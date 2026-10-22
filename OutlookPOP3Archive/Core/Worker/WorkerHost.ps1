@@ -30,6 +30,7 @@ function Invoke-OPAWorkerRequest {
         [object]$Payload = @{},
         [ValidateRange(1,300)][int]$TimeoutSeconds = 15,
         [switch]$KeepArtifacts,
+        [string]$RequestId = '',
         # 2.6.1 optional typed result: legacy callers retain existing response
         # and throw behavior unless they deliberately request this outcome mode.
         [switch]$ReturnOutcome
@@ -52,7 +53,7 @@ function Invoke-OPAWorkerRequest {
         New-Item -ItemType Directory -Path $runDir -ErrorAction Stop | Out-Null
         $requestFile = Join-Path $runDir 'request.json'
         $responseFile = Join-Path $runDir 'response.json'
-        $request = New-OPAWorkerRequest -Operation $Operation -Payload $Payload
+        $request = New-OPAWorkerRequest -Operation $Operation -Payload $Payload -RequestId $RequestId
         Write-OPAWorkerJsonAtomic -Path $requestFile -Value $request
 
         $info = New-Object System.Diagnostics.ProcessStartInfo
