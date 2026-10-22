@@ -234,11 +234,10 @@ Import-Module Pester -MinimumVersion 5.0 -Force -ErrorAction Stop
 # cannot silently succeed just because the console printed failures.
 $pesterResult = Invoke-Pester -Path (Join-Path $root 'Tests') -PassThru
 if ($null -eq $pesterResult) { throw 'Pester returned no result; release denied.' }
-$passed = [int]$pesterResult.PassedCount
-$failed = [int]$pesterResult.FailedCount
-$skipped = [int]$pesterResult.SkippedCount
-if ($failed -gt 0 -or $skipped -gt 0 -or $passed -le 0) {
-    throw ("Pester release gate failed: passed={0}, failed={1}, skipped={2}." -f $passed,$failed,$skipped)
-}
-Write-Host ("PASS Pester: {0} tests, 0 failed, 0 skipped." -f $passed)
+. (Join-Path $root 'Core/Runtime/PesterReleaseGate.ps1')
+# Count every discovered test file, including files that fail to parse.
+# A discovery error creates a failed container but can leave FailedCount=0.
+$gate = Assert-OPAPesterReleaseGate -Result $pesterResult -ExpectedContainerCount $testFiles.Count
+Write-Host ("PASS Pester: {0} tests in {1} containers, 0 failed, 0 skipped, 0 failed containers." -f
+    $gate.PassedCount,$gate.ContainerCount)
 Write-Host 'CI PASSED — release prerequisites satisfied.'
