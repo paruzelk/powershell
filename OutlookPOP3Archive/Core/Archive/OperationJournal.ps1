@@ -200,13 +200,23 @@ function Resolve-OPAOperationRecovery {
                 ArchivePst    = [string]$event.ArchivePst
                 Status        = 'Indeterminate'
                 OperationKind = $(if ($event.PSObject.Properties.Name -contains 'OperationKind') { [string]$event.OperationKind } else { 'MailMove' })
+                ExplicitIndeterminate = $false
             }
             continue
         }
         $item = $states[$id]
+        $eventKind = if ($event.PSObject.Properties.Name -contains 'OperationKind') { [string]$event.OperationKind } else { 'MailMove' }
+        if ($eventKind -cne $item.OperationKind) { throw "Operation '$id' changed kind during replay." }
+        if ($item.ExplicitIndeterminate -and $phase -ne 'Reconciled') {
+            throw "Operation '$id' is indeterminate; only independently proven Reconciled may follow."
+        }
         if ($item.Status -ne 'Indeterminate' -or $phase -eq 'Intent') {
             throw "Conflicting/duplicate terminal event for operation '$id'."
         }
+        if ($phase -eq 'Completed' -and $item.OperationKind -eq 'WorkerDiagnostic') {
+            throw 'WorkerDiagnostic cannot be marked as MailMove Completed.'
+        }
+        if ($phase -eq 'Indeterminate') { $item.ExplicitIndeterminate = $true }
         if ($phase -in @('Completed','Reconciled')) {
             if ($item.OperationKind -eq 'MailMove' -and [string]::IsNullOrWhiteSpace([string]$event.ArchiveEntryId)) {
                 throw "Terminal event for operation '$id' lacks ArchiveEntryId."
