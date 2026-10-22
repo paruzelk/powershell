@@ -1,7 +1,7 @@
 ﻿{
-  "Release": "BUILD2.6.1-PREVIEW1a",
-  "Build": "2.6.1-PREVIEW1a",
-  "ApplicationVersion": "0.9.4-rc1-build2.6.1-PREVIEW1a",
+  "Release": "BUILD2.6.2-PREVIEW1",
+  "Build": "2.6.2-PREVIEW1",
+  "ApplicationVersion": "0.9.4-rc1-build2.6.2-PREVIEW1",
   "TransactionSchemaVersion": "2.5.4",
   "DuplicateIndexSchemaVersion": "1.2",
   "WorkerProtocolVersion": "1.0",
@@ -12,10 +12,15 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
-    "Distinct Succeeded, Failed and Indeterminate controller outcomes without automatic retries",
-    "Strong worker request correlation, spawned-process PID validation and STA response validation",
-    "Bounded process execution and worker-only timeout termination, optional diagnostic evidence retention",
-    "CI build-version/release/manifest consistency gate and removal of obsolete runbooks from distribution",
-    "Existing Archive/Resume/Auto implementation and transaction schema remain unchanged"
-  ]
+    "Separate append-only SHA256-verified durable journal for diagnostic STA Worker operations",
+    "Controller-owned RequestId correlates flushed Intent with bounded Worker and verified outcome",
+    "Timeout, crash, truncated journal or lost terminal flush fail closed and block automatic retry",
+    "User-verified Worker Ping, Crash, torn-tail and restart recovery tests on previous development snapshot",
+    "Mandatory version/manifest/docs checks, Pester and PSScriptAnalyzer gates, project-only ZIP packaging",
+    "Existing Archive, Resume, Auto, Transaction and DuplicateIndex schemas unchanged; no worker MailItem.Move"
+  ],
+  "Verification": {
+    "Status": "PREVIEW CANDIDATE; full CI and release packaging gate need Windows retest",
+    "RealMailMoveViaWorker": false
+  }
 }

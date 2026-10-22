@@ -1,4 +1,14 @@
-﻿## 2.6.1-PREVIEW1a (2026-10-22)
+﻿## 2.6.2-PREVIEW1 (2026-10-22; candidate pending full CI)
+
+- Introduced append-only SHA-256 Durable Operation Journal for diagnostic Worker; controller-supplied RequestId, durable Intent and terminal outcome, exclusive journal lock and fail-closed replay.
+- Independent PowerShell restart, Worker crash and truncated-tail fault injection tested successfully by the user on the preceding development snapshot; Pester worker journal suite 11 passed, 0 failed.
+- Distinguished diagnostic-only unresolved events from potential PST reconciliation requirements; malformed journal tails conservatively require manual reconciliation.
+- Hardened the release gate: Core/Version, RELEASE, MANIFEST, current docs and test version checks; mandatory Pester/PSScriptAnalyzer and reviewed source-only ZIP packaging with SHA-256.
+- Updated dynamic Worker SelfTest version display; Transaction schema 2.5.4, DuplicateIndex schema 1.2 and Worker protocol 1.0 are unchanged.
+- Production Archive/Resume/Auto and real MailItem.Move continue using FIX13b; 2.6.2 does not activate Worker COM mutations.
+- Full Windows PowerShell 5.1 CI and packaging verification required before promotion.
+
+## 2.6.1-PREVIEW1a (2026-10-22)
 
 - Fixed the Windows PowerShell 5.1 CI manifest validator: version fields are now generated as four separate output lines rather than one concatenated array expression.
 - Added a PS5.1-compatible shared manifest guard and seven behavioral Pester tests, including rejection of collapsed, missing, duplicate and stale metadata.

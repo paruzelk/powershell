@@ -1,4 +1,4 @@
-﻿# Architecture — 2.6.1-PREVIEW1a
+﻿# Architecture — 2.6.2-PREVIEW1
 
 The main `OutlookPOP3Archive.ps1` still invokes the FIX13b in-process Outlook COM archiver and normal transaction pipeline. `Core/Archive/MailMover.ps1`, `ArchiveTransaction.ps1` and `StoragePolicy.ps1` are unchanged from 2.6.0-PREVIEW1a.
 
@@ -10,6 +10,10 @@ Statuses:
 - `Failed`: validated structured worker error response, or host failed before worker launched.
 - `Indeterminate`: worker started, but timed out, crashed, produced invalid/missing response or failed protocol/process correlation.
 
-Any indeterminate outcome requires **independent reconciliation**. This does not yet constitute a durable mutating COM transaction journal; it must be added and tested before worker-driven Move.
+An indeterminate diagnostic outcome blocks automatic retry; a durable `Intent` and terminal event are now recorded by `Core/Worker/WorkerOperationJournal.ps1`. This **still is not a journal integrated into mutating Outlook COM operations**, so independently verified `MailItem.Move()` reconciliation must be implemented and tested before worker-driven archiving.
 
 The worker is a process-isolation boundary only, not a security sandbox. No arbitrary code execution endpoints are provided.
+
+## 2.6.2 isolated operation journal
+
+`Core/Archive/OperationJournal.ps1` appends Base64-encoded SHA-256-protected JSONL events, calls `FileStream.Flush(true)`, and refuses to overwrite or trim broken records. The diagnostic controller holds an exclusive `.lock` file handle, persists `Intent` with transaction ID, sequence and caller-owned GUID, then executes the bounded worker and commits a validated outcome. Replay blocks retry on incomplete, corrupt, failed or unknown operations. `WorkerSucceeded` never means that mail has been moved. The separate existing archive transaction/step journal and DuplicateIndex remain in use on the in-process FIX13b path.

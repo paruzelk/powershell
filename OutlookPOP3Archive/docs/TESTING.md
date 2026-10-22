@@ -1,17 +1,27 @@
-﻿# Testing — 2.6.1-PREVIEW1a
+﻿# Testing — 2.6.2-PREVIEW1
 
-Run in Windows PowerShell 5.1 under the intended Windows user:
+Run from the OutlookPOP3Archive directory under Windows PowerShell 5.1 (Pester 5+ and PSScriptAnalyzer both installed).
 
 ```powershell
-.\Invoke-CI.ps1
+.\Invoke-CI.ps1 -ExpectedBuild '2.6.2-PREVIEW1'
 .\Invoke-OPAWorkerSelfTest.ps1
 .\Invoke-OPAWorkerSelfTest.ps1 -IncludeOutlookProbe -TimeoutSeconds 30
+Invoke-Pester -Path .\Tests\Worker\WorkerOperationJournal.Tests.ps1 -Output Detailed
 .\OutlookPOP3Archive.ps1 -Mode Plan -ProfileName 'Outlook' -Limit 50
 .\OutlookPOP3Archive.ps1 -Mode Auto -ProfileName 'Outlook' -WhatIf
 ```
 
-CI begins with a build/release/schema/documentation consistency gate and forbidden-artifact check. It retains parser/generic collection safety, PSScriptAnalyzer (if installed) and all prior archive Pester tests. 2.6.0-PREVIEW1a previously passed 170 tests on ADMIN-5; 2.6.1 adds a control suite and extra release tests. No tests move real Outlook messages.
+Release CI must reject stale Core/Version, MANIFEST, RELEASE, README or active documentation headers, obsolete package files, parser/PS5.1 compatibility errors, analyzer findings, missing analyzers and failed/skipped Pester tests. For packaged ZIP generation see `docs/RELEASING.md` and `New-OPABuildPackage.ps1`. The standalone ZIP must contain only the OutlookPOP3Archive project and SHA-256.
 
-Self-test runs synthetic Ping, Echo, Fail, Delay and new controlled status checks. `-IncludeOutlookProbe` is opt-in and may start Outlook; it only reads account/store counts. For failure simulation Pester exercises `Crash` and forced `Delay` timeout in a disposable worker. Do not exercise forced worker termination against actual mail mutations.
+### Already validated on preceding 2.6.2 dev snapshot
 
-Unverified scenarios: real PST capacity rollover, deep folder integration, COM Move timeout and reconciliation, OS power-loss recovery and Outlook Compact. FIX13b remains baseline for actual mail moves.
+- Non-mutating Worker SelfTest: Ping, Echo, Fail, Delay, controlled result classification. Opt-in STA Outlook COM probe: 2 accounts and 4 stores; no mail moved.
+- Durable diagnostic journal: `Intent → WorkerSucceeded` recorded and replayed; synthetic Worker Crash captured as `Indeterminate` and automatic retry blocked; truncated journal tail retained with append and dispatch blocked.
+- Real restart of PowerShell: successful diagnostic replay and next monotonically numbered operation; indeterminate diagnostic replay still blocked.
+- `Tests/Worker/WorkerOperationJournal.Tests.ps1`: 11 Passed, 0 Failed in Pester 6.2.0, including torn journal completion test.
+
+The earlier snapshot does **not** certify new release-pipeline changes or this metadata-bumped preview. Run full CI again before publishing.
+
+### Not covered yet
+
+Real Worker-driven COM `MailItem.Move()`, production Archive/Resume integration, post-move PST reconciliation, OS power-loss under COM mutation and Outlook Compact are not yet verified. FIX13b remains the active mail-moving engine.

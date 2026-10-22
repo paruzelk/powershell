@@ -1,8 +1,8 @@
-﻿# OutlookPOP3Archive — 2.6.1-PREVIEW1a
+﻿# OutlookPOP3Archive — 2.6.2-PREVIEW1
 
-Application: `0.9.4-rc1-build2.6.1-PREVIEW1a`. Target: Windows PowerShell 5.1, Outlook 2016/2019.
+Application: `0.9.4-rc1-build2.6.2-PREVIEW1`. Target: Windows PowerShell 5.1, Outlook 2016/2019.
 
-**Status:** 2.6.1 is an experimental, isolated worker-control preview. Production `Archive`, `Resume`, `Plan` and `Auto` still use the existing FIX13b Outlook COM code. Mail movement is **not delegated** to a worker. Keep FIX13b as the tested archiving baseline.
+**Status:** 2.6.2-PREVIEW1 is a diagnostic Durable Operation Journal candidate awaiting full Windows CI. Production `Archive`, `Resume`, `Plan` and `Auto` still use the existing FIX13b Outlook COM code. Mail movement is **not delegated** to a worker. Keep FIX13b as the tested archiving baseline.
 
 ## Purpose and safety rules
 
@@ -25,7 +25,7 @@ Application: `0.9.4-rc1-build2.6.1-PREVIEW1a`. Target: Windows PowerShell 5.1, O
 .\OutlookPOP3Archive.ps1 -Mode Resume -ProfileName 'Outlook' -Transaction '<TransactionId>'
 ```
 
-## Worker 2.6.1 (diagnostic only)
+## Worker 2.6.2 (diagnostic only)
 
 ```powershell
 .\Invoke-OPAWorkerSelfTest.ps1
@@ -36,4 +36,10 @@ Application: `0.9.4-rc1-build2.6.1-PREVIEW1a`. Target: Windows PowerShell 5.1, O
 
 **Important:** A worker kill cannot prove a COM side effect did not finish. A future worker-driven `MailItem.Move` needs durable intent, independent source/destination reconciliation, and explicit safety gates before production use. Outlook.exe is not killed by this worker host.
 
-See `docs/TESTING.md`, `docs/ARCHITECTURE.md`, `docs/RECOVERY.md`, and `docs/CONFIGURATION.md`.
+See `docs/TESTING.md`, `docs/ARCHITECTURE.md`, `docs/RECOVERY.md`, `docs/CONFIGURATION.md`, `docs/2.6.2-operation-journal.md` and `docs/RELEASING.md`.
+
+## 2.6.2 Durable Operation Journal preview
+
+An optional diagnostic-only API `Core/Worker/WorkerOperationJournal.ps1` writes a flushed `Intent` before dispatching the STA Worker and a second durable event after a confirmed outcome. Replay refuses automatic retry after an indeterminate worker result, missing completion, corrupted journal or truncated tail. It does not route real mail moves, and a worker success is not evidence that `MailItem.Move()` occurred.
+
+Before publishing a release package, Windows PowerShell 5.1 must pass `Invoke-CI.ps1 -ExpectedBuild '2.6.2-PREVIEW1'` including PSScriptAnalyzer/Pester. Produce only the OutlookPOP3Archive project ZIP using `New-OPABuildPackage.ps1` after that check; `docs/RELEASING.md` contains the checklist.
