@@ -8,9 +8,10 @@ function Invoke-OPAWorkerControlledOperation {
         [ValidateSet('Ping','Echo','Fail','Crash','Delay','ProbeOutlook')][string]$Operation,
         [object]$Payload = @{},
         [ValidateRange(1,300)][int]$TimeoutSeconds = 15,
-        [switch]$KeepArtifacts
+        [switch]$KeepArtifacts,
+        [string]$RequestId = ''
     )
-    return Invoke-OPAWorkerRequest -Operation $Operation -Payload $Payload -TimeoutSeconds $TimeoutSeconds -ReturnOutcome -KeepArtifacts:$KeepArtifacts
+    return Invoke-OPAWorkerRequest -Operation $Operation -Payload $Payload -TimeoutSeconds $TimeoutSeconds -ReturnOutcome -KeepArtifacts:$KeepArtifacts -RequestId $RequestId
 }
 
 function Get-OPAWorkerRecoveryDisposition {
