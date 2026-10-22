@@ -72,4 +72,38 @@ Describe '2.6.2 durable operation journal' {
         Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'O1' -Sequence 3 -Phase Completed -ArchiveEntryId 'A1' | Out-Null
         { Resolve-OPAOperationRecovery -Journal (Read-OPAOperationJournal -Path $script:path) } | Should -Throw
     }
+
+    It 'supports a diagnostic worker success without claiming a MailMove completed' {
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'req-1' -Sequence 1 -Phase Intent -OperationKind WorkerDiagnostic | Out-Null
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'req-1' -Sequence 2 -Phase WorkerSucceeded -OperationKind WorkerDiagnostic -WorkerProcessId 20 | Out-Null
+        $state = Resolve-OPAOperationRecovery -Journal (Read-OPAOperationJournal -Path $script:path)
+        $state.BlockAutomaticRetry | Should -BeFalse
+        $state.Resolved[0].Status | Should -Be 'WorkerSucceeded'
+    }
+
+    It 'requires a positive PID when recording worker success' {
+        { Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'req-1' -Sequence 1 -Phase WorkerSucceeded -OperationKind WorkerDiagnostic } | Should -Throw
+    }
+
+    It 'disallows late success after an explicit Indeterminate event' {
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'req-1' -Sequence 1 -Phase Intent -OperationKind WorkerDiagnostic | Out-Null
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'req-1' -Sequence 2 -Phase Indeterminate -OperationKind WorkerDiagnostic | Out-Null
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'req-1' -Sequence 3 -Phase WorkerSucceeded -OperationKind WorkerDiagnostic -WorkerProcessId 20 | Out-Null
+        { Resolve-OPAOperationRecovery -Journal (Read-OPAOperationJournal -Path $script:path) } | Should -Throw
+    }
+
+    It 'rejects changing OperationKind across Intent and terminal event' {
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'same' -Sequence 1 -Phase Intent -OperationKind WorkerDiagnostic | Out-Null
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'same' -Sequence 2 -Phase Reconciled -ArchiveEntryId 'A1' | Out-Null
+        { Resolve-OPAOperationRecovery -Journal (Read-OPAOperationJournal -Path $script:path) } | Should -Throw
+    }
+
+    It 'permits only independently proven Reconciled after a MailMove Indeterminate' {
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'same' -Sequence 1 -Phase Intent -SourceEntryId 'S1' | Out-Null
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'same' -Sequence 2 -Phase Indeterminate | Out-Null
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'same' -Sequence 3 -Phase Reconciled -ArchiveEntryId 'A1' | Out-Null
+        $state = Resolve-OPAOperationRecovery -Journal (Read-OPAOperationJournal -Path $script:path)
+        $state.BlockAutomaticRetry | Should -BeFalse
+        $state.Resolved[0].ArchiveEntryId | Should -Be 'A1'
+    }
 }
