@@ -243,6 +243,9 @@ function Resolve-OPAOperationRecovery {
         Failed                   = $failed
         TrailingPartial          = [bool]$Journal.TrailingPartial
         BlockAutomaticRetry      = $blocked
-        RequiresPstReconciliation= ($unresolved.Count -gt 0 -or [bool]$Journal.TrailingPartial)
+        # A diagnostic Worker crash requires an audit/recovery decision, but
+        # cannot by itself require comparing Outlook PST contents.
+        # A torn tail remains conservative: its unknown event might be MailMove.
+        RequiresPstReconciliation= (@($unresolved | Where-Object { $_.OperationKind -eq 'MailMove' }).Count -gt 0 -or [bool]$Journal.TrailingPartial)
     }
 }
