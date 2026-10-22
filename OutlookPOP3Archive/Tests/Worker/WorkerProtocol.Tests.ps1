@@ -79,4 +79,15 @@ Describe 'worker protocol 1.0 validation and atomic exchange' {
         $resp.WorkerProcessId = 99
         { Assert-OPAWorkerResponse -Response $resp -Request $req } | Should -Throw '*error*'
     }
+
+    It 'accepts an externally generated GUID to correlate durable Intent with the request' {
+        $id = [guid]::NewGuid().ToString('D')
+        $r = New-OPAWorkerRequest -Operation Ping -RequestId $id
+        $r.RequestId | Should -Be $id
+        Assert-OPAWorkerRequest -Request $r | Should -BeTrue
+    }
+
+    It 'rejects an invalid caller-owned RequestId before starting any Worker' {
+        { New-OPAWorkerRequest -Operation Ping -RequestId 'not-a-guid' } | Should -Throw '*RequestId*'
+    }
 }
