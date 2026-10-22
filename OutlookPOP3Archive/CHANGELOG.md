@@ -1,4 +1,12 @@
-﻿## 2.6.2-PREVIEW1 (2026-10-22; candidate pending full CI)
+﻿## 2.6.3-PREVIEW1 (2026-10-22; DEV, Windows CI pending)
+
+- Added independent read-only MailMove Intent reconciliation with source/target snapshots, fingerprint and store/path validation.
+- All outcomes fail closed with no automatic retry or journal mutation; legacy/partial Intents are not treated as proof.
+- Added Pester tests for false duplicates, missing messages, incomplete MAPI enumeration and mismatched identities.
+- Removed obsolete version-prefixed 2.6.2 design filename from active package; content retained under docs/OPERATION-JOURNAL.md.
+- Worker Move still disabled; FIX13b remains the production archive engine. Full PS5.1 CI required.
+
+## 2.6.2-PREVIEW1 (2026-10-22; candidate pending full CI)
 
 - Introduced append-only SHA-256 Durable Operation Journal for diagnostic Worker; controller-supplied RequestId, durable Intent and terminal outcome, exclusive journal lock and fail-closed replay.
 - Independent PowerShell restart, Worker crash and truncated-tail fault injection tested successfully by the user on the preceding development snapshot; Pester worker journal suite 11 passed, 0 failed.

@@ -1,9 +1,9 @@
-﻿# Testing — 2.6.2-PREVIEW1
+﻿# Testing — 2.6.3-PREVIEW1
 
 Run from the OutlookPOP3Archive directory under Windows PowerShell 5.1 (Pester 5+ and PSScriptAnalyzer both installed).
 
 ```powershell
-.\Invoke-CI.ps1 -ExpectedBuild '2.6.2-PREVIEW1'
+.\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
 .\Invoke-OPAWorkerSelfTest.ps1
 .\Invoke-OPAWorkerSelfTest.ps1 -IncludeOutlookProbe -TimeoutSeconds 30
 Invoke-Pester -Path .\Tests\Worker\WorkerOperationJournal.Tests.ps1 -Output Detailed
@@ -25,3 +25,12 @@ The earlier snapshot does **not** certify new release-pipeline changes or this m
 ### Not covered yet
 
 Real Worker-driven COM `MailItem.Move()`, production Archive/Resume integration, post-move PST reconciliation, OS power-loss under COM mutation and Outlook Compact are not yet verified. FIX13b remains the active mail-moving engine.
+
+## 2.6.3 additional tests — run under Windows PowerShell 5.1
+
+```powershell
+Invoke-Pester -Path .\Tests\Archive\MoveReconciliation.Tests.ps1 -Output Detailed
+.\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
+```
+
+No real Outlook MailItem.Move is exercised; validate read-only observation against disposable PSTs before proceeding.
