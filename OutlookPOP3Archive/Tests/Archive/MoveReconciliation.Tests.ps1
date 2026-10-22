@@ -12,7 +12,7 @@ BeforeAll {
             [long]$Size=256
         )
         [pscustomobject]@{
-            EntryID=$Id; EntryId=$Id; InternetMessageId=$MessageId
+            EntryID=$Id; InternetMessageId=$MessageId
             Subject=$Subject; SenderEmailAddress=$Sender; Sender=$Sender
             Size=$Size; Class=43
         }
