@@ -1,0 +1,11 @@
+# Outlook/PST data and local state must never be committed
+*.pst
+*.ost
+OutlookPOP3Archive-Transactions/
+*.steps.jsonl
+*.auto-storage.state
+*.auto-retry
+*.zip
+*.bak
+*.tmp
+*.log

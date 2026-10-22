@@ -1,0 +1,160 @@
+﻿[CmdletBinding()]
+param()
+
+$ErrorActionPreference = 'Stop'
+$root = $PSScriptRoot
+
+Write-Host '== PS5.1 ConvertTo-Json rule =='
+$production = @(Get-ChildItem -Path $root -Recurse -Filter '*.ps1' |
+    Where-Object { $_.FullName -notmatch '[\\/]Tests[\\/]' })
+$badJson = @()
+foreach ($file in $production) {
+    $tokens = $null; $parseErrors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseFile($file.FullName,[ref]$tokens,[ref]$parseErrors)
+    if ($parseErrors.Count -gt 0) {
+        foreach ($e in @($parseErrors)) {
+            $badJson += ('{0}:{1}: PowerShell parse error: {2}' -f $file.FullName,$e.Extent.StartLineNumber,$e.Message)
+        }
+        continue
+    }
+    $pipelines = $ast.FindAll({
+        param($node)
+        if ($node -isnot [System.Management.Automation.Language.PipelineAst]) { return $false }
+        $els=@($node.PipelineElements); if ($els.Count -lt 2) { return $false }
+        $last=$els[$els.Count-1]
+        if ($last -isnot [System.Management.Automation.Language.CommandAst]) { return $false }
+        try { return ($last.GetCommandName() -eq 'ConvertTo-Json') } catch { return $false }
+    },$true)
+    foreach ($pipeline in $pipelines) {
+        $cmd=$pipeline.PipelineElements[$pipeline.PipelineElements.Count-1]
+        $hasInputObject=$false
+        foreach ($el in @($cmd.CommandElements)) {
+            if ($el -is [System.Management.Automation.Language.CommandParameterAst] -and $el.ParameterName -eq 'InputObject') { $hasInputObject=$true; break }
+        }
+        if (-not $hasInputObject) { $badJson += ('{0}:{1}: pipeline ConvertTo-Json without -InputObject' -f $file.FullName,$pipeline.Extent.StartLineNumber) }
+    }
+}
+if ($badJson.Count -gt 0) {
+    $summary = "PS 5.1 JSON compatibility gate failed: {0} finding(s).`n{1}" -f $badJson.Count, ($badJson -join "`n")
+    throw $summary
+}
+Write-Host 'PASS'
+
+Write-Host '== PS5.1 generic List safety =='
+$genericListUnsafe = @()
+
+foreach ($file in $production) {
+    $tokens = $null; $parseErrors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseFile(
+        $file.FullName, [ref]$tokens, [ref]$parseErrors)
+    if ($parseErrors.Count -gt 0) { continue }
+
+    # PowerShell has function-scoped variables. Scanning the file as one
+    # namespace (the previous regex-based gate) mixed unrelated scopes and
+    # produced false positives whenever a name like $list was a generic
+    # collection in one function and a plain array in another.
+    # Scan each function body and the script top level as separate scopes.
+    # Nested function bodies are masked out of the enclosing scope so their
+    # declarations do not leak upward.
+    $scopeAsts = New-Object System.Collections.Generic.List[object]
+    foreach ($fn in @($ast.FindAll({
+        param($node)
+        $node -is [System.Management.Automation.Language.FunctionDefinitionAst]
+    }, $true))) {
+        $scopeAsts.Add($fn.Body) | Out-Null
+    }
+    if ($null -ne $ast.EndBlock) { $scopeAsts.Add($ast.EndBlock) | Out-Null }
+
+    foreach ($scopeAst in $scopeAsts) {
+        $scopeText = [string]$scopeAst.Extent.Text
+        if ([string]::IsNullOrWhiteSpace($scopeText)) { continue }
+
+        # Mask nested function bodies: replace every non-newline character
+        # inside them with a space. Length and line count are preserved, so
+        # downstream offset arithmetic stays valid.
+        foreach ($nf in @($scopeAst.FindAll({
+            param($n)
+            $n -is [System.Management.Automation.Language.FunctionDefinitionAst]
+        }, $true))) {
+            $s = $nf.Extent.StartOffset - $scopeAst.Extent.StartOffset
+            $len = $nf.Extent.EndOffset - $nf.Extent.StartOffset
+            if ($s -lt 0 -or $len -le 0 -or ($s + $len) -gt $scopeText.Length) { continue }
+            $slice = $scopeText.Substring($s, $len)
+            $masked = [regex]::Replace($slice, '[^\r\n]', ' ')
+            $scopeText = $scopeText.Substring(0, $s) + $masked + $scopeText.Substring($s + $len)
+        }
+
+        # Strip full-line comments (content only, keep the newline). Line
+        # counts are preserved; inline code before a '#' is untouched.
+        $scanText = [regex]::Replace($scopeText, '(?m)^\s*#[^\r\n]*', '')
+
+        $genericVars = [System.Collections.Generic.HashSet[string]]::new(
+            [System.StringComparer]::OrdinalIgnoreCase)
+        # NOTE: HashSet<T> is deliberately excluded. @() on a HashSet<string>
+# is safe because its elements are always homogeneous strings;
+# the PS 5.1 enumerable-binder bug only fires on mixed-type
+# collections such as List[object] populated from ConvertFrom-Json.
+$declPatterns = @(
+            '\$(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*New-Object\s+[''"]?System\.Collections\.Generic\.(?:List|Queue)\[[^\]]+\]?',
+            '\$(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*\[System\.Collections\.Generic\.(?:List|Queue)\[[^\]]+\]\]::new'
+        )
+        foreach ($pattern in $declPatterns) {
+            foreach ($m in [regex]::Matches($scanText, $pattern,
+                        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)) {
+                [void]$genericVars.Add($m.Groups['name'].Value)
+            }
+        }
+        if ($genericVars.Count -eq 0) { continue }
+
+        foreach ($m in [regex]::Matches($scanText, '@\(\$(?<name>[A-Za-z_][A-Za-z0-9_]*)\)',
+                    [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)) {
+            $name = $m.Groups['name'].Value
+            if (-not $genericVars.Contains($name)) { continue }
+
+            $linesIntoScope = (($scanText.Substring(0, $m.Index)) -split "`n").Count - 1
+            $line = $scopeAst.Extent.StartLineNumber + $linesIntoScope
+            $genericListUnsafe += ('{0}:{1}: direct @(${2}) on generic collection; review explicit enumeration for PS5.1 compatibility.' -f $file.FullName, $line, $name)
+        }
+    }
+}
+
+if ($genericListUnsafe.Count -gt 0) {
+    $summary = "PS5.1 generic collection safety gate failed: {0} finding(s).`n{1}" -f $genericListUnsafe.Count, ($genericListUnsafe -join "`n")
+    throw $summary
+}
+Write-Host 'PASS'
+
+if (-not (Test-Path -LiteralPath (Join-Path $root '.psscriptanalyzer.psd1'))) { throw 'PSScriptAnalyzer settings file is missing.' }
+
+Write-Host '== PSScriptAnalyzer =='
+if (Get-Module -ListAvailable -Name PSScriptAnalyzer) {
+    Import-Module PSScriptAnalyzer -Force
+    # Windows PowerShell 5.1 can bind the member-enumerated 
+    # $production.FullName as System.Object[] while this PSScriptAnalyzer
+    # version expects a scalar String. Analyze each production script
+    # separately and aggregate the findings.
+    $settingsPath = Join-Path $root '.psscriptanalyzer.psd1'
+    $findings = New-Object System.Collections.Generic.List[object]
+    foreach ($file in $production) {
+        try {
+            $fileFindings = @(Invoke-ScriptAnalyzer -Path ([string]$file.FullName) -Settings $settingsPath -ErrorAction Stop)
+        }
+        catch {
+            throw ("PSScriptAnalyzer failed for '{0}': {1}" -f [string]$file.FullName, $_.Exception.Message)
+        }
+        foreach ($finding in $fileFindings) { [void]$findings.Add($finding) }
+    }
+    $findingsArray = $findings.ToArray()
+    if ($findingsArray.Count -gt 0) { $findingsArray | Format-Table -AutoSize }
+    if ($findings.Count -gt 0) { throw "PSScriptAnalyzer reported $($findings.Count) finding(s)." }
+} else {
+    Write-Warning 'PSScriptAnalyzer is not installed; analyzer stage skipped.'
+}
+
+Write-Host '== Pester =='
+if (Get-Module -ListAvailable -Name Pester) {
+    Import-Module Pester -MinimumVersion 5.0 -Force
+    Invoke-Pester -Path (Join-Path $root 'Tests') -CI
+} else {
+    Write-Warning 'Pester is not installed; test stage skipped.'
+}

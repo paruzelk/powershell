@@ -1,0 +1,9 @@
+﻿OutlookPOP3Archive RC1.2-FIX13b
+Build: 2.5.7
+Application: 0.9.3-rc1-build2.5.7-FIX13b
+Transaction schema: 2.5.4
+Target: Windows PowerShell 5.1 / Outlook 2016-2019
+
+Production files exclude backup, repair-overlay, patch and unpack scripts.
+Tests are under Tests/.
+No previous release packages or test-result dumps are included.
