@@ -26,6 +26,7 @@ Describe '2.6.2 durable operation journal' {
         $recovery = Resolve-OPAOperationRecovery -Journal (Read-OPAOperationJournal -Path $script:path)
         @($recovery.Indeterminate).Count | Should -Be 1
         $recovery.BlockAutomaticRetry | Should -BeTrue
+        $recovery.RequiresPstReconciliation | Should -BeTrue
     }
 
     It 'recognizes durable Completed without marking it for retry' {
