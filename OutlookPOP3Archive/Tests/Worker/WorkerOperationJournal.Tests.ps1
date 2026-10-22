@@ -52,7 +52,9 @@ Describe '2.6.2 journaled worker dispatch (no Outlook COM)' {
         }
         $r = Invoke-OPAWorkerJournaledOperation -JournalPath $script:journal -TransactionId 'T1' -Operation Delay
         $r.Status | Should -Be 'Indeterminate'
-        (Get-OPAWorkerOperationJournalState -JournalPath $script:journal).BlockAutomaticRetry | Should -BeTrue
+        $state = Get-OPAWorkerOperationJournalState -JournalPath $script:journal
+        $state.BlockAutomaticRetry | Should -BeTrue
+        $state.RequiresPstReconciliation | Should -BeFalse
         { Invoke-OPAWorkerJournaledOperation -JournalPath $script:journal -TransactionId 'T1' -Operation Delay } | Should -Throw
         Should -Invoke Invoke-OPAWorkerControlledOperation -Exactly -Times 1
     }
