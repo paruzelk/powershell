@@ -45,6 +45,13 @@ function New-OPAReadOnlyMoveSnapshot {
                 $sender = [string]$item.SenderEmailAddress
                 $size = [long]$item.Size
                 if ([string]::IsNullOrWhiteSpace($entry)) { throw "MailItem without EntryID at $index." }
+                # Absence of an identifier/field means that a potential match
+                # cannot be ruled out. Never treat such a scan as complete.
+                if ([string]::IsNullOrWhiteSpace($msgId) -or
+                    [string]::IsNullOrWhiteSpace($subject) -or
+                    [string]::IsNullOrWhiteSpace($sender) -or $size -le 0) {
+                    throw "MailItem fingerprint incomplete at index $index."
+                }
                 [void]$rows.Add([pscustomobject]@{
                     EntryId=$entry; InternetMessageId=$msgId
                     Subject=$subject; Sender=$sender; Size=$size
@@ -153,6 +160,21 @@ function Resolve-OPAInterruptedMoveEvidence {
         $reason='Journal contains an unterminated record; do not act on incomplete evidence.'
     }
     elseif ($hasIntent) {
+        # Refuse a snapshot with an intentionally missing inventory; a
+        # missing Items property cannot establish zero candidates.
+        if ($null -eq $SourceSnapshot.Items -or $null -eq $DestinationSnapshot.Items) {
+            $status='IncompleteScan'
+            $reason='Source or destination inventory was not provided.'
+            return [pscustomobject]@{
+                TransactionId=[string]$intent.TransactionId; OperationId=$OperationId
+                Status=$status; Reason=$reason; SourceMatches=0; DestinationMatches=0
+                DestinationEntryId=''; ProvenMoved=$false
+                AutomaticRetryAllowed=$false; RequiresManualReview=$true
+                JournalLastSequence=[long]$state.LastSequence
+                JournalTrailingPartial=[bool]$Journal.TrailingPartial
+                EvidenceKind='ReadOnlyFingerprintCandidate'
+            }
+        }
         $expectedArchive = ''
         $observedArchive = ''
         try {
