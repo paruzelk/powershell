@@ -1,5 +1,9 @@
 ﻿[CmdletBinding()]
-param()
+param(
+    # Packaging passes its intended build here; a 2.6.2 package built from
+    # an unbumped 2.6.1 Core/Version.ps1 must fail before ZIP creation.
+    [string]$ExpectedBuild = ''
+)
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
@@ -12,6 +16,9 @@ $applicationVersion = [string]$script:OPAApplicationVersion
 $versionMatch = [regex]::Match($applicationVersion, '^\d+\.\d+\.\d+-rc\d+-build(?<build>\d+\.\d+\.\d+(?:-[A-Za-z0-9]+)*)$')
 if (-not $versionMatch.Success) { throw "Invalid application version: $applicationVersion" }
 $build = [string]$versionMatch.Groups['build'].Value
+if (-not [string]::IsNullOrWhiteSpace($ExpectedBuild) -and $ExpectedBuild -cne $build) {
+    throw ("Expected build '{0}', but Core/Version.ps1 declares '{1}'." -f $ExpectedBuild,$build)
+}
 $manifestPath = Join-Path $root 'MANIFEST.txt'
 $releasePath = Join-Path $root 'RELEASE.json'
 $readmePath = Join-Path $root 'README.md'
@@ -200,13 +207,25 @@ if (Get-Module -ListAvailable -Name PSScriptAnalyzer) {
     if ($findingsArray.Count -gt 0) { $findingsArray | Format-Table -AutoSize }
     if ($findings.Count -gt 0) { throw "PSScriptAnalyzer reported $($findings.Count) finding(s)." }
 } else {
-    Write-Warning 'PSScriptAnalyzer is not installed; analyzer stage skipped.'
+    throw 'PSScriptAnalyzer is required for CI/release and is not installed.'
 }
 
 Write-Host '== Pester =='
-if (Get-Module -ListAvailable -Name Pester) {
-    Import-Module Pester -MinimumVersion 5.0 -Force
-    Invoke-Pester -Path (Join-Path $root 'Tests') -CI
-} else {
-    Write-Warning 'Pester is not installed; test stage skipped.'
+if (-not (Get-Module -ListAvailable -Name Pester |
+        Where-Object { $_.Version -ge [version]'5.0' })) {
+    throw 'Pester 5.0 or newer is required for CI/release and is not installed.'
 }
+Import-Module Pester -MinimumVersion 5.0 -Force -ErrorAction Stop
+# -CI causes Pester to exit the host process on test failure. Use PassThru
+# instead so callers receive an explicit, inspectable exception and tests
+# cannot silently succeed just because the console printed failures.
+$pesterResult = Invoke-Pester -Path (Join-Path $root 'Tests') -PassThru
+if ($null -eq $pesterResult) { throw 'Pester returned no result; release denied.' }
+$passed = [int]$pesterResult.PassedCount
+$failed = [int]$pesterResult.FailedCount
+$skipped = [int]$pesterResult.SkippedCount
+if ($failed -gt 0 -or $skipped -gt 0 -or $passed -le 0) {
+    throw ("Pester release gate failed: passed={0}, failed={1}, skipped={2}." -f $passed,$failed,$skipped)
+}
+Write-Host ("PASS Pester: {0} tests, 0 failed, 0 skipped." -f $passed)
+Write-Host 'CI PASSED — release prerequisites satisfied.'
