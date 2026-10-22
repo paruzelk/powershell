@@ -64,6 +64,17 @@ if ($obsolete.Count -gt 0) { throw ('Obsolete package files detected: ' + (($obs
 $testFiles = @(Get-ChildItem -Path (Join-Path $root 'Tests') -Recurse -File -Filter '*.Tests.ps1')
 $tagPattern = '\d+\.\d+\.\d+-rc\d+-build\d+\.\d+\.\d+(?:-[A-Za-z0-9]+)*'
 foreach ($testFile in $testFiles) {
+    # Fail early on syntax/discovery errors in tests. Pester's FailedCount
+    # does not include a test file rejected before discovery.
+    $testTokens = $null
+    $testParseErrors = $null
+    [void][System.Management.Automation.Language.Parser]::ParseFile(
+        [string]$testFile.FullName,[ref]$testTokens,[ref]$testParseErrors)
+    if ($null -ne $testParseErrors -and $testParseErrors.Count -gt 0) {
+        $first = $testParseErrors[0]
+        throw ("Test source syntax failure: {0}:{1}: {2}" -f
+            [string]$testFile.FullName,[int]$first.Extent.StartLineNumber,[string]$first.Message)
+    }
     $testContent = Get-Content -LiteralPath $testFile.FullName -Raw
     if ($testContent.Contains('^0\.9\.')) {
         throw ("Obsolete hardcoded application-version regex in test: {0}" -f $testFile.FullName)
