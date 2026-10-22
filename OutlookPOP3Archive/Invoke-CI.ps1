@@ -41,6 +41,19 @@ if ([string]$release.Build -cne $build -or
     throw 'RELEASE.json disagrees with Core/Version.ps1 or MANIFEST.txt.'
 }
 if (-not $readme.Contains($applicationVersion)) { throw 'README.md does not describe the current application version.' }
+if (-not $readme.Contains($build)) { throw 'README.md is missing the current build identifier.' }
+# Active operational documentation must not retain an old release banner.
+# CHANGELOG.md is intentionally exempt: historical versions belong there.
+foreach ($docName in @('ARCHITECTURE.md','CONFIGURATION.md','RECOVERY.md','TESTING.md')) {
+    $docPath = Join-Path (Join-Path $root 'docs') $docName
+    if (-not (Test-Path -LiteralPath $docPath -PathType Leaf)) {
+        throw "Current release documentation missing: $docName"
+    }
+    $firstLine = [string](Get-Content -LiteralPath $docPath -Encoding UTF8 -TotalCount 1)
+    if (-not $firstLine.Contains($build)) {
+        throw ("Stale release header in docs/{0}. Expected {1}." -f $docName,$build)
+    }
+}
 # Historical runbooks are kept in prior release archives; ship only current docs.
 $obsolete = @(Get-ChildItem -LiteralPath $root -File | Where-Object {
     $_.Name -match '^(?:TEST-FIX.*\.md|TEST-2\.6\.0\.md|BUILD-2\.5\.7\.txt|BUILD-2\.6\.0\.txt|MANIFEST-RC1\.txt|RELEASE-RC1\.json)$' -or
