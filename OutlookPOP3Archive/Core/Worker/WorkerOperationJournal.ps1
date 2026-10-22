@@ -52,6 +52,13 @@ function Invoke-OPAWorkerJournaledOperation {
     )
     if ([string]::IsNullOrWhiteSpace($TransactionId)) { throw 'TransactionId is required.' }
     $parent = [IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($JournalPath))
+    # Prevent a caller from writing the right transaction to the wrong file:
+    # journal identity remains deterministic even after a crash/restart.
+    $expected = Get-OPAWorkerOperationJournalPath -TransactionDirectory $parent -TransactionId $TransactionId
+    if (-not [string]::Equals([IO.Path]::GetFullPath($JournalPath),
+            [IO.Path]::GetFullPath($expected), [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Journal filename does not match TransactionId.'
+    }
     if (-not [IO.Directory]::Exists($parent)) { [void][IO.Directory]::CreateDirectory($parent) }
 
     # A persistent lock FILE, but an ephemeral exclusive HANDLE. A crashed
