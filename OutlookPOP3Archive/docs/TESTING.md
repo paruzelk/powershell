@@ -34,3 +34,7 @@ Invoke-Pester -Path .\Tests\Archive\MoveReconciliation.Tests.ps1 -Output Detaile
 ```
 
 No real Outlook MailItem.Move is exercised; validate read-only observation against disposable PSTs before proceeding.
+
+### CI regression gate added after first 2.6.3 DEV run
+
+The first local 2.6.3 CI run reported `229 passed, 0 failed` **but one failed test discovery container** due to duplicate case-insensitive `EntryID`/`EntryId` keys in a new Pester fixture. This was a CI **failure** and must never be described as a successful build. The test fixture has been corrected. The updated `Invoke-CI.ps1` rejects invalid test source during the parser pass and uses the full Pester result (`Result`, `FailedContainersCount`, `FailedBlocksCount`, `Containers`, `InconclusiveCount`, `NotRunCount`), not just `FailedCount`. `Tests/Core/PesterReleaseGate.Tests.ps1` regression-tests the false-positive. Re-run full CI before packaging. 

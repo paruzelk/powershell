@@ -4,6 +4,9 @@
 - All outcomes fail closed with no automatic retry or journal mutation; legacy/partial Intents are not treated as proof.
 - Added Pester tests for false duplicates, missing messages, incomplete MAPI enumeration and mismatched identities.
 - Removed obsolete version-prefixed 2.6.2 design filename from active package; content retained under docs/OPERATION-JOURNAL.md.
+- Corrected malformed MoveReconciliation test fixture: `EntryID` and `EntryId` are duplicate keys in case-insensitive PowerShell hash literals.
+- Fixed critical CI false-positive: 229 tests passed but a Pester container could fail discovery while old CI printed PASS. CI now checks run Result, failed containers and blocks, discovered container count, and test parse errors.
+- Added 12 CI release-gate regression tests, including a failed discovery container with zero failing It tests.
 - Worker Move still disabled; FIX13b remains the production archive engine. Full PS5.1 CI required.
 
 ## 2.6.2-PREVIEW1 (2026-10-22; candidate pending full CI)

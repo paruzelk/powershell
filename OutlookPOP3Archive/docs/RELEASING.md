@@ -24,3 +24,7 @@ Applies to every release and development ZIP from 2.6.2 onward. **Never package 
 The command deliberately fails if `Core/Version.ps1` still says `2.6.1-PREVIEW1a` while `-ExpectedBuild` is `2.6.2-PREVIEW1`. A feature branch is not an approved release merely because its Pester tests pass. For an internal snapshot, explicitly identify it as `dev` and include the short Git SHA in the filename.
 
 **Packaging cleanliness:** the build deletes only its own newly created temporary staging directory. The source working directory and user Outlook data are never subject to automatic cleanup.
+
+## Discovery failures are release failures
+
+Mandatory CI must confirm the Pester run `Result=Passed`, all expected test containers were discovered and passed, `FailedContainersCount=0`, `FailedBlocksCount=0`, and no failed, skipped, inconclusive or not-run tests. Before Pester starts, all `*.Tests.ps1` files are parsed using the native PowerShell 5.1 parser. A syntax failure or discovery failure blocks ZIP creation even if `FailedCount=0` and other tests passed.
