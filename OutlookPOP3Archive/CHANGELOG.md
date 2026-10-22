@@ -1,4 +1,4 @@
-﻿## 2.6.3-PREVIEW1 (2026-10-22; DEV, Windows CI pending)
+﻿## 2.6.3-PREVIEW1 (2026-10-22; DEV, latest revision needs Windows CI)
 
 - Added independent read-only MailMove Intent reconciliation with source/target snapshots, fingerprint and store/path validation.
 - All outcomes fail closed with no automatic retry or journal mutation; legacy/partial Intents are not treated as proof.
@@ -8,6 +8,7 @@
 - Fixed critical CI false-positive: 229 tests passed but a Pester container could fail discovery while old CI printed PASS. CI now checks run Result, failed containers and blocks, discovered container count, and test parse errors.
 - Added 12 CI release-gate regression tests, including a failed discovery container with zero failing It tests.
 - Added an opt-in Outlook COM integration harness operating on two fresh, disposable PSTs, with a copied donor test message and four crash-window observation scenarios. The donor test PST can temporarily receive a copied message.
+- Live Outlook test on prior commit: first three scenarios PASS (SourceOnly / DestinationCandidate / BothPresent) and MailItem.Size remained 375442 bytes across the first Move; Ambiguous FAIL because the second plain Copy() did not produce a second matching destination item. Changed diagnostic duplicate staging to Copy -> Move into disposable source -> Move back into disposable archive and added diagnostic snapshot/fingerprint counts. Needs re-test on Windows.
 - Worker Move still disabled; FIX13b remains the production archive engine. Full PS5.1 CI required for each new revision.
 
 ## 2.6.2-PREVIEW1 (2026-10-22; candidate pending full CI)

@@ -46,3 +46,7 @@ Use `Core/Diagnostics/Invoke-OPA263LivePstTest.ps1 -SeedPstPath '<absolute path 
 ```powershell
 .\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
 ```
+
+### Live COM regression retest after second-copy staging fix
+
+The first live COM integration test passed `SourceOnly`, `DestinationCandidate`, and `BothPresent`, but not `Ambiguous` because the extra bare `Copy()` was not observed as a second matching destination item. Re-run full CI on the **new** commit and then run the opt-in live harness on a newly created pair of disposable PSTs. Confirm `DestinationFingerprintMatches=2` in the generated `report.json` (or examine per-field comparisons if still 1). The harness does not repair original operation journals.
