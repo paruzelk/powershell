@@ -30,6 +30,21 @@ Describe '2.6.3 disposable PST integration harness safety gates' {
         $script:text | Should -Not -Match '\.Quit\('
     }
 
+    It 'stages the second destination duplicate by moving the copied item to a disposable folder and back' {
+        $script:text | Should -Match '\$duplicate = \$destinationMail.Copy\(\)'
+        $script:text | Should -Match '\$duplicateInSource = \$duplicate.Move\(\$sourceFolder\)'
+        $script:text | Should -Match '\$duplicateInArchive = \$duplicateInSource.Move\(\$archiveFolder\)'
+        $script:text | Should -Match 'DistinctSecondDestinationEntryId'
+    }
+
+    It 'records actual source and destination fingerprint observations before expecting Ambiguous' {
+        $script:text | Should -Match 'New-OPAReadOnlyMoveSnapshot'
+        $script:text | Should -Match 'DestinationFingerprintMatches'
+        $script:text | Should -Match 'DestinationMessageIdMatches'
+        $script:text | Should -Match 'DestinationSizeValues'
+        $script:text | Should -Match 'DuplicateDiagnostics=\$duplicateDiagnostics'
+    }
+
     It 'tests first Move and then keeps journal unresolved and automatic retry blocked' {
         $script:text | Should -Match 'First controlled Move'
         $script:text | Should -Match 'DestinationCandidate'
