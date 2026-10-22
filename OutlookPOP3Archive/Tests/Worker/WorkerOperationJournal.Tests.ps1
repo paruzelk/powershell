@@ -68,7 +68,7 @@ Describe '2.6.2 journaled worker dispatch (no Outlook COM)' {
         [void](Write-OPAOperationJournalEvent -Path $script:journal -TransactionId 'T1' -OperationId 'test' -Sequence 1 -Phase Intent -OperationKind WorkerDiagnostic)
         [void](Write-OPAOperationJournalEvent -Path $script:journal -TransactionId 'T1' -OperationId 'test' -Sequence 2 -Phase WorkerSucceeded -OperationKind WorkerDiagnostic -WorkerProcessId 12)
         Mock Invoke-OPAWorkerControlledOperation { throw 'Must not be dispatched' }
-        { Invoke-OPAWorkerJournaledOperation -JournalPath $script:journal -TransactionId 'T2' -Operation Ping } | Should -Throw '*different transaction*'
+        { Invoke-OPAWorkerJournaledOperation -JournalPath $script:journal -TransactionId 'T2' -Operation Ping } | Should -Throw '*filename does not match*'
         Should -Invoke Invoke-OPAWorkerControlledOperation -Exactly -Times 0
     }
 
