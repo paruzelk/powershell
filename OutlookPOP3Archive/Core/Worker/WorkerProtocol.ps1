@@ -37,14 +37,15 @@ function New-OPAWorkerRequest {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateSet('Ping','Echo','Fail','Crash','Delay','ProbeOutlook')][string]$Operation,
-        [object]$Payload = @{}
+        [object]$Payload = @{},
+        [string]$RequestId = ''
     )
     if ($null -eq $Payload -or $Payload -is [string] -or $Payload -is [array]) {
         throw 'Worker protocol: Payload must be a JSON object.'
     }
     $request = [pscustomobject]@{
         ProtocolVersion = $script:OPAWorkerProtocolVersion
-        RequestId       = ([guid]::NewGuid().ToString('D'))
+        RequestId       = $(if ([string]::IsNullOrWhiteSpace($RequestId)) { [guid]::NewGuid().ToString('D') } else { $RequestId })
         Operation       = $Operation
         Payload         = $Payload
         CreatedUtc      = [datetime]::UtcNow.ToString('o')
