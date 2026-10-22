@@ -210,4 +210,32 @@ Describe '2.6.3 independent read-only interrupted Move reconciliation' {
         (Get-Item -LiteralPath $script:path).Length | Should -Be $before
         @((Read-OPAOperationJournal -Path $script:path).Events).Count | Should -Be 1
     }
+
+    It 'does not mark a MailItem with absent MessageId as completely scanned' {
+        $item = New-OPA263Item -Id 'source-1' -MessageId ''
+        $folder = New-OPA263FakeFolder -Path '\\POP3\\Inbox' -Store 'source-store' -Rows @($item)
+        $snap = New-OPAReadOnlyMoveSnapshot -Folder $folder -FolderPath '\\POP3\\Inbox' -StoreIdentity 'source-store'
+        $snap.ScanComplete | Should -BeFalse
+        @($snap.Errors).Count | Should -BeGreaterThan 0
+    }
+
+    It 'fails closed if the caller supplies no destination inventory' {
+        $script:destination.Items = $null
+        $r = Resolve-OPAInterruptedMoveEvidence -Journal (Read-OPAOperationJournal -Path $script:path) -OperationId 'move-1' -SourceSnapshot $script:source -DestinationSnapshot $script:destination
+        $r.Status | Should -Be 'IncompleteScan'
+        $r.AutomaticRetryAllowed | Should -BeFalse
+    }
+
+    It 'does not confuse equal message IDs with different senders' {
+        $script:destination.Items = @((New-OPA263Item -Id 'A1' -Sender 'another@example.test'))
+        $r = Resolve-OPAInterruptedMoveEvidence -Journal (Read-OPAOperationJournal -Path $script:path) -OperationId 'move-1' -SourceSnapshot $script:source -DestinationSnapshot $script:destination
+        $r.Status | Should -Be 'MissingBoth'
+        $r.DestinationMatches | Should -Be 0
+    }
+
+    It 'does not confuse equal message IDs with different sizes' {
+        $script:destination.Items = @((New-OPA263Item -Id 'A1' -Size 257))
+        $r = Resolve-OPAInterruptedMoveEvidence -Journal (Read-OPAOperationJournal -Path $script:path) -OperationId 'move-1' -SourceSnapshot $script:source -DestinationSnapshot $script:destination
+        $r.Status | Should -Be 'MissingBoth'
+    }
 }
