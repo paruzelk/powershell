@@ -38,3 +38,11 @@ No real Outlook MailItem.Move is exercised; validate read-only observation again
 ### CI regression gate added after first 2.6.3 DEV run
 
 The first local 2.6.3 CI run reported `229 passed, 0 failed` **but one failed test discovery container** due to duplicate case-insensitive `EntryID`/`EntryId` keys in a new Pester fixture. This was a CI **failure** and must never be described as a successful build. The test fixture has been corrected. The updated `Invoke-CI.ps1` rejects invalid test source during the parser pass and uses the full Pester result (`Result`, `FailedContainersCount`, `FailedBlocksCount`, `Containers`, `InconclusiveCount`, `NotRunCount`), not just `FailedCount`. `Tests/Core/PesterReleaseGate.Tests.ps1` regression-tests the false-positive. Re-run full CI before packaging. 
+
+### Real Outlook COM integration (disposable PSTs only)
+
+Use `Core/Diagnostics/Invoke-OPA263LivePstTest.ps1 -SeedPstPath '<absolute path to designated TEST PST>' -Execute` in Windows PowerShell 5.1 STA while Outlook is open. This creates two new temporary PSTs, clones one eligible message from the designated test PST, and simulates a missing journal completion after a real first Move. Preserve the temp journal and report for review; note that Outlook Copy temporarily modifies the donor test PST. Full CI before running:
+
+```powershell
+.\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
+```

@@ -7,7 +7,8 @@
 - Corrected malformed MoveReconciliation test fixture: `EntryID` and `EntryId` are duplicate keys in case-insensitive PowerShell hash literals.
 - Fixed critical CI false-positive: 229 tests passed but a Pester container could fail discovery while old CI printed PASS. CI now checks run Result, failed containers and blocks, discovered container count, and test parse errors.
 - Added 12 CI release-gate regression tests, including a failed discovery container with zero failing It tests.
-- Worker Move still disabled; FIX13b remains the production archive engine. Full PS5.1 CI required.
+- Added an opt-in Outlook COM integration harness operating on two fresh, disposable PSTs, with a copied donor test message and four crash-window observation scenarios. The donor test PST can temporarily receive a copied message.
+- Worker Move still disabled; FIX13b remains the production archive engine. Full PS5.1 CI required for each new revision.
 
 ## 2.6.2-PREVIEW1 (2026-10-22; candidate pending full CI)
 
