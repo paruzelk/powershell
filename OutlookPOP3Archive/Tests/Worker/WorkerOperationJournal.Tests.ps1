@@ -109,4 +109,19 @@ Describe '2.6.2 journaled worker dispatch (no Outlook COM)' {
         (Get-OPAWorkerOperationJournalState -JournalPath $script:journal).LastSequence | Should -Be 4
         @((Read-OPAOperationJournal -Path $script:journal).Events).Count | Should -Be 4
     }
+
+    It 'reports Indeterminate if a worker succeeded but the terminal journal flush failed' {
+        Mock Invoke-OPAWorkerControlledOperation {
+            [pscustomobject]@{ Status='Succeeded'; RequestId=$RequestId; WorkerProcessId=123; FailureKind='None'; Error='' }
+        }
+        Mock Write-OPAOperationJournalEvent { throw 'simulated terminal write failure' } -ParameterFilter { $Phase -eq 'WorkerSucceeded' }
+        $r = Invoke-OPAWorkerJournaledOperation -JournalPath $script:journal -TransactionId 'T1' -Operation Ping
+        $r.Status | Should -Be 'Indeterminate'
+        $r.WorkerStatus | Should -Be 'Succeeded'
+        $r.JournalCommitted | Should -BeFalse
+        $r.RequiresReconciliation | Should -BeTrue
+        (Get-OPAWorkerOperationJournalState -JournalPath $script:journal).BlockAutomaticRetry | Should -BeTrue
+        @((Read-OPAOperationJournal -Path $script:journal).Events).Count | Should -Be 1
+        Should -Invoke Invoke-OPAWorkerControlledOperation -Exactly -Times 1
+    }
 }
