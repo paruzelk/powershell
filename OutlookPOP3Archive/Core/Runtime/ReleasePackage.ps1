@@ -8,7 +8,7 @@ function Get-OPAReleasePackageFiles {
         [Parameter(Mandatory=$true)][string]$ProjectRoot,
         [Parameter(Mandatory=$true)][string]$ExpectedBuild
     )
-    $root = [IO.Path]::GetFullPath($ProjectRoot).TrimEnd('\','/')
+    $root = [IO.Path]::GetFullPath($ProjectRoot).TrimEnd([char[]]@('\','/'))
     if (-not (Test-Path -LiteralPath $root -PathType Container)) {
         throw "Project directory not found: $root"
     }
@@ -41,7 +41,7 @@ function Get-OPAReleasePackageFiles {
         }
         $items = @(Get-ChildItem -LiteralPath $folder -File -Recurse -Force -ErrorAction Stop)
         foreach ($file in $items) {
-            $relative = $file.FullName.Substring($root.Length).TrimStart('\','/') -replace '\\','/'
+            $relative = $file.FullName.Substring($root.Length).TrimStart([char[]]@('\','/')) -replace '\\','/'
             if (($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
                 throw "Release source contains a link: $relative"
             }
