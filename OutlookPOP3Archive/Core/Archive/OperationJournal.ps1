@@ -1,6 +1,6 @@
 #requires -Version 5.1
 # OutlookPOP3Archive 2.6.2: durable, append-only per-message operation journal.
-# Deliberately not wired into MailMover until the validated 2.6.1 base is merged.
+# Remains isolated from MailMover; 2.6.1 base has been merged.
 # A caller MUST flush Intent before Outlook Move(), and MUST NOT retry an
 # unresolved Intent automatically. Journal and PST reconciliation are separate.
 
@@ -21,7 +21,10 @@ function Write-OPAOperationJournalEvent {
         [Parameter(Mandatory=$true)][string]$TransactionId,
         [Parameter(Mandatory=$true)][string]$OperationId,
         [Parameter(Mandatory=$true)][ValidateRange(1,9223372036854775807)][long]$Sequence,
-        [Parameter(Mandatory=$true)][ValidateSet('Intent','Completed','Reconciled','Indeterminate')][string]$Phase,
+        [Parameter(Mandatory=$true)][ValidateSet('Intent','Completed','Reconciled','Indeterminate','WorkerSucceeded','WorkerFailed')][string]$Phase,
+        [ValidateSet('MailMove','WorkerDiagnostic')][string]$OperationKind = 'MailMove',
+        [int]$WorkerProcessId = 0,
+        [string]$FailureKind = '',
         [string]$SourceEntryId = '',
         [string]$ArchiveEntryId = '',
         [string]$ArchivePst = '',
@@ -31,13 +34,16 @@ function Write-OPAOperationJournalEvent {
     if ([string]::IsNullOrWhiteSpace($TransactionId) -or [string]::IsNullOrWhiteSpace($OperationId)) {
         throw 'TransactionId and OperationId must not be blank.'
     }
-    if ($Phase -eq 'Intent' -and [string]::IsNullOrWhiteSpace($SourceEntryId)) {
+    if ($Phase -eq 'Intent' -and $OperationKind -eq 'MailMove' -and [string]::IsNullOrWhiteSpace($SourceEntryId)) {
         throw 'Intent must record SourceEntryId before Outlook Move().'
     }
-    if ($Phase -in @('Completed','Reconciled') -and [string]::IsNullOrWhiteSpace($ArchiveEntryId)) {
+    if ($OperationKind -eq 'MailMove' -and $Phase -in @('Completed','Reconciled') -and [string]::IsNullOrWhiteSpace($ArchiveEntryId)) {
         throw 'Completed/Reconciled must record ArchiveEntryId.'
     }
 
+    if ($Phase -in @('WorkerSucceeded','WorkerFailed') -and $OperationKind -ne 'WorkerDiagnostic') {
+        throw 'Worker-only outcomes cannot prove completion of a MailMove.'
+    }
     $payload = [ordered]@{
         SchemaVersion = '1.0'
         Utc           = [datetime]::UtcNow.ToString('o')
@@ -45,6 +51,9 @@ function Write-OPAOperationJournalEvent {
         OperationId   = $OperationId
         Sequence      = $Sequence
         Phase         = $Phase
+        OperationKind = $OperationKind
+        WorkerProcessId = $WorkerProcessId
+        FailureKind   = $FailureKind
         SourceEntryId = $SourceEntryId
         ArchiveEntryId= $ArchiveEntryId
         ArchivePst    = $ArchivePst
@@ -130,10 +139,17 @@ function Read-OPAOperationJournal {
                 if ([string]$item.SchemaVersion -cne '1.0') { throw 'Unsupported schema' }
                 if ([string]::IsNullOrWhiteSpace([string]$item.TransactionId) -or
                     [string]::IsNullOrWhiteSpace([string]$item.OperationId) -or
-                    [string]$item.Phase -notin @('Intent','Completed','Reconciled','Indeterminate') -or
+                    [string]$item.Phase -notin @('Intent','Completed','Reconciled','Indeterminate','WorkerSucceeded','WorkerFailed') -or
                     [long]$item.Sequence -lt 1) {
                     throw 'Invalid event fields'
                 }
+                $kind = if ($item.PSObject.Properties.Name -contains 'OperationKind') { [string]$item.OperationKind } else { 'MailMove' }
+                if ($kind -notin @('MailMove','WorkerDiagnostic')) { throw 'Unknown operation kind' }
+                if ($kind -eq 'MailMove' -and [string]$item.Phase -in @('WorkerSucceeded','WorkerFailed')) { throw 'Invalid MailMove worker outcome' }
+                if ($kind -eq 'MailMove' -and [string]$item.Phase -eq 'Intent' -and
+                    [string]::IsNullOrWhiteSpace([string]$item.SourceEntryId)) { throw 'MailMove Intent missing source EntryId' }
+                if ($kind -eq 'MailMove' -and [string]$item.Phase -in @('Completed','Reconciled') -and
+                    [string]::IsNullOrWhiteSpace([string]$item.ArchiveEntryId)) { throw 'MailMove completion missing archive EntryId' }
                 [void]$events.Add($item)
             }
             catch {
@@ -177,6 +193,7 @@ function Resolve-OPAOperationRecovery {
                 ArchiveEntryId= ''
                 ArchivePst    = [string]$event.ArchivePst
                 Status        = 'Indeterminate'
+                OperationKind = $(if ($event.PSObject.Properties.Name -contains 'OperationKind') { [string]$event.OperationKind } else { 'MailMove' })
             }
             continue
         }
@@ -184,25 +201,32 @@ function Resolve-OPAOperationRecovery {
         if ($item.Status -ne 'Indeterminate' -or $phase -eq 'Intent') {
             throw "Conflicting/duplicate terminal event for operation '$id'."
         }
-        if ($phase -eq 'Completed' -or $phase -eq 'Reconciled') {
-            if ([string]::IsNullOrWhiteSpace([string]$event.ArchiveEntryId)) {
+        if ($phase -in @('Completed','Reconciled')) {
+            if ($item.OperationKind -eq 'MailMove' -and [string]::IsNullOrWhiteSpace([string]$event.ArchiveEntryId)) {
                 throw "Terminal event for operation '$id' lacks ArchiveEntryId."
             }
             $item.ArchiveEntryId = [string]$event.ArchiveEntryId
             $item.Status = $phase
         }
-        # An explicit Indeterminate event remains unresolved.
+        if ($phase -in @('WorkerSucceeded','WorkerFailed')) {
+            if ($item.OperationKind -ne 'WorkerDiagnostic') { throw 'Worker outcome cannot finalize a MailMove.' }
+            $item.Status = $phase
+        }
+        # An explicit Indeterminate event remains unresolved. Manual reconciliation
+        # may later append Reconciled for the same operation after independent proof.
     }
     $resolved = @($states.Values | Where-Object { $_.Status -ne 'Indeterminate' })
     $unresolved = @($states.Values | Where-Object { $_.Status -eq 'Indeterminate' })
-    $blocked = ($unresolved.Count -gt 0 -or [bool]$Journal.TrailingPartial)
+    $failed = @($states.Values | Where-Object { $_.Status -eq 'WorkerFailed' })
+    $blocked = ($unresolved.Count -gt 0 -or $failed.Count -gt 0 -or [bool]$Journal.TrailingPartial)
     return [pscustomobject]@{
         TransactionId            = $transactionId
         LastSequence             = $lastSeq
         Resolved                 = $resolved
         Indeterminate            = $unresolved
+        Failed                   = $failed
         TrailingPartial          = [bool]$Journal.TrailingPartial
         BlockAutomaticRetry      = $blocked
-        RequiresPstReconciliation= $blocked
+        RequiresPstReconciliation= ($unresolved.Count -gt 0 -or [bool]$Journal.TrailingPartial)
     }
 }
