@@ -44,6 +44,9 @@ function Write-OPAOperationJournalEvent {
     if ($Phase -in @('WorkerSucceeded','WorkerFailed') -and $OperationKind -ne 'WorkerDiagnostic') {
         throw 'Worker-only outcomes cannot prove completion of a MailMove.'
     }
+    if ($Phase -eq 'WorkerSucceeded' -and $WorkerProcessId -le 0) {
+        throw 'WorkerSucceeded must record a verified positive worker PID.'
+    }
     $payload = [ordered]@{
         SchemaVersion = '1.0'
         Utc           = [datetime]::UtcNow.ToString('o')
@@ -150,6 +153,9 @@ function Read-OPAOperationJournal {
                     [string]::IsNullOrWhiteSpace([string]$item.SourceEntryId)) { throw 'MailMove Intent missing source EntryId' }
                 if ($kind -eq 'MailMove' -and [string]$item.Phase -in @('Completed','Reconciled') -and
                     [string]::IsNullOrWhiteSpace([string]$item.ArchiveEntryId)) { throw 'MailMove completion missing archive EntryId' }
+                if ([string]$item.Phase -eq 'WorkerSucceeded' -and [int]$item.WorkerProcessId -le 0) {
+                    throw 'WorkerSucceeded missing verified PID'
+                }
                 [void]$events.Add($item)
             }
             catch {
