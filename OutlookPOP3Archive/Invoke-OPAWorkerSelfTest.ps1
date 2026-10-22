@@ -6,12 +6,16 @@ param(
     [ValidateRange(1,120)][int]$TimeoutSeconds = 15
 )
 $ErrorActionPreference = 'Stop'
+. "$PSScriptRoot\Core\Version.ps1"
+$versionMatch = [regex]::Match([string]$script:OPAApplicationVersion, '-build(?<build>\d+\.\d+\.\d+(?:-[A-Za-z0-9]+)*)$')
+if (-not $versionMatch.Success) { throw 'Invalid product version in Core/Version.ps1.' }
+$build = [string]$versionMatch.Groups['build'].Value
 . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
 . "$PSScriptRoot\Core\Worker\WorkerHost.ps1"
 . "$PSScriptRoot\Core\Worker\WorkerControl.ps1"
 
-Write-Host '== OutlookPOP3Archive 2.6.1 controlled worker self-test =='
-Write-Host 'Archive/Resume integration: DISABLED in 2.6.1-PREVIEW1a'
+Write-Host ("== OutlookPOP3Archive {0} controlled worker self-test ==" -f $build)
+Write-Host ("Archive/Resume integration: DISABLED in {0}" -f $build)
 
 $ping = Invoke-OPAWorkerRequest -Operation Ping -TimeoutSeconds $TimeoutSeconds
 if ($ping.Status -ne 'Succeeded' -or -not $ping.Result.Alive -or
@@ -20,8 +24,9 @@ if ($ping.Status -ne 'Succeeded' -or -not $ping.Result.Alive -or
 }
 Write-Host ("PASS Ping: parent PID={0}; worker PID={1}; apartment={2}" -f $PID,$ping.WorkerProcessId,$ping.ApartmentState)
 
-$echo = Invoke-OPAWorkerRequest -Operation Echo -Payload @{Value='OPA-Worker-2.6.1'; Number=42} -TimeoutSeconds $TimeoutSeconds
-if ($echo.Status -ne 'Succeeded' -or [string]$echo.Result.Payload.Value -ne 'OPA-Worker-2.6.1' -or [int]$echo.Result.Payload.Number -ne 42) {
+$echoTag = 'OPA-Worker-' + $build
+$echo = Invoke-OPAWorkerRequest -Operation Echo -Payload @{Value=$echoTag; Number=42} -TimeoutSeconds $TimeoutSeconds
+if ($echo.Status -ne 'Succeeded' -or [string]$echo.Result.Payload.Value -ne $echoTag -or [int]$echo.Result.Payload.Number -ne 42) {
     throw 'Worker Echo protocol roundtrip failed.'
 }
 Write-Host 'PASS Echo: request/response data integrity'
