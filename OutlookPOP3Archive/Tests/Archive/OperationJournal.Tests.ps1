@@ -107,4 +107,25 @@ Describe '2.6.2 durable operation journal' {
         $state.BlockAutomaticRetry | Should -BeFalse
         $state.Resolved[0].ArchiveEntryId | Should -Be 'A1'
     }
+
+    It 'durably preserves 2.6.3 MailMove identity metadata for later independent replay' {
+        $intent = Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'M1' -Sequence 1 -Phase Intent -OperationKind MailMove -SourceEntryId 'S1' -SourceStoreId 'POP3-STORE' -SourceFolderPath '\\POP3\\Inbox' -TargetFolderPath '\\Archive\\2020' -ArchivePst 'Archive-2020.pst' -InternetMessageId '<m@example.test>' -Subject 'subject' -Sender 'sender@example.test' -Size 256
+        $read = Read-OPAOperationJournal -Path $script:path
+        $read.Events[0].InternetMessageId | Should -Be '<m@example.test>'
+        $read.Events[0].SourceStoreId | Should -Be 'POP3-STORE'
+        $read.Events[0].TargetFolderPath | Should -Be '\\Archive\\2020'
+        $replayed = Resolve-OPAOperationRecovery -Journal $read
+        $replayed.Indeterminate[0].Sender | Should -Be 'sender@example.test'
+        $replayed.Indeterminate[0].Size | Should -Be 256
+        $replayed.Indeterminate[0].SourceFolderPath | Should -Be '\\POP3\\Inbox'
+        $replayed.BlockAutomaticRetry | Should -BeTrue
+    }
+
+    It 'continues to read a 2.6.2 MailMove Intent with absent optional 2.6.3 metadata' {
+        Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'M1' -Sequence 1 -Phase Intent -OperationKind MailMove -SourceEntryId 'S1' -ArchivePst 'old-archive.pst' | Out-Null
+        $replayed = Resolve-OPAOperationRecovery -Journal (Read-OPAOperationJournal -Path $script:path)
+        $replayed.Indeterminate[0].SourceStoreId | Should -Be ''
+        $replayed.Indeterminate[0].InternetMessageId | Should -Be ''
+        $replayed.BlockAutomaticRetry | Should -BeTrue
+    }
 }
