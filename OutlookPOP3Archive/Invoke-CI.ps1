@@ -4,6 +4,58 @@ param()
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 
+Write-Host '== Build version and package hygiene =='
+$versionScript = Join-Path $root 'Core/Version.ps1'
+if (-not (Test-Path -LiteralPath $versionScript -PathType Leaf)) { throw 'Missing Core/Version.ps1.' }
+. $versionScript
+$applicationVersion = [string]$script:OPAApplicationVersion
+$versionMatch = [regex]::Match($applicationVersion, '^\d+\.\d+\.\d+-rc\d+-build(?<build>\d+\.\d+\.\d+(?:-[A-Za-z0-9]+)*)$')
+if (-not $versionMatch.Success) { throw "Invalid application version: $applicationVersion" }
+$build = [string]$versionMatch.Groups['build'].Value
+$manifestPath = Join-Path $root 'MANIFEST.txt'
+$releasePath = Join-Path $root 'RELEASE.json'
+$readmePath = Join-Path $root 'README.md'
+foreach ($path in @($manifestPath,$releasePath,$readmePath)) {
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Release metadata missing: $path" }
+}
+# Dedicated manifest validator is also tested against malformed synthetic
+# manifests; do not construct comma-separated concatenations inside @(...).
+. (Join-Path $root 'Core/Runtime/BuildMetadata.ps1')
+Assert-OPABuildManifest -Path $manifestPath -Build $build `
+    -ApplicationVersion $applicationVersion `
+    -TransactionSchemaVersion ([string]$script:OPATransactionSchemaVersion) `
+    -DuplicateIndexSchemaVersion ([string]$script:OPADuplicateIndexSchemaVersion) | Out-Null
+$release = ConvertFrom-Json -InputObject (Get-Content -LiteralPath $releasePath -Raw) -ErrorAction Stop
+$readme = Get-Content -LiteralPath $readmePath -Raw
+if ([string]$release.Build -cne $build -or
+    [string]$release.ApplicationVersion -cne $applicationVersion -or
+    [string]$release.TransactionSchemaVersion -cne [string]$script:OPATransactionSchemaVersion -or
+    [string]$release.DuplicateIndexSchemaVersion -cne [string]$script:OPADuplicateIndexSchemaVersion) {
+    throw 'RELEASE.json disagrees with Core/Version.ps1 or MANIFEST.txt.'
+}
+if (-not $readme.Contains($applicationVersion)) { throw 'README.md does not describe the current application version.' }
+# Historical runbooks are kept in prior release archives; ship only current docs.
+$obsolete = @(Get-ChildItem -LiteralPath $root -File | Where-Object {
+    $_.Name -match '^(?:TEST-FIX.*\.md|TEST-2\.6\.0\.md|BUILD-2\.5\.7\.txt|BUILD-2\.6\.0\.txt|MANIFEST-RC1\.txt|RELEASE-RC1\.json)$' -or
+    $_.Extension -in @('.zip','.bak','.old','.tmp')
+})
+if ($obsolete.Count -gt 0) { throw ('Obsolete package files detected: ' + (($obsolete | ForEach-Object { $_.Name }) -join ', ')) }
+# No Pester test may pin the old 0.9.x pattern, or embed a stale build tag.
+$testFiles = @(Get-ChildItem -Path (Join-Path $root 'Tests') -Recurse -File -Filter '*.Tests.ps1')
+$tagPattern = '\d+\.\d+\.\d+-rc\d+-build\d+\.\d+\.\d+(?:-[A-Za-z0-9]+)*'
+foreach ($testFile in $testFiles) {
+    $testContent = Get-Content -LiteralPath $testFile.FullName -Raw
+    if ($testContent.Contains('^0\.9\.')) {
+        throw ("Obsolete hardcoded application-version regex in test: {0}" -f $testFile.FullName)
+    }
+    foreach ($tag in [regex]::Matches($testContent, $tagPattern)) {
+        if ([string]$tag.Value -cne $applicationVersion) {
+            throw ("Stale application build tag '{0}' in test {1}" -f $tag.Value,$testFile.FullName)
+        }
+    }
+}
+Write-Host 'PASS'
+
 Write-Host '== PS5.1 ConvertTo-Json rule =='
 $production = @(Get-ChildItem -Path $root -Recurse -Filter '*.ps1' |
     Where-Object { $_.FullName -notmatch '[\\/]Tests[\\/]' })

@@ -1,0 +1,11 @@
+﻿OutlookPOP3Archive 2.6.1-PREVIEW1a
+Build: 2.6.1-PREVIEW1a
+Application: 0.9.4-rc1-build2.6.1-PREVIEW1a
+Transaction schema: 2.5.4
+DuplicateIndex schema: 1.2
+Worker JSON protocol: 1.0
+Target: Windows PowerShell 5.1 / Outlook 2016-2019
+
+Production Archive/Resume/Auto use the tested FIX13b engine unchanged.
+Controlled worker operations are test-only/read-only; no Move delegation.
+The package excludes prior-build test plans, transient files and old build notes.

@@ -1,0 +1,21 @@
+﻿{
+  "Release": "BUILD2.6.1-PREVIEW1a",
+  "Build": "2.6.1-PREVIEW1a",
+  "ApplicationVersion": "0.9.4-rc1-build2.6.1-PREVIEW1a",
+  "TransactionSchemaVersion": "2.5.4",
+  "DuplicateIndexSchemaVersion": "1.2",
+  "WorkerProtocolVersion": "1.0",
+  "Target": "Windows PowerShell 5.1 / Outlook 2016-2019",
+  "Integration": {
+    "ArchiveWorkerEnabled": false,
+    "ResumeWorkerEnabled": false,
+    "AutoWorkerEnabled": false
+  },
+  "Highlights": [
+    "Distinct Succeeded, Failed and Indeterminate controller outcomes without automatic retries",
+    "Strong worker request correlation, spawned-process PID validation and STA response validation",
+    "Bounded process execution and worker-only timeout termination, optional diagnostic evidence retention",
+    "CI build-version/release/manifest consistency gate and removal of obsolete runbooks from distribution",
+    "Existing Archive/Resume/Auto implementation and transaction schema remain unchanged"
+  ]
+}
