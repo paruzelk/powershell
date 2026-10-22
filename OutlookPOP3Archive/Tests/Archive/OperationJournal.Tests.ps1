@@ -45,7 +45,7 @@ Describe '2.6.2 durable operation journal' {
     It 'rejects altered hash-verification metadata' {
         Write-OPAOperationJournalEvent -Path $script:path -TransactionId 'T1' -OperationId 'O1' -Sequence 1 -Phase Intent -SourceEntryId 'S1' | Out-Null
         $line = [IO.File]::ReadAllText($script:path)
-        $corrupt = $line -replace '("Sha256":"?)[a-f0-9]{64}', ('$1' + ('0' * 64))
+        $corrupt = $line -replace '("Sha256":"?)[a-f0-9]{64}', ('${1}' + ('0' * 64))
         [IO.File]::WriteAllText($script:path, $corrupt, (New-Object Text.UTF8Encoding($false)))
         { Read-OPAOperationJournal -Path $script:path } | Should -Throw
     }
