@@ -111,10 +111,13 @@ Describe '2.6.2 journaled worker dispatch (no Outlook COM)' {
     }
 
     It 'reports Indeterminate if a worker succeeded but the terminal journal flush failed' {
+        # Simulate a torn terminal journal write after the durable Intent.
+        # No overlapping Pester mocks are needed: the real journal writer
+        # rejects the unterminated tail and the controller must fail closed.
         Mock Invoke-OPAWorkerControlledOperation {
+            [IO.File]::AppendAllText($script:journal, '{"V":', (New-Object Text.UTF8Encoding($false)))
             [pscustomobject]@{ Status='Succeeded'; RequestId=$RequestId; WorkerProcessId=123; FailureKind='None'; Error='' }
         }
-        Mock Write-OPAOperationJournalEvent { throw 'simulated terminal write failure' } -ParameterFilter { $Phase -eq 'WorkerSucceeded' }
         $r = Invoke-OPAWorkerJournaledOperation -JournalPath $script:journal -TransactionId 'T1' -Operation Ping
         $r.Status | Should -Be 'Indeterminate'
         $r.WorkerStatus | Should -Be 'Succeeded'
