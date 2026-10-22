@@ -119,6 +119,7 @@ $operationId = [guid]::NewGuid().ToString('D')
 $results = New-Object 'System.Collections.Generic.List[object]'
 $failure = ''
 $stage = 'Initializing'
+$duplicateDiagnostics = $null
 
 [void][IO.Directory]::CreateDirectory($testDir)
 Write-Host ("Test directory: {0}" -f $testDir)
@@ -252,16 +253,77 @@ try {
         -ExpectedStatus BothPresent -Result $r -Output $results
 
     $stage = 'Create second destination duplicate'
+    # Outlook MailItem.Copy() may yield a new, not-yet-persisted item or a
+    # clone whose actual parent differs from the expected folder. The first
+    # live run revealed one destination match rather than two, despite Copy()
+    # returning an object. Do NOT assume Copy() proves an on-disk duplicate.
+    # Move the COPY into our disposable source and then back to the disposable
+    # archive, exactly as tested by the successful BothPresent scenario.
     $destinationMail = $ns.GetItemFromID($movedId,[string]$archiveStore.StoreID)
+    if ($null -eq $destinationMail) { throw 'Original archived test mail unavailable.' }
     $duplicate = $destinationMail.Copy()
     if ($null -eq $duplicate) { throw 'Cannot create test duplicate in disposable archive.' }
-    Release-OPAComObject -Object $destinationMail
+    $duplicateInSource = $duplicate.Move($sourceFolder)
+    if ($null -eq $duplicateInSource) { throw 'Could not stage second test duplicate in disposable source.' }
+    $duplicateInArchive = $duplicateInSource.Move($archiveFolder)
+    if ($null -eq $duplicateInArchive) { throw 'Could not move second test duplicate back into disposable archive.' }
+    $secondDestinationId = [string]$duplicateInArchive.EntryID
+    if ([string]::IsNullOrWhiteSpace($secondDestinationId) -or
+        $secondDestinationId -ceq $movedId) {
+        throw 'Second archive item lacks a distinct EntryID; duplicate not established.'
+    }
+    Write-Host ("Second destination copy staged: distinct EntryID={0}; size={1}" -f
+        ($secondDestinationId -cne $movedId),[long]$duplicateInArchive.Size)
+    Release-OPAComObject -Object $duplicateInArchive
+    Release-OPAComObject -Object $duplicateInSource
     Release-OPAComObject -Object $duplicate
+    Release-OPAComObject -Object $destinationMail
 
     $stage = 'Read-only Ambiguous'
-    $r = Invoke-OPA263Review -JournalPath $journalPath -OperationId $operationId `
-        -SourceFolder $sourceFolder -DestinationFolder $archiveFolder `
-        -SourceStore $sourceStore -DestinationStore $archiveStore -ArchivePst $archivePst
+    # Record independent read-only observations even if the expected status
+    # is not reached, so a missing/mutated second item is diagnosable.
+    $srcSnapshot = New-OPAReadOnlyMoveSnapshot -Folder $sourceFolder `
+        -FolderPath ([string]$sourceFolder.FolderPath) `
+        -StoreIdentity ([string]$sourceStore.StoreID) -Role Source
+    $dstSnapshot = New-OPAReadOnlyMoveSnapshot -Folder $archiveFolder `
+        -FolderPath ([string]$archiveFolder.FolderPath) `
+        -StoreIdentity ([string]$archiveStore.StoreID) -Role Destination -ArchivePst $archivePst
+    $intentRecord = (Read-OPAOperationJournal -Path $journalPath).Events[0]
+    $matchedSource = @($srcSnapshot.Items | Where-Object {
+        Test-OPAMoveFingerprint -Intent $intentRecord -Observed $_
+    })
+    $matchedDestination = @($dstSnapshot.Items | Where-Object {
+        Test-OPAMoveFingerprint -Intent $intentRecord -Observed $_
+    })
+    $duplicateDiagnostics = [pscustomobject]@{
+        SourceScanComplete=[bool]$srcSnapshot.ScanComplete
+        DestinationScanComplete=[bool]$dstSnapshot.ScanComplete
+        SourceScannedCount=[int]$srcSnapshot.ScannedCount
+        DestinationScannedCount=[int]$dstSnapshot.ScannedCount
+        SourceRows=@($srcSnapshot.Items).Count
+        DestinationRows=@($dstSnapshot.Items).Count
+        SourceFingerprintMatches=$matchedSource.Count
+        DestinationFingerprintMatches=$matchedDestination.Count
+        DistinctSecondDestinationEntryId=($secondDestinationId -cne $movedId)
+        SourceErrors=@($srcSnapshot.Errors)
+        DestinationErrors=@($dstSnapshot.Errors)
+        DestinationSizeValues=@($dstSnapshot.Items | ForEach-Object { [long]$_.Size })
+        DestinationMessageIdMatches=@($dstSnapshot.Items | ForEach-Object {
+            [string]$_.InternetMessageId -ceq [string]$intentRecord.InternetMessageId
+        })
+        DestinationSubjectMatches=@($dstSnapshot.Items | ForEach-Object {
+            [string]$_.Subject -ceq [string]$intentRecord.Subject
+        })
+        DestinationSenderMatches=@($dstSnapshot.Items | ForEach-Object {
+            [string]$_.Sender -ieq [string]$intentRecord.Sender
+        })
+    }
+    Write-Host ("Diagnostics: destination rows={0}; matching fingerprints={1}; scan complete={2}" -f
+        $duplicateDiagnostics.DestinationRows,
+        $duplicateDiagnostics.DestinationFingerprintMatches,
+        $duplicateDiagnostics.DestinationScanComplete)
+    $r = Resolve-OPAInterruptedMoveEvidence -Journal (Read-OPAOperationJournal -Path $journalPath) `
+        -OperationId $operationId -SourceSnapshot $srcSnapshot -DestinationSnapshot $dstSnapshot
     Add-OPA263Outcome -Name 'Duplicate destination matches' `
         -ExpectedStatus Ambiguous -Result $r -Output $results
 
@@ -282,6 +344,7 @@ finally {
         Build='2.6.3-PREVIEW1'; RunId=$runId; TimestampUtc=[datetime]::UtcNow.ToString('o')
         SeedPst=$seedPath; SourcePst=$sourcePst; ArchivePst=$archivePst
         Journal=$journalPath; Stage=$stage; Failure=$failure
+        DuplicateDiagnostics=$duplicateDiagnostics
         Scenarios=$results.ToArray()
         Note='Keep disposable PSTs and operation journal; do not auto-retry.'
     }
