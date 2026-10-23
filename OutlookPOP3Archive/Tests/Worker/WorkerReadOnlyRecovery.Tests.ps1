@@ -149,6 +149,13 @@ Describe '2.6.4-D independent read-only recovery (synthetic only, no Outlook)' {
         $after=(Get-FileHash -LiteralPath $paths.JournalPath -Algorithm SHA256).Hash
         $before | Should -Be $after
     }
+    It 'uses olStoreUnicode=2 for both newly created disposable PSTs' {
+        $path=Join-Path $PSScriptRoot '../../Core/Diagnostics/New-OPA264DisposableFixture.ps1'
+        $content=Get-Content -LiteralPath $path -Raw
+        $content | Should -Match '\$ns\.AddStoreEx\(\$paths\.SourcePst,2\)'
+        $content | Should -Match '\$ns\.AddStoreEx\(\$paths\.ArchivePst,2\)'
+        $content | Should -Not -Match '\$ns\.AddStoreEx\(\$paths\.(SourcePst|ArchivePst),3\)'
+    }
     It 'has no Outlook launch, PST mounting or MailItem.Move in the recovery CLI' {
         $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA264ReadOnlyRecovery.ps1'
         $tokens=$null;$parseErrors=$null
