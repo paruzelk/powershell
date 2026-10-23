@@ -1,4 +1,12 @@
-﻿## 2.6.4-C (2026-10-23; controlled crash injection DEV)
+﻿## 2.6.4-D (2026-10-23; independent read-only restart recovery DEV)
+
+- User-reported 2.6.4-C Windows PowerShell 5.1 CI PASS: 358 tests in 30 containers; this does NOT validate the D source.
+- Added an independent recovery-only STA CLI that attaches to already running Outlook, checks the two exact mounted disposable PSTs and scans source/target folders read-only.
+- Added strict claim, barrier, journal and response identity checks with fail-closed classification. Does not retry Move, append a terminal event, mount/detach PSTs or terminate processes.
+- Fixed B2 disposable fixture AddStoreEx parameter: 2 is olStoreUnicode; 3 is olStoreANSI, per Microsoft OlStoreType documentation.
+- Added 23 offline recovery/regression tests; full Windows CI target is 381 in 31 containers, CI pending. No live Outlook COM experiment in this increment.
+
+## 2.6.4-C (2026-10-23; controlled crash injection DEV)
 
 - User-reported B2 Windows PS5.1 Pester PASS: 334 tests in 29 containers; C testing still pending.
 - Added strict run-scoped, PID-correlated and durably flushed controlled crash barriers; parent may terminate only its own test Worker process.
