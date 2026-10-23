@@ -45,9 +45,31 @@ function Write-OPA264CrashBarrier {
             'AfterMoveBeforeResponse','AfterResponseBeforeTerminal')][string]$CrashWindow,
         [Parameter(Mandatory=$true)][ValidateRange(1,2147483647)][int]$ProcessId
     )
-    $paths=Assert-OPA264TestMoveScope -Request $Request
-    [void](Assert-OPA264TestMoveIntent -Request $Request -Paths $paths)
     $definition=Get-OPA264CrashMode -Name $CrashWindow
+    if ($CrashWindow -ceq 'AfterMoveBeforeResponse') {
+        # After a MailItem.Move attempt, the durable worker claim MUST exist.
+        # The normal pre-Move scope guard intentionally refuses such a claim.
+        $paths=Get-OPA264TestPaths -RunId ([string]$Request.RunId)
+        foreach ($field in @('SourcePst','ArchivePst','JournalPath')) {
+            if (-not [string]::Equals([string]$Request.$field,[string]$paths.$field,
+                [StringComparison]::OrdinalIgnoreCase)) {
+                throw 'Post-Move crash barrier scope path mismatch.'
+            }
+        }
+        foreach ($pathToCheck in @($paths.SourcePst,$paths.ArchivePst,$paths.MarkerPath,$paths.ClaimPath)) {
+            [void](Assert-OPA264TestPath -Actual $pathToCheck -Expected $pathToCheck -Label 'post-Move fixture')
+        }
+        $marker=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($paths.MarkerPath)) -ErrorAction Stop
+        if ([string]$marker.Purpose -cne 'OPA264-Disposable-Pst-Pair' -or
+            [string]$marker.RunId -cne $paths.RunId -or
+            [string]$marker.SourcePst -cne $paths.SourcePst -or
+            [string]$marker.ArchivePst -cne $paths.ArchivePst -or
+            [string]([IO.File]::ReadAllText($paths.ClaimPath)).Trim() -cne [string]$Request.OperationId) {
+            throw 'Post-Move crash barrier requires an exact disposable marker and one-shot claim.'
+        }
+    }
+    else { $paths=Assert-OPA264TestMoveScope -Request $Request }
+    [void](Assert-OPA264TestMoveIntent -Request $Request -Paths $paths)
     if ($ProcessId -ne $PID) {
         throw 'Crash barrier PID must equal the creating process PID.'
     }
