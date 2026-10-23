@@ -76,6 +76,10 @@ function Get-OPA264RecoveryArtifactEvidence {
         $barrier=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($barrierPath)) -ErrorAction Stop
         if ([int]$barrier.ProcessId -le 0) { throw 'Recovery crash barrier PID invalid.' }
         [void](Assert-OPA264CrashBarrier -Record $barrier -Request $Request -ExpectedWindow ([string]$barrier.CrashWindow) -ExpectedProcessId ([int]$barrier.ProcessId))
+        if ([string]$barrier.CrashWindow -in @('AfterMoveBeforeResponse','AfterResponseBeforeTerminal') -and
+            -not [IO.File]::Exists($workerClaim)) {
+            throw 'Post-Move barrier lacks the original durable one-shot Move claim.'
+        }
         # Reconstructed PID correlation is not proof of process ownership.
         $barrierName=[string]$barrier.CrashWindow
     }
