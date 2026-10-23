@@ -15,12 +15,14 @@
     "Read-only 2.6.3 MailMove evidence classification with durable Intent fingerprint",
     "Source/destination StoreID, folder and PST identity checking; no mutation",
     "All classifications require manual review and forbid automatic retry",
-    "New read-only reconciliation behavior tests pending Windows PowerShell 5.1 CI",
-    "FIX13b production Archive/Resume/Auto and schemas unchanged"
+    "FIX13b production Archive/Resume/Auto and schemas unchanged",
+    "SourceCommit packages require matching independently pinned full source inventory SHA-256."
   ],
   "Verification": {
-    "Status": "2.6.3 DEV; Windows PowerShell 5.1 CI NOT YET RUN",
+    "Status": "2.6.3 DEV; full Windows CI on exact source revision required",
     "RealMailMoveViaWorker": false,
-    "ReadOnlyReconciliationOnly": true
+    "ReadOnlyReconciliationOnly": true,
+    "ExpectedTestContainers": 26,
+    "ExpectedPesterTests": 281
   }
 }
