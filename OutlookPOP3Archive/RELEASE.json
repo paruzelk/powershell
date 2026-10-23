@@ -19,10 +19,10 @@
     "SourceCommit packages require matching independently pinned full source inventory SHA-256."
   ],
   "Verification": {
-    "Status": "2.6.4-LIVE2 cloned-PST functional restore smoke test DEV; Windows CI and real Outlook test pending",
+    "Status": "2.6.4-LIVE2B per-folder restore count mismatch evidence DEV; native Windows CI pending; prior live restore mismatch unresolved",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": true,
     "ExpectedTestContainers": 36,
-    "ExpectedPesterTests": 490
+    "ExpectedPesterTests": 500
   }
 }
