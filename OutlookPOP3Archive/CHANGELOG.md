@@ -1,4 +1,11 @@
-﻿## 2.6.3-PREVIEW1 (2026-10-23; DEV, exact-source build gate pending Windows CI)
+﻿## 2.6.4-A (2026-10-23; staged crash-protocol DESIGN ONLY)
+
+- Added pure WorkerCrashProtocol.ps1: eight crash windows, safe correlation plans, timeline invariant checks and fail-closed read-only replay directives.
+- Added 23 non-COM Pester tests: worker/journal timing, unknown outcomes, missing/corrupt journals, identity conflicts, no executable MailMove/Kill/journal write.
+- Interim feature CI test count 304 in 27 containers. Application version remains at 2.6.3-PREVIEW1 solely as the 2.6.4-A integration baseline; do not publish this branch as a new 2.6.3 release.
+- Does not change Worker protocol allowlist, archive/resume/auto integration, production FIX13b or operation-journal schemas. See docs/2.6.4-crash-window-protocol.md and GitHub Issue #4.
+
+## 2.6.3-PREVIEW1 (2026-10-23; DEV, exact-source build gate pending Windows CI)
 
 - Fixed false-positive restart read-only safety test: old raw-text negative regex matched a harmless `New-Object -ComObject` reference in a comment. New test inspects PowerShell CommandAst/InvokeMemberExpressionAst nodes instead; still forbids executable COM construction, PST store mutations, mail moves/copies/deletes, and operation-journal writes.
 - User Windows CI of preceding source `053c37ef`: 280 tests passed and 1 test failed in 26 containers; CI correctly failed. Latest source requires a new full Windows CI and exact-source package verification.
