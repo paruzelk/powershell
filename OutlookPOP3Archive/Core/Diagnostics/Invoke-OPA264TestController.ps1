@@ -5,10 +5,17 @@
 param(
     [Parameter(Mandatory=$true)][string]$RunId,
     [ValidateRange(5,300)][int]$TimeoutSeconds=45,
-    [switch]$Execute
+    [switch]$Execute,
+    [ValidateSet('None','AfterIntentBeforeDispatch','WorkerStartedBeforeMove',
+        'AfterMoveBeforeResponse','AfterResponseBeforeTerminal')]
+    [string]$ControlledCrashWindow='None',
+    [switch]$EnableControlledCrash
 )
 $ErrorActionPreference='Stop'
 if (-not $Execute) { throw 'Test controller requires -Execute.' }
+if (($ControlledCrashWindow -cne 'None') -ne [bool]$EnableControlledCrash) {
+    throw 'Crash injection requires explicit -EnableControlledCrash with a named test window.'
+}
 if ($PSVersionTable.PSEdition -ne 'Desktop' -or
     $PSVersionTable.PSVersion.Major -ne 5 -or
     [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -cne 'STA') {
@@ -16,6 +23,8 @@ if ($PSVersionTable.PSEdition -ne 'Desktop' -or
 }
 . (Join-Path $PSScriptRoot '../Worker/WorkerTestMove.ps1')
 . (Join-Path $PSScriptRoot '../Worker/WorkerProtocol.ps1')
+. (Join-Path $PSScriptRoot '../Worker/WorkerCrashInjection.ps1')
+$crashMode=Get-OPA264CrashMode -Name $ControlledCrashWindow
 
 $paths=Get-OPA264TestPaths -RunId $RunId
 if (-not [IO.File]::Exists($paths.RequestPath)) {
@@ -47,6 +56,13 @@ try {
 }
 finally { if ($null -ne $claim) { $claim.Dispose() } }
 
+if ($ControlledCrashWindow -ceq 'AfterIntentBeforeDispatch') {
+    [void](Write-OPA264CrashBarrier -Request $request -CrashWindow $ControlledCrashWindow -ProcessId ([int]$PID))
+    # Intent and parent one-shot claim already flushed. No worker was
+    # launched. Simulate controller loss BEFORE dispatch or report write.
+    exit 70
+}
+
 $child=$null
 $started=$false
 $pidValue=0
@@ -61,6 +77,11 @@ try {
     # Only locally derived fixed paths are passed. No arbitrary code/payload.
     $info.Arguments=('-NoLogo -NoProfile -NonInteractive -STA -ExecutionPolicy Bypass -File "{0}" -RequestFile "{1}" -ResponseFile "{2}" -Execute' -f
         $workerScript,$paths.RequestPath,$paths.ResponsePath)
+    if ($crashMode.Owner -ceq 'Worker') {
+        # Strict named mode is validated by Get-OPA264CrashMode, no payload
+        # or arbitrary script enters the command line.
+        $info.Arguments += (' -ControlledCrashWindow {0} -EnableControlledCrash' -f $ControlledCrashWindow)
+    }
     $info.WorkingDirectory=[IO.Path]::GetDirectoryName($workerScript)
     $info.UseShellExecute=$false
     $info.CreateNoWindow=$true
@@ -70,6 +91,14 @@ try {
     $started=$true
     $pidValue=[int]$child.Id
     $failureKind='MissingResponse'
+    if ($crashMode.RequiresOwnedChildKill) {
+        $failureKind='ControlledCrash'
+        [void](Wait-OPA264OwnedWorkerBarrier -Process $child -Request $request -CrashWindow $ControlledCrashWindow -TimeoutSeconds $TimeoutSeconds)
+        # Only the System.Diagnostics.Process object created by THIS parent.
+        # Never Stop-Process by user supplied PID, never kill Outlook.exe.
+        if (-not $child.HasExited) { $child.Kill(); [void]$child.WaitForExit(3000) }
+        throw 'Owned disposable-PST test Worker terminated at durable crash barrier; disposition Indeterminate.'
+    }
     if (-not $child.WaitForExit([int]($TimeoutSeconds*1000))) {
         $failureKind='Timeout'
         # Only the child represented by the Process object we started.
@@ -113,9 +142,17 @@ finally {
         $child.Dispose()
     }
 }
+if ($ControlledCrashWindow -ceq 'AfterResponseBeforeTerminal' -and
+    $status -ceq 'ReturnedNeedsReview') {
+    [void](Write-OPA264CrashBarrier -Request $request -CrashWindow $ControlledCrashWindow -ProcessId ([int]$PID))
+    # No MailMove terminal event exists in this diagnostic protocol.
+    # Emulate controller loss between validated response and its report.
+    exit 73
+}
 $report=[pscustomobject]@{
     RunId=$paths.RunId; OperationId=[string]$request.OperationId
     Status=$status; FailureKind=$failureKind; Error=$errorMessage
+    ControlledCrashWindow=$ControlledCrashWindow
     WorkerProcessId=$pidValue; WorkerStarted=$started; ExitCode=$exitCode
     StartedUtc=$startedUtc; FinishedUtc=[datetime]::UtcNow.ToString('o')
     AutomaticRetryAllowed=$false; JournalCompleted=$false
