@@ -1,4 +1,12 @@
-﻿## 2.6.4-LIVE1 (2026-10-23; existing test POP3 PST backup gate DEV)
+﻿## 2.6.4-LIVE2 (2026-10-23; test-only Outlook cloned backup restore drill DEV)
+
+- LIVE1 exact-source native Windows PowerShell 5.1 CI user-confirmed 478 tests/35 containers PASS.
+- User created a reference POP3 PST backup with SHA256-matched byte copy; original unchanged. This is not yet a functional Outlook restore test.
+- Add immutable reference backup guard, one-shot RunId-specific TEMP restored PST clone, distinct -Review/-PrepareClone/-ProbeClone actions, Outlook-closed cloning and full SHA256 verification.
+- The opt-in restore probe uses the CURRENT test Outlook profile; requires unique source POP3 DeliveryStore, opens only an exact temporary clone using Unicode AddStoreEx, compares read-only folder structure/counts and detaches only that confirmed clone.
+- Add 12 offline Pester tests; LIVE2 expected 490 tests in 36 containers (not yet run). No MailItem.Move, journal completion, Worker retry or production Archive/Resume/Auto changes.
+
+## 2.6.4-LIVE1 (2026-10-23; existing test POP3 PST backup gate DEV)
 
 - User confirmed the current Outlook profile is the dedicated test context; the selected info@stios.ru.pst maps uniquely to the POP3 DeliveryStore. Read-only audit measured 9 folders and 26,310 Inbox items (~7,200.98 MB PST). Existing 2019/2020 archives are protected.
 - User-reported 2.6.4-G Windows PS5.1 CI PASS: 464 tests/34 containers, and separately independently pinned extracted ZIP audit ExactContentMatch. Live Outlook PST Move/crash tests not yet executed.
