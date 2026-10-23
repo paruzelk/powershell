@@ -1,4 +1,12 @@
-﻿## 2.6.4-LIVE2 (2026-10-23; test-only Outlook cloned backup restore drill DEV)
+﻿## 2.6.4-LIVE3 (2026-10-23; user-directed return to Move/Worker roadmap DEV)
+
+- User confirmed existing Outlook profile and POP3 PST are intentional test data; historical mail risk accepted. Do not require new profile, another byte-for-byte backup, or LIVE2B mismatch follow-up to develop the archiver.
+- LIVE2 real Outlook temporary PST mount/read/detach succeeded; one CountMismatch (9 folders on both sides) was observed, potentially because inbox contents changed. User has not tested LIVE2B; that diagnostic branch is deferred.
+- Add a separate test-only fixture for an existing uniquely bound POP3 PST: one GUID-scoped synthetic folder and one synthetic MailItem, new temporary destination PST, durable MailMove Intent. Existing Inbox mail is never selected.
+- Add one-shot diagnostic Worker invoking MailItem.Move on only the exact synthetic fingerprinted item after a durable claim, plus separate read-only source/destination folder observation.
+- Add 17 offline safety and path tests; LIVE3 target 507 tests in 37 containers, native Windows CI PENDING. Production Archive/Resume/Auto and standard Worker allowlist unchanged.
+
+## 2.6.4-LIVE2 (2026-10-23; test-only Outlook cloned backup restore drill DEV)
 
 - LIVE1 exact-source native Windows PowerShell 5.1 CI user-confirmed 478 tests/35 containers PASS.
 - User created a reference POP3 PST backup with SHA256-matched byte copy; original unchanged. This is not yet a functional Outlook restore test.
