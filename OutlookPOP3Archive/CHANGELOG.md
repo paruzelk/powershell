@@ -1,4 +1,12 @@
-﻿## 2.6.4-D (2026-10-23; independent read-only restart recovery DEV)
+﻿## 2.6.4-E (2026-10-23; test-only PST detach/reopen identity stability DEV)
+
+- User-reported Windows PS5.1 CI PASS on 2.6.4-D: 381 tests in 31 containers; E has not yet passed Windows CI.
+- Added disposable identity observation and fail-closed comparison of StoreID, FolderID, folder path and synthetic MailItem EntryID after reattaching two NEW PSTs.
+- Added a separate triple-opt-in diagnostic CLI with durable one-shot identity-probe claim; refuses prior Worker operations, default Outlook stores, nonmatching or missing PSTs. Never deletes, retries, moves mail or rewrites journals.
+- Added 28 synthetic no-Outlook Pester tests; target 409 tests in 32 containers. Real detach/reopen COM testing remains pending in a dedicated isolated Outlook test profile.
+- Production Archive/Resume/Auto and FIX13b remain unchanged. Unicode PST AddStoreEx uses olStoreUnicode=2.
+
+## 2.6.4-D (2026-10-23; independent read-only restart recovery DEV)
 
 - User-reported 2.6.4-C Windows PowerShell 5.1 CI PASS: 358 tests in 30 containers; this does NOT validate the D source.
 - Added an independent recovery-only STA CLI that attaches to already running Outlook, checks the two exact mounted disposable PSTs and scans source/target folders read-only.
