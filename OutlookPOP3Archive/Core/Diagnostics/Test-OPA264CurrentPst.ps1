@@ -93,9 +93,11 @@ try {
     if ($null -ne $selected -and -not $selected.Exists) {
         throw 'The selected PST file does not exist.'
     }
+    $status='PstInventoryReadOnly'
+    if ($target) { $status='SelectedPstReadOnlyVerified' }
     return [pscustomobject]@{
         Schema='2.6.4-Live.CurrentPst.1'
-        Status=if ($target) { 'SelectedPstReadOnlyVerified' } else { 'PstInventoryReadOnly' }
+        Status=$status
         CurrentProfile=$profile
         EmailAccountsCount=$accounts
         TotalOutlookStores=$stores
