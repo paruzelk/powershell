@@ -1,4 +1,7 @@
-﻿## 2.6.3-PREVIEW1 (2026-10-22; DEV, latest revision needs Windows CI)
+﻿## 2.6.3-PREVIEW1 (2026-10-23; DEV, latest revision needs Windows CI)
+
+- 272 Pester tests in 25 containers passed for source `8e4be719`; user also verified all four real Outlook COM scenarios with disposable PSTs, two matching destination fingerprints, stable MailItem.Size=375442 and blocked retry.
+- Added a standalone **read-only new-process replay** of the preserved journal and mounted source/archive PSTs with strict StoreID/PST/folder identities and unchanged SHA-256; six regression tests. This latest addition requires a fresh CI run.
 
 - Added independent read-only MailMove Intent reconciliation with source/target snapshots, fingerprint and store/path validation.
 - All outcomes fail closed with no automatic retry or journal mutation; legacy/partial Intents are not treated as proof.

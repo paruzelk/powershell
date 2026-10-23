@@ -51,3 +51,7 @@ Before publishing a release package, Windows PowerShell 5.1 must pass `Invoke-CI
 ## Live COM integration test (disposable PSTs)
 
 `Core/Diagnostics/Invoke-OPA263LivePstTest.ps1` creates two **new temporary PSTs** and runs controlled copy/move diagnostics on a message cloned from the specified **test-only** donor PST. The donor's original message is never moved/deleted, but Outlook Copy temporarily writes a duplicate to its folder (if interrupted that duplicate may remain). The script is opt-in with `-Execute` and leaves its journal/PST evidence intact. The new reconciliation module still never issues a retry. Details: `docs/2.6.3-interrupted-move.md`.
+
+## 2.6.3 independent process restart verification
+
+The opt-in live COM harness leaves an unresolved Intent and both temporary PSTs mounted. To check restart replay with a **fresh PowerShell process**, run `Core/Diagnostics/Test-OPA263RestartReadOnly.ps1` against the specific generated `*.operations.jsonl` file. The script attaches to already running Outlook, locates stores by persisted StoreID/PST path, resolves existing folders and independently classifies their contents. It never writes to a PST, attaches a new store, changes the journal, retries a Move, or marks a transaction completed. See `docs/TESTING.md`.

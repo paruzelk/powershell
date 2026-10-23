@@ -50,3 +50,15 @@ Use `Core/Diagnostics/Invoke-OPA263LivePstTest.ps1 -SeedPstPath '<absolute path 
 ### Live COM regression retest after second-copy staging fix
 
 The first live COM integration test passed `SourceOnly`, `DestinationCandidate`, and `BothPresent`, but not `Ambiguous` because the extra bare `Copy()` was not observed as a second matching destination item. Re-run full CI on the **new** commit and then run the opt-in live harness on a newly created pair of disposable PSTs. Confirm `DestinationFingerprintMatches=2` in the generated `report.json` (or examine per-field comparisons if still 1). The harness does not repair original operation journals.
+
+### Independent-process restart gate (read-only)
+
+After a successful opt-in live COM harness run, leave Outlook and both disposable PSTs mounted. Open a **new** Windows PowerShell 5.1 STA process, go to the same source checkout and run:
+
+```powershell
+powershell.exe -NoProfile -STA -File .\Core\Diagnostics\Test-OPA263RestartReadOnly.ps1 `
+  -JournalPath '<exact persisted Temp OPA263-Live-.../live-....operations.jsonl>' `
+  -ExpectedStatus 'Ambiguous'
+```
+
+The result must report `Ambiguous`, `DestinationMatches=2`, no automatic retry, and unchanged journal SHA-256. The script does not create, attach, detach or modify Outlook stores. If stores were detached, Outlook was restarted into a different profile or MAPI StoreID changed, the verifier MUST fail closed rather than searching other PSTs. Windows full CI must be rerun for any source code change.
