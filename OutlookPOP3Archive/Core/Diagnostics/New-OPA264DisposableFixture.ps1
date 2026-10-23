@@ -47,8 +47,8 @@ try {
         throw 'PST already exists.'
     }
     $stage='Create two Unicode PSTs'
-    $ns.AddStoreEx($paths.SourcePst,3)
-    $ns.AddStoreEx($paths.ArchivePst,3)
+    $ns.AddStoreEx($paths.SourcePst,2) # olStoreUnicode=2; 3 is olStoreANSI
+    $ns.AddStoreEx($paths.ArchivePst,2) # olStoreUnicode=2; 3 is olStoreANSI
     $src=Get-OPA264MountedFixtureStore -Namespace $ns -Path $paths.SourcePst
     $dst=Get-OPA264MountedFixtureStore -Namespace $ns -Path $paths.ArchivePst
     if ([string]$src.StoreID -ceq [string]$dst.StoreID) { throw 'Duplicate StoreID.' }
