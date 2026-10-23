@@ -36,7 +36,7 @@ BeforeAll {
         $script:zipSha=([string](Get-FileHash -LiteralPath $script:zipPath -Algorithm SHA256).Hash).ToLowerInvariant()
     }
     function Test-OPAGPackage {
-        Assert-OPA264GDevPackage -SourceRoot $script:srcRoot -ZipPath $script:zipPath -ExpectedSourceCommit $script:commit -ExpectedZipSHA256 $script:zipSha -ExpectedTests 462 -ExpectedContainers 34
+        Assert-OPA264GDevPackage -SourceRoot $script:srcRoot -ZipPath $script:zipPath -ExpectedSourceCommit $script:commit -ExpectedZipSHA256 $script:zipSha -ExpectedTests 464 -ExpectedContainers 34
     }
 }
 Describe '2.6.4-G release integrity audit on synthetic files (no Outlook)' {
@@ -57,7 +57,7 @@ Describe '2.6.4-G release integrity audit on synthetic files (no Outlook)' {
             SourceCommit=$script:commit
             SourceInventorySHA256=$inv.InventorySHA256
             SourceFileCount=2
-            ExpectedPesterTests=462
+            ExpectedPesterTests=464
             ExpectedTestContainers=34
             WindowsCI='PENDING'
             RealOutlookTest='NOT_RUN'
@@ -76,7 +76,7 @@ Describe '2.6.4-G release integrity audit on synthetic files (no Outlook)' {
             }
             Verification=[pscustomobject]@{
                 RealMailMoveViaWorker=$false
-                ExpectedPesterTests=462
+                ExpectedPesterTests=464
                 ExpectedTestContainers=34
             }
         }
@@ -102,13 +102,13 @@ Describe '2.6.4-G release integrity audit on synthetic files (no Outlook)' {
         $p.ProductionReady | Should -BeFalse
     }
     It 'rejects incorrect external ZIP SHA256' {
-        { Assert-OPA264GDevPackage -SourceRoot $script:srcRoot -ZipPath $script:zipPath -ExpectedSourceCommit $script:commit -ExpectedZipSHA256 ('b'*64) -ExpectedTests 462 -ExpectedContainers 34 } | Should -Throw '*SHA256 mismatch*'
+        { Assert-OPA264GDevPackage -SourceRoot $script:srcRoot -ZipPath $script:zipPath -ExpectedSourceCommit $script:commit -ExpectedZipSHA256 ('b'*64) -ExpectedTests 464 -ExpectedContainers 34 } | Should -Throw '*SHA256 mismatch*'
     }
     It 'rejects incorrect externally pinned commit prefix' {
-        { Assert-OPA264GDevPackage -SourceRoot $script:srcRoot -ZipPath $script:zipPath -ExpectedSourceCommit ('c'*40) -ExpectedZipSHA256 $script:zipSha -ExpectedTests 462 -ExpectedContainers 34 } | Should -Throw '*basename*'
+        { Assert-OPA264GDevPackage -SourceRoot $script:srcRoot -ZipPath $script:zipPath -ExpectedSourceCommit ('c'*40) -ExpectedZipSHA256 $script:zipSha -ExpectedTests 464 -ExpectedContainers 34 } | Should -Throw '*basename*'
     }
     It 'rejects an invalid external commit format' {
-        { Assert-OPA264GDevPackage -SourceRoot $script:srcRoot -ZipPath $script:zipPath -ExpectedSourceCommit 'bad' -ExpectedZipSHA256 $script:zipSha -ExpectedTests 462 -ExpectedContainers 34 } | Should -Throw '*pinned*'
+        { Assert-OPA264GDevPackage -SourceRoot $script:srcRoot -ZipPath $script:zipPath -ExpectedSourceCommit 'bad' -ExpectedZipSHA256 $script:zipSha -ExpectedTests 464 -ExpectedContainers 34 } | Should -Throw '*pinned*'
     }
     It 'rejects an alien ZIP root' {
         New-OPAGTestZip -WrongRoot 'OtherProject'
@@ -168,7 +168,7 @@ Describe '2.6.4-G release integrity audit on synthetic files (no Outlook)' {
     It 'rejects claimed CI without exact commit and zero skips' {
         $ci=[pscustomobject]@{
             SourceCommit=('b'*40)
-            Passed=462
+            Passed=464
             Containers=34
             Failed=0
             Skipped=0
@@ -178,7 +178,7 @@ Describe '2.6.4-G release integrity audit on synthetic files (no Outlook)' {
     It 'labels even matching user-reported CI as not independently attested' {
         $ci=[pscustomobject]@{
             SourceCommit=$script:commit
-            Passed=462
+            Passed=464
             Containers=34
             Failed=0
             Skipped=0
