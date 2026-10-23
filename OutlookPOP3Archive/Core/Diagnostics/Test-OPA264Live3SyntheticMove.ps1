@@ -46,8 +46,9 @@ try{
     $srcN=[int]$sourceFolder.Items.Count
     $dstN=[int]$archiveFolder.Items.Count
     $srcMatches=0;$dstMatches=0
-    foreach($pair in @(@($sourceFolder,'Source'),@($archiveFolder,'Destination'))){
-        $folder=$pair[0];$role=[string]$pair[1]
+    foreach($role in @('Source','Destination')){
+        $folder=$sourceFolder
+        if($role -ceq 'Destination'){$folder=$archiveFolder}
         for($i=1;$i -le [int]$folder.Items.Count;$i++){
             $item=$folder.Items.Item($i)
             if($null -eq $item -or [int]$item.Class -ne 43){continue}
