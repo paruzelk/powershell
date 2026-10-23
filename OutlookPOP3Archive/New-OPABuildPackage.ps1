@@ -15,7 +15,15 @@ if ([string]::IsNullOrWhiteSpace($OutputDirectory)) {
 if ($ExpectedBuild -notmatch '^\d+\.\d+\.\d+(?:-[A-Za-z0-9]+)*$') {
     throw 'Invalid ExpectedBuild. Use the exact RELEASE.json Build value.'
 }
-if ($SourceCommit -and $SourceCommit -notmatch '^[a-fA-F0-9]{40}
+if ($SourceCommit -and $SourceCommit -notmatch '^[a-fA-F0-9]{40}$') {
+    throw 'SourceCommit must be a full 40-character Git SHA.'
+}
+if ($SourceCommit -and [string]::IsNullOrWhiteSpace($ExpectedSourceInventorySha256)) {
+    throw 'SourceCommit alone is only a label. Supply -ExpectedSourceInventorySha256 from the pinned Git commit.'
+}
+if (-not $SourceCommit -and -not [string]::IsNullOrWhiteSpace($ExpectedSourceInventorySha256)) {
+    throw 'ExpectedSourceInventorySha256 requires SourceCommit.'
+}
 . (Join-Path $root 'Core/Runtime/ReleasePackage.ps1')
 [void](Assert-OPAReleaseSourceHygiene -ProjectRoot $root)
 
