@@ -1,4 +1,12 @@
-﻿## 2.6.4-B2 (2026-10-23; disposable fixture and owned-worker controller DEV)
+﻿## 2.6.4-C (2026-10-23; controlled crash injection DEV)
+
+- User-reported B2 Windows PS5.1 Pester PASS: 334 tests in 29 containers; C testing still pending.
+- Added strict run-scoped, PID-correlated and durably flushed controlled crash barriers; parent may terminate only its own test Worker process.
+- Supports opt-in AfterIntentBeforeDispatch, WorkerStartedBeforeMove, AfterMoveBeforeResponse and AfterResponseBeforeTerminal (diagnostic-report boundary; no journal terminal) windows. DuringMove is not deterministically injectable.
+- Added 24 offline crash barrier tests: expected full Windows CI 358 tests in 30 containers. No live Outlook MailMove has been executed in C.
+- Production WorkerProtocol, Archive, Resume and Auto remain unchanged on FIX13b; no retries or automatic journal completion.
+
+## 2.6.4-B2 (2026-10-23; disposable fixture and owned-worker controller DEV)
 
 - User-reported Windows PS5.1 Pester PASS on exact preceding 2.6.4-B increment: 320 tests in 28 containers, zero failures/skips; this does NOT certify B2.
 - Added opt-in NEW two-PST fixture generator, synthetic test mail, durable single Intent and last-written scope marker. No production/user mail copied.
