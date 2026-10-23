@@ -39,6 +39,7 @@ try {
     if ($null -eq $app) { throw 'Outlook is not running.' }
     $ns=$app.GetNamespace('MAPI')
     $profile=[string]$ns.CurrentProfileName
+    $pstSizeMB=[Math]::Round(([double](Get-Item -LiteralPath $expected -Force).Length / 1MB),2)
     $selected=$null
     $storeMatches=0
     for($i=1;$i -le [int]$ns.Stores.Count;$i++){
@@ -46,7 +47,10 @@ try {
         $path=''
         try { $path=[string]$item.FilePath } catch { $path='' }
         if ([string]::IsNullOrWhiteSpace($path)) { continue }
-        if ([string]::Equals([IO.Path]::GetFullPath($path),$expected,
+        $canonical=''
+        try { $canonical=[IO.Path]::GetFullPath($path) }
+        catch { continue }
+        if ([string]::Equals($canonical,$expected,
                 [StringComparison]::OrdinalIgnoreCase)) {
             $selected=$item
             $storeMatches++
@@ -111,7 +115,7 @@ try {
         CurrentProfile=$profile
         SourcePst=$expected
         SourceStoreDisplayName=[string]$selected.DisplayName
-        SourceSizeMB=[Math]::Round([double]([IO.FileInfo]$expected).Length/1MB,2)
+        SourceSizeMB=$pstSizeMB
         MatchingPop3Account=$matchingAccountName
         Pop3Accounts=$pop3Accounts
         ImapAccounts=$imapAccounts
