@@ -167,36 +167,130 @@ function Compare-OPA264RestoreFolderInventories {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Source,
           [Parameter(Mandatory=$true)][object]$Restored)
-    $original=[Collections.Generic.Dictionary[string,string]]::new([StringComparer]::OrdinalIgnoreCase)
-    $duplicate=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+
+    # This function is PURE: only folder-relative names and counts are
+    # used, never MailItem, MAPI identities, subjects, bodies or archives.
+    $original=[Collections.Generic.Dictionary[string,object]]::new(
+        [StringComparer]::OrdinalIgnoreCase)
+    $restoredSeen=[Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase)
+    $diffTypes=New-Object 'System.Collections.Generic.List[string]'
+    $diffRows=New-Object 'System.Collections.Generic.List[object]'
+    [long]$sourceItems=0
+    [long]$restoredItems=0
+    $structureEqual=$true
+    $itemCountsEqual=$true
+    $subfolderCountsEqual=$true
+
     foreach ($row in @($Source.Folders)) {
         $path=[string]$row.RelativePath
-        if ($original.ContainsKey($path)) { throw 'Source inventory has duplicate relative folder paths.' }
-        $original.Add($path,([string]$row.Items+'/'+[string]$row.Subfolders))
+        if ($original.ContainsKey($path)) {
+            throw 'Source inventory has duplicate relative folder paths.'
+        }
+        if ([long]$row.Items -lt 0 -or [long]$row.Subfolders -lt 0) {
+            throw 'Source inventory has negative folder counts.'
+        }
+        $sourceItems += [long]$row.Items
+        $original.Add($path,$row)
     }
-    $differences=New-Object 'System.Collections.Generic.List[object]'
+
     foreach ($row in @($Restored.Folders)) {
         $path=[string]$row.RelativePath
-        if (-not $duplicate.Add($path)) { throw 'Restored inventory has duplicate relative paths.' }
-        $expected=$null
-        if (-not $original.TryGetValue($path,[ref]$expected)) {
-            [void]$differences.Add('UnexpectedFolder')
+        if (-not $restoredSeen.Add($path)) {
+            throw 'Restored inventory has duplicate relative folder paths.'
         }
-        elseif ($expected -cne ([string]$row.Items+'/'+[string]$row.Subfolders)) {
-            [void]$differences.Add('CountMismatch')
+        if ([long]$row.Items -lt 0 -or [long]$row.Subfolders -lt 0) {
+            throw 'Restored inventory has negative folder counts.'
+        }
+        $restoredItems += [long]$row.Items
+        $sourceRow=$null
+        if (-not $original.TryGetValue($path,[ref]$sourceRow)) {
+            $structureEqual=$false
+            $itemCountsEqual=$false
+            $subfolderCountsEqual=$false
+            [void]$diffTypes.Add('UnexpectedFolder')
+            [void]$diffRows.Add([pscustomobject]@{
+                RelativePath=$path
+                Type='UnexpectedFolder'
+                SourceItems=$null
+                RestoredItems=[long]$row.Items
+                SourceSubfolders=$null
+                RestoredSubfolders=[int]$row.Subfolders
+            })
+            continue
+        }
+        $itemsDiffer=([long]$sourceRow.Items -ne [long]$row.Items)
+        $childrenDiffer=([int]$sourceRow.Subfolders -ne [int]$row.Subfolders)
+        if ($itemsDiffer) { $itemCountsEqual=$false }
+        if ($childrenDiffer) {
+            $structureEqual=$false
+            $subfolderCountsEqual=$false
+        }
+        if ($itemsDiffer -or $childrenDiffer) {
+            # Retain the LIVE2 summary type for backwards compatibility.
+            [void]$diffTypes.Add('CountMismatch')
+            $reason='ItemCountMismatch'
+            if ($childrenDiffer) { $reason='SubfolderCountMismatch' }
+            if ($itemsDiffer -and $childrenDiffer) {
+                $reason='ItemAndSubfolderCountMismatch'
+            }
+            [void]$diffRows.Add([pscustomobject]@{
+                RelativePath=$path
+                Type=$reason
+                SourceItems=[long]$sourceRow.Items
+                RestoredItems=[long]$row.Items
+                SourceSubfolders=[int]$sourceRow.Subfolders
+                RestoredSubfolders=[int]$row.Subfolders
+            })
         }
     }
+
     foreach ($path in $original.Keys) {
-        if (-not $duplicate.Contains($path)) { [void]$differences.Add('MissingFolder') }
+        if (-not $restoredSeen.Contains($path)) {
+            $structureEqual=$false
+            $itemCountsEqual=$false
+            $subfolderCountsEqual=$false
+            $row=$original[$path]
+            [void]$diffTypes.Add('MissingFolder')
+            [void]$diffRows.Add([pscustomobject]@{
+                RelativePath=$path
+                Type='MissingFolder'
+                SourceItems=[long]$row.Items
+                RestoredItems=$null
+                SourceSubfolders=[int]$row.Subfolders
+                RestoredSubfolders=$null
+            })
+        }
     }
-    $equal=($differences.Count -eq 0 -and
-        [int]$Source.FolderCount -eq [int]$Restored.FolderCount)
+
+    $folderCountEqual=([int]$Source.FolderCount -eq
+        [int]$Restored.FolderCount)
+    if (-not $folderCountEqual) {
+        $structureEqual=$false
+        $itemCountsEqual=$false
+        $subfolderCountsEqual=$false
+    }
+    # Fail closed on malformed caller snapshots even if sets agree.
+    if ([int]$Source.FolderCount -ne $original.Count -or
+        [int]$Restored.FolderCount -ne $restoredSeen.Count) {
+        throw 'Restore inventory folder count is inconsistent with its rows.'
+    }
+    $equal=($structureEqual -and $itemCountsEqual -and
+        $subfolderCountsEqual -and $diffRows.Count -eq 0)
     return [pscustomobject]@{
-        Schema='2.6.4-LIVE2.Comparison.1'
+        Schema='2.6.4-LIVE2B.Comparison.1'
         FolderCountSource=[int]$Source.FolderCount
         FolderCountRestored=[int]$Restored.FolderCount
-        FolderStructureAndCountsEqual=$equal
-        DifferenceTypes=$differences.ToArray()
+        FolderStructureEqual=[bool]$structureEqual
+        ItemCountsEqual=[bool]$itemCountsEqual
+        SubfolderCountsEqual=[bool]$subfolderCountsEqual
+        TotalItemsSource=[long]$sourceItems
+        TotalItemsRestored=[long]$restoredItems
+        FolderStructureAndCountsEqual=[bool]$equal
+        DifferenceCount=[int]$diffRows.Count
+        DifferenceTypes=$diffTypes.ToArray()
+        # Only a relative folder path plus numeric counts. Never mail metadata.
+        Differences=$diffRows.ToArray()
         MailMoveAllowed=$false
         OriginalPstModified=$false
         ProductionReady=$false
