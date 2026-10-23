@@ -1,4 +1,12 @@
-﻿## 2.6.4-E (2026-10-23; test-only PST detach/reopen identity stability DEV)
+﻿## 2.6.4-F (2026-10-23; machine-readable crash evidence audit DEV)
+
+- User-reported Windows PowerShell 5.1 Pester PASS for stage E: 409 tests in 32 containers, zero failures/skips. F native CI remains pending.
+- Added pure, fail-closed JSON-ready audit validator for 2.6.4-D read-only reconciliation and optional 2.6.4-E PST identity stability evidence; strict RunId/OperationId correlation, safety flags, controlled crash-barrier classification and privacy-limited output.
+- Added opt-in read-only diagnostic CLI invoking existing 2.6.4-D fresh Outlook recovery scan, no MailMove or journal mutation; it reports evidence but cannot prove Move correctness or production readiness.
+- Added four-window diagnostic evidence coverage, but ProductionReady remains false unconditionally pending REAL isolated Outlook crash/restart tests.
+- Added 33 non-COM audit tests; full Windows CI target 442 in 33 containers, pending. Production Archive/Resume/Auto remain unchanged.
+
+## 2.6.4-E (2026-10-23; test-only PST detach/reopen identity stability DEV)
 
 - User-reported Windows PS5.1 CI PASS on 2.6.4-D: 381 tests in 31 containers; E has not yet passed Windows CI.
 - Added disposable identity observation and fail-closed comparison of StoreID, FolderID, folder path and synthetic MailItem EntryID after reattaching two NEW PSTs.
