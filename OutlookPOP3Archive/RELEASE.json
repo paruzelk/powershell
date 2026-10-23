@@ -19,10 +19,10 @@
     "SourceCommit packages require matching independently pinned full source inventory SHA-256."
   ],
   "Verification": {
-    "Status": "2.6.4-B scoped test-only MailMove DEV; no production integration; Windows CI pending",
+    "Status": "2.6.4-B2 disposable fixture/controller DEV; Windows CI and live Outlook test pending",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": true,
-    "ExpectedTestContainers": 28,
-    "ExpectedPesterTests": 320
+    "ExpectedTestContainers": 29,
+    "ExpectedPesterTests": 334
   }
 }
