@@ -59,8 +59,8 @@ function Assert-OPA264GDevPackage {
         [Parameter(Mandatory=$true)][string]$ZipPath,
         [Parameter(Mandatory=$true)][string]$ExpectedSourceCommit,
         [Parameter(Mandatory=$true)][string]$ExpectedZipSHA256,
-        [ValidateRange(1,50000)][int]$ExpectedTests=442,
-        [ValidateRange(1,1000)][int]$ExpectedContainers=33
+        [ValidateRange(1,50000)][int]$ExpectedTests=464,
+        [ValidateRange(1,1000)][int]$ExpectedContainers=34
     )
     if ($ExpectedSourceCommit -cnotmatch '^[a-f0-9]{40}$' -or
         $ExpectedZipSHA256 -cnotmatch '^[a-f0-9]{64}$') {
