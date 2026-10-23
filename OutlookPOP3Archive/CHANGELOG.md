@@ -1,4 +1,27 @@
-﻿## 2.6.2-PREVIEW1 (2026-10-22; candidate pending full CI)
+﻿## 2.6.3-PREVIEW1 (2026-10-23; DEV, exact-source build gate pending Windows CI)
+
+- Fixed false-positive restart read-only safety test: old raw-text negative regex matched a harmless `New-Object -ComObject` reference in a comment. New test inspects PowerShell CommandAst/InvokeMemberExpressionAst nodes instead; still forbids executable COM construction, PST store mutations, mail moves/copies/deletes, and operation-journal writes.
+- User Windows CI of preceding source `053c37ef`: 280 tests passed and 1 test failed in 26 containers; CI correctly failed. Latest source requires a new full Windows CI and exact-source package verification.
+
+- Hardened the project-only packager: a full Git SourceCommit must accompany an independently pinned SHA-256 of all packaged source file identities and bytes. Prevents mislabeled archives assembled from old extracted trees.
+- CI now checks expected **26 containers and 281 tests** from `RELEASE.json`; added 3 source-integrity regression tests.
+- Previous `gd4bc6974` ZIP was generated from older `g8e4be719` directory (272 tests/25 containers, 70 source files), therefore not verified as source commit `d4bc6974` despite its filename and SourceCommit metadata.
+
+- 272 Pester tests in 25 containers passed for source `8e4be719`; user also verified all four real Outlook COM scenarios with disposable PSTs, two matching destination fingerprints, stable MailItem.Size=375442 and blocked retry.
+- Added a standalone **read-only new-process replay** of the preserved journal and mounted source/archive PSTs with strict StoreID/PST/folder identities and unchanged SHA-256; six regression tests. This latest addition requires a fresh CI run.
+
+- Added independent read-only MailMove Intent reconciliation with source/target snapshots, fingerprint and store/path validation.
+- All outcomes fail closed with no automatic retry or journal mutation; legacy/partial Intents are not treated as proof.
+- Added Pester tests for false duplicates, missing messages, incomplete MAPI enumeration and mismatched identities.
+- Removed obsolete version-prefixed 2.6.2 design filename from active package; content retained under docs/OPERATION-JOURNAL.md.
+- Corrected malformed MoveReconciliation test fixture: `EntryID` and `EntryId` are duplicate keys in case-insensitive PowerShell hash literals.
+- Fixed critical CI false-positive: 229 tests passed but a Pester container could fail discovery while old CI printed PASS. CI now checks run Result, failed containers and blocks, discovered container count, and test parse errors.
+- Added 12 CI release-gate regression tests, including a failed discovery container with zero failing It tests.
+- Added an opt-in Outlook COM integration harness operating on two fresh, disposable PSTs, with a copied donor test message and four crash-window observation scenarios. The donor test PST can temporarily receive a copied message.
+- Live Outlook test on prior commit: first three scenarios PASS (SourceOnly / DestinationCandidate / BothPresent) and MailItem.Size remained 375442 bytes across the first Move; Ambiguous FAIL because the second plain Copy() did not produce a second matching destination item. Changed diagnostic duplicate staging to Copy -> Move into disposable source -> Move back into disposable archive and added diagnostic snapshot/fingerprint counts. Needs re-test on Windows.
+- Worker Move still disabled; FIX13b remains the production archive engine. Full PS5.1 CI required for each new revision.
+
+## 2.6.2-PREVIEW1 (2026-10-22; candidate pending full CI)
 
 - Introduced append-only SHA-256 Durable Operation Journal for diagnostic Worker; controller-supplied RequestId, durable Intent and terminal outcome, exclusive journal lock and fail-closed replay.
 - Independent PowerShell restart, Worker crash and truncated-tail fault injection tested successfully by the user on the preceding development snapshot; Pester worker journal suite 11 passed, 0 failed.

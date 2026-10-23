@@ -1,4 +1,4 @@
-﻿# Architecture — 2.6.2-PREVIEW1
+﻿# Architecture — 2.6.3-PREVIEW1
 
 The main `OutlookPOP3Archive.ps1` still invokes the FIX13b in-process Outlook COM archiver and normal transaction pipeline. `Core/Archive/MailMover.ps1`, `ArchiveTransaction.ps1` and `StoragePolicy.ps1` are unchanged from 2.6.0-PREVIEW1a.
 
@@ -17,3 +17,7 @@ The worker is a process-isolation boundary only, not a security sandbox. No arbi
 ## 2.6.2 isolated operation journal
 
 `Core/Archive/OperationJournal.ps1` appends Base64-encoded SHA-256-protected JSONL events, calls `FileStream.Flush(true)`, and refuses to overwrite or trim broken records. The diagnostic controller holds an exclusive `.lock` file handle, persists `Intent` with transaction ID, sequence and caller-owned GUID, then executes the bounded worker and commits a validated outcome. Replay blocks retry on incomplete, corrupt, failed or unknown operations. `WorkerSucceeded` never means that mail has been moved. The separate existing archive transaction/step journal and DuplicateIndex remain in use on the in-process FIX13b path.
+
+## Read-only 2.6.3 evidence review
+
+`Core/Archive/MoveReconciliation.ps1` evaluates a verified MailMove Intent against complete source/destination folder snapshots. Incomplete scans, identity mismatches and fingerprint collisions block decisions. No status permits automatic retry or journal mutation.

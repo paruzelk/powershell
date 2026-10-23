@@ -1,4 +1,4 @@
-﻿# Configuration — 2.6.2-PREVIEW1
+﻿# Configuration — 2.6.3-PREVIEW1
 
 Use `-Mode Analyze` for account discovery and `-Mode Plan` to inspect selected POP3 folders before moving mail. `-ProfileName 'Outlook'` selects a profile. `-OlderThanMonths 12` is the default; zero requires `-IgnoreAge`. POP3 Sent Items and nested folders are included. `-ArchiveDeletedItems`, `-ArchiveDrafts`, `-ArchiveJunk` are explicit opt-ins; Outbox remains excluded.
 
@@ -9,3 +9,5 @@ For tests, import `Core/Worker/WorkerProtocol.ps1`, `WorkerHost.ps1`, then `Work
 ### 2.6.2 opt-in diagnostics
 
 For durable *diagnostic* operations, dot-source `Core/Worker/WorkerOperationJournal.ps1` and use `Get-OPAWorkerOperationJournalPath`, `Invoke-OPAWorkerJournaledOperation`, and `Get-OPAWorkerOperationJournalState`. Use a dedicated diagnostic transaction directory, not a production transaction journal. This API never delegates `MailItem.Move()`. The three Worker flags in `RELEASE.json` remain disabled.
+
+2.6.3 read-only review: dot-source `Core/Archive/OperationJournal.ps1` and `Core/Archive/MoveReconciliation.ps1`. Pass only existing verified source/destination folder handles; the API does not mount a PST or move mail.

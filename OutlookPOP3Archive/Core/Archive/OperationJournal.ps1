@@ -28,6 +28,14 @@ function Write-OPAOperationJournalEvent {
         [string]$SourceEntryId = '',
         [string]$ArchiveEntryId = '',
         [string]$ArchivePst = '',
+        # 2.6.3 read-only reconciliation evidence, preserved with Intent.
+        [string]$SourceStoreId = '',
+        [string]$SourceFolderPath = '',
+        [string]$TargetFolderPath = '',
+        [string]$InternetMessageId = '',
+        [string]$Subject = '',
+        [string]$Sender = '',
+        [long]$Size = 0,
         [string]$Message = ''
     )
 
@@ -60,6 +68,13 @@ function Write-OPAOperationJournalEvent {
         SourceEntryId = $SourceEntryId
         ArchiveEntryId= $ArchiveEntryId
         ArchivePst    = $ArchivePst
+        SourceStoreId = $SourceStoreId
+        SourceFolderPath = $SourceFolderPath
+        TargetFolderPath = $TargetFolderPath
+        InternetMessageId = $InternetMessageId
+        Subject       = $Subject
+        Sender        = $Sender
+        Size          = $Size
         Message       = $Message
     }
     $utf8 = New-Object System.Text.UTF8Encoding($false)
@@ -198,6 +213,13 @@ function Resolve-OPAOperationRecovery {
                 SourceEntryId = [string]$event.SourceEntryId
                 ArchiveEntryId= ''
                 ArchivePst    = [string]$event.ArchivePst
+                SourceStoreId = [string]$event.SourceStoreId
+                SourceFolderPath = [string]$event.SourceFolderPath
+                TargetFolderPath = [string]$event.TargetFolderPath
+                InternetMessageId = [string]$event.InternetMessageId
+                Subject       = [string]$event.Subject
+                Sender        = [string]$event.Sender
+                Size          = [long]$event.Size
                 Status        = 'Indeterminate'
                 OperationKind = $(if ($event.PSObject.Properties.Name -contains 'OperationKind') { [string]$event.OperationKind } else { 'MailMove' })
                 ExplicitIndeterminate = $false

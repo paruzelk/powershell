@@ -62,8 +62,24 @@ $obsolete = @(Get-ChildItem -LiteralPath $root -File | Where-Object {
 if ($obsolete.Count -gt 0) { throw ('Obsolete package files detected: ' + (($obsolete | ForEach-Object { $_.Name }) -join ', ')) }
 # No Pester test may pin the old 0.9.x pattern, or embed a stale build tag.
 $testFiles = @(Get-ChildItem -Path (Join-Path $root 'Tests') -Recurse -File -Filter '*.Tests.ps1')
+if ($release.Verification.PSObject.Properties.Name -contains 'ExpectedTestContainers' -and
+    $testFiles.Count -ne [int]$release.Verification.ExpectedTestContainers) {
+    throw ("Test inventory incomplete: expected {0} test files, found {1}." -f
+        [int]$release.Verification.ExpectedTestContainers,$testFiles.Count)
+}
 $tagPattern = '\d+\.\d+\.\d+-rc\d+-build\d+\.\d+\.\d+(?:-[A-Za-z0-9]+)*'
 foreach ($testFile in $testFiles) {
+    # Fail early on syntax/discovery errors in tests. Pester's FailedCount
+    # does not include a test file rejected before discovery.
+    $testTokens = $null
+    $testParseErrors = $null
+    [void][System.Management.Automation.Language.Parser]::ParseFile(
+        [string]$testFile.FullName,[ref]$testTokens,[ref]$testParseErrors)
+    if ($null -ne $testParseErrors -and $testParseErrors.Count -gt 0) {
+        $first = $testParseErrors[0]
+        throw ("Test source syntax failure: {0}:{1}: {2}" -f
+            [string]$testFile.FullName,[int]$first.Extent.StartLineNumber,[string]$first.Message)
+    }
     $testContent = Get-Content -LiteralPath $testFile.FullName -Raw
     if ($testContent.Contains('^0\.9\.')) {
         throw ("Obsolete hardcoded application-version regex in test: {0}" -f $testFile.FullName)
@@ -234,11 +250,15 @@ Import-Module Pester -MinimumVersion 5.0 -Force -ErrorAction Stop
 # cannot silently succeed just because the console printed failures.
 $pesterResult = Invoke-Pester -Path (Join-Path $root 'Tests') -PassThru
 if ($null -eq $pesterResult) { throw 'Pester returned no result; release denied.' }
-$passed = [int]$pesterResult.PassedCount
-$failed = [int]$pesterResult.FailedCount
-$skipped = [int]$pesterResult.SkippedCount
-if ($failed -gt 0 -or $skipped -gt 0 -or $passed -le 0) {
-    throw ("Pester release gate failed: passed={0}, failed={1}, skipped={2}." -f $passed,$failed,$skipped)
+. (Join-Path $root 'Core/Runtime/PesterReleaseGate.ps1')
+# Count every discovered test file, including files that fail to parse.
+# A discovery error creates a failed container but can leave FailedCount=0.
+$gate = Assert-OPAPesterReleaseGate -Result $pesterResult -ExpectedContainerCount $testFiles.Count
+if ($release.Verification.PSObject.Properties.Name -contains 'ExpectedPesterTests' -and
+    $gate.PassedCount -ne [int]$release.Verification.ExpectedPesterTests) {
+    throw ("Pester test count incomplete: expected {0}, passed {1}." -f
+        [int]$release.Verification.ExpectedPesterTests,$gate.PassedCount)
 }
-Write-Host ("PASS Pester: {0} tests, 0 failed, 0 skipped." -f $passed)
+Write-Host ("PASS Pester: {0} tests in {1} containers, 0 failed, 0 skipped, 0 failed containers." -f
+    $gate.PassedCount,$gate.ContainerCount)
 Write-Host 'CI PASSED — release prerequisites satisfied.'

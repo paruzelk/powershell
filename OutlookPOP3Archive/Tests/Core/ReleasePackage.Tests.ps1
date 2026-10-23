@@ -63,4 +63,28 @@ Describe 'Release ZIP hygiene and allowlist' {
         { Get-OPAReleasePackageFiles -ProjectRoot $script:project -ExpectedBuild '2.6.2-PREVIEW1' } |
             Should -Throw '*Mandatory release source file is missing*'
     }
+
+    It 'calculates a deterministic inventory hash independent of file iteration order' {
+        $inventory = @(Get-OPAReleasePackageFiles -ProjectRoot $script:project -ExpectedBuild '2.6.2-PREVIEW1')
+        $expected = Get-OPAReleaseSourceInventorySha256 -Files $inventory
+        $reversed = @($inventory | Sort-Object RelativePath -Descending)
+        Get-OPAReleaseSourceInventorySha256 -Files $reversed | Should -Be $expected
+        $expected | Should -Match '^[a-f0-9]{64}$'
+        Assert-OPAReleaseSourceInventorySha256 -Files $inventory -ExpectedSha256 $expected | Should -Be $expected
+    }
+    It 'refuses a changed source file even if version and file count remain unchanged' {
+        $inventory = @(Get-OPAReleasePackageFiles -ProjectRoot $script:project -ExpectedBuild '2.6.2-PREVIEW1')
+        $expected = Get-OPAReleaseSourceInventorySha256 -Files $inventory
+        [IO.File]::AppendAllText((Join-Path $script:project 'Core/Archive/MailMover.ps1'),'modified')
+        { Assert-OPAReleaseSourceInventorySha256 -Files $inventory -ExpectedSha256 $expected } |
+            Should -Throw '*Source inventory SHA-256 mismatch*'
+    }
+    It 'refuses an extra test file missing from the pinned source manifest' {
+        $inventory = @(Get-OPAReleasePackageFiles -ProjectRoot $script:project -ExpectedBuild '2.6.2-PREVIEW1')
+        $expected = Get-OPAReleaseSourceInventorySha256 -Files $inventory
+        [IO.File]::WriteAllText((Join-Path $script:project 'Tests/Core/Extra.Tests.ps1'),'test')
+        $updated = @(Get-OPAReleasePackageFiles -ProjectRoot $script:project -ExpectedBuild '2.6.2-PREVIEW1')
+        { Assert-OPAReleaseSourceInventorySha256 -Files $updated -ExpectedSha256 $expected } |
+            Should -Throw '*Source inventory SHA-256 mismatch*'
+    }
 }

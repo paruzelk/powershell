@@ -83,3 +83,58 @@ function Assert-OPAReleaseSourceHygiene {
     }
     return $true
 }
+
+# Portable source identity for ZIP-based builds that do not contain .git.
+# SHA-256 covers every release-selected relative path and exact source bytes.
+function Get-OPAReleaseSourceInventorySha256 {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object[]]$Files)
+
+    if ($Files.Count -lt 1) { throw 'Source inventory must not be empty.' }
+    $entries = @{}
+    foreach ($file in $Files) {
+        $relative = [string]$file.RelativePath
+        $full = [string]$file.FullName
+        if ([string]::IsNullOrWhiteSpace($relative) -or
+            $relative.Contains([string][char]92) -or
+            [string]::IsNullOrWhiteSpace($full) -or
+            -not (Test-Path -LiteralPath $full -PathType Leaf)) {
+            throw "Invalid source inventory record: '$relative'."
+        }
+        if ($entries.ContainsKey($relative)) { throw "Duplicate source inventory path: '$relative'." }
+        $entries[$relative] = (Get-FileHash -LiteralPath $full -Algorithm SHA256 -ErrorAction Stop).Hash.ToLowerInvariant()
+    }
+    $names = [string[]]@($entries.Keys)
+    [Array]::Sort($names, [StringComparer]::Ordinal)
+    $builder = New-Object System.Text.StringBuilder
+    foreach ($name in $names) {
+        [void]$builder.Append($name)
+        [void]$builder.Append([char]9)
+        [void]$builder.Append([string]$entries[$name])
+        [void]$builder.Append([char]10)
+    }
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $utf8 = New-Object System.Text.UTF8Encoding($false)
+        $bytes = $utf8.GetBytes($builder.ToString())
+        return ([BitConverter]::ToString($sha.ComputeHash($bytes))).Replace('-', '').ToLowerInvariant()
+    }
+    finally { $sha.Dispose() }
+}
+
+function Assert-OPAReleaseSourceInventorySha256 {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][object[]]$Files,
+        [Parameter(Mandatory=$true)][string]$ExpectedSha256
+    )
+    if ($ExpectedSha256 -notmatch '^[a-fA-F0-9]{64}$') {
+        throw 'Expected source inventory SHA-256 must contain 64 hexadecimal characters.'
+    }
+    $actual = Get-OPAReleaseSourceInventorySha256 -Files $Files
+    if ($actual -cne $ExpectedSha256.ToLowerInvariant()) {
+        throw ("Source inventory SHA-256 mismatch: requested Git source is NOT the current directory. Expected {0}; got {1}." -f
+            $ExpectedSha256.ToLowerInvariant(),$actual)
+    }
+    return $actual
+}

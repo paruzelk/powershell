@@ -1,11 +1,11 @@
-﻿OutlookPOP3Archive 2.6.2-PREVIEW1
-Build: 2.6.2-PREVIEW1
-Application: 0.9.4-rc1-build2.6.2-PREVIEW1
+﻿OutlookPOP3Archive 2.6.3-PREVIEW1
+Build: 2.6.3-PREVIEW1
+Application: 0.9.4-rc1-build2.6.3-PREVIEW1
 Transaction schema: 2.5.4
 DuplicateIndex schema: 1.2
 Worker JSON protocol: 1.0
 Target: Windows PowerShell 5.1 / Outlook 2016-2019
 
 Production Archive/Resume/Auto use the tested FIX13b engine unchanged.
-Worker 2.6.2 supports diagnostic-only durable Intent/outcome journaling; no Move delegation.
+2.6.3: read-only MailMove source/destination evidence review; no automatic reconciliation or Worker Move.
 The package excludes prior-build test plans, transient files and old build notes.

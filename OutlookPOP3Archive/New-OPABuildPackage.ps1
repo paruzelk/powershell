@@ -4,7 +4,8 @@
 param(
     [Parameter(Mandatory=$true)][string]$ExpectedBuild,
     [string]$OutputDirectory = '',
-    [string]$SourceCommit = ''
+    [string]$SourceCommit = '',
+    [string]$ExpectedSourceInventorySha256 = ''
 )
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
@@ -14,8 +15,14 @@ if ([string]::IsNullOrWhiteSpace($OutputDirectory)) {
 if ($ExpectedBuild -notmatch '^\d+\.\d+\.\d+(?:-[A-Za-z0-9]+)*$') {
     throw 'Invalid ExpectedBuild. Use the exact RELEASE.json Build value.'
 }
-if ($SourceCommit -and $SourceCommit -notmatch '^[a-fA-F0-9]{7,40}$') {
-    throw 'SourceCommit must be a Git SHA (7-40 hexadecimal characters).'
+if ($SourceCommit -and $SourceCommit -notmatch '^[a-fA-F0-9]{40}$') {
+    throw 'SourceCommit must be a full 40-character Git SHA.'
+}
+if ($SourceCommit -and [string]::IsNullOrWhiteSpace($ExpectedSourceInventorySha256)) {
+    throw 'SourceCommit alone is only a label. Supply -ExpectedSourceInventorySha256 from the pinned Git commit.'
+}
+if (-not $SourceCommit -and -not [string]::IsNullOrWhiteSpace($ExpectedSourceInventorySha256)) {
+    throw 'ExpectedSourceInventorySha256 requires SourceCommit.'
 }
 . (Join-Path $root 'Core/Runtime/ReleasePackage.ps1')
 [void](Assert-OPAReleaseSourceHygiene -ProjectRoot $root)
@@ -30,6 +37,11 @@ if ([string]$release.Build -cne $ExpectedBuild) {
 }
 $items = @(Get-OPAReleasePackageFiles -ProjectRoot $root -ExpectedBuild $ExpectedBuild)
 if ($items.Count -lt 10) { throw 'No source files selected for packaging.' }
+$actualInventorySha256 = Get-OPAReleaseSourceInventorySha256 -Files $items
+if ($SourceCommit) {
+    [void](Assert-OPAReleaseSourceInventorySha256 -Files $items -ExpectedSha256 $ExpectedSourceInventorySha256)
+}
+Write-Host ("Source inventory SHA-256: {0} ({1} files)" -f $actualInventorySha256,$items.Count)
 
 $version = $ExpectedBuild.ToLowerInvariant()
 $artifactName = 'OutlookPOP3Archive-v' + $version
@@ -58,6 +70,7 @@ try {
         Build = $ExpectedBuild
         ApplicationVersion = [string]$release.ApplicationVersion
         SourceCommit = $SourceCommit
+        SourceInventorySha256 = $actualInventorySha256
         CreatedUtc = [datetime]::UtcNow.ToString('o')
         Files = $items.Count
         TestsRequired = $true
@@ -77,6 +90,7 @@ try {
         SHA256 = $hash
         Build = $ExpectedBuild
         SourceCommit = $SourceCommit
+        SourceInventorySha256 = $actualInventorySha256
         IncludedSourceFiles = $items.Count
     }
 }

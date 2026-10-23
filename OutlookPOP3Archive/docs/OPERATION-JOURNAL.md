@@ -1,6 +1,6 @@
-# OutlookPOP3Archive 2.6.2 — Durable Operation Journal (work in progress)
+# OutlookPOP3Archive — Durable Operation Journal (2.6.2 diagnostic baseline)
 
-**Status:** feature branch; NOT an official release. The feature branch now includes the exact 2.6.1-PREVIEW1a source tree published to `develop` on 2026-10-22. **Do not merge this feature into `main` or deploy to Outlook until the 2.6.2 integration and Windows CI/fault-injection tests pass.**
+**Status:** 2.6.2-preview1 published as a diagnostic preview; 2.6.3 adds a separate read-only MailMove evaluator. The feature branch now includes the exact 2.6.1-PREVIEW1a source tree published to `develop` on 2026-10-22. **Do not merge this feature into `main` or deploy to Outlook until the 2.6.2 integration and Windows CI/fault-injection tests pass.**
 
 ## Objective
 
