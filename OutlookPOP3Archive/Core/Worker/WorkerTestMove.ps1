@@ -131,7 +131,8 @@ function Assert-OPA264TestStore {
           [Parameter(Mandatory=$true)][string]$StoreId,
           [Parameter(Mandatory=$true)][string]$PstPath)
     $matched = 0
-    foreach ($store in @($Namespace.Stores)) {
+    for ($index=1; $index -le [int]$Namespace.Stores.Count; $index++) {
+        $store = $Namespace.Stores.Item($index)
         if ([string]::Equals([string]$store.StoreID,$StoreId,[StringComparison]::Ordinal)) {
             if (-not [string]::Equals([string]$store.FilePath,$PstPath,
                 [StringComparison]::OrdinalIgnoreCase)) {
