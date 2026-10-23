@@ -22,6 +22,11 @@ function Get-OPA264RestorePlan {
     }
     $source=Assert-OPA264BackupLocalPath -Path $SourcePst -MustExist -File
     $backup=Assert-OPA264BackupLocalPath -Path $BackupPst -MustExist -File
+    $sourceParent=[IO.Path]::GetDirectoryName($source)
+    $backupParent=[IO.Path]::GetDirectoryName($backup)
+    if ([string]::Equals($sourceParent,$backupParent,[StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Reference backup must not share the active Outlook data directory.'
+    }
     if ([string]::Equals($source,$backup,[StringComparison]::OrdinalIgnoreCase)) {
         throw 'Restore source PST and reference backup must differ.'
     }
@@ -122,7 +127,7 @@ function Get-OPA264RestoreFolderInventory {
     $queue=New-Object Collections.Queue
     $queue.Enqueue([pscustomobject]@{Folder=$root;Relative='';Depth=0})
     $counts=New-Object 'System.Collections.Generic.List[object]'
-    $seen=New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    $seen=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     while ($queue.Count -gt 0) {
         if ($counts.Count -ge $MaxFolders) {
             throw 'Outlook store exceeds the bounded restore verification folder count.'
@@ -162,8 +167,8 @@ function Compare-OPA264RestoreFolderInventories {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Source,
           [Parameter(Mandatory=$true)][object]$Restored)
-    $original=New-Object 'System.Collections.Generic.Dictionary[string,string]' ([StringComparer]::OrdinalIgnoreCase)
-    $duplicate=New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    $original=[Collections.Generic.Dictionary[string,string]]::new([StringComparer]::OrdinalIgnoreCase)
+    $duplicate=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     foreach ($row in @($Source.Folders)) {
         $path=[string]$row.RelativePath
         if ($original.ContainsKey($path)) { throw 'Source inventory has duplicate relative folder paths.' }
