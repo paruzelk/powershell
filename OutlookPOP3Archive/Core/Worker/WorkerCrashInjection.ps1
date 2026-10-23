@@ -46,7 +46,7 @@ function Write-OPA264CrashBarrier {
         [Parameter(Mandatory=$true)][ValidateRange(1,2147483647)][int]$ProcessId
     )
     $definition=Get-OPA264CrashMode -Name $CrashWindow
-    if ($CrashWindow -ceq 'AfterMoveBeforeResponse') {
+    if ($CrashWindow -in @('AfterMoveBeforeResponse','AfterResponseBeforeTerminal')) {
         # After a MailItem.Move attempt, the durable worker claim MUST exist.
         # The normal pre-Move scope guard intentionally refuses such a claim.
         $paths=Get-OPA264TestPaths -RunId ([string]$Request.RunId)
