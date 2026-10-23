@@ -1,5 +1,8 @@
 ﻿## 2.6.3-PREVIEW1 (2026-10-23; DEV, exact-source build gate pending Windows CI)
 
+- Fixed false-positive restart read-only safety test: old raw-text negative regex matched a harmless `New-Object -ComObject` reference in a comment. New test inspects PowerShell CommandAst/InvokeMemberExpressionAst nodes instead; still forbids executable COM construction, PST store mutations, mail moves/copies/deletes, and operation-journal writes.
+- User Windows CI of preceding source `053c37ef`: 280 tests passed and 1 test failed in 26 containers; CI correctly failed. Latest source requires a new full Windows CI and exact-source package verification.
+
 - Hardened the project-only packager: a full Git SourceCommit must accompany an independently pinned SHA-256 of all packaged source file identities and bytes. Prevents mislabeled archives assembled from old extracted trees.
 - CI now checks expected **26 containers and 281 tests** from `RELEASE.json`; added 3 source-integrity regression tests.
 - Previous `gd4bc6974` ZIP was generated from older `g8e4be719` directory (272 tests/25 containers, 70 source files), therefore not verified as source commit `d4bc6974` despite its filename and SourceCommit metadata.
