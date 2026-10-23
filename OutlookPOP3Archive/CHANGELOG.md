@@ -1,4 +1,12 @@
-﻿## 2.6.4-F (2026-10-23; machine-readable crash evidence audit DEV)
+﻿## 2.6.4-G (2026-10-23; source/package integrity and release gate DEV)
+
+- User-reported Windows PowerShell 5.1 Pester CI PASS for F: 442 tests in 33 containers, zero failures/skips. G Windows CI is pending.
+- Added offline SHA-256 inventory of source files and byte-level verification of every ZIP entry against source, exact single root/stem, externally pinned Git commit and SHA-256, BUILD-INFO and safe Worker flags.
+- Added standalone read-only package/DEV-readiness audit and 22 new offline tests. Expected G CI: 464 tests in 34 containers, zero failures/skips.
+- Blocked formal release, tag, merge-to-stable and production Archive/Resume/Auto Worker integration until REAL isolated Outlook COM crash/restart/reconciliation and PST identity tests are completed with human review and version metadata bumped.
+- Source application version intentionally remains 2.6.3-PREVIEW1 as an integration baseline; no production MailMove or journal Auto/Reconciled route changes.
+
+## 2.6.4-F (2026-10-23; machine-readable crash evidence audit DEV)
 
 - User-reported Windows PowerShell 5.1 Pester PASS for stage E: 409 tests in 32 containers, zero failures/skips. F native CI remains pending.
 - Added pure, fail-closed JSON-ready audit validator for 2.6.4-D read-only reconciliation and optional 2.6.4-E PST identity stability evidence; strict RunId/OperationId correlation, safety flags, controlled crash-barrier classification and privacy-limited output.
