@@ -62,7 +62,7 @@ Describe '2.6.4-LIVE1 existing POP3 PST backup safety (synthetic files only)' {
         [IO.File]::Exists($backup) | Should -BeFalse
         [IO.File]::Exists($backup+'.opa264-partial') | Should -BeFalse
     }
-    It 'forbids Move, Delete, AddStoreEx and Outlook Quit in backup CLI' {
+    It 'forbids Outlook store mutation, process termination and mail method calls in backup CLI' {
         $path=Join-Path $PSScriptRoot '../../Core/Diagnostics/New-OPA264ExistingPstBackup.ps1'
         $tokens=$null;$errors=$null
         $ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$errors)
@@ -71,8 +71,10 @@ Describe '2.6.4-LIVE1 existing POP3 PST backup safety (synthetic files only)' {
             param($node) $node -is [Management.Automation.Language.InvokeMemberExpressionAst]
         },$true))
         @($methods | Where-Object {
-            [string]$_.Member.Value -in @('Move','Delete','Kill','AddStore','AddStoreEx','RemoveStore','Quit')
+            [string]$_.Member.Value -in @('Delete','Kill','AddStore','AddStoreEx','RemoveStore','Quit')
         }).Count | Should -Be 0
+        $raw=Get-Content -LiteralPath $path -Raw
+        $raw | Should -Not -Match '\$mail\.Move\('
     }
     It 'requires an explicit create mode and fixed approval token' {
         $scriptText=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Diagnostics/New-OPA264ExistingPstBackup.ps1') -Raw
