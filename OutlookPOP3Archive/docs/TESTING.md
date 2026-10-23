@@ -62,3 +62,7 @@ powershell.exe -NoProfile -STA -File .\Core\Diagnostics\Test-OPA263RestartReadOn
 ```
 
 The result must report `Ambiguous`, `DestinationMatches=2`, no automatic retry, and unchanged journal SHA-256. The script does not create, attach, detach or modify Outlook stores. If stores were detached, Outlook was restarted into a different profile or MAPI StoreID changed, the verifier MUST fail closed rather than searching other PSTs. Windows full CI must be rerun for any source code change.
+
+## 2.6.3 source-mismatch incident and enforced CI inventory
+
+A local package labeled `d4bc6974` was built from an older `g8e4be719` extracted directory. It executed 272 tests/25 containers and selected 70 source files, while the pinned commit had 26 test files and 71 project files. This is **not** validated provenance; do not publish that ZIP as a release. The corrected pipeline requires **26** test containers, **281** Pester tests (three added source-integrity regressions), and a SHA256 over the entire release source inventory. For exact-source Git packages, use `-ExpectedSourceInventorySha256` from the separately verified commit.

@@ -1,4 +1,8 @@
-﻿## 2.6.3-PREVIEW1 (2026-10-23; DEV, latest revision needs Windows CI)
+﻿## 2.6.3-PREVIEW1 (2026-10-23; DEV, exact-source build gate pending Windows CI)
+
+- Hardened the project-only packager: a full Git SourceCommit must accompany an independently pinned SHA-256 of all packaged source file identities and bytes. Prevents mislabeled archives assembled from old extracted trees.
+- CI now checks expected **26 containers and 281 tests** from `RELEASE.json`; added 3 source-integrity regression tests.
+- Previous `gd4bc6974` ZIP was generated from older `g8e4be719` directory (272 tests/25 containers, 70 source files), therefore not verified as source commit `d4bc6974` despite its filename and SourceCommit metadata.
 
 - 272 Pester tests in 25 containers passed for source `8e4be719`; user also verified all four real Outlook COM scenarios with disposable PSTs, two matching destination fingerprints, stable MailItem.Size=375442 and blocked retry.
 - Added a standalone **read-only new-process replay** of the preserved journal and mounted source/archive PSTs with strict StoreID/PST/folder identities and unchanged SHA-256; six regression tests. This latest addition requires a fresh CI run.
