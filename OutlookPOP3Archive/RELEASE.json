@@ -19,10 +19,10 @@
     "SourceCommit packages require matching independently pinned full source inventory SHA-256."
   ],
   "Verification": {
-    "Status": "2.6.4-D independent read-only restart recovery DEV; Windows CI and live PST testing pending",
+    "Status": "2.6.4-E disposable PST identity stability DEV; Windows CI and live PST testing pending",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": true,
-    "ExpectedTestContainers": 31,
-    "ExpectedPesterTests": 381
+    "ExpectedTestContainers": 32,
+    "ExpectedPesterTests": 409
   }
 }
