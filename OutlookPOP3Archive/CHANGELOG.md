@@ -1,4 +1,11 @@
-﻿## 2.6.4-B (2026-10-23; isolated test-only scope DEV; Windows CI pending)
+﻿## 2.6.4-B2 (2026-10-23; disposable fixture and owned-worker controller DEV)
+
+- User-reported Windows PS5.1 Pester PASS on exact preceding 2.6.4-B increment: 320 tests in 28 containers, zero failures/skips; this does NOT certify B2.
+- Added opt-in NEW two-PST fixture generator, synthetic test mail, durable single Intent and last-written scope marker. No production/user mail copied.
+- Added parent-owned bounded test-only Worker controller with one-shot dispatch claim and fail-closed Indeterminate result. No retries, no Completed/Reconciled.
+- Added 14 offline safety tests, target 334 tests in 29 containers. B2 Windows CI and real Outlook testing PENDING; no production routing changes.
+
+## 2.6.4-B (2026-10-23; isolated test-only scope DEV; Windows CI pending)
 
 - Added diagnostic-only WorkerTestMove.ps1: fixed run-unique TEMP PST scope, identity/fingerprint check, one verified Intent, durable one-shot claim, one MailItem.Move call.
 - Added separate opt-in Windows PowerShell 5.1 STA test-worker entry point. The regular Worker allowlist, Archive/Resume/Auto and FIX13b remain unchanged.
