@@ -19,10 +19,10 @@
     "SourceCommit packages require matching independently pinned full source inventory SHA-256."
   ],
   "Verification": {
-    "Status": "2.6.4-C controlled test-only crash injection DEV; Windows CI and live PST test pending",
+    "Status": "2.6.4-D independent read-only restart recovery DEV; Windows CI and live PST testing pending",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": true,
-    "ExpectedTestContainers": 30,
-    "ExpectedPesterTests": 358
+    "ExpectedTestContainers": 31,
+    "ExpectedPesterTests": 381
   }
 }
