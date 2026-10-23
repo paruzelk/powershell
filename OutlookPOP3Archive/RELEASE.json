@@ -19,10 +19,10 @@
     "SourceCommit packages require matching independently pinned full source inventory SHA-256."
   ],
   "Verification": {
-    "Status": "2.6.4-G package/source integrity and DEV readiness gate; Windows CI and live Outlook testing pending",
+    "Status": "2.6.4-LIVE1 existing POP3 PST backup gate DEV; Windows CI and live Outlook Move tests pending",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": true,
-    "ExpectedTestContainers": 34,
-    "ExpectedPesterTests": 464
+    "ExpectedTestContainers": 35,
+    "ExpectedPesterTests": 478
   }
 }
