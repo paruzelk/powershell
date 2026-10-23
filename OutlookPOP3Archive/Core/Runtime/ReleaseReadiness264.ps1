@@ -17,7 +17,7 @@ function Get-OPA264GSourceInventory {
             throw 'G inventory refuses a reparse-point source entry.'
         }
     }
-    $paths=New-Object 'System.Collections.Generic.Dictionary[string,string]' ([StringComparer]::OrdinalIgnoreCase)
+    $paths=[Collections.Generic.Dictionary[string,string]]::new([StringComparer]::OrdinalIgnoreCase)
     foreach ($item in $files) {
         $relative=$item.FullName.Substring($root.Length).TrimStart([char]'\',[char]'/').Replace('\','/')
         if ($relative -ceq 'BUILD-INFO.json') { continue }
@@ -81,7 +81,7 @@ function Assert-OPA264GDevPackage {
     $archive=$null
     $entryCount=0
     $buildInfo=$null
-    $seen=New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    $seen=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     $sourceLookup=New-Object 'System.Collections.Generic.Dictionary[string,string]' ([StringComparer]::OrdinalIgnoreCase)
     foreach ($row in $inventory.Files) { $sourceLookup.Add([string]$row.RelativePath,[string]$row.SHA256) }
     try {
