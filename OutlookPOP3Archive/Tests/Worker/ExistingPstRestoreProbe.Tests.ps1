@@ -43,7 +43,7 @@ Describe '2.6.4-LIVE2 restore scope offline' {
     It 'refuses clone scope reuse' {
         $p=Get-OPA264RestorePlan @params
         [void][IO.Directory]::CreateDirectory($p.Directory)
-        try { { Assert-OPA264RestoreClonePlan -Plan $p } | Should -Throw '*already exists*' }
+        try { { Assert-OPA264RestoreClonePlan -Plan $p } | Should -Throw '*artifacts*' }
         finally { [IO.Directory]::Delete($p.Directory,$true) }
     }
     It 'rejects unauthorized mutation flags' {
