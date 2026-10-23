@@ -22,6 +22,8 @@ if($PSVersionTable.PSEdition -cne 'Desktop' -or
 . (Join-Path $PSScriptRoot '../Worker/WorkerProtocol.ps1')
 $paths=Get-OPA264Live3Paths -RunId $RunId -SourcePst $SourcePst
 $req=Read-OPAWorkerJson -Path $paths.RequestPath
+if(-not [string]::Equals([string]$req.SourcePst,[string]$paths.SourcePst,
+    [StringComparison]::OrdinalIgnoreCase)){throw 'LIVE3 request differs from explicitly selected POP3 PST.'}
 $paths=Assert-OPA264Live3Request -Request $req -BeforeMove
 $intent=Assert-OPA264Live3Intent -Request $req -Paths $paths
 $app=$null;$ns=$null;$stage='Outlook preflight';$claimed=$false
