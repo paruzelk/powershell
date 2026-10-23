@@ -291,7 +291,9 @@ try {
         Results = [System.Collections.ArrayList]::new()
     }
     $reportThrew = $false
+    $ErrorActionPreference = 'Continue'
     try { New-SMFReport -Context $reportContext } catch { $reportThrew = $true }
+    finally { $ErrorActionPreference = 'Stop' }
     Assert-SMFTest $reportThrew 'Report writer propagates filesystem failure'
     $reportContext.ReportPath = $ReportDir
     $unsafeResult = New-SMFResult -ModuleName 'Unsafe'

@@ -12,7 +12,7 @@ function New-SMFReport {
         if ($null -eq $Context.ProfileSettings -or -not $Context.ProfileSettings.GenerateReport) { return }
 
         $ReportPath = $Context.ReportPath
-        if (-not (Test-Path $ReportPath)) { New-Item -Path $ReportPath -ItemType Directory -Force | Out-Null }
+        if (-not (Test-Path -LiteralPath $ReportPath)) { New-Item -Path $ReportPath -ItemType Directory -Force -ErrorAction Stop | Out-Null }
 
         $TimeStamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
         $JsonFile  = Join-Path $ReportPath "SMF_$TimeStamp.json"
@@ -31,7 +31,7 @@ function New-SMFReport {
             Duration   = $EndTime - $Context.StartTime
             Modules    = @($Context.Results)
         }
-        $Report | ConvertTo-Json -Depth 6 | Set-Content -Path $JsonFile -Encoding UTF8
+        $Report | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $JsonFile -Encoding UTF8 -ErrorAction Stop
 
         # --- Фильтрация модулей ---
         $moduleResults = $Context.Results | Where-Object {
@@ -205,20 +205,20 @@ function New-SMFReport {
 
         # --- Запись HTML ---
         $htmlContent = $html -join "`r`n"
-        $htmlContent | Set-Content -Path $HtmlFile -Encoding UTF8
+        $htmlContent | Set-Content -LiteralPath $HtmlFile -Encoding UTF8 -ErrorAction Stop
 
         # --- CSV ---
         if ($moduleResults.Count -gt 0) {
             $moduleResults | Select-Object Module, Status, FilesFound, FilesDeleted,
                 @{N='BytesFreedMB';E={[math]::Round($_.BytesFreed/1MB,2)}} |
-                Export-Csv -Path $CsvFile -NoTypeInformation -Encoding UTF8
+                Export-Csv -LiteralPath $CsvFile -NoTypeInformation -Encoding UTF8 -ErrorAction Stop
         }
 
         Write-Host ""
         Write-Host "Reports generated:"
         Write-Host "  $JsonFile"
         Write-Host "  $HtmlFile"
-        if (Test-Path $CsvFile) { Write-Host "  $CsvFile" }
+        if (Test-Path -LiteralPath $CsvFile) { Write-Host "  $CsvFile" }
     }
     catch {
         Write-Host ""
