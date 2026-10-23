@@ -14,6 +14,9 @@ PowerShell 5.1 script for configuring the Outlook IMAP synchronization window th
 
 Current documented release: v1.0 Final. Earlier development versions exist.
 
+### Remove-StaleProfiles
+PowerShell 5.1 script for auditing and safely deleting stale Windows Server user profiles, with CSV/HTML reports and regression tests.
+
 ### ServerMaintenance
 PowerShell 5.1 server maintenance framework for Windows Server 2016+.
 
@@ -27,6 +30,7 @@ Includes Analyze/Day/Night profiles, preview analysis, HTML reporting and modula
 OutlookPOP3Archive/
 OutlookIMAPSync/
 ServerMaintenance/
+Remove-StaleProfiles/
 ```
 
 The repository is intended to become the canonical source for these projects.
