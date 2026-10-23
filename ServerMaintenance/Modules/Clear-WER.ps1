@@ -21,7 +21,10 @@ function global:Invoke-ClearWER {
             return $Result
         }
 
-        $KeepDays = $Settings.KeepDays
+        $KeepDays = 0
+        if (-not [int]::TryParse([string]$Settings.KeepDays, [ref]$KeepDays) -or $KeepDays -lt 1 -or $KeepDays -gt 3650) {
+            throw 'WER.KeepDays must be an integer from 1 to 3650 days'
+        }
         $CutoffDate = (Get-Date).AddDays(-$KeepDays)
         Add-SMFResultDetail $Result "Keep days: $KeepDays"
 

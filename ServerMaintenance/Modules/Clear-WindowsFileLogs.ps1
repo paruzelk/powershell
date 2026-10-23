@@ -34,21 +34,44 @@ function global:Invoke-ClearWindowsFileLogs {
             return $Result
         }
 
-        $Files = Get-ChildItem -LiteralPath $Path -File -Recurse -Force -ErrorAction Stop |
-            Where-Object { $_.LastWriteTime -lt $CutoffDate }
-        foreach ($File in $Files) {
-            $Result.FilesFound++
-            $Result.BytesBefore += $File.Length
-            if ($Context.WhatIf -or -not $Context.ProfileSettings.Delete) {
-                Add-SMFResultDetail $Result "Would delete: $($File.FullName)"
+        $rootItem = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+        if (($rootItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw "Windows Logs root is a reparse point: $Path"
+        }
+        $pending = New-Object System.Collections.Stack
+        $pending.Push($Path)
+        while ($pending.Count -gt 0) {
+            $current = [string]$pending.Pop()
+            try {
+                $entries = @(Get-ChildItem -LiteralPath $current -Force -ErrorAction Stop)
+            } catch {
+                Add-SMFResultWarning $Result "Cannot scan $current`: $($_.Exception.Message)"
                 continue
             }
-            try {
-                Remove-Item -LiteralPath $File.FullName -Force -ErrorAction Stop
-                $Result.FilesDeleted++
-                $Result.BytesFreed += $File.Length
-            } catch {
-                Add-SMFResultWarning $Result "Failed to delete: $($File.FullName): $($_.Exception.Message)"
+            $Result.DirectoriesScanned++
+            foreach ($entry in $entries) {
+                if (($entry.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                    Add-SMFResultWarning $Result "Skipping reparse point: $($entry.FullName)"
+                    continue
+                }
+                if ($entry.PSIsContainer) {
+                    $pending.Push($entry.FullName)
+                    continue
+                }
+                if ($entry.LastWriteTime -ge $CutoffDate) { continue }
+                $Result.FilesFound++
+                $Result.BytesBefore += $entry.Length
+                if ($Context.WhatIf -or -not $Context.ProfileSettings.Delete) {
+                    Add-SMFResultDetail $Result "Would delete: $($entry.FullName)"
+                    continue
+                }
+                try {
+                    Remove-Item -LiteralPath $entry.FullName -Force -ErrorAction Stop
+                    $Result.FilesDeleted++
+                    $Result.BytesFreed += $entry.Length
+                } catch {
+                    Add-SMFResultWarning $Result "Failed to delete: $($entry.FullName): $($_.Exception.Message)"
+                }
             }
         }
         Complete-SMFResult $Result

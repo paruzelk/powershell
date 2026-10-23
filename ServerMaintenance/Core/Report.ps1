@@ -1,5 +1,10 @@
 #requires -Version 5.1
 
+function ConvertTo-SMFHtmlText {
+    param($Value)
+    return [System.Net.WebUtility]::HtmlEncode([string]$Value)
+}
+
 function New-SMFReport {
     param([object]$Context)
 
@@ -77,11 +82,11 @@ function New-SMFReport {
         $totalBytesFreedMB = [math]::Round($totalBytesFreed / 1MB, 2)
 
         $html += '    <div class="summary">'
-        $html += "        <p><strong>Computer:</strong> $($Context.ComputerName)</p>"
-        $html += "        <p><strong>Profile:</strong> $($Context.Profile)</p>"
-        $html += "        <p><strong>Start:</strong> $($Context.StartTime)</p>"
-        $html += "        <p><strong>End:</strong> $($Context.EndTime)</p>"
-        $html += "        <p><strong>Duration:</strong> $($Context.Duration)</p>"
+        $html += "        <p><strong>Computer:</strong> $(ConvertTo-SMFHtmlText $Context.ComputerName)</p>"
+        $html += "        <p><strong>Profile:</strong> $(ConvertTo-SMFHtmlText $Context.Profile)</p>"
+        $html += "        <p><strong>Start:</strong> $(ConvertTo-SMFHtmlText $Context.StartTime)</p>"
+        $html += "        <p><strong>End:</strong> $(ConvertTo-SMFHtmlText $Context.EndTime)</p>"
+        $html += "        <p><strong>Duration:</strong> $(ConvertTo-SMFHtmlText $Context.Duration)</p>"
         $html += "        <hr>"
         $html += "        <p><span>Files found:</span> $totalFilesFound</p>"
         $html += "        <p><span>Files deleted:</span> $totalFilesDeleted</p>"
@@ -111,8 +116,8 @@ function New-SMFReport {
                     default     { "color: orange;" }
                 }
                 $html += "            <tr>"
-                $html += "                <td><b>$($Item.Module)</b></td>"
-                $html += "                <td style='$statusColor'>$($Item.Status)</td>"
+                $html += "                <td><b>$(ConvertTo-SMFHtmlText $Item.Module)</b></td>"
+                $html += "                <td style='$statusColor'>$(ConvertTo-SMFHtmlText $Item.Status)</td>"
                 $html += "                <td>$($Item.FilesFound)</td>"
                 $html += "                <td>$($Item.FilesDeleted)</td>"
                 $html += "                <td>$([math]::Round($Item.BytesBefore / 1MB, 2)) MB</td>"
@@ -130,7 +135,7 @@ function New-SMFReport {
         foreach ($Item in $moduleResults) {
             if ($Item.PSObject.Properties["WouldDeleteCount"] -and $Item.PSObject.Properties["SkippedCount"]) {
                 $html += '    <div class="details">'
-                $html += "        <h3>$($Item.Module) - Additional Stats</h3>"
+                $html += "        <h3>$(ConvertTo-SMFHtmlText $Item.Module) - Additional Stats</h3>"
                 $html += "        <p><b>Would Delete:</b> $($Item.WouldDeleteCount)</p>"
                 $html += "        <p><b>Skipped:</b> $($Item.SkippedCount)</p>"
                 $html += '    </div>'
@@ -142,10 +147,10 @@ function New-SMFReport {
         $html += '        <h2>Warnings &amp; Errors per Module</h2>'
         $ModuleDetails = ""
         foreach ($Item in $moduleResults) {
-            $warnings = $Item.Warnings -join "<br>"
-            $errors = $Item.Errors -join "<br>"
+            $warnings = @($Item.Warnings | ForEach-Object { ConvertTo-SMFHtmlText $_ }) -join "<br>"
+            $errors = @($Item.Errors | ForEach-Object { ConvertTo-SMFHtmlText $_ }) -join "<br>"
             if ($warnings -or $errors) {
-                $ModuleDetails += "<h3>$($Item.Module)</h3>"
+                $ModuleDetails += "<h3>$(ConvertTo-SMFHtmlText $Item.Module)</h3>"
                 if ($warnings) { $ModuleDetails += "<p><b>Предупреждения:</b><br>$warnings</p>" }
                 if ($errors) { $ModuleDetails += "<p><b>Ошибки:</b><br>$errors</p>" }
             }
@@ -159,7 +164,7 @@ function New-SMFReport {
             $html += '    <div class="details">'
             $html += '        <details>'
             $summary = "$($Item.Module) - user details ($($Item.UserDetails.Count) profiles)"
-            $html += "            <summary><b>$summary</b></summary>"
+            $html += "            <summary><b>$(ConvertTo-SMFHtmlText $summary)</b></summary>"
             $html += '            <table>'
             $html += '                <thead>'
             $html += '                    <tr>'
@@ -177,15 +182,15 @@ function New-SMFReport {
             $html += '                <tbody>'
             foreach ($u in $Item.UserDetails) {
                 $html += '                    <tr>'
-                $html += "                        <td>$($u.User)</td>"
-                $html += "                        <td>$($u.Account)</td>"
-                $html += "                        <td>$($u.ProfilePath)</td>"
-                $html += "                        <td>$($u.SizeMB)</td>"
-                $html += "                        <td>$($u.LastUseTime)</td>"
-                $html += "                        <td>$($u.ADEnabled)</td>"
-                $html += "                        <td>$($u.ADLastLogon)</td>"
-                $html += "                        <td><strong>$($u.Action)</strong></td>"
-                $html += "                        <td>$($u.Reason)</td>"
+                $html += "                        <td>$(ConvertTo-SMFHtmlText $u.User)</td>"
+                $html += "                        <td>$(ConvertTo-SMFHtmlText $u.Account)</td>"
+                $html += "                        <td>$(ConvertTo-SMFHtmlText $u.ProfilePath)</td>"
+                $html += "                        <td>$(ConvertTo-SMFHtmlText $u.SizeMB)</td>"
+                $html += "                        <td>$(ConvertTo-SMFHtmlText $u.LastUseTime)</td>"
+                $html += "                        <td>$(ConvertTo-SMFHtmlText $u.ADEnabled)</td>"
+                $html += "                        <td>$(ConvertTo-SMFHtmlText $u.ADLastLogon)</td>"
+                $html += "                        <td><strong>$(ConvertTo-SMFHtmlText $u.Action)</strong></td>"
+                $html += "                        <td>$(ConvertTo-SMFHtmlText $u.Reason)</td>"
                 $html += '                    </tr>'
             }
             $html += '                </tbody>'
@@ -222,5 +227,6 @@ function New-SMFReport {
         if (Get-Command Write-SMFLog -ErrorAction SilentlyContinue) {
             Write-SMFLog "Report generation failed: $($_.Exception.Message)" "ERROR"
         }
+        throw
     }
 }

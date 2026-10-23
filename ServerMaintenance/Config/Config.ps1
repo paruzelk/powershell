@@ -78,16 +78,10 @@ $SMFConfig = @{
             KeepDays = 30
         }
 
-        # Recycle Bin (new)
+        # Recycle bins for all user SIDs on fixed local drives
         RecycleBin = @{
             Enabled        = $true
-            ExcludedUsers  = @(
-                "Administrator",
-                "Default",
-                "Default User",
-                "Public",
-                "Guest"
-            )
+            ExcludedUsers  = @()
         }
         # User Profiles Cleanup (stale profiles)
 UserProfiles = @{

@@ -15,7 +15,10 @@ function global:Invoke-ClearTemp {
 
     try {
         $TempSettings = $Context.Config.Settings.Temp
-        $MaxAgeDays = $TempSettings.MaxAgeDays
+        $MaxAgeDays = 0
+        if (-not [int]::TryParse([string]$TempSettings.MaxAgeDays, [ref]$MaxAgeDays) -or $MaxAgeDays -lt 1 -or $MaxAgeDays -gt 3650) {
+            throw 'Temp.MaxAgeDays must be an integer from 1 to 3650 days'
+        }
         $CutoffDate = (Get-Date).AddDays(-$MaxAgeDays)
         $Paths = @()
 

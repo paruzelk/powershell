@@ -22,14 +22,18 @@ Night currently uses the same safe cleanup categories as Day. Browser site
 storage is excluded by default. To include IndexedDB and Service Worker databases, explicitly set
 Settings.BrowserCache.IncludeSiteStorage = $true in Config\Config.ps1.
 
-The Windows Event Log module inventories event channels only. Neither Day
-nor Night clears event channels. The Windows file log module separately
-removes age-qualified files under %WINDIR%\Logs. A future full-channel
-Event Log clear requires an explicit policy and successful backup first.
+The Windows Event Log module inventories event channels only in every
+profile. The Windows file log module separately removes age-qualified
+files under %WINDIR%\Logs.
+
+Day and Night empty recycle bins for all user SIDs on fixed local drives.
+The module includes accounts without a current profile, retains SID folders,
+and skips reparse points. RecycleBin.ExcludedUsers accepts exact account
+names or SIDs. Run with sufficient rights for other users' bins.
 
 The user-profile cleanup module is disabled because its implementation is
 not present. Enabled modules whose files are missing stop startup with an
-error. Module failures produce a nonzero process exit code.
+error. Failed modules produce exit code 1; partial results produce exit code 2.
 
 Outputs
 -------

@@ -32,7 +32,7 @@ function Get-SMFFolderSize
         [string]$Path
     )
 
-    if (!(Test-Path $Path))
+    if (!(Test-Path -LiteralPath $Path))
     {
         return 0
     }
@@ -70,7 +70,7 @@ function Get-SMFFileCount
         [string]$Path
     )
 
-    if (!(Test-Path $Path))
+    if (!(Test-Path -LiteralPath $Path))
     {
         return 0
     }
@@ -130,7 +130,7 @@ function Remove-SMFFileSafe
         [string]$Path
     )
 
-    if (!(Test-Path $Path))
+    if (!(Test-Path -LiteralPath $Path))
     {
         return $false
     }

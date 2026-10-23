@@ -15,7 +15,7 @@
 - No destructive tests on real Windows directories or Event Log channels.
 - PowerShell scripts use ASCII characters only.
 - Reports, logs, and backups are excluded from GitHub.
-- A full Event Log clear is out of scope for this milestone.
+- Event Log remains analysis-only in every profile.
 
 ## Review Focus
 
@@ -57,13 +57,22 @@
 
 - [x] Add tests showing no event clear command executes and no browser site-storage path is selected by default.
 - [x] Run tests and verify the expected failures.
-- [x] Implement guardrails and document deferred explicit policies.
+- [x] Implement guardrails and document the analysis-only policy.
 - [x] Run tests and verify pass.
 
-### Task 4: Publication gate
+### Task 4: All-user recycle bins and reliable outcomes
+
+**Files:** `Modules/Clear-RecycleBin.ps1`, `Config/Config.ps1`, `Core/Result.ps1`, `Start-SMF.ps1`, `Tests/Invoke-RegressionTests.ps1`
+
+- [x] Add temporary multi-user recycle-bin tests and retention validation tests.
+- [x] Verify expected failures, then implement fixed-drive SID-bin cleanup and exact exclusions.
+- [x] Propagate warnings, report failures, and invalid retention to nonzero exit codes.
+- [x] Verify the regression tests pass.
+
+### Task 5: Publication gate
 
 **Files:** `docs/SMF-ROADMAP.md`, `.gitignore`, `README.txt`, all changed source and tests.
 
-- [ ] Run all regression checks, parse all scripts under Windows PowerShell 5.1, and review the exact upload inventory.
-- [ ] Create a development branch in `paruzelk/powershell` and upload only `ServerMaintenance` source, docs, and tests.
-- [ ] Open a draft PR for review; do not merge before native Windows Server validation.
+- [x] Run all regression checks, parse all scripts under Windows PowerShell 5.1, and review the exact upload inventory.
+- [x] Create a development branch in `paruzelk/powershell` and upload only `ServerMaintenance` source, docs, and tests.
+- [x] Open a draft PR for review; do not merge before native Windows Server validation.

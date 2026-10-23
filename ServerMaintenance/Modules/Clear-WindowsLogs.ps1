@@ -4,7 +4,7 @@ function global:Get-SMFModuleInfo {
     return [PSCustomObject]@{
         Name        = "Clear-WindowsLogs"
         Version     = "1.0.1"
-        Description = "Analyze and clear Windows Event Logs"
+        Description = "Inventory Windows Event Logs without clearing channels"
     }
 }
 

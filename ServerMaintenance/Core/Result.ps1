@@ -149,6 +149,15 @@ function Complete-SMFResult
 
 
 
+    if ($Status -eq 'Completed' -and $Result.Errors -and $Result.Errors.Count -gt 0)
+    {
+        $Status = 'Failed'
+    }
+    elseif ($Status -eq 'Completed' -and $Result.Warnings -and $Result.Warnings.Count -gt 0)
+    {
+        $Status = 'Partial'
+    }
+
     $Result.Status =
         $Status
 

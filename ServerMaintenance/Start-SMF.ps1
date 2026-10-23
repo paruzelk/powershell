@@ -210,13 +210,15 @@ if (Get-Command New-SMFReport -ErrorAction SilentlyContinue) {
     } catch {
         Write-Host "Report generation failed: $_" -ForegroundColor Yellow
         Write-SMFLog "Report generation failed: $_"
+        $ReportFailed = $true
     }
 } else {
     Write-Host "Report function not available." -ForegroundColor Yellow
 }
 
 $FailedResults = @($SMFContext.Results | Where-Object { $_.Status -eq 'Failed' })
-$ExitCode = if ($ModuleExecutionFailed -or $FailedResults.Count -gt 0) { 1 } else { 0 }
+$PartialResults = @($SMFContext.Results | Where-Object { $_.Status -eq 'Partial' })
+$ExitCode = if ($ModuleExecutionFailed -or $ReportFailed -or $FailedResults.Count -gt 0) { 1 } elseif ($PartialResults.Count -gt 0) { 2 } else { 0 }
 Write-SMFLog "SMF finished (exit code $ExitCode)"
 Write-Host ""
 Write-Host "SMF finished. Exit code: $ExitCode"

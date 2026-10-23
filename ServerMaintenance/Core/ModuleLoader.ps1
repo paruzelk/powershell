@@ -134,9 +134,14 @@ function Invoke-SMFModules
             {
                 Write-SMFLog "Function not found: $($Module.ExecuteFunction)"
             }
+            $Failure = New-SMFResult -ModuleName $Module.Name
+            Add-SMFResultError $Failure "Function not found: $($Module.ExecuteFunction)"
+            Complete-SMFResult $Failure 'Failed'
+            [void]$Context.Results.Add($Failure)
             continue
         }
 
+        $BeforeCount = $Context.Results.Count
         try
         {
             $Output = @( & $Command.Name -Context $Context )
@@ -158,6 +163,13 @@ function Invoke-SMFModules
                     Write-Host "  WARNING: Ignored output without 'Module' property: $($Item.GetType().Name)"
                 }
             }
+            if ($Context.Results.Count -eq $BeforeCount)
+            {
+                $Failure = New-SMFResult -ModuleName $Module.Name
+                Add-SMFResultError $Failure 'Module returned no result object'
+                Complete-SMFResult $Failure 'Failed'
+                [void]$Context.Results.Add($Failure)
+            }
         }
         catch
         {
@@ -168,6 +180,10 @@ function Invoke-SMFModules
             {
                 Write-SMFLog "Exception in module $($Module.Name): $($_.Exception.Message)"
             }
+            $Failure = New-SMFResult -ModuleName $Module.Name
+            Add-SMFResultError $Failure $_.Exception.Message
+            Complete-SMFResult $Failure 'Failed'
+            [void]$Context.Results.Add($Failure)
         }
     }
 }
