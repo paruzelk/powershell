@@ -1,4 +1,11 @@
-﻿## 2.6.4-A (2026-10-23; staged crash-protocol DESIGN ONLY)
+﻿## 2.6.4-B (2026-10-23; isolated test-only scope DEV; Windows CI pending)
+
+- Added diagnostic-only WorkerTestMove.ps1: fixed run-unique TEMP PST scope, identity/fingerprint check, one verified Intent, durable one-shot claim, one MailItem.Move call.
+- Added separate opt-in Windows PowerShell 5.1 STA test-worker entry point. The regular Worker allowlist, Archive/Resume/Auto and FIX13b remain unchanged.
+- Added 16 new non-COM tests (target: 320 cases in 28 containers) and a safety runbook. Windows CI and live disposable-PST fixture gate are PENDING.
+- This is a development ZIP only. Application version remains at 2.6.3-PREVIEW1 as an integration baseline, not a new 2.6.3 release.
+
+## 2.6.4-A (2026-10-23; staged crash-protocol DESIGN ONLY)
 
 - Added pure WorkerCrashProtocol.ps1: eight crash windows, safe correlation plans, timeline invariant checks and fail-closed read-only replay directives.
 - Added 23 non-COM Pester tests: worker/journal timing, unknown outcomes, missing/corrupt journals, identity conflicts, no executable MailMove/Kill/journal write.
