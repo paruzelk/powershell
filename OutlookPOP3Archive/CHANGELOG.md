@@ -1,4 +1,12 @@
-﻿## 2.6.4-G (2026-10-23; source/package integrity and release gate DEV)
+﻿## 2.6.4-LIVE1 (2026-10-23; existing test POP3 PST backup gate DEV)
+
+- User confirmed the current Outlook profile is the dedicated test context; the selected info@stios.ru.pst maps uniquely to the POP3 DeliveryStore. Read-only audit measured 9 folders and 26,310 Inbox items (~7,200.98 MB PST). Existing 2019/2020 archives are protected.
+- User-reported 2.6.4-G Windows PS5.1 CI PASS: 464 tests/34 containers, and separately independently pinned extracted ZIP audit ExactContentMatch. Live Outlook PST Move/crash tests not yet executed.
+- Added safe scripts to list current mounted PSTs, verify a specified POP3 source StoreID and folder scope, preview cleanup of ONLY old opa263_archive*.pst, and (optionally) enforce an isolated profile.
+- Added preview/explicit-approval backup flow for existing PST while Outlook is closed: copy into a distinct local directory via .partial and CreateNew, flush, SHA-256 verify, then publish to new .pst. Never changes or overwrites source or archive files.
+- Added 14 offline backup guard tests; LIVE1 Windows CI target 478 tests / 35 containers, currently unverified. No existing PST MailItem.Move and no production Worker integration.
+
+## 2.6.4-G (2026-10-23; source/package integrity and release gate DEV)
 
 - User-reported Windows PowerShell 5.1 Pester CI PASS for F: 442 tests in 33 containers, zero failures/skips. G Windows CI is pending.
 - Added offline SHA-256 inventory of source files and byte-level verification of every ZIP entry against source, exact single root/stem, externally pinned Git commit and SHA-256, BUILD-INFO and safe Worker flags.
