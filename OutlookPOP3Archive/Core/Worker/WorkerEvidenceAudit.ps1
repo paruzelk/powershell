@@ -174,6 +174,8 @@ function New-OPA264EvidenceAudit {
     }
     # A synthetic matching candidate, a stable PST identity and a user-
     # supplied CI line do NOT prove production crash consistency.
+    $identityStatus='NotCollected'
+    if ($null -ne $Identity) { $identityStatus=[string]$Identity.Status }
     return [pscustomobject]@{
         Schema='2.6.4-F.1'
         RunId=$RunId
@@ -187,7 +189,7 @@ function New-OPA264EvidenceAudit {
         ScansComplete=$scanComplete
         WorkerMoveClaimPresent=[bool]$Recovery.Artifacts.WorkerMoveClaimPresent
         WorkerResponsePresent=[bool]$Recovery.Artifacts.WorkerResponsePresent
-        IdentityEvidence=if ($null -eq $Identity) { 'NotCollected' } else { [string]$Identity.Status }
+        IdentityEvidence=$identityStatus
         Classification=$classification
         IndependentMoveProof=$false
         AutomaticRetryAllowed=$false
