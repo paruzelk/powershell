@@ -124,11 +124,11 @@ function Compare-OPA264IdentityObservations {
     $required=@('RunId','SourcePst','ArchivePst','SourceStoreId','ArchiveStoreId',
         'SourceFolderId','ArchiveFolderId','SourceFolderPath','ArchiveFolderPath',
         'MessageStoreRole','MailEntryId','FullyScanned')
-    foreach ($input in @($Before,$After)) {
-        if ($null -eq $input) { throw 'Identity observation is null.' }
+    foreach ($observation in @($Before,$After)) {
+        if ($null -eq $observation) { throw 'Identity observation is null.' }
         foreach ($field in $required) {
-            if ($input.PSObject.Properties.Name -cnotcontains $field -or
-                [string]::IsNullOrWhiteSpace([string]$input.$field)) {
+            if ($observation.PSObject.Properties.Name -cnotcontains $field -or
+                [string]::IsNullOrWhiteSpace([string]$observation.$field)) {
                 throw "Identity observation missing $field."
             }
         }
