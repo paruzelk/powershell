@@ -1,0 +1,26 @@
+﻿{
+  "Release": "BUILD2.6.2-PREVIEW1",
+  "Build": "2.6.2-PREVIEW1",
+  "ApplicationVersion": "0.9.4-rc1-build2.6.2-PREVIEW1",
+  "TransactionSchemaVersion": "2.5.4",
+  "DuplicateIndexSchemaVersion": "1.2",
+  "WorkerProtocolVersion": "1.0",
+  "Target": "Windows PowerShell 5.1 / Outlook 2016-2019",
+  "Integration": {
+    "ArchiveWorkerEnabled": false,
+    "ResumeWorkerEnabled": false,
+    "AutoWorkerEnabled": false
+  },
+  "Highlights": [
+    "Separate append-only SHA256-verified durable journal for diagnostic STA Worker operations",
+    "Controller-owned RequestId correlates flushed Intent with bounded Worker and verified outcome",
+    "Timeout, crash, truncated journal or lost terminal flush fail closed and block automatic retry",
+    "User-verified Worker Ping, Crash, torn-tail and restart recovery tests on previous development snapshot",
+    "Mandatory version/manifest/docs checks, Pester and PSScriptAnalyzer gates, project-only ZIP packaging",
+    "Existing Archive, Resume, Auto, Transaction and DuplicateIndex schemas unchanged; no worker MailItem.Move"
+  ],
+  "Verification": {
+    "Status": "PREVIEW CANDIDATE; full CI and release packaging gate need Windows retest",
+    "RealMailMoveViaWorker": false
+  }
+}
