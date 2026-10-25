@@ -34,3 +34,8 @@ Remove-StaleProfiles/
 ```
 
 The repository is intended to become the canonical source for these projects.
+## Development and releases
+
+Use GitHub Flow: branch from `main`, open a Pull Request, run project-specific Windows PowerShell 5.1 CI, then merge approved changes. Each project has independent version tags and GitHub Releases rather than keeping every ZIP in a long-lived branch. Historical `release/*` and `package/*` branches are retained during migration.
+
+See [Repository workflow](docs/REPOSITORY-WORKFLOW.md) for branch names, the 2.6.2/2.6.3 migration, Windows CI, release tagging, and safety gates.
