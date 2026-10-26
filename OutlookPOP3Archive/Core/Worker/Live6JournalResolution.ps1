@@ -234,33 +234,6 @@ function Assert-OPA264Live6SizeApproval {
     }
     return $true
 }
- -or
-        [string]::IsNullOrWhiteSpace($ArchiveEntryId)) {
-        throw 'LIVE6 requires a pinned journal SHA256 and exact nonempty archive EntryID.'
-    }
-    $claim=[pscustomobject]@{
-        Schema='2.6.4-LIVE6.ResolutionClaim.1'
-        RunId=[string]$Request.RunId
-        OperationId=[string]$Request.OperationId
-        PreviousJournalSha256=$ExpectedJournalSha256
-        ArchiveEntryId=$ArchiveEntryId
-        Utc=[datetime]::UtcNow.ToString('o')
-        AutomaticRetryAllowed=$false
-        ProductionReady=$false
-    }
-    $bytes=(New-Object Text.UTF8Encoding($false)).GetBytes(
-        (ConvertTo-Json -InputObject $claim -Depth 5))
-    $stream=$null
-    try {
-        $stream=[IO.FileStream]::new((Get-OPA264Live6ClaimPath -Paths $Paths),
-            [IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
-        $stream.Write($bytes,0,$bytes.Length)
-        $stream.Flush($true)
-    } finally {
-        if ($null -ne $stream) { $stream.Dispose() }
-    }
-    return $claim
-}
 function Assert-OPA264Live6Completed {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Request,
