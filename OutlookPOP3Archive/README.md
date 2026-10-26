@@ -83,3 +83,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW2b - strict source fingerprint evidence (DEV)
 
 [Diagnostic runbook](docs/2.6.5-bw2b-source-fingerprint-evidence.md). After BW2a confirmed a real Outlook source MailItem fingerprint mismatch, BW2b reports *separately* source EntryID equality (plus exact SHA-256 hashes) and source MailItem.Size compared with durable Intent. Strict fail-closed guards remain intact; no size waiver, no automatic retry, Move or production activation. Windows CI 756/44 target.
+
+### 2.6.5-BW2c source size review (DEV)
+
+[Runbook](docs/2.6.5-bw2c-explicit-source-size-consent.md). Explicit, manually pinned *read-only only* acknowledgment of the proven source MailItem.Size drift 1436 to 1808 on the one pre-Move LIVE4 synthetic fixture, preserving strict EntryID/RunId/OperationId/journal checks. Neither automatically retries nor performs Move or journal updates. Native Windows CI target 784/45.
