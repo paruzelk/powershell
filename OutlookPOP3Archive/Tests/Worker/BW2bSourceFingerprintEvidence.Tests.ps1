@@ -117,7 +117,9 @@ Describe '2.6.5-BW2b source EntryID/size evidence: strict read-only diagnostics'
         $text=Get-Content -LiteralPath $path -Raw
         $text | Should -Match 'Assert-OPA265BW2SourceFingerprint -Evidence'
         $text | Should -Match 'Assert-OPA265BW2MatchingMail -Mail [$]mail'
-        $text | Should -Not -Match 'ConfirmSourceSizeDifference|SkipSourceSizeCheck'
+        $text | Should -Match 'Assert-OPA265BW2SourceFingerprint -Evidence'
+        $text | Should -Match 'Assert-OPA265BW2SourceSizeConsent -Evidence'
+        $text | Should -Not -Match 'SkipSourceSizeCheck'
     }
     It 'parses changed module under native Windows PowerShell 5.1' {
         $path=Join-Path $PSScriptRoot '../../Core/Worker/SyntheticReadOnlyProbe265BW2.ps1'
