@@ -173,7 +173,7 @@ Describe '2.6.4-LIVE3 synthetic-only existing POP3 PST Worker contract' {
     }
     It 'journal Intent accepts an unsent synthetic test item with zero Size and no sender' {
         [void][IO.Directory]::CreateDirectory($paths.Directory)
-        $args=@{
+        $intentParams=@{
             Path=$paths.JournalPath
             TransactionId=$paths.RunId
             OperationId=$request.OperationId
@@ -190,14 +190,14 @@ Describe '2.6.4-LIVE3 synthetic-only existing POP3 PST Worker contract' {
             Sender=''
             Size=[long]0
         }
-        [void](Write-OPAOperationJournalEvent @args)
+        [void](Write-OPAOperationJournalEvent @intentParams)
         $observed=Assert-OPA264Live3Intent -Request $request -Paths $paths
         $observed.Subject | Should -Be ('OPA264 LIVE3 synthetic '+$paths.RunId)
         $observed.Size | Should -Be 0
     }
     It 'journal Intent rejects a foreign Subject even if EntryId matches' {
         [void][IO.Directory]::CreateDirectory($paths.Directory)
-        $args=@{
+        $intentParams=@{
             Path=$paths.JournalPath;TransactionId=$paths.RunId;OperationId=$request.OperationId
             Sequence=1;Phase='Intent';OperationKind='MailMove'
             SourceEntryId=$request.SourceEntryId;SourceStoreId=$request.SourceStoreId
@@ -206,13 +206,13 @@ Describe '2.6.4-LIVE3 synthetic-only existing POP3 PST Worker contract' {
             InternetMessageId=('<opa264-live3-'+$paths.RunId+'@example.invalid>')
             Subject='Some other mail';Sender='';Size=0
         }
-        [void](Write-OPAOperationJournalEvent @args)
+        [void](Write-OPAOperationJournalEvent @intentParams)
         {Assert-OPA264Live3Intent -Request $request -Paths $paths} |
             Should -Throw '*synthetic request*'
     }
     It 'journal Intent rejects a foreign MessageId even when Subject matches' {
         [void][IO.Directory]::CreateDirectory($paths.Directory)
-        $args=@{
+        $intentParams=@{
             Path=$paths.JournalPath;TransactionId=$paths.RunId;OperationId=$request.OperationId
             Sequence=1;Phase='Intent';OperationKind='MailMove'
             SourceEntryId=$request.SourceEntryId;SourceStoreId=$request.SourceStoreId
@@ -221,13 +221,13 @@ Describe '2.6.4-LIVE3 synthetic-only existing POP3 PST Worker contract' {
             InternetMessageId='<not-this-run@example.invalid>'
             Subject=('OPA264 LIVE3 synthetic '+$paths.RunId);Sender='';Size=0
         }
-        [void](Write-OPAOperationJournalEvent @args)
+        [void](Write-OPAOperationJournalEvent @intentParams)
         {Assert-OPA264Live3Intent -Request $request -Paths $paths} |
             Should -Throw '*synthetic request*'
     }
     It 'journal Intent rejects negative synthetic Size metadata' {
         [void][IO.Directory]::CreateDirectory($paths.Directory)
-        $args=@{
+        $intentParams=@{
             Path=$paths.JournalPath;TransactionId=$paths.RunId;OperationId=$request.OperationId
             Sequence=1;Phase='Intent';OperationKind='MailMove'
             SourceEntryId=$request.SourceEntryId;SourceStoreId=$request.SourceStoreId
@@ -236,7 +236,7 @@ Describe '2.6.4-LIVE3 synthetic-only existing POP3 PST Worker contract' {
             InternetMessageId=('<opa264-live3-'+$paths.RunId+'@example.invalid>')
             Subject=('OPA264 LIVE3 synthetic '+$paths.RunId);Sender='';Size=-1
         }
-        [void](Write-OPAOperationJournalEvent @args)
+        [void](Write-OPAOperationJournalEvent @intentParams)
         {Assert-OPA264Live3Intent -Request $request -Paths $paths} |
             Should -Throw '*synthetic request*'
     }
