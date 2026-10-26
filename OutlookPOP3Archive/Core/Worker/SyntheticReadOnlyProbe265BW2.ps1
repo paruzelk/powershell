@@ -92,6 +92,65 @@ function Assert-OPA265BW2ObservedCounts {
     }
     throw 'BW2 synthetic contents disagree with durable journal state.'
 }
+# Pure diagnostic evidence only. Does not read, write, or change Outlook.
+# SHA256 is calculated from the exact EntryID text to avoid printing IDs.
+function Get-OPA265BW2SourceFingerprintEvidence {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][AllowEmptyString()][string]$ExpectedEntryId,
+        [Parameter(Mandatory=$true)][AllowEmptyString()][string]$ObservedEntryId,
+        [long]$IntentSizeBytes,
+        [long]$ObservedSourceSizeBytes
+    )
+    if ([string]::IsNullOrWhiteSpace($ExpectedEntryId) -or
+        [string]::IsNullOrWhiteSpace($ObservedEntryId) -or
+        $IntentSizeBytes -lt 0 -or $ObservedSourceSizeBytes -lt 0) {
+        throw 'BW2b source fingerprint requires nonempty EntryIDs and nonnegative sizes.'
+    }
+    $sha=[System.Security.Cryptography.SHA256]::Create()
+    try {
+        $expectedHash=([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($ExpectedEntryId)))).Replace('-','').ToLowerInvariant()
+        $observedHash=([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($ObservedEntryId)))).Replace('-','').ToLowerInvariant()
+    } finally {
+        $sha.Dispose()
+    }
+    $entryMatches=[string]::Equals($ExpectedEntryId,$ObservedEntryId,[StringComparison]::Ordinal)
+    $sizeMatches=($IntentSizeBytes -eq $ObservedSourceSizeBytes)
+    return [pscustomobject]@{
+        Schema='2.6.5-BW2b.SourceFingerprintEvidence.1'
+        SourceEntryIdMatchesIntent=$entryMatches
+        ExpectedSourceEntryIdSha256=$expectedHash
+        ObservedSourceEntryIdSha256=$observedHash
+        IntentSizeBytes=$IntentSizeBytes
+        ObservedSourceSizeBytes=$ObservedSourceSizeBytes
+        SizeDifferenceBytes=($ObservedSourceSizeBytes - $IntentSizeBytes)
+        SourceSizeMatchesIntent=$sizeMatches
+        ExactMatch=($entryMatches -and $sizeMatches)
+        OutlookMoveExecuted=$false
+        AutomaticRetryAllowed=$false
+    }
+}
+function Assert-OPA265BW2SourceFingerprint {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Evidence)
+    if ([string]$Evidence.Schema -cne '2.6.5-BW2b.SourceFingerprintEvidence.1' -or
+        [bool]$Evidence.AutomaticRetryAllowed -or
+        [bool]$Evidence.OutlookMoveExecuted -or
+        -not [bool]$Evidence.ExactMatch) {
+        throw ('BW2b source fingerprint mismatch (NO AUTO RETRY): ' +
+            ('SourceEntryIdMatchesIntent={0}; SourceSizeMatchesIntent={1}; ' +
+             'IntentSizeBytes={2}; ObservedSourceSizeBytes={3}; SizeDifferenceBytes={4}; ' +
+             'ExpectedSourceEntryIdSha256={5}; ObservedSourceEntryIdSha256={6}' -f
+                [bool]$Evidence.SourceEntryIdMatchesIntent,
+                [bool]$Evidence.SourceSizeMatchesIntent,
+                [long]$Evidence.IntentSizeBytes,
+                [long]$Evidence.ObservedSourceSizeBytes,
+                [long]$Evidence.SizeDifferenceBytes,
+                [string]$Evidence.ExpectedSourceEntryIdSha256,
+                [string]$Evidence.ObservedSourceEntryIdSha256))
+    }
+    return $true
+}
 function Assert-OPA265BW2MatchingMail {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Mail,[Parameter(Mandatory=$true)][object]$Folder,
@@ -118,9 +177,15 @@ function Assert-OPA265BW2MatchingMail {
             [long]$Mail.Size -ne [long]$Proof.ApprovedArchiveSizeBytes) {
             throw 'BW2 archive size differs from manually approved LIVE6 claim.'
         }
-    } elseif ([string]$Mail.EntryID -cne [string]$Proof.Request.SourceEntryId -or
-        [long]$Mail.Size -ne [long]$Proof.ExpectedSizeBytes) {
-        throw 'BW2 source MailItem differs from durable Intent.'
+    } else {
+        # Keep the exact original invariant. BW2b exposes BOTH components of
+        # a mismatch; it never treats MAPI size drift as automatic consent.
+        $evidence=Get-OPA265BW2SourceFingerprintEvidence `
+            -ExpectedEntryId ([string]$Proof.Request.SourceEntryId) `
+            -ObservedEntryId ([string]$Mail.EntryID) `
+            -IntentSizeBytes ([long]$Proof.ExpectedSizeBytes) `
+            -ObservedSourceSizeBytes ([long]$Mail.Size)
+        [void](Assert-OPA265BW2SourceFingerprint -Evidence $evidence)
     }
     return $true
 }
