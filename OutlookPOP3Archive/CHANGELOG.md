@@ -1,3 +1,10 @@
+## 2.6.5-BW2c — single-fixture read-only source MAPI size consent (2026-10-26; CI pending)
+
+- User BW2b pre-Move read-only probe observed unchanged SourceEntryId, but Intent.Size=1436 vs source MailItem.Size=1808 (+372). Previous LIVE6a +8 destination size approval is unrelated.
+- New explicit paired switches acknowledge exactly 1808 observed SOURCE bytes only for pinned pre-Move RunId 77854a93-...; OperationId, original journal SHA256, stored Intent.Size, matching EntryID, synthetic folder and POP3 identity remain mandatory. Both parent and child independently validate. Original source-size mismatch still fails without consent.
+- Read-only inspection ONLY, no durable Intent edits, no journal resolution, PST/Outlook modifications, retry or real MailItem.Move. No other RunId can use this consent.
+- Added 28 offline regression tests; Windows PS5.1 target 784 tests, 45 containers. Production flags unchanged.
+
 ## 2.6.5-BW2b - independent source EntryID/size evidence (2026-10-26; DEV CI pending)
 
 - Real Windows BW2a 732/43 CI PASS. BW2a real pre-Move synthetic probe stopped at source MailItem identity: EntryID or Size differs from durable Intent. Which component differs remains unknown.
