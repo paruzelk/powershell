@@ -62,6 +62,15 @@ try {
             . "$PSScriptRoot\Core\Worker\SyntheticReadOnlyProbe265BW2.ps1"
             $result=Invoke-OPA265BW2ReadOnlySyntheticProbe -Payload $request.Payload
         }
+        'BW3SyntheticOneShotMove' {
+            # BW3: exact NEW synthetic fixture only, explicit operator-approved
+            # parent dispatch claim required; one irreversible Move claim.
+            . "$PSScriptRoot\Core\Worker\Live3SyntheticScope.ps1"
+            . "$PSScriptRoot\Core\Archive\OperationJournal.ps1"
+            . "$PSScriptRoot\Core\Worker\BW3OneShotProtocol265.ps1"
+            . "$PSScriptRoot\Core\Worker\BW3SyntheticMoveWorker265.ps1"
+            $result=Invoke-OPA265BW3SyntheticOneShotMove -Payload $request.Payload -RequestId ([string]$request.RequestId)
+        }
         'ProbeOutlook' {
             # EXPLICITLY OPT-IN. COM lives entirely within this child process.
             # Read-only enumeration: no PST creation, archive, move, delete,
