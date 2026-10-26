@@ -63,3 +63,7 @@ Read-only synthetic-only LIVE4 run reconciliation: see [LIVE5 runbook](docs/2.6.
 ### 2.6.4-LIVE6 (opt-in synthetic-only journal resolution)
 
 See [LIVE6 runbook](docs/2.6.4-live6-controlled-journal-resolution.md). Only explicit pinned, independently confirmed post-Move crash evidence allows ONE journal-only Reconciled append. Otherwise read-only review. No MailItem.Move, production Worker enablement, or automatic retry. Windows PS5.1 CI 614/40 pending.
+
+### 2.6.4-LIVE6a — separate manual size evidence gate
+
+After cross-PST Move, MAPI MailItem.Size can differ from its original source-side value. The LIVE6a [read-only review runbook](docs/2.6.4-live6a-cross-pst-size-review.md) reports both sizes and prohibits any journal write without additional explicit approval and the exact destination byte count. Native Windows CI 631/40 pending; production Worker remains disabled.
