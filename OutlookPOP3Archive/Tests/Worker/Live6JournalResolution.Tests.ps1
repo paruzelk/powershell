@@ -263,4 +263,18 @@ Describe '2.6.4-LIVE6a cross-PST store-computed size evidence and explicit appro
         $content | Should -Match 'ConfirmCrossPstSizeDifference'
         $content | Should -Match 'Assert-OPA264Live6SizeApproval'
     }
+    It 'rejects writing a claim with changed sizes and no explicit consent' {
+        $req=[pscustomobject]@{RunId=[guid]::NewGuid().ToString('D');OperationId=[guid]::NewGuid().ToString('D')}
+        $paths=[pscustomobject]@{Directory=$TestDrive}
+        {New-OPA264Live6Claim -Request $req -Paths $paths -ExpectedJournalSha256 ('a'*64) -ArchiveEntryId 'synthetic' -IntentSizeBytes 3000 -ObservedArchiveSizeBytes 3024} | Should -Throw '*explicitly approved*'
+    }
+    It 'persists original and observed sizes together with explicit consent in its claim' {
+        $req=[pscustomobject]@{RunId=[guid]::NewGuid().ToString('D');OperationId=[guid]::NewGuid().ToString('D')}
+        $paths=[pscustomobject]@{Directory=$TestDrive}
+        $claim=New-OPA264Live6Claim -Request $req -Paths $paths -ExpectedJournalSha256 ('a'*64) -ArchiveEntryId 'synthetic' -IntentSizeBytes 3000 -ObservedArchiveSizeBytes 3024 -ExplicitSizeDifferenceApproved $true
+        $claim.IntentSizeBytes | Should -Be 3000
+        $claim.ObservedArchiveSizeBytes | Should -Be 3024
+        $claim.ExplicitSizeDifferenceApproved | Should -BeTrue
+    }
+
 }
