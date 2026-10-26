@@ -82,7 +82,10 @@ param(
     # BW2: isolated read-only probe for ONE previously created synthetic fixture.
     [switch]$WorkerPilotProbeSynthetic,
     [string]$WorkerPilotRunId = '',
-    [string]$WorkerPilotSourcePst = ''
+    [string]$WorkerPilotSourcePst = '',
+    # BW2c: explicit size consent only for one read-only synthetic probe.
+    [switch]$WorkerPilotConfirmSourceSizeDifference,
+    [long]$WorkerPilotExpectedSourceSizeBytes = 0
 )
 
 $ErrorActionPreference = 'Stop'
@@ -132,7 +135,9 @@ $pilotOptionsSpecified = ($PSBoundParameters.ContainsKey('WorkerPilotMaxOperatio
     $PSBoundParameters.ContainsKey('WorkerPilotKeepArtifacts') -or
     $PSBoundParameters.ContainsKey('WorkerPilotProbeSynthetic') -or
     $PSBoundParameters.ContainsKey('WorkerPilotRunId') -or
-    $PSBoundParameters.ContainsKey('WorkerPilotSourcePst'))
+    $PSBoundParameters.ContainsKey('WorkerPilotSourcePst') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotConfirmSourceSizeDifference') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes'))
 $pilotGate = Assert-OPA265WorkerPilotGate -Mode $Mode -PilotRequested ([bool]$WorkerPilot) -ExplicitConsent ([bool]$ConfirmDevWorkerPilot) -WhatIfEnabled ([bool]$WhatIf) -Limit $Limit -ProfileName $ProfileName -Transaction $Transaction -MaxOperations $WorkerPilotMaxOperations -TimeoutSeconds $WorkerPilotTimeoutSeconds -OtherPilotOptionsSpecified $pilotOptionsSpecified
 if ($WorkerPilot) {
     . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
@@ -149,10 +154,19 @@ if ($WorkerPilot) {
         . "$PSScriptRoot\Core\Archive\OperationJournal.ps1"
         . "$PSScriptRoot\Core\Worker\SyntheticReadOnlyProbe265BW2.ps1"
         . "$PSScriptRoot\Core\Worker\BoundedWorkerProbe265BW2.ps1"
-        $pilotResult = Invoke-OPA265BW2BoundedReadOnlyCanary -Gate $pilotGate -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -KeepArtifacts:$WorkerPilotKeepArtifacts
+        if ([bool]$WorkerPilotConfirmSourceSizeDifference -ne
+            $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes')) {
+            throw 'BW2c: source size consent requires BOTH confirm and explicit observed bytes.'
+        }
+        if ($WorkerPilotConfirmSourceSizeDifference -and $WorkerPilotExpectedSourceSizeBytes -le 0) {
+            throw 'BW2c: expected observed source bytes must be positive.'
+        }
+        $pilotResult = Invoke-OPA265BW2BoundedReadOnlyCanary -Gate $pilotGate -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -KeepArtifacts:$WorkerPilotKeepArtifacts -ConfirmSourceSizeDifference:$WorkerPilotConfirmSourceSizeDifference -ExpectedSourceSizeBytes $WorkerPilotExpectedSourceSizeBytes
     } else {
         if (-not [string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
-            -not [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst)) {
+            -not [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst) -or
+            [bool]$WorkerPilotConfirmSourceSizeDifference -or
+            $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes')) {
             throw 'BW2 fixture options require explicit -WorkerPilotProbeSynthetic.'
         }
         # BW1 backwards-compatible Ping-only path, still before any COM.
