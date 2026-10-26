@@ -50,7 +50,7 @@ function New-OPA264Live6Claim {
          ($IntentSizeBytes -eq $ObservedArchiveSizeBytes -and $ExplicitSizeDifferenceApproved))) {
         throw 'LIVE6 durable claim size evidence must be complete and explicitly approved when changed.'
     }
-    if ($ExpectedJournalSha256 -cnotmatch '^[a-f0-9]{64}
+    if ($ExpectedJournalSha256 -cnotmatch '^[a-f0-9]{64}$' -or
         [string]::IsNullOrWhiteSpace($ArchiveEntryId)) {
         throw 'LIVE6 requires a pinned journal SHA256 and exact nonempty archive EntryID.'
     }
