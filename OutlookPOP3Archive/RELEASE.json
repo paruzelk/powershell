@@ -19,14 +19,17 @@
     "SourceCommit packages require matching independently pinned full source inventory SHA-256.",
     "LIVE5 synthetic-only independent read-only crash/journal classification; no journal mutation or automatic retry",
     "LIVE6 explicit manual synthetic-only Reconciled journal append with pinned SHA256, durable claim and exclusive file lock; no MailItem.Move",
-    "LIVE6a reports independent source Intent.Size vs exact archive MailItem.Size; size drift requires additional explicit consent and pinned observed destination bytes, no automatic approval"
+    "LIVE6a reports independent source Intent.Size vs exact archive MailItem.Size; size drift requires additional explicit consent and pinned observed destination bytes, no automatic approval",
+    "2.6.5 opt-in Archive/Resume CLI read-only Ping Worker canary, exactly one operation; hard exit before COM/transactions/MailMover; no production or real mail integration"
   ],
   "Verification": {
-    "Status": "2.6.4-LIVE6a cross-PST MAPI size review DEV; LIVE6 Windows CI 614/40 PASS; LIVE6a Windows CI 631/40 pending; live -Review pending",
+    "Status": "2.6.5 bounded Archive/Resume Worker Ping canary DEV; 674/41 native Windows PS5.1 CI pending; no real mail Move or production activation",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 40,
-    "ExpectedPesterTests": 631,
-    "ControlledJournalResolutionOptIn": true
+    "ExpectedTestContainers": 41,
+    "ExpectedPesterTests": 674,
+    "ControlledJournalResolutionOptIn": true,
+    "BoundedWorkerCanaryDevOptIn": true,
+    "BoundedWorkerCanaryReadOnly": true
   }
 }
