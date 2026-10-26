@@ -167,7 +167,7 @@ function Assert-OPA265BW2SourceFingerprint {
     return $true
 }
 # BW2c strictly single-fixture manual read-only consent. This does NOT
-# authorize any MailItem.Move or permanent correction of durable Intent.
+# authorize message mutation or permanent correction of durable Intent.
 function Assert-OPA265BW2SourceSizeConsent {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Evidence,
