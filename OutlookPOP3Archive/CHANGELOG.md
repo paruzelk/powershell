@@ -1,3 +1,11 @@
+## 2.6.5-BW2a - fail-closed child Worker diagnostic fix (2026-10-26; CI pending)
+
+- Native Windows BW2 718/42 CI PASS. First real read-only synthetic pre-Move probe safely stopped with a generic Worker error.
+- Underlying child status, exit code and original error were hidden; BW2a reports them in bounded printable text, while preserving fail-closed no-retry policy.
+- Child labels narrow read-only COM inspection stages, not new mutation logic.
+- Original synthetic fixture scope, journal SHA256, no PST edits, no MailItem.Move and FIX13b remain unchanged.
+- 14 new offline tests; native Windows PS5.1 expected 732 tests/43 containers. Outlook cause pending real inspection.
+
 ## 2.6.5-BW2 — isolated synthetic-only Outlook read-only probe (2026-10-26; CI pending)
 
 - Real Windows BW1 Archive/Resume one-Ping worker canaries PASS. New explicit BW2 opt-in inspects only exact existing LIVE3 synthetic folders from an isolated native Windows PS5.1 STA Worker.
