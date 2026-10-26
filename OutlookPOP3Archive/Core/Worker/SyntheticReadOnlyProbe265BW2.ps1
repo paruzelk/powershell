@@ -53,7 +53,21 @@ function Assert-OPA265BW2Payload {
     foreach($field in @('Schema','RunId','SourcePst','OperationId','JournalSha256','State')) {
         if ($fields -cnotcontains $field) {throw ('BW2 required payload field missing: '+$field)}
     }
-    if ($fields.Count -ne 6 -or
+    $consentFields=@('ConfirmSourceSizeDifference','ExpectedSourceSizeBytes')
+    $consentPresent=($fields -ccontains $consentFields[0] -or
+        $fields -ccontains $consentFields[1])
+    if ($consentPresent) {
+        if ($fields.Count -ne 8 -or
+            $fields -cnotcontains $consentFields[0] -or
+            $fields -cnotcontains $consentFields[1] -or
+            $Payload.ConfirmSourceSizeDifference -isnot [bool] -or
+            -not [bool]$Payload.ConfirmSourceSizeDifference -or
+            [string]$Payload.ExpectedSourceSizeBytes -cne '1808' -or
+            [string]$Payload.State -cne 'UnresolvedIntent') {
+            throw 'BW2c: unapproved or incomplete source-size consent payload.'
+        }
+    }
+    if (($fields.Count -ne 6 -and -not $consentPresent) -or
         [string]$Payload.Schema -cne '2.6.5-BW2.SyntheticProbeRequest.1' -or
         [string]$Payload.JournalSha256 -cnotmatch '^[a-f0-9]{64}$' -or
         [string]$Payload.State -cnotin @('UnresolvedIntent','Reconciled')) {
@@ -152,12 +166,38 @@ function Assert-OPA265BW2SourceFingerprint {
     }
     return $true
 }
+# BW2c strictly single-fixture manual read-only consent. This does NOT
+# authorize any MailItem.Move or permanent correction of durable Intent.
+function Assert-OPA265BW2SourceSizeConsent {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Evidence,
+          [Parameter(Mandatory=$true)][object]$Proof,
+          [Parameter(Mandatory=$true)][object]$Consent)
+    if ([string]$Proof.RunId -cne '77854a93-ecfd-42c7-b58e-2948fe9afa88' -or
+        [string]$Proof.OperationId -cne 'e249f73b-8cdf-4672-92e3-5c49f8feaca0' -or
+        [string]$Proof.State -cne 'UnresolvedIntent' -or
+        [string]$Proof.JournalSha256 -cne '22d2047972825f3207ef3b099f57ebe46d6088a5f4c7fd0525ab45dd19d098fc' -or
+        [long]$Proof.ExpectedSizeBytes -ne 1436 -or
+        [string]$Evidence.Schema -cne '2.6.5-BW2b.SourceFingerprintEvidence.1' -or
+        -not [bool]$Evidence.SourceEntryIdMatchesIntent -or
+        [bool]$Evidence.SourceSizeMatchesIntent -or
+        [bool]$Evidence.AutomaticRetryAllowed -or
+        [bool]$Evidence.OutlookMoveExecuted -or
+        -not [bool]$Consent.ConfirmSourceSizeDifference -or
+        [long]$Consent.ExpectedSourceSizeBytes -ne 1808 -or
+        [long]$Evidence.ObservedSourceSizeBytes -ne [long]$Consent.ExpectedSourceSizeBytes -or
+        [long]$Evidence.SizeDifferenceBytes -ne 372) {
+        throw 'BW2c: explicit size consent rejected (exact RunId/OperationId/Intent SHA, EntryID and pinned observed bytes required); NO AUTO RETRY.'
+    }
+    return $true
+}
 function Assert-OPA265BW2MatchingMail {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Mail,[Parameter(Mandatory=$true)][object]$Folder,
           [Parameter(Mandatory=$true)][string]$ExpectedStoreId,
           [Parameter(Mandatory=$true)][string]$ExpectedFolderId,
-          [Parameter(Mandatory=$true)][object]$Proof,[switch]$Archive)
+          [Parameter(Mandatory=$true)][object]$Proof,[switch]$Archive,
+          [object]$SourceSizeConsent=$null)
     if ($null -eq $Mail -or [int]$Mail.Class -ne 43 -or
         [string]::IsNullOrWhiteSpace([string]$Mail.EntryID) -or
         -not (Test-OPA264Live3FolderIdentity -ObservedStoreId ([string]$Folder.StoreID) -ObservedFolderEntryId ([string]$Folder.EntryID) -ExpectedStoreId $ExpectedStoreId -ExpectedFolderEntryId $ExpectedFolderId) -or
@@ -186,7 +226,12 @@ function Assert-OPA265BW2MatchingMail {
             -ObservedEntryId ([string]$Mail.EntryID) `
             -IntentSizeBytes ([long]$Proof.ExpectedSizeBytes) `
             -ObservedSourceSizeBytes ([long]$Mail.Size)
-        [void](Assert-OPA265BW2SourceFingerprint -Evidence $evidence)
+        if ($null -ne $SourceSizeConsent) {
+            [void](Assert-OPA265BW2SourceSizeConsent -Evidence $evidence -Proof $Proof -Consent $SourceSizeConsent)
+        } else {
+            [void](Assert-OPA265BW2SourceFingerprint -Evidence $evidence)
+        }
+        return $evidence
     }
     return $true
 }
@@ -200,6 +245,18 @@ function Invoke-OPA265BW2ReadOnlySyntheticProbe {
         throw 'BW2 requires native Windows PowerShell 5.1 STA.'
     }
     $proof=Get-OPA265BW2FixtureProof -RunId ([string]$Payload.RunId) -SourcePst ([string]$Payload.SourcePst)
+    $consent=$null
+    if ($Payload.PSObject.Properties.Name -ccontains 'ConfirmSourceSizeDifference') {
+        $consent=$Payload
+        # Reject unsolicited consent before any Outlook COM access.
+        if ([string]$proof.State -cne 'UnresolvedIntent' -or
+            [string]$proof.RunId -cne '77854a93-ecfd-42c7-b58e-2948fe9afa88' -or
+            [string]$proof.OperationId -cne 'e249f73b-8cdf-4672-92e3-5c49f8feaca0' -or
+            [string]$proof.JournalSha256 -cne '22d2047972825f3207ef3b099f57ebe46d6088a5f4c7fd0525ab45dd19d098fc' -or
+            [long]$proof.ExpectedSizeBytes -ne 1436) {
+            throw 'BW2c: explicit source-size consent outside exact synthetic fixture.'
+        }
+    }
     if ([string]$proof.OperationId -cne [string]$Payload.OperationId -or
         [string]$proof.State -cne [string]$Payload.State -or
         [string]$proof.JournalSha256 -cne [string]$Payload.JournalSha256) {
@@ -238,10 +295,10 @@ function Invoke-OPA265BW2ReadOnlySyntheticProbe {
         $sc=[int]$src.Items.Count;$dc=[int]$dst.Items.Count
         if ($sc -gt 1 -or $dc -gt 1) {throw 'BW2 refuses extra or duplicate items.'}
         $stage='Check unique synthetic MailItem identity'
-        $sm=0;$dm=0;$archiveId=''
+        $sm=0;$dm=0;$archiveId='';$sourceEvidence=$null
         if ($sc -eq 1) {
             $mail=$src.Items.Item(1)
-            [void](Assert-OPA265BW2MatchingMail -Mail $mail -Folder $src -ExpectedStoreId ([string]$req.SourceStoreId) -ExpectedFolderId ([string]$req.SourceFolderEntryId) -Proof $proof)
+            $sourceEvidence=Assert-OPA265BW2MatchingMail -Mail $mail -Folder $src -ExpectedStoreId ([string]$req.SourceStoreId) -ExpectedFolderId ([string]$req.SourceFolderEntryId) -Proof $proof -SourceSizeConsent $consent
             $sm=1
         }
         if ($dc -eq 1) {
@@ -266,6 +323,13 @@ function Invoke-OPA265BW2ReadOnlySyntheticProbe {
             SyntheticSourceMatches=$sm
             SyntheticArchiveMatches=$dm
             ArchiveEntryId=$archiveId
+            SourceSizeDifferenceExplicitlyApproved=([bool]($null -ne $consent -and
+                $null -ne $sourceEvidence -and -not [bool]$sourceEvidence.SourceSizeMatchesIntent))
+            SourceEntryIdMatchesIntent=$(if ($null -eq $sourceEvidence) {$false} else {[bool]$sourceEvidence.SourceEntryIdMatchesIntent})
+            SourceSizeMatchesIntent=$(if ($null -eq $sourceEvidence) {$false} else {[bool]$sourceEvidence.SourceSizeMatchesIntent})
+            IntentSizeBytes=[long]$proof.ExpectedSizeBytes
+            ObservedSourceSizeBytes=$(if ($null -eq $sourceEvidence) {0} else {[long]$sourceEvidence.ObservedSourceSizeBytes})
+            SizeDifferenceBytes=$(if ($null -eq $sourceEvidence) {0} else {[long]$sourceEvidence.SizeDifferenceBytes})
             JournalSha256=[string]$proof.JournalSha256
             OutlookProfile='Outlook'
             OnlySyntheticFoldersInspected=$true
