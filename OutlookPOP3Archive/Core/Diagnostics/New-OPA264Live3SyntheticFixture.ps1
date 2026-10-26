@@ -73,17 +73,32 @@ try{
     $mail.Subject=$subject
     $mail.Body='Synthetic LIVE3 diagnostic email; no user content.'
     $mail.PropertyAccessor.SetProperty('http://schemas.microsoft.com/mapi/proptag/0x1035001F',$messageId)
-    $mail.PropertyAccessor.SetProperty('http://schemas.microsoft.com/mapi/proptag/0x0C1F001F',$sender)
     $mail.Save()
-    if([int]$srcFolder.Items.Count -ne 1 -or
-       [int]$dstFolder.Items.Count -ne 0 -or
-       [string]::IsNullOrWhiteSpace([string]$mail.EntryID) -or
-       [string]$mail.Parent.StoreID -cne [string]$src.StoreID -or
-       [string]$mail.Parent.FolderPath -cne [string]$srcFolder.FolderPath -or
-       [string]$mail.PropertyAccessor.GetProperty('http://schemas.microsoft.com/mapi/proptag/0x1035001F') -cne $messageId -or
-       [string]$mail.SenderEmailAddress -ine $sender -or
-       [long]$mail.Size -le 0){
-        throw 'LIVE3 synthetic MailItem fingerprint could not be verified. Worker is forbidden.'
+    # A locally created unsent IPM.Note has no reliable SenderEmailAddress
+    # and MailItem.Size may be 0 until Outlook recalculates store metadata.
+    # Only stable user-controlled identity fields are mandatory here.
+    $problems=New-Object 'System.Collections.Generic.List[string]'
+    if([int]$srcFolder.Items.Count -ne 1){[void]$problems.Add('SourceItemsNotOne')}
+    if([int]$dstFolder.Items.Count -ne 0){[void]$problems.Add('TargetNotEmpty')}
+    if([string]::IsNullOrWhiteSpace([string]$mail.EntryID)){
+        [void]$problems.Add('MissingSourceEntryID')
+    }
+    if([string]$mail.Parent.StoreID -cne [string]$src.StoreID){
+        [void]$problems.Add('UnexpectedParentStoreID')
+    }
+    if([string]$mail.Parent.FolderPath -cne [string]$srcFolder.FolderPath){
+        [void]$problems.Add('UnexpectedParentFolder')
+    }
+    if([string]$mail.Subject -cne $subject){
+        [void]$problems.Add('SubjectMismatch')
+    }
+    $observedId=[string]$mail.PropertyAccessor.GetProperty(
+        'http://schemas.microsoft.com/mapi/proptag/0x1035001F')
+    if($observedId -cne $messageId){
+        [void]$problems.Add('InternetMessageIdMismatch')
+    }
+    if($problems.Count -gt 0){
+        throw ('LIVE3 synthetic identity failed: '+($problems.ToArray() -join ', '))
     }
     $stage='Write durable test-only Intent'
     $req=[pscustomobject]@{
@@ -108,7 +123,7 @@ try{
         SourceFolderPath=[string]$srcFolder.FolderPath
         TargetFolderPath=[string]$dstFolder.FolderPath
         ArchivePst=$paths.ArchivePst;InternetMessageId=$messageId
-        Subject=$subject;Sender=$sender;Size=[long]$mail.Size
+        Subject=$subject;Sender='';Size=[long]$mail.Size
     }
     [void](Write-OPAOperationJournalEvent @journal)
     Write-OPAWorkerJsonAtomic -Path $paths.RequestPath -Value $req
