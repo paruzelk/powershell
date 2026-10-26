@@ -87,3 +87,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW2c source size review (DEV)
 
 [Runbook](docs/2.6.5-bw2c-explicit-source-size-consent.md). Explicit, manually pinned *read-only only* acknowledgment of the proven source MailItem.Size drift 1436 to 1808 on the one pre-Move LIVE4 synthetic fixture, preserving strict EntryID/RunId/OperationId/journal checks. Neither automatically retries nor performs Move or journal updates. Native Windows CI target 784/45.
+
+### 2.6.5-BW3 — crash-safe one-shot synthetic Worker (DEV)
+
+[Runbook](docs/2.6.5-bw3-crash-safe-synthetic-one-shot.md). Dedicated **operator-only** synthetic Move controller with filesystem-only -Review, then explicit -Execute/-ConfirmBW3SyntheticMove and operator-pinned journal SHA256. For a **NEW** LIVE3 synthetic fixture only: durable controller dispatch claim before child, durable Worker attempt claim before one Move, no retry and no automatic journal completion. Production Archive/Resume/Auto and FIX13b remain unchanged. Windows PS5.1 CI target 822/46. Real Outlook Move is **not executed or authorized by building this DEV stage**.
