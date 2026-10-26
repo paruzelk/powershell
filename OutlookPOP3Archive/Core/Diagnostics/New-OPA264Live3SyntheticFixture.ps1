@@ -1,6 +1,7 @@
 #requires -Version 5.1
 # LIVE3: create ONE synthetic mail in existing user-designated test POP3 PST
-# and a NEW disposable destination Archive.pst. No Move in this script.
+# and a NEW disposable destination Archive.pst. A staging Move of ONLY the
+# newly saved synthetic draft may be required by Outlook; no archive Move.
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)][string]$SourcePst,
@@ -74,21 +75,17 @@ try{
     $mail.Body='Synthetic LIVE3 diagnostic email; no user content.'
     $mail.PropertyAccessor.SetProperty('http://schemas.microsoft.com/mapi/proptag/0x1035001F',$messageId)
     $mail.Save()
-    # A locally created unsent IPM.Note has no reliable SenderEmailAddress
-    # and MailItem.Size may be 0 until Outlook recalculates store metadata.
-    # Only stable user-controlled identity fields are mandatory here.
+    # Outlook MailItem.Save() for a NEW unsent mail may store the item
+    # in its default Drafts folder, not in the Items.Add() folder.
+    # Inspect the exact new GUID-stamped item before any staging Move.
+    # This Move is fixture setup ONLY, distinct from the later one-shot
+    # cross-PST Worker Move whose Intent is persisted below.
+    $stage='Verify saved synthetic identity'
     $problems=New-Object 'System.Collections.Generic.List[string]'
-    if([int]$srcFolder.Items.Count -ne 1){[void]$problems.Add('SourceItemsNotOne')}
-    if([int]$dstFolder.Items.Count -ne 0){[void]$problems.Add('TargetNotEmpty')}
     if([string]::IsNullOrWhiteSpace([string]$mail.EntryID)){
         [void]$problems.Add('MissingSourceEntryID')
     }
-    if([string]$mail.Parent.StoreID -cne [string]$src.StoreID){
-        [void]$problems.Add('UnexpectedParentStoreID')
-    }
-    if([string]$mail.Parent.FolderPath -cne [string]$srcFolder.FolderPath){
-        [void]$problems.Add('UnexpectedParentFolder')
-    }
+    if([int]$mail.Class -ne 43){[void]$problems.Add('MailClassNot43')}
     if([string]$mail.Subject -cne $subject){
         [void]$problems.Add('SubjectMismatch')
     }
@@ -99,6 +96,50 @@ try{
     }
     if($problems.Count -gt 0){
         throw ('LIVE3 synthetic identity failed: '+($problems.ToArray() -join ', '))
+    }
+    $stagingMoveExecuted=$false
+    $parent=$mail.Parent
+    if(-not (Test-OPA264Live3FolderIdentity `
+        -ObservedStoreId ([string]$parent.StoreID) `
+        -ObservedFolderEntryId ([string]$parent.EntryID) `
+        -ExpectedStoreId ([string]$src.StoreID) `
+        -ExpectedFolderEntryId ([string]$srcFolder.EntryID))){
+        $stage='Place saved synthetic draft into exact test folder'
+        if([int]$srcFolder.Items.Count -ne 0 -or
+           [int]$dstFolder.Items.Count -ne 0){
+            throw 'LIVE3 cannot stage synthetic draft into a nonempty test folder.'
+        }
+        $staged=$mail.Move($srcFolder)
+        if($null -eq $staged){
+            throw 'LIVE3 fixture staging Move did not return the item.'
+        }
+        $mail=$staged
+        $stagingMoveExecuted=$true
+    }
+    $stage='Verify placed synthetic MailItem'
+    $problems=New-Object 'System.Collections.Generic.List[string]'
+    if([int]$srcFolder.Items.Count -ne 1){[void]$problems.Add('SourceItemsNotOne')}
+    if([int]$dstFolder.Items.Count -ne 0){[void]$problems.Add('TargetNotEmpty')}
+    if([string]::IsNullOrWhiteSpace([string]$mail.EntryID)){
+        [void]$problems.Add('MissingStagedEntryID')
+    }
+    if(-not (Test-OPA264Live3FolderIdentity `
+        -ObservedStoreId ([string]$mail.Parent.StoreID) `
+        -ObservedFolderEntryId ([string]$mail.Parent.EntryID) `
+        -ExpectedStoreId ([string]$src.StoreID) `
+        -ExpectedFolderEntryId ([string]$srcFolder.EntryID))){
+        [void]$problems.Add('UnexpectedStagedParentFolder')
+    }
+    if([string]$mail.Subject -cne $subject){
+        [void]$problems.Add('StagedSubjectMismatch')
+    }
+    $stagedMessageId=[string]$mail.PropertyAccessor.GetProperty(
+        'http://schemas.microsoft.com/mapi/proptag/0x1035001F')
+    if($stagedMessageId -cne $messageId){
+        [void]$problems.Add('StagedInternetMessageIdMismatch')
+    }
+    if($problems.Count -gt 0){
+        throw ('LIVE3 placed synthetic mail failed verification: '+($problems.ToArray() -join ', '))
     }
     $stage='Write durable test-only Intent'
     $req=[pscustomobject]@{
@@ -150,6 +191,7 @@ try{
         RequestFile=$paths.RequestPath
         JournalFile=$paths.JournalPath
         SyntheticMailCount=1
+        FixtureStagingMoveExecuted=[bool]$stagingMoveExecuted
         ExistingInboxTouched=$false
         MailMoveExecuted=$false
         WorkerStarted=$false
