@@ -17,13 +17,15 @@
     "All classifications require manual review and forbid automatic retry",
     "FIX13b production Archive/Resume/Auto and schemas unchanged",
     "SourceCommit packages require matching independently pinned full source inventory SHA-256.",
-    "LIVE5 synthetic-only independent read-only crash/journal classification; no journal mutation or automatic retry"
+    "LIVE5 synthetic-only independent read-only crash/journal classification; no journal mutation or automatic retry",
+    "LIVE6 explicit manual synthetic-only Reconciled journal append with pinned SHA256, durable claim and exclusive file lock; no MailItem.Move"
   ],
   "Verification": {
-    "Status": "2.6.4-LIVE5 read-only journal reconciliation DEV; LIVE4 user-confirmed 551/38 and two real crash windows PASS; LIVE5 CI 583/39 pending",
+    "Status": "2.6.4-LIVE6 controlled synthetic-only Reconciled journal DEV; LIVE5 real Outlook PASS; LIVE6 Windows CI 614/40 pending",
     "RealMailMoveViaWorker": false,
-    "ReadOnlyReconciliationOnly": true,
-    "ExpectedTestContainers": 39,
-    "ExpectedPesterTests": 583
+    "ReadOnlyReconciliationOnly": false,
+    "ExpectedTestContainers": 40,
+    "ExpectedPesterTests": 614,
+    "ControlledJournalResolutionOptIn": true
   }
 }
