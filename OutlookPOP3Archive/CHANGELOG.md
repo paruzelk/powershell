@@ -1,4 +1,11 @@
-﻿## 2.6.4-LIVE3b (2026-10-26; real Outlook synthetic mail identity fix DEV)
+﻿## 2.6.4-LIVE3C (2026-10-26; Microsoft Outlook new unsent mail Save placement DEV)
+
+- User-confirmed LIVE3B native Windows PowerShell 5.1 CI PASS: 517/37; real Outlook fixture reported SourceItemsNotOne and UnexpectedParentFolder before any Worker Move or journal Intent.
+- Microsoft MailItem.Save documentation allows new mail to be saved in default Drafts. The fixture now validates the exact newly created RunId-stamped mail, performs an explicit one-item staging Move into the GUID-scoped source folder only when needed, verifies parent StoreID + EntryID and 1/0 folder counts, then writes durable Intent.
+- Worker still performs exactly one independently claimed archive Move later; fingerprint now checks stable parent MAPI folder identity rather than visual FolderPath. Fixture response discloses FixtureStagingMoveExecuted. Existing Inbox/2019/2020 archives not touched by test.
+- Add 6 offline tests for folder identity, placement ordering and one staging Move; Windows CI target 523/37 PENDING. Old incomplete fixtures remain untouched, fresh RunId on every attempt.
+
+## 2.6.4-LIVE3b (2026-10-26; real Outlook synthetic mail identity fix DEV)
 
 - LIVE3 native Windows PowerShell 5.1 CI user-verified PASS: 507 Pester / 37 containers. First real Outlook synthetic fixture failed at the aggregated identity check BEFORE durable journal/request/marker and BEFORE any Move.
 - Remove unstable SenderEmailAddress and PST-dependent strict Size requirements from synthetic fixture, one-shot Worker and independent inspector. Keep exact folder/store/EntryId plus run-unique InternetMessageId and Subject. Source fixture now reports the specific failed identity predicate instead of an opaque combined error.
