@@ -19,10 +19,10 @@
     "SourceCommit packages require matching independently pinned full source inventory SHA-256."
   ],
   "Verification": {
-    "Status": "2.6.4-LIVE3b synthetic fingerprint correction DEV; 507/37 prior CI PASS, updated 517/37 CI and live Move pending",
+    "Status": "2.6.4-LIVE3C Outlook Save Drafts staging fix DEV; 517/37 prior CI PASS, updated 523/37 CI and live Worker Move pending",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": true,
     "ExpectedTestContainers": 37,
-    "ExpectedPesterTests": 517
+    "ExpectedPesterTests": 523
   }
 }
