@@ -51,6 +51,17 @@ try {
             Start-Sleep -Milliseconds $milliseconds
             $result = [pscustomobject]@{ SleptMilliseconds=$milliseconds }
         }
+        'ProbeSyntheticPstReadOnly' {
+            # BW2: attach ONLY to the existing Outlook session, inspect EXACT
+            # LIVE3 test folders and the reconciled/unresolved journal.
+            # No creation, mounting, Move, Save, Delete, retries, or PST edits.
+            . "$PSScriptRoot\Core\Worker\Live3SyntheticScope.ps1"
+            . "$PSScriptRoot\Core\Worker\Live5Reconciliation.ps1"
+            . "$PSScriptRoot\Core\Worker\Live6JournalResolution.ps1"
+            . "$PSScriptRoot\Core\Archive\OperationJournal.ps1"
+            . "$PSScriptRoot\Core\Worker\SyntheticReadOnlyProbe265BW2.ps1"
+            $result=Invoke-OPA265BW2ReadOnlySyntheticProbe -Payload $request.Payload
+        }
         'ProbeOutlook' {
             # EXPLICITLY OPT-IN. COM lives entirely within this child process.
             # Read-only enumeration: no PST creation, archive, move, delete,
