@@ -1,3 +1,10 @@
+## 2.6.4-LIVE5 — independent journal reconciliation (2026-10-26; pending Windows CI)
+
+- User confirmed LIVE4 Windows PS5.1 Pester 551/38 PASS and two real synthetic-only crash scenarios (before Move: 1/0; after Move before response: 0/1).
+- New read-only LIVE5 journal replay, durable Intent fingerprint validation, independent LIVE4 Outlook re-inspection, explicit NoMoveObserved/MoveConfirmed/AmbiguousDuplicate/MissingItem/Ambiguous/InspectionFailed decisions and SHA-256 journal stability check.
+- 32 offline regression tests; expected LIVE5 Pester 583/39, NOT yet independently run on Windows.
+- No automatic retry, journal commit, PST mutation, production integration, or build version bump; FIX13b and 2.6.3-PREVIEW1 remain unchanged.
+
 ﻿## 2.6.4-LIVE4 (2026-10-26; real synthetic Worker crash windows DEV)
 
 - User-confirmed LIVE3C native Windows 5.1 CI PASS 523 tests in 37 containers, and real one-shot cross-PST synthetic-only MailItem.Move PASS: source 1->0; archive 0->1; exact synthetic match; claim and response present; no normal production Worker enable.
