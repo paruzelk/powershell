@@ -169,7 +169,7 @@ Describe '2.6.4-LIVE3 synthetic-only existing POP3 PST Worker contract' {
         $txt | Should -Match 'MissingSourceEntryID'
         $txt | Should -Match 'InternetMessageIdMismatch'
         $txt | Should -Match 'UnexpectedParentFolder'
-        $txt | Should -Match 'Worker is forbidden'
+        $txt | Should -Match 'LIVE3 synthetic identity failed'
     }
     It 'journal Intent accepts an unsent synthetic test item with zero Size and no sender' {
         [void][IO.Directory]::CreateDirectory($paths.Directory)
