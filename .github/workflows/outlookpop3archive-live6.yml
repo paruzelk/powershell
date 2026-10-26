@@ -2,7 +2,7 @@ name: OutlookPOP3Archive LIVE6 Windows PS5.1 CI and DEV package
 on:
   push:
     branches:
-      - feature/outlookpop3archive-2.6.4-live6-independent-reconciliation
+      - feature/outlookpop3archive-2.6.4-live6-controlled-journal-resolution
     paths:
       - 'OutlookPOP3Archive/**'
       - '.github/workflows/outlookpop3archive-live6.yml'
