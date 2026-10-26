@@ -60,8 +60,11 @@ try{
     $mail=$ns.GetItemFromID([string]$req.SourceEntryId,[string]$req.SourceStoreId)
     if($null -eq $mail -or [int]$mail.Class -ne 43 -or
        [string]$mail.EntryID -cne [string]$req.SourceEntryId -or
-       [string]$mail.Parent.StoreID -cne [string]$req.SourceStoreId -or
-       [string]$mail.Parent.FolderPath -cne [string]$req.SourceFolderPath -or
+       -not (Test-OPA264Live3FolderIdentity `
+           -ObservedStoreId ([string]$mail.Parent.StoreID) `
+           -ObservedFolderEntryId ([string]$mail.Parent.EntryID) `
+           -ExpectedStoreId ([string]$req.SourceStoreId) `
+           -ExpectedFolderEntryId ([string]$req.SourceFolderEntryId)) -or
        [string]$mail.PropertyAccessor.GetProperty('http://schemas.microsoft.com/mapi/proptag/0x1035001F') -cne [string]$intent.InternetMessageId -or
        [string]$mail.Subject -cne [string]$intent.Subject){
         throw 'LIVE3 Worker found a nonmatching synthetic mail fingerprint.'
