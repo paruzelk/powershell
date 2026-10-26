@@ -59,7 +59,7 @@ function Assert-OPA265BW2Outcome {
         [string]$Outcome.FailureKind -cne 'None' -or
         [bool]$Outcome.RequiresReconciliation) {
         $details=Get-OPA265BW2WorkerFailureDetails -Outcome $Outcome
-        throw ('BW2: Worker refused/failed (NO AUTO RETRY). '+$details)
+        throw ('BW2: Worker refused/failed (fail closed without retry; NO AUTO RETRY). '+$details)
     }
     if ([string]$Outcome.Operation -cne 'ProbeSyntheticPstReadOnly' -or
         [int]$Outcome.WorkerProcessId -le 0 -or
