@@ -107,7 +107,7 @@ function Assert-OPA264Live6Completed {
 }
 function Write-OPA264Live6ReconciledLocked {
     [CmdletBinding()]
-    param([Parameter(Mandatory=$true)][string]$JournalPath,
+    param([Parameter(Mandatory=$true)][object]$Paths,
           [Parameter(Mandatory=$true)][object]$Intent,
           [Parameter(Mandatory=$true)][string]$ExpectedJournalSha256,
           [Parameter(Mandatory=$true)][string]$ArchiveEntryId)
@@ -118,6 +118,20 @@ function Write-OPA264Live6ReconciledLocked {
         [long]$Intent.Sequence -ne 1) {
         throw 'LIVE6 refuses to append without one validated Intent and pinned journal.'
     }
+    $claimPath=Get-OPA264Live6ClaimPath -Paths $Paths
+    if (-not [IO.File]::Exists($claimPath)) {
+        throw 'LIVE6 refuses journal append without prior durable CreateNew resolution claim.'
+    }
+    $claim=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($claimPath)) -ErrorAction Stop
+    if ([string]$claim.Schema -cne '2.6.4-LIVE6.ResolutionClaim.1' -or
+        [string]$claim.RunId -cne [string]$Intent.TransactionId -or
+        [string]$claim.OperationId -cne [string]$Intent.OperationId -or
+        [string]$claim.ArchiveEntryId -cne $ArchiveEntryId -or
+        [string]$claim.PreviousJournalSha256 -cne $ExpectedJournalSha256 -or
+        [bool]$claim.AutomaticRetryAllowed -or [bool]$claim.ProductionReady) {
+        throw 'LIVE6 durable resolution claim does not match exact intended append.'
+    }
+    $JournalPath=[string]$Paths.JournalPath
     $stream=$null
     try {
         # Exclusive lock covers both pinned byte check and full append.
