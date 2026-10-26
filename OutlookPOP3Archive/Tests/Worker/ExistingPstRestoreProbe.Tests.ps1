@@ -84,13 +84,13 @@ Describe '2.6.4-LIVE2 restore scope offline' {
         $raw | Should -Not -Match '\$mail\.Move\('
     }
     It 'reports the exact relative folder with differing item counts' {
-        $a=[pscustomobject]@{FolderCount=1;Folders=@([pscustomobject]@{RelativePath='Входящие';Items=26310;Subfolders=0})}
-        $b=[pscustomobject]@{FolderCount=1;Folders=@([pscustomobject]@{RelativePath='Входящие';Items=26309;Subfolders=0})}
+        $a=[pscustomobject]@{FolderCount=1;Folders=@([pscustomobject]@{RelativePath='Inbox';Items=26310;Subfolders=0})}
+        $b=[pscustomobject]@{FolderCount=1;Folders=@([pscustomobject]@{RelativePath='Inbox';Items=26309;Subfolders=0})}
         $result=Compare-OPA264RestoreFolderInventories -Source $a -Restored $b
         $result.Schema | Should -Be '2.6.4-LIVE2B.Comparison.1'
         $result.DifferenceCount | Should -Be 1
         $result.DifferenceTypes[0] | Should -Be 'CountMismatch'
-        $result.Differences[0].RelativePath | Should -Be 'Входящие'
+        $result.Differences[0].RelativePath | Should -Be 'Inbox'
         $result.Differences[0].Type | Should -Be 'ItemCountMismatch'
         $result.Differences[0].SourceItems | Should -Be 26310
         $result.Differences[0].RestoredItems | Should -Be 26309
