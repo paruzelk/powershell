@@ -128,10 +128,11 @@ function Assert-OPA264Live3Intent {
         [string]$item.SourceFolderPath -cne [string]$Request.SourceFolderPath -or
         [string]$item.TargetFolderPath -cne [string]$Request.ArchiveFolderPath -or
         [string]$item.ArchivePst -cne [string]$Paths.ArchivePst -or
-        [string]::IsNullOrWhiteSpace([string]$item.InternetMessageId) -or
-        [string]::IsNullOrWhiteSpace([string]$item.Subject) -or
-        [string]::IsNullOrWhiteSpace([string]$item.Sender) -or
-        [long]$item.Size -le 0){
+        [string]$item.InternetMessageId -cne
+            ('<opa264-live3-'+$Paths.RunId+'@example.invalid>') -or
+        [string]$item.Subject -cne
+            ('OPA264 LIVE3 synthetic '+$Paths.RunId) -or
+        [long]$item.Size -lt 0){
         throw 'LIVE3 durable Intent differs from synthetic request.'
     }
     return $item
