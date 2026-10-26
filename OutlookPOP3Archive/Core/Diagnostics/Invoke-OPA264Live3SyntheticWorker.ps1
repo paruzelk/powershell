@@ -24,6 +24,9 @@ $paths=Get-OPA264Live3Paths -RunId $RunId -SourcePst $SourcePst
 $req=Read-OPAWorkerJson -Path $paths.RequestPath
 if(-not [string]::Equals([string]$req.SourcePst,[string]$paths.SourcePst,
     [StringComparison]::OrdinalIgnoreCase)){throw 'LIVE3 request differs from explicitly selected POP3 PST.'}
+if([IO.File]::Exists((Join-Path $paths.Directory 'bw3-dispatch.claim'))){
+    throw 'LIVE3 direct Worker refuses BW3 controller-dispatched fixture; NO AUTO RETRY.'
+}
 if([IO.File]::Exists((Join-Path $paths.Directory 'controller-dispatch.claim'))){
     throw 'LIVE3 direct Worker refuses a RunId already dispatched by LIVE4 controller.'
 }
