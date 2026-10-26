@@ -1,3 +1,10 @@
+## 2.6.5-BW2b - independent source EntryID/size evidence (2026-10-26; DEV CI pending)
+
+- Real Windows BW2a 732/43 CI PASS. BW2a real pre-Move synthetic probe stopped at source MailItem identity: EntryID or Size differs from durable Intent. Which component differs remains unknown.
+- BW2b keeps strict fail-closed matching and adds both comparison booleans, Intent/observed sizes, signed delta and SHA256 hashes of raw EntryIDs instead of echoing raw EntryID strings. A size mismatch is NOT auto-approved.
+- No new Outlook COM scope, MailItem.Move, journal append, PST writes, automatic retry or fallback to FIX13b. Production flags remain false.
+- 24 offline regression tests; native Windows PS5.1 CI target 756 tests / 44 containers.
+
 ## 2.6.5-BW2a - fail-closed child Worker diagnostic fix (2026-10-26; CI pending)
 
 - Native Windows BW2 718/42 CI PASS. First real read-only synthetic pre-Move probe safely stopped with a generic Worker error.
