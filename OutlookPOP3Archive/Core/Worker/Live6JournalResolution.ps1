@@ -189,3 +189,36 @@ function Write-OPA264Live6ReconciledLocked {
     }
     return $true
 }
+
+# MAPI PR_MESSAGE_SIZE is store-computed, not a byte-identical cross-PST
+# content hash. A difference demands explicit separately pinned manual consent.
+function Get-OPA264Live6SizeEvidence {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][long]$IntentSizeBytes,
+          [Parameter(Mandatory=$true)][long]$ObservedArchiveSizeBytes)
+    if ($IntentSizeBytes -le 0 -or $ObservedArchiveSizeBytes -le 0) {
+        throw 'LIVE6 refuses unknown, zero or negative MailItem sizes.'
+    }
+    return [pscustomobject]@{
+        IntentSizeBytes=$IntentSizeBytes
+        ObservedArchiveSizeBytes=$ObservedArchiveSizeBytes
+        SizeDifferenceBytes=($ObservedArchiveSizeBytes - $IntentSizeBytes)
+        CrossPstSizeDiffers=($IntentSizeBytes -ne $ObservedArchiveSizeBytes)
+    }
+}
+function Assert-OPA264Live6SizeApproval {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Evidence,
+          [switch]$ConfirmCrossPstSizeDifference,
+          [long]$ExpectedArchiveSizeBytes=-1)
+    if ([bool]$Evidence.CrossPstSizeDiffers) {
+        if (-not $ConfirmCrossPstSizeDifference -or
+            $ExpectedArchiveSizeBytes -le 0 -or
+            $ExpectedArchiveSizeBytes -ne [long]$Evidence.ObservedArchiveSizeBytes) {
+            throw 'LIVE6 cross-PST size changed: explicit consent and exact pinned observed archive size are required.'
+        }
+    } elseif ($ConfirmCrossPstSizeDifference -or $ExpectedArchiveSizeBytes -ne -1) {
+        throw 'LIVE6 refuses unsolicited size-difference override when sizes match.'
+    }
+    return $true
+}
