@@ -1,4 +1,12 @@
-﻿## 2.6.4-LIVE2 (2026-10-23; test-only Outlook cloned backup restore drill DEV)
+﻿## 2.6.4-LIVE2B (2026-10-23; exact-folder restore mismatch evidence DEV)
+
+- User-confirmed LIVE2 native Windows PS5.1 CI PASS: 490 tests/36 containers.
+- User-confirmed real TEMP PST restore smoke test: mount/read/detach succeeded, 9 folders on each side, but exactly one CountMismatch; not a restore PASS. Production gate remains blocked.
+- Extend pure restore snapshot comparison to persist only relative folder path, source/restored item and subfolder counts, precise reason and separate structure/contents-equality flags. No message metadata included, no MailItem.Move, no source/archive modifications.
+- Add 10 pure offline Pester checks; target LIVE2B CI 500 tests in 36 containers (pending).
+- Earlier claimed RunId is never replayed; historical report lacks folder-level count fields and cannot retroactively identify the differing folder.
+
+## 2.6.4-LIVE2 (2026-10-23; test-only Outlook cloned backup restore drill DEV)
 
 - LIVE1 exact-source native Windows PowerShell 5.1 CI user-confirmed 478 tests/35 containers PASS.
 - User created a reference POP3 PST backup with SHA256-matched byte copy; original unchanged. This is not yet a functional Outlook restore test.
