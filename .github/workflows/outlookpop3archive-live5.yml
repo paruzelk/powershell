@@ -1,0 +1,46 @@
+name: OutlookPOP3Archive LIVE5 Windows PS5.1 CI and DEV package
+on:
+  push:
+    branches:
+      - feature/outlookpop3archive-2.6.4-live5-independent-reconciliation
+    paths:
+      - 'OutlookPOP3Archive/**'
+      - '.github/workflows/outlookpop3archive-live5.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live5-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+        working-directory: OutlookPOP3Archive
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Windows PowerShell CI prerequisites
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module -Name Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+          Install-Module -Name PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
+      - name: Native Windows PowerShell 5.1 test gate (583 / 39)
+        run: |
+          if ($PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5) { throw 'Not Windows PowerShell 5.1.' }
+          .\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
+      - name: Package full project only after successful CI
+        run: |
+          $output = Join-Path $env:RUNNER_TEMP 'OPA-LIVE5-Package'
+          .\New-OPABuildPackage.ps1 -ExpectedBuild '2.6.3-PREVIEW1' -OutputDirectory $output
+          Get-ChildItem -LiteralPath $output -File | ForEach-Object { Write-Host $_.FullName }
+      - name: Upload CI-validated LIVE5 development archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutlookPOP3Archive-2.6.4-LIVE5-dev
+          path: |
+            ${{ runner.temp }}/OPA-LIVE5-Package/*.zip
+            ${{ runner.temp }}/OPA-LIVE5-Package/*.sha256
+          if-no-files-found: error
+          retention-days: 14
