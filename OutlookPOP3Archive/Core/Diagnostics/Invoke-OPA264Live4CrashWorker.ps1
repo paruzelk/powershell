@@ -29,6 +29,12 @@ $req=Read-OPAWorkerJson -Path $paths.RequestPath
 if(-not [string]::Equals([string]$req.SourcePst,[string]$paths.SourcePst,
     [StringComparison]::OrdinalIgnoreCase)){throw 'LIVE3 request differs from explicitly selected POP3 PST.'}
 $paths=Assert-OPA264Live3Request -Request $req -BeforeMove
+$live4Paths=Get-OPA264Live4Paths -FixturePaths $paths
+[void](Assert-OPA264Live4Claim -Path $live4Paths.DispatchClaim -OperationId ([string]$req.OperationId))
+if([IO.File]::Exists($live4Paths.CrashBarrier) -or
+   [IO.File]::Exists($live4Paths.ControllerResult)){
+    throw 'LIVE4 worker refuses a previously crashed or reported RunId.'
+}
 $intent=Assert-OPA264Live3Intent -Request $req -Paths $paths
 $app=$null;$ns=$null;$stage='Outlook preflight';$claimed=$false
 try{
