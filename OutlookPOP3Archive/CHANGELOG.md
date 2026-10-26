@@ -1,3 +1,11 @@
+## 2.6.5 — opt-in bounded Archive/Resume Worker canary (2026-10-26; DEV CI pending)
+
+- LIVE6a real Outlook review, explicit +8-byte cross-PST size consent, one-shot synthetic Reconciled journal append and subsequent independent AlreadyReconciled check PASS. Archived mail was not moved again.
+- Main Archive/Resume entry supports a strictly gated read-only WorkerPilot switch. Requires explicit -ConfirmDevWorkerPilot, -WhatIf, -Mode Archive or Resume, -ProfileName Outlook, -Limit 1, exactly one Ping operation, and bounded 1..30-second timeout. Resume additionally requires an explicit GUID -Transaction.
+- Canary exits before Outlook COM, transaction/PST creation, journal writes and MailMover. Failed/indeterminate responses stop; no retry and no fallback to legacy mail Move.
+- Default FIX13b is unchanged. RealMailMoveViaWorker remains false; no Auto Worker; production remains unpromoted.
+- Added 43 offline tests; native Windows PS5.1 gate expected 674/41.
+
 ## 2.6.4-LIVE6a — cross-PST store-computed MailItem.Size safety fix (2026-10-26; CI pending)
 
 - User's LIVE6 real Outlook pre-Move review PASS; post-Move review rejected because source-side durable Intent.Size differed from archive MailItem.Size after the cross-PST Move. Journal was not changed.
