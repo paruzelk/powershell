@@ -13,7 +13,8 @@ function Get-OPA265BW3Preflight {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][string]$RunId,
           [Parameter(Mandatory=$true)][string]$SourcePst,
-          [string]$ExpectedJournalSha256='')
+          [string]$ExpectedJournalSha256='',
+          [switch]$ForDispatchedWorker)
     $paths=Get-OPA264Live3Paths -RunId $RunId -SourcePst $SourcePst
     $request=Read-OPAWorkerJson -Path $paths.RequestPath
     if ([string]$request.RunId -cne [string]$paths.RunId -or
@@ -39,9 +40,11 @@ function Get-OPA265BW3Preflight {
     $extra=Get-OPA265BW3Paths -FixturePaths $paths
     $legacyController=Join-Path $paths.Directory 'controller-dispatch.claim'
     $live6=Join-Path $paths.Directory 'live6-resolution.claim'
-    foreach ($p in @($paths.ClaimPath,$paths.ResponsePath,$extra.DispatchClaimPath,
+    $blocked=@($paths.ClaimPath,$paths.ResponsePath,
         $extra.ControllerResultPath,$legacyController,$live6,
-        (Join-Path $paths.Directory 'crash-barrier.json'))) {
+        (Join-Path $paths.Directory 'crash-barrier.json'))
+    if (-not $ForDispatchedWorker) {$blocked+= $extra.DispatchClaimPath}
+    foreach ($p in $blocked) {
         if ([IO.File]::Exists([string]$p)) {
             throw 'BW3 RunId has an attempt, dispatch, crash, resolution or response artifact: NEVER retry or reuse.'
         }
