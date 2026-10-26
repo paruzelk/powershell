@@ -173,8 +173,8 @@ function Assert-OPA264Live3Pop3Source {
 function Test-OPA264Live3FolderIdentity {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)][string]$ObservedStoreId,
-        [Parameter(Mandatory=$true)][string]$ObservedFolderEntryId,
+        [Parameter(Mandatory=$true)][AllowEmptyString()][string]$ObservedStoreId,
+        [Parameter(Mandatory=$true)][AllowEmptyString()][string]$ObservedFolderEntryId,
         [Parameter(Mandatory=$true)][string]$ExpectedStoreId,
         [Parameter(Mandatory=$true)][string]$ExpectedFolderEntryId
     )
