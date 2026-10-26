@@ -179,7 +179,7 @@ if ([IO.File]::Exists($claimPath)) {
 }
 # Durable CreateNew claim before any journal mutation. If the host dies in
 # the gap, the claim blocks all retries and needs separate manual review.
-$claim=New-OPA264Live6Claim -Request $request -Paths $paths -ExpectedJournalSha256 $initialSha -ArchiveEntryId $archiveEntryId
+$claim=New-OPA264Live6Claim -Request $request -Paths $paths -ExpectedJournalSha256 $initialSha -ArchiveEntryId $archiveEntryId -IntentSizeBytes ([long]$sizeEvidence.IntentSizeBytes) -ObservedArchiveSizeBytes ([long]$sizeEvidence.ObservedArchiveSizeBytes) -ExplicitSizeDifferenceApproved ([bool]($sizeEvidence.CrossPstSizeDiffers -and $ConfirmCrossPstSizeDifference))
 [void](Write-OPA264Live6ReconciledLocked -Paths $paths -Intent $initial.Events[0] -ExpectedJournalSha256 $initialSha -ArchiveEntryId $archiveEntryId)
 $complete=Read-OPAOperationJournal -Path $paths.JournalPath
 [void](Assert-OPA264Live6Completed -Request $request -Paths $paths -Journal $complete -Claim $claim)
