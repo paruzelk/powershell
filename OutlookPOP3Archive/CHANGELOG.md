@@ -1,3 +1,11 @@
+## 2.6.5-BW2 — isolated synthetic-only Outlook read-only probe (2026-10-26; CI pending)
+
+- Real Windows BW1 Archive/Resume one-Ping worker canaries PASS. New explicit BW2 opt-in inspects only exact existing LIVE3 synthetic folders from an isolated native Windows PS5.1 STA Worker.
+- Supports unresolved Intent (NoMoveObserved) and completed LIVE6a Reconciled (MoveConfirmed) with durable claim/EntryID and immutable journal SHA256.
+- Parent and child independently validate fixture, output and identity; only an already-running TEST Outlook profile, POP3 DeliveryStore and exactly two synthetic folders may be examined. No Inbox, new PST mount, MailItem.Move, journal mutation, automatic retries, or fallback to Archive/Resume.
+- 44 new offline tests; Windows CI target 718 tests / 42 containers.
+- Default FIX13b production path unchanged; RealMailMoveViaWorker=False, ProductionReady=False.
+
 ## 2.6.5 — opt-in bounded Archive/Resume Worker canary (2026-10-26; DEV CI pending)
 
 - LIVE6a real Outlook review, explicit +8-byte cross-PST size consent, one-shot synthetic Reconciled journal append and subsequent independent AlreadyReconciled check PASS. Archived mail was not moved again.
