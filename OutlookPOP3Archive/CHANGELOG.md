@@ -1,3 +1,10 @@
+## 2.6.4-LIVE6 — controlled journal resolution (2026-10-26; Windows CI pending)
+
+- LIVE5 real Outlook independently confirmed source=1/archive=0 pre-Move and source=0/archive=1 post-Move crash, with unchanged journals and no re-Move.
+- LIVE6 introduces explicitly approved synthetic-only manual journal Reconciled append ONLY after independently re-observed MoveConfirmed, exact target MailItem.EntryID, pinned original SHA256 and durable exclusive claim + compare-and-append.
+- Refuses NoMoveObserved, corrupt/torn/ambiguous/stale journal, unapproved Outlook profiles, missing target identity, concurrent claim, and repeat writes. Subsequent read-only review returns AlreadyReconciled.
+- 31 new offline fail-closed tests; expected native Windows PS5.1 614 tests / 40 containers. No production Archive/Resume/Auto changes and no automatic retry.
+
 ## 2.6.4-LIVE5 — independent journal reconciliation (2026-10-26; pending Windows CI)
 
 - User confirmed LIVE4 Windows PS5.1 Pester 551/38 PASS and two real synthetic-only crash scenarios (before Move: 1/0; after Move before response: 0/1).
