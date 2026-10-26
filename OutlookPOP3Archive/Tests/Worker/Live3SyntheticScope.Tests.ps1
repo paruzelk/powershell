@@ -135,4 +135,110 @@ Describe '2.6.4-LIVE3 synthetic-only existing POP3 PST Worker contract' {
         $raw=Get-Content -LiteralPath $file -Raw
         $raw | Should -Not -Match "'MailMove'"
     }
+    It 'fixture never requires SenderEmailAddress from locally created unsent MailItem' {
+        $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/New-OPA264Live3SyntheticFixture.ps1'
+        $txt=Get-Content -LiteralPath $file -Raw
+        $txt | Should -Not -Match '\$mail\.SenderEmailAddress'
+    }
+    It 'fixture never sets sender MAPI proptag on unsent synthetic item' {
+        $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/New-OPA264Live3SyntheticFixture.ps1'
+        $txt=Get-Content -LiteralPath $file -Raw
+        $txt | Should -Not -Match '0x0C1F001F'
+    }
+    It 'LIVE3 Worker verifies synthetic identifiers without SenderEmailAddress' {
+        $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA264Live3SyntheticWorker.ps1'
+        $txt=Get-Content -LiteralPath $file -Raw
+        $txt | Should -Not -Match '\$mail\.SenderEmailAddress'
+        $txt | Should -Match '0x1035001F'
+        $txt | Should -Match 'SourceEntryId'
+    }
+    It 'LIVE3 Worker does not require identical MailItem Size across Outlook stores' {
+        $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA264Live3SyntheticWorker.ps1'
+        $txt=Get-Content -LiteralPath $file -Raw
+        $txt | Should -Not -Match '\$mail\.Size -ne '
+    }
+    It 'read-only inspector does not require sender or equal Size after cross-PST Move' {
+        $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/Test-OPA264Live3SyntheticMove.ps1'
+        $txt=Get-Content -LiteralPath $file -Raw
+        $txt | Should -Not -Match '\$item\.SenderEmailAddress'
+        $txt | Should -Not -Match '\$item\.Size -ne '
+    }
+    It 'fixture reports which identity assertion failed without permitting a Move' {
+        $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/New-OPA264Live3SyntheticFixture.ps1'
+        $txt=Get-Content -LiteralPath $file -Raw
+        $txt | Should -Match 'MissingSourceEntryID'
+        $txt | Should -Match 'InternetMessageIdMismatch'
+        $txt | Should -Match 'UnexpectedParentFolder'
+        $txt | Should -Match 'Worker is forbidden'
+    }
+    It 'journal Intent accepts an unsent synthetic test item with zero Size and no sender' {
+        [void][IO.Directory]::CreateDirectory($paths.Directory)
+        $args=@{
+            Path=$paths.JournalPath
+            TransactionId=$paths.RunId
+            OperationId=$request.OperationId
+            Sequence=1
+            Phase='Intent'
+            OperationKind='MailMove'
+            SourceEntryId=$request.SourceEntryId
+            SourceStoreId=$request.SourceStoreId
+            SourceFolderPath=$request.SourceFolderPath
+            TargetFolderPath=$request.ArchiveFolderPath
+            ArchivePst=$paths.ArchivePst
+            InternetMessageId=('<opa264-live3-'+$paths.RunId+'@example.invalid>')
+            Subject=('OPA264 LIVE3 synthetic '+$paths.RunId)
+            Sender=''
+            Size=[long]0
+        }
+        [void](Write-OPAOperationJournalEvent @args)
+        $observed=Assert-OPA264Live3Intent -Request $request -Paths $paths
+        $observed.Subject | Should -Be ('OPA264 LIVE3 synthetic '+$paths.RunId)
+        $observed.Size | Should -Be 0
+    }
+    It 'journal Intent rejects a foreign Subject even if EntryId matches' {
+        [void][IO.Directory]::CreateDirectory($paths.Directory)
+        $args=@{
+            Path=$paths.JournalPath;TransactionId=$paths.RunId;OperationId=$request.OperationId
+            Sequence=1;Phase='Intent';OperationKind='MailMove'
+            SourceEntryId=$request.SourceEntryId;SourceStoreId=$request.SourceStoreId
+            SourceFolderPath=$request.SourceFolderPath;TargetFolderPath=$request.ArchiveFolderPath
+            ArchivePst=$paths.ArchivePst
+            InternetMessageId=('<opa264-live3-'+$paths.RunId+'@example.invalid>')
+            Subject='Some other mail';Sender='';Size=0
+        }
+        [void](Write-OPAOperationJournalEvent @args)
+        {Assert-OPA264Live3Intent -Request $request -Paths $paths} |
+            Should -Throw '*synthetic request*'
+    }
+    It 'journal Intent rejects a foreign MessageId even when Subject matches' {
+        [void][IO.Directory]::CreateDirectory($paths.Directory)
+        $args=@{
+            Path=$paths.JournalPath;TransactionId=$paths.RunId;OperationId=$request.OperationId
+            Sequence=1;Phase='Intent';OperationKind='MailMove'
+            SourceEntryId=$request.SourceEntryId;SourceStoreId=$request.SourceStoreId
+            SourceFolderPath=$request.SourceFolderPath;TargetFolderPath=$request.ArchiveFolderPath
+            ArchivePst=$paths.ArchivePst
+            InternetMessageId='<not-this-run@example.invalid>'
+            Subject=('OPA264 LIVE3 synthetic '+$paths.RunId);Sender='';Size=0
+        }
+        [void](Write-OPAOperationJournalEvent @args)
+        {Assert-OPA264Live3Intent -Request $request -Paths $paths} |
+            Should -Throw '*synthetic request*'
+    }
+    It 'journal Intent rejects negative synthetic Size metadata' {
+        [void][IO.Directory]::CreateDirectory($paths.Directory)
+        $args=@{
+            Path=$paths.JournalPath;TransactionId=$paths.RunId;OperationId=$request.OperationId
+            Sequence=1;Phase='Intent';OperationKind='MailMove'
+            SourceEntryId=$request.SourceEntryId;SourceStoreId=$request.SourceStoreId
+            SourceFolderPath=$request.SourceFolderPath;TargetFolderPath=$request.ArchiveFolderPath
+            ArchivePst=$paths.ArchivePst
+            InternetMessageId=('<opa264-live3-'+$paths.RunId+'@example.invalid>')
+            Subject=('OPA264 LIVE3 synthetic '+$paths.RunId);Sender='';Size=-1
+        }
+        [void](Write-OPAOperationJournalEvent @args)
+        {Assert-OPA264Live3Intent -Request $request -Paths $paths} |
+            Should -Throw '*synthetic request*'
+    }
+
 }
