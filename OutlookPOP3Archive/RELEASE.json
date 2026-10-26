@@ -19,10 +19,10 @@
     "SourceCommit packages require matching independently pinned full source inventory SHA-256."
   ],
   "Verification": {
-    "Status": "2.6.4-LIVE3 synthetic-only diagnostic MailItem.Move in existing test POP3 PST DEV; Windows CI and live synthetic Move pending",
+    "Status": "2.6.4-LIVE3b synthetic fingerprint correction DEV; 507/37 prior CI PASS, updated 517/37 CI and live Move pending",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": true,
     "ExpectedTestContainers": 37,
-    "ExpectedPesterTests": 507
+    "ExpectedPesterTests": 517
   }
 }
