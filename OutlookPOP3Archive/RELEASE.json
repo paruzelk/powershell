@@ -16,13 +16,14 @@
     "Source/destination StoreID, folder and PST identity checking; no mutation",
     "All classifications require manual review and forbid automatic retry",
     "FIX13b production Archive/Resume/Auto and schemas unchanged",
-    "SourceCommit packages require matching independently pinned full source inventory SHA-256."
+    "SourceCommit packages require matching independently pinned full source inventory SHA-256.",
+    "LIVE5 synthetic-only independent read-only crash/journal classification; no journal mutation or automatic retry"
   ],
   "Verification": {
-    "Status": "2.6.4-LIVE4 real synthetic Worker pre/post controlled crash DEV; LIVE3C real cross-PST Move PASS, 551/38 CI pending",
+    "Status": "2.6.4-LIVE5 read-only journal reconciliation DEV; LIVE4 user-confirmed 551/38 and two real crash windows PASS; LIVE5 CI 583/39 pending",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": true,
-    "ExpectedTestContainers": 38,
-    "ExpectedPesterTests": 551
+    "ExpectedTestContainers": 39,
+    "ExpectedPesterTests": 583
   }
 }
