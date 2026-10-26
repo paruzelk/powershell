@@ -1,4 +1,26 @@
-﻿## 2.6.4-LIVE2 (2026-10-23; test-only Outlook cloned backup restore drill DEV)
+﻿## 2.6.4-LIVE3C (2026-10-26; Microsoft Outlook new unsent mail Save placement DEV)
+
+- User-confirmed LIVE3B native Windows PowerShell 5.1 CI PASS: 517/37; real Outlook fixture reported SourceItemsNotOne and UnexpectedParentFolder before any Worker Move or journal Intent.
+- Microsoft MailItem.Save documentation allows new mail to be saved in default Drafts. The fixture now validates the exact newly created RunId-stamped mail, performs an explicit one-item staging Move into the GUID-scoped source folder only when needed, verifies parent StoreID + EntryID and 1/0 folder counts, then writes durable Intent.
+- Worker still performs exactly one independently claimed archive Move later; fingerprint now checks stable parent MAPI folder identity rather than visual FolderPath. Fixture response discloses FixtureStagingMoveExecuted. Existing Inbox/2019/2020 archives not touched by test.
+- Add 6 offline tests for folder identity, placement ordering and one staging Move; Windows CI target 523/37 PENDING. Old incomplete fixtures remain untouched, fresh RunId on every attempt.
+
+## 2.6.4-LIVE3b (2026-10-26; real Outlook synthetic mail identity fix DEV)
+
+- LIVE3 native Windows PowerShell 5.1 CI user-verified PASS: 507 Pester / 37 containers. First real Outlook synthetic fixture failed at the aggregated identity check BEFORE durable journal/request/marker and BEFORE any Move.
+- Remove unstable SenderEmailAddress and PST-dependent strict Size requirements from synthetic fixture, one-shot Worker and independent inspector. Keep exact folder/store/EntryId plus run-unique InternetMessageId and Subject. Source fixture now reports the specific failed identity predicate instead of an opaque combined error.
+- Add 10 regression Pester tests for unsent mail identity, forged Intent and zero Size, target 517/37 native CI PENDING.
+- Do not reuse incomplete first fixture RunId; new GUID fixture is isolated. No full PST re-backup, no LIVE2B dependency, production Worker remains disabled.
+
+## 2.6.4-LIVE3 (2026-10-23; user-directed return to Move/Worker roadmap DEV)
+
+- User confirmed existing Outlook profile and POP3 PST are intentional test data; historical mail risk accepted. Do not require new profile, another byte-for-byte backup, or LIVE2B mismatch follow-up to develop the archiver.
+- LIVE2 real Outlook temporary PST mount/read/detach succeeded; one CountMismatch (9 folders on both sides) was observed, potentially because inbox contents changed. User has not tested LIVE2B; that diagnostic branch is deferred.
+- Add a separate test-only fixture for an existing uniquely bound POP3 PST: one GUID-scoped synthetic folder and one synthetic MailItem, new temporary destination PST, durable MailMove Intent. Existing Inbox mail is never selected.
+- Add one-shot diagnostic Worker invoking MailItem.Move on only the exact synthetic fingerprinted item after a durable claim, plus separate read-only source/destination folder observation.
+- Add 17 offline safety and path tests; LIVE3 target 507 tests in 37 containers, native Windows CI PENDING. Production Archive/Resume/Auto and standard Worker allowlist unchanged.
+
+## 2.6.4-LIVE2 (2026-10-23; test-only Outlook cloned backup restore drill DEV)
 
 - LIVE1 exact-source native Windows PowerShell 5.1 CI user-confirmed 478 tests/35 containers PASS.
 - User created a reference POP3 PST backup with SHA256-matched byte copy; original unchanged. This is not yet a functional Outlook restore test.
