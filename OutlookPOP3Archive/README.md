@@ -59,3 +59,7 @@ The opt-in live COM harness leaves an unresolved Intent and both temporary PSTs 
 ### 2.6.4-LIVE5 (test-only independent crash journal review)
 
 Read-only synthetic-only LIVE4 run reconciliation: see [LIVE5 runbook](docs/2.6.4-live5-independent-reconciliation.md). No automatic recovery, Worker production activation, or journal completion. Windows PS5.1 CI 583/39 pending.
+
+### 2.6.4-LIVE6 (opt-in synthetic-only journal resolution)
+
+See [LIVE6 runbook](docs/2.6.4-live6-controlled-journal-resolution.md). Only explicit pinned, independently confirmed post-Move crash evidence allows ONE journal-only Reconciled append. Otherwise read-only review. No MailItem.Move, production Worker enablement, or automatic retry. Windows PS5.1 CI 614/40 pending.
