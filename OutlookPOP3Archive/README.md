@@ -55,3 +55,7 @@ Before publishing a release package, Windows PowerShell 5.1 must pass `Invoke-CI
 ## 2.6.3 independent process restart verification
 
 The opt-in live COM harness leaves an unresolved Intent and both temporary PSTs mounted. To check restart replay with a **fresh PowerShell process**, run `Core/Diagnostics/Test-OPA263RestartReadOnly.ps1` against the specific generated `*.operations.jsonl` file. The script attaches to already running Outlook, locates stores by persisted StoreID/PST path, resolves existing folders and independently classifies their contents. It never writes to a PST, attaches a new store, changes the journal, retries a Move, or marks a transaction completed. See `docs/TESTING.md`.
+
+### 2.6.4-LIVE5 (test-only independent crash journal review)
+
+Read-only synthetic-only LIVE4 run reconciliation: see [LIVE5 runbook](docs/2.6.4-live5-independent-reconciliation.md). No automatic recovery, Worker production activation, or journal completion. Windows PS5.1 CI 583/39 pending.
