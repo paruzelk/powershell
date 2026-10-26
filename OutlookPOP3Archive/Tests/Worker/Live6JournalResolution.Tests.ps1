@@ -198,3 +198,69 @@ Describe '2.6.4-LIVE6 explicit synthetic-only journal resolution protocol (offli
         )}).Count | Should -Be 0
     }
 }
+
+Describe '2.6.4-LIVE6a cross-PST store-computed size evidence and explicit approval' {
+    BeforeAll {
+        . (Join-Path $PSScriptRoot '../../Core/Worker/Live6JournalResolution.ps1')
+    }
+    BeforeEach {
+        $same=Get-OPA264Live6SizeEvidence -IntentSizeBytes 3000 -ObservedArchiveSizeBytes 3000
+        $changed=Get-OPA264Live6SizeEvidence -IntentSizeBytes 3000 -ObservedArchiveSizeBytes 3024
+    }
+    It 'reports exact matching pre/post-PST size without drift' {
+        $same.CrossPstSizeDiffers | Should -BeFalse
+        $same.IntentSizeBytes | Should -Be 3000
+        $same.ObservedArchiveSizeBytes | Should -Be 3000
+    }
+    It 'reports exact changed source/archive byte sizes and signed delta' {
+        $changed.CrossPstSizeDiffers | Should -BeTrue
+        $changed.SizeDifferenceBytes | Should -Be 24
+    }
+    It 'reports signed negative delta for smaller destination message' {
+        $e=Get-OPA264Live6SizeEvidence -IntentSizeBytes 3000 -ObservedArchiveSizeBytes 2990
+        $e.CrossPstSizeDiffers | Should -BeTrue
+        $e.SizeDifferenceBytes | Should -Be -10
+    }
+    It 'rejects unknown zero original Intent size' {
+        {Get-OPA264Live6SizeEvidence -IntentSizeBytes 0 -ObservedArchiveSizeBytes 1000} | Should -Throw '*unknown*'
+    }
+    It 'rejects unknown zero observed archive size' {
+        {Get-OPA264Live6SizeEvidence -IntentSizeBytes 3000 -ObservedArchiveSizeBytes 0} | Should -Throw '*unknown*'
+    }
+    It 'rejects negative observed destination size' {
+        {Get-OPA264Live6SizeEvidence -IntentSizeBytes 3000 -ObservedArchiveSizeBytes -1} | Should -Throw '*unknown*'
+    }
+    It 'allows a matching size without extra flags' {
+        (Assert-OPA264Live6SizeApproval -Evidence $same) | Should -BeTrue
+    }
+    It 'rejects unsolicited size-difference flag on matching sizes' {
+        {Assert-OPA264Live6SizeApproval -Evidence $same -ConfirmCrossPstSizeDifference} | Should -Throw '*unsolicited*'
+    }
+    It 'rejects unsolicited expected size on matching sizes' {
+        {Assert-OPA264Live6SizeApproval -Evidence $same -ExpectedArchiveSizeBytes 3000} | Should -Throw '*unsolicited*'
+    }
+    It 'rejects drift without independent explicit approval' {
+        {Assert-OPA264Live6SizeApproval -Evidence $changed} | Should -Throw '*explicit consent*'
+    }
+    It 'rejects drift when only observed size is pinned' {
+        {Assert-OPA264Live6SizeApproval -Evidence $changed -ExpectedArchiveSizeBytes 3024} | Should -Throw '*explicit consent*'
+    }
+    It 'rejects drift when consent lacks observed size pin' {
+        {Assert-OPA264Live6SizeApproval -Evidence $changed -ConfirmCrossPstSizeDifference} | Should -Throw '*exact pinned*'
+    }
+    It 'rejects stale archive size pin even with manual consent' {
+        {Assert-OPA264Live6SizeApproval -Evidence $changed -ConfirmCrossPstSizeDifference -ExpectedArchiveSizeBytes 3023} | Should -Throw '*exact pinned*'
+    }
+    It 'accepts size drift only with explicit consent and exact observed archive byte pin' {
+        (Assert-OPA264Live6SizeApproval -Evidence $changed -ConfirmCrossPstSizeDifference -ExpectedArchiveSizeBytes 3024) | Should -BeTrue
+    }
+    It 'wires reviewer fields and separate consent flag into the LIVE6 CLI' {
+        $path=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA264Live6JournalResolution.ps1'
+        $content=Get-Content -LiteralPath $path -Raw
+        $content | Should -Match 'CanExecuteWithExplicitSizeConsent'
+        $content | Should -Match 'ObservedArchiveSizeBytes'
+        $content | Should -Match 'IntentSizeBytes'
+        $content | Should -Match 'ConfirmCrossPstSizeDifference'
+        $content | Should -Match 'Assert-OPA264Live6SizeApproval'
+    }
+}
