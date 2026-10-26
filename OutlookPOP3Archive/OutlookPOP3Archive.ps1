@@ -72,7 +72,13 @@ param(
 
     # Stop Auto after consecutive verified batches without logical removal.
     [ValidateRange(1,1000)]
-    [int]$AutoMaxEmptyBatches = 2
+    [int]$AutoMaxEmptyBatches = 2,
+    # 2.6.5 read-only Archive/Resume Worker canary; exits before COM or PST changes.
+    [switch]$WorkerPilot,
+    [switch]$ConfirmDevWorkerPilot,
+    [ValidateRange(1,1)][int]$WorkerPilotMaxOperations = 1,
+    [ValidateRange(1,30)][int]$WorkerPilotTimeoutSeconds = 10,
+    [switch]$WorkerPilotKeepArtifacts
 )
 
 $ErrorActionPreference = 'Stop'
@@ -113,6 +119,25 @@ if ($Mode -in @('Archive','Plan','Auto') -and $OlderThanMonths -eq 0 -and -not $
 . "$PSScriptRoot\Core\Archive\MailMover.ps1"
 . "$PSScriptRoot\Core\Archive\ArchiveVerifier.ps1"
 . "$PSScriptRoot\Core\Archive\ArchiveReport.ps1"
+
+. "$PSScriptRoot\Core\Worker\BoundedWorkerCanary265.ps1"
+# Guard BEFORE New-OPAComSession, transaction creation, MailMover or any PST changes.
+# FIX13b route remains unchanged when WorkerPilot is disabled.
+$pilotOptionsSpecified = ($PSBoundParameters.ContainsKey('WorkerPilotMaxOperations') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotTimeoutSeconds') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotKeepArtifacts'))
+$pilotGate = Assert-OPA265WorkerPilotGate -Mode $Mode -PilotRequested ([bool]$WorkerPilot) -ExplicitConsent ([bool]$ConfirmDevWorkerPilot) -WhatIfEnabled ([bool]$WhatIf) -Limit $Limit -ProfileName $ProfileName -Transaction $Transaction -MaxOperations $WorkerPilotMaxOperations -TimeoutSeconds $WorkerPilotTimeoutSeconds -OtherPilotOptionsSpecified $pilotOptionsSpecified
+if ($WorkerPilot) {
+    . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
+    . "$PSScriptRoot\Core\Worker\WorkerHost.ps1"
+    . "$PSScriptRoot\Core\Worker\WorkerControl.ps1"
+    # Exactly one isolated Ping, then exit before archive/Resume execution.
+    $pilotResult = Invoke-OPA265BoundedWorkerCanary -Gate $pilotGate -KeepArtifacts:$WorkerPilotKeepArtifacts
+    Write-Output $pilotResult
+    exit 0
+}
+
+
 
 Write-Host "OutlookPOP3Archive $($script:OPAApplicationVersion)"
 Write-Host ("Computer : {0}" -f $env:COMPUTERNAME)
