@@ -67,3 +67,7 @@ See [LIVE6 runbook](docs/2.6.4-live6-controlled-journal-resolution.md). Only exp
 ### 2.6.4-LIVE6a — separate manual size evidence gate
 
 After cross-PST Move, MAPI MailItem.Size can differ from its original source-side value. The LIVE6a [read-only review runbook](docs/2.6.4-live6a-cross-pst-size-review.md) reports both sizes and prohibits any journal write without additional explicit approval and the exact destination byte count. Native Windows CI 631/40 pending; production Worker remains disabled.
+
+### 2.6.5 bounded Worker canary (DEV only)
+
+[Operational runbook](docs/2.6.5-bounded-worker-canary.md). The Archive/Resume CLI now includes a strictly bounded, explicit -WhatIf -WorkerPilot -ConfirmDevWorkerPilot **Ping-only** process isolation canary and stops before any COM/PST/transaction mutation. It does not archive/resume or enable real mail Move through Worker. Default FIX13b production path and worker integration flags remain unchanged. Native Windows CI target: 674 Pester tests in 41 containers.
