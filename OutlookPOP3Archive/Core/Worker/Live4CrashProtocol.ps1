@@ -112,7 +112,17 @@ function Wait-OPA264Live4OwnedBarrier {
     try{
         while($watch.Elapsed.TotalSeconds -lt $TimeoutSeconds){
             if([IO.File]::Exists($paths.CrashBarrier)){
-                $record=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($paths.CrashBarrier)) -ErrorAction Stop
+                # CreateNew/FileShare.None makes the filename visible BEFORE
+                # the Worker has flushed and closed the JSON. Poll past
+                # transient sharing violations; never accept partial JSON.
+                $barrierText=$null
+                try{$barrierText=[IO.File]::ReadAllText($paths.CrashBarrier)}
+                catch [IO.IOException]{
+                    if($Process.HasExited){throw 'LIVE4 Worker exited while writing crash barrier.'}
+                    Start-Sleep -Milliseconds 50
+                    continue
+                }
+                $record=ConvertFrom-Json -InputObject $barrierText -ErrorAction Stop
                 [void](Assert-OPA264Live4Barrier -Record $record -Request $Request -Window $Window -ExpectedWorkerPid ([int]$Process.Id))
                 if($Window -ceq 'AfterMoveBeforeResponse'){
                     [void](Assert-OPA264Live4Claim -Path $FixturePaths.ClaimPath -OperationId ([string]$Request.OperationId))
