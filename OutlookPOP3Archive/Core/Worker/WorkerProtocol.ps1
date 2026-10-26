@@ -1,7 +1,7 @@
 ﻿# Worker protocol 1.0 — standalone, deliberately independent of transaction
 # journals and OutlookPOP3Archive.ps1. Compatible with Windows PowerShell 5.1.
 $script:OPAWorkerProtocolVersion = '1.0'
-$script:OPAWorkerAllowedOperations = @('Ping','Echo','Fail','Crash','Delay','ProbeOutlook','ProbeSyntheticPstReadOnly')
+$script:OPAWorkerAllowedOperations = @('Ping','Echo','Fail','Crash','Delay','ProbeOutlook','ProbeSyntheticPstReadOnly','BW3SyntheticOneShotMove')
 
 function Assert-OPAWorkerRequest {
     [CmdletBinding()]
@@ -36,7 +36,7 @@ function New-OPAWorkerRequest {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [ValidateSet('Ping','Echo','Fail','Crash','Delay','ProbeOutlook','ProbeSyntheticPstReadOnly')][string]$Operation,
+        [ValidateSet('Ping','Echo','Fail','Crash','Delay','ProbeOutlook','ProbeSyntheticPstReadOnly','BW3SyntheticOneShotMove')][string]$Operation,
         [object]$Payload = @{},
         [string]$RequestId = ''
     )
