@@ -18,14 +18,15 @@
     "FIX13b production Archive/Resume/Auto and schemas unchanged",
     "SourceCommit packages require matching independently pinned full source inventory SHA-256.",
     "LIVE5 synthetic-only independent read-only crash/journal classification; no journal mutation or automatic retry",
-    "LIVE6 explicit manual synthetic-only Reconciled journal append with pinned SHA256, durable claim and exclusive file lock; no MailItem.Move"
+    "LIVE6 explicit manual synthetic-only Reconciled journal append with pinned SHA256, durable claim and exclusive file lock; no MailItem.Move",
+    "LIVE6a reports independent source Intent.Size vs exact archive MailItem.Size; size drift requires additional explicit consent and pinned observed destination bytes, no automatic approval"
   ],
   "Verification": {
-    "Status": "2.6.4-LIVE6 controlled synthetic-only Reconciled journal DEV; LIVE5 real Outlook PASS; LIVE6 Windows CI 614/40 pending",
+    "Status": "2.6.4-LIVE6a cross-PST MAPI size review DEV; LIVE6 Windows CI 614/40 PASS; LIVE6a Windows CI 631/40 pending; live -Review pending",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
     "ExpectedTestContainers": 40,
-    "ExpectedPesterTests": 614,
+    "ExpectedPesterTests": 631,
     "ControlledJournalResolutionOptIn": true
   }
 }
