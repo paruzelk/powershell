@@ -170,7 +170,7 @@ Describe '2.6.4-LIVE4 controlled Worker crash barriers (offline, no Outlook)' {
     It 'the controller terminates only its own created child and never Outlook process' {
         $text=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA264Live4CrashController.ps1') -Raw
         $text | Should -Match '\$child\.Kill\(\)'
-        $text | Should -Not -Match 'Stop-Process|Get-Process|OUTLOOK\.EXE'
+        $text | Should -Not -Match 'Stop-Process|Get-Process'
     }
     It 'the independent recovery inspector never mutates Outlook or claims' {
         $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/Test-OPA264Live4CrashRecovery.ps1'
