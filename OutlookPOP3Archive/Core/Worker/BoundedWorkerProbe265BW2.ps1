@@ -54,7 +54,9 @@ function Get-OPA265BW2WorkerFailureDetails {
 function Assert-OPA265BW2Outcome {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Outcome,
-          [Parameter(Mandatory=$true)][object]$Proof)
+          [Parameter(Mandatory=$true)][object]$Proof,
+          [switch]$ConfirmSourceSizeDifference,
+          [long]$ExpectedSourceSizeBytes=0)
     if ([string]$Outcome.Status -cne 'Succeeded' -or
         [string]$Outcome.FailureKind -cne 'None' -or
         [bool]$Outcome.RequiresReconciliation) {
@@ -91,6 +93,26 @@ function Assert-OPA265BW2Outcome {
         [bool]$r.ProductionReady) {
         throw 'BW2: child read-only proof differs from exact parent fixture.'
     }
+    # Parent independently verifies the exact source-size consent reflected in
+    # child result. A child cannot widen consent or change the pinned bytes.
+    if ($ConfirmSourceSizeDifference) {
+        if ([string]$Proof.RunId -cne '77854a93-ecfd-42c7-b58e-2948fe9afa88' -or
+            [string]$Proof.OperationId -cne 'e249f73b-8cdf-4672-92e3-5c49f8feaca0' -or
+            [string]$Proof.State -cne 'UnresolvedIntent' -or
+            [string]$Proof.JournalSha256 -cne '22d2047972825f3207ef3b099f57ebe46d6088a5f4c7fd0525ab45dd19d098fc' -or
+            $ExpectedSourceSizeBytes -ne 1808 -or
+            [long]$Proof.ExpectedSizeBytes -ne 1436 -or
+            -not [bool]$r.SourceSizeDifferenceExplicitlyApproved -or
+            -not [bool]$r.SourceEntryIdMatchesIntent -or
+            [bool]$r.SourceSizeMatchesIntent -or
+            [long]$r.IntentSizeBytes -ne 1436 -or
+            [long]$r.ObservedSourceSizeBytes -ne $ExpectedSourceSizeBytes -or
+            [long]$r.SizeDifferenceBytes -ne 372) {
+            throw 'BW2c: returned source-size evidence differs from one-shot explicit consent; fail closed.'
+        }
+    } elseif ([bool]$r.SourceSizeDifferenceExplicitlyApproved) {
+        throw 'BW2c: child claimed unrequested source-size approval; fail closed.'
+    }
     $decision=Assert-OPA265BW2ObservedCounts -State ([string]$r.State) -SourceCount ([int]$r.SourceItemCount) -ArchiveCount ([int]$r.ArchiveItemCount) -SourceMatches ([int]$r.SyntheticSourceMatches) -ArchiveMatches ([int]$r.SyntheticArchiveMatches)
     if ([string]$r.Decision -cne $decision) {
         throw 'BW2 child decision and independent parent count proof disagree.'
@@ -110,9 +132,23 @@ function Invoke-OPA265BW2BoundedReadOnlyCanary {
     param([Parameter(Mandatory=$true)][object]$Gate,
           [Parameter(Mandatory=$true)][string]$RunId,
           [Parameter(Mandatory=$true)][string]$SourcePst,
-          [switch]$KeepArtifacts)
+          [switch]$KeepArtifacts,
+          [switch]$ConfirmSourceSizeDifference,
+          [long]$ExpectedSourceSizeBytes=0)
     [void](Assert-OPA265BW2CanaryGate -Gate $Gate -RunId $RunId -SourcePst $SourcePst)
+    if (-not $ConfirmSourceSizeDifference -and $ExpectedSourceSizeBytes -ne 0) {
+        throw 'BW2c: observed source bytes require explicit size consent.'
+    }
     $proof=Get-OPA265BW2FixtureProof -RunId $RunId -SourcePst $SourcePst
+    if ($ConfirmSourceSizeDifference -and
+        ([string]$proof.RunId -cne '77854a93-ecfd-42c7-b58e-2948fe9afa88' -or
+         [string]$proof.OperationId -cne 'e249f73b-8cdf-4672-92e3-5c49f8feaca0' -or
+         [string]$proof.State -cne 'UnresolvedIntent' -or
+         [string]$proof.JournalSha256 -cne '22d2047972825f3207ef3b099f57ebe46d6088a5f4c7fd0525ab45dd19d098fc' -or
+         [long]$proof.ExpectedSizeBytes -ne 1436 -or
+         $ExpectedSourceSizeBytes -ne 1808)) {
+        throw 'BW2c: size consent outside exact pinned pre-Move synthetic fixture.'
+    }
     $payload=[pscustomobject]@{
         Schema='2.6.5-BW2.SyntheticProbeRequest.1'
         RunId=[string]$proof.RunId
@@ -121,10 +157,14 @@ function Invoke-OPA265BW2BoundedReadOnlyCanary {
         JournalSha256=[string]$proof.JournalSha256
         State=[string]$proof.State
     }
+    if ($ConfirmSourceSizeDifference) {
+        $payload | Add-Member NoteProperty ConfirmSourceSizeDifference $true
+        $payload | Add-Member NoteProperty ExpectedSourceSizeBytes ([long]$ExpectedSourceSizeBytes)
+    }
     [void](Assert-OPA265BW2Payload -Payload $payload)
     # EXACTLY one child process and operation. No retry/fallback to MailMover.
     $outcome=Invoke-OPAWorkerControlledOperation -Operation 'ProbeSyntheticPstReadOnly' -Payload $payload -TimeoutSeconds ([int]$Gate.TimeoutSeconds) -KeepArtifacts:$KeepArtifacts
-    [void](Assert-OPA265BW2Outcome -Outcome $outcome -Proof $proof)
+    [void](Assert-OPA265BW2Outcome -Outcome $outcome -Proof $proof -ConfirmSourceSizeDifference:$ConfirmSourceSizeDifference -ExpectedSourceSizeBytes $ExpectedSourceSizeBytes)
     if ([string]$proof.JournalSha256 -cne
         (Get-FileHash -LiteralPath $proof.Paths.JournalPath -Algorithm SHA256).Hash.ToLowerInvariant()) {
         throw 'BW2 journal changed during child Worker inspection.'
@@ -149,6 +189,12 @@ function Invoke-OPA265BW2BoundedReadOnlyCanary {
         SyntheticSourceMatches=[int]$r.SyntheticSourceMatches
         SyntheticArchiveMatches=[int]$r.SyntheticArchiveMatches
         ArchiveEntryId=[string]$r.ArchiveEntryId
+        SourceSizeDifferenceExplicitlyApproved=[bool]$r.SourceSizeDifferenceExplicitlyApproved
+        SourceEntryIdMatchesIntent=[bool]$r.SourceEntryIdMatchesIntent
+        SourceSizeMatchesIntent=[bool]$r.SourceSizeMatchesIntent
+        IntentSizeBytes=[long]$r.IntentSizeBytes
+        ObservedSourceSizeBytes=[long]$r.ObservedSourceSizeBytes
+        SizeDifferenceBytes=[long]$r.SizeDifferenceBytes
         JournalSha256=[string]$r.JournalSha256
         OnlySyntheticFoldersInspected=$true
         OutlookComAccessExecuted=$true
