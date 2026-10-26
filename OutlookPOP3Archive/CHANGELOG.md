@@ -1,3 +1,13 @@
+## 2.6.5-BW3 — crash-safe one-shot synthetic Worker dispatch (2026-10-26; DEV CI pending)
+
+- BW2c real Windows read-only PRE-MOVE and POST-MOVE canaries PASS with unchanged original journal SHA256. Old RunIds never reused for Move.
+- Dedicated BW3 controller supplies read-only fixture -Review and explicit -Execute/-ConfirmBW3SyntheticMove with operator-pinned journal SHA256. Does not modify production Archive/Resume/Auto route or FIX13b.
+- Strict new fixture scope, complete durable Intent and original SHA; durable CreateNew+Flush(true) dispatch claim BEFORE Worker start, then child durable CreateNew+Flush(true) attempt claim BEFORE sole synthetic MailItem.Move.
+- Native Win PS5.1 STA child attaches to existing TEST Outlook and unique POP3+disposable-PST synthetic folders only; checks EntryID, Parent, InternetMessageId, Subject, untouched Intent size, source=1/archive=0; no size waiver, existing Inbox or PST mounting.
+- Any error/timeout/invalid response is permanent stop for that RunId; no automatic retry, no Completed/Reconciled write, independent fresh read-only review always required.
+- Legacy LIVE3/LIVE4 entry points refuse BW3-dispatched fixture, preventing simultaneous claims/races.
+- 38 new offline tests, Windows CI target 822 tests / 46 containers. Real BW3 Outlook execution NOT performed. Production Worker Move disabled.
+
 ## 2.6.5-BW2c — single-fixture read-only source MAPI size consent (2026-10-26; CI pending)
 
 - User BW2b pre-Move read-only probe observed unchanged SourceEntryId, but Intent.Size=1436 vs source MailItem.Size=1808 (+372). Previous LIVE6a +8 destination size approval is unrelated.
