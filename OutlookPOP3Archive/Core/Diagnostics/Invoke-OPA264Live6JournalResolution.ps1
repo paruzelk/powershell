@@ -7,6 +7,8 @@ param(
     [switch]$Review,
     [switch]$Execute,
     [switch]$ConfirmSyntheticJournalResolution,
+    [switch]$ConfirmCrossPstSizeDifference,
+    [long]$ExpectedArchiveSizeBytes=-1,
     [string]$ExpectedJournalSha256=''
 )
 $ErrorActionPreference='Stop'
@@ -17,7 +19,8 @@ if ($Execute -and (-not $ConfirmSyntheticJournalResolution -or
     $ExpectedJournalSha256 -cnotmatch '^[a-fA-F0-9]{64}$')) {
     throw 'LIVE6 Execute requires -ConfirmSyntheticJournalResolution and -ExpectedJournalSha256.'
 }
-if ($Review -and ($ConfirmSyntheticJournalResolution -or $ExpectedJournalSha256)) {
+if ($Review -and ($ConfirmSyntheticJournalResolution -or $ExpectedJournalSha256 -or
+    $ConfirmCrossPstSizeDifference -or $ExpectedArchiveSizeBytes -ne -1)) {
     throw 'LIVE6 Review must be strictly read-only, without Execute confirmations.'
 }
 if ($PSVersionTable.PSEdition -cne 'Desktop' -or
@@ -71,6 +74,7 @@ if (@($initial.Events).Count -ne 1 -or [bool]$initial.TrailingPartial) {
 [void](Assert-OPA264Live5Journal -Request $request -Paths $paths -Journal $initial)
 $live5=& (Join-Path $PSScriptRoot 'Test-OPA264Live5Reconciliation.ps1') -RunId $paths.RunId -SourcePst $paths.SourcePst -Review
 $archiveEntryId=''
+$sizeEvidence=$null
 if ([string]$live5.Decision -ceq 'MoveConfirmed') {
     [void](Assert-OPA264Live6CommitReview -Review $live5 -Request $request -ExpectedJournalSha256 $initialSha)
     # Retrieve exact destination EntryID from already-running test Outlook.
@@ -109,9 +113,10 @@ if ([string]$live5.Decision -ceq 'MoveConfirmed') {
             [string]$item.Subject -cne [string]$intent.Subject) {
             throw 'LIVE6 archive MailItem fingerprint changed.'
         }
-        if ([long]$intent.Size -gt 0 -and [long]$item.Size -ne [long]$intent.Size) {
-            throw 'LIVE6 archive MailItem size differs from durable Intent.'
-        }
+        # Store-computed MAPI PR_MESSAGE_SIZE can change during cross-PST Move.
+        # Record both exact values and require explicit separate size approval
+        # if they differ; never silently accept a drift during -Execute.
+        $sizeEvidence=Get-OPA264Live6SizeEvidence -IntentSizeBytes ([long]$intent.Size) -ObservedArchiveSizeBytes ([long]$item.Size)
         if (-not [string]::IsNullOrWhiteSpace([string]$intent.Sender) -and
             [string]$item.SenderEmailAddress -cne [string]$intent.Sender) {
             throw 'LIVE6 archive MailItem sender differs from durable Intent.'
@@ -142,7 +147,15 @@ if ($Review) {
         Status='ReviewOnly'
         Decision=[string]$live5.Decision
         CanExecute=([string]$live5.Decision -ceq 'MoveConfirmed' -and
-                    -not [string]::IsNullOrWhiteSpace($archiveEntryId))
+                    -not [string]::IsNullOrWhiteSpace($archiveEntryId) -and
+                    $null -ne $sizeEvidence -and -not [bool]$sizeEvidence.CrossPstSizeDiffers)
+        CanExecuteWithExplicitSizeConsent=([string]$live5.Decision -ceq 'MoveConfirmed' -and
+                    -not [string]::IsNullOrWhiteSpace($archiveEntryId) -and
+                    $null -ne $sizeEvidence -and [bool]$sizeEvidence.CrossPstSizeDiffers)
+        CrossPstSizeDiffers=$(if ($null -eq $sizeEvidence) {$false} else {[bool]$sizeEvidence.CrossPstSizeDiffers})
+        IntentSizeBytes=$(if ($null -eq $sizeEvidence) {0} else {[long]$sizeEvidence.IntentSizeBytes})
+        ObservedArchiveSizeBytes=$(if ($null -eq $sizeEvidence) {0} else {[long]$sizeEvidence.ObservedArchiveSizeBytes})
+        SizeDifferenceBytes=$(if ($null -eq $sizeEvidence) {0} else {[long]$sizeEvidence.SizeDifferenceBytes})
         ArchiveEntryId=$archiveEntryId
         ExpectedJournalSha256=$initialSha
         JournalEventCount=1
@@ -160,6 +173,7 @@ if ($Review) {
 if ([string]::IsNullOrWhiteSpace($archiveEntryId)) {
     throw 'LIVE6 requires exactly one independently identified target MailItem EntryID.'
 }
+[void](Assert-OPA264Live6SizeApproval -Evidence $sizeEvidence -ConfirmCrossPstSizeDifference:$ConfirmCrossPstSizeDifference -ExpectedArchiveSizeBytes $ExpectedArchiveSizeBytes)
 if ([IO.File]::Exists($claimPath)) {
     throw 'LIVE6 concurrent resolution claim appeared; no retry.'
 }
@@ -179,6 +193,10 @@ Write-Output ([pscustomobject]@{
     OperationId=[string]$request.OperationId
     Status='ReconciledJournalAppended'
     ArchiveEntryId=$archiveEntryId
+    IntentSizeBytes=[long]$sizeEvidence.IntentSizeBytes
+    ObservedArchiveSizeBytes=[long]$sizeEvidence.ObservedArchiveSizeBytes
+    CrossPstSizeDiffers=[bool]$sizeEvidence.CrossPstSizeDiffers
+    ExplicitSizeDifferenceApproved=([bool]$sizeEvidence.CrossPstSizeDiffers -and [bool]$ConfirmCrossPstSizeDifference)
     PreviousJournalSha256=$initialSha
     JournalSha256=$finalSha
     JournalEventCount=2
