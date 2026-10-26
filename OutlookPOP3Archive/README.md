@@ -75,3 +75,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW2 isolated read-only Outlook probe (DEV)
 
 [Runbook](docs/2.6.5-bw2-synthetic-readonly-probe.md). Explicit -WorkerPilotProbeSynthetic plus existing BW1 strict -WhatIf/consent gates permits a single isolated child Worker to **read only** exact previously-created LIVE3 synthetic source/archive folders and journal/claim identity, including a LIVE6a Reconciled journal. No Move, PST mutation, production archive routing, or automatic retry. Windows CI 718/42 pending.
+
+### 2.6.5-BW2a - fail-closed diagnostic hotfix (DEV)
+
+[Runbook](docs/2.6.5-bw2a-failclosed-diagnostics.md). First real BW2 read-only canary stopped safely but masked the original Worker error. This DEV hotfix surfaces bounded status and COM stage without auto retry, Move, PST changes or production integration. Windows CI target 732/43.
