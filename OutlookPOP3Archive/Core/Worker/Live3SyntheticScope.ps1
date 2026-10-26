@@ -168,3 +168,20 @@ function Assert-OPA264Live3Pop3Source {
     if($matched -ne 1){throw 'LIVE3 source must be uniquely bound to POP3 DeliveryStore.'}
     return $true
 }
+
+
+function Test-OPA264Live3FolderIdentity {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][string]$ObservedStoreId,
+        [Parameter(Mandatory=$true)][string]$ObservedFolderEntryId,
+        [Parameter(Mandatory=$true)][string]$ExpectedStoreId,
+        [Parameter(Mandatory=$true)][string]$ExpectedFolderEntryId
+    )
+    return (-not [string]::IsNullOrWhiteSpace($ObservedStoreId) -and
+            -not [string]::IsNullOrWhiteSpace($ObservedFolderEntryId) -and
+            [string]::Equals($ObservedStoreId,$ExpectedStoreId,
+                [StringComparison]::Ordinal) -and
+            [string]::Equals($ObservedFolderEntryId,$ExpectedFolderEntryId,
+                [StringComparison]::Ordinal))
+}
