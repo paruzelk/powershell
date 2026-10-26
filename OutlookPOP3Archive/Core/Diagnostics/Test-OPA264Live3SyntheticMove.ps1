@@ -60,9 +60,7 @@ try{
                     'http://schemas.microsoft.com/mapi/proptag/0x1035001F')
             }catch{continue}
             if($msgid -cne [string]$intent.InternetMessageId -or
-                [string]$item.Subject -cne [string]$intent.Subject -or
-                [string]$item.SenderEmailAddress -ine [string]$intent.Sender -or
-                [long]$item.Size -ne [long]$intent.Size){continue}
+                [string]$item.Subject -cne [string]$intent.Subject){continue}
             if($role -ceq 'Source'){$srcMatches++}
             else{$dstMatches++}
         }
