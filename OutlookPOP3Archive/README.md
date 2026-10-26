@@ -79,3 +79,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW2a - fail-closed diagnostic hotfix (DEV)
 
 [Runbook](docs/2.6.5-bw2a-failclosed-diagnostics.md). First real BW2 read-only canary stopped safely but masked the original Worker error. This DEV hotfix surfaces bounded status and COM stage without auto retry, Move, PST changes or production integration. Windows CI target 732/43.
+
+### 2.6.5-BW2b - strict source fingerprint evidence (DEV)
+
+[Diagnostic runbook](docs/2.6.5-bw2b-source-fingerprint-evidence.md). After BW2a confirmed a real Outlook source MailItem fingerprint mismatch, BW2b reports *separately* source EntryID equality (plus exact SHA-256 hashes) and source MailItem.Size compared with durable Intent. Strict fail-closed guards remain intact; no size waiver, no automatic retry, Move or production activation. Windows CI 756/44 target.
