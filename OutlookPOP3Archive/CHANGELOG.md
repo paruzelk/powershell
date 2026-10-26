@@ -1,4 +1,13 @@
-﻿## 2.6.4-LIVE3C (2026-10-26; Microsoft Outlook new unsent mail Save placement DEV)
+﻿## 2.6.4-LIVE4 (2026-10-26; real synthetic Worker crash windows DEV)
+
+- User-confirmed LIVE3C native Windows 5.1 CI PASS 523 tests in 37 containers, and real one-shot cross-PST synthetic-only MailItem.Move PASS: source 1->0; archive 0->1; exact synthetic match; claim and response present; no normal production Worker enable.
+- Add separate test-only LIVE4 controlled crash Worker + parent-owned controller: WorkerStartedBeforeMove and AfterMoveBeforeResponse durable, RunId/OperationId/PID verified crash barriers; kill only launched child, never Outlook; parent dispatch claim precedes spawn; no retry or optimistic journal completion.
+- Add read-only independent LIVE4 crash recovery probe; validates controller/barrier/claim, then exact synthetic source/archive matches. No automatic reconciliation or Move; production gates remain closed.
+- Block direct LIVE3 diagnostic Worker from replay of a LIVE4 dispatched RunId; LIVE4 Worker also refuses pre-existing crash barrier/controller results.
+- Add 28 offline regression tests in one additional container. LIVE4 native Windows CI target **551 tests / 38 containers** (PENDING), real Outlook crash windows NOT YET RUN.
+- Preserve prior claimed RunIds. For each crash scenario, create a fresh synthetic test fixture in existing test POP3 PST with a new disposable archive. No repeated 7 GB backup/restore exercise.
+
+## 2.6.4-LIVE3C (2026-10-26; Microsoft Outlook new unsent mail Save placement DEV)
 
 - User-confirmed LIVE3B native Windows PowerShell 5.1 CI PASS: 517/37; real Outlook fixture reported SourceItemsNotOne and UnexpectedParentFolder before any Worker Move or journal Intent.
 - Microsoft MailItem.Save documentation allows new mail to be saved in default Drafts. The fixture now validates the exact newly created RunId-stamped mail, performs an explicit one-item staging Move into the GUID-scoped source folder only when needed, verifies parent StoreID + EntryID and 1/0 folder counts, then writes durable Intent.
