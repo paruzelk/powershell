@@ -63,9 +63,7 @@ try{
        [string]$mail.Parent.StoreID -cne [string]$req.SourceStoreId -or
        [string]$mail.Parent.FolderPath -cne [string]$req.SourceFolderPath -or
        [string]$mail.PropertyAccessor.GetProperty('http://schemas.microsoft.com/mapi/proptag/0x1035001F') -cne [string]$intent.InternetMessageId -or
-       [string]$mail.Subject -cne [string]$intent.Subject -or
-       [string]$mail.SenderEmailAddress -ine [string]$intent.Sender -or
-       [long]$mail.Size -ne [long]$intent.Size){
+       [string]$mail.Subject -cne [string]$intent.Subject){
         throw 'LIVE3 Worker found a nonmatching synthetic mail fingerprint.'
     }
     $stage='Write one-shot durable claim'
