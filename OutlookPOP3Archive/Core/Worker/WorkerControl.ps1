@@ -5,7 +5,7 @@ function Invoke-OPAWorkerControlledOperation {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [ValidateSet('Ping','Echo','Fail','Crash','Delay','ProbeOutlook')][string]$Operation,
+        [ValidateSet('Ping','Echo','Fail','Crash','Delay','ProbeOutlook','ProbeSyntheticPstReadOnly')][string]$Operation,
         [object]$Payload = @{},
         [ValidateRange(1,300)][int]$TimeoutSeconds = 15,
         [switch]$KeepArtifacts,
