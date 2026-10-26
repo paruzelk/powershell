@@ -34,6 +34,9 @@ if(-not [string]::Equals([string]$req.SourcePst,[string]$paths.SourcePst,
 $paths=Assert-OPA264Live3Request -Request $req -BeforeMove
 [void](Assert-OPA264Live3Intent -Request $req -Paths $paths)
 $crashPaths=Get-OPA264Live4Paths -FixturePaths $paths
+if([IO.File]::Exists((Join-Path $paths.Directory 'bw3-dispatch.claim'))){
+    throw 'LIVE4 refuses BW3 controller-dispatched RunId; NEVER reuse.'
+}
 if([IO.File]::Exists($crashPaths.DispatchClaim) -or
    [IO.File]::Exists($crashPaths.CrashBarrier) -or
    [IO.File]::Exists($crashPaths.ControllerResult)){
