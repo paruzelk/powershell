@@ -1,3 +1,11 @@
+## 2.6.4-LIVE6a — cross-PST store-computed MailItem.Size safety fix (2026-10-26; CI pending)
+
+- User's LIVE6 real Outlook pre-Move review PASS; post-Move review rejected because source-side durable Intent.Size differed from archive MailItem.Size after the cross-PST Move. Journal was not changed.
+- Source-side and archive-side MAPI message sizes are now independently reported as exact observed values. A mismatch cannot be silently accepted: Execute requires new explicit size-difference consent plus an exact separately pinned destination byte count.
+- Existing run-specific synthetic message ID/subject, StoreIDs, folder EntryIDs, source-empty/archive-one, original SHA-256 journal, exclusive claim, and no-Worker retry protections remain.
+- Persist source/archive size evidence and explicit drift approval in single-use durable claim. Added 17 offline tests; expected Windows PS5.1 CI 631/40.
+- No live Execute performed; no production routing changes.
+
 ## 2.6.4-LIVE6 — controlled journal resolution (2026-10-26; Windows CI pending)
 
 - LIVE5 real Outlook independently confirmed source=1/archive=0 pre-Move and source=0/archive=1 post-Move crash, with unchanged journals and no re-Move.
