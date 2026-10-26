@@ -137,17 +137,18 @@ function Assert-OPA265BW2SourceFingerprint {
         [bool]$Evidence.AutomaticRetryAllowed -or
         [bool]$Evidence.OutlookMoveExecuted -or
         -not [bool]$Evidence.ExactMatch) {
-        throw ('BW2b source fingerprint mismatch (NO AUTO RETRY): ' +
-            ('SourceEntryIdMatchesIntent={0}; SourceSizeMatchesIntent={1}; ' +
-             'IntentSizeBytes={2}; ObservedSourceSizeBytes={3}; SizeDifferenceBytes={4}; ' +
-             'ExpectedSourceEntryIdSha256={5}; ObservedSourceEntryIdSha256={6}' -f
-                [bool]$Evidence.SourceEntryIdMatchesIntent,
-                [bool]$Evidence.SourceSizeMatchesIntent,
-                [long]$Evidence.IntentSizeBytes,
-                [long]$Evidence.ObservedSourceSizeBytes,
-                [long]$Evidence.SizeDifferenceBytes,
-                [string]$Evidence.ExpectedSourceEntryIdSha256,
-                [string]$Evidence.ObservedSourceEntryIdSha256))
+        $format = 'BW2b source fingerprint mismatch (NO AUTO RETRY): ' +
+            'SourceEntryIdMatchesIntent={0}; SourceSizeMatchesIntent={1}; ' +
+            'IntentSizeBytes={2}; ObservedSourceSizeBytes={3}; SizeDifferenceBytes={4}; ' +
+            'ExpectedSourceEntryIdSha256={5}; ObservedSourceEntryIdSha256={6}'
+        throw ($format -f
+            [bool]$Evidence.SourceEntryIdMatchesIntent,
+            [bool]$Evidence.SourceSizeMatchesIntent,
+            [long]$Evidence.IntentSizeBytes,
+            [long]$Evidence.ObservedSourceSizeBytes,
+            [long]$Evidence.SizeDifferenceBytes,
+            [string]$Evidence.ExpectedSourceEntryIdSha256,
+            [string]$Evidence.ObservedSourceEntryIdSha256)
     }
     return $true
 }
