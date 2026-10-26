@@ -78,7 +78,11 @@ param(
     [switch]$ConfirmDevWorkerPilot,
     [ValidateRange(1,1)][int]$WorkerPilotMaxOperations = 1,
     [ValidateRange(1,30)][int]$WorkerPilotTimeoutSeconds = 10,
-    [switch]$WorkerPilotKeepArtifacts
+    [switch]$WorkerPilotKeepArtifacts,
+    # BW2: isolated read-only probe for ONE previously created synthetic fixture.
+    [switch]$WorkerPilotProbeSynthetic,
+    [string]$WorkerPilotRunId = '',
+    [string]$WorkerPilotSourcePst = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -125,14 +129,35 @@ if ($Mode -in @('Archive','Plan','Auto') -and $OlderThanMonths -eq 0 -and -not $
 # FIX13b route remains unchanged when WorkerPilot is disabled.
 $pilotOptionsSpecified = ($PSBoundParameters.ContainsKey('WorkerPilotMaxOperations') -or
     $PSBoundParameters.ContainsKey('WorkerPilotTimeoutSeconds') -or
-    $PSBoundParameters.ContainsKey('WorkerPilotKeepArtifacts'))
+    $PSBoundParameters.ContainsKey('WorkerPilotKeepArtifacts') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotProbeSynthetic') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotRunId') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotSourcePst'))
 $pilotGate = Assert-OPA265WorkerPilotGate -Mode $Mode -PilotRequested ([bool]$WorkerPilot) -ExplicitConsent ([bool]$ConfirmDevWorkerPilot) -WhatIfEnabled ([bool]$WhatIf) -Limit $Limit -ProfileName $ProfileName -Transaction $Transaction -MaxOperations $WorkerPilotMaxOperations -TimeoutSeconds $WorkerPilotTimeoutSeconds -OtherPilotOptionsSpecified $pilotOptionsSpecified
 if ($WorkerPilot) {
     . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerHost.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerControl.ps1"
-    # Exactly one isolated Ping, then exit before archive/Resume execution.
-    $pilotResult = Invoke-OPA265BoundedWorkerCanary -Gate $pilotGate -KeepArtifacts:$WorkerPilotKeepArtifacts
+    if ($WorkerPilotProbeSynthetic) {
+        if ([string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst)) {
+            throw 'BW2 requires exact -WorkerPilotRunId and -WorkerPilotSourcePst with -WorkerPilotProbeSynthetic.'
+        }
+        . "$PSScriptRoot\Core\Worker\Live3SyntheticScope.ps1"
+        . "$PSScriptRoot\Core\Worker\Live5Reconciliation.ps1"
+        . "$PSScriptRoot\Core\Worker\Live6JournalResolution.ps1"
+        . "$PSScriptRoot\Core\Archive\OperationJournal.ps1"
+        . "$PSScriptRoot\Core\Worker\SyntheticReadOnlyProbe265BW2.ps1"
+        . "$PSScriptRoot\Core\Worker\BoundedWorkerProbe265BW2.ps1"
+        $pilotResult = Invoke-OPA265BW2BoundedReadOnlyCanary -Gate $pilotGate -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -KeepArtifacts:$WorkerPilotKeepArtifacts
+    } else {
+        if (-not [string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
+            -not [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst)) {
+            throw 'BW2 fixture options require explicit -WorkerPilotProbeSynthetic.'
+        }
+        # BW1 backwards-compatible Ping-only path, still before any COM.
+        $pilotResult = Invoke-OPA265BoundedWorkerCanary -Gate $pilotGate -KeepArtifacts:$WorkerPilotKeepArtifacts
+    }
     Write-Output $pilotResult
     exit 0
 }
