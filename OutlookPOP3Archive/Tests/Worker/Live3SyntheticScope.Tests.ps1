@@ -98,7 +98,7 @@ Describe '2.6.4-LIVE3 synthetic-only existing POP3 PST Worker contract' {
         [IO.File]::WriteAllText($paths.JournalPath,'')
         {Assert-OPA264Live3Request -Request $request} | Should -Throw '*StoreID*'
     }
-    It 'forbids fixture creator from invoking MailItem.Move' {
+    It 'allows one exact synthetic staging Move in fixture, separate from Worker' {
         $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/New-OPA264Live3SyntheticFixture.ps1'
         $tokens=$null;$errors=$null
         $ast=[Management.Automation.Language.Parser]::ParseFile($file,[ref]$tokens,[ref]$errors)
@@ -106,7 +106,7 @@ Describe '2.6.4-LIVE3 synthetic-only existing POP3 PST Worker contract' {
         $methods=@($ast.FindAll({param($node)
             $node -is [Management.Automation.Language.InvokeMemberExpressionAst]
         },$true))
-        @($methods | Where-Object {[string]$_.Member.Value -eq 'Move'}).Count | Should -Be 0
+        @($methods | Where-Object {[string]$_.Member.Value -eq 'Move'}).Count | Should -Be 1
     }
     It 'allows exactly one Move method invocation in dedicated test Worker' {
         $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA264Live3SyntheticWorker.ps1'
@@ -239,6 +239,36 @@ Describe '2.6.4-LIVE3 synthetic-only existing POP3 PST Worker contract' {
         [void](Write-OPAOperationJournalEvent @intentParams)
         {Assert-OPA264Live3Intent -Request $request -Paths $paths} |
             Should -Throw '*synthetic request*'
+    }
+
+    It 'accepts exact source folder StoreID and EntryID identity' {
+        (Test-OPA264Live3FolderIdentity -ObservedStoreId 'store-1' -ObservedFolderEntryId 'id-1' -ExpectedStoreId 'store-1' -ExpectedFolderEntryId 'id-1') | Should -BeTrue
+    }
+    It 'rejects a different parent folder EntryID even in the same store' {
+        (Test-OPA264Live3FolderIdentity -ObservedStoreId 'store-1' -ObservedFolderEntryId 'id-Drafts' -ExpectedStoreId 'store-1' -ExpectedFolderEntryId 'id-LIVE3') | Should -BeFalse
+    }
+    It 'rejects a different parent store even if EntryID matches' {
+        (Test-OPA264Live3FolderIdentity -ObservedStoreId 'other-store' -ObservedFolderEntryId 'id-1' -ExpectedStoreId 'store-1' -ExpectedFolderEntryId 'id-1') | Should -BeFalse
+    }
+    It 'rejects empty MAPI parent identifiers' {
+        (Test-OPA264Live3FolderIdentity -ObservedStoreId '' -ObservedFolderEntryId 'id-1' -ExpectedStoreId 'store-1' -ExpectedFolderEntryId 'id-1') | Should -BeFalse
+    }
+    It 'places only saved draft into exact test source folder before Intent' {
+        $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/New-OPA264Live3SyntheticFixture.ps1'
+        $sourceText=Get-Content -LiteralPath $file -Raw
+        $movePos=$sourceText.IndexOf('$staged=$mail.Move($srcFolder)')
+        $intentPos=$sourceText.IndexOf('$stage=' + "'Write durable test-only Intent'")
+        $checkPos=$sourceText.IndexOf('InternetMessageIdMismatch')
+        $movePos | Should -BeGreaterThan $checkPos
+        $intentPos | Should -BeGreaterThan $movePos
+        $sourceText | Should -Match 'FixtureStagingMoveExecuted'
+    }
+    It 'Worker uses exact MAPI source folder EntryID rather than visual FolderPath' {
+        $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA264Live3SyntheticWorker.ps1'
+        $sourceText=Get-Content -LiteralPath $file -Raw
+        $sourceText | Should -Match 'Test-OPA264Live3FolderIdentity'
+        $sourceText | Should -Match 'ObservedFolderEntryId'
+        $sourceText | Should -Match 'ExpectedFolderEntryId'
     }
 
 }
