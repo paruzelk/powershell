@@ -71,3 +71,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5 bounded Worker canary (DEV only)
 
 [Operational runbook](docs/2.6.5-bounded-worker-canary.md). The Archive/Resume CLI now includes a strictly bounded, explicit -WhatIf -WorkerPilot -ConfirmDevWorkerPilot **Ping-only** process isolation canary and stops before any COM/PST/transaction mutation. It does not archive/resume or enable real mail Move through Worker. Default FIX13b production path and worker integration flags remain unchanged. Native Windows CI target: 674 Pester tests in 41 containers.
+
+### 2.6.5-BW2 isolated read-only Outlook probe (DEV)
+
+[Runbook](docs/2.6.5-bw2-synthetic-readonly-probe.md). Explicit -WorkerPilotProbeSynthetic plus existing BW1 strict -WhatIf/consent gates permits a single isolated child Worker to **read only** exact previously-created LIVE3 synthetic source/archive folders and journal/claim identity, including a LIVE6a Reconciled journal. No Move, PST mutation, production archive routing, or automatic retry. Windows CI 718/42 pending.
