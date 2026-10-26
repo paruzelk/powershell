@@ -1,4 +1,11 @@
-﻿## 2.6.4-LIVE3 (2026-10-23; user-directed return to Move/Worker roadmap DEV)
+﻿## 2.6.4-LIVE3b (2026-10-26; real Outlook synthetic mail identity fix DEV)
+
+- LIVE3 native Windows PowerShell 5.1 CI user-verified PASS: 507 Pester / 37 containers. First real Outlook synthetic fixture failed at the aggregated identity check BEFORE durable journal/request/marker and BEFORE any Move.
+- Remove unstable SenderEmailAddress and PST-dependent strict Size requirements from synthetic fixture, one-shot Worker and independent inspector. Keep exact folder/store/EntryId plus run-unique InternetMessageId and Subject. Source fixture now reports the specific failed identity predicate instead of an opaque combined error.
+- Add 10 regression Pester tests for unsent mail identity, forged Intent and zero Size, target 517/37 native CI PENDING.
+- Do not reuse incomplete first fixture RunId; new GUID fixture is isolated. No full PST re-backup, no LIVE2B dependency, production Worker remains disabled.
+
+## 2.6.4-LIVE3 (2026-10-23; user-directed return to Move/Worker roadmap DEV)
 
 - User confirmed existing Outlook profile and POP3 PST are intentional test data; historical mail risk accepted. Do not require new profile, another byte-for-byte backup, or LIVE2B mismatch follow-up to develop the archiver.
 - LIVE2 real Outlook temporary PST mount/read/detach succeeded; one CountMismatch (9 folders on both sides) was observed, potentially because inbox contents changed. User has not tested LIVE2B; that diagnostic branch is deferred.
