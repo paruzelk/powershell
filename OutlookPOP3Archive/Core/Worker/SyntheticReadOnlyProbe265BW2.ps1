@@ -140,6 +140,7 @@ function Invoke-OPA265BW2ReadOnlySyntheticProbe {
         throw 'BW2 fixture changed between parent and child; no COM access.'
     }
     $app=$null;$ns=$null
+    $stage='Attach existing Outlook'
     try {
         # Attach ONLY to already running Outlook; never new COM Outlook.
         $app=[Runtime.InteropServices.Marshal]::GetActiveObject('Outlook.Application')
@@ -148,6 +149,7 @@ function Invoke-OPA265BW2ReadOnlySyntheticProbe {
         if ([string]$ns.CurrentProfileName -cne 'Outlook') {
             throw 'BW2 refuses profile other than approved TEST Outlook.'
         }
+        $stage='Check exact mounted stores and POP3 binding'
         $srcStore=Get-OPA264Live3MountedStore -Namespace $ns -Path $proof.SourcePst
         $dstStore=Get-OPA264Live3MountedStore -Namespace $ns -Path $proof.ArchivePst
         [void](Assert-OPA264Live3Pop3Source -Namespace $ns -Store $srcStore)
@@ -156,6 +158,7 @@ function Invoke-OPA265BW2ReadOnlySyntheticProbe {
             [string]$dstStore.StoreID -cne [string]$req.ArchiveStoreId) {
             throw 'BW2 source/archive StoreID mismatch.'
         }
+        $stage='Check synthetic folder entry IDs and paths'
         $src=$ns.GetFolderFromID([string]$req.SourceFolderEntryId,[string]$req.SourceStoreId)
         $dst=$ns.GetFolderFromID([string]$req.ArchiveFolderEntryId,[string]$req.ArchiveStoreId)
         if ($null -eq $src -or $null -eq $dst -or
@@ -165,8 +168,10 @@ function Invoke-OPA265BW2ReadOnlySyntheticProbe {
             -not (Test-OPA264Live3FolderIdentity -ObservedStoreId ([string]$dst.StoreID) -ObservedFolderEntryId ([string]$dst.EntryID) -ExpectedStoreId ([string]$req.ArchiveStoreId) -ExpectedFolderEntryId ([string]$req.ArchiveFolderEntryId))) {
             throw 'BW2 exact synthetic folder identity mismatch.'
         }
+        $stage='Check exact synthetic item counts'
         $sc=[int]$src.Items.Count;$dc=[int]$dst.Items.Count
         if ($sc -gt 1 -or $dc -gt 1) {throw 'BW2 refuses extra or duplicate items.'}
+        $stage='Check unique synthetic MailItem identity'
         $sm=0;$dm=0;$archiveId=''
         if ($sc -eq 1) {
             $mail=$src.Items.Item(1)
@@ -178,7 +183,9 @@ function Invoke-OPA265BW2ReadOnlySyntheticProbe {
             [void](Assert-OPA265BW2MatchingMail -Mail $mail -Folder $dst -ExpectedStoreId ([string]$req.ArchiveStoreId) -ExpectedFolderId ([string]$req.ArchiveFolderEntryId) -Proof $proof -Archive)
             $dm=1;$archiveId=[string]$mail.EntryID
         }
+        $stage='Classify exact synthetic source/target contents'
         $decision=Assert-OPA265BW2ObservedCounts -State ([string]$proof.State) -SourceCount $sc -ArchiveCount $dc -SourceMatches $sm -ArchiveMatches $dm
+        $stage='Recheck unchanged journal SHA256'
         if ([string]$proof.JournalSha256 -cne (Get-FileHash -LiteralPath $proof.Paths.JournalPath -Algorithm SHA256).Hash.ToLowerInvariant()) {
             throw 'BW2 journal changed during Outlook observation.'
         }
@@ -202,6 +209,8 @@ function Invoke-OPA265BW2ReadOnlySyntheticProbe {
             RealMailMoveViaWorker=$false
             ProductionReady=$false
         }
+    } catch {
+        throw ('BW2 read-only stage [{0}]: {1}' -f $stage,[string]$_.Exception.Message)
     } finally {
         if ($null -ne $ns -and [Runtime.InteropServices.Marshal]::IsComObject($ns)) {
             [void][Runtime.InteropServices.Marshal]::ReleaseComObject($ns)
