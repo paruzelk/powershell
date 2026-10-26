@@ -155,4 +155,34 @@ Describe '2.6.4-LIVE4 controlled Worker crash barriers (offline, no Outlook)' {
         [void](Write-OPA264Live4Barrier -Request $req -FixturePaths $paths -Window 'WorkerStartedBeforeMove' -WorkerProcessId ([int]$PID))
         {Write-OPA264Live4Barrier -Request $req -FixturePaths $paths -Window 'WorkerStartedBeforeMove' -WorkerProcessId ([int]$PID)} | Should -Throw
     }
+    It 'blocks direct LIVE3 Worker reuse after a LIVE4 dispatch claim' {
+        $text=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA264Live3SyntheticWorker.ps1') -Raw
+        $text | Should -Match 'controller-dispatch.claim'
+        $text | Should -Match 'already dispatched by LIVE4'
+    }
+    It 'LIVE4 Worker requires dispatch claim and blocks existing crash evidence' {
+        $text=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA264Live4CrashWorker.ps1') -Raw
+        $text | Should -Match 'Assert-OPA264Live4Claim'
+        $text | Should -Match 'CrashBarrier'
+        $text | Should -Match 'ControllerResult'
+        $text | Should -Match 'previously crashed or reported RunId'
+    }
+    It 'the controller terminates only its own created child and never Outlook process' {
+        $text=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA264Live4CrashController.ps1') -Raw
+        $text | Should -Match '\$child\.Kill\(\)'
+        $text | Should -Not -Match 'Stop-Process|Get-Process|OUTLOOK\.EXE'
+    }
+    It 'the independent recovery inspector never mutates Outlook or claims' {
+        $file=Join-Path $PSScriptRoot '../../Core/Diagnostics/Test-OPA264Live4CrashRecovery.ps1'
+        $tokens=$null;$errors=$null
+        $ast=[Management.Automation.Language.Parser]::ParseFile($file,[ref]$tokens,[ref]$errors)
+        @($errors).Count | Should -Be 0
+        $methods=@($ast.FindAll({param($node)
+            $node -is [Management.Automation.Language.InvokeMemberExpressionAst]
+        },$true))
+        @($methods | Where-Object {[string]$_.Member.Value -in @(
+            'Move','AddStoreEx','AddStore','RemoveStore','Delete','Save','Kill'
+        )}).Count | Should -Be 0
+    }
+
 }
