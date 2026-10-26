@@ -24,20 +24,22 @@
     "BW2 opt-in Worker COM read-only inspection of exact LIVE3 synthetic fixture, including LIVE6a Reconciled journals; no Move, auto-retry or production activation",
     "BW2a preserves fail-closed synthetic Outlook probe and exposes bounded child Status/FailureKind/ExitCode/error stage for diagnosis, with no automatic retry",
     "BW2b reports exact read-only source EntryID equality, SHA256 fingerprints and source MailItem.Size drift against durable Intent; never auto-approves differences",
-    "BW2c exact single-fixture explicit 1436->1808 source size consent in isolated read-only Worker; RunId/OperationId/journal SHA/EntryID pinned, no Move or auto-retry"
+    "BW2c exact single-fixture explicit 1436->1808 source size consent in isolated read-only Worker; RunId/OperationId/journal SHA/EntryID pinned, no Move or auto-retry",
+    "BW3 dedicated DEV synthetic-only one-shot Worker Move route with durable parent dispatch claim, durable child attempt claim, exact isolated POP3 test scope, no retry or automatic journal completion"
   ],
   "Verification": {
-    "Status": "2.6.5-BW2c manually pinned synthetic source-size read-only consent DEV; native Windows PS5.1 CI 784/45 pending; user Outlook check pending",
+    "Status": "2.6.5-BW3 crash-safe synthetic one-shot Worker DEV; native Windows PowerShell 5.1 CI 822/46 pending; real synthetic Move NOT executed",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 45,
-    "ExpectedPesterTests": 784,
+    "ExpectedTestContainers": 46,
+    "ExpectedPesterTests": 822,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
     "BW2SyntheticOutlookReadOnlyPilot": true,
     "BW2aFailClosedWorkerDiagnostics": true,
     "BW2bSourceFingerprintEvidence": true,
-    "BW2cManualSourceSizeReadOnlyConsent": true
+    "BW2cManualSourceSizeReadOnlyConsent": true,
+    "BW3SyntheticOneShotMoveDevHarness": true
   }
 }
