@@ -25,14 +25,15 @@
     "BW2a preserves fail-closed synthetic Outlook probe and exposes bounded child Status/FailureKind/ExitCode/error stage for diagnosis, with no automatic retry",
     "BW2b reports exact read-only source EntryID equality, SHA256 fingerprints and source MailItem.Size drift against durable Intent; never auto-approves differences",
     "BW2c exact single-fixture explicit 1436->1808 source size consent in isolated read-only Worker; RunId/OperationId/journal SHA/EntryID pinned, no Move or auto-retry",
-    "BW3 dedicated DEV synthetic-only one-shot Worker Move route with durable parent dispatch claim, durable child attempt claim, exact isolated POP3 test scope, no retry or automatic journal completion"
+    "BW3 dedicated DEV synthetic-only one-shot Worker Move route with durable parent dispatch claim, durable child attempt claim, exact isolated POP3 test scope, no retry or automatic journal completion",
+    "BW3a replaces invalid PowerShell $pid variable assignment with safe $workerProcessId and locks in AST tests; previous BW3 dispatch claim irrevocably blocks replay"
   ],
   "Verification": {
-    "Status": "2.6.5-BW3 crash-safe synthetic one-shot Worker DEV; native Windows PowerShell 5.1 CI 822/46 pending; real synthetic Move NOT executed",
+    "Status": "2.6.5-BW3a DEV hotfix: prevent reserved PID variable assignment after durable dispatch claim; native Windows PS5.1 837/47 pending; old RunId irrevocably blocked",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 46,
-    "ExpectedPesterTests": 822,
+    "ExpectedTestContainers": 47,
+    "ExpectedPesterTests": 837,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -40,6 +41,7 @@
     "BW2aFailClosedWorkerDiagnostics": true,
     "BW2bSourceFingerprintEvidence": true,
     "BW2cManualSourceSizeReadOnlyConsent": true,
-    "BW3SyntheticOneShotMoveDevHarness": true
+    "BW3SyntheticOneShotMoveDevHarness": true,
+    "BW3aReservedPidRegression": true
   }
 }
