@@ -28,14 +28,15 @@
     "BW3 dedicated DEV synthetic-only one-shot Worker Move route with durable parent dispatch claim, durable child attempt claim, exact isolated POP3 test scope, no retry or automatic journal completion",
     "BW3a replaces invalid PowerShell $pid variable assignment with safe $workerProcessId and locks in AST tests; previous BW3 dispatch claim irrevocably blocks replay",
     "BW3b read-only pinned archive EntryID/WorkerRequestId audit for the successfully observed historical BW3a synthetic Move; no new Move, size consent, PST edits or automatic journal resolution",
-    "BW3c fixes PS5.1 ANSI misdecode of UTF-8-without-BOM Cyrillic SourcePst literal via pinned Unicode code points and 12 native regression tests; read-only audit only, strict fixture identity preserved"
+    "BW3c fixes PS5.1 ANSI misdecode of UTF-8-without-BOM Cyrillic SourcePst literal via pinned Unicode code points and 12 native regression tests; read-only audit only, strict fixture identity preserved",
+    "TZ-ENC-001 mandates UTF-8 BOM for all new/modified PowerShell sources, enforced before CI/Pester; 82 byte-identical legacy files held by pinned SHA256; no Outlook/PST changes"
   ],
   "Verification": {
-    "Status": "2.6.5-BW3c DEV hotfix of PS5.1 Cyrillic source PST path in read-only BW3b audit; native Windows 892/49 pending; no new Move",
+    "Status": "TZ-ENC-001 encoding-spec / CI enforcement DEV only; Windows PowerShell 5.1 CI 901/50 pending; no new Outlook Move",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 49,
-    "ExpectedPesterTests": 892,
+    "ExpectedTestContainers": 50,
+    "ExpectedPesterTests": 901,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -46,6 +47,9 @@
     "BW3SyntheticOneShotMoveDevHarness": true,
     "BW3aReservedPidRegression": true,
     "BW3bIndependentPostMoveAudit": true,
-    "BW3cUnicodeSourcePstPathCompatibility": true
+    "BW3cUnicodeSourcePstPathCompatibility": true,
+    "PowerShellCodeEncoding": "UTF-8 with BOM required for new or modified *.ps1, *.psm1, *.psd1",
+    "LegacyBomlessPowerShellCount": 82,
+    "LegacyBomlessSourceSetSha256": "ace042f4ab915f2c1bd274685ea0e041e1f94f05c82418bed5a893ae153967ca"
   }
 }
