@@ -1,3 +1,11 @@
+## 2.6.5-BW3i1 — legacy LIVE6/BW3a read-only protocol incompatibility diagnosis (2026-10-27; CI pending)
+
+- BW3i native Windows PS5.1 local CI PASS 1212 tests / 57 containers. Actual Outlook reached legacy LIVE6 -Review before stopping: LIVE6 decision did not match one original synthetic Intent.
+- Root architectural issue: BW3a used one-shot BW3 Worker claims, NOT a LIVE4 controlled-crash simulation. Old LIVE6 requires LIVE5->LIVE4 crash-barrier.json and controller-dispatch.claim/controller-result.json to classify MoveConfirmed. Missing LIVE4 crash provenance is a reason to STOP, not to synthesize or bypass claims.
+- BW3i1 reads the legacy LIVE6 ReviewOnly/InspectionFailed result strictly (no measured MAPI sizes, entry ID or authorization), checks all 3 legacy crash files absent, reaudits BW3h and all original seven hashes, requires a single original Intent, and emits a nonauthorizing **HistoricalBW3EvidenceVerifiedLegacyLive6ExecutorBlocked** verdict.
+- +38 offline native PS5.1 regressions, target 1250 tests / 58 containers; new source PowerShell UTF-8 BOM mandatory.
+- No journal/claim/approval/PST write, no MailItem.Move, no legacy LIVE6 -Execute and no retry. A new BW3-scoped journal-resolution design plus separate explicit user authorization is needed before considering Reconciled.
+
 ## 2.6.5-BW3i — independent original Intent and legacy LIVE6 read-only protocol preflight (2026-10-27; CI pending)
 
 - BW3h local real Outlook PASS and Windows PS5.1 Pester 1142/56; historical separate synthetic +8-byte acceptance JSON SHA256 pinned and verified, original Intent/claims unchanged.
