@@ -91,3 +91,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW3 — crash-safe one-shot synthetic Worker (DEV)
 
 [Runbook](docs/2.6.5-bw3-crash-safe-synthetic-one-shot.md). Dedicated **operator-only** synthetic Move controller with filesystem-only -Review, then explicit -Execute/-ConfirmBW3SyntheticMove and operator-pinned journal SHA256. For a **NEW** LIVE3 synthetic fixture only: durable controller dispatch claim before child, durable Worker attempt claim before one Move, no retry and no automatic journal completion. Production Archive/Resume/Auto and FIX13b remain unchanged. Windows PS5.1 CI target 822/46. Real Outlook Move is **not executed or authorized by building this DEV stage**.
+
+### 2.6.5-BW3a — automatic PID assignment hotfix (DEV)
+
+[Runbook](docs/2.6.5-bw3a-reserved-pid-crash.md). The first manually approved BW3 synthetic run stopped after durably recording its dispatch claim but before launching the Worker because controller code attempted to assign read-only PowerShell `$PID`. BW3a uses `$workerProcessId`; adds native Windows AST guards. **Never replay RunId e2399ba1-38e9-48e8-bf43-d39cc1c19edb**. New one-shot test needs a new operator-approved fixture and a separate approval; production remains off. Windows CI target 837/47.
