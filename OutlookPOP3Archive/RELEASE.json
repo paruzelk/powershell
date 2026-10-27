@@ -31,14 +31,15 @@
     "BW3c fixes PS5.1 ANSI misdecode of UTF-8-without-BOM Cyrillic SourcePst literal via pinned Unicode code points and 12 native regression tests; read-only audit only, strict fixture identity preserved",
     "TZ-ENC-001 mandates UTF-8 BOM for all new/modified PowerShell sources, enforced before CI/Pester; 82 byte-identical legacy files held by pinned SHA256; no Outlook/PST changes",
     "BW3d: read-only +8-byte previous synthetic archived MailItem Body/attachments and optional MAPI size; exact EntryID and claims pinned; no size consent, journal modifications or production changes",
-    "BW3e: pinned historical synthetic Body + SPACE/CR/LF Unicode and SHA256 read-only verification, all claims/journal intact; +8 MAPI bytes unapproved and unexplained; no Move"
+    "BW3e: pinned historical synthetic Body + SPACE/CR/LF Unicode and SHA256 read-only verification, all claims/journal intact; +8 MAPI bytes unapproved and unexplained; no Move",
+    "BW3f strict one-run read-only manual evidence dossier for 8-byte synthetic size drift; retained immutable journal/claims and exact SPACE CR LF; no size waiver, approval or Reconciled"
   ],
   "Verification": {
-    "Status": "2.6.5-BW3e DEV exact Body suffix Unicode read-only audit; native Windows PS5.1 CI 980/52 pending",
+    "Status": "2.6.5-BW3f DEV read-only human size decision dossier; native Windows PS5.1 CI 1030/53 pending; historical +8 bytes remain unapproved",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 52,
-    "ExpectedPesterTests": 980,
+    "ExpectedTestContainers": 53,
+    "ExpectedPesterTests": 1030,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -56,6 +57,9 @@
     "BW3dSyntheticSizeEvidence": true,
     "BW3dSizeDifferenceAutomaticallyApproved": false,
     "BW3eExactSyntheticBodyTailEvidence": true,
-    "BW3eSizeDifferenceAutomaticallyApproved": false
+    "BW3eSizeDifferenceAutomaticallyApproved": false,
+    "BW3fManualSizeDecisionDossier": true,
+    "BW3fSizeWaiverIssued": false,
+    "BW3fJournalReconciliationAuthorized": false
   }
 }
