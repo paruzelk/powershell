@@ -24,7 +24,7 @@ if (-not $Review -or
 $pinned=Get-OPA265BW3bPinnedIdentity
 if ($RunId -cne $pinned.RunId -or
     $ExpectedJournalSha256 -cne $pinned.JournalSha256 -or
-    $SourcePst -cne 'C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.pst') {
+    $SourcePst -cne [string]$pinned.SourcePst) {
     throw 'BW3b only audits the exact approved BW3a synthetic RunId/PST/journal SHA256.'
 }
 $paths=Get-OPA264Live3Paths -RunId $RunId -SourcePst $SourcePst
