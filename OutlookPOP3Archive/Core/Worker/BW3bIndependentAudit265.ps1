@@ -4,7 +4,13 @@
 function Get-OPA265BW3bPinnedIdentity {
     [CmdletBinding()]
     param()
+    # BW3c: Windows PowerShell 5.1 assumes legacy ANSI for a BOM-less .ps1.
+    # Construct the exact Cyrillic directory name from Unicode code points
+    # instead of embedding non-ASCII source text.
+    $rus=(-join @([char]0x0424,[char]0x0430,[char]0x0439,[char]0x043B,[char]0x044B))
+    $pinnedSource=('C:\Users\bogoderov_e\Documents\'+$rus+' Outlook\info@stios.ru.pst')
     return [pscustomobject]@{
+        SourcePst=$pinnedSource
         RunId='a7b51427-7494-43f4-bc96-64915f6bee7e'
         OperationId='9bd83da2-d47e-404f-a4fd-792852b58dec'
         WorkerRequestId='24553e9c-fa09-497f-b42d-4329ebe27021'
@@ -47,7 +53,9 @@ function Assert-OPA265BW3bRecords {
         [string]$Pinned.OperationId -cne '9bd83da2-d47e-404f-a4fd-792852b58dec' -or
         [string]$Pinned.WorkerRequestId -cne '24553e9c-fa09-497f-b42d-4329ebe27021' -or
         [string]$Pinned.JournalSha256 -cne '5a68dbc4186c69eff13e49c7d69a19f16eba86e04969bb5aea3be0327820a648' -or
-        [string]$Pinned.ArchiveEntryId -cne '00000000953C628FC9EAC24E97DBE040019A969924002000') {
+        [string]$Pinned.ArchiveEntryId -cne '00000000953C628FC9EAC24E97DBE040019A969924002000' -or
+        [string]$Pinned.SourcePst -cne (Get-OPA265BW3bPinnedIdentity).SourcePst -or
+        [string]$Proof.SourcePst -cne [string]$Pinned.SourcePst) {
         throw 'BW3b audit is pinned to a single approved historical fixture.'
     }
     [void](Assert-OPA265BW3bExactFields -Record $Dispatch -Label 'dispatch' -Fields @(
