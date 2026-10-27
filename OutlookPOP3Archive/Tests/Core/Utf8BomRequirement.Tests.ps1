@@ -58,7 +58,7 @@ Describe 'TZ-ENC-001: every new or modified PowerShell file must be UTF-8 with B
     It 'checks code encoding in Invoke-CI before release metadata and test discovery' {
         $ci=Get-Content -LiteralPath (Join-Path $script:ProjectRoot 'Invoke-CI.ps1') -Raw
         $check=$ci.IndexOf('Assert-OPAPowerShellEncodingPolicy -ProjectRoot')
-        $version=$ci.IndexOf("$versionScript = Join-Path $root 'Core/Version.ps1'")
+        $version=$ci.IndexOf('if (-not (Test-Path -LiteralPath $versionScript')
         $check | Should -BeGreaterThan 0
         ($check -lt $version) | Should -BeTrue
     }
