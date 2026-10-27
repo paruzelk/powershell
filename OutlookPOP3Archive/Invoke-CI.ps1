@@ -8,6 +8,13 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 
+# TZ-ENC-001: enforce raw UTF-8 BOM before loading arbitrary PowerShell source,
+# running Pester or creating any package. Legacy BOM-less files are valid only
+# while their entire pre-requirement byte snapshot remains unchanged.
+. (Join-Path $root 'Core/Runtime/PowerShellEncodingPolicy.ps1')
+[void](Assert-OPAPowerShellEncodingPolicy -ProjectRoot $root)
+Write-Host 'PASS TZ-ENC-001: UTF-8 BOM for all new/modified PowerShell code.'
+
 Write-Host '== Build version and package hygiene =='
 $versionScript = Join-Path $root 'Core/Version.ps1'
 if (-not (Test-Path -LiteralPath $versionScript -PathType Leaf)) { throw 'Missing Core/Version.ps1.' }
