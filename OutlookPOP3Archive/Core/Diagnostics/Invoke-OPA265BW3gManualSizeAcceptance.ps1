@@ -92,11 +92,11 @@ try {
         return
     }
     $stage='Create exactly one independent explicit acceptance record'
-    $record=New-OPA265BW3gManualAcceptance -Dossier $dossier -Pinned $pinned -EvidenceHashes $current -Acknowledgment $ExactSizeAcceptance
+    $sizeAcceptanceEntry=New-OPA265BW3gManualAcceptance -Dossier $dossier -Pinned $pinned -EvidenceHashes $current -Acknowledgment $ExactSizeAcceptance
     $sha=Get-OPA265BW3gDossierFingerprint -Dossier $dossier -Pinned $pinned
-    [void](Assert-OPA265BW3gManualAcceptance -Record $record -Pinned $pinned -EvidenceHashes $current -DossierFingerprint $sha)
+    [void](Assert-OPA265BW3gManualAcceptance -Record $sizeAcceptanceEntry -Pinned $pinned -EvidenceHashes $current -DossierFingerprint $sha)
     # There is only ONE irreversible write: FileMode.CreateNew at fixed path.
-    $written=Write-OPA265BW3gCreateNewRecord -Paths $paths -Record $record
+    $written=Write-OPA265BW3gCreateNewRecord -Paths $paths -Record $sizeAcceptanceEntry
     $stage='Verify original journal and claim hashes unchanged after separate record write'
     $after=Get-OPA265BW3gEvidenceFileHashes -Paths $paths -Extra $extra
     [void](Assert-OPA265BW3gHashesUnchanged -Previous $current -Current $after)
