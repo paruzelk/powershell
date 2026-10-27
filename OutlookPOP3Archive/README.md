@@ -103,3 +103,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW3c — Russian PST path hotfix for independent read-only audit
 
 [Runbook](docs/2.6.5-bw3c-unicode-path-fix.md). The first real BW3b audit stopped before COM: native Windows PowerShell 5.1 misread a BOM-less UTF-8 Cyrillic SourcePst literal as ANSI. BW3c replaces it with the EXACT same run-specific pinned Unicode path built from ASCII-only code points and adds 12 regression tests. Native Windows CI target 892/49. No Worker dispatch, MailItem.Move, PST modification or journal write. Production unchanged.
+
+### Обязательное ТЗ по кодировке PowerShell
+
+[Техническое задание — ТЗ-ENC-001](docs/TECHNICAL_SPECIFICATION.md): **весь новый и изменённый PowerShell-код** (`.ps1`, `.psm1`, `.psd1`) должен быть сохранён в **UTF-8 с BOM (EF BB BF)**, включая файлы, содержащие только ASCII. Windows PowerShell 5.1 без BOM может искажать Unicode/кириллицу. Настройка редактора — `.editorconfig`. `Invoke-CI.ps1` проверяет байты **до Pester** и отклоняет новые либо изменённые BOM-less файлы. Для 82 старых неизменённых файлов действует фиксированный переходный SHA-256; журналы JSON/JSONL не перекодировать автоматически. Production FIX13b остаётся без изменений.
