@@ -1,3 +1,11 @@
+## 2.6.5-BW3h — pinned seven-artifact independent read-only chain audit (2026-10-27; CI pending)
+
+- User completed BW3g1 one-shot synthetic +8-byte manual acceptance JSON write, independently verified SHA256 c7b066436b03d5f9cd400ebf560c82852e46d943d15d276a2d42e3fa3fb01161 and subsequent read-only HistoricalSyntheticSizeAcceptanceRecordVerified.
+- BW3h pins historical RunId, OperationId, WorkerRequestId, archive EntryID, original journal SHA256 and independently observed acceptance JSON SHA256. Fingerprints original Intent, fixture request, fixture scope, Move attempt claim, dispatch claim, controller result and acceptance JSON before/after an independent BW3g1 -Review (which reruns BW3f/BW3e/BW3d/BW3b).
+- Strict Boolean and exact status/schema/path checks reject false journal completion, unauthorized Reconciled, changed evidence and unrelated size acceptance. Only prints a pending journal-decision verdict; JournalReconciliationAuthorized=False and JournalWritePermitIssued=False.
+- +52 new native Windows PowerShell 5.1 Pester regression cases (target 1142/56); mandatory UTF-8 BOM for new source.
+- No PST/claim/acceptance-file/journal mutation, Move, automatic retry or production activation; full MAPI byte equality and +8 root cause still unproven.
+
 ## 2.6.5-BW3g1 — one-shot manual size acceptance variable shadowing hotfix (2026-10-27; CI pending)
 
 - Native local BW3g Pester PASS 1084/54 and real Outlook `-Review` PASS. First `-Record` invocation failed with PS5.1 cannot convert PSCustomObject to SwitchParameter at assignment `$record=New-OPA265BW3gManualAcceptance ...`. Root cause: parameter `[switch]$Record` and `$record` local variable collide case-insensitively.
