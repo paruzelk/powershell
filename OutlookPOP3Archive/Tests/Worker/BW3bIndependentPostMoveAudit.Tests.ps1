@@ -9,7 +9,7 @@ Describe 'BW3b one historical synthetic post-Move read-only evidence audit' {
             RunId=$script:p.RunId
             OperationId=$script:p.OperationId
             JournalSha256=$script:p.JournalSha256
-            SourcePst='C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.pst'
+            SourcePst=$script:p.SourcePst
             Intent=[pscustomobject]@{Size=1436;Subject=('OPA264 LIVE3 synthetic '+$script:p.RunId);
                 InternetMessageId=('<opa264-live3-'+$script:p.RunId+'@example.invalid>')}
             Request=[pscustomobject]@{
