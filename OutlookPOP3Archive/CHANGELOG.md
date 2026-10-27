@@ -1,3 +1,11 @@
+## 2.6.5-BW3i — independent original Intent and legacy LIVE6 read-only protocol preflight (2026-10-27; CI pending)
+
+- BW3h local real Outlook PASS and Windows PS5.1 Pester 1142/56; historical separate synthetic +8-byte acceptance JSON SHA256 pinned and verified, original Intent/claims unchanged.
+- New BW3i -Review-only diagnostic checks original journal exact pinned SHA256, one complete Intent, schema, sequence=1, bounded length and trailing LF; requires missing live6-resolution.claim and reruns strict BW3h read-only evidence chain plus legacy LIVE6 -Review only.
+- A hypothetical next event would be Reconciled sequence=2, but no write permit is issued. Legacy LIVE6 CanExecuteWithExplicitSizeConsent=True is a technical indicator, NOT authorization. BW3i rejects any actual completed journal, claim, changed evidence or booleans masquerading as consent.
+- Preserves seven original file SHA256s, acceptance JSON, PST, journal, all claims and FIX13b. Adds 70 native PS5.1 regression tests (target 1212/57), UTF-8 BOM for all new PowerShell sources.
+- No claim creation, journal append, MailItem.Move, automatic retry or production promotion. A later journal write requires a new, separate and exactly scoped human authorization and crash-gap safety review.
+
 ## 2.6.5-BW3h — pinned seven-artifact independent read-only chain audit (2026-10-27; CI pending)
 
 - User completed BW3g1 one-shot synthetic +8-byte manual acceptance JSON write, independently verified SHA256 c7b066436b03d5f9cd400ebf560c82852e46d943d15d276a2d42e3fa3fb01161 and subsequent read-only HistoricalSyntheticSizeAcceptanceRecordVerified.
