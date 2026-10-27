@@ -1,3 +1,10 @@
+## 2.6.5-BW3g1 — one-shot manual size acceptance variable shadowing hotfix (2026-10-27; CI pending)
+
+- Native local BW3g Pester PASS 1084/54 and real Outlook `-Review` PASS. First `-Record` invocation failed with PS5.1 cannot convert PSCustomObject to SwitchParameter at assignment `$record=New-OPA265BW3gManualAcceptance ...`. Root cause: parameter `[switch]$Record` and `$record` local variable collide case-insensitively.
+- Rename the **local object**, not the switch or authorization logic, to `$sizeAcceptanceEntry` in creation, validation and CreateNew writer call. Original one-time operation produced no successful record status; local file existence remains independently unverified and must be checked before ANY future write.
+- +6 regression tests with PowerShell AST assignment scan and native switch/object separation. Target 1090/55 native Windows PowerShell 5.1; mandatory UTF-8 BOM retained.
+- Operator safety: read-only `Test-Path` and `-Review` first. Never delete/overwrite an existing or partial record; do not automatically retry. Any new `-Record` run after the failed attempt requires fresh explicit approval and preflight review. No MailItem.Move, journal write, claim mutation, automatic retry or production change.
+
 ## 2.6.5-BW3g — one-time standalone synthetic +8-byte size acceptance record (2026-10-27; CI pending)
 
 - After BW3f independent real Outlook read-only PASS, operator explicitly approved the +8-byte MAPI size deviation for this ONE historical synthetic RunId only; journal reconciliation was NOT authorized.
