@@ -26,14 +26,15 @@
     "BW2b reports exact read-only source EntryID equality, SHA256 fingerprints and source MailItem.Size drift against durable Intent; never auto-approves differences",
     "BW2c exact single-fixture explicit 1436->1808 source size consent in isolated read-only Worker; RunId/OperationId/journal SHA/EntryID pinned, no Move or auto-retry",
     "BW3 dedicated DEV synthetic-only one-shot Worker Move route with durable parent dispatch claim, durable child attempt claim, exact isolated POP3 test scope, no retry or automatic journal completion",
-    "BW3a replaces invalid PowerShell $pid variable assignment with safe $workerProcessId and locks in AST tests; previous BW3 dispatch claim irrevocably blocks replay"
+    "BW3a replaces invalid PowerShell $pid variable assignment with safe $workerProcessId and locks in AST tests; previous BW3 dispatch claim irrevocably blocks replay",
+    "BW3b read-only pinned archive EntryID/WorkerRequestId audit for the successfully observed historical BW3a synthetic Move; no new Move, size consent, PST edits or automatic journal resolution"
   ],
   "Verification": {
-    "Status": "2.6.5-BW3a DEV hotfix: prevent reserved PID variable assignment after durable dispatch claim; native Windows PS5.1 837/47 pending; old RunId irrevocably blocked",
+    "Status": "2.6.5-BW3b DEV independent read-only post-Move evidence audit; native Windows PS5.1 CI 880/48 pending; no additional Outlook Move",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 47,
-    "ExpectedPesterTests": 837,
+    "ExpectedTestContainers": 48,
+    "ExpectedPesterTests": 880,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -42,6 +43,7 @@
     "BW2bSourceFingerprintEvidence": true,
     "BW2cManualSourceSizeReadOnlyConsent": true,
     "BW3SyntheticOneShotMoveDevHarness": true,
-    "BW3aReservedPidRegression": true
+    "BW3aReservedPidRegression": true,
+    "BW3bIndependentPostMoveAudit": true
   }
 }
