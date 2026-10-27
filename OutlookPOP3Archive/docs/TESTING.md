@@ -66,3 +66,7 @@ The result must report `Ambiguous`, `DestinationMatches=2`, no automatic retry, 
 ## 2.6.3 source-mismatch incident and enforced CI inventory
 
 A local package labeled `d4bc6974` was built from an older `g8e4be719` extracted directory. It executed 272 tests/25 containers and selected 70 source files, while the pinned commit had 26 test files and 71 project files. This is **not** validated provenance; do not publish that ZIP as a release. The corrected pipeline requires **26** test containers, **281** Pester tests (three added source-integrity regressions), and a SHA256 over the entire release source inventory. For exact-source Git packages, use `-ExpectedSourceInventorySha256` from the separately verified commit.
+
+## Mandatory UTF-8 BOM gate (TZ-ENC-001)
+
+See [technical specification](TECHNICAL_SPECIFICATION.md). All new or modified PowerShell `.ps1`, `.psm1`, `.psd1` files MUST be UTF-8 with the `EF BB BF` byte-order mark, including ASCII-only source. `Invoke-CI.ps1` verifies actual source bytes and strict UTF-8 decoding **before** loading other scripts or running Pester. The 82 preexisting files lacking BOM are tolerated only while their canonical whole-set SHA-256 remains exactly unchanged; any edit to one requires migrating that file to BOM. This requirement deliberately excludes worker protocol JSON, journals and PST data, which must retain their specified byte formats.
