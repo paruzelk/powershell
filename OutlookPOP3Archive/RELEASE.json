@@ -27,14 +27,15 @@
     "BW2c exact single-fixture explicit 1436->1808 source size consent in isolated read-only Worker; RunId/OperationId/journal SHA/EntryID pinned, no Move or auto-retry",
     "BW3 dedicated DEV synthetic-only one-shot Worker Move route with durable parent dispatch claim, durable child attempt claim, exact isolated POP3 test scope, no retry or automatic journal completion",
     "BW3a replaces invalid PowerShell $pid variable assignment with safe $workerProcessId and locks in AST tests; previous BW3 dispatch claim irrevocably blocks replay",
-    "BW3b read-only pinned archive EntryID/WorkerRequestId audit for the successfully observed historical BW3a synthetic Move; no new Move, size consent, PST edits or automatic journal resolution"
+    "BW3b read-only pinned archive EntryID/WorkerRequestId audit for the successfully observed historical BW3a synthetic Move; no new Move, size consent, PST edits or automatic journal resolution",
+    "BW3c fixes PS5.1 ANSI misdecode of UTF-8-without-BOM Cyrillic SourcePst literal via pinned Unicode code points and 12 native regression tests; read-only audit only, strict fixture identity preserved"
   ],
   "Verification": {
-    "Status": "2.6.5-BW3b DEV independent read-only post-Move evidence audit; native Windows PS5.1 CI 880/48 pending; no additional Outlook Move",
+    "Status": "2.6.5-BW3c DEV hotfix of PS5.1 Cyrillic source PST path in read-only BW3b audit; native Windows 892/49 pending; no new Move",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 48,
-    "ExpectedPesterTests": 880,
+    "ExpectedTestContainers": 49,
+    "ExpectedPesterTests": 892,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -44,6 +45,7 @@
     "BW2cManualSourceSizeReadOnlyConsent": true,
     "BW3SyntheticOneShotMoveDevHarness": true,
     "BW3aReservedPidRegression": true,
-    "BW3bIndependentPostMoveAudit": true
+    "BW3bIndependentPostMoveAudit": true,
+    "BW3cUnicodeSourcePstPathCompatibility": true
   }
 }
