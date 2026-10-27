@@ -131,3 +131,7 @@ The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Recor
 ### 2.6.5-BW3h — independent read-only seven-evidence chain audit (DEV)
 
 [Runbook](docs/2.6.5-bw3h-independent-chain-readonly-audit.md). BW3h rechecks exact original Intent and six durable claims/fixture files plus separately recorded **single-synthetic +8 byte acceptance JSON** hard-pinned to its user-observed SHA256. It reruns BW3g1 → BW3f → BW3e → BW3d → BW3b read-only Outlook audit and rehashes all seven files before/after. No new approval or journal Reconciled, no Move, file writes or production change. PS5.1 CI target 1142/56; UTF-8 BOM source.
+
+### 2.6.5-BW3i — journal reconciliation preflight READ-ONLY (DEV)
+
+[Runbook](docs/2.6.5-bw3i-journal-reconciliation-readonly-preflight.md). BW3i reruns BW3h (all seven user-verified historical evidence files) and independently reviews original single-Intent journal append safety and existing LIVE6 `-Review` only. It verifies absence of any `live6-resolution.claim`, the journal's pinned bytes, and the exact hypothetical next `Reconciled` sequence 2, but never writes, creates a claim, moves mail or grants journal permission. Historical manual +8-byte size consent is not permission for `Reconciled`. Windows PowerShell 5.1 DEV CI target: 1212 tests / 57 containers. All new PS code UTF-8 with BOM.
