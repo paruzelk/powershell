@@ -33,14 +33,15 @@
     "BW3d: read-only +8-byte previous synthetic archived MailItem Body/attachments and optional MAPI size; exact EntryID and claims pinned; no size consent, journal modifications or production changes",
     "BW3e: pinned historical synthetic Body + SPACE/CR/LF Unicode and SHA256 read-only verification, all claims/journal intact; +8 MAPI bytes unapproved and unexplained; no Move",
     "BW3f strict one-run read-only manual evidence dossier for 8-byte synthetic size drift; retained immutable journal/claims and exact SPACE CR LF; no size waiver, approval or Reconciled",
-    "BW3g: explicit one-run synthetic +8-byte manual size approval in a separate flushed CreateNew UTF-8 JSON; original journal/claims/PST unchanged, no Reconciled authorization"
+    "BW3g: explicit one-run synthetic +8-byte manual size approval in a separate flushed CreateNew UTF-8 JSON; original journal/claims/PST unchanged, no Reconciled authorization",
+    "BW3g1 fixes case-insensitive [switch]Record/$record variable collision; no new write without checking existing acceptance file and obtaining a separate explicit operator approval"
   ],
   "Verification": {
-    "Status": "2.6.5-BW3g DEV one-time separate manual +8 byte synthetic-size acceptance only; Windows PS5.1 CI 1084/54 pending",
+    "Status": "2.6.5-BW3g1 DEV record switch PS5.1 local variable collision hotfix; Windows CI 1090/55 pending; previous manual record failed before CreateNew; actual file existence unverified",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 54,
-    "ExpectedPesterTests": 1084,
+    "ExpectedTestContainers": 55,
+    "ExpectedPesterTests": 1090,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -63,6 +64,8 @@
     "BW3fSizeWaiverIssued": false,
     "BW3fJournalReconciliationAuthorized": false,
     "BW3gManualSizeAcceptanceAvailable": true,
-    "BW3gJournalReconciliationAuthorized": false
+    "BW3gJournalReconciliationAuthorized": false,
+    "BW3g1RecordSwitchCollisionHotfix": true,
+    "BW3gOriginalRecordStatus": "UnverifiedAfterPreWriteFailure"
   }
 }
