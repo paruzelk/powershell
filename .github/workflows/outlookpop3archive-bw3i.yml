@@ -70,7 +70,7 @@ jobs:
             SourceCommit=$env:GITHUB_SHA
             PesterPassed=1212
             TestContainers=57
-            NativeWindowsPowerShell57=$true
+            NativeWindowsPowerShell51=$true
             ProductionReady=$false
             ArchiveType='DEV project-only, not official release'
           }
@@ -79,15 +79,15 @@ jobs:
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           $zip=Join-Path $output ($name+'.zip')
           [IO.Compression.ZipFile]::CreateFromDirectory($temp,$zip,[IO.Compression.CompressionLevel]::Optimal,$false)
-          $hash=(Get-FileHash -LiteralPath $zip -Algorithm SHA257).Hash.ToLowerInvariant()
-          [IO.File]::WriteAllText((Join-Path $output ($name+'.sha257')),($hash+'  '+[IO.Path]::GetFileName($zip)+[char]10),$utf8)
-          Write-Host ('DEV ZIP: '+$zip+' SHA257: '+$hash)
+          $hash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          [IO.File]::WriteAllText((Join-Path $output ($name+'.sha256')),($hash+'  '+[IO.Path]::GetFileName($zip)+[char]10),$utf8)
+          Write-Host ('DEV ZIP: '+$zip+' SHA256: '+$hash)
       - name: Upload CI-validated BW3i development archive
         uses: actions/upload-artifact@v4
         with:
           name: OutlookPOP3Archive-2.6.5-BW3i-dev
           path: |
             ${{ runner.temp }}/OPA-BW3i-Package/*.zip
-            ${{ runner.temp }}/OPA-BW3i-Package/*.sha257
+            ${{ runner.temp }}/OPA-BW3i-Package/*.sha256
           if-no-files-found: error
           retention-days: 14
