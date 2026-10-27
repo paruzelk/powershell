@@ -13,7 +13,7 @@ function Get-OPAPowerShellEncodingInventory {
     $withBom=0
     $files=@(Get-ChildItem -LiteralPath $root -File -Recurse -Force -ErrorAction Stop |
         Where-Object { $_.Extension -in @('.ps1','.psm1','.psd1') })
-    $decoder=New-Object System.Text.UTF8Encoding($false,$true)
+    $decoder=[Text.UTF8Encoding]::new($false,$true)
     foreach($file in $files) {
         $total++
         if (($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
