@@ -135,3 +135,7 @@ The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Recor
 ### 2.6.5-BW3i — journal reconciliation preflight READ-ONLY (DEV)
 
 [Runbook](docs/2.6.5-bw3i-journal-reconciliation-readonly-preflight.md). BW3i reruns BW3h (all seven user-verified historical evidence files) and independently reviews original single-Intent journal append safety and existing LIVE6 `-Review` only. It verifies absence of any `live6-resolution.claim`, the journal's pinned bytes, and the exact hypothetical next `Reconciled` sequence 2, but never writes, creates a claim, moves mail or grants journal permission. Historical manual +8-byte size consent is not permission for `Reconciled`. Windows PowerShell 5.1 DEV CI target: 1212 tests / 57 containers. All new PS code UTF-8 with BOM.
+
+### 2.6.5-BW3i1 — legacy LIVE6 cannot certify historical BW3a crash provenance (READ ONLY)
+
+[Runbook](docs/2.6.5-bw3i1-legacy-live6-compatibility-readonly.md). Local BW3i: Pester 1212/57 PASS, actual Outlook `-Review` STOP at old LIVE6 classification. Historical BW3a Worker one-shot was **not** a LIVE4 controlled-crash fixture and lacks the three legacy crash-specific artifacts. BW3i1 strictly checks that mismatch (including the exact failed LIVE6 read-only schema), the seven intact BW3h evidence files and unchanged original Intent; it issues a **blocked executor** compatibility verdict. Never run `LIVE6 -Execute` for BW3a, fabricate crash artifacts, append Reconciled or create a new Move. DEV CI target 1250/58, mandatory UTF-8 BOM.
