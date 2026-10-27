@@ -1,3 +1,11 @@
+## 2.6.5-BW3b — independent synthetic post-Move audit (2026-10-27; CI pending)
+
+- BW3a real Outlook one-shot Worker returned Succeeded for RunId a7b51427-7494-43f4-bc96-64915f6bee7e; independent LIVE3 read-only inspector observed source 0/archive 1; both durable dispatch/Move claims exist and original journal SHA256 unchanged.
+- Dedicated DEV-only `Test-OPA265BW3bIndependentMoveAudit.ps1 -Review` for that one historical RunId, worker RequestId and archive destination EntryID. Strictly read-only: no MailItem.Move, no PST store modifications, no journal writes.
+- Correlate immutable Intent, full dispatch record, attempt claim, controller result, WorkerRequestId, expected archive EntryID and exact synthetic POP3 test scope. Reject missing/foreign claims, extra fields, changed journal, wrong folder/store/subject/InternetMessageId, missing/duplicate mail.
+- New direct Outlook archive EntryID lookup and before/after raw durable evidence comparison. Source 0/archive 1 + exact archived EntryID yields an identity-only classification; archive MAPI size drift is reported but NEVER automatically approved. Content byte equality is not asserted.
+- +43 offline tests. Target native Windows PS5.1 CI 880/48; production FIX13b, Archive/Resume/Auto, RealMailMoveViaWorker=False and ProductionReady=False unchanged.
+
 ## 2.6.5-BW3a - reserved PID hotfix, no replay of claimed synthetic run (2026-10-27; CI pending)
 
 - User BW3 real operator-approved one-shot controller hit PowerShell read-only automatic variable `$PID` while executing case-insensitive `$pid=0` **AFTER** flushing `bw3-dispatch.claim` and **BEFORE** any Worker invocation.
