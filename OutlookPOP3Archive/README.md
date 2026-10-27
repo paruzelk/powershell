@@ -123,3 +123,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW3g - one-time separate manual +8 byte acceptance (DEV only)
 
 [Runbook](docs/2.6.5-bw3g-durable-manual-size-acceptance.md). Following explicit operator acceptance for the single historical synthetic RunId, BW3g adds read-only `-Review` and a one-shot explicit `-Record -ExactSizeAcceptance ...` command. Only a NEW standalone UTF-8 JSON consent file is written, via FileMode.CreateNew and forced flush. It pins historical evidence and six original SHA256s but does not modify the unresolved Intent, claims or PST and cannot authorize Reconciled or production. PowerShell code UTF-8 BOM, Windows PS5.1 CI target 1084/54.
+
+### 2.6.5-BW3g1 — PowerShell switch `-Record` collision hotfix (DEV)
+
+The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Record` attempt STOPPED before disk creation because PowerShell 5.1 treats switch parameter `$Record` and local `$record` as the **same case-insensitive variable**. BW3g1 renames only the object local to `$sizeAcceptanceEntry`. Check whether the exact acceptance JSON path exists using read-only `Test-Path`; never delete a present/partial file or automatically retry. Re-run `-Review` using BW3g1 after CI; new `-Record` requires a new separate operator approval after confirming absence and evidence integrity. Mandatory source BOM; native Windows PS5.1 test gate target 1090/55. Original PST, journal Intent and claims unchanged by hotfix.
