@@ -29,14 +29,15 @@
     "BW3a replaces invalid PowerShell $pid variable assignment with safe $workerProcessId and locks in AST tests; previous BW3 dispatch claim irrevocably blocks replay",
     "BW3b read-only pinned archive EntryID/WorkerRequestId audit for the successfully observed historical BW3a synthetic Move; no new Move, size consent, PST edits or automatic journal resolution",
     "BW3c fixes PS5.1 ANSI misdecode of UTF-8-without-BOM Cyrillic SourcePst literal via pinned Unicode code points and 12 native regression tests; read-only audit only, strict fixture identity preserved",
-    "TZ-ENC-001 mandates UTF-8 BOM for all new/modified PowerShell sources, enforced before CI/Pester; 82 byte-identical legacy files held by pinned SHA256; no Outlook/PST changes"
+    "TZ-ENC-001 mandates UTF-8 BOM for all new/modified PowerShell sources, enforced before CI/Pester; 82 byte-identical legacy files held by pinned SHA256; no Outlook/PST changes",
+    "BW3d: read-only +8-byte previous synthetic archived MailItem Body/attachments and optional MAPI size; exact EntryID and claims pinned; no size consent, journal modifications or production changes"
   ],
   "Verification": {
-    "Status": "TZ-ENC-001 encoding-spec / CI enforcement DEV only; Windows PowerShell 5.1 CI 901/50 pending; no new Outlook Move",
+    "Status": "2.6.5-BW3d DEV read-only +8-byte synthetic Body/attachment MAPI size evidence; native Windows PS5.1 CI 942/51 pending",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 50,
-    "ExpectedPesterTests": 901,
+    "ExpectedTestContainers": 51,
+    "ExpectedPesterTests": 942,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -50,6 +51,8 @@
     "BW3cUnicodeSourcePstPathCompatibility": true,
     "PowerShellCodeEncoding": "UTF-8 with BOM required for new or modified *.ps1, *.psm1, *.psd1",
     "LegacyBomlessPowerShellCount": 82,
-    "LegacyBomlessSourceSetSha256": "ace042f4ab915f2c1bd274685ea0e041e1f94f05c82418bed5a893ae153967ca"
+    "LegacyBomlessSourceSetSha256": "ace042f4ab915f2c1bd274685ea0e041e1f94f05c82418bed5a893ae153967ca",
+    "BW3dSyntheticSizeEvidence": true,
+    "BW3dSizeDifferenceAutomaticallyApproved": false
   }
 }
