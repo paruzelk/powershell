@@ -99,3 +99,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW3b — independent post-Move synthetic evidence audit (DEV, read-only)
 
 [Runbook](docs/2.6.5-bw3b-independent-postmove-audit.md). A dedicated native Windows PowerShell 5.1 -Review-only inspector checks the ONE already successful BW3a synthetic Move: Worker-request correlation, exact durable claims and unchanged Intent journal, archived MailItem EntryID via independent COM lookup, class, parent folder, Subject/InternetMessageId and source=0/archive=1. No Move, store mount, journal write or implicit archive-size consent. Production FIX13b unchanged. Native Windows CI target 880/48.
+
+### 2.6.5-BW3c — Russian PST path hotfix for independent read-only audit
+
+[Runbook](docs/2.6.5-bw3c-unicode-path-fix.md). The first real BW3b audit stopped before COM: native Windows PowerShell 5.1 misread a BOM-less UTF-8 Cyrillic SourcePst literal as ANSI. BW3c replaces it with the EXACT same run-specific pinned Unicode path built from ASCII-only code points and adds 12 regression tests. Native Windows CI target 892/49. No Worker dispatch, MailItem.Move, PST modification or journal write. Production unchanged.
