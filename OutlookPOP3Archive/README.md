@@ -95,3 +95,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW3a — automatic PID assignment hotfix (DEV)
 
 [Runbook](docs/2.6.5-bw3a-reserved-pid-crash.md). The first manually approved BW3 synthetic run stopped after durably recording its dispatch claim but before launching the Worker because controller code attempted to assign read-only PowerShell `$PID`. BW3a uses `$workerProcessId`; adds native Windows AST guards. **Never replay RunId e2399ba1-38e9-48e8-bf43-d39cc1c19edb**. New one-shot test needs a new operator-approved fixture and a separate approval; production remains off. Windows CI target 837/47.
+
+### 2.6.5-BW3b — independent post-Move synthetic evidence audit (DEV, read-only)
+
+[Runbook](docs/2.6.5-bw3b-independent-postmove-audit.md). A dedicated native Windows PowerShell 5.1 -Review-only inspector checks the ONE already successful BW3a synthetic Move: Worker-request correlation, exact durable claims and unchanged Intent journal, archived MailItem EntryID via independent COM lookup, class, parent folder, Subject/InternetMessageId and source=0/archive=1. No Move, store mount, journal write or implicit archive-size consent. Production FIX13b unchanged. Native Windows CI target 880/48.
