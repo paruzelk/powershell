@@ -1,3 +1,10 @@
+## ТЗ-ENC-001 — обязательная кодировка PowerShell UTF-8 с BOM (2026-10-27)
+
+- В `docs/TECHNICAL_SPECIFICATION.md` формализовано требование для всех новых/изменённых `.ps1`, `.psm1`, `.psd1`: UTF-8 с BOM `EF BB BF`, независимо от наличия кириллицы.
+- Добавлен `.editorconfig` с `charset = utf-8-bom`. В `Invoke-CI.ps1` введён ранний fail-closed байтовый контроль и проверка корректности UTF-8.
+- Зафиксирован неизменяемый переходный SHA-256 для 82 старых BOM-less файлов. Их изменение возможно только после миграции конкретного файла в BOM. Девять новых Pester-тестов кодировки, локальный и Windows CI на 901 тест/50 контейнеров.
+- JSON, JSONL, журналы и PST исключены из автоматической BOM-конверсии. Маршруты Archive/Resume и production FIX13b не изменены.
+
 ## 2.6.5-BW3c — native PS5.1 Cyrillic SourcePst audit hotfix (2026-10-27; CI pending)
 
 - User's BW3b 880/48 native Windows CI PASS, but its first live read-only audit stopped at exact source-PST parameter check without Outlook COM.
