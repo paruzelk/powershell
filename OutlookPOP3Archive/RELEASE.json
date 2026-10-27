@@ -35,14 +35,15 @@
     "BW3f strict one-run read-only manual evidence dossier for 8-byte synthetic size drift; retained immutable journal/claims and exact SPACE CR LF; no size waiver, approval or Reconciled",
     "BW3g: explicit one-run synthetic +8-byte manual size approval in a separate flushed CreateNew UTF-8 JSON; original journal/claims/PST unchanged, no Reconciled authorization",
     "BW3g1 fixes case-insensitive [switch]Record/$record variable collision; no new write without checking existing acceptance file and obtaining a separate explicit operator approval",
-    "BW3h one-run independent read-only seven-artifact chain: six original hashes plus hard-pinned +8-byte acceptance JSON SHA256; no Reconciled/Move/production"
+    "BW3h one-run independent read-only seven-artifact chain: six original hashes plus hard-pinned +8-byte acceptance JSON SHA256; no Reconciled/Move/production",
+    "BW3i: pinned seven-evidence chain and original single Intent validation, LIVE6 -Review only, hypothetical Reconciled sequence 2; no write permit or Move"
   ],
   "Verification": {
-    "Status": "2.6.5-BW3h DEV pinned read-only seven-artifact chain; native Windows PS5.1 CI 1142/56 pending; JournalReconciliationAuthorized=false",
+    "Status": "2.6.5-BW3i DEV strict read-only journal-reconciliation preflight; Windows PS5.1 CI 1212/57 pending; no journal authorization",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 56,
-    "ExpectedPesterTests": 1142,
+    "ExpectedTestContainers": 57,
+    "ExpectedPesterTests": 1212,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -70,6 +71,8 @@
     "BW3gOriginalRecordStatus": "UnverifiedAfterPreWriteFailure",
     "BW3hSevenDurableEvidenceReadOnly": true,
     "BW3hAcceptanceRecordExpectedSha256": "c7b066436b03d5f9cd400ebf560c82852e46d943d15d276a2d42e3fa3fb01161",
-    "BW3hJournalReconciliationAuthorized": false
+    "BW3hJournalReconciliationAuthorized": false,
+    "BW3iJournalProtocolPreflightReadOnly": true,
+    "BW3iJournalReconciliationAuthorized": false
   }
 }
