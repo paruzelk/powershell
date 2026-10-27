@@ -1,3 +1,11 @@
+## 2.6.5-BW3d - independent archived synthetic +8-byte size evidence (2026-10-27; CI pending)
+
+- BW3c independently verified previous BW3a Move (source=0, archive=1, EntryID correlated, immutable Intent) but Intent size 1436 differs from archived MailItem.Size 1444. No size approval exists.
+- New read-only Test-OPA265BW3dSyntheticSizeAudit.ps1 invokes previous BW3b audit and then inspects the exact synthetic archived Body, zero attachments, MessageClass, MailItem.Size, optional MAPI PR_MESSAGE_SIZE. Reports diagnostic UTF8 text hashes and CRLF-only normalized comparison, never claiming stored-byte equivalence.
+- Strict pinned old run/operation/WorkerRequestId/archived EntryID/POP3 PST/journal; hashes six durable files before and after COM. Fail closed for duplicate mail, unexpected content, wrong size or corrupted evidence.
+- All new PowerShell sources have UTF-8 BOM. +41 Pester cases, expected native Windows PS5.1 gate 942 tests in 51 containers.
+- No MailItem.Move, automatic size waiver, journal Reconciled, PST writes, production Worker or FIX13b changes.
+
 ## ТЗ-ENC-001 — обязательная кодировка PowerShell UTF-8 с BOM (2026-10-27)
 
 - В `docs/TECHNICAL_SPECIFICATION.md` формализовано требование для всех новых/изменённых `.ps1`, `.psm1`, `.psd1`: UTF-8 с BOM `EF BB BF`, независимо от наличия кириллицы.
