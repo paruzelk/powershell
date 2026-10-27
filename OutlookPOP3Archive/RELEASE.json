@@ -34,14 +34,15 @@
     "BW3e: pinned historical synthetic Body + SPACE/CR/LF Unicode and SHA256 read-only verification, all claims/journal intact; +8 MAPI bytes unapproved and unexplained; no Move",
     "BW3f strict one-run read-only manual evidence dossier for 8-byte synthetic size drift; retained immutable journal/claims and exact SPACE CR LF; no size waiver, approval or Reconciled",
     "BW3g: explicit one-run synthetic +8-byte manual size approval in a separate flushed CreateNew UTF-8 JSON; original journal/claims/PST unchanged, no Reconciled authorization",
-    "BW3g1 fixes case-insensitive [switch]Record/$record variable collision; no new write without checking existing acceptance file and obtaining a separate explicit operator approval"
+    "BW3g1 fixes case-insensitive [switch]Record/$record variable collision; no new write without checking existing acceptance file and obtaining a separate explicit operator approval",
+    "BW3h one-run independent read-only seven-artifact chain: six original hashes plus hard-pinned +8-byte acceptance JSON SHA256; no Reconciled/Move/production"
   ],
   "Verification": {
-    "Status": "2.6.5-BW3g1 DEV record switch PS5.1 local variable collision hotfix; Windows CI 1090/55 pending; previous manual record failed before CreateNew; actual file existence unverified",
+    "Status": "2.6.5-BW3h DEV pinned read-only seven-artifact chain; native Windows PS5.1 CI 1142/56 pending; JournalReconciliationAuthorized=false",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 55,
-    "ExpectedPesterTests": 1090,
+    "ExpectedTestContainers": 56,
+    "ExpectedPesterTests": 1142,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -66,6 +67,9 @@
     "BW3gManualSizeAcceptanceAvailable": true,
     "BW3gJournalReconciliationAuthorized": false,
     "BW3g1RecordSwitchCollisionHotfix": true,
-    "BW3gOriginalRecordStatus": "UnverifiedAfterPreWriteFailure"
+    "BW3gOriginalRecordStatus": "UnverifiedAfterPreWriteFailure",
+    "BW3hSevenDurableEvidenceReadOnly": true,
+    "BW3hAcceptanceRecordExpectedSha256": "c7b066436b03d5f9cd400ebf560c82852e46d943d15d276a2d42e3fa3fb01161",
+    "BW3hJournalReconciliationAuthorized": false
   }
 }
