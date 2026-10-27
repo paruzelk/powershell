@@ -1,3 +1,11 @@
+## 2.6.5-BW3c — native PS5.1 Cyrillic SourcePst audit hotfix (2026-10-27; CI pending)
+
+- User's BW3b 880/48 native Windows CI PASS, but its first live read-only audit stopped at exact source-PST parameter check without Outlook COM.
+- Root cause: native Windows PowerShell 5.1 decodes a UTF-8-without-BOM .ps1 as ANSI; embedded Cyrillic in exact SourcePst check was corrupted. CI had not compared that path with the real operator-provided Unicode input.
+- BW3c retains the same fully pinned source PST, RunId, OperationId, WorkerRequestId, archive EntryID and journal SHA256. It constructs the Cyrillic folder name from ASCII-only [char] Unicode code points in the pinned proof, without relaxing -cne case-sensitive scope validation.
+- Existing 43 offline evidence tests now use the common pinned identity; +12 dedicated native PS5.1 charset and safety regressions. Windows CI target 892/49.
+- No new Move, no new fixture, no journal modifications and no automatic Reconciled. Production FIX13b unchanged and production Worker disabled.
+
 ## 2.6.5-BW3b — independent synthetic post-Move audit (2026-10-27; CI pending)
 
 - BW3a real Outlook one-shot Worker returned Succeeded for RunId a7b51427-7494-43f4-bc96-64915f6bee7e; independent LIVE3 read-only inspector observed source 0/archive 1; both durable dispatch/Move claims exist and original journal SHA256 unchanged.
