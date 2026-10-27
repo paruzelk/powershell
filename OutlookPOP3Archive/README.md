@@ -119,3 +119,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW3f - manual size decision dossier (DEV, read-only)
 
 [Runbook](docs/2.6.5-bw3f-human-size-decision-dossier.md). For the exact already-confirmed historical synthetic BW3a Move, BW3f reruns BW3e/BW3d/BW3b read-only audits, hashes all six original journal/request/scope/dispatch/attempt/controller files before and after, and emits a **no-consent human review dossier**. Original Intent=1436, archive=1444 (+8 bytes, cause undetermined), Body baseline+SPACE/CR/LF, zero attachments. A passing dossier **does not** approve size drift, establish byte equality or authorize Reconciled. Mandatory UTF-8 BOM; Windows PS5.1 CI target 1030/53; production unchanged.
+
+### 2.6.5-BW3g - one-time separate manual +8 byte acceptance (DEV only)
+
+[Runbook](docs/2.6.5-bw3g-durable-manual-size-acceptance.md). Following explicit operator acceptance for the single historical synthetic RunId, BW3g adds read-only `-Review` and a one-shot explicit `-Record -ExactSizeAcceptance ...` command. Only a NEW standalone UTF-8 JSON consent file is written, via FileMode.CreateNew and forced flush. It pins historical evidence and six original SHA256s but does not modify the unresolved Intent, claims or PST and cannot authorize Reconciled or production. PowerShell code UTF-8 BOM, Windows PS5.1 CI target 1084/54.
