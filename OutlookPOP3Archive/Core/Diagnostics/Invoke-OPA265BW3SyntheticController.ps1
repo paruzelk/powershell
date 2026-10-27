@@ -65,10 +65,10 @@ $payload=[pscustomobject]@{
 [void](Assert-OPA265BW3Payload -Payload $payload)
 [void](Write-OPA265BW3DurableDispatchClaim -Preflight $pre -RequestId $workerRequestId)
 # Absolutely no retry: the presence of the claim blocks all subsequent calls.
-$outcome=$null;$status='IndeterminateRequiresIndependentReview';$failure='';$pid=0;$destination=''
+$outcome=$null;$status='IndeterminateRequiresIndependentReview';$failure='';$workerProcessId=0;$destination=''
 try {
     $outcome=Invoke-OPAWorkerControlledOperation -Operation 'BW3SyntheticOneShotMove' -Payload $payload -TimeoutSeconds $TimeoutSeconds -KeepArtifacts:$KeepArtifacts -RequestId $workerRequestId
-    if ($null -ne $outcome) {$pid=[int]$outcome.WorkerProcessId}
+    if ($null -ne $outcome) {$workerProcessId=[int]$outcome.WorkerProcessId}
     [void](Assert-OPA265BW3Outcome -Outcome $outcome -Preflight $pre -RequestId $workerRequestId)
     $status='MoveReturnedNeedsIndependentReview'
     $destination=[string]$outcome.Response.Result.DestinationEntryId
@@ -83,7 +83,7 @@ $report=[pscustomobject]@{
     RunId=[string]$pre.RunId
     OperationId=[string]$pre.OperationId
     WorkerRequestId=$workerRequestId
-    WorkerProcessId=$pid
+    WorkerProcessId=$workerProcessId
     WorkerStatus=$(if($null -eq $outcome){'Unknown'}else{[string]$outcome.Status})
     FailureKind=$(if($null -eq $outcome){'DispatcherException'}else{[string]$outcome.FailureKind})
     Error=$failure
