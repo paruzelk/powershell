@@ -1,3 +1,10 @@
+## 2.6.5-BW3g — one-time standalone synthetic +8-byte size acceptance record (2026-10-27; CI pending)
+
+- After BW3f independent real Outlook read-only PASS, operator explicitly approved the +8-byte MAPI size deviation for this ONE historical synthetic RunId only; journal reconciliation was NOT authorized.
+- Adds native Windows PowerShell 5.1 opt-in `-Review` (read-only) and `-Record` (explicit single-use size token) to create only a separate `bw3g-manual-size-acceptance.json` under the original synthetic fixture directory, never the journal or claims.
+- Record stores exact identities, size 1436/1444/+8, uncertainty statement, independent BW3f evidence fingerprint, six original file hashes and UTC record time. FileMode.CreateNew + Flush(true); never overwrite/retry, including partially written files. JSON data uses UTF8 without BOM; source PS code uses mandatory BOM.
+- +54 new offline Pester regressions. Expected native Windows PS5.1 CI 1084/54. No new Move, automatic retry, journal Reconciled or production FIX13b change.
+
 ## 2.6.5-BW3f - read-only human size decision dossier (2026-10-27; CI pending)
 
 - BW3e local Windows PS5.1 Pester 980/52 PASS and Outlook live read-only Body tail PASS: 50-character assigned fixture Body plus SPACE/CR/LF (53), SHA256 matched; archive size 1444 versus 1436 Intent, +8 remains unexplained/unapproved.
