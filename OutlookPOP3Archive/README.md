@@ -127,3 +127,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW3g1 — PowerShell switch `-Record` collision hotfix (DEV)
 
 The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Record` attempt STOPPED before disk creation because PowerShell 5.1 treats switch parameter `$Record` and local `$record` as the **same case-insensitive variable**. BW3g1 renames only the object local to `$sizeAcceptanceEntry`. Check whether the exact acceptance JSON path exists using read-only `Test-Path`; never delete a present/partial file or automatically retry. Re-run `-Review` using BW3g1 after CI; new `-Record` requires a new separate operator approval after confirming absence and evidence integrity. Mandatory source BOM; native Windows PS5.1 test gate target 1090/55. Original PST, journal Intent and claims unchanged by hotfix.
+
+### 2.6.5-BW3h — independent read-only seven-evidence chain audit (DEV)
+
+[Runbook](docs/2.6.5-bw3h-independent-chain-readonly-audit.md). BW3h rechecks exact original Intent and six durable claims/fixture files plus separately recorded **single-synthetic +8 byte acceptance JSON** hard-pinned to its user-observed SHA256. It reruns BW3g1 → BW3f → BW3e → BW3d → BW3b read-only Outlook audit and rehashes all seven files before/after. No new approval or journal Reconciled, no Move, file writes or production change. PS5.1 CI target 1142/56; UTF-8 BOM source.
