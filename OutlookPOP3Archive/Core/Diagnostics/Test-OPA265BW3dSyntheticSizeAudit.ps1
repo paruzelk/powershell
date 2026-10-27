@@ -17,6 +17,7 @@ if (-not $Review -or
 }
 . (Join-Path $PSScriptRoot '../Worker/WorkerProtocol.ps1')
 . (Join-Path $PSScriptRoot '../Worker/Live3SyntheticScope.ps1')
+. (Join-Path $PSScriptRoot '../Worker/BW3OneShotProtocol265.ps1')
 . (Join-Path $PSScriptRoot '../Worker/BW3bIndependentAudit265.ps1')
 . (Join-Path $PSScriptRoot '../Worker/BW3dSyntheticSizeEvidence265.ps1')
 $pinned=Get-OPA265BW3dPinnedSizeReview
