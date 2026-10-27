@@ -1,3 +1,11 @@
+## 2.6.5-BW3e - exact archived synthetic Body trailing Unicode proof (2026-10-27; CI pending)
+
+- Historical BW3d read-only Outlook check: 942/51 local PASS, but Body hash differs from fixture literal, archived MAPI size 1444 against Intent 1436. User independently reproduced observed SHA256 for exact literal + SPACE + CR + LF.
+- New BW3e independent read-only inspector requires BW3d (which reruns BW3b), pinned RunId/OperationId/WorkerRequestId/journal, and single exact archive EntryID, then checks *entire* Body text plus exactly U+0020/U+000D/U+000A, length and SHA256.
+- No raw Body output; original six journal/claim/request/scope files rehashed before and after COM getters; no code path for Move, journal writes or size consent.
+- +38 native PowerShell 5.1 Pester cases (target 980/52); all new code and tests strictly UTF-8 BOM (TZ-ENC-001).
+- Trailing whitespace does NOT establish when it was added or explain eight additional provider MAPI size bytes. Journal remains unresolved; no Reconciled, retries or production changes.
+
 ## 2.6.5-BW3d - independent archived synthetic +8-byte size evidence (2026-10-27; CI pending)
 
 - BW3c independently verified previous BW3a Move (source=0, archive=1, EntryID correlated, immutable Intent) but Intent size 1436 differs from archived MailItem.Size 1444. No size approval exists.
