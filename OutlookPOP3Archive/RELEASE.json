@@ -30,14 +30,15 @@
     "BW3b read-only pinned archive EntryID/WorkerRequestId audit for the successfully observed historical BW3a synthetic Move; no new Move, size consent, PST edits or automatic journal resolution",
     "BW3c fixes PS5.1 ANSI misdecode of UTF-8-without-BOM Cyrillic SourcePst literal via pinned Unicode code points and 12 native regression tests; read-only audit only, strict fixture identity preserved",
     "TZ-ENC-001 mandates UTF-8 BOM for all new/modified PowerShell sources, enforced before CI/Pester; 82 byte-identical legacy files held by pinned SHA256; no Outlook/PST changes",
-    "BW3d: read-only +8-byte previous synthetic archived MailItem Body/attachments and optional MAPI size; exact EntryID and claims pinned; no size consent, journal modifications or production changes"
+    "BW3d: read-only +8-byte previous synthetic archived MailItem Body/attachments and optional MAPI size; exact EntryID and claims pinned; no size consent, journal modifications or production changes",
+    "BW3e: pinned historical synthetic Body + SPACE/CR/LF Unicode and SHA256 read-only verification, all claims/journal intact; +8 MAPI bytes unapproved and unexplained; no Move"
   ],
   "Verification": {
-    "Status": "2.6.5-BW3d DEV read-only +8-byte synthetic Body/attachment MAPI size evidence; native Windows PS5.1 CI 942/51 pending",
+    "Status": "2.6.5-BW3e DEV exact Body suffix Unicode read-only audit; native Windows PS5.1 CI 980/52 pending",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 51,
-    "ExpectedPesterTests": 942,
+    "ExpectedTestContainers": 52,
+    "ExpectedPesterTests": 980,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -53,6 +54,8 @@
     "LegacyBomlessPowerShellCount": 82,
     "LegacyBomlessSourceSetSha256": "ace042f4ab915f2c1bd274685ea0e041e1f94f05c82418bed5a893ae153967ca",
     "BW3dSyntheticSizeEvidence": true,
-    "BW3dSizeDifferenceAutomaticallyApproved": false
+    "BW3dSizeDifferenceAutomaticallyApproved": false,
+    "BW3eExactSyntheticBodyTailEvidence": true,
+    "BW3eSizeDifferenceAutomaticallyApproved": false
   }
 }
