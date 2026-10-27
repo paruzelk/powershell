@@ -90,7 +90,7 @@ function Get-OPA265BW3eTailCodeUnits {
     for($i=$start;$i -lt $Text.Length;$i++) {
         [void]$units.Add([int][char]$Text[$i])
     }
-    return ,([int[]]$units.ToArray())
+    return $units.ToArray()
 }
 function Get-OPA265BW3eTailVerdict {
     [CmdletBinding()]
