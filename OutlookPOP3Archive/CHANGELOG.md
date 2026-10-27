@@ -1,3 +1,11 @@
+## 2.6.5-BW3f - read-only human size decision dossier (2026-10-27; CI pending)
+
+- BW3e local Windows PS5.1 Pester 980/52 PASS and Outlook live read-only Body tail PASS: 50-character assigned fixture Body plus SPACE/CR/LF (53), SHA256 matched; archive size 1444 versus 1436 Intent, +8 remains unexplained/unapproved.
+- New dev-only Test-OPA265BW3fManualSizeDecisionDossier.ps1 -Review reruns BW3e -> BW3d -> BW3b and fingerprints original journal/request/scope/dispatch/attempt/controller files before and after. Pure classifier checks exact historical identities, success fields, typed booleans and Unicode arrays; forged size waiver, content byte equivalence or journal completion fails closed.
+- Produces a read-only manual evidence packet. HumanSizeDecisionRecorded=False, SizeDifferenceApproved=False, ManualJournalDecisionAuthorized=False, WriteableReconciliationPermitIssued=False, JournalReconciled=False. Any future waiver or journal write requires distinct explicit user authorization and safety review.
+- +50 new Pester tests; Windows PowerShell 5.1 CI target 1030 tests / 53 containers, mandatory UTF-8 with BOM for all new code.
+- No additional Move, PST mutation, claim creation/deletion, automatic retry, production Worker or FIX13b changes.
+
 ## 2.6.5-BW3e - exact archived synthetic Body trailing Unicode proof (2026-10-27; CI pending)
 
 - Historical BW3d read-only Outlook check: 942/51 local PASS, but Body hash differs from fixture literal, archived MAPI size 1444 against Intent 1436. User independently reproduced observed SHA256 for exact literal + SPACE + CR + LF.
