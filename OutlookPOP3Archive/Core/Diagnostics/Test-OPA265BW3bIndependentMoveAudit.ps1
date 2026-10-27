@@ -66,9 +66,11 @@ foreach($path in @($paths.ResponsePath,(Join-Path $paths.Directory 'controller-d
         throw 'BW3b unexpected legacy response/crash/reconciliation artifact.'
     }
 }
-$dispatch=Read-OPAWorkerJson -Path $extra.DispatchClaimPath
-$report=Read-OPAWorkerJson -Path $extra.ControllerResultPath
+$dispatchRaw=[IO.File]::ReadAllText($extra.DispatchClaimPath)
+$reportRaw=[IO.File]::ReadAllText($extra.ControllerResultPath)
 $attempt=[IO.File]::ReadAllText($paths.ClaimPath)
+$dispatch=ConvertFrom-Json -InputObject $dispatchRaw -ErrorAction Stop
+$report=ConvertFrom-Json -InputObject $reportRaw -ErrorAction Stop
 [void](Assert-OPA265BW3bRecords -Proof $proof -Dispatch $dispatch -Report $report -MoveClaimText $attempt -Pinned $pinned)
 $app=$null;$ns=$null;$stage='Attach existing test Outlook'
 try {
@@ -147,10 +149,8 @@ try {
     $finalHash=(Get-FileHash -LiteralPath $paths.JournalPath -Algorithm SHA256).Hash.ToLowerInvariant()
     if ($finalHash -cne $originalHash -or
         [IO.File]::ReadAllText($paths.ClaimPath) -cne $attempt -or
-        [IO.File]::ReadAllText($extra.DispatchClaimPath) -cne
-            (ConvertTo-Json -InputObject $dispatch -Depth 5)) {
-        # JSON round-trip text is not byte-stable. The dispatch check is
-        # deliberately replaced below with a raw-text snapshot.
+        [IO.File]::ReadAllText($extra.DispatchClaimPath) -cne $dispatchRaw -or
+        [IO.File]::ReadAllText($extra.ControllerResultPath) -cne $reportRaw) {
         throw 'BW3b durable evidence changed while reading Outlook.'
     }
     Write-Output (Get-OPA265BW3bVerdict -Proof $proof -Pinned $pinned -Observed $observed)
