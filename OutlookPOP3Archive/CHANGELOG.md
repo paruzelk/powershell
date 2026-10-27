@@ -1,3 +1,10 @@
+## 2.6.5-BW3a - reserved PID hotfix, no replay of claimed synthetic run (2026-10-27; CI pending)
+
+- User BW3 real operator-approved one-shot controller hit PowerShell read-only automatic variable `$PID` while executing case-insensitive `$pid=0` **AFTER** flushing `bw3-dispatch.claim` and **BEFORE** any Worker invocation.
+- Historical RunId e2399ba1-38e9-48e8-bf43-d39cc1c19edb is permanently claimed. Preserve the dispatch claim and original Intent, do not retry with old/new scripts even when the independent read-only observation shows no Move.
+- BW3a renames the controller-local variable to `$workerProcessId` in initialization, assignment and reporting. 15 new AST/static regression tests prevent regression; Windows CI target 837 tests/47 containers.
+- No change to one-shot claim order, Outlook scopes, Worker Move, journal policy, or production FIX13b. ProductionReady=False, RealMailMoveViaWorker=False. New fixture/Move will require separate explicit approval.
+
 ## 2.6.5-BW3 — crash-safe one-shot synthetic Worker dispatch (2026-10-26; DEV CI pending)
 
 - BW2c real Windows read-only PRE-MOVE and POST-MOVE canaries PASS with unchanged original journal SHA256. Old RunIds never reused for Move.
