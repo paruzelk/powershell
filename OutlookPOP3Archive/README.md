@@ -115,3 +115,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### 2.6.5-BW3e - exact synthetic archived Body tail audit (DEV, read-only)
 
 [Runbook](docs/2.6.5-bw3e-synthetic-body-tail-readonly-audit.md). The BW3d observed Body UTF8 SHA256 agrees with the fixture baseline text followed by exactly SPACE (32), CR (13), LF (10). BW3e independently rereads only the pinned archived synthetic MailItem and checks the entire Body text, length, final three Unicode code units and UTF8 SHA256. Runs existing BW3d/BW3b read-only identity/claims checks and rehashes all original evidence; raw Body is not printed. The +8-byte archived size drift is NOT automatically explained, approved or reconciled. Mandatory UTF-8 BOM source gate; Windows PS5.1 CI target 980/52. Production FIX13b unchanged.
+
+### 2.6.5-BW3f - manual size decision dossier (DEV, read-only)
+
+[Runbook](docs/2.6.5-bw3f-human-size-decision-dossier.md). For the exact already-confirmed historical synthetic BW3a Move, BW3f reruns BW3e/BW3d/BW3b read-only audits, hashes all six original journal/request/scope/dispatch/attempt/controller files before and after, and emits a **no-consent human review dossier**. Original Intent=1436, archive=1444 (+8 bytes, cause undetermined), Body baseline+SPACE/CR/LF, zero attachments. A passing dossier **does not** approve size drift, establish byte equality or authorize Reconciled. Mandatory UTF-8 BOM; Windows PS5.1 CI target 1030/53; production unchanged.
