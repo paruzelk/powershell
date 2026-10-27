@@ -107,3 +107,7 @@ After cross-PST Move, MAPI MailItem.Size can differ from its original source-sid
 ### Обязательное ТЗ по кодировке PowerShell
 
 [Техническое задание — ТЗ-ENC-001](docs/TECHNICAL_SPECIFICATION.md): **весь новый и изменённый PowerShell-код** (`.ps1`, `.psm1`, `.psd1`) должен быть сохранён в **UTF-8 с BOM (EF BB BF)**, включая файлы, содержащие только ASCII. Windows PowerShell 5.1 без BOM может искажать Unicode/кириллицу. Настройка редактора — `.editorconfig`. `Invoke-CI.ps1` проверяет байты **до Pester** и отклоняет новые либо изменённые BOM-less файлы. Для 82 старых неизменённых файлов действует фиксированный переходный SHA-256; журналы JSON/JSONL не перекодировать автоматически. Production FIX13b остаётся без изменений.
+
+### 2.6.5-BW3d - archived synthetic size evidence (DEV, read-only)
+
+[Runbook](docs/2.6.5-bw3d-synthetic-size-readonly-audit.md). The previously confirmed synthetic BW3a Move has +8 bytes archive MAPI size drift (Intent 1436, archived 1444). BW3d reruns independent BW3b proof, reads only the existing archived synthetic MailItem Body/Attachments/MessageClass/size and optional PR_MESSAGE_SIZE, checks original durable artifact SHA256 before/after and outputs diagnostic text hashes. No new Move, size consent, content-byte-equivalence claim or Reconciled; production FIX13b unchanged. Native PS5.1 CI target 942/51 and mandatory UTF-8 BOM source gate.
