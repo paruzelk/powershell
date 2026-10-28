@@ -645,7 +645,7 @@ function New-OPAArchiveTransaction {
         Limit              = $Limit
         ArchiveGrouping    = $ArchiveGrouping
         OlderThanMonths    = $OlderThanMonths
-        ArchiveCutoff      = if($OlderThanMonths -gt 0 -and $null -ne $ArchiveCutoff){$ArchiveCutoff.ToString('o')}else{$null}
+        ArchiveCutoff      = if($null -ne $ArchiveCutoff){$ArchiveCutoff.ToString('o')}else{$null}
         Planned            = 0
         Executed           = 0
         Verified           = 0
