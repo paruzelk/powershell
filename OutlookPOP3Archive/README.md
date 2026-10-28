@@ -163,3 +163,7 @@ The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Recor
 ## BW4c DEV read-only Outlook/MAPI per-item review
 
 The opt-in `-WorkerPilotReviewOutlookPerItem` route reads ONE exact synthetic candidate from an already-running Outlook profile using two MAPI lookup paths and verifies historical BW3a evidence before and after. It never mounts a PST or calls Move, and is not externally independent evidence. See [BW4c read-only guide](docs/2.6.5-bw4c-outlook-dual-path-readonly.md). Original historical Intent remains unresolved and quarantined; Worker Archive/Resume/Auto remains disabled.
+
+## BW4d DEV: read-only prior LIVE3/LIVE4 replay fence
+
+Use the explicit `-WorkerPilotReviewHistoryReplay` opt-in route to compare the BW4c exact MailItem readback with the available bounded LOCAL TEMP LIVE3/LIVE4 operation journals. Prior synthetic IDs remain blocked even if the journal is missing. Zero matches is not Move permission; no production Worker or historical writer. See [BW4d guide](docs/2.6.5-bw4d-history-replay-readonly.md).
