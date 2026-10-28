@@ -157,21 +157,9 @@ if ($WorkerPilot) {
             [string]::IsNullOrWhiteSpace($WorkerPilotExpectedHistoricalJournalSha256)) {
             throw 'BW4a requires exact historic RunId/PST/SHA256 and disallows synthetic probe or size consent.'
         }
-        # Read-only local evidence; NO Worker process, Outlook COM, or PST writes.
-        . "$PSScriptRoot\Core\Worker\Live3SyntheticScope.ps1"
-        . "$PSScriptRoot\Core\Worker\BW3OneShotProtocol265.ps1"
-        . "$PSScriptRoot\Core\Worker\BW3bIndependentAudit265.ps1"
-        . "$PSScriptRoot\Core\Worker\BW3dSyntheticSizeEvidence265.ps1"
-        . "$PSScriptRoot\Core\Worker\BW3eSyntheticBodyTailEvidence265.ps1"
-        . "$PSScriptRoot\Core\Worker\BW3gManualSizeAcceptance265.ps1"
-        . "$PSScriptRoot\Core\Worker\BW3hIndependentEvidenceChain265.ps1"
-        . "$PSScriptRoot\Core\Worker\BW3iJournalResolutionPreflight265.ps1"
-        . "$PSScriptRoot\Core\Worker\BW3jResolutionDesign265.ps1"
-        . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
-        . "$PSScriptRoot\Core\Archive\OperationJournal.ps1"
-        . "$PSScriptRoot\Core\Worker\BW4aHistoricalIntentIsolation265.ps1"
-        . "$PSScriptRoot\Core\Worker\BW4aHistoricalFenceReadOnly265.ps1"
-        $pilotResult=Invoke-OPA265BW4aHistoricalFenceReview -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction
+        # Delegate to a self-contained read-only BW4a entrypoint; this
+        # production CLI must NOT import legacy BW3 audit or writer modules.
+        $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4aHistoricalIntentIsolationReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -Review
     } elseif ($WorkerPilotProbeSynthetic) {
         if ([string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
             [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst)) {
