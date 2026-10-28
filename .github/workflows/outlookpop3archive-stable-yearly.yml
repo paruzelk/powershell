@@ -21,9 +21,9 @@ jobs:
       - name: Install PS5.1 test dependencies
         run: |
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          Install-PackageProvider -Name NuGet -Force -Scope CurrentUser
-          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck
-          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
           Import-Module Pester -MinimumVersion 5.0 -Force
           Import-Module PSScriptAnalyzer -Force
       - name: Validate stable source tree, UTF-8 BOM on changes, PSScriptAnalyzer and Pester
