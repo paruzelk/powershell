@@ -319,7 +319,7 @@ function Get-OPASourceByPst {
 function Get-OPAArchiveCutoff {
     param([Parameter(Mandatory=$true)][int]$OlderThanMonths)
     if ($ArchiveThroughYear -gt 0) {
-        return (New-Object datetime ($ArchiveThroughYear + 1),1,1)
+        return [datetime]::new(($ArchiveThroughYear + 1),1,1)
     }
     if ($OlderThanMonths -le 0) { return $null }
     return (Get-Date).AddMonths(-$OlderThanMonths)
