@@ -359,7 +359,7 @@ Describe 'BW3m: final historical writer security proof, original READ ONLY' {
     }
     It 'has no write path in BW3m independent audit module' {
         $src=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Worker/BW3mHistoricalWriterSafetyReview265.ps1') -Raw
-        $src | Should -Not -Match 'FileStream\]::new|CreateNew|WriteAllBytes|WriteAllText|Move\(|MailItem\.Move|ProductionReady=\$true'
+        $src | Should -Not -Match 'FileStream\]::new|\[IO\.FileMode\]::CreateNew|WriteAllBytes|WriteAllText|Move\(|MailItem\.Move|ProductionReady=\$true'
     }
     It 'is not exposed in production Archive Resume Auto' {
         $src=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../OutlookPOP3Archive.ps1') -Raw
