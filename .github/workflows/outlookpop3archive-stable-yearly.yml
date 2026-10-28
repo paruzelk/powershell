@@ -1,0 +1,81 @@
+name: Stable FIX13b Yearly 90GB Operator Windows PS5.1 CI and ZIP
+on:
+  push:
+    branches:
+      - release/outlookpop3archive-2.5.7-fix13b-yearly-90gb-operator
+    paths:
+      - 'OutlookPOP3Archive/**'
+      - '.github/workflows/outlookpop3archive-stable-yearly.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+        working-directory: OutlookPOP3Archive
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PS5.1 test dependencies
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          Install-PackageProvider -Name NuGet -Force -Scope CurrentUser
+          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+          Import-Module Pester -MinimumVersion 5.0 -Force
+          Import-Module PSScriptAnalyzer -Force
+      - name: Validate stable source tree, UTF-8 BOM on changes, PSScriptAnalyzer and Pester
+        run: |
+          $ErrorActionPreference='Stop'
+          $base='dcff8e77e87455382d76fa0a25136deb1a84ec2f'
+          $changed=@(git diff --name-only $base HEAD -- OutlookPOP3Archive | Where-Object { $_ -match '\.ps1$' })
+          foreach($p in $changed){
+            $full=Join-Path (Split-Path -Parent $PWD.Path) ($p -replace '/','\')
+            if(-not (Test-Path -LiteralPath $full)){throw "Changed PowerShell file missing: $p"}
+            $b=[IO.File]::ReadAllBytes($full)
+            if($b.Length -lt 3 -or $b[0] -ne 239 -or $b[1] -ne 187 -or $b[2] -ne 191){throw "UTF-8 BOM missing: $p"}
+          }
+          Write-Host ("PASS UTF8 BOM on {0} changed PowerShell files" -f $changed.Count)
+          .\Invoke-CI.ps1
+          if($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0){throw "Stable CI exit code $LASTEXITCODE"}
+          Write-Host 'STABLE FIX13b YEARLY CI PASSED'
+      - name: Package stable source project-only ZIP after CI PASS
+        run: |
+          $ErrorActionPreference='Stop'
+          $stage=Join-Path $env:RUNNER_TEMP 'OPA-STABLE-YEARLY-PACKAGE'
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          $destination=Join-Path $stage 'OutlookPOP3Archive'
+          Copy-Item -LiteralPath $PWD.Path -Destination $destination -Recurse -Force
+          $info=[ordered]@{
+             Package='OutlookPOP3Archive-2.5.7-FIX13b-STABLE-YEARLY-90GB'
+             StableBaseCommit='dcff8e77e87455382d76fa0a25136deb1a84ec2f'
+             SourceCommit=$env:GITHUB_SHA
+             BaseBuild='2.5.7-FIX13b'
+             ExperimentalWorkerIncluded=$false
+             ArchiveGrouping='Year'
+             ArchiveThroughYear=2025
+             Artificial10GBArchiveCapEnabled=$false
+             OutlookPhysicalSizeSafetyMaintained=$true
+             NativeWindowsPowerShell51=$true
+             OperatorMustSupplySourcePstAndExplicitExecute=$true
+             OperatorPreviewDefault=$true
+             BackupBeforeExecuteRequired=$true
+          }
+          [IO.File]::WriteAllText((Join-Path $destination 'BUILD-INFO.json'),(ConvertTo-Json -InputObject $info -Depth 6),[Text.Encoding]::UTF8)
+          $file=Join-Path $env:RUNNER_TEMP ('OutlookPOP3Archive-2.5.7-FIX13b-STABLE-YEARLY-90GB-g'+$env:GITHUB_SHA.Substring(0,8)+'.zip')
+          Compress-Archive -LiteralPath $destination -DestinationPath $file -CompressionLevel Optimal -Force
+          $hash=(Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()
+          $sidecar=$file+'.sha256'
+          [IO.File]::WriteAllText($sidecar,($hash+'  '+[IO.Path]::GetFileName($file)+[char]10),[Text.Encoding]::ASCII)
+          Copy-Item -LiteralPath $file -Destination $stage -Force
+          Copy-Item -LiteralPath $sidecar -Destination $stage -Force
+          Write-Host ("STABLE YEARLY ZIP: "+[IO.Path]::GetFileName($file)+" SHA256: "+$hash)
+      - name: Publish CI-verified stable yearly ZIP and SHA256
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutlookPOP3Archive-2.5.7-FIX13b-STABLE-YEARLY-90GB
+          path: ${{ runner.temp }}/OPA-STABLE-YEARLY-PACKAGE/*.zip*
+          retention-days: 30
+          if-no-files-found: error
