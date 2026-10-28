@@ -276,7 +276,12 @@ function Invoke-OPA265BW3lCopyOnlyRehearsal {
         throw 'BW3l copy claim exists: permanent STOP, no retry or cleanup.'
     }
     $original=[IO.File]::ReadAllBytes($paths.JournalPath)
-    $null=Assert-OPA265BW3lOneIntent -Bytes $original -Pinned $Pinned -ExpectedSha256 $marker.OriginalIntentSha256
+    $preclaimIntent=Assert-OPA265BW3lOneIntent -Bytes $original -Pinned $Pinned -ExpectedSha256 $marker.OriginalIntentSha256
+    # ALL copy marker-to-Intent identities MUST match before irreversible CreateNew.
+    # In particular, a forged ArchivePst must never consume a claim.
+    if ([string]$preclaimIntent.ArchivePst -cne [string]$marker.ArchivePst) {
+        throw 'BW3l copy marker/archive identity mismatch BEFORE claim creation.'
+    }
     $claim=[pscustomobject][ordered]@{
         Schema='2.6.5-BW3l.CopyOnlyResolutionClaim.1'
         RunId=[string]$Pinned.RunId;OperationId=[string]$Pinned.OperationId
