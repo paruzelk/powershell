@@ -159,3 +159,7 @@ The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Recor
 ### BW4a — Option B historic Intent isolation for future Worker Archive/Resume (DEV)
 
 [Runbook](docs/2.6.5-bw4a-option-b-historical-worker-fence.md). After BW3m local 1491/62 and actual Outlook PASS, Option B preserves the original single historical BW3a Intent. Adds a strictly opt-in -WorkerPilotReviewHistoricalFence (Archive/Resume only) **before COM, Worker dispatch or MailMover** and standalone no-Outlook -Review. Verifies seven historical immutable SHA256s, exact one Intent, absence of resolution claims; blocks historic RunId/OperationId/EntryID/journal identity and shared PST pending BW4b per-item fencing. Unrelated new candidates are NOT authorized by BW4a. No new journal, claim, PST write or production activation. Native PS5.1 CI target 1572/63, 81 new tests; TZ-ENC-001 enforced.
+
+## BW4c DEV read-only Outlook/MAPI per-item review
+
+The opt-in `-WorkerPilotReviewOutlookPerItem` route reads ONE exact synthetic candidate from an already-running Outlook profile using two MAPI lookup paths and verifies historical BW3a evidence before and after. It never mounts a PST or calls Move, and is not externally independent evidence. See [BW4c read-only guide](docs/2.6.5-bw4c-outlook-dual-path-readonly.md). Original historical Intent remains unresolved and quarantined; Worker Archive/Resume/Auto remains disabled.
