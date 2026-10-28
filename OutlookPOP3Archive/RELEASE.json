@@ -47,14 +47,15 @@
     "BW4d: separate bounded filesystem audit of prior LIVE3/LIVE4 operation journals plus BW4c Outlook readback; known synthetic IDs permanently block Move retry and no evidence catalog is treated as complete",
     "BW4d1: strict hexadecimal EntryID/StoreID case normalization and exact folder mismatch diagnostics for real Outlook; no bypass, PST changes or Worker Move",
     "BW4e: exact candidate EntryID, InternetMessageId, PR_SEARCH_KEY and content fingerprint pinned before a new BW4d read-only historical audit; no proof of newness or Move permission",
-    "BW4e1: rename PSCustomObject readback from $review to $bw4dSnapshot to prevent PowerShell case-insensitive SwitchParameter collision; no Worker/Move permit"
+    "BW4e1: rename PSCustomObject readback from $review to $bw4dSnapshot to prevent PowerShell case-insensitive SwitchParameter collision; no Worker/Move permit",
+    "BW4e2: explicitly targeted exact MAPI InternetMessageId DASL Restrict for large POP3 Inbox; zero/duplicate/other item blocked; never a Move permit"
   ],
   "Verification": {
-    "Status": "BW4e1 DEV read-only Review SwitchParameter naming collision hotfix; Windows PowerShell 5.1 CI 1670/68; Worker and MailItem.Move disabled",
+    "Status": "BW4e2 DEV targeted exact InternetMessageId MAPI Restrict for 26485-item POP3 Inbox; Windows PS5.1 1688/69; no Worker or Move",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 68,
-    "ExpectedPesterTests": 1670,
+    "ExpectedTestContainers": 69,
+    "ExpectedPesterTests": 1688,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -126,6 +127,10 @@
     "BW4eMovePermitAllowed": false,
     "BW4e1ReadOnlyReviewSwitchCollisionFixed": true,
     "BW4e1WorkerDispatchAllowed": false,
-    "BW4e1MovePermitAllowed": false
+    "BW4e1MovePermitAllowed": false,
+    "BW4e2TargetedReadOnlyRestrict": true,
+    "BW4e2UnboundedEnumerationAllowed": false,
+    "BW4e2WorkerDispatchAllowed": false,
+    "BW4e2MovePermitAllowed": false
   }
 }
