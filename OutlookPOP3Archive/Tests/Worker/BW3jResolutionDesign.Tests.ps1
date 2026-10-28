@@ -1,4 +1,4 @@
-﻿﻿#requires -Version 5.1
+﻿#requires -Version 5.1
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../Core/Worker/BW3bIndependentAudit265.ps1')
     . (Join-Path $PSScriptRoot '../../Core/Worker/BW3dSyntheticSizeEvidence265.ps1')
