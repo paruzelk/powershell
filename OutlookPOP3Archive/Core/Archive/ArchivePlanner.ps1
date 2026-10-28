@@ -191,7 +191,7 @@ function New-OPAArchivePlan {
             }
             $folderPlan = $folders[-1]
             try {
-                $selection = Get-OPAArchiveCandidates -SourceFolder $folder -Limit 2147483647 -OlderThanCutoff $(if($OlderThanMonths -gt 0){$ArchiveCutoff}else{$null}) -Diagnostics
+                $selection = Get-OPAArchiveCandidates -SourceFolder $folder -Limit 2147483647 -OlderThanCutoff $ArchiveCutoff -Diagnostics
                 $folderPlan.EligibleItemCount = [int]$selection.EligibleByAge
                 $folderPlan.ExcludedByAge = [int]$selection.ExcludedByAge
                 $folderPlan.ExcludedByAgeExact = [bool]$selection.ExcludedByAgeExact
@@ -263,7 +263,7 @@ function Write-OPAArchivePlan {
     Write-Host ("Items   : {0}" -f $Plan.ItemCount)
     Write-Host ("Folders : {0}" -f $Plan.FolderCount)
     Write-Host ("Available items : {0}" -f (($Plan.Folders | Measure-Object -Property ItemCount -Sum).Sum))
-    Write-Host ("Older than     : {0}" -f $(if($Plan.OlderThanMonths -gt 0){"$($Plan.ArchiveCutoff.ToString('yyyy-MM-dd HH:mm:ss')) (OlderThanMonths=$($Plan.OlderThanMonths))"}else{'Disabled'}))
+    Write-Host ("Older than     : {0}" -f $(if($Plan.ArchiveCutoff){"$($Plan.ArchiveCutoff.ToString('yyyy-MM-dd HH:mm:ss'))"}else{'Disabled'}))
     if($Plan.TestLimit -gt 0){ Write-Host ("Selected limit  : {0}" -f $Plan.TestLimit) }
     Write-Host ""
 
