@@ -106,4 +106,36 @@ Describe 'BW4c dual-path Outlook MAPI read-only capture' {
     It 'returns SHA256 for abc' {
         (Get-OPA265BW4cHash -Bytes ([byte[]](97,98,99))) | Should -BeExactly 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad'
     }
+    It 'accepts identical hexadecimal folder EntryID with different letter casing' {
+        $script:folder.EntryID='00aabbcc'
+        $r=Get-OPA265BW4cDualReadback -Namespace $script:ns -SourcePst $script:pst -FolderEntryId '00AABBCC' -CandidateEntryId 'ITEM'
+        $r.CandidateMatches | Should -Be 1
+        $r.MailMoveExecuted | Should -BeFalse
+    }
+    It 'accepts identical hexadecimal StoreID despite casing from different Outlook COM routes' {
+        $script:store.StoreID='00AABBCC'
+        $script:folder.StoreID='00aabbcc'
+        $r=Get-OPA265BW4cDualReadback -Namespace $script:ns -SourcePst $script:pst -FolderEntryId 'FOLDER' -CandidateEntryId 'ITEM'
+        $r.CandidateMatches | Should -Be 1
+        $r.MailMoveExecuted | Should -BeFalse
+    }
+    It 'accepts identical hexadecimal MailItem EntryID from two routes with different letter casing' {
+        $script:mail.EntryID='aa11bb22'
+        $r=Get-OPA265BW4cDualReadback -Namespace $script:ns -SourcePst $script:pst -FolderEntryId 'FOLDER' -CandidateEntryId 'AA11BB22'
+        $r.Primary.SourceEntryId | Should -BeExactly 'AA11BB22'
+        $r.MailMoveExecuted | Should -BeFalse
+    }
+    It 'does not equate genuinely different folder EntryIDs and reports the failed check' {
+        $script:folder.EntryID='00aabbcd'
+        {Get-OPA265BW4cDualReadback -Namespace $script:ns -SourcePst $script:pst -FolderEntryId '00AABBCC' -CandidateEntryId 'ITEM'} | Should -Throw '*folder EntryID mismatch*'
+    }
+    It 'does not equate genuinely different StoreIDs and reports the failed check' {
+        $script:folder.StoreID='00AABBCE'
+        {Get-OPA265BW4cDualReadback -Namespace $script:ns -SourcePst $script:pst -FolderEntryId 'FOLDER' -CandidateEntryId 'ITEM'} | Should -Throw '*StoreID mismatch*'
+    }
+    It 'reports missing folder from explicit MAPI store without silent fallback' {
+        $script:ns.Folder=$null
+        {Get-OPA265BW4cDualReadback -Namespace $script:ns -SourcePst $script:pst -FolderEntryId 'FOLDER' -CandidateEntryId 'ITEM'} | Should -Throw '*returned null*'
+    }
+
 }
