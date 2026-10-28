@@ -26,7 +26,7 @@ jobs:
           Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
           Install-Module -Name Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
           Install-Module -Name PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
-      - name: Native Windows PowerShell 5.1 test gate (1408 / 61)
+      - name: Native Windows PowerShell 5.1 test gate (1429 / 61)
         run: |
           if ($PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5) { throw 'Not Windows PowerShell 5.1.' }
           .\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
@@ -68,7 +68,7 @@ jobs:
             BaseApplicationBuild='2.6.3-PREVIEW1'
             DevelopmentGate='2.6.5-BW3l'
             SourceCommit=$env:GITHUB_SHA
-            PesterPassed=1408
+            PesterPassed=1429
             TestContainers=61
             NativeWindowsPowerShell51=$true
             ProductionReady=$false
