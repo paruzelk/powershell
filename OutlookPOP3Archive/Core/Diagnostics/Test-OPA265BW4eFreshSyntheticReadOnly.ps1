@@ -34,8 +34,8 @@ try {
     [void](Assert-OPA265BW4eCandidatePins -CandidateReviewId $CandidateReviewId -HistoricalRunId $RunId -ExpectedCandidateEntryId $CandidateEntryId -ExpectedInternetMessageId $ExpectedInternetMessageId -ExpectedSearchKeySha256 $ExpectedSearchKeySha256 -ExpectedContentFingerprintSha256 $ExpectedContentFingerprintSha256)
     # BW4d performs seven original pinned historical SHA checks pre/post Outlook,
     # and snapshots all visible Live3/Live4 journal files before/after the read.
-    $review=& (Join-Path $PSScriptRoot 'Test-OPA265BW4dHistoryReplayReadOnly.ps1') -RunId $RunId -SourcePst $SourcePst -ExpectedJournalSha256 $ExpectedJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -ExpectedProfileName $ExpectedProfileName -MaxFolderItems $MaxFolderItems -HistoryRoot $HistoryRoot -MaxHistoryRuns $MaxHistoryRuns -Review -ConfirmExistingOutlookReadOnly
-    $result=Get-OPA265BW4eFreshCandidateDecision -Bw4dReview $review -CandidateReviewId $CandidateReviewId -HistoricalRunId $RunId -ExpectedCandidateEntryId $CandidateEntryId -ExpectedInternetMessageId $ExpectedInternetMessageId -ExpectedSearchKeySha256 $ExpectedSearchKeySha256 -ExpectedContentFingerprintSha256 $ExpectedContentFingerprintSha256
+    $bw4dSnapshot=& (Join-Path $PSScriptRoot 'Test-OPA265BW4dHistoryReplayReadOnly.ps1') -RunId $RunId -SourcePst $SourcePst -ExpectedJournalSha256 $ExpectedJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -ExpectedProfileName $ExpectedProfileName -MaxFolderItems $MaxFolderItems -HistoryRoot $HistoryRoot -MaxHistoryRuns $MaxHistoryRuns -Review -ConfirmExistingOutlookReadOnly
+    $result=Get-OPA265BW4eFreshCandidateDecision -Bw4dReview $bw4dSnapshot -CandidateReviewId $CandidateReviewId -HistoricalRunId $RunId -ExpectedCandidateEntryId $CandidateEntryId -ExpectedInternetMessageId $ExpectedInternetMessageId -ExpectedSearchKeySha256 $ExpectedSearchKeySha256 -ExpectedContentFingerprintSha256 $ExpectedContentFingerprintSha256
     if ($result.CanInvokeMailMove -or $result.CanDispatchWorker -or
         $result.CanRetryPreviousMove -or $result.CanWriteHistoricalJournal) {
         throw 'BW4e critical immutable no-Move invariant failed.'
@@ -51,9 +51,9 @@ try {
         PriorReadOnlyPinsMatch=$result.PriorReadOnlyPinsMatch
         SourcePstPop3ItemObserved=$result.SourcePstPop3ItemObserved
         CandidateNewnessIndependentlyProven=$false
-        HistoryRunDirectoriesScanned=[int]$review.RunDirectoriesScanned
-        HistoryJournalsScanned=[int]$review.JournalsScanned
-        HistoryEvidenceSnapshotSha256=[string]$review.HistoryEvidenceSnapshotSha256
+        HistoryRunDirectoriesScanned=[int]$bw4dSnapshot.RunDirectoriesScanned
+        HistoryJournalsScanned=[int]$bw4dSnapshot.JournalsScanned
+        HistoryEvidenceSnapshotSha256=[string]$bw4dSnapshot.HistoryEvidenceSnapshotSha256
         HistoryEvidenceFilesUnchanged=$true
         HistoryCatalogComplete=$false
         IndependentlyAuthenticatedExternalMAPIContent=$false
