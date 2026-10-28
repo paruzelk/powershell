@@ -1,3 +1,10 @@
+## 2.6.5-BW4b (DEV): read-only per-item historical fencing
+
+- Two independent-labelled JSON item witnesses; historical EntryIDs and InternetMessageId block even across a shared PST.
+- Malformed, conflicting and incomplete candidate proof fails closed. No actual Outlook readback, Worker dispatch, Move, journal or claim.
+- Read-only opt-in Archive/Resume CLI preflight, repeat pinned original BW3a hash and one-Intent checks before and after.
+- Windows PS5.1, BOM and full Pester CI mandatory; package remains non-production.
+
 ## BW4a — Option B historic one-Intent quarantine, Worker Archive/Resume read-only boundary (2026-10-28; CI pending)
 
 - BW3m local 1491/62 and actual Outlook read-only -Review PASS. User selected Option B: preserve historical BW3a one Intent, no historical journal append or claims, never auto-retry previous Move.

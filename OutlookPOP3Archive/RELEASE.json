@@ -45,11 +45,11 @@
     "BW4a: Option B historic single Intent fenced permanently with read-only Archive/Resume WorkerPilot gate before COM; no journal/claim/PST writes, no historic retry or Worker Move"
   ],
   "Verification": {
-    "Status": "BW4a DEV Option B historical one-Intent read-only Worker Archive/Resume quarantine; Windows PS5.1 CI target 1572/63; no Worker Move",
+    "Status": "BW4b DEV per-item read-only witness consistency; Windows PS5.1 CI target 1592/64; Worker Move prohibited",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 63,
-    "ExpectedPesterTests": 1572,
+    "ExpectedTestContainers": 64,
+    "ExpectedPesterTests": 1592,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -97,6 +97,9 @@
     "BW4aOptionBHistoricalIntentQuarantine": true,
     "BW4aHistoricalRetryBlocked": true,
     "BW4aReadOnlyWorkerPilotRoute": true,
-    "BW4aWorkerDispatchAllowed": false
+    "BW4aWorkerDispatchAllowed": false,
+    "BW4bPerItemReadOnlyFence": true,
+    "BW4bTrustedOutlookReadback": false,
+    "BW4bWorkerDispatchAllowed": false
   }
 }

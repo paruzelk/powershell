@@ -88,7 +88,10 @@ param(
     [long]$WorkerPilotExpectedSourceSizeBytes = 0,
     # BW4a OPTION B: explicit read-only one-Intent quarantine preflight.
     [switch]$WorkerPilotReviewHistoricalFence,
-    [string]$WorkerPilotExpectedHistoricalJournalSha256 = ''
+    [string]$WorkerPilotExpectedHistoricalJournalSha256 = '',
+    [switch]$WorkerPilotReviewPerItemFence,
+    [string]$WorkerPilotPrimaryPath = '',
+    [string]$WorkerPilotIndependentPath = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -142,14 +145,32 @@ $pilotOptionsSpecified = ($PSBoundParameters.ContainsKey('WorkerPilotMaxOperatio
     $PSBoundParameters.ContainsKey('WorkerPilotConfirmSourceSizeDifference') -or
     $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes') -or
     $PSBoundParameters.ContainsKey('WorkerPilotReviewHistoricalFence') -or
-    $PSBoundParameters.ContainsKey('WorkerPilotExpectedHistoricalJournalSha256'))
+    $PSBoundParameters.ContainsKey('WorkerPilotExpectedHistoricalJournalSha256') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotReviewPerItemFence') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotPrimaryPath') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotIndependentPath'))
 $pilotGate = Assert-OPA265WorkerPilotGate -Mode $Mode -PilotRequested ([bool]$WorkerPilot) -ExplicitConsent ([bool]$ConfirmDevWorkerPilot) -WhatIfEnabled ([bool]$WhatIf) -Limit $Limit -ProfileName $ProfileName -Transaction $Transaction -MaxOperations $WorkerPilotMaxOperations -TimeoutSeconds $WorkerPilotTimeoutSeconds -OtherPilotOptionsSpecified $pilotOptionsSpecified
 if ($WorkerPilot) {
     . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerHost.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerControl.ps1"
-    if ($WorkerPilotReviewHistoricalFence) {
-        if ($WorkerPilotProbeSynthetic -or
+    if ($WorkerPilotReviewHistoricalFence -and $WorkerPilotReviewPerItemFence) {
+        throw 'BW4b conflicts with BW4a pilot review.'
+    }
+    if ($WorkerPilotReviewPerItemFence) {
+        if ($WorkerPilotProbeSynthetic -or $WorkerPilotConfirmSourceSizeDifference -or
+            $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes') -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotExpectedHistoricalJournalSha256) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotPrimaryPath) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotIndependentPath)) {
+            throw 'BW4b requires pinned history and two local read-only witnesses.'
+        }
+        $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4bPerItemFencingReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -PrimaryPath $WorkerPilotPrimaryPath -IndependentPath $WorkerPilotIndependentPath -Review
+    } elseif ($WorkerPilotReviewHistoricalFence) {
+        if ($PSBoundParameters.ContainsKey('WorkerPilotPrimaryPath') -or
+            $PSBoundParameters.ContainsKey('WorkerPilotIndependentPath') -or
             $WorkerPilotConfirmSourceSizeDifference -or
             $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes') -or
             [string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
@@ -161,6 +182,9 @@ if ($WorkerPilot) {
         # production CLI must NOT import legacy BW3 audit or writer modules.
         $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4aHistoricalIntentIsolationReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -Review
     } elseif ($WorkerPilotProbeSynthetic) {
+        if ($PSBoundParameters.ContainsKey('WorkerPilotPrimaryPath') -or
+            $PSBoundParameters.ContainsKey('WorkerPilotIndependentPath') -or
+            $PSBoundParameters.ContainsKey('WorkerPilotExpectedHistoricalJournalSha256')) { throw 'BW4b witnesses are not allowed in BW2 probe.' }
         if ([string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
             [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst)) {
             throw 'BW2 requires exact -WorkerPilotRunId and -WorkerPilotSourcePst with -WorkerPilotProbeSynthetic.'
@@ -181,6 +205,8 @@ if ($WorkerPilot) {
         $pilotResult = Invoke-OPA265BW2BoundedReadOnlyCanary -Gate $pilotGate -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -KeepArtifacts:$WorkerPilotKeepArtifacts -ConfirmSourceSizeDifference:$WorkerPilotConfirmSourceSizeDifference -ExpectedSourceSizeBytes $WorkerPilotExpectedSourceSizeBytes
     } else {
         if ($PSBoundParameters.ContainsKey('WorkerPilotExpectedHistoricalJournalSha256') -or
+            $PSBoundParameters.ContainsKey('WorkerPilotPrimaryPath') -or
+            $PSBoundParameters.ContainsKey('WorkerPilotIndependentPath') -or
             -not [string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
             -not [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst) -or
             [bool]$WorkerPilotConfirmSourceSizeDifference -or
