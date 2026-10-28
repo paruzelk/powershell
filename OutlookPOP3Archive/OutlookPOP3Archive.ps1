@@ -91,7 +91,12 @@ param(
     [string]$WorkerPilotExpectedHistoricalJournalSha256 = '',
     [switch]$WorkerPilotReviewPerItemFence,
     [string]$WorkerPilotPrimaryPath = '',
-    [string]$WorkerPilotIndependentPath = ''
+    [string]$WorkerPilotIndependentPath = '',
+    # BW4c: explicitly attach to already-running Outlook and read one exact mail twice.
+    [switch]$WorkerPilotReviewOutlookPerItem,
+    [string]$WorkerPilotCandidateFolderEntryId = '',
+    [string]$WorkerPilotCandidateEntryId = '',
+    [ValidateRange(1,5000)][int]$WorkerPilotMaxFolderItems = 1000
 )
 
 $ErrorActionPreference = 'Stop'
@@ -148,16 +153,44 @@ $pilotOptionsSpecified = ($PSBoundParameters.ContainsKey('WorkerPilotMaxOperatio
     $PSBoundParameters.ContainsKey('WorkerPilotExpectedHistoricalJournalSha256') -or
     $PSBoundParameters.ContainsKey('WorkerPilotReviewPerItemFence') -or
     $PSBoundParameters.ContainsKey('WorkerPilotPrimaryPath') -or
-    $PSBoundParameters.ContainsKey('WorkerPilotIndependentPath'))
+    $PSBoundParameters.ContainsKey('WorkerPilotIndependentPath') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotReviewOutlookPerItem') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotCandidateFolderEntryId') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotCandidateEntryId') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotMaxFolderItems'))
 $pilotGate = Assert-OPA265WorkerPilotGate -Mode $Mode -PilotRequested ([bool]$WorkerPilot) -ExplicitConsent ([bool]$ConfirmDevWorkerPilot) -WhatIfEnabled ([bool]$WhatIf) -Limit $Limit -ProfileName $ProfileName -Transaction $Transaction -MaxOperations $WorkerPilotMaxOperations -TimeoutSeconds $WorkerPilotTimeoutSeconds -OtherPilotOptionsSpecified $pilotOptionsSpecified
 if ($WorkerPilot) {
     . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerHost.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerControl.ps1"
+    if (-not $WorkerPilotReviewOutlookPerItem -and (
+        $PSBoundParameters.ContainsKey('WorkerPilotCandidateFolderEntryId') -or
+        $PSBoundParameters.ContainsKey('WorkerPilotCandidateEntryId') -or
+        $PSBoundParameters.ContainsKey('WorkerPilotMaxFolderItems'))) {
+        throw 'BW4c candidate identity and scan options require explicit BW4c read-only mode.'
+    }
+    if ($WorkerPilotReviewOutlookPerItem -and
+        ($WorkerPilotReviewHistoricalFence -or $WorkerPilotReviewPerItemFence -or
+         $WorkerPilotProbeSynthetic -or $WorkerPilotConfirmSourceSizeDifference -or
+         $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes') -or
+         $PSBoundParameters.ContainsKey('WorkerPilotPrimaryPath') -or
+         $PSBoundParameters.ContainsKey('WorkerPilotIndependentPath'))) {
+        throw 'BW4c cannot combine legacy pilot routes, synthetic probe, size consent or user-supplied witnesses.'
+    }
     if ($WorkerPilotReviewHistoricalFence -and $WorkerPilotReviewPerItemFence) {
         throw 'BW4b conflicts with BW4a pilot review.'
     }
-    if ($WorkerPilotReviewPerItemFence) {
+    if ($WorkerPilotReviewOutlookPerItem) {
+        if ([string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotExpectedHistoricalJournalSha256) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotCandidateFolderEntryId) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotCandidateEntryId) -or
+            [string]::IsNullOrWhiteSpace($ProfileName)) {
+            throw 'BW4c requires exact pinned historical evidence, Outlook profile, candidate folder and MailItem EntryID.'
+        }
+        $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4cOutlookPerItemReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $WorkerPilotCandidateFolderEntryId -CandidateEntryId $WorkerPilotCandidateEntryId -ExpectedProfileName $ProfileName -MaxFolderItems $WorkerPilotMaxFolderItems -Review -ConfirmExistingOutlookReadOnly
+    } elseif ($WorkerPilotReviewPerItemFence) {
         if ($WorkerPilotProbeSynthetic -or $WorkerPilotConfirmSourceSizeDifference -or
             $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes') -or
             [string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
