@@ -17,6 +17,11 @@ param(
     [ValidateRange(0,1200)]
     [int]$OlderThanMonths = 12,
 
+    # Stable operator add-on: exact inclusive calendar cutoff (e.g. 2025).
+    # 0 preserves FIX13b original rolling-month behavior.
+    [ValidateRange(0,2099)]
+    [int]$ArchiveThroughYear = 0,
+
     [ValidateRange(0.1,1000)]
     [double]$SourcePstHighWatermarkGB = 40,
 
@@ -123,6 +128,7 @@ Write-Host ("Transaction: {0}" -f $Transaction)
 Write-Host ("WhatIf   : {0}" -f [bool]$WhatIf)
 Write-Host ("Limit    : {0}" -f $(if ($Limit -gt 0) { $Limit } else { 'Unlimited' }))
 Write-Host ("Grouping : {0}" -f $ArchiveGrouping)
+Write-Host ("Years    : {0}" -f $(if ($ArchiveThroughYear -gt 0) { "Through $ArchiveThroughYear inclusive" } else { "By existing rolling-month cutoff" }))
 Write-Host ("OlderThan: {0}" -f $(if($OlderThanMonths -gt 0){"$OlderThanMonths months"}else{'Disabled'}))
 Write-Host ("Storage  : {0}" -f $(if($DisableStoragePolicy){'Disabled'}else{"Source High=$SourcePstHighWatermarkGB GB / Target=$SourcePstTargetSizeGB GB"}))
 $archiveSafeLimitGB = $MaxArchivePstSizeGB - $SafetyMarginGB
@@ -312,6 +318,9 @@ function Get-OPASourceByPst {
 
 function Get-OPAArchiveCutoff {
     param([Parameter(Mandatory=$true)][int]$OlderThanMonths)
+    if ($ArchiveThroughYear -gt 0) {
+        return (New-Object datetime ($ArchiveThroughYear + 1),1,1)
+    }
     if ($OlderThanMonths -le 0) { return $null }
     return (Get-Date).AddMonths(-$OlderThanMonths)
 }
