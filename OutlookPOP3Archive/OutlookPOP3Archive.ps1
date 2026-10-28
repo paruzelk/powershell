@@ -104,7 +104,9 @@ param(
     [string]$WorkerPilotCandidateReviewId = '',
     [string]$WorkerPilotExpectedCandidateInternetMessageId = '',
     [string]$WorkerPilotExpectedCandidateSearchKeySha256 = '',
-    [string]$WorkerPilotExpectedCandidateContentFingerprintSha256 = ''
+    [string]$WorkerPilotExpectedCandidateContentFingerprintSha256 = '',
+    # BW4e2: explicit large-folder exact InternetMessageId DASL Restrict read-only path.
+    [switch]$WorkerPilotUseTargetedMessageIdReadOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -171,12 +173,17 @@ $pilotOptionsSpecified = ($PSBoundParameters.ContainsKey('WorkerPilotMaxOperatio
     $PSBoundParameters.ContainsKey('WorkerPilotCandidateReviewId') -or
     $PSBoundParameters.ContainsKey('WorkerPilotExpectedCandidateInternetMessageId') -or
     $PSBoundParameters.ContainsKey('WorkerPilotExpectedCandidateSearchKeySha256') -or
-    $PSBoundParameters.ContainsKey('WorkerPilotExpectedCandidateContentFingerprintSha256'))
+    $PSBoundParameters.ContainsKey('WorkerPilotExpectedCandidateContentFingerprintSha256') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotUseTargetedMessageIdReadOnly'))
 $pilotGate = Assert-OPA265WorkerPilotGate -Mode $Mode -PilotRequested ([bool]$WorkerPilot) -ExplicitConsent ([bool]$ConfirmDevWorkerPilot) -WhatIfEnabled ([bool]$WhatIf) -Limit $Limit -ProfileName $ProfileName -Transaction $Transaction -MaxOperations $WorkerPilotMaxOperations -TimeoutSeconds $WorkerPilotTimeoutSeconds -OtherPilotOptionsSpecified $pilotOptionsSpecified
 if ($WorkerPilot) {
     . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerHost.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerControl.ps1"
+    if ($WorkerPilotUseTargetedMessageIdReadOnly -and
+        -not ($WorkerPilotReviewOutlookPerItem -or $WorkerPilotReviewHistoryReplay -or $WorkerPilotReviewFreshSynthetic)) {
+        throw 'BW4e2 targeted MAPI read-only mode requires an explicit BW4c/BW4d/BW4e review route.'
+    }
     if (-not ($WorkerPilotReviewOutlookPerItem -or $WorkerPilotReviewHistoryReplay -or $WorkerPilotReviewFreshSynthetic) -and (
         $PSBoundParameters.ContainsKey('WorkerPilotCandidateFolderEntryId') -or
         $PSBoundParameters.ContainsKey('WorkerPilotCandidateEntryId') -or
@@ -222,11 +229,11 @@ if ($WorkerPilot) {
                 [string]::IsNullOrWhiteSpace($WorkerPilotExpectedCandidateContentFingerprintSha256)) {
                 throw 'BW4e requires a new review GUID, exact InternetMessageId and both prior MAPI SHA256 pins.'
             }
-            $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4eFreshSyntheticReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $WorkerPilotCandidateFolderEntryId -CandidateEntryId $WorkerPilotCandidateEntryId -ExpectedProfileName $ProfileName -MaxFolderItems $WorkerPilotMaxFolderItems -CandidateReviewId $WorkerPilotCandidateReviewId -ExpectedInternetMessageId $WorkerPilotExpectedCandidateInternetMessageId -ExpectedSearchKeySha256 $WorkerPilotExpectedCandidateSearchKeySha256 -ExpectedContentFingerprintSha256 $WorkerPilotExpectedCandidateContentFingerprintSha256 -Review -ConfirmExistingOutlookReadOnly
+            $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4eFreshSyntheticReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $WorkerPilotCandidateFolderEntryId -CandidateEntryId $WorkerPilotCandidateEntryId -ExpectedProfileName $ProfileName -MaxFolderItems $WorkerPilotMaxFolderItems -UseTargetedMessageIdReadOnly:$WorkerPilotUseTargetedMessageIdReadOnly -CandidateReviewId $WorkerPilotCandidateReviewId -ExpectedInternetMessageId $WorkerPilotExpectedCandidateInternetMessageId -ExpectedSearchKeySha256 $WorkerPilotExpectedCandidateSearchKeySha256 -ExpectedContentFingerprintSha256 $WorkerPilotExpectedCandidateContentFingerprintSha256 -Review -ConfirmExistingOutlookReadOnly
         } elseif ($WorkerPilotReviewHistoryReplay) {
-            $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4dHistoryReplayReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $WorkerPilotCandidateFolderEntryId -CandidateEntryId $WorkerPilotCandidateEntryId -ExpectedProfileName $ProfileName -MaxFolderItems $WorkerPilotMaxFolderItems -Review -ConfirmExistingOutlookReadOnly
+            $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4dHistoryReplayReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $WorkerPilotCandidateFolderEntryId -CandidateEntryId $WorkerPilotCandidateEntryId -ExpectedProfileName $ProfileName -MaxFolderItems $WorkerPilotMaxFolderItems -UseTargetedMessageIdReadOnly:$WorkerPilotUseTargetedMessageIdReadOnly -Review -ConfirmExistingOutlookReadOnly
         } else {
-            $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4cOutlookPerItemReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $WorkerPilotCandidateFolderEntryId -CandidateEntryId $WorkerPilotCandidateEntryId -ExpectedProfileName $ProfileName -MaxFolderItems $WorkerPilotMaxFolderItems -Review -ConfirmExistingOutlookReadOnly
+            $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4cOutlookPerItemReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $WorkerPilotCandidateFolderEntryId -CandidateEntryId $WorkerPilotCandidateEntryId -ExpectedProfileName $ProfileName -MaxFolderItems $WorkerPilotMaxFolderItems -UseTargetedMessageIdReadOnly:$WorkerPilotUseTargetedMessageIdReadOnly -Review -ConfirmExistingOutlookReadOnly
         }
     } elseif ($WorkerPilotReviewPerItemFence) {
         if ($WorkerPilotProbeSynthetic -or $WorkerPilotConfirmSourceSizeDifference -or
