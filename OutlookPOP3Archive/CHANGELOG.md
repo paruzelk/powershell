@@ -1,3 +1,10 @@
+## 2.6.5-BW4d1 — strict Outlook folder identity diagnostics (DEV, 2026-10-28)
+
+- Fix a false-negative possibility in BW4c/BW4d: hexadecimal Outlook EntryID and StoreID may differ in letter case while referring to the same binary identity.
+- Require equal-length even-character hexadecimal strings for case-insensitive matching; arbitrary or absent identities fail closed.
+- Distinguish folder lookup COM error, null result, folder EntryID mismatch, and StoreID mismatch without fallback to other PSTs.
+- Add six PowerShell 5.1 regression tests; no Worker dispatch, historical Intent mutation, journaling, claims, retry or Move.
+
 ## 2.6.5-BW4d — independent read-only historical replay audit (DEV, 2026-10-28)
 
 - Compares exact BW4c Outlook MailItem observation with bounded LIVE3/LIVE4 on-disk journal events and persistent claims.
