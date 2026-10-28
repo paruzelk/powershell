@@ -41,14 +41,15 @@
     "BW3j: one historical BW3a original Intent and seven-hash design-only journal resolution preflight; never invokes legacy LIVE6 or creates a claim, no writer, no Reconciled permission",
     "BW3k: isolated OS-TEMP synthetic journal test-only one-shot claim/locked SHA256 append/Flush and crash-gap STOP; no historical Reconciled or PST",
     "BW3l: BW3j real-Outlook review then exact original one-Intent byte copy in fresh TEMP and copy-only Reconciled one-shot claim/locked append; original READ ONLY, no historical writer",
-    "BW3m: independent real-Outlook BW3l copy-only readback of exact original Intent, TEMP claim and Reconciled, original seven hashes unchanged; no historical writer or permit"
+    "BW3m: independent real-Outlook BW3l copy-only readback of exact original Intent, TEMP claim and Reconciled, original seven hashes unchanged; no historical writer or permit",
+    "BW4a: Option B historic single Intent fenced permanently with read-only Archive/Resume WorkerPilot gate before COM; no journal/claim/PST writes, no historic retry or Worker Move"
   ],
   "Verification": {
-    "Status": "BW3m DEV independent TEMP byte-copy readback security audit, original journal READ ONLY, Windows PS5.1 CI target 1491/62",
+    "Status": "BW4a DEV Option B historical one-Intent read-only Worker Archive/Resume quarantine; Windows PS5.1 CI target 1572/63; no Worker Move",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 62,
-    "ExpectedPesterTests": 1491,
+    "ExpectedTestContainers": 63,
+    "ExpectedPesterTests": 1572,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -92,6 +93,10 @@
     "BW3lHistoricalWritePermission": false,
     "BW3mIndependentWriterSecurityReview": true,
     "BW3mHistoricalJournalWriterImplemented": false,
-    "BW3mHistoricalWritePermission": false
+    "BW3mHistoricalWritePermission": false,
+    "BW4aOptionBHistoricalIntentQuarantine": true,
+    "BW4aHistoricalRetryBlocked": true,
+    "BW4aReadOnlyWorkerPilotRoute": true,
+    "BW4aWorkerDispatchAllowed": false
   }
 }
