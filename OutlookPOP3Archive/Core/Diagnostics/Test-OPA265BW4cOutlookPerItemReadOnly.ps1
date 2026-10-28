@@ -11,6 +11,7 @@ param(
     [Parameter(Mandatory=$true)][string]$CandidateEntryId,
     [Parameter(Mandatory=$true)][string]$ExpectedProfileName,
     [ValidateRange(1,5000)][int]$MaxFolderItems=1000,
+    [switch]$UseTargetedMessageIdReadOnly,
     [switch]$Review,
     [switch]$ConfirmExistingOutlookReadOnly
 )
@@ -61,7 +62,7 @@ try {
     $ns=$app.GetNamespace('MAPI')
     if ([string]$ns.CurrentProfileName -cne $ExpectedProfileName) { throw 'BW4c: active Outlook profile is not the explicitly selected profile.' }
     $stage='Read exact candidate using two Outlook COM lookup paths'
-    $readback=Get-OPA265BW4cDualReadback -Namespace $ns -SourcePst $SourcePst -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -MaxFolderItems $MaxFolderItems
+    $readback=Get-OPA265BW4cDualReadback -Namespace $ns -SourcePst $SourcePst -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -MaxFolderItems $MaxFolderItems -UseTargetedMessageIdReadOnly:$UseTargetedMessageIdReadOnly
     $stage='Apply BW4b permanent historical item fence'
     $decision=Get-OPA265BW4bPerItemDecision -Fence $fence -Mode $Mode -TransactionId $Transaction -SourcePst $SourcePst -Primary $readback.Primary -Independent $readback.Independent
     $stage='Post-COM immutable historical evidence and journal recheck'
@@ -84,6 +85,8 @@ try {
         SearchKeySha256=$readback.Primary.SearchKeySha256
         ContentFieldFingerprintSha256=$readback.Primary.ContentSha256
         FolderItemsScanned=$readback.FolderItemsScanned
+        FolderItemsObserved=$readback.FolderItemsObserved
+        TargetedMessageIdReadOnlyUsed=[bool]$readback.TargetedMessageIdReadOnlyUsed
         SameOutlookSession=$true
         TwoSeparateOutlookReadPaths=$true
         IndependentlyAuthenticatedExternalEvidence=$false
