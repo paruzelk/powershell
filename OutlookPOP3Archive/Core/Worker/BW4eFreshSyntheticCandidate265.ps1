@@ -24,7 +24,7 @@ function Assert-OPA265BW4eCandidatePins {
         $ExpectedCandidateEntryId.Length -gt 8192 -or
         [string]::IsNullOrWhiteSpace($ExpectedInternetMessageId) -or
         $ExpectedInternetMessageId.Length -gt 4096 -or
-        $ExpectedInternetMessageId -cnotmatch '^<[^<>[:cntrl:]]+@[^<>[:cntrl:]]+>$' -or
+        $ExpectedInternetMessageId -cnotmatch '^<[^<>\s]+@[^<>\s]+>$' -or
         [string]$ExpectedSearchKeySha256 -cnotmatch '^[0-9a-fA-F]{64}$' -or
         [string]$ExpectedContentFingerprintSha256 -cnotmatch '^[0-9a-fA-F]{64}$') {
         throw 'BW4e requires exact read-only MAPI EntryID, InternetMessageId and two valid SHA256 pins.'
