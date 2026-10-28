@@ -1,3 +1,10 @@
+## BW4a — Option B historic one-Intent quarantine, Worker Archive/Resume read-only boundary (2026-10-28; CI pending)
+
+- BW3m local 1491/62 and actual Outlook read-only -Review PASS. User selected Option B: preserve historical BW3a one Intent, no historical journal append or claims, never auto-retry previous Move.
+- New pure historical fence and collision classifier, exact immutable evidence and 7 SHA256 before/after, historic RunId/OperationId/WorkerRequestId/journal hash/EntryIDs/Message-ID, same-source/archive PST requiring per-item BW4b fence. Every candidate remains WorkerDispatchAllowed=False/ProductionReady=False.
+- Opt-in new -WorkerPilotReviewHistoricalFence for Archive/Resume through existing -WorkerPilot/WhatIf/TEST profile/Limit 1 gate; exits before Outlook COM, Worker process, MailMover, transaction or journal changes. Standalone -Review diagnostic available. Original FIX13b when pilot disabled, BW2 probe unchanged.
+- +81 fail-closed Pester regressions, target 1572 tests / 63 containers native Windows PS5.1, 4 new PowerShell files BOM. No Worker Move permitted, no production integration.
+
 ## BW3m — historical writer final security review, original journal READ ONLY (2026-10-28; CI pending)
 
 - BW3l local 1429/61 PASS and actual Outlook independent review/copy-only Reconciled PASS. BW3m independently inspects copy-only claim, exact original byte prefix, second journal event, destination/identity, final SHA256 and recovered Reconciled replay. Read-only original seven hashes, still one unresolved historical Intent and no original claim, verified before/after.
