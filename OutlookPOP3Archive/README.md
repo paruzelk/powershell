@@ -155,3 +155,7 @@ The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Recor
 ### BW3m — independent historical journal writer security review (ORIGINAL READ ONLY)
 
 [Runbook](docs/2.6.5-bw3m-historical-writer-security-review.md). BW3m re-runs BW3l/BW3j on exact historical Outlook evidence, then independently reads the NEW TEMP COPY claim, original one-Intent byte prefix, terminal Reconciled and recovery replay. All seven ORIGINAL hashes and one original Intent revalidated before/after. No original journal writer, claim creation, PST write, Move, retry or production. +62 fail-closed PS5.1 tests; expected 1491/62; UTF-8 BOM. -Review writes a NEW isolated TEMP COPY through BW3l only.
+
+### BW4a — Option B historic Intent isolation for future Worker Archive/Resume (DEV)
+
+[Runbook](docs/2.6.5-bw4a-option-b-historical-worker-fence.md). After BW3m local 1491/62 and actual Outlook PASS, Option B preserves the original single historical BW3a Intent. Adds a strictly opt-in -WorkerPilotReviewHistoricalFence (Archive/Resume only) **before COM, Worker dispatch or MailMover** and standalone no-Outlook -Review. Verifies seven historical immutable SHA256s, exact one Intent, absence of resolution claims; blocks historic RunId/OperationId/EntryID/journal identity and shared PST pending BW4b per-item fencing. Unrelated new candidates are NOT authorized by BW4a. No new journal, claim, PST write or production activation. Native PS5.1 CI target 1572/63, 81 new tests; TZ-ENC-001 enforced.
