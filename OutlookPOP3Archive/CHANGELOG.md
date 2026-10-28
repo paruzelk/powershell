@@ -1,3 +1,10 @@
+## BW3m — historical writer final security review, original journal READ ONLY (2026-10-28; CI pending)
+
+- BW3l local 1429/61 PASS and actual Outlook independent review/copy-only Reconciled PASS. BW3m independently inspects copy-only claim, exact original byte prefix, second journal event, destination/identity, final SHA256 and recovered Reconciled replay. Read-only original seven hashes, still one unresolved historical Intent and no original claim, verified before/after.
+- Strict 26-field BW3l verdict and rejection of synthetic offline fixtures as actual historical evidence; test-only offline reader proves checks of tampered claim, journal, marker, authorization flags, duplicated records, forged Replay and original evidence drift.
+- No historical writer, write switch, original claim, PST write, Outlook Move or automatic retry. Future exact RunId explicit separate human permission and dedicated original-writer review remain mandatory.
+- +62 native PS5.1 Pester tests, CI target 1491/62; 3 new PowerShell sources UTF-8 BOM.
+
 ## BW3l — exact historical BW3a Intent TEMP copy rehearsal, original READ ONLY (2026-10-28; CI pending)
 
 - Build a strictly no-execution historical writer rehearsal from verified BW3j real Outlook review, existing BW3h seven-hash proofs and pinned original Intent SHA256. Original historical journal opened ONLY for reading; an exact byte-for-byte duplicate is stored in fresh OS TEMP OPA-BW3l-Copy-{GUID}.
