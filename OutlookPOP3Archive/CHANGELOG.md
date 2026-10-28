@@ -1,3 +1,11 @@
+## BW3k — isolated synthetic journal one-shot reconciliation and crash injection (2026-10-28; CI pending)
+
+- BW3j actual local Outlook -Review PASS, historical synthetic Move/7 hashes verified and no original journal writes or claims.
+- BW3k implements a NEW strictly OS-TEMP sandbox journal writer, generated random identifiers, fake ArchivePst (no PST), signed Intent JSONL, durable CreateNew resolution claim with Flush(true), exclusive journal FileStream lock, original SHA256 recheck under lock, single Reconciled event Sequence 2, Flush(true) and recovery replay verification.
+- Fault injection AfterClaim, PartialAppend, AfterAppend. A prior or partial claim always blocks retry, never deleted. Tests cover tampered identities/original bytes, terminal/duplicate events, concurrent lock, outside-TEMP paths and no production linkage.
+- +54 native Windows PS5.1 regression tests, target 1355 tests in 60 containers; 3 new PowerShell files UTF-8 BOM. A self-contained -SelfTest generates fresh synthetic TEMP data, never accepts a user-provided journal or PST path.
+- NO historical Intent/PST/claims/approval file mutation; NO actual Outlook Move, NO historical Reconciled authorization, NO production activation. Claim/append crash gap remains a separate manual-review stop.
+
 ## BW3j — distinct BW3a-scoped one-Intent journal resolution DESIGN, strictly read-only (2026-10-28; Windows CI pending)
 
 - BW3i1 local 1250/58 PASS and historical BW3a vs controlled LIVE4 crash protocol incompatibility independently confirmed; legacy LIVE6 -Execute remains prohibited.
