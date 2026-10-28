@@ -53,6 +53,7 @@ try {
         CandidateEntryId=[string]$bw4c.CandidateEntryId
         InternetMessageId=[string]$bw4c.InternetMessageId
         SourceStoreId=[string]$bw4c.SourceStoreId
+        SearchKeySha256=[string]$bw4c.SearchKeySha256
         SourceItemFingerprintSha256=[string]$bw4c.ContentFieldFingerprintSha256
         HistoryRoot=$after.HistoryRoot
         RunDirectoriesScanned=$after.RunDirectoriesScanned
