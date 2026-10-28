@@ -42,14 +42,15 @@
     "BW3k: isolated OS-TEMP synthetic journal test-only one-shot claim/locked SHA256 append/Flush and crash-gap STOP; no historical Reconciled or PST",
     "BW3l: BW3j real-Outlook review then exact original one-Intent byte copy in fresh TEMP and copy-only Reconciled one-shot claim/locked append; original READ ONLY, no historical writer",
     "BW3m: independent real-Outlook BW3l copy-only readback of exact original Intent, TEMP claim and Reconciled, original seven hashes unchanged; no historical writer or permit",
-    "BW4a: Option B historic single Intent fenced permanently with read-only Archive/Resume WorkerPilot gate before COM; no journal/claim/PST writes, no historic retry or Worker Move"
+    "BW4a: Option B historic single Intent fenced permanently with read-only Archive/Resume WorkerPilot gate before COM; no journal/claim/PST writes, no historic retry or Worker Move",
+    "BW4c: existing Outlook dual-path read-only capture of a single explicitly selected POP3 MailItem; historical hashes before/after, no Worker, Move or claims"
   ],
   "Verification": {
-    "Status": "BW4b DEV per-item read-only witness consistency; Windows PS5.1 CI target 1592/64; Worker Move prohibited",
+    "Status": "BW4c DEV existing-Outlook dual-path read-only evidence; Windows PS5.1 CI target 1610/65; no Worker dispatch",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 64,
-    "ExpectedPesterTests": 1592,
+    "ExpectedTestContainers": 65,
+    "ExpectedPesterTests": 1610,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -100,6 +101,10 @@
     "BW4aWorkerDispatchAllowed": false,
     "BW4bPerItemReadOnlyFence": true,
     "BW4bTrustedOutlookReadback": false,
-    "BW4bWorkerDispatchAllowed": false
+    "BW4bWorkerDispatchAllowed": false,
+    "BW4cExistingOutlookLiveReadOnlyCapture": true,
+    "BW4cSameSessionDualPathOnly": true,
+    "BW4cIndependentExternalMAPIProof": false,
+    "BW4cWorkerDispatchAllowed": false
   }
 }
