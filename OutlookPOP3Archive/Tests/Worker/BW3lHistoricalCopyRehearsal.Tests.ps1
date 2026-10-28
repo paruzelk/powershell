@@ -362,3 +362,136 @@ Describe 'BW3l - historical-shaped journal COPY ONLY; never original' {
         }
     }
 }
+
+Describe 'BW3l exact 42-field BW3j authorization boundary' {
+    BeforeEach {
+        $script:fixed=Get-OPA265BW3hPinnedChain
+        $script:review=[pscustomobject][ordered]@{
+            Schema='2.6.5-BW3j.BW3ScopedJournalResolutionDesignReadOnly.1'
+            Status='BW3ScopedResolutionDesignEvidenceVerifiedAuthorizationNotIssued'
+            Decision='DesignOnlyNoJournalAppendWithoutSeparateExplicitAuthorization'
+            RunId=[string]$script:fixed.RunId
+            OperationId=[string]$script:fixed.OperationId
+            WorkerRequestId=[string]$script:fixed.WorkerRequestId
+            OriginalIntentSha256=[string]$script:fixed.JournalSha256
+            AcceptanceRecordSha256=[string]$script:fixed.AcceptanceFileSha256
+            DestinationEntryId=[string]$script:fixed.DestinationEntryId
+            VerifiedHistoricalMoveViaBW3h=$true
+            SevenHistoricalEvidenceHashesUnchanged=$true
+            SourceItemCount=0
+            ArchiveItemCount=1
+            OriginalJournalEventCount=1
+            OriginalJournalPhase='Intent'
+            ProposedJournalSequence=2
+            ProposedJournalPhase='Reconciled'
+            PinnedIntentSizeBytes=1436L
+            PinnedArchiveSizeBytes=1444L
+            ManuallyAcceptedSyntheticDifferenceBytes=8L
+            SingleSyntheticSizeAcceptanceVerified=$true
+            LegacyLive6ExecuteApplicable=$false
+            ExistingResolutionClaimFound=$false
+            FutureClaimPathReservedInDesignOnly=$true
+            FutureClaimCreated=$false
+            FutureExclusiveJournalLockImplemented=$false
+            FutureJournalAppendWriterImplemented=$false
+            CrashGapAfterClaimBeforeAppendRequiresManualStop=$true
+            CrashGapAfterAppendBeforeVerifyRequiresManualStop=$true
+            ConcurrentAppendRequiresExclusiveLockAndFreshSHA256=$true
+            OriginalJournalRetentionRequired=$true
+            FullMAPIContentByteEqualityVerified=$false
+            SizeDriftCauseEstablished=$false
+            JournalReconciliationAuthorized=$false
+            JournalWritePermitIssued=$false
+            JournalChanged=$false
+            JournalCompleted=$false
+            JournalReconciled=$false
+            OutlookMoveExecuted=$false
+            AutomaticRetryAllowed=$false
+            ProductionReady=$false
+            NextAction='IndependentReviewOfSeparateBW3ScopedWriterDesignAndFreshOneRunUserAuthorization'
+        }
+    }
+    It 'accepts one complete strictly nonauthorizing BW3j proof' {
+        (Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed) | Should -BeTrue
+    }
+    It 'rejects BW3j forged journal approval' {
+        $script:review.JournalReconciliationAuthorized=$true
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j forged journal permit' {
+        $script:review.JournalWritePermitIssued=$true
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j reported historical Reconciled' {
+        $script:review.JournalReconciled=$true
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j changed source RunId' {
+        $script:review.RunId='other'
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j changed OperationId' {
+        $script:review.OperationId='other'
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j changed WorkerRequestId' {
+        $script:review.WorkerRequestId='other'
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j changed original SHA256' {
+        $script:review.OriginalIntentSha256='f'*64
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j changed acceptance SHA256' {
+        $script:review.AcceptanceRecordSha256='f'*64
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j changed archive EntryID' {
+        $script:review.DestinationEntryId='OTHER'
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j wrong source count' {
+        $script:review.SourceItemCount=1
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j wrong archive count' {
+        $script:review.ArchiveItemCount=0
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j unapproved size discrepancy' {
+        $script:review.ManuallyAcceptedSyntheticDifferenceBytes=9
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j falsely claimed byte equality' {
+        $script:review.FullMAPIContentByteEqualityVerified=$true
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j unsafe automatic retry' {
+        $script:review.AutomaticRetryAllowed=$true
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j activated production' {
+        $script:review.ProductionReady=$true
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j fabricated writer availability' {
+        $script:review.FutureJournalAppendWriterImplemented=$true
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j incorrect next action' {
+        $script:review.NextAction='AppendNow'
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j missing last field' {
+        $script:review.PSObject.Properties.Remove('NextAction')
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j untrusted extra field' {
+        $script:review | Add-Member -NotePropertyName WritePermit -NotePropertyValue $true
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+    It 'rejects BW3j string Boolean forging' {
+        $script:review.SevenHistoricalEvidenceHashesUnchanged='True'
+        { Assert-OPA265BW3lBw3jReview -Review $script:review -Pinned $script:fixed } | Should -Throw
+    }
+}
