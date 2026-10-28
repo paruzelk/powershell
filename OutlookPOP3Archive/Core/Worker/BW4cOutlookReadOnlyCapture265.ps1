@@ -204,6 +204,12 @@ function Get-OPA265BW4cDualReadback {
         $scanned=$n
     }
     $b=Get-OPA265BW4cItemWitness -Mail $matched -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method IndependentReadOnly
+    if ($UseTargetedMessageIdReadOnly -and (
+        [string]$b.InternetMessageId -cne [string]$a.InternetMessageId -or
+        [string]$b.SearchKeySha256 -cne [string]$a.SearchKeySha256 -or
+        [string]$b.ContentSha256 -cne [string]$a.ContentSha256)) {
+        throw 'BW4e2: direct and restricted readbacks disagree; no synthetic Move permit.'
+    }
     return [pscustomobject]@{
         Primary=$a
         Independent=$b
