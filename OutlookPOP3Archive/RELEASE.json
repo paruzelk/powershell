@@ -40,14 +40,15 @@
     "BW3i1: historical BW3a one-shot claims cannot fulfill controlled LIVE4 crash evidence LIVE6 requires; read-only legacy inapplicability verdict, executor BLOCKED, no Reconciled",
     "BW3j: one historical BW3a original Intent and seven-hash design-only journal resolution preflight; never invokes legacy LIVE6 or creates a claim, no writer, no Reconciled permission",
     "BW3k: isolated OS-TEMP synthetic journal test-only one-shot claim/locked SHA256 append/Flush and crash-gap STOP; no historical Reconciled or PST",
-    "BW3l: BW3j real-Outlook review then exact original one-Intent byte copy in fresh TEMP and copy-only Reconciled one-shot claim/locked append; original READ ONLY, no historical writer"
+    "BW3l: BW3j real-Outlook review then exact original one-Intent byte copy in fresh TEMP and copy-only Reconciled one-shot claim/locked append; original READ ONLY, no historical writer",
+    "BW3m: independent real-Outlook BW3l copy-only readback of exact original Intent, TEMP claim and Reconciled, original seven hashes unchanged; no historical writer or permit"
   ],
   "Verification": {
-    "Status": "BW3l DEV BW3j-verified historical Intent exact byte-copy rehearsal only in OS TEMP; Windows PS5.1 CI 1429/61 pending, original journal/PST untouched",
+    "Status": "BW3m DEV independent TEMP byte-copy readback security audit, original journal READ ONLY, Windows PS5.1 CI target 1491/62",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 61,
-    "ExpectedPesterTests": 1429,
+    "ExpectedTestContainers": 62,
+    "ExpectedPesterTests": 1491,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -88,6 +89,9 @@
     "BW3kHistoricalJournalWriteAuthorized": false,
     "BW3lHistoricalByteCopyRehearsal": true,
     "BW3lHistoricalOriginalWriterImplemented": false,
-    "BW3lHistoricalWritePermission": false
+    "BW3lHistoricalWritePermission": false,
+    "BW3mIndependentWriterSecurityReview": true,
+    "BW3mHistoricalJournalWriterImplemented": false,
+    "BW3mHistoricalWritePermission": false
   }
 }
