@@ -1,3 +1,11 @@
+## 2.6.5-BW4e — new disposable synthetic candidate read-only pre-Move evidence (DEV, 2026-10-28)
+
+- Revalidates a separately selected disposable candidate using BW4d Outlook/MAPI and independent file-journal snapshots; rejects known LIVE3/LIVE4 historical test items.
+- Requires operator-pin consistency on exact MailItem EntryID, InternetMessageId and two SHA-256 readbacks from a previous BW4c observation.
+- Unmatched candidate only receives FreshCandidatePinsConsistentButNoProofOfNewnessOrMovePermit, never Worker authorization.
+- Explicitly preserves incomplete journal history, original BW3a single Intent, all seven historic hashes, and no journal write, claim, retry or MailItem.Move.
+- 29 new native Windows PS5.1 Pester regressions; UTF-8 BOM and full GitHub CI mandatory.
+
 ## 2.6.5-BW4d1 — strict Outlook folder identity diagnostics (DEV, 2026-10-28)
 
 - Fix a false-negative possibility in BW4c/BW4d: hexadecimal Outlook EntryID and StoreID may differ in letter case while referring to the same binary identity.
