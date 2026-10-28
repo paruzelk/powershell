@@ -1,3 +1,10 @@
+## 2.6.5-BW4e1 — read-only Review SwitchParameter collision hotfix (DEV, 2026-10-28)
+
+- Correct the PowerShell case-insensitive collision between -Review ([switch]) and the BW4d PSCustomObject stored as $review in the BW4e diagnostic.
+- Preserve the explicit -Review consent and rename the result variable to $bw4dSnapshot; output and safety flags remain read-only/no-Move.
+- Add five real-wrapper tests with a synthetic BW4d mock, explicit denial of missing consent and AST no-shadow check.
+- Previously used LIVE3 synthetic MailItems remain blocked, regardless of matching MAPI pins and prior test results; no production Worker activation.
+
 ## 2.6.5-BW4e — new disposable synthetic candidate read-only pre-Move evidence (DEV, 2026-10-28)
 
 - Revalidates a separately selected disposable candidate using BW4d Outlook/MAPI and independent file-journal snapshots; rejects known LIVE3/LIVE4 historical test items.
