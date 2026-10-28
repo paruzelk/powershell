@@ -362,10 +362,10 @@ Describe 'BW4a: option-B single unresolved historical Intent permanent Worker is
         $t=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../OutlookPOP3Archive.ps1') -Raw
         $t | Should -Match '\[switch\]\$WorkerPilotReviewHistoricalFence'
         $t | Should -Match 'if \(\$WorkerPilotReviewHistoricalFence\)'
-        $t | Should -Match 'Invoke-OPA265BW4aHistoricalFenceReview'
+        $t | Should -Match 'Test-OPA265BW4aHistoricalIntentIsolationReadOnly.ps1'
         $t | Should -Match 'Assert-OPA265WorkerPilotGate'
-        $t.IndexOf('Invoke-OPA265BW4aHistoricalFenceReview') | Should -BeLessThan $t.IndexOf('$session = New-OPAComSession')
-        $t.IndexOf('Invoke-OPA265BW4aHistoricalFenceReview') | Should -BeLessThan $t.IndexOf('Move-OPAItemsWithLimit')
+        $t.IndexOf('Test-OPA265BW4aHistoricalIntentIsolationReadOnly.ps1') | Should -BeLessThan $t.IndexOf('$session = New-OPAComSession')
+        $t.IndexOf('Test-OPA265BW4aHistoricalIntentIsolationReadOnly.ps1') | Should -BeLessThan $t.IndexOf('Move-OPAItemsWithLimit')
         $t | Should -Match 'WorkerPilotExpectedHistoricalJournalSha256'
     }
     It 'rejects pilot-only historic flag when WorkerPilot is off (structural gate)' {
