@@ -128,7 +128,8 @@ function Get-OPA265BW4cDualReadback {
         [Parameter(Mandatory=$true)][string]$SourcePst,
         [Parameter(Mandatory=$true)][string]$FolderEntryId,
         [Parameter(Mandatory=$true)][string]$CandidateEntryId,
-        [ValidateRange(1,5000)][int]$MaxFolderItems=1000
+        [ValidateRange(1,5000)][int]$MaxFolderItems=1000,
+        [switch]$UseTargetedMessageIdReadOnly
     )
     if ([string]::IsNullOrWhiteSpace($FolderEntryId) -or
         [string]::IsNullOrWhiteSpace($CandidateEntryId) -or
@@ -154,20 +155,54 @@ function Get-OPA265BW4cDualReadback {
     $direct=$Namespace.GetItemFromID($CandidateEntryId,$scope.StoreId)
     if ($null -eq $direct) { throw 'BW4c: GetItemFromID returned no candidate.' }
     $a=Get-OPA265BW4cItemWitness -Mail $direct -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method PrimaryReadOnly
-    # Route 2: re-enumerate exact folder (not the object returned by GetItemFromID).
+    # Route 2: either bounded full enumeration (original BW4c) or EXPLICIT
+    # BW4e2 targeted server/MAPI restriction. Never scan a large folder client-side.
     $items=$folder.Items
     $n=[int]$items.Count
-    if ($n -lt 1 -or $n -gt $MaxFolderItems) { throw 'BW4c: folder cardinality outside explicit scan cap; no partial proof.' }
     $matched=$null
     $hits=0
-    for($i=1;$i -le $n;$i++) {
-        $item=$items.Item($i)
-        if (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$item.EntryID) -Expected $CandidateEntryId) {
-            $hits++
-            $matched=$item
+    $scanned=0
+    if ($UseTargetedMessageIdReadOnly) {
+        if ($n -lt 1 -or $n -gt 100000) {
+            throw 'BW4e2: folder count outside targeted-read-only guard (1..100000).'
         }
+        $messageId=[string]$a.InternetMessageId
+        # Strictly bounded simple InternetMessageId; reject SQL quoting/injection,
+        # whitespace, controls and ambiguous characters rather than escaping.
+        if ($messageId.Length -gt 512 -or
+            $messageId -cnotmatch '^<[A-Za-z0-9.!#$%&*+/=?^_{}|~-]+@[A-Za-z0-9.-]+>$') {
+            throw 'BW4e2: direct MAPI InternetMessageId is not safe for exact DASL filtering.'
+        }
+        $filter='@SQL="http://schemas.microsoft.com/mapi/proptag/0x1035001F" = ' + "'" + $messageId + "'"
+        $restricted=$null
+        try { $restricted=$items.Restrict($filter) }
+        catch { throw ('BW4e2: exact MAPI InternetMessageId restriction failed closed: '+[string]$_.Exception.Message) }
+        if ($null -eq $restricted) { throw 'BW4e2: MAPI Restrict returned null; no fallback.' }
+        $hits=[int]$restricted.Count
+        if ($hits -ne 1) { throw 'BW4e2: exact InternetMessageId restriction must return ONE item (zero/duplicates denied).' }
+        $matched=$restricted.Item(1)
+        if ($null -eq $matched) { throw 'BW4e2: filtered item is null.' }
+        if (-not (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$matched.EntryID) -Expected $CandidateEntryId)) {
+            throw 'BW4e2: restriction returned a different EntryID; no fallback.'
+        }
+        # No full enumeration of the original 26485-item folder took place.
+        $scanned=0
+    } else {
+        if ($n -lt 1 -or $n -gt $MaxFolderItems) {
+            throw 'BW4c: folder cardinality outside explicit scan cap; no partial proof.'
+        }
+        for($i=1;$i -le $n;$i++) {
+            $item=$items.Item($i)
+            if (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$item.EntryID) -Expected $CandidateEntryId) {
+                $hits++
+                $matched=$item
+            }
+        }
+        if ($hits -ne 1 -or $null -eq $matched) {
+            throw 'BW4c: folder scan must find exactly one candidate.'
+        }
+        $scanned=$n
     }
-    if ($hits -ne 1 -or $null -eq $matched) { throw 'BW4c: folder scan must find exactly one candidate.' }
     $b=Get-OPA265BW4cItemWitness -Mail $matched -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method IndependentReadOnly
     return [pscustomobject]@{
         Primary=$a
@@ -175,7 +210,9 @@ function Get-OPA265BW4cDualReadback {
         TwoSeparateOutlookReadPaths=$true
         SameOutlookSession=$true
         IndependentExternalMAPIProof=$false
-        FolderItemsScanned=$n
+        FolderItemsScanned=$scanned
+        FolderItemsObserved=$n
+        TargetedMessageIdReadOnlyUsed=[bool]$UseTargetedMessageIdReadOnly
         CandidateMatches=1
         MailMoveExecuted=$false
     }
