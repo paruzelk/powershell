@@ -7,6 +7,7 @@ BeforeAll {
     . (Join-Path $root 'Core/Runtime/ComManager.ps1')
     . (Join-Path $root 'Core/Archive/ArchiveGrouping.ps1')
     . (Join-Path $root 'Core/Archive/ArchiveTransaction.ps1')
+    . (Join-Path $root 'Core/Archive/MailMover.ps1')
     $tokens=$null;$errors=$null
     $ast=[Management.Automation.Language.Parser]::ParseFile($main,[ref]$tokens,[ref]$errors)
     if (@($errors).Count -gt 0) { throw 'Stable monolithic script must parse.' }
@@ -64,7 +65,7 @@ Describe 'FIX13b stable yearly operator cutoff and rollover protection' {
     It 'operator launcher uses explicit Year and Safe durability, never production DEV Worker or physical-limit bypass' {
         $launch=Get-Content -LiteralPath (Join-Path $root 'StableYearly/Start-StableYearlyArchive.ps1') -Raw
         $launch | Should -Match "ArchiveGrouping='Year'"
-        $launch | Should -Match "ArchiveThroughYear=\`$ArchiveThroughYear"
+        $launch | Should -Match 'ArchiveThroughYear=\$ArchiveThroughYear'
         $launch | Should -Match "DurabilityMode='Safe'"
         $launch | Should -Match "WarnLargeFileSize"
         $launch | Should -Not -Match '\.Move\('
