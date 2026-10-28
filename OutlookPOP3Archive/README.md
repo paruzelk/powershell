@@ -167,3 +167,7 @@ The opt-in `-WorkerPilotReviewOutlookPerItem` route reads ONE exact synthetic ca
 ## BW4d DEV: read-only prior LIVE3/LIVE4 replay fence
 
 Use the explicit `-WorkerPilotReviewHistoryReplay` opt-in route to compare the BW4c exact MailItem readback with the available bounded LOCAL TEMP LIVE3/LIVE4 operation journals. Prior synthetic IDs remain blocked even if the journal is missing. Zero matches is not Move permission; no production Worker or historical writer. See [BW4d guide](docs/2.6.5-bw4d-history-replay-readonly.md).
+
+## BW4d1 Outlook folder ID diagnostics (DEV hotfix)
+
+The same explicit -WorkerPilotReviewHistoryReplay route now compares hexadecimal Outlook EntryIDs and StoreIDs without hex-letter-case false negatives, and distinguishes folder identity failures precisely. It does not fall back to another store or allow a Move. See [BW4d1 guide](docs/2.6.5-bw4d1-folder-id-hotfix.md).
