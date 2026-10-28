@@ -30,6 +30,21 @@ jobs:
         run: |
           if ($PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5) { throw 'Not Windows PowerShell 5.1.' }
           .\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
+      - name: Native PS5.1 isolated synthetic sandbox one-shot and retry STOP smoke gate
+        run: |
+          $r=.\Core\Diagnostics\Test-OPA265BW3kSandboxJournalProtocol.ps1 -SelfTest
+          if ($r.Schema -cne '2.6.5-BW3k.IsolatedSyntheticSelfTest.1' -or
+              $r.Status -cne 'IsolatedSyntheticAppendAndReplayVerified' -or
+              $r.SingleIntentThenReconciled -isnot [bool] -or -not $r.SingleIntentThenReconciled -or
+              $r.RepeatedAppendBlocked -isnot [bool] -or -not $r.RepeatedAppendBlocked -or
+              [int]$r.JournalEventCount -ne 2 -or
+              [bool]$r.HistoricBw3aJournalTouched -or
+              [bool]$r.OutlookComAccessExecuted -or
+              [bool]$r.MailMoveExecuted -or
+              [bool]$r.ProductionReady) {
+              throw 'BW3k isolated smoke gate did not prove synthetic one-shot and historical isolation.'
+          }
+          Write-Host ('BW3k isolated sandbox smoke PASS: '+$r.SandboxDirectory)
       - name: Package BW3k DEV source only after successful CI (no production release promotion)
         run: |
           $project=(Get-Location).Path
