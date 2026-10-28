@@ -143,3 +143,7 @@ The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Recor
 ### BW3j — separate BW3a scoped journal resolution DESIGN (read-only DEV)
 
 [Runbook](docs/2.6.5-bw3j-bw3-scoped-journal-resolution-readonly-design.md). Verified BW3i1 proved legacy LIVE6 inapplicable. BW3j (no LIVE4/LIVE5/LIVE6 calls) rechecks one exact historical synthetic Intent, both currently absent resolution claim slots, all seven original evidence SHA256s and the full read-only BW3h Outlook chain. Outputs ONLY an in-memory design contract: hypothetical Reconciled sequence 2, **no writer, no journal-write permission**, no Move or production. Native Windows PowerShell 5.1 DEV CI target 1301 tests / 59 containers, mandatory UTF-8 BOM.
+
+### BW3k - isolated TEMP-only synthetic journal one-shot crash tests (DEV)
+
+[Runbook](docs/2.6.5-bw3k-sandbox-oneshot-journal-crash-test.md). BW3k creates NEW synthetic journal fixtures strictly under OS TEMP. A durable CreateNew claim fences retries; exclusive journal lock and pinned SHA256 precede append of synthetic Reconciled sequence 2; replay is verified. Crash injection after claim, partial append and after append preserves evidence and blocks retry. No historical BW3a RunId/PST/Intent path is accepted, no Outlook COM, no MailItem.Move, no real journal writer or historical authorization. Native PS5.1 CI target: 1355 tests / 60 containers. New PS sources UTF-8 BOM.
