@@ -87,7 +87,7 @@ function Assert-OPA265BW3mCopyReadback {
     if ([string]$claim.Schema -cne '2.6.5-BW3l.CopyOnlyResolutionClaim.1' -or
         [string]$claim.RunId -cne [string]$Pinned.RunId -or
         [string]$claim.OperationId -cne [string]$Pinned.OperationId -or
-        [string]$claim.CopyOriginalSha256 -cne [string]$Pinned.JournalSha256 -or
+        [string]$claim.CopyOriginalSha256 -cne $expectedCopySha -or
         [string]$claim.DestinationEntryId -cne [string]$Pinned.DestinationEntryId -or
         [string]$claim.Scope -cne 'OS-TEMP-COPY-ONLY-NOT-ORIGINAL') {
         throw 'BW3m TEMP claim scope/identity differs from historical BW3a.'
