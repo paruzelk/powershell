@@ -15,6 +15,7 @@ param(
     [Parameter(Mandatory=$true)][string]$ExpectedSearchKeySha256,
     [Parameter(Mandatory=$true)][string]$ExpectedContentFingerprintSha256,
     [ValidateRange(1,5000)][int]$MaxFolderItems=1000,
+    [switch]$UseTargetedMessageIdReadOnly,
     [string]$HistoryRoot=([IO.Path]::GetTempPath()),
     [ValidateRange(1,512)][int]$MaxHistoryRuns=256,
     [switch]$Review,
@@ -34,7 +35,7 @@ try {
     [void](Assert-OPA265BW4eCandidatePins -CandidateReviewId $CandidateReviewId -HistoricalRunId $RunId -ExpectedCandidateEntryId $CandidateEntryId -ExpectedInternetMessageId $ExpectedInternetMessageId -ExpectedSearchKeySha256 $ExpectedSearchKeySha256 -ExpectedContentFingerprintSha256 $ExpectedContentFingerprintSha256)
     # BW4d performs seven original pinned historical SHA checks pre/post Outlook,
     # and snapshots all visible Live3/Live4 journal files before/after the read.
-    $bw4dSnapshot=& (Join-Path $PSScriptRoot 'Test-OPA265BW4dHistoryReplayReadOnly.ps1') -RunId $RunId -SourcePst $SourcePst -ExpectedJournalSha256 $ExpectedJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -ExpectedProfileName $ExpectedProfileName -MaxFolderItems $MaxFolderItems -HistoryRoot $HistoryRoot -MaxHistoryRuns $MaxHistoryRuns -Review -ConfirmExistingOutlookReadOnly
+    $bw4dSnapshot=& (Join-Path $PSScriptRoot 'Test-OPA265BW4dHistoryReplayReadOnly.ps1') -RunId $RunId -SourcePst $SourcePst -ExpectedJournalSha256 $ExpectedJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -ExpectedProfileName $ExpectedProfileName -MaxFolderItems $MaxFolderItems -HistoryRoot $HistoryRoot -MaxHistoryRuns $MaxHistoryRuns -UseTargetedMessageIdReadOnly:$UseTargetedMessageIdReadOnly -Review -ConfirmExistingOutlookReadOnly
     $result=Get-OPA265BW4eFreshCandidateDecision -Bw4dReview $bw4dSnapshot -CandidateReviewId $CandidateReviewId -HistoricalRunId $RunId -ExpectedCandidateEntryId $CandidateEntryId -ExpectedInternetMessageId $ExpectedInternetMessageId -ExpectedSearchKeySha256 $ExpectedSearchKeySha256 -ExpectedContentFingerprintSha256 $ExpectedContentFingerprintSha256
     if ($result.CanInvokeMailMove -or $result.CanDispatchWorker -or
         $result.CanRetryPreviousMove -or $result.CanWriteHistoricalJournal) {
@@ -50,6 +51,8 @@ try {
         SyntheticLive3Identity=$result.SyntheticLive3Identity
         PriorReadOnlyPinsMatch=$result.PriorReadOnlyPinsMatch
         SourcePstPop3ItemObserved=$result.SourcePstPop3ItemObserved
+        TargetedMessageIdReadOnlyUsed=[bool]$bw4dSnapshot.TargetedMessageIdReadOnlyUsed
+        FolderItemsObserved=[int]$bw4dSnapshot.FolderItemsObserved
         CandidateNewnessIndependentlyProven=$false
         HistoryRunDirectoriesScanned=[int]$bw4dSnapshot.RunDirectoriesScanned
         HistoryJournalsScanned=[int]$bw4dSnapshot.JournalsScanned
