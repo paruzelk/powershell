@@ -43,11 +43,11 @@
     "BW3l: BW3j real-Outlook review then exact original one-Intent byte copy in fresh TEMP and copy-only Reconciled one-shot claim/locked append; original READ ONLY, no historical writer"
   ],
   "Verification": {
-    "Status": "BW3l DEV BW3j-verified historical Intent exact byte-copy rehearsal only in OS TEMP; Windows PS5.1 CI 1408/61 pending, original journal/PST untouched",
+    "Status": "BW3l DEV BW3j-verified historical Intent exact byte-copy rehearsal only in OS TEMP; Windows PS5.1 CI 1429/61 pending, original journal/PST untouched",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
     "ExpectedTestContainers": 61,
-    "ExpectedPesterTests": 1408,
+    "ExpectedPesterTests": 1429,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
