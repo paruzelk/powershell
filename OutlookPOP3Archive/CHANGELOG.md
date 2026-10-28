@@ -1,3 +1,11 @@
+## 2.6.5-BW4c — native Outlook dual-path per-item read-only review (DEV, 2026-10-28)
+
+- Requires already-running Outlook PowerShell 5.1 STA, exactly one mounted POP3 DeliveryStore PST and explicit folder/Item EntryIDs.
+- Reads the selected item using Namespace.GetItemFromID and exact bounded Folder.Items enumeration, then applies unchanged BW4b historical per-item quarantine.
+- Rechecks all seven historical hashes and original one-Intent before and after COM. No start/mount, file writes, Worker dispatch, Move, journal, claims or retry.
+- Warns that same-session dual paths are NOT independently authenticated external proof, not full MAPI byte equality, and cannot guarantee Outlook did not touch PST bytes.
+- 18 mock MAPI regression cases and mandatory GitHub Windows PS5.1 BOM/Analyzer/Pester gate.
+
 ## 2.6.5-BW4b (DEV): read-only per-item historical fencing
 
 - Two independent-labelled JSON item witnesses; historical EntryIDs and InternetMessageId block even across a shared PST.
