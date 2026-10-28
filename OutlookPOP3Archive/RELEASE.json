@@ -43,14 +43,15 @@
     "BW3l: BW3j real-Outlook review then exact original one-Intent byte copy in fresh TEMP and copy-only Reconciled one-shot claim/locked append; original READ ONLY, no historical writer",
     "BW3m: independent real-Outlook BW3l copy-only readback of exact original Intent, TEMP claim and Reconciled, original seven hashes unchanged; no historical writer or permit",
     "BW4a: Option B historic single Intent fenced permanently with read-only Archive/Resume WorkerPilot gate before COM; no journal/claim/PST writes, no historic retry or Worker Move",
-    "BW4c: existing Outlook dual-path read-only capture of a single explicitly selected POP3 MailItem; historical hashes before/after, no Worker, Move or claims"
+    "BW4c: existing Outlook dual-path read-only capture of a single explicitly selected POP3 MailItem; historical hashes before/after, no Worker, Move or claims",
+    "BW4d: separate bounded filesystem audit of prior LIVE3/LIVE4 operation journals plus BW4c Outlook readback; known synthetic IDs permanently block Move retry and no evidence catalog is treated as complete"
   ],
   "Verification": {
-    "Status": "BW4c DEV existing-Outlook dual-path read-only evidence; Windows PS5.1 CI target 1610/65; no Worker dispatch",
+    "Status": "BW4d DEV independent bounded LIVE3/LIVE4 journal replay audit; Windows PS5.1 CI target 1630/66; no Worker dispatch or Move",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 65,
-    "ExpectedPesterTests": 1610,
+    "ExpectedTestContainers": 66,
+    "ExpectedPesterTests": 1630,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -105,6 +106,11 @@
     "BW4cExistingOutlookLiveReadOnlyCapture": true,
     "BW4cSameSessionDualPathOnly": true,
     "BW4cIndependentExternalMAPIProof": false,
-    "BW4cWorkerDispatchAllowed": false
+    "BW4cWorkerDispatchAllowed": false,
+    "BW4dHistoricalReplayReadOnlyAudit": true,
+    "BW4dCompleteOperationCoverageProven": false,
+    "BW4dIndependentExternalMAPIProof": false,
+    "BW4dPriorMoveRetryAllowed": false,
+    "BW4dWorkerDispatchAllowed": false
   }
 }
