@@ -1,0 +1,76 @@
+name: OutlookPOP3Archive BW4e1 Windows PS5.1 CI and DEV ZIP
+on:
+  push:
+    branches:
+      - feature/outlookpop3archive-2.6.5-bw4e1-switch-review-hotfix
+    paths:
+      - 'OutlookPOP3Archive/**'
+      - '.github/workflows/outlookpop3archive-bw4e1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+        working-directory: OutlookPOP3Archive
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PS5.1 test requirements
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
+      - name: Full PowerShell 5.1 BOM Analyzer Pester gate
+        run: |
+          if($PSVersionTable.PSEdition -cne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5){throw 'Requires Windows PowerShell 5.1.'}
+          .\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
+      - name: Package BW4e1 project-only DEV ZIP after CI PASS
+        run: |
+          $project=(Get-Location).Path
+          $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
+          $tag='OutlookPOP3Archive-2.6.5-BW4e1-dev-g'+$short
+          $tmp=Join-Path $env:RUNNER_TEMP ('OPA-BW4e1-'+[guid]::NewGuid().ToString('N'))
+          $stage=Join-Path $tmp $tag
+          $out=Join-Path $env:RUNNER_TEMP 'OPA-BW4e1-Build'
+          [void][IO.Directory]::CreateDirectory($stage)
+          [void][IO.Directory]::CreateDirectory($out)
+          $top=@('.gitignore','.editorconfig','.psscriptanalyzer.psd1','CHANGELOG.md','README.md','MANIFEST.txt','RELEASE.json','OutlookPOP3Archive.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')
+          foreach($x in $top) {
+            $f=Join-Path $project $x
+            if(-not (Test-Path -LiteralPath $f -PathType Leaf)){throw ('Missing '+$x)}
+            Copy-Item -LiteralPath $f -Destination (Join-Path $stage $x)
+          }
+          foreach($dir in @('Core','Tests','docs')) {
+            $from=Join-Path $project $dir
+            foreach($f in @(Get-ChildItem -LiteralPath $from -Recurse -File -Force)){
+              $ext=if($dir -eq 'docs'){'.md'}else{'.ps1'}
+              if($f.Extension -cne $ext -or ($dir -eq 'Tests' -and $f.Name -notmatch '\.Tests\.ps1$') -or
+                (($f.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)){throw ('Unexpected source file '+$f.FullName)}
+              $rel=$f.FullName.Substring($project.Length).TrimStart([char[]]@('\','/'))
+              $dst=Join-Path $stage $rel
+              [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($dst))
+              Copy-Item -LiteralPath $f.FullName -Destination $dst
+            }
+          }
+          $meta=[ordered]@{Artifact=$tag+'.zip';BaseApplicationBuild='2.6.3-PREVIEW1';DevelopmentGate='2.6.5-BW4e1';SourceCommit=$env:GITHUB_SHA;PesterPassed=1670;TestContainers=68;NativeWindowsPowerShell51=$true;ProductionReady=$false}
+          $utf8=New-Object Text.UTF8Encoding($false)
+          [IO.File]::WriteAllText((Join-Path $stage 'BUILD-INFO.json'),(ConvertTo-Json -InputObject $meta -Depth 4),$utf8)
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip=Join-Path $out ($tag+'.zip')
+          [IO.Compression.ZipFile]::CreateFromDirectory($tmp,$zip,[IO.Compression.CompressionLevel]::Optimal,$false)
+          $hash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          [IO.File]::WriteAllText((Join-Path $out ($tag+'.sha256')),($hash+'  '+[IO.Path]::GetFileName($zip)+[char]10),$utf8)
+          Write-Host ('BW4e1 DEV ZIP: '+$zip+' SHA256: '+$hash)
+      - name: Publish CI validated artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutlookPOP3Archive-2.6.5-BW4e1-dev
+          path: |
+            ${{ runner.temp }}/OPA-BW4e1-Build/*.zip
+            ${{ runner.temp }}/OPA-BW4e1-Build/*.sha256
+          if-no-files-found: error
+          retention-days: 14
