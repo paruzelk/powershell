@@ -151,3 +151,7 @@ The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Recor
 ### BW3l — historical BW3a Intent byte-copy Reconciled rehearsal (DEV, ORIGINAL READ ONLY)
 
 [Runbook](docs/2.6.5-bw3l-historical-intent-copy-rehearsal.md). Reruns BW3j independent Outlook review and validates seven durable hashes and pinned one-Intent bytes; constructs a new exact byte-copy in a fresh OS TEMP OPA-BW3l-Copy-{GUID} folder, appends Reconciled only to that COPY using a permanent CreateNew claim, exclusive lock and SHA256 check. Original journal/PST/claims NEVER opened for write; no historical-run writer or permit. Offline regression target 1429 Pester tests / 61 containers on native Windows PowerShell 5.1; UTF-8 BOM.
+
+### BW3m — independent historical journal writer security review (ORIGINAL READ ONLY)
+
+[Runbook](docs/2.6.5-bw3m-historical-writer-security-review.md). BW3m re-runs BW3l/BW3j on exact historical Outlook evidence, then independently reads the NEW TEMP COPY claim, original one-Intent byte prefix, terminal Reconciled and recovery replay. All seven ORIGINAL hashes and one original Intent revalidated before/after. No original journal writer, claim creation, PST write, Move, retry or production. +62 fail-closed PS5.1 tests; expected 1491/62; UTF-8 BOM. -Review writes a NEW isolated TEMP COPY through BW3l only.
