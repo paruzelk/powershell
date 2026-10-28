@@ -171,3 +171,7 @@ Use the explicit `-WorkerPilotReviewHistoryReplay` opt-in route to compare the B
 ## BW4d1 Outlook folder ID diagnostics (DEV hotfix)
 
 The same explicit -WorkerPilotReviewHistoryReplay route now compares hexadecimal Outlook EntryIDs and StoreIDs without hex-letter-case false negatives, and distinguishes folder identity failures precisely. It does not fall back to another store or allow a Move. See [BW4d1 guide](docs/2.6.5-bw4d1-folder-id-hotfix.md).
+
+## BW4e read-only fresh synthetic candidate evidence (DEV)
+
+The explicit `-WorkerPilotReviewFreshSynthetic` route re-reads an already selected, NEW disposable synthetic test mail and cross-checks exact prior BW4c InternetMessageId, PR_SEARCH_KEY SHA256 and content-field SHA256, then invokes BW4d replay-history quarantine. It never proves complete history, issues a Move permit, or enables production Worker. See [BW4e guide](docs/2.6.5-bw4e-fresh-synthetic-premoval-readonly.md).
