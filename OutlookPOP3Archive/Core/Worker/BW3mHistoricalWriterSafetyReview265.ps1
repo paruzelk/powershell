@@ -58,13 +58,20 @@ function Assert-OPA265BW3mCopyReadback {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Review,
           [Parameter(Mandatory=$true)][object]$Pinned,
-          [Parameter(Mandatory=$true)][byte[]]$OriginalBytes)
+          [Parameter(Mandatory=$true)][byte[]]$OriginalBytes,
+          [switch]$OfflineReplicaForTests)
     [void](Assert-OPA265BW3mBw3lReview -Review $Review -Pinned $Pinned)
     $paths=Get-OPA265BW3lCopyPaths -Directory ([string]$Review.SandboxDirectory)
     $m=Read-OPA265BW3lCopyMarker -Paths $paths -Pinned $Pinned
-    if ([string]$m.Mode -cne 'ActualHistoricalByteCopy' -or
-        [string]$m.OriginalIntentSha256 -cne [string]$Pinned.JournalSha256) {
-        throw 'BW3m refuses offline replica; only exact historical byte-copy is evidence.'
+    $expectedCopySha=if($OfflineReplicaForTests){
+        Get-OPAOperationJournalSha256 -Bytes $OriginalBytes
+    }else{
+        [string]$Pinned.JournalSha256
+    }
+    if (($OfflineReplicaForTests -and [string]$m.Mode -cne 'OfflineReplicaNotHistoricalProof') -or
+        (-not $OfflineReplicaForTests -and [string]$m.Mode -cne 'ActualHistoricalByteCopy') -or
+        [string]$m.OriginalIntentSha256 -cne $expectedCopySha) {
+        throw 'BW3m copy marker provenance/hash does not match independently read bytes.'
     }
     [void](Assert-OPA265BW3lRegular -Path $paths.JournalPath)
     [void](Assert-OPA265BW3lRegular -Path $paths.ClaimPath)
@@ -90,7 +97,7 @@ function Assert-OPA265BW3mCopyReadback {
             throw ('BW3m TEMP claim elevates original journal permissions '+$f)
         }
     }
-    $old=Assert-OPA265BW3lOneIntent -Bytes $OriginalBytes -Pinned $Pinned -ExpectedSha256 ([string]$Pinned.JournalSha256)
+    $old=Assert-OPA265BW3lOneIntent -Bytes $OriginalBytes -Pinned $Pinned -ExpectedSha256 $expectedCopySha
     $copyBytes=[IO.File]::ReadAllBytes([string]$paths.JournalPath)
     $copyHash=Get-OPAOperationJournalSha256 -Bytes $copyBytes
     if ($copyHash -cne [string]$Review.SandboxCopyFinalSha256 -or
@@ -144,6 +151,7 @@ function Assert-OPA265BW3mCopyReadback {
         Schema='2.6.5-BW3m.IndependentCopyReadback.1'
         SandboxDirectory=[string]$paths.Directory
         CopyFinalSha256=$copyHash
+        CopyMode=[string]$m.Mode
         OriginalIntentBytePrefixPreserved=$true
         ClaimScopeCopyOnlyVerified=$true
         TwoJournalEventsReplayVerified=$true
@@ -163,6 +171,7 @@ function Get-OPA265BW3mSecurityDecision {
     if ([string]$CopyAudit.Schema -cne '2.6.5-BW3m.IndependentCopyReadback.1' -or
         [string]$CopyAudit.SandboxDirectory -cne [string]$Bw3l.SandboxDirectory -or
         [string]$CopyAudit.CopyFinalSha256 -cne [string]$Bw3l.SandboxCopyFinalSha256 -or
+        [string]$CopyAudit.CopyMode -cne 'ActualHistoricalByteCopy' -or
         $CopyAudit.OriginalIntentBytePrefixPreserved -isnot [bool] -or
         -not $CopyAudit.OriginalIntentBytePrefixPreserved -or
         $CopyAudit.ClaimScopeCopyOnlyVerified -isnot [bool] -or
