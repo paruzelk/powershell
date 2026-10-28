@@ -147,3 +147,7 @@ The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Recor
 ### BW3k - isolated TEMP-only synthetic journal one-shot crash tests (DEV)
 
 [Runbook](docs/2.6.5-bw3k-sandbox-oneshot-journal-crash-test.md). BW3k creates NEW synthetic journal fixtures strictly under OS TEMP. A durable CreateNew claim fences retries; exclusive journal lock and pinned SHA256 precede append of synthetic Reconciled sequence 2; replay is verified. Crash injection after claim, partial append and after append preserves evidence and blocks retry. No historical BW3a RunId/PST/Intent path is accepted, no Outlook COM, no MailItem.Move, no real journal writer or historical authorization. Native PS5.1 CI target: 1355 tests / 60 containers. New PS sources UTF-8 BOM.
+
+### BW3l — historical BW3a Intent byte-copy Reconciled rehearsal (DEV, ORIGINAL READ ONLY)
+
+[Runbook](docs/2.6.5-bw3l-historical-intent-copy-rehearsal.md). Reruns BW3j independent Outlook review and validates seven durable hashes and pinned one-Intent bytes; constructs a new exact byte-copy in a fresh OS TEMP OPA-BW3l-Copy-{GUID} folder, appends Reconciled only to that COPY using a permanent CreateNew claim, exclusive lock and SHA256 check. Original journal/PST/claims NEVER opened for write; no historical-run writer or permit. Offline regression target 1408 Pester tests / 61 containers on native Windows PowerShell 5.1; UTF-8 BOM.
