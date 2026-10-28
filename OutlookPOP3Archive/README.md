@@ -179,3 +179,7 @@ The explicit `-WorkerPilotReviewFreshSynthetic` route re-reads an already select
 ## BW4e1 DEV read-only -Review switch hotfix
 
 The BW4e diagnostic no longer overwrites the case-insensitive `[switch]$Review` parameter with its PSCustomObject BW4d result. Use the same `-WorkerPilotReviewFreshSynthetic` command from BW4e; a previously used LIVE3 item is correctly blocked. See [BW4e1 guide](docs/2.6.5-bw4e1-review-switch-collision-hotfix.md). No journal writes, Worker, retry or Move.
+
+## BW4e2 DEV: targeted read-only MAPI lookup in large POP3 Inbox
+
+For an Inbox larger than 5000 messages, do NOT increase the original full-enumeration limit. The explicit `-WorkerPilotUseTargetedMessageIdReadOnly` switch replaces the second read path with exact `Items.Restrict` on the already observed MAPI InternetMessageId, requires exactly one match and preserves BW4d/BW4e historical no-Move rules. See [BW4e2 procedure](docs/2.6.5-bw4e2-targeted-large-folder-readonly.md). Outlook support must be checked locally; CI alone does not authorize Move.
