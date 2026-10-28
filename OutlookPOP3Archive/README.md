@@ -175,3 +175,7 @@ The same explicit -WorkerPilotReviewHistoryReplay route now compares hexadecimal
 ## BW4e read-only fresh synthetic candidate evidence (DEV)
 
 The explicit `-WorkerPilotReviewFreshSynthetic` route re-reads an already selected, NEW disposable synthetic test mail and cross-checks exact prior BW4c InternetMessageId, PR_SEARCH_KEY SHA256 and content-field SHA256, then invokes BW4d replay-history quarantine. It never proves complete history, issues a Move permit, or enables production Worker. See [BW4e guide](docs/2.6.5-bw4e-fresh-synthetic-premoval-readonly.md).
+
+## BW4e1 DEV read-only -Review switch hotfix
+
+The BW4e diagnostic no longer overwrites the case-insensitive `[switch]$Review` parameter with its PSCustomObject BW4d result. Use the same `-WorkerPilotReviewFreshSynthetic` command from BW4e; a previously used LIVE3 item is correctly blocked. See [BW4e1 guide](docs/2.6.5-bw4e1-review-switch-collision-hotfix.md). No journal writes, Worker, retry or Move.
