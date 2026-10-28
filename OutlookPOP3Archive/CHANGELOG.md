@@ -1,3 +1,11 @@
+## 2.6.5-BW4e2 — targeted MAPI read-only lookup for large POP3 Inbox (DEV, 2026-10-28)
+
+- Source Inbox contains 26485 items, exceeding BW4c original cap of 1000/5000; do not raise old full-scan threshold.
+- New explicit WorkerPilotUseTargetedMessageIdReadOnly uses direct Namespace.GetItemFromID plus Folder.Items.Restrict exact DASL equality on MAPI PR_INTERNET_MESSAGE_ID.
+- Fail closed for zero/duplicate matches, StoreID/EntryID mismatch, unsupported Restrict, unsafe message IDs, unbounded folder counts or inconsistent two-path MAPI hashes.
+- BW4a original seven historic hashes, single unresolved Intent and BW4d read-only LIVE3/4 replay audit remain required. No Move, claim, journal writing or Worker dispatch.
+- 18 mocked MAPI regressions exercise a 26485-item Inbox with zero full enumeration, duplicates and conflicting evidence.
+
 ## 2.6.5-BW4e1 — read-only Review SwitchParameter collision hotfix (DEV, 2026-10-28)
 
 - Correct the PowerShell case-insensitive collision between -Review ([switch]) and the BW4d PSCustomObject stored as $review in the BW4e diagnostic.
