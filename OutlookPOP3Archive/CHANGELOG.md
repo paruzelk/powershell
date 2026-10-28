@@ -1,3 +1,11 @@
+## BW3j — distinct BW3a-scoped one-Intent journal resolution DESIGN, strictly read-only (2026-10-28; Windows CI pending)
+
+- BW3i1 local 1250/58 PASS and historical BW3a vs controlled LIVE4 crash protocol incompatibility independently confirmed; legacy LIVE6 -Execute remains prohibited.
+- BW3j scopes all evidence to exact BW3a RunId/OperationId/PST/archive EntryID, immutable original single Intent journal SHA256 and recorded BW3g1 +8 byte acceptance JSON SHA256. Requires legacy live6-resolution.claim and RESERVED hypothetical bw3j-resolution.claim both absent.
+- BW3j DOES NOT call LIVE4/LIVE5/LIVE6 and DOES NOT implement any journal writer. Rechecks seven file hashes and original one-event Intent before/after rerunning BW3h read-only actual Outlook evidence. Output includes only hypothetical Reconciled sequence=2 and separate future consent requirements, NOT a write permit.
+- Explicit design covers one-shot CreateNew claim, exclusive journal lock with fresh byte hash, crash after claim/before append, crash after append/before verification, no retries, concurrency and tamper checks; implementation of writer and all journal/PST changes are out of scope.
+- +51 native PS5.1 Pester negative/positive tests; total CI target 1301 in 59 containers; new code UTF-8 with BOM EF BB BF.
+
 ## 2.6.5-BW3i1 — legacy LIVE6/BW3a read-only protocol incompatibility diagnosis (2026-10-27; CI pending)
 
 - BW3i native Windows PS5.1 local CI PASS 1212 tests / 57 containers. Actual Outlook reached legacy LIVE6 -Review before stopping: LIVE6 decision did not match one original synthetic Intent.
