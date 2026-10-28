@@ -12,6 +12,7 @@ param(
     [Parameter(Mandatory=$true)][string]$CandidateEntryId,
     [Parameter(Mandatory=$true)][string]$ExpectedProfileName,
     [ValidateRange(1,5000)][int]$MaxFolderItems=1000,
+    [switch]$UseTargetedMessageIdReadOnly,
     [string]$HistoryRoot=([IO.Path]::GetTempPath()),
     [ValidateRange(1,512)][int]$MaxHistoryRuns=256,
     [switch]$Review,
@@ -31,7 +32,7 @@ try {
     $before=Get-OPA265BW4dHistoryCatalog -HistoryRoot $HistoryRoot -MaxRunDirectories $MaxHistoryRuns
     # Existing BW4c independently hashes the original 7 BW3a files before AND after
     # its controlled COM read of the selected Outlook item, and never calls Move.
-    $bw4c=& (Join-Path $PSScriptRoot 'Test-OPA265BW4cOutlookPerItemReadOnly.ps1') -RunId $RunId -SourcePst $SourcePst -ExpectedJournalSha256 $ExpectedJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -ExpectedProfileName $ExpectedProfileName -MaxFolderItems $MaxFolderItems -Review -ConfirmExistingOutlookReadOnly
+    $bw4c=& (Join-Path $PSScriptRoot 'Test-OPA265BW4cOutlookPerItemReadOnly.ps1') -RunId $RunId -SourcePst $SourcePst -ExpectedJournalSha256 $ExpectedJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -ExpectedProfileName $ExpectedProfileName -MaxFolderItems $MaxFolderItems -UseTargetedMessageIdReadOnly:$UseTargetedMessageIdReadOnly -Review -ConfirmExistingOutlookReadOnly
     $after=Get-OPA265BW4dHistoryCatalog -HistoryRoot $HistoryRoot -MaxRunDirectories $MaxHistoryRuns
     if ([string]$before.EvidenceSnapshotSha256 -cne [string]$after.EvidenceSnapshotSha256 -or
         $before.RunDirectoriesScanned -ne $after.RunDirectoriesScanned -or
@@ -54,6 +55,8 @@ try {
         InternetMessageId=[string]$bw4c.InternetMessageId
         SourceStoreId=[string]$bw4c.SourceStoreId
         SearchKeySha256=[string]$bw4c.SearchKeySha256
+        TargetedMessageIdReadOnlyUsed=[bool]$bw4c.TargetedMessageIdReadOnlyUsed
+        FolderItemsObserved=[int]$bw4c.FolderItemsObserved
         SourceItemFingerprintSha256=[string]$bw4c.ContentFieldFingerprintSha256
         HistoryRoot=$after.HistoryRoot
         RunDirectoriesScanned=$after.RunDirectoriesScanned
