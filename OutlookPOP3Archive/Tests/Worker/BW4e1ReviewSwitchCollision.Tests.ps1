@@ -25,7 +25,8 @@ param(
  [string]$Mode,[string]$Transaction,[string]$FolderEntryId,
  [string]$CandidateEntryId,[string]$ExpectedProfileName,
  [int]$MaxFolderItems,[string]$HistoryRoot,[int]$MaxHistoryRuns,
- [switch]$Review,[switch]$ConfirmExistingOutlookReadOnly
+ [switch]$Review,[switch]$ConfirmExistingOutlookReadOnly,
+ [switch]$UseTargetedMessageIdReadOnly
 )
 if (-not $Review -or -not $ConfirmExistingOutlookReadOnly) { throw 'Stub must retain explicit read-only consent.' }
 [pscustomobject][ordered]@{
