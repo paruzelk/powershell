@@ -1,3 +1,11 @@
+## 2.6.5-BW4d — independent read-only historical replay audit (DEV, 2026-10-28)
+
+- Compares exact BW4c Outlook MailItem observation with bounded LIVE3/LIVE4 on-disk journal events and persistent claims.
+- Same history snapshots SHA-256 before and after COM; rechecks seven original BW3a evidence hashes and unresolved Intent.
+- Stops reuse of any previously created LIVE3 synthetic InternetMessageId even if its journal is missing; history coverage is never declared complete.
+- Zero matches, uncertain history, and PASS tests do NOT authorize Move, journal writes, claims, Worker dispatch or automatic retry.
+- Windows PowerShell 5.1, UTF-8 BOM, PSScriptAnalyzer and Pester regression tests via GitHub CI.
+
 ## 2.6.5-BW4c — native Outlook dual-path per-item read-only review (DEV, 2026-10-28)
 
 - Requires already-running Outlook PowerShell 5.1 STA, exactly one mounted POP3 DeliveryStore PST and explicit folder/Item EntryIDs.
