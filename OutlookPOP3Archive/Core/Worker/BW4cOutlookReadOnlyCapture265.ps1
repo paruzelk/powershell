@@ -1,8 +1,7 @@
 ﻿#requires -Version 5.1
 # BW4c: two Outlook read paths, one existing MAPI session. Never grants Worker authorization.
-
-# Outlook exposes EntryID/StoreID as hexadecimal. Hex character case is not identity.
-# Nonhex placeholders (in tests) still require exact ordinal equality.
+# Compare Outlook opaque hexadecimal identities byte-for-byte, ignoring hex letter case.
+# Non-hexadecimal mock IDs still require exact ordinal equality.
 function Test-OPA265BW4cOpaqueIdMatch {
     [CmdletBinding()]
     param([AllowEmptyString()][string]$Observed,
@@ -12,7 +11,13 @@ function Test-OPA265BW4cOpaqueIdMatch {
     if ([string]::Equals($Observed,$Expected,[StringComparison]::Ordinal)) { return $true }
     if ($Observed.Length -eq $Expected.Length -and
         ($Observed.Length % 2) -eq 0 -and
-        $Observed -cmatch '^[0-9a-fA-F]+
+        $Observed -cmatch '^[0-9a-fA-F]+$' -and
+        $Expected -cmatch '^[0-9a-fA-F]+$') {
+        return [string]::Equals($Observed,$Expected,[StringComparison]::OrdinalIgnoreCase)
+    }
+    return $false
+}
+function Get-OPA265BW4cHash {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][byte[]]$Bytes)
     $sha=[Security.Cryptography.SHA256]::Create()
@@ -133,16 +138,16 @@ function Get-OPA265BW4cDualReadback {
     $scope=Get-OPA265BW4cPop3Store -Namespace $Namespace -SourcePst $SourcePst
     $folder=$null
     try { $folder=$Namespace.GetFolderFromID($FolderEntryId,$scope.StoreId) }
-    catch { throw ('BW4c: GetFolderFromID could not resolve the explicit folder/store pair: '+[string]$_.Exception.Message) }
-    if ($null -eq $folder) { throw 'BW4c: GetFolderFromID returned no folder for the explicit store.' }
+    catch { throw ('BW4c: GetFolderFromID failed for explicit folder/store: '+[string]$_.Exception.Message) }
+    if ($null -eq $folder) { throw 'BW4c: GetFolderFromID returned null for the explicit store.' }
     $observedFolderEntryId=[string]$folder.EntryID
     $observedFolderStoreId=[string]$folder.StoreID
     if (-not (Test-OPA265BW4cOpaqueIdMatch -Observed $observedFolderEntryId -Expected $FolderEntryId)) {
-        throw ('BW4c: GetFolderFromID folder EntryID mismatch; expected hex chars='+$FolderEntryId.Length+
+        throw ('BW4c: GetFolderFromID folder EntryID mismatch; expected chars='+$FolderEntryId.Length+
             ', observed chars='+$observedFolderEntryId.Length+'. No fallback or Move.')
     }
     if (-not (Test-OPA265BW4cOpaqueIdMatch -Observed $observedFolderStoreId -Expected $scope.StoreId)) {
-        throw ('BW4c: GetFolderFromID StoreID mismatch; expected hex chars='+$scope.StoreId.Length+
+        throw ('BW4c: GetFolderFromID StoreID mismatch; expected chars='+$scope.StoreId.Length+
             ', observed chars='+$observedFolderStoreId.Length+'. No fallback or Move.')
     }
     # Route 1: direct MAPI namespace lookup.
@@ -158,323 +163,6 @@ function Get-OPA265BW4cDualReadback {
     for($i=1;$i -le $n;$i++) {
         $item=$items.Item($i)
         if (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$item.EntryID) -Expected $CandidateEntryId) {
-            $hits++
-            $matched=$item
-        }
-    }
-    if ($hits -ne 1 -or $null -eq $matched) { throw 'BW4c: folder scan must find exactly one candidate.' }
-    $b=Get-OPA265BW4cItemWitness -Mail $matched -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method IndependentReadOnly
-    return [pscustomobject]@{
-        Primary=$a
-        Independent=$b
-        TwoSeparateOutlookReadPaths=$true
-        SameOutlookSession=$true
-        IndependentExternalMAPIProof=$false
-        FolderItemsScanned=$n
-        CandidateMatches=1
-        MailMoveExecuted=$false
-    }
-}
- -and
-        $Expected -cmatch '^[0-9a-fA-F]+
-    [CmdletBinding()]
-    param([Parameter(Mandatory=$true)][byte[]]$Bytes)
-    $sha=[Security.Cryptography.SHA256]::Create()
-    try { return [BitConverter]::ToString($sha.ComputeHash($Bytes)).Replace('-','').ToLowerInvariant() }
-    finally { $sha.Dispose() }
-}
-function Get-OPA265BW4cItemWitness {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true)][object]$Mail,
-        [Parameter(Mandatory=$true)][string]$SourcePst,
-        [Parameter(Mandatory=$true)][string]$StoreId,
-        [Parameter(Mandatory=$true)][string]$FolderEntryId,
-        [Parameter(Mandatory=$true)][string]$CandidateEntryId,
-        [Parameter(Mandatory=$true)][ValidateSet('PrimaryReadOnly','IndependentReadOnly')][string]$Method
-    )
-    if ([int]$Mail.Class -ne 43 -or
-        [string]$Mail.EntryID -cne $CandidateEntryId -or
-        [string]$Mail.Parent.EntryID -cne $FolderEntryId -or
-        [string]$Mail.Parent.StoreID -cne $StoreId) {
-        throw 'BW4c: candidate is not the exact MailItem in the pinned folder and store.'
-    }
-    $id=[string]$Mail.PropertyAccessor.GetProperty('http://schemas.microsoft.com/mapi/proptag/0x1035001F')
-    if ([string]::IsNullOrWhiteSpace($id) -or $id.Length -gt 4096) {
-        throw 'BW4c: a complete InternetMessageId is required.'
-    }
-    $key=$Mail.PropertyAccessor.GetProperty('http://schemas.microsoft.com/mapi/proptag/0x300B0102')
-    if ($null -eq $key) { throw 'BW4c: missing MAPI PR_SEARCH_KEY.' }
-    try { [byte[]]$keyBytes=[byte[]]$key } catch { throw 'BW4c: MAPI PR_SEARCH_KEY is not binary.' }
-    if ($keyBytes.Length -lt 1 -or $keyBytes.Length -gt 4096) { throw 'BW4c: invalid search key length.' }
-    $size=[long]$Mail.Size
-    if ($size -lt 1) { throw 'BW4c: invalid MAPI message size.' }
-    $when=[datetime]$Mail.ReceivedTime
-    if ($when.Year -lt 1990) { throw 'BW4c: invalid received timestamp.' }
-    $subject=[string]$Mail.Subject
-    $sender=[string]$Mail.SenderEmailAddress
-    $body=[string]$Mail.Body
-    if ($subject.Length -gt 32768 -or $sender.Length -gt 4096 -or $body.Length -gt 4194304) {
-        throw 'BW4c: item content exceeds bounded read-only fingerprint limits.'
-    }
-    # Deterministic field-length-prefix encoding; fingerprint is NOT full MAPI byte equality.
-    $buffer=New-Object Text.StringBuilder
-    foreach($v in @($subject,$sender,$body,[string]$size,[string]$when.ToUniversalTime().Ticks)) {
-        [void]$buffer.Append(([string]$v).Length.ToString([Globalization.CultureInfo]::InvariantCulture))
-        [void]$buffer.Append(':')
-        [void]$buffer.Append([string]$v)
-    }
-    $contentHash=Get-OPA265BW4cHash -Bytes ([Text.Encoding]::UTF8.GetBytes($buffer.ToString()))
-    return [pscustomobject][ordered]@{
-        Schema='2.6.5-BW4b.PerItemWitness.1'
-        CaptureId=[guid]::NewGuid().ToString('D')
-        CaptureMethod=$Method
-        SourcePst=$SourcePst
-        SourceStoreId=$StoreId
-        SourceEntryId=$CandidateEntryId
-        InternetMessageId=$id
-        SearchKeySha256=(Get-OPA265BW4cHash -Bytes $keyBytes)
-        ContentSha256=$contentHash
-        ObservedItemCount=1
-    }
-}
-function Get-OPA265BW4cPop3Store {
-    [CmdletBinding()]
-    param([Parameter(Mandatory=$true)][object]$Namespace,
-          [Parameter(Mandatory=$true)][string]$SourcePst)
-    if (-not [IO.Path]::IsPathRooted($SourcePst) -or
-        $SourcePst.StartsWith('\\',[StringComparison]::Ordinal) -or
-        [IO.Path]::GetExtension($SourcePst) -ine '.pst' -or
-        -not [IO.File]::Exists($SourcePst) -or
-        (([IO.File]::GetAttributes($SourcePst) -band [IO.FileAttributes]::ReparsePoint) -ne 0)) {
-        throw 'BW4c requires an existing non-symlink local PST.'
-    }
-    $canonical=[IO.Path]::GetFullPath($SourcePst)
-    $count=[int]$Namespace.Stores.Count
-    if ($count -lt 1 -or $count -gt 128) { throw 'BW4c: unsafe Outlook store inventory.' }
-    $selected=$null
-    $hits=0
-    for($i=1;$i -le $count;$i++) {
-        $s=$Namespace.Stores.Item($i)
-        $path=''
-        try { $path=[string]$s.FilePath } catch { continue }
-        if ([string]::IsNullOrWhiteSpace($path)) { continue }
-        if ([string]::Equals([IO.Path]::GetFullPath($path),$canonical,[StringComparison]::OrdinalIgnoreCase)) {
-            $selected=$s
-            $hits++
-        }
-    }
-    if ($hits -ne 1) { throw 'BW4c: source PST is not uniquely mounted in the active Outlook session.' }
-    $storeId=[string]$selected.StoreID
-    if ([string]::IsNullOrWhiteSpace($storeId)) { throw 'BW4c: missing store ID.' }
-    $pop3=0
-    $accountCount=[int]$Namespace.Accounts.Count
-    if ($accountCount -lt 1 -or $accountCount -gt 128) { throw 'BW4c: unsafe Outlook account inventory.' }
-    for($i=1;$i -le $accountCount;$i++) {
-        $account=$Namespace.Accounts.Item($i)
-        if ([int]$account.AccountType -ne 2) { continue } # olPop3 only, never IMAP.
-        $delivery=$account.DeliveryStore
-        if ($null -eq $delivery) { throw 'BW4c: POP3 DeliveryStore unavailable.' }
-        if ([string]$delivery.StoreID -ceq $storeId) { $pop3++ }
-    }
-    if ($pop3 -ne 1) { throw 'BW4c: exactly one POP3 DeliveryStore must own the selected PST.' }
-    return [pscustomobject]@{ Store=$selected; StoreId=$storeId; SourcePst=$canonical }
-}
-function Get-OPA265BW4cDualReadback {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true)][object]$Namespace,
-        [Parameter(Mandatory=$true)][string]$SourcePst,
-        [Parameter(Mandatory=$true)][string]$FolderEntryId,
-        [Parameter(Mandatory=$true)][string]$CandidateEntryId,
-        [ValidateRange(1,5000)][int]$MaxFolderItems=1000
-    )
-    if ([string]::IsNullOrWhiteSpace($FolderEntryId) -or
-        [string]::IsNullOrWhiteSpace($CandidateEntryId) -or
-        $FolderEntryId.Length -gt 8192 -or $CandidateEntryId.Length -gt 8192) {
-        throw 'BW4c: explicit folder and message EntryIDs are mandatory.'
-    }
-    $scope=Get-OPA265BW4cPop3Store -Namespace $Namespace -SourcePst $SourcePst
-    $folder=$Namespace.GetFolderFromID($FolderEntryId,$scope.StoreId)
-    if ($null -eq $folder -or
-        [string]$folder.EntryID -cne $FolderEntryId -or
-        [string]$folder.StoreID -cne $scope.StoreId) {
-        throw 'BW4c: folder lookup did not match selected POP3 store.'
-    }
-    # Route 1: direct MAPI namespace lookup.
-    $direct=$Namespace.GetItemFromID($CandidateEntryId,$scope.StoreId)
-    if ($null -eq $direct) { throw 'BW4c: GetItemFromID returned no candidate.' }
-    $a=Get-OPA265BW4cItemWitness -Mail $direct -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method PrimaryReadOnly
-    # Route 2: re-enumerate exact folder (not the object returned by GetItemFromID).
-    $items=$folder.Items
-    $n=[int]$items.Count
-    if ($n -lt 1 -or $n -gt $MaxFolderItems) { throw 'BW4c: folder cardinality outside explicit scan cap; no partial proof.' }
-    $matched=$null
-    $hits=0
-    for($i=1;$i -le $n;$i++) {
-        $item=$items.Item($i)
-        if ([string]$item.EntryID -ceq $CandidateEntryId) {
-            $hits++
-            $matched=$item
-        }
-    }
-    if ($hits -ne 1 -or $null -eq $matched) { throw 'BW4c: folder scan must find exactly one candidate.' }
-    $b=Get-OPA265BW4cItemWitness -Mail $matched -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method IndependentReadOnly
-    return [pscustomobject]@{
-        Primary=$a
-        Independent=$b
-        TwoSeparateOutlookReadPaths=$true
-        SameOutlookSession=$true
-        IndependentExternalMAPIProof=$false
-        FolderItemsScanned=$n
-        CandidateMatches=1
-        MailMoveExecuted=$false
-    }
-}
-) {
-        return [string]::Equals($Observed,$Expected,[StringComparison]::OrdinalIgnoreCase)
-    }
-    return $false
-}
-
-function Get-OPA265BW4cHash {
-    [CmdletBinding()]
-    param([Parameter(Mandatory=$true)][byte[]]$Bytes)
-    $sha=[Security.Cryptography.SHA256]::Create()
-    try { return [BitConverter]::ToString($sha.ComputeHash($Bytes)).Replace('-','').ToLowerInvariant() }
-    finally { $sha.Dispose() }
-}
-function Get-OPA265BW4cItemWitness {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true)][object]$Mail,
-        [Parameter(Mandatory=$true)][string]$SourcePst,
-        [Parameter(Mandatory=$true)][string]$StoreId,
-        [Parameter(Mandatory=$true)][string]$FolderEntryId,
-        [Parameter(Mandatory=$true)][string]$CandidateEntryId,
-        [Parameter(Mandatory=$true)][ValidateSet('PrimaryReadOnly','IndependentReadOnly')][string]$Method
-    )
-    if ([int]$Mail.Class -ne 43 -or
-        [string]$Mail.EntryID -cne $CandidateEntryId -or
-        [string]$Mail.Parent.EntryID -cne $FolderEntryId -or
-        [string]$Mail.Parent.StoreID -cne $StoreId) {
-        throw 'BW4c: candidate is not the exact MailItem in the pinned folder and store.'
-    }
-    $id=[string]$Mail.PropertyAccessor.GetProperty('http://schemas.microsoft.com/mapi/proptag/0x1035001F')
-    if ([string]::IsNullOrWhiteSpace($id) -or $id.Length -gt 4096) {
-        throw 'BW4c: a complete InternetMessageId is required.'
-    }
-    $key=$Mail.PropertyAccessor.GetProperty('http://schemas.microsoft.com/mapi/proptag/0x300B0102')
-    if ($null -eq $key) { throw 'BW4c: missing MAPI PR_SEARCH_KEY.' }
-    try { [byte[]]$keyBytes=[byte[]]$key } catch { throw 'BW4c: MAPI PR_SEARCH_KEY is not binary.' }
-    if ($keyBytes.Length -lt 1 -or $keyBytes.Length -gt 4096) { throw 'BW4c: invalid search key length.' }
-    $size=[long]$Mail.Size
-    if ($size -lt 1) { throw 'BW4c: invalid MAPI message size.' }
-    $when=[datetime]$Mail.ReceivedTime
-    if ($when.Year -lt 1990) { throw 'BW4c: invalid received timestamp.' }
-    $subject=[string]$Mail.Subject
-    $sender=[string]$Mail.SenderEmailAddress
-    $body=[string]$Mail.Body
-    if ($subject.Length -gt 32768 -or $sender.Length -gt 4096 -or $body.Length -gt 4194304) {
-        throw 'BW4c: item content exceeds bounded read-only fingerprint limits.'
-    }
-    # Deterministic field-length-prefix encoding; fingerprint is NOT full MAPI byte equality.
-    $buffer=New-Object Text.StringBuilder
-    foreach($v in @($subject,$sender,$body,[string]$size,[string]$when.ToUniversalTime().Ticks)) {
-        [void]$buffer.Append(([string]$v).Length.ToString([Globalization.CultureInfo]::InvariantCulture))
-        [void]$buffer.Append(':')
-        [void]$buffer.Append([string]$v)
-    }
-    $contentHash=Get-OPA265BW4cHash -Bytes ([Text.Encoding]::UTF8.GetBytes($buffer.ToString()))
-    return [pscustomobject][ordered]@{
-        Schema='2.6.5-BW4b.PerItemWitness.1'
-        CaptureId=[guid]::NewGuid().ToString('D')
-        CaptureMethod=$Method
-        SourcePst=$SourcePst
-        SourceStoreId=$StoreId
-        SourceEntryId=$CandidateEntryId
-        InternetMessageId=$id
-        SearchKeySha256=(Get-OPA265BW4cHash -Bytes $keyBytes)
-        ContentSha256=$contentHash
-        ObservedItemCount=1
-    }
-}
-function Get-OPA265BW4cPop3Store {
-    [CmdletBinding()]
-    param([Parameter(Mandatory=$true)][object]$Namespace,
-          [Parameter(Mandatory=$true)][string]$SourcePst)
-    if (-not [IO.Path]::IsPathRooted($SourcePst) -or
-        $SourcePst.StartsWith('\\',[StringComparison]::Ordinal) -or
-        [IO.Path]::GetExtension($SourcePst) -ine '.pst' -or
-        -not [IO.File]::Exists($SourcePst) -or
-        (([IO.File]::GetAttributes($SourcePst) -band [IO.FileAttributes]::ReparsePoint) -ne 0)) {
-        throw 'BW4c requires an existing non-symlink local PST.'
-    }
-    $canonical=[IO.Path]::GetFullPath($SourcePst)
-    $count=[int]$Namespace.Stores.Count
-    if ($count -lt 1 -or $count -gt 128) { throw 'BW4c: unsafe Outlook store inventory.' }
-    $selected=$null
-    $hits=0
-    for($i=1;$i -le $count;$i++) {
-        $s=$Namespace.Stores.Item($i)
-        $path=''
-        try { $path=[string]$s.FilePath } catch { continue }
-        if ([string]::IsNullOrWhiteSpace($path)) { continue }
-        if ([string]::Equals([IO.Path]::GetFullPath($path),$canonical,[StringComparison]::OrdinalIgnoreCase)) {
-            $selected=$s
-            $hits++
-        }
-    }
-    if ($hits -ne 1) { throw 'BW4c: source PST is not uniquely mounted in the active Outlook session.' }
-    $storeId=[string]$selected.StoreID
-    if ([string]::IsNullOrWhiteSpace($storeId)) { throw 'BW4c: missing store ID.' }
-    $pop3=0
-    $accountCount=[int]$Namespace.Accounts.Count
-    if ($accountCount -lt 1 -or $accountCount -gt 128) { throw 'BW4c: unsafe Outlook account inventory.' }
-    for($i=1;$i -le $accountCount;$i++) {
-        $account=$Namespace.Accounts.Item($i)
-        if ([int]$account.AccountType -ne 2) { continue } # olPop3 only, never IMAP.
-        $delivery=$account.DeliveryStore
-        if ($null -eq $delivery) { throw 'BW4c: POP3 DeliveryStore unavailable.' }
-        if ([string]$delivery.StoreID -ceq $storeId) { $pop3++ }
-    }
-    if ($pop3 -ne 1) { throw 'BW4c: exactly one POP3 DeliveryStore must own the selected PST.' }
-    return [pscustomobject]@{ Store=$selected; StoreId=$storeId; SourcePst=$canonical }
-}
-function Get-OPA265BW4cDualReadback {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true)][object]$Namespace,
-        [Parameter(Mandatory=$true)][string]$SourcePst,
-        [Parameter(Mandatory=$true)][string]$FolderEntryId,
-        [Parameter(Mandatory=$true)][string]$CandidateEntryId,
-        [ValidateRange(1,5000)][int]$MaxFolderItems=1000
-    )
-    if ([string]::IsNullOrWhiteSpace($FolderEntryId) -or
-        [string]::IsNullOrWhiteSpace($CandidateEntryId) -or
-        $FolderEntryId.Length -gt 8192 -or $CandidateEntryId.Length -gt 8192) {
-        throw 'BW4c: explicit folder and message EntryIDs are mandatory.'
-    }
-    $scope=Get-OPA265BW4cPop3Store -Namespace $Namespace -SourcePst $SourcePst
-    $folder=$Namespace.GetFolderFromID($FolderEntryId,$scope.StoreId)
-    if ($null -eq $folder -or
-        [string]$folder.EntryID -cne $FolderEntryId -or
-        [string]$folder.StoreID -cne $scope.StoreId) {
-        throw 'BW4c: folder lookup did not match selected POP3 store.'
-    }
-    # Route 1: direct MAPI namespace lookup.
-    $direct=$Namespace.GetItemFromID($CandidateEntryId,$scope.StoreId)
-    if ($null -eq $direct) { throw 'BW4c: GetItemFromID returned no candidate.' }
-    $a=Get-OPA265BW4cItemWitness -Mail $direct -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method PrimaryReadOnly
-    # Route 2: re-enumerate exact folder (not the object returned by GetItemFromID).
-    $items=$folder.Items
-    $n=[int]$items.Count
-    if ($n -lt 1 -or $n -gt $MaxFolderItems) { throw 'BW4c: folder cardinality outside explicit scan cap; no partial proof.' }
-    $matched=$null
-    $hits=0
-    for($i=1;$i -le $n;$i++) {
-        $item=$items.Item($i)
-        if ([string]$item.EntryID -ceq $CandidateEntryId) {
             $hits++
             $matched=$item
         }
