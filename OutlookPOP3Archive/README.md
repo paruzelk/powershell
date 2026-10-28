@@ -139,3 +139,7 @@ The actual BW3g read-only check PASSED. The subsequent explicit one-shot `-Recor
 ### 2.6.5-BW3i1 — legacy LIVE6 cannot certify historical BW3a crash provenance (READ ONLY)
 
 [Runbook](docs/2.6.5-bw3i1-legacy-live6-compatibility-readonly.md). Local BW3i: Pester 1212/57 PASS, actual Outlook `-Review` STOP at old LIVE6 classification. Historical BW3a Worker one-shot was **not** a LIVE4 controlled-crash fixture and lacks the three legacy crash-specific artifacts. BW3i1 strictly checks that mismatch (including the exact failed LIVE6 read-only schema), the seven intact BW3h evidence files and unchanged original Intent; it issues a **blocked executor** compatibility verdict. Never run `LIVE6 -Execute` for BW3a, fabricate crash artifacts, append Reconciled or create a new Move. DEV CI target 1250/58, mandatory UTF-8 BOM.
+
+### BW3j — separate BW3a scoped journal resolution DESIGN (read-only DEV)
+
+[Runbook](docs/2.6.5-bw3j-bw3-scoped-journal-resolution-readonly-design.md). Verified BW3i1 proved legacy LIVE6 inapplicable. BW3j (no LIVE4/LIVE5/LIVE6 calls) rechecks one exact historical synthetic Intent, both currently absent resolution claim slots, all seven original evidence SHA256s and the full read-only BW3h Outlook chain. Outputs ONLY an in-memory design contract: hypothetical Reconciled sequence 2, **no writer, no journal-write permission**, no Move or production. Native Windows PowerShell 5.1 DEV CI target 1301 tests / 59 containers, mandatory UTF-8 BOM.
