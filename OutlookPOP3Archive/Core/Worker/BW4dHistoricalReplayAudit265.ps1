@@ -111,7 +111,7 @@ function Get-OPA265BW4dReplayDecision {
             throw ('BW4d requires observed identity: '+$f)
         }
     }
-    $matches=New-Object 'System.Collections.Generic.List[string]'
+    $replayHits=New-Object 'System.Collections.Generic.List[string]'
     $entryId=[string]$Bw4cReview.CandidateEntryId
     $messageId=[string]$Bw4cReview.InternetMessageId
     foreach($e in @($History.Events)) {
@@ -123,12 +123,12 @@ function Get-OPA265BW4dReplayDecision {
             [string]::Equals([string]$e.InternetMessageId,$messageId,[StringComparison]::OrdinalIgnoreCase)))
         if ($related) {
             $key=[string]$e.RunDirectory+':'+[string]$e.OperationId+':'+[string]$e.Phase
-            if (-not $matches.Contains($key)) { [void]$matches.Add($key) }
+            if (-not $replayHits.Contains($key)) { [void]$replayHits.Add($key) }
         }
     }
     # Live3/Live4 synthetic messages are NOT replay-clear if records disappear or moved.
     $synthetic=($messageId -match '^<opa264-live3-[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}@example\.invalid>$')
-    $status=if ($matches.Count -gt 0) {
+    $status=if ($replayHits.Count -gt 0) {
         'BlockedKnownPriorLive3Live4OperationEvidence'
     } elseif ($synthetic) {
         'BlockedSyntheticLive3OriginCannotProveNoEarlierMove'
@@ -138,7 +138,7 @@ function Get-OPA265BW4dReplayDecision {
     return [pscustomobject][ordered]@{
         Schema='2.6.5-BW4d.HistoryReplayFenceDecision.1'
         Status=$status
-        HistoricalOperationMatches=$matches.ToArray()
+        HistoricalOperationMatches=$replayHits.ToArray()
         SyntheticLive3Identity=[bool]$synthetic
         JournalsScanned=[int]$History.JournalsScanned
         RunDirectoriesScanned=[int]$History.RunDirectoriesScanned
