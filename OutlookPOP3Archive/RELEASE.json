@@ -37,14 +37,15 @@
     "BW3g1 fixes case-insensitive [switch]Record/$record variable collision; no new write without checking existing acceptance file and obtaining a separate explicit operator approval",
     "BW3h one-run independent read-only seven-artifact chain: six original hashes plus hard-pinned +8-byte acceptance JSON SHA256; no Reconciled/Move/production",
     "BW3i: pinned seven-evidence chain and original single Intent validation, LIVE6 -Review only, hypothetical Reconciled sequence 2; no write permit or Move",
-    "BW3i1: historical BW3a one-shot claims cannot fulfill controlled LIVE4 crash evidence LIVE6 requires; read-only legacy inapplicability verdict, executor BLOCKED, no Reconciled"
+    "BW3i1: historical BW3a one-shot claims cannot fulfill controlled LIVE4 crash evidence LIVE6 requires; read-only legacy inapplicability verdict, executor BLOCKED, no Reconciled",
+    "BW3j: one historical BW3a original Intent and seven-hash design-only journal resolution preflight; never invokes legacy LIVE6 or creates a claim, no writer, no Reconciled permission"
   ],
   "Verification": {
-    "Status": "2.6.5-BW3i1 DEV read-only proof historical BW3a incompatible with LIVE4 crash-only LIVE6 executor; Windows PS5.1 CI 1250/58 pending, no journal authorization",
+    "Status": "BW3j DEV exact BW3a journal resolution design-only preflight; native PS5.1 CI 1301/59 pending; no claim/writer/journal authorization",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 58,
-    "ExpectedPesterTests": 1250,
+    "ExpectedTestContainers": 59,
+    "ExpectedPesterTests": 1301,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -76,6 +77,9 @@
     "BW3iJournalProtocolPreflightReadOnly": true,
     "BW3iJournalReconciliationAuthorized": false,
     "BW3i1LegacyLive6CompatibilityDiagnostic": true,
-    "BW3i1LegacyLive6ExecuteAuthorized": false
+    "BW3i1LegacyLive6ExecuteAuthorized": false,
+    "BW3jResolutionDesignReadOnly": true,
+    "BW3jJournalWriterImplemented": false,
+    "BW3jJournalReconciliationAuthorized": false
   }
 }
