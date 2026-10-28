@@ -30,9 +30,11 @@ jobs:
         run: |
           $ErrorActionPreference='Stop'
           $base='dcff8e77e87455382d76fa0a25136deb1a84ec2f'
-          $changed=@(git diff --name-only $base HEAD -- OutlookPOP3Archive | Where-Object { $_ -match '\.ps1$' })
+          $repoRoot=Split-Path -Parent $PWD.Path
+          $changed=@(git -C $repoRoot diff --name-only $base HEAD -- OutlookPOP3Archive | Where-Object { $_ -match '\.ps1$' })
+          if($changed.Count -lt 4){throw "BOM gate did not discover the expected changed stable PowerShell files: $($changed.Count)"}
           foreach($p in $changed){
-            $full=Join-Path (Split-Path -Parent $PWD.Path) ($p -replace '/','\')
+            $full=Join-Path $repoRoot ($p -replace '/','\')
             if(-not (Test-Path -LiteralPath $full)){throw "Changed PowerShell file missing: $p"}
             $b=[IO.File]::ReadAllBytes($full)
             if($b.Length -lt 3 -or $b[0] -ne 239 -or $b[1] -ne 187 -or $b[2] -ne 191){throw "UTF-8 BOM missing: $p"}
