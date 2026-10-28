@@ -85,7 +85,10 @@ param(
     [string]$WorkerPilotSourcePst = '',
     # BW2c: explicit size consent only for one read-only synthetic probe.
     [switch]$WorkerPilotConfirmSourceSizeDifference,
-    [long]$WorkerPilotExpectedSourceSizeBytes = 0
+    [long]$WorkerPilotExpectedSourceSizeBytes = 0,
+    # BW4a OPTION B: explicit read-only one-Intent quarantine preflight.
+    [switch]$WorkerPilotReviewHistoricalFence,
+    [string]$WorkerPilotExpectedHistoricalJournalSha256 = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -137,13 +140,39 @@ $pilotOptionsSpecified = ($PSBoundParameters.ContainsKey('WorkerPilotMaxOperatio
     $PSBoundParameters.ContainsKey('WorkerPilotRunId') -or
     $PSBoundParameters.ContainsKey('WorkerPilotSourcePst') -or
     $PSBoundParameters.ContainsKey('WorkerPilotConfirmSourceSizeDifference') -or
-    $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes'))
+    $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotReviewHistoricalFence') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotExpectedHistoricalJournalSha256'))
 $pilotGate = Assert-OPA265WorkerPilotGate -Mode $Mode -PilotRequested ([bool]$WorkerPilot) -ExplicitConsent ([bool]$ConfirmDevWorkerPilot) -WhatIfEnabled ([bool]$WhatIf) -Limit $Limit -ProfileName $ProfileName -Transaction $Transaction -MaxOperations $WorkerPilotMaxOperations -TimeoutSeconds $WorkerPilotTimeoutSeconds -OtherPilotOptionsSpecified $pilotOptionsSpecified
 if ($WorkerPilot) {
     . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerHost.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerControl.ps1"
-    if ($WorkerPilotProbeSynthetic) {
+    if ($WorkerPilotReviewHistoricalFence) {
+        if ($WorkerPilotProbeSynthetic -or
+            $WorkerPilotConfirmSourceSizeDifference -or
+            $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes') -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst) -or
+            [string]::IsNullOrWhiteSpace($WorkerPilotExpectedHistoricalJournalSha256)) {
+            throw 'BW4a requires exact historic RunId/PST/SHA256 and disallows synthetic probe or size consent.'
+        }
+        # Read-only local evidence; NO Worker process, Outlook COM, or PST writes.
+        . "$PSScriptRoot\Core\Worker\Live3SyntheticScope.ps1"
+        . "$PSScriptRoot\Core\Worker\BW3OneShotProtocol265.ps1"
+        . "$PSScriptRoot\Core\Worker\BW3bIndependentAudit265.ps1"
+        . "$PSScriptRoot\Core\Worker\BW3dSyntheticSizeEvidence265.ps1"
+        . "$PSScriptRoot\Core\Worker\BW3eSyntheticBodyTailEvidence265.ps1"
+        . "$PSScriptRoot\Core\Worker\BW3gManualSizeAcceptance265.ps1"
+        . "$PSScriptRoot\Core\Worker\BW3hIndependentEvidenceChain265.ps1"
+        . "$PSScriptRoot\Core\Worker\BW3iJournalResolutionPreflight265.ps1"
+        . "$PSScriptRoot\Core\Worker\BW3jResolutionDesign265.ps1"
+        . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
+        . "$PSScriptRoot\Core\Archive\OperationJournal.ps1"
+        . "$PSScriptRoot\Core\Worker\BW4aHistoricalIntentIsolation265.ps1"
+        . "$PSScriptRoot\Core\Worker\BW4aHistoricalFenceReadOnly265.ps1"
+        $pilotResult=Invoke-OPA265BW4aHistoricalFenceReview -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction
+    } elseif ($WorkerPilotProbeSynthetic) {
         if ([string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
             [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst)) {
             throw 'BW2 requires exact -WorkerPilotRunId and -WorkerPilotSourcePst with -WorkerPilotProbeSynthetic.'
@@ -163,7 +192,8 @@ if ($WorkerPilot) {
         }
         $pilotResult = Invoke-OPA265BW2BoundedReadOnlyCanary -Gate $pilotGate -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -KeepArtifacts:$WorkerPilotKeepArtifacts -ConfirmSourceSizeDifference:$WorkerPilotConfirmSourceSizeDifference -ExpectedSourceSizeBytes $WorkerPilotExpectedSourceSizeBytes
     } else {
-        if (-not [string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
+        if ($PSBoundParameters.ContainsKey('WorkerPilotExpectedHistoricalJournalSha256') -or
+            -not [string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
             -not [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst) -or
             [bool]$WorkerPilotConfirmSourceSizeDifference -or
             $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes')) {
