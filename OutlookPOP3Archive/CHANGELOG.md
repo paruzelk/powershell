@@ -3,7 +3,7 @@
 - Build a strictly no-execution historical writer rehearsal from verified BW3j real Outlook review, existing BW3h seven-hash proofs and pinned original Intent SHA256. Original historical journal opened ONLY for reading; an exact byte-for-byte duplicate is stored in fresh OS TEMP OPA-BW3l-Copy-{GUID}.
 - Only the temporary copy accepts an isolated CreateNew resolution claim, SHA256 recheck under exclusive lock, Sequence=2 Reconciled append/Flush(true) and journal recovery replay; original seven hashes and original one-Intent replay verified again after rehearsal.
 - BW3l includes no original-path writer, no historical journal write permit, no PST changes, no MailItem.Move and no retry. Simulated offline replica fixtures cannot impersonate actual byte copies; copy claim crash gap preserved.
-- New 53 negative and positive Pester tests; target native PS5.1 1408/61; all new PS files single UTF-8 BOM.
+- New 74 negative and positive Pester tests; target native PS5.1 1429/61; all new PS files single UTF-8 BOM.
 
 ## BW3k — isolated synthetic journal one-shot reconciliation and crash injection (2026-10-28; CI pending)
 
