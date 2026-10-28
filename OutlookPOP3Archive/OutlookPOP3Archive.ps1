@@ -98,7 +98,13 @@ param(
     [string]$WorkerPilotCandidateEntryId = '',
     [ValidateRange(1,5000)][int]$WorkerPilotMaxFolderItems = 1000,
     # BW4d: independent read-only journal replay audit around existing BW4c Outlook capture.
-    [switch]$WorkerPilotReviewHistoryReplay
+    [switch]$WorkerPilotReviewHistoryReplay,
+    # BW4e: explicitly pin an already observed disposable candidate; never a Worker/Move permit.
+    [switch]$WorkerPilotReviewFreshSynthetic,
+    [string]$WorkerPilotCandidateReviewId = '',
+    [string]$WorkerPilotExpectedCandidateInternetMessageId = '',
+    [string]$WorkerPilotExpectedCandidateSearchKeySha256 = '',
+    [string]$WorkerPilotExpectedCandidateContentFingerprintSha256 = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -160,22 +166,36 @@ $pilotOptionsSpecified = ($PSBoundParameters.ContainsKey('WorkerPilotMaxOperatio
     $PSBoundParameters.ContainsKey('WorkerPilotCandidateFolderEntryId') -or
     $PSBoundParameters.ContainsKey('WorkerPilotCandidateEntryId') -or
     $PSBoundParameters.ContainsKey('WorkerPilotMaxFolderItems') -or
-    $PSBoundParameters.ContainsKey('WorkerPilotReviewHistoryReplay'))
+    $PSBoundParameters.ContainsKey('WorkerPilotReviewHistoryReplay') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotReviewFreshSynthetic') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotCandidateReviewId') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotExpectedCandidateInternetMessageId') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotExpectedCandidateSearchKeySha256') -or
+    $PSBoundParameters.ContainsKey('WorkerPilotExpectedCandidateContentFingerprintSha256'))
 $pilotGate = Assert-OPA265WorkerPilotGate -Mode $Mode -PilotRequested ([bool]$WorkerPilot) -ExplicitConsent ([bool]$ConfirmDevWorkerPilot) -WhatIfEnabled ([bool]$WhatIf) -Limit $Limit -ProfileName $ProfileName -Transaction $Transaction -MaxOperations $WorkerPilotMaxOperations -TimeoutSeconds $WorkerPilotTimeoutSeconds -OtherPilotOptionsSpecified $pilotOptionsSpecified
 if ($WorkerPilot) {
     . "$PSScriptRoot\Core\Worker\WorkerProtocol.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerHost.ps1"
     . "$PSScriptRoot\Core\Worker\WorkerControl.ps1"
-    if (-not ($WorkerPilotReviewOutlookPerItem -or $WorkerPilotReviewHistoryReplay) -and (
+    if (-not ($WorkerPilotReviewOutlookPerItem -or $WorkerPilotReviewHistoryReplay -or $WorkerPilotReviewFreshSynthetic) -and (
         $PSBoundParameters.ContainsKey('WorkerPilotCandidateFolderEntryId') -or
         $PSBoundParameters.ContainsKey('WorkerPilotCandidateEntryId') -or
         $PSBoundParameters.ContainsKey('WorkerPilotMaxFolderItems'))) {
         throw 'BW4c candidate identity and scan options require explicit BW4c read-only mode.'
     }
-    if ($WorkerPilotReviewOutlookPerItem -and $WorkerPilotReviewHistoryReplay) {
-        throw 'BW4d and BW4c pilot routes are mutually exclusive.'
+    if (($WorkerPilotReviewOutlookPerItem -and $WorkerPilotReviewHistoryReplay) -or
+        ($WorkerPilotReviewFreshSynthetic -and
+        ($WorkerPilotReviewOutlookPerItem -or $WorkerPilotReviewHistoryReplay))) {
+        throw 'BW4e, BW4d and BW4c pilot routes are mutually exclusive.'
     }
-    if (($WorkerPilotReviewOutlookPerItem -or $WorkerPilotReviewHistoryReplay) -and
+    if (-not $WorkerPilotReviewFreshSynthetic -and
+        ($PSBoundParameters.ContainsKey('WorkerPilotCandidateReviewId') -or
+        $PSBoundParameters.ContainsKey('WorkerPilotExpectedCandidateInternetMessageId') -or
+        $PSBoundParameters.ContainsKey('WorkerPilotExpectedCandidateSearchKeySha256') -or
+        $PSBoundParameters.ContainsKey('WorkerPilotExpectedCandidateContentFingerprintSha256'))) {
+        throw 'BW4e exact candidate pins are only accepted by its explicit read-only mode.'
+    }
+    if (($WorkerPilotReviewOutlookPerItem -or $WorkerPilotReviewHistoryReplay -or $WorkerPilotReviewFreshSynthetic) -and
         ($WorkerPilotReviewHistoricalFence -or $WorkerPilotReviewPerItemFence -or
          $WorkerPilotProbeSynthetic -or $WorkerPilotConfirmSourceSizeDifference -or
          $PSBoundParameters.ContainsKey('WorkerPilotExpectedSourceSizeBytes') -or
@@ -186,7 +206,7 @@ if ($WorkerPilot) {
     if ($WorkerPilotReviewHistoricalFence -and $WorkerPilotReviewPerItemFence) {
         throw 'BW4b conflicts with BW4a pilot review.'
     }
-    if ($WorkerPilotReviewOutlookPerItem -or $WorkerPilotReviewHistoryReplay) {
+    if ($WorkerPilotReviewOutlookPerItem -or $WorkerPilotReviewHistoryReplay -or $WorkerPilotReviewFreshSynthetic) {
         if ([string]::IsNullOrWhiteSpace($WorkerPilotRunId) -or
             [string]::IsNullOrWhiteSpace($WorkerPilotSourcePst) -or
             [string]::IsNullOrWhiteSpace($WorkerPilotExpectedHistoricalJournalSha256) -or
@@ -195,7 +215,15 @@ if ($WorkerPilot) {
             [string]::IsNullOrWhiteSpace($ProfileName)) {
             throw 'BW4c requires exact pinned historical evidence, Outlook profile, candidate folder and MailItem EntryID.'
         }
-        if ($WorkerPilotReviewHistoryReplay) {
+        if ($WorkerPilotReviewFreshSynthetic) {
+            if ([string]::IsNullOrWhiteSpace($WorkerPilotCandidateReviewId) -or
+                [string]::IsNullOrWhiteSpace($WorkerPilotExpectedCandidateInternetMessageId) -or
+                [string]::IsNullOrWhiteSpace($WorkerPilotExpectedCandidateSearchKeySha256) -or
+                [string]::IsNullOrWhiteSpace($WorkerPilotExpectedCandidateContentFingerprintSha256)) {
+                throw 'BW4e requires a new review GUID, exact InternetMessageId and both prior MAPI SHA256 pins.'
+            }
+            $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4eFreshSyntheticReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $WorkerPilotCandidateFolderEntryId -CandidateEntryId $WorkerPilotCandidateEntryId -ExpectedProfileName $ProfileName -MaxFolderItems $WorkerPilotMaxFolderItems -CandidateReviewId $WorkerPilotCandidateReviewId -ExpectedInternetMessageId $WorkerPilotExpectedCandidateInternetMessageId -ExpectedSearchKeySha256 $WorkerPilotExpectedCandidateSearchKeySha256 -ExpectedContentFingerprintSha256 $WorkerPilotExpectedCandidateContentFingerprintSha256 -Review -ConfirmExistingOutlookReadOnly
+        } elseif ($WorkerPilotReviewHistoryReplay) {
             $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4dHistoryReplayReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $WorkerPilotCandidateFolderEntryId -CandidateEntryId $WorkerPilotCandidateEntryId -ExpectedProfileName $ProfileName -MaxFolderItems $WorkerPilotMaxFolderItems -Review -ConfirmExistingOutlookReadOnly
         } else {
             $pilotResult=& "$PSScriptRoot\Core\Diagnostics\Test-OPA265BW4cOutlookPerItemReadOnly.ps1" -RunId $WorkerPilotRunId -SourcePst $WorkerPilotSourcePst -ExpectedJournalSha256 $WorkerPilotExpectedHistoricalJournalSha256 -Mode $Mode -Transaction $Transaction -FolderEntryId $WorkerPilotCandidateFolderEntryId -CandidateEntryId $WorkerPilotCandidateEntryId -ExpectedProfileName $ProfileName -MaxFolderItems $WorkerPilotMaxFolderItems -Review -ConfirmExistingOutlookReadOnly
