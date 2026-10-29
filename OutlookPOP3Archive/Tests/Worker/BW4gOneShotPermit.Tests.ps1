@@ -90,6 +90,32 @@ Describe 'BW4g: durable attempt filename is per-fixture GUID and fail closed' {
         $obj=[pscustomobject]@{Schema='2.6.5-BW4g.ImmutableOneShotClaim.1';TestId='98bef817-0fb5-478a-b869-33f02fda59d3';AutomaticRetryAllowed=$false;ProductionReady=$false}
         {Write-OPA265BW4gOneShotClaim -ClaimPath (Join-Path $TestDrive 'fake.claim') -Claim $obj} | Should -Throw '*cannot be redirected*'
     }
+    It 'durably creates exactly one claim under isolated temporary per-user AppData' {
+        $original=$env:LOCALAPPDATA
+        try {
+            $env:LOCALAPPDATA=Join-Path $TestDrive 'test-appdata'
+            $g='98bef817-0fb5-478a-b869-33f02fda59d3'
+            $path=Get-OPA265BW4gClaimPath -TestId $g
+            $obj=[pscustomobject]@{Schema='2.6.5-BW4g.ImmutableOneShotClaim.1';TestId=$g;AutomaticRetryAllowed=$false;ProductionReady=$false}
+            $saved=Write-OPA265BW4gOneShotClaim -ClaimPath $path -Claim $obj
+            $saved | Should -BeExactly $path
+            (Test-Path -LiteralPath $path) | Should -BeTrue
+            (Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json).TestId | Should -BeExactly $g
+        } finally { $env:LOCALAPPDATA=$original }
+    }
+    It 'never permits reusing an already claimed disposable fixture GUID' {
+        $original=$env:LOCALAPPDATA
+        try {
+            $env:LOCALAPPDATA=Join-Path $TestDrive 'test-appdata'
+            $g='98bef817-0fb5-478a-b869-33f02fda59d3'
+            $path=Get-OPA265BW4gClaimPath -TestId $g
+            $obj=[pscustomobject]@{Schema='2.6.5-BW4g.ImmutableOneShotClaim.1';TestId=$g;AutomaticRetryAllowed=$false;ProductionReady=$false}
+            [void](Write-OPA265BW4gOneShotClaim -ClaimPath $path -Claim $obj)
+            $before=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
+            {Write-OPA265BW4gOneShotClaim -ClaimPath $path -Claim $obj} | Should -Throw
+            (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash | Should -BeExactly $before
+        } finally { $env:LOCALAPPDATA=$original }
+    }
     It 'refuses a payload with any automatic retry permission' {
         $obj=[pscustomobject]@{Schema='2.6.5-BW4g.ImmutableOneShotClaim.1';TestId='98bef817-0fb5-478a-b869-33f02fda59d3';AutomaticRetryAllowed=$true;ProductionReady=$false}
         {Write-OPA265BW4gOneShotClaim -ClaimPath (Join-Path $TestDrive 'fake.claim') -Claim $obj} | Should -Throw '*claim payload invalid*'
