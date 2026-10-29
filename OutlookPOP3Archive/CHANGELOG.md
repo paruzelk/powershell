@@ -1,3 +1,10 @@
+## 2.6.5-BW4f1 — BW4b witness compatibility hotfix (DEV, 2026-10-29)
+
+- Fix actual Outlook BW4f failure: BW4f emits 12 witness fields but strict BW4b expected 10 and returned BlockedUnverifiedPerItemEvidence, which BW4d wrapped in the generic "modified historical evidence or falsely trusted input" error.
+- BW4b now accepts ONLY original 10-field witnesses or exact 12-field BW4f witnesses, validates canonical TestId, and demands matching marker across both Outlook MAPI read paths; unexpected extras remain blocked.
+- Add five test regressions using authentic pinned BW3a historic evidence; no Move, Worker, journal write or historical reconciliation.
+- Requires successful local BW4f1 read-only BW4c and BW4f test before use of any BW4g -Execute.
+
 ## 2.6.5-BW4f — exact operator disposable fixture scope (DEV, 2026-10-29)
 
 - Add strict read-only operator TestId marker checks in both direct and targeted MAPI reads: exact Subject, Body header, one matching GUID and no attachments.
