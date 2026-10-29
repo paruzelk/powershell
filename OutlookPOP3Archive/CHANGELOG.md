@@ -1,3 +1,11 @@
+## 2.6.5-BW4g — operator-approved disposable one-shot Move (DEV, 2026-10-29)
+
+- Add isolated Windows PowerShell 5.1 STA controller: -Review is strictly read-only; -Execute -ConfirmOneShotDisposableMove makes one disposable cross-PST MailItem.Move ONLY after complete BW4f historical and MAPI checks.
+- Require separately created, exact GUID-named Unicode test destination PST with empty GUID-named folder; never use real client email or production Archive/Resume/Auto.
+- Create irreversible user-local CreateNew+Flush(true) claim before Move; all timeouts, indeterminate outcomes and successful attempts are forever no-retry for the TestId.
+- Fix strict BW4b schema handling to accept only documented legacy 10 fields or new BW4f 12 fields, including exact synthetic GUID validation; reject unexpected fields and disagreement.
+- No BW3a original Intent writes, no historical Reconciled, no automatic retries, no production Worker dispatch.
+
 ## 2.6.5-BW4f — exact operator disposable fixture scope (DEV, 2026-10-29)
 
 - Add strict read-only operator TestId marker checks in both direct and targeted MAPI reads: exact Subject, Body header, one matching GUID and no attachments.
