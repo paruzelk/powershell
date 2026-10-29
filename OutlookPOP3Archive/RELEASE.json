@@ -51,11 +51,11 @@
     "BW4e2: explicitly targeted exact MAPI InternetMessageId DASL Restrict for large POP3 Inbox; zero/duplicate/other item blocked; never a Move permit"
   ],
   "Verification": {
-    "Status": "BW4e2 DEV targeted exact InternetMessageId MAPI Restrict for 26485-item POP3 Inbox; Windows PS5.1 1688/69; no Worker or Move",
+    "Status": "BW4f DEV targeted MAPI snapshot stability check; Windows PS5.1 CI 1692/69; never Move",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
     "ExpectedTestContainers": 69,
-    "ExpectedPesterTests": 1688,
+    "ExpectedPesterTests": 1692,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
