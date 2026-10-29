@@ -1,3 +1,9 @@
+﻿## 2.6.5-BW4f — targeted MAPI read-only stability recheck (DEV)
+
+- Rechecks Inbox and filtered item counts during exact InternetMessageId restriction to reject delivery/move changes.
+- Re-opens candidate by original EntryID and StoreID, comparing InternetMessageId, PR_SEARCH_KEY SHA-256 and content digest after Restrict.
+- Four regression tests. No Worker, Move, PST change, claim, historical journal writer or retry.
+
 ## 2.6.5-BW4e2 — targeted MAPI read-only lookup for large POP3 Inbox (DEV, 2026-10-28)
 
 - Source Inbox contains 26485 items, exceeding BW4c original cap of 1000/5000; do not raise old full-scan threshold.
