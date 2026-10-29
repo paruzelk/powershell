@@ -82,6 +82,8 @@ try {
         SourceStoreId=$readback.Primary.SourceStoreId
         CandidateEntryId=$readback.Primary.SourceEntryId
         InternetMessageId=$readback.Primary.InternetMessageId
+        IsExactOperatorFixture=[bool]$readback.Primary.IsExactOperatorFixture
+        ObservedOperatorTestId=[string]$readback.Primary.ObservedOperatorTestId
         SearchKeySha256=$readback.Primary.SearchKeySha256
         ContentFieldFingerprintSha256=$readback.Primary.ContentSha256
         FolderItemsScanned=$readback.FolderItemsScanned
