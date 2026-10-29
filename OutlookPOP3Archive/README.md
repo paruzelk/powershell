@@ -187,3 +187,7 @@ For an Inbox larger than 5000 messages, do NOT increase the original full-enumer
 ## BW4f exact disposable test fixture scope (read-only DEV)
 
 The opt-in `-WorkerPilotReviewFreshFixtureScope` route requires exact operator-created test subject/body GUID, no attachments and both BW4e2 Outlook read paths with preserved BW3a and LIVE3/4 evidence. A positive match is **never** a Move permit; production Archive/Resume/Auto Worker remains disabled. See [BW4f procedure](docs/2.6.5-bw4f-exact-fresh-fixture-scope-readonly.md).
+
+## BW4g — DEV-only explicit disposable one-shot cross-PST Move
+
+Separate native PowerShell 5.1 STA script `Core/Diagnostics/Invoke-OPA265BW4gOneShotDisposableMove.ps1` accepts read-only `-Review` and an explicitly approved `-Execute -ConfirmOneShotDisposableMove`. Runs BW4f + BW4e2 + BW4d original historical checks, requires a new empty GUID-named disposable PST/folder and writes a durable no-retry claim before one `MailItem.Move`. Production Archive/Resume/Auto Worker stays disabled. See [BW4g instructions](docs/2.6.5-bw4g-one-shot-disposable-move.md).
