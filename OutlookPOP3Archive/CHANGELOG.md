@@ -1,3 +1,10 @@
+## 2.6.5-BW4f — exact operator disposable fixture scope (DEV, 2026-10-29)
+
+- Add strict read-only operator TestId marker checks in both direct and targeted MAPI reads: exact Subject, Body header, one matching GUID and no attachments.
+- BW4f scope never infers independent freshness, complete history or replay permission, and permanently denies Worker, MailItem.Move, journal writes and automatic retry.
+- Preserve original BW3a one Intent, seven pinned SHA256 historical files and BW4d LIVE3/4 independent journal audit.
+- Add 26 native Pester regression tests; Windows PowerShell 5.1, PSScriptAnalyzer, UTF-8 BOM and project-only DEV ZIP gates.
+
 ## 2.6.5-BW4e2 — targeted MAPI read-only lookup for large POP3 Inbox (DEV, 2026-10-28)
 
 - Source Inbox contains 26485 items, exceeding BW4c original cap of 1000/5000; do not raise old full-scan threshold.
