@@ -1,4 +1,5 @@
 ﻿#requires -Version 5.1
+. (Join-Path $PSScriptRoot 'BW4fFreshFixtureScope265.ps1')
 # BW4c: two Outlook read paths, one existing MAPI session. Never grants Worker authorization.
 # Compare Outlook opaque hexadecimal identities byte-for-byte, ignoring hex letter case.
 # Non-hexadecimal mock IDs still require exact ordinal equality.
@@ -65,6 +66,9 @@ function Get-OPA265BW4cItemWitness {
         [void]$buffer.Append(':')
         [void]$buffer.Append([string]$v)
     }
+    $attachmentCount=$null
+    try { $attachmentCount=[int]$Mail.Attachments.Count } catch {}
+    $fixture=Get-OPA265BW4fFixtureTag -Subject $subject -Body $body -AttachmentCount $attachmentCount
     $contentHash=Get-OPA265BW4cHash -Bytes ([Text.Encoding]::UTF8.GetBytes($buffer.ToString()))
     return [pscustomobject][ordered]@{
         Schema='2.6.5-BW4b.PerItemWitness.1'
@@ -76,6 +80,8 @@ function Get-OPA265BW4cItemWitness {
         InternetMessageId=$id
         SearchKeySha256=(Get-OPA265BW4cHash -Bytes $keyBytes)
         ContentSha256=$contentHash
+        IsExactOperatorFixture=[bool]$fixture.IsExactOperatorFixture
+        ObservedOperatorTestId=[string]$fixture.TestId
         ObservedItemCount=1
     }
 }
@@ -204,6 +210,10 @@ function Get-OPA265BW4cDualReadback {
         $scanned=$n
     }
     $b=Get-OPA265BW4cItemWitness -Mail $matched -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method IndependentReadOnly
+    if ([bool]$a.IsExactOperatorFixture -ne [bool]$b.IsExactOperatorFixture -or
+        [string]$a.ObservedOperatorTestId -cne [string]$b.ObservedOperatorTestId) {
+        throw 'BW4f: disposable fixture tag differs between direct and secondary Outlook read paths.'
+    }
     if ($UseTargetedMessageIdReadOnly -and (
         [string]$b.InternetMessageId -cne [string]$a.InternetMessageId -or
         [string]$b.SearchKeySha256 -cne [string]$a.SearchKeySha256 -or
