@@ -4,6 +4,7 @@
 - Require separately created, exact GUID-named Unicode test destination PST with empty GUID-named folder; never use real client email or production Archive/Resume/Auto.
 - Create irreversible user-local CreateNew+Flush(true) claim before Move; all timeouts, indeterminate outcomes and successful attempts are forever no-retry for the TestId.
 - Fix strict BW4b schema handling to accept only documented legacy 10 fields or new BW4f 12 fields, including exact synthetic GUID validation; reject unexpected fields and disagreement.
+- Add positive CreateNew/Flush(true) durability and same-fixture no-retry checks in isolated per-user TestDrive.
 - No BW3a original Intent writes, no historical Reconciled, no automatic retries, no production Worker dispatch.
 
 ## 2.6.5-BW4f — exact operator disposable fixture scope (DEV, 2026-10-29)
