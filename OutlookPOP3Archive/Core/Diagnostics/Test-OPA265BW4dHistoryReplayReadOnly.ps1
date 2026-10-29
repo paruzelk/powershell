@@ -53,6 +53,8 @@ try {
         SyntheticLive3Identity=$decision.SyntheticLive3Identity
         CandidateEntryId=[string]$bw4c.CandidateEntryId
         InternetMessageId=[string]$bw4c.InternetMessageId
+        IsExactOperatorFixture=[bool]$bw4c.IsExactOperatorFixture
+        ObservedOperatorTestId=[string]$bw4c.ObservedOperatorTestId
         SourceStoreId=[string]$bw4c.SourceStoreId
         SearchKeySha256=[string]$bw4c.SearchKeySha256
         TargetedMessageIdReadOnlyUsed=[bool]$bw4c.TargetedMessageIdReadOnlyUsed
