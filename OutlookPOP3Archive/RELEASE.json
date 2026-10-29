@@ -49,14 +49,15 @@
     "BW4e: exact candidate EntryID, InternetMessageId, PR_SEARCH_KEY and content fingerprint pinned before a new BW4d read-only historical audit; no proof of newness or Move permission",
     "BW4e1: rename PSCustomObject readback from $review to $bw4dSnapshot to prevent PowerShell case-insensitive SwitchParameter collision; no Worker/Move permit",
     "BW4e2: explicitly targeted exact MAPI InternetMessageId DASL Restrict for large POP3 Inbox; zero/duplicate/other item blocked; never a Move permit",
-    "BW4f: compare exact disposable Subject, body TestId and zero attachments across both Outlook MAPI read paths; no Worker/Move permission"
+    "BW4f: compare exact disposable Subject, body TestId and zero attachments across both Outlook MAPI read paths; no Worker/Move permission",
+    "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4f DEV exact operator fixture read-only scope; Windows PowerShell 5.1 CI 1716/70; no Worker or Move authorization",
+    "Status": "BW4g DEV explicit one-shot disposable Move with irreversible attempt claim, CI 1736/71; NOT production",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 70,
-    "ExpectedPesterTests": 1716,
+    "ExpectedTestContainers": 71,
+    "ExpectedPesterTests": 1736,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -136,6 +137,10 @@
     "BW4fOperatorSyntheticScopeReadOnly": true,
     "BW4fCandidateNewnessIndependentlyProven": false,
     "BW4fWorkerDispatchAllowed": false,
-    "BW4fMovePermitAllowed": false
+    "BW4fMovePermitAllowed": false,
+    "BW4gDisposableOneShotRequiresExplicitExecute": true,
+    "BW4gAutomaticRetryAllowed": false,
+    "BW4gHistoricJournalWriterAllowed": false,
+    "BW4gProductionWorkerDispatchAllowed": false
   }
 }
