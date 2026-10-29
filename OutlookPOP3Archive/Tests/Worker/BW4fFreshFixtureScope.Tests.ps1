@@ -50,6 +50,38 @@ Describe 'BW4f exact disposable Outlook fixture tag' {
         (Get-OPA265BW4fFixtureTag -Subject ($script:subject.Replace($script:testGuid,$z)) -Body ($script:body.Replace($script:testGuid,$z)) -AttachmentCount 0).IsExactOperatorFixture | Should -BeFalse
     }
 }
+Describe 'BW4f real BW4c witness must not fake attachment absence' {
+    BeforeAll {
+        . (Join-Path $PSScriptRoot '../../Core/Worker/BW4cOutlookReadOnlyCapture265.ps1')
+    }
+    BeforeEach {
+        $script:folder=[pscustomobject]@{EntryID='00112244';StoreID='00CCCCFF'}
+        $script:accessor=[pscustomobject]@{MessageId='<new-test@example.invalid>';Key=[byte[]](1,2,3)}
+        $script:accessor | Add-Member ScriptMethod GetProperty {
+            param($name)
+            if ($name -eq 'http://schemas.microsoft.com/mapi/proptag/0x1035001F'){return $this.MessageId}
+            if ($name -eq 'http://schemas.microsoft.com/mapi/proptag/0x300B0102'){return $this.Key}
+            throw 'Unknown MAPI property'
+        }
+        $script:mail=[pscustomobject]@{
+            Class=43;EntryID='00AABBCC';Parent=$script:folder
+            PropertyAccessor=$script:accessor
+            Size=[long]512;ReceivedTime=[datetime]'2026-10-28T11:00:00'
+            Subject=$script:subject;SenderEmailAddress='self@example.invalid'
+            Body=$script:body
+        }
+    }
+    It 'does not interpret absent Attachments COM collection as 0 attachments' {
+        $w=Get-OPA265BW4cItemWitness -Mail $script:mail -SourcePst 'C:\fixture.pst' -StoreId '00CCCCFF' -FolderEntryId '00112244' -CandidateEntryId '00AABBCC' -Method PrimaryReadOnly
+        $w.IsExactOperatorFixture | Should -BeFalse
+    }
+    It 'recognizes exact fixture when Outlook proves actual Attachments.Count equals zero' {
+        $script:mail | Add-Member NoteProperty Attachments ([pscustomobject]@{Count=0})
+        $w=Get-OPA265BW4cItemWitness -Mail $script:mail -SourcePst 'C:\fixture.pst' -StoreId '00CCCCFF' -FolderEntryId '00112244' -CandidateEntryId '00AABBCC' -Method PrimaryReadOnly
+        $w.IsExactOperatorFixture | Should -BeTrue
+        $w.ObservedOperatorTestId | Should -BeExactly $script:testGuid
+    }
+}
 Describe 'BW4f historical no-Move gate after BW4e2 targeted read-only' {
     BeforeEach {
         $script:review=[pscustomobject][ordered]@{
