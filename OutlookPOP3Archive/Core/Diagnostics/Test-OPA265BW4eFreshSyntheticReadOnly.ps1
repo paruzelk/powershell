@@ -47,6 +47,8 @@ try {
         CandidateReviewId=$CandidateReviewId
         CandidateEntryId=$result.CandidateEntryId
         InternetMessageId=$result.InternetMessageId
+        IsExactOperatorFixture=[bool]$bw4dSnapshot.IsExactOperatorFixture
+        ObservedOperatorTestId=[string]$bw4dSnapshot.ObservedOperatorTestId
         HistoricalOperationMatches=$result.HistoricalOperationMatches
         SyntheticLive3Identity=$result.SyntheticLive3Identity
         PriorReadOnlyPinsMatch=$result.PriorReadOnlyPinsMatch
