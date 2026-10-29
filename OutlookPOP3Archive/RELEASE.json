@@ -52,11 +52,11 @@
     "BW4f: compare exact disposable Subject, body TestId and zero attachments across both Outlook MAPI read paths; no Worker/Move permission"
   ],
   "Verification": {
-    "Status": "BW4f DEV exact operator fixture read-only scope; Windows PowerShell 5.1 CI 1716/70; no Worker or Move authorization",
+    "Status": "BW4f1 read-only BW4b 12-field witness hotfix, 1721 tests in 71 containers, no Move or Worker",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 70,
-    "ExpectedPesterTests": 1716,
+    "ExpectedTestContainers": 71,
+    "ExpectedPesterTests": 1721,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -136,6 +136,8 @@
     "BW4fOperatorSyntheticScopeReadOnly": true,
     "BW4fCandidateNewnessIndependentlyProven": false,
     "BW4fWorkerDispatchAllowed": false,
-    "BW4fMovePermitAllowed": false
+    "BW4fMovePermitAllowed": false,
+    "BW4f1Witness12FieldCompatibilityFixed": true,
+    "BW4f1ArchiveOrResumeWorkerEnabled": false
   }
 }
