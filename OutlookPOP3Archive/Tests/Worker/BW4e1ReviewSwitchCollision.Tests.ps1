@@ -5,6 +5,7 @@ BeforeAll {
     $script:realDiagnostic=Join-Path $PSScriptRoot '../../Core/Diagnostics/Test-OPA265BW4eFreshSyntheticReadOnly.ps1'
     $script:realBw4c=Join-Path $PSScriptRoot '../../Core/Worker/BW4cOutlookReadOnlyCapture265.ps1'
     $script:realBw4e=Join-Path $PSScriptRoot '../../Core/Worker/BW4eFreshSyntheticCandidate265.ps1'
+    $script:realBw4f=Join-Path $PSScriptRoot '../../Core/Worker/BW4fFreshFixtureScope265.ps1'
 }
 Describe 'BW4e1 live wrapper switch -Review cannot collide with $bw4dSnapshot result' {
     BeforeEach {
@@ -17,6 +18,7 @@ Describe 'BW4e1 live wrapper switch -Review cannot collide with $bw4dSnapshot re
         Copy-Item -LiteralPath $script:realDiagnostic -Destination $script:target
         Copy-Item -LiteralPath $script:realBw4c -Destination (Join-Path $worker 'BW4cOutlookReadOnlyCapture265.ps1')
         Copy-Item -LiteralPath $script:realBw4e -Destination (Join-Path $worker 'BW4eFreshSyntheticCandidate265.ps1')
+        Copy-Item -LiteralPath $script:realBw4f -Destination (Join-Path $worker 'BW4fFreshFixtureScope265.ps1')
         $fake=@'
 #requires -Version 5.1
 [CmdletBinding()]
