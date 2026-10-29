@@ -125,6 +125,17 @@ try {
         }
         return
     }
+    $stage='Prepare exact candidate MailItem immediately before irreversible attempt'
+    $mail=$ns.GetItemFromID($CandidateEntryId,[string]$srcScope.StoreId)
+    if ($null -eq $mail) {throw 'BW4g source disappeared before claim.'}
+    $lastWitness=Get-OPA265BW4cItemWitness -Mail $mail -SourcePst $srcScope.SourcePst -StoreId $srcScope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method PrimaryReadOnly
+    if (-not [bool]$lastWitness.IsExactOperatorFixture -or
+        [string]$lastWitness.ObservedOperatorTestId -cne $TestId -or
+        [string]$lastWitness.InternetMessageId -cne $ExpectedInternetMessageId -or
+        [string]$lastWitness.SearchKeySha256 -cne $ExpectedSearchKeySha256 -or
+        [string]$lastWitness.ContentSha256 -cne $ExpectedContentFingerprintSha256) {
+        throw 'BW4g source changed during final preclaim verification; no attempt claimed.'
+    }
     $stage='Durably create irreversible one-attempt claim'
     $claim=[pscustomobject][ordered]@{
         Schema='2.6.5-BW4g.ImmutableOneShotClaim.1'
@@ -142,12 +153,6 @@ try {
     $written=Write-OPA265BW4gOneShotClaim -ClaimPath $claimPath -Claim $claim
     $claimed=$true
     $stage='Attempt exactly ONE disposable cross-PST MailItem.Move'
-    $mail=$ns.GetItemFromID($CandidateEntryId,[string]$srcScope.StoreId)
-    if ($null -eq $mail -or [int]$mail.Class -ne 43 -or
-        -not (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$mail.EntryID) -Expected $CandidateEntryId) -or
-        -not (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$mail.Parent.EntryID) -Expected $FolderEntryId)) {
-        throw 'BW4g source changed immediately after claim; never retry.'
-    }
     $moved=$mail.Move($dest)
     if ($null -eq $moved -or [string]::IsNullOrWhiteSpace([string]$moved.EntryID)) {
         throw 'BW4g one Move returned indeterminate destination; never retry.'
