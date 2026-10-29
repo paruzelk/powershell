@@ -67,7 +67,10 @@ function Get-OPA265BW4cItemWitness {
         [void]$buffer.Append([string]$v)
     }
     $attachmentCount=$null
-    try { $attachmentCount=[int]$Mail.Attachments.Count } catch {}
+    try {
+        $actualAttachments=$Mail.Attachments
+        if ($null -ne $actualAttachments) { $attachmentCount=[int]$actualAttachments.Count }
+    } catch {}
     $fixture=Get-OPA265BW4fFixtureTag -Subject $subject -Body $body -AttachmentCount $attachmentCount
     $contentHash=Get-OPA265BW4cHash -Bytes ([Text.Encoding]::UTF8.GetBytes($buffer.ToString()))
     return [pscustomobject][ordered]@{
