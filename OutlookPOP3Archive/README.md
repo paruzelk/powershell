@@ -187,3 +187,7 @@ For an Inbox larger than 5000 messages, do NOT increase the original full-enumer
 ## BW4f exact disposable test fixture scope (read-only DEV)
 
 The opt-in `-WorkerPilotReviewFreshFixtureScope` route requires exact operator-created test subject/body GUID, no attachments and both BW4e2 Outlook read paths with preserved BW3a and LIVE3/4 evidence. A positive match is **never** a Move permit; production Archive/Resume/Auto Worker remains disabled. See [BW4f procedure](docs/2.6.5-bw4f-exact-fresh-fixture-scope-readonly.md).
+
+## BW4f1 read-only hotfix — BW4b/BW4f witness compatibility
+
+BW4f1 fixes the real Outlook failure where BW4f produces 12 MAPI witness fields but BW4b strictly accepted only 10. Both exact legacy 10-field and new 12-field layouts are allowed, with strict GUID and identical dual-path fixture evidence, never extra permit fields. BW4g -Execute must not be used until local BW4f1 read-only tests pass; production Worker remains disabled.
