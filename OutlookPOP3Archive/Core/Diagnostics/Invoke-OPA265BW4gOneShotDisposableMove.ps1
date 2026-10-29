@@ -67,7 +67,7 @@ try {
     if ([string]$ns.CurrentProfileName -cne $ExpectedProfileName) {throw 'BW4g Outlook profile mismatch.'}
     $stage='Resolve precreated unique disposable destination PST'
     $dstPath=[IO.Path]::GetFullPath($DestinationPst)
-    $destStore=$null;$matches=0
+    $destStore=$null;$storeMatches=0
     $count=[int]$ns.Stores.Count
     if ($count -lt 2 -or $count -gt 128) {throw 'BW4g store inventory unsafe.'}
     for($i=1;$i -le $count;$i++){
@@ -75,10 +75,10 @@ try {
         $path=''
         try {$path=[string]$store.FilePath} catch {}
         if ($path -and [string]::Equals([IO.Path]::GetFullPath($path),$dstPath,[StringComparison]::OrdinalIgnoreCase)) {
-            $destStore=$store;$matches++
+            $destStore=$store;$storeMatches++
         }
     }
-    if ($matches -ne 1 -or $null -eq $destStore -or
+    if ($storeMatches -ne 1 -or $null -eq $destStore -or
         [string]::IsNullOrWhiteSpace([string]$destStore.StoreID)) {
         throw 'BW4g target disposable PST is not uniquely mounted.'
     }
@@ -175,7 +175,7 @@ try {
     }
 } catch {
     throw ('BW4g STOP at ['+$stage+']: '+[string]$_.Exception.Message+
-        $(if($claimed){'. Move attempt claimed; outcome MAY BE INDETERMINATE; NEVER RETRY.'}else{'. No attempt claim created; no Move issued.'}))
+        $(if($claimed -or [IO.File]::Exists($claimPath)){'. An attempt claim exists or may be incomplete; NEVER RETRY.'}else{'. No attempt claim observed; no Move issued.'}))
 } finally {
     if($null -ne $ns -and [Runtime.InteropServices.Marshal]::IsComObject($ns)){
         [void][Runtime.InteropServices.Marshal]::ReleaseComObject($ns)
