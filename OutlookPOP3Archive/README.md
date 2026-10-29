@@ -183,3 +183,7 @@ The BW4e diagnostic no longer overwrites the case-insensitive `[switch]$Review` 
 ## BW4e2 DEV: targeted read-only MAPI lookup in large POP3 Inbox
 
 For an Inbox larger than 5000 messages, do NOT increase the original full-enumeration limit. The explicit `-WorkerPilotUseTargetedMessageIdReadOnly` switch replaces the second read path with exact `Items.Restrict` on the already observed MAPI InternetMessageId, requires exactly one match and preserves BW4d/BW4e historical no-Move rules. See [BW4e2 procedure](docs/2.6.5-bw4e2-targeted-large-folder-readonly.md). Outlook support must be checked locally; CI alone does not authorize Move.
+
+## BW4f exact disposable test fixture scope (read-only DEV)
+
+The opt-in `-WorkerPilotReviewFreshFixtureScope` route requires exact operator-created test subject/body GUID, no attachments and both BW4e2 Outlook read paths with preserved BW3a and LIVE3/4 evidence. A positive match is **never** a Move permit; production Archive/Resume/Auto Worker remains disabled. See [BW4f procedure](docs/2.6.5-bw4f-exact-fresh-fixture-scope-readonly.md).
