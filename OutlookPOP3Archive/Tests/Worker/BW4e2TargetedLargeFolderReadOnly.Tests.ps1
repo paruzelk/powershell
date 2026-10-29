@@ -80,6 +80,46 @@ Describe 'BW4e2 bounded targeted exact MAPI InternetMessageId read-only lookup' 
         {Get-OPA265BW4cDualReadback -Namespace $script:ns -SourcePst $script:pst -FolderEntryId '0011AABB' -CandidateEntryId '00AACCEE' -MaxFolderItems 1000} | Should -Throw '*folder cardinality outside explicit scan cap*'
         $script:items.Filter | Should -BeExactly ''
     }
+    It 'BW4f rejects a changed restricted result count on second read' {
+        $script:restricted | Add-Member ScriptProperty Count {
+            if (-not $script:hitCounter) { $script:hitCounter=0 }
+            $script:hitCounter++
+            if ($script:hitCounter -gt 1) { return 2 }
+            return 1
+        } -Force
+        { Invoke-BW4e2MockTarget } | Should -Throw '*changed during readback*'
+    }
+    It 'BW4f rejects changed folder population while Restrict executes' {
+        $script:items | Add-Member ScriptMethod Restrict {
+            param($sql)
+            $this.Filter=$sql
+            $this.Count=26486
+            return $this.Restricted
+        } -Force
+        { Invoke-BW4e2MockTarget } | Should -Throw '*changed during readback*'
+        $script:items.FullEnumerationAttempts | Should -Be 0
+    }
+    It 'BW4f reopens the exact item before accepting MAPI evidence' {
+        $script:ns | Add-Member NoteProperty DirectCount 0 -Force
+        $script:ns | Add-Member ScriptMethod GetItemFromID {
+            param($id,$store)
+            $this.DirectCount++
+            return $this.Target
+        } -Force
+        $r=Invoke-BW4e2MockTarget
+        $script:ns.DirectCount | Should -Be 2
+        $r.FolderItemsScanned | Should -Be 0
+    }
+    It 'BW4f rejects null candidate at the final direct MAPI recheck' {
+        $script:ns | Add-Member NoteProperty DirectCount 0 -Force
+        $script:ns | Add-Member ScriptMethod GetItemFromID {
+            param($id,$store)
+            $this.DirectCount++
+            if($this.DirectCount -gt 1){return $null}
+            return $this.Target
+        } -Force
+        {Invoke-BW4e2MockTarget} | Should -Throw '*direct candidate recheck returned null*'
+    }
     It 'rejects zero matching InternetMessageId values' {
         $script:restricted.Count=0
         {Invoke-BW4e2MockTarget} | Should -Throw '*must return ONE item*'
