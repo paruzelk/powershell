@@ -93,7 +93,7 @@ Describe 'BW4g: durable attempt filename is per-fixture GUID and fail closed' {
     It 'durably creates exactly one claim under isolated temporary per-user AppData' {
         $original=$env:LOCALAPPDATA
         try {
-            $env:LOCALAPPDATA=Join-Path $TestDrive 'test-appdata'
+            $env:LOCALAPPDATA=Join-Path $TestDrive ('test-appdata-'+[guid]::NewGuid().ToString('N'))
             $g='98bef817-0fb5-478a-b869-33f02fda59d3'
             $path=Get-OPA265BW4gClaimPath -TestId $g
             $obj=[pscustomobject]@{Schema='2.6.5-BW4g.ImmutableOneShotClaim.1';TestId=$g;AutomaticRetryAllowed=$false;ProductionReady=$false}
@@ -106,7 +106,7 @@ Describe 'BW4g: durable attempt filename is per-fixture GUID and fail closed' {
     It 'never permits reusing an already claimed disposable fixture GUID' {
         $original=$env:LOCALAPPDATA
         try {
-            $env:LOCALAPPDATA=Join-Path $TestDrive 'test-appdata'
+            $env:LOCALAPPDATA=Join-Path $TestDrive ('test-appdata-'+[guid]::NewGuid().ToString('N'))
             $g='98bef817-0fb5-478a-b869-33f02fda59d3'
             $path=Get-OPA265BW4gClaimPath -TestId $g
             $obj=[pscustomobject]@{Schema='2.6.5-BW4g.ImmutableOneShotClaim.1';TestId=$g;AutomaticRetryAllowed=$false;ProductionReady=$false}
