@@ -36,13 +36,29 @@ function Get-OPA265BW4bPerItemDecision {
         $status='BlockedMissingPerItemEvidence'
     } else {
         $expected=@('Schema','CaptureId','CaptureMethod','SourcePst','SourceStoreId','SourceEntryId','InternetMessageId','SearchKeySha256','ContentSha256','ObservedItemCount')
+        # BW4g: permit ONLY the two documented read-only BW4f fixture markers.
+        # Continue accepting legacy exact ten-field BW4b witnesses unchanged.
+        $markerFields=@('IsExactOperatorFixture','ObservedOperatorTestId')
         $formatValid=$true
+        $firstFields=@($Primary.PSObject.Properties.Name)
+        $secondFields=@($Independent.PSObject.Properties.Name)
+        $extended=($firstFields.Count -eq 12 -and $secondFields.Count -eq 12)
         foreach($o in @($Primary,$Independent)) {
-            if ($o -isnot [pscustomobject] -or @($o.PSObject.Properties.Name).Count -ne $expected.Count) { $formatValid=$false; continue }
-            foreach($f in $expected) {
+            $expectedHere=if ($extended) {@($expected)+@($markerFields)}else{@($expected)}
+            if ($o -isnot [pscustomobject] -or @($o.PSObject.Properties.Name).Count -ne $expectedHere.Count) { $formatValid=$false; continue }
+            foreach($f in $expectedHere) {
                 if ($o.PSObject.Properties.Name -cnotcontains $f) { $formatValid=$false }
             }
             if (-not $formatValid) { continue }
+            if ($extended) {
+                $marker=[string]$o.ObservedOperatorTestId
+                $parsed=[guid]::Empty
+                if ($o.IsExactOperatorFixture -isnot [bool]) { $formatValid=$false; continue }
+                if ($o.IsExactOperatorFixture) {
+                    if (-not [guid]::TryParse($marker,[ref]$parsed) -or
+                        $parsed -eq [guid]::Empty -or $marker -cne $parsed.ToString('D')) { $formatValid=$false; continue }
+                } elseif (-not [string]::IsNullOrEmpty($marker)) { $formatValid=$false; continue }
+            }
             $id=[guid]::Empty
             if ([string]$o.Schema -cne '2.6.5-BW4b.PerItemWitness.1' -or
                 -not [guid]::TryParse([string]$o.CaptureId,[ref]$id) -or $id -eq [guid]::Empty -or
@@ -65,6 +81,11 @@ function Get-OPA265BW4bPerItemDecision {
             $consistent=$true
             foreach($key in @('SourcePst','SourceStoreId','SourceEntryId','InternetMessageId','SearchKeySha256','ContentSha256','ObservedItemCount')) {
                 if ([string]$Primary.$key -cne [string]$Independent.$key) { $consistent=$false }
+            }
+            if ($extended -and (
+                [bool]$Primary.IsExactOperatorFixture -ne [bool]$Independent.IsExactOperatorFixture -or
+                [string]$Primary.ObservedOperatorTestId -cne [string]$Independent.ObservedOperatorTestId)) {
+                $consistent=$false
             }
             $status=if ($consistent) {'PerItemEvidenceConsistentDesignOnlyNoWorkerDispatch'} else {'BlockedConflictingPerItemEvidence'}
         }
