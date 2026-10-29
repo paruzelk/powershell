@@ -103,8 +103,8 @@ Describe 'BW4g: BW4b backward compatible exact 10-field and 12-field witness acc
             Schema='2.6.5-BW4a.HistoricalWorkerIsolationFence.1';Policy='OptionBPreserveSingleIntentNeverRedispatch'
             RunId=$p.RunId;OperationId=$p.OperationId;WorkerRequestId=$p.WorkerRequestId;SourcePst=$p.SourcePst
             ArchivePst='C:\BW4g-fixture.pst';JournalSha256=$p.JournalSha256
-            AcceptanceRecordSha256=$p.AcceptanceFileSha256;SourceEntryId='historic-source'
-            DestinationEntryId=$p.DestinationEntryId;InternetMessageId='<historic@example.invalid>'
+            AcceptanceRecordSha256=$p.AcceptanceFileSha256;SourceEntryId='old-historical-src'
+            DestinationEntryId=$p.DestinationEntryId;InternetMessageId=('<opa264-live3-'+$p.RunId+'@example.invalid>')
             HistoricalJournalEventCount=1;HistoricalJournalPhase='Intent';HistoricalMovePreviouslyConfirmed=$true
             JournalReconciliationAuthorized=$false;HistoricRetryBlocked=$true;WorkerDispatchAllowed=$false
             AutomaticRetryAllowed=$false;ProductionReady=$false
