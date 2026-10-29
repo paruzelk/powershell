@@ -56,7 +56,7 @@ jobs:
               Copy-Item -LiteralPath $f.FullName -Destination $dst
             }
           }
-          $meta=[ordered]@{Artifact=$tag+'.zip';BaseApplicationBuild='2.6.3-PREVIEW1';DevelopmentGate='2.6.5-BW4f';SourceCommit=$env:GITHUB_SHA;PesterPassed=1714;TestContainers=70;NativeWindowsPowerShell51=$true;ProductionReady=$false}
+          $meta=[ordered]@{Artifact=$tag+'.zip';BaseApplicationBuild='2.6.3-PREVIEW1';DevelopmentGate='2.6.5-BW4f';SourceCommit=$env:GITHUB_SHA;PesterPassed=1716;TestContainers=70;NativeWindowsPowerShell51=$true;ProductionReady=$false}
           $utf8=New-Object Text.UTF8Encoding($false)
           [IO.File]::WriteAllText((Join-Path $stage 'BUILD-INFO.json'),(ConvertTo-Json -InputObject $meta -Depth 4),$utf8)
           Add-Type -AssemblyName System.IO.Compression.FileSystem
