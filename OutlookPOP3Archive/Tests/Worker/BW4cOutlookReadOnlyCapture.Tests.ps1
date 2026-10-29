@@ -42,7 +42,9 @@ Describe 'BW4c dual-path Outlook MAPI read-only capture' {
     It 'uses exactly BW4b witness schema and never prints Body' {
         $r=Get-OPA265BW4cDualReadback -Namespace $script:ns -SourcePst $script:pst -FolderEntryId 'FOLDER' -CandidateEntryId 'ITEM'
         $r.Primary.Schema | Should -BeExactly '2.6.5-BW4b.PerItemWitness.1'
-        @($r.Primary.PSObject.Properties.Name).Count | Should -Be 10
+        @($r.Primary.PSObject.Properties.Name).Count | Should -Be 12
+        $r.Primary.PSObject.Properties.Name | Should -Contain 'IsExactOperatorFixture'
+        $r.Primary.PSObject.Properties.Name | Should -Contain 'ObservedOperatorTestId'
         $r.Primary.PSObject.Properties.Name | Should -Not -Contain 'Body'
     }
     It 'refuses wrong folder ID' {
