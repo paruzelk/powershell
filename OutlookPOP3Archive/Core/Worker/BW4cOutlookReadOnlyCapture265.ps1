@@ -185,6 +185,24 @@ function Get-OPA265BW4cDualReadback {
         if (-not (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$matched.EntryID) -Expected $CandidateEntryId)) {
             throw 'BW4e2: restriction returned a different EntryID; no fallback.'
         }
+        # BW4f: a changing Inbox invalidates the dual-path snapshot.
+        # A Restrict collection is not a snapshot guarantee. Fail closed when
+        # an item was delivered, removed or reindexed during MAPI readback.
+        $recheckedHits=[int]$restricted.Count
+        $recheckedFolderCount=[int]$items.Count
+        if ($recheckedHits -ne 1 -or $recheckedFolderCount -ne $n) {
+            throw 'BW4f: MAPI restricted result or folder cardinality changed during readback; no consistent evidence.'
+        }
+        $directRecheck=$null
+        try { $directRecheck=$Namespace.GetItemFromID($CandidateEntryId,$scope.StoreId) }
+        catch { throw ('BW4f: direct candidate recheck failed closed: '+[string]$_.Exception.Message) }
+        if ($null -eq $directRecheck) { throw 'BW4f: direct candidate recheck returned null.' }
+        $recheck=Get-OPA265BW4cItemWitness -Mail $directRecheck -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method DirectStabilityRecheck
+        if ([string]$recheck.InternetMessageId -cne [string]$a.InternetMessageId -or
+            [string]$recheck.SearchKeySha256 -cne [string]$a.SearchKeySha256 -or
+            [string]$recheck.ContentSha256 -cne [string]$a.ContentSha256) {
+            throw 'BW4f: direct candidate MAPI fingerprint changed during readback; no stable evidence.'
+        }
         # No full enumeration of the original 26485-item folder took place.
         $scanned=0
     } else {
