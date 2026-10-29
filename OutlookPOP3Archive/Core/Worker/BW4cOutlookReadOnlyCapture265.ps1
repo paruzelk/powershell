@@ -197,7 +197,7 @@ function Get-OPA265BW4cDualReadback {
         try { $directRecheck=$Namespace.GetItemFromID($CandidateEntryId,$scope.StoreId) }
         catch { throw ('BW4f: direct candidate recheck failed closed: '+[string]$_.Exception.Message) }
         if ($null -eq $directRecheck) { throw 'BW4f: direct candidate recheck returned null.' }
-        $recheck=Get-OPA265BW4cItemWitness -Mail $directRecheck -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method DirectStabilityRecheck
+        $recheck=Get-OPA265BW4cItemWitness -Mail $directRecheck -SourcePst $scope.SourcePst -StoreId $scope.StoreId -FolderEntryId $FolderEntryId -CandidateEntryId $CandidateEntryId -Method PrimaryReadOnly
         if ([string]$recheck.InternetMessageId -cne [string]$a.InternetMessageId -or
             [string]$recheck.SearchKeySha256 -cne [string]$a.SearchKeySha256 -or
             [string]$recheck.ContentSha256 -cne [string]$a.ContentSha256) {
