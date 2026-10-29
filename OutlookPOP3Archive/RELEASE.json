@@ -48,14 +48,15 @@
     "BW4d1: strict hexadecimal EntryID/StoreID case normalization and exact folder mismatch diagnostics for real Outlook; no bypass, PST changes or Worker Move",
     "BW4e: exact candidate EntryID, InternetMessageId, PR_SEARCH_KEY and content fingerprint pinned before a new BW4d read-only historical audit; no proof of newness or Move permission",
     "BW4e1: rename PSCustomObject readback from $review to $bw4dSnapshot to prevent PowerShell case-insensitive SwitchParameter collision; no Worker/Move permit",
-    "BW4e2: explicitly targeted exact MAPI InternetMessageId DASL Restrict for large POP3 Inbox; zero/duplicate/other item blocked; never a Move permit"
+    "BW4e2: explicitly targeted exact MAPI InternetMessageId DASL Restrict for large POP3 Inbox; zero/duplicate/other item blocked; never a Move permit",
+    "BW4f: compare exact disposable Subject, body TestId and zero attachments across both Outlook MAPI read paths; no Worker/Move permission"
   ],
   "Verification": {
-    "Status": "BW4e2 DEV targeted exact InternetMessageId MAPI Restrict for 26485-item POP3 Inbox; Windows PS5.1 1688/69; no Worker or Move",
+    "Status": "BW4f DEV exact operator fixture read-only scope; Windows PowerShell 5.1 CI 1714/70; no Worker or Move authorization",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 69,
-    "ExpectedPesterTests": 1688,
+    "ExpectedTestContainers": 70,
+    "ExpectedPesterTests": 1714,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -131,6 +132,10 @@
     "BW4e2TargetedReadOnlyRestrict": true,
     "BW4e2UnboundedEnumerationAllowed": false,
     "BW4e2WorkerDispatchAllowed": false,
-    "BW4e2MovePermitAllowed": false
+    "BW4e2MovePermitAllowed": false,
+    "BW4fOperatorSyntheticScopeReadOnly": true,
+    "BW4fCandidateNewnessIndependentlyProven": false,
+    "BW4fWorkerDispatchAllowed": false,
+    "BW4fMovePermitAllowed": false
   }
 }
