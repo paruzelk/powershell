@@ -21,10 +21,19 @@ function Get-OPA265BW4fFixtureTag {
     if (-not [guid]::TryParse([string]$m.Groups['id'].Value,[ref]$guid) -or $guid -eq [guid]::Empty) {
         return $none
     }
-    if ([string]$Body -cnotmatch '(?m)^OPA265 BW4e1 disposable synthetic test\.\r?$') {
+    # BW4f2: Outlook text bodies may use CR-only or CRCRLF line endings
+    # (including mixed line endings within one received POP3 MailItem).
+    # Normalize separator characters ONLY for marker classification:
+    # never modify actual MailItem.Body nor BW4c raw content SHA256 pins.
+    $normalizedBody=[regex]::Replace([string]$Body,'\r+\n|\r',"`n")
+    # BW4f3: live POP3 Body inspection showed one ASCII SPACE (U+0020)
+    # appended to each nonblank line. Accept zero/one ASCII space on the
+    # strict header and TestId marker lines; never tabs, NBSP or 2 spaces.
+    # Do NOT trim/rewrite MailItem.Body; BW4c raw SHA256 stays pinned.
+    if ($normalizedBody -cnotmatch '(?m)^OPA265 BW4e1 disposable synthetic test\. ?$') {
         return $none
     }
-    $testLines=@([regex]::Matches([string]$Body,'(?m)^TestId: (?<id>[0-9a-fA-F-]{36})\r?$'))
+    $testLines=@([regex]::Matches($normalizedBody,'(?m)^TestId: (?<id>[0-9a-fA-F-]{36}) ?$'))
     if ($testLines.Count -ne 1 -or
         [string]$testLines[0].Groups['id'].Value -cne [string]$m.Groups['id'].Value) {
         return $none
