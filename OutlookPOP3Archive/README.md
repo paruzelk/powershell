@@ -199,3 +199,7 @@ BW4g1 integrates locally verified BW4f3 exact trailing-space test fixture recogn
 ## BW4h — independent read-only post-Move reconciliation
 
 After one confirmed BW4g1 `MailItem.Move` return, run BW4h to hash and validate the persistent claim, recheck original BW3a Intent and seven evidence files, independently verify zero source and exactly one destination message, and compare pinned identity/fingerprints. Any size/content or SearchKey drift requires manual review; **never retry Move** or modify the original historical journal. See `docs/2.6.5-bw4h-independent-move-reconciliation.md`.
+
+## BW4h1 — diagnostic-only MAPI Size vs content drift
+
+After BW4h confirms zero source/one destination but reports `MoveObservedButMAPIFieldFingerprintDriftNeedsManualReview`, BW4h1 re-runs all read-only historical and claim checks, recomputes exactly the five-field BW4c SHA256, and scans a bounded ±256 observed `MailItem.Size` window to test whether only message size explains the hash mismatch. No Move, no acceptance record or journal writes, and no source byte-equality claim. See `docs/2.6.5-bw4h1-field-drift-readonly.md`.
