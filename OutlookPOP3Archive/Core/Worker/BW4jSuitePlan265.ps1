@@ -58,7 +58,7 @@ function Assert-OPA265BW4jPlan {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Plan)
     if($Plan -isnot [pscustomobject] -or
-        @($Plan.PSObject.Properties.Name).Count -ne 7 -or
+        @($Plan.PSObject.Properties.Name).Count -ne 8 -or
         $Plan.Schema -cne '2.6.5-BW4j.SyntheticSuitePlan.1' -or
         $Plan.OnlySynthetic -isnot [bool] -or -not $Plan.OnlySynthetic -or
         $Plan.AutomaticSendAllowed -isnot [bool] -or $Plan.AutomaticSendAllowed -or
