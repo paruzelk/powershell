@@ -103,7 +103,7 @@ function Assert-OPA265BW4h2Evidence {
         'AttachmentCount','CapturedUtc','AutomaticRetryAllowed','ProductionReady')
     $id=[guid]::Empty
     if ($Evidence -isnot [pscustomobject] -or
-        $Evidence.PSObject.Properties.Count -ne $names.Count -or
+        @($Evidence.PSObject.Properties.Name).Count -ne $names.Count -or
         -not [guid]::TryParse([string]$TestId,[ref]$id) -or $id -eq [guid]::Empty -or
         [string]$TestId -cne $id.ToString('D')) {
         throw 'BW4h2 malformed field evidence or invalid operator TestId.'
