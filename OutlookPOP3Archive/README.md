@@ -203,3 +203,7 @@ After one confirmed BW4g1 `MailItem.Move` return, run BW4h to hash and validate 
 ## BW4h1 — diagnostic-only MAPI Size vs content drift
 
 After BW4h confirms zero source/one destination but reports `MoveObservedButMAPIFieldFingerprintDriftNeedsManualReview`, BW4h1 re-runs all read-only historical and claim checks, recomputes exactly the five-field BW4c SHA256, and scans a bounded ±256 observed `MailItem.Size` window to test whether only message size explains the hash mismatch. No Move, no acceptance record or journal writes, and no source byte-equality claim. See `docs/2.6.5-bw4h1-field-drift-readonly.md`.
+
+## BW4h2 — durable before/after field evidence for FUTURE disposable moves
+
+BW4h2 has a separate opt-in SourceReview, one-shot SourceCapture and read-only DestinationCompare. Capture a new disposable fixture **before** any BW4g Move claim: Size, per-field SHA256 for Subject/Sender/Body/ReceivedUtcTicks and overall five-field content SHA256. The write-once file is stored only under per-user AppData, not in source PST or historical journals. After a separately authorized Move, DestinationCompare requires its independently preserved SHA256 pin and exact old BW4g claim and reports content-vs-MAPI-size drift without ever retrying Move. Already-moved BW4g1 TestId cannot be retrospectively captured. See `docs/2.6.5-bw4h2-durable-five-field-evidence.md`.
