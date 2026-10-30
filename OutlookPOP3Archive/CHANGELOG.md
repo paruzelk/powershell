@@ -1,3 +1,11 @@
+## 2.6.5-BW4j — five-format synthetic suite manifest and read-only comparison (DEV, 2026-10-30)
+
+- 5 NEW per-suite disposable TestIds: PlainSmall, UnicodePlain, HtmlBody, Attachment1K, Attachment256K. Write-once UTF8-BOM suite manifest under user AppData, SHA256 pinned. Does not send messages, prepare Outlook drafts, or auto-run Move.
+- Read-only MAPI witness for exact subject/body marker, text/HTML UTF8 SHA256, Sender, PR_SEARCH_KEY, ReceivedUtcTicks, original Size; binary by-value attachment SHA256 computed from bounded ephemeral SaveAsFile copy, securely removed afterward; no attachment contents stored in JSON.
+- Optional explicit one-shot SourceCapture per fixture (CreateNew / Flush(true)); DestinationReview needs independently pinned source JSON SHA256, exact GUID-derived destination PST and exact source-zero/destination-one MAPI read plus Outlook profile POP3 source-store check. Distinguishes HTML/attachment corruption from benign-only-MAPI-Size hypothesis; does NOT silently accept any difference.
+- Preserves original BW3a seven historical evidence hashes and journal Intent via read-only preflight; does not modify prior BW4g/BW4i claims, PST or operation journals. No multi-fixture one-shot Move engine and no crash/resume batch integration yet; these require a separate gated BW4j continuation.
+- Added 40 PowerShell 5.1 Pester tests; expected full project gate 1935 tests / 79 containers. Production Archive/Resume/Auto remains disabled.
+
 ## 2.6.5-BW4i — one-fixture bounded manual MAPI Size drift decision (DEV, 2026-10-30)
 
 - Pinned to exact already executed BW4g1 TestId 841545a1-b5fa-4c69-964a-8c0318981d52, original 8760 bytes, destination 8798 bytes, size delta +38 bytes. Separate original BW4h2 pre-Move evidence SHA256 c0a7700d... and irreversible BW4g claim SHA256 809f047c... required; source-zero and destination-one.
