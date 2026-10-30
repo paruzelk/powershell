@@ -195,3 +195,7 @@ BW4f1 fixes the real Outlook failure where BW4f produces 12 MAPI witness fields 
 ## BW4f2 Outlook POP3 line endings — read-only hotfix
 
 BW4f2 normalizes only CR/CRLF/CRCRLF line endings for comparison of the disposable test Subject/Body marker. The original MailItem.Body and pinned BW4c fingerprint remain byte-for-byte untouched by the script, historical one-Intent and seven SHA-256 gates stay unchanged, and **no Move is permitted**. See `docs/2.6.5-bw4f2-outlook-body-lineendings.md`.
+
+## BW4f3 — strict Outlook-added trailing ASCII space fix
+
+Actual POP3 Body inspection showed one U+0020 space appended at the end of the fixture header and TestId lines. BW4f3 accepts **zero or one** literal ASCII trailing space on those two lines, while rejecting tabs, NBSP, two spaces, unknown attachments, historical operation matches and forged identities. No original MAPI content or SHA256 changes, no Move. See `docs/2.6.5-bw4f3-outlook-marker-trailing-space.md`.
