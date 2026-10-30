@@ -68,6 +68,18 @@ try {
     }
     if($matches -ne 1 -or $null -eq $case){throw 'BW4j TestId not unique in original plan.'}
     $evidencePath=Get-OPA265BW4jEvidencePath -SuiteId $SuiteId -TestId $TestId
+    $oldClaimPath=Join-Path (Join-Path $env:LOCALAPPDATA 'OutlookPOP3Archive-BW4g-Claims') ('fixture-'+$TestId+'.json')
+    if($Mode -cne 'DestinationReview' -and [IO.File]::Exists($oldClaimPath)) {
+        throw 'BW4j refuses source re-capture on any previously attempted BW4g fixture.'
+    }
+    $stage='Independently pin original BW3a seven-file historical Intent without mutation'
+    $historical=& (Join-Path $PSScriptRoot 'Test-OPA265BW4aHistoricalIntentIsolationReadOnly.ps1') -RunId 'a7b51427-7494-43f4-bc96-64915f6bee7e' -SourcePst $SourcePst -ExpectedJournalSha256 '5a68dbc4186c69eff13e49c7d69a19f16eba86e04969bb5aea3be0327820a648' -Mode Archive -Review
+    if(-not [bool]$historical.SevenHistoricalEvidenceHashesUnchanged -or
+        [int]$historical.HistoricJournalEventCount -ne 1 -or
+        [string]$historical.HistoricJournalPhase -cne 'Intent' -or
+        [bool]$historical.WorkerDispatchAllowed) {
+        throw 'BW4j historical seven-file quarantine or original single Intent check failed.'
+    }
     if($Mode -ceq 'DestinationReview'){
         if($ExpectedSourceEvidenceSha256 -cnotmatch '^[a-f0-9]{64}$' -or
             -not [IO.Path]::IsPathRooted($DestinationPst) -or
@@ -116,6 +128,7 @@ try {
             EvidencePath=$p
             EvidenceSha256=$hash
             PlanSha256=$planHash
+            HistoricalSevenHashesUnchanged=$true
             OutlookMoveExecuted=$false
             CanRetryMove=$false
             ProductionReady=$false
@@ -207,6 +220,7 @@ try {
         DeltaSize=$comparison.DeltaSize
         OriginalSourceEvidenceSha256=$beforeHash
         OriginalSuitePlanSha256=$planHash
+        HistoricalSevenHashesUnchanged=$true
         MoveAttemptIndependentlyClaimed=$false
         FullMAPIByteEqualityProven=$false
         PhysicalPstDurabilityProven=$false
