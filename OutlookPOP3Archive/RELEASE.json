@@ -49,14 +49,15 @@
     "BW4e: exact candidate EntryID, InternetMessageId, PR_SEARCH_KEY and content fingerprint pinned before a new BW4d read-only historical audit; no proof of newness or Move permission",
     "BW4e1: rename PSCustomObject readback from $review to $bw4dSnapshot to prevent PowerShell case-insensitive SwitchParameter collision; no Worker/Move permit",
     "BW4e2: explicitly targeted exact MAPI InternetMessageId DASL Restrict for large POP3 Inbox; zero/duplicate/other item blocked; never a Move permit",
-    "BW4f: compare exact disposable Subject, body TestId and zero attachments across both Outlook MAPI read paths; no Worker/Move permission"
+    "BW4f: compare exact disposable Subject, body TestId and zero attachments across both Outlook MAPI read paths; no Worker/Move permission",
+    "BW4f3: allow exactly zero or one Outlook-added ASCII trailing space at strict fixture header and TestId line endings; preserve original MailItem.Body and pinned SHA256, no Move"
   ],
   "Verification": {
-    "Status": "BW4f2 DEV read-only strict Outlook CR/CRLF/CRCRLF Body fixture line normalization, 1736 tests/72 containers, never Move",
+    "Status": "BW4f3 DEV strict optional single ASCII U+0020 trailing space on two fixture marker lines; native PS5.1 1755/73, no Move",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 72,
-    "ExpectedPesterTests": 1736,
+    "ExpectedTestContainers": 73,
+    "ExpectedPesterTests": 1755,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -141,6 +142,9 @@
     "BW4f1ArchiveOrResumeWorkerEnabled": false,
     "BW4f2OnlyLineSeparatorsNormalized": true,
     "BW4f2OriginalBodyFingerprintUntouched": true,
-    "BW4f2MoveExecutionAllowed": false
+    "BW4f2MoveExecutionAllowed": false,
+    "BW4f3SingleAsciiTrailingSpaceOnly": true,
+    "BW4f3RawContentHashUnchanged": true,
+    "BW4f3MoveExecutionAllowed": false
   }
 }
