@@ -1,3 +1,10 @@
+## 2.6.5-BW4h2 — durable BEFORE/AFTER five-field Outlook evidence (DEV, 2026-10-30)
+
+- BW4h1 earlier reconstructed source 8760B vs destination 8798B (+38B) from composite SHA256, but no independent original source field values had been recorded. Do NOT turn this retrospective hypothesis into a proven source-size observation.
+- For a FUTURE new disposable fixture TestId only, BW4h2 reads two independent Outlook source MAPI paths and historic BW3a seven-file chain, extracts original Size, Subject/Sender/Body/ReceivedTime hashes and original composite hash. It writes a single durable UTF8-BOM JSON under per-user AppData, by CreateNew and Flush(true), when explicitly invoked with -Mode SourceCapture -ConfirmWriteOnceEvidence.
+- It will not backfill source evidence if a BW4g one-shot claim already exists. SourceReview does not write. DestinationCompare requires independently preserved expected evidence SHA256 and the actual BW4g claim, runs complete historical BW4h source-zero/destination-one read-only audit and compares each field individually. Size-only drift is a distinct manual-review status; no automatic acceptance, Move retry or original journal reconciliation.
+- No Customer email text stored in evidence (SHA256 and lengths only); original historical Intent and seven files remain untouched; production Archive/Resume/Auto Worker disabled. Add 29 Windows PS5.1 Pester checks, total 1854 tests / 77 containers.
+
 ## 2.6.5-BW4h1 — post-Move MAPI five-field drift analysis (read-only DEV, 2026-10-30)
 
 - Local BW4h observed exactly zero source and exactly one destination, same EntryID/MessageId/TestId/SearchKey, unchanged claim and historic BW3a seven-file chain, but changed composite content SHA256 (0b508d0d... -> 9bd953e5...). ExitCode=0 meant diagnostic execution, NOT reconciliation success.
