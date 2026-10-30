@@ -1,3 +1,11 @@
+## 2.6.5-BW4i — one-fixture bounded manual MAPI Size drift decision (DEV, 2026-10-30)
+
+- Pinned to exact already executed BW4g1 TestId 841545a1-b5fa-4c69-964a-8c0318981d52, original 8760 bytes, destination 8798 bytes, size delta +38 bytes. Separate original BW4h2 pre-Move evidence SHA256 c0a7700d... and irreversible BW4g claim SHA256 809f047c... required; source-zero and destination-one.
+- BW4i Review, Accept and Verify all re-run full BW4h2 DestinationCompare including BW4h independent Outlook MAPI dual read and historic BW3a seven-file / one-Intent quarantine. Subject, sender, Body, Received UTC must agree by individual SHA256, SearchKey/MessageId/EntryID pinned. No generic 38-byte policy.
+- Review only inspects; Accept requires explicit -ConfirmExactSizeDrift and creates one separate UTC UTF-8 BOM per-user JSON acknowledgment with FileMode.CreateNew + Flush(true); Verify requires independently saved decision SHA256 and performs a fresh read-only audit. No prior historical operation journal writes or changes to one-shot claim, and no second MailItem.Move.
+- Strict fail-closed existing decision, mismatched pins, symlink, altered historical evidence, changed body or changed mailbox identity. Full MAPI byte equality and physical PST durability remain unproven; production Archive/Resume/Auto Workers disabled.
+- Add 41 Pester tests; total 1895 in 78 containers.
+
 ## 2.6.5-BW4h2 — durable BEFORE/AFTER five-field Outlook evidence (DEV, 2026-10-30)
 
 - BW4h1 earlier reconstructed source 8760B vs destination 8798B (+38B) from composite SHA256, but no independent original source field values had been recorded. Do NOT turn this retrospective hypothesis into a proven source-size observation.
