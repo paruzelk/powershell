@@ -1,3 +1,12 @@
+## 2.6.5-BW4h — independent read-only reconciliation after confirmed one-shot BW4g1 (DEV, 2026-10-30)
+
+- Operator observed BW4g1 one-shot real Outlook Move succeed with ExitCode=0, exactly one call, source EntryID E187..., destination EntryID CF619...4002000, durable per-user claim and unchanged original historical journal.
+- BW4h reads exact one-shot claim, hashes it before and after; performs original BW3a seven-file invariant and visible Live3/Live4 journal catalog snapshots before and after COM.
+- Re-checks source POP3 Inbox using exact MAPI InternetMessageId Restrict (must yield zero) and the separate GUID-named target Unicode PST/folder using independent GetItemFromID + Restrict paths (exactly one).
+- Compares exact destination EntryID, original InternetMessageId, TestId, SearchKey SHA256 and deterministic Outlook field fingerprint. SHA mismatch reported as drift demanding manual review rather than auto-acceptance.
+- Read-only; no Move, claim creation, journal reconciliation, production Archive/Resume Worker or automatic retry. Full PST physical durability and full MAPI binary equivalence remain unproven.
+- Add 32 Pester cases covering immutable claim, no source duplicates, destination identity and drift; 1809 tests / 75 containers.
+
 ## 2.6.5-BW4g1 — one-shot disposable Move with confirmed BW4f3 Outlook fixture (DEV, 2026-10-30)
 
 - Operator locally confirmed complete BW4f3 read-only candidate and historical fence: exact fixture TestId, SHA256 fingerprints, source Inbox 26541 items, zero full scans, historic seven files unchanged and single original Intent unmodified.
