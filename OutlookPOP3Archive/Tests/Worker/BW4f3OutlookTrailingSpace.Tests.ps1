@@ -9,8 +9,7 @@ BeforeAll {
         "This message contains no customer data.`n"+
         "Created exclusively for read-only Outlook/MAPI verification.`n"+
         "No historical operation or journal may be reused.`n"
-    $script:bothSpaced=$script:body.Replace($script:header,$script:header+' ').
-        Replace($script:idLine,$script:idLine+' ')
+    $script:bothSpaced=$script:body.Replace($script:header,$script:header+' ').Replace($script:idLine,$script:idLine+' ')
 }
 Describe 'BW4f3 exact ONE Outlook-added U+0020 trailing space on fixture markers' {
     It 'accepts all nonempty lines ending with one ASCII space, Outlook CRLF' {
