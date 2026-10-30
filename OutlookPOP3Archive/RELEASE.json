@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4g DEV explicit one-shot disposable Move with irreversible attempt claim, CI 1738/71; NOT production",
+    "Status": "BW4g1 DEV isolated one-shot synthetic Move with locally validated BW4f3 fixture, 1777 Pester/74 containers, production Workers disabled",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 71,
-    "ExpectedPesterTests": 1738,
+    "ExpectedTestContainers": 74,
+    "ExpectedPesterTests": 1777,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -141,6 +141,9 @@
     "BW4gDisposableOneShotRequiresExplicitExecute": true,
     "BW4gAutomaticRetryAllowed": false,
     "BW4gHistoricJournalWriterAllowed": false,
-    "BW4gProductionWorkerDispatchAllowed": false
+    "BW4gProductionWorkerDispatchAllowed": false,
+    "BW4g1OutlookFixtureTrailerFixMerged": true,
+    "BW4g1OneShotClaimRequiredBeforeMove": true,
+    "BW4g1ProductionWorkerDispatchAllowed": false
   }
 }
