@@ -6,7 +6,7 @@ BeforeAll {
     $script:body="OPA265 BW4e1 disposable synthetic test. `r`n`r`nTestId: 98bef817-0fb5-478a-b869-33f02fda59d3 `r`n"
     $script:originalSize=[long]1720
     $script:ticks=[long]638600000000000000
-    $script:gold='7cc35ed2da0848297959f8523285e81d1b1ff5ad9ced1cc1f22341595d2'
+    $script:gold='7cc35ed2da0848297959f852ea7523285e81d1b1ff5ad9ced1cc1f22341595d2'
     $script:params=@{Subject=$script:sub;SenderEmailAddress=$script:sender;Body=$script:body;ReceivedUtcTicks=$script:ticks}
 }
 Describe 'BW4h1 exact historical BW4c five-field SHA256' {
