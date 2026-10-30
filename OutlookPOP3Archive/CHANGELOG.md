@@ -1,3 +1,10 @@
+## 2.6.5-BW4f2 — Outlook POP3 Body newline-only fixture recognition (read-only DEV)
+
+- Investigated real Outlook: SubjectExact=True, Attachments.Count=0, BodyLength=250, but fixture header and TestId both failed exact multiline regex on Body. Original user-authored text has 237 LF or 243 CRLF characters, consistent with Outlook inserting additional CR characters; actual separator bytes require confirmation by local test.
+- Normalize CR-only, CRLF and repeated CR+LF to LF ONLY inside BW4f strict fixture classifier; never modify original Outlook MailItem.Body or BW4c content-field SHA256 pins.
+- Preserve exact subject/GUID, exact header and TestId lines, one valid TestId, and explicit zero attachments; reject ambiguous or real mail.
+- Add 15 native PowerShell 5.1 positive/negative line-ending tests. BW4e2 history and BW4a immutable single Intent stay fenced; no Worker or Move.
+
 ## 2.6.5-BW4f1 — BW4b witness compatibility hotfix (DEV, 2026-10-29)
 
 - Fix actual Outlook BW4f failure: BW4f emits 12 witness fields but strict BW4b expected 10 and returned BlockedUnverifiedPerItemEvidence, which BW4d wrapped in the generic "modified historical evidence or falsely trusted input" error.
