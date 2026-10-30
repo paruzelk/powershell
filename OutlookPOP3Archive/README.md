@@ -195,3 +195,7 @@ Separate native PowerShell 5.1 STA script `Core/Diagnostics/Invoke-OPA265BW4gOne
 ## BW4g1 — isolated one-shot disposable Move (BW4f3 merged)
 
 BW4g1 integrates locally verified BW4f3 exact trailing-space test fixture recognition into the isolated BW4g experimental one-shot cross-PST Move controller. `-Review` is read-only. `-Execute -ConfirmOneShotDisposableMove` writes an immutable once-only user claim BEFORE one `MailItem.Move`, with no automatic retry, no historical journal updates or production Worker activation. Use only a NEW empty test PST and the exact operator synthetic GUID. See [BW4g1 usage](docs/2.6.5-bw4g1-merged-one-shot.md).
+
+## BW4h — independent read-only post-Move reconciliation
+
+After one confirmed BW4g1 `MailItem.Move` return, run BW4h to hash and validate the persistent claim, recheck original BW3a Intent and seven evidence files, independently verify zero source and exactly one destination message, and compare pinned identity/fingerprints. Any size/content or SearchKey drift requires manual review; **never retry Move** or modify the original historical journal. See `docs/2.6.5-bw4h-independent-move-reconciliation.md`.
