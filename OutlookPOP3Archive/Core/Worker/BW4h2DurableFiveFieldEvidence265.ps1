@@ -157,11 +157,15 @@ function Write-OPA265BW4h2OnceEvidence {
     if(([IO.File]::GetAttributes($dir) -band [IO.FileAttributes]::ReparsePoint) -ne 0){
         throw 'BW4h2 evidence directory is a reparse point.'
     }
-    $data=(New-Object Text.UTF8Encoding($true)).GetBytes((ConvertTo-Json -InputObject $Evidence -Depth 5))
+    $encoding=New-Object Text.UTF8Encoding($true)
+    $data=$encoding.GetBytes((ConvertTo-Json -InputObject $Evidence -Depth 5))
+    # UTF8Encoding.GetBytes() excludes the BOM; write GetPreamble() explicitly.
+    $preamble=$encoding.GetPreamble()
     $stream=$null
     try{
         $stream=[IO.FileStream]::new($expected,[IO.FileMode]::CreateNew,
             [IO.FileAccess]::Write,[IO.FileShare]::None)
+        $stream.Write($preamble,0,$preamble.Length)
         $stream.Write($data,0,$data.Length)
         $stream.Flush($true)
     } finally {if($null -ne $stream){$stream.Dispose()}}
