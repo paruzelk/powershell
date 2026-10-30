@@ -52,11 +52,11 @@
     "BW4f: compare exact disposable Subject, body TestId and zero attachments across both Outlook MAPI read paths; no Worker/Move permission"
   ],
   "Verification": {
-    "Status": "BW4f1 read-only BW4b 12-field witness hotfix, 1721 tests in 71 containers, no Move or Worker",
+    "Status": "BW4f2 DEV read-only strict Outlook CR/CRLF/CRCRLF Body fixture line normalization, 1736 tests/72 containers, never Move",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 71,
-    "ExpectedPesterTests": 1721,
+    "ExpectedTestContainers": 72,
+    "ExpectedPesterTests": 1736,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -138,6 +138,9 @@
     "BW4fWorkerDispatchAllowed": false,
     "BW4fMovePermitAllowed": false,
     "BW4f1Witness12FieldCompatibilityFixed": true,
-    "BW4f1ArchiveOrResumeWorkerEnabled": false
+    "BW4f1ArchiveOrResumeWorkerEnabled": false,
+    "BW4f2OnlyLineSeparatorsNormalized": true,
+    "BW4f2OriginalBodyFingerprintUntouched": true,
+    "BW4f2MoveExecutionAllowed": false
   }
 }
