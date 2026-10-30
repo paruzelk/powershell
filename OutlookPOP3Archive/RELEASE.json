@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4i DEV exact one-synthetic-fixture 8760 to 8798 MAPI Size drift manual decision; 1895 Pester tests / 78 containers, no Move or original journal writer",
+    "Status": "BW4j DEV five-format suite manifest, bounded attachment SHA and before-after read-only diagnostic. 1935 Pester tests / 79 containers; no multi-fixture Move or production authorization",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 78,
-    "ExpectedPesterTests": 1895,
+    "ExpectedTestContainers": 79,
+    "ExpectedPesterTests": 1935,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -165,6 +165,15 @@
     "BW4iDecisionCreateNewFlushBeforeReturn": true,
     "BW4iHistoricOriginalJournalWriterAllowed": false,
     "BW4iMailItemMoveAllowed": false,
-    "BW4iProductionWorkerDispatchAllowed": false
+    "BW4iProductionWorkerDispatchAllowed": false,
+    "BW4jFiveCaseImmutableManifest": true,
+    "BW4jUnicodeHtmlAndAttachmentWitnessHashes": true,
+    "BW4jSourceCaptureCreateNewOnly": true,
+    "BW4jPostMoveReadOnlyDestinationComparison": true,
+    "BW4jAutomaticSendEnabled": false,
+    "BW4jOneShotMoveControllerImplemented": false,
+    "BW4jCrashRecoveryBatchVerified": false,
+    "BW4jOriginalJournalWriterAllowed": false,
+    "BW4jProductionWorkerDispatchAllowed": false
   }
 }
