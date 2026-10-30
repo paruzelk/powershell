@@ -33,7 +33,7 @@ Describe 'BW4g1 merge: real BW4f3 250-char Outlook fixture is eligible for ONLY 
         $iFinal | Should -BeGreaterThan 0
         $iClaim | Should -BeGreaterThan $iFinal
         $iMove | Should -BeGreaterThan $iClaim
-        @([regex]::Matches($script:worker,'\$mail\.Move\(\$dest\)')).Count | Should -Be 1
+        ([regex]::Matches($script:worker,'\$mail\.Move\(\$dest\)')).Count | Should -Be 1
     }
     It 'requires explicit operator Execute and one-shot confirmation; Review excludes execution' {
         $script:worker | Should -Match '\$Execute -and -not \$ConfirmOneShotDisposableMove'
