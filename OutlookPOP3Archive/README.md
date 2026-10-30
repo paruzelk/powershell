@@ -191,3 +191,7 @@ The opt-in `-WorkerPilotReviewFreshFixtureScope` route requires exact operator-c
 ## BW4f1 read-only hotfix — BW4b/BW4f witness compatibility
 
 BW4f1 fixes the real Outlook failure where BW4f produces 12 MAPI witness fields but BW4b strictly accepted only 10. Both exact legacy 10-field and new 12-field layouts are allowed, with strict GUID and identical dual-path fixture evidence, never extra permit fields. BW4g -Execute must not be used until local BW4f1 read-only tests pass; production Worker remains disabled.
+
+## BW4f2 Outlook POP3 line endings — read-only hotfix
+
+BW4f2 normalizes only CR/CRLF/CRCRLF line endings for comparison of the disposable test Subject/Body marker. The original MailItem.Body and pinned BW4c fingerprint remain byte-for-byte untouched by the script, historical one-Intent and seven SHA-256 gates stay unchanged, and **no Move is permitted**. See `docs/2.6.5-bw4f2-outlook-body-lineendings.md`.
