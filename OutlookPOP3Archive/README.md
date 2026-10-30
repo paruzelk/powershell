@@ -191,3 +191,7 @@ The opt-in `-WorkerPilotReviewFreshFixtureScope` route requires exact operator-c
 ## BW4g — DEV-only explicit disposable one-shot cross-PST Move
 
 Separate native PowerShell 5.1 STA script `Core/Diagnostics/Invoke-OPA265BW4gOneShotDisposableMove.ps1` accepts read-only `-Review` and an explicitly approved `-Execute -ConfirmOneShotDisposableMove`. Runs BW4f + BW4e2 + BW4d original historical checks, requires a new empty GUID-named disposable PST/folder and writes a durable no-retry claim before one `MailItem.Move`. Production Archive/Resume/Auto Worker stays disabled. See [BW4g instructions](docs/2.6.5-bw4g-one-shot-disposable-move.md).
+
+## BW4g1 — isolated one-shot disposable Move (BW4f3 merged)
+
+BW4g1 integrates locally verified BW4f3 exact trailing-space test fixture recognition into the isolated BW4g experimental one-shot cross-PST Move controller. `-Review` is read-only. `-Execute -ConfirmOneShotDisposableMove` writes an immutable once-only user claim BEFORE one `MailItem.Move`, with no automatic retry, no historical journal updates or production Worker activation. Use only a NEW empty test PST and the exact operator synthetic GUID. See [BW4g1 usage](docs/2.6.5-bw4g1-merged-one-shot.md).
