@@ -51,7 +51,8 @@ function Get-OPA265BW4jAttachments {
             if([IO.File]::Exists($tempFile)){[IO.File]::Delete($tempFile)}
         }
     }
-    return ,@($out.ToArray())
+    # Return individual witnesses for correct zero/one attachment cardinality.
+    return $out.ToArray()
 }
 function Get-OPA265BW4jMailWitness {
     [CmdletBinding()]
