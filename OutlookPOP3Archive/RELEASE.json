@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4h1 DEV read-only BW4c five-field post-Move fingerprint drift and bounded size-only hypothesis; 1825 tests / 76 containers, never replay Move",
+    "Status": "BW4h2 DEV durable pre-Move five-field evidence and independent post-Move field comparison; 1854 tests in 77 containers, no production Worker",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 76,
-    "ExpectedPesterTests": 1825,
+    "ExpectedTestContainers": 77,
+    "ExpectedPesterTests": 1854,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -152,6 +152,13 @@
     "BW4h1StrictFieldHashReadOnly": true,
     "BW4h1BoundedMAPIMessageSizeHypothesis": true,
     "BW4h1AutomaticSizeApprovalAllowed": false,
-    "BW4h1CanRetryMove": false
+    "BW4h1CanRetryMove": false,
+    "BW4h2DurableSourceFiveFieldEvidence": true,
+    "BW4h2SeparatePreAndPostMoveFieldSHA256": true,
+    "BW4h2OneShotBeforeMoveEvidenceCreateNew": true,
+    "BW4h2CannotBackfillOldMove": true,
+    "BW4h2ExistingBW4gClaimModified": false,
+    "BW4h2HistoricJournalWriterAllowed": false,
+    "BW4h2ProductionWorkerDispatchAllowed": false
   }
 }
