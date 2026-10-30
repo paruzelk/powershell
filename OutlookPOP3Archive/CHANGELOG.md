@@ -1,3 +1,11 @@
+## 2.6.5-BW4g1 — one-shot disposable Move with confirmed BW4f3 Outlook fixture (DEV, 2026-10-30)
+
+- Operator locally confirmed complete BW4f3 read-only candidate and historical fence: exact fixture TestId, SHA256 fingerprints, source Inbox 26541 items, zero full scans, historic seven files unchanged and single original Intent unmodified.
+- Merge BW4f3 exact zero-or-one ASCII trailing-space marker recognition (original MailItem.Body content SHA never modified) into isolated BW4g one-shot worker. Include BW4f2 and BW4f3 regressions.
+- Keep distinct new empty GUID-named Unicode PST, separate -Review and -Execute -ConfirmOneShotDisposableMove, local persistent per-fixture CreateNew+Flush(true) claim preceding exactly one Move, and independent reconciliation afterward.
+- No BW3a Intent reconciliation or historical retry; Archive/Resume/Auto production Worker remains disabled.
+- Add test for actual real POP3 Body length 250 and order of durable claim before one Move.
+
 ## 2.6.5-BW4g — operator-approved disposable one-shot Move (DEV, 2026-10-29)
 
 - Add isolated Windows PowerShell 5.1 STA controller: -Review is strictly read-only; -Execute -ConfirmOneShotDisposableMove makes one disposable cross-PST MailItem.Move ONLY after complete BW4f historical and MAPI checks.
