@@ -1,3 +1,11 @@
+## 2.6.5-BW4h1 — post-Move MAPI five-field drift analysis (read-only DEV, 2026-10-30)
+
+- Local BW4h observed exactly zero source and exactly one destination, same EntryID/MessageId/TestId/SearchKey, unchanged claim and historic BW3a seven-file chain, but changed composite content SHA256 (0b508d0d... -> 9bd953e5...). ExitCode=0 meant diagnostic execution, NOT reconciliation success.
+- BW4h1 re-runs the entire original read-only BW4h preflight, reads the exact independently pinned moved MailItem, computes bounded per-field UTF-8 SHA256 and the exact legacy BW4c Subject/Sender/Body/Size/ReceivedUtcTicks length-prefixed digest.
+- Tests candidate MAPI.Size-only deltas ±256 by default (maximum ±4096) against original full SHA256 without ever writing a message. A match reconstructs a conditional size-only hypothesis, NOT independent cross-PST byte equality or automatic size-waiver permission.
+- Logs field lengths, body CR/LF count, original and destination digests, and claim SHA; no email text or sender address is displayed.
+- 16 PS5.1 Pester tests include independent fixed golden SHA, ±8 MAPI.Size, Body/ReceivedTime drift, safe limits and read-only invariant. Expected 1825 tests / 76 containers.
+
 ## 2.6.5-BW4h — independent read-only reconciliation after confirmed one-shot BW4g1 (DEV, 2026-10-30)
 
 - Operator observed BW4g1 one-shot real Outlook Move succeed with ExitCode=0, exactly one call, source EntryID E187..., destination EntryID CF619...4002000, durable per-user claim and unchanged original historical journal.
