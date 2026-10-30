@@ -1,3 +1,10 @@
+## 2.6.5-BW4f3 — Outlook added one trailing ASCII space to synthetic marker lines (DEV read-only, 2026-10-30)
+
+- Real selected POP3 test letter: SubjectExact=True, BodyLength=250, CR=7/LF=7, HeaderPresent=True and TestIdPresent=True; JSON line dump proved a single trailing U+0020 on every non-empty line, including exact fixture header and TestId line. BW4f2 failed because it required end-of-line immediately after the marker.
+- BW4f3 allows precisely zero or one literal ASCII space immediately before end-of-line for only the two strict fixture marker regexes. Two spaces, TAB, NBSP, duplicate TestId, wrong Subject/GUID and attachments are still blocked.
+- No original MailItem.Body edits, no content SHA256 recalc, no historical BW3a journal/claims changes, no Worker or Move. Source PST stays read-only.
+- Add 19 Windows PowerShell 5.1 regressions, 1755 total / 73 Pester containers.
+
 ## 2.6.5-BW4f2 — Outlook POP3 Body newline-only fixture recognition (read-only DEV)
 
 - Investigated real Outlook: SubjectExact=True, Attachments.Count=0, BodyLength=250, but fixture header and TestId both failed exact multiline regex on Body. Original user-authored text has 237 LF or 243 CRLF characters, consistent with Outlook inserting additional CR characters; actual separator bytes require confirmation by local test.
