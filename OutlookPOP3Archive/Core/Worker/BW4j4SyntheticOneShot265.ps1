@@ -90,7 +90,8 @@ function New-OPA265BW4j4Fixture {
             Sha256=(Get-OPA265BW4jSha256 -Bytes $bytes)
         })
     }
-    $index=@('PlainSmall','UnicodePlain','HtmlBody','Attachment1K','Attachment256K').IndexOf([string]$Case.Name)
+    $index=[Array]::IndexOf(@('PlainSmall','UnicodePlain','HtmlBody','Attachment1K','Attachment256K'),[string]$Case.Name)
+    if($index -lt 0){throw 'BW4j4 unsupported synthetic case.'}
     [pscustomobject][ordered]@{
         Schema='2.6.5-BW4j4.IndependentSyntheticMail.1'
         SuiteId=$SuiteId
