@@ -1,3 +1,12 @@
+## 2.6.5-BW4j6 — GitHub Actions-only synthetic BW4j4→BW4j6 protocol gates (DEV, 2026-11-01)
+
+- **Rollback checkpoint**: branch `checkpoint/outlookpop3archive-2.6.5-bw4j-ci-pass-g5e458c92` pinned to passing BW4j commit `5e458c921aa3c1aaf9aad5cc4bc124984d788cd5`; subsequent work isolated in `feature/outlookpop3archive-2.6.5-bw4j6-synthetic-gates`.
+- **BW4j4**: five deterministic GitHub runner-only synthetic fixture JSONs (including Unicode, HTML, 1 KiB and 256 KiB raw binary payloads). Immutable SHA256 manifest, durable per-TestId one-attempt claim with FileMode.CreateNew + Flush(true) BEFORE simulated same-volume atomic File.Move. No Outlook COM, mail send, PST or historical journal access.
+- **BW4j5**: independent read-only SHA256 of each synthetic field and decoded attachment bytes, one external immutable reconciliation receipt per successful one-shot move and five-item aggregate report; fake +38-byte metadata delta is explicitly **model input**, NOT proof for real Outlook or other message types.
+- **BW4j6**: Windows PowerShell 5.1 GitHub Actions-only matrix for 5/5 synthetic cases, reject all duplicate Move requests, simulate crash after claim (quarantine; never retry), crash after atomic simulated move (independent read-only reconcile), detect duplicate source/target and one-byte content tampering.
+- Previous BW4i exact manual receipt, historical BW3a Intent and seven files, source POP3 PST, old BW4g claims never accessed/written. Production Archive/Resume/Auto disabled. Final Outlook test postponed until all CI gates pass.
+- 33 new Pester tests; full gate 1968 tests in 80 containers; separate synthetic CI matrix before ZIP package.
+
 ## 2.6.5-BW4j — five-format synthetic suite manifest and read-only comparison (DEV, 2026-10-30)
 
 - 5 NEW per-suite disposable TestIds: PlainSmall, UnicodePlain, HtmlBody, Attachment1K, Attachment256K. Write-once UTF8-BOM suite manifest under user AppData, SHA256 pinned. Does not send messages, prepare Outlook drafts, or auto-run Move.
