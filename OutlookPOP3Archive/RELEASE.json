@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k7b DEV: approved SEM-001 Outlook logical message preservation requirements and read-only source policy, synthetic cross-PST content comparison independent of MailItem.Size, 3 prior Claims pinned. 2165 Pester tests in 91 containers, no new Move, no size waiver or production.",
+    "Status": "BW4k7c DEV: exact Attachment1K 8122->8634 (+512) manual size-only decision; separate operator-only immutable JSON CreateNew/Flush(true) SHA with independent original semantic witnesses. 2192 Pester tests in 92 containers; no new Move, no historical journal, no global size waiver or production.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 91,
-    "ExpectedPesterTests": 2165,
+    "ExpectedTestContainers": 92,
+    "ExpectedPesterTests": 2192,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -259,6 +259,15 @@
     "BW4k7bMetadataDriftGeneralWaiverEnabled": false,
     "BW4k7bOriginalSourceRebaselineAllowed": false,
     "BW4k7bNewRealMoveAllowed": false,
-    "BW4k7bProductionWorkerDispatchAllowed": false
+    "BW4k7bProductionWorkerDispatchAllowed": false,
+    "BW4k7cOneExact512SourceSizeDecisionEnabled": true,
+    "BW4k7cManualAcceptRequiresExplicitPhrase": true,
+    "BW4k7cImmutableStandaloneDecisionSha256": true,
+    "BW4k7cIndependentLiveReviewBeforeAccept": true,
+    "BW4k7cWhatIfNoDiskWrites": true,
+    "BW4k7cNoRebaselineSourceEvidence": true,
+    "BW4k7cNoNewRealMove": true,
+    "BW4k7cNoHistoricalJournalWrite": true,
+    "BW4k7cNoProductionWorkerDispatch": true
   }
 }
