@@ -1,0 +1,117 @@
+name: OutlookPOP3Archive BW4k7f full Windows PS5.1 CI
+on:
+  push:
+    branches: [feature/outlookpop3archive-2.6.5-bw4k7f-preflight-no-move]
+    paths: ['OutlookPOP3Archive/**', '.github/workflows/outlookpop3archive-bw4k7f.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  full-ci:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+        working-directory: OutlookPOP3Archive
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pester and PSScriptAnalyzer
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
+      - name: Complete original PS5.1 CI release gates
+        run: .\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
+      - name: Verify normative SEM-001 documentation is tracked
+        run: |
+          $ErrorActionPreference='Stop'
+          $spec=Get-Content -LiteralPath 'docs/TECHNICAL_SPECIFICATION.md' -Raw -Encoding UTF8
+          $norm=Get-Content -LiteralPath 'docs/SEMANTIC-INTEGRITY-POLICY.md' -Raw -Encoding UTF8
+          foreach($doc in @('README.md','docs/ARCHITECTURE.md','docs/TESTING.md','docs/RECOVERY.md')){
+            $body=Get-Content -LiteralPath $doc -Raw -Encoding UTF8
+            if($body -cnotmatch 'SEM-001'){throw ('Missing SEM-001 policy link '+$doc)}
+          }
+          if($spec -cnotmatch 'SEM-001' -or
+             $norm -cnotmatch 'SEM-001-MAPI' -or
+             $norm -cnotmatch 'SEM-001-MOVE' -or
+             $norm -cnotmatch 'SEM-001-CI' -or
+             $norm -cnotmatch 'PR_MESSAGE_SIZE' -or
+             $norm -cnotmatch 'Sent Items'){
+            throw 'Normative semantic integrity policy incomplete.'
+          }
+          Write-Host 'PASS SEM-001 normative requirements and architecture/testing/recovery docs'
+      - name: Verify BW4k7f original semantic SHA and empty target policy
+        run: |
+          $ErrorActionPreference='Stop'
+          $d=Get-Content -LiteralPath 'docs/2.6.5-bw4k7f-empty-target-no-move.md' -Raw -Encoding UTF8
+          $n=Get-Content -LiteralPath 'docs/SEMANTIC-INTEGRITY-POLICY.md' -Raw -Encoding UTF8
+          if($d -cnotmatch 'fa6fbc343a16c0d19a9fa369b0bcb595d40647fbd8e9a6c9b66ea4851761e4ac' -or
+             $d -cnotmatch 'source-one/target-zero' -or
+             $n -cnotmatch 'BW4k7f read-only'){
+            throw 'BW4k7f original semantic empty-target contract missing.'
+          }
+          Write-Host 'PASS BW4k7f original snapshot and empty PST contract'
+      - name: Original BW4j6 synthetic fault matrix (no Outlook)
+        run: .\Core\Diagnostics\Invoke-OPA265BW4j6SyntheticMatrix.ps1 -RequireGitHubActions -SandboxParent $env:RUNNER_TEMP
+
+      - name: Create project-only BW4k7f DEV ZIP and checksum
+        run: |
+          $ErrorActionPreference='Stop'
+          $project=(Get-Location).Path
+          $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
+          $base='OutlookPOP3Archive-2.6.5-BW4k7f-dev-g'+$short
+          $stageParent=Join-Path $env:RUNNER_TEMP ('OPA-BW4k7f-'+[guid]::NewGuid().ToString('N'))
+          $stage=Join-Path $stageParent $base
+          $out=Join-Path $env:RUNNER_TEMP 'OPA-BW4k7f-Build'
+          [void][IO.Directory]::CreateDirectory($stage)
+          [void][IO.Directory]::CreateDirectory($out)
+          $top=@('.gitignore','.editorconfig','.psscriptanalyzer.psd1','CHANGELOG.md','README.md','MANIFEST.txt','RELEASE.json','OutlookPOP3Archive.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')
+          foreach($x in $top) {
+            $f=Join-Path $project $x
+            if(-not (Test-Path -LiteralPath $f -PathType Leaf)){throw ('Missing '+$x)}
+            Copy-Item -LiteralPath $f -Destination (Join-Path $stage $x)
+          }
+          foreach($dir in @('Core','Tests','docs')){
+            foreach($f in @(Get-ChildItem -LiteralPath (Join-Path $project $dir) -Recurse -File -Force)){
+              $ext=if($dir -eq 'docs'){'.md'}else{'.ps1'}
+              if($f.Extension -cne $ext -or ($dir -eq 'Tests' -and $f.Name -notmatch '\.Tests\.ps1$') -or (($f.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
+                throw ('Unexpected project source '+$f.FullName)
+              }
+              $relative=$f.FullName.Substring($project.Length).TrimStart([char[]]@('\','/'))
+              $dest=Join-Path $stage $relative
+              [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($dest))
+              Copy-Item -LiteralPath $f.FullName -Destination $dest
+            }
+          }
+          $info=[ordered]@{Artifact=$base+'.zip';DevelopmentGate='2.6.5-BW4k7f';SourceCommit=$env:GITHUB_SHA;PesterPassed=2276;TestContainers=95;WindowsPowerShell51=$true;LiveOutlookMoveExecutedInCI=$false;ProductionReady=$false}
+          [IO.File]::WriteAllText((Join-Path $stage 'BUILD-INFO.json'),(ConvertTo-Json -InputObject $info -Depth 4),(New-Object Text.UTF8Encoding($false)))
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip=Join-Path $out ($base+'.zip')
+          [IO.Compression.ZipFile]::CreateFromDirectory($stageParent,$zip,[IO.Compression.CompressionLevel]::Optimal,$false)
+          $hash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          $sum=Join-Path $out ($base+'.sha256')
+          [IO.File]::WriteAllText($sum,($hash+'  '+[IO.Path]::GetFileName($zip)+[char]10),(New-Object Text.UTF8Encoding($false)))
+          Write-Host ('BW4k7f project-only DEV ZIP SHA256: '+$hash)
+      - name: Upload tested DEV ZIP to Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutlookPOP3Archive-2.6.5-BW4k7f-dev
+          path: |
+            ${{ runner.temp }}/OPA-BW4k7f-Build/*.zip
+            ${{ runner.temp }}/OPA-BW4k7f-Build/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+      - name: Publish public test-only BW4k7f prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
+          $tag='outlookpop3archive-2.6.5-bw4k7f-dev-g'+$short
+          $base='OutlookPOP3Archive-2.6.5-BW4k7f-dev-g'+$short
+          $dir=Join-Path $env:RUNNER_TEMP 'OPA-BW4k7f-Build'
+          $zip=Join-Path $dir ($base+'.zip')
+          $sha=Join-Path $dir ($base+'.sha256')
+          if(-not (Test-Path -LiteralPath $zip -PathType Leaf) -or -not (Test-Path -LiteralPath $sha -PathType Leaf)){throw 'Missing tested ZIP or checksum.'}
+          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-BW4k7f DEV '+$short) --notes 'TEST ONLY. BW4k7f original pinned BW4k7e semantic snapshot and two full read-only verification passes plus exact pre-existing empty destination PST source-one/target-zero guard. No live Outlook/PST in CI, no Move, claim, mount/create or production.' --prerelease
+          if($LASTEXITCODE -ne 0){throw 'Public test-only prerelease failed.'}
