@@ -53,10 +53,10 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k1a DEV: WhatIf read-only scope fix before irreversible Move claim; 1999 Pester tests in 82 containers. No real Outlook Move in CI.",
+    "Status": "BW4k1a DEV: WhatIf read-only scope fix before irreversible Move claim; 1999 Pester tests in 83 containers. No real Outlook Move in CI.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 82,
+    "ExpectedTestContainers": 83,
     "ExpectedPesterTests": 1999,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
