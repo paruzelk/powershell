@@ -107,7 +107,9 @@ function Compare-OPA265BW4k7bSyntheticMoveContentReadOnly {
     $contentOk=([bool]$c.SubjectMatches -and [bool]$c.SenderMatches -and
         [bool]$c.BodyMatches -and [bool]$c.HtmlBodyMatches -and
         [bool]$c.ReceivedUtcTicksMatches -and [bool]$c.AttachmentsMatch)
-    $identityOk=[bool]$c.IdentityMatches
+    $identityOk=([bool]$c.IdentityMatches -and
+        [string]$Source.EntryId -cne [string]$Destination.EntryId -and
+        [string]$Source.FolderEntryId -cne [string]$Destination.FolderEntryId)
     $status=if(-not $cardinalityOk){'STOP_IncompleteOrAmbiguousSourceTargetScan'}
         elseif(-not $identityOk){'STOP_StoreOrMessageIdentityMismatch'}
         elseif(-not $contentOk){'STOP_MailContentOrAttachmentMismatch'}
