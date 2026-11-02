@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k1a DEV: WhatIf read-only scope fix before irreversible Move claim; 1999 Pester tests in 83 containers. No real Outlook Move in CI.",
+    "Status": "BW4k2 DEV: independent immutable real Move Claim and double destination read-only comparison; 2016 Pester tests in 84 containers; +38-byte drift stays unaccepted, no Outlook Move in CI.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 83,
-    "ExpectedPesterTests": 1999,
+    "ExpectedTestContainers": 84,
+    "ExpectedPesterTests": 2016,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -191,6 +191,13 @@
     "BW4k1ProductionWorkerDispatchAllowed": false,
     "BW4k1aWhatIfReadOnlyPreflightFix": true,
     "BW4k1aOperatorDryRunEnforcedBeforeClaim": true,
-    "BW4k1RealOutlookMoveExecutedInCI": false
+    "BW4k1RealOutlookMoveExecutedInCI": false,
+    "BW4k2IndependentImmutableClaimReadOnlyAudit": true,
+    "BW4k2DoubleOutlookDestinationReview": true,
+    "BW4k2SizeDriftAutomaticallyAccepted": false,
+    "BW4k2HistoricalJournalWriterAllowed": false,
+    "BW4k2ProductionWorkerDispatchAllowed": false,
+    "BW4k2PhysicalPstCrashDurabilityProven": false,
+    "BW4k2SourceMoveRetryAllowed": false
   }
 }
