@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k6 DEV: exact HtmlBody source capture pinned by immutable SHA; independent empty-PST PreMoveReview and future post-Move MAPI/content read-only audit. 2083 Pester tests in 88 containers; no real Outlook Move in CI.",
+    "Status": "BW4k7 DEV: exactly one source Attachment1K fixture, immutable SHA256 of 15 bounded MAPI properties and original 1 KiB attachment, all 3 previous real-Move Claims pinned. 2104 Pester tests in 89 containers; no new Outlook Move in CI.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 88,
-    "ExpectedPesterTests": 2083,
+    "ExpectedTestContainers": 89,
+    "ExpectedPesterTests": 2104,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -233,6 +233,15 @@
     "BW4k6RealHtmlMoveExecutedInCI": false,
     "BW4k6GlobalSizeDriftWaiverAllowed": false,
     "BW4k6ProductionWorkerDispatchAllowed": false,
-    "BW4k6HistoricalJournalWriterAllowed": false
+    "BW4k6HistoricalJournalWriterAllowed": false,
+    "BW4k7Attachment1KSourceReadOnlyReviewEnabled": true,
+    "BW4k7Attachment1KSourceOnceOnlyCaptureEnabled": true,
+    "BW4k7PriorThreeRealMoveClaimsPinned": true,
+    "BW4k7PriorHtmlAndUnicodeMapiSourcesPinned": true,
+    "BW4k7NoNewRealMoveInCI": true,
+    "BW4k7NewRealMovePermitted": false,
+    "BW4k7GlobalSizeWaiverAllowed": false,
+    "BW4k7ProductionWorkerDispatchAllowed": false,
+    "BW4k7HistoricalJournalWriterAllowed": false
   }
 }
