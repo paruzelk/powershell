@@ -1,0 +1,48 @@
+name: OutlookPOP3Archive BW4k1 development validation (no release)
+on:
+  push:
+    branches:
+      - feature/outlookpop3archive-2.6.5-bw4k1-real-one-shot
+    paths:
+      - 'OutlookPOP3Archive/**'
+      - '.github/workflows/outlookpop3archive-bw4k1-dev.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-dev:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+        working-directory: OutlookPOP3Archive
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PS5.1 Pester Analyzer
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
+      - name: DEV gate (not full release prerequisite)
+        run: |
+          $ErrorActionPreference='Stop'
+          if($PSVersionTable.PSEdition -cne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5){throw 'Windows PowerShell 5.1 required.'}
+          $files=@('Core/Worker/BW4k1RealOneShotGuards265.ps1','Core/Diagnostics/Invoke-OPA265BW4k1RealOneShotMove.ps1','Tests/Worker/BW4k1RealOneShotGuards.Tests.ps1')
+          foreach($path in $files){
+            $bytes=[IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $path).Path)
+            if($bytes.Length -lt 3 -or $bytes[0] -ne 239 -or $bytes[1] -ne 187 -or $bytes[2] -ne 191){
+              throw ('BW4k1 script requires UTF8 BOM: '+$path)
+            }
+            $issues=@(Invoke-ScriptAnalyzer -Path $path -Severity Error,Warning)
+            if($issues.Count){$issues|Format-Table -AutoSize|Out-String|Write-Host;throw ('BW4k1 PSScriptAnalyzer: '+$path)}
+          }
+          $r=Invoke-Pester -Path .\Tests -PassThru
+          . .\Core\Runtime\PesterReleaseGate.ps1
+          $gate=Assert-OPAPesterReleaseGate -Result $r -ExpectedContainerCount 82
+          if($gate.PassedCount -ne 1996){throw ('BW4k1 expected 1996 tests, found '+$gate.PassedCount)}
+          Write-Host 'BW4k1 DEV: 1996 Pester PASS in 82 containers; not release-certified.'
+      - name: Preserve original five-case BW4j6 synthetic crash matrix
+        run: |
+          $ErrorActionPreference='Stop'
+          .\Core\Diagnostics\Invoke-OPA265BW4j6SyntheticMatrix.ps1 -RequireGitHubActions -SandboxParent $env:RUNNER_TEMP
