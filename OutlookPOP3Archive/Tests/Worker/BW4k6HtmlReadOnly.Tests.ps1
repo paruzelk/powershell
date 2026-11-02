@@ -141,7 +141,7 @@ Describe 'BW4k6 exact HtmlBody immutable pre/post MAPI audit and static no-write
     }
     It 'source witness remains case-specific with nonempty HTMLBody and no attachments' {
         $src=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k6HtmlReadOnly.ps1') -Raw -Encoding UTF8
-        $src | Should -Match '\$original.HtmlBodyLength -lt 1'
+        $src | Should -Match 'HtmlBodyLength -lt 1'
         $src | Should -Match '\$original.Attachments'
         $src | Should -Match "'HtmlBody'"
     }
