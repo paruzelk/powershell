@@ -161,7 +161,7 @@ try{
         $stage='Write exactly ONE standalone immutable source metadata evidence, no Outlook mutation'
         $saved=Write-OPA265BW4k5HtmlSnapshotOnce -Record $record -Path $snapshotPath
         $outPath=[string]$saved.SnapshotPath
-        $outSha=[string]$saved.EvidenceSha256
+        $outSha=[string]$saved.SnapshotSha256
     }
     [pscustomobject][ordered]@{
         Schema='2.6.5-BW4k5.HtmlBodyPreMoveMapiReview.1'
