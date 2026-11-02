@@ -147,7 +147,7 @@ Describe 'BW4k1 real one-shot source scope, immutable evidence set and irreversi
         }
         $r=Write-OPA265BW4k1ClaimOnce -Claim $claim -ClaimPath $path -LocalAppData $script:root
         $r.ClaimSha256 | Should -Match '^[a-f0-9]{64}$'
-        [IO.File]::ReadAllBytes($path)[0] | Should -Be 239
+        ([IO.File]::ReadAllBytes($path))[0] | Should -Be 239
         {Write-OPA265BW4k1ClaimOnce -Claim $claim -ClaimPath $path -LocalAppData $script:root} | Should -Throw
         (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() | Should -BeExactly $r.ClaimSha256
     }
