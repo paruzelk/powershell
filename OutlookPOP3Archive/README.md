@@ -229,3 +229,7 @@ BW4k7a real `Attachment1K` source size changed **8122 -> 8634 (+512)**, while bo
 ## BW4k7c — isolated +512 source-size manual acknowledgment (DEV only)
 
 [Runbook](docs/2.6.5-bw4k7c-exact-source-size-decision.md). Adds strict `Review` / explicit-once `Accept` / independent `Verify` for the already documented original `Attachment1K` source `8122 -> 8634` (+512 bytes). Requires immutable original five-source witnesses and all three past Move Claims, verifies full existing BW4k7b source semantic evidence twice before optional separate UTF-8 BOM CreateNew / Flush(true) SHA256 decision record. `-WhatIf` makes no decision write. **No source witness reset, journal writer, global size waiver, MailItem.Move, auto-retry, or production enablement.**
+
+## BW4k7d — read-only recipient/flags evidence
+
+[Runbook](docs/2.6.5-bw4k7d-recipients-flags-readonly.md). Exact previously accepted Attachment1K decision SHA `29c0c00ed73afe8b154888d335dbed24935d41fdd8cebcc82fd02dcf4afb22b6` verified before/after. Outlook recipients and significant user state hashed via two read-only witnesses, never Move, Capture, journal write, existing decision rewrite, or production.
