@@ -21,3 +21,11 @@ The worker is a process-isolation boundary only, not a security sandbox. No arbi
 ## Read-only 2.6.3 evidence review
 
 `Core/Archive/MoveReconciliation.ps1` evaluates a verified MailMove Intent against complete source/destination folder snapshots. Incomplete scans, identity mismatches and fingerprint collisions block decisions. No status permits automatic retry or journal mutation.
+
+## SEM-001 — Logical-mail semantic integrity contract (normative since 2026-11-02)
+
+Archive Outlook **MailItem objects** through supported Outlook COM/MAPI semantics; do not demand that physical PST bytes, all MAPI properties or `MailItem.Size` / `PR_MESSAGE_SIZE` stay identical across stores. This is **not** a global size-drift waiver: changes alone prove neither loss nor integrity. Independent read-only reconciliation must verify correct source/target store and folder, source-zero/target-one, immutable content identity, sender/recipients including POP3 Sent Items, timestamps, plain/HTML bodies, message class and each attachment's exact byte-count/SHA-256, transport headers and defined user-visible status bits. Cross-store EntryID and RecordKey can differ; PR_MESSAGE_FLAGS requires a pinned semantic bit mask; unavailable mandatory evidence fails closed. The existing BW4j synthetic witness does **not** cover production-grade recipient/flag completeness.
+
+The future Worker must durably persist Intent/claim, attempt exactly one Move, independently read and reconcile, then commit only on conclusive evidence. Indeterminate Move, crash or mismatch **never** triggers automatic retry. Annual PST rollover/capacity and physical Compact are separate responsibilities. The BW4k7a 8122->8634 +512-byte **source-side** drift remains unapproved, despite identical 1024-byte attachment SHA and all other witness fields. New BW4k7b policy code is **read-only / diagnostic** with no writer permit.
+
+See [normative semantic integrity policy](SEMANTIC-INTEGRITY-POLICY.md) and [technical specification](TECHNICAL_SPECIFICATION.md).
