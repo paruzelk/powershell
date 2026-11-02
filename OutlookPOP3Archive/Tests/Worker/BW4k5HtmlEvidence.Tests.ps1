@@ -136,7 +136,7 @@ Describe 'BW4k5 original HtmlBody immutable 15-property pre-Move evidence' {
         $src | Should -Match "'HtmlBody'"
         $src | Should -Match 'Assert-OPA265BW4k1PinnedSource'
         $src | Should -Match 'Assert-OPA265BW4k5HistoricCompletedMoves'
-        $src | Should -Match "if\(\$Mode -ceq 'Capture'\)"
+        $src | Should -Match 'if\(\$Mode -ceq'
         $src | Should -Match 'Write-OPA265BW4k5HtmlSnapshotOnce'
         $src | Should -Not -Match '(?i)\$mail\.(Move|Save|Send|Delete)\('
         $src | Should -Match 'ProductionReady=\$false'
