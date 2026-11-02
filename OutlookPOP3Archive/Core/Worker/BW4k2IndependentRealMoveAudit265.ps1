@@ -19,7 +19,7 @@ function Assert-OPA265BW4k2Claim {
         'SourceFolderEntryId','InternetMessageId','DestinationPst',
         'DestinationFolderEntryId','ClaimUtc','RealOutlookOneShot',
         'AutomaticRetryAllowed','ProductionReady')
-    if($Claim.PSObject.Properties.Count -ne $fields.Count){
+    if(@($Claim.PSObject.Properties.Name).Count -ne $fields.Count){
         throw 'BW4k2 claim schema property count differs.'
     }
     foreach($f in $fields){
