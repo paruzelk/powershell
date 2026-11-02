@@ -57,7 +57,7 @@
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
     "ExpectedTestContainers": 82,
-    "ExpectedPesterTests": 1996,
+    "ExpectedPesterTests": 1999,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -189,6 +189,8 @@
     "BW4k1OneShotDevHarnessImplemented": true,
     "BW4k1HistoricJournalWriterAllowed": false,
     "BW4k1ProductionWorkerDispatchAllowed": false,
+    "BW4k1aWhatIfReadOnlyPreflightFix": true,
+    "BW4k1aOperatorDryRunEnforcedBeforeClaim": true,
     "BW4k1RealOutlookMoveExecutedInCI": false
   }
 }
