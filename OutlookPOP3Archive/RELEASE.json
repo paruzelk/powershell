@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4j6 DEV GitHub Actions synthetic-only one-shot suite, independent reconciliation and crash/recovery without real Outlook/PST. 1968 Pester tests in 80 containers",
+    "Status": "BW4k0 DEV: selected five-fixture real Outlook source review/capture only; BW4j6 synthetic gate retained. 1978 Pester tests in 81 containers. No real MailItem.Move.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 80,
-    "ExpectedPesterTests": 1968,
+    "ExpectedTestContainers": 81,
+    "ExpectedPesterTests": 1978,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -182,6 +182,9 @@
     "BW4j6SyntheticModeled38ByteDeltaEmpiricallyProven": false,
     "BW4j6RealPstOrOutlookTouched": false,
     "BW4j6ProductionWorkerDispatchAllowed": false,
-    "BW4j6RollbackCheckpointCommit": "5e458c921aa3c1aaf9aad5cc4bc124984d788cd5"
+    "BW4j6RollbackCheckpointCommit": "5e458c921aa3c1aaf9aad5cc4bc124984d788cd5",
+    "BW4k0SelectedPOP3InboxSourceReview": true,
+    "BW4k0FiveMailRealMoveExecuted": false,
+    "BW4k0AutomaticSendOrMoveAllowed": false
   }
 }
