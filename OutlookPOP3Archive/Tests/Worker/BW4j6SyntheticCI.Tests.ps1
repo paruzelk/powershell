@@ -53,7 +53,7 @@ Describe 'BW4j4 atomic one-shot claim and no retry under synthetic faults' {
         $script:id=[string]$script:m.Plan.Cases[0].TestId
     }
     It 'requires explicit operator synthetic consent' {
-        {Invoke-OPA265BW4j4OneShotSyntheticMove -SandboxRoot $script:s.SandboxRoot -ExpectedManifestSha256 $script:s.ManifestSha256 -TestId $script:id} | Should -Throw
+        {Invoke-OPA265BW4j4OneShotSyntheticMove -SandboxRoot $script:s.SandboxRoot -ExpectedManifestSha256 $script:s.ManifestSha256 -TestId $script:id -ConfirmIsolatedSyntheticOneShot:$false} | Should -Throw '*explicit isolated synthetic confirmation required*'
     }
     It 'emits one claim before simulated local rename and never invokes Outlook' {
         $r=Invoke-OPA265BW4j4OneShotSyntheticMove -SandboxRoot $script:s.SandboxRoot -ExpectedManifestSha256 $script:s.ManifestSha256 -TestId $script:id -ConfirmIsolatedSyntheticOneShot
