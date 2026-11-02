@@ -84,3 +84,7 @@ BW4k7a **real disposable** Attachment1K source drift: 8122 -> 8634 (+512) while 
 ## BW4k7d read-only semantic mail recipient/flag regression
 
 31 new tests cover complete ordered recipients (To/Cc/Bcc), stable SHA256 digests, read/unread, categories, priority, MAPI READ and HASATTACH bits, missing properties and double-read consistency. Expected 2223 Pester tests / 93 containers. The previously recorded size decision is immutable, no new Move permitted. See [BW4k7d guide](2.6.5-bw4k7d-recipients-flags-readonly.md).
+
+## BW4k7e immutable semantic source snapshot tests
+
+25 new PowerShell 5.1 tests (target **2248 tests / 94 containers**) validate exact previous BW4k7d recipient/state SHA, unchanged previous 3 Move claims, SHA-pinned BW4k7c decision, write-once BOM JSON `FileMode.CreateNew` + `Flush(true)`, verified readback, `-WhatIf`, schema strictness, no raw addresses, no source baseline rewrite and no Move/production permission. Only synthetic CI; no COM Move in Actions. [Runbook](2.6.5-bw4k7e-immutable-semantic-source.md).
