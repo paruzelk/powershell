@@ -8,7 +8,7 @@ on:
       - '.github/workflows/outlookpop3archive-bw4k0.yml'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   windows:
     runs-on: windows-latest
@@ -79,3 +79,19 @@ jobs:
             ${{ runner.temp }}/OPA-BW4k0-Build/*.sha256
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish public BW4k0 TEST-ONLY DEV prerelease ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
+          $tag='outlookpop3archive-2.6.5-bw4k0-dev-g'+$short
+          $base='OutlookPOP3Archive-2.6.5-BW4k0-dev-g'+$short
+          $dir=Join-Path $env:RUNNER_TEMP 'OPA-BW4k0-Build'
+          $zip=Join-Path $dir ($base+'.zip')
+          $sha=Join-Path $dir ($base+'.sha256')
+          if(-not (Test-Path -LiteralPath $zip -PathType Leaf) -or
+             -not (Test-Path -LiteralPath $sha -PathType Leaf)){throw 'Public DEV release is missing CI-validated ZIP or SHA256.'}
+          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-BW4k0 DEV '+$short) --notes 'TEST ONLY. Real Outlook selected-source read-only preflight. Windows PS5.1 CI: 1978 Pester tests in 81 containers plus BW4j6 five-case synthetic crash matrix. NOT PRODUCTION. NO REAL MAILITEM.MOVE. Archive/Resume/Auto Worker disabled.' --prerelease
+          if($LASTEXITCODE -ne 0){throw 'GitHub public BW4k0 DEV prerelease publication failed.'}
+          Write-Host ('PUBLIC BW4k0 DEV: https://github.com/'+$env:GITHUB_REPOSITORY+'/releases/tag/'+$tag)
