@@ -15,3 +15,7 @@ Until this future integration exists, archive and resume continue using FIX13b c
 ### 2.6.3 safety policy
 
 Use `Resolve-OPAInterruptedMoveEvidence` only for manual review of an unresolved MailMove Intent with persisted StoreID, source/target paths, archive PST and a complete message fingerprint. A unique destination match is a candidate, not proof of move completion. Never append Reconciled automatically.
+
+### SEM-001 recovery and metadata-only size drift (normative 2026-11-02)
+
+Do **not** retry Outlook `MailItem.Move()` after a persisted attempt claim, a timeout, crash or ambiguous response. Reconcile read-only with original immutable message witness and exact source/target PST scope. Conclusive successful completion requires one archive item, zero original items and preserved significant content + **attachment byte SHA-256**, not equality of `MailItem.Size` or all MAPI properties. Different EntryID/RecordKey or a logged size delta do not authorize a writer; changed/missing required content, missing recipients or unknown semantic flags keep the operation indeterminate. Do not erase claims or rebaseline original evidence to bypass drift. Record logical completion and physical PST compact/durability separately. See [SEM-001](SEMANTIC-INTEGRITY-POLICY.md).
