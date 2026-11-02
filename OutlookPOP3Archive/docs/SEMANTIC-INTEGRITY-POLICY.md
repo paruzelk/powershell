@@ -72,3 +72,7 @@ Full ordered Outlook recipients and significant user state are separately sample
 ## BW4k7e independent immutable source digest snapshot
 
 After operator-verified BW4k7d read-only source evidence, pin exact observed ordered recipient and user-state digests to one independent immutable, SHA256-verified source-only JSON file. Only an explicit separate operator action may write this record once. `Review` alone never persists; `Verify` reads and compares independently against **current** live source evidence. The original BW4j/BW4k source witnesses, 3 old Move claims, and BW4k7c size acknowledgment must not be rewritten. Matching source-side hashes cannot by themselves prove postmove/destination identity or authorize Move/production. [BW4k7e](2.6.5-bw4k7e-immutable-semantic-source.md).
+
+## BW4k7f read-only precreated empty target PST preflight
+
+A source semantic baseline is not a Move permit. Before any future one-shot disposable Move, twice independently verify source semantic snapshot SHA `fa6fbc343a16c0d19a9fa369b0bcb595d40647fbd8e9a6c9b66ea4851761e4ac`, original +512 decision, immutable source evidence and previous three claims. Require exact existing mounted destination PST and one empty top-level destination folder, source-one/target-zero with unique InternetMessageId and exact EntryID; ambiguous/nonempty destination fails closed. No implicit PST creation, mount, claim or MailItem.Move, even if `-WhatIf` passes. [BW4k7f runbook](2.6.5-bw4k7f-empty-target-no-move.md).
