@@ -237,3 +237,7 @@ BW4k7a real `Attachment1K` source size changed **8122 -> 8634 (+512)**, while bo
 ## BW4k7e — immutable semantic source snapshot (DEV)
 
 [Runbook](docs/2.6.5-bw4k7e-immutable-semantic-source.md). Adds new separate original recipient and user-state SHA256 snapshot only, pinned to verified BW4k7c size decision and BW4k7d two Outlook source reads. `Review` and `Verify` only read; explicit operator-once `Capture` writes BOM JSON CreateNew/Flush(true), never modifies existing original source witnesses/Claim/journals or executes Move. No production enablement.
+
+## BW4k7f — pre-existing empty target PST read-only gate
+
+[Runbook](docs/2.6.5-bw4k7f-empty-target-no-move.md): exact original Attachment1K source-one/target-zero, two independent BW4k7e immutable source snapshot verifications and existing uniquely mounted empty disposable PST/folder. No target creation/mount, no claim or MailItem.Move, no retry or production. Verified semantic snapshot SHA-256 `fa6fbc343a16c0d19a9fa369b0bcb595d40647fbd8e9a6c9b66ea4851761e4ac`.
