@@ -1,7 +1,7 @@
 ﻿#requires -Version 5.1
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../Core/Worker/BW4k1RealOneShotGuards265.ps1')
-    function New-BW4k1FakeWitness {
+    function Get-BW4k1FakeWitness {
         param([object]$Case,[string]$SuiteId)
         $attachments=@()
         if([int]$Case.ExpectedAttachmentCount -eq 1){
@@ -37,12 +37,15 @@ BeforeAll {
         }
     }
     function New-BW4k1TestSet {
+        [CmdletBinding(SupportsShouldProcess=$true)]
         param([string]$LocalAppData)
         $p=New-OPA265BW4jPlan
         foreach($c in @($p.Cases)){
-            $w=New-BW4k1FakeWitness -Case $c -SuiteId $p.SuiteId
+            $w=Get-BW4k1FakeWitness -Case $c -SuiteId $p.SuiteId
             $path=Get-OPA265BW4jEvidencePath -SuiteId $p.SuiteId -TestId $c.TestId -LocalAppData $LocalAppData
-            [void](Write-OPA265BW4jOnce -Object $w -Path $path)
+            if($PSCmdlet.ShouldProcess($path,'Create disposable fake source witness')){
+                [void](Write-OPA265BW4jOnce -Object $w -Path $path)
+            }
         }
         return $p
     }
@@ -51,7 +54,7 @@ Describe 'BW4k1 real one-shot source scope, immutable evidence set and irreversi
     BeforeEach {
         $script:p=New-OPA265BW4jPlan
         $script:c=$script:p.Cases[0]
-        $script:w=New-BW4k1FakeWitness -Case $script:c -SuiteId $script:p.SuiteId
+        $script:w=Get-BW4k1FakeWitness -Case $script:c -SuiteId $script:p.SuiteId
         $script:root=Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
     }
     It 'uses canonical TestId and independent suite-scoped irreversible claim path' {
@@ -94,14 +97,14 @@ Describe 'BW4k1 real one-shot source scope, immutable evidence set and irreversi
     }
     It 'blocks binary attachment SHA drift' {
         $c=$script:p.Cases[3]
-        $w=New-BW4k1FakeWitness -Case $c -SuiteId $script:p.SuiteId
+        $w=Get-BW4k1FakeWitness -Case $c -SuiteId $script:p.SuiteId
         $clone=($w|ConvertTo-Json -Depth 9|ConvertFrom-Json)
         $clone.Attachments[0].Sha256='e'*64
         {Assert-OPA265BW4k1PinnedSource -Original $w -Current $clone -Case $c -SuiteId $script:p.SuiteId} | Should -Throw '*binary attachment drift*'
     }
     It 'blocks binary attachment size drift' {
         $c=$script:p.Cases[4]
-        $w=New-BW4k1FakeWitness -Case $c -SuiteId $script:p.SuiteId
+        $w=Get-BW4k1FakeWitness -Case $c -SuiteId $script:p.SuiteId
         $clone=($w|ConvertTo-Json -Depth 9|ConvertFrom-Json)
         $clone.Attachments[0].ByteCount++
         {Assert-OPA265BW4k1PinnedSource -Original $w -Current $clone -Case $c -SuiteId $script:p.SuiteId} | Should -Throw '*binary attachment drift*'
