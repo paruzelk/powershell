@@ -135,7 +135,7 @@ try{
     for($i=1;$i -le $count;$i++){
         $s=$ns.Stores.Item($i)
         $path=''
-        try{$path=[string]$s.FilePath}catch{}
+        try{$path=[string]$s.FilePath}catch{continue}
         if($path -and [string]::Equals([IO.Path]::GetFullPath($path),[IO.Path]::GetFullPath($DestinationPst),[StringComparison]::OrdinalIgnoreCase)){
             $destStore=$s;$found++
         }
@@ -146,7 +146,7 @@ try{
     }
     $root=$destStore.GetRootFolder()
     $destFolder=$null
-    try{$destFolder=$root.Folders.Item($targetFolderName)}catch{}
+    try{$destFolder=$root.Folders.Item($targetFolderName)}catch{throw 'BW4k1 destination folder missing.'}
     if($null -eq $destFolder -or
        [string]$destFolder.Name -cne $targetFolderName -or
        -not (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$destFolder.Parent.EntryID) -Expected ([string]$root.EntryID)) -or
@@ -173,9 +173,9 @@ try{
     [void](Assert-OPA265BW4k1PinnedSource -Original $original -Current $w1 -Case $case -SuiteId $SuiteId)
     [void](Assert-OPA265BW4k1PinnedSource -Original $original -Current $w2 -Case $case -SuiteId $SuiteId)
     $filter='@SQL="http://schemas.microsoft.com/mapi/proptag/0x1035001F" = '+"'"+[string]$original.InternetMessageId+"'"
-    $matches=$inbox.Items.Restrict($filter)
-    if([int]$matches.Count -ne 1 -or
-       -not (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$matches.Item(1).EntryID) -Expected $ExpectedSourceEntryId)){
+    $sourceMessageMatches=$inbox.Items.Restrict($filter)
+    if([int]$sourceMessageMatches.Count -ne 1 -or
+       -not (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$sourceMessageMatches.Item(1).EntryID) -Expected $ExpectedSourceEntryId)){
         throw 'BW4k1 source must contain exactly one expected InternetMessageId.'
     }
     $stage='Verify original plan/source evidence hashes are still pinned before permit'
