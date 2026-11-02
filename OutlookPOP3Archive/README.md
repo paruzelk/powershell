@@ -233,3 +233,7 @@ BW4k7a real `Attachment1K` source size changed **8122 -> 8634 (+512)**, while bo
 ## BW4k7d — read-only recipient/flags evidence
 
 [Runbook](docs/2.6.5-bw4k7d-recipients-flags-readonly.md). Exact previously accepted Attachment1K decision SHA `29c0c00ed73afe8b154888d335dbed24935d41fdd8cebcc82fd02dcf4afb22b6` verified before/after. Outlook recipients and significant user state hashed via two read-only witnesses, never Move, Capture, journal write, existing decision rewrite, or production.
+
+## BW4k7e — immutable semantic source snapshot (DEV)
+
+[Runbook](docs/2.6.5-bw4k7e-immutable-semantic-source.md). Adds new separate original recipient and user-state SHA256 snapshot only, pinned to verified BW4k7c size decision and BW4k7d two Outlook source reads. `Review` and `Verify` only read; explicit operator-once `Capture` writes BOM JSON CreateNew/Flush(true), never modifies existing original source witnesses/Claim/journals or executes Move. No production enablement.
