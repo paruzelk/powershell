@@ -62,62 +62,62 @@ Describe 'BW4k2 immutable BW4k1 claim and independent double read-only compariso
         $script:auditArgs=$script:caseData.AuditParams
     }
     It 'verifies correctly pinned one-shot claim with exact 17 fields' {
-        (Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @script:input.Params) | Should -BeTrue
+        (Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @claimArgs) | Should -BeTrue
     }
     It 'rejects claim with foreign suite' {
         $script:caseData.Claim.SuiteId=[guid]::NewGuid().ToString('D')
-        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @script:input.Params} | Should -Throw '*SuiteId*'
+        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @claimArgs} | Should -Throw '*SuiteId*'
     }
     It 'rejects tampered exact original evidence digest' {
         $script:caseData.Claim.SourceEvidenceSha256='d'*64
-        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @script:input.Params} | Should -Throw '*SourceEvidenceSha256*'
+        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @claimArgs} | Should -Throw '*SourceEvidenceSha256*'
     }
     It 'rejects a destination folder mismatch' {
         $script:caseData.Claim.DestinationFolderEntryId='OTHER-FOLDER'
-        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @script:input.Params} | Should -Throw '*DestinationFolderEntryId*'
+        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @claimArgs} | Should -Throw '*DestinationFolderEntryId*'
     }
     It 'rejects foreign PST path in recorded claim' {
         $script:caseData.Claim.DestinationPst='C:\foreign.pst'
-        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @script:input.Params} | Should -Throw '*PST path mismatch*'
+        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @claimArgs} | Should -Throw '*PST path mismatch*'
     }
     It 'rejects automatic retry permission' {
         $script:caseData.Claim.AutomaticRetryAllowed=$true
-        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @script:input.Params} | Should -Throw '*unsafe real move claim flags*'
+        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @claimArgs} | Should -Throw '*unsafe real move claim flags*'
     }
     It 'rejects production readiness' {
         $script:caseData.Claim.ProductionReady=$true
-        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @script:input.Params} | Should -Throw '*unsafe real move claim flags*'
+        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @claimArgs} | Should -Throw '*unsafe real move claim flags*'
     }
     It 'rejects unparseable claim time' {
         $script:caseData.Claim.ClaimUtc='not-a-time'
-        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @script:input.Params} | Should -Throw '*ClaimUtc*'
+        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @claimArgs} | Should -Throw '*ClaimUtc*'
     }
     It 'rejects extra claim property' {
         $script:caseData.Claim|Add-Member -NotePropertyName ExtraPermit -NotePropertyValue $true
-        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @script:input.Params} | Should -Throw '*schema property count differs*'
+        {Assert-OPA265BW4k2Claim -Claim $script:caseData.Claim @claimArgs} | Should -Throw '*schema property count differs*'
     }
     It 'accepts only reportable exact source-zero destination-one and unaccepted +38' {
-        (Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @script:input.AuditParams) | Should -BeTrue
+        (Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @auditArgs) | Should -BeTrue
     }
     It 'rejects destination-zero' {
         $script:caseData.Audit.DestinationMessageIdMatches=0
-        {Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @script:input.AuditParams} | Should -Throw '*source-zero/target-one*'
+        {Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @auditArgs} | Should -Throw '*source-zero/target-one*'
     }
     It 'rejects altered HTML' {
         $script:caseData.Audit.HtmlBodyMatches=$false
-        {Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @script:input.AuditParams} | Should -Throw '*HtmlBodyMatches*'
+        {Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @auditArgs} | Should -Throw '*HtmlBodyMatches*'
     }
     It 'rejects incorrect +38 size arithmetic' {
         $script:caseData.Audit.DeltaSize=39
-        {Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @script:input.AuditParams} | Should -Throw '*size arithmetic*'
+        {Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @auditArgs} | Should -Throw '*size arithmetic*'
     }
     It 'rejects status that implicitly accepts changed size' {
         $script:caseData.Audit.Status='AllCheckedFieldsMatchReadOnly'
-        {Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @script:input.AuditParams} | Should -Throw '*drift status differs*'
+        {Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @auditArgs} | Should -Throw '*drift status differs*'
     }
     It 'rejects audit that claims PST crash durability was proved' {
         $script:caseData.Audit.PhysicalPstDurabilityProven=$true
-        {Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @script:input.AuditParams} | Should -Throw '*overclaimed proof*'
+        {Assert-OPA265BW4k2IndependentAudit -Audit $script:caseData.Audit @auditArgs} | Should -Throw '*overclaimed proof*'
     }
     It 'requires two independent readings to be identical' {
         $second=$script:caseData.Audit|ConvertTo-Json -Depth 6|ConvertFrom-Json
