@@ -49,7 +49,7 @@ function ConvertTo-OPA265BW4k3HashedValue {
     } elseif($Value -is [string]){
         $kind='UnicodeText'
         $bytes=[Text.Encoding]::UTF8.GetBytes([string]$Value)
-    } elseif($Value -is [int] -or $Value -is [long] -or $Value -is [short]){
+    } elseif($Value -is [int] -or $Value -is [long] -or $Value -is [int16]){
         $kind='SignedInteger'
         $scalar=[Convert]::ToString($Value,[Globalization.CultureInfo]::InvariantCulture)
         $bytes=[Text.Encoding]::UTF8.GetBytes($scalar)
