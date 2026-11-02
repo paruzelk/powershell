@@ -32,7 +32,7 @@ jobs:
             $body=Get-Content -LiteralPath $doc -Raw -Encoding UTF8
             if($body -cnotmatch 'SEM-001'){throw ('Missing SEM-001 policy link '+$doc)}
           }
-          if($spec -cnotmatch 'ТЗ-SEM-001' -or
+          if($spec -cnotmatch 'SEM-001' -or
              $norm -cnotmatch 'SEM-001-MAPI' -or
              $norm -cnotmatch 'SEM-001-MOVE' -or
              $norm -cnotmatch 'SEM-001-CI' -or
