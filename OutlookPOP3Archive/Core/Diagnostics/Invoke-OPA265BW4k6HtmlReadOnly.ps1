@@ -30,6 +30,16 @@ if($PSVersionTable.PSEdition -cne 'Desktop' -or
 $stage='Pin original immutable plan, source witness and pre-Move MAPI snapshot'
 $app=$null;$ns=$null
 try{
+    # BW4k6 is a fixed-fixture safety gate, not a generic PST MailItem mover.
+    if($SuiteId -cne '74912f94-d523-4856-9efd-d5528a92426f' -or
+       $TestId -cne '42db9da2-0596-4e17-aad7-52eeab0e4601' -or
+       $ExpectedPlanSha256 -cne '6464f562eec08082d1db7781281e3cb0a4efd5264f1c2197ab9f14aedfb74f63' -or
+       $ExpectedFiveEvidenceSetSha256 -cne 'ce76abc7f4752e1a2b477730fad69e82332398560b73355aec82f2203e24a3d3' -or
+       $ExpectedSourceEvidenceSha256 -cne '1689ee2b6b8aead84eed5dcf5884a61603f0b7f335f48601ebafb19dbb2c3eec' -or
+       $ExpectedSourceMapiSnapshotSha256 -cne '755242f7ea0c270e12236f20a2b578a9b43dc648b105ae6c5c0ccce5caada3be' -or
+       $ExpectedSourceEntryId -cne '00000000E1878292411BC64291BD506DCEFD2A35846D3C00'){
+        throw 'BW4k6 STOP: original HtmlBody fixture pins differ from independently captured BW4k5.'
+    }
     foreach($sha in @($ExpectedPlanSha256,$ExpectedFiveEvidenceSetSha256,
         $ExpectedSourceEvidenceSha256,$ExpectedSourceMapiSnapshotSha256)){
         if($sha -cnotmatch '^[a-f0-9]{64}$'){throw 'BW4k6 requires exact lowercase SHA256 pins.'}
@@ -143,7 +153,7 @@ try{
         }
         [pscustomobject][ordered]@{
             Schema='2.6.5-BW4k6.HtmlBodyIndependentPreMoveReview.1'
-            Status='OriginalUnicodeMapiAndEmptyTargetReviewedNoMove'
+            Status='OriginalHtmlMapiAndEmptyTargetReviewedNoMove'
             SuiteId=$SuiteId;TestId=$TestId
             SourceSize=[long]$original.Size
             SourceMapiSnapshotSha256=$ExpectedSourceMapiSnapshotSha256
@@ -228,7 +238,7 @@ try{
         throw 'BW4k6 original MAPI witness or immutable claim changed during audit.'
     }
     [pscustomobject][ordered]@{
-        Schema='2.6.5-BW4k6.IndependentUnicodePrePostMapiDigestCompare.1'
+        Schema='2.6.5-BW4k6.IndependentHtmlPrePostMapiDigestCompare.1'
         Status='SourceZeroDestinationOneContentMatchedMapiDifferencesForManualReview'
         SuiteId=$SuiteId;TestId=$TestId;CaseName='HtmlBody'
         ClaimVerified=$true
@@ -254,7 +264,7 @@ try{
         NextAction='StopWriter;NeverRetry;ReviewAllMapiDeltas;NoGlobalSizeWaiver'
     }
 }catch{
-    throw ('BW4k6 STOP at ['+$stage+']: '+[string]$_.Exception.Message+'. No MailItem.Move or claim/journal modifications made by BW4k4.')
+    throw ('BW4k6 STOP at ['+$stage+']: '+[string]$_.Exception.Message+'. No MailItem.Move or claim/journal modifications made by BW4k6.')
 }finally{
     if($null -ne $ns -and [Runtime.InteropServices.Marshal]::IsComObject($ns)){
         [void][Runtime.InteropServices.Marshal]::ReleaseComObject($ns)
