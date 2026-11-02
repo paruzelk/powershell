@@ -80,3 +80,7 @@ BW4k7a **real disposable** Attachment1K source drift: 8122 -> 8634 (+512) while 
 ## BW4k7c one-fixture source Size acknowledgment regression
 
 27 additional synthetic Windows PowerShell 5.1 tests (2192 total, 92 containers) validate original exact identity/size/attachment SHA, rejected wrong source evidence, manual approval phrase, invalid decision or injected writer flags, correct BOM CreateNew+Flush(true) immutable file, duplicate-write refusal, no redirected evidence, independent exact hash verification and no journal/Move in controller. The test suite does **not** run a real Accept or Move on Outlook; user decides whether to record a standalone size-only acknowledgment after local `Review`. See [runbook](2.6.5-bw4k7c-exact-source-size-decision.md) and [SEM-001](SEMANTIC-INTEGRITY-POLICY.md).
+
+## BW4k7d read-only semantic mail recipient/flag regression
+
+31 new tests cover complete ordered recipients (To/Cc/Bcc), stable SHA256 digests, read/unread, categories, priority, MAPI READ and HASATTACH bits, missing properties and double-read consistency. Expected 2223 Pester tests / 93 containers. The previously recorded size decision is immutable, no new Move permitted. See [BW4k7d guide](2.6.5-bw4k7d-recipients-flags-readonly.md).
