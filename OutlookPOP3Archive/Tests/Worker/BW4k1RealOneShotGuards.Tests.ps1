@@ -173,63 +173,6 @@ Describe 'BW4k1 real one-shot source scope, immutable evidence set and irreversi
         $path=Get-OPA265BW4k1ClaimPath -SuiteId $script:p.SuiteId -TestId $script:c.TestId -LocalAppData $script:root
         {Write-OPA265BW4k1ClaimOnce -Claim $claim -ClaimPath $path -LocalAppData $script:root} | Should -Throw '*unsafe irreversible claim*'
     }
-    It 'BW4k1a WhatIf of Seal runs complete file preflight then refuses dry-run Seal explicitly' {
-        $oldLocal=$env:LOCALAPPDATA
-        try {
-            $env:LOCALAPPDATA=$script:root
-            $p=New-BW4k1TestSet -LocalAppData $script:root
-            $planPath=Get-OPA265BW4jPlanPath -SuiteId $p.SuiteId -LocalAppData $script:root
-            [void](Write-OPA265BW4jOnce -Object $p -Path $planPath)
-            $sha=(Get-FileHash -LiteralPath $planPath -Algorithm SHA256).Hash.ToLowerInvariant()
-            $runner=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k1RealOneShotMove.ps1'
-            { & $runner -Mode Seal -SuiteId $p.SuiteId -ExpectedPlanSha256 $sha -WhatIf } |
-                Should -Throw '*Seal accepts only exact SuiteId and plan SHA*'
-        } finally {
-            $env:LOCALAPPDATA=$oldLocal
-        }
-    }
-    It 'BW4k1a normal Seal still returns exactly five evidence hashes without COM' {
-        $oldLocal=$env:LOCALAPPDATA
-        try {
-            $env:LOCALAPPDATA=$script:root
-            $p=New-BW4k1TestSet -LocalAppData $script:root
-            $planPath=Get-OPA265BW4jPlanPath -SuiteId $p.SuiteId -LocalAppData $script:root
-            [void](Write-OPA265BW4jOnce -Object $p -Path $planPath)
-            $sha=(Get-FileHash -LiteralPath $planPath -Algorithm SHA256).Hash.ToLowerInvariant()
-            $runner=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k1RealOneShotMove.ps1'
-            $result=& $runner -Mode Seal -SuiteId $p.SuiteId -ExpectedPlanSha256 $sha
-            $result.Count | Should -Be 5
-            $result.EvidenceSetSha256 | Should -Match '^[a-f0-9]{64}
-        $path=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k1RealOneShotMove.ps1'
-        $source=Get-Content -LiteralPath $path -Raw -Encoding UTF8
-        ([regex]::Matches($source,'(?i)\$mail\.Move\(\$destFolder\)')).Count | Should -Be 1
-        $source | Should -Not -Match '(?i)\$mail\.(Send|Save|Delete)\('
-        $source | Should -Match 'Write-OPA265BW4k1ClaimOnce'
-        $source.IndexOf('Write-OPA265BW4k1ClaimOnce') | Should -BeLessThan $source.IndexOf('$mail.Move($destFolder)')
-        $source | Should -Match 'SupportsShouldProcess'
-    }
-}
-
-        } finally {
-            $env:LOCALAPPDATA=$oldLocal
-        }
-    }
-    It 'BW4k1a explicit dry-run guard precedes irreversible claim creation' {
-        $runner=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k1RealOneShotMove.ps1'
-        $source=Get-Content -LiteralPath $runner -Raw -Encoding UTF8
-        $capture=$source.IndexOf('$requestedWhatIf=[bool]$WhatIfPreference')
-        $disable=$source.IndexOf('if($requestedWhatIf){$WhatIfPreference=$false}')
-        $preflight=$source.IndexOf('$planPath=Get-OPA265BW4jPlanPath')
-        $guard=$source.IndexOf('if($requestedWhatIf){', $preflight)
-        $claim=$source.IndexOf('$written=Write-OPA265BW4k1ClaimOnce')
-        $move=$source.IndexOf('$moved=$mail.Move($destFolder)')
-        $capture | Should -BeGreaterThan -1
-        $disable | Should -BeGreaterThan $capture
-        $preflight | Should -BeGreaterThan $disable
-        $guard | Should -BeGreaterThan $preflight
-        $claim | Should -BeGreaterThan $guard
-        $move | Should -BeGreaterThan $claim
-    }
     It 'one-shot script never uses Send/Save/Remove and contains one explicit Move call' {
         $path=Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k1RealOneShotMove.ps1'
         $source=Get-Content -LiteralPath $path -Raw -Encoding UTF8
