@@ -19,6 +19,13 @@ param(
     [string]$ApprovalText=''
 )
 $ErrorActionPreference='Stop'
+# BW4k1a: capture the operator's dry-run intent before read-only path
+# resolution. PowerShell 5.1 propagates WhatIfPreference into cmdlets such
+# as Get-FileHash/Join-Path, which can return null under -WhatIf. Suppress
+# that ambient preference ONLY for the independent read-only preflight.
+# The original intent is enforced explicitly at the last preclaim boundary.
+$requestedWhatIf=[bool]$WhatIfPreference
+if($requestedWhatIf){$WhatIfPreference=$false}
 if($PSVersionTable.PSEdition -cne 'Desktop' -or
    $PSVersionTable.PSVersion.Major -ne 5 -or
    [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -cne 'STA'){
@@ -59,7 +66,7 @@ try{
     if($Mode -ceq 'Seal'){
         if($TestId -or $ExpectedSourceEvidenceSha256 -or $ExpectedFiveEvidenceSetSha256 -or
            $SourcePst -or $DestinationPst -or $ExpectedSourceEntryId -or
-           $ExpectedDestinationFolderEntryId -or $WhatIfPreference){
+           $ExpectedDestinationFolderEntryId -or $requestedWhatIf){
             throw 'BW4k1 Seal accepts only exact SuiteId and plan SHA, no mail/target/WhatIf inputs.'
         }
         $set
@@ -201,6 +208,18 @@ try{
             PriorClaimExists=$false;AttemptClaimWritten=$false
             OutlookMoveExecuted=$false;CanRetryMove=$false;ProductionReady=$false
             NextAction='IndependentOperatorApprovalRequiredForExecute'
+        }
+        return
+    }
+    # -WhatIf still performed the COMPLETE source/destination/historical
+    # preflight, but may NEVER reach a Claim writer or Outlook Move.
+    # This remains true even though ambient WhatIfPreference was suppressed
+    # for internal read-only operations above.
+    if($requestedWhatIf){
+        [pscustomobject]@{
+            Status='WhatIfNoClaimNoMove';TestId=$TestId
+            AttemptClaimWritten=$false;OutlookMoveExecuted=$false
+            CanRetryMove=$false;ProductionReady=$false
         }
         return
     }
