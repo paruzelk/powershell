@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k4 DEV: pinned UnicodePlain original 15-property snapshot SHA, independent empty-target preflight, future read-only MAPI delta and immutable claim review; 2049 Pester tests in 86 containers; NO Move in CI.",
+    "Status": "BW4k5 DEV: exact HtmlBody original 15-property MAPI pre-Move review and one-time immutable snapshot; seals for both earlier disposable real Moves; 2067 Pester tests in 87 containers. No real Outlook Move in CI.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 86,
-    "ExpectedPesterTests": 2049,
+    "ExpectedTestContainers": 87,
+    "ExpectedPesterTests": 2067,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -214,6 +214,16 @@
     "BW4k4SizeDriftAutomaticallyAccepted": false,
     "BW4k4HistoricalJournalWriterAllowed": false,
     "BW4k4ProductionWorkerDispatchAllowed": false,
-    "BW4k4MoveExecutedInCI": false
+    "BW4k4MoveExecutedInCI": false,
+    "BW4k5HtmlBodyOriginal15PropertyReview": true,
+    "BW4k5HtmlBodyOneShotImmutableCapture": true,
+    "BW4k5PriorPlainAndUnicodeClaimSeals": true,
+    "BW4k5SourceIdentityPinnedByFiveWitnessSet": true,
+    "BW4k5RealHtmlBodyMoveExecutedInCI": false,
+    "BW4k5HtmlBodyPostMoveAlreadyVerified": false,
+    "BW4k5MAPI38ByteCauseProven": false,
+    "BW4k5GlobalSizeDriftWaiverAllowed": false,
+    "BW4k5HistoricalJournalWriterAllowed": false,
+    "BW4k5ProductionWorkerDispatchAllowed": false
   }
 }
