@@ -88,3 +88,7 @@ BW4k7a **real disposable** Attachment1K source drift: 8122 -> 8634 (+512) while 
 ## BW4k7e immutable semantic source snapshot tests
 
 25 new PowerShell 5.1 tests (target **2248 tests / 94 containers**) validate exact previous BW4k7d recipient/state SHA, unchanged previous 3 Move claims, SHA-pinned BW4k7c decision, write-once BOM JSON `FileMode.CreateNew` + `Flush(true)`, verified readback, `-WhatIf`, schema strictness, no raw addresses, no source baseline rewrite and no Move/production permission. Only synthetic CI; no COM Move in Actions. [Runbook](2.6.5-bw4k7e-immutable-semantic-source.md).
+
+## BW4k7f no-Move empty target gate
+
+Expected CI **2276 Pester tests / 95 containers**. 28 synthetic tests enforce immutable original Attachment1K recipient/state SHA, unique source message with pinned EntryID, exact source-one/target-zero destination folder and distinct store, no duplicate folder, no stale current fixture Claim, no hidden PST creation/mount/Move, and same full read-only checks under `-WhatIf`. Full Windows PowerShell 5.1 BOM/PSScriptAnalyzer/Pester plus BW4j6 fault matrix before ZIP release; no real Outlook inside CI. [BW4k7f runbook](2.6.5-bw4k7f-empty-target-no-move.md).
