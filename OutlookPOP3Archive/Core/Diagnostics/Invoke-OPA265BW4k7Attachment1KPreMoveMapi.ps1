@@ -170,6 +170,8 @@ try{
         SuiteId=$SuiteId;TestId=$TestId;CaseName=$case[0].Name
         SourceEntryId=$sourceEntryId
         SourceSize=[long]$original.Size
+        AttachmentByteCount=[long]$original.Attachments[0].ByteCount
+        AttachmentSha256=[string]$original.Attachments[0].Sha256
         PlanSha256=$ExpectedPlanSha256
         OriginalSourceEvidenceSha256=$originalEvidenceSha256
         FiveEvidenceSetSha256=$ExpectedFiveEvidenceSetSha256
