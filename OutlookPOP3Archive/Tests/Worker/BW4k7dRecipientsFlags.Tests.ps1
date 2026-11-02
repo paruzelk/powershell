@@ -82,7 +82,7 @@ Describe 'BW4k7d SEM-001 original recipient/state coverage read-only witness' {
     }
     It 'requires at least one addressable recipient' {
         $script:opts.Recipients=@()
-        {Get-OPA265BW4k7dWitness @opts} | Should -Throw '*recipient count*'
+        {Get-OPA265BW4k7dWitness @opts} | Should -Throw '*empty array*'
     }
     It 'rejects blank recipient Address' {
         $script:f.Recipients[0].Address=''
