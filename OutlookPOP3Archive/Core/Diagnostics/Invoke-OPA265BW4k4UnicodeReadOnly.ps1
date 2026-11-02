@@ -116,6 +116,22 @@ try{
            [string]::IsNullOrWhiteSpace([string]$review.DestinationFolderEntryId)){
             throw 'BW4k4 independent exact empty-target Outlook Review did not pass.'
         }
+        $stage='Verify 15 pinned source MAPI properties STILL match immutable pre-Move capture'
+        $app=[Runtime.InteropServices.Marshal]::GetActiveObject('Outlook.Application')
+        $ns=$app.GetNamespace('MAPI')
+        if([string]$ns.CurrentProfileName -cne $ExpectedProfileName){throw 'BW4k4 pre-Move wrong Outlook profile.'}
+        $srcStore=Get-OPA265BW4cPop3Store -Namespace $ns -SourcePst $SourcePst
+        $srcMail=$ns.GetItemFromID($ExpectedSourceEntryId,[string]$srcStore.StoreId)
+        $liveOpts=@{
+            Mail=$srcMail;SuiteId=$SuiteId;TestId=$TestId
+            ExpectedEntryId=$ExpectedSourceEntryId
+            ExpectedFolderEntryId=[string]$original.FolderEntryId
+            ExpectedStoreId=[string]$srcStore.StoreId
+        }
+        $live1=Get-OPA265BW4k3MapiSnapshot @liveOpts
+        $live2=Get-OPA265BW4k3MapiSnapshot @liveOpts
+        [void](Assert-OPA265BW4k3StableSnapshots -First $live1 -Second $live2)
+        [void](Assert-OPA265BW4k3StableSnapshots -First $pre.Snapshot -Second $live2)
         if((Get-FileHash -LiteralPath $snapPath -Algorithm SHA256).Hash.ToLowerInvariant() -cne $ExpectedSourceMapiSnapshotSha256 -or [IO.File]::Exists($claimPath)){
             throw 'BW4k4 pre-move metadata snapshot changed or new attempt claim appeared.'
         }
