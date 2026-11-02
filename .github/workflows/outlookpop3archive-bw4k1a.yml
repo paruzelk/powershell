@@ -55,7 +55,7 @@ jobs:
               Copy-Item -LiteralPath $f.FullName -Destination $dest
             }
           }
-          $info=[ordered]@{Artifact=$base+'.zip';DevelopmentGate='2.6.5-BW4k1a';SourceCommit=$env:GITHUB_SHA;PesterPassed=1999;TestContainers=82;WindowsPowerShell51=$true;LiveOutlookMoveExecutedInCI=$false;ProductionReady=$false}
+          $info=[ordered]@{Artifact=$base+'.zip';DevelopmentGate='2.6.5-BW4k1a';SourceCommit=$env:GITHUB_SHA;PesterPassed=1999;TestContainers=83;WindowsPowerShell51=$true;LiveOutlookMoveExecutedInCI=$false;ProductionReady=$false}
           [IO.File]::WriteAllText((Join-Path $stage 'BUILD-INFO.json'),(ConvertTo-Json -InputObject $info -Depth 4),(New-Object Text.UTF8Encoding($false)))
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           $zip=Join-Path $out ($base+'.zip')
