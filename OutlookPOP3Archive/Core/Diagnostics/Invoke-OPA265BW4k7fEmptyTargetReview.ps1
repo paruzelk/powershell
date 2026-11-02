@@ -114,6 +114,11 @@ try{
     }
     if($named -ne 1){throw 'Exactly one precreated target folder required.'}
     $query='@SQL="http://schemas.microsoft.com/mapi/proptag/0x1035001F" = '+"'"+[string]$original.InternetMessageId+"'"
+    $selected=$inbox.Items.Restrict($query)
+    if([int]$selected.Count -ne 1 -or
+       -not (Test-OPA265BW4cOpaqueIdMatch -Observed ([string]$selected.Item(1).EntryID) -Expected $sourceId)){
+        throw 'BW4k7f exact source InternetMessageId must identify the pinned MailItem uniquely.'
+    }
     $stage='Two independent destination-empty and source-one observations'
     $make=@{
         SuiteId=$SuiteId;TestId=$TestId
