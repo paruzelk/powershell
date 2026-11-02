@@ -68,3 +68,7 @@ An **operator may separately acknowledge** a proven size-only source-side differ
 ## BW4k7d supplementary To/Cc/Bcc and user-visible flag proof
 
 Full ordered Outlook recipients and significant user state are separately sampled read-only before any future source snapshot. Enforce message READ/HASATTACH bit consistency, record user-visible categories, importance, sensitivity, follow-up and reminder indicators. The original BW4k7c SHA `29c0c00ed73afe8b154888d335dbed24935d41fdd8cebcc82fd02dcf4afb22b6` is independently verified. Two matching reads do not constitute persistent baseline, postmove preservation, or producer-grade flag coverage; fail closed if required fields are unavailable. [BW4k7d runbook](2.6.5-bw4k7d-recipients-flags-readonly.md).
+
+## BW4k7e independent immutable source digest snapshot
+
+After operator-verified BW4k7d read-only source evidence, pin exact observed ordered recipient and user-state digests to one independent immutable, SHA256-verified source-only JSON file. Only an explicit separate operator action may write this record once. `Review` alone never persists; `Verify` reads and compares independently against **current** live source evidence. The original BW4j/BW4k source witnesses, 3 old Move claims, and BW4k7c size acknowledgment must not be rewritten. Matching source-side hashes cannot by themselves prove postmove/destination identity or authorize Move/production. [BW4k7e](2.6.5-bw4k7e-immutable-semantic-source.md).
