@@ -1,0 +1,27 @@
+name: OutlookPOP3Archive BW4k1 full Windows PS5.1 CI
+on:
+  push:
+    branches: [feature/outlookpop3archive-2.6.5-bw4k1-real-one-shot]
+    paths: ['OutlookPOP3Archive/**', '.github/workflows/outlookpop3archive-bw4k1.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-ci:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+        working-directory: OutlookPOP3Archive
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pester and PSScriptAnalyzer
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
+      - name: Complete original PS5.1 CI release gates
+        run: .\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
+      - name: Original BW4j6 synthetic fault matrix (no Outlook)
+        run: .\Core\Diagnostics\Invoke-OPA265BW4j6SyntheticMatrix.ps1 -RequireGitHubActions -SandboxParent $env:RUNNER_TEMP
