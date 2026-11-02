@@ -30,40 +30,40 @@ BeforeAll {
 Describe 'BW4k7a source-only exact 1KiB attachment size-drift diagnosis, no consent' {
     BeforeEach {
         $script:sample=New-BW4k7aFixture
-        $script:args=@{
+        $script:compareInputs=@{
             Original=$script:sample.Source;Current=$script:sample.Current
             Case=$script:sample.Case;SuiteId=$script:sample.SuiteId
         }
     }
     It 'classifies exactly one MailItem.Size drift as unapproved' {
         $script:sample.Current.Size=12007
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.Status | Should -BeExactly 'OnlySourceMailItemSizeDriftUnapproved'
         $r.DeltaSize | Should -Be 7
         $r.OnlySizeDrift | Should -BeTrue
     }
     It 'also classifies negative source size drift without permission' {
         $script:sample.Current.Size=11992
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.DeltaSize | Should -Be -8
         $r.SizeDriftAccepted | Should -BeFalse
     }
     It 'does not blanket-accept plus 38 bytes seen in earlier target PSTs' {
         $script:sample.Current.Size=12038
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.Status | Should -BeExactly 'OnlySourceMailItemSizeDriftUnapproved'
         $r.SizeDriftAccepted | Should -BeFalse
         $r.ProductionReady | Should -BeFalse
     }
     It 'classifies unchanged original witness without pretending Move readiness' {
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.Status | Should -BeExactly 'NoCurrentSourceWitnessDrift'
         $r.OnlySizeDrift | Should -BeFalse
         $r.CanRetryMove | Should -BeFalse
     }
     It 'pins all original attachment bytes by SHA and name on size-only drift' {
         $script:sample.Current.Size=12007
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.AttachmentByteExactMatch | Should -BeTrue
         $r.OriginalAttachmentSha256 | Should -BeExactly ('f'*64)
         $r.CurrentAttachmentByteCount | Should -Be 1024
@@ -71,7 +71,7 @@ Describe 'BW4k7a source-only exact 1KiB attachment size-drift diagnosis, no cons
     It 'blocks changed attachment SHA even when mail size drift is present' {
         $script:sample.Current.Size=12007
         $script:sample.Current.Attachments[0].Sha256=('9'*64)
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.Status | Should -BeExactly 'STOP_OtherWitnessFieldDrift'
         $r.OtherFieldMismatchNames | Should -Contain 'Attachment.Sha256'
         $r.AttachmentByteExactMatch | Should -BeFalse
@@ -79,60 +79,60 @@ Describe 'BW4k7a source-only exact 1KiB attachment size-drift diagnosis, no cons
     }
     It 'blocks changed by-value attachment byte count' {
         $script:sample.Current.Attachments[0].ByteCount=1025
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.OtherFieldMismatchNames | Should -Contain 'Attachment.ByteCount'
     }
     It 'blocks changed attachment filename' {
         $script:sample.Current.Attachments[0].FileName='unexpected.bin'
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.OtherFieldMismatchNames | Should -Contain 'Attachment.FileName'
     }
     It 'blocks missing attachment instead of allowing size-only exception' {
         $script:sample.Current.Attachments=@()
-        {Compare-OPA265BW4k7aSourceWitnessReadOnly @args} | Should -Throw '*attachment cardinality*'
+        {Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs} | Should -Throw '*attachment cardinality*'
     }
     It 'blocks changed subject digest even if size is same' {
         $script:sample.Current.SubjectUtf8Sha256=('1'*64)
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.Status | Should -BeExactly 'STOP_OtherWitnessFieldDrift'
         $r.OtherFieldMismatchNames | Should -Contain 'SubjectUtf8Sha256'
     }
     It 'blocks changed message body digest during size drift' {
         $script:sample.Current.Size=12003
         $script:sample.Current.BodyUtf8Sha256=('2'*64)
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.OtherFieldMismatchNames | Should -Contain 'BodyUtf8Sha256'
     }
     It 'blocks source entry ID drift' {
         $script:sample.Current.EntryId='OTHER'
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.OtherFieldMismatchNames | Should -Contain 'EntryId'
     }
     It 'blocks source StoreId drift' {
         $script:sample.Current.StoreId='OTHER'
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.OtherFieldMismatchNames | Should -Contain 'StoreId'
     }
     It 'blocks ReceivedUtcTicks drift' {
         $script:sample.Current.ReceivedUtcTicks=639291968060000000
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.OtherFieldMismatchNames | Should -Contain 'ReceivedUtcTicks'
     }
     It 'fails closed when fixture suite ID is changed' {
-        $script:args.SuiteId=[guid]::NewGuid().ToString('D')
-        {Compare-OPA265BW4k7aSourceWitnessReadOnly @args} | Should -Throw '*fixed Attachment1K*'
+        $script:compareInputs.SuiteId=[guid]::NewGuid().ToString('D')
+        {Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs} | Should -Throw '*fixed Attachment1K*'
     }
     It 'fails closed for wrong fixture TestId' {
-        $script:args.Case.TestId=[guid]::NewGuid().ToString('D')
-        {Compare-OPA265BW4k7aSourceWitnessReadOnly @args} | Should -Throw '*fixed Attachment1K*'
+        $script:compareInputs.Case.TestId=[guid]::NewGuid().ToString('D')
+        {Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs} | Should -Throw '*fixed Attachment1K*'
     }
     It 'fails closed when source witness changes the schema shape' {
         $script:sample.Source | Add-Member -NotePropertyName AllowMove -NotePropertyValue $true
-        {Compare-OPA265BW4k7aSourceWitnessReadOnly @args} | Should -Throw '*schema*'
+        {Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs} | Should -Throw '*schema*'
     }
     It 'never grants Move, Claim write or production readiness' {
         $script:sample.Current.Size=12038
-        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @args
+        $r=Compare-OPA265BW4k7aSourceWitnessReadOnly @compareInputs
         $r.ClaimWritten | Should -BeFalse
         $r.OutlookMoveExecuted | Should -BeFalse
         $r.CanRetryMove | Should -BeFalse
