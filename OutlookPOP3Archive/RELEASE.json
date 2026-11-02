@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k0 DEV: selected five-fixture real Outlook source review/capture only; BW4j6 synthetic gate retained. 1978 Pester tests in 81 containers. No real MailItem.Move.",
+    "Status": "BW4k1 DEV: isolated one-shot real test fixture Move implemented (no real Move executed in CI), sealed five-original-witness gate; 1996 tests, 82 containers.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 81,
-    "ExpectedPesterTests": 1978,
+    "ExpectedTestContainers": 82,
+    "ExpectedPesterTests": 1996,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -185,6 +185,10 @@
     "BW4j6RollbackCheckpointCommit": "5e458c921aa3c1aaf9aad5cc4bc124984d788cd5",
     "BW4k0SelectedPOP3InboxSourceReview": true,
     "BW4k0FiveMailRealMoveExecuted": false,
-    "BW4k0AutomaticSendOrMoveAllowed": false
+    "BW4k0AutomaticSendOrMoveAllowed": false,
+    "BW4k1OneShotDevHarnessImplemented": true,
+    "BW4k1HistoricJournalWriterAllowed": false,
+    "BW4k1ProductionWorkerDispatchAllowed": false,
+    "BW4k1RealOutlookMoveExecutedInCI": false
   }
 }
