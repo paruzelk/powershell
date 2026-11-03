@@ -53,7 +53,7 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k7o DEV SEM-001-BW4k7o-v1: 88 new synthetic policy cases; exact BW4k7n1 real Outlook forensic read-only revalidation chain with BW4k7l original Evidence and BW4k7m irreversible Claim SHA; precedence content/identity/user read+attachment/unknown raw 0x10000 > provider size/known mfUnmodified review; observed 65555->17 XOR 0x00010002 and -532 MailItem.Size remain unclassified; PT_I8 NotProbed not invented; Archive/Resume/Auto worker disabled; no Move, waiver, retry or journal permission.",
+    "Status": "BW4k7p DEV: exact POP3 DeliveryStore; Outlook Store.GetDefaultFolder(5) SentMail and 4 Outbox distinguish by StoreID/EntryID, recursive bounded read-only Inbox+Sent+user mail, system exclusion, year date fallback and optional attachment metadata, proposed annual filenames ONLY; all production workers, unknown MAPI 0x10000 waiver and Outlook Move remain disabled.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
     "ExpectedTestContainers": 105,
