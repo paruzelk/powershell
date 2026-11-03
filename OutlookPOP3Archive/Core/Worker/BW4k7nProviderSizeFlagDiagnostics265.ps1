@@ -50,8 +50,30 @@ function Get-OPA265BW4k7nPropertyState {
        [string]$Definition.Kind -cnotin @('Int32','Int64','Bool','DateTime')){
         throw 'BW4k7n invalid bounded property definition.'
     }
+    # Outlook COM PropertyAccessor is not guaranteed to marshal PT_I8 for this
+    # specific tag on the operator's 32-bit Outlook. The real BW4k7n run failed
+    # with a locale-dependent PowerShell string-to-string binder exception.
+    # Do NOT reinterpret that failure as MAPI_E_NOT_FOUND or provider absence.
+    # Skip ONLY this optional tag, and disclose NotProbed, not Unavailable.
+    if([string]$Definition.Name -ceq 'PrMessageSizeExtended' -and
+       [string]$Definition.Tag -ceq '0x0E080014' -and
+       [string]$Definition.Kind -ceq 'Int64' -and
+       -not [bool]$Definition.Required){
+        return [pscustomobject][ordered]@{
+            Name=[string]$Definition.Name
+            Tag=[string]$Definition.Tag
+            Kind=[string]$Definition.Kind
+            Required=$false
+            Available=$false
+            Value=$null
+            ObservationState='NotProbedPowerShellComPtI8Interop'
+            Description=[string]$Definition.Description
+            OriginalPreMoveValueCaptured=$false
+        }
+    }
     $uri='http://schemas.microsoft.com/mapi/proptag/'+$Definition.Tag
     $available=$true;$raw=$null
+    $observationState='Read'
     try{$raw=$PropertyAccessor.GetProperty($uri)}
     catch{
         $exception=$_.Exception;$notFound=$false
@@ -63,6 +85,7 @@ function Get-OPA265BW4k7nPropertyState {
             throw ('BW4k7n required property, provider or access error on '+$Definition.Name+': '+[string]$_.Exception.Message)
         }
         $available=$false
+        $observationState='MapiNotFound'
     }
     $v=$null
     if($available){
@@ -97,6 +120,7 @@ function Get-OPA265BW4k7nPropertyState {
         Required=[bool]$Definition.Required
         Available=[bool]$available
         Value=$v
+        ObservationState=$observationState
         Description=[string]$Definition.Description
         OriginalPreMoveValueCaptured=$false
     }
@@ -168,7 +192,7 @@ function Assert-OPA265BW4k7nStableArchivedProbe {
     $a=@($First.Properties);$b=@($Second.Properties)
     if($a.Count -ne 11 -or $b.Count -ne 11){throw 'BW4k7n incomplete MAPI scalar read paths.'}
     for($i=0;$i -lt $a.Count;$i++){
-        foreach($field in @('Name','Tag','Kind','Required','Available','Value','OriginalPreMoveValueCaptured')){
+        foreach($field in @('Name','Tag','Kind','Required','Available','Value','ObservationState','OriginalPreMoveValueCaptured')){
             if([string]$a[$i].$field -cne [string]$b[$i].$field){
                 throw ('BW4k7n independent MAPI read paths disagree: '+$a[$i].Name+'.'+$field)
             }
@@ -250,6 +274,9 @@ function Get-OPA265BW4k7nClassification {
         PrMessageSizeExtendedPresent=[bool]$size64.Available
         PrMessageSizeExtendedBytes=$size64.Value
         PrMessageSizeExtendedMatchesDestinationMailItemSize=$size64Matches
+        PrMessageSizeExtendedObservationState=[string]$size64.ObservationState
+        PrMessageSizeExtendedNotProbedByDesign=([string]$size64.ObservationState -ceq 'NotProbedPowerShellComPtI8Interop')
+        PrMessageSizeExtendedProviderSupportEstablished=$false
         OriginalPrMessageSizeCapturedBeforeMove=$false
         OriginalPrMessageSizeExtendedCapturedBeforeMove=$false
         PropertySpecificSizeDeltaCauseProven=$false
