@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k7s DEV PST-LIMIT-001: original BW4k7r 26605 POP3 candidate reconciliation, 26602 MailItems plus 3 nonmail Inbox objects, three read-only Class/MessageClass/EntryID witnesses (no discard), Office16 policy/user registry PST DWORD limit inspection and unsealed six-year 2020-2025 plan self-check, 65 new Pester tests. No Outlook Move/registry changes/PST deletion/old Claim rewrite, SEM-001 unknown 0x10000 still blocked, production disabled.",
+    "Status": "BW4k7t DEV SEM-001-Prospective-v1: read-only pure A critical/B explained identity+size/C undocumented provider risk classifications, exact 0x10000 not asserted safe or corrupt, no unconditional waiver, no signed acceptance. 3 prior nonmail witnesses preserved and original 2020-2025 six-year plan checked only when operator reports supplied. Old BW4k7o strict historic evidence and block immutable; no production, Move, PST, registry, Claim or journal writes. 94 new Pester tests, 3049 total in 109 containers.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 108,
-    "ExpectedPesterTests": 2955,
+    "ExpectedTestContainers": 109,
+    "ExpectedPesterTests": 3049,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -437,6 +437,21 @@
     "BW4k7sSEM001Unknown0x10000Waived": false,
     "BW4k7sOutlookMoveExecutedInCI": false,
     "BW4k7sProductionArchiveResumeAutoAllowed": false,
-    "BW4k7sAutomaticRetryAllowed": false
+    "BW4k7sAutomaticRetryAllowed": false,
+    "BW4k7tSemanticRiskPolicyABCCategoriesVersioned": true,
+    "BW4k7tUnknown0x10000MeaningNotProven": true,
+    "BW4k7tUnknownBitNeitherProofOfDamageNorSafety": true,
+    "BW4k7tOriginalBW4k7oHistoricBlockPreserved": true,
+    "BW4k7tMandatorySemanticBodyRecipientsAttachmentsAndState": true,
+    "BW4k7tThreeNonMailObjectsManualPreserve": true,
+    "BW4k7tSixAnnualYearPlanOnlyPriorUnsealedEvidence": true,
+    "BW4k7tOperatorResidualRiskAcceptanceRecorded": false,
+    "BW4k7tGlobalUndocumentedFlagWaiverGranted": false,
+    "BW4k7tOutlookMoveExecuted": false,
+    "BW4k7tJournalCompletionWritten": false,
+    "BW4k7tHistoricEvidenceOrClaimRewritten": false,
+    "BW4k7tPstRegistryOrMailModified": false,
+    "BW4k7tAutomaticRetryAllowed": false,
+    "BW4k7tProductionArchiveResumeAutoAllowed": false
   }
 }
