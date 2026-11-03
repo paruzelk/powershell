@@ -347,10 +347,11 @@ jobs:
           $doc=Get-Content -LiteralPath 'docs/2.6.5-bw4k7q-pop3-scope-exclusions.md' -Raw -Encoding UTF8
           $bw4k7qGateFailures=New-Object 'System.Collections.Generic.List[string]'
           if([int]$m.Verification.ExpectedPesterTests -ne 2804){$bw4k7qGateFailures.Add('G01: expected Pester tests')}
+          if([int]$m.Verification.ExpectedTestContainers -ne 106){$bw4k7qGateFailures.Add('G01b: expected 106 Pester containers')}
           if($pure -cnotmatch 'POP3-SCOPE-001-BW4k7q-v1'){$bw4k7qGateFailures.Add('G02: expected Pester containers')}
           if($pure -cnotmatch 'OPA264-LIVE3-'){$bw4k7qGateFailures.Add('G03: versioned policy ID')}
-          if($pure -cnotmatch 'Настройка быстрых действий'){$bw4k7qGateFailures.Add('G04: reserved LIVE3 marker')}
-          if($pure -cnotmatch 'Настройка действий беседы'){$bw4k7qGateFailures.Add('G05: quick settings')}
+          if($pure -cnotmatch 'KnownSettingsRootNames'){$bw4k7qGateFailures.Add('G04: reserved LIVE3 marker')}
+          if($pure -cnotmatch 'ExactKnownOutlookSettingsFolder'){$bw4k7qGateFailures.Add('G05: quick settings')}
           if($pure -cnotmatch 'SentItemsIncludedEvenWhenEmpty=\$true'){$bw4k7qGateFailures.Add('G06: conversation settings')}
           if($pure -cnotmatch 'ReservedTestFolderItemsQuarantined'){$bw4k7qGateFailures.Add('G07: empty Sent included')}
           if($pure -cnotmatch 'TotalFolderItemsReconciled=\$true'){$bw4k7qGateFailures.Add('G08: reserved test item count')}
