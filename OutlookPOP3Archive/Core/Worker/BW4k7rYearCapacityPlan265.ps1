@@ -181,7 +181,7 @@ function Get-OPA265BW4k7rCapacityPlan {
 function Assert-OPA265BW4k7rPlanIntegrity {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][psobject]$Accumulator,
-          [Parameter(Mandatory=$true)][object[]]$YearPlan)
+          [Parameter(Mandatory=$true)][AllowEmptyCollection()][object[]]$YearPlan)
     $count=0L;$size=0L
     foreach($row in $YearPlan){
         $count+=[long]$row.TotalMailItems
