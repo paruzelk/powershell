@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k7f DEV: immutable BW4k7e recipient/state SHA pinned, two independent semantic source reviews and existing mounted exact empty PST target source-one/target-zero preflight. 2276 Pester tests in 95 containers; no Move, no Claim, no PST creation or production.",
+    "Status": "BW4k7g DEV: exact one disposable Attachment1K claimed MailItem.Move separate operator-approved path only after double empty-target/SEM-001 preflight, immutable BW4k1-path Claim-before-Move, separate independent source-zero/destination-one full SHA auditor. 2315 Pester tests in 96 containers; no Move in CI and no production.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 95,
-    "ExpectedPesterTests": 2276,
+    "ExpectedTestContainers": 96,
+    "ExpectedPesterTests": 2315,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -291,6 +291,16 @@
     "BW4k7fWhatIfNoClaimNoMove": true,
     "BW4k7fAutomaticPstMountOrCreateAllowed": false,
     "BW4k7fNewRealMoveAllowed": false,
-    "BW4k7fProductionWorkerDispatchAllowed": false
+    "BW4k7fProductionWorkerDispatchAllowed": false,
+    "BW4k7gOneShotDisposableMoveAvailable": true,
+    "BW4k7gRequiresExactSeparateOperatorApproval": true,
+    "BW4k7gPriorBW4k7cAndBW4k7eShaRequired": true,
+    "BW4k7gIndependentDoubleBW4k7fPreflightRequired": true,
+    "BW4k7gImmutableClaimBeforeMoveInLegacyBW4k1Fence": true,
+    "BW4k7gAutomaticMoveRetryAllowed": false,
+    "BW4k7gOriginalJournalsWritable": false,
+    "BW4k7gIndependentPostMoveRecipientAttachmentAuditAvailable": true,
+    "BW4k7gMoveExecutedInCI": false,
+    "BW4k7gProductionWorkerDispatchAllowed": false
   }
 }
