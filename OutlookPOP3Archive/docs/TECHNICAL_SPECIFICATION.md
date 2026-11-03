@@ -43,3 +43,7 @@
 ## ТЗ-SEM-002. Адресаты и значимые свойства
 
 В архивировании Inbox, Sent Items и пользовательских папок обязательно сохранять адресатов To/Cc/Bcc, состояние прочтения, категории, важность, чувствительность, напоминания и флаги задач. Сверять значимые биты MAPI READ и HASATTACH, но не требовать побайтового совпадения служебных MAPI-полей. Если обязательное свойство недоступно — STOP. BW4k7d проверяет исходное письмо только read-only; не разрешает перенос. [SEM-001](SEMANTIC-INTEGRITY-POLICY.md).
+
+## SEM-001 BW4k7g controlled disposable one-shot execution
+
+Separate operator permission required for exactly one synthetic Attachment1K MailItem.Move. In Windows PowerShell 5.1, current Outlook source letter MAPI Size 8634 is permitted only by pinned one-item original +512 BW4k7c decision, while actual content, attachment SHA and recipient/state SHA must match BW4j/BW4k7e. Use durable SHA256-verifiable Claim written by CreateNew/Flush(true) in existing cross-version BW4k1 claims location **before** Move; no second Move on any crash or ambiguous return. Independent read-only source-zero/destination-one audit of headers, full To/Cc/Bcc, body/HTML, flags and attachment binaries after the operation. Never dispatch production Archive/Resume/Auto based on a disposable experiment. [BW4k7g](2.6.5-bw4k7g-one-shot-attachment-move.md).
