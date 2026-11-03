@@ -100,3 +100,7 @@ Expected CI **2276 Pester tests / 95 containers**. 28 synthetic tests enforce im
 ## BW4k7h post-Move state attribution, SEM-001
 
 24 new synthetic Pester tests (expected **2339 tests in 97 containers**) validate byte-for-byte compatibility with original BW4k7d state SHA canonicalization, original full MAPI flags substitution, XOR bit reporting, changed user-visible Categories/To/FlagStatus detection, READ/HASATTACH significant bits, double independent-read stability, read-only controller and immutable Claim/evidence SHA fence. GitHub Actions full native Windows PowerShell 5.1 + BOM + PSScriptAnalyzer + Pester + 5/5 BW4j6 synthetic matrix; no real Outlook/PST in CI. No new Move, Claim writer or archival production flag. [BW4k7h guide](2.6.5-bw4k7h-postmove-state-attribution.md).
+
+## BW4k7i read-only reopen integrity (SEM-001)
+
+32 new synthetic Pester tests (expected **2371 tests in 98 containers**) verify exact original irreversible Claim/recipient snapshot SHA, source-zero/destination-one, body/attachment/recipient integrity, known MSGFLAG_UNMODIFIED 0x2 vs unknown 0x00010000, one immutable BOM/Flush(true) evidence capture, no claim/journal/PST writes and true Outlook restart StartUtcTicks before repeated compare. GitHub Actions native Windows PS5.1 Pester/PSScriptAnalyzer/BOM and full original 5/5 BW4j6 matrix; no actual Outlook/PST process-restart tests in CI. Operator uses read-only [BW4k7i runbook](2.6.5-bw4k7i-reopen-integrity-readonly.md).
