@@ -281,6 +281,6 @@ Describe 'BW4k7p exact POP3 Sent vs Outbox folder scope and bounded inventory po
     $s=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k7pPop3FolderScopeInventory.ps1') -Raw -Encoding UTF8; $s | Should -Match 'InspectAttachmentMetadata -and -not \$ScanYears'
   }
   It 'controller no Move Save Delete Create PST' {
-    $s=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k7pPop3FolderScopeInventory.ps1') -Raw -Encoding UTF8; $s | Should -Not -Match '(?i).(Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)s*('
+    $s=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k7pPop3FolderScopeInventory.ps1') -Raw -Encoding UTF8; $s | Should -Not -Match '[.](Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)[ ]*[(]'
   }
 }
