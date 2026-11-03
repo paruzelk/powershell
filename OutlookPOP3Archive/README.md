@@ -253,3 +253,7 @@ BW4k7a real `Attachment1K` source size changed **8122 -> 8634 (+512)**, while bo
 ## BW4k7i — read-only archived mail integrity after true Outlook restart
 
 [Runbook](docs/2.6.5-bw4k7i-reopen-integrity-readonly.md). Original disposable Attachment1K real Move Claim and its postmove content/recipient SHA comparison remain immutable; full raw MAPI flags changed from 0x00010013 to 0x00000011. Known MSGFLAG_UNMODIFIED=0x00000002 is a storage modification-state bit, but 0x00010000 remains unknown and **not waived**. New Review/Capture/VerifyAfterReopen diagnostic stores ONE separate UTF8-BOM immutable evidence baseline (FileMode.CreateNew+Flush(true)) and requires a truly new OUTLOOK.EXE StartTime before repeating read-only source-zero/target-one, body/attachment/recipients/user-state audit; never repeat Move or enable production.
+
+## BW4k7j — read-only PR_MESSAGE_FLAGS documented vs unresolved bit investigation
+
+[Runbook](docs/2.6.5-bw4k7j-mapi-flag-investigation.md). Microsoft [MS-OXCMSG] defines `mfUnmodified=0x00000002` for `PR_MESSAGE_FLAGS`, but the **different-property** constant `STORE_HTML_OK=0x00010000` cannot identify the unknown `PR_MESSAGE_FLAGS` bit `0x00010000`. The exact original Attachment1K archive and immutable Claim/BW4k7i reopened baseline SHA are verified again, all changed bits classified individually with no automatic waiver. **No Move, Capture, Claim edits, producer, or production permit.**
