@@ -128,17 +128,31 @@ function Get-OPA265BW4k7lFreshMailWitness {
     $attach=Get-OPA265BW4k7lAttachmentHash -Attachment $Mail.Attachments.Item(1)
     $html=[string]$Mail.HTMLBody
     if($html.Length -gt 524288){throw 'BW4k7l HTMLBody exceeds bounded synthetic limit.'}
+    $sender=[string]$Mail.SenderEmailAddress
+    $received=[datetime]$Mail.ReceivedTime
+    $sent=[datetime]$Mail.SentOn
+    $size=[long]$Mail.Size
+    if([string]::IsNullOrWhiteSpace($sender) -or $sender.Length -gt 4096 -or
+       $received.Year -lt 2020 -or $sent.Year -lt 2020 -or
+       $size -lt 1 -or $size -gt 1073741824){
+        throw 'BW4k7l sender, timestamps or diagnostic size invalid.'
+    }
     $w=[pscustomobject][ordered]@{
         Schema='2.6.5-BW4k7l.FreshPreMoveMapiWitness.1'
         FixtureId=$FixtureId
         SourceEntryId=$ExpectedEntryId
         SourceFolderEntryId=$ExpectedFolderId
         SourceStoreIdSha256=(Get-OPA265BW4k7lStringSha -Value $ExpectedStoreId)
+        InternetMessageId=$messageId
         InternetMessageIdSha256=(Get-OPA265BW4k7lStringSha -Value $messageId)
         SearchKeySha256=(Get-OPA265BW4k7lSha256 -Bytes $searchKey)
         SubjectSha256=(Get-OPA265BW4k7lStringSha -Value $subject)
         BodySha256=(Get-OPA265BW4k7lStringSha -Value $body)
         HtmlBodySha256=(Get-OPA265BW4k7lStringSha -Value $html)
+        SenderSha256=(Get-OPA265BW4k7lStringSha -Value $sender)
+        ReceivedUtcTicks=[long]$received.ToUniversalTime().Ticks
+        SentUtcTicks=[long]$sent.ToUniversalTime().Ticks
+        MessageSizeDiagnostic=[long]$size
         RecipientCount=$n
         RecipientDigestSha256=(Get-OPA265BW4k7lStringSha -Value ($parts -join [char]10))
         RawPrMessageFlags=[int]$flags
