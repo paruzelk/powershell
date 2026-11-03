@@ -56,8 +56,8 @@
     "Status": "BW4k7q DEV POP3-SCOPE-001: exact original POP3 StoreID+EntryID Inbox/Sent/Outbox, full original 22 folder structure-only scope, seven root OPA264-LIVE3 synthetic test folders and two Outlook settings excluded IN MEMORY, no deletion/detach, empty Sent included and synthetic nonempty 37 Sent retained; unknown original MAPI 0x10000 SEM-001 still blocks production; 69 new PS5.1 Pester tests, 2804/106 total.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 106,
-    "ExpectedPesterTests": 2804,
+    "ExpectedTestContainers": 107,
+    "ExpectedPesterTests": 2890,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -408,6 +408,20 @@
     "BW4k7qOutlookMoveInCI": false,
     "BW4k7qJournalOrProductionWriterAllowed": false,
     "BW4k7qAutomaticRetryAllowed": false,
-    "BW4k7qProductionWorkerDispatchAllowed": false
+    "BW4k7qProductionWorkerDispatchAllowed": false,
+    "BW4k7rOnlyExactQPop3IncludedFolders": true,
+    "BW4k7rBoundedScanPartialExplicit": true,
+    "BW4k7rRevalidateScopeAndOutlookAfterScan": true,
+    "BW4k7rSentOnPriorityAndUserFolderYears": true,
+    "BW4k7rCapacityMarginAndRolloverForecastOnly": true,
+    "BW4k7rNoDurableResumeCheckpointClaim": true,
+    "BW4k7rArchivePstCreated": false,
+    "BW4k7rPstRegistryChanged": false,
+    "BW4k7rOtherImapOrTestFolderMailRead": false,
+    "BW4k7rOriginalEvidenceOrClaimRewritten": false,
+    "BW4k7rHistoricUnknown0x10000Waived": false,
+    "BW4k7rOutlookMoveInCI": false,
+    "BW4k7rProductionArchiveResumeAutoAllowed": false,
+    "BW4k7rAutomaticRetryAllowed": false
   }
 }
