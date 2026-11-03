@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k7k DEV: locale-neutral Windows PowerShell 5.1 Pester empty-array binder assertion, 100 test containers and 2422 synthetic tests; provider-specific read-only MAPI message flags/status/hasattach; original BW4k7g Claim and BW4k7i baseline unchanged; unknown 0x00010000 blocked, never retry, no production.",
+    "Status": "BW4k7l DEV: new disposable POP3 Inbox Attachment1K pre-Move MAPI read-only Review plus separately approved once-only immutable evidence CreateNew; 2456 Pester tests in 101 containers; no Move, no Claim/journal write, unknown 0x10000 remains blocked; original BW4k7g Claim and BW4k7i reopen witness unchanged.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 100,
-    "ExpectedPesterTests": 2422,
+    "ExpectedTestContainers": 101,
+    "ExpectedPesterTests": 2456,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -336,6 +336,15 @@
     "BW4k7kReadOnlyPropertyTagProvenance": true,
     "BW4k7kOriginalPRMessageStatusBeforeMoveCaptured": false,
     "BW4k7kUnknown0x10000Waived": false,
-    "BW4k7kProductionWorkerDispatchAllowed": false
+    "BW4k7kProductionWorkerDispatchAllowed": false,
+    "BW4k7lFreshDisposablePreMoveReadOnly": true,
+    "BW4k7lSeparateImmutablePreMoveCaptureApproval": true,
+    "BW4k7lSourceOriginalMessageFlagsAndStatusCaptured": true,
+    "BW4k7lOriginalFixtureClaimRewritten": false,
+    "BW4k7lRealOutlookMoveInCI": false,
+    "BW4k7lOneShotMoveImplemented": false,
+    "BW4k7lAutomaticRetryAllowed": false,
+    "BW4k7lUnknownRawFlagWaived": false,
+    "BW4k7lProductionWorkerDispatchAllowed": false
   }
 }
