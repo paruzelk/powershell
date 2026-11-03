@@ -12,14 +12,14 @@ BeforeAll {
                  elseif($Ansi -and $n -eq 'WarnFileSize'){1950368768}
                  else{-1}
             $present=$num -ge 0
-            $kind=if(-not $present){'NotConfigured'}
+            $valueKind=if(-not $present){'NotConfigured'}
                   elseif($n -eq 'MaxLargeFileSize'){$MaxKind}
                   elseif($n -eq 'WarnLargeFileSize'){$WarnKind}
                   else{'DWord'}
             $v[$n]=[pscustomobject]@{
                 Present=$present
-                RegistryValueKind=$kind
-                DecimalDwordValue=if($present -and $kind -eq 'DWord'){$num}else{$null}
+                RegistryValueKind=$valueKind
+                DecimalDwordValue=if($present -and $valueKind -eq 'DWord'){$num}else{$null}
             }
         }
         return [pscustomobject]@{Kind=$Kind;Values=[pscustomobject]$v;RegistryKeyExists=$true}
