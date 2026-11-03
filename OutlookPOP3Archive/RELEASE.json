@@ -56,8 +56,8 @@
     "Status": "BW4k7o DEV SEM-001-BW4k7o-v1: 88 new synthetic policy cases; exact BW4k7n1 real Outlook forensic read-only revalidation chain with BW4k7l original Evidence and BW4k7m irreversible Claim SHA; precedence content/identity/user read+attachment/unknown raw 0x10000 > provider size/known mfUnmodified review; observed 65555->17 XOR 0x00010002 and -532 MailItem.Size remain unclassified; PT_I8 NotProbed not invented; Archive/Resume/Auto worker disabled; no Move, waiver, retry or journal permission.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 104,
-    "ExpectedPesterTests": 2659,
+    "ExpectedTestContainers": 105,
+    "ExpectedPesterTests": 2735,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -384,6 +384,17 @@
     "BW4k7oOutlookMoveInCI": false,
     "BW4k7oAutomaticRetryAllowed": false,
     "BW4k7oJournalCompletionAllowed": false,
-    "BW4k7oProductionWorkerDispatchAllowed": false
+    "BW4k7oProductionWorkerDispatchAllowed": false,
+    "BW4k7pExactPop3DeliveryStoreOnly": true,
+    "BW4k7pCanonicalSentMailNotOutbox": true,
+    "BW4k7pNestedUserFoldersReadOnlyInventory": true,
+    "BW4k7pBoundedPartialYearScans": true,
+    "BW4k7pAttachmentPayloadsRead": false,
+    "BW4k7pArchivePstsCreated": false,
+    "BW4k7pOriginalBw4k7mClaimRewritten": false,
+    "BW4k7pUnknown0x10000Waived": false,
+    "BW4k7pActualOutlookMoveInCI": false,
+    "BW4k7pAutomaticRetryAllowed": false,
+    "BW4k7pProductionWorkerDispatchAllowed": false
   }
 }
