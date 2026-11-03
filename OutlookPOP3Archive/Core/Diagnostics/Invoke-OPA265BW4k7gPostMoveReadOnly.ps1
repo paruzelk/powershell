@@ -68,12 +68,12 @@ try{
  }
  $manualPath=Get-OPA265BW4k7cDecisionPath -SuiteId $SuiteId -TestId $TestId
  $snapshotPath=Get-OPA265BW4k7eSnapshotPath -SuiteId $SuiteId -TestId $TestId
- foreach($pin in @(@($manualPath,$ExpectedDecisionSha256),@($snapshotPath,$ExpectedSemanticSnapshotSha256))){
-  $path=[string]$pin[0]
+ foreach($path in @($manualPath,$snapshotPath)){
+  $expected=if($path -ceq $manualPath){$ExpectedDecisionSha256}else{$ExpectedSemanticSnapshotSha256}
   if(-not [IO.File]::Exists($path) -or
      (([IO.File]::GetAttributes($path) -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or
      (Get-Item -LiteralPath $path -Force).Length -gt 16384 -or
-     (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -cne [string]$pin[1]){
+     (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -cne $expected){
    throw 'BW4k7g original source-size decision or recipient snapshot SHA-256 changed.'
   }
  }
