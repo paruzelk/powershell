@@ -241,3 +241,7 @@ BW4k7a real `Attachment1K` source size changed **8122 -> 8634 (+512)**, while bo
 ## BW4k7f — pre-existing empty target PST read-only gate
 
 [Runbook](docs/2.6.5-bw4k7f-empty-target-no-move.md): exact original Attachment1K source-one/target-zero, two independent BW4k7e immutable source snapshot verifications and existing uniquely mounted empty disposable PST/folder. No target creation/mount, no claim or MailItem.Move, no retry or production. Verified semantic snapshot SHA-256 `fa6fbc343a16c0d19a9fa369b0bcb595d40647fbd8e9a6c9b66ea4851761e4ac`.
+
+## BW4k7g — test-only Attachment1K one-shot Move and independent post-Move audit
+
+[Runbook](docs/2.6.5-bw4k7g-one-shot-attachment-move.md). Re-verifies BW4k7f and exact immutable BW4k7c (+512) and BW4k7e (recipients/state) source evidence. `Review` and `Execute -WhatIf` are read-only; only an independently and explicitly operator-approved `Execute` may durably create one irreversible SHA-256 Claim in the existing BW4k1 claim location, then invoke exactly one Outlook MailItem.Move. Never retry an attempted Move. Separate independent read-only postmove source-zero/destination-one, To/Cc/Bcc/user-state/body/attachment SHA audit. Not production-ready.
