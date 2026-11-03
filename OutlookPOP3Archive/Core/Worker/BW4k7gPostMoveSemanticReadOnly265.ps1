@@ -80,8 +80,8 @@ function Assert-OPA265BW4k7gStableDestSemantics {
     param([Parameter(Mandatory=$true)][psobject]$First,
           [Parameter(Mandatory=$true)][psobject]$Second)
     if([string]$First.Schema -cne '2.6.5-BW4k7g.DestinationRecipientsStateReadOnly.1' -or
-       @($First.PSObject.Properties.Name).Count -ne 13 -or
-       @($Second.PSObject.Properties.Name).Count -ne 13 -or
+       @($First.PSObject.Properties.Name).Count -ne 14 -or
+       @($Second.PSObject.Properties.Name).Count -ne 14 -or
        [string]$First.RecipientDigestSha256 -cnotmatch '^[a-f0-9]{64}$' -or
        [string]$First.UserStateDigestSha256 -cnotmatch '^[a-f0-9]{64}$' -or
        [int]$First.RecipientCount -lt 1 -or
