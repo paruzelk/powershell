@@ -345,47 +345,46 @@ jobs:
           $live=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7qPop3ScopeExclusionReview.ps1' -Raw -Encoding UTF8
           $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7qPop3ScopeExclusionPolicy.Tests.ps1' -Raw -Encoding UTF8
           $doc=Get-Content -LiteralPath 'docs/2.6.5-bw4k7q-pop3-scope-exclusions.md' -Raw -Encoding UTF8
-          if([int]$m.Verification.ExpectedPesterTests -ne 2804 -or
-             [int]$m.Verification.ExpectedTestContainers -ne 106 -or
-             $pure -cnotmatch 'POP3-SCOPE-001-BW4k7q-v1' -or
-             $pure -cnotmatch 'OPA264-LIVE3-' -or
-             $pure -cnotmatch 'Настройка быстрых действий' -or
-             $pure -cnotmatch 'Настройка действий беседы' -or
-             $pure -cnotmatch 'SentItemsIncludedEvenWhenEmpty=\$true' -or
-             $pure -cnotmatch 'ReservedTestFolderItemsQuarantined' -or
-             $pure -cnotmatch 'TotalFolderItemsReconciled=\$true' -or
-             $pure -cnotmatch 'Unknown0x00010000StillBlocked=\$true' -or
-             $pure -cnotmatch 'NoTestArchivePstsDetachedOrDeleted=\$true' -or
-             $live -cnotmatch 'Invoke-OPA265BW4k7pPop3FolderScopeInventory.ps1' -or
-             $live -cnotmatch 'WhatIfNoOutlookContactNoMailReadNoPstMutation' -or
-             $live -cnotmatch 'HistoricUnknownRaw0x00010000StillBlocked=\$true' -or
-             $live -cnotmatch 'AllOriginalTestFoldersAndPstsRetained=\$true' -or
-             $live -cnotmatch 'SourceMailItemsMoved=\$false' -or
-             $live -cnotmatch 'WriterPermit=\$false' -or
-             $live -cnotmatch 'ProductionReady=\$false' -or
-             $pure -cmatch '\.(Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)\s*\(' -or
-             $live -cmatch '\.(Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)\s*\(' -or
-             $tests -cnotmatch 'nonempty Sent fixture 37 included in scope' -or
-             $tests -cnotmatch 'exact seven OPA264 LIVE3 root quarantined' -or
-             $tests -cnotmatch 'test descendants inherited exclusion' -or
-             $doc -cnotmatch '26605' -or
-             -not [bool]$m.Verification.BW4k7qExactPop3StoreAndCanonicalSentInboxOutbox -or
-             -not [bool]$m.Verification.BW4k7qEmptySentRequiredAndNonemptySentSynthetic -or
-             -not [bool]$m.Verification.BW4k7qOnlyReservedTestFolderNamesQuarantined -or
-             [bool]$m.Verification.BW4k7qOldTestFoldersDeleted -or
-             [bool]$m.Verification.BW4k7qOldTestArchivePstDetachedOrDeleted -or
-             [bool]$m.Verification.BW4k7qOriginalEvidenceOrIrreversibleClaimRewritten -or
-             [bool]$m.Verification.BW4k7qOtherImapMailItemsRead -or
-             [bool]$m.Verification.BW4k7qOriginalUnknown0x10000Waived -or
-             [bool]$m.Verification.BW4k7qOutlookMoveInCI -or
-             [bool]$m.Verification.BW4k7qJournalOrProductionWriterAllowed -or
-             [bool]$m.Verification.BW4k7qAutomaticRetryAllowed -or
-             [bool]$m.Verification.BW4k7qProductionWorkerDispatchAllowed -or
-             [bool]$m.Integration.ArchiveWorkerEnabled -or
-             [bool]$m.Integration.ResumeWorkerEnabled -or
-             [bool]$m.Integration.AutoWorkerEnabled){
-              throw 'BW4k7q strict POP3-SCOPE-001 source/Sent/test-preservation/no-writer gate failed.'
-          }
+          $bw4k7qGateFailures=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 2804){$bw4k7qGateFailures.Add('G01: expected Pester tests')}
+          if($pure -cnotmatch 'POP3-SCOPE-001-BW4k7q-v1'){$bw4k7qGateFailures.Add('G02: expected Pester containers')}
+          if($pure -cnotmatch 'OPA264-LIVE3-'){$bw4k7qGateFailures.Add('G03: versioned policy ID')}
+          if($pure -cnotmatch 'Настройка быстрых действий'){$bw4k7qGateFailures.Add('G04: reserved LIVE3 marker')}
+          if($pure -cnotmatch 'Настройка действий беседы'){$bw4k7qGateFailures.Add('G05: quick settings')}
+          if($pure -cnotmatch 'SentItemsIncludedEvenWhenEmpty=\$true'){$bw4k7qGateFailures.Add('G06: conversation settings')}
+          if($pure -cnotmatch 'ReservedTestFolderItemsQuarantined'){$bw4k7qGateFailures.Add('G07: empty Sent included')}
+          if($pure -cnotmatch 'TotalFolderItemsReconciled=\$true'){$bw4k7qGateFailures.Add('G08: reserved test item count')}
+          if($pure -cnotmatch 'Unknown0x00010000StillBlocked=\$true'){$bw4k7qGateFailures.Add('G09: item reconciliation')}
+          if($pure -cnotmatch 'NoTestArchivePstsDetachedOrDeleted=\$true'){$bw4k7qGateFailures.Add('G10: unknown MAPI blocked')}
+          if($live -cnotmatch 'Invoke-OPA265BW4k7pPop3FolderScopeInventory.ps1'){$bw4k7qGateFailures.Add('G11: test PST preservation')}
+          if($live -cnotmatch 'WhatIfNoOutlookContactNoMailReadNoPstMutation'){$bw4k7qGateFailures.Add('G12: BW4k7p chained')}
+          if($live -cnotmatch 'HistoricUnknownRaw0x00010000StillBlocked=\$true'){$bw4k7qGateFailures.Add('G13: WhatIf no Outlook')}
+          if($live -cnotmatch 'AllOriginalTestFoldersAndPstsRetained=\$true'){$bw4k7qGateFailures.Add('G14: unknown MAPI gate in live')}
+          if($live -cnotmatch 'SourceMailItemsMoved=\$false'){$bw4k7qGateFailures.Add('G15: original tests kept')}
+          if($live -cnotmatch 'WriterPermit=\$false'){$bw4k7qGateFailures.Add('G16: no Move live')}
+          if($live -cnotmatch 'ProductionReady=\$false'){$bw4k7qGateFailures.Add('G17: no writer live')}
+          if($pure -cmatch '\.(Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)\s*\('){$bw4k7qGateFailures.Add('G18: not production live')}
+          if($live -cmatch '\.(Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)\s*\('){$bw4k7qGateFailures.Add('G19: no writer pure')}
+          if($tests -cnotmatch 'nonempty Sent fixture 37 included in scope'){$bw4k7qGateFailures.Add('G20: no writer controller')}
+          if($tests -cnotmatch 'exact seven OPA264 LIVE3 root quarantined'){$bw4k7qGateFailures.Add('G21: nonempty Sent synthetic test')}
+          if($tests -cnotmatch 'test descendants inherited exclusion'){$bw4k7qGateFailures.Add('G22: seven historical tests')}
+          if($doc -cnotmatch '26605'){$bw4k7qGateFailures.Add('G23: nested test excludes')}
+          if(-not [bool]$m.Verification.BW4k7qExactPop3StoreAndCanonicalSentInboxOutbox){$bw4k7qGateFailures.Add('G24: doc previous Inbox count')}
+          if(-not [bool]$m.Verification.BW4k7qEmptySentRequiredAndNonemptySentSynthetic){$bw4k7qGateFailures.Add('G25: meta store')}
+          if(-not [bool]$m.Verification.BW4k7qOnlyReservedTestFolderNamesQuarantined){$bw4k7qGateFailures.Add('G26: meta Sent synthetic')}
+          if([bool]$m.Verification.BW4k7qOldTestFoldersDeleted){$bw4k7qGateFailures.Add('G27: meta test name bounds')}
+          if([bool]$m.Verification.BW4k7qOldTestArchivePstDetachedOrDeleted){$bw4k7qGateFailures.Add('G28: no deletion')}
+          if([bool]$m.Verification.BW4k7qOriginalEvidenceOrIrreversibleClaimRewritten){$bw4k7qGateFailures.Add('G29: no detachment')}
+          if([bool]$m.Verification.BW4k7qOtherImapMailItemsRead){$bw4k7qGateFailures.Add('G30: immutable original Evidence/Claim')}
+          if([bool]$m.Verification.BW4k7qOriginalUnknown0x10000Waived){$bw4k7qGateFailures.Add('G31: no IMAP item scan')}
+          if([bool]$m.Verification.BW4k7qOutlookMoveInCI){$bw4k7qGateFailures.Add('G32: unknown bit not waived')}
+          if([bool]$m.Verification.BW4k7qJournalOrProductionWriterAllowed){$bw4k7qGateFailures.Add('G33: no real Move')}
+          if([bool]$m.Verification.BW4k7qAutomaticRetryAllowed){$bw4k7qGateFailures.Add('G34: no journal/writer')}
+          if([bool]$m.Verification.BW4k7qProductionWorkerDispatchAllowed){$bw4k7qGateFailures.Add('G35: no auto retry')}
+          if([bool]$m.Integration.ArchiveWorkerEnabled){$bw4k7qGateFailures.Add('G36: no production dispatch')}
+          if([bool]$m.Integration.ResumeWorkerEnabled){$bw4k7qGateFailures.Add('G37: archive worker disabled')}
+          if([bool]$m.Integration.AutoWorkerEnabled){$bw4k7qGateFailures.Add('G38: resume worker disabled')}
+          if($bw4k7qGateFailures.Count -gt 0){throw ('BW4k7q strict fail-closed scope gate: '+($bw4k7qGateFailures -join '; '))}
           Write-Host 'PASS BW4k7q POP3 scope exact Sent/In/Out, reserved tests quarantined not deleted, no writer'
 
       - name: Original BW4j6 synthetic fault matrix (no Outlook)
