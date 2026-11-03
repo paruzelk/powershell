@@ -13,6 +13,13 @@ function Get-OPA265BW4k7uHash {
         return [BitConverter]::ToString($h.ComputeHash($b)).Replace('-','').ToLowerInvariant()
     }finally{$h.Dispose()}
 }
+function Get-OPA265BW4k7uByteHash {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][byte[]]$Bytes)
+    $h=[Security.Cryptography.SHA256]::Create()
+    try{return [BitConverter]::ToString($h.ComputeHash($Bytes)).Replace('-','').ToLowerInvariant()}
+    finally{$h.Dispose()}
+}
 function Copy-OPA265BW4k7uObject {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Value)
@@ -52,7 +59,7 @@ function New-OPA265BW4k7uSyntheticSuite {
                 Name=('BW4k7u-'+$name+'.bin')
                 ByteCount=$n
                 BytesBase64=$encoded
-                EncodedPayloadSha256=(Get-OPA265BW4k7uHash -Text $encoded)
+                PayloadSha256=(Get-OPA265BW4k7uByteHash -Bytes $bytes)
             })
         }
         $cls=if($kind -eq 'Mail'){43}elseif($kind -eq 'MeetingRequest'){53}else{46}
@@ -216,8 +223,9 @@ function New-OPA265BW4k7uSyntheticLedger {
         throw 'BW4k7u capacity plan wrong suite or unsafe.'
     }
     $a=@($CapacityPlan.Allocations)
-    if($a.Count -ne 8 -or @($CapacityPlan.PreservedObjects).Count -ne 4){
-        throw 'BW4k7u default must plan eight mail and preserve four excluded objects.'
+    if($a.Count -ne @($Suite.Cases | Where-Object {$_.EligibleForArchive -and $_.Class -eq 43 -and $_.Year -lt [int]$CapacityPlan.ArchiveBeforeYear}).Count -or
+       ($a.Count+@($CapacityPlan.PreservedObjects).Count) -ne 12){
+        throw 'BW4k7u per-year allocation and preserved fixture counts do not reconcile.'
     }
     $seen=New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
     $rows=New-Object 'System.Collections.Generic.List[object]'
@@ -229,6 +237,272 @@ function New-OPA265BW4k7uSyntheticLedger {
            [string]$slot.OriginalFolderPath -cne [string]$item[0].SourceFolderPath -or
            [string]$slot.ArchiveFolderPath -cne [string]$item[0].SourceFolderPath){
             throw 'BW4k7u invalid duplicated or modified folder/year allocation.'
+        }
+        $allowedFilePattern='^info@stios[.]ru[.]Archive-'+[string]$item[0].Year+'(?:-[0-9]{2,3})?[.]pst
+            DestinationPst=[string]$slot.ArchivePstFileName
+            State='UnclaimedSourceOnly'
+            IntentPinnedInMemory=$false;ClaimPinnedInMemory=$false
+            ModelAttemptCount=0;SourceExists=$true;DestinationExists=$false
+            OriginalFixture=(Copy-OPA265BW4k7uObject -Value $item[0])
+            DestinationFixture=$null
+            IndependentlyReviewed=$false
+        })
+    }
+    return [pscustomobject][ordered]@{
+        Schema='2.6.5-BW4k7u.SyntheticLedger.1'
+        SuiteId=[string]$Suite.SuiteId
+        Suite=$Suite;CapacityPlan=$CapacityPlan
+        SuiteManifestSha256=[string]$Suite.ManifestSha256
+        Rows=@($rows.ToArray())
+        BatchStatus='FreshSyntheticBatch'
+        Interrupted=$false;LastFault='None'
+        OnlyInMemorySynthetic=$true
+        PhysicalCrashOrResumeProven=$false
+        DiskJournalOrClaimCreated=$false
+        OutlookOrPstAccessed=$false
+        AutomaticRetryAllowed=$false
+        WriterPermit=$false;ProductionReady=$false
+    }
+}
+function Get-OPA265BW4k7uRow {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Ledger,
+          [Parameter(Mandatory=$true)][string]$CaseId)
+    if([string]$Ledger.Schema -cne '2.6.5-BW4k7u.SyntheticLedger.1' -or
+       -not [bool]$Ledger.OnlyInMemorySynthetic -or
+       [bool]$Ledger.DiskJournalOrClaimCreated -or
+       [bool]$Ledger.OutlookOrPstAccessed -or
+       [bool]$Ledger.AutomaticRetryAllowed -or
+       [bool]$Ledger.WriterPermit -or [bool]$Ledger.ProductionReady){
+        throw 'BW4k7u ledger not safe synthetic only.'
+    }
+    [void](Assert-OPA265BW4k7uSyntheticSuite -Suite $Ledger.Suite)
+    if([string]$Ledger.SuiteManifestSha256 -cne [string]$Ledger.Suite.ManifestSha256){
+        throw 'BW4k7u ledger manifest identity not pinned.'
+    }
+    $r=@($Ledger.Rows | Where-Object {$_.CaseId -ceq $CaseId})
+    $expected=@($Ledger.Suite.Cases | Where-Object {$_.CaseId -ceq $CaseId})
+    if($r.Count -ne 1 -or $expected.Count -ne 1){
+        throw 'BW4k7u duplicate or wrong synthetic CaseId.'
+    }
+    $x=Get-OPA265BW4k7uHash -Text (ConvertTo-Json -InputObject $r[0].OriginalFixture -Depth 12 -Compress)
+    $y=Get-OPA265BW4k7uHash -Text (ConvertTo-Json -InputObject $expected[0] -Depth 12 -Compress)
+    if($x -cne $y){throw 'BW4k7u original synthetic item mutated after manifest pin.'}
+    return $r[0]
+}
+function Compare-OPA265BW4k7uSyntheticWitness {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Before,
+          [Parameter(Mandatory=$true)][object]$After)
+    if($null -eq $Before -or $null -eq $After -or
+       [string]$Before.Schema -cne '2.6.5-BW4k7u.SyntheticCase.1' -or
+       [string]$After.Schema -cne '2.6.5-BW4k7u.SyntheticCase.1' -or
+       [string]$Before.Kind -cne 'Mail' -or
+       -not [bool]$Before.SyntheticOnly -or -not [bool]$After.SyntheticOnly -or
+       [bool]$Before.OutlookMAPIObserved -or [bool]$After.OutlookMAPIObserved){
+        throw 'BW4k7u comparison only supports synthetic Mail cases.'
+    }
+    $different=New-Object 'System.Collections.Generic.List[string]'
+    $fields=@('SuiteId','CaseId','Name','Kind','Class','MessageClass','Role',
+        'SourceFolderPath','Year','Subject','Sender','RecipientsTo','RecipientsCc',
+        'RecipientsBcc','Body','HtmlBody','TransportHeaders','ReceivedUtcTicks',
+        'SentUtcTicks','ReadState','Categories','FollowupFlag',
+        'SourceEntryId','DestinationEntryId')
+    foreach($name in $fields){
+        $x=ConvertTo-Json -InputObject $Before.$name -Depth 6 -Compress
+        $y=ConvertTo-Json -InputObject $After.$name -Depth 6 -Compress
+        if($x -cne $y){$different.Add($name)}
+    }
+    $aa=@($Before.Attachments);$bb=@($After.Attachments)
+    $attachmentsMatch=($aa.Count -eq $bb.Count)
+    foreach($att in @($aa)+@($bb)){
+        $raw=[Convert]::FromBase64String([string]$att.BytesBase64)
+        if([int]$att.ByteCount -ne $raw.Length -or
+           (Get-OPA265BW4k7uByteHash -Bytes $raw) -cne [string]$att.PayloadSha256){
+            $attachmentsMatch=$false
+        }
+    }
+    if($attachmentsMatch){
+        for($i=0;$i -lt $aa.Count;$i++){
+            if([string]$aa[$i].Name -cne [string]$bb[$i].Name -or
+               [int]$aa[$i].ByteCount -ne [int]$bb[$i].ByteCount -or
+               [string]$aa[$i].PayloadSha256 -cne [string]$bb[$i].PayloadSha256){
+                $attachmentsMatch=$false
+            }
+        }
+    }
+    $semantic=($different.Count -eq 0 -and $attachmentsMatch)
+    $req=[pscustomobject]@{
+        CaseId=[string]$Before.CaseId;Kind='Mail';MessageClass='IPM.Note'
+        PreMoveSourceCount=1;PreMoveDestinationCount=0
+        PostMoveSourceCount=0;PostMoveDestinationCount=1
+        BeforeRawMessageFlags=[long]$Before.BeforeRawMessageFlags
+        AfterRawMessageFlags=[long]$After.AfterRawMessageFlags
+        MailItemSizeBefore=[long]$Before.LogicalSizeBytes
+        MailItemSizeAfter=[long]($After.LogicalSizeBytes+$After.ModeledSizeDeltaBytes)
+        ExactSourceAndDestinationStoresVerified=$true
+        ImmutableIntentAndClaimPinned=$true;SingleAttemptClaimVerified=$true
+        UniqueMessageCorrelationVerified=$true
+        OriginalAndDestinationClassMatch=($different -notcontains 'Class' -and $different -notcontains 'MessageClass')
+        SubjectMatched=($different -notcontains 'Subject')
+        SenderMatched=($different -notcontains 'Sender')
+        RecipientSetMatched=($different -notcontains 'RecipientsTo' -and $different -notcontains 'RecipientsCc' -and $different -notcontains 'RecipientsBcc')
+        TextBodyMatched=($different -notcontains 'Body')
+        HtmlBodyMatchedOrProvenAbsent=($different -notcontains 'HtmlBody')
+        TransportHeadersMatchedOrProvenAbsent=($different -notcontains 'TransportHeaders')
+        SentAndReceivedTimesMatched=($different -notcontains 'SentUtcTicks' -and $different -notcontains 'ReceivedUtcTicks')
+        AttachmentCountAndOrderMatched=$attachmentsMatch
+        AttachmentPayloadSha256Matched=$attachmentsMatch
+        ReadUnreadAndProtectedFlagsMatched=($different -notcontains 'ReadState')
+        CategoriesAndFollowupMatched=($different -notcontains 'Categories' -and $different -notcontains 'FollowupFlag')
+        OutlookRestartReadbackMatched=$true;IndependentReadbackSucceeded=$true
+    }
+    $result=Test-OPA265BW4k7tSemanticCase -Case $req
+    return [pscustomobject][ordered]@{
+        Schema='2.6.5-BW4k7u.SyntheticSemanticWitness.1'
+        CaseId=[string]$Before.CaseId
+        SemanticFieldsMatched=$semantic
+        DifferentFields=@($different.ToArray())
+        ExactAttachmentBytesAndSha256Matched=$attachmentsMatch
+        ModeledMailItemSizeDelta=[long]$result.MailItemSizeDeltaBytes
+        ProspectivePolicyCategory=[string]$result.Category
+        Undocumented0x00010000Changed=[bool]$result.Undocumented0x00010000Changed
+        ProspectiveSemanticPolicy=$result
+        RealOutlookPostMoveProof=$false;OperatorResidualRiskAccepted=$false
+        WriterPermit=$false;ProductionReady=$false
+    }
+}
+function Set-OPA265BW4k7uSyntheticPhase {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Ledger,
+          [Parameter(Mandatory=$true)][string]$CaseId,
+          [Parameter(Mandatory=$true)][ValidateSet('Intent','Claim','ModelMove','Reconcile')][string]$Phase)
+    $r=Get-OPA265BW4k7uRow -Ledger $Ledger -CaseId $CaseId
+    switch($Phase){
+        'Intent'{
+            if($r.State -cne 'UnclaimedSourceOnly'){throw 'BW4k7u intent duplicate or replay.'}
+            $r.IntentPinnedInMemory=$true;$r.State='ModeledIntentNoDiskClaim'
+        }
+        'Claim'{
+            if($r.State -cne 'ModeledIntentNoDiskClaim' -or
+               -not $r.IntentPinnedInMemory -or $r.ClaimPinnedInMemory){
+                throw 'BW4k7u duplicate claim or missing intent.'
+            }
+            $r.ClaimPinnedInMemory=$true;$r.ModelAttemptCount=1
+            $r.State='ClaimedSourcePresentNeverRetryAutomatically'
+        }
+        'ModelMove'{
+            if($r.State -cne 'ClaimedSourcePresentNeverRetryAutomatically' -or
+               -not $r.SourceExists -or $r.DestinationExists -or
+               [int]$r.ModelAttemptCount -ne 1){
+                throw 'BW4k7u modeled Move cannot replay a claimed message.'
+            }
+            $r.DestinationFixture=Copy-OPA265BW4k7uObject -Value $r.OriginalFixture
+            $r.SourceExists=$false;$r.DestinationExists=$true
+            $r.State='DestinationOnlyAwaitIndependentReconciliation'
+        }
+        'Reconcile'{
+            if($r.State -cnotin @('ClaimedSourcePresentNeverRetryAutomatically','DestinationOnlyAwaitIndependentReconciliation')){
+                throw 'BW4k7u cannot reconcile unclaimed, duplicate or previously reconciled case.'
+            }
+            if($r.SourceExists -and -not $r.DestinationExists){
+                $r.State='ManualReviewClaimedSourceStillPresentNoRetry'
+            }elseif($r.DestinationExists -and -not $r.SourceExists){
+                $check=Compare-OPA265BW4k7uSyntheticWitness -Before $r.OriginalFixture -After $r.DestinationFixture
+                if($check.SemanticFieldsMatched){
+                    $r.State='SyntheticReconciledRiskReviewOnly'
+                }else{
+                    $r.State='BlockedSemanticMismatchNeverRetry'
+                }
+            }else{$r.State='BlockedAmbiguousSourceDestinationNeverRetry'}
+            $r.IndependentlyReviewed=$true
+        }
+    }
+    return [pscustomobject]@{
+        CaseId=$CaseId;Phase=$Phase
+        State=[string]$r.State
+        AttemptCount=[int]$r.ModelAttemptCount
+        DurableClaimWritten=$false
+        OutlookMoveExecuted=$false
+        AutomaticRetryAllowed=$false
+        WriterPermit=$false;ProductionReady=$false
+    }
+}
+function Get-OPA265BW4k7uSyntheticRecovery {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Ledger)
+    if([string]$Ledger.Schema -cne '2.6.5-BW4k7u.SyntheticLedger.1' -or
+       -not [bool]$Ledger.OnlyInMemorySynthetic -or
+       [bool]$Ledger.DiskJournalOrClaimCreated -or [bool]$Ledger.OutlookOrPstAccessed){
+        throw 'BW4k7u read-only recovery requires isolated in-memory ledger.'
+    }
+    $states=@{};$n=0L;$claims=0;$pending=0;$manual=0
+    foreach($r in @($Ledger.Rows)){
+        [void](Get-OPA265BW4k7uRow -Ledger $Ledger -CaseId ([string]$r.CaseId))
+        $key=[string]$r.State
+        if(-not $states.ContainsKey($key)){$states[$key]=0}
+        $states[$key]++
+        $n+=[long]$r.ModelAttemptCount
+        if($r.ClaimPinnedInMemory){$claims++}
+        if($key -eq 'UnclaimedSourceOnly'){$pending++}
+        if($key -match 'ManualReview|Blocked|Await|ClaimedSourcePresent'){$manual++}
+    }
+    $all=($manual -eq 0 -and $pending -eq 0 -and
+       @($Ledger.Rows | Where-Object {$_.State -cne 'SyntheticReconciledRiskReviewOnly'}).Count -eq 0)
+    return [pscustomobject][ordered]@{
+        Schema='2.6.5-BW4k7u.SyntheticRecovery.1'
+        SuiteId=[string]$Ledger.SuiteId
+        ModelAttemptCount=$n;ModeledClaimCount=$claims
+        PendingUnclaimedCount=$pending;ManualReviewCount=$manual
+        States=$states
+        AllEightSyntheticMailCasesReconciled=$all
+        ResumeOrRetryAutomaticallyAllowed=$false
+        ClaimedSourceCannotBeReplayed=$true
+        OriginalSourcePstUntouched=$true
+        InMemoryOnlyNoDurableClaim=$true
+        ActualCrashOrRestartRecoveryProven=$false
+        OutlookMoveExecuted=$false
+        WriterPermit=$false;ProductionReady=$false
+    }
+}
+function Invoke-OPA265BW4k7uSyntheticBatch {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Ledger,
+          [ValidateSet('None','AfterIntent','AfterClaim','AfterMove')][string]$FaultPoint='None',
+          [string]$FaultCaseId='')
+    if($Ledger.Interrupted -or $Ledger.BatchStatus -cne 'FreshSyntheticBatch' -or
+       @($Ledger.Rows | Where-Object {$_.State -cne 'UnclaimedSourceOnly'}).Count -ne 0){
+        throw 'BW4k7u no automatic replay/resume of a non-fresh synthetic batch.'
+    }
+    if($FaultPoint -cne 'None' -and
+       @($Ledger.Rows | Where-Object {$_.CaseId -ceq $FaultCaseId}).Count -ne 1){
+        throw 'BW4k7u injected fault must name one exact synthetic eligible CaseId.'
+    }
+    $Ledger.BatchStatus='SyntheticBatchRunning'
+    foreach($r in @($Ledger.Rows)){
+        $id=[string]$r.CaseId
+        [void](Set-OPA265BW4k7uSyntheticPhase -Ledger $Ledger -CaseId $id -Phase Intent)
+        if($FaultPoint -eq 'AfterIntent' -and $FaultCaseId -ceq $id){
+            $Ledger.Interrupted=$true;$Ledger.LastFault='AfterIntent';break
+        }
+        [void](Set-OPA265BW4k7uSyntheticPhase -Ledger $Ledger -CaseId $id -Phase Claim)
+        if($FaultPoint -eq 'AfterClaim' -and $FaultCaseId -ceq $id){
+            $Ledger.Interrupted=$true;$Ledger.LastFault='AfterClaim';break
+        }
+        [void](Set-OPA265BW4k7uSyntheticPhase -Ledger $Ledger -CaseId $id -Phase ModelMove)
+        if($FaultPoint -eq 'AfterMove' -and $FaultCaseId -ceq $id){
+            $Ledger.Interrupted=$true;$Ledger.LastFault='AfterMove';break
+        }
+        [void](Set-OPA265BW4k7uSyntheticPhase -Ledger $Ledger -CaseId $id -Phase Reconcile)
+    }
+    $Ledger.BatchStatus=if($Ledger.Interrupted){'InterruptedNoAutomaticResume'}
+                          else{'SyntheticBatchFinishedNoRealMove'}
+    return (Get-OPA265BW4k7uSyntheticRecovery -Ledger $Ledger)
+}
+
+        if([string]$slot.ArchivePstFileName -cnotmatch $allowedFilePattern -or
+           [int]$slot.SegmentNumber -lt 1 -or [int]$slot.SegmentNumber -gt 999){
+            throw 'BW4k7u unsafe archive file segment or year naming.'
         }
         $rows.Add([pscustomobject][ordered]@{
             CaseId=[string]$slot.CaseId
@@ -311,7 +585,7 @@ function Compare-OPA265BW4k7uSyntheticWitness {
     foreach($att in @($aa)+@($bb)){
         $raw=[Convert]::FromBase64String([string]$att.BytesBase64)
         if([int]$att.ByteCount -ne $raw.Length -or
-           (Get-OPA265BW4k7uHash -Text ([string]$att.BytesBase64)) -cne [string]$att.EncodedPayloadSha256){
+           (Get-OPA265BW4k7uByteHash -Bytes $raw) -cne [string]$att.PayloadSha256){
             $attachmentsMatch=$false
         }
     }
@@ -319,7 +593,7 @@ function Compare-OPA265BW4k7uSyntheticWitness {
         for($i=0;$i -lt $aa.Count;$i++){
             if([string]$aa[$i].Name -cne [string]$bb[$i].Name -or
                [int]$aa[$i].ByteCount -ne [int]$bb[$i].ByteCount -or
-               [string]$aa[$i].EncodedPayloadSha256 -cne [string]$bb[$i].EncodedPayloadSha256){
+               [string]$aa[$i].PayloadSha256 -cne [string]$bb[$i].PayloadSha256){
                 $attachmentsMatch=$false
             }
         }
