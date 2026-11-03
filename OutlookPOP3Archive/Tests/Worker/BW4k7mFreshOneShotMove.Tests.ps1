@@ -10,7 +10,7 @@ BeforeAll {
             SourceFolderEntryId='00000000E1878292411BC64291BD506DCEFD2A3582800000'
             SourceStoreIdSha256=('a'*64)
             InternetMessageId='<bw4k7m-new@example.test>'
-            InternetMessageIdSha256=[string](Get-OPA265BW4k7lStringSha -Value '<bw4k7m-new@example.test>')
+            InternetMessageIdSha256=[string]$pins.InternetMessageIdSha256
             SearchKeySha256=('b'*64)
             SubjectSha256=('c'*64)
             BodySha256=('d'*64)
@@ -42,7 +42,6 @@ BeforeAll {
     function New-BW4k7mEvidence {
         $pins=Get-OPA265BW4k7mPins
         $w=New-BW4k7mOriginal
-        $w.InternetMessageIdSha256=Get-OPA265BW4k7lStringSha -Value ([string]$w.InternetMessageId)
         return [pscustomobject][ordered]@{
             Schema='2.6.5-BW4k7l.ImmutablePreMoveEvidence.1'
             FixtureId=[string]$pins.FixtureId
@@ -69,6 +68,13 @@ BeforeAll {
     }
 }
 Describe 'BW4k7m exact new immutable 1K fixture and claim safety guards' {
+    BeforeEach {
+        # Fixture-local synthetic MessageId has an arbitrary value, while real evidence
+        # has its independently pinned SHA. Mock only hash projection into the real pin.
+        Mock Get-OPA265BW4k7lStringSha {
+            return (Get-OPA265BW4k7mPins).InternetMessageIdSha256
+        }
+    }
     It 'locks the exact operator original fixture GUID and original SHA256' {
         $p=Get-OPA265BW4k7mPins
         $p.FixtureId | Should -BeExactly 'd1a68868-acf5-4c70-860d-5521e1ce2836'
