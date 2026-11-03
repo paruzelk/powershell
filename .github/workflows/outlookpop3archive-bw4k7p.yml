@@ -318,7 +318,7 @@ jobs:
              $worker -cnotmatch 'AttachmentSizeEvidenceComplete' -or
              $worker -cmatch '\.(Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)\s*\(' -or
              $tests -cnotmatch 'Sent Mail other store rejected' -or
-             $tests -cnotmatch 'partial bounded results only one' -or
+             $tests -cnotmatch 'bounded partial has no inflated count' -or
              $doc -cnotmatch 'olFolderSentMail=5' -or
              $doc -cnotmatch '90-GB PST' -or
              -not [bool]$meta.Verification.BW4k7pExactPop3DeliveryStoreOnly -or
