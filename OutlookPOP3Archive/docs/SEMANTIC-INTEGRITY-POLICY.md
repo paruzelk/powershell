@@ -109,3 +109,30 @@ New **SEM-001-BW4k7o-v1** policy is strictly non-production and explicitly order
 7. Even exact tested content and metadata can be labeled read-only match only, **never** completed transaction, WriterPermit or ProductionReady from this policy alone.
 
 Refer to [BW4k7o exact operator runbook and full decision matrix](2.6.5-bw4k7o-semantic-integrity-decision.md). **NO new Move, historical journal completion, claim rewrite, automatic retry, Archive/Resume/Auto enablement or physical PST-durability claim.** The Sent Items, custom folders, 90-GB source PST, yearly capacity rollover and crash/resume coverage remain separate unverified prerequisites.
+
+
+## BW4k7t prospective SEM-001 controlled residual-risk review (2026-11-03)
+
+**Prospective normative amendment; NOT a retrospective BW4k7o decision reversal or production authorization.** The original BW4k7o historical 0x00010000 hard block, irreversible one-shot claim, source Evidence and postmove observations remain unchanged. Reliable POP3 archive preservation is the goal, not reverse-engineering undocumented MAPI provider bits. An unknown raw flag change alone is neither evidence of corruption nor evidence of harmlessness. We terminate attempts to assign meaning to this bit without an authoritative source.
+
+### Prospective classification (not a write permit)
+
+| Class | Meaning | Required action |
+|---|---|---|
+| A - Critical | Invalid source/destination unique identity; wrong store/year PST, changed sender, recipients, subject, plain/HTML, attachment payload SHA256 or count/order, dates, user categories/follow-up/READ/HASATTACH; missing mandatory original intent, failed independent readback | STOP. No automatic waiver, deletion, Move, retry, journal completion. Preserve evidence. |
+| B - Explained diagnostics | Cross-PST EntryID/store identity change after strong unique correlation and MailItem.Size/PR_MESSAGE_SIZE deltas. An observed mfUnmodified bit difference can be recorded but cannot itself prove content equivalence. | Log original/new identity and sizes. Do not reject or accept solely because of sizes or documented identity changes. Require all meaningful semantic witnesses. |
+| C - Unclassified provider metadata | Unknown PR_MESSAGE_FLAGS 0x00010000 (observed XOR 0x00010002) with all required semantic/attachment/identity observations matching | SCOPED RESIDUAL-RISK REVIEW CANDIDATE only. No global bit waiver or assertion of safe semantics. New unknown bits or missing evidence cannot qualify automatically. |
+
+The old SEM-001-BW4k7o-v1 evaluator and its historic BLOCKED decision are immutable. The new SEM-001-BW4k7t-Prospective-v1 permits evaluation for a SEPARATE future operator decision only. BW4k7t deliberately does NOT accept risk itself, does NOT write a decision record, never grants archive worker access or production permission, never retries old evidence.
+
+### Non-negotiable evidence for a future separate scope-specific decision
+
+1. Exact original POP3 delivery store, target yearly PST/folder and one unique strong message correlation; original source-one/dest-zero and postmove source-zero/dest-one; durable Intent and one irrevocable attempt Claim before any Move; ambiguous crash always means STOP, NEVER RETRY.
+2. Preserve and compare sender, ordered To/Cc/Bcc recipients when applicable, plain Body/HTMLBody, subject, available transport headers, sent/delivery dates, category/followup, read/unread, message class, and exact attachment byte hashes SHA256 and count/order. Missing required fields are not matches.
+3. Independent postmove/destination readback, Outlook restart readback, after-crash read-only reconciliation and physical PST durability, source scope and safe per-year PST capacity/rollover; full production POP3 Sent and custom folders must be covered, as well as multi-item batch/fault matrix.
+4. The three previously identified non-mail Inbox objects (Report.IPM.Note.NDR, Report.IPM.Note.IPNRN, IPM.Schedule.Meeting.Request, Class 46/46/53) may contain user data. They are not regular MailItem messages; never delete, skip or auto-move based solely on their type. Preserve in source until independent class-specific integrity handling is designed and tested.
+5. A future operator acceptance must be separately scoped to exact fixture/mask/evidence, independently pinned and immutable, with explicit description of remaining undocumentable internal state. It cannot overwrite old Evidence/Claim or turn a read-only policy review into production authorization. No real Move can occur in this BW4k7t stage.
+6. Previous BW4k7r read-only operator observation: 26602 dated mail + 3 other objects = 26605 source candidates; 21985 mail from six potential annual PSTs 2020-2025; the data is NOT a cryptographically sealed PST snapshot. The 2026 4617 mail messages are excluded by the current age threshold. All old test PSTs/folders remain untouched.
+7. Registry PST maximum is not disabled or bypassed; archive capacity and safety margin forecasts are non-binding until actual provider limits and physical PST durability are verified.
+
+Constrained future risk-review eligibility is not a proof of undocumented flag safety and not a blanket suppression. This stage preserves WriterPermit=False, ProductionReady=False, AutomaticRetryAllowed=False, JournalCompletionAllowed=False. No changes to old BW4k7o historic evaluation, no completed journal, no PST or registry modification. See docs/2.6.5-bw4k7t-semantic-risk-policy.md.
