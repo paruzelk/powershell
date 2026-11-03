@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k7n DEV: two confirmed independent BW4k7g/BW4k7m PR_MESSAGE_FLAGS XOR 0x00010002; exact BW4k7m 10489 to 9957 (-532) MailItem.Size stable after Outlook restart; new bounded optional PR_MESSAGE_SIZE and extended scalar read-only diagnostic, full immutable original BW4k7l Evidence and BW4k7m Claim SHA gates; no third Move, no guessed missing original raw size or 0x00010000 semantics, no production, no retry.",
+    "Status": "BW4k7n1 DEV: local BW4k7n 2564/2564 PASS but real Outlook PropertyAccessor.GetProperty optional PT_I8 0x0E080014 COM string-to-string marshalling failed; skip only this exact optional tag as NotProbed (NOT provider absent); continue reading all other 10 properties incl 32-bit PR_MESSAGE_SIZE, unchanged required MAPI fail-close, original Evidence and Claim SHA pinned, 2571 Pester/103 containers; no Move, retry, waiver or production.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
     "ExpectedTestContainers": 103,
-    "ExpectedPesterTests": 2564,
+    "ExpectedPesterTests": 2571,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -365,6 +365,13 @@
     "BW4k7nHistoricalClaimOrEvidenceRewritten": false,
     "BW4k7nLiveOutlookMoveInCI": false,
     "BW4k7nAutomaticRetryAllowed": false,
-    "BW4k7nProductionWorkerDispatchAllowed": false
+    "BW4k7nProductionWorkerDispatchAllowed": false,
+    "BW4k7n1OnlyOptionalPtI8ComTagSkipped": true,
+    "BW4k7n1NotProbedNotProviderAbsent": true,
+    "BW4k7n1RequiredMapiPropertiesRemainFailClosed": true,
+    "BW4k7n1OriginalEvidenceOrClaimRewritten": false,
+    "BW4k7n1OutlookMoveInCI": false,
+    "BW4k7n1AutomaticRetryAllowed": false,
+    "BW4k7n1ProductionWorkerDispatchAllowed": false
   }
 }
