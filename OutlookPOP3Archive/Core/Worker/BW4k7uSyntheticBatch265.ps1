@@ -172,7 +172,7 @@ function Get-OPA265BW4k7uSyntheticCapacityPlan {
             })
             continue
         }
-        $forecast=[long]([decimal]::Ceiling([decimal][long]$c.LogicalSizeBytes*1.25M)+65536M)
+        $forecast=[long]([decimal]::Ceiling([decimal][long]$c.LogicalSizeBytes*([decimal]125/[decimal]100))+65536M)
         if($forecast -gt $usable){throw ('BW4k7u modeled message larger than segment: '+$c.Name)}
         $key=[string]$c.Year
         if(-not $used.ContainsKey($key)){$used[$key]=[pscustomobject]@{Segment=1;Bytes=0L}}
