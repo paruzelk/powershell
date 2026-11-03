@@ -306,7 +306,7 @@ jobs:
              $driver -cnotmatch 'SentItemsResolvedInThisPop3Store' -or
              $driver -cnotmatch 'OutboxNeverEquivalentToSentItems=\$true' -or
              $driver -cnotmatch 'Pop3BoundedPartialYearInventoryNoFullCoverageClaim' -or
-             $driver -cnotmatch 'Get-OPA265BW4k7pYearPlan' -or
+             $driver -cnotmatch 'New-OPA265BW4k7pYearPlan' -or
              $driver -cnotmatch 'ProposedArchiveFilesCreated=\$false' -or
              $driver -cnotmatch 'WriterPermit=\$false' -or
              $driver -cnotmatch 'ProductionReady=\$false' -or
