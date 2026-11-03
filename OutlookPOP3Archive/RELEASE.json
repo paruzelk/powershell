@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k7t DEV SEM-001-Prospective-v1: read-only pure A critical/B explained identity+size/C undocumented provider risk classifications, exact 0x10000 not asserted safe or corrupt, no unconditional waiver, no signed acceptance. 3 prior nonmail witnesses preserved and original 2020-2025 six-year plan checked only when operator reports supplied. Old BW4k7o strict historic evidence and block immutable; no production, Move, PST, registry, Claim or journal writes. 94 new Pester tests, 3049 total in 109 containers.",
+    "Status": "BW4k7u DEV SYNTHETIC MULTI-ITEM PREFLIGHT: 12 deterministic synthetic fixtures, 8 archived-by-year MailItems (Inbox, Sent, nested user folders, UTF8, HTML, 1K/256K attachments with actual byte SHA256), one current-year and three nonmail preserved; in-memory per-year Archive-YYYY-02 rollover model; modeled Intent/Claim/one-shot/faults AfterIntent/AfterClaim/AfterMove and independent semantic reconciliation via BW4k7t Category C review. NO Outlook, real/disposable PST, disk journal/claim, physical crash resume or production; historic BW4k7m Claim untouched. 111 new tests, 3160/110 total.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 109,
-    "ExpectedPesterTests": 3049,
+    "ExpectedTestContainers": 110,
+    "ExpectedPesterTests": 3160,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -452,6 +452,21 @@
     "BW4k7tHistoricEvidenceOrClaimRewritten": false,
     "BW4k7tPstRegistryOrMailModified": false,
     "BW4k7tAutomaticRetryAllowed": false,
-    "BW4k7tProductionArchiveResumeAutoAllowed": false
+    "BW4k7tProductionArchiveResumeAutoAllowed": false,
+    "BW4k7uTwelveSyntheticCasesAndEightEligible": true,
+    "BW4k7uIncludesInboxSentNestedUserFolderAndNonMail": true,
+    "BW4k7uAttachmentRawByteSha256AndSyntheticSemanticReview": true,
+    "BW4k7uInMemoryOneShotIntentClaimAndFaultMatrix": true,
+    "BW4k7uArtificialYearPstRolloverForecastOnly": true,
+    "BW4k7uOriginalBW4k7tSEMRiskNotWaived": true,
+    "BW4k7uOriginalHistoricalClaimUntouched": true,
+    "BW4k7uPhysicalPstReadOrWritten": false,
+    "BW4k7uOutlookComOrMoveCalled": false,
+    "BW4k7uDurableIntentOrClaimWritten": false,
+    "BW4k7uRealCrashRecoveryProven": false,
+    "BW4k7uOldEvidenceOrClaimRewritten": false,
+    "BW4k7uThreeNonMailObjectsDiscardedOrMoved": false,
+    "BW4k7uAutomaticRetryAllowed": false,
+    "BW4k7uProductionArchiveResumeAutoAllowed": false
   }
 }
