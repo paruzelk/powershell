@@ -245,3 +245,7 @@ BW4k7a real `Attachment1K` source size changed **8122 -> 8634 (+512)**, while bo
 ## BW4k7g — test-only Attachment1K one-shot Move and independent post-Move audit
 
 [Runbook](docs/2.6.5-bw4k7g-one-shot-attachment-move.md). Re-verifies BW4k7f and exact immutable BW4k7c (+512) and BW4k7e (recipients/state) source evidence. `Review` and `Execute -WhatIf` are read-only; only an independently and explicitly operator-approved `Execute` may durably create one irreversible SHA-256 Claim in the existing BW4k1 claim location, then invoke exactly one Outlook MailItem.Move. Never retry an attempted Move. Separate independent read-only postmove source-zero/destination-one, To/Cc/Bcc/user-state/body/attachment SHA audit. Not production-ready.
+
+## BW4k7h — read-only post-Move raw MAPI flags vs Outlook user-state attribution
+
+[Runbook](docs/2.6.5-bw4k7h-postmove-state-attribution.md): user-reported BW4k7g real disposable Attachment1K postmove audit has source=0/destination=1; complete body, recipient and attachment SHA match but **FullUserStateSha256Matches=False**. BW4k7h independently rechecks the *immutable* original BW4k7e SHA and irreversible BW4k7g Claim, recomputes archived user's exact ten COM state fields and MAPI flag digest, and substitutes **only original PR_MESSAGE_FLAGS=65555** to isolate a raw-provider-flag change. No automatic semantic waiver, no Move/Claim write or retry, no production.
