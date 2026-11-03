@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k7q DEV POP3-SCOPE-001: exact original POP3 StoreID+EntryID Inbox/Sent/Outbox, full original 22 folder structure-only scope, seven root OPA264-LIVE3 synthetic test folders and two Outlook settings excluded IN MEMORY, no deletion/detach, empty Sent included and synthetic nonempty 37 Sent retained; unknown original MAPI 0x10000 SEM-001 still blocks production; 69 new PS5.1 Pester tests, 2804/106 total.",
+    "Status": "BW4k7s DEV PST-LIMIT-001: original BW4k7r 26605 POP3 candidate reconciliation, 26602 MailItems plus 3 nonmail Inbox objects, three read-only Class/MessageClass/EntryID witnesses (no discard), Office16 policy/user registry PST DWORD limit inspection and unsealed six-year 2020-2025 plan self-check, 65 new Pester tests. No Outlook Move/registry changes/PST deletion/old Claim rewrite, SEM-001 unknown 0x10000 still blocked, production disabled.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 107,
-    "ExpectedPesterTests": 2890,
+    "ExpectedTestContainers": 108,
+    "ExpectedPesterTests": 2955,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -422,6 +422,21 @@
     "BW4k7rHistoricUnknown0x10000Waived": false,
     "BW4k7rOutlookMoveInCI": false,
     "BW4k7rProductionArchiveResumeAutoAllowed": false,
-    "BW4k7rAutomaticRetryAllowed": false
+    "BW4k7rAutomaticRetryAllowed": false,
+    "BW4k7sOriginalPop3QScopeRechecked": true,
+    "BW4k7sThreeNonMailObjectWitnessesReadOnly": true,
+    "BW4k7sOtherClassItemsNeverAutomaticallyDeleted": true,
+    "BW4k7sOffice16PstRegistryPolicyAndUserInspectedReadOnly": true,
+    "BW4k7sPreviousFullYearEvidenceUnsealedSelfConsistency": true,
+    "BW4k7sOldTestPstOrFolderDeleted": false,
+    "BW4k7sRegistryKeysChanged": false,
+    "BW4k7sPstLimitDisabled": false,
+    "BW4k7sMailBodyOrAttachmentsRead": false,
+    "BW4k7sOtherImapItemsRead": false,
+    "BW4k7sOriginalEvidenceOrClaimRewritten": false,
+    "BW4k7sSEM001Unknown0x10000Waived": false,
+    "BW4k7sOutlookMoveExecutedInCI": false,
+    "BW4k7sProductionArchiveResumeAutoAllowed": false,
+    "BW4k7sAutomaticRetryAllowed": false
   }
 }
