@@ -112,8 +112,8 @@ Describe 'BW4k7n PST provider scalar MAPI + post-restart immutable evidence safe
   It 'missing optional message size preserved as null' {
      $f=New-BW4k7nFake; [void]$f.PA.Map.Remove("0x0E080003"); $w=Get-BW4k7nFakeProbe $f; $w.Properties[3].Available | Should -BeFalse; $null -eq $w.Properties[3].Value | Should -BeTrue
   }
-  It 'missing optional 64-bit size preserved as absent' {
-     $f=New-BW4k7nFake; [void]$f.PA.Map.Remove("0x0E080014"); (Get-BW4k7nFakeProbe $f).Properties[4].Available | Should -BeFalse
+  It 'optional 64-bit size is NotProbed rather than falsely marked absent' {
+     $f=New-BW4k7nFake; [void]$f.PA.Map.Remove("0x0E080014"); $x=(Get-BW4k7nFakeProbe $f).Properties[4]; $x.Available | Should -BeFalse; $x.ObservationState | Should -BeExactly "NotProbedPowerShellComPtI8Interop"
   }
   It 'missing native format is acceptable' {
      $f=New-BW4k7nFake; [void]$f.PA.Map.Remove("0x10160003"); (Get-BW4k7nFakeProbe $f).Properties[5].Available | Should -BeFalse
@@ -133,8 +133,8 @@ Describe 'BW4k7n PST provider scalar MAPI + post-restart immutable evidence safe
   It 'negative provider size blocked' {
      $f=New-BW4k7nFake; $f.PA.Map["0x0E080003"]=[int]-1; {Get-BW4k7nFakeProbe $f} | Should -Throw
   }
-  It 'wrong extended size type blocked' {
-     $f=New-BW4k7nFake; $f.PA.Map["0x0E080014"]="9957"; {Get-BW4k7nFakeProbe $f} | Should -Throw
+  It 'mismatched 64-bit property is never interpreted because interop is not probed' {
+     $f=New-BW4k7nFake; $f.PA.Map["0x0E080014"]="9957"; $x=(Get-BW4k7nFakeProbe $f).Properties[4]; $x.ObservationState | Should -BeExactly "NotProbedPowerShellComPtI8Interop"; $null -eq $x.Value | Should -BeTrue
   }
   It 'wrong has-attachment bool blocked' {
      $f=New-BW4k7nFake; $f.PA.Map["0x0E1B000B"]=[int]1; {Get-BW4k7nFakeProbe $f} | Should -Throw
@@ -175,8 +175,8 @@ Describe 'BW4k7n PST provider scalar MAPI + post-restart immutable evidence safe
   It 'optional size difference detected across reads' {
      $f=New-BW4k7nFake; $a=Get-BW4k7nFakeProbe $f; $f.PA.Map["0x0E080003"]=[int]9958; $b=Get-BW4k7nFakeProbe $f; {Assert-OPA265BW4k7nStableArchivedProbe -First $a -Second $b} | Should -Throw
   }
-  It 'optional availability drift detected' {
-     $f=New-BW4k7nFake; $a=Get-BW4k7nFakeProbe $f; [void]$f.PA.Map.Remove("0x0E080014"); $b=Get-BW4k7nFakeProbe $f; {Assert-OPA265BW4k7nStableArchivedProbe -First $a -Second $b} | Should -Throw
+  It 'optional availability drift detected on genuinely probed Int32 size' {
+     $f=New-BW4k7nFake; $a=Get-BW4k7nFakeProbe $f; [void]$f.PA.Map.Remove("0x0E080003"); $b=Get-BW4k7nFakeProbe $f; {Assert-OPA265BW4k7nStableArchivedProbe -First $a -Second $b} | Should -Throw
   }
   It 'timestamp drift between reads detected' {
      $f=New-BW4k7nFake; $a=Get-BW4k7nFakeProbe $f; $f.PA.Map["0x30080040"]=[datetime]"2026-11-03T11:00:00Z"; $b=Get-BW4k7nFakeProbe $f; {Assert-OPA265BW4k7nStableArchivedProbe -First $a -Second $b} | Should -Throw
@@ -211,8 +211,8 @@ Describe 'BW4k7n PST provider scalar MAPI + post-restart immutable evidence safe
   It 'current PR_MESSAGE_SIZE discrepancy still needs investigation' {
      $f=New-BW4k7nFake; $f.PA.Map["0x0E080003"]=[int]9999; $r=Get-BW4k7nResult $f; $r.PrMessageSizeMatchesDestinationMailItemSize | Should -BeFalse; $r.ProductionReady | Should -BeFalse
   }
-  It '64-bit optional property is independently evaluated' {
-     $r=Get-BW4k7nResult; $r.PrMessageSizeExtendedPresent | Should -BeTrue; $r.PrMessageSizeExtendedBytes | Should -Be 9957; $r.PrMessageSizeExtendedMatchesDestinationMailItemSize | Should -BeTrue
+  It '64-bit extended MAPI property is explicitly unprobed, not unavailable' {
+     $r=Get-BW4k7nResult; $r.PrMessageSizeExtendedPresent | Should -BeFalse; $null -eq $r.PrMessageSizeExtendedBytes | Should -BeTrue; $null -eq $r.PrMessageSizeExtendedMatchesDestinationMailItemSize | Should -BeTrue; $r.PrMessageSizeExtendedObservationState | Should -BeExactly "NotProbedPowerShellComPtI8Interop"; $r.PrMessageSizeExtendedProviderSupportEstablished | Should -BeFalse
   }
   It 'missing optional size leaves comparison null' {
      $f=New-BW4k7nFake; [void]$f.PA.Map.Remove("0x0E080003"); $r=Get-BW4k7nResult $f; $r.PrMessageSizePresent | Should -BeFalse; $null -eq $r.PrMessageSizeMatchesDestinationMailItemSize | Should -BeTrue
@@ -255,5 +255,26 @@ Describe 'BW4k7n PST provider scalar MAPI + post-restart immutable evidence safe
   }
   It 'controller offers WhatIf with no Outlook access' {
      $s=Get-Content -Raw -Encoding UTF8 (Join-Path $PSScriptRoot "../../Core/Diagnostics/Invoke-OPA265BW4k7nReadOnlyProviderInvestigation.ps1"); $s | Should -Match "WhatIfNoOutlookReadNoPstOrEvidenceWrite"; $s | Should -Match "IndependentProcessRestartComparisonAvailable"
+  }
+  It 'PT_I8 skipped on real-world COM string conversion without triggering GetProperty' {
+    $f=New-BW4k7nFake; $f.PA | Add-Member -Force -MemberType ScriptMethod -Name GetProperty -Value {param($uri) if([string]$uri -like '*0x0E080014'){throw 'PowerShell COM string conversion failed'}; $tag=([string]$uri).Replace('http://schemas.microsoft.com/mapi/proptag/',''); return $this.Map[$tag]}; $r=Get-BW4k7nFakeProbe $f; $r.Properties[4].ObservationState | Should -BeExactly 'NotProbedPowerShellComPtI8Interop'
+  }
+  It 'optional Int32 MessageSize still read after extended skip' {
+    $r=Get-BW4k7nFakeProbe (New-BW4k7nFake); $r.Properties[3].Value | Should -Be 9957; $r.Properties[3].ObservationState | Should -BeExactly 'Read'
+  }
+  It 'required message flags still read after extended skip' {
+    $r=Get-BW4k7nFakeProbe (New-BW4k7nFake); $r.Properties[0].ObservationState | Should -BeExactly 'Read'; $r.Properties[0].Available | Should -BeTrue
+  }
+  It 'optional missing Int32 differs from PT_I8 unprobed' {
+    $f=New-BW4k7nFake; [void]$f.PA.Map.Remove('0x0E080003'); $r=Get-BW4k7nFakeProbe $f; $r.Properties[3].ObservationState | Should -BeExactly 'MapiNotFound'; $r.Properties[4].ObservationState | Should -BeExactly 'NotProbedPowerShellComPtI8Interop'
+  }
+  It 'classification reports deliberate PT_I8 skip without inference of provider support' {
+    $r=Get-BW4k7nResult; $r.PrMessageSizeExtendedNotProbedByDesign | Should -BeTrue; $r.PrMessageSizeExtendedProviderSupportEstablished | Should -BeFalse; $r.PropertySpecificSizeDeltaCauseProven | Should -BeFalse
+  }
+  It 'independent read paths detect a forged PT_I8 ObservationState' {
+    $f=New-BW4k7nFake; $a=Get-BW4k7nFakeProbe $f; $b=Get-BW4k7nFakeProbe $f; $b.Properties[4].ObservationState='MapiNotFound'; { Assert-OPA265BW4k7nStableArchivedProbe -First $a -Second $b } | Should -Throw
+  }
+  It 'fail closed if required flags invocation throws after extended skip' {
+    $f=New-BW4k7nFake; $f.PA | Add-Member -Force -MemberType ScriptMethod -Name GetProperty -Value {param($uri) throw 'required read must still fail'}; {Get-BW4k7nFakeProbe $f} | Should -Throw
   }
 }
