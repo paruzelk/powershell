@@ -41,6 +41,7 @@ try{
   throw 'BW4k7g postmove strict fixture/destination pins mismatch.'
  }
  $claim=Read-OPA265BW4k7gClaimVerified -ExpectedClaimSha256 $ExpectedClaimSha256
+ [void](Assert-OPA265BW4k7HistoricCompletedMoves -SuiteId $SuiteId)
  if(-not [string]::Equals([string]$claim.SourcePst,[IO.Path]::GetFullPath($SourcePst),[StringComparison]::OrdinalIgnoreCase) -or
     -not [string]::Equals([string]$claim.DestinationPst,[IO.Path]::GetFullPath($DestinationPst),[StringComparison]::OrdinalIgnoreCase)){
   throw 'BW4k7g immutable Claim source/target PST differs.'
@@ -157,6 +158,7 @@ try{
     (Get-FileHash -LiteralPath $manualPath -Algorithm SHA256).Hash.ToLowerInvariant() -cne $ExpectedDecisionSha256){
   throw 'BW4k7g postmove immutable source evidence changed during audit.'
  }
+ [void](Assert-OPA265BW4k7HistoricCompletedMoves -SuiteId $SuiteId)
  $claim2=Read-OPA265BW4k7gClaimVerified -ExpectedClaimSha256 $ExpectedClaimSha256
  if([string]$claim2.Schema -cne [string]$claim.Schema){
   throw 'BW4k7g postmove claim changed.'
