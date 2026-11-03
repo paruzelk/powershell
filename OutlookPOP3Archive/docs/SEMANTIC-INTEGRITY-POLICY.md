@@ -92,3 +92,20 @@ Original BW4k7h: complete captured message, recipients, ten Outlook COM user fie
 ## BW4k7j distinguish documented per-message MAPI flags from equal-valued other-property flags
 
 `PR_MESSAGE_FLAGS=0x0E070003` source `0x00010013`, destination `0x00000011`, XOR `0x00010002`. Microsoft [MS-OXCMSG] PidTagMessageFlags explicitly defines `mfUnmodified=0x00000002`, which may clear after saving/modification, with user READ/HASATTACH bits unchanged in this original evidence. **Microsoft PidTagStoreSupportMask's `STORE_HTML_OK=0x00010000` is from a different property** and **Microsoft PidTagMessageStatus 0x00010000 high-bit provisions are also a different property**; neither documents original message flag `0x00010000`. In reviewed MS-OXCMSG it is **unclassified**, must remain BLOCKED; no blanket lifecycle mask waiver or reinterpretation as HTML support permitted. BW4k7j read-only repeats independently verified BW4k7i genuine Outlook reopen integrity against SHA `f75594047529cca19bbeb8d2a52db5412187325a39db4d659dc85b4b41d44399`, then pure bit-by-bit classification. Historical BW4k7g full-user-state SHA failure is immutable; writer/prod disabled, never retry prior Move. [Source-backed runbook](2.6.5-bw4k7j-mapi-flag-investigation.md).
+
+
+## BW4k7o versioned SEM-001 semantic integrity decision gate (2026-11-03)
+
+BW4k7n1 operator real Outlook read-only review returned original source-zero/destination-one, matched tested message content and attachment bytes, stable raw PR_MESSAGE_FLAGS 65555 -> 17 (XOR 0x00010002), PR_MESSAGE_STATUS 0 -> 0, MailItem.Size 10489 -> 9957 (delta -532), and destination PR_MESSAGE_SIZE 9957. PT_I8 PR_MESSAGE_SIZE_EXTENDED was explicitly NotProbedPowerShellComPtI8Interop (not proved absent). The original pre-Move raw PR_MESSAGE_SIZE was never captured. The original Evidence SHA256 36ca109b7905e0040e57c6b9e01d0858daefd2ae7c76daba5c091663bbe36c29 and irreversible Claim SHA256 6ba71ce58605f5c53ef0051f7f10919a388357ed3ac3c9e1feab76e71facda58 are independently verified in the linked read-only chain.
+
+New **SEM-001-BW4k7o-v1** policy is strictly non-production and explicitly ordered:
+
+1. Original SHA-pinned evidence/Claim and independent count/identity proof must be present. Fail closed otherwise.
+2. Required subject/body/HTML/recipients/attachment payload and user state must match; any mismatch blocks.
+3. Separate PR_MESSAGE_STATUS, user READ and HASATTACH bits remain protected; changes block.
+4. **Undocumented PR_MESSAGE_FLAGS bit 0x00010000 remains unclassified and blocks** irrespective of valid content, stable Outlook restart, or provider size. Do not confuse it with STORE_HTML_OK of a different property.
+5. Documented mfUnmodified bit 0x00000002 changes still require isolated review, not global normalization.
+6. A provider-size-only difference or unavailable PR_MESSAGE_SIZE requires separate review; size mismatch is neither automatic corruption proof nor acceptance. No global +38/+512/-532 waiver.
+7. Even exact tested content and metadata can be labeled read-only match only, **never** completed transaction, WriterPermit or ProductionReady from this policy alone.
+
+Refer to [BW4k7o exact operator runbook and full decision matrix](2.6.5-bw4k7o-semantic-integrity-decision.md). **NO new Move, historical journal completion, claim rewrite, automatic retry, Archive/Resume/Auto enablement or physical PST-durability claim.** The Sent Items, custom folders, 90-GB source PST, yearly capacity rollover and crash/resume coverage remain separate unverified prerequisites.
