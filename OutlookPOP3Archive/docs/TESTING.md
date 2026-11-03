@@ -92,3 +92,7 @@ BW4k7a **real disposable** Attachment1K source drift: 8122 -> 8634 (+512) while 
 ## BW4k7f no-Move empty target gate
 
 Expected CI **2276 Pester tests / 95 containers**. 28 synthetic tests enforce immutable original Attachment1K recipient/state SHA, unique source message with pinned EntryID, exact source-one/target-zero destination folder and distinct store, no duplicate folder, no stale current fixture Claim, no hidden PST creation/mount/Move, and same full read-only checks under `-WhatIf`. Full Windows PowerShell 5.1 BOM/PSScriptAnalyzer/Pester plus BW4j6 fault matrix before ZIP release; no real Outlook inside CI. [BW4k7f runbook](2.6.5-bw4k7f-empty-target-no-move.md).
+
+## BW4k7g one-shot disposable mail and postmove semantic audit (SEM-001)
+
+39 synthetic Pester tests (expected **2315 tests/96 containers**) cover exact +512-only provider Size drift, unchanged original message/content/attachment SHA, manual size decision and original immutable recipient-state snapshot, durable `FileMode.CreateNew/Flush(true)` one-attempt Claim in the prior BW4k1 path (cross-version retry fencing), explicit approval, single call to `MailItem.Move()`, `-WhatIf` with no claim, and independent destination full To/Cc/Bcc/user-state hash and source-zero/target-one checks. GitHub Actions native Windows PowerShell 5.1 + Analyzer + Pester + original 5/5 BW4j6 synthetic fault matrix; no Outlook/PST in CI. Actual user disposable Move never runs as part of CI. [BW4k7g guide](2.6.5-bw4k7g-one-shot-attachment-move.md).
