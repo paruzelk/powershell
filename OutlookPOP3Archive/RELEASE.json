@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k7p DEV: exact POP3 DeliveryStore; Outlook Store.GetDefaultFolder(5) SentMail and 4 Outbox distinguish by StoreID/EntryID, recursive bounded read-only Inbox+Sent+user mail, system exclusion, year date fallback and optional attachment metadata, proposed annual filenames ONLY; all production workers, unknown MAPI 0x10000 waiver and Outlook Move remain disabled.",
+    "Status": "BW4k7q DEV POP3-SCOPE-001: exact original POP3 StoreID+EntryID Inbox/Sent/Outbox, full original 22 folder structure-only scope, seven root OPA264-LIVE3 synthetic test folders and two Outlook settings excluded IN MEMORY, no deletion/detach, empty Sent included and synthetic nonempty 37 Sent retained; unknown original MAPI 0x10000 SEM-001 still blocks production; 69 new PS5.1 Pester tests, 2804/106 total.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 105,
-    "ExpectedPesterTests": 2735,
+    "ExpectedTestContainers": 106,
+    "ExpectedPesterTests": 2804,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -395,6 +395,19 @@
     "BW4k7pUnknown0x10000Waived": false,
     "BW4k7pActualOutlookMoveInCI": false,
     "BW4k7pAutomaticRetryAllowed": false,
-    "BW4k7pProductionWorkerDispatchAllowed": false
+    "BW4k7pProductionWorkerDispatchAllowed": false,
+    "BW4k7qExactPop3StoreAndCanonicalSentInboxOutbox": true,
+    "BW4k7qEmptySentRequiredAndNonemptySentSynthetic": true,
+    "BW4k7qOnlyReservedTestFolderNamesQuarantined": true,
+    "BW4k7qKnownOutlookSettingsExcluded": true,
+    "BW4k7qOldTestFoldersDeleted": false,
+    "BW4k7qOldTestArchivePstDetachedOrDeleted": false,
+    "BW4k7qOriginalEvidenceOrIrreversibleClaimRewritten": false,
+    "BW4k7qOtherImapMailItemsRead": false,
+    "BW4k7qOriginalUnknown0x10000Waived": false,
+    "BW4k7qOutlookMoveInCI": false,
+    "BW4k7qJournalOrProductionWriterAllowed": false,
+    "BW4k7qAutomaticRetryAllowed": false,
+    "BW4k7qProductionWorkerDispatchAllowed": false
   }
 }
