@@ -104,3 +104,7 @@ Expected CI **2276 Pester tests / 95 containers**. 28 synthetic tests enforce im
 ## BW4k7i read-only reopen integrity (SEM-001)
 
 32 new synthetic Pester tests (expected **2371 tests in 98 containers**) verify exact original irreversible Claim/recipient snapshot SHA, source-zero/destination-one, body/attachment/recipient integrity, known MSGFLAG_UNMODIFIED 0x2 vs unknown 0x00010000, one immutable BOM/Flush(true) evidence capture, no claim/journal/PST writes and true Outlook restart StartUtcTicks before repeated compare. GitHub Actions native Windows PS5.1 Pester/PSScriptAnalyzer/BOM and full original 5/5 BW4j6 matrix; no actual Outlook/PST process-restart tests in CI. Operator uses read-only [BW4k7i runbook](2.6.5-bw4k7i-reopen-integrity-readonly.md).
+
+## BW4k7j Microsoft MAPI raw flag classification, SEM-001
+
+32 new Pester synthetic cases (expected 2403 tests in 99 containers) verify documented `mfUnmodified` 0x2, unchanged READ/HASATTACH, exact observed 0x00010002 XOR, unidentified PR_MESSAGE_FLAGS 0x00010000, separate-property STORE_HTML_OK collision, strict no-waiver policies, alternate dangerous flag mutations, BW4k7i immutable reopened SHA, and a read-only controller with no Move/Claim file writer. Full native Windows PowerShell 5.1/Pester/PSScriptAnalyzer/TZ-ENC-001/SEM-001/BW4j6 5-of-5 synthetic CI; actual PST/Outlook writes never performed by CI. [Runbook](2.6.5-bw4k7j-mapi-flag-investigation.md).
