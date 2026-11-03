@@ -460,7 +460,7 @@ jobs:
           foreach($word in @('Invoke-OPA265BW4k7qPop3ScopeExclusionReview.ps1',
             'GetFolderFromID','TestFolderOrDescendant','GetFirst',
             'MaxNonMailWitnesses=25','MaxTotalItems=5000','RegistryOnly',
-            'NoPstOrRegistryWrite=$true','OriginalSEM001Unknown0x00010000StillBlocked=$true',
+            'PstOrRegistryWritten=$false','OriginalSEM001Unknown0x00010000StillBlocked=$true',
             'WriterPermit=$false','ProductionReady=$false','NonMailWitnesses')){
             if($c -cnotmatch [regex]::Escape($word)){$bad.Add(('controller '+$word))}
           }
