@@ -1,3 +1,9 @@
+## 2.6.5-BW4k7v2a2 — Real post-save pilot failure forensic review, read-only (DEV, 2026-11-05)
+
+- Operator BW4k7v2a1 real `Inspect` passed, eight stores and POP3 delivery confirmed; subsequent original `CreatePilot` failed in combined **post-Save** identity check. `HRESULT=0x80131501` from script throw is not an Outlook MAPI failure code; exact mismatched predicate unknown.
+- New `Core/Diagnostics/Invoke-OPA265BW4k7v2a2FailedPilotReadOnlyReview.ps1` probes **only** the exact original SuiteId test PST and synthetic folder, bounded 16 items, verifies StoreID/FolderID/EntryID/Class/subject and optional independent by-ID read. No previous items or profile stores searched for mail, no file/PST/profile mutations, no retry.
+- Pure classifier, 19 Pester cases; expected 3419 tests in 116 containers; all earlier and BW4j6 gates inherited. `ProductionReady=False`, `WriterPermit=False`.
+
 ## 2.6.5-BW4k7v2a1 — Existing Outlook POP3 test profile one-pilot extension (DEV, 2026-11-05)
 
 - Previous BW4k7v2/v2a profile-isolation preflight and its passing CI checkpoint remain unchanged. New opt-in **ExistingTestProfile** one-shot pilot for existing `Outlook` profile and POP3 `info@stios.ru` account; requires exact `Account.DeliveryStore.StoreID`.
