@@ -61,8 +61,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 114,
-    "ExpectedPesterTests": 3370,
+    "ExpectedTestContainers": 115,
+    "ExpectedPesterTests": 3400,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -516,6 +516,15 @@
     "BW4k7v2MultiItemMoveOrSendExecuted": false,
     "BW4k7v2GenuineSentOrReceivedYearsProven": false,
     "BW4k7v2AutomaticRetryAllowed": false,
-    "BW4k7v2ProductionArchiveResumeAutoAllowed": false
+    "BW4k7v2ProductionArchiveResumeAutoAllowed": false,
+    "BW4k7v2a1ExistingTestProfileAllowed": true,
+    "BW4k7v2a1RequiresExactPop3DeliveryStore": true,
+    "BW4k7v2a1OneShotIntentBeforeAddStore": true,
+    "BW4k7v2a1ExplicitNewPstItemsAdd": true,
+    "BW4k7v2a1PostSaveExactStoreFolderAndRestart": true,
+    "BW4k7v2a1ActualOutlookPilotTestedInGitHubCI": false,
+    "BW4k7v2a1AutomaticRetryAllowed": false,
+    "BW4k7v2a1ProductionWorkerEnabled": false,
+    "BW4k7v2a1OldOriginalSourcePstChangedByScript": false
   }
 }
