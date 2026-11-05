@@ -78,7 +78,7 @@ Describe 'BW4k7v2a READ-ONLY pristine visible PST gate before pilot' {
         {Test-OPA265BW4k7v2aPristineInventory -Rows @()} | Should -Throw
     }
     It 'limits to 128 folder observations' {
-        $rows=@(for($i=0;$i -lt 129;$i++){[pscustomobject]@{FolderId=('id'+$i);Depth=if($i){1}else{0};ItemCount=0;ChildFolderCount=if($i){0}else{128}}})
+        $rows=@(for($i=0;$i -lt 129;$i++){[pscustomobject]@{FolderId=('id'+$i);Depth=$([int]($i -gt 0));ItemCount=0;ChildFolderCount=$([int]($i -eq 0)*128)}})
         {Test-OPA265BW4k7v2aPristineInventory -Rows $rows} | Should -Throw
     }
     It 'rejects unresolved descendants at maximum depth' {
