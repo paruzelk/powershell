@@ -661,3 +661,9 @@ Correct the two List[string] array conversions flagged in FIX7 CI. No movement l
 - Restrict Resume completed-item tracking to EntryIDs present in the transaction PlannedItems.
 - Prevent stale or unrelated inline Move steps from inflating Completed items and Executed counts.
 - Keep DuplicateIndex reconciliation scoped to the current transaction and its planned source IDs.
+
+## 2.6.5-BW4k7v2a (DEV, 2026-11-05)
+
+- Added fail-closed, read-only traversal of a freshly provisioned account-free Outlook profile's sole default PST before the first pilot folder or template is written. Any preexisting visible MailItem, duplicate/missing folder identity, incomplete child scan or >128 folders/depth 32 prevents CreatePilot.
+- Existing BW4k7v2 OFT explicit InFolder pilot, per-GUID approval, actual StoreID/Parent check, immutable manifest, restart readback and old failed SuiteId quarantine remain mandatory. No MailItem.Move/Send/Delete, no automatic retry, no production Worker dispatch.
+- Added 23 pure Pester tests and separate security policy; planned full 3370 tests/114 containers. Actual Windows CI status is determined only by its own run.
