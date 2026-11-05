@@ -3,7 +3,7 @@ BeforeAll {
     . (Join-Path $PSScriptRoot '../../Core/Worker/BW4k7v2IsolatedProfilePolicy265.ps1')
     $script:id='c934c588-321b-4f74-88c7-3e2e2ab7ab8f'
     $script:layout=Get-OPA265BW4k7v2Layout -SuiteId $script:id -LocalAppData $env:LOCALAPPDATA
-    $script:args=@{
+    $script:isolationParams=@{
         Layout=$script:layout
         ActualProfileName='OPA265-BW4k7v2'
         AccountsCount=0
@@ -115,43 +115,43 @@ Describe 'BW4k7v2 dedicated single-default-PST zero-account profile and one-pilo
         (Test-OPA265BW4k7v2StoreIsolation @script:args).Isolated | Should -BeTrue
     }
     It 'new Outlook main working profile rejected' {
-        $x=@{}+$script:args; $x.ActualProfileName='Outlook'; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
+        $x=@{}+$script:isolationParams; $x.ActualProfileName='Outlook'; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
     }
     It 'wrong profile reason code surfaced' {
-        $x=@{}+$script:args; $x.ActualProfileName='Outlook'; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'NotDedicatedProfile'
+        $x=@{}+$script:isolationParams; $x.ActualProfileName='Outlook'; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'NotDedicatedProfile'
     }
     It 'one linked mail account rejected' {
-        $x=@{}+$script:args; $x.AccountsCount=1; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'MailAccountsPresent'
+        $x=@{}+$script:isolationParams; $x.AccountsCount=1; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'MailAccountsPresent'
     }
     It 'two accounts rejected' {
-        $x=@{}+$script:args; $x.AccountsCount=2; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
+        $x=@{}+$script:isolationParams; $x.AccountsCount=2; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
     }
     It 'two mounted PSTs rejected' {
-        $x=@{}+$script:args; $x.StoresCount=2; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'MultipleOrMissingStores'
+        $x=@{}+$script:isolationParams; $x.StoresCount=2; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'MultipleOrMissingStores'
     }
     It 'zero stores rejected' {
-        $x=@{}+$script:args; $x.StoresCount=0; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
+        $x=@{}+$script:isolationParams; $x.StoresCount=0; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
     }
     It 'wrong default StoreID rejected' {
-        $x=@{}+$script:args; $x.DefaultStoreId='different'; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'DefaultStoreNotOnlyStore'
+        $x=@{}+$script:isolationParams; $x.DefaultStoreId='different'; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'DefaultStoreNotOnlyStore'
     }
     It 'empty only StoreID rejected' {
-        $x=@{}+$script:args; $x.OnlyStoreId=''; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
+        $x=@{}+$script:isolationParams; $x.OnlyStoreId=''; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
     }
     It 'wrong default path rejected' {
-        $x=@{}+$script:args; $x.OnlyStoreFilePath='C:\Outlook Files\info@stios.ru.pst'; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'OnlyStorePathMismatch'
+        $x=@{}+$script:isolationParams; $x.OnlyStoreFilePath='C:\Outlook Files\info@stios.ru.pst'; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'OnlyStorePathMismatch'
     }
     It 'empty default path rejected' {
-        $x=@{}+$script:args; $x.OnlyStoreFilePath=''; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
+        $x=@{}+$script:isolationParams; $x.OnlyStoreFilePath=''; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
     }
     It 'suspiciously large initial PST rejected' {
-        $x=@{}+$script:args; $x.PstSizeBytes=30000000; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'PilotPstTooLargeOrMissing'
+        $x=@{}+$script:isolationParams; $x.PstSizeBytes=30000000; (Test-OPA265BW4k7v2StoreIsolation @x).ReasonCodes | Should -Contain 'PilotPstTooLargeOrMissing'
     }
     It 'missing or empty initial PST rejected' {
-        $x=@{}+$script:args; $x.PstSizeBytes=0; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
+        $x=@{}+$script:isolationParams; $x.PstSizeBytes=0; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
     }
     It 'hard-stop on failed profile safety' {
-        $x=@{}+$script:args; $x.AccountsCount=1; (Test-OPA265BW4k7v2StoreIsolation @x).MustStopBeforeAnyMailCreation | Should -BeTrue
+        $x=@{}+$script:isolationParams; $x.AccountsCount=1; (Test-OPA265BW4k7v2StoreIsolation @x).MustStopBeforeAnyMailCreation | Should -BeTrue
     }
     It 'never fallback to another store' {
         (Test-OPA265BW4k7v2StoreIsolation @script:args).AutomaticRecoveryOrFallbackAllowed | Should -BeFalse
