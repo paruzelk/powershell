@@ -53,11 +53,11 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "BW4k7u DEV SYNTHETIC MULTI-ITEM PREFLIGHT: 12 deterministic synthetic fixtures, 8 archived-by-year MailItems (Inbox, Sent, nested user folders, UTF8, HTML, 1K/256K attachments with actual byte SHA256), one current-year and three nonmail preserved; in-memory per-year Archive-YYYY-02 rollover model; modeled Intent/Claim/one-shot/faults AfterIntent/AfterClaim/AfterMove and independent semantic reconciliation via BW4k7t Category C review. NO Outlook, real/disposable PST, disk journal/claim, physical crash resume or production; historic BW4k7m Claim untouched. 111 new tests, 3160/110 total.",
+    "Status": "BW4k7v DEV FRESH DISPOSABLE PST PREFLIGHT: Plan no Outlook; Create ONLY explicitly approved new GUID Unicode PST in isolated LOCALAPPDATA and 8 unsent test IPM.Note by Folder.Items.Add; Save in fresh test PST, hash raw synthetic attachment bytes plus recipients/body/HTML/user state into immutable CreateNew Flush(true) pre-Move manifest; Verify original SHA on restarted Outlook with double-read. Synthetic year tag is NOT MAPI ReceivedTime/SentOn; Sent-named folder is NOT genuine sent mail. No Move/Send/Delete, old PST/evidence/Claim change or production permission. 64 Pester tests, 3224/111 total.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
-    "ExpectedTestContainers": 110,
-    "ExpectedPesterTests": 3160,
+    "ExpectedTestContainers": 111,
+    "ExpectedPesterTests": 3224,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -467,6 +467,22 @@
     "BW4k7uOldEvidenceOrClaimRewritten": false,
     "BW4k7uThreeNonMailObjectsDiscardedOrMoved": false,
     "BW4k7uAutomaticRetryAllowed": false,
-    "BW4k7uProductionArchiveResumeAutoAllowed": false
+    "BW4k7uProductionArchiveResumeAutoAllowed": false,
+    "BW4k7vNewIsolatedPstCreationExplicitlyApprovedOnly": true,
+    "BW4k7vEightUnsentSyntheticIpMNoteCases": true,
+    "BW4k7vNoProductionStoreCreateItem": true,
+    "BW4k7vImmutablePreMoveManifestCreateNewFlushAndSha256": true,
+    "BW4k7vIndependentPostRestartDoubleReadRequired": true,
+    "BW4k7vActualCalendarYearAndGenuineSentUnproven": true,
+    "BW4k7vExistingOriginalPstAndHistoricClaimUntouched": true,
+    "BW4k7vPstWrittenInCI": false,
+    "BW4k7vOutlookComConnectedInCI": false,
+    "BW4k7vProductionMailboxItemWritten": false,
+    "BW4k7vOutlookMoveOrSendExecuted": false,
+    "BW4k7vOriginalEvidenceOrClaimRewritten": false,
+    "BW4k7vOldPstOrTestFolderDeleted": false,
+    "BW4k7vPstRegistryLimitChanged": false,
+    "BW4k7vAutomaticallyRetriesInterruptedCreation": false,
+    "BW4k7vProductionArchiveResumeAutoAllowed": false
   }
 }
