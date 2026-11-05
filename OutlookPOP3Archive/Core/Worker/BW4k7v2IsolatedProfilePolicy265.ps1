@@ -72,9 +72,9 @@ function Test-OPA265BW4k7v2StoreIsolation {
           [Parameter(Mandatory=$true)][string]$ActualProfileName,
           [ValidateRange(0,999)][int]$AccountsCount,
           [ValidateRange(0,999)][int]$StoresCount,
-          [Parameter(Mandatory=$true)][string]$DefaultStoreId,
-          [Parameter(Mandatory=$true)][string]$OnlyStoreId,
-          [Parameter(Mandatory=$true)][string]$OnlyStoreFilePath,
+          [Parameter(Mandatory=$true)][AllowEmptyString()][string]$DefaultStoreId,
+          [Parameter(Mandatory=$true)][AllowEmptyString()][string]$OnlyStoreId,
+          [Parameter(Mandatory=$true)][AllowEmptyString()][string]$OnlyStoreFilePath,
           [ValidateRange(0,1000000000000)][long]$PstSizeBytes,
           [switch]$RequirePristine)
     $issues=New-Object 'System.Collections.Generic.List[string]'
