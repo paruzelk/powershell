@@ -73,6 +73,9 @@ Describe 'BW4k7v2a READ-ONLY pristine visible PST gate before pilot' {
         $rows=Copy-OPA265BW4k7v2aRows
         [void]$rows[1].PSObject.Properties.Remove('ItemCount')
         {Test-OPA265BW4k7v2aPristineInventory -Rows $rows} | Should -Throw
+        $rows=Copy-OPA265BW4k7v2aRows
+        $rows[1].ItemCount=$null
+        {Test-OPA265BW4k7v2aPristineInventory -Rows $rows} | Should -Throw
     }
     It 'rejects empty inventory' {
         {Test-OPA265BW4k7v2aPristineInventory -Rows @()} | Should -Throw
