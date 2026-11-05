@@ -151,8 +151,13 @@ try{
             $folder=$node.Folder
             $depth=[int]$node.Depth
             $entryId=[string]$folder.EntryID
-            $itemCount=[long]$folder.Items.Count
-            $childCount=[int]$folder.Folders.Count
+            $rawItemCount=$folder.Items.Count
+            $rawChildCount=$folder.Folders.Count
+            if($null -eq $rawItemCount -or $null -eq $rawChildCount){
+                throw 'BW4k7v2a Outlook folder count unreadable; STOP.'
+            }
+            $itemCount=[long]$rawItemCount
+            $childCount=[int]$rawChildCount
             if($childCount -lt 0 -or $childCount -gt 128 -or
                ($inventoryRows.Count+$folderQueue.Count+$childCount+1) -gt 128){
                 throw 'BW4k7v2a pristine inventory exceeds 128 folders; STOP.'
