@@ -712,7 +712,7 @@ jobs:
             if($tests -cnotmatch [regex]::Escape($token)){$bad.Add(('Pester '+$token))}
           }
           foreach($token in @('UNSENT','NOT proved by actual MAPI',
-            'DO NOT retry the same GUID','after closing and restarting Outlook')){
+            'do NOT retry the same GUID','completely close Outlook')){
             if($doc -cnotmatch [regex]::Escape($token)){$bad.Add(('runbook '+$token))}
           }
           foreach($key in @('BW4k7vNewIsolatedPstCreationExplicitlyApprovedOnly',
