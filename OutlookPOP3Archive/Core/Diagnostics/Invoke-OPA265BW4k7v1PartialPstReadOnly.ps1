@@ -132,7 +132,7 @@ try{
                 }catch{
                     $opened=$false;$openErrors++
                     $err=[string]$_.Exception.Message
-                    $hresult=('0x{0:X8}' -f ([uint32]([int64]$_.Exception.HResult -band 0xffffffffL)))
+                    $hresult=('0x{0:X8}' -f ([uint32]([int64]$_.Exception.HResult -band 4294967295L)))
                 }
             }
             $rows.Add([pscustomobject][ordered]@{
