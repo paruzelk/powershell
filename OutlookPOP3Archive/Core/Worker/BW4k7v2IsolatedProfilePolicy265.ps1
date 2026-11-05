@@ -152,7 +152,7 @@ function Write-OPA265BW4k7v2ManifestOnce {
     param([Parameter(Mandatory=$true)][object]$Layout,
           [Parameter(Mandatory=$true)][object]$Manifest)
     [void](Assert-OPA265BW4k7v2PilotManifest -Manifest $Manifest -Layout $Layout)
-    $utf8=New-Object Text.UTF8Encoding($false)
+    $utf8=[Text.UTF8Encoding]::new($false)
     $data=$utf8.GetBytes((ConvertTo-Json -InputObject $Manifest -Depth 12))
     $fs=$null
     try{
