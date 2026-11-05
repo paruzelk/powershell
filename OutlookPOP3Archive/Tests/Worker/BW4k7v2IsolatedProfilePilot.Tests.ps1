@@ -112,7 +112,7 @@ Describe 'BW4k7v2 dedicated single-default-PST zero-account profile and one-pilo
         (Assert-OPA265BW4k7v2Layout -Layout $script:layout -LocalAppData $env:LOCALAPPDATA) | Should -BeTrue
     }
     It 'only test PST default and one account-free store passes' {
-        (Test-OPA265BW4k7v2StoreIsolation @script:args).Isolated | Should -BeTrue
+        (Test-OPA265BW4k7v2StoreIsolation @script:isolationParams).Isolated | Should -BeTrue
     }
     It 'new Outlook main working profile rejected' {
         $x=@{}+$script:isolationParams; $x.ActualProfileName='Outlook'; (Test-OPA265BW4k7v2StoreIsolation @x).Isolated | Should -BeFalse
@@ -154,10 +154,10 @@ Describe 'BW4k7v2 dedicated single-default-PST zero-account profile and one-pilo
         $x=@{}+$script:isolationParams; $x.AccountsCount=1; (Test-OPA265BW4k7v2StoreIsolation @x).MustStopBeforeAnyMailCreation | Should -BeTrue
     }
     It 'never fallback to another store' {
-        (Test-OPA265BW4k7v2StoreIsolation @script:args).AutomaticRecoveryOrFallbackAllowed | Should -BeFalse
+        (Test-OPA265BW4k7v2StoreIsolation @script:isolationParams).AutomaticRecoveryOrFallbackAllowed | Should -BeFalse
     }
     It 'never grant writer even in valid one-store test' {
-        (Test-OPA265BW4k7v2StoreIsolation @script:args).WriterPermit | Should -BeFalse
+        (Test-OPA265BW4k7v2StoreIsolation @script:isolationParams).WriterPermit | Should -BeFalse
     }
     It 'sha256 abc correct RFC value' {
         (Get-OPA265BW4k7v2Sha256 -Text 'abc') | Should -BeExactly 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad'
