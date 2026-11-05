@@ -16,7 +16,8 @@ function Test-OPA265BW4k7v2aPristineInventory {
     foreach($row in $Rows) {
         if ($null -eq $row) { throw 'BW4k7v2a null folder observation.' }
         foreach($field in @('FolderId','Depth','ItemCount','ChildFolderCount')) {
-            if ($row.PSObject.Properties.Name -cnotcontains $field) {
+            if ($row.PSObject.Properties.Name -cnotcontains $field -or
+                $null -eq $row.PSObject.Properties[$field].Value) {
                 throw ('BW4k7v2a missing mandatory folder field '+$field)
             }
         }
