@@ -1,3 +1,10 @@
+## 2.6.5-BW4k7v2a1 — Existing Outlook POP3 test profile one-pilot extension (DEV, 2026-11-05)
+
+- Previous BW4k7v2/v2a profile-isolation preflight and its passing CI checkpoint remain unchanged. New opt-in **ExistingTestProfile** one-shot pilot for existing `Outlook` profile and POP3 `info@stios.ru` account; requires exact `Account.DeliveryStore.StoreID`.
+- Creates one **new disposable Unicode PST** inside current test Outlook profile with `Namespace.AddStoreEx(path, 2)` and saves exactly one pilot via `targetFolder.Items.Add('IPM.Note')`. Never writes to default Drafts, no default store switch, no changes to original POP3 mail items.
+- Explicit `SuiteId` consent, `-WhatIf`, immutable intent before COM mutation, exact target StoreID + Parent Folder verification, independent two-read witness and post-Outlook-restart verification. No repeat after partial failure.
+- 30 new PS5.1 Pester cases, expected full 3400 tests in 115 containers; synthetic CI cannot prove real Outlook 2019 provider behavior. No Move, Send, Delete, production Archive/Resume/Auto, or SEM-001 waiver. One new PST remains attached in the test profile until the operator decides on disposal.
+
 ## 2.6.5-BW4j6 — GitHub Actions-only synthetic BW4j4→BW4j6 protocol gates (DEV, 2026-11-01)
 
 - **Rollback checkpoint**: branch `checkpoint/outlookpop3archive-2.6.5-bw4j-ci-pass-g5e458c92` pinned to passing BW4j commit `5e458c921aa3c1aaf9aad5cc4bc124984d788cd5`; subsequent work isolated in `feature/outlookpop3archive-2.6.5-bw4j6-synthetic-gates`.
