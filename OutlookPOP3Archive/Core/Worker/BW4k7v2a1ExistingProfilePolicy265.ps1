@@ -59,8 +59,8 @@ function Test-OPA265BW4k7v2a1ExistingProfileScope {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Layout,
           [Parameter(Mandatory=$true)][string]$ActualProfileName,
-          [Parameter(Mandatory=$true)][object[]]$Accounts,
-          [Parameter(Mandatory=$true)][object[]]$Stores,
+          [Parameter(Mandatory=$true)][AllowNull()][AllowEmptyCollection()][object[]]$Accounts,
+          [Parameter(Mandatory=$true)][AllowNull()][AllowEmptyCollection()][object[]]$Stores,
           [switch]$AllowTargetAttached)
     $issues=New-Object 'System.Collections.Generic.List[string]'
     if($ActualProfileName -cne 'Outlook'){$issues.Add('WrongOutlookProfile')}
