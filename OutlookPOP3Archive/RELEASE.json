@@ -61,8 +61,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 115,
-    "ExpectedPesterTests": 3400,
+    "ExpectedTestContainers": 116,
+    "ExpectedPesterTests": 3419,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -525,6 +525,16 @@
     "BW4k7v2a1ActualOutlookPilotTestedInGitHubCI": false,
     "BW4k7v2a1AutomaticRetryAllowed": false,
     "BW4k7v2a1ProductionWorkerEnabled": false,
-    "BW4k7v2a1OldOriginalSourcePstChangedByScript": false
+    "BW4k7v2a1OldOriginalSourcePstChangedByScript": false,
+    "BW4k7v2a2ActualOperatorPilotFailedPostSavePredicate": true,
+    "BW4k7v2a2OriginalSuiteIdQuarantinedNoRetry": true,
+    "BW4k7v2a2PureReadOnlyPstFolderAndByIdForensic": true,
+    "BW4k7v2a2PreservesOriginalImmutableIntentAndClaim": true,
+    "BW4k7v2a2OriginalFailedPredicateExactlyIdentified": false,
+    "BW4k7v2a2OutlookComUsedInGitHubCI": false,
+    "BW4k7v2a2NewPstOrMailItemCreated": false,
+    "BW4k7v2a2AnyOutlookMoveSaveSendDelete": false,
+    "BW4k7v2a2OriginalPstOrTestFolderDeleted": false,
+    "BW4k7v2a2ProductionWorkerEnabled": false
   }
 }
