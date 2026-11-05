@@ -64,7 +64,7 @@ function Test-OPA265BW4k7v2a1ExistingProfileScope {
           [switch]$AllowTargetAttached)
     $issues=New-Object 'System.Collections.Generic.List[string]'
     if($ActualProfileName -cne 'Outlook'){$issues.Add('WrongOutlookProfile')}
-    $storeIds=New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+    $storeIds=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
     $pop3StoreId=''
     $matchedStores=0
     foreach($store in $Stores){
