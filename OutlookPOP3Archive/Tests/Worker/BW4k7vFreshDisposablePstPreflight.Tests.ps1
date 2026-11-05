@@ -217,7 +217,7 @@ Describe 'BW4k7v fresh isolated Outlook PST plan, original 8 synthetic preMove m
         $s=Get-Content -Raw -Encoding UTF8 (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k7vFreshDisposablePstPreflight.ps1'); $s | Should -Match 'CreatingOutlookProcessStartUtcTicks'
     }
     It 'controller creates a Unicode PST only in separate directory' {
-        $s=Get-Content -Raw -Encoding UTF8 (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k7vFreshDisposablePstPreflight.ps1'); $s | Should -Match 'AddStoreEx'
+        $s=Get-Content -Raw -Encoding UTF8 (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k7vFreshDisposablePstPreflight.ps1'); $s | Should -Match 'AddStoreEx\(\[string\]\$layout[.]SourcePst,2\)'
     }
     It 'controller never grants production' {
         $s=Get-Content -Raw -Encoding UTF8 (Join-Path $PSScriptRoot '../../Core/Diagnostics/Invoke-OPA265BW4k7vFreshDisposablePstPreflight.ps1'); $s | Should -Match 'ProductionReady=\$false'
