@@ -4,6 +4,8 @@ Application: `0.9.4-rc1-build2.6.3-PREVIEW1`. Target: Windows PowerShell 5.1, Ou
 
 **Status:** 2.6.3-PREVIEW1 development candidate: read-only interrupted Move reconciliation; CI pending. Production `Archive`, `Resume`, `Plan` and `Auto` still use the existing FIX13b Outlook COM code. Mail movement is **not delegated** to a worker. Keep FIX13b as the tested archiving baseline.
 
+**New diagnostic BW4k7v2a1 (existing Outlook test profile):** For a one-item pilot without a second Outlook profile, see [existing-profile runbook](docs/2.6.5-bw4k7v2a1-existing-profile-pilot.md). The script attaches one new Unicode disposable PST to the existing `Outlook` POP3 profile and creates one item only in an explicitly identified folder. Requires exact approval; no old PST writes, no Move/Send/Delete, no production worker.
+
 ## Purpose and safety rules
 
 - Archive old messages from **POP3** PST stores only; IMAP accounts are never archived.
