@@ -86,8 +86,8 @@ try{
            [IO.File]::Exists($layout.ManifestPath)){
             throw 'BW4k7v fresh fixture collision: refuse overwrite.'
         }
-        # olStoreUnicode=3. AddStoreEx only for the new isolated GUID path.
-        $ns.AddStoreEx([string]$layout.SourcePst,3)
+        # olStoreUnicode=2 (olStoreANSI=3). Only use the new isolated GUID path.
+        $ns.AddStoreEx([string]$layout.SourcePst,2)
     }
     $stage='Verify unique mounted isolated store (not default POP3)'
     $store=Get-OPA265BW4k7vExactMountedStore -Namespace $ns -Layout $layout
