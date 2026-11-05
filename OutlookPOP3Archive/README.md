@@ -6,6 +6,8 @@ Application: `0.9.4-rc1-build2.6.3-PREVIEW1`. Target: Windows PowerShell 5.1, Ou
 
 **New diagnostic BW4k7v2a1 (existing Outlook test profile):** For a one-item pilot without a second Outlook profile, see [existing-profile runbook](docs/2.6.5-bw4k7v2a1-existing-profile-pilot.md). The script attaches one new Unicode disposable PST to the existing `Outlook` POP3 profile and creates one item only in an explicitly identified folder. Requires exact approval; no old PST writes, no Move/Send/Delete, no production worker.
 
+**NEW BW4k7v2a2 read-only forensic diagnostic:** The real BW4k7v2a1 test returned a post-save target-identity mismatch for suite `2c15cb7c-4c09-4bcf-bca1-9fec458af3a5`; this does not identify the original predicate or prove a wrong PST. Do not retry its CreatePilot. [Read-only forensic runbook](docs/2.6.5-bw4k7v2a2-failed-pilot-readonly-forensics.md) reads only the named disposable test PST folder and original intent, never saves, mounts or moves mail.
+
 ## Purpose and safety rules
 
 - Archive old messages from **POP3** PST stores only; IMAP accounts are never archived.
