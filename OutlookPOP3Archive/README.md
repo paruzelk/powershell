@@ -257,3 +257,7 @@ BW4k7a real `Attachment1K` source size changed **8122 -> 8634 (+512)**, while bo
 ## BW4k7j — read-only PR_MESSAGE_FLAGS documented vs unresolved bit investigation
 
 [Runbook](docs/2.6.5-bw4k7j-mapi-flag-investigation.md). Microsoft [MS-OXCMSG] defines `mfUnmodified=0x00000002` for `PR_MESSAGE_FLAGS`, but the **different-property** constant `STORE_HTML_OK=0x00010000` cannot identify the unknown `PR_MESSAGE_FLAGS` bit `0x00010000`. The exact original Attachment1K archive and immutable Claim/BW4k7i reopened baseline SHA are verified again, all changed bits classified individually with no automatic waiver. **No Move, Capture, Claim edits, producer, or production permit.**
+
+## BW4k7v2a read-only pristine test-PST precreation gate (DEV)
+
+BW4k7v2a adds an Outlook-visible, bounded read-only inventory of every folder in the exact account-free dedicated test PST before the one permitted pilot is created. Any existing item or incomplete scan blocks the pilot; the original failed old PST/working-profile Draft remains quarantined. No production Archive/Resume/Auto or MailItem.Move permission. See [BW4k7v2a guide](docs/2.6.5-bw4k7v2a-pristine-inventory.md). CI target: 3370 tests / 114 containers (Windows PowerShell 5.1).
