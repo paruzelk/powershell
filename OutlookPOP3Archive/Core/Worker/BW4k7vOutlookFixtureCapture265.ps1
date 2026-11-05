@@ -74,22 +74,34 @@ function New-OPA265BW4k7vSavedMail {
     $mail.Categories='BW4k7vDisposable'
     $tag=$mail.UserProperties.Add('OPA265BW4k7vArchiveYear',1,$true)
     $tag.Value=[string]$Case.Year
-    foreach($att in @($Case.Attachments)){
-        $temp=Join-Path ([string]$Layout.AttachmentScratchDirectory) ('attachment-'+[guid]::NewGuid().ToString('N')+'.bin')
-        try{
+    $tempFiles=New-Object 'System.Collections.Generic.List[string]'
+    try{
+        foreach($att in @($Case.Attachments)){
+            if([string]$att.Name -cnotmatch '^[A-Za-z0-9._-]{1,128}$'){
+                throw 'BW4k7v unsafe attachment fixture filename.'
+            }
+            # Outlook may ignore DisplayName for non-RTF messages; exact on-disk
+            # source filename must already match the expected MAPI attachment name.
+            $temp=Join-Path ([string]$Layout.AttachmentScratchDirectory) ([string]$att.Name)
+            if([IO.File]::Exists($temp)){throw 'BW4k7v transient attachment file already exists.'}
             $bytes=[Convert]::FromBase64String([string]$att.BytesBase64)
             if($bytes.Length -ne [int]$att.ByteCount -or $bytes.Length -gt 262144){
                 throw 'BW4k7v synthetic attachment payload invalid.'
             }
             [IO.File]::WriteAllBytes($temp,$bytes)
+            $tempFiles.Add($temp)
             [void]$mail.Attachments.Add($temp,1,1,[string]$att.Name)
-        }finally{
+        }
+        # Do not remove transient source files until Outlook saves attachments
+        # into the exact isolated MailItem.
+        $mail.Save()
+    }finally{
+        foreach($temp in $tempFiles){
             if([IO.File]::Exists($temp)){
                 Remove-Item -LiteralPath $temp -Force -ErrorAction Stop
             }
         }
     }
-    $mail.Save()
     $id=[string]$mail.EntryID
     if($id -cnotmatch '^[a-fA-F0-9]{40,512}$'){
         throw 'BW4k7v newly saved MailItem EntryID unavailable.'
