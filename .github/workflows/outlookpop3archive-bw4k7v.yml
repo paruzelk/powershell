@@ -692,7 +692,7 @@ jobs:
           foreach($token in @('ValidateSet(',
             "'Plan','Create','Verify'",
             'CREATE NEW BW4K7V PST',
-            'GetActiveObject','AddStoreEx','Get-OPA265BW4k7vExactMountedStore',
+            'GetActiveObject','AddStoreEx([string]$layout.SourcePst,2)','Get-OPA265BW4k7vExactMountedStore',
             'CreatingOutlookProcessStartUtcTicks',
             'New-OPA265BW4k7vSavedMail',
             'Write-OPA265BW4k7vManifestOnce',
