@@ -18,6 +18,7 @@ if($PSVersionTable.PSEdition -cne 'Desktop' -or
     throw 'BW4k7v2 requires native Windows PowerShell 5.1 STA.'
 }
 . (Join-Path $PSScriptRoot '../Worker/BW4k7v2IsolatedProfilePolicy265.ps1')
+. (Join-Path $PSScriptRoot '../Worker/BW4k7v2aPristineInventoryPolicy265.ps1')
 [void](Assert-OPA265BW4k7v2SuiteId -SuiteId $SuiteId)
 $layout=Get-OPA265BW4k7v2Layout -SuiteId $SuiteId -LocalAppData $env:LOCALAPPDATA
 if($Mode -ceq 'CreatePilot'){
@@ -138,6 +139,45 @@ try{
             'Create exactly ONE template-based pilot MailItem in test-only default PST')){
             throw 'BW4k7v2 operator declined pilot creation.'
         }
+        $stage='BW4k7v2a read-only scan of every visible test PST folder before creation'
+        $inventoryRows=New-Object 'System.Collections.Generic.List[object]'
+        $folderQueue=New-Object System.Collections.Queue
+        $folderQueue.Enqueue([pscustomobject]@{Folder=$pstRoot;Depth=0})
+        while($folderQueue.Count -gt 0){
+            if($inventoryRows.Count -ge 128){
+                throw 'BW4k7v2a pristine inventory exceeds 128 folders; STOP.'
+            }
+            $node=$folderQueue.Dequeue()
+            $folder=$node.Folder
+            $depth=[int]$node.Depth
+            $entryId=[string]$folder.EntryID
+            $itemCount=[long]$folder.Items.Count
+            $childCount=[int]$folder.Folders.Count
+            if($childCount -lt 0 -or $childCount -gt 128 -or
+               ($inventoryRows.Count+$folderQueue.Count+$childCount+1) -gt 128){
+                throw 'BW4k7v2a pristine inventory exceeds 128 folders; STOP.'
+            }
+            if($depth -ge 32 -and $childCount -gt 0){
+                throw 'BW4k7v2a folder tree too deep for safe inspection; STOP.'
+            }
+            $inventoryRows.Add([pscustomobject]@{
+                FolderId=$entryId
+                Depth=$depth
+                ItemCount=$itemCount
+                ChildFolderCount=$childCount
+            })
+            for($j=1;$j -le $childCount;$j++){
+                $folderQueue.Enqueue([pscustomobject]@{
+                    Folder=$folder.Folders.Item($j)
+                    Depth=($depth+1)
+                })
+            }
+        }
+        $pristine=Test-OPA265BW4k7v2aPristineInventory -Rows @($inventoryRows.ToArray())
+        if(-not $pristine.Pristine){
+            throw ('BW4k7v2a visible test PST has existing items; STOP. '+
+                ($pristine.ReasonCodes -join ','))
+        }
         $fixtureRoot=$pstRoot.Folders.Add([string]$layout.RootFolderName)
         $pilotFolder=$fixtureRoot.Folders.Add([string]$layout.PilotFolderName)
         if([string]$pilotFolder.StoreID -cne $onlyId){
@@ -212,6 +252,9 @@ try{
             ActualParentFolderId=[string]$pilotFolder.EntryID
             ActualStoreId=$onlyId;ExactTargetFolderVerified=$true
             ManifestSha256=$seal;CreatedMailItemCount=1
+            PristineVisiblePstBeforeCreateVerified=$true
+            ObservedVisibleFolderCountBeforeCreate=[int]$pristine.FolderCount
+            PhysicalPstByteEmptinessProven=$false
             MustRestartOutlookBeforeVerify=$true
             NoRealMAPIYearOrSentMessageProven=$true
             NoOldOutlookProfileContact=$true
