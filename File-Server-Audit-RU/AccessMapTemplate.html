@@ -105,6 +105,16 @@
   .badge.dormant { background:var(--warn); color:#000; }
   .badge.locked { background:var(--bad); color:#fff; }
   .badge.broken { background:var(--warn); color:#000; }
+  /* RU_IDENTITY_STATUS_EVERYWHERE_1_0_12: consistent AD-state badges across views. */
+  .statusBadges { display:inline-flex; align-items:center; flex-wrap:wrap; gap:3px; vertical-align:middle; }
+  .statusBadges .badge { margin:0 0 0 4px; white-space:nowrap; }
+  .sidebarMemberLink .statusBadges { margin-left:5px; }
+  .sidebarMemberLink.statusCritical, .aclRow.statusCritical, .listItem.statusCritical { background:var(--bad-bg); }
+  .sidebarMemberLink.statusWatch, .aclRow.statusWatch, .listItem.statusWatch { background:var(--warn-bg); }
+  .sidebarMemberLink.statusCritical { border-left:2px solid var(--bad); }
+  .sidebarMemberLink.statusWatch { border-left:2px solid var(--warn); }
+  .aclRow .statusBadges { flex-shrink:0; }
+
   .listMore { padding:8px 10px; color:var(--muted); font-size:11px; font-style:italic; }
   #content { flex:1; overflow-y:auto; padding:16px; min-width:0; }
   /* Folder/identity views (Tree-or-Graph + a permissions list below it) use an
@@ -822,6 +832,74 @@ function displayGroupScope(scope) {
   return names[scope] || scope;
 }
 
+// One source of truth for account-state labels in the whole report.
+// Flags are computed from the values saved at scan time (precompute()).
+// Unknown "Enabled" is NOT treated as disabled; absent logon data is NOT dormant.
+function identityStatusItems(idn) {
+  if (!idn) return [];
+  const result = [];
+  if (idn.flagDisabled === true) result.push({
+    kind: 'disabled', label: 'Отключена',
+    title: 'Учётная запись отмечена в AD как отключённая на момент аудита.'
+  });
+  if (idn.flagLocked === true) result.push({
+    kind: 'locked', label: 'Заблокирована',
+    title: 'Учётная запись была заблокирована на момент аудита.'
+  });
+  if (idn.flagDormant === true) result.push({
+    kind: 'dormant', label: 'Неактивна (' + DORMANT_DAYS + '+ дн.)',
+    title: 'По приблизительному времени последнего входа: более ' +
+      DORMANT_DAYS + ' дней без входа. Это повод для проверки, не доказательство отсутствия работы.'
+  });
+  return result;
+}
+function identityStatusText(idn) {
+  return identityStatusItems(idn).map(x => x.label).join('; ');
+}
+function identityStatusBadgesHtml(idn) {
+  const statuses = identityStatusItems(idn);
+  if (!statuses.length) return '';
+  return '<span class="statusBadges">' + statuses.map(x =>
+    '<span class="badge ' + x.kind + '" title="' + esc(x.title) + '">' +
+       esc(x.label) + '</span>'
+  ).join('') + '</span>';
+}
+function appendIdentityStatusBadges(parent, idn) {
+  const statuses = identityStatusItems(idn);
+  if (!statuses.length) return;
+  const wrap = document.createElement('span');
+  wrap.className = 'statusBadges';
+  statuses.forEach(x => {
+    const chip = document.createElement('span');
+    chip.className = 'badge ' + x.kind;
+    chip.textContent = x.label;
+    chip.title = x.title;
+    wrap.appendChild(chip);
+  });
+  parent.appendChild(wrap);
+}
+function identityStatusRowClass(idn) {
+  if (!idn) return '';
+  if (idn.flagDisabled === true || idn.flagLocked === true) return 'statusCritical';
+  return idn.flagDormant === true ? 'statusWatch' : '';
+}
+function groupMembersStatusSummary(memberIndices) {
+  const counts = { disabled:0, locked:0, dormant:0 };
+  memberIndices.forEach(idx => {
+    const x = DATA.identities[idx];
+    if (!x) return;
+    if (x.flagDisabled === true) counts.disabled++;
+    if (x.flagLocked === true) counts.locked++;
+    if (x.flagDormant === true) counts.dormant++;
+  });
+  const items = [];
+  if (counts.disabled) items.push('отключены: ' + counts.disabled);
+  if (counts.locked) items.push('заблокированы: ' + counts.locked);
+  if (counts.dormant) items.push('нет входов ' + DORMANT_DAYS + '+ дней: ' + counts.dormant);
+  return items.length ? ' · Требуют проверки (' + items.join('; ') + ')' : '';
+}
+
+
 
 // Members are taken from manifest.js, not queried live from AD.
 // "members" is recursively expanded membership observed via GrantedViaGroup.
@@ -862,7 +940,8 @@ function populateReportGroupMembers(host, group, groupIdx) {
     group.memberCount !== '' && Number.isFinite(directCount);
   note.textContent = 'Раскрытых по данным аудита: ' + ids.length +
     ' (с учётом вложенных групп)' +
-    (directKnown ? '; непосредственных в AD: ' + directCount : '') + '.';
+    (directKnown ? '; непосредственных в AD: ' + directCount : '') + '.' +
+    groupMembersStatusSummary(ids);
   host.appendChild(note);
   let visible = 0;
   const more = document.createElement('button');
@@ -877,7 +956,12 @@ function populateReportGroupMembers(host, group, groupIdx) {
       link.type = 'button';
       link.className = 'sidebarMemberLink';
       link.textContent = person.name || '(неизвестно)';
-      link.title = 'Открыть сведения и права: ' + (person.name || '');
+      const status = identityStatusText(person);
+      link.title = 'Открыть сведения и права: ' + (person.name || '') +
+        (status ? ' · ' + status : '');
+      const statusClass = identityStatusRowClass(person);
+      if (statusClass) link.classList.add(statusClass);
+      appendIdentityStatusBadges(link, person);
       link.onclick = (event) => { event.stopPropagation(); selectIdentity(idx, true); };
       host.insertBefore(link, more);
     }
@@ -907,8 +991,11 @@ function appendGroupSidebarRow(panel, group, idx, badges) {
   item.className = 'listItem';
   const direct = group.memberCount !== null && group.memberCount !== undefined &&
     group.memberCount !== '' ? ' · непосредственно в AD: ' + esc(group.memberCount) : '';
-  item.innerHTML = '<div>' + esc(group.name || '(неизвестно)') + badges + '</div>' +
+  item.innerHTML = '<div>' + esc(group.name || '(неизвестно)') + badges +
+    identityStatusBadgesHtml(group) + '</div>' +
     '<div class="sub">Группа' + direct + '</div>';
+  const groupStatus = identityStatusRowClass(group);
+  if (groupStatus) item.classList.add(groupStatus);
   item.onclick = () => selectIdentity(idx, true);
   line.appendChild(toggle);
   line.appendChild(item);
@@ -971,13 +1058,15 @@ function renderList() {
     items.forEach(({ idn, idx }) => {
       const div = document.createElement('div');
       div.className = 'listItem';
-      let badges = '';
-      if (idn.flagDisabled) badges += '<span class="badge disabled">отключена</span>';
-      if (idn.flagLocked) badges += '<span class="badge locked">заблокирована</span>';
-      if (idn.flagDormant && !idn.flagDisabled) badges += '<span class="badge dormant">неактивна</span>';
+      const badges = identityStatusBadgesHtml(idn);
       div.innerHTML = `<div>${esc(idn.name || '(неизвестно)')}${badges}</div><div class="sub">${esc(displayIdentityType(idn.type))}${idn.title ? ' \u00b7 ' + esc(idn.title) : ''}</div>`;
+      const statusClass = identityStatusRowClass(idn);
+      if (statusClass) {
+        div.classList.add(statusClass);
+        div.title = (idn.name || '') + ' · ' + identityStatusText(idn);
+      }
       if (idn.type === 'Group') {
-        appendGroupSidebarRow(panel, idn, idx, badges);
+        appendGroupSidebarRow(panel, idn, idx, '');
       } else {
         div.onclick = () => selectIdentity(idx, true);
         panel.appendChild(div);
@@ -1445,7 +1534,13 @@ function nodeDisplayInfo(key) {
     return { label: lastPathSegment(f.path), full: f.path, color: effectiveThemeIsLight() ? '#0d7373' : '#57d3d3', flagged: f.broken };
   }
   const idn = DATA.identities[idx];
-  return { label: idn.name, full: idn.name, color: getTypeColors()[idn.type] || (effectiveThemeIsLight() ? '#4a5568' : '#7d8a99'), flagged: idn.flagDisabled || idn.flagDormant || idn.flagLocked };
+  return {
+    label: idn.name, full: idn.name,
+    color: getTypeColors()[idn.type] || (effectiveThemeIsLight() ? '#4a5568' : '#7d8a99'),
+    flagged: identityStatusItems(idn).length > 0,
+    status: identityStatusText(idn),
+    critical: idn.flagDisabled === true || idn.flagLocked === true
+  };
 }
 
 function edgeDisplayInfo(edgeInfo) {
@@ -1456,8 +1551,8 @@ function edgeDisplayInfo(edgeInfo) {
   });
   if (best.type === 'membership') return { label: 'Состоит в группе', color: effectiveThemeIsLight() ? '#7c3aed' : '#c084fc', dashed: true };
   const e = best.e;
-  let label = RIGHTS_LABELS[e[2]];
-  if (e[5]) label = 'Deny ' + label;
+  let label = displayRight(RIGHTS_LABELS[e[2]]);
+  if (e[5]) label = 'Запрет: ' + label;
   return { label, color: getEdgeColors()[e[2]], dashed: !!e[3] };
 }
 
@@ -1639,14 +1734,21 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
     const r = isCenter ? 26 : 17;
     const group = svgEl('g', { class: 'nodeGroup', transform: `translate(${pos.x},${pos.y})`, 'data-key': key });
     group.appendChild(svgEl('circle', { class: 'nodeCircle' + (isCenter ? ' centerCircle' : ''), r, fill: isCenter ? undefined : info.color }));
-    if (info.flagged && !isCenter) {
-      group.appendChild(svgEl('circle', { cx: r * 0.7, cy: -r * 0.7, r: 5, fill: effectiveThemeIsLight() ? '#b8720a' : '#ffb454', stroke: '#000', 'stroke-width': 0.5, class: 'flagRing' }));
+    if (info.flagged) {
+      // Show the warning even when the flagged account is the selected center.
+      const signal = info.critical ? (effectiveThemeIsLight() ? '#d53c3c' : '#ff5d5d') :
+        (effectiveThemeIsLight() ? '#b8720a' : '#ffb454');
+      group.appendChild(svgEl('circle', {
+        cx: r * 0.7, cy: -r * 0.7, r: 6, fill: signal,
+        stroke: effectiveThemeIsLight() ? '#f7f7f5' : '#1a1f26', 'stroke-width': 1,
+        class: 'flagRing'
+      }));
     }
     const nameLbl = svgEl('text', { class: 'nodeLabel', x: 0, y: r + 16, 'text-anchor': 'middle' });
     nameLbl.textContent = truncateLabel(info.label, 22);
     group.appendChild(nameLbl);
     const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-    title.textContent = info.full;
+    title.textContent = info.full + (info.status ? '\nСостояние: ' + info.status : '');
     group.appendChild(title);
     nodesLayer.appendChild(group);
     return group;
@@ -1881,13 +1983,10 @@ function renderTable(rows, columns, opts) {
 function identityInfoCard(idn) {
   const div = document.createElement('div');
   div.className = 'card';
-  const flags = [];
-  if (idn.flagDisabled) flags.push('<span class="badge disabled">Отключена</span>');
-  if (idn.flagLocked) flags.push('<span class="badge locked">Заблокирована</span>');
-  if (idn.flagDormant) flags.push('<span class="badge dormant">Нет входов более ' + DORMANT_DAYS + ' дней</span>');
+  const flags = identityStatusBadgesHtml(idn);
   const field = (label, val) => val ? `<span class="field"><b>${esc(label)}:</b> ${esc(val)}</span>` : '';
   div.innerHTML =
-    `<h2>${esc(idn.name || '(неизвестно)')} <span style="font-weight:400;color:var(--muted);font-size:12px;">${esc(displayIdentityType(idn.type))}</span> ${flags.join(' ')}</h2>` +
+    `<h2>${esc(idn.name || '(неизвестно)')} <span style="font-weight:400;color:var(--muted);font-size:12px;">${esc(displayIdentityType(idn.type))}</span> ${flags}</h2>` +
     field('Должность', idn.title) + field('Отдел', idn.dept) + field('Руководитель', idn.manager) +
     field('Электронная почта', idn.email) + field('Последний вход (приблизительно)', idn.lastLogon) +
     field('Изменено в AD', idn.changed) + field('Пароль изменён', idn.pwdSet) +
@@ -1896,11 +1995,13 @@ function identityInfoCard(idn) {
     field('Примечания', displayAdNote(idn.notes)) + field('SID', idn.sid);
   if (idn.type === 'Group') {
     const groupIdx = DATA.identities.indexOf(idn);
-    const reportMemberCount = getReportGroupMembers(idn, groupIdx).length;
+    const reportMembers = getReportGroupMembers(idn, groupIdx);
+    const reportMemberCount = reportMembers.length;
     const section = document.createElement('details');
     section.className = 'groupMemberDetails';
     const heading = document.createElement('summary');
-    heading.textContent = 'Показать состав группы (' + reportMemberCount + ' по данным аудита)';
+    heading.textContent = 'Показать состав группы (' + reportMemberCount + ' по данным аудита)' +
+      groupMembersStatusSummary(reportMembers);
     heading.title = 'Показатель непосредственных участников показывает членов группы в AD. Здесь отображается состав, полученный при аудите, включая вложенные группы.';
     section.appendChild(heading);
     const host = document.createElement('div');
@@ -2129,6 +2230,8 @@ function renderAclRow(row, onIdentityClick, isChild) {
   const idn = DATA.identities[e[1]];
   const div = document.createElement('div');
   div.className = 'aclRow';
+  const statusClass = identityStatusRowClass(idn);
+  if (statusClass) div.classList.add(statusClass);
 
   const toggle = document.createElement('span');
   toggle.className = 'treeToggle';
@@ -2138,8 +2241,10 @@ function renderAclRow(row, onIdentityClick, isChild) {
   const name = document.createElement('span');
   name.className = 'aclName';
   name.textContent = idn.name || '(неизвестно)';
-  name.title = idn.name || '';
+  const stateText = identityStatusText(idn);
+  name.title = (idn.name || '') + (stateText ? ' · ' + stateText : '');
   div.appendChild(name);
+  appendIdentityStatusBadges(div, idn);
 
   const type = document.createElement('span');
   type.className = 'aclType';

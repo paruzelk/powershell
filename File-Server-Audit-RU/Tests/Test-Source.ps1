@@ -83,3 +83,25 @@ foreach ($english in @(
     }
 }
 Write-Host 'PASS: русская справка, пояснения и встроенная локализация.' -ForegroundColor Green
+
+# RU_IDENTITY_STATUS_EVERYWHERE_1_0_12: контроль единых меток состояния.
+foreach ($marker in @(
+    'RU_IDENTITY_STATUS_EVERYWHERE_1_0_12',
+    'function identityStatusItems(idn)',
+    'function identityStatusBadgesHtml(idn)',
+    'function appendIdentityStatusBadges(parent, idn)',
+    'function identityStatusRowClass(idn)',
+    'function groupMembersStatusSummary(memberIndices)',
+    'appendIdentityStatusBadges(link, person)',
+    'appendIdentityStatusBadges(div, idn)',
+    'groupMembersStatusSummary(ids)',
+    'groupMembersStatusSummary(reportMembers)',
+    'identityStatusBadgesHtml(group)',
+    'title.textContent = info.full + (info.status',
+    'if (info.flagged)'
+)) {
+    if (-not $html.Contains($marker)) {
+        throw "Отсутствует единое отображение статуса учётной записи: $marker"
+    }
+}
+Write-Host 'PASS: единые метки AD во всех представлениях, включая группы и граф.' -ForegroundColor Green
