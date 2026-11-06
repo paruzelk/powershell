@@ -1,0 +1,1497 @@
+# Changelog
+
+Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
+
+## [0.7.4] - Full audit and fix of hardcoded colors that ignored light mode
+
+The 0.7.2 light-mode fix only caught four instances found via a narrow
+search (specific `background:#`/`color:#`/`fill:#`/`stroke:#` property
+patterns). Reported again as "broken inheritance / observations AU/NZ/US
+badges, and tree/graph rights colors are still dark" -- this time audited
+every single hex color literal in the file (`grep -noE "#[0-9a-fA-F]{3,8}"`,
+checked line by line, not just a few property-name patterns), rather than
+guessing at which ones might be the specific complaint.
+
+### Fixed
+- **`.disclaimerBanner`/`.incompleteBanner`** (the Observations section's
+  own disclaimer, and the "scan incomplete" banner) -- hardcoded dark
+  backgrounds regardless of theme. New `--warn-bg`/`--bad-bg`/`--bad-text`
+  variables, themed per mode.
+- **`.regionPill-AU/NZ/US/EU/Intl`** -- exactly the "AU badges" in the
+  report. Hardcoded dark navy/green/purple/amber backgrounds with light
+  text, designed for a dark canvas only; new `--pill-*` variables give each
+  a proper light-mode pastel-background/dark-text pairing instead of
+  reusing the dark-mode colors unchanged.
+- **`.pill.explicit`** (the ACL list's inherited/explicit/deny indicators)
+  -- hardcoded dark green, now themed via a new `--good-bg` variable.
+- **Four repeated hardcoded border colors** (`#22272e`, across table and
+  row separators in the summary/abuse/scan-errors tables) -- switched to
+  `var(--border)`.
+- **The graph's own rights/identity-type colors** (`EDGE_COLORS`/
+  `TYPE_COLORS`) -- very likely the main "tree/graph permissions Special/
+  Read/Write" complaint. These were flat constants tuned for a
+  permanently-dark graph canvas; now theme-aware functions
+  (`getEdgeColors()`/`getTypeColors()`) with genuinely different light-mode
+  variants, since a couple of the dark-mode colors (the light purple used
+  for Group/membership especially) were close to unreadable against the
+  now-theme-aware graph background introduced in 0.7.2.
+- **A second, independent copy of the same node/edge colors** for folder
+  nodes and "Member of" edges specifically, missed in the first pass
+  through that same function.
+- **The graph's own legend panel** had its own separate hardcoded copies
+  of these same colors (center node, folder, solid/dashed line examples) --
+  fixed to match the themed versions above rather than silently
+  contradicting them.
+- **The flagged-node indicator dot** in the graph (the small amber ring
+  marking a broken/disabled/dormant node) -- same fix.
+- **A genuinely serious one, not just a visual mismatch**: the Summary
+  dashboard's rights-distribution donut chart had a hardcoded light-colored
+  center-text fill. In light mode this was light text on a light
+  background -- actually unreadable, not merely "looks dark." Its
+  background-ring stroke was also hardcoded dark. Both fixed.
+- Two purely decorative elements (`.graphLegendDot`, `svg.graph
+  .centerCircle`) switched to `var(--warn)` directly, since those are real
+  stylesheet rules rather than inline SVG attributes, where `var()`
+  resolution is unambiguous.
+- **Removed a dead, unused color constant** (`IDENTITY_TYPE_COLORS`) found
+  during the audit -- never actually referenced anywhere in the file, so
+  it wasn't contributing to any visible bug, but left as-is it was a stale
+  hardcoded-color trap for a future maintainer to accidentally wire up.
+
+### Verified as intentional, left unchanged
+- A handful of fixed-contrast text colors (white/black text on `var(--bad)`/
+  `var(--warn)`/`var(--accent)` badge and button backgrounds) were checked
+  individually and confirmed to have adequate contrast in both themes,
+  since none of those three variables becomes light enough in light mode
+  for the fixed text color to fail -- left alone rather than adding
+  complexity for no visible benefit.
+- A few pure-black SVG strokes/borders on decorative elements (node
+  circles, legend dots) are a deliberate "always dark outline for
+  definition" choice, not a theme bug -- confirmed by checking each one's
+  actual visual role rather than assuming every hex literal is broken.
+
+### Verified
+- Directly tested `getEdgeColors()`/`getTypeColors()`/`effectiveThemeIsLight()`
+  return the correct palette in both the default (dark) and toggled (light)
+  states, and that the rendered graph's actual node `fill` attributes and
+  the donut chart's actual text `fill` attribute reflect the light-mode
+  palette once toggled -- not just that the functions exist, but that the
+  real rendered output uses them. Full pre-existing regression suite still
+  passes with zero errors on both build paths, which still produce
+  byte-identical `AccessMap.html` from the same template.
+
+## [0.7.3] - Per-folder file counts and broken-inheritance flag, built from existing data
+
+No scanner change, and fully consumable from data already captured by any
+past `-IncludeFiles` scan -- this is entirely new work in `Build-AccessMapHtml.ps1`/
+`Build-AccessMapHtml.sh`+`build.awk`/`AccessMapTemplate.html`, reading fields
+(`ObjectType`, `Path`, `InheritanceBrokenHere`) that have existed in
+`IdentityPermissions.csv` for a long time, well before this project's recent
+scanner changes. An existing report's CSVs don't need a re-scan to benefit.
+
+### Added -- `Build-AccessMapHtml.ps1` / `Build-AccessMapHtml.sh`+`build.awk`
+- File rows (`ObjectType: File`) were previously discarded entirely except
+  for one global counter used in a single informational message. They're
+  now also aggregated per folder: a `fileCount` and a
+  `filesBrokenInheritance` flag (true if *any* file directly in that folder
+  has broken inheritance), attached to that folder's own manifest entry.
+  Individual files still never become their own nodes, edges, or rows in
+  the interactive map -- only these two aggregate values attach to the
+  folder they belong to, matching the existing design reasoning already in
+  this code for why files were excluded from the graph in the first place.
+- A new `hasFileCounts` manifest flag (parallel to `hasFileMetadata`) marks
+  whether this scan captured file rows at all; a folder genuinely untouched
+  by any file row stays completely *absent* from `fileCount`/
+  `filesBrokenInheritance` rather than showing a misleading `0`/`false` --
+  the same "absence, not a zero value" distinction already used for
+  Created/Modified/Accessed.
+- Fixed a real ordering assumption in `Get-OrAdd-Folder`/`get_or_add_folder`:
+  a file's own row can be processed before its containing folder's own ACE
+  row creates that folder's manifest entry (this function is now also
+  called, with no timestamps to offer, purely to resolve a file's parent
+  folder for this aggregation). Previously, whichever call happened to
+  create the entry first was treated as authoritative for
+  Created/Modified/Accessed, with no way for a later call to fill in a
+  value the first one didn't have. Now any call can fill in whichever of
+  the three is still empty, regardless of which one runs first.
+- Deduplicates by file path before counting: a file with multiple ACE rows
+  (one per identity granted access) would otherwise inflate its folder's
+  file count by however many ACEs that one file has.
+- Verified against a synthetic dataset built specifically to exercise the
+  tricky cases: a file with two ACE rows (confirmed not double-counted), a
+  file row placed *before* its own folder's row in the CSV (confirmed the
+  ordering fix works), a folder with a genuinely broken-inheritance file
+  mixed with a clean one (confirmed the flag reflects "any", not "all"),
+  and a folder with no file rows at all (confirmed it stays absent, not
+  zero). Cross-checked the PS1 and bash/awk outputs as an exact match for
+  every case.
+
+### Added -- `AccessMapTemplate.html`
+- A folder's own page now shows "Files in this folder: N" and, when
+  applicable, a "File(s) with broken inheritance" badge -- alongside
+  Created/Modified/Accessed, gated on the new `hasFileCounts` flag rather
+  than bundled with the timestamp feature, since a scan could have one
+  capability without the other.
+- New header toggle, "Flag files w/ broken inheritance" (only shown when
+  `hasFileCounts` is true, matching how Aged folders is hidden otherwise):
+  off by default, so this doesn't clutter the sidebar list or tree view by
+  default. When on, folders with `filesBrokenInheritance` get a small
+  "files: broken inheritance" / "files: broken" badge in both the sidebar
+  list and the tree view (shared by both a folder's own page and an
+  identity's page, since both use the same tree-rendering function).
+  Toggling it re-renders whichever of those is currently on screen.
+
+### Verified
+- Full pre-existing regression suite still passes with zero errors on both
+  build paths after these changes, and both paths still produce
+  byte-identical `AccessMap.html` from the same template.
+
+## [0.7.2] - UI polish: unified button style, light-mode fixes, build duration
+
+### Fixed -- real light-mode readability bug
+- **Several elements had hardcoded hex colors that bypassed the theme
+  variable system entirely**, so they stayed dark-mode-dark even when
+  light mode was active: `.treeRow.selected` (a folder tree's selected-row
+  highlight), `.pill.inherited` (the "inherited" permission badge),
+  `button:hover`, and `svg.graph`'s background. Combined with `--text`
+  correctly switching to a dark color in light mode, this produced dark
+  text on a background that never actually left dark mode -- exactly the
+  "folder list in light mode is still dark, text unreadable" report. All
+  four now use theme variables (added a new `--selected-bg`, themed per
+  mode, for the tree-row highlight specifically).
+
+### Changed
+- **Light mode toned down** to an off-white palette (`--bg`/`--panel`/
+  `--panel2`) rather than a stark white/near-white, easier on the eyes for
+  a page someone may have open for a while.
+- **Unified "chip" button style** across every small utility control that
+  toggles or cycles a view option: the header's Broken-inheritance/
+  Disabled-dormant/Aged-folders quick filters, the theme toggle, the
+  sidebar's Users/Groups/Both filter, the new Groups-first control, and
+  the GitHub footer link. Previously these all looked different despite
+  doing the same kind of job (colored borders at rest for the header
+  filters, a bare checkbox for Groups-first, unstyled text for "All", a
+  plain text link for GitHub) -- now they share one neutral resting look,
+  colored only in an active state (green "on" / red "hidden"), consistent
+  with how the show/hide states already worked.
+- **Header layout**: the Broken-inheritance/Disabled-dormant/Aged-folders
+  buttons now sit grouped with the theme toggle on the header's right
+  side (one `.headerRightGroup`), rather than visually separated from it.
+- **Groups-first is now a toggle button**, not a checkbox, positioned to
+  the right of the Users/Groups/Both cycle button (which sits on the
+  left) -- matching the chip style used everywhere else in this round.
+- **Users/Groups/Both button labels now always say what's currently
+  shown** ("Users & Groups" / "Users only" / "Groups only") instead of a
+  bare "All" that didn't explain what clicking it would do.
+- **GitHub footer link**: restyled as a chip, right-aligned, reading
+  "File Server Permission Audit Toolkit \u2197" instead of the bare word
+  "GitHub".
+- **Footer now shows build duration** next to the generated date/time
+  (e.g. "built in 2.3s"). `Build-AccessMapHtml.ps1` measures this directly.
+  The bash/awk path measures it in bash and appends it as a separate,
+  trailing JS statement onto `manifest.js` after `build.awk` finishes
+  (`ACCESS_MAP_MANIFEST.buildDurationSeconds = N;`) rather than editing
+  awk's own JSON construction -- deliberately avoids needing `systime()`
+  (a gawk-only extension not available in `mawk`, which this project is
+  also tested against) just to measure a duration bash already knows on
+  its own. Genuinely absent (not just zero) on a report built by an older
+  version of either script; the footer simply omits the duration clause
+  when that's the case rather than showing "built in undefineds".
+
+### Fixed -- documentation
+- README's opening line called this "three scripts" -- corrected to note
+  step 3 (`Build-AccessMapHtml.ps1`) also ships as a bash/awk equivalent
+  for Linux/macOS/WSL, making it closer to three and a half.
+
+### Verified
+- Full pre-existing regression suite re-run after every change in this
+  round (including an update to `test_new_features.js` itself, since it
+  referenced the now-removed `groupsFirstChk` checkbox by id -- an
+  expected test-file update from the redesign, not a regression). Zero
+  errors across every suite. Both build paths (`Build-AccessMapHtml.ps1`
+  and `Build-AccessMapHtml.sh`+`build.awk`) still produce byte-identical
+  `AccessMap.html` from the same template.
+
+## [0.7.1] - Created/Modified/Accessed capture, aged-folder filter, retention observation
+
+Fully backward compatible: an older CSV (from `Invoke-NTFSPermissionAudit.ps1`
+0.5.4 or earlier) simply doesn't have the three new columns, and every layer
+below detects that and degrades gracefully -- no crash, no misleading data,
+just the feature quietly not being available for that report (with a plain
+note on the Summary page saying so).
+
+### Added -- `Invoke-NTFSPermissionAudit.ps1` (bumped to 0.5.5)
+- Captures Created/Modified/Accessed (UTC, ISO 8601 round-trip format) for
+  every folder (and file, when `-IncludeFiles` is set) -- added to both
+  `FolderPermissions.csv` and `IdentityPermissions.csv`. `Get-ObjectAcl`
+  already constructed a `DirectoryInfo`/`FileInfo` object for the ACL call
+  itself on PS7+; these three timestamps are read off that same object, so
+  this is essentially free -- no extra filesystem round-trip. A timestamp-
+  read failure is caught separately from the ACL read and is non-fatal: it
+  can never cost the permissions data itself, which remains this tool's
+  actual core purpose.
+
+### Added -- `Build-AccessMapHtml.ps1` / `Build-AccessMapHtml.sh`+`build.awk`
+  (bumped to 0.7.1)
+- Detect the three new columns once, via the CSV's own header (not per-row --
+  every row already tolerates a missing column safely, returning empty/`""`,
+  confirmed directly rather than assumed), and expose the result as a
+  `hasFileMetadata` flag in the manifest alongside each folder's own
+  `created`/`modified`/`accessed` fields.
+- Verified end-to-end against both an existing pre-0.5.5 CSV (correctly
+  produces `hasFileMetadata: false`, empty fields, no crash) and a synthetic
+  post-0.5.5-shaped CSV (correctly produces `hasFileMetadata: true` with the
+  right values) -- and cross-checked the two build paths produce byte-
+  identical manifest data for the same input, same rigor as every other
+  build-script feature in this project.
+
+### Added -- `AccessMapTemplate.html`
+- A folder's own page shows Created/Last modified/Last accessed (when
+  available), formatted for readability, the same way an identity's own AD
+  timestamps already appear on its own card.
+- **Aged folders filter**: a new header button cycling off -> 1yr+ -> 5yr+ ->
+  10yr+ (since last modified) -> off, composing with the existing search and
+  Broken-inheritance filter the same way the other quick filters already do.
+  Only shown at all when `DATA.hasFileMetadata` is true. A folder with no
+  Modified value captured for that specific item (even when the scan overall
+  has the data) is excluded from an active aged filter rather than shown as
+  a false positive -- "definitely old" is the claim being made, not
+  "unknown age".
+- **Summary page**: a plain info banner when `hasFileMetadata` is false,
+  saying so and naming the minimum scanner version needed, rather than the
+  feature just silently not being there with no explanation.
+- **New Observations entry**: folders unmodified for 5+ years (a fixed
+  threshold for this specific observation, independent of the sidebar's own
+  user-controlled 1yr/5yr/10yr cycle), with sourced data-retention guidance
+  spanning NZ (Privacy Act 2020, IPP 9), AU (Privacy Act 1988, APP 11.2), EU
+  (GDPR Article 5(1)(e), storage limitation), US (NIST SP 800-53 SI-12), and
+  CIS Controls v8 (Safeguard 3.4, Enforce Data Retention) -- added a new `EU`
+  region-pill style alongside the existing AU/NZ/US/Intl ones, since GDPR is
+  jurisdiction-specific rather than a globally-adopted framework like CIS.
+  The existing Observations section disclaimer (already present, already
+  framing every observation as a heuristic starting point rather than a
+  compliance determination) was extended to also point at each
+  jurisdiction's own privacy regulator for the retention-related items
+  specifically, alongside the cybersecurity bodies it already named.
+- Verified: the new observation and filter are both present with correct
+  counts against the metadata-bearing test dataset, and both correctly
+  absent against an existing dataset without the new columns; the
+  observation's own action button correctly jumps to the folder list with
+  the 5yr+ filter already applied and the header button's label in sync.
+  Full pre-existing regression suite still passes with zero errors on both
+  build paths after these changes.
+
+## [0.7.0] - Dark/light mode, deep links, GitHub footer link, Users/Groups filter
+
+All four features below are confined to `AccessMapTemplate.html` -- neither
+build script needed any change, since both just copy this file byte-for-byte.
+
+### Added
+- **Dark/light mode.** Follows the browser's own `prefers-color-scheme` by
+  default; a toggle button at the top-right of the header lets the user
+  override it explicitly (persisted via `localStorage`, same graceful-
+  degradation pattern as the existing pane splitters -- if storage isn't
+  available, the toggle still works for the session, it just won't persist
+  across reloads). An explicit choice always wins over the OS preference;
+  with no explicit choice made, the OS preference is followed live.
+- **Deep links.** Selecting a folder or identity now updates the address bar
+  to `#f:<idx>` / `#i:<idx>` (with a `:graph` suffix if the Graph tab is
+  active), and opening `AccessMap.html#f:12` directly restores that exact
+  view -- tree/graph tab included. This is a link to a specific view *within
+  this one generated report* (the index is only stable for the lifetime of
+  this exact `AccessMap.html`/`AccessMap_data` pairing, not a portable
+  reference to a filesystem path -- a different run's rebuild can reorder
+  indices). Uses `history.replaceState` so it doesn't add browser-native
+  history entries competing with the app's own Back button and in-app
+  history; falls back to a plain `location.hash` assignment (which does add
+  a browser history entry) only if `replaceState` itself is rejected.
+- **GitHub link in the footer**, linking to
+  https://github.com/sean-aura/File-Server-Audit, opening in a new tab.
+- **Users/Groups/Both filter for the sidebar identities list**, a 3-way
+  cycle (mirroring the existing header quick-filters' own style) next to a
+  "Groups first" sort checkbox. "Groups" means `type === 'Group'`; "Users"
+  means everything else (User, Computer, Well-known/Local, Unresolved) --
+  the split that matters most for an access audit is "expandable group" vs.
+  "terminal principal", not stricter type-by-type buckets. Both compose
+  with the existing search box and the Disabled/dormant tri-state filter
+  rather than replacing or conflicting with them -- all of these apply
+  together in `renderList()`, and "Groups first" only changes relative
+  ordering within whatever the filters already narrowed down to.
+
+### Verified
+- New jsdom test suite (`test_new_features.js`) confirms: the theme toggle
+  correctly sets/reads `data-theme` and flips on each click; the GitHub
+  link has the correct `href` and opens in a new tab; the Users/Groups/Both
+  filter shows the exact expected count in each state and "Groups first"
+  produces an order where no Group ever appears after the first non-Group,
+  with the Disabled/dormant filter still composing correctly on top; the
+  URL hash updates correctly on folder/identity selection and on tab
+  switches, and clears on navigating to the Summary/scan-errors views;
+  opening a URL with a valid hash restores the exact folder (breadcrumb,
+  tree, and the correct share lazy-loaded) with zero errors.
+- Two jsdom-specific (not real-browser) quirks surfaced and were worked
+  around during testing, not worth mistaking for real bugs: `localStorage`
+  and `history.replaceState` are both stricter under jsdom's `file://`
+  origin handling than real desktop browsers typically are (jsdom throws
+  "not available for opaque origins" / rejects a hash-only `replaceState`
+  against a `file://` URL; real browsers generally allow both). Confirmed
+  by reproducing each in isolation with a minimal jsdom test outside the
+  app entirely. The existing try/catch pattern already used for the pane
+  splitters' persistence handles the first case; the new `location.hash`
+  fallback handles the second.
+- Full pre-existing regression suite (dashboard, cross-share lazy loading,
+  relationship graph, the resizable panes, the non-UNC path fixes, the
+  false-prefix sort trap) still passes with zero errors on both build
+  paths after these changes.
+
+## [0.6.9] - Fixed: parallel mode misclassified rights as "Special" (much wider than first reported)
+
+### Fixed -- `Invoke-NTFSPermissionAudit.ps1` (bumped to 0.5.4)
+- **A second, separate parallel-mode bug**, unrelated to the group-expansion
+  fix in 0.5.3/0.6.6 (confirmed independently fixed -- a follow-up
+  comparison came back with zero deviations). Reported as "10 fewer 'Read &
+  Execute' rows, appearing in 'Special' instead" -- but the actual bug is
+  far broader: `Convert-RightsToFriendly`'s own `$script:RightsCombos`
+  (the lookup table of reference bit-patterns for Full Control/Modify/
+  Read & Execute/Read/Write) and `$script:SynchronizeFlag` (used to mask
+  out a bit that isn't meaningful for the comparison) were simply never
+  re-established inside the `-Parallel` worker scriptblock -- every OTHER
+  script-scoped variable the injected functions need (`$adAvailable`,
+  `$ExpandGroups`, the shared caches, etc.) is explicitly reconstructed
+  there via `$using:`, but these two were missed, precisely because they
+  aren't parameters like the others and so didn't fit the pattern the
+  existing code was already following.
+- The user's own key observation -- **the same gap at `-ThrottleLimit`
+  2, 5, 10, and 15** -- was the crucial clue: a genuine race produces a
+  *different* wrong answer each time depending on scheduling; a missing
+  initialization produces the *exact same* wrong answer every time,
+  regardless of how many workers there are. That ruled out a timing-
+  dependent cause and pointed straight at something structurally absent
+  in every parallel worker, unconditionally.
+- With both script-scoped variables `$null` inside a worker,
+  `Convert-RightsToFriendly`'s masking (`-band (-bnot $script:SynchronizeFlag)`)
+  silently degrades to a no-op instead of erroring, and its
+  `foreach ($comboName in $script:RightsCombos.Keys)` loop iterates *zero
+  times* (no exception; PowerShell just skips a `foreach` over `$null`).
+  The practical effect: **every single ACE processed by any parallel
+  worker fell through to the 'Special' catch-all**, regardless of its real
+  right -- not just Read & Execute. A scan's entire rights breakdown
+  (Full Control/Modify/Read & Execute/Read/Write) would show as
+  near-empty under any `-ThrottleLimit > 1`, with 'Special' absorbing
+  almost the whole edge count. The rows themselves were never lost --
+  correctly attributed to the right identity and folder throughout --
+  only their reported *right* was wrong.
+- **Confirmed directly**, not just reasoned about: reproduced the exact
+  mechanism with real `System.Security.AccessControl.FileSystemRights`
+  enum values (available cross-platform under PS7) -- with the two
+  variables correctly set, `ReadAndExecute` classifies correctly as
+  "Read & Execute" whether or not its `Synchronize` bit happens to be set
+  (the masking is what makes this robust to different tools/platforms
+  setting that bit differently -- relevant here given the reporting
+  folders sit on an NFS-backed NAS, where Unix-to-Windows ACL translation
+  doesn't always set that bit the way native Windows tooling does); with
+  the two variables `$null` (simulating the unfixed parallel worker),
+  the exact same input classifies as "Special" instead, every time, with
+  no exception thrown -- exactly matching the reported symptom.
+- Fixed by adding `$script:RightsCombos = $using:script:RightsCombos` and
+  `$script:SynchronizeFlag = $using:script:SynchronizeFlag` alongside the
+  existing `$adAvailable`/`$ExpandGroups`/etc. reconstruction at the top
+  of the `-Parallel` scriptblock.
+- Script still parses cleanly under PS7's own parser. A real end-to-end
+  test against actual concurrent `-Parallel` execution isn't possible in
+  this project's dev environment (no Windows host, no real filesystem
+  under real load) -- the confirmation above reproduces the exact
+  mechanism against real .NET rights values, which is the strongest
+  verification available here, but **field verification is still the
+  next step**: re-run the same `-ThrottleLimit` comparison and confirm
+  the full rights distribution (not just Read & Execute) now matches
+  between single- and multi-threaded runs.
+
+## [0.6.8] - Resizable Tree/Graph vs. permissions panes
+
+### Added
+- **A draggable horizontal splitter** between the Tree/Graph view and the
+  permissions list beneath it, on both a folder's and an identity's detail
+  view -- mirrors the existing sidebar splitter's own design (pointer
+  events, drag-to-resize, ratio persisted to `localStorage`), just dividing
+  vertical space instead of horizontal. The folder view and the identity
+  view each get their own independent ratio/storage key, so resizing one
+  doesn't move the other.
+- The relationship graph's `<svg>` already used a `viewBox` (a scalable
+  coordinate system) rather than fixed pixel dimensions, so it scales
+  correctly to whatever height the new splitter gives it with no changes
+  needed to the actual radial-layout computation -- only the CSS sizing
+  (`height:520px` -> `flex:1`) needed to change for the graph, tree, and
+  permissions containers alike.
+- `renderTable` (the identity view's flat, sortable permissions table)
+  gained its own scrollable body wrapper, since it previously had no
+  internal scroll container at all and relied entirely on the outer
+  content pane's own scroll.
+
+### Design note
+- `#content` normally scrolls as a whole (the dashboard, quick-filter
+  lists, the scan-errors detail view all rely on that). The new internal
+  split needed a fixed height budget to divide between its two panes
+  instead, so a `content-split` class toggles between the two modes:
+  added by `renderFolder`/`renderIdentity` (the two views with the new
+  split), removed by `renderSummaryView`/`showScanErrorsDetail` (every
+  other view, so the class never lingers from a previous folder/identity
+  selection into an unrelated view).
+
+### Verified
+- New jsdom test suite (`test_resize_panes.js`) confirms: the split-pane
+  DOM structure is present with the tree/graph inside the top pane and the
+  permissions list inside the bottom pane; the default 55/45 ratio applies
+  on first render; simulating a drag on the new splitter correctly updates
+  both panes' flex ratios in real time; the folder view and identity view
+  use distinct, independent storage keys; the `content-split` class is
+  present on folder/identity views and absent on the dashboard and scan-
+  errors views. Full pre-existing regression suite (dashboard, cross-share
+  lazy loading, relationship graph, the false-prefix sort trap, the
+  gap-bridging virtual nodes, non-UNC paths) still passes with zero errors.
+- **One thing that could not be verified in this project's dev environment,
+  worth knowing about rather than treating as broken**: jsdom deliberately
+  throws when `localStorage` is accessed under a `file://` origin ("not
+  available for opaque origins"), which the existing try/catch (same
+  pattern the sidebar splitter already uses) correctly swallows -- the
+  drag-resize itself works regardless, but the "remember the ratio across
+  reloads" persistence couldn't be exercised here. Real desktop browsers
+  are generally more permissive about `file://` `localStorage` than jsdom's
+  strict interpretation, matching the sidebar splitter's own already-
+  accepted behavior; this isn't a regression, just an existing, shared
+  limitation of testing a `file://`-only tool outside a real browser.
+
+## [0.6.7] - Root-caused the WSL CRLF corruption to git's own core.autocrlf
+
+### Added
+- **`.gitattributes`**, forcing `*.sh`/`*.awk` to stay LF regardless of the
+  cloning machine's own git config, and `*.ps1` to `eol=crlf` (native
+  Windows convention; PowerShell 7+ parses either line ending correctly
+  regardless).
+
+### Fixed -- precise root cause of the 0.6.4/0.6.5 WSL CRLF guidance
+- **Confirmed the exact mechanism**, from a user's reported workflow: repo
+  extracted/committed on macOS (LF, correct) -> pulled onto a Windows
+  machine via `gh`/git -> built inside WSL. A Windows machine's git config
+  very commonly has `core.autocrlf=true` (Git for Windows' own installer-
+  recommended default), which silently converts LF to CRLF for any file git
+  thinks is text **as part of `git clone`/`git pull` itself** -- before WSL
+  or bash ever sees the file. This is why byte-verifying the shipped file
+  as plain LF (done in 0.6.4/0.6.5) didn't resolve it: the corruption isn't
+  in the file as delivered, it's introduced by git on the checkout step
+  that happens after. Confirmed unaffected on macOS (no autocrlf conversion
+  there) and reproducing specifically after the Windows-side git pull,
+  exactly matching this mechanism.
+- The permanent fix is `.gitattributes` (above), which needs the same
+  `git add --renormalize .` (or delete-and-re-clone) treatment as any
+  `.gitattributes` change to a repo with already-tracked files -- adding it
+  doesn't retroactively fix a working copy that was checked out before it
+  existed. Documented in both the script's own header comment and
+  README.md, alongside the existing immediate one-off fix
+  (`sed -i 's/\r$//' Build-AccessMapHtml.sh build.awk`, or `dos2unix`) for a
+  checkout that's already corrupted and can't be re-cloned right away.
+
+## [0.6.6] - Fixed: parallel-mode group-expansion rows silently dropped
+
+### Fixed -- `Invoke-NTFSPermissionAudit.ps1` (root cause of the 0.6.5 KNOWN ISSUE)
+- **Confirmed root cause of the `-ThrottleLimit`-dependent row-count
+  discrepancy opened in 0.6.5.** `Resolve-IdentityInfo`'s SharedLabelCache
+  fast path (parallel mode only) returns an identity with `Principal = $null`
+  when another worker already resolved that SID's plain Name/Type label --
+  its own comment even said *"if THIS item later needs the full Principal,
+  it falls through to a fresh AD lookup"*, but no such fallback actually
+  existed anywhere in the code. `Get-EffectiveGroupMembers` immediately
+  bailed out (`-not $IdentityInfo.Principal` -> `return @()`) the moment it
+  saw a `$null` Principal, silently returning zero members with no error
+  and no indication anything had been skipped.
+
+  The practical effect: for any group referenced on more than one folder --
+  an extremely common pattern (a department group granted on its own share
+  root, inherited or re-granted many levels down) -- only the very first
+  folder, across the ENTIRE scan, to resolve that group's SID successfully
+  expanded its membership. Every other folder referencing the same group,
+  processed by any worker, after that group's label had already been
+  written to the shared cache, silently lost 100% of that group's member
+  rows for that folder. This explains every observed symptom precisely:
+  only ever happened under `-ThrottleLimit > 1` (SharedLabelCache is only
+  populated/consulted there; sequential mode always does the full lookup
+  and always gets a real Principal); the total varied between otherwise-
+  identical parallel runs (a genuine race for *which* folder wins the "first
+  to resolve this SID" race, not a fixed, deterministic loss); and it scaled
+  with how heavily groups were reused across the tree, not with tree size
+  directly.
+- Fixed by implementing the fallback the comment already described:
+  `Get-EffectiveGroupMembers` now resolves a missing Principal fresh, on its
+  own thread, via the same `$script:PrincipalCtx`/`FindByIdentity` call
+  `Resolve-IdentityInfo` itself already uses, before giving up. This only
+  costs an extra AD round-trip for a group's first encounter *per worker*,
+  not per folder -- as soon as any worker successfully expands a group once,
+  it's written to `SharedGroupCache`, and every subsequent folder (any
+  worker) hits that cache directly, exactly as originally intended, without
+  needing a Principal at all.
+- Verified the control flow directly (a real end-to-end AD-backed test isn't
+  possible in this project's dev environment -- no Windows host, no domain
+  available here): a Group identity with a live `Principal` short-circuits
+  exactly as before; a Group identity with `Principal = $null` now attempts
+  fresh resolution instead of giving up immediately, and degrades cleanly
+  (returns an empty array, no exception) when that resolution itself can't
+  succeed (AD genuinely unreachable at that moment) rather than crashing;
+  non-Group identities are unaffected either way. Script still parses
+  cleanly under PS7's own parser.
+- **Verification still needed from the field**: re-run the same 4-way
+  comparison that surfaced this (`-ThrottleLimit 1` vs `15`, `-BreadthFirst`
+  on/off, same folder) against this fixed version and confirm all four now
+  produce identical total row counts. If they don't, the diagnostic script
+  from the 0.6.5 entry below still applies -- rerun it against the new
+  output and share the "which folders are most affected" breakdown.
+- The README.md `-ThrottleLimit` warning is updated to describe this as
+  fixed-pending-field-verification rather than an open, uncharacterized
+  issue.
+
+## [0.6.5] - WSL CRLF guidance; KNOWN ISSUE opened for a parallel-mode row-count discrepancy
+
+### Fixed
+- **`Build-AccessMapHtml.sh` failing on WSL with `syntax error near unexpected
+  token '$'{\r''`.** Byte-verified the shipped file has zero carriage-return
+  characters -- pure LF -- so this isn't a bug in the script's own content;
+  the CRLF is being introduced somewhere between delivery and the user's WSL
+  environment (a very common gotcha: Windows-side zip extraction, an editor
+  re-save, or a git checkout with `core.autocrlf=true` can each do this).
+  Since a script can't reliably detect and fix its own line-ending
+  corruption (the corruption itself breaks parsing before any of the
+  script's own logic can run), added explicit remediation guidance instead,
+  in both the script's own header comment and README.md:
+  `sed -i 's/\r$//' Build-AccessMapHtml.sh build.awk` (or `dos2unix`).
+
+### KNOWN ISSUE opened, not yet fixed -- `-ThrottleLimit` parallel mode drops rows
+- **A user-reported, reproduced discrepancy**: the same folder, scanned with
+  `-ThrottleLimit 1` vs `-ThrottleLimit 15`, produced meaningfully different
+  total `IdentityPermissions.csv` row counts (34344 vs 33826-33828 in the
+  reported case, roughly 1.5% fewer at the higher throttle value) --
+  **and the count varied between two `-ThrottleLimit 15` runs that only
+  differed in `-BreadthFirst`** (33828 vs 33826). That variability between
+  otherwise-comparable parallel runs is the specific signature of a genuine
+  race condition -- a deterministic logic bug would reproduce the exact same
+  wrong count every time regardless of traversal order.
+- Investigated and ELIMINATED as the cause: `Get-EffectiveGroupMembers`'s
+  and `Resolve-IdentityInfo`'s shared `ConcurrentDictionary` caches both
+  compute their full result before writing it atomically at the end (a
+  cache-miss race there just means redundant wasted computation on two
+  threads, not lost data for either thread's own calling item, since
+  neither reads back a partially-written value). Row-buffer aggregation
+  (`$script:FolderRows`/`$script:IdentityRows`/`$script:PendingCompletedPaths`)
+  happens only in the single-threaded post-`-Parallel` stage, never touched
+  directly by worker runspaces, by design.
+- NOT yet confirmed or ruled out: a subtler issue in how
+  `ForEach-Object -Parallel` streams/serializes output objects back across
+  the runspace boundary under real concurrent load against a real
+  filesystem, which can't be exercised in this project's own dev/test
+  environment (no Windows host, no real network share, no PowerShell 7
+  `-Parallel` runtime available here). Deliberately not guessing a fix
+  blind on a tool whose entire purpose is completeness of a security audit.
+- **Until root-caused, `-ThrottleLimit 1` (fully sequential) should be
+  treated as the trustworthy result** -- see the prominent warning now in
+  README.md's `-ThrottleLimit` documentation. Don't rely on parallel-mode
+  output where completeness matters.
+- Diagnostic script provided to identify exactly which rows differ (run a
+  `-ThrottleLimit 1` and a higher-throttle scan of the same folder
+  back-to-back, then compare -- accounts for exact row multiplicity, not
+  just presence/absence, and breaks the difference down by which folders
+  are most affected, which is the key signal for narrowing down the
+  mechanism: clustered on folders with large `-ExpandGroups`-expanded
+  groups points one direction, evenly spread across unrelated folders
+  points at the `-Parallel` pipeline itself):
+  ```powershell
+  function Get-RowKeyCounts($csvPath) {
+      $counts = @{}
+      Import-Csv $csvPath | ForEach-Object {
+          $k = "$($_.Path)|$($_.IdentitySid)|$($_.AccessControlType)|$($_.RightsSummary)|$($_.IsInheritedAce)|$($_.InheritanceBrokenHere)|$($_.GrantedViaGroup)"
+          if ($counts.ContainsKey($k)) { $counts[$k]++ } else { $counts[$k] = 1 }
+      }
+      return $counts
+  }
+  $tl1  = Get-RowKeyCounts 'C:\Path\To\TL1Run\IdentityPermissions_*.csv'
+  $tl15 = Get-RowKeyCounts 'C:\Path\To\TL15Run\IdentityPermissions_*.csv'
+  $missing = foreach ($k in $tl1.Keys) {
+      $c15 = if ($tl15.ContainsKey($k)) { $tl15[$k] } else { 0 }
+      if ($c15 -lt $tl1[$k]) { [PSCustomObject]@{ Key = $k; InTL1 = $tl1[$k]; InTL15 = $c15 } }
+  }
+  $missing | ForEach-Object { ($_.Key -split '\|')[0] } | Group-Object | Sort-Object Count -Descending | Select-Object -First 20 | Format-Table Name, Count
+  $missing | Select-Object -First 30 | Format-Table -AutoSize
+  ```
+
+## [0.6.4] - Sidebar list truncation now responsive to the resizable pane
+
+### Fixed
+- **Widening the sidebar via the resizable splitter (added in 0.6.2) never
+  showed more of a long folder path.** `truncateLabel(f.path, 60)` was
+  cutting the text itself down to a fixed 60 characters in JavaScript,
+  entirely independent of the sidebar's actual on-screen width -- so making
+  the pane wider had nothing left to reveal. Replaced with the full,
+  untruncated path in the DOM plus CSS `text-overflow:ellipsis` on a
+  dedicated `.path` element, which responds to whatever width is actually
+  available: narrower shows less, wider (via a splitter drag) now shows
+  more, up to the full path if there's room. The full path was already in
+  the row's `title` tooltip either way; this only affects what's visibly
+  displayed inline. Identity list rows were unaffected (they never used
+  this truncation); only the two folder-path list renderers did.
+
+### Investigated, not fixed here -- see the 0.6.4 discussion for the full trail
+- A report of a parent folder (e.g. a share's own top-level subfolder)
+  missing from the folder list/breadcrumb while its own children are
+  present and correct. Traced through `Invoke-NTFSPermissionAudit.ps1`'s
+  full sequential tree walk and `Get-ItemAuditRows`'s complete ACE loop,
+  eliminating in turn: `-SkipInheritedAces` (confirmed off via the run's own
+  `RunConfig_*.json`), access-denied reads (nothing in `Errors.log`),
+  reparse points/DFS links (confirmed a plain folder), a checkpoint/`-Resume`
+  race (the folder legitimately completed, per the checkpoint file, with no
+  crash), the parallel-vs-sequential dispatch (`ThrottleLimit: 1` uses the
+  sequential path only), `MaxDepth`/recursion limits (unlimited, and
+  children were clearly walked), and every other per-ACE filter in the loop
+  (none apply once `-SkipInheritedAces` is off). What remains, given the
+  folder checkpointed successfully with zero rows, is that
+  `$acl.GetAccessRules(...)` itself returned an empty collection for that
+  folder without throwing -- which is either a genuine, if unusual, empty/
+  fully-protected ACL (in which case the right fix is an explicit "no ACL
+  entries" marker row so it stops looking identical to "not scanned"), or a
+  real discrepancy between .NET's view of the ACL and the OS's own (in which
+  case a comparison against `icacls`'s output on the same folder is the
+  needed next step). Blocked on that `icacls` check, which needs to run
+  against the real file server and couldn't be done as part of this session.
+
+## [0.6.3] - Fixed empty folder list and dead breadcrumb links: non-UNC path support
+
+### Fixed
+- **Root cause: every path-hierarchy computation assumed a UNC-style
+  (`\\server\share\...`) path.** `AccessMapTemplate.html`'s `buildFolderTree()`
+  /`ensureNode()` (added in 0.6.1 for gap-bridging) and `folderInfoCard()`'s
+  breadcrumb (added in 0.6.2) both reconstructed an ancestor's path by
+  splitting into segments and re-joining with a hardcoded `\\` prefix. That
+  only produces a real match for a UNC path -- for a locally-rooted audit (a
+  plain `C:\...` path, no UNC prefix at all) it fabricated an ancestor path
+  (`\\D:\Shares`, say) that could never match the real folder actually
+  stored at that level (`D:\Shares`, no fake leading backslash). The result:
+  every real folder appeared to have only virtual, disconnected ancestors,
+  which (combined with 0.6.2's stricter root-detection) meant the sidebar
+  folder list found zero valid roots and rendered empty, and every
+  breadcrumb ancestor segment came back "not found" and was shown as plain,
+  unclickable text instead of a link.
+- Fixed by deriving a parent path from the path's own last backslash
+  (`path.substring(0, path.lastIndexOf('\\'))`) instead of re-synthesizing
+  one from split segments -- this preserves whatever prefix convention the
+  path already uses, UNC or otherwise, so it can never produce a mismatched
+  ancestor. The walk now also stops at each folder's own precomputed
+  `.share` field rather than a hardcoded "2 segments" rule, and the sidebar
+  list's root-detection (`isTopOfItsOwnBranch`) walks the full ancestor
+  chain looking for any REAL folder rather than requiring a folder to have
+  literally no parent at all -- so it also now handles an audit that was
+  pointed at a subfolder partway down a share (every real folder technically
+  has *some* recorded parent in that case, but that chain, being entirely
+  virtual, should still correctly resolve to a top-level entry).
+- **Bonus fix, same root cause, different function**: `Get-ShareKeyFromPath`
+  (`Build-AccessMapHtml.ps1`) and `get_share_key` (`build.awk`) had the
+  identical unconditional-`\\`-prefix bug -- cosmetic only (all folders
+  under one local root still consistently got the SAME fabricated share
+  key, so lazy-loading kept working), but confusing (`\\D:\Shares` for a
+  plain local path) and worth fixing for the same reason. Now only prepends
+  `\\` when the source path itself actually had one.
+
+### Verified
+- A dataset built with local drive-letter paths (`D:\Shares\Finance\...`,
+  no UNC prefix at all) confirms: the sidebar folder list is no longer
+  empty and nests correctly (3 folders, properly ordered); the breadcrumb's
+  real ancestor segments ("Finance", "Reports") are clickable and correctly
+  navigate there, while segments the scan never recorded as their own
+  folder ("D:", "Shares") are shown as plain text; the folder's own Tree
+  view still nests correctly too. Share keys from both build scripts came
+  back as the correct, non-fabricated `D:\Shares` (previously `\\D:\Shares`).
+- Full pre-existing regression suite -- including the 0.6.1 gap-bridging
+  dataset (virtual nodes still shown as plain, unclickable breadcrumb
+  segments) and the 0.6.2 false-prefix sibling-sort trap (still correctly
+  ordered in both A-Z and Z-A) -- still passes with zero errors on both
+  build paths after these changes.
+
+## [0.6.2] - AccessMapTemplate.html: hierarchical folder sort, breadcrumb nav
+
+Both fixes below are confined to `AccessMapTemplate.html` -- neither build
+script needed any change, since both just copy this file byte-for-byte.
+
+### Fixed
+- **Sidebar folder list sort didn't respect the actual tree.** A flat
+  lexicographic sort of full path strings can put an unrelated sibling
+  folder in between a parent and its own child -- e.g. `\\test\shared\test2`
+  (a sibling) sorted between `\\test\shared\test` and its own child
+  `\\test\shared\test\a`, because the character right after "test" (`2`,
+  code 50) happens to sort before the character after it in the child's path
+  (`\`, code 92). `getFolderListInTreeOrder()` now walks the actual folder
+  tree depth-first, pre-order (each share in turn, and within it every
+  descendant nested exactly where it belongs), so a folder's whole branch
+  always reads as one contiguous, alphabetized block -- matching how a file
+  explorer's own expanded tree would read if flattened into a list. A-Z
+  keeps the root of each branch on top; Z-A is a true full reversal of that
+  same sequence, so a branch's root ends up at the BOTTOM of its own block
+  (children-then-parent), not just reversed sibling order with the parent
+  still pinned to the top. This reversal rule is specific to this flat
+  list -- the nested Tree view's own child ordering still reverses sibling
+  order only, since a parent node there can never visually sit below its
+  own children in an expandable widget; two different UI shapes, two
+  different reversal rules, both intentional.
+
+### Added
+- **Clickable breadcrumb** above a folder's Tree/Graph tabs, replacing the
+  old plain path heading. Each ancestor segment the scan actually recorded
+  navigates straight to that folder; a segment standing in for a path level
+  the scan never recorded (a virtual "not scanned" node -- see the 0.6.1
+  entry below) renders as plain, unclickable text instead, same as it does
+  in the Tree view itself.
+
+### Verified
+- A dataset built specifically to reproduce the false-prefix sibling trap
+  (`test`, `test\a`, `test\b`, `test2`, `zzz` under one share) confirms the
+  sidebar list now nests correctly in A-Z, and is a true full reversal in
+  Z-A, exactly matching hand-computed expected order for both directions.
+- The existing gapped-path dataset (0.6.1) confirms the breadcrumb marks a
+  virtual ancestor as plain text and a real one as a clickable link that
+  correctly navigates there.
+- The full multi-share Run1 dataset confirms the tree-order generalizes
+  correctly at scale: each share's entire branch (up to 26 folders in one
+  case) stays grouped as one contiguous block rather than interleaving
+  with another share's folders.
+- Full pre-existing regression suite (dashboard, cross-share lazy loading,
+  relationship graph, scan errors, the 0.6.0/0.6.1 fixes) still passes with
+  zero errors after these changes.
+
+## [0.6.1] - Root-caused the \\?\UNC path prefix bug (tree fracture, bogus share key)
+
+### Fixed -- `Invoke-NTFSPermissionAudit.ps1` (bumped to 0.5.2)
+- **The real root cause of a flat-looking folder tree and stray `\\?\UNC\`
+  prefixes in scanned paths.** `Get-LongPathSafe`'s own long-path prefix
+  (`\\?\` / `\\?\UNC\`, applied so classic .NET IO APIs can handle paths
+  near `MAX_PATH`) was supposed to be stripped back off before a path was
+  stored or reported, but the strip was gated on whether the *parent*
+  folder's own path was prefixed (`if ($currentPath.StartsWith('\\?\'))`).
+  .NET can independently decide to hand back a prefixed *child* path based
+  on the child's own resulting length, regardless of whether its parent
+  needed one -- so a short, unprefixed parent with a long enough descendant
+  several levels down would leak `\\?\UNC\...` into that one descendant's
+  path while every folder around it stayed clean. Two folders that are
+  actually the same tree ended up looking like two different addressing
+  schemes: string-based parent/child matching (both in this project's own
+  `AccessMapTemplate.html` and in any other tool that consumes these CSVs)
+  breaks exactly at the depth where the prefix appears, and share-root
+  detection collapses onto a bogus `\\?\UNC` "share" instead of the real one.
+  Fixed by always attempting the strip (`-replace` is a harmless no-op when
+  the prefix isn't present) instead of gating it on the parent's own state,
+  in both the sequential and parallel code paths. Verified: the regex logic
+  itself passes 4 hand-checked prefix/no-prefix cases, the script still
+  parses cleanly, and a real directory walk on a short/unprefixed path still
+  returns correct, unchanged output (no regression for the common case).
+
+### Fixed -- `Build-AccessMapHtml.ps1` / `Build-AccessMapHtml.sh`+`build.awk`
+  (both bumped to 0.6.1)
+- **Defensive path normalization** for CSVs captured before the fix above
+  (can't be re-scanned just to pick it up): both build scripts now strip a
+  leading `\\?\UNC\` or `\\?\` from every row's `Path` at ingestion time,
+  before anything else (share-key derivation, folder indexing) touches it.
+  Applied identically in PowerShell and awk; verified byte-identical
+  normalization output for the same inputs under mawk and gawk.
+- **Case-insensitive, and now explicitly toggleable, sort order.** Sidebar
+  folder/identity lists and the folder tree's child ordering previously
+  relied on plain `localeCompare()`, whose default collation isn't
+  guaranteed case-insensitive across environments and could interleave
+  mixed-case names in a way that looked unsorted even with a comparator
+  applied. Replaced with an explicit lowercase comparison used consistently
+  everywhere folders/identities are listed, and added an **A-Z / Z-A toggle
+  button** in the sidebar (next to the search box) that flips sort direction
+  across the sidebar list, the tree view, and an identity's multi-root
+  folder view together.
+- Verified end-to-end with a dataset built to reproduce the exact reported
+  scenario (shallow, unprefixed home-directory-style folders alongside a
+  deep descendant captured with the `\\?\UNC\` prefix, several unscanned
+  intermediate levels in between): the tree now renders as one correctly-
+  nested branch instead of fracturing at the prefixed folder, the share
+  stays unified (not split into a bogus `\\?\UNC` bucket), and both the
+  sidebar list and the tree correctly re-sort when the new toggle is
+  clicked -- checked against both the PowerShell and bash/awk build paths.
+
+## [0.6.0] - AccessMapTemplate.html: ACL duplication, flat tree, sidebar UX
+
+All fixes below are confined to `AccessMapTemplate.html` -- the CSV input
+format and both build scripts are untouched, since `Build-AccessMapHtml.ps1`
+and `Build-AccessMapHtml.sh` both just copy this file byte-for-byte into the
+generated `AccessMap.html` and need no script-side changes for any of this
+to take effect (confirmed: both build paths still emit an identical, fixed
+`AccessMap.html` from the same template).
+
+### Fixed
+- **A folder's ACL list double-counted group members.** A group's own grant
+  and each of its expanded members previously rendered as separate, equally-
+  counted flat rows, inflating the apparent number of identities with
+  access. A direct grant for a Group identity now absorbs its own via-group
+  rows as collapsible children instead, with a summary line splitting
+  "N direct grants" from "M more via group membership". The folder tree's
+  per-node count badge gets the same direct+viaGroup breakdown (e.g. "2+2")
+  instead of one blended number. CSV export of the full flat edge list is
+  unchanged.
+- **The folder tree rendered flat instead of nested** when the scan hadn't
+  recorded every intermediate folder level (an ACL-unchanged folder it
+  skipped, etc.), which broke the parent/child chain and made deeper
+  folders show up as their own disconnected tree roots. `buildFolderTree()`/
+  `ensureNode()` now insert a "virtual" node (unclickable, labeled "not
+  scanned") for any missing path segment needed to structurally connect two
+  real folders, so a real folder several levels deep still nests under its
+  true ancestor regardless of gaps in what the scan actually recorded.
+- **Sidebar folder/identity lists were in raw scan/CSV order.** Both tabs
+  now sort alphabetically by path/name.
+- **The two header quick-filter buttons were one-shot list replacements**
+  with no way to turn them back off short of switching tabs. They're now
+  true 3-way toggles -- off / show-only (green, "ON") / hide (red, "HIDDEN")
+  -- composing with search and tab state instead of replacing the render
+  path. The dashboard's existing clickable stat cards/observations still
+  jump straight to "show only" and stay in sync with the button's state.
+
+### Added
+- A draggable splitter between the sidebar and content panes (pointer-event
+  based, width persisted via `localStorage`, wrapped in try/catch), plus a
+  responsive breakpoint that stacks the panes vertically on narrow
+  viewports.
+
+### Verified
+- jsdom test suite against both a real pwsh-generated and a bash/awk-
+  generated dataset: a deliberately gapped folder path (5 levels, none of
+  the 4 intermediate folders scanned) renders as one 6-node branch with the
+  4 missing levels shown as virtual nodes, not two flat roots; a folder
+  with a group holding Modify plus 2 members granted via that group shows
+  exactly 2 top-level ACL rows (not 4), collapsed by default, expanding to
+  reveal exactly its 2 members; the tri-state filter cycles off -> show-
+  only -> hide -> off correctly via both the header button and the
+  dashboard's stat-card entry point; the sidebar folder list comes back
+  pre-sorted; the splitter's pointer handlers fire without error (full
+  visual drag behavior isn't something jsdom can verify -- no real layout
+  engine -- so treat that part as structurally tested only, not visually
+  confirmed in a real browser). Full pre-existing regression suite
+  (dashboard, cross-share lazy loading, relationship graph, scan errors)
+  still passes with zero errors on both build paths after these changes.
+
+### Considered and declined
+- Moving the direct/via-group count split and the tree gap-bridging out of
+  the browser and into both build scripts as precomputed manifest/share
+  data. Declined for the count split (already cheap, scoped to one folder's
+  already-in-memory edges -- no benefit to precomputing). Declined for
+  gap-bridging too, on balance (a real but narrow win at very large folder
+  counts, outweighed by duplicating trie-building logic across PowerShell
+  and awk and keeping both provably equivalent, for a browser-side render
+  step that would still be needed either way) -- revisit only if a specific
+  large dataset actually shows a noticeable pause here.
+
+## [0.6.0] - Access map: lazy per-share loading, offline bash/awk variant
+
+### Added -- offline bash/awk variant of Build-AccessMapHtml
+- **`Build-AccessMapHtml.sh` + `build.awk`**: a Linux/macOS bash+awk port of
+  `Build-AccessMapHtml.ps1`, producing the exact same `AccessMap.html` +
+  `AccessMap_data\` output from the same CSVs without needing PowerShell at
+  all. Needs only `bash` and a standard `awk` (tested against gawk, mawk,
+  and reasoned to be POSIX-portable to macOS's built-in awk). Mirrors the
+  PowerShell script's CLI shape (`-i/--input-folder`, `-o/--output-folder`,
+  `-m/--max-edges-per-node`, `-f/--force`), its multi-run "most recent by
+  timestamp" file discovery, its truncated-last-CSV-line detection, and its
+  non-empty-output-folder guard. Written without `set -e`/`set -u`/
+  `set -o pipefail`, per a specific request -- every command whose failure
+  matters is checked explicitly instead.
+  - CSV parsing uses a hybrid strategy: a plain `split(",")` fast path for
+    the overwhelming majority of rows, falling back to a quote-aware
+    character-by-character parser only for rows that actually contain a
+    `"` (handling embedded commas and doubled `""` quoting correctly). A
+    stray trailing `\r` is stripped from every physical line before use, so
+    a `\r\n`-terminated (Windows-authored) CSV parses the same as a
+    Unix-authored one regardless of which column ends up last. A quoted
+    field containing a literal embedded newline is detected (an odd count
+    of `"` characters in the record built so far means a quoted field is
+    still open) and correctly reassembled across however many physical
+    lines it spans, rather than silently mis-parsed -- the build's own
+    summary output reports when this happens. A file that ends with an
+    unterminated quote (a genuinely malformed CSV, or the same mid-write
+    kill the existing truncated-last-line check already catches, just
+    landing inside a quoted field instead) is detected too and its
+    incomplete last row dropped, with the two detection paths deduplicated
+    so a single truncated row is never reported as two.
+  - Verified against a real generated multi-share dataset (3 shares,
+    broken inheritance, group membership, a broad-principal grant,
+    dormant/disabled/locked identities, an unresolved SID, scan errors, a
+    truncated-last-line scenario, shares with exactly one access entry, a
+    genuine embedded-newline-in-a-quoted-field row, `\r\n` line endings,
+    and a truncation landing inside a quoted field) with a structural diff
+    against `Build-AccessMapHtml.ps1`'s output for the same input -- same
+    identities, same folders (incl. `broken` flags), same per-share edge
+    multisets, same dashboard aggregates (`rightsDistribution`,
+    `broadPrincipalGrants`, `totalEdgeCount`, `scanErrors`) -- not just "it
+    ran without crashing." Also cross-checked byte-identical output between
+    gawk and mawk. NOT verified against macOS's own built-in awk (a
+    BWK/"one true awk" derivative) -- the script avoids gawk-only features
+    so it's expected to behave the same there, but that's an expectation,
+    not something actually tested on this project so far. The only
+    difference found and fixed along the way was a genuine bug (see Fixed,
+    below), not a compromise accepted afterward.
+    `identities[]`/`folders[]` array ORDER is not guaranteed to match the
+    PowerShell version's for the same input; the data itself is
+    equivalent either way.
+
+### Fixed -- found by actually running this against generated test data
+- Plain (non-boolean) AD-detail fields (`title`, `dept`, `lastLogon`, etc.)
+  were emitted as JSON `null` whenever that one field happened to be blank,
+  where the PowerShell version only nulls them when there's no AD detail
+  record for the identity AT ALL, otherwise emitting `""` for a blank field
+  on an otherwise-known identity. Functionally inert either way (`""` and
+  `null` are both falsy in the JS that reads them), but the structural diff
+  against the PowerShell output flagged it, so it was fixed for semantic
+  parity: `sid`/`name`/`type` are now always emitted as-is (even empty),
+  and the AD-lookup fields null only when no detail record exists at all.
+
+### Changed -- `Build-AccessMapHtml.ps1` / `AccessMapTemplate.html`
+- **Report output is now a folder, not one file.** `-OutputHtmlPath` is
+  replaced by `-OutputFolder` (old name still accepted as an alias, but it
+  now names a *directory*, not a file path). Each run writes:
+  - `AccessMap.html` -- the viewer, now a byte-for-byte copy of
+    `AccessMapTemplate.html`. Nothing is templated or rewritten into it
+    anymore, so the template can be edited, diffed, and version-controlled
+    directly, independent of any run's data.
+  - `AccessMap_data\manifest.js` -- identities, folders, and every
+    dashboard-level total/observation (rights distribution, broad-principal
+    grants, broken-inheritance folders, dormant identities), loaded eagerly.
+    Small regardless of audit size -- one entry per identity/folder, never
+    per access grant.
+  - `AccessMap_data\share_N.js` -- one file per top-level share
+    (`\\server\share`), holding just that share's access entries (the part
+    of the dataset that actually gets huge). `AccessMap.html` fetches a
+    share's file via a plain `<script src>` tag (works from `file://`, no
+    server, unlike `fetch()`/XHR) the moment something on screen needs it --
+    a folder in that share is opened, an identity with access there is
+    selected, or the relationship graph expands into it.
+  - Keep `AccessMap.html` and `AccessMap_data\` together -- the HTML file
+    can't load its data on its own. Copy/zip/email the whole output folder.
+- **Previously, the entire dataset (every access entry, for every share) was
+  embedded as one inline JSON blob in a single HTML file.** For a 1+ GB
+  `IdentityPermissions.csv`, that meant the browser had to parse a
+  multi-hundred-MB-to-GB string before showing anything at all -- the
+  dashboard included. Now the dashboard, sidebar search, and both quick
+  filters render instantly with zero access entries loaded (their
+  aggregates are precomputed server-side into `manifest.js`), and opening a
+  specific folder or identity only fetches the one or few shares it
+  actually touches.
+- `-Force` now guards writing into an existing, non-empty `-OutputFolder`
+  (previously it guarded overwriting a single existing output file).
+- The "large map" warning is rescoped: it used to warn about the resulting
+  HTML file being slow for a *browser* to open; since the browser now only
+  ever loads one share at a time, that warning now instead flags when this
+  *script's own* memory use while reading a very large source CSV, or a
+  single share with an unusually large number of access entries, might be
+  worth splitting into a per-subtree scan.
+- Bumped to 0.6.0 for both scripts to reflect this file-layout change
+  (`Build-AccessMapHtml.ps1`'s own version banner; `AccessMapTemplate.html`
+  has no separate version string, it inherits the toolkit's).
+
+### Fixed -- found by actually running this against generated test data
+- A share with **exactly one** access entry got its edge row corrupted into
+  seven separate single-value arrays instead of one seven-value array
+  (`registerShareChunk(key, [[0],[0],[3],[0],[0],[0],[-1]])` instead of
+  `[[0,0,3,0,0,0,-1]]`), silently breaking that share's data. Root cause:
+  `$rows = if (...) { $edgesByShare[$shareKey] } else {...}` pipes the List
+  through PowerShell's success-output stream to produce the if-expression's
+  value, which enumerates it -- collapsing a List with exactly one element
+  down to that bare element instead of preserving it as a 1-item List (this
+  is the same family of behavior as the well-known single-element-array
+  ConvertTo-Json quirk noted above, just triggered by an if-expression
+  assignment instead). Fixed by assigning inside each branch explicitly
+  instead of relying on the if-statement's own piped-through output.
+
+## [0.5.1] - Identity-backfill fix for -Resume, plus troubleshooting docs
+
+### Fixed -- found during a deliberate, requested review of the 0.5.0 changes
+- **`ADIdentityDetails.csv` could silently omit identities from a resumed
+  scan's already-completed portion.** The parallel-mode identity backfill
+  added in 0.3.0 only covered that one case; on `-Resume` (with or without
+  `-ThrottleLimit`), a fresh process's identity cache only ever contains
+  identities *this* invocation actually processed. Anything that only ever
+  appeared in the already-checkpointed (skipped) portion of the scan --
+  fully valid rows already sitting in `IdentityPermissions.csv` from
+  before this invocation started -- never touched this process's cache at
+  all, since those items are never re-processed by design. Reproduced with
+  a targeted mock test before fixing (confirmed real identities would go
+  missing), then fixed by extending the backfill to also read back the
+  existing `IdentityPermissions.csv` on `-Resume` and re-resolve any
+  identity not already known. Verified the actual code path (not just the
+  isolated logic) via a hand-crafted resumable-run scenario.
+
+### Documentation
+- New **Troubleshooting** section in `README.md`:
+  - Confirms, based on re-reading the actual gating code rather than
+    re-asserting it, that `-ThrottleLimit` parallelization has no code
+    path that runs, attempts to run, or silently falls back under Windows
+    PowerShell 5.1 -- it's a hard, immediate failure before any scanning
+    begins.
+  - Documents a real, pre-existing (not introduced by `-ThrottleLimit`)
+    risk: neither scan mode has a timeout on individual ACL reads, so an
+    unresponsive (not erroring, just hanging) network path can stall a
+    scan indefinitely -- worse under `-ThrottleLimit` in one specific way,
+    since `ForEach-Object -Parallel` won't return until every dispatched
+    item completes, so one permanently-hung worker blocks the whole run
+    even if everything else finished cleanly. Notes `-Resume` as the
+    practical mitigation if this happens.
+
+### Testing notes
+- Re-verified, with direct tests rather than assumption, two things that
+  are easy to get subtly wrong: (1) grepped all three scripts for
+  PS7-only syntax (ternary, null-coalescing, pipeline chain operators) --
+  none found, confirming the sequential path genuinely stays PS 5.1
+  compatible; (2) the RunConfig JSON round-trip correctly preserves
+  single-element arrays, negative integers, and booleans across
+  `ConvertTo-Json`/`ConvertFrom-Json` (a classic PowerShell gotcha is
+  single-element arrays collapsing to bare scalars -- confirmed this does
+  not happen here, and that the comparison logic would tolerate it even
+  if it did).
+- All three features combined (`-BreadthFirst` + `-ThrottleLimit` +
+  `-Resume`) tested together with a real `kill -9`, completing correctly.
+- Full existing suite (13 HTML/JS files, 4 PowerShell/shell files, plus
+  the new identity-gap reproduction test) re-run clean.
+
+---
+
+## [0.5.0] - Crash recovery (-Resume) and incomplete/truncated-data handling
+
+### Added
+- `Invoke-NTFSPermissionAudit.ps1`: new `-Resume` switch. Continues a run
+  that was interrupted (killed, crashed, the machine rebooted) before
+  finishing, instead of starting the whole scan over. Requires an explicit
+  `-OutputFolder` pointing at the same folder the interrupted run used
+  (the default value bakes in the current timestamp, so relying on it here
+  would point at a brand-new empty folder instead).
+  - Every run now writes `RunConfig_<timestamp>.json` (every parameter
+    that affects what gets scanned or how -- Path, MaxDepth, BreadthFirst,
+    ThrottleLimit, ExpandGroups, etc.) and `Checkpoint_<timestamp>.txt`
+    (every object fully processed and durably flushed to the CSVs). A
+    finished run also gets `Completed_<timestamp>.marker`.
+  - `-Resume` finds the most recent run without a matching Completed
+    marker, validates every parameter from this invocation against
+    RunConfig, and refuses with a specific, itemized error if anything
+    differs -- never guesses which settings should win.
+  - `Flush-Buffers` was restructured to use a single unified "items
+    completed" trigger instead of three independent per-CSV row-count
+    thresholds, specifically so a checkpoint entry is only ever written
+    once that item's row data (if any) is confirmed durably on disk --
+    an item can legitimately produce rows in one CSV and none in another
+    (or none at all), so a per-buffer trigger could otherwise leave a
+    completed item's checkpoint entry pending indefinitely.
+  - Fixed, as part of building this: `ADIdentityDetails.csv` would have
+    been silently overwritten (losing the original run's identity data)
+    on a resumed run, since its Export-Csv call didn't previously know to
+    append.
+  - Documented trade-off: an object already scanned before the
+    interruption is not re-checked on resume, even if it changed in the
+    meantime.
+- `Build-AccessMapHtml.ps1` / `AccessMapTemplate.html`: the report now
+  detects and clearly flags two distinct ways source data can be
+  incomplete, while still showing everything successfully captured:
+  - **An interrupted scan** -- no matching `Completed_<timestamp>.marker`
+    for the run's own timestamp.
+  - **A truncated source file** -- a CSV whose last line was cut off
+    mid-write (a killed process, not a normal completion). Detected by
+    checking whether the raw file ends with a newline at all, rather than
+    checking for `null` in specific fields -- a truncation partway through
+    a field's *text* just silently shortens that value without producing
+    any `null`, so a null-only check would miss it; the newline check
+    catches truncation regardless of where in the row it happened. The one
+    affected row is dropped; nothing else in the file is touched.
+  - Surfaced as a prominent banner at the top of the Summary view plus a
+    small persistent badge next to the Summary button, visible from any
+    view in the report.
+
+### Testing notes
+- Crash recovery was tested against **real interruptions**, not simulated
+  ones: `kill -9` sent to the actual process mid-scan at several points
+  (including deliberately between one checkpoint flush and the next, so
+  some objects are processed but not yet durable when killed), across
+  both sequential and `-ThrottleLimit` (parallel) modes. In every case,
+  the resumed run's final checkpoint is byte-for-byte identical (as a set)
+  to a fresh, uninterrupted run of the same tree -- no gaps, no duplicate
+  entries. Also confirmed: resuming an already-completed run refuses
+  clearly; resuming with a changed parameter (tested with `-BreadthFirst`)
+  refuses and names the mismatch; resuming without an explicit
+  `-OutputFolder` refuses before touching anything.
+- The truncated-file detection was verified against the actual observed
+  behavior of `Import-Csv` on a genuinely truncated file (confirmed
+  directly: it never throws, and a truncation can produce either a `null`
+  trailing field or a silently shortened string value depending on
+  exactly where it lands) rather than assumed, which is what led to
+  redesigning the detection from a field-null check to the more general
+  trailing-newline check.
+- Full existing suite (13 HTML/JS files, 4 PowerShell/shell files) re-run
+  clean after every change in this release.
+
+---
+
+## [0.3.0] - Parallel processing, plus three real bugs found by a deliberate code-review pass
+
+### Added
+- `Invoke-NTFSPermissionAudit.ps1`: new `-ThrottleLimit N` switch. Processes
+  N objects' ACL reads and identity resolution concurrently instead of one
+  at a time. Requires PowerShell 7+ (a clear, immediate error under Windows
+  PowerShell 5.1, never a silent fallback); default remains 1 (fully
+  sequential, unchanged behavior). Only per-object ACL/identity work is
+  parallelized -- directory discovery stays sequential, so `-BreadthFirst`/
+  `-MaxDepth`/`-NoRecursion` behave identically either way. Two
+  thread-safe `ConcurrentDictionary` caches (identity Name/Type labels;
+  group-membership expansion results) are shared across workers, holding
+  only plain data -- never a live AD `Principal`/`DirectoryEntry` object,
+  since those aren't safe to use from a thread other than the one that
+  resolved them.
+- **Measured, not assumed, performance characteristic** (documented in the
+  parameter help and README): against a synthetic 15ms-per-item delay
+  standing in for a real network ACL round-trip, `-ThrottleLimit 16`
+  measured roughly 6x faster than sequential. Against near-zero-latency
+  work, the fixed per-item dispatch overhead of `ForEach-Object -Parallel`
+  made parallel processing measurably *slower* than sequential --
+  documented plainly rather than oversold, with a recommendation to
+  benchmark against a representative sample before committing to a value
+  for a multi-hour scan.
+
+### Fixed -- found during a deliberate, requested code-review pass, not reported bugs
+- **`ADIdentityDetails.csv` would come out completely empty under
+  `-ThrottleLimit`.** Parallel workers resolve identities into fresh,
+  throwaway per-item caches, never into the persistent `$script:IdentityCache`
+  that the final identity-details report reads from -- and the shared cache
+  deliberately excludes live AD objects for thread-safety, so it can't
+  substitute either. Fixed by re-resolving every distinct identity
+  encountered (from the shared cache's keys) once, sequentially, on the
+  main thread, after the parallel scan completes -- exactly what would
+  have happened inline during a sequential scan, just deferred. Verified
+  the fix's logic with a mock test, since the real Windows security APIs
+  this depends on (SecurityIdentifier, AD PrincipalContext) are entirely
+  unsupported outside Windows, not just the filesystem-ACL-reading part.
+- **`Build-AccessMapHtml.ps1` could silently pair CSVs from two different
+  audit runs.** When `-InputFolder` held output from more than one run,
+  file discovery picked "most recent by filesystem `LastWriteTime`"
+  independently for `IdentityPermissions*.csv`, `ADIdentityDetails*.csv`,
+  and `Errors_*.log` -- which can disagree with which run a file actually
+  belongs to (a file copied, restored from backup, or touched later than
+  it was written). Reproduced live with a deliberately constructed
+  mismatched-mtime scenario (confirmed it really did pick mismatched
+  files, not just a theoretical risk), then fixed by sorting on the run
+  timestamp embedded in each filename instead, which is authoritative and
+  unaffected by filesystem metadata. Added as a permanent regression test.
+- **Summary view's access-rights donut chart showed "1" instead of "0"**
+  for a dataset with zero access entries. The divide-by-zero-safe
+  denominator (falls back to 1 to avoid a `NaN` percentage) was being
+  reused for the chart's displayed total as well, which is factually wrong
+  when the real total is genuinely zero. Fixed by tracking the real total
+  separately from the safe-for-division one.
+
+### Testing notes
+- The code review was a genuine line-by-line pass across all four files
+  (both PowerShell scripts touched recently, `Get-FileServerShareInventory.ps1`,
+  and `AccessMapTemplate.html`), not a superficial scan -- each of the three
+  fixes above was found by reading the code critically enough to predict a
+  failure mode, then actually reproducing it (via a targeted mock, a
+  deliberately constructed mismatched-mtime scenario, or a zero-edges
+  dataset) before fixing it, rather than fixing based on suspicion alone.
+- Also specifically checked (found clean, no changes needed): HTML-escaping
+  of all user/AD-derived data rendered via `innerHTML` throughout
+  `AccessMapTemplate.html`; CSV-export quoting for embedded commas/quotes/
+  newlines; the `-ExpandGroupsExclude` short-name-vs-full-name matching
+  logic; `computeTopmostRoots`'s ancestor-chain walk; CIM session cleanup
+  and DFS namespace traversal in `Get-FileServerShareInventory.ps1`.
+- Re-ran the full existing suite (12 HTML/JS test files, 3 PowerShell test
+  files) after every fix, plus real end-to-end runs at scale (a
+  2,501-folder synthetic tree) across sequential, breadth-first, parallel,
+  and parallel+breadth-first combined -- all four modes still produce
+  identical, complete coverage.
+
+---
+
+## [0.2.2] - Breadth-first scan order option
+
+### Added
+- `Invoke-NTFSPermissionAudit.ps1`: new `-BreadthFirst` switch. Scans level
+  by level (every folder at the current depth before any folder at the
+  next depth) instead of the default depth-first order (one branch all
+  the way down before backing up to its siblings). Implemented with a
+  `Queue` instead of a `Stack` for the traversal frontier when set (both
+  are O(1) per operation -- deliberately not a `List` with `RemoveAt(0)`,
+  which would be quietly O(n) per removal on exactly the large scans this
+  targets).
+- Rationale: if a scan of a very large share is interrupted partway
+  through (killed, times out, a reboot), depth-first leaves one
+  fully-scanned branch and nothing else, while breadth-first leaves the
+  top few levels of everything -- a far more useful partial result in
+  most cases, and one the HTML tree view already displays well with no
+  changes needed (a shallow-but-complete tree is indistinguishable from
+  an intentionally `-MaxDepth`-limited run).
+
+### Testing notes
+- Built a real nested test directory tree and confirmed via `-Verbose`
+  trace analysis (not just eyeballing it) that both modes visit the
+  identical *set* of folders, breadth-first's depth sequence is strictly
+  non-decreasing, depth-first's is a genuine zigzag, and all depth-1
+  siblings are visited before any depth-2 folder under `-BreadthFirst`.
+  Confirmed default-mode behavior (error counts, folders touched) is
+  byte-for-byte unaffected by the refactor. Confirmed -- by re-running the
+  full HTML test suite unmodified -- that scan order has zero effect on
+  `Build-AccessMapHtml.ps1`'s output, since folder hierarchy there is
+  reconstructed from path strings, never from CSV row order.
+
+---
+
+## [0.2.1] - Version-mismatch troubleshooting (no functional changes)
+
+### Fixed
+- No code changes in this release -- prompted by a real support case
+  where a user's Summary view showed "0 objects could not be scanned"
+  despite `Errors.log` containing 5 real entries. Reproduced the exact
+  scenario synthetically and confirmed the parsing/display pipeline
+  itself was correct; root cause was that only `AccessMapTemplate.html`
+  had been re-shared recently, not the paired `Build-AccessMapHtml.ps1`
+  containing the `Errors.log`-parsing feature -- an older copy of that
+  script silently shows 0 (indistinguishable from "clean scan") rather
+  than erroring.
+
+### Changed
+- Version bumped (all three scripts + README) specifically so the
+  generated report's footer (`toolkit vX.X.X`) can be used as a quick
+  sanity check that the version in front of you is the one you think it
+  is.
+- `README.md`: fixed remaining bare `Errors.log` references to note the
+  actual `Errors_<timestamp>.log` naming; added the diagnostic sequence
+  for a suspicious "0 errors" result (check the footer version, check the
+  log file actually exists where you pointed `-InputFolder`, check the
+  HTML was regenerated after the run that produced the errors); combined
+  the existing file-colocation requirement with new "keep all three
+  scripts as a matched set" guidance.
+
+---
+
+## [0.2.0] - Interactive access map redesign, reliability fixes, PowerShell 7 support
+
+### Fixed
+- **PowerShell 7 compatibility**: `[System.IO.Directory]::GetAccessControl`
+  (used to read ACLs) only exists in full .NET Framework (PS 5.1); PS7 runs
+  on .NET Core, where the same functionality moved to extension methods on
+  `DirectoryInfo`/`FileInfo`. `Get-ObjectAcl` now branches on
+  `$PSVersionTable.PSEdition` so the script works correctly under both.
+- **Owner-resolution crash under `Set-StrictMode`**: `DirectorySecurity`/
+  `FileSecurity` has no public `.Owner` property (only `GetOwner(type)`);
+  a broken fallback line was aborting entire scans whenever an owner SID
+  couldn't be translated to a name (a common, non-exceptional case for
+  orphaned/foreign SIDs). Replaced with a real three-level fallback
+  (friendly name -> raw SID string -> logged placeholder) that cannot
+  itself throw.
+- **Access-map "hub explosion"**: the relationship graph would walk
+  through a shared Group's *own* other access edges, letting one broadly-
+  permissioned group bridge two unrelated parts of the tree into one
+  tangled view. Fixed twice, progressively: first by restricting
+  non-centered Groups/Unresolved/Well-known identities to revealing only
+  their direct reach (membership only) unless they're the actual
+  selection; then generalized from identity *type* to actual *fan-out*,
+  after a screenshot showed a User-typed admin account (`Administrator`)
+  with a large footprint causing the identical problem untouched by the
+  type-only rule.
+- **Color collision**: broken-inheritance folders were colored identically
+  to the actual graph center, creating a "second center" illusion in
+  screenshots. Folders now always render their normal color; the existing
+  small flag-dot indicator (shared with disabled/dormant identity flags)
+  marks broken inheritance without hijacking the node's main color.
+- **Table filter losing keyboard focus on every keystroke**: the filter
+  `<input>` was being destroyed and recreated on every character typed.
+  `renderTable()` now builds the input once and only updates rows/header/
+  export-count afterward.
+
+### Changed
+- **Access map visualization redesigned from a relationship graph to a
+  folder/subfolder tree** as the primary view, after feedback that
+  depth-based relationship hops were the wrong model: a single folder has
+  no meaningful "depth" to traverse, identity views rendered in a
+  fixed-size canvas rather than expanding to a readable size, and higher
+  depths kept reaching back through the share root into relationships
+  outside the selected identity's own access. The tree mirrors Explorer,
+  with each subfolder's own children branching from it specifically
+  (never pooled with a sibling's); depth (1-5, Full) now means levels of
+  subfolder nesting to auto-expand, matching the requested A-B/A-B-1
+  semantics exactly. Structurally eliminates the "hub explosion" class of
+  bugs, since a tree never walks through other identities at all.
+- **The relationship graph brought back as a second "Graph" tab**
+  alongside "Tree", after feedback that the picture view was still
+  wanted for a different purpose (seeing direct relationships visually).
+  Later given its own depth control (separate from the Tree's, since they
+  mean different things), reusing the hub-safe multi-hop traversal logic
+  above.
+- **Duplicate/overlapping tree roots fixed**: a normal recursive audit
+  records an ACE row for every folder in a branch (inherited ACEs
+  captured per-folder), so an identity's "directly accessed folders"
+  naturally includes both a parent and several of its own descendants --
+  shown as a duplicated top-level root without correction. Added
+  `computeTopmostRoots()` to keep only the topmost folder per branch.
+- **`-SkipInheritedAcesInFolderReport` renamed to `-SkipInheritedAces`**
+  (old name kept as a parameter alias) -- it always filtered both CSVs,
+  not just the folder one, so the old name was misleading.
+- **Summary view added**, consolidating scattered counts into one screen
+  shown by default on open: identity breakdown by type, user account
+  health (enabled/disabled/locked/dormant), an access-rights distribution
+  donut chart, a plain-language "what each access level allows and how it
+  could be misused" reference table, and a set of data-driven
+  observations (broad default-group grants, broken inheritance, stale
+  account access, orphaned SIDs, high Full-Control share) each mapped to
+  specific, sourced normative guidance tagged by region -- **AU** (ACSC
+  Essential Eight by maturity level, Australian Government ISM
+  principles), **NZ** (specific NZISM control IDs), **US** (named NIST SP
+  800-53 control IDs and CSF 2.0 subcategories), **Intl** (CIS Controls
+  v8 safeguards) -- researched against current published wording rather
+  than relied on from memory, and explicitly framed as a heuristic
+  starting point for a security/compliance conversation, not a certified
+  assessment. The header's separate stats line was removed as pure
+  duplication once this existed.
+- **`Errors.log` now ingested into the access map** as "folders that
+  could not be scanned", parsed and categorized (access denied / path-
+  platform limitation / other), exportable to CSV -- previously these
+  objects were invisible blind spots with no ACL data to display anywhere.
+- **Output files timestamped** (`FolderPermissions_<timestamp>.csv`, etc.)
+  across all three scripts, with `-Force` required to overwrite an exact
+  collision -- re-running into a shared `-OutputFolder` no longer
+  silently clobbers a previous run.
+- **`Build-AccessMapHtml.ps1` output-path handling**: accepts a full file
+  path, an empty directory (auto-names inside it), or errors clearly on a
+  non-empty directory rather than guessing a filename into it.
+- **DFS discovery reworked for restricted-access environments**: new
+  `-DfsPath` on `Get-FileServerShareInventory.ps1` resolves a known DFS
+  path to its physical target via the client-side `NetDfsGetClientInfo`
+  API -- no DFS admin rights or RSAT module required, unlike
+  `-DfsNamespace`'s full tree enumeration (kept as an optional
+  higher-privilege bonus).
+- `ADIdentityDetails.csv` / access map: added `WhenChanged` as a more
+  consistently-available fallback when `LastLogonTimestampApprox` is
+  blank or stale.
+- Added `LICENSE` (MIT) and `Version`/`$ScriptVersion` metadata (shown in
+  each script's startup banner and, for the access map, in the generated
+  report's own footer) to all three scripts.
+- Added `Manual-DFS-Verification.md`: a checklist for hand-verifying DFS
+  topology when no tooling -- not even `-DfsPath` -- can query it at all.
+
+### Testing notes
+- Each fix above was verified with a purpose-built reproduction before
+  being called fixed, not just patched and assumed correct -- notably the
+  hub-explosion fix was tested against a synthetic dataset mirroring the
+  exact reported scenario (a shared group with access to two unrelated
+  folders) both before and after the fan-out generalization, and the tree
+  redesign was tested against a dataset matching the requested A-B/A-B-1
+  branching example precisely, including that depths 4/5/Full correctly
+  plateau rather than double-counting.
+- Retired four test files that exercised mechanisms intentionally removed
+  in the tree redesign (drag/zoom/pan interaction, BFS hub-restriction on
+  the old single graph) -- expected, not a regression.
+- Test suite grew to 10 files covering the tree, the reintroduced graph
+  (including its own depth control and the hub-safe engine end-to-end),
+  the summary view (including specific AU/NZ/US control-ID citations,
+  not just framework names), focus retention, and scale (400+ identities).
+
+---
+
+## [0.1.0] - Initial release
+
+### Added
+
+**`Invoke-NTFSPermissionAudit.ps1`**
+- Walks folder (optionally file) trees and captures full ACL detail per
+  object: identity, allow/deny, explicit vs. inherited, inheritance scope
+  decoded to plain English, and rights decoded to the same basic-permission
+  labels the Windows ACL editor shows (Full Control / Modify / Read &
+  Execute / Read / Write) or "Special" with the exact granular rights
+  listed.
+- Recursive group-membership expansion and AD identity/account-state
+  lookup via `System.DirectoryServices.AccountManagement` -- no RSAT
+  `ActiveDirectory` module required.
+- Four report outputs from a single pass:
+  - `FolderPermissions.csv` -- per-folder-tree view (one row per ACE per
+    object).
+  - `IdentityPermissions.csv` -- per-identity/pivoted view, with a
+    `GrantedViaGroup` column when `-ExpandGroups` is used.
+  - `ADIdentityDetails.csv` -- one row per unique identity encountered
+    anywhere in the scan (title/department/office/phone/employee ID/
+    manager, enabled/locked/expired, password age, approximate last logon,
+    creation date; scope/category/member count/managed-by for groups),
+    joinable to the other two by `IdentitySid`.
+  - `InheritanceExceptions.csv` -- every folder with broken inheritance.
+  - `Errors.log` -- access-denied/path-too-long failures logged rather
+    than aborting the run.
+- Iterative (stack-based) tree walk to avoid recursion-depth limits on deep
+  trees; `\\?\` long-path fallback near MAX_PATH.
+- Parameters: `-Path`, `-IncludeFiles`, `-IncludeInheritedFileAces`,
+  `-MaxDepth`, `-NoRecursion`, `-ExpandGroups`, `-ExpandGroupsExclude`,
+  `-SkipInheritedAcesInFolderReport`, `-OutputFolder`, `-NoAdLookup`,
+  `-Verbose` (with real diagnostic output: per-folder traversal, ACL reads,
+  identity/group-member cache hits, buffer flushes).
+
+**`Get-FileServerShareInventory.ps1`**
+- Enumerates non-default SMB shares and share-level ACLs across one or more
+  servers, guarded with `Get-Command` checks -- degrades to a warning +
+  skip rather than a hard failure if the `SmbShare` module isn't present.
+- `-DfsPath` resolves one or more already-known DFS paths to their physical
+  target(s) via the Win32 `NetDfsGetClientInfo` API -- the same
+  client-side referral lookup Windows performs when a path is opened in
+  Explorer. No DFS admin rights or RSAT `DFSN` module required, only
+  ordinary read access to browse the path. Reports whether each target is
+  currently the *Active* one, not just Online.
+- `-DfsNamespace` offers full namespace-tree enumeration via the `DFSN`
+  module (`Get-DfsnFolder`/`Get-DfsnFolderTarget`, walking nested DFS
+  folders) as an explicitly optional, higher-privilege bonus if that access
+  is also available; skipped with an explanatory message otherwise.
+- Parameters: `-ComputerName` (optional), `-DfsPath`, `-DfsNamespace`,
+  `-NoRecursion` (applies to DFS folder discovery), `-OutputFolder`,
+  `-Verbose`.
+
+**`Build-AccessMapHtml.ps1`** + **`AccessMapTemplate.html`**
+- Turns the audit CSVs into a single, self-contained, interactive HTML
+  file -- no server, no database, no external JS libraries, opens directly
+  from disk over `file://`.
+- Search/filter identities and folders; select one to see a radial "ego
+  network" graph of its access relationships (capped at `-MaxEdgesPerNode`
+  most notable neighbors, default 60, explicit access and higher rights
+  first) plus a full sortable table underneath with everything, each
+  row/node clickable to pivot.
+- Quick filters for broken-inheritance folders and disabled/dormant
+  identities (no logon in 90+ days, disabled, or locked).
+- Per-table CSV export via a client-side Blob download; Back-button
+  navigation across pivots.
+- All data embedded as JSON directly in the HTML, so it works fully
+  offline at both generation and view time.
+
+**Documentation**
+- `README.md` -- full workflow, report-column reference, and access-level
+  caveats (share-level vs. NTFS-level permissions being distinct layers,
+  DFS access-tier summary, `-IncludeFiles` cost, long-path limitations).
+- `Manual-DFS-Verification.md` -- step-by-step checklist for hand-verifying
+  DFS topology when no tooling (not even `-DfsPath`) can query it at all,
+  plus an explicit list of what genuinely requires server/DFS-management
+  access to check.
+- `LICENSE` -- MIT.
+
+### Fixed
+- AD large-integer conversion (`lastLogonTimestamp`) was recombining the
+  `HighPart`/`LowPart` 32-bit halves using double-precision arithmetic,
+  which silently loses precision above 2^53 and produced wrong dates (a
+  known 2026 date round-tripped as year 2452 in testing). Rewritten using
+  pure `Int64` bitwise shift/OR.
+
+### Testing notes
+- All PowerShell parsed clean against the PS7 language parser.
+- Rights-decoding logic unit-tested against known-good `FileSystemRights`
+  decimal values, confirmed to match Windows ACL editor labels.
+- The corrected large-integer conversion was round-trip tested against
+  four dates spanning 1601-2040.
+- The `NetDfsGetClientInfo` P/Invoke signature and struct layouts compile
+  cleanly with expected native sizes; the actual `Netapi32.dll` call
+  couldn't be exercised outside a Windows/DFS environment -- a first run
+  against one known path is recommended before relying on it broadly.
+- The HTML/JS report was executed and exercised via headless DOM (jsdom)
+  against real generated output: search/filter, identity and folder
+  selection, table sorting, both quick filters, CSV export, and
+  back-navigation all verified programmatically, first on a small dataset
+  then a synthetic 420-identity/50-folder/4,000-edge dataset to confirm
+  capping logic holds at scale. Visual layout has not been confirmed in an
+  actual browser.

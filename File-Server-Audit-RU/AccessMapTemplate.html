@@ -1,0 +1,3023 @@
+<!DOCTYPE html>
+<!-- SPDX-License-Identifier: MIT -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Карта прав доступа файлового сервера</title>
+<style>
+  :root {
+    /* Dark is the base/fallback. Light applies automatically when the OS
+       prefers it AND the user hasn't explicitly chosen (see the toggle
+       button below) -- an explicit choice (data-theme="light"/"dark")
+       always wins over the OS preference either way. */
+    --bg: #111418; --panel: #1a1f26; --panel2: #20262f; --border: #2c333d;
+    --text: #e6e9ee; --muted: #9aa4b2; --accent: #4da3ff; --warn: #ffb454; --bad: #ff5d5d;
+    --good: #57d38c; --selected-bg: #20304a;
+    --warn-bg: #2a2410; --bad-bg: #3a1a1a; --bad-text: #ff9d9d; --good-bg: #2c4a3d;
+    --pill-au-bg: #003a5c; --pill-au-text: #7dd3fc;
+    --pill-nz-bg: #1a2e1a; --pill-nz-text: #86efac;
+    --pill-us-bg: #2e1a3a; --pill-us-text: #d8b4fe;
+    --pill-eu-bg: #2e2a1a; --pill-eu-text: #fde68a;
+    --pill-intl-bg: #2c333d;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+      /* Off-white rather than a stark #fff/#f5f6f8 -- easier on the eyes
+         for a page people may have open for a while. */
+      --bg: #eef0f2; --panel: #f7f7f5; --panel2: #ececea; --border: #d8dce2;
+      --text: #1a1f26; --muted: #5b6472; --accent: #1a73e8; --warn: #b8720a; --bad: #d53c3c;
+      --good: #1e8e4f; --selected-bg: #d7e6fb;
+      --warn-bg: #fdf1d9; --bad-bg: #fbe4e2; --bad-text: #a32e20; --good-bg: #dcf3e6;
+      --pill-au-bg: #d9edfb; --pill-au-text: #0a4a72;
+      --pill-nz-bg: #dff3e2; --pill-nz-text: #146c33;
+      --pill-us-bg: #f0e3fa; --pill-us-text: #5a2a82;
+      --pill-eu-bg: #faf0d4; --pill-eu-text: #7a5c00;
+      --pill-intl-bg: #e4e7eb;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #eef0f2; --panel: #f7f7f5; --panel2: #ececea; --border: #d8dce2;
+    --text: #1a1f26; --muted: #5b6472; --accent: #1a73e8; --warn: #b8720a; --bad: #d53c3c;
+    --good: #1e8e4f; --selected-bg: #d7e6fb;
+    --warn-bg: #fdf1d9; --bad-bg: #fbe4e2; --bad-text: #a32e20; --good-bg: #dcf3e6;
+    --pill-au-bg: #d9edfb; --pill-au-text: #0a4a72;
+    --pill-nz-bg: #dff3e2; --pill-nz-text: #146c33;
+    --pill-us-bg: #f0e3fa; --pill-us-text: #5a2a82;
+    --pill-eu-bg: #faf0d4; --pill-eu-text: #7a5c00;
+    --pill-intl-bg: #e4e7eb;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
+  #app { display:flex; flex-direction:column; height:100vh; }
+  header { padding:10px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:16px; background:var(--panel); flex-shrink:0; }
+  .themeToggleBtn { font-size:16px; padding:6px 10px; flex-shrink:0; }
+  /* Unified small "chip" look for the header's right-side utility buttons
+     (quick filters + theme toggle) and the sidebar's own identity filter
+     row (kind + groups-first) -- these previously looked inconsistent
+     (colored borders at rest for Broken/Dormant, a bare checkbox for
+     Groups First, a plain "All" for the kind filter) despite doing the
+     same KIND of job: toggle or cycle a view option. They now share one
+     neutral resting look, differing only in their ACTIVE state (green
+     "on" / red "hidden"), matching how the show/hide colors already
+     worked -- just no longer colored while simply at rest. */
+  .chipBtn { background:var(--panel2); color:var(--text); border:1px solid var(--border); border-radius:14px; padding:5px 12px; font-size:12px; white-space:nowrap; }
+  .chipBtn:hover { background:var(--border); }
+  .chipBtn.state-show { background:var(--good); color:#062b17; border-color:var(--good); font-weight:600; }
+  .chipBtn.state-hide { background:var(--bad); color:#fff; border-color:var(--bad); font-weight:600; }
+  header .headerRightGroup { margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .identityFilterRow { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 10px 10px; }
+  header h1 { font-size:16px; margin:0; font-weight:600; }
+  button { background:var(--panel2); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:6px 10px; cursor:pointer; font-size:12px; }
+  button:hover { background:var(--panel2); }
+  #main { flex:1; display:flex; min-height:0; }
+  #sidebar { width:320px; flex-shrink:0; border-right:1px solid var(--border); display:flex; flex-direction:column; background:var(--panel); }
+  #sidebar .tabs { display:flex; border-bottom:1px solid var(--border); }
+  #sidebar .tabs button { flex:1; border:none; border-radius:0; background:transparent; padding:10px; }
+  #sidebar .tabs button.active { background:var(--panel2); border-bottom:2px solid var(--accent); }
+  .searchRow { display:flex; gap:6px; margin:10px; align-items:stretch; }
+  #searchBox { flex:1; min-width:0; padding:8px; border-radius:4px; border:1px solid var(--border); background:var(--panel2); color:var(--text); }
+  #sortDirBtn { flex-shrink:0; font-size:12px; padding:6px 10px; }
+  #listPanel { flex:1; overflow-y:auto; padding:0 6px 10px; }
+  .listItem { padding:8px 10px; border-radius:4px; cursor:pointer; font-size:13px; margin-bottom:2px; }
+  .listItem:hover { background:var(--panel2); }
+  .listItem .sub { color:var(--muted); font-size:11px; }
+  .listItemPathRow { display:flex; align-items:center; gap:6px; min-width:0; }
+  .listItemPathRow .path { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
+  .badge { display:inline-block; padding:1px 6px; border-radius:3px; font-size:10px; margin-left:6px; vertical-align:middle; }
+  .badge.disabled { background:var(--bad); color:#fff; }
+  .badge.dormant { background:var(--warn); color:#000; }
+  .badge.locked { background:var(--bad); color:#fff; }
+  .badge.broken { background:var(--warn); color:#000; }
+  .listMore { padding:8px 10px; color:var(--muted); font-size:11px; font-style:italic; }
+  #content { flex:1; overflow-y:auto; padding:16px; min-width:0; }
+  /* Folder/identity views (Tree-or-Graph + a permissions list below it) use an
+     internal resizable split instead of #content's own outer scroll -- each
+     pane scrolls itself, so the two share a fixed height budget the splitter
+     can actually divide between them. Every other view (dashboard, quick-
+     filter lists, welcome screen) keeps the plain #content scroll above. */
+  #content.content-split { display:flex; flex-direction:column; overflow:hidden; }
+  .splitPanes { flex:1; min-height:0; display:flex; flex-direction:column; }
+  .splitPaneTop, .splitPaneBottom { min-height:60px; overflow:hidden; display:flex; flex-direction:column; }
+  .paneSplitter { height:7px; flex-shrink:0; cursor:row-resize; background:var(--border); touch-action:none; margin:6px 0; border-radius:3px; }
+  .paneSplitter:hover, .paneSplitter.dragging { background:var(--accent); }
+  @media (max-width: 760px) {
+    .splitPanes { flex:none; }
+    .splitPaneTop, .splitPaneBottom { flex:none !important; min-height:0; overflow:visible; }
+    .paneSplitter { display:none; }
+    #content.content-split { overflow-y:auto; }
+  }
+  #welcome { color:var(--muted); max-width:600px; }
+  #welcome ul { line-height:1.8; }
+  .card { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:14px 16px; margin-bottom:16px; }
+  .card h2 { margin:0 0 10px; font-size:15px; }
+  .breadcrumb { font-size:15px; font-weight:600; line-height:1.7; word-break:break-word; margin-bottom:6px; }
+  .crumbLink { color:var(--accent); cursor:pointer; }
+  .crumbLink:hover { text-decoration:underline; }
+  .crumbCurrent { color:var(--text); }
+  .crumbPlain { color:var(--muted); font-weight:400; }
+  .crumbSep { color:var(--muted); margin:0 5px; font-weight:400; }
+  .card .field { display:inline-block; min-width:220px; margin:2px 18px 2px 0; font-size:13px; }
+  .folderMetaRow { margin-top:6px; }
+  .card .field b { color:var(--muted); font-weight:500; }
+  .treeWrap { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:8px; margin-bottom:16px; flex:1; min-height:0; display:flex; flex-direction:column; }
+  .treeToolbar { display:flex; align-items:center; gap:14px; padding:2px 6px 8px; flex-wrap:wrap; border-bottom:1px solid var(--border); margin-bottom:6px; flex-shrink:0; }
+  .treeToolbar .groupLabel { font-size:11px; color:var(--muted); margin-right:2px; }
+  .depthBtn { padding:4px 9px; font-size:11px; }
+  .depthBtn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .treeNote { font-size:11px; color:var(--muted); padding:4px 8px; }
+  .treeHost { flex:1; min-height:0; overflow-y:auto; padding:4px 6px; }
+  .treeNode { }
+  .treeRow { display:flex; align-items:center; gap:6px; padding:3px 6px; border-radius:4px; cursor:pointer; font-size:13px; }
+  .treeRow:hover { background:var(--panel2); }
+  .treeRow.selected { background:var(--selected-bg); outline:1px solid var(--accent); }
+  .treeToggle { display:inline-block; width:14px; text-align:center; color:var(--muted); flex-shrink:0; }
+  .treeToggle.hasChildren { cursor:pointer; }
+  .treeToggle.hasChildren:hover { color:var(--text); }
+  .treeLabel { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .treeCount { font-size:10px; color:var(--muted); background:var(--panel2); border-radius:8px; padding:1px 7px; flex-shrink:0; }
+  .treeChildren { margin-left:20px; padding-left:10px; border-left:1px solid var(--border); }
+  .treeMore { font-size:11px; color:var(--muted); font-style:italic; padding:3px 6px 3px 26px; }
+  .detailTabs { display:flex; gap:4px; margin-bottom:8px; }
+  .detailTabBtn { padding:6px 14px; font-size:12px; }
+  .detailTabBtn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .graphWrap { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:8px; margin-bottom:16px; position:relative; flex:1; min-height:0; display:flex; flex-direction:column; }
+  .graphToolbar { display:flex; align-items:center; gap:14px; padding:2px 6px 8px; flex-wrap:wrap; flex-shrink:0; }
+  .graphToolbar .groupLabel { font-size:11px; color:var(--muted); margin-right:2px; }
+  .graphLegendToggle { position:absolute; right:14px; bottom:14px; width:26px; height:26px; border-radius:50%; background:var(--panel2); border:1px solid var(--border); color:var(--muted); font-size:14px; font-weight:600; font-style:italic; font-family:Georgia,serif; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:5; }
+  .graphLegendToggle:hover { color:var(--text); border-color:var(--muted); }
+  .graphLegendPanel { position:absolute; right:14px; bottom:48px; width:230px; background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:12px 14px; font-size:11px; z-index:5; box-shadow:0 4px 16px rgba(0,0,0,0.4); }
+  .graphLegendPanel h4 { margin:0 0 6px; font-size:11px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.03em; }
+  .graphLegendPanel h4:not(:first-child) { margin-top:10px; }
+  .graphLegendRow { display:flex; align-items:center; gap:7px; padding:2px 0; }
+  .graphLegendSwatch { width:13px; height:13px; border-radius:3px; flex-shrink:0; }
+  .graphLegendLine { width:16px; height:0; border-top:3px solid; flex-shrink:0; }
+  .graphLegendLine.dashed { border-top-style:dashed; }
+  .graphLegendDot { width:9px; height:9px; border-radius:50%; background:var(--warn); border:1px solid #000; flex-shrink:0; }
+  .zoomBtn { padding:4px 9px; font-size:13px; line-height:1; }
+  .graphNote { font-size:11px; color:var(--muted); padding:4px 8px; }
+  svg.graph { width:100%; flex:1; min-height:200px; display:block; background:var(--panel2); border-radius:4px; touch-action:none; }
+  svg.graph text { fill:var(--text); font-size:11px; font-family:inherit; pointer-events:none; }
+  svg.graph .nodeGroup { cursor:grab; }
+  svg.graph .nodeGroup:active { cursor:grabbing; }
+  svg.graph .nodeCircle { stroke:#000; stroke-width:1; }
+  svg.graph .centerCircle { fill:var(--warn); }
+  svg.graph .nodeLabel { font-weight:500; }
+  svg.graph .nodeSubLabel { fill:var(--muted); font-size:9px; }
+  svg.graph .edgeLabel { fill:var(--muted); font-size:9px; }
+  svg.graph .flagRing { pointer-events:none; }
+  .summaryGrid { display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:14px; margin-bottom:18px; }
+  .statCard { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:14px 16px; }
+  .statCard .bigNum { font-size:28px; font-weight:600; line-height:1; }
+  .statCard .cardLabel { font-size:12px; color:var(--muted); margin-top:6px; }
+  .statCard.clickable { cursor:pointer; }
+  .statCard.clickable:hover { background:var(--panel2); }
+  .statCard.warn .bigNum { color:var(--warn); }
+  .statCard.bad .bigNum { color:var(--bad); }
+  .breakdownRow { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; border-bottom:1px solid var(--border); }
+  .breakdownRow:last-child { border-bottom:none; }
+  .summarySection { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:16px; margin-bottom:16px; }
+  .summarySection h2 { font-size:14px; margin:0 0 12px; }
+  .chartRow { display:flex; gap:24px; align-items:center; flex-wrap:wrap; }
+  .chartLegend { font-size:12px; }
+  .chartLegend .legendRow { display:flex; align-items:center; gap:8px; padding:3px 0; }
+  .legendSwatch { width:11px; height:11px; border-radius:2px; flex-shrink:0; }
+  .disclaimerBanner { background:var(--warn-bg); border:1px solid var(--warn); color:var(--warn); border-radius:6px; padding:10px 14px; font-size:12px; margin-bottom:16px; }
+  .incompleteBanner { background:var(--bad-bg); border:1px solid var(--bad); color:var(--bad-text); border-radius:6px; padding:12px 16px; font-size:13px; margin-bottom:18px; font-weight:500; }
+  .infoBanner { background:var(--panel2); border:1px solid var(--border); color:var(--muted); border-radius:6px; padding:12px 16px; font-size:13px; margin-bottom:18px; }
+  .headerIncompleteBadge { background:var(--bad); color:#fff; font-size:11px; font-weight:600; padding:3px 9px; border-radius:10px; margin-left:6px; }
+  .obsCard { border-left:3px solid var(--warn); background:var(--panel2); border-radius:0 6px 6px 0; padding:10px 14px; margin-bottom:10px; }
+  .obsCard .obsTitle { font-weight:600; font-size:13px; margin-bottom:4px; }
+  .obsCard .obsWhy { font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .obsCard .obsFrameworks { font-size:11px; color:var(--text); }
+  .guidanceRow { display:flex; align-items:flex-start; gap:8px; margin-bottom:5px; }
+  .regionPill { flex-shrink:0; width:34px; text-align:center; font-size:10px; font-weight:600; padding:1px 0; border-radius:3px; }
+  .regionPill-AU { background:var(--pill-au-bg); color:var(--pill-au-text); }
+  .regionPill-NZ { background:var(--pill-nz-bg); color:var(--pill-nz-text); }
+  .regionPill-US { background:var(--pill-us-bg); color:var(--pill-us-text); }
+  .regionPill-EU { background:var(--pill-eu-bg); color:var(--pill-eu-text); }
+  .regionPill-Intl { background:var(--pill-intl-bg); color:var(--muted); }
+  .abuseTable { width:100%; border-collapse:collapse; font-size:12px; }
+  .abuseTable th, .abuseTable td { text-align:left; padding:5px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .abuseTable th { color:var(--muted); font-weight:500; }
+  .scanErrorsTable { width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
+  .scanErrorsTable th, .scanErrorsTable td { text-align:left; padding:5px 8px; border-bottom:1px solid var(--border); }
+  .scanErrorsTable th { color:var(--muted); font-weight:500; }
+  table.datatable { width:100%; border-collapse:collapse; font-size:12px; }
+  table.datatable th { text-align:left; padding:6px 8px; border-bottom:1px solid var(--border); cursor:pointer; color:var(--muted); position:sticky; top:0; background:var(--panel); user-select:none; }
+  table.datatable th:hover { color:var(--text); }
+  table.datatable td { padding:5px 8px; border-bottom:1px solid var(--border); }
+  table.datatable tr.rowclick { cursor:pointer; }
+  table.datatable tr.rowclick:hover td { background:var(--panel2); }
+  .tableToolbar { display:flex; gap:8px; margin-bottom:8px; align-items:center; flex-shrink:0; }
+  .tableWrap { flex:1; min-height:0; display:flex; flex-direction:column; }
+  .tableBody { flex:1; min-height:0; overflow:auto; }
+  .tableToolbar input { flex:1; padding:6px; border-radius:4px; border:1px solid var(--border); background:var(--panel2); color:var(--text); }
+  .pill { padding:2px 6px; border-radius:3px; font-size:10px; }
+  .pill.inherited { background:var(--panel2); color:var(--muted); }
+  .pill.explicit { background:var(--good-bg); color:var(--good); }
+  .pill.deny { background:var(--bad); color:#fff; }
+  #backBtn:disabled { opacity:0.4; cursor:default; }
+  footer { padding:6px 16px; font-size:11px; color:var(--muted); border-top:1px solid var(--border); flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  footer a.chipBtn { color:var(--text); text-decoration:none; font-size:11px; padding:4px 10px; }
+
+  /* Resizable / responsive split panes */
+  #splitter { width:6px; flex-shrink:0; cursor:col-resize; background:var(--border); touch-action:none; }
+  #splitter:hover, #splitter.dragging { background:var(--accent); }
+  @media (max-width: 760px) {
+    #main { flex-direction:column; }
+    #sidebar { width:100% !important; height:38vh; flex-shrink:0; border-right:none; border-bottom:1px solid var(--border); }
+    #splitter { display:none; }
+    #content { height:auto; }
+  }
+
+  /* Tri-state quick filter buttons: off (neutral) / show-only (green) / hide (red) -- see .chipBtn */
+  .filterStateLabel { font-size:9px; text-transform:uppercase; letter-spacing:0.03em; opacity:0.85; margin-left:5px; }
+
+  /* Folder tree: "virtual" nodes stand in for a path segment the scan itself
+     never recorded as its own folder (so parent/child structure still nests
+     correctly even when the scan has gaps) -- shown distinctly since there's
+     no data behind them to open. */
+  .treeRow.virtual .treeLabel { color:var(--muted); font-style:italic; }
+  .treeRow.virtual { cursor:default; }
+  .treeRow.virtual:hover { background:none; }
+  .virtualNote { font-size:9px; color:var(--muted); border:1px solid var(--border); border-radius:8px; padding:0 6px; flex-shrink:0; }
+
+  /* Nested ACL list (a folder's identities, with group members collapsible
+     underneath the group instead of flattened alongside it) */
+  .aclWrap { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:10px; margin-bottom:16px; flex:1; min-height:0; display:flex; flex-direction:column; }
+  .aclSummary { font-size:12px; color:var(--muted); padding:0 4px 8px; flex-shrink:0; }
+  .aclToolbar { display:flex; gap:8px; margin-bottom:8px; align-items:center; flex-shrink:0; }
+  .aclToolbar input { flex:1; padding:6px; border-radius:4px; border:1px solid var(--border); background:var(--panel2); color:var(--text); }
+  .aclHost { flex:1; min-height:0; overflow-y:auto; }
+  .aclRow { display:flex; align-items:center; gap:8px; padding:5px 6px; border-radius:4px; cursor:pointer; font-size:13px; }
+  .aclRow:hover { background:var(--panel2); }
+  .aclRow .treeToggle { display:inline-block; width:14px; text-align:center; color:var(--muted); flex-shrink:0; }
+  .aclRow .treeToggle.hasChildren { cursor:pointer; }
+  .aclRow .treeToggle.hasChildren:hover { color:var(--text); }
+  .aclName { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .aclType { font-size:10px; color:var(--muted); flex-shrink:0; }
+  .aclChildren { margin-left:20px; padding-left:10px; border-left:1px solid var(--border); }
+  .aclChildren .aclRow { font-size:12px; }
+  .aclViaNote { font-size:10px; color:var(--muted); flex-shrink:0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>File Server Access Map</h1>
+    <button id="summaryBtn">Summary</button>
+    <span id="headerIncompleteBadge" style="display:none;" class="headerIncompleteBadge" title="Click Summary for details">Incomplete data</span>
+    <button id="backBtn" disabled>&larr; Back</button>
+    <div class="headerRightGroup">
+      <button id="btnBroken" class="chipBtn" title="Cycles: off -> show only -> hide -> off">Broken inheritance folders</button>
+      <button id="btnDormant" class="chipBtn" title="Cycles: off -> show only -> hide -> off">Disabled / dormant identities</button>
+      <button id="btnAged" class="chipBtn" style="display:none;" title="Cycles: off -> 1yr+ -> 5yr+ -> 10yr+ since last modified -> off">Aged folders</button>
+      <button id="btnFilesBroken" class="chipBtn" style="display:none;" title="Toggle: flag folders where a file has broken inheritance">Flag files w/ broken inheritance</button>
+      <button id="themeToggleBtn" class="chipBtn themeToggleBtn" title="Toggle light/dark (follows your browser by default)"></button>
+    </div>
+  </header>
+  <div id="main">
+    <div id="sidebar">
+      <div class="tabs">
+        <button id="tabIdentities" class="active">Identities</button>
+        <button id="tabFolders">Folders</button>
+      </div>
+      <div class="searchRow">
+        <input id="searchBox" type="text" placeholder="Search...">
+        <button id="sortDirBtn" title="Sort direction">A&ndash;Z</button>
+      </div>
+      <div id="identityFilterRow" class="identityFilterRow">
+        <button id="identityKindBtn" class="chipBtn" title="Cycles: show all -> Users only -> Groups only -> show all">Users &amp; Groups</button>
+        <button id="groupsFirstBtn" class="chipBtn" title="Toggle: sort Groups before Users">Groups first</button>
+      </div>
+      <div id="listPanel"></div>
+    </div>
+    <div id="splitter" title="Drag to resize"></div>
+    <div id="content">
+      <div id="welcome"></div>
+    </div>
+  </div>
+  <footer><span id="footerLine"></span> <a id="footerGithubLink" class="chipBtn" href="https://github.com/sean-aura/File-Server-Audit" target="_blank" rel="noopener noreferrer" title="Open the File Server Permission Audit Toolkit repository on GitHub">File Server Permission Audit Toolkit &#8599;</a></footer>
+</div>
+
+<script src="AccessMap_data/manifest.js"></script>
+<script>
+'use strict';
+
+/* ---------------------------------------------------------------------------
+   Data loading.
+
+   Build-AccessMapHtml.ps1 copies THIS FILE byte-for-byte to AccessMap.html --
+   nothing on this page is templated or rewritten at generation time. Every
+   run's actual data lives next to it in a sibling AccessMap_data/ folder:
+
+     AccessMap.html
+     AccessMap_data/
+       manifest.js     -- identities, folders, and every dashboard-level
+                           total/observation, loaded eagerly (small
+                           regardless of audit size: one entry per identity
+                           and per folder, never per access grant)
+       share_0.js       -- one file per top-level share (\\server\share),
+       share_1.js ...       each holding just that share's access edges
+                             (folder x identity ACE rows -- the part of the
+                             dataset that actually gets huge)
+
+   manifest.js is loaded up front via the <script src> above -- <script src>
+   works from file:// with no CORS restrictions and no server, unlike
+   fetch()/XHR, so this stays a "just open it" report. A share_N.js file is
+   only fetched the moment something on screen actually needs that share's
+   access entries (a folder is selected, an identity with access there is
+   selected, or the relationship graph expands into it) -- see
+   ensureShareLoaded() below. This is what lets a multi-gigabyte audit open
+   instantly instead of parsing the whole thing before showing anything.
+--------------------------------------------------------------------------- */
+const ACCESS_MAP_DATA_DIR = 'AccessMap_data';
+const MAX_EDGES_PER_NODE = ACCESS_MAP_MANIFEST.maxEdgesPerNode;
+
+// DATA mirrors the old all-in-one shape everything below was written
+// against. identities/folders and the rest are eager (straight off the
+// manifest); edges starts EMPTY and grows in place as share chunks load
+// (see mergeEdges) -- every place below that reads DATA.edges/byFolder/
+// byIdentity/adjacency for a specific folder or identity is only ever
+// reached after that folder's/identity's own share(s) are confirmed loaded.
+const DATA = {
+  identities: ACCESS_MAP_MANIFEST.identities,
+  folders: ACCESS_MAP_MANIFEST.folders,
+  edges: [],
+  generatedAt: ACCESS_MAP_MANIFEST.generatedAt,
+  sourceFolder: ACCESS_MAP_MANIFEST.sourceFolder,
+  toolkitVersion: ACCESS_MAP_MANIFEST.toolkitVersion,
+  scanErrors: ACCESS_MAP_MANIFEST.scanErrors,
+  scanComplete: ACCESS_MAP_MANIFEST.scanComplete,
+  truncatedRowsDropped: ACCESS_MAP_MANIFEST.truncatedRowsDropped,
+  // Created/Modified/Accessed per folder are optional -- only present when
+  // built from a CSV produced by Invoke-NTFSPermissionAudit.ps1 0.5.5+.
+  // !! coerces an older manifest's genuinely absent field to false rather
+  // than undefined, though in practice this template and the build script
+  // that produced any given manifest are always the same version pair --
+  // there's no supported scenario mixing an old manifest with this template.
+  hasFileMetadata: !!ACCESS_MAP_MANIFEST.hasFileMetadata,
+  hasFileCounts: !!ACCESS_MAP_MANIFEST.hasFileCounts,
+  // The bash/awk build path appends this as a separate, trailing statement
+  // after manifest.js's own const declaration (see Build-AccessMapHtml.sh --
+  // avoids build.awk needing systime(), a gawk-only extension not available
+  // in mawk), so it can genuinely be absent on an older report even when
+  // everything else in ACCESS_MAP_MANIFEST is present; undefined here is
+  // handled the same as "not available" by fmtDuration/the footer, not as 0.
+  buildDurationSeconds: ACCESS_MAP_MANIFEST.buildDurationSeconds
+};
+
+/* ------------------------------ Lazy share data ---------------------------- */
+
+const shareByKey = new Map();
+(ACCESS_MAP_MANIFEST.shares || []).forEach(s => shareByKey.set(s.key, s));
+
+const loadedShares = new Set();      // share keys whose edges are in DATA.edges/byFolder/byIdentity/adjacency
+const shareLoadPromises = new Map(); // share key -> { promise, resolve, reject } while a chunk is in flight
+
+// Called by each share_N.js chunk file itself, as the very last thing it
+// does, once the <script> tag for it has finished loading.
+function registerShareChunk(shareKey, edgeRows) {
+  if (loadedShares.has(shareKey)) return; // safety net, shouldn't normally happen
+  loadedShares.add(shareKey);
+  mergeEdges(edgeRows);
+  const pending = shareLoadPromises.get(shareKey);
+  if (pending) pending.resolve();
+}
+
+function ensureShareLoaded(shareKey) {
+  if (!shareKey || loadedShares.has(shareKey)) return Promise.resolve();
+  const existing = shareLoadPromises.get(shareKey);
+  if (existing) return existing.promise;
+  const shareMeta = shareByKey.get(shareKey);
+  if (!shareMeta) return Promise.resolve(); // unknown key -- nothing to load
+
+  let resolveFn, rejectFn;
+  const promise = new Promise((res, rej) => { resolveFn = res; rejectFn = rej; });
+  shareLoadPromises.set(shareKey, { promise, resolve: resolveFn, reject: rejectFn });
+
+  const script = document.createElement('script');
+  script.src = ACCESS_MAP_DATA_DIR + '/' + shareMeta.file;
+  script.onerror = () => {
+    shareLoadPromises.delete(shareKey);
+    rejectFn(new Error(`Couldn't load ${script.src} -- the AccessMap_data folder may have been moved, renamed, or not copied along with this HTML file.`));
+  };
+  document.head.appendChild(script);
+  return promise;
+}
+
+function ensureSharesLoaded(shareKeys) {
+  return Promise.all(Array.from(new Set((shareKeys || []).filter(Boolean))).map(ensureShareLoaded));
+}
+
+function linkAdjacency(k1, k2, edgeDescr) {
+  if (!adjacency.has(k1)) adjacency.set(k1, new Map());
+  if (!adjacency.has(k2)) adjacency.set(k2, new Map());
+  const m1 = adjacency.get(k1), m2 = adjacency.get(k2);
+  if (!m1.has(k2)) m1.set(k2, { edges: [] });
+  if (!m2.has(k1)) m2.set(k1, { edges: [] });
+  m1.get(k2).edges.push(edgeDescr);
+  m2.get(k1).edges.push(edgeDescr);
+}
+
+function mergeEdges(edgeRows) {
+  edgeRows.forEach(e => {
+    const ei = DATA.edges.length;
+    DATA.edges.push(e);
+    const folderIdx = e[0], identityIdx = e[1];
+    if (!byIdentity.has(identityIdx)) byIdentity.set(identityIdx, []);
+    byIdentity.get(identityIdx).push(ei);
+    if (!byFolder.has(folderIdx)) byFolder.set(folderIdx, []);
+    byFolder.get(folderIdx).push(ei);
+    linkAdjacency('f:' + folderIdx, 'i:' + identityIdx, { type: 'access', e, ei });
+    // Group-membership adjacency ("who else is a member of this group") is
+    // NOT built here -- it's global and cheap, so it's built once, eagerly,
+    // in precompute() from manifest data, and never depends on which
+    // share's access edges happen to be loaded.
+  });
+}
+
+const RIGHTS_LABELS = ['Full Control', 'Modify', 'Read & Execute', 'Read', 'Write', 'Special'];
+// Higher = more "interesting" to show first when a node has more neighbors
+// than MAX_EDGES_PER_NODE. Explicit (non-inherited) always outweighs rights level.
+const RIGHTS_WEIGHT = [100, 90, 50, 10, 60, 85];
+// Used as swatch/stroke colors (graph edges, legend dots, the dashboard's
+// rights donut chart) against the graph/panel background, never as text
+// sitting on top of them -- so the one real risk is a color simply being
+// too washed-out against whichever theme's background is currently active,
+// not text-on-color contrast. The dark-mode set was tuned against a dark
+// canvas; a couple of those (the light purple especially) read as too
+// pale once the graph background itself became theme-aware rather than
+// permanently dark (see svg.graph's own fix) -- these functions pick a
+// deliberately darker/more saturated variant for light mode instead of
+// reusing the same six colors unchanged in both themes.
+const EDGE_COLORS_DARK  = ['#ff5d5d', '#ffb454', '#57d3d3', '#7d8a99', '#4da3ff', '#c084fc'];
+const EDGE_COLORS_LIGHT = ['#d53c3c', '#b8720a', '#0d7373', '#4a5568', '#1a73e8', '#7c3aed'];
+function getEdgeColors() { return effectiveThemeIsLight() ? EDGE_COLORS_LIGHT : EDGE_COLORS_DARK; }
+
+const TYPE_COLORS_DARK = {
+  User: '#4da3ff', Group: '#c084fc', Computer: '#7d8a99',
+  'Well-known / Local': '#5a6472', Unresolved: '#5a6472'
+};
+const TYPE_COLORS_LIGHT = {
+  User: '#1a73e8', Group: '#7c3aed', Computer: '#4a5568',
+  'Well-known / Local': '#6b7280', Unresolved: '#6b7280'
+};
+function getTypeColors() { return effectiveThemeIsLight() ? TYPE_COLORS_LIGHT : TYPE_COLORS_DARK; }
+
+const DORMANT_DAYS = 90;
+const TREE_CHILD_CAP = MAX_EDGES_PER_NODE; // max children shown per folder before "+N more"
+const TREE_AUTO_EXPAND_CAP = 1500;         // safety cap on total nodes auto-expanded (Full depth), regardless of tree size
+
+let state = {
+  tab: 'identities',
+  search: '',
+  selected: null,      // { kind: 'identity'|'folder', idx: N }
+  history: [],
+  tableSort: { col: null, dir: 1 },
+  tableFilter: '',
+  depth: 1,            // tree auto-expand depth: 1/2/3/4/5/Infinity ("Full") -- 1 = just the
+                        // folder itself, no subfolders shown yet; 2 = + its direct subfolders;
+                        // 3 = + their own subfolders in turn; etc. Each subfolder's own children
+                        // branch from it specifically -- never pooled with a sibling's.
+  detailTab: 'tree',   // 'tree' (folder/subfolder hierarchy) or 'graph' (relationship picture)
+  graphDepth: 1,       // Graph tab's own depth setting: 1/2/3/4/5/Infinity ("Full") -- 1 = direct
+                        // relationships only. Separate from the Tree's `depth` since they mean
+                        // different things (relationship hops here vs. subfolder nesting there).
+  filterBroken: 0,     // sidebar quick filter, tri-state: 0=off, 1=show only, 2=hide
+  filterDormant: 0,    // same, for the disabled/dormant/locked identities filter
+  sortDir: 1,          // sidebar list sort direction: 1 = A-Z, -1 = Z-A
+  filterIdentityKind: 0, // sidebar identities filter, tri-state: 0=all, 1=Users (non-Group), 2=Groups only
+  sortGroupsFirst: false, // when true, all Groups sort before all non-Groups (each block still respects sortDir/search/filterIdentityKind)
+  filterAgedYears: 0,     // sidebar folder list "aged" filter, cycles 0 (off) -> 1 -> 5 -> 10 (years since last modified) -> back to 0; only meaningful when DATA.hasFileMetadata is true
+  flagFilesBroken: false  // when true, shows a "files: broken" badge on folders with filesBrokenInheritance in both the sidebar list and the tree view; only meaningful when DATA.hasFileCounts is true
+};
+
+// Case-insensitive comparator for anything shown alphabetically (sidebar
+// lists, tree children) -- plain localeCompare()'s default collation isn't
+// guaranteed case-insensitive across environments/locales, which could
+// otherwise interleave "Arthur"/"bill"/"Diane" in a way that LOOKS unsorted
+// even though a comparator was technically applied.
+function cmpText(a, b) {
+  a = (a || '').toLowerCase();
+  b = (b || '').toLowerCase();
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
+
+const RING_SPACING = 130;
+const HUB_DEGREE_THRESHOLD = 15;
+const GRAPH_NODE_CAP = 600; // safety cap on total nodes drawn in the graph, regardless of depth
+let adjacency = new Map(); // 'f:N'|'i:N' -> Map<neighborKey, {edges:[{type,e,ei}]}> -- membership links built
+                            // once in precompute(); access links added incrementally by mergeEdges() as
+                            // each share's chunk loads (see linkAdjacency())
+
+/* ------------------------------- Precompute ------------------------------- */
+
+const byIdentity = new Map();  // idx -> [edgeIdx,...]
+const byFolder = new Map();    // idx -> [edgeIdx,...]
+const folderPathToIdx = new Map(); // path string -> folder idx (REAL folders only)
+const folderChildren = new Map();  // nodeId -> [nodeId,...], sorted, built in precompute()
+const folderParent = new Map();    // nodeId -> nodeId
+
+// A node id is a real folder's own index (>=0) when the scan actually
+// recorded that folder, or a negative "virtual" id standing in for a path
+// segment the scan never recorded as its own folder (a share it walked
+// non-recursively, an ACL-unchanged folder it skipped, etc.) but that still
+// has to exist structurally so a folder several levels deeper nests under
+// the right ancestor instead of becoming its own disconnected tree root.
+// Without this, any gap in the scanned set turns what should be one deep
+// tree into a wall of single-node "roots" that merely LOOK flat.
+const virtualNodes = []; // virtualNodes[-id-1] = { path, segment }
+function nodeIsReal(id) { return id >= 0; }
+function nodePath(id) { return id >= 0 ? DATA.folders[id].path : virtualNodes[-id - 1].path; }
+function nodeLabel(id) { return id >= 0 ? lastPathSegment(DATA.folders[id].path) : virtualNodes[-id - 1].segment; }
+
+function ensureNode(path, shareRoot) {
+  // Returns the node id for `path`: the real folder if the scan recorded
+  // one there, otherwise a virtual node -- creating it, and recursively
+  // wiring its own parent the same way, the first time this exact path is
+  // asked for. Recursion terminates as soon as it reaches a path already in
+  // pathToNodeId (a real folder, or a virtual node created by an earlier
+  // call), since that node's own ancestor chain was already wired then, or
+  // once it reaches shareRoot itself (nothing above that is meaningful --
+  // just a bare server or drive letter, not another folder level).
+  if (folderPathToIdx.has(path)) return folderPathToIdx.get(path);
+  const lastSep = path.lastIndexOf('\\');
+  const segment = lastSep >= 0 ? path.substring(lastSep + 1) : path;
+  const id = -(virtualNodes.length + 1);
+  virtualNodes.push({ path, segment });
+  folderPathToIdx.set(path, id);
+  if (path !== shareRoot && lastSep > 0) {
+    const parentPath = path.substring(0, lastSep);
+    const parentId = ensureNode(parentPath, shareRoot);
+    if (!folderChildren.has(parentId)) folderChildren.set(parentId, []);
+    folderChildren.get(parentId).push(id);
+    folderParent.set(id, parentId);
+  }
+  return id;
+}
+
+function buildFolderTree() {
+  // Parent/child relationships are derived from path strings -- a folder's
+  // parent path is whatever's left after trimming its own last segment off
+  // (via the path's own last backslash), not a path re-synthesized from
+  // split segments with a hardcoded "\\" prefix -- that assumption only
+  // holds for UNC-style (\\server\share\...) paths and silently fabricates
+  // a non-matching ancestor for any other convention (a local C:\... root,
+  // for instance), which then never connects back to the real folder at
+  // that level and can leave every folder looking parentless. Each
+  // folder's own precomputed .share field (whatever convention it itself
+  // uses) marks where the walk stops -- nothing above a share's own root is
+  // meaningful here. Any missing intermediate level gets a virtual node
+  // (see ensureNode) rather than breaking the chain, so real folders still
+  // nest under their true ancestor even when the scan itself has gaps.
+  DATA.folders.forEach((f, idx) => folderPathToIdx.set(f.path, idx));
+  DATA.folders.forEach((f, idx) => {
+    if (f.path === f.share) return; // this folder IS its own share's root -- no parent
+    const lastSep = f.path.lastIndexOf('\\');
+    if (lastSep <= 0) return; // defensive: nothing to trim
+    const parentPath = f.path.substring(0, lastSep);
+    const parentId = ensureNode(parentPath, f.share);
+    if (!folderChildren.has(parentId)) folderChildren.set(parentId, []);
+    folderChildren.get(parentId).push(idx);
+    folderParent.set(idx, parentId);
+  });
+  folderChildren.forEach(list => list.sort((a, b) => cmpText(nodePath(a), nodePath(b))));
+}
+
+function computeTopmostRoots(candidateIndices) {
+  // Given a set of folders an identity has a direct edge to, a normal
+  // recursive audit typically records an ACE row for EVERY folder in a
+  // branch (inherited ACEs get captured per-folder) -- so without this, a
+  // parent folder and several of its own descendants would each show up as
+  // their own separate, duplicated top-level tree root. Keep only the
+  // topmost folder per branch; everything beneath it is already reachable
+  // by expanding that one root.
+  const candidateSet = new Set(candidateIndices);
+  return candidateIndices.filter(idx => {
+    let p = folderParent.get(idx);
+    while (p !== undefined) {
+      if (candidateSet.has(p)) return false; // an ancestor is also a candidate -- not topmost
+      p = folderParent.get(p);
+    }
+    return true;
+  });
+}
+
+let cachedFolderTreeOrder = null;
+let cachedFolderTreeOrderDir = null;
+
+function isTopOfItsOwnBranch(idx) {
+  // A real folder counts as a top-level entry for the flat sidebar list if
+  // no ancestor above it (walking up through any virtual bridge nodes) is
+  // ALSO a real, scanned folder. Covers both the ordinary case (this
+  // folder's own share root was itself scanned, so it simply has no
+  // parent at all) and the less obvious one: an audit pointed at a
+  // subfolder partway down a share, where EVERY real folder in the data
+  // technically has some recorded parent, but that parent chain -- purely
+  // virtual the whole way -- never actually passes through another folder
+  // the scan itself captured. Plain `folderParent.get(idx) === undefined`
+  // would wrongly find zero roots in that second case.
+  let p = folderParent.get(idx);
+  while (p !== undefined) {
+    if (nodeIsReal(p)) return false;
+    p = folderParent.get(p);
+  }
+  return true;
+}
+
+function getFolderListInTreeOrder() {
+  // A flat lexicographic sort of every folder's own full path string doesn't
+  // respect the tree it's actually describing: one folder's own descendants
+  // can sort BEHIND an entirely unrelated sibling folder purely because of
+  // how their names compare character-by-character (e.g. "\\srv\test2"
+  // sorts between "\\srv\test" and "\\srv\test\a", even though the latter is
+  // test's own child, not test2's). This instead walks the real tree
+  // depth-first, pre-order -- each share (root) in turn, and within it every
+  // descendant nested exactly where it belongs -- so a folder's whole branch
+  // always reads as one contiguous, alphabetized block, matching how a file
+  // explorer's expanded tree would read if flattened into a list. Virtual
+  // "not scanned" bridge nodes (see ensureNode) are walked through so their
+  // real descendants still land in the right place, but aren't themselves
+  // emitted (nothing to select there).
+  //
+  // Cached and only rebuilt when the sort direction actually changes --
+  // search keystrokes and filter toggles re-render the list far more often
+  // than that, and re-filtering this cached order is cheap regardless.
+  // Compute the ascending (A-Z) linearization once, then reverse the WHOLE
+  // sequence for Z-A -- not just each level's own sibling order. "Root on
+  // top in A-Z, root on bottom in Z-A" means the parent's own POSITION
+  // relative to its children flips too (children-then-parent in Z-A), not
+  // just which sibling comes first at any given level. This only makes
+  // sense for this flat list; the nested Tree view's own children ordering
+  // (see renderFolderNode) reverses sibling order only, since a parent node
+  // there can never visually sit below its own children in an expandable
+  // widget -- two different UI shapes, two different reversal rules.
+  if (cachedFolderTreeOrder && cachedFolderTreeOrderDir === state.sortDir) return cachedFolderTreeOrder;
+
+  const roots = [];
+  DATA.folders.forEach((f, idx) => { if (isTopOfItsOwnBranch(idx)) roots.push(idx); });
+  roots.sort((a, b) => cmpText(DATA.folders[a].path, DATA.folders[b].path));
+
+  const out = [];
+  function visit(nodeId) {
+    if (nodeIsReal(nodeId)) out.push(nodeId);
+    (folderChildren.get(nodeId) || []).forEach(visit); // already pre-sorted ascending by buildFolderTree
+  }
+  roots.forEach(visit);
+
+  const finalOrder = state.sortDir === -1 ? out.slice().reverse() : out;
+  cachedFolderTreeOrder = finalOrder;
+  cachedFolderTreeOrderDir = state.sortDir;
+  return finalOrder;
+}
+
+function precompute() {
+  buildFolderTree();
+
+  // folders[].broken is precomputed by Build-AccessMapHtml.ps1 (it already
+  // knows this from InheritanceBrokenHere while it builds each edge) -- no
+  // edges need to be loaded client-side to know which folders show the
+  // "broken inheritance" badge.
+
+  // Group-membership relationships ("who else is a member of this group")
+  // are also global and cheap -- Build-AccessMapHtml.ps1 already resolves
+  // every GrantedViaGroup while it streams IdentityPermissions.csv once, so
+  // this is built here, eagerly, and never needs a share chunk loaded.
+  DATA.identities.forEach((idn, groupIdx) => {
+    (idn.members || []).forEach(memberIdx => {
+      linkAdjacency('i:' + groupIdx, 'i:' + memberIdx, { type: 'membership' });
+    });
+  });
+
+  // Per-identity disabled/dormant/locked flags, precomputed once.
+  const now = new Date();
+  DATA.identities.forEach(idn => {
+    idn.flagDisabled = (idn.enabled === false);
+    idn.flagLocked = (idn.locked === true);
+    idn.flagDormant = false;
+    if (idn.lastLogon) {
+      const d = new Date(idn.lastLogon);
+      if (!isNaN(d.getTime())) {
+        const days = (now - d) / (1000 * 60 * 60 * 24);
+        if (days > DORMANT_DAYS) idn.flagDormant = true;
+      }
+    }
+  });
+}
+
+/* --------------------------------- Helpers -------------------------------- */
+
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtBool(b) { return b === true ? 'Yes' : (b === false ? 'No' : ''); }
+function fmtDate(iso) {
+  // Created/Modified/Accessed are stored as raw ISO-8601 (round-trip,
+  // locale-independent) strings -- reformatted here into something more
+  // readable for display; ageInDays/the aged-document filter still parse
+  // the RAW value directly via new Date(iso), not this formatted string.
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso; // fall back to the raw string rather than hide a genuinely unparseable value
+  return d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function ageInDays(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return null;
+  return (Date.now() - d.getTime()) / (1000 * 60 * 60 * 24);
+}
+function fmtDuration(seconds) {
+  if (seconds === undefined || seconds === null || isNaN(seconds)) return '';
+  if (seconds < 60) return `${seconds}s`;
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.round(seconds % 60);
+  return `${mins}m ${secs}s`;
+}
+function truncateLabel(s, n) { if (!s) return ''; return s.length > n ? s.slice(0, n - 1) + '\u2026' : s; }
+
+function downloadCsv(filename, rows, columns) {
+  const header = columns.map(c => c.label).join(',');
+  const lines = rows.map(r => columns.map(c => {
+    let v = c.get(r);
+    if (v === null || v === undefined) v = '';
+    v = String(v).replace(/"/g, '""');
+    return /[",\n]/.test(v) ? '"' + v + '"' : v;
+  }).join(','));
+  const csv = [header].concat(lines).join('\r\n');
+  const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ---------------------------------- Sidebar -------------------------------- */
+
+function renderList() {
+  const panel = document.getElementById('listPanel');
+  panel.innerHTML = '';
+  const q = state.search.trim().toLowerCase();
+  const LIMIT = 300;
+
+  if (state.tab === 'identities') {
+    let items = DATA.identities.map((idn, idx) => ({ idn, idx }));
+    if (q) items = items.filter(x => (x.idn.name || '').toLowerCase().includes(q) ||
+                                      (x.idn.dept || '').toLowerCase().includes(q) ||
+                                      (x.idn.title || '').toLowerCase().includes(q));
+    // filterDormant: 0=off, 1=show only disabled/dormant/locked, 2=hide them
+    if (state.filterDormant === 1) items = items.filter(x => x.idn.flagDisabled || x.idn.flagDormant || x.idn.flagLocked);
+    else if (state.filterDormant === 2) items = items.filter(x => !(x.idn.flagDisabled || x.idn.flagDormant || x.idn.flagLocked));
+    // filterIdentityKind: 0=all, 1=Users (anything that isn't a Group -- User,
+    // Computer, Well-known/Local, Unresolved), 2=Groups only. Composes with
+    // filterDormant above (both apply together, not as alternatives) and with
+    // sortGroupsFirst below -- none of these three fight each other.
+    if (state.filterIdentityKind === 1) items = items.filter(x => x.idn.type !== 'Group');
+    else if (state.filterIdentityKind === 2) items = items.filter(x => x.idn.type === 'Group');
+    if (state.sortGroupsFirst) {
+      items.sort((a, b) => {
+        const aGroup = a.idn.type === 'Group' ? 0 : 1;
+        const bGroup = b.idn.type === 'Group' ? 0 : 1;
+        if (aGroup !== bGroup) return aGroup - bGroup; // Groups block always first, regardless of sortDir
+        return state.sortDir * cmpText(a.idn.name, b.idn.name);
+      });
+    } else {
+      items.sort((a, b) => state.sortDir * cmpText(a.idn.name, b.idn.name));
+    }
+    const total = items.length;
+    items = items.slice(0, LIMIT);
+    items.forEach(({ idn, idx }) => {
+      const div = document.createElement('div');
+      div.className = 'listItem';
+      let badges = '';
+      if (idn.flagDisabled) badges += '<span class="badge disabled">disabled</span>';
+      if (idn.flagLocked) badges += '<span class="badge locked">locked</span>';
+      if (idn.flagDormant && !idn.flagDisabled) badges += '<span class="badge dormant">dormant</span>';
+      div.innerHTML = `<div>${esc(idn.name || '(unknown)')}${badges}</div><div class="sub">${esc(idn.type || '')}${idn.title ? ' \u00b7 ' + esc(idn.title) : ''}</div>`;
+      div.onclick = () => selectIdentity(idx, true);
+      panel.appendChild(div);
+    });
+    if (total === 0) {
+      const none = document.createElement('div');
+      none.className = 'listMore';
+      none.textContent = 'None found.';
+      panel.appendChild(none);
+    } else if (total > LIMIT) {
+      const more = document.createElement('div');
+      more.className = 'listMore';
+      more.textContent = `${total - LIMIT} more \u2014 refine your search`;
+      panel.appendChild(more);
+    }
+  } else {
+    let items = getFolderListInTreeOrder().map(idx => ({ f: DATA.folders[idx], idx }));
+    if (q) items = items.filter(x => x.f.path.toLowerCase().includes(q));
+    // filterBroken: 0=off, 1=show only broken-inheritance folders, 2=hide them
+    if (state.filterBroken === 1) items = items.filter(x => x.f.broken);
+    else if (state.filterBroken === 2) items = items.filter(x => !x.f.broken);
+    // filterAgedYears: 0=off, else show only folders whose Modified date is
+    // at least that many years old. A folder with no Modified value at all
+    // (this scan didn't capture it for that specific item, even if
+    // DATA.hasFileMetadata is true overall) is excluded rather than shown
+    // as a false positive -- "definitely old" is the claim being made here,
+    // not "unknown age".
+    if (state.filterAgedYears > 0) {
+      const thresholdDays = state.filterAgedYears * 365;
+      items = items.filter(x => {
+        const age = ageInDays(x.f.modified);
+        return age !== null && age >= thresholdDays;
+      });
+    }
+    // NOTE: no separate sort here -- getFolderListInTreeOrder() already
+    // ordered everything (see there for why a flat string sort isn't used),
+    // and .filter() preserves that relative order.
+    const total = items.length;
+    items = items.slice(0, LIMIT);
+    items.forEach(({ f, idx }) => {
+      const div = document.createElement('div');
+      div.className = 'listItem';
+      const badge = f.broken ? '<span class="badge broken">broken inheritance</span>' : '';
+      const fileBadge = (state.flagFilesBroken && f.filesBrokenInheritance) ? '<span class="badge broken" title="One or more files directly in this folder have broken inheritance">files: broken inheritance</span>' : '';
+      div.innerHTML = `<div class="listItemPathRow"><span class="path">${esc(f.path)}</span>${badge}${fileBadge}</div>`;
+      div.title = f.path;
+      div.onclick = () => selectFolder(idx, true);
+      panel.appendChild(div);
+    });
+    if (total === 0) {
+      const none = document.createElement('div');
+      none.className = 'listMore';
+      none.textContent = 'None found.';
+      panel.appendChild(none);
+    } else if (total > LIMIT) {
+      const more = document.createElement('div');
+      more.className = 'listMore';
+      more.textContent = `${total - LIMIT} more \u2014 refine your search`;
+      panel.appendChild(more);
+    }
+  }
+}
+
+function setTab(tab) {
+  state.tab = tab;
+  document.getElementById('tabIdentities').className = tab === 'identities' ? 'active' : '';
+  document.getElementById('tabFolders').className = tab === 'folders' ? 'active' : '';
+  renderList();
+}
+
+/* ----------------------------- Selection / nav ----------------------------- */
+
+function pushHistory() {
+  if (state.selected) state.history.push(state.selected);
+  document.getElementById('backBtn').disabled = state.history.length === 0;
+}
+
+function goBack() {
+  if (state.history.length === 0) return;
+  const prev = state.history.pop();
+  document.getElementById('backBtn').disabled = state.history.length === 0;
+  if (prev.kind === 'identity') selectIdentity(prev.idx, false); else selectFolder(prev.idx, false);
+}
+
+let selectionToken = 0;
+
+async function selectIdentity(idx, recordHistory) {
+  if (recordHistory) pushHistory();
+  state.selected = { kind: 'identity', idx };
+  state.tableSort = { col: null, dir: 1 };
+  state.tableFilter = '';
+  setTab('identities');
+  const token = ++selectionToken;
+  // Usually resolves on the same tick (already loaded, or this identity has
+  // no access anywhere) -- the placeholder only actually shows for however
+  // long a genuinely new share chunk takes to fetch and register.
+  document.getElementById('content').innerHTML = '<div id="welcome">Loading\u2026</div>';
+  try {
+    await ensureSharesLoaded(DATA.identities[idx].shareKeys);
+  } catch (err) {
+    if (token !== selectionToken) return;
+    document.getElementById('content').innerHTML = `<div id="welcome">Could not load this identity's access data: ${esc(err.message)}</div>`;
+    return;
+  }
+  if (token !== selectionToken) return; // a newer selection superseded this one
+  renderIdentity(idx);
+}
+
+async function selectFolder(idx, recordHistory) {
+  if (recordHistory) pushHistory();
+  state.selected = { kind: 'folder', idx };
+  state.tableSort = { col: null, dir: 1 };
+  state.tableFilter = '';
+  setTab('folders');
+  const token = ++selectionToken;
+  document.getElementById('content').innerHTML = '<div id="welcome">Loading\u2026</div>';
+  try {
+    await ensureShareLoaded(DATA.folders[idx].share);
+  } catch (err) {
+    if (token !== selectionToken) return;
+    document.getElementById('content').innerHTML = `<div id="welcome">Could not load this folder's access data: ${esc(err.message)}</div>`;
+    return;
+  }
+  if (token !== selectionToken) return;
+  renderFolder(idx);
+}
+
+/* -------------------------------- Folder tree view --------------------------- */
+
+function lastPathSegment(path) {
+  const segs = path.split('\\').filter(Boolean);
+  return segs.length ? segs[segs.length - 1] : path;
+}
+
+function folderAccessCounts(folderIdx) {
+  // Splits a folder's access entries into "direct" (this row's own identity
+  // holds an ACE here that isn't itself an expanded group-membership row --
+  // covers both an ordinary direct grant AND a group's own listing) versus
+  // "via group" (a member shown here only because of a group ACE elsewhere
+  // in this same folder's list). Flattening both into one number is what
+  // made a group's members look like additional, separately-counted access
+  // rather than a breakdown of ONE grant -- see buildFolderAclRows, which
+  // uses this same split to nest members under their group instead.
+  const edgeIdxs = byFolder.get(folderIdx) || [];
+  let direct = 0, viaGroup = 0;
+  edgeIdxs.forEach(ei => { if (DATA.edges[ei][6] >= 0) viaGroup++; else direct++; });
+  return { direct, viaGroup, total: edgeIdxs.length };
+}
+
+function renderFolderNode(nodeId, level, maxAutoExpandDepth, onSelectFolder, selectedFolderIdx, expandBudget) {
+  // Builds one folder row plus a (possibly lazily-built) container for its
+  // children. Auto-expands up to maxAutoExpandDepth LEVELS deep (level 1 =
+  // this node itself, so maxAutoExpandDepth=1 means "just this folder, no
+  // children shown yet"); every subfolder's own children always branch from
+  // that subfolder specifically, never pooled with a sibling's. Beyond the
+  // auto-expand depth, anything with children can still be expanded manually
+  // by clicking its toggle, regardless of the depth setting.
+  //
+  // nodeId can be a REAL folder (>=0, an index into DATA.folders) or a
+  // VIRTUAL node (see ensureNode) standing in for a path segment the scan
+  // itself never recorded -- shown as a plain, unclickable structural label
+  // (no count, no broken badge, nothing to select) so the real folders on
+  // either side of the gap still nest correctly instead of each becoming
+  // their own disconnected root.
+  const isReal = nodeIsReal(nodeId);
+  const wrap = document.createElement('div');
+  wrap.className = 'treeNode';
+
+  const row = document.createElement('div');
+  row.className = 'treeRow' + (nodeId === selectedFolderIdx ? ' selected' : '') + (isReal ? '' : ' virtual');
+
+  const allChildren = folderChildren.get(nodeId) || [];
+  const hasChildren = allChildren.length > 0;
+
+  const toggle = document.createElement('span');
+  toggle.className = 'treeToggle';
+  toggle.textContent = '\u00a0\u00a0';
+  row.appendChild(toggle);
+
+  const label = document.createElement('span');
+  label.className = 'treeLabel';
+  label.textContent = nodeLabel(nodeId);
+  label.title = nodePath(nodeId);
+  row.appendChild(label);
+
+  if (isReal) {
+    const counts = folderAccessCounts(nodeId);
+    const countBadge = document.createElement('span');
+    countBadge.className = 'treeCount';
+    countBadge.textContent = counts.viaGroup > 0 ? `${counts.direct}+${counts.viaGroup}` : String(counts.direct);
+    countBadge.title = counts.viaGroup > 0
+      ? `${counts.direct} direct access ${counts.direct === 1 ? 'entry' : 'entries'}, plus ${counts.viaGroup} more via group membership`
+      : `${counts.direct} direct access ${counts.direct === 1 ? 'entry' : 'entries'} on this folder`;
+    row.appendChild(countBadge);
+
+    if (DATA.folders[nodeId].broken) {
+      const b = document.createElement('span');
+      b.className = 'badge broken';
+      b.textContent = 'broken';
+      b.title = 'Inheritance is broken here (explicit ACL, not inherited from parent)';
+      row.appendChild(b);
+    }
+    if (state.flagFilesBroken && DATA.folders[nodeId].filesBrokenInheritance) {
+      const fb = document.createElement('span');
+      fb.className = 'badge broken';
+      fb.textContent = 'files: broken';
+      fb.title = 'One or more files directly in this folder have broken inheritance';
+      row.appendChild(fb);
+    }
+    row.onclick = () => onSelectFolder(nodeId);
+  } else {
+    const note = document.createElement('span');
+    note.className = 'virtualNote';
+    note.textContent = 'not scanned';
+    note.title = 'This folder level wasn\u2019t recorded by the scan itself -- shown only to connect the real folders above and below it in the tree.';
+    row.appendChild(note);
+    row.onclick = () => { if (hasChildren) setExpanded(!expanded); };
+  }
+  wrap.appendChild(row);
+
+  const childHost = document.createElement('div');
+  childHost.className = 'treeChildren';
+  wrap.appendChild(childHost);
+
+  let expanded = false;
+  let built = false;
+
+  function buildChildren() {
+    if (built) return;
+    built = true;
+    // allChildren is stored sorted ascending (see buildFolderTree); reversing
+    // it here reflects the sidebar's own A-Z/Z-A toggle in the tree too,
+    // without needing to re-sort the underlying structure on every toggle.
+    const ordered = state.sortDir === -1 ? allChildren.slice().reverse() : allChildren;
+    const shown = ordered.slice(0, TREE_CHILD_CAP);
+    shown.forEach(childId => {
+      childHost.appendChild(renderFolderNode(childId, level + 1, maxAutoExpandDepth, onSelectFolder, selectedFolderIdx, expandBudget));
+    });
+    if (allChildren.length > TREE_CHILD_CAP) {
+      const more = document.createElement('div');
+      more.className = 'treeMore';
+      more.textContent = `+ ${allChildren.length - TREE_CHILD_CAP} more subfolder(s) not shown here -- select this folder to see everything in the table below.`;
+      childHost.appendChild(more);
+    }
+  }
+
+  function setExpanded(v) {
+    expanded = v;
+    if (expanded) buildChildren();
+    childHost.style.display = expanded ? 'block' : 'none';
+    if (hasChildren) toggle.textContent = expanded ? '\u25be' : '\u25b8';
+  }
+
+  if (hasChildren) {
+    toggle.classList.add('hasChildren');
+    toggle.onclick = (e) => { e.stopPropagation(); setExpanded(!expanded); };
+  }
+
+  const shouldAutoExpand = hasChildren && level < maxAutoExpandDepth && expandBudget.count < TREE_AUTO_EXPAND_CAP;
+  if (shouldAutoExpand) expandBudget.count++;
+  setExpanded(shouldAutoExpand);
+
+  return wrap;
+}
+
+function renderFolderTreeView(rootFolderIndices, onSelectFolder, selectedFolderIdx, onDepthChange) {
+  // rootFolderIndices: one root (folder-centered view) or several (identity-
+  // centered view -- every folder that identity directly accesses, each
+  // getting its own independent tree; nothing here ever reaches OUTSIDE those
+  // specific roots' own subfolder structure, so there is no path for an
+  // unrelated part of the tree to leak in the way a relationship-hop graph
+  // could -- see the depth toolbar's hint text for what depth means here).
+  const wrap = document.createElement('div');
+  wrap.className = 'treeWrap';
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'treeToolbar';
+  const depthLabel = document.createElement('span');
+  depthLabel.className = 'groupLabel';
+  depthLabel.textContent = 'Depth:';
+  toolbar.appendChild(depthLabel);
+  [1, 2, 3, 4, 5, 'Full'].forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'depthBtn' + ((d === 'Full' ? Infinity : d) === state.depth ? ' active' : '');
+    btn.textContent = String(d);
+    btn.onclick = () => { state.depth = (d === 'Full' ? Infinity : d); onDepthChange(); };
+    toolbar.appendChild(btn);
+  });
+  const hint = document.createElement('span');
+  hint.className = 'groupLabel';
+  hint.textContent = 'Depth = how many levels of subfolders to auto-expand \u00b7 each subfolder\'s own children branch from it, not a shared pool \u00b7 click the \u25b8 to expand/collapse manually \u00b7 click a folder name to select it';
+  toolbar.appendChild(hint);
+  wrap.appendChild(toolbar);
+
+  const maxAutoExpandDepth = state.depth === Infinity ? Infinity : state.depth;
+  const expandBudget = { count: 0 };
+  const treeHost = document.createElement('div');
+  treeHost.className = 'treeHost';
+  rootFolderIndices.forEach(rootIdx => {
+    treeHost.appendChild(renderFolderNode(rootIdx, 1, maxAutoExpandDepth, onSelectFolder, selectedFolderIdx, expandBudget));
+  });
+  wrap.appendChild(treeHost);
+
+  if (expandBudget.count >= TREE_AUTO_EXPAND_CAP) {
+    const note = document.createElement('div');
+    note.className = 'treeNote';
+    note.textContent = `This tree is large -- auto-expansion stopped after ${TREE_AUTO_EXPAND_CAP} folders to stay responsive. Anything still collapsed can be expanded manually by clicking its \u25b8, or reduce depth.`;
+    wrap.appendChild(note);
+  }
+
+  return wrap;
+}
+
+/* -------------------------------- Simple 1-hop graph -------------------------- */
+/* The picture view: center node plus its DIRECT relationships only (no
+   multi-hop traversal, so none of the earlier hub-explosion/unrelated-
+   relationship issues can recur here -- it always shows exactly what the
+   Tree tab's root row plus the table below it already shows, just as a
+   visual instead of a list). Purely a rendering choice alongside the Tree
+   tab; both read from the same underlying edges. */
+
+function svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  if (attrs) Object.keys(attrs).forEach(k => el.setAttribute(k, attrs[k]));
+  return el;
+}
+
+function bestEdgeScore(edgeInfo) {
+  let best = -1;
+  edgeInfo.edges.forEach(d => {
+    const s = d.type === 'membership' ? 40 : ((d.e[3] ? 0 : 1000) + RIGHTS_WEIGHT[d.e[2]]);
+    if (s > best) best = s;
+  });
+  return best;
+}
+
+function isExpandable(key, isCenter) {
+  // Gates what a node reveals when the BFS steps OUT of it (not whether it
+  // appears at all). The center is always fully expanded. Beyond that:
+  //   - Folders: always fully expandable.
+  //   - Unresolved / Well-known, not centered: 'none' -- frequent accidental
+  //     hubs (a stale SID on hundreds of ACLs, a default group on nearly
+  //     everything) with little signal once you know what they are.
+  //   - Groups, not centered: 'membershipOnly' -- reveal other members, not
+  //     the group's own reach into unrelated folders.
+  //   - Users, not centered: 'full' UNLESS their total fan-out (degree)
+  //     exceeds HUB_DEGREE_THRESHOLD, in which case 'membershipOnly' too --
+  //     an admin/service account with a huge footprint is just as much a
+  //     hub as a broadly-permissioned group.
+  if (isCenter) return 'full';
+  if (key[0] === 'f') return 'full';
+  const idx = parseInt(key.slice(2), 10);
+  const idn = DATA.identities[idx];
+  if (idn.type === 'Unresolved' || idn.type === 'Well-known / Local') return 'none';
+  if (idn.type === 'Group') return 'membershipOnly';
+  // edgeCount is precomputed server-side across the WHOLE dataset (not just
+  // shares loaded so far) -- using byIdentity's size here instead would
+  // under-count a hub identity until every one of its shares happened to
+  // already be loaded, letting a real hub slip through as 'full'.
+  const degree = idn.edgeCount || 0;
+  if (degree > HUB_DEGREE_THRESHOLD) return 'membershipOnly';
+  return 'full';
+}
+
+async function buildEgoGraph(centerKey, depth, cap, perSourceCap) {
+  const visited = new Map();
+  visited.set(centerKey, { hop: 0, from: null });
+  let frontier = [centerKey];
+  const layers = [[centerKey]];
+  let truncated = false;
+
+  for (let hop = 1; hop <= depth && visited.size < cap; hop++) {
+    const candidates = [];
+    for (const fKey of frontier) {
+      const mode = isExpandable(fKey, fKey === centerKey);
+      if (mode === 'none') continue;
+      // A folder's own share is always already loaded by the time it can
+      // appear here (it was only ever discovered via an edge that came from
+      // a loaded chunk). An identity being expanded 'full' reveals its own
+      // access edges too, which may live in shares not loaded yet -- load
+      // them now. 'membershipOnly' only needs membership links, which are
+      // global/eager (see precompute()), so nothing to load for that case.
+      if (mode === 'full' && fKey[0] === 'i') {
+        const idx = parseInt(fKey.slice(2), 10);
+        await ensureSharesLoaded(DATA.identities[idx].shareKeys);
+      }
+      const nbrs = adjacency.get(fKey) || new Map();
+      const fromThisSource = [];
+      nbrs.forEach((edgeInfo, nKey) => {
+        if (visited.has(nKey)) return;
+        if (mode === 'membershipOnly' && !edgeInfo.edges.some(d => d.type === 'membership')) return;
+        fromThisSource.push({ nKey, fromKey: fKey, edgeInfo, score: bestEdgeScore(edgeInfo) });
+      });
+      fromThisSource.sort((a, b) => b.score - a.score);
+      if (fromThisSource.length > perSourceCap) truncated = true;
+      candidates.push(...fromThisSource.slice(0, perSourceCap));
+    }
+    const bestByKey = new Map();
+    candidates.forEach(c => {
+      const existing = bestByKey.get(c.nKey);
+      if (!existing || c.score > existing.score) bestByKey.set(c.nKey, c);
+    });
+    let sorted = Array.from(bestByKey.values()).sort((a, b) => b.score - a.score);
+    const budget = cap - visited.size;
+    if (sorted.length > budget) truncated = true;
+    sorted = sorted.slice(0, Math.max(0, budget));
+    const nextFrontier = [];
+    sorted.forEach(c => {
+      visited.set(c.nKey, { hop, from: c.fromKey, edgeInfo: c.edgeInfo });
+      nextFrontier.push(c.nKey);
+    });
+    layers.push(nextFrontier);
+    frontier = nextFrontier;
+    if (nextFrontier.length === 0) break;
+  }
+  return { visited, layers, truncated };
+}
+
+function layoutRadial(layers, visited) {
+  // Concentric rings by hop distance; within a ring, nodes are angularly
+  // clustered near their parent's angle so related nodes stay visually
+  // grouped instead of scattering randomly.
+  const positions = new Map();
+  positions.set(layers[0][0], { x: 0, y: 0, angle: 0 });
+  for (let hop = 1; hop < layers.length; hop++) {
+    const nodesThisHop = layers[hop];
+    if (nodesThisHop.length === 0) continue;
+    const byParent = new Map();
+    nodesThisHop.forEach(k => {
+      const p = visited.get(k).from;
+      if (!byParent.has(p)) byParent.set(p, []);
+      byParent.get(p).push(k);
+    });
+    const parentKeys = Array.from(byParent.keys()).sort((a, b) =>
+      (positions.get(a) ? positions.get(a).angle : 0) - (positions.get(b) ? positions.get(b).angle : 0));
+    const total = nodesThisHop.length;
+    parentKeys.forEach(p => {
+      const kids = byParent.get(p);
+      const parentAngle = positions.get(p) ? positions.get(p).angle : 0;
+      const arcWidth = (kids.length / total) * 2 * Math.PI;
+      const startAngle = parentAngle - arcWidth / 2;
+      kids.forEach((k, i) => {
+        const angle = kids.length === 1 ? parentAngle : startAngle + (arcWidth * (i + 0.5) / kids.length);
+        positions.set(k, { angle, x: 0, y: 0 });
+      });
+    });
+  }
+  layers.forEach((nodesThisHop, hop) => {
+    const radius = hop * RING_SPACING;
+    nodesThisHop.forEach(k => {
+      const pos = positions.get(k);
+      pos.x = radius * Math.cos(pos.angle - Math.PI / 2);
+      pos.y = radius * Math.sin(pos.angle - Math.PI / 2);
+    });
+  });
+  return positions;
+}
+
+function nodeDisplayInfo(key) {
+  const kind = key[0], idx = parseInt(key.slice(2), 10);
+  if (kind === 'f') {
+    const f = DATA.folders[idx];
+    return { label: lastPathSegment(f.path), full: f.path, color: effectiveThemeIsLight() ? '#0d7373' : '#57d3d3', flagged: f.broken };
+  }
+  const idn = DATA.identities[idx];
+  return { label: idn.name, full: idn.name, color: getTypeColors()[idn.type] || (effectiveThemeIsLight() ? '#4a5568' : '#7d8a99'), flagged: idn.flagDisabled || idn.flagDormant || idn.flagLocked };
+}
+
+function edgeDisplayInfo(edgeInfo) {
+  let best = null, bestScore = -1;
+  edgeInfo.edges.forEach(d => {
+    const s = d.type === 'membership' ? 40 : ((d.e[3] ? 0 : 1000) + RIGHTS_WEIGHT[d.e[2]]);
+    if (s > bestScore) { bestScore = s; best = d; }
+  });
+  if (best.type === 'membership') return { label: 'Member of', color: effectiveThemeIsLight() ? '#7c3aed' : '#c084fc', dashed: true };
+  const e = best.e;
+  let label = RIGHTS_LABELS[e[2]];
+  if (e[5]) label = 'Deny ' + label;
+  return { label, color: getEdgeColors()[e[2]], dashed: !!e[3] };
+}
+
+let graphRenderToken = 0;
+
+function renderRelationshipGraph(kind, idx, onNavigate, onDepthChange) {
+  // Returns a placeholder synchronously (so the caller can appendChild it
+  // right away, same as before) and swaps in the real graph once this
+  // node's own share(s) -- and anything the BFS expands into -- are loaded.
+  const holder = document.createElement('div');
+  holder.className = 'graphWrap';
+  const note = document.createElement('div');
+  note.className = 'graphNote';
+  note.textContent = 'Loading relationship data\u2026';
+  holder.appendChild(note);
+
+  const centerKey = (kind === 'folder' ? 'f:' : 'i:') + idx;
+  const depth = state.graphDepth === Infinity ? 999 : state.graphDepth;
+  const token = ++graphRenderToken;
+
+  (async () => {
+    try {
+      if (kind === 'folder') await ensureShareLoaded(DATA.folders[idx].share);
+      else await ensureSharesLoaded(DATA.identities[idx].shareKeys);
+      const g = await buildEgoGraph(centerKey, depth, GRAPH_NODE_CAP, MAX_EDGES_PER_NODE);
+      if (token !== graphRenderToken) return; // a newer selection superseded this one
+      const positions = layoutRadial(g.layers, g.visited);
+      const built = renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDepthChange);
+      holder.replaceWith(built);
+    } catch (err) {
+      if (token !== graphRenderToken) return;
+      note.textContent = 'Could not load relationship data: ' + err.message;
+    }
+  })();
+
+  return holder;
+}
+
+function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDepthChange) {
+  const wrap = document.createElement('div');
+  wrap.className = 'graphWrap';
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'graphToolbar';
+  const depthLabel = document.createElement('span');
+  depthLabel.className = 'groupLabel';
+  depthLabel.textContent = 'Depth:';
+  toolbar.appendChild(depthLabel);
+  [1, 2, 3, 4, 5, 'Full'].forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'depthBtn' + ((d === 'Full' ? Infinity : d) === state.graphDepth ? ' active' : '');
+    btn.textContent = String(d);
+    btn.onclick = () => { state.graphDepth = (d === 'Full' ? Infinity : d); onDepthChange(); };
+    toolbar.appendChild(btn);
+  });
+  const btnOut = document.createElement('button'); btnOut.className = 'zoomBtn'; btnOut.textContent = '\u2212'; btnOut.title = 'Zoom out';
+  const btnIn = document.createElement('button'); btnIn.className = 'zoomBtn'; btnIn.textContent = '+'; btnIn.title = 'Zoom in';
+  const btnReset = document.createElement('button'); btnReset.className = 'zoomBtn'; btnReset.textContent = '\u2317'; btnReset.title = 'Reset view';
+  toolbar.appendChild(btnOut); toolbar.appendChild(btnIn); toolbar.appendChild(btnReset);
+  const hint = document.createElement('span');
+  hint.className = 'groupLabel';
+  hint.textContent = 'Depth = relationship hops from center \u00b7 groups/well-known/high-fan-out accounts show only direct reach unless centered \u00b7 scroll to zoom \u00b7 drag background to pan \u00b7 drag a node to move it \u00b7 click a node to follow it';
+  toolbar.appendChild(hint);
+  wrap.appendChild(toolbar);
+
+  const legendToggle = document.createElement('button');
+  legendToggle.className = 'graphLegendToggle';
+  legendToggle.textContent = 'i';
+  legendToggle.title = 'Show legend';
+  wrap.appendChild(legendToggle);
+
+  const legendPanel = document.createElement('div');
+  legendPanel.className = 'graphLegendPanel';
+  legendPanel.style.display = 'none';
+  function legendSection(title, rows) {
+    const h = document.createElement('h4');
+    h.textContent = title;
+    legendPanel.appendChild(h);
+    rows.forEach(row => legendPanel.appendChild(row));
+  }
+  function swatchRow(color, label) {
+    const row = document.createElement('div');
+    row.className = 'graphLegendRow';
+    const sw = document.createElement('span');
+    sw.className = 'graphLegendSwatch';
+    sw.style.background = color;
+    row.appendChild(sw);
+    const lbl = document.createElement('span');
+    lbl.textContent = label;
+    row.appendChild(lbl);
+    return row;
+  }
+  function lineRow(color, label, dashed) {
+    const row = document.createElement('div');
+    row.className = 'graphLegendRow';
+    const ln = document.createElement('span');
+    ln.className = 'graphLegendLine' + (dashed ? ' dashed' : '');
+    ln.style.borderTopColor = color;
+    row.appendChild(ln);
+    const lbl = document.createElement('span');
+    lbl.textContent = label;
+    row.appendChild(lbl);
+    return row;
+  }
+  legendSection('Nodes', [
+    swatchRow(effectiveThemeIsLight() ? '#b8720a' : '#ffb454', 'Center (current selection)'),
+    swatchRow(effectiveThemeIsLight() ? '#0d7373' : '#57d3d3', 'Folder'),
+    swatchRow(getTypeColors().User, 'User'),
+    swatchRow(getTypeColors().Group, 'Group'),
+    swatchRow(getTypeColors().Computer, 'Computer'),
+    swatchRow(getTypeColors()['Well-known / Local'], 'Well-known / Local / Unresolved')
+  ]);
+  const flagRow = document.createElement('div');
+  flagRow.className = 'graphLegendRow';
+  const dot = document.createElement('span');
+  dot.className = 'graphLegendDot';
+  flagRow.appendChild(dot);
+  const flagLbl = document.createElement('span');
+  flagLbl.textContent = 'Broken inheritance (folder) / disabled, locked, or dormant (identity)';
+  flagRow.appendChild(flagLbl);
+  legendPanel.appendChild(flagRow);
+  legendSection('Access rights', RIGHTS_LABELS.map((label, i) => swatchRow(getEdgeColors()[i], label)));
+  legendSection('Lines', [
+    lineRow(effectiveThemeIsLight() ? '#4a5568' : '#7d8a99', 'Solid = explicit access', false),
+    lineRow(effectiveThemeIsLight() ? '#4a5568' : '#7d8a99', 'Dashed = inherited access', true),
+    lineRow(effectiveThemeIsLight() ? '#7c3aed' : '#c084fc', 'Dashed = group membership', true)
+  ]);
+  wrap.appendChild(legendPanel);
+  legendToggle.onclick = () => {
+    const showing = legendPanel.style.display !== 'none';
+    legendPanel.style.display = showing ? 'none' : 'block';
+    legendToggle.title = showing ? 'Show legend' : 'Hide legend';
+  };
+
+  let maxAbs = 60;
+  positions.forEach(p => { maxAbs = Math.max(maxAbs, Math.abs(p.x), Math.abs(p.y)); });
+  const half = maxAbs + 140;
+  const vbW = half * 2, vbH = vbW * (520 / 900);
+  const vb = { x: -vbW / 2, y: -vbH / 2, w: vbW, h: vbH };
+
+  const svg = svgEl('svg', { class: 'graph', viewBox: `${vb.x} ${vb.y} ${vb.w} ${vb.h}`, xmlns: 'http://www.w3.org/2000/svg' });
+  const edgesLayer = svgEl('g', {});
+  const nodesLayer = svgEl('g', {});
+  svg.appendChild(edgesLayer);
+  svg.appendChild(nodesLayer);
+  wrap.appendChild(svg);
+
+  const linesByNode = new Map();
+  function trackLine(key, el, xAttr, yAttr) {
+    if (!linesByNode.has(key)) linesByNode.set(key, []);
+    linesByNode.get(key).push({ el, xAttr, yAttr });
+  }
+
+  const allKeys = [].concat(...g.layers);
+  g.layers.forEach((layerKeys, hop) => {
+    if (hop === 0) return;
+    layerKeys.forEach(key => {
+      const info = g.visited.get(key);
+      const parentPos = positions.get(info.from);
+      const pos = positions.get(key);
+      const edisp = edgeDisplayInfo(info.edgeInfo);
+      const line = svgEl('line', {
+        x1: parentPos.x, y1: parentPos.y, x2: pos.x, y2: pos.y,
+        stroke: edisp.color, 'stroke-width': edisp.dashed ? 1.5 : 3,
+        'stroke-dasharray': edisp.dashed ? '5,4' : 'none', opacity: 0.85
+      });
+      edgesLayer.appendChild(line);
+      trackLine(info.from, line, 'x1', 'y1');
+      trackLine(key, line, 'x2', 'y2');
+      const midx = (parentPos.x + pos.x) / 2, midy = (parentPos.y + pos.y) / 2;
+      const lbl = svgEl('text', { class: 'edgeLabel', x: midx, y: midy, 'text-anchor': 'middle' });
+      lbl.textContent = edisp.label;
+      edgesLayer.appendChild(lbl);
+    });
+  });
+
+  function buildNode(key, pos, isCenter) {
+    const info = nodeDisplayInfo(key);
+    const r = isCenter ? 26 : 17;
+    const group = svgEl('g', { class: 'nodeGroup', transform: `translate(${pos.x},${pos.y})`, 'data-key': key });
+    group.appendChild(svgEl('circle', { class: 'nodeCircle' + (isCenter ? ' centerCircle' : ''), r, fill: isCenter ? undefined : info.color }));
+    if (info.flagged && !isCenter) {
+      group.appendChild(svgEl('circle', { cx: r * 0.7, cy: -r * 0.7, r: 5, fill: effectiveThemeIsLight() ? '#b8720a' : '#ffb454', stroke: '#000', 'stroke-width': 0.5, class: 'flagRing' }));
+    }
+    const nameLbl = svgEl('text', { class: 'nodeLabel', x: 0, y: r + 16, 'text-anchor': 'middle' });
+    nameLbl.textContent = truncateLabel(info.label, 22);
+    group.appendChild(nameLbl);
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    title.textContent = info.full;
+    group.appendChild(title);
+    nodesLayer.appendChild(group);
+    return group;
+  }
+
+  function attachDragHandlers(group, key, pos, isCenter) {
+    let dragging = false, moved = false, startClientX = 0, startClientY = 0, startX = pos.x, startY = pos.y;
+    function clientToSvgScale() {
+      const rect = svg.getBoundingClientRect ? svg.getBoundingClientRect() : null;
+      const vbNow = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal : vb;
+      const clientW = (rect && rect.width) ? rect.width : 900;
+      const clientH = (rect && rect.height) ? rect.height : 520;
+      return { sx: vbNow.width / clientW, sy: vbNow.height / clientH };
+    }
+    function onMouseMove(e) {
+      if (!dragging) return;
+      const scale = clientToSvgScale();
+      const dx = (e.clientX - startClientX) * scale.sx;
+      const dy = (e.clientY - startClientY) * scale.sy;
+      if (Math.abs(e.clientX - startClientX) > 2 || Math.abs(e.clientY - startClientY) > 2) moved = true;
+      const nx = startX + dx, ny = startY + dy;
+      group.setAttribute('transform', `translate(${nx},${ny})`);
+      pos.x = nx; pos.y = ny;
+      (linesByNode.get(key) || []).forEach(l => {
+        l.el.setAttribute(l.xAttr, nx);
+        l.el.setAttribute(l.yAttr, ny);
+      });
+    }
+    function onMouseUp() {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      dragging = false;
+      // The center is already the current selection -- dragging it around is
+      // still useful (decluttering a busy graph), but clicking it to
+      // "navigate to itself" would be a no-op at best, so only non-center
+      // nodes trigger navigation on a genuine (non-drag) click.
+      if (!moved && !isCenter) onNavigate(key);
+    }
+    group.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      dragging = true; moved = false;
+      startClientX = e.clientX; startClientY = e.clientY;
+      startX = pos.x; startY = pos.y;
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+  }
+
+  const centerGroup = buildNode(centerKey, positions.get(centerKey), true);
+  attachDragHandlers(centerGroup, centerKey, positions.get(centerKey), true);
+
+  allKeys.forEach(key => {
+    if (key === centerKey) return;
+    const pos = positions.get(key);
+    const group = buildNode(key, pos, false);
+    attachDragHandlers(group, key, pos, false);
+  });
+
+  let panning = false, panStartClientX = 0, panStartClientY = 0, panStartVb = null;
+  svg.addEventListener('mousedown', (e) => {
+    if (e.target !== svg) return;
+    panning = true;
+    panStartClientX = e.clientX; panStartClientY = e.clientY;
+    const cur = svg.getAttribute('viewBox').split(' ').map(Number);
+    panStartVb = { x: cur[0], y: cur[1], w: cur[2], h: cur[3] };
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!panning) return;
+    const rect = svg.getBoundingClientRect ? svg.getBoundingClientRect() : null;
+    const clientW = (rect && rect.width) ? rect.width : 900;
+    const clientH = (rect && rect.height) ? rect.height : 520;
+    const dx = (e.clientX - panStartClientX) * (panStartVb.w / clientW);
+    const dy = (e.clientY - panStartClientY) * (panStartVb.h / clientH);
+    svg.setAttribute('viewBox', `${panStartVb.x - dx} ${panStartVb.y - dy} ${panStartVb.w} ${panStartVb.h}`);
+  });
+  document.addEventListener('mouseup', () => { panning = false; });
+
+  const MIN_W = 200, MAX_W = 6000;
+  function zoomBy(factor, clientX, clientY) {
+    const cur = svg.getAttribute('viewBox').split(' ').map(Number);
+    let [x, y, w, h] = cur;
+    const newW = Math.min(MAX_W, Math.max(MIN_W, w * factor));
+    const ratio = newW / w;
+    const newH = h * ratio;
+    let anchorX = x + w / 2, anchorY = y + h / 2;
+    if (clientX !== undefined) {
+      const rect = svg.getBoundingClientRect ? svg.getBoundingClientRect() : null;
+      if (rect && rect.width) {
+        anchorX = x + (clientX - rect.left) * (w / rect.width);
+        anchorY = y + (clientY - rect.top) * (h / rect.height);
+      }
+    }
+    const newX = anchorX - (anchorX - x) * ratio;
+    const newY = anchorY - (anchorY - y) * ratio;
+    svg.setAttribute('viewBox', `${newX} ${newY} ${newW} ${newH}`);
+  }
+  svg.addEventListener('wheel', (e) => { e.preventDefault(); zoomBy(e.deltaY > 0 ? 1.15 : (1 / 1.15), e.clientX, e.clientY); }, { passive: false });
+  btnIn.onclick = () => zoomBy(1 / 1.3);
+  btnOut.onclick = () => zoomBy(1.3);
+  btnReset.onclick = () => svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+
+  if (g.truncated) {
+    const note = document.createElement('div');
+    note.className = 'graphNote';
+    note.textContent = `Some connections at this depth were too numerous to draw (kept the ${MAX_EDGES_PER_NODE} most notable per node, and ${GRAPH_NODE_CAP} nodes overall). Reduce depth, or use the table below for the complete, uncapped list of the CENTER's own direct relationships.`;
+    wrap.appendChild(note);
+  }
+
+  return wrap;
+}
+
+function renderDetailTabs(onTabChange) {
+  const bar = document.createElement('div');
+  bar.className = 'detailTabs';
+  [['tree', 'Tree'], ['graph', 'Graph']].forEach(([tab, label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'detailTabBtn' + (state.detailTab === tab ? ' active' : '');
+    btn.textContent = label;
+    btn.onclick = () => { state.detailTab = tab; onTabChange(); };
+    bar.appendChild(btn);
+  });
+  return bar;
+}
+
+function renderTable(rows, columns, opts) {
+  // columns: [{ key, label, get(row), sortable }]
+  // The filter <input> (and the table/toolbar shells) are created exactly ONCE
+  // here and never torn down again for the lifetime of this table -- typing a
+  // character calls update() below, which only touches the header cells, the
+  // tbody rows, and the export button's row count. Rebuilding the whole
+  // container (including the input itself) on every keystroke was the earlier
+  // approach, and it silently stole focus after each character since the
+  // browser can't keep focus on an element that no longer exists.
+  const container = document.createElement('div');
+  container.className = 'tableWrap';
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'tableToolbar';
+  const filterInput = document.createElement('input');
+  filterInput.placeholder = 'Filter this table...';
+  filterInput.value = state.tableFilter;
+  toolbar.appendChild(filterInput);
+  const exportBtn = document.createElement('button');
+  toolbar.appendChild(exportBtn);
+  container.appendChild(toolbar);
+
+  const tableBody = document.createElement('div');
+  tableBody.className = 'tableBody';
+  container.appendChild(tableBody);
+
+  const table = document.createElement('table');
+  table.className = 'datatable';
+  const thead = document.createElement('thead');
+  const trh = document.createElement('tr');
+  thead.appendChild(trh);
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  table.appendChild(tbody);
+  tableBody.appendChild(table);
+
+  const note = document.createElement('div');
+  note.className = 'graphNote';
+  tableBody.appendChild(note);
+
+  function computeFilteredSorted() {
+    let filtered = rows;
+    const q = state.tableFilter.trim().toLowerCase();
+    if (q) {
+      filtered = rows.filter(r => columns.some(c => String(c.get(r) || '').toLowerCase().includes(q)));
+    }
+    if (state.tableSort.col) {
+      const col = columns.find(c => c.key === state.tableSort.col);
+      if (col) {
+        filtered = filtered.slice().sort((a, b) => {
+          const va = col.get(a), vb = col.get(b);
+          if (va < vb) return -1 * state.tableSort.dir;
+          if (va > vb) return 1 * state.tableSort.dir;
+          return 0;
+        });
+      }
+    }
+    return filtered;
+  }
+
+  const RENDER_LIMIT = 2000;
+
+  function update() {
+    const filtered = computeFilteredSorted();
+
+    trh.innerHTML = '';
+    columns.forEach(c => {
+      const th = document.createElement('th');
+      let arrow = '';
+      if (state.tableSort.col === c.key) arrow = state.tableSort.dir === 1 ? ' \u25b2' : ' \u25bc';
+      th.textContent = c.label + arrow;
+      th.onclick = () => {
+        if (state.tableSort.col === c.key) state.tableSort.dir *= -1;
+        else state.tableSort = { col: c.key, dir: 1 };
+        update();
+      };
+      trh.appendChild(th);
+    });
+
+    tbody.innerHTML = '';
+    filtered.slice(0, RENDER_LIMIT).forEach(r => {
+      const tr = document.createElement('tr');
+      if (opts.onRowClick) { tr.className = 'rowclick'; tr.onclick = () => opts.onRowClick(r); }
+      columns.forEach(c => {
+        const td = document.createElement('td');
+        if (c.html) td.innerHTML = c.html(r); else td.textContent = c.get(r);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    exportBtn.textContent = `Export ${filtered.length} row(s) as CSV`;
+    exportBtn.onclick = () => downloadCsv(opts.filename, filtered, columns.map(c => ({ label: c.label, get: c.get })));
+
+    note.textContent = filtered.length > RENDER_LIMIT
+      ? `Showing first ${RENDER_LIMIT} of ${filtered.length} filtered rows. Narrow the filter, or use Export to get all of them.`
+      : '';
+  }
+
+  filterInput.oninput = (e) => { state.tableFilter = e.target.value; update(); };
+
+  update();
+  return container;
+}
+
+/* ------------------------------- Identity view ------------------------------ */
+
+function identityInfoCard(idn) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  const flags = [];
+  if (idn.flagDisabled) flags.push('<span class="badge disabled">Disabled</span>');
+  if (idn.flagLocked) flags.push('<span class="badge locked">Locked out</span>');
+  if (idn.flagDormant) flags.push('<span class="badge dormant">No logon in ' + DORMANT_DAYS + '+ days</span>');
+  const field = (label, val) => val ? `<span class="field"><b>${esc(label)}:</b> ${esc(val)}</span>` : '';
+  div.innerHTML =
+    `<h2>${esc(idn.name || '(unknown)')} <span style="font-weight:400;color:var(--muted);font-size:12px;">${esc(idn.type||'')}</span> ${flags.join(' ')}</h2>` +
+    field('Title', idn.title) + field('Department', idn.dept) + field('Manager', idn.manager) +
+    field('Email', idn.email) + field('Last logon (approx.)', idn.lastLogon) +
+    field('Last modified (AD)', idn.changed) + field('Password last set', idn.pwdSet) +
+    field('Account expires', idn.expires) + field('Created', idn.created) +
+    field('Group scope', idn.groupScope) + field('Direct member count', idn.memberCount) + field('Managed by', idn.managedBy) +
+    field('Notes', idn.notes) + field('SID', idn.sid);
+  return div;
+}
+
+function renderIdentity(idx) {
+  const idn = DATA.identities[idx];
+  const content = document.getElementById('content');
+  content.classList.add('content-split');
+  content.innerHTML = '';
+  content.appendChild(identityInfoCard(idn));
+
+  const edgeIdxs = byIdentity.get(idx) || [];
+  const allRows = edgeIdxs.map(ei => ({ ei, e: DATA.edges[ei] }));
+
+  content.appendChild(renderDetailTabs(() => renderIdentity(idx)));
+
+  let topContent;
+  if (state.detailTab === 'graph') {
+    topContent = renderRelationshipGraph('identity', idx, (key) => {
+      const kind = key[0], kidx = parseInt(key.slice(2), 10);
+      if (kind === 'f') selectFolder(kidx, true); else selectIdentity(kidx, true);
+    }, () => renderIdentity(idx));
+  } else {
+    // Every distinct folder this identity directly accesses becomes its OWN tree
+    // root -- each expands into its own subfolder structure independently, with
+    // no relationship-hop traversal through other identities/groups at all, so
+    // there's no way for something outside this identity's own access to appear.
+    // computeTopmostRoots collapses a folder-and-several-of-its-own-descendants
+    // (common with inherited ACEs recorded per-folder) down to just the topmost
+    // one per branch, so a subfolder never shows up as a duplicate second root.
+    const allAccessedFolders = Array.from(new Set(allRows.map(r => r.e[0])));
+    const rootFolderIndices = computeTopmostRoots(allAccessedFolders)
+      .sort((a, b) => state.sortDir * cmpText(DATA.folders[a].path, DATA.folders[b].path));
+
+    topContent = renderFolderTreeView(
+      rootFolderIndices,
+      (folderIdx) => selectFolder(folderIdx, true),
+      null, // no single "selected" folder highlight makes sense from an identity view with multiple roots
+      () => renderIdentity(idx)
+    );
+  }
+
+  const columns = [
+    { key: 'path', label: 'Path', get: r => DATA.folders[r.e[0]].path },
+    { key: 'rights', label: 'Rights', get: r => RIGHTS_LABELS[r.e[2]] },
+    { key: 'inherited', label: 'Inherited', get: r => r.e[3] ? 'Yes' : 'No' },
+    { key: 'broken', label: 'Broken inheritance here', get: r => r.e[4] ? 'Yes' : 'No' },
+    { key: 'deny', label: 'Deny', get: r => r.e[5] ? 'Yes' : 'No' },
+    { key: 'via', label: 'Granted via group', get: r => r.e[6] >= 0 ? DATA.identities[r.e[6]].name : '' }
+  ];
+  const bottomContent = renderTable(allRows, columns, {
+    filename: `access_${(idn.name||'identity').replace(/[^a-z0-9]+/gi,'_')}.csv`,
+    onRowClick: (r) => selectFolder(r.e[0], true)
+  });
+
+  content.appendChild(makeResizableSplitPanes(topContent, bottomContent, 'accessMapIdentityPaneRatio', 0.55));
+  updateUrlHash();
+}
+
+/* -------------------------------- Folder view -------------------------------- */
+
+function folderInfoCard(f) {
+  const div = document.createElement('div');
+  div.className = 'card';
+
+  // A clickable breadcrumb instead of a flat path string, so a deeply nested
+  // folder can jump straight back to any ancestor without going through the
+  // sidebar or the tree -- each segment navigates to that exact folder if
+  // it's one the scan actually recorded (a virtual, "not scanned" ancestor
+  // -- see ensureNode -- has nothing to navigate to, so it's shown plain).
+  //
+  // Walks the ORIGINAL path string's own backslash positions rather than
+  // re-splitting into segments and re-joining with a hardcoded "\\" prefix
+  // -- that assumption only holds for UNC-style (\\server\share\...) paths,
+  // and silently made every ancestor segment unclickable for any other
+  // path convention (a local C:\... root, for instance), since the
+  // reconstructed prefix would never match how the path was actually
+  // stored.
+  const crumbWrap = document.createElement('div');
+  crumbWrap.className = 'breadcrumb';
+  const path = f.path;
+  const isUnc = path.startsWith('\\\\');
+  const segments = []; // [text, endIndexInPath]
+  let start = 0;
+  for (let i = 0; i <= path.length; i++) {
+    if (i === path.length || path[i] === '\\') {
+      if (i > start) segments.push([path.substring(start, i), i]);
+      start = i + 1;
+    }
+  }
+
+  segments.forEach(([seg, endIdx], i) => {
+    const isLast = i === segments.length - 1;
+    const span = document.createElement('span');
+    span.textContent = seg;
+    if (i === 0 && isUnc) {
+      // The server name alone (\\server, no share) was never a node in our
+      // data to begin with -- nothing to navigate to.
+      span.className = 'crumbPlain';
+    } else if (isLast) {
+      span.className = 'crumbCurrent';
+    } else {
+      const nodeId = folderPathToIdx.get(path.substring(0, endIdx));
+      if (nodeId !== undefined && nodeIsReal(nodeId)) {
+        span.className = 'crumbLink';
+        span.onclick = () => selectFolder(nodeId, true);
+      } else {
+        span.className = 'crumbPlain';
+      }
+    }
+    crumbWrap.appendChild(span);
+    if (!isLast) {
+      const sep = document.createElement('span');
+      sep.className = 'crumbSep';
+      sep.textContent = '\u203a';
+      crumbWrap.appendChild(sep);
+    }
+  });
+  div.appendChild(crumbWrap);
+
+  if (f.broken) {
+    const badge = document.createElement('span');
+    badge.className = 'badge broken';
+    badge.textContent = 'Inheritance broken here';
+    div.appendChild(badge);
+  }
+
+  // Created/Modified/Accessed are optional -- only present if the scan that
+  // produced this report captured them (Invoke-NTFSPermissionAudit.ps1
+  // 0.5.5+; see the Summary page for whether THIS scan did). Shown the same
+  // way an identity's own AD timestamps are shown on its own card -- a
+  // blank/absent field just doesn't render, no special casing needed.
+  if (DATA.hasFileMetadata) {
+    const field = (label, val) => val ? `<span class="field"><b>${esc(label)}:</b> ${esc(fmtDate(val))}</span>` : '';
+    const metaHtml = field('Created', f.created) + field('Last modified', f.modified) + field('Last accessed', f.accessed);
+    if (metaHtml) {
+      const metaWrap = document.createElement('div');
+      metaWrap.className = 'folderMetaRow';
+      metaWrap.innerHTML = metaHtml;
+      div.appendChild(metaWrap);
+    }
+  }
+  // fileCount/filesBrokenInheritance are per-folder and only present at all
+  // when this folder actually had at least one File row under -IncludeFiles
+  // (see DATA.hasFileCounts and Get-OrAdd-Folder's own comment on why this
+  // is absence, not a 0/false value, for a folder that was never touched by
+  // one) -- shown here unconditionally, since this IS that folder's own
+  // page; the tree/list views gate the broken-files badge behind a toggle
+  // instead, since space there is much more constrained.
+  if (DATA.hasFileCounts && f.fileCount !== undefined) {
+    const fileMetaWrap = document.createElement('div');
+    fileMetaWrap.className = 'folderMetaRow';
+    fileMetaWrap.innerHTML = `<span class="field"><b>Files in this folder:</b> ${f.fileCount}</span>`;
+    if (f.filesBrokenInheritance) {
+      const fbadge = document.createElement('span');
+      fbadge.className = 'badge broken';
+      fbadge.textContent = 'File(s) with broken inheritance';
+      fileMetaWrap.appendChild(fbadge);
+    }
+    div.appendChild(fileMetaWrap);
+  }
+  return div;
+}
+
+function buildFolderAclGroups(folderIdx) {
+  // Splits a folder's access entries into direct rows (e[6] === -1: an
+  // ordinary direct grant, OR a group's own listing) and via-group rows
+  // (e[6] >= 0: a member shown here only because of that group's grant).
+  // A direct row for a Group identity absorbs its own via-group rows as
+  // nested children instead of leaving them as separate top-level rows --
+  // that flattening (group AND every member listed side by side) is what
+  // made a single group grant look like several additional, separately-
+  // counted identities with access.
+  const edgeIdxs = byFolder.get(folderIdx) || [];
+  const byVia = new Map(); // groupIdx -> [ei,...], consumed as each group's row is built
+  const directEis = [];
+  edgeIdxs.forEach(ei => {
+    const via = DATA.edges[ei][6];
+    if (via >= 0) {
+      if (!byVia.has(via)) byVia.set(via, []);
+      byVia.get(via).push(ei);
+    } else {
+      directEis.push(ei);
+    }
+  });
+  const rows = [];
+  directEis.forEach(ei => {
+    const e = DATA.edges[ei];
+    const identIdx = e[1];
+    const idn = DATA.identities[identIdx];
+    let children = null;
+    if (idn.type === 'Group' && byVia.has(identIdx)) {
+      children = byVia.get(identIdx).map(cei => ({ ei: cei, e: DATA.edges[cei] }));
+      byVia.delete(identIdx);
+    }
+    rows.push({ ei, e, children });
+  });
+  // Any leftover via-group rows whose granting group has no direct row of
+  // its own recorded on this exact folder still need to be shown -- surfaced
+  // as their own top-level rows (tagged "via <group>") rather than dropped.
+  byVia.forEach(eis => eis.forEach(cei => rows.push({ ei: cei, e: DATA.edges[cei], children: null })));
+  return rows;
+}
+
+function aclRowMatches(row, q) {
+  if (!q) return true;
+  const hay = (r) => {
+    const e = r.e, idn = DATA.identities[e[1]];
+    return [idn.name, idn.type, RIGHTS_LABELS[e[2]]].join(' ').toLowerCase();
+  };
+  if (hay(row).includes(q)) return true;
+  return !!(row.children && row.children.some(c => hay(c).includes(q)));
+}
+
+function renderAclRow(row, onIdentityClick, isChild) {
+  const e = row.e;
+  const idn = DATA.identities[e[1]];
+  const div = document.createElement('div');
+  div.className = 'aclRow';
+
+  const toggle = document.createElement('span');
+  toggle.className = 'treeToggle';
+  toggle.textContent = '\u00a0\u00a0';
+  div.appendChild(toggle);
+
+  const name = document.createElement('span');
+  name.className = 'aclName';
+  name.textContent = idn.name || '(unknown)';
+  name.title = idn.name || '';
+  div.appendChild(name);
+
+  const type = document.createElement('span');
+  type.className = 'aclType';
+  type.textContent = idn.type || '';
+  div.appendChild(type);
+
+  const rights = document.createElement('span');
+  rights.className = 'pill ' + (e[5] ? 'deny' : (e[3] ? 'inherited' : 'explicit'));
+  rights.textContent = RIGHTS_LABELS[e[2]] + (e[5] ? ' (Deny)' : '');
+  div.appendChild(rights);
+  if (!isChild && idn.type === 'Group' && (!row.children || row.children.length === 0)) {
+    const groupHint = document.createElement('span');
+    groupHint.className = 'aclViaNote';
+    groupHint.textContent = 'Состав группы не загружен';
+    groupHint.title = 'Для отображения участников нужен аудит с -ExpandGroups; проверьте исключения -ExpandGroupsExclude и доступность AD.';
+    div.insertBefore(groupHint, rights);
+  }
+
+  if (isChild) {
+    const tag = document.createElement('span');
+    tag.className = 'aclViaNote';
+    tag.textContent = 'member';
+    div.appendChild(tag);
+  } else if (e[6] >= 0) {
+    // An orphaned via-group row: its granting group has no direct row of its
+    // own on this exact folder, so it's shown flat with a "via" tag instead
+    // of nested (there's no parent row here to nest it under).
+    const tag = document.createElement('span');
+    tag.className = 'aclViaNote';
+    tag.textContent = 'via ' + (DATA.identities[e[6]].name || '?');
+    div.appendChild(tag);
+  }
+
+  div.onclick = () => onIdentityClick(e[1]);
+
+  const wrap = document.createElement('div');
+  wrap.appendChild(div);
+
+  if (row.children && row.children.length) {
+    const childHost = document.createElement('div');
+    childHost.className = 'aclChildren';
+    childHost.style.display = 'none';
+    row.children.forEach(c => childHost.appendChild(renderAclRow(c, onIdentityClick, true)));
+    wrap.appendChild(childHost);
+    toggle.classList.add('hasChildren');
+    toggle.textContent = '\u25b8';
+    // FSA_RU_GROUP_CONTROLS_EMBEDDED_V2
+    const membersButton = document.createElement('button');
+    membersButton.type = 'button';
+    membersButton.className = 'chipBtn';
+    membersButton.style.fontSize = '11px';
+    membersButton.textContent = 'Участники: ' + row.children.length + ' ▸';
+    membersButton.title = 'Показать или скрыть участников группы';
+    div.insertBefore(membersButton, rights);
+    let expanded = false;
+    const setExpanded = (v) => {
+      expanded = v;
+      childHost.style.display = expanded ? 'block' : 'none';
+      toggle.textContent = expanded ? '\u25be' : '\u25b8';
+      membersButton.textContent = 'Участники: ' + row.children.length + (expanded ? ' ▾' : ' ▸');
+    };
+    toggle.onclick = (ev) => { ev.stopPropagation(); setExpanded(!expanded); };
+    membersButton.onclick = (ev) => { ev.stopPropagation(); setExpanded(!expanded); };
+    wrap._setExpanded = setExpanded; // used below to auto-expand a group whose members matched a filter
+  }
+  return wrap;
+}
+
+function renderFolderAclList(folderIdx, onIdentityClick) {
+  const rows = buildFolderAclGroups(folderIdx);
+  const counts = folderAccessCounts(folderIdx);
+  const allFlatForExport = (byFolder.get(folderIdx) || []).map(ei => ({ ei, e: DATA.edges[ei] }));
+
+  const wrap = document.createElement('div');
+  wrap.className = 'aclWrap';
+
+  const summary = document.createElement('div');
+  summary.className = 'aclSummary';
+  summary.textContent = counts.viaGroup > 0
+    ? `${counts.direct} direct grant${counts.direct === 1 ? '' : 's'} \u00b7 ${counts.viaGroup} more identit${counts.viaGroup === 1 ? 'y' : 'ies'} via group membership (expand a group below to see its members)`
+    : `${counts.direct} direct grant${counts.direct === 1 ? '' : 's'}`;
+  wrap.appendChild(summary);
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'aclToolbar';
+  const filterInput = document.createElement('input');
+  filterInput.placeholder = 'Filter this list...';
+  toolbar.appendChild(filterInput);
+  toolbar.style.flexWrap = 'wrap';
+  filterInput.style.minWidth = '180px';
+  const expandAllGroupsBtn = document.createElement('button');
+  expandAllGroupsBtn.type = 'button';
+  expandAllGroupsBtn.className = 'chipBtn';
+  expandAllGroupsBtn.textContent = 'Развернуть все группы';
+  toolbar.appendChild(expandAllGroupsBtn);
+  const collapseAllGroupsBtn = document.createElement('button');
+  collapseAllGroupsBtn.type = 'button';
+  collapseAllGroupsBtn.className = 'chipBtn';
+  collapseAllGroupsBtn.textContent = 'Свернуть все группы';
+  toolbar.appendChild(collapseAllGroupsBtn);
+  const exportBtn = document.createElement('button');
+  exportBtn.textContent = `Export ${allFlatForExport.length} row(s) as CSV`;
+  exportBtn.onclick = () => downloadCsv(
+    `access_${DATA.folders[folderIdx].path.replace(/[^a-z0-9]+/gi, '_')}.csv`,
+    allFlatForExport,
+    [
+      { label: 'Identity', get: r => DATA.identities[r.e[1]].name },
+      { label: 'Type', get: r => DATA.identities[r.e[1]].type },
+      { label: 'Rights', get: r => RIGHTS_LABELS[r.e[2]] },
+      { label: 'Inherited', get: r => r.e[3] ? 'Yes' : 'No' },
+      { label: 'Deny', get: r => r.e[5] ? 'Yes' : 'No' },
+      { label: 'Granted via group', get: r => r.e[6] >= 0 ? DATA.identities[r.e[6]].name : '' },
+      { label: 'Enabled', get: r => fmtBool(DATA.identities[r.e[1]].enabled) }
+    ]
+  );
+  toolbar.appendChild(exportBtn);
+  wrap.appendChild(toolbar);
+
+  const host = document.createElement('div');
+  host.className = 'aclHost';
+  wrap.appendChild(host);
+  let renderedGroups = [];
+  expandAllGroupsBtn.onclick = () => {
+    if (!renderedGroups.length) {
+      window.alert('Для этой папки состав групп не загружен. Выполните аудит с -ExpandGroups.');
+      return;
+    }
+    renderedGroups.forEach(n => n._setExpanded(true));
+  };
+  collapseAllGroupsBtn.onclick = () => renderedGroups.forEach(n => n._setExpanded(false));
+
+  function rebuild() {
+    host.innerHTML = '';
+    renderedGroups = [];
+    const q = filterInput.value.trim().toLowerCase();
+    const visible = rows.filter(r => aclRowMatches(r, q));
+    visible.forEach(r => {
+      const node = renderAclRow(r, onIdentityClick, false);
+      host.appendChild(node);
+      if (node._setExpanded) renderedGroups.push(node);
+      if (q && node._setExpanded) {
+        const idn = DATA.identities[r.e[1]];
+        const parentMatches = [idn.name, idn.type, RIGHTS_LABELS[r.e[2]]].join(' ').toLowerCase().includes(q);
+        if (!parentMatches) node._setExpanded(true); // the match was in a member, not the group itself -- expand so it's visible
+      }
+    });
+    if (visible.length === 0) {
+      const none = document.createElement('div');
+      none.className = 'graphNote';
+      none.textContent = 'No matches.';
+      host.appendChild(none);
+    }
+  }
+  filterInput.oninput = rebuild;
+  rebuild();
+
+  return wrap;
+}
+
+function renderFolder(idx) {
+  const f = DATA.folders[idx];
+  const content = document.getElementById('content');
+  content.classList.add('content-split');
+  content.innerHTML = '';
+  content.appendChild(folderInfoCard(f));
+
+  content.appendChild(renderDetailTabs(() => renderFolder(idx)));
+
+  const topContent = state.detailTab === 'graph'
+    ? renderRelationshipGraph('folder', idx, (key) => {
+        const kind = key[0], kidx = parseInt(key.slice(2), 10);
+        if (kind === 'f') selectFolder(kidx, true); else selectIdentity(kidx, true);
+      }, () => renderFolder(idx))
+    : renderFolderTreeView(
+        [idx],
+        (folderIdx) => selectFolder(folderIdx, true),
+        idx,
+        () => renderFolder(idx)
+      );
+
+  const bottomContent = renderFolderAclList(idx, (identIdx) => selectIdentity(identIdx, true));
+
+  content.appendChild(makeResizableSplitPanes(topContent, bottomContent, 'accessMapFolderPaneRatio', 0.55));
+  updateUrlHash();
+}
+
+/* -------------------------------- Quick filters ------------------------------ */
+
+/* ------------------------------- Summary view --------------------------------- */
+
+const IDENTITY_TYPE_ORDER = ['User', 'Group', 'Computer', 'Well-known / Local', 'Unresolved'];
+
+function computeIdentityBreakdown() {
+  const byType = {};
+  DATA.identities.forEach(idn => { byType[idn.type] = (byType[idn.type] || 0) + 1; });
+  return byType;
+}
+
+function computeUserHealth() {
+  let total = 0, enabled = 0, disabled = 0, locked = 0, dormant = 0;
+  DATA.identities.forEach(idn => {
+    if (idn.type !== 'User') return;
+    total++;
+    if (idn.enabled === false) disabled++;
+    else if (idn.enabled === true) enabled++;
+    if (idn.locked === true) locked++;
+    if (idn.flagDormant) dormant++;
+  });
+  return { total, enabled, disabled, locked, dormant };
+}
+
+// These three feed the dashboard, which has to render correctly with ZERO
+// share chunks loaded (that's the whole point -- opening the report and
+// seeing the summary shouldn't cost a multi-gigabyte parse). Each one used
+// to get its answer by scanning every edge; now that edges only exist for
+// shares someone has actually drilled into, that same scan would silently
+// under-report on an untouched dataset. Build-AccessMapHtml.ps1 already
+// visits every edge once while it builds them, so these are precomputed
+// there instead and just read back here.
+
+function computeRightsDistribution() {
+  return (ACCESS_MAP_MANIFEST.rightsDistribution || [0, 0, 0, 0, 0, 0]).slice();
+}
+
+function computeBroadPrincipalGrants() {
+  const b = ACCESS_MAP_MANIFEST.broadPrincipalGrants || { folderCount: 0, folderIdxs: [] };
+  return { folderCount: b.folderCount, folderIdxs: b.folderIdxs || [] };
+}
+
+function computeStaleAccessCounts() {
+  let dormantWithAccess = 0, unresolvedWithAccess = 0;
+  DATA.identities.forEach(idn => {
+    if (!(idn.edgeCount > 0)) return; // precomputed total across ALL shares, not just loaded ones
+    if (idn.flagDisabled || idn.flagDormant || idn.flagLocked) dormantWithAccess++;
+    if (idn.type === 'Unresolved') unresolvedWithAccess++;
+  });
+  return { dormantWithAccess, unresolvedWithAccess };
+}
+
+function renderDonutChart(segments, size) {
+  size = size || 200;
+  const R = size / 2 - 28, strokeW = 24, cx = size / 2, cy = size / 2;
+  const realTotal = segments.reduce((s, x) => s + x.count, 0);
+  const total = realTotal || 1; // safe denominator only -- never used for display
+  const C = 2 * Math.PI * R;
+  let offset = 0;
+  const svg = svgEl('svg', { viewBox: `0 0 ${size} ${size}`, width: size, height: size });
+  svg.appendChild(svgEl('circle', { cx, cy, r: R, fill: 'none', stroke: effectiveThemeIsLight() ? '#d8dce2' : '#20262f', 'stroke-width': strokeW }));
+  segments.forEach(seg => {
+    if (seg.count <= 0) return;
+    const frac = seg.count / total;
+    const dash = Math.max(frac * C - (segments.length > 1 ? 1.5 : 0), 0);
+    const circle = svgEl('circle', {
+      cx, cy, r: R, fill: 'none', stroke: seg.color, 'stroke-width': strokeW,
+      'stroke-dasharray': `${dash} ${C - dash}`, 'stroke-dashoffset': -offset,
+      transform: `rotate(-90 ${cx} ${cy})`
+    });
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    title.textContent = `${seg.label}: ${seg.count} (${(frac * 100).toFixed(1)}%)`;
+    circle.appendChild(title);
+    svg.appendChild(circle);
+    offset += frac * C;
+  });
+  const centerText = svgEl('text', { x: cx, y: cy, 'text-anchor': 'middle', 'dominant-baseline': 'middle', 'font-size': 15, fill: effectiveThemeIsLight() ? '#1a1f26' : '#e6e9ee' });
+  centerText.textContent = String(realTotal);
+  svg.appendChild(centerText);
+  return svg;
+}
+
+function renderChartWithLegend(segments) {
+  const row = document.createElement('div');
+  row.className = 'chartRow';
+  row.appendChild(renderDonutChart(segments));
+  const legend = document.createElement('div');
+  legend.className = 'chartLegend';
+  const total = segments.reduce((s, x) => s + x.count, 0) || 1;
+  segments.forEach(seg => {
+    const r = document.createElement('div');
+    r.className = 'legendRow';
+    const sw = document.createElement('span');
+    sw.className = 'legendSwatch';
+    sw.style.background = seg.color;
+    r.appendChild(sw);
+    const label = document.createElement('span');
+    label.textContent = `${seg.label}: ${seg.count} (${((seg.count / total) * 100).toFixed(1)}%)`;
+    r.appendChild(label);
+    legend.appendChild(r);
+  });
+  row.appendChild(legend);
+  return row;
+}
+
+function statCard(num, label, opts) {
+  opts = opts || {};
+  const card = document.createElement('div');
+  card.className = 'statCard' + (opts.tone ? ' ' + opts.tone : '') + (opts.onClick ? ' clickable' : '');
+  const bignum = document.createElement('div');
+  bignum.className = 'bigNum';
+  bignum.textContent = String(num);
+  card.appendChild(bignum);
+  const lbl = document.createElement('div');
+  lbl.className = 'cardLabel';
+  lbl.textContent = label;
+  card.appendChild(lbl);
+  if (opts.onClick) card.onclick = opts.onClick;
+  return card;
+}
+
+function computeObservations() {
+  const broad = computeBroadPrincipalGrants();
+  const stale = computeStaleAccessCounts();
+  const brokenCount = DATA.folders.filter(f => f.broken).length;
+  const rights = computeRightsDistribution();
+  const totalEdges = rights.reduce((a, b) => a + b, 0) || 1;
+  const fullControlShare = rights[0] / totalEdges;
+  const scanErrorCount = (DATA.scanErrors || []).length;
+
+  const observations = [];
+
+  // Reused guidance blocks: several observations here are really the same
+  // underlying "least privilege" / "stale accounts" issues, so the same
+  // sourced control language applies to more than one of them.
+  const LEAST_PRIVILEGE_GUIDANCE = [
+    { region: 'AU', source: 'ACSC Essential Eight -- Restrict Administrative Privileges (Maturity Level 1)', text: 'Requests for privileged access to systems and applications are validated when first requested, and privileges are assigned on the principle of least privilege.' },
+    { region: 'AU', source: 'Australian Government ISM -- Cybersecurity Principle PRO-12 (Least privilege access)', text: 'Grant users the least amount of access necessary to complete their job functions.' },
+    { region: 'NZ', source: 'NZISM control 16.4.38.C.01', text: 'Agencies MUST apply the Principle of Least Privilege when developing and implementing a Privileged Access Management policy.' },
+    { region: 'US', source: 'NIST SP 800-53 AC-6 (Least Privilege)', text: 'Employ the principle of least privilege, allowing only authorized accesses for users that are necessary to accomplish assigned organizational tasks.' },
+    { region: 'US', source: 'NIST CSF 2.0 -- PR.AA-05', text: 'Access permissions and authorizations are managed, incorporating the principles of least privilege and separation of duties.' },
+    { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 3.3 (Configure Data Access Control Lists)', text: "Configure data access control lists based on a user's need to know. Apply data access control lists, also known as access permissions, to local and remote file systems." }
+  ];
+  const STALE_ACCOUNT_GUIDANCE = [
+    { region: 'US', source: 'NIST SP 800-53 AC-2(3) (Disable Accounts)', text: 'Disable accounts when they have expired, are no longer associated with a user or individual, are in violation of organizational policy, or have been inactive for an organization-defined period.' },
+    { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 5.3 (Disable Dormant Accounts)', text: 'Delete or disable any dormant accounts after a defined period of inactivity.' },
+    { region: 'AU', source: 'ACSC Essential Eight -- Restrict Administrative Privileges (Maturity Level 2)', text: 'Privileged access to systems and applications is automatically disabled after 12 months unless revalidated.' },
+    { region: 'NZ', source: 'NZISM control 9.2.17.C.02', text: 'Where an agency grants limited higher access, it MUST be temporary and an exception rather than the norm, with a cessation date set.' }
+  ];
+  const RETENTION_GUIDANCE = [
+    { region: 'NZ', source: 'Privacy Act 2020 -- Information Privacy Principle 9 (Limits on retention)', text: 'An agency that holds personal information must not keep that information for longer than is required for the purposes for which it may lawfully be used.' },
+    { region: 'AU', source: 'Privacy Act 1988 (Cth) -- Australian Privacy Principle 11.2', text: 'An entity must take reasonable steps to destroy or de-identify personal information it holds once it is no longer needed for any purpose for which it may be used or disclosed.' },
+    { region: 'EU', source: 'GDPR Article 5(1)(e) -- Storage limitation principle', text: 'Personal data must be kept in a form permitting identification of data subjects for no longer than is necessary for the purposes for which it is processed.' },
+    { region: 'US', source: 'NIST SP 800-53 SI-12 (Information Management and Retention)', text: 'Manage and retain system information and output in accordance with applicable laws, regulations, policies, and operational requirements.' },
+    { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 3.4 (Enforce Data Retention)', text: "Retain data according to the enterprise's documented data management process, including both a minimum and a maximum retention timeline." }
+  ];
+
+  if (broad.folderCount > 0) {
+    observations.push({
+      title: `${broad.folderCount} folder(s) grant Full Control or Modify to a broad, default group (Everyone, Authenticated Users, Domain Users, or Users)`,
+      why: 'Broad, generic principals with high-privilege access make it hard to know exactly who can read, change, or delete data, and are a common way ransomware or a single compromised account can spread impact across many folders at once. The frameworks below don\u2019t mention "Everyone" by name, but a broad default group holding Full Control or Modify is close to the opposite of what "least privilege" or "need to know" require.',
+      guidance: LEAST_PRIVILEGE_GUIDANCE,
+      action: () => filterToBroadGrantFolders()
+    });
+  }
+  if (brokenCount > 0) {
+    observations.push({
+      title: `${brokenCount} folder(s) have broken inheritance (an explicit ACL that no longer follows the parent)`,
+      why: 'Ad-hoc, per-folder permission changes are harder to review consistently and more prone to drift from the intended access model over time. None of the frameworks checked here have a specific rule about NTFS inheritance -- this is a more general configuration-management/consistency concern than a directly-legislated control, so treat it as a "worth a look" flag rather than a named violation.',
+      guidance: [
+        { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 3.3 (Configure Data Access Control Lists)', text: 'The same access-control-list safeguard applies here: an ACL that silently diverges from the folder above it is harder to configure and audit consistently.' }
+      ],
+      action: () => filterToBrokenFolders()
+    });
+  }
+  if (stale.dormantWithAccess > 0) {
+    observations.push({
+      title: `${stale.dormantWithAccess} disabled, locked, or dormant (90+ day) identity(ies) still have active access grants`,
+      why: 'Stale accounts that still hold access are attack surface with no legitimate current user behind them -- a common target for re-activation or credential misuse.',
+      guidance: STALE_ACCOUNT_GUIDANCE,
+      action: () => filterToDormantIdentities()
+    });
+  }
+  if (stale.unresolvedWithAccess > 0) {
+    observations.push({
+      title: `${stale.unresolvedWithAccess} unresolved SID(s) (likely deleted accounts) still have active access grants`,
+      why: 'An orphaned SID on an ACL means the account it once represented no longer exists in AD, but the permission entry was never cleaned up -- pure hygiene debt with no offsetting benefit. This is close to a textbook case of the "no longer associated with a user" condition below.',
+      guidance: [
+        { region: 'US', source: 'NIST SP 800-53 AC-2(3) (Disable Accounts)', text: 'Disable accounts... that are no longer associated with a user or individual.' },
+        { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 5.3 (Disable Dormant Accounts)', text: 'Delete or disable any dormant accounts after a defined period of inactivity.' }
+      ]
+    });
+  }
+  if (scanErrorCount > 0) {
+    observations.push({
+      title: `${scanErrorCount} object(s) could not be scanned at all (access denied or a path/platform limitation)`,
+      why: "You can't audit what you can't see. These are blind spots in this report -- worth checking whether the scanning account should have access, and if not, why not, and what's actually stored in the folders you can't see into. This is a general asset-visibility concern rather than a specific access-control rule.",
+      guidance: [
+        { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 1.1 (Establish and Maintain Detailed Enterprise Asset Inventory)', text: 'You cannot protect (or audit) assets you do not know exist or cannot see into.' },
+        { region: 'US', source: 'NIST CSF 2.0 -- ID.AM (Asset Management)', text: 'Assets are inventoried and managed consistent with their relative importance to organizational objectives.' }
+      ],
+      action: () => showScanErrorsDetail()
+    });
+  }
+  if (fullControlShare > 0.25 && totalEdges >= 20) {
+    observations.push({
+      title: `${(fullControlShare * 100).toFixed(0)}% of all access grants are Full Control`,
+      why: 'Full Control allows changing permissions and taking ownership, not just reading/writing data -- it\'s rarely needed by more than a small set of administrators or data owners. A high share suggests broad over-provisioning rather than least-privilege access.',
+      guidance: LEAST_PRIVILEGE_GUIDANCE
+    });
+  }
+  if (DATA.hasFileMetadata) {
+    // 5 years is this observation's own fixed threshold for "worth flagging
+    // at all" (distinct from the sidebar's own 1yr/5yr/10yr cycle, which the
+    // viewer controls directly) -- a reasonable, common checkpoint for
+    // unstructured-data review across the frameworks cited below, without
+    // being so short it flags routine, actively-used folders.
+    const agedThresholdDays = 5 * 365;
+    const agedCount = DATA.folders.filter(f => {
+      const age = ageInDays(f.modified);
+      return age !== null && age >= agedThresholdDays;
+    }).length;
+    if (agedCount > 0) {
+      observations.push({
+        title: `${agedCount} folder(s) haven't been modified in 5+ years`,
+        why: 'Folders that haven\u2019t changed in years are a common home for data that should have been reviewed, archived, or deleted under a retention schedule long ago -- and every identity/group still holding access to them is attack surface for data nobody actually needs anymore. This flags "worth reviewing for retention", not "definitely delete" -- some old data is legitimately kept long-term (financial records, historical archives, etc.) for its own separate, valid reasons.',
+        guidance: RETENTION_GUIDANCE,
+        action: () => {
+          state.filterAgedYears = 5;
+          const btn = document.getElementById('btnAged');
+          btn.textContent = 'Aged folders (5yr+)';
+          btn.classList.add('state-show');
+          setTab('folders');
+        }
+      });
+    }
+  }
+
+  return observations;
+}
+
+
+function filterToBroadGrantFolders() {
+  setTab('folders');
+  document.getElementById('searchBox').value = '';
+  state.search = '';
+  const panel = document.getElementById('listPanel');
+  panel.innerHTML = '';
+  const broad = computeBroadPrincipalGrants();
+  const folderIdxs = broad.folderIdxs;
+  folderIdxs.forEach(idx => {
+    const f = DATA.folders[idx];
+    const div = document.createElement('div');
+    div.className = 'listItem';
+    div.innerHTML = `<div class="listItemPathRow"><span class="path">${esc(f.path)}</span></div>`;
+    div.title = f.path;
+    div.onclick = () => selectFolder(idx, true);
+    panel.appendChild(div);
+  });
+  if (folderIdxs.length === 0) {
+    const none = document.createElement('div');
+    none.className = 'listMore';
+    none.textContent = 'None found.';
+    panel.appendChild(none);
+  }
+}
+
+function showScanErrorsDetail() {
+  const content = document.getElementById('content');
+  content.classList.remove('content-split');
+  content.innerHTML = '';
+  clearUrlHash();
+  const card = document.createElement('div');
+  card.className = 'summarySection';
+  const title = document.createElement('h2');
+  title.textContent = `Objects that could not be scanned (${(DATA.scanErrors || []).length})`;
+  card.appendChild(title);
+
+  const errors = DATA.scanErrors || [];
+  const table = document.createElement('table');
+  table.className = 'scanErrorsTable';
+  table.innerHTML = '<thead><tr><th>Path</th><th>Category</th><th>Message</th></tr></thead>';
+  const tbody = document.createElement('tbody');
+  errors.forEach(err => {
+    const tr = document.createElement('tr');
+    const tdPath = document.createElement('td');
+    tdPath.textContent = err.Path || '(unparsed log line)';
+    tdPath.title = err.Path || '';
+    const tdCat = document.createElement('td');
+    tdCat.textContent = err.Category || '';
+    const tdMsg = document.createElement('td');
+    tdMsg.textContent = err.Message || '';
+    tr.appendChild(tdPath); tr.appendChild(tdCat); tr.appendChild(tdMsg);
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  card.appendChild(table);
+
+  const exportBtn = document.createElement('button');
+  exportBtn.textContent = `Export ${errors.length} row(s) as CSV`;
+  exportBtn.style.marginTop = '10px';
+  exportBtn.onclick = () => downloadCsv('scan_errors.csv', errors, [
+    { label: 'Path', get: r => r.Path },
+    { label: 'Category', get: r => r.Category },
+    { label: 'Message', get: r => r.Message },
+    { label: 'Timestamp', get: r => r.Timestamp }
+  ]);
+  card.appendChild(exportBtn);
+
+  const backLink = document.createElement('button');
+  backLink.textContent = '\u2190 Back to Summary';
+  backLink.style.marginTop = '10px';
+  backLink.style.marginLeft = '8px';
+  backLink.onclick = () => renderSummaryView();
+  card.appendChild(backLink);
+
+  content.appendChild(card);
+}
+
+const ABUSE_REFERENCE = [
+  { level: 'Full Control', allows: 'Everything Modify allows, plus changing permissions and taking ownership.', abuse: 'Can lock other people out, silently grant itself/others further access, or take ownership to bypass existing restrictions entirely -- the highest-impact level.' },
+  { level: 'Modify', allows: 'Read, write, execute, and delete, but cannot change permissions or ownership.', abuse: 'Can tamper with, encrypt (ransomware-style), or destroy data, and plant executable content -- but can\'t entrench itself by rewriting the ACL.' },
+  { level: 'Read & Execute', allows: 'Read files/folders and run existing executables; no write.', abuse: 'Information disclosure, and can run whatever is already there -- but can\'t plant or modify files.' },
+  { level: 'Write', allows: 'Create/modify content without necessarily being able to delete or execute.', abuse: 'Can tamper with or inject content; impact depends heavily on whether the target location also allows execution.' },
+  { level: 'Read', allows: 'Read-only.', abuse: 'Information disclosure only -- the lowest-impact level, but still worth reviewing for sensitive data.' },
+  { level: 'Special', allows: 'A non-standard combination that does not match one of the above.', abuse: 'Impact depends entirely on the specific rights granted -- worth reviewing individually rather than assuming either way.' }
+];
+
+function renderAbuseReferenceTable() {
+  const table = document.createElement('table');
+  table.className = 'abuseTable';
+  table.innerHTML = '<thead><tr><th>Level</th><th>Allows</th><th>Abuse potential if misused</th></tr></thead>';
+  const tbody = document.createElement('tbody');
+  ABUSE_REFERENCE.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><b>${esc(row.level)}</b></td><td>${esc(row.allows)}</td><td>${esc(row.abuse)}</td>`;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  return table;
+}
+
+function renderSummaryView() {
+  state.selected = null;
+  const content = document.getElementById('content');
+  content.classList.remove('content-split');
+  content.innerHTML = '';
+  clearUrlHash();
+
+  if (DATA.scanComplete === false || (DATA.truncatedRowsDropped || 0) > 0) {
+    const banner = document.createElement('div');
+    banner.className = 'incompleteBanner';
+    const parts = [];
+    if (DATA.scanComplete === false) {
+      parts.push("This scan appears to have been interrupted before finishing (killed, crashed, or the machine rebooted mid-run) -- some folders may be missing entirely, not just from this report but from the underlying data. Everything that WAS successfully captured is still shown below and throughout.");
+    }
+    if ((DATA.truncatedRowsDropped || 0) > 0) {
+      parts.push(`${DATA.truncatedRowsDropped} source file(s) had their last line cut off mid-write (consistent with the same kind of interruption) -- that one incomplete row was dropped; nothing else in those files was affected.`);
+    }
+    banner.textContent = '\u26a0 ' + parts.join(' ');
+    content.appendChild(banner);
+  }
+
+  if (!DATA.hasFileMetadata) {
+    const infoBanner = document.createElement('div');
+    infoBanner.className = 'infoBanner';
+    infoBanner.textContent = '\u2139 File/folder Created, Modified, and Accessed timestamps were not captured in this scan (needs Invoke-NTFSPermissionAudit.ps1 0.5.5 or later) -- aged-folder flagging and the metadata shown on a folder\u2019s own page are unavailable for this report. Nothing else is affected.';
+    content.appendChild(infoBanner);
+  }
+
+  const idBreakdown = computeIdentityBreakdown();
+  const userHealth = computeUserHealth();
+  const rights = computeRightsDistribution();
+  const brokenCount = DATA.folders.filter(f => f.broken).length;
+  const dormantCount = DATA.identities.filter(i => i.flagDisabled || i.flagDormant || i.flagLocked).length;
+  const scanErrorCount = (DATA.scanErrors || []).length;
+  const observations = computeObservations();
+
+  // --- Top-line stat cards ---
+  const grid = document.createElement('div');
+  grid.className = 'summaryGrid';
+  grid.appendChild(statCard(DATA.identities.length, 'Identities total', {}));
+  grid.appendChild(statCard(ACCESS_MAP_MANIFEST.totalEdgeCount || 0, 'Access entries total', {}));
+  grid.appendChild(statCard(userHealth.total, `Users (${userHealth.enabled} enabled, ${userHealth.disabled} disabled)`, {}));
+  grid.appendChild(statCard(idBreakdown.Group || 0, 'Groups', {}));
+  grid.appendChild(statCard(idBreakdown.Computer || 0, 'Computer / service accounts', {}));
+  grid.appendChild(statCard(DATA.folders.length, 'Folders scanned', {}));
+  grid.appendChild(statCard(brokenCount, 'Broken inheritance', { tone: brokenCount > 0 ? 'warn' : '', onClick: brokenCount > 0 ? filterToBrokenFolders : null }));
+  grid.appendChild(statCard(dormantCount, 'Disabled / dormant identities', { tone: dormantCount > 0 ? 'warn' : '', onClick: dormantCount > 0 ? filterToDormantIdentities : null }));
+  grid.appendChild(statCard(scanErrorCount, 'Objects that could not be scanned', { tone: scanErrorCount > 0 ? 'bad' : '', onClick: scanErrorCount > 0 ? showScanErrorsDetail : null }));
+  content.appendChild(grid);
+
+  // --- Identity breakdown ---
+  const idSection = document.createElement('div');
+  idSection.className = 'summarySection';
+  idSection.innerHTML = '<h2>Identities identified</h2>';
+  IDENTITY_TYPE_ORDER.forEach(type => {
+    if (!idBreakdown[type]) return;
+    const row = document.createElement('div');
+    row.className = 'breakdownRow';
+    row.innerHTML = `<span>${esc(type)}</span><span>${idBreakdown[type]}</span>`;
+    idSection.appendChild(row);
+  });
+  if (userHealth.total > 0) {
+    const sub = document.createElement('div');
+    sub.style.marginTop = '8px';
+    sub.style.fontSize = '11px';
+    sub.style.color = 'var(--muted)';
+    sub.textContent = `Of ${userHealth.total} user(s): ${userHealth.enabled} enabled, ${userHealth.disabled} disabled, ${userHealth.locked} locked out, ${userHealth.dormant} with no logon in ${DORMANT_DAYS}+ days.`;
+    idSection.appendChild(sub);
+  }
+  content.appendChild(idSection);
+
+  // --- Rights distribution ---
+  const rightsSection = document.createElement('div');
+  rightsSection.className = 'summarySection';
+  rightsSection.innerHTML = '<h2>Access rights distribution</h2>';
+  const segments = RIGHTS_LABELS.map((label, i) => ({ label, count: rights[i], color: getEdgeColors()[i] }));
+  rightsSection.appendChild(renderChartWithLegend(segments));
+  content.appendChild(rightsSection);
+
+  // --- Abuse-potential reference ---
+  const abuseSection = document.createElement('div');
+  abuseSection.className = 'summarySection';
+  abuseSection.innerHTML = '<h2>What each access level actually allows (and how it could be misused)</h2>';
+  abuseSection.appendChild(renderAbuseReferenceTable());
+  content.appendChild(abuseSection);
+
+  // --- Observations / framework mapping ---
+  const obsSection = document.createElement('div');
+  obsSection.className = 'summarySection';
+  obsSection.innerHTML = '<h2>Observations worth a closer look</h2>';
+  const banner = document.createElement('div');
+  banner.className = 'disclaimerBanner';
+  banner.textContent = 'These are heuristic, data-driven starting points for a conversation with your security/compliance team -- not a certified compliance assessment. The guidance text below is paraphrased from publicly available framework/legislation text (not quoted verbatim), and both frameworks and laws are periodically revised -- check the current, authoritative source (ACSC, GCSB/NCSC-NZ, NIST, CIS, or your own Privacy Commissioner/regulator for the retention-related items) before treating this as a compliance determination either way.';
+  obsSection.appendChild(banner);
+  if (observations.length === 0) {
+    const none = document.createElement('div');
+    none.style.fontSize = '13px';
+    none.style.color = 'var(--muted)';
+    none.textContent = 'No notable observations from the signals this tool currently checks for.';
+    obsSection.appendChild(none);
+  } else {
+    observations.forEach(obs => {
+      const card = document.createElement('div');
+      card.className = 'obsCard';
+      const t = document.createElement('div');
+      t.className = 'obsTitle';
+      t.textContent = obs.title;
+      card.appendChild(t);
+      const why = document.createElement('div');
+      why.className = 'obsWhy';
+      why.textContent = obs.why;
+      card.appendChild(why);
+      const fw = document.createElement('div');
+      fw.className = 'obsFrameworks';
+      obs.guidance.forEach(g => {
+        const row = document.createElement('div');
+        row.className = 'guidanceRow';
+        const pill = document.createElement('span');
+        pill.className = 'regionPill regionPill-' + g.region;
+        pill.textContent = g.region;
+        row.appendChild(pill);
+        const textSpan = document.createElement('span');
+        textSpan.innerHTML = `<b>${esc(g.source)}:</b> ${esc(g.text)}`;
+        row.appendChild(textSpan);
+        fw.appendChild(row);
+      });
+      card.appendChild(fw);
+      if (obs.action) {
+        const btn = document.createElement('button');
+        btn.textContent = 'View these';
+        btn.style.marginTop = '6px';
+        btn.onclick = obs.action;
+        card.appendChild(btn);
+      }
+      obsSection.appendChild(card);
+    });
+  }
+  content.appendChild(obsSection);
+
+  const hint = document.createElement('p');
+  hint.style.color = 'var(--muted)';
+  hint.style.fontSize = '12px';
+  hint.textContent = 'Select an identity or folder on the left for its own detail view (Tree/Graph tabs), or use the quick filters above.';
+  content.appendChild(hint);
+}
+
+function setFilterButtonUI(btnId, val) {
+  const btn = document.getElementById(btnId);
+  btn.classList.remove('state-show', 'state-hide');
+  let tag = btn.querySelector('.filterStateLabel');
+  if (val === 0) {
+    if (tag) tag.remove();
+    btn.title = '';
+    return;
+  }
+  if (val === 1) { btn.classList.add('state-show'); btn.title = 'Showing only these -- click to switch to hiding them, click again to turn off'; }
+  else { btn.classList.add('state-hide'); btn.title = 'Hiding these -- click to turn off'; }
+  if (!tag) { tag = document.createElement('span'); tag.className = 'filterStateLabel'; btn.appendChild(tag); }
+  tag.textContent = val === 1 ? 'ON' : 'HIDDEN';
+}
+
+// Explicit "show only" entry points -- used by the Summary dashboard's
+// clickable stat cards/observations, which mean "take me straight to these",
+// not "toggle". The header buttons cycle instead (see cycleBrokenFilter/
+// cycleDormantFilter in init()); both act on the same underlying state, so
+// either path keeps the button's own visual state in sync.
+function filterToBrokenFolders() {
+  state.filterBroken = 1;
+  setFilterButtonUI('btnBroken', 1);
+  document.getElementById('searchBox').value = '';
+  state.search = '';
+  setTab('folders');
+}
+
+function filterToDormantIdentities() {
+  state.filterDormant = 1;
+  setFilterButtonUI('btnDormant', 1);
+  document.getElementById('searchBox').value = '';
+  state.search = '';
+  setTab('identities');
+}
+
+/* --------------------------- Resizable split panes ---------------------------- */
+
+function initSplitter() {
+  const splitter = document.getElementById('splitter');
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('main');
+  const MIN_SIDEBAR = 220, MIN_CONTENT = 320;
+
+  let saved = null;
+  try { saved = localStorage.getItem('accessMapSidebarWidth'); } catch (e) { /* ignore -- fall back to CSS default */ }
+  if (saved) {
+    const w = parseInt(saved, 10);
+    if (!isNaN(w) && w >= MIN_SIDEBAR) sidebar.style.width = w + 'px';
+  }
+
+  let dragging = false;
+  splitter.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    splitter.classList.add('dragging');
+    try { splitter.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+  });
+  splitter.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const rect = main.getBoundingClientRect();
+    let w = e.clientX - rect.left;
+    const maxW = Math.max(MIN_SIDEBAR, rect.width - MIN_CONTENT - 6);
+    w = Math.max(MIN_SIDEBAR, Math.min(maxW, w));
+    sidebar.style.width = w + 'px';
+  });
+  function stopDrag() {
+    if (!dragging) return;
+    dragging = false;
+    splitter.classList.remove('dragging');
+    try { localStorage.setItem('accessMapSidebarWidth', String(sidebar.getBoundingClientRect().width)); } catch (e) { /* ignore -- resize just won't persist across reloads */ }
+  }
+  splitter.addEventListener('pointerup', stopDrag);
+  splitter.addEventListener('pointercancel', stopDrag);
+  splitter.addEventListener('lostpointercapture', stopDrag);
+}
+
+function makeResizableSplitPanes(topContent, bottomContent, storageKey, defaultTopRatio) {
+  // Stacks topContent/bottomContent with a draggable horizontal splitter
+  // between them, dividing whatever height the caller's own container ends
+  // up with (via flex -- see the .splitPanes/.splitPaneTop/.splitPaneBottom
+  // CSS) rather than a fixed pixel split, so it still works however tall
+  // the viewport happens to be. The ratio persists per storageKey (folder
+  // Tree/Graph vs. permissions gets its own key, separate from identity's,
+  // so a preference set on one doesn't unexpectedly move the other).
+  const wrap = document.createElement('div');
+  wrap.className = 'splitPanes';
+
+  const topPane = document.createElement('div');
+  topPane.className = 'splitPaneTop';
+  topPane.appendChild(topContent);
+
+  const splitter = document.createElement('div');
+  splitter.className = 'paneSplitter';
+  splitter.title = 'Drag to resize';
+
+  const bottomPane = document.createElement('div');
+  bottomPane.className = 'splitPaneBottom';
+  bottomPane.appendChild(bottomContent);
+
+  wrap.appendChild(topPane);
+  wrap.appendChild(splitter);
+  wrap.appendChild(bottomPane);
+
+  let ratio = defaultTopRatio;
+  try {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) { const n = parseFloat(saved); if (!isNaN(n) && n > 0.1 && n < 0.9) ratio = n; }
+  } catch (e) { /* ignore -- falls back to defaultTopRatio */ }
+  const applyRatio = (r) => {
+    topPane.style.flex = `${r} 1 0`;
+    bottomPane.style.flex = `${1 - r} 1 0`;
+  };
+  applyRatio(ratio);
+
+  let dragging = false;
+  splitter.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    splitter.classList.add('dragging');
+    try { splitter.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+  });
+  splitter.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const rect = wrap.getBoundingClientRect();
+    if (rect.height <= 0) return;
+    let r = (e.clientY - rect.top) / rect.height;
+    r = Math.max(0.15, Math.min(0.85, r));
+    ratio = r;
+    applyRatio(r);
+  });
+  function stopDrag() {
+    if (!dragging) return;
+    dragging = false;
+    splitter.classList.remove('dragging');
+    try { localStorage.setItem(storageKey, String(ratio)); } catch (e) { /* ignore -- resize just won't persist across reloads */ }
+  }
+  splitter.addEventListener('pointerup', stopDrag);
+  splitter.addEventListener('pointercancel', stopDrag);
+  splitter.addEventListener('lostpointercapture', stopDrag);
+
+  return wrap;
+}
+
+/* -------------------------------- Theme toggle -------------------------------- */
+
+function effectiveThemeIsLight() {
+  const explicit = document.documentElement.getAttribute('data-theme');
+  if (explicit === 'light') return true;
+  if (explicit === 'dark') return false;
+  return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches);
+}
+
+function updateThemeBtnLabel() {
+  const btn = document.getElementById('themeToggleBtn');
+  if (!btn) return;
+  // Label names the mode a click will switch TO, matching how the sidebar's
+  // own A-Z/Z-A button already communicates "what happens if you click this".
+  btn.textContent = effectiveThemeIsLight() ? '\ud83c\udf19 Dark' : '\u2600\ufe0f Light';
+}
+
+function initTheme() {
+  let saved = null;
+  try { saved = localStorage.getItem('accessMapTheme'); } catch (e) { /* ignore -- falls back to the OS preference */ }
+  if (saved === 'light' || saved === 'dark') document.documentElement.setAttribute('data-theme', saved);
+  updateThemeBtnLabel();
+  document.getElementById('themeToggleBtn').onclick = () => {
+    const next = effectiveThemeIsLight() ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('accessMapTheme', next); } catch (e) { /* ignore -- choice just won't persist across reloads */ }
+    updateThemeBtnLabel();
+  };
+}
+
+/* ------------------------------ Deep-link (URL hash) --------------------------- */
+/* A link like AccessMap.html#f:12:graph or #i:5 refers to a specific folder/
+   identity (by index) and detail tab within THIS generated report -- it's only
+   ever meaningful alongside this exact AccessMap.html/AccessMap_data pairing
+   (indices aren't stable across a different run's rebuild), not a general,
+   portable reference to a filesystem path. history.replaceState (not
+   pushState/location.hash=) keeps the address bar in sync without adding
+   browser-level back/forward entries -- this app already has its own Back
+   button and in-app history (see pushHistory/goBack), and stacking browser-
+   native history on top of that would just be two competing mechanisms. */
+
+function clearUrlHash() {
+  // Same replaceState-preferred, location.hash-fallback approach as
+  // updateUrlHash -- see there for why both are attempted.
+  try { history.replaceState(null, '', location.pathname + location.search); }
+  catch (e) {
+    try { location.hash = ''; } catch (e2) { /* ignore */ }
+  }
+}
+
+function updateUrlHash() {
+  if (!state.selected) return;
+  const tabPart = state.detailTab === 'graph' ? ':graph' : '';
+  const hash = '#' + (state.selected.kind === 'folder' ? 'f:' : 'i:') + state.selected.idx + tabPart;
+  // history.replaceState is preferred (doesn't add a browser-native history
+  // entry, avoiding a second history mechanism competing with this app's own
+  // Back button); some environments reject a hash-only replaceState against
+  // a file:// URL, though, so fall back to a plain location.hash assignment
+  // (which does add a browser history entry) rather than silently giving up
+  // and leaving the address bar out of sync with what's on screen.
+  try { history.replaceState(null, '', hash); }
+  catch (e) {
+    try { location.hash = hash; } catch (e2) { /* ignore -- copying the current URL just won't carry the view */ }
+  }
+}
+
+function restoreFromHash() {
+  const m = /^#(f|i):(\d+)(:graph)?$/.exec(location.hash);
+  if (!m) return false;
+  const kind = m[1], idx = parseInt(m[2], 10), isGraph = !!m[3];
+  if (kind === 'f' && idx >= 0 && idx < DATA.folders.length) {
+    if (isGraph) state.detailTab = 'graph';
+    selectFolder(idx, false);
+    return true;
+  }
+  if (kind === 'i' && idx >= 0 && idx < DATA.identities.length) {
+    if (isGraph) state.detailTab = 'graph';
+    selectIdentity(idx, false);
+    return true;
+  }
+  return false;
+}
+
+/* ----------------------------------- Init ------------------------------------ */
+
+function init() {
+  precompute();
+  renderList();
+  initSplitter();
+  initTheme();
+
+  document.getElementById('tabIdentities').onclick = () => setTab('identities');
+  document.getElementById('tabFolders').onclick = () => setTab('folders');
+  document.getElementById('searchBox').oninput = (e) => { state.search = e.target.value; renderList(); };
+  document.getElementById('sortDirBtn').onclick = () => {
+    state.sortDir *= -1;
+    document.getElementById('sortDirBtn').innerHTML = state.sortDir === 1 ? 'A&ndash;Z' : 'Z&ndash;A';
+    renderList();
+    if (state.selected) {
+      if (state.selected.kind === 'folder') renderFolder(state.selected.idx);
+      else renderIdentity(state.selected.idx);
+    }
+  };
+  document.getElementById('backBtn').onclick = goBack;
+  document.getElementById('summaryBtn').onclick = renderSummaryView;
+
+  // Users/Groups/Both tri-state (mirrors the header quick-filters' own cycle:
+  // off/all -> one setting -> the other -> back to all) and the independent
+  // "Groups first" sort option -- both compose with the existing search and
+  // Disabled/dormant filter rather than replacing or fighting them (see
+  // renderList's identities branch, which applies all of them together).
+  // Every label names what's CURRENTLY shown, not just "All" at rest, which
+  // didn't say what clicking it would actually do.
+  const identityKindLabels = ['Users & Groups', 'Users only', 'Groups only'];
+  document.getElementById('identityKindBtn').onclick = () => {
+    state.filterIdentityKind = (state.filterIdentityKind + 1) % 3;
+    document.getElementById('identityKindBtn').textContent = identityKindLabels[state.filterIdentityKind];
+    document.getElementById('identityKindBtn').classList.toggle('state-show', state.filterIdentityKind !== 0);
+    if (state.tab !== 'identities') setTab('identities'); else renderList();
+  };
+  document.getElementById('groupsFirstBtn').onclick = () => {
+    state.sortGroupsFirst = !state.sortGroupsFirst;
+    document.getElementById('groupsFirstBtn').classList.toggle('state-show', state.sortGroupsFirst);
+    renderList();
+  };
+
+  // Header quick-filter buttons are 3-way toggles -- off / show-only (green,
+  // "ON") / hide (red, "HIDDEN") -- rather than one-shot actions, so they can
+  // be turned back off again without having to switch tabs or search to undo
+  // them. Turning one on jumps to the tab it applies to; cycling within that
+  // tab, or turning it off, just re-renders in place.
+  document.getElementById('btnBroken').onclick = () => {
+    state.filterBroken = (state.filterBroken + 1) % 3;
+    setFilterButtonUI('btnBroken', state.filterBroken);
+    if (state.filterBroken !== 0 && state.tab !== 'folders') setTab('folders'); else renderList();
+  };
+  document.getElementById('btnDormant').onclick = () => {
+    state.filterDormant = (state.filterDormant + 1) % 3;
+    setFilterButtonUI('btnDormant', state.filterDormant);
+    if (state.filterDormant !== 0 && state.tab !== 'identities') setTab('identities'); else renderList();
+  };
+
+  // Aged-folders filter only makes sense (and is only shown at all) when
+  // this scan actually captured Created/Modified/Accessed -- see
+  // DATA.hasFileMetadata and the Summary page's own note when it's missing.
+  const AGED_YEAR_CYCLE = [0, 1, 5, 10];
+  if (DATA.hasFileMetadata) {
+    document.getElementById('btnAged').style.display = '';
+    document.getElementById('btnAged').onclick = () => {
+      const curIdx = AGED_YEAR_CYCLE.indexOf(state.filterAgedYears);
+      state.filterAgedYears = AGED_YEAR_CYCLE[(curIdx + 1) % AGED_YEAR_CYCLE.length];
+      const btn = document.getElementById('btnAged');
+      btn.textContent = state.filterAgedYears === 0 ? 'Aged folders' : `Aged folders (${state.filterAgedYears}yr+)`;
+      btn.classList.toggle('state-show', state.filterAgedYears !== 0);
+      if (state.filterAgedYears !== 0 && state.tab !== 'folders') setTab('folders'); else renderList();
+    };
+  }
+
+  // Flag-files-broken toggle only makes sense (and is only shown at all)
+  // when this scan actually aggregated per-folder file counts -- see
+  // DATA.hasFileCounts. The badge it controls appears in both the sidebar
+  // list (renderList) and the tree view (renderFolderTreeView, shared by
+  // both renderFolder and renderIdentity), so toggling it needs to
+  // re-render whichever of those is currently on screen, not just one.
+  if (DATA.hasFileCounts) {
+    document.getElementById('btnFilesBroken').style.display = '';
+    document.getElementById('btnFilesBroken').onclick = () => {
+      state.flagFilesBroken = !state.flagFilesBroken;
+      document.getElementById('btnFilesBroken').classList.toggle('state-show', state.flagFilesBroken);
+      renderList();
+      if (state.selected) {
+        if (state.selected.kind === 'folder') renderFolder(state.selected.idx);
+        else renderIdentity(state.selected.idx);
+      }
+    };
+  }
+
+  if (DATA.scanComplete === false || (DATA.truncatedRowsDropped || 0) > 0) {
+    const badge = document.getElementById('headerIncompleteBadge');
+    badge.style.display = 'inline-block';
+    badge.style.cursor = 'pointer';
+    badge.onclick = renderSummaryView;
+  }
+
+  document.getElementById('footerLine').textContent =
+    `Generated ${DATA.generatedAt}${fmtDuration(DATA.buildDurationSeconds) ? ' (built in ' + fmtDuration(DATA.buildDurationSeconds) + ')' : ''} from ${DATA.sourceFolder} (toolkit v${DATA.toolkitVersion || '?'}) \u2014 point-in-time snapshot, not live data.`;
+
+  // A #f:<idx> / #i:<idx>[:graph] link in the address bar (see updateUrlHash)
+  // takes the visitor straight back to that exact view; anything else (no
+  // hash, or one that doesn't resolve) falls back to the normal Summary
+  // landing page.
+  if (!restoreFromHash()) renderSummaryView();
+}
+
+init();
+</script>
+<!-- FSA_RU_EMBEDDED_TRANSLATION_V2: localization is part of the HTML source, not an installer. -->
+<script>
+(function () {
+  'use strict';
+  const dict = {"File Server Access Map":"Карта доступа файлового сервера","Summary":"Сводка","Incomplete data":"Неполные данные","Back":"Назад","Broken inheritance folders":"Папки с отключённым наследованием","Disabled / dormant identities":"Отключённые и неактивные учётные записи","Aged folders":"Давно не изменявшиеся папки","Flag files w/ broken inheritance":"Отметить файлы с нарушенным наследованием","Identities":"Пользователи и группы","Folders":"Папки","Search...":"Поиск...","Groups first":"Сначала группы","Users & Groups":"Пользователи и группы","Users only":"Только пользователи","Groups only":"Только группы","Full Control":"Полный доступ","Modify":"Изменение","Read & Execute":"Чтение и выполнение","Read":"Чтение","Write":"Запись","Special":"Особые права","Deny":"Запрет","Disabled":"Отключена","Locked out":"Заблокирована","disabled":"отключена","locked":"заблокирована","dormant":"неактивна","broken inheritance":"отключено наследование","broken":"наследование отключено","not scanned":"не проверено","None found.":"Не найдено.","No matches.":"Совпадений нет.","member":"участник","Last logon (approx.)":"Последний вход (приблизительно)","Last modified (AD)":"Изменено в AD","Password last set":"Пароль установлен","Account expires":"Срок действия учётной записи","Group scope":"Область действия группы","Direct member count":"Непосредственных участников","Managed by":"Ответственный","Access rights":"Права доступа","Objects that could not be scanned":"Недоступные для проверки объекты","Identities total":"Всего субъектов","Access entries total":"Всего записей доступа","Groups":"Группы","Folders scanned":"Проверенные папки","Broken inheritance":"Отключённое наследование","Access rights distribution":"Распределение прав доступа","Observations worth a closer look":"Замечания, требующие проверки","Identities identified":"Найденные субъекты доступа","View these":"Показать","Show legend":"Показать легенду","Hide legend":"Скрыть легенду","Zoom in":"Приблизить","Zoom out":"Отдалить","Reset view":"Сбросить масштаб","Filter this table...":"Фильтр таблицы...","Filter this list...":"Фильтр списка...","Member of":"Состоит в группе","Granted via group":"Доступ через группу","Read-only.":"Только чтение.","Path":"Путь","Category":"Категория","Message":"Сообщение","Level":"Уровень","Allows":"Разрешённые действия","Abuse potential if misused":"Возможный риск","ON":"ВКЛ","HIDDEN":"СКРЫТО","Group":"Группа","User":"Пользователь","(unknown)":"(неизвестно)","Aged folders (5yr+)":"Не менялись более 5 лет","No notable observations from the signals this tool currently checks for.":"Существенных замечаний по проверенным признакам нет.","Export":"Экспорт","No logon":"Нет входа"};
+  const patterns = [
+    [/^Export (\d+) row\(s\) as CSV$/, 'Экспорт $1 строк в CSV'],
+    [/^(\d+) more — refine your search$/, 'Ещё $1 — уточните поиск'],
+    [/^No logon in (\d+)\+ days$/, 'Нет входов более $1 дней'],
+    [/^via (.+)$/, 'через $1']
+  ];
+  function translate(input) {
+    if (typeof input !== 'string') return input;
+    const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(input);
+    if (!m) return input;
+    let v = m[2];
+    if (Object.prototype.hasOwnProperty.call(dict,v)) v=dict[v];
+    else for(const [r,repl] of patterns) if (r.test(v)) { v=v.replace(r,repl); break; }
+    return m[1]+v+m[3];
+  }
+  function translateNode(root) {
+    if (!root) return;
+    if (root.nodeType===3) {
+      if(root.parentNode && /^(SCRIPT|STYLE|TEXTAREA)$/i.test(root.parentNode.nodeName))return;
+      const v=translate(root.nodeValue);if(v!==root.nodeValue)root.nodeValue=v;
+      return;
+    }
+    if(root.nodeType!==1 && root.nodeType!==9 && root.nodeType!==11)return;
+    const visit=(el)=>{
+      if(el.nodeType===1)for(const k of ['title','placeholder','aria-label']) {
+        const before=el.getAttribute(k);
+        if(before!==null) {const after=translate(before);if(before!==after)el.setAttribute(k,after);}
+      } else if(el.nodeType===3 && el.parentNode && !/^(SCRIPT|STYLE|TEXTAREA)$/i.test(el.parentNode.nodeName)) {
+        const after=translate(el.nodeValue);if(after!==el.nodeValue)el.nodeValue=after;
+      }
+    };
+    visit(root);
+    const w=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,null);
+    while(w.nextNode())visit(w.currentNode);
+  }
+  function run(){
+    document.documentElement.lang='ru';
+    document.title='Карта доступа файлового сервера';
+    const app=document.getElementById('app');if(!app)return;
+    translateNode(app);
+    let pending=[],scheduled=false;
+    const observer=new MutationObserver(changes=>{
+      for(const change of changes) {
+        if(change.type==='childList')pending.push(...change.addedNodes);
+        else pending.push(change.target);
+      }
+      if(!scheduled && pending.length){
+        scheduled=true;Promise.resolve().then(()=>{
+          scheduled=false;const queued=pending;pending=[];
+          for(const n of queued)translateNode(n);
+        });
+      }
+    });
+    observer.observe(app,{subtree:true,childList:true,characterData:true,
+      attributes:true,attributeFilter:['title','placeholder','aria-label']});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);
+  else run();
+})();
+</script>
+</body>
+</html>

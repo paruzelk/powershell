@@ -1,0 +1,42 @@
+﻿#Requires -Version 5.1
+# SPDX-License-Identifier: MIT
+[CmdletBinding()]
+param()
+$ErrorActionPreference = 'Stop'
+$root = Split-Path -Parent $PSScriptRoot
+$psFiles = @(
+    'Invoke-FileServerAudit-RU.ps1',
+    'Build-AccessMapFromFolder.ps1',
+    'Invoke-NTFSPermissionAudit.ps1',
+    'Get-FileServerShareInventory.ps1',
+    'Build-AccessMapHtml.ps1'
+)
+foreach ($name in $psFiles) {
+    $file = Join-Path $root $name
+    if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "Missing: $file" }
+    $bytes = [IO.File]::ReadAllBytes($file)
+    if ($bytes.Length -lt 3 -or $bytes[0] -ne 239 -or $bytes[1] -ne 187 -or $bytes[2] -ne 191) {
+        throw "UTF-8 BOM missing: $name"
+    }
+    $tokens = $null
+    $errors = $null
+    [void][System.Management.Automation.Language.Parser]::ParseFile($file, [ref]$tokens, [ref]$errors)
+    if ($errors -and $errors.Count -gt 0) {
+        throw ("PowerShell syntax error in {0}: {1}" -f $name,$errors[0].Message)
+    }
+    Write-Host "PASS: $name" -ForegroundColor Green
+}
+$htmlFile = Join-Path $root 'AccessMapTemplate.html'
+if (-not (Test-Path -LiteralPath $htmlFile -PathType Leaf)) { throw "Missing: $htmlFile" }
+$html = [IO.File]::ReadAllText($htmlFile,[Text.Encoding]::UTF8)
+foreach ($marker in @('FSA_RU_GROUP_CONTROLS_EMBEDDED_V2','FSA_RU_EMBEDDED_TRANSLATION_V2','Участники: ','Развернуть все группы')) {
+    if (-not $html.Contains($marker)) { throw "HTML feature missing: $marker" }
+}
+$scan = [IO.File]::ReadAllText((Join-Path $root 'Invoke-NTFSPermissionAudit.ps1'),[Text.Encoding]::UTF8)
+if (-not $scan.Contains('RU_UAC_STATUS_V2')) { throw 'AD UAC status check missing' }
+$exports = [regex]::Matches($scan,'(?m)Export-Csv[^\r\n]*-NoTypeInformation[^\r\n]*')
+foreach ($m in $exports) {
+    if ($m.Value -notmatch '-Encoding UTF8') { throw 'Export-Csv lacks -Encoding UTF8' }
+}
+Write-Host 'PASS: HTML, AD UAC, CSV UTF8' -ForegroundColor Green
+Write-Host 'Static source checks passed (AD/SMB integration not tested).' -ForegroundColor Cyan
