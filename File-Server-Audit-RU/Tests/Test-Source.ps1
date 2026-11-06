@@ -105,3 +105,25 @@ foreach ($marker in @(
     }
 }
 Write-Host 'PASS: единые метки AD во всех представлениях, включая группы и граф.' -ForegroundColor Green
+
+# RU_GRAPH_NODE_RIGHTS_1_0_13: защита от неподвижных подписей при перетаскивании.
+foreach ($marker in @(
+    'RU_GRAPH_NODE_RIGHTS_1_0_13',
+    "const tag = svgEl('g', { class: 'graphRightsTag'",
+    'function updateNodePosition(key, x, y)',
+    'updateNodePosition(key, nx, ny)',
+    'originalPositions.forEach((initial, key)',
+    "rightsToggle.textContent = showAllRights ?",
+    "svg.classList.toggle('rightsAlways', showAllRights)",
+    "line.appendChild(lineTip)",
+    "group.appendChild(tag)",
+    "const radius = hop === 0 ? 0 : Math.max("
+)) {
+    if (-not $html.Contains($marker)) {
+        throw "Отсутствует обновление связанного с узлом графа: $marker"
+    }
+}
+if ($html.Contains("class: 'edgeLabel'")) {
+    throw 'В графе осталась отдельная неподвижная подпись права.'
+}
+Write-Host 'PASS: права привязаны к узлам, перетаскивание и сброс координат учтены.' -ForegroundColor Green

@@ -190,7 +190,19 @@
   svg.graph .centerCircle { fill:var(--warn); }
   svg.graph .nodeLabel { font-weight:500; }
   svg.graph .nodeSubLabel { fill:var(--muted); font-size:9px; }
-  svg.graph .edgeLabel { fill:var(--muted); font-size:9px; }
+  /* RU_GRAPH_NODE_RIGHTS_1_0_13: rights belong to the connected node.
+     No free-floating edge text can remain behind after dragging. */
+  svg.graph .graphRightsTag { pointer-events:none; }
+  svg.graph .graphRightsBadge { fill:var(--panel); stroke-width:1.6; }
+  svg.graph .graphRightsLabel { fill:var(--text); font-size:10px; font-weight:600; }
+  svg.graph:not(.rightsAlways) .graphRightsTag { opacity:0; visibility:hidden; }
+  svg.graph:not(.rightsAlways) .nodeGroup:hover .graphRightsTag,
+  svg.graph:not(.rightsAlways) .nodeGroup:focus .graphRightsTag,
+  svg.graph:not(.rightsAlways) .nodeGroup:focus-within .graphRightsTag { opacity:1; visibility:visible; }
+  svg.graph .graphRightsTag { transition:opacity 0.12s ease; }
+  svg.graph .nodeGroup:focus { outline:none; }
+  svg.graph .nodeGroup:focus .nodeCircle { stroke:var(--accent); stroke-width:2.5; }
+  svg.graph .graphLinkTitle { pointer-events:none; }
   svg.graph .flagRing { pointer-events:none; }
   .summaryGrid { display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:14px; margin-bottom:18px; }
   .statCard { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:14px 16px; }
@@ -1517,7 +1529,11 @@ function layoutRadial(layers, visited) {
     });
   }
   layers.forEach((nodesThisHop, hop) => {
-    const radius = hop * RING_SPACING;
+    // A fixed radius puts dozens of distinct identities on top of each other.
+    // Reserve enough angular distance for each node on dense rings.
+    const minSeparation = nodesThisHop.length > 18 ? 115 : 95;
+    const radius = hop === 0 ? 0 : Math.max(hop * RING_SPACING,
+      (nodesThisHop.length * minSeparation) / (2 * Math.PI));
     nodesThisHop.forEach(k => {
       const pos = positions.get(k);
       pos.x = radius * Math.cos(pos.angle - Math.PI / 2);
@@ -1610,11 +1626,15 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
   });
   const btnOut = document.createElement('button'); btnOut.className = 'zoomBtn'; btnOut.textContent = '\u2212'; btnOut.title = 'Уменьшить масштаб';
   const btnIn = document.createElement('button'); btnIn.className = 'zoomBtn'; btnIn.textContent = '+'; btnIn.title = 'Увеличить масштаб';
-  const btnReset = document.createElement('button'); btnReset.className = 'zoomBtn'; btnReset.textContent = '\u2317'; btnReset.title = 'Сбросить масштаб';
+  const btnReset = document.createElement('button'); btnReset.className = 'zoomBtn'; btnReset.textContent = '\u2317'; btnReset.title = 'Сбросить масштаб и расположение узлов';
   toolbar.appendChild(btnOut); toolbar.appendChild(btnIn); toolbar.appendChild(btnReset);
+  const rightsToggle = document.createElement('button');
+  rightsToggle.type = 'button';
+  rightsToggle.className = 'chipBtn graphRightsToggle';
+  toolbar.appendChild(rightsToggle);
   const hint = document.createElement('span');
   hint.className = 'groupLabel';
-  hint.textContent = 'Глубина — число переходов от центрального объекта \u00b7 для больших групп и системных учётных записей показаны только прямые связи, пока они не выбраны центром \u00b7 колёсико мыши меняет масштаб \u00b7 перетаскивание фона перемещает граф \u00b7 перетаскивание узла меняет его положение \u00b7 нажмите на узел для перехода';
+  hint.textContent = 'Глубина — число переходов от выбранного объекта · права привязаны к соответствующим узлам · в плотных графах наведите курсор на пользователя или группу для просмотра прав · перетаскивайте узлы для изменения расположения · кнопка ⌗ возвращает исходное расположение';
   toolbar.appendChild(hint);
   wrap.appendChild(toolbar);
 
@@ -1694,16 +1714,58 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
   const vb = { x: -vbW / 2, y: -vbH / 2, w: vbW, h: vbH };
 
   const svg = svgEl('svg', { class: 'graph', viewBox: `${vb.x} ${vb.y} ${vb.w} ${vb.h}`, xmlns: 'http://www.w3.org/2000/svg' });
+  const graphNodeCount = [].concat(...g.layers).length;
+  // On a crowded graph show rights for the hovered/focused node only.
+  let showAllRights = graphNodeCount <= 14;
+  const syncRightsMode = () => {
+    svg.classList.toggle('rightsAlways', showAllRights);
+    rightsToggle.textContent = showAllRights ? 'Права: всегда' : 'Права: при наведении';
+    rightsToggle.title = showAllRights ?
+      'Подписи прав закреплены за узлами. Нажмите для показа по наведению.' :
+      'Наведите курсор на узел. Нажмите, чтобы показывать все подписи.';
+    rightsToggle.setAttribute('aria-pressed', String(showAllRights));
+  };
+  rightsToggle.onclick = () => { showAllRights = !showAllRights; syncRightsMode(); };
+  syncRightsMode();
   const edgesLayer = svgEl('g', {});
   const nodesLayer = svgEl('g', {});
   svg.appendChild(edgesLayer);
   svg.appendChild(nodesLayer);
   wrap.appendChild(svg);
 
+  // All mutable geometry is keyed by the identity/folder ID, never by
+  // absolute screen coordinates. Node labels live inside their <g>.
   const linesByNode = new Map();
+  const nodeGroupsByKey = new Map();
+  const originalPositions = new Map(Array.from(positions, ([key, pos]) =>
+    [key, { x: pos.x, y: pos.y }]));
   function trackLine(key, el, xAttr, yAttr) {
     if (!linesByNode.has(key)) linesByNode.set(key, []);
     linesByNode.get(key).push({ el, xAttr, yAttr });
+  }
+  function updateNodePosition(key, x, y) {
+    const pos = positions.get(key);
+    if (!pos) return;
+    pos.x = x; pos.y = y;
+    const group = nodeGroupsByKey.get(key);
+    if (group) group.setAttribute('transform', `translate(${x},${y})`);
+    (linesByNode.get(key) || []).forEach(link => {
+      link.el.setAttribute(link.xAttr, x);
+      link.el.setAttribute(link.yAttr, y);
+    });
+  }
+  function edgeDetailLines(edgeInfo) {
+    const seen = new Set();
+    for (const item of (edgeInfo.edges || [])) {
+      if (item.type === 'membership') {
+        seen.add('Членство в группе');
+      } else if (item.e) {
+        seen.add((item.e[5] ? 'Запрет: ' : '') +
+          displayRight(RIGHTS_LABELS[item.e[2]]) +
+          (item.e[3] ? ' (наследуемые права)' : ' (явные права)'));
+      }
+    }
+    return Array.from(seen);
   }
 
   const allKeys = [].concat(...g.layers);
@@ -1722,17 +1784,24 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
       edgesLayer.appendChild(line);
       trackLine(info.from, line, 'x1', 'y1');
       trackLine(key, line, 'x2', 'y2');
-      const midx = (parentPos.x + pos.x) / 2, midy = (parentPos.y + pos.y) / 2;
-      const lbl = svgEl('text', { class: 'edgeLabel', x: midx, y: midy, 'text-anchor': 'middle' });
-      lbl.textContent = edisp.label;
-      edgesLayer.appendChild(lbl);
+      // A line still has its full rights information on hover; it no longer
+      // owns a free-floating label that can be left behind when nodes move.
+      const lineTip = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      lineTip.textContent = nodeDisplayInfo(info.from).full + ' ↔ ' +
+        nodeDisplayInfo(key).full + '\n' + edgeDetailLines(info.edgeInfo).join('; ');
+      line.appendChild(lineTip);
     });
   });
 
   function buildNode(key, pos, isCenter) {
     const info = nodeDisplayInfo(key);
     const r = isCenter ? 26 : 17;
-    const group = svgEl('g', { class: 'nodeGroup', transform: `translate(${pos.x},${pos.y})`, 'data-key': key });
+    const group = svgEl('g', {
+      class: 'nodeGroup', transform: `translate(${pos.x},${pos.y})`,
+      'data-key': key, tabindex: 0, role: 'button',
+      'aria-label': info.full
+    });
+    nodeGroupsByKey.set(key, group);
     group.appendChild(svgEl('circle', { class: 'nodeCircle' + (isCenter ? ' centerCircle' : ''), r, fill: isCenter ? undefined : info.color }));
     if (info.flagged) {
       // Show the warning even when the flagged account is the selected center.
@@ -1744,13 +1813,49 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
         class: 'flagRing'
       }));
     }
+    // Rights badge is a CHILD of the corresponding user/group/folder node.
+    // Its local coordinates remain correct for zoom, pan and node dragging.
+    let edgeTip = '';
+    if (!isCenter) {
+      const relation = g.visited.get(key);
+      if (relation && relation.edgeInfo) {
+        const edisp = edgeDisplayInfo(relation.edgeInfo);
+        const details = edgeDetailLines(relation.edgeInfo);
+        const edgeCount = relation.edgeInfo.edges.length;
+        edgeTip = '\nСвязь с ' + nodeDisplayInfo(relation.from).full +
+          ': ' + details.join('; ') +
+          (edgeCount > 1 ? '\nЗаписей связи: ' + edgeCount : '');
+        const shown = truncateLabel(edisp.label, 25) +
+          (edgeCount > 1 ? ' (+' + (edgeCount - 1) + ')' : '');
+        const width = Math.min(265, Math.max(66, shown.length * 6.15 + 18));
+        const offsetX = r + 10;
+        const tag = svgEl('g', { class: 'graphRightsTag',
+          transform: `translate(${offsetX},-13)` });
+        tag.appendChild(svgEl('rect', { class: 'graphRightsBadge',
+          x: 0, y: 0, width, height: 25, rx: 5, stroke: edisp.color }));
+        const txt = svgEl('text', { class: 'graphRightsLabel', x: 8, y: 17 });
+        txt.textContent = shown;
+        tag.appendChild(txt);
+        group.appendChild(tag);
+      }
+    }
     const nameLbl = svgEl('text', { class: 'nodeLabel', x: 0, y: r + 16, 'text-anchor': 'middle' });
     nameLbl.textContent = truncateLabel(info.label, 22);
     group.appendChild(nameLbl);
     const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-    title.textContent = info.full + (info.status ? '\nСостояние: ' + info.status : '');
+    title.textContent = info.full + (info.status ? '\nСостояние: ' + info.status : '') + edgeTip;
     group.appendChild(title);
     nodesLayer.appendChild(group);
+    // In crowded charts keep the hovered or keyboard-focused node above its
+    // neighbours so its attached rights badge is readable.
+    group.addEventListener('mouseenter', () => nodesLayer.appendChild(group));
+    group.addEventListener('focus', () => nodesLayer.appendChild(group));
+    group.addEventListener('keydown', ev => {
+      if (!isCenter && (ev.key === 'Enter' || ev.key === ' ')) {
+        ev.preventDefault();
+        onNavigate(key);
+      }
+    });
     return group;
   }
 
@@ -1758,10 +1863,15 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
     let dragging = false, moved = false, startClientX = 0, startClientY = 0, startX = pos.x, startY = pos.y;
     function clientToSvgScale() {
       const rect = svg.getBoundingClientRect ? svg.getBoundingClientRect() : null;
-      const vbNow = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal : vb;
+      // Use the current SVG viewBox after zoom/pan. The original fallback
+      // accidentally used vb.width/height even though vb stores w/h.
+      const live = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal : null;
+      const coords = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
+      const viewWidth = (live && live.width > 0 ? live.width : coords[2]) || vb.w;
+      const viewHeight = (live && live.height > 0 ? live.height : coords[3]) || vb.h;
       const clientW = (rect && rect.width) ? rect.width : 900;
       const clientH = (rect && rect.height) ? rect.height : 520;
-      return { sx: vbNow.width / clientW, sy: vbNow.height / clientH };
+      return { sx: viewWidth / clientW, sy: viewHeight / clientH };
     }
     function onMouseMove(e) {
       if (!dragging) return;
@@ -1770,12 +1880,7 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
       const dy = (e.clientY - startClientY) * scale.sy;
       if (Math.abs(e.clientX - startClientX) > 2 || Math.abs(e.clientY - startClientY) > 2) moved = true;
       const nx = startX + dx, ny = startY + dy;
-      group.setAttribute('transform', `translate(${nx},${ny})`);
-      pos.x = nx; pos.y = ny;
-      (linesByNode.get(key) || []).forEach(l => {
-        l.el.setAttribute(l.xAttr, nx);
-        l.el.setAttribute(l.yAttr, ny);
-      });
+      updateNodePosition(key, nx, ny);
     }
     function onMouseUp() {
       document.removeEventListener('mousemove', onMouseMove);
@@ -1848,7 +1953,12 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
   svg.addEventListener('wheel', (e) => { e.preventDefault(); zoomBy(e.deltaY > 0 ? 1.15 : (1 / 1.15), e.clientX, e.clientY); }, { passive: false });
   btnIn.onclick = () => zoomBy(1 / 1.3);
   btnOut.onclick = () => zoomBy(1.3);
-  btnReset.onclick = () => svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+  btnReset.onclick = () => {
+    // Reset both positions and connected lines. Rights tags are inside
+    // node groups, so they follow automatically and cannot become detached.
+    originalPositions.forEach((initial, key) => updateNodePosition(key, initial.x, initial.y));
+    svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+  };
 
   if (g.truncated) {
     const note = document.createElement('div');
