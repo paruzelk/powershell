@@ -29,7 +29,7 @@ foreach ($name in $psFiles) {
 $htmlFile = Join-Path $root 'AccessMapTemplate.html'
 if (-not (Test-Path -LiteralPath $htmlFile -PathType Leaf)) { throw "Missing: $htmlFile" }
 $html = [IO.File]::ReadAllText($htmlFile,[Text.Encoding]::UTF8)
-foreach ($marker in @('FSA_RU_GROUP_CONTROLS_EMBEDDED_V2','FSA_RU_EMBEDDED_TRANSLATION_V2','RU_SUMMARY_DIAGNOSTIC_1.0.8','Участники: ','Развернуть все группы')) {
+foreach ($marker in @('FSA_RU_GROUP_CONTROLS_EMBEDDED_V2','FSA_RU_EMBEDDED_TRANSLATION_V2','RU_SUMMARY_DIAGNOSTIC_1.0.8','RU_SIDEBAR_GROUP_MEMBERS_V1','Участники: ','Развернуть все группы')) {
     if (-not $html.Contains($marker)) { throw "HTML feature missing: $marker" }
 }
 $scan = [IO.File]::ReadAllText((Join-Path $root 'Invoke-NTFSPermissionAudit.ps1'),[Text.Encoding]::UTF8)

@@ -81,6 +81,23 @@
   .listItem { padding:8px 10px; border-radius:4px; cursor:pointer; font-size:13px; margin-bottom:2px; }
   .listItem:hover { background:var(--panel2); }
   .listItem .sub { color:var(--muted); font-size:11px; }
+  /* RU_SIDEBAR_GROUP_MEMBERS_V1 */
+  .sidebarGroupLine { display:flex; align-items:stretch; gap:2px; min-width:0; }
+  .sidebarGroupLine .listItem { flex:1; min-width:0; margin-bottom:0; padding-left:5px; }
+  .sidebarGroupToggle { width:25px; flex:0 0 25px; border:0; padding:4px; border-radius:4px;
+    background:transparent; color:var(--text); cursor:pointer; font-size:15px; }
+  .sidebarGroupToggle:hover, .sidebarGroupToggle:focus-visible { background:var(--panel2); }
+  .sidebarGroupMembers { border-left:1px solid var(--border); padding-left:8px; margin:1px 0 6px 16px; }
+  .sidebarMemberLink { display:block; width:100%; padding:6px 8px; text-align:left; border:0;
+    border-radius:4px; background:transparent; color:var(--text); font:inherit; font-size:12px;
+    cursor:pointer; overflow-wrap:anywhere; }
+  .sidebarMemberLink:hover, .sidebarMemberLink:focus-visible { background:var(--panel2); }
+  .sidebarMemberNote { color:var(--muted); padding:6px 8px; font-size:11px; line-height:1.4; }
+  .groupMemberDetails { margin-top:10px; padding:8px 10px; border:1px solid var(--border);
+    border-radius:5px; font-size:12px; max-height:230px; overflow-y:auto; }
+  .groupMemberDetails > summary { cursor:pointer; font-weight:600; }
+  .groupMemberDetails .sidebarGroupMembers { margin-top:8px; }
+
   .listItemPathRow { display:flex; align-items:center; gap:6px; min-width:0; }
   .listItemPathRow .path { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
   .badge { display:inline-block; padding:1px 6px; border-radius:3px; font-size:10px; margin-left:6px; vertical-align:middle; }
@@ -759,8 +776,121 @@ function downloadCsv(filename, rows, columns) {
 
 /* ---------------------------------- Sidebar -------------------------------- */
 
+// Members are taken from manifest.js, not queried live from AD.
+// "members" is recursively expanded membership observed via GrantedViaGroup.
+// "memberCount" is a separate LDAP count of immediate members of the group.
+const sidebarExpandedGroups = new Set();
+const GROUP_MEMBER_PAGE_SIZE = 150;
+function getReportGroupMembers(group, groupIdx) {
+  const seen = new Set();
+  if (Array.isArray(group.members)) for (const idx of group.members) {
+    if (!Number.isInteger(idx) || idx < 0 || idx >= DATA.identities.length ||
+        idx === groupIdx || !DATA.identities[idx]) continue;
+    seen.add(idx);
+  }
+  return Array.from(seen).sort((a, b) =>
+    cmpText(DATA.identities[a].name || '', DATA.identities[b].name || ''));
+}
+function groupMemberMissingText(group) {
+  if (Number(group.memberCount) === 0 && group.memberCount !== null &&
+      group.memberCount !== undefined && group.memberCount !== '')
+    return 'По данным AD у группы нет непосредственных участников.';
+  return 'Состав группы не записан в отчёт. При сканировании укажите -ExpandGroups; проверьте -ExpandGroupsExclude и доступ к AD.';
+}
+function populateReportGroupMembers(host, group, groupIdx) {
+  if (host.dataset.populated === '1') return;
+  host.dataset.populated = '1';
+  const ids = getReportGroupMembers(group, groupIdx);
+  if (ids.length === 0) {
+    const note = document.createElement('div');
+    note.className = 'sidebarMemberNote';
+    note.textContent = groupMemberMissingText(group);
+    host.appendChild(note);
+    return;
+  }
+  const note = document.createElement('div');
+  note.className = 'sidebarMemberNote';
+  const directCount = Number(group.memberCount);
+  const directKnown = group.memberCount !== null && group.memberCount !== undefined &&
+    group.memberCount !== '' && Number.isFinite(directCount);
+  note.textContent = 'Раскрытых по данным аудита: ' + ids.length +
+    ' (с учётом вложенных групп)' +
+    (directKnown ? '; непосредственных в AD: ' + directCount : '') + '.';
+  host.appendChild(note);
+  let visible = 0;
+  const more = document.createElement('button');
+  more.type = 'button';
+  more.className = 'sidebarMemberLink';
+  function appendBatch() {
+    const end = Math.min(ids.length, visible + GROUP_MEMBER_PAGE_SIZE);
+    while (visible < end) {
+      const idx = ids[visible++];
+      const person = DATA.identities[idx];
+      const link = document.createElement('button');
+      link.type = 'button';
+      link.className = 'sidebarMemberLink';
+      link.textContent = person.name || '(неизвестно)';
+      link.title = 'Открыть сведения и права: ' + (person.name || '');
+      link.onclick = (event) => { event.stopPropagation(); selectIdentity(idx, true); };
+      host.insertBefore(link, more);
+    }
+    more.style.display = visible < ids.length ? '' : 'none';
+    if (visible < ids.length)
+      more.textContent = 'Показать ещё ' + Math.min(GROUP_MEMBER_PAGE_SIZE, ids.length-visible) +
+        ' (осталось ' + (ids.length-visible) + ')';
+  }
+  more.onclick = (event) => { event.stopPropagation(); appendBatch(); };
+  host.appendChild(more);
+  appendBatch();
+}
+function appendGroupSidebarRow(panel, group, idx, badges) {
+  const line = document.createElement('div');
+  line.className = 'sidebarGroupLine';
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'sidebarGroupToggle';
+  const members = getReportGroupMembers(group, idx);
+  const expanded = sidebarExpandedGroups.has(idx);
+  toggle.textContent = expanded ? '▾' : '▸';
+  toggle.title = 'Показать или скрыть состав группы: ' + (group.name || '') +
+    '. В отчёте: ' + members.length + '.';
+  toggle.setAttribute('aria-label', 'Раскрыть группу ' + (group.name || ''));
+  toggle.setAttribute('aria-expanded', String(expanded));
+  const item = document.createElement('div');
+  item.className = 'listItem';
+  const direct = group.memberCount !== null && group.memberCount !== undefined &&
+    group.memberCount !== '' ? ' · непосредственно в AD: ' + esc(group.memberCount) : '';
+  item.innerHTML = '<div>' + esc(group.name || '(неизвестно)') + badges + '</div>' +
+    '<div class="sub">Группа' + direct + '</div>';
+  item.onclick = () => selectIdentity(idx, true);
+  line.appendChild(toggle);
+  line.appendChild(item);
+  const host = document.createElement('div');
+  host.className = 'sidebarGroupMembers';
+  host.style.display = expanded ? '' : 'none';
+  if (expanded) populateReportGroupMembers(host, group, idx);
+  toggle.onclick = event => {
+    event.stopPropagation();
+    const isOpen = !sidebarExpandedGroups.has(idx);
+    if (isOpen) {
+      sidebarExpandedGroups.add(idx);
+      populateReportGroupMembers(host, group, idx);
+    } else {
+      sidebarExpandedGroups.delete(idx);
+    }
+    host.style.display = isOpen ? '' : 'none';
+    toggle.textContent = isOpen ? '▾' : '▸';
+    toggle.setAttribute('aria-expanded', String(isOpen));
+  };
+  const wrapper = document.createElement('div');
+  wrapper.appendChild(line);
+  wrapper.appendChild(host);
+  panel.appendChild(wrapper);
+}
+
 function renderList() {
   const panel = document.getElementById('listPanel');
+  const previousScroll = panel.scrollTop;
   panel.innerHTML = '';
   const q = state.search.trim().toLowerCase();
   const LIMIT = 300;
@@ -799,8 +929,12 @@ function renderList() {
       if (idn.flagLocked) badges += '<span class="badge locked">locked</span>';
       if (idn.flagDormant && !idn.flagDisabled) badges += '<span class="badge dormant">dormant</span>';
       div.innerHTML = `<div>${esc(idn.name || '(unknown)')}${badges}</div><div class="sub">${esc(idn.type || '')}${idn.title ? ' \u00b7 ' + esc(idn.title) : ''}</div>`;
-      div.onclick = () => selectIdentity(idx, true);
-      panel.appendChild(div);
+      if (idn.type === 'Group') {
+        appendGroupSidebarRow(panel, idn, idx, badges);
+      } else {
+        div.onclick = () => selectIdentity(idx, true);
+        panel.appendChild(div);
+      }
     });
     if (total === 0) {
       const none = document.createElement('div');
@@ -859,6 +993,7 @@ function renderList() {
       panel.appendChild(more);
     }
   }
+  panel.scrollTop = previousScroll;
 }
 
 function setTab(tab) {
@@ -1712,6 +1847,23 @@ function identityInfoCard(idn) {
     field('Account expires', idn.expires) + field('Created', idn.created) +
     field('Group scope', idn.groupScope) + field('Direct member count', idn.memberCount) + field('Managed by', idn.managedBy) +
     field('Notes', idn.notes) + field('SID', idn.sid);
+  if (idn.type === 'Group') {
+    const groupIdx = DATA.identities.indexOf(idn);
+    const reportMemberCount = getReportGroupMembers(idn, groupIdx).length;
+    const section = document.createElement('details');
+    section.className = 'groupMemberDetails';
+    const heading = document.createElement('summary');
+    heading.textContent = 'Показать состав группы (' + reportMemberCount + ' по данным аудита)';
+    heading.title = 'Число Direct member count показывает непосредственных членов AD, а здесь отображается раскрытое членство по данным отчёта.';
+    section.appendChild(heading);
+    const host = document.createElement('div');
+    host.className = 'sidebarGroupMembers';
+    section.appendChild(host);
+    section.addEventListener('toggle', () => {
+      if (section.open) populateReportGroupMembers(host, idn, groupIdx);
+    });
+    div.appendChild(section);
+  }
   return div;
 }
 
