@@ -29,7 +29,7 @@ foreach ($name in $psFiles) {
 $htmlFile = Join-Path $root 'AccessMapTemplate.html'
 if (-not (Test-Path -LiteralPath $htmlFile -PathType Leaf)) { throw "Missing: $htmlFile" }
 $html = [IO.File]::ReadAllText($htmlFile,[Text.Encoding]::UTF8)
-foreach ($marker in @('FSA_RU_GROUP_CONTROLS_EMBEDDED_V2','FSA_RU_EMBEDDED_TRANSLATION_V2','RU_SUMMARY_DIAGNOSTIC_1.0.8','RU_SIDEBAR_GROUP_MEMBERS_V1','RU_RIGHTS_CHART_VALIDATION_V1','Участники: ','Развернуть все группы')) {
+foreach ($marker in @('FSA_RU_GROUP_CONTROLS_EMBEDDED_V2','RU_I18N_INLINE_1_0_11','RU_SUMMARY_DIAGNOSTIC_1.0.8','RU_SIDEBAR_GROUP_MEMBERS_V1','RU_RIGHTS_CHART_VALIDATION_V1','Участники: ','Развернуть все группы')) {
     if (-not $html.Contains($marker)) { throw "HTML feature missing: $marker" }
 }
 $scan = [IO.File]::ReadAllText((Join-Path $root 'Invoke-NTFSPermissionAudit.ps1'),[Text.Encoding]::UTF8)
@@ -57,3 +57,29 @@ if ($values.Count -ne 6 -or [int]$values[0] -ne 2 -or [int]$values[1] -ne 1) {
     throw 'PowerShell 5.1 could not round-trip rightsDistribution as an array.'
 }
 Write-Host 'PASS: rights totals, JSON structure and fallback code markers.' -ForegroundColor Green
+
+# Проверка встроенной русской справки без прежнего DOM-русификатора.
+$documentationMarkers = @(
+    'Уровни доступа: разрешённые действия и возможные риски',
+    'Эти замечания основаны на эвристическом анализе данных отчёта',
+    'Замечания, требующие проверки',
+    'Непосредственных участников в AD',
+    'Пользователи и группы'
+)
+foreach ($phrase in $documentationMarkers) {
+    if (-not $html.Contains($phrase)) { throw "Отсутствует русская справка: $phrase" }
+}
+if ($html.Contains('FSA_RU_EMBEDDED_TRANSLATION_V2')) {
+    throw 'Устаревший динамический HTML-русификатор не удалён.'
+}
+foreach ($english in @(
+    'What each access level actually allows (and how it could be misused)',
+    'These are heuristic, data-driven starting points',
+    'Some connections at this depth were too numerous',
+    'Objects that could not be scanned ('
+)) {
+    if ($html.Contains($english)) {
+        throw "Остался англоязычный элемент отчёта: $english"
+    }
+}
+Write-Host 'PASS: русская справка, пояснения и встроенная локализация.' -ForegroundColor Green

@@ -281,40 +281,40 @@
 <body>
 <div id="app">
   <header>
-    <h1>File Server Access Map</h1>
-    <button id="summaryBtn">Summary</button>
-    <span id="headerIncompleteBadge" style="display:none;" class="headerIncompleteBadge" title="Click Summary for details">Incomplete data</span>
-    <button id="backBtn" disabled>&larr; Back</button>
+    <h1>Карта доступа файлового сервера</h1>
+    <button id="summaryBtn">Сводка</button>
+    <span id="headerIncompleteBadge" style="display:none;" class="headerIncompleteBadge" title="Подробности см. в разделе «Сводка»">Неполные данные</span>
+    <button id="backBtn" disabled>&larr; Назад</button>
     <div class="headerRightGroup">
-      <button id="btnBroken" class="chipBtn" title="Cycles: off -> show only -> hide -> off">Broken inheritance folders</button>
-      <button id="btnDormant" class="chipBtn" title="Cycles: off -> show only -> hide -> off">Disabled / dormant identities</button>
-      <button id="btnAged" class="chipBtn" style="display:none;" title="Cycles: off -> 1yr+ -> 5yr+ -> 10yr+ since last modified -> off">Aged folders</button>
-      <button id="btnFilesBroken" class="chipBtn" style="display:none;" title="Toggle: flag folders where a file has broken inheritance">Flag files w/ broken inheritance</button>
-      <button id="themeToggleBtn" class="chipBtn themeToggleBtn" title="Toggle light/dark (follows your browser by default)"></button>
+      <button id="btnBroken" class="chipBtn" title="Последовательно: все → только отмеченные → исключить отмеченные → все">Папки с отключённым наследованием</button>
+      <button id="btnDormant" class="chipBtn" title="Последовательно: все → только отмеченные → исключить отмеченные → все">Отключённые и неактивные учётные записи</button>
+      <button id="btnAged" class="chipBtn" style="display:none;" title="Последовательно: без фильтра → старше 1 года → 5 лет → 10 лет → без фильтра">Давно не изменявшиеся папки</button>
+      <button id="btnFilesBroken" class="chipBtn" style="display:none;" title="Показывать папки с файлами, для которых отключено наследование">Отмечать файлы с отключённым наследованием</button>
+      <button id="themeToggleBtn" class="chipBtn themeToggleBtn" title="Переключить светлую или тёмную тему (по умолчанию — тема браузера)"></button>
     </div>
   </header>
   <div id="main">
     <div id="sidebar">
       <div class="tabs">
-        <button id="tabIdentities" class="active">Identities</button>
-        <button id="tabFolders">Folders</button>
+        <button id="tabIdentities" class="active">Пользователи и группы</button>
+        <button id="tabFolders">Папки</button>
       </div>
       <div class="searchRow">
-        <input id="searchBox" type="text" placeholder="Search...">
-        <button id="sortDirBtn" title="Sort direction">A&ndash;Z</button>
+        <input id="searchBox" type="text" placeholder="Поиск...">
+        <button id="sortDirBtn" title="Направление сортировки">A&ndash;Z</button>
       </div>
       <div id="identityFilterRow" class="identityFilterRow">
-        <button id="identityKindBtn" class="chipBtn" title="Cycles: show all -> Users only -> Groups only -> show all">Users &amp; Groups</button>
-        <button id="groupsFirstBtn" class="chipBtn" title="Toggle: sort Groups before Users">Groups first</button>
+        <button id="identityKindBtn" class="chipBtn" title="Последовательно: все → пользователи → группы → все">Пользователи и группы</button>
+        <button id="groupsFirstBtn" class="chipBtn" title="Сначала отображать группы, затем пользователей">Сначала группы</button>
       </div>
       <div id="listPanel"></div>
     </div>
-    <div id="splitter" title="Drag to resize"></div>
+    <div id="splitter" title="Перетащите для изменения ширины"></div>
     <div id="content">
       <div id="welcome"></div>
     </div>
   </div>
-  <footer><span id="footerLine"></span> <a id="footerGithubLink" class="chipBtn" href="https://github.com/sean-aura/File-Server-Audit" target="_blank" rel="noopener noreferrer" title="Open the File Server Permission Audit Toolkit repository on GitHub">File Server Permission Audit Toolkit &#8599;</a></footer>
+  <footer><span id="footerLine"></span> <a id="footerGithubLink" class="chipBtn" href="https://github.com/sean-aura/File-Server-Audit" target="_blank" rel="noopener noreferrer" title="Открыть репозиторий File Server Permission Audit Toolkit на GitHub">File Server Permission Audit Toolkit &#8599;</a></footer>
 </div>
 
 <script src="AccessMap_data/manifest.js"></script>
@@ -417,7 +417,7 @@ function ensureShareLoaded(shareKey) {
   script.src = ACCESS_MAP_DATA_DIR + '/' + shareMeta.file;
   script.onerror = () => {
     shareLoadPromises.delete(shareKey);
-    rejectFn(new Error(`Couldn't load ${script.src} -- the AccessMap_data folder may have been moved, renamed, or not copied along with this HTML file.`));
+    rejectFn(new Error(`Не удалось загрузить ${script.src}. Папка AccessMap_data могла быть перемещена, переименована или не скопирована вместе с HTML-отчётом.`));
   };
   document.head.appendChild(script);
   return promise;
@@ -740,7 +740,7 @@ function fmtDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso; // fall back to the raw string rather than hide a genuinely unparseable value
-  return d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleString('ru-RU', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 function ageInDays(iso) {
   if (!iso) return null;
@@ -750,10 +750,10 @@ function ageInDays(iso) {
 }
 function fmtDuration(seconds) {
   if (seconds === undefined || seconds === null || isNaN(seconds)) return '';
-  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 60) return `${seconds} с`;
   const mins = Math.floor(seconds / 60);
   const secs = Math.round(seconds % 60);
-  return `${mins}m ${secs}s`;
+  return `${mins} мин ${secs} с`;
 }
 function truncateLabel(s, n) { if (!s) return ''; return s.length > n ? s.slice(0, n - 1) + '\u2026' : s; }
 
@@ -775,6 +775,53 @@ function downloadCsv(filename, rows, columns) {
 }
 
 /* ---------------------------------- Sidebar -------------------------------- */
+// RU_I18N_INLINE_1_0_11: presentation-only translations.
+// Internal identity types, rights codes, CSV keys and exported schema stay unchanged.
+const UI_IDENTITY_TYPES = {
+  'User': 'Пользователь', 'Group': 'Группа', 'Computer': 'Компьютер',
+  'Well-known / Local': 'Встроенная / локальная учётная запись',
+  'Unresolved': 'Неопределённый SID'
+};
+const UI_RIGHTS = {
+  'Full Control': 'Полный доступ', 'Modify': 'Изменение',
+  'Read & Execute': 'Чтение и выполнение', 'Read': 'Чтение',
+  'Write': 'Запись', 'Special': 'Особые права'
+};
+const UI_COLUMN_LABELS = {
+  'Path': 'Путь', 'Rights': 'Права', 'Inherited': 'Наследуемая запись',
+  'Broken inheritance here': 'Наследование отключено',
+  'Deny': 'Запрет', 'Granted via group': 'Доступ через группу',
+  'Identity': 'Учётная запись', 'Type': 'Тип', 'Enabled': 'Включена'
+};
+const displayIdentityType = type => UI_IDENTITY_TYPES[type] || type || '';
+const displayRight = right => UI_RIGHTS[right] || right || '';
+const displayColumnLabel = label => UI_COLUMN_LABELS[label] || label || '';
+function displayTableValue(column, row) {
+  const value = column.get(row);
+  if (column.key === 'rights') return displayRight(value);
+  if (['inherited', 'broken', 'deny'].includes(column.key)) {
+    if (value === 'Yes') return 'Да';
+    if (value === 'No') return 'Нет';
+  }
+  return value;
+}
+function displayAdNote(text) {
+  if (typeof text !== 'string') return text;
+  const notes = {
+    'No AD object resolved (well-known/local SID, or unresolved/orphaned SID).': 'Объект AD не найден: встроенный, локальный или неразрешённый SID.',
+    'AD lookup disabled (-NoAdLookup); only Name/Sid/Type available.': 'Поиск в AD отключён (-NoAdLookup): доступны только имя, SID и тип.',
+    'Principal.Enabled differs from userAccountControl; UAC used.': 'Состояние Principal.Enabled отличается от userAccountControl; использовано значение UAC.',
+    'Enabled is unknown: userAccountControl is unavailable.': 'Состояние неизвестно: атрибут userAccountControl недоступен.',
+    'Enabled is unknown: underlying AD DirectoryEntry is unavailable.': 'Состояние неизвестно: объект AD DirectoryEntry недоступен.'
+  };
+  return notes[text] || text.replace('Enabled is unknown: failed to read userAccountControl.',
+    'Состояние неизвестно: не удалось прочитать userAccountControl.');
+}
+function displayGroupScope(scope) {
+  const names = {Global: 'Глобальная', Universal: 'Универсальная', DomainLocal: 'Локальная в домене'};
+  return names[scope] || scope;
+}
+
 
 // Members are taken from manifest.js, not queried live from AD.
 // "members" is recursively expanded membership observed via GrantedViaGroup.
@@ -925,10 +972,10 @@ function renderList() {
       const div = document.createElement('div');
       div.className = 'listItem';
       let badges = '';
-      if (idn.flagDisabled) badges += '<span class="badge disabled">disabled</span>';
-      if (idn.flagLocked) badges += '<span class="badge locked">locked</span>';
-      if (idn.flagDormant && !idn.flagDisabled) badges += '<span class="badge dormant">dormant</span>';
-      div.innerHTML = `<div>${esc(idn.name || '(unknown)')}${badges}</div><div class="sub">${esc(idn.type || '')}${idn.title ? ' \u00b7 ' + esc(idn.title) : ''}</div>`;
+      if (idn.flagDisabled) badges += '<span class="badge disabled">отключена</span>';
+      if (idn.flagLocked) badges += '<span class="badge locked">заблокирована</span>';
+      if (idn.flagDormant && !idn.flagDisabled) badges += '<span class="badge dormant">неактивна</span>';
+      div.innerHTML = `<div>${esc(idn.name || '(неизвестно)')}${badges}</div><div class="sub">${esc(displayIdentityType(idn.type))}${idn.title ? ' \u00b7 ' + esc(idn.title) : ''}</div>`;
       if (idn.type === 'Group') {
         appendGroupSidebarRow(panel, idn, idx, badges);
       } else {
@@ -939,12 +986,12 @@ function renderList() {
     if (total === 0) {
       const none = document.createElement('div');
       none.className = 'listMore';
-      none.textContent = 'None found.';
+      none.textContent = 'Ничего не найдено.';
       panel.appendChild(none);
     } else if (total > LIMIT) {
       const more = document.createElement('div');
       more.className = 'listMore';
-      more.textContent = `${total - LIMIT} more \u2014 refine your search`;
+      more.textContent = `${total - LIMIT} ещё — уточните поиск`;
       panel.appendChild(more);
     }
   } else {
@@ -974,8 +1021,8 @@ function renderList() {
     items.forEach(({ f, idx }) => {
       const div = document.createElement('div');
       div.className = 'listItem';
-      const badge = f.broken ? '<span class="badge broken">broken inheritance</span>' : '';
-      const fileBadge = (state.flagFilesBroken && f.filesBrokenInheritance) ? '<span class="badge broken" title="One or more files directly in this folder have broken inheritance">files: broken inheritance</span>' : '';
+      const badge = f.broken ? '<span class="badge broken">наследование отключено</span>' : '';
+      const fileBadge = (state.flagFilesBroken && f.filesBrokenInheritance) ? '<span class="badge broken" title="Для одного или нескольких файлов в этой папке отключено наследование">файлы: наследование отключено</span>' : '';
       div.innerHTML = `<div class="listItemPathRow"><span class="path">${esc(f.path)}</span>${badge}${fileBadge}</div>`;
       div.title = f.path;
       div.onclick = () => selectFolder(idx, true);
@@ -984,12 +1031,12 @@ function renderList() {
     if (total === 0) {
       const none = document.createElement('div');
       none.className = 'listMore';
-      none.textContent = 'None found.';
+      none.textContent = 'Ничего не найдено.';
       panel.appendChild(none);
     } else if (total > LIMIT) {
       const more = document.createElement('div');
       more.className = 'listMore';
-      more.textContent = `${total - LIMIT} more \u2014 refine your search`;
+      more.textContent = `${total - LIMIT} ещё — уточните поиск`;
       panel.appendChild(more);
     }
   }
@@ -1029,12 +1076,12 @@ async function selectIdentity(idx, recordHistory) {
   // Usually resolves on the same tick (already loaded, or this identity has
   // no access anywhere) -- the placeholder only actually shows for however
   // long a genuinely new share chunk takes to fetch and register.
-  document.getElementById('content').innerHTML = '<div id="welcome">Loading\u2026</div>';
+  document.getElementById('content').innerHTML = '<div id="welcome">Загрузка…</div>';
   try {
     await ensureSharesLoaded(DATA.identities[idx].shareKeys);
   } catch (err) {
     if (token !== selectionToken) return;
-    document.getElementById('content').innerHTML = `<div id="welcome">Could not load this identity's access data: ${esc(err.message)}</div>`;
+    document.getElementById('content').innerHTML = `<div id="welcome">Не удалось загрузить права учётной записи: ${esc(err.message)}</div>`;
     return;
   }
   if (token !== selectionToken) return; // a newer selection superseded this one
@@ -1048,12 +1095,12 @@ async function selectFolder(idx, recordHistory) {
   state.tableFilter = '';
   setTab('folders');
   const token = ++selectionToken;
-  document.getElementById('content').innerHTML = '<div id="welcome">Loading\u2026</div>';
+  document.getElementById('content').innerHTML = '<div id="welcome">Загрузка…</div>';
   try {
     await ensureShareLoaded(DATA.folders[idx].share);
   } catch (err) {
     if (token !== selectionToken) return;
-    document.getElementById('content').innerHTML = `<div id="welcome">Could not load this folder's access data: ${esc(err.message)}</div>`;
+    document.getElementById('content').innerHTML = `<div id="welcome">Не удалось загрузить права папки: ${esc(err.message)}</div>`;
     return;
   }
   if (token !== selectionToken) return;
@@ -1124,30 +1171,30 @@ function renderFolderNode(nodeId, level, maxAutoExpandDepth, onSelectFolder, sel
     countBadge.className = 'treeCount';
     countBadge.textContent = counts.viaGroup > 0 ? `${counts.direct}+${counts.viaGroup}` : String(counts.direct);
     countBadge.title = counts.viaGroup > 0
-      ? `${counts.direct} direct access ${counts.direct === 1 ? 'entry' : 'entries'}, plus ${counts.viaGroup} more via group membership`
-      : `${counts.direct} direct access ${counts.direct === 1 ? 'entry' : 'entries'} on this folder`;
+      ? `${counts.direct} прямых записей ACL и ${counts.viaGroup} записей через группы`
+      : `${counts.direct} прямых записей ACL в этой папке`;
     row.appendChild(countBadge);
 
     if (DATA.folders[nodeId].broken) {
       const b = document.createElement('span');
       b.className = 'badge broken';
-      b.textContent = 'broken';
-      b.title = 'Inheritance is broken here (explicit ACL, not inherited from parent)';
+      b.textContent = 'наследование отключено';
+      b.title = 'Наследование NTFS отключено: используются явные записи ACL';
       row.appendChild(b);
     }
     if (state.flagFilesBroken && DATA.folders[nodeId].filesBrokenInheritance) {
       const fb = document.createElement('span');
       fb.className = 'badge broken';
-      fb.textContent = 'files: broken';
-      fb.title = 'One or more files directly in this folder have broken inheritance';
+      fb.textContent = 'файлы: наследование отключено';
+      fb.title = 'Для одного или нескольких файлов в этой папке отключено наследование';
       row.appendChild(fb);
     }
     row.onclick = () => onSelectFolder(nodeId);
   } else {
     const note = document.createElement('span');
     note.className = 'virtualNote';
-    note.textContent = 'not scanned';
-    note.title = 'This folder level wasn\u2019t recorded by the scan itself -- shown only to connect the real folders above and below it in the tree.';
+    note.textContent = 'не проверено';
+    note.title = 'Этот уровень папок не попал в аудит и показан только для сохранения структуры дерева.';
     row.appendChild(note);
     row.onclick = () => { if (hasChildren) setExpanded(!expanded); };
   }
@@ -1174,7 +1221,7 @@ function renderFolderNode(nodeId, level, maxAutoExpandDepth, onSelectFolder, sel
     if (allChildren.length > TREE_CHILD_CAP) {
       const more = document.createElement('div');
       more.className = 'treeMore';
-      more.textContent = `+ ${allChildren.length - TREE_CHILD_CAP} more subfolder(s) not shown here -- select this folder to see everything in the table below.`;
+      more.textContent = `+ ${allChildren.length - TREE_CHILD_CAP} подпапок скрыто. Выберите папку, чтобы просмотреть полный список в таблице ниже.`;
       childHost.appendChild(more);
     }
   }
@@ -1212,18 +1259,18 @@ function renderFolderTreeView(rootFolderIndices, onSelectFolder, selectedFolderI
   toolbar.className = 'treeToolbar';
   const depthLabel = document.createElement('span');
   depthLabel.className = 'groupLabel';
-  depthLabel.textContent = 'Depth:';
+  depthLabel.textContent = 'Глубина:';
   toolbar.appendChild(depthLabel);
   [1, 2, 3, 4, 5, 'Full'].forEach(d => {
     const btn = document.createElement('button');
     btn.className = 'depthBtn' + ((d === 'Full' ? Infinity : d) === state.depth ? ' active' : '');
-    btn.textContent = String(d);
+    btn.textContent = d === 'Full' ? 'Все' : String(d);
     btn.onclick = () => { state.depth = (d === 'Full' ? Infinity : d); onDepthChange(); };
     toolbar.appendChild(btn);
   });
   const hint = document.createElement('span');
   hint.className = 'groupLabel';
-  hint.textContent = 'Depth = how many levels of subfolders to auto-expand \u00b7 each subfolder\'s own children branch from it, not a shared pool \u00b7 click the \u25b8 to expand/collapse manually \u00b7 click a folder name to select it';
+  hint.textContent = 'Глубина — число автоматически раскрываемых уровней папок \u00b7 каждая подпапка имеет собственную ветку \u00b7 нажмите ▸ для раскрытия или сворачивания \u00b7 нажмите имя папки для перехода';
   toolbar.appendChild(hint);
   wrap.appendChild(toolbar);
 
@@ -1239,7 +1286,7 @@ function renderFolderTreeView(rootFolderIndices, onSelectFolder, selectedFolderI
   if (expandBudget.count >= TREE_AUTO_EXPAND_CAP) {
     const note = document.createElement('div');
     note.className = 'treeNote';
-    note.textContent = `This tree is large -- auto-expansion stopped after ${TREE_AUTO_EXPAND_CAP} folders to stay responsive. Anything still collapsed can be expanded manually by clicking its \u25b8, or reduce depth.`;
+    note.textContent = `Дерево слишком большое: автоматическое раскрытие остановлено после ${TREE_AUTO_EXPAND_CAP} папок для сохранения быстродействия. Остальные ветки можно раскрыть вручную кнопкой ▸ или уменьшить глубину.`;
     wrap.appendChild(note);
   }
 
@@ -1407,7 +1454,7 @@ function edgeDisplayInfo(edgeInfo) {
     const s = d.type === 'membership' ? 40 : ((d.e[3] ? 0 : 1000) + RIGHTS_WEIGHT[d.e[2]]);
     if (s > bestScore) { bestScore = s; best = d; }
   });
-  if (best.type === 'membership') return { label: 'Member of', color: effectiveThemeIsLight() ? '#7c3aed' : '#c084fc', dashed: true };
+  if (best.type === 'membership') return { label: 'Состоит в группе', color: effectiveThemeIsLight() ? '#7c3aed' : '#c084fc', dashed: true };
   const e = best.e;
   let label = RIGHTS_LABELS[e[2]];
   if (e[5]) label = 'Deny ' + label;
@@ -1424,7 +1471,7 @@ function renderRelationshipGraph(kind, idx, onNavigate, onDepthChange) {
   holder.className = 'graphWrap';
   const note = document.createElement('div');
   note.className = 'graphNote';
-  note.textContent = 'Loading relationship data\u2026';
+  note.textContent = 'Загрузка связей…';
   holder.appendChild(note);
 
   const centerKey = (kind === 'folder' ? 'f:' : 'i:') + idx;
@@ -1442,7 +1489,7 @@ function renderRelationshipGraph(kind, idx, onNavigate, onDepthChange) {
       holder.replaceWith(built);
     } catch (err) {
       if (token !== graphRenderToken) return;
-      note.textContent = 'Could not load relationship data: ' + err.message;
+      note.textContent = 'Не удалось загрузить данные связей: ' + err.message;
     }
   })();
 
@@ -1457,29 +1504,29 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
   toolbar.className = 'graphToolbar';
   const depthLabel = document.createElement('span');
   depthLabel.className = 'groupLabel';
-  depthLabel.textContent = 'Depth:';
+  depthLabel.textContent = 'Глубина:';
   toolbar.appendChild(depthLabel);
   [1, 2, 3, 4, 5, 'Full'].forEach(d => {
     const btn = document.createElement('button');
     btn.className = 'depthBtn' + ((d === 'Full' ? Infinity : d) === state.graphDepth ? ' active' : '');
-    btn.textContent = String(d);
+    btn.textContent = d === 'Full' ? 'Все' : String(d);
     btn.onclick = () => { state.graphDepth = (d === 'Full' ? Infinity : d); onDepthChange(); };
     toolbar.appendChild(btn);
   });
-  const btnOut = document.createElement('button'); btnOut.className = 'zoomBtn'; btnOut.textContent = '\u2212'; btnOut.title = 'Zoom out';
-  const btnIn = document.createElement('button'); btnIn.className = 'zoomBtn'; btnIn.textContent = '+'; btnIn.title = 'Zoom in';
-  const btnReset = document.createElement('button'); btnReset.className = 'zoomBtn'; btnReset.textContent = '\u2317'; btnReset.title = 'Reset view';
+  const btnOut = document.createElement('button'); btnOut.className = 'zoomBtn'; btnOut.textContent = '\u2212'; btnOut.title = 'Уменьшить масштаб';
+  const btnIn = document.createElement('button'); btnIn.className = 'zoomBtn'; btnIn.textContent = '+'; btnIn.title = 'Увеличить масштаб';
+  const btnReset = document.createElement('button'); btnReset.className = 'zoomBtn'; btnReset.textContent = '\u2317'; btnReset.title = 'Сбросить масштаб';
   toolbar.appendChild(btnOut); toolbar.appendChild(btnIn); toolbar.appendChild(btnReset);
   const hint = document.createElement('span');
   hint.className = 'groupLabel';
-  hint.textContent = 'Depth = relationship hops from center \u00b7 groups/well-known/high-fan-out accounts show only direct reach unless centered \u00b7 scroll to zoom \u00b7 drag background to pan \u00b7 drag a node to move it \u00b7 click a node to follow it';
+  hint.textContent = 'Глубина — число переходов от центрального объекта \u00b7 для больших групп и системных учётных записей показаны только прямые связи, пока они не выбраны центром \u00b7 колёсико мыши меняет масштаб \u00b7 перетаскивание фона перемещает граф \u00b7 перетаскивание узла меняет его положение \u00b7 нажмите на узел для перехода';
   toolbar.appendChild(hint);
   wrap.appendChild(toolbar);
 
   const legendToggle = document.createElement('button');
   legendToggle.className = 'graphLegendToggle';
   legendToggle.textContent = 'i';
-  legendToggle.title = 'Show legend';
+  legendToggle.title = 'Показать обозначения';
   wrap.appendChild(legendToggle);
 
   const legendPanel = document.createElement('div');
@@ -1515,13 +1562,13 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
     row.appendChild(lbl);
     return row;
   }
-  legendSection('Nodes', [
-    swatchRow(effectiveThemeIsLight() ? '#b8720a' : '#ffb454', 'Center (current selection)'),
-    swatchRow(effectiveThemeIsLight() ? '#0d7373' : '#57d3d3', 'Folder'),
-    swatchRow(getTypeColors().User, 'User'),
-    swatchRow(getTypeColors().Group, 'Group'),
-    swatchRow(getTypeColors().Computer, 'Computer'),
-    swatchRow(getTypeColors()['Well-known / Local'], 'Well-known / Local / Unresolved')
+  legendSection('Узлы', [
+    swatchRow(effectiveThemeIsLight() ? '#b8720a' : '#ffb454', 'Центр (выбранный объект)'),
+    swatchRow(effectiveThemeIsLight() ? '#0d7373' : '#57d3d3', 'Папка'),
+    swatchRow(getTypeColors().User, 'Пользователь'),
+    swatchRow(getTypeColors().Group, 'Группа'),
+    swatchRow(getTypeColors().Computer, 'Компьютер'),
+    swatchRow(getTypeColors()['Well-known / Local'], 'Встроенная / локальная / SID без имени')
   ]);
   const flagRow = document.createElement('div');
   flagRow.className = 'graphLegendRow';
@@ -1529,20 +1576,20 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
   dot.className = 'graphLegendDot';
   flagRow.appendChild(dot);
   const flagLbl = document.createElement('span');
-  flagLbl.textContent = 'Broken inheritance (folder) / disabled, locked, or dormant (identity)';
+  flagLbl.textContent = 'Папка: отключено наследование; учётная запись: отключена, заблокирована или неактивна';
   flagRow.appendChild(flagLbl);
   legendPanel.appendChild(flagRow);
-  legendSection('Access rights', RIGHTS_LABELS.map((label, i) => swatchRow(getEdgeColors()[i], label)));
-  legendSection('Lines', [
-    lineRow(effectiveThemeIsLight() ? '#4a5568' : '#7d8a99', 'Solid = explicit access', false),
-    lineRow(effectiveThemeIsLight() ? '#4a5568' : '#7d8a99', 'Dashed = inherited access', true),
-    lineRow(effectiveThemeIsLight() ? '#7c3aed' : '#c084fc', 'Dashed = group membership', true)
+  legendSection('Права доступа', RIGHTS_LABELS.map((label, i) => swatchRow(getEdgeColors()[i], displayRight(label))));
+  legendSection('Связи', [
+    lineRow(effectiveThemeIsLight() ? '#4a5568' : '#7d8a99', 'Сплошная линия — явно назначенный доступ', false),
+    lineRow(effectiveThemeIsLight() ? '#4a5568' : '#7d8a99', 'Пунктир — наследуемый доступ', true),
+    lineRow(effectiveThemeIsLight() ? '#7c3aed' : '#c084fc', 'Пунктир — членство в группе', true)
   ]);
   wrap.appendChild(legendPanel);
   legendToggle.onclick = () => {
     const showing = legendPanel.style.display !== 'none';
     legendPanel.style.display = showing ? 'none' : 'block';
-    legendToggle.title = showing ? 'Show legend' : 'Hide legend';
+    legendToggle.title = showing ? 'Показать обозначения' : 'Скрыть обозначения';
   };
 
   let maxAbs = 60;
@@ -1704,7 +1751,7 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
   if (g.truncated) {
     const note = document.createElement('div');
     note.className = 'graphNote';
-    note.textContent = `Some connections at this depth were too numerous to draw (kept the ${MAX_EDGES_PER_NODE} most notable per node, and ${GRAPH_NODE_CAP} nodes overall). Reduce depth, or use the table below for the complete, uncapped list of the CENTER's own direct relationships.`;
+    note.textContent = `Связей слишком много (оставлено ${MAX_EDGES_PER_NODE} наиболее важных на узел и ${GRAPH_NODE_CAP} узлов всего). Уменьшите глубину или используйте таблицу ниже для полного перечня прямых связей центрального объекта.`;
     wrap.appendChild(note);
   }
 
@@ -1714,7 +1761,7 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
 function renderDetailTabs(onTabChange) {
   const bar = document.createElement('div');
   bar.className = 'detailTabs';
-  [['tree', 'Tree'], ['graph', 'Graph']].forEach(([tab, label]) => {
+  [['tree', 'Дерево'], ['graph', 'Граф']].forEach(([tab, label]) => {
     const btn = document.createElement('button');
     btn.className = 'detailTabBtn' + (state.detailTab === tab ? ' active' : '');
     btn.textContent = label;
@@ -1739,7 +1786,7 @@ function renderTable(rows, columns, opts) {
   const toolbar = document.createElement('div');
   toolbar.className = 'tableToolbar';
   const filterInput = document.createElement('input');
-  filterInput.placeholder = 'Filter this table...';
+  filterInput.placeholder = 'Фильтр таблицы...';
   filterInput.value = state.tableFilter;
   toolbar.appendChild(filterInput);
   const exportBtn = document.createElement('button');
@@ -1794,7 +1841,7 @@ function renderTable(rows, columns, opts) {
       const th = document.createElement('th');
       let arrow = '';
       if (state.tableSort.col === c.key) arrow = state.tableSort.dir === 1 ? ' \u25b2' : ' \u25bc';
-      th.textContent = c.label + arrow;
+      th.textContent = displayColumnLabel(c.label) + arrow;
       th.onclick = () => {
         if (state.tableSort.col === c.key) state.tableSort.dir *= -1;
         else state.tableSort = { col: c.key, dir: 1 };
@@ -1809,17 +1856,17 @@ function renderTable(rows, columns, opts) {
       if (opts.onRowClick) { tr.className = 'rowclick'; tr.onclick = () => opts.onRowClick(r); }
       columns.forEach(c => {
         const td = document.createElement('td');
-        if (c.html) td.innerHTML = c.html(r); else td.textContent = c.get(r);
+        if (c.html) td.innerHTML = c.html(r); else td.textContent = displayTableValue(c, r);
         tr.appendChild(td);
       });
       tbody.appendChild(tr);
     });
 
-    exportBtn.textContent = `Export ${filtered.length} row(s) as CSV`;
+    exportBtn.textContent = `Экспорт ${filtered.length} строк в CSV`;
     exportBtn.onclick = () => downloadCsv(opts.filename, filtered, columns.map(c => ({ label: c.label, get: c.get })));
 
     note.textContent = filtered.length > RENDER_LIMIT
-      ? `Showing first ${RENDER_LIMIT} of ${filtered.length} filtered rows. Narrow the filter, or use Export to get all of them.`
+      ? `Показаны первые ${RENDER_LIMIT} из ${filtered.length} строк. Уточните фильтр или экспортируйте весь список в CSV.`
       : '';
   }
 
@@ -1835,18 +1882,18 @@ function identityInfoCard(idn) {
   const div = document.createElement('div');
   div.className = 'card';
   const flags = [];
-  if (idn.flagDisabled) flags.push('<span class="badge disabled">Disabled</span>');
-  if (idn.flagLocked) flags.push('<span class="badge locked">Locked out</span>');
-  if (idn.flagDormant) flags.push('<span class="badge dormant">No logon in ' + DORMANT_DAYS + '+ days</span>');
+  if (idn.flagDisabled) flags.push('<span class="badge disabled">Отключена</span>');
+  if (idn.flagLocked) flags.push('<span class="badge locked">Заблокирована</span>');
+  if (idn.flagDormant) flags.push('<span class="badge dormant">Нет входов более ' + DORMANT_DAYS + ' дней</span>');
   const field = (label, val) => val ? `<span class="field"><b>${esc(label)}:</b> ${esc(val)}</span>` : '';
   div.innerHTML =
-    `<h2>${esc(idn.name || '(unknown)')} <span style="font-weight:400;color:var(--muted);font-size:12px;">${esc(idn.type||'')}</span> ${flags.join(' ')}</h2>` +
-    field('Title', idn.title) + field('Department', idn.dept) + field('Manager', idn.manager) +
-    field('Email', idn.email) + field('Last logon (approx.)', idn.lastLogon) +
-    field('Last modified (AD)', idn.changed) + field('Password last set', idn.pwdSet) +
-    field('Account expires', idn.expires) + field('Created', idn.created) +
-    field('Group scope', idn.groupScope) + field('Direct member count', idn.memberCount) + field('Managed by', idn.managedBy) +
-    field('Notes', idn.notes) + field('SID', idn.sid);
+    `<h2>${esc(idn.name || '(неизвестно)')} <span style="font-weight:400;color:var(--muted);font-size:12px;">${esc(displayIdentityType(idn.type))}</span> ${flags.join(' ')}</h2>` +
+    field('Должность', idn.title) + field('Отдел', idn.dept) + field('Руководитель', idn.manager) +
+    field('Электронная почта', idn.email) + field('Последний вход (приблизительно)', idn.lastLogon) +
+    field('Изменено в AD', idn.changed) + field('Пароль изменён', idn.pwdSet) +
+    field('Срок действия учётной записи', idn.expires) + field('Создана', idn.created) +
+    field('Область действия группы', displayGroupScope(idn.groupScope)) + field('Непосредственных участников в AD', idn.memberCount) + field('Ответственный', idn.managedBy) +
+    field('Примечания', displayAdNote(idn.notes)) + field('SID', idn.sid);
   if (idn.type === 'Group') {
     const groupIdx = DATA.identities.indexOf(idn);
     const reportMemberCount = getReportGroupMembers(idn, groupIdx).length;
@@ -1854,7 +1901,7 @@ function identityInfoCard(idn) {
     section.className = 'groupMemberDetails';
     const heading = document.createElement('summary');
     heading.textContent = 'Показать состав группы (' + reportMemberCount + ' по данным аудита)';
-    heading.title = 'Число Direct member count показывает непосредственных членов AD, а здесь отображается раскрытое членство по данным отчёта.';
+    heading.title = 'Показатель непосредственных участников показывает членов группы в AD. Здесь отображается состав, полученный при аудите, включая вложенные группы.';
     section.appendChild(heading);
     const host = document.createElement('div');
     host.className = 'sidebarGroupMembers';
@@ -1986,7 +2033,7 @@ function folderInfoCard(f) {
   if (f.broken) {
     const badge = document.createElement('span');
     badge.className = 'badge broken';
-    badge.textContent = 'Inheritance broken here';
+    badge.textContent = 'Наследование отключено';
     div.appendChild(badge);
   }
 
@@ -1997,7 +2044,7 @@ function folderInfoCard(f) {
   // blank/absent field just doesn't render, no special casing needed.
   if (DATA.hasFileMetadata) {
     const field = (label, val) => val ? `<span class="field"><b>${esc(label)}:</b> ${esc(fmtDate(val))}</span>` : '';
-    const metaHtml = field('Created', f.created) + field('Last modified', f.modified) + field('Last accessed', f.accessed);
+    const metaHtml = field('Создана', f.created) + field('Изменена', f.modified) + field('Последний доступ', f.accessed);
     if (metaHtml) {
       const metaWrap = document.createElement('div');
       metaWrap.className = 'folderMetaRow';
@@ -2015,11 +2062,11 @@ function folderInfoCard(f) {
   if (DATA.hasFileCounts && f.fileCount !== undefined) {
     const fileMetaWrap = document.createElement('div');
     fileMetaWrap.className = 'folderMetaRow';
-    fileMetaWrap.innerHTML = `<span class="field"><b>Files in this folder:</b> ${f.fileCount}</span>`;
+    fileMetaWrap.innerHTML = `<span class="field"><b>Файлов в этой папке:</b> ${f.fileCount}</span>`;
     if (f.filesBrokenInheritance) {
       const fbadge = document.createElement('span');
       fbadge.className = 'badge broken';
-      fbadge.textContent = 'File(s) with broken inheritance';
+      fbadge.textContent = 'Файлы с отключённым наследованием';
       fileMetaWrap.appendChild(fbadge);
     }
     div.appendChild(fileMetaWrap);
@@ -2090,18 +2137,18 @@ function renderAclRow(row, onIdentityClick, isChild) {
 
   const name = document.createElement('span');
   name.className = 'aclName';
-  name.textContent = idn.name || '(unknown)';
+  name.textContent = idn.name || '(неизвестно)';
   name.title = idn.name || '';
   div.appendChild(name);
 
   const type = document.createElement('span');
   type.className = 'aclType';
-  type.textContent = idn.type || '';
+  type.textContent = displayIdentityType(idn.type);
   div.appendChild(type);
 
   const rights = document.createElement('span');
   rights.className = 'pill ' + (e[5] ? 'deny' : (e[3] ? 'inherited' : 'explicit'));
-  rights.textContent = RIGHTS_LABELS[e[2]] + (e[5] ? ' (Deny)' : '');
+  rights.textContent = displayRight(RIGHTS_LABELS[e[2]]) + (e[5] ? ' (Запрет)' : '');
   div.appendChild(rights);
   if (!isChild && idn.type === 'Group' && (!row.children || row.children.length === 0)) {
     const groupHint = document.createElement('span');
@@ -2114,7 +2161,7 @@ function renderAclRow(row, onIdentityClick, isChild) {
   if (isChild) {
     const tag = document.createElement('span');
     tag.className = 'aclViaNote';
-    tag.textContent = 'member';
+    tag.textContent = 'участник';
     div.appendChild(tag);
   } else if (e[6] >= 0) {
     // An orphaned via-group row: its granting group has no direct row of its
@@ -2122,7 +2169,7 @@ function renderAclRow(row, onIdentityClick, isChild) {
     // of nested (there's no parent row here to nest it under).
     const tag = document.createElement('span');
     tag.className = 'aclViaNote';
-    tag.textContent = 'via ' + (DATA.identities[e[6]].name || '?');
+    tag.textContent = 'через ' + (DATA.identities[e[6]].name || '?');
     div.appendChild(tag);
   }
 
@@ -2172,14 +2219,14 @@ function renderFolderAclList(folderIdx, onIdentityClick) {
   const summary = document.createElement('div');
   summary.className = 'aclSummary';
   summary.textContent = counts.viaGroup > 0
-    ? `${counts.direct} direct grant${counts.direct === 1 ? '' : 's'} \u00b7 ${counts.viaGroup} more identit${counts.viaGroup === 1 ? 'y' : 'ies'} via group membership (expand a group below to see its members)`
-    : `${counts.direct} direct grant${counts.direct === 1 ? '' : 's'}`;
+    ? `${counts.direct} прямых записей доступа · ${counts.viaGroup} записей через членство в группах (раскройте группу для просмотра участников)`
+    : `${counts.direct} прямых записей доступа`;
   wrap.appendChild(summary);
 
   const toolbar = document.createElement('div');
   toolbar.className = 'aclToolbar';
   const filterInput = document.createElement('input');
-  filterInput.placeholder = 'Filter this list...';
+  filterInput.placeholder = 'Фильтр списка...';
   toolbar.appendChild(filterInput);
   toolbar.style.flexWrap = 'wrap';
   filterInput.style.minWidth = '180px';
@@ -2194,7 +2241,7 @@ function renderFolderAclList(folderIdx, onIdentityClick) {
   collapseAllGroupsBtn.textContent = 'Свернуть все группы';
   toolbar.appendChild(collapseAllGroupsBtn);
   const exportBtn = document.createElement('button');
-  exportBtn.textContent = `Export ${allFlatForExport.length} row(s) as CSV`;
+  exportBtn.textContent = `Экспорт ${allFlatForExport.length} строк в CSV`;
   exportBtn.onclick = () => downloadCsv(
     `access_${DATA.folders[folderIdx].path.replace(/[^a-z0-9]+/gi, '_')}.csv`,
     allFlatForExport,
@@ -2242,7 +2289,7 @@ function renderFolderAclList(folderIdx, onIdentityClick) {
     if (visible.length === 0) {
       const none = document.createElement('div');
       none.className = 'graphNote';
-      none.textContent = 'No matches.';
+      none.textContent = 'Совпадений нет.';
       host.appendChild(none);
     }
   }
@@ -2473,78 +2520,78 @@ function computeObservations() {
   // underlying "least privilege" / "stale accounts" issues, so the same
   // sourced control language applies to more than one of them.
   const LEAST_PRIVILEGE_GUIDANCE = [
-    { region: 'AU', source: 'ACSC Essential Eight -- Restrict Administrative Privileges (Maturity Level 1)', text: 'Requests for privileged access to systems and applications are validated when first requested, and privileges are assigned on the principle of least privilege.' },
-    { region: 'AU', source: 'Australian Government ISM -- Cybersecurity Principle PRO-12 (Least privilege access)', text: 'Grant users the least amount of access necessary to complete their job functions.' },
-    { region: 'NZ', source: 'NZISM control 16.4.38.C.01', text: 'Agencies MUST apply the Principle of Least Privilege when developing and implementing a Privileged Access Management policy.' },
-    { region: 'US', source: 'NIST SP 800-53 AC-6 (Least Privilege)', text: 'Employ the principle of least privilege, allowing only authorized accesses for users that are necessary to accomplish assigned organizational tasks.' },
-    { region: 'US', source: 'NIST CSF 2.0 -- PR.AA-05', text: 'Access permissions and authorizations are managed, incorporating the principles of least privilege and separation of duties.' },
-    { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 3.3 (Configure Data Access Control Lists)', text: "Configure data access control lists based on a user's need to know. Apply data access control lists, also known as access permissions, to local and remote file systems." }
+    { region: "AU", source: "ACSC Essential Eight — ограничение административных привилегий (уровень зрелости 1)", text: "Запросы на привилегированный доступ к системам и приложениям проверяются при поступлении; права предоставляются по принципу минимально необходимых привилегий." },
+    { region: "AU", source: "ISM правительства Австралии — принцип кибербезопасности PRO-12 (минимальные привилегии)", text: "Предоставляйте пользователям только те права, которые необходимы им для выполнения рабочих обязанностей." },
+    { region: "NZ", source: "NZISM, контроль 16.4.38.C.01", text: "При разработке и применении политики управления привилегированным доступом организации обязаны соблюдать принцип минимальных привилегий." },
+    { region: "US", source: "NIST SP 800-53 AC-6 (минимальные привилегии)", text: "Применяйте принцип минимальных привилегий: разрешайте пользователям только действия, необходимые для выполнения назначенных задач." },
+    { region: "US", source: "NIST CSF 2.0 — PR.AA-05", text: "Управляйте разрешениями и полномочиями с учётом минимальных привилегий и разделения обязанностей." },
+    { region: "Intl", source: "CIS Controls v8 — мера 3.3 (настройка списков контроля доступа)", text: "Настраивайте ACL по принципу служебной необходимости. Применяйте такие списки к локальным и сетевым файловым системам." }
   ];
   const STALE_ACCOUNT_GUIDANCE = [
-    { region: 'US', source: 'NIST SP 800-53 AC-2(3) (Disable Accounts)', text: 'Disable accounts when they have expired, are no longer associated with a user or individual, are in violation of organizational policy, or have been inactive for an organization-defined period.' },
-    { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 5.3 (Disable Dormant Accounts)', text: 'Delete or disable any dormant accounts after a defined period of inactivity.' },
-    { region: 'AU', source: 'ACSC Essential Eight -- Restrict Administrative Privileges (Maturity Level 2)', text: 'Privileged access to systems and applications is automatically disabled after 12 months unless revalidated.' },
-    { region: 'NZ', source: 'NZISM control 9.2.17.C.02', text: 'Where an agency grants limited higher access, it MUST be temporary and an exception rather than the norm, with a cessation date set.' }
+    { region: "US", source: "NIST SP 800-53 AC-2(3) (отключение учётных записей)", text: "Отключайте учётные записи по истечении срока действия, при прекращении связи с пользователем, нарушении политики или после заданного периода неактивности." },
+    { region: "Intl", source: "CIS Controls v8 — мера 5.3 (отключение неактивных учётных записей)", text: "Удаляйте либо отключайте учётные записи, не использовавшиеся в течение установленного периода." },
+    { region: "AU", source: "ACSC Essential Eight — ограничение административных привилегий (уровень зрелости 2)", text: "Привилегированный доступ к системам и приложениям автоматически отключается через 12 месяцев, если необходимость в нём не подтверждена повторно." },
+    { region: "NZ", source: "NZISM, контроль 9.2.17.C.02", text: "Повышенные права, предоставленные в виде исключения, должны быть временными и иметь установленную дату окончания." }
   ];
   const RETENTION_GUIDANCE = [
-    { region: 'NZ', source: 'Privacy Act 2020 -- Information Privacy Principle 9 (Limits on retention)', text: 'An agency that holds personal information must not keep that information for longer than is required for the purposes for which it may lawfully be used.' },
-    { region: 'AU', source: 'Privacy Act 1988 (Cth) -- Australian Privacy Principle 11.2', text: 'An entity must take reasonable steps to destroy or de-identify personal information it holds once it is no longer needed for any purpose for which it may be used or disclosed.' },
-    { region: 'EU', source: 'GDPR Article 5(1)(e) -- Storage limitation principle', text: 'Personal data must be kept in a form permitting identification of data subjects for no longer than is necessary for the purposes for which it is processed.' },
-    { region: 'US', source: 'NIST SP 800-53 SI-12 (Information Management and Retention)', text: 'Manage and retain system information and output in accordance with applicable laws, regulations, policies, and operational requirements.' },
-    { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 3.4 (Enforce Data Retention)', text: "Retain data according to the enterprise's documented data management process, including both a minimum and a maximum retention timeline." }
+    { region: "NZ", source: "Закон Новой Зеландии Privacy Act 2020 — принцип 9 (ограничение сроков хранения)", text: "Организация не должна хранить персональные данные дольше, чем это необходимо для законных целей их использования." },
+    { region: "AU", source: "Закон Австралии Privacy Act 1988 — Australian Privacy Principle 11.2", text: "Когда персональные данные больше не требуются для законных целей, организация должна принять разумные меры по их удалению или обезличиванию." },
+    { region: "EU", source: "GDPR, статья 5(1)(e) — ограничение срока хранения", text: "Персональные данные должны храниться в форме, позволяющей идентифицировать субъектов, не дольше необходимого для целей обработки." },
+    { region: "US", source: "NIST SP 800-53 SI-12 (управление и хранение информации)", text: "Управляйте системной информацией и сроками её хранения в соответствии с применимыми законами, правилами и установленными политиками." },
+    { region: "Intl", source: "CIS Controls v8 — мера 3.4 (соблюдение сроков хранения данных)", text: "Храните данные по документированному порядку организации с учётом минимальных и максимальных сроков хранения." }
   ];
 
   if (broad.folderCount > 0) {
     observations.push({
-      title: `${broad.folderCount} folder(s) grant Full Control or Modify to a broad, default group (Everyone, Authenticated Users, Domain Users, or Users)`,
-      why: 'Broad, generic principals with high-privilege access make it hard to know exactly who can read, change, or delete data, and are a common way ransomware or a single compromised account can spread impact across many folders at once. The frameworks below don\u2019t mention "Everyone" by name, but a broad default group holding Full Control or Modify is close to the opposite of what "least privilege" or "need to know" require.',
+      title: `${broad.folderCount} папок предоставляют «Полный доступ» или «Изменение» широкой группе (Everyone, Authenticated Users, Domain Users или Users)`,
+      why: "Широкие группы с высокими привилегиями затрудняют понимание того, кто может читать, изменять или удалять данные. При компрометации одной учётной записи или заражении программой-вымогателем такие права увеличивают масштаб возможного ущерба. Хотя приведённые стандарты не всегда упоминают группу Everyone напрямую, её высокие полномочия противоречат принципам минимальных привилегий и доступа по необходимости.",
       guidance: LEAST_PRIVILEGE_GUIDANCE,
       action: () => filterToBroadGrantFolders()
     });
   }
   if (brokenCount > 0) {
     observations.push({
-      title: `${brokenCount} folder(s) have broken inheritance (an explicit ACL that no longer follows the parent)`,
-      why: 'Ad-hoc, per-folder permission changes are harder to review consistently and more prone to drift from the intended access model over time. None of the frameworks checked here have a specific rule about NTFS inheritance -- this is a more general configuration-management/consistency concern than a directly-legislated control, so treat it as a "worth a look" flag rather than a named violation.',
+      title: `${brokenCount} папок с отключённым наследованием NTFS-разрешений (ACL не наследуется от родительской папки)`,
+      why: "Индивидуальные изменения разрешений в отдельных папках сложнее поддерживать и проверять; они могут со временем отклониться от принятой модели доступа. Сами по себе отключённое наследование и явные ACL не нарушают конкретного требования NTFS: это признак, который следует проверить, а не автоматически исправлять.",
       guidance: [
-        { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 3.3 (Configure Data Access Control Lists)', text: 'The same access-control-list safeguard applies here: an ACL that silently diverges from the folder above it is harder to configure and audit consistently.' }
+        { region: "Intl", source: "CIS Controls v8 — мера 3.3 (настройка ACL)", text: "Принцип настройки ACL по служебной необходимости применим и здесь: правила, незаметно отличающиеся от разрешений родителя, сложнее последовательно сопровождать и проверять." }
       ],
       action: () => filterToBrokenFolders()
     });
   }
   if (stale.dormantWithAccess > 0) {
     observations.push({
-      title: `${stale.dormantWithAccess} disabled, locked, or dormant (90+ day) identity(ies) still have active access grants`,
-      why: 'Stale accounts that still hold access are attack surface with no legitimate current user behind them -- a common target for re-activation or credential misuse.',
+      title: `${stale.dormantWithAccess} отключённых, заблокированных или неактивных (более 90 дней) субъектов всё ещё имеют записи доступа`,
+      why: "Неактивные учётные записи с сохранившимися правами доступа могут стать целью злоумышленников, например при повторном включении аккаунта или компрометации его учётных данных. Статус «неактивна» здесь основан на приблизительном времени входа, а не доказывает отсутствие использования учётной записи.",
       guidance: STALE_ACCOUNT_GUIDANCE,
       action: () => filterToDormantIdentities()
     });
   }
   if (stale.unresolvedWithAccess > 0) {
     observations.push({
-      title: `${stale.unresolvedWithAccess} unresolved SID(s) (likely deleted accounts) still have active access grants`,
-      why: 'An orphaned SID on an ACL means the account it once represented no longer exists in AD, but the permission entry was never cleaned up -- pure hygiene debt with no offsetting benefit. This is close to a textbook case of the "no longer associated with a user" condition below.',
+      title: `${stale.unresolvedWithAccess} SID не удалось разрешить (возможно, учётные записи удалены), однако записи ACL сохранились`,
+      why: "Неразрешённый SID в ACL может означать, что соответствующая учётная запись удалена или недоступна текущему контексту AD. Проверьте происхождение SID и разрешение имени до удаления записи: отсутствие разрешения не доказывает, что учётная запись уже не существует.",
       guidance: [
-        { region: 'US', source: 'NIST SP 800-53 AC-2(3) (Disable Accounts)', text: 'Disable accounts... that are no longer associated with a user or individual.' },
-        { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 5.3 (Disable Dormant Accounts)', text: 'Delete or disable any dormant accounts after a defined period of inactivity.' }
+        { region: "US", source: "NIST SP 800-53 AC-2(3) (отключение учётных записей)", text: "Отключайте учётные записи, которые больше не связаны с действующими пользователями или субъектами." },
+        { region: "Intl", source: "CIS Controls v8 — мера 5.3 (отключение неактивных учётных записей)", text: "Удаляйте или отключайте неактивные учётные записи по установленной политике." }
       ]
     });
   }
   if (scanErrorCount > 0) {
     observations.push({
-      title: `${scanErrorCount} object(s) could not be scanned at all (access denied or a path/platform limitation)`,
-      why: "You can't audit what you can't see. These are blind spots in this report -- worth checking whether the scanning account should have access, and if not, why not, and what's actually stored in the folders you can't see into. This is a general asset-visibility concern rather than a specific access-control rule.",
+      title: `${scanErrorCount} объектов не удалось проверить из-за отказа в доступе или ограничений пути/платформы`,
+      why: "Если папку нельзя прочитать при аудите, сведения о её разрешениях в отчёте неполны. Проверьте, должен ли аккаунт аудита иметь доступ к этой папке, а также возможные ограничения пути и платформы. Это проблема полноты инвентаризации, а не автоматическое доказательство ошибки ACL.",
       guidance: [
-        { region: 'Intl', source: 'CIS Controls v8 -- Safeguard 1.1 (Establish and Maintain Detailed Enterprise Asset Inventory)', text: 'You cannot protect (or audit) assets you do not know exist or cannot see into.' },
-        { region: 'US', source: 'NIST CSF 2.0 -- ID.AM (Asset Management)', text: 'Assets are inventoried and managed consistent with their relative importance to organizational objectives.' }
+        { region: "Intl", source: "CIS Controls v8 — мера 1.1 (подробная инвентаризация ресурсов)", text: "Невозможно надёжно защитить и проверить ресурсы, сведения о которых отсутствуют или доступ к которым для инвентаризации ограничен." },
+        { region: "US", source: "NIST CSF 2.0 — ID.AM (управление активами)", text: "Инвентаризируйте активы и управляйте ими с учётом их значимости для организации." }
       ],
       action: () => showScanErrorsDetail()
     });
   }
   if (fullControlShare > 0.25 && totalEdges >= 20) {
     observations.push({
-      title: `${(fullControlShare * 100).toFixed(0)}% of all access grants are Full Control`,
-      why: 'Full Control allows changing permissions and taking ownership, not just reading/writing data -- it\'s rarely needed by more than a small set of administrators or data owners. A high share suggests broad over-provisioning rather than least-privilege access.',
+      title: `${(fullControlShare * 100).toFixed(0)}% записей доступа предоставляют «Полный доступ»`,
+      why: "«Полный доступ» позволяет не только читать и записывать данные, но и менять разрешения и владельца. Обычно такие права необходимы ограниченному кругу администраторов и владельцев данных. Высокая доля таких записей — повод проверить принцип минимальных привилегий.",
       guidance: LEAST_PRIVILEGE_GUIDANCE
     });
   }
@@ -2561,13 +2608,13 @@ function computeObservations() {
     }).length;
     if (agedCount > 0) {
       observations.push({
-        title: `${agedCount} folder(s) haven't been modified in 5+ years`,
-        why: 'Folders that haven\u2019t changed in years are a common home for data that should have been reviewed, archived, or deleted under a retention schedule long ago -- and every identity/group still holding access to them is attack surface for data nobody actually needs anymore. This flags "worth reviewing for retention", not "definitely delete" -- some old data is legitimately kept long-term (financial records, historical archives, etc.) for its own separate, valid reasons.',
+        title: `${agedCount} папок не изменялись пять лет или дольше`,
+        why: "Давно не изменявшиеся каталоги могут содержать данные, которые стоит проверить на необходимость хранения, архивирования или удаления. При этом финансовые, исторические и другие документы могут законно храниться длительное время. Эта отметка означает «проверить сроки хранения», а не «удалить».",
         guidance: RETENTION_GUIDANCE,
         action: () => {
           state.filterAgedYears = 5;
           const btn = document.getElementById('btnAged');
-          btn.textContent = 'Aged folders (5yr+)';
+          btn.textContent = 'Папки без изменений более 5 лет';
           btn.classList.add('state-show');
           setTab('folders');
         }
@@ -2599,7 +2646,7 @@ function filterToBroadGrantFolders() {
   if (folderIdxs.length === 0) {
     const none = document.createElement('div');
     none.className = 'listMore';
-    none.textContent = 'None found.';
+    none.textContent = 'Ничего не найдено.';
     panel.appendChild(none);
   }
 }
@@ -2612,18 +2659,18 @@ function showScanErrorsDetail() {
   const card = document.createElement('div');
   card.className = 'summarySection';
   const title = document.createElement('h2');
-  title.textContent = `Objects that could not be scanned (${(DATA.scanErrors || []).length})`;
+  title.textContent = `Не удалось проверить объектов: ${(DATA.scanErrors || []).length}`;
   card.appendChild(title);
 
   const errors = DATA.scanErrors || [];
   const table = document.createElement('table');
   table.className = 'scanErrorsTable';
-  table.innerHTML = '<thead><tr><th>Path</th><th>Category</th><th>Message</th></tr></thead>';
+  table.innerHTML = '<thead><tr><th>Путь</th><th>Категория</th><th>Сообщение</th></tr></thead>';
   const tbody = document.createElement('tbody');
   errors.forEach(err => {
     const tr = document.createElement('tr');
     const tdPath = document.createElement('td');
-    tdPath.textContent = err.Path || '(unparsed log line)';
+    tdPath.textContent = err.Path || '(строка журнала не распознана)';
     tdPath.title = err.Path || '';
     const tdCat = document.createElement('td');
     tdCat.textContent = err.Category || '';
@@ -2636,7 +2683,7 @@ function showScanErrorsDetail() {
   card.appendChild(table);
 
   const exportBtn = document.createElement('button');
-  exportBtn.textContent = `Export ${errors.length} row(s) as CSV`;
+  exportBtn.textContent = `Экспорт ${errors.length} строк в CSV`;
   exportBtn.style.marginTop = '10px';
   exportBtn.onclick = () => downloadCsv('scan_errors.csv', errors, [
     { label: 'Path', get: r => r.Path },
@@ -2647,7 +2694,7 @@ function showScanErrorsDetail() {
   card.appendChild(exportBtn);
 
   const backLink = document.createElement('button');
-  backLink.textContent = '\u2190 Back to Summary';
+  backLink.textContent = '← Вернуться к сводке';
   backLink.style.marginTop = '10px';
   backLink.style.marginLeft = '8px';
   backLink.onclick = () => renderSummaryView();
@@ -2657,18 +2704,42 @@ function showScanErrorsDetail() {
 }
 
 const ABUSE_REFERENCE = [
-  { level: 'Full Control', allows: 'Everything Modify allows, plus changing permissions and taking ownership.', abuse: 'Can lock other people out, silently grant itself/others further access, or take ownership to bypass existing restrictions entirely -- the highest-impact level.' },
-  { level: 'Modify', allows: 'Read, write, execute, and delete, but cannot change permissions or ownership.', abuse: 'Can tamper with, encrypt (ransomware-style), or destroy data, and plant executable content -- but can\'t entrench itself by rewriting the ACL.' },
-  { level: 'Read & Execute', allows: 'Read files/folders and run existing executables; no write.', abuse: 'Information disclosure, and can run whatever is already there -- but can\'t plant or modify files.' },
-  { level: 'Write', allows: 'Create/modify content without necessarily being able to delete or execute.', abuse: 'Can tamper with or inject content; impact depends heavily on whether the target location also allows execution.' },
-  { level: 'Read', allows: 'Read-only.', abuse: 'Information disclosure only -- the lowest-impact level, but still worth reviewing for sensitive data.' },
-  { level: 'Special', allows: 'A non-standard combination that does not match one of the above.', abuse: 'Impact depends entirely on the specific rights granted -- worth reviewing individually rather than assuming either way.' }
+  {
+    "level": "Полный доступ",
+    "allows": "Все возможности уровня «Изменение», а также изменение разрешений и смена владельца.",
+    "abuse": "Позволяет заблокировать доступ другим, незаметно выдать дополнительные права себе или другим и сменить владельца, обходя действующие ограничения. Наиболее высокий риск."
+  },
+  {
+    "level": "Изменение",
+    "allows": "Чтение, запись, выполнение и удаление файлов; без изменения разрешений и владельца.",
+    "abuse": "Позволяет подменить, зашифровать или удалить данные, а также разместить исполняемые файлы. Само по себе не даёт права изменять ACL."
+  },
+  {
+    "level": "Чтение и выполнение",
+    "allows": "Чтение файлов и папок, запуск существующих программ; запись не разрешена.",
+    "abuse": "Возможна утечка информации и запуск существующих программ, но не размещение и не изменение файлов."
+  },
+  {
+    "level": "Запись",
+    "allows": "Создание и изменение содержимого; удаление или выполнение могут быть недоступны.",
+    "abuse": "Возможны подмена и добавление данных. Последствия особенно серьёзны, если в этом каталоге также разрешён запуск файлов."
+  },
+  {
+    "level": "Чтение",
+    "allows": "Просмотр содержимого без изменений.",
+    "abuse": "Основной риск — раскрытие конфиденциальной информации. Даже доступ только для чтения следует проверять на чувствительных данных."
+  },
+  {
+    "level": "Особые права",
+    "allows": "Нестандартное сочетание разрешений, не совпадающее с перечисленными уровнями.",
+    "abuse": "Риск зависит от конкретных разрешённых операций. Необходим отдельный разбор состава NTFS-разрешений."
+  }
 ];
 
 function renderAbuseReferenceTable() {
   const table = document.createElement('table');
   table.className = 'abuseTable';
-  table.innerHTML = '<thead><tr><th>Level</th><th>Allows</th><th>Abuse potential if misused</th></tr></thead>';
+  table.innerHTML = '<thead><tr><th>Уровень</th><th>Разрешённые действия</th><th>Возможный риск</th></tr></thead>';
   const tbody = document.createElement('tbody');
   ABUSE_REFERENCE.forEach(row => {
     const tr = document.createElement('tr');
@@ -2725,10 +2796,10 @@ function renderSummaryViewContent() {
     banner.className = 'incompleteBanner';
     const parts = [];
     if (DATA.scanComplete === false) {
-      parts.push("This scan appears to have been interrupted before finishing (killed, crashed, or the machine rebooted mid-run) -- some folders may be missing entirely, not just from this report but from the underlying data. Everything that WAS successfully captured is still shown below and throughout.");
+      parts.push('Сканирование, вероятно, было прервано до завершения (сбой, остановка процесса или перезагрузка). Часть папок может отсутствовать и в исходных данных, и в отчёте. Уже полученные сведения остаются доступными для просмотра.');
     }
     if ((DATA.truncatedRowsDropped || 0) > 0) {
-      parts.push(`${DATA.truncatedRowsDropped} source file(s) had their last line cut off mid-write (consistent with the same kind of interruption) -- that one incomplete row was dropped; nothing else in those files was affected.`);
+      parts.push(`${DATA.truncatedRowsDropped} исходных файлов содержали оборванную последнюю строку (возможно, из-за прерванного сканирования). Эти неполные строки пропущены; остальные строки сохранены.`);
     }
     banner.textContent = '\u26a0 ' + parts.join(' ');
     content.appendChild(banner);
@@ -2737,7 +2808,7 @@ function renderSummaryViewContent() {
   if (!DATA.hasFileMetadata) {
     const infoBanner = document.createElement('div');
     infoBanner.className = 'infoBanner';
-    infoBanner.textContent = '\u2139 File/folder Created, Modified, and Accessed timestamps were not captured in this scan (needs Invoke-NTFSPermissionAudit.ps1 0.5.5 or later) -- aged-folder flagging and the metadata shown on a folder\u2019s own page are unavailable for this report. Nothing else is affected.';
+    infoBanner.textContent = '\u2139 При сканировании не были сохранены даты создания, изменения и последнего доступа к файлам и папкам. Для их сбора нужен Invoke-NTFSPermissionAudit.ps1 версии 0.5.5 или новее. Фильтрация давно не изменявшихся папок и соответствующие метаданные недоступны; остальные разделы работают.';
     content.appendChild(infoBanner);
   }
 
@@ -2752,26 +2823,26 @@ function renderSummaryViewContent() {
   // --- Top-line stat cards ---
   const grid = document.createElement('div');
   grid.className = 'summaryGrid';
-  grid.appendChild(statCard(DATA.identities.length, 'Identities total', {}));
-  grid.appendChild(statCard(ACCESS_MAP_MANIFEST.totalEdgeCount || 0, 'Access entries total', {}));
-  grid.appendChild(statCard(userHealth.total, `Users (${userHealth.enabled} enabled, ${userHealth.disabled} disabled)`, {}));
-  grid.appendChild(statCard(idBreakdown.Group || 0, 'Groups', {}));
-  grid.appendChild(statCard(idBreakdown.Computer || 0, 'Computer / service accounts', {}));
-  grid.appendChild(statCard(DATA.folders.length, 'Folders scanned', {}));
-  grid.appendChild(statCard(brokenCount, 'Broken inheritance', { tone: brokenCount > 0 ? 'warn' : '', onClick: brokenCount > 0 ? filterToBrokenFolders : null }));
-  grid.appendChild(statCard(dormantCount, 'Disabled / dormant identities', { tone: dormantCount > 0 ? 'warn' : '', onClick: dormantCount > 0 ? filterToDormantIdentities : null }));
-  grid.appendChild(statCard(scanErrorCount, 'Objects that could not be scanned', { tone: scanErrorCount > 0 ? 'bad' : '', onClick: scanErrorCount > 0 ? showScanErrorsDetail : null }));
+  grid.appendChild(statCard(DATA.identities.length, 'Всего субъектов доступа', {}));
+  grid.appendChild(statCard(ACCESS_MAP_MANIFEST.totalEdgeCount || 0, 'Всего записей доступа', {}));
+  grid.appendChild(statCard(userHealth.total, `Пользователи (${userHealth.enabled} включены, ${userHealth.disabled} отключены)`, {}));
+  grid.appendChild(statCard(idBreakdown.Group || 0, 'Группы', {}));
+  grid.appendChild(statCard(idBreakdown.Computer || 0, 'Компьютеры / служебные записи', {}));
+  grid.appendChild(statCard(DATA.folders.length, 'Проверено папок', {}));
+  grid.appendChild(statCard(brokenCount, 'Наследование отключено', { tone: brokenCount > 0 ? 'warn' : '', onClick: brokenCount > 0 ? filterToBrokenFolders : null }));
+  grid.appendChild(statCard(dormantCount, 'Отключённые / неактивные записи', { tone: dormantCount > 0 ? 'warn' : '', onClick: dormantCount > 0 ? filterToDormantIdentities : null }));
+  grid.appendChild(statCard(scanErrorCount, 'Не проверено объектов', { tone: scanErrorCount > 0 ? 'bad' : '', onClick: scanErrorCount > 0 ? showScanErrorsDetail : null }));
   content.appendChild(grid);
 
   // --- Identity breakdown ---
   const idSection = document.createElement('div');
   idSection.className = 'summarySection';
-  idSection.innerHTML = '<h2>Identities identified</h2>';
+  idSection.innerHTML = '<h2>Обнаруженные субъекты доступа</h2>';
   IDENTITY_TYPE_ORDER.forEach(type => {
     if (!idBreakdown[type]) return;
     const row = document.createElement('div');
     row.className = 'breakdownRow';
-    row.innerHTML = `<span>${esc(type)}</span><span>${idBreakdown[type]}</span>`;
+    row.innerHTML = `<span>${esc(displayIdentityType(type))}</span><span>${idBreakdown[type]}</span>`;
     idSection.appendChild(row);
   });
   if (userHealth.total > 0) {
@@ -2779,7 +2850,7 @@ function renderSummaryViewContent() {
     sub.style.marginTop = '8px';
     sub.style.fontSize = '11px';
     sub.style.color = 'var(--muted)';
-    sub.textContent = `Of ${userHealth.total} user(s): ${userHealth.enabled} enabled, ${userHealth.disabled} disabled, ${userHealth.locked} locked out, ${userHealth.dormant} with no logon in ${DORMANT_DAYS}+ days.`;
+    sub.textContent = `Из ${userHealth.total} пользователей: включены — ${userHealth.enabled}, отключены — ${userHealth.disabled}, заблокированы — ${userHealth.locked}, без входов более ${DORMANT_DAYS} дней — ${userHealth.dormant}.`;
     idSection.appendChild(sub);
   }
   content.appendChild(idSection);
@@ -2835,23 +2906,23 @@ function renderSummaryViewContent() {
   // --- Abuse-potential reference ---
   const abuseSection = document.createElement('div');
   abuseSection.className = 'summarySection';
-  abuseSection.innerHTML = '<h2>What each access level actually allows (and how it could be misused)</h2>';
+  abuseSection.innerHTML = '<h2>Уровни доступа: разрешённые действия и возможные риски</h2>';
   abuseSection.appendChild(renderAbuseReferenceTable());
   content.appendChild(abuseSection);
 
   // --- Observations / framework mapping ---
   const obsSection = document.createElement('div');
   obsSection.className = 'summarySection';
-  obsSection.innerHTML = '<h2>Observations worth a closer look</h2>';
+  obsSection.innerHTML = '<h2>Замечания, требующие проверки</h2>';
   const banner = document.createElement('div');
   banner.className = 'disclaimerBanner';
-  banner.textContent = 'These are heuristic, data-driven starting points for a conversation with your security/compliance team -- not a certified compliance assessment. The guidance text below is paraphrased from publicly available framework/legislation text (not quoted verbatim), and both frameworks and laws are periodically revised -- check the current, authoritative source (ACSC, GCSB/NCSC-NZ, NIST, CIS, or your own Privacy Commissioner/regulator for the retention-related items) before treating this as a compliance determination either way.';
+  banner.textContent = 'Эти замечания основаны на эвристическом анализе данных отчёта и предназначены для дополнительной проверки специалистами по информационной безопасности. Они не являются сертифицированной оценкой соответствия требованиям. Рекомендации ниже пересказывают общедоступные положения стандартов и законодательства (не являются дословными цитатами). Перед принятием решений сверяйтесь с актуальными первоисточниками ACSC, GCSB/NCSC-NZ, NIST, CIS, GDPR и применимыми требованиями к хранению данных.';
   obsSection.appendChild(banner);
   if (observations.length === 0) {
     const none = document.createElement('div');
     none.style.fontSize = '13px';
     none.style.color = 'var(--muted)';
-    none.textContent = 'No notable observations from the signals this tool currently checks for.';
+    none.textContent = 'По проверенным показателям существенных замечаний не обнаружено.';
     obsSection.appendChild(none);
   } else {
     observations.forEach(obs => {
@@ -2882,7 +2953,7 @@ function renderSummaryViewContent() {
       card.appendChild(fw);
       if (obs.action) {
         const btn = document.createElement('button');
-        btn.textContent = 'View these';
+        btn.textContent = 'Показать';
         btn.style.marginTop = '6px';
         btn.onclick = obs.action;
         card.appendChild(btn);
@@ -2895,7 +2966,7 @@ function renderSummaryViewContent() {
   const hint = document.createElement('p');
   hint.style.color = 'var(--muted)';
   hint.style.fontSize = '12px';
-  hint.textContent = 'Select an identity or folder on the left for its own detail view (Tree/Graph tabs), or use the quick filters above.';
+  hint.textContent = 'Выберите слева пользователя, группу или папку для просмотра подробностей (вкладки «Дерево» и «Граф») либо воспользуйтесь фильтрами вверху.';
   content.appendChild(hint);
 }
 
@@ -2908,10 +2979,10 @@ function setFilterButtonUI(btnId, val) {
     btn.title = '';
     return;
   }
-  if (val === 1) { btn.classList.add('state-show'); btn.title = 'Showing only these -- click to switch to hiding them, click again to turn off'; }
-  else { btn.classList.add('state-hide'); btn.title = 'Hiding these -- click to turn off'; }
+  if (val === 1) { btn.classList.add('state-show'); btn.title = 'Показаны только отмеченные; нажмите, чтобы скрыть их, затем ещё раз — чтобы отключить фильтр'; }
+  else { btn.classList.add('state-hide'); btn.title = 'Отмеченные скрыты; нажмите для сброса фильтра'; }
   if (!tag) { tag = document.createElement('span'); tag.className = 'filterStateLabel'; btn.appendChild(tag); }
-  tag.textContent = val === 1 ? 'ON' : 'HIDDEN';
+  tag.textContent = val === 1 ? 'ВКЛ' : 'СКРЫТО';
 }
 
 // Explicit "show only" entry points -- used by the Summary dashboard's
@@ -2992,7 +3063,7 @@ function makeResizableSplitPanes(topContent, bottomContent, storageKey, defaultT
 
   const splitter = document.createElement('div');
   splitter.className = 'paneSplitter';
-  splitter.title = 'Drag to resize';
+  splitter.title = 'Перетащите для изменения высоты';
 
   const bottomPane = document.createElement('div');
   bottomPane.className = 'splitPaneBottom';
@@ -3055,7 +3126,7 @@ function updateThemeBtnLabel() {
   if (!btn) return;
   // Label names the mode a click will switch TO, matching how the sidebar's
   // own A-Z/Z-A button already communicates "what happens if you click this".
-  btn.textContent = effectiveThemeIsLight() ? '\ud83c\udf19 Dark' : '\u2600\ufe0f Light';
+  btn.textContent = effectiveThemeIsLight() ? '🌙 Тёмная тема' : '☀️ Светлая тема';
 }
 
 function initTheme() {
@@ -3154,7 +3225,7 @@ function init() {
   // renderList's identities branch, which applies all of them together).
   // Every label names what's CURRENTLY shown, not just "All" at rest, which
   // didn't say what clicking it would actually do.
-  const identityKindLabels = ['Users & Groups', 'Users only', 'Groups only'];
+  const identityKindLabels = ['Пользователи и группы', 'Только пользователи', 'Только группы'];
   document.getElementById('identityKindBtn').onclick = () => {
     state.filterIdentityKind = (state.filterIdentityKind + 1) % 3;
     document.getElementById('identityKindBtn').textContent = identityKindLabels[state.filterIdentityKind];
@@ -3193,7 +3264,7 @@ function init() {
       const curIdx = AGED_YEAR_CYCLE.indexOf(state.filterAgedYears);
       state.filterAgedYears = AGED_YEAR_CYCLE[(curIdx + 1) % AGED_YEAR_CYCLE.length];
       const btn = document.getElementById('btnAged');
-      btn.textContent = state.filterAgedYears === 0 ? 'Aged folders' : `Aged folders (${state.filterAgedYears}yr+)`;
+      btn.textContent = state.filterAgedYears === 0 ? 'Давно не изменявшиеся папки' : `Без изменений ${state.filterAgedYears} лет и более`;
       btn.classList.toggle('state-show', state.filterAgedYears !== 0);
       if (state.filterAgedYears !== 0 && state.tab !== 'folders') setTab('folders'); else renderList();
     };
@@ -3226,7 +3297,7 @@ function init() {
   }
 
   document.getElementById('footerLine').textContent =
-    `Generated ${DATA.generatedAt}${fmtDuration(DATA.buildDurationSeconds) ? ' (built in ' + fmtDuration(DATA.buildDurationSeconds) + ')' : ''} from ${DATA.sourceFolder} (toolkit v${DATA.toolkitVersion || '?'}) \u2014 point-in-time snapshot, not live data.`;
+    `Создано ${DATA.generatedAt}${fmtDuration(DATA.buildDurationSeconds) ? ' (сборка за ' + fmtDuration(DATA.buildDurationSeconds) + ')' : ''} из ${DATA.sourceFolder} (версия инструмента ${DATA.toolkitVersion || '?'}) — снимок состояния на момент аудита, не текущие данные.`;
 
   // A #f:<idx> / #i:<idx>[:graph] link in the address bar (see updateUrlHash)
   // takes the visitor straight back to that exact view; anything else (no
@@ -3237,70 +3308,6 @@ function init() {
 
 init();
 </script>
-<!-- FSA_RU_EMBEDDED_TRANSLATION_V2: localization is part of the HTML source, not an installer. -->
-<script>
-(function () {
-  'use strict';
-  const dict = {"File Server Access Map":"Карта доступа файлового сервера","Summary":"Сводка","Incomplete data":"Неполные данные","Back":"Назад","Broken inheritance folders":"Папки с отключённым наследованием","Disabled / dormant identities":"Отключённые и неактивные учётные записи","Aged folders":"Давно не изменявшиеся папки","Flag files w/ broken inheritance":"Отметить файлы с нарушенным наследованием","Identities":"Пользователи и группы","Folders":"Папки","Search...":"Поиск...","Groups first":"Сначала группы","Users & Groups":"Пользователи и группы","Users only":"Только пользователи","Groups only":"Только группы","Full Control":"Полный доступ","Modify":"Изменение","Read & Execute":"Чтение и выполнение","Read":"Чтение","Write":"Запись","Special":"Особые права","Deny":"Запрет","Disabled":"Отключена","Locked out":"Заблокирована","disabled":"отключена","locked":"заблокирована","dormant":"неактивна","broken inheritance":"отключено наследование","broken":"наследование отключено","not scanned":"не проверено","None found.":"Не найдено.","No matches.":"Совпадений нет.","member":"участник","Last logon (approx.)":"Последний вход (приблизительно)","Last modified (AD)":"Изменено в AD","Password last set":"Пароль установлен","Account expires":"Срок действия учётной записи","Group scope":"Область действия группы","Direct member count":"Непосредственных участников","Managed by":"Ответственный","Access rights":"Права доступа","Objects that could not be scanned":"Недоступные для проверки объекты","Identities total":"Всего субъектов","Access entries total":"Всего записей доступа","Groups":"Группы","Folders scanned":"Проверенные папки","Broken inheritance":"Отключённое наследование","Access rights distribution":"Распределение прав доступа","Observations worth a closer look":"Замечания, требующие проверки","Identities identified":"Найденные субъекты доступа","View these":"Показать","Show legend":"Показать легенду","Hide legend":"Скрыть легенду","Zoom in":"Приблизить","Zoom out":"Отдалить","Reset view":"Сбросить масштаб","Filter this table...":"Фильтр таблицы...","Filter this list...":"Фильтр списка...","Member of":"Состоит в группе","Granted via group":"Доступ через группу","Read-only.":"Только чтение.","Path":"Путь","Category":"Категория","Message":"Сообщение","Level":"Уровень","Allows":"Разрешённые действия","Abuse potential if misused":"Возможный риск","ON":"ВКЛ","HIDDEN":"СКРЫТО","Group":"Группа","User":"Пользователь","(unknown)":"(неизвестно)","Aged folders (5yr+)":"Не менялись более 5 лет","No notable observations from the signals this tool currently checks for.":"Существенных замечаний по проверенным признакам нет.","Export":"Экспорт","No logon":"Нет входа"};
-  const patterns = [
-    [/^Export (\d+) row\(s\) as CSV$/, 'Экспорт $1 строк в CSV'],
-    [/^(\d+) more — refine your search$/, 'Ещё $1 — уточните поиск'],
-    [/^No logon in (\d+)\+ days$/, 'Нет входов более $1 дней'],
-    [/^via (.+)$/, 'через $1']
-  ];
-  function translate(input) {
-    if (typeof input !== 'string') return input;
-    const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(input);
-    if (!m) return input;
-    let v = m[2];
-    if (Object.prototype.hasOwnProperty.call(dict,v)) v=dict[v];
-    else for(const [r,repl] of patterns) if (r.test(v)) { v=v.replace(r,repl); break; }
-    return m[1]+v+m[3];
-  }
-  function translateNode(root) {
-    if (!root) return;
-    if (root.nodeType===3) {
-      if(root.parentNode && /^(SCRIPT|STYLE|TEXTAREA)$/i.test(root.parentNode.nodeName))return;
-      const v=translate(root.nodeValue);if(v!==root.nodeValue)root.nodeValue=v;
-      return;
-    }
-    if(root.nodeType!==1 && root.nodeType!==9 && root.nodeType!==11)return;
-    const visit=(el)=>{
-      if(el.nodeType===1)for(const k of ['title','placeholder','aria-label']) {
-        const before=el.getAttribute(k);
-        if(before!==null) {const after=translate(before);if(before!==after)el.setAttribute(k,after);}
-      } else if(el.nodeType===3 && el.parentNode && !/^(SCRIPT|STYLE|TEXTAREA)$/i.test(el.parentNode.nodeName)) {
-        const after=translate(el.nodeValue);if(after!==el.nodeValue)el.nodeValue=after;
-      }
-    };
-    visit(root);
-    const w=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,null);
-    while(w.nextNode())visit(w.currentNode);
-  }
-  function run(){
-    document.documentElement.lang='ru';
-    document.title='Карта доступа файлового сервера';
-    const app=document.getElementById('app');if(!app)return;
-    translateNode(app);
-    let pending=[],scheduled=false;
-    const observer=new MutationObserver(changes=>{
-      for(const change of changes) {
-        if(change.type==='childList')pending.push(...change.addedNodes);
-        else pending.push(change.target);
-      }
-      if(!scheduled && pending.length){
-        scheduled=true;Promise.resolve().then(()=>{
-          scheduled=false;const queued=pending;pending=[];
-          for(const n of queued)translateNode(n);
-        });
-      }
-    });
-    observer.observe(app,{subtree:true,childList:true,characterData:true,
-      attributes:true,attributeFilter:['title','placeholder','aria-label']});
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);
-  else run();
-})();
-</script>
+
 </body>
 </html>
