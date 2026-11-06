@@ -127,3 +127,18 @@ if ($html.Contains("class: 'edgeLabel'")) {
     throw 'В графе осталась отдельная неподвижная подпись права.'
 }
 Write-Host 'PASS: права привязаны к узлам, перетаскивание и сброс координат учтены.' -ForegroundColor Green
+
+# RU_GRAPH_LEGEND_COMBINATIONS_1_0_14 — расшифровка красного пунктира.
+foreach ($marker in @(
+    'RU_GRAPH_LEGEND_COMBINATIONS_1_0_14',
+    "lineRow(getEdgeColors()[0],",
+    'Красный пунктир — унаследованный «Полный доступ»',
+    'Красная сплошная — явно назначенный «Полный доступ»',
+    'Красный цвет обозначает «Полный доступ», а НЕ запрет (Deny)',
+    'цвет показывает категорию прав NTFS'
+)) {
+    if (-not $html.Contains($marker)) {
+        throw "Нет пояснения комбинации цвета и типа линии: $marker"
+    }
+}
+Write-Host 'PASS: в легенде объяснены красный пунктир, наследуемые и явно назначенные права.' -ForegroundColor Green
