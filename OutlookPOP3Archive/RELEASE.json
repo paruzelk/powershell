@@ -61,8 +61,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 116,
-    "ExpectedPesterTests": 3419,
+    "ExpectedTestContainers": 117,
+    "ExpectedPesterTests": 3443,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -535,6 +535,16 @@
     "BW4k7v2a2NewPstOrMailItemCreated": false,
     "BW4k7v2a2AnyOutlookMoveSaveSendDelete": false,
     "BW4k7v2a2OriginalPstOrTestFolderDeleted": false,
-    "BW4k7v2a2ProductionWorkerEnabled": false
+    "BW4k7v2a2ProductionWorkerEnabled": false,
+    "BW4k7v2a3ExistingOriginalSuiteIdAndIntentPinned": true,
+    "BW4k7v2a3OnlyExactSyntheticSubjectInStoreDrafts": true,
+    "BW4k7v2a3BoundedReadOnlyCrossStoreDrafts": true,
+    "BW4k7v2a3DistinguishesNoMatchesFromPartialProviders": true,
+    "BW4k7v2a3LiveOperatorOutlookTestCompleted": false,
+    "BW4k7v2a3OriginalPilotReplayed": false,
+    "BW4k7v2a3NewPstCreatedOrAttached": false,
+    "BW4k7v2a3OutlookMailWrittenOrMoved": false,
+    "BW4k7v2a3OtherFoldersOrMessageBodiesRead": false,
+    "BW4k7v2a3ProductionWorkerEnabled": false
   }
 }
