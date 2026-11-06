@@ -753,6 +753,44 @@ foreach ($row in (Import-CsvRobust -Path $identityPermsPath)) {
 }
 Write-Progress -Activity 'Building access map' -Completed
 
+# RU_RIGHTS_DISTRIBUTION_VERIFIED_V1
+# Calculate the summary directly from the exact 7-element access edge tuples
+# that are going to be written as share_N.js. This is deliberately independent
+# of the incremental bucket counter above and guarantees that the summary
+# cannot silently show zeros while the map contains access edges.
+[int[]]$verifiedRights = @(0, 0, 0, 0, 0, 0)
+[int64]$verifiedEdges = 0
+foreach ($shareKeyForStats in @($edgesByShare.Keys)) {
+    foreach ($edgeForStats in $edgesByShare[$shareKeyForStats]) {
+        if ($null -eq $edgeForStats -or $edgeForStats.Count -lt 3) {
+            throw 'Invalid access edge encountered while validating rights distribution.'
+        }
+        [int]$codeForStats = $edgeForStats[2]
+        if ($codeForStats -lt 0 -or $codeForStats -ge $verifiedRights.Length) {
+            throw "Invalid rights category code: $codeForStats."
+        }
+        $verifiedRights[$codeForStats]++
+        $verifiedEdges++
+    }
+}
+if ($verifiedEdges -ne $totalEdgeCount) {
+    throw "Rights-distribution validation failed: $verifiedEdges edge(s) vs $totalEdgeCount recorded."
+}
+$incrementalSum = 0
+foreach ($amount in $rightsDistribution) { $incrementalSum += [int64]$amount }
+if ($incrementalSum -ne $verifiedEdges) {
+    Write-Warning "Incremental rights counters disagree with access edges. Using verified edge counts."
+}
+# Explicit plain array of six [int] values for consistent PS5.1 ConvertTo-Json.
+$rightsDistribution = @(
+    [int]$verifiedRights[0], [int]$verifiedRights[1],
+    [int]$verifiedRights[2], [int]$verifiedRights[3],
+    [int]$verifiedRights[4], [int]$verifiedRights[5]
+)
+Write-Host ("Verified rights totals: {0} (Full={1}, Modify={2}, ReadExecute={3}, Read={4}, Write={5}, Special={6})" -f
+    $verifiedEdges, $rightsDistribution[0], $rightsDistribution[1], $rightsDistribution[2],
+    $rightsDistribution[3], $rightsDistribution[4], $rightsDistribution[5]) -ForegroundColor Cyan
+
 Write-Host "Read $i permission row(s).   Identities: $($identityIndex.Count)   Folders: $($folderIndex.Count)   Shares: $($shareOrder.Count)   Edges: $totalEdgeCount   Broken-inheritance folders: $($brokenInheritanceFolders.Count)" -ForegroundColor Green
 if ($fileRowsExcluded -gt 0) {
     Write-Host "$fileRowsExcluded file-level access row(s) from -IncludeFiles were excluded from this interactive map (folders/identities only) -- they're still in $identityPermsPath itself." -ForegroundColor Cyan
@@ -828,7 +866,15 @@ $manifestObject = [ordered]@{
 }
 
 Write-Verbose "Writing $DataDirName\manifest.js ..."
-$manifestJson = $manifestObject | ConvertTo-Json -Depth 6 -Compress
+$manifestJson = ConvertTo-Json -InputObject $manifestObject -Depth 6 -Compress
+# Round-trip check: prevent silently publishing malformed counters on PS5.1.
+$manifestProbe = ConvertFrom-Json -InputObject $manifestJson
+$probeRights = @($manifestProbe.rightsDistribution)
+$probeSum = [int64]0
+foreach ($count in $probeRights) { $probeSum += [int64]$count }
+if ($probeRights.Count -ne 6 -or $probeSum -ne [int64]$totalEdgeCount) {
+    throw "Invalid serialized rightsDistribution: $($probeRights.Count) bucket(s), sum=$probeSum, edges=$totalEdgeCount."
+}
 Set-Content -LiteralPath (Join-Path $DataDirPath 'manifest.js') -Value "const ACCESS_MAP_MANIFEST = $manifestJson;" -Encoding UTF8 -NoNewline
 
 function Write-ShareChunkFile {

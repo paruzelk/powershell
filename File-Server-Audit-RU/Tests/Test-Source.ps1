@@ -29,7 +29,7 @@ foreach ($name in $psFiles) {
 $htmlFile = Join-Path $root 'AccessMapTemplate.html'
 if (-not (Test-Path -LiteralPath $htmlFile -PathType Leaf)) { throw "Missing: $htmlFile" }
 $html = [IO.File]::ReadAllText($htmlFile,[Text.Encoding]::UTF8)
-foreach ($marker in @('FSA_RU_GROUP_CONTROLS_EMBEDDED_V2','FSA_RU_EMBEDDED_TRANSLATION_V2','RU_SUMMARY_DIAGNOSTIC_1.0.8','RU_SIDEBAR_GROUP_MEMBERS_V1','Участники: ','Развернуть все группы')) {
+foreach ($marker in @('FSA_RU_GROUP_CONTROLS_EMBEDDED_V2','FSA_RU_EMBEDDED_TRANSLATION_V2','RU_SUMMARY_DIAGNOSTIC_1.0.8','RU_SIDEBAR_GROUP_MEMBERS_V1','RU_RIGHTS_CHART_VALIDATION_V1','Участники: ','Развернуть все группы')) {
     if (-not $html.Contains($marker)) { throw "HTML feature missing: $marker" }
 }
 $scan = [IO.File]::ReadAllText((Join-Path $root 'Invoke-NTFSPermissionAudit.ps1'),[Text.Encoding]::UTF8)
@@ -40,3 +40,20 @@ foreach ($m in $exports) {
 }
 Write-Host 'PASS: HTML, AD UAC, CSV UTF8' -ForegroundColor Green
 Write-Host 'Static source checks passed (AD/SMB integration not tested).' -ForegroundColor Cyan
+
+# RU_RIGHTS_STATIC_TEST_V1 — проверка исходного сборщика и формата массива PS5.1.
+$builder = [IO.File]::ReadAllText((Join-Path $root 'Build-AccessMapHtml.ps1'), [Text.Encoding]::UTF8)
+if (-not $builder.Contains('RU_RIGHTS_DISTRIBUTION_VERIFIED_V1')) {
+    throw 'Rights-distribution verification missing from Build-AccessMapHtml.ps1'
+}
+[int[]]$sampleBuckets = @(2, 1, 0, 0, 0, 0)
+$sampleJson = ConvertTo-Json -InputObject ([ordered]@{
+    rightsDistribution = $sampleBuckets
+    totalEdgeCount = 3
+}) -Depth 4 -Compress
+$parsed = ConvertFrom-Json -InputObject $sampleJson
+$values = @($parsed.rightsDistribution)
+if ($values.Count -ne 6 -or [int]$values[0] -ne 2 -or [int]$values[1] -ne 1) {
+    throw 'PowerShell 5.1 could not round-trip rightsDistribution as an array.'
+}
+Write-Host 'PASS: rights totals, JSON structure and fallback code markers.' -ForegroundColor Green

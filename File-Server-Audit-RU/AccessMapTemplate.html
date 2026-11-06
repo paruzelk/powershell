@@ -2313,13 +2313,62 @@ function computeUserHealth() {
 // visits every edge once while it builds them, so these are precomputed
 // there instead and just read back here.
 
+// RU_RIGHTS_CHART_VALIDATION_V1: missing counters are UNKNOWN, not zero.
+// Validate against the total number of access edges published in the manifest.
+const RIGHTS_LABELS_SUMMARY_RU = [
+  'Полный доступ', 'Изменение', 'Чтение и выполнение', 'Чтение', 'Запись', 'Особые права'
+];
+let recoveredRightsDistribution = null;
+let pendingRightsRecount = null;
+
 function computeRightsDistribution() {
-  // Optional or malformed manifest counters must never crash the dashboard.
-  const source = ACCESS_MAP_MANIFEST.rightsDistribution;
-  return Array.from({length: RIGHTS_LABELS.length}, (_, i) => {
-    const value = Array.isArray(source) ? Number(source[i]) : 0;
-    return Number.isFinite(value) && value >= 0 ? value : 0;
-  });
+  if (recoveredRightsDistribution) return recoveredRightsDistribution.slice();
+  const raw = ACCESS_MAP_MANIFEST.rightsDistribution;
+  let source = null;
+  if (Array.isArray(raw)) {
+    source = raw;
+  } else if (raw && typeof raw === 'object' &&
+      Array.from({length: RIGHTS_LABELS.length}, (_, i) => i)
+        .every(i => Object.prototype.hasOwnProperty.call(raw, String(i)))) {
+    // Accept a numeric-key object, sometimes emitted by an older serializer.
+    source = Array.from({length: RIGHTS_LABELS.length}, (_, i) => raw[i]);
+  }
+  if (!source || source.length !== RIGHTS_LABELS.length) return null;
+  const counts = source.map(x => Number(x));
+  if (!counts.every(x => Number.isSafeInteger(x) && x >= 0)) return null;
+  const total = Number(ACCESS_MAP_MANIFEST.totalEdgeCount);
+  if (Number.isSafeInteger(total) && total >= 0 &&
+      counts.reduce((a, b) => a + b, 0) !== total) return null;
+  return counts;
+}
+
+async function recountRightsFromShareChunks() {
+  if (pendingRightsRecount) return pendingRightsRecount;
+  pendingRightsRecount = (async () => {
+    // A fallback for old reports with missing/malformed manifest counters.
+    // Do not load every share just to display a dashboard unless needed.
+    const shareKeys = (ACCESS_MAP_MANIFEST.shares || []).map(s => s.key);
+    await ensureSharesLoaded(shareKeys);
+    const counts = Array(RIGHTS_LABELS.length).fill(0);
+    for (const edge of DATA.edges) {
+      const rightsCode = Number(edge[2]);
+      if (!Number.isInteger(rightsCode) || rightsCode < 0 || rightsCode >= counts.length)
+        throw new Error('Недопустимый код прав доступа: ' + edge[2]);
+      counts[rightsCode]++;
+    }
+    const total = Number(ACCESS_MAP_MANIFEST.totalEdgeCount);
+    const observed = counts.reduce((a, b) => a + b, 0);
+    if (Number.isSafeInteger(total) && total >= 0 && observed !== total)
+      throw new Error('Количество записей не совпадает: ' + observed + ' вместо ' + total +
+        '. Проверьте целостность AccessMap_data.');
+    recoveredRightsDistribution = counts;
+    return counts;
+  })();
+  try {
+    return await pendingRightsRecount;
+  } finally {
+    pendingRightsRecount = null;
+  }
 }
 
 function computeBroadPrincipalGrants() {
@@ -2414,8 +2463,8 @@ function computeObservations() {
   const stale = computeStaleAccessCounts();
   const brokenCount = DATA.folders.filter(f => f.broken).length;
   const rights = computeRightsDistribution();
-  const totalEdges = rights.reduce((a, b) => a + b, 0) || 1;
-  const fullControlShare = rights[0] / totalEdges;
+  const totalEdges = rights ? rights.reduce((a, b) => a + b, 0) : 0;
+  const fullControlShare = totalEdges > 0 ? rights[0] / totalEdges : 0;
   const scanErrorCount = (DATA.scanErrors || []).length;
 
   const observations = [];
@@ -2738,9 +2787,49 @@ function renderSummaryViewContent() {
   // --- Rights distribution ---
   const rightsSection = document.createElement('div');
   rightsSection.className = 'summarySection';
-  rightsSection.innerHTML = '<h2>Access rights distribution</h2>';
-  const segments = RIGHTS_LABELS.map((label, i) => ({ label, count: rights[i], color: getEdgeColors()[i] }));
-  rightsSection.appendChild(renderChartWithLegend(segments));
+  rightsSection.innerHTML = '<h2>Распределение прав доступа</h2>';
+  if (rights) {
+    const segments = RIGHTS_LABELS_SUMMARY_RU.map((label, i) => ({
+      label, count: rights[i], color: getEdgeColors()[i]
+    }));
+    rightsSection.appendChild(renderChartWithLegend(segments));
+  } else {
+    // Never present invented zeros for a report that has access entries.
+    const warning = document.createElement('p');
+    warning.className = 'infoBanner';
+    warning.textContent = 'В манифесте отсутствует корректная статистика прав. ' +
+      'Количество записей доступа: ' + (ACCESS_MAP_MANIFEST.totalEdgeCount || 0) + '.';
+    rightsSection.appendChild(warning);
+    const recountButton = document.createElement('button');
+    recountButton.type = 'button';
+    recountButton.textContent = 'Пересчитать права по данным отчёта';
+    rightsSection.appendChild(recountButton);
+    const diagnostic = document.createElement('p');
+    diagnostic.className = 'graphNote';
+    diagnostic.textContent = 'Пересчёт использует сохранённые файлы AccessMap_data, без обращения к NTFS или AD.';
+    rightsSection.appendChild(diagnostic);
+    recountButton.onclick = async () => {
+      recountButton.disabled = true;
+      diagnostic.textContent = 'Загружаются сохранённые записи разрешений...';
+      try {
+        await recountRightsFromShareChunks();
+        if (rightsSection.isConnected) renderSummaryView();
+      } catch (error) {
+        console.error('Rights recount failed', error);
+        if (rightsSection.isConnected) {
+          diagnostic.textContent = 'Не удалось пересчитать: ' + (error.message || String(error));
+          recountButton.disabled = false;
+        }
+      }
+    };
+    const edges = Number(ACCESS_MAP_MANIFEST.totalEdgeCount);
+    // Small reports can be repaired automatically; huge reports stay lazy.
+    if (edges > 0 && edges <= 50000) {
+      Promise.resolve().then(() => {
+        if (rightsSection.isConnected && !recountButton.disabled) recountButton.click();
+      });
+    }
+  }
   content.appendChild(rightsSection);
 
   // --- Abuse-potential reference ---
