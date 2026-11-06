@@ -200,7 +200,11 @@ try{
         }catch{
             $state='ProviderError'
             $errorText=[string]$_.Exception.Message
-            # Partial observations remain visible but must not claim full scan.
+            # Never classify partially enumerated matches as a complete store read.
+            while($matches.Count -gt 0){
+                $matches.RemoveAt($matches.Count-1)
+                $candidates.RemoveAt($candidates.Count-1)
+            }
         }
         $rows.Add([pscustomobject]@{
             StoreIdSha256=$idHash;Status=$state
