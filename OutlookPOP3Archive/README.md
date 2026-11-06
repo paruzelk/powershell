@@ -8,6 +8,8 @@ Application: `0.9.4-rc1-build2.6.3-PREVIEW1`. Target: Windows PowerShell 5.1, Ou
 
 **NEW BW4k7v2a2 read-only forensic diagnostic:** The real BW4k7v2a1 test returned a post-save target-identity mismatch for suite `2c15cb7c-4c09-4bcf-bca1-9fec458af3a5`; this does not identify the original predicate or prove a wrong PST. Do not retry its CreatePilot. [Read-only forensic runbook](docs/2.6.5-bw4k7v2a2-failed-pilot-readonly-forensics.md) reads only the named disposable test PST folder and original intent, never saves, mounts or moves mail.
 
+**NEW BW4k7v2a3 read-only Drafts forensic:** The previous BW4k7v2a2 real Outlook test proved zero messages in the expected disposable test PST folder, while the first MailItem.Save had returned without error. [Exact-subject existing-Store Drafts runbook](docs/2.6.5-bw4k7v2a3-drafts-location-readonly.md) searches only the failed SuiteId synthetic Subject in currently mounted store-specific Drafts folders; it never writes, mounts, retries or scans unrelated mail content.
+
 ## Purpose and safety rules
 
 - Archive old messages from **POP3** PST stores only; IMAP accounts are never archived.
