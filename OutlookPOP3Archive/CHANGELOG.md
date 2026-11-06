@@ -1,3 +1,10 @@
+## 2.6.5-BW4k7v2a3 — Real failed pilot Drafts location, read-only exact-subject search (DEV, 2026-11-06)
+
+- Operator BW4k7v2a2 confirmed exactly one mounted target test PST (271,360 bytes), exact fixture folder and **zero matching or other visible items** in it; original immutable Intent SHA256 d78b80450f84e182fef7549bfae6cc48e1b487eb190e216cecbee7be9e05f606. No manifest and no prior CreatePilot retry.
+- Microsoft MailItem.Save docs permit a *new* item to be persisted to the **default folder for its type**, regardless of initial Items.Add target collection. A misrouted Drafts pilot is plausible, not yet observed.
+- New read-only, original SHA256-pinned diagnostic visits only existing Stores' default Drafts via Store.GetDefaultFolder(16) and exact Subject Items.Restrict; capped 32 stores/8 per-folder/16 overall and provider error incompleteness. Does not read unrelated message bodies, attach PST, Save, Move, Send, Delete or retry old SuiteId.
+- 24 Pester tests, CI target **3443 in 117 containers**, original BW4j6 matrix and all prior safety gates. Original evidence immutable, no production writer.
+
 ## 2.6.5-BW4k7v2a2 — Real post-save pilot failure forensic review, read-only (DEV, 2026-11-05)
 
 - Operator BW4k7v2a1 real `Inspect` passed, eight stores and POP3 delivery confirmed; subsequent original `CreatePilot` failed in combined **post-Save** identity check. `HRESULT=0x80131501` from script throw is not an Outlook MAPI failure code; exact mismatched predicate unknown.
