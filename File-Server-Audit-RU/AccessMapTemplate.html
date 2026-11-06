@@ -2162,12 +2162,20 @@ function computeUserHealth() {
 // there instead and just read back here.
 
 function computeRightsDistribution() {
-  return (ACCESS_MAP_MANIFEST.rightsDistribution || [0, 0, 0, 0, 0, 0]).slice();
+  // Optional or malformed manifest counters must never crash the dashboard.
+  const source = ACCESS_MAP_MANIFEST.rightsDistribution;
+  return Array.from({length: RIGHTS_LABELS.length}, (_, i) => {
+    const value = Array.isArray(source) ? Number(source[i]) : 0;
+    return Number.isFinite(value) && value >= 0 ? value : 0;
+  });
 }
 
 function computeBroadPrincipalGrants() {
-  const b = ACCESS_MAP_MANIFEST.broadPrincipalGrants || { folderCount: 0, folderIdxs: [] };
-  return { folderCount: b.folderCount, folderIdxs: b.folderIdxs || [] };
+  const b = ACCESS_MAP_MANIFEST.broadPrincipalGrants || {};
+  return {
+    folderCount: Number.isFinite(Number(b.folderCount)) ? Number(b.folderCount) : 0,
+    folderIdxs: Array.isArray(b.folderIdxs) ? b.folderIdxs : []
+  };
 }
 
 function computeStaleAccessCounts() {
@@ -2470,7 +2478,41 @@ function renderAbuseReferenceTable() {
   return table;
 }
 
+// RU_SUMMARY_DIAGNOSTIC_1.0.8: keep UI visible when an unexpected report record
+// raises a runtime error during summary rendering. No ACL/AD data is changed.
 function renderSummaryView() {
+  try {
+    renderSummaryViewContent();
+    window.__fsaSummaryLastError = null;
+  } catch (error) {
+    window.__fsaSummaryLastError = String(error && (error.stack || error.message) || error);
+    console.error('File-Server-Audit: summary rendering failed', error);
+    const container = document.getElementById('content');
+    container.classList.remove('content-split');
+    container.innerHTML = '';
+    const box = document.createElement('section');
+    box.className = 'summarySection';
+    const title = document.createElement('h2');
+    title.textContent = 'Не удалось отобразить сводку';
+    box.appendChild(title);
+    const description = document.createElement('p');
+    description.textContent = 'Обнаружена ошибка обработки данных отчёта. Остальные разделы и исходные CSV не изменены.';
+    box.appendChild(description);
+    const diagnostic = document.createElement('pre');
+    diagnostic.style.whiteSpace = 'pre-wrap';
+    diagnostic.style.overflowWrap = 'anywhere';
+    diagnostic.style.fontSize = '12px';
+    diagnostic.style.color = 'var(--bad-text)';
+    diagnostic.textContent = window.__fsaSummaryLastError;
+    box.appendChild(diagnostic);
+    const help = document.createElement('p');
+    help.textContent = 'Сообщите этот текст ошибки для исправления причины. F12 → Console также содержит подробности.';
+    box.appendChild(help);
+    container.appendChild(box);
+  }
+}
+
+function renderSummaryViewContent() {
   state.selected = null;
   const content = document.getElementById('content');
   content.classList.remove('content-split');
