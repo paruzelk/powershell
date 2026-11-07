@@ -69,7 +69,7 @@ const rows=[
 ];
 const harnessBody=[
   'precompute();mergeEdges(rows);',
-  "const keys=Array.from(adjacency.get('f:0').keys()).sort();",
+  "const keys=Array.from((adjacency.get('f:0')||new Map()).keys()).sort();",
   "const g=await buildEgoGraph(center||'f:0',depth,600,60);",
   "const positions=layoutRadial(g.layers,g.visited);",
   'let visual=null;',
@@ -94,7 +94,7 @@ const harnessBody=[
   " const restored=[user.getAttribute('transform'),direct.getAttribute('x2'),member.getAttribute('x2')];",
   ' visual={secondary,badges,user,old,moved,restored};',
   '}',
-  'return {g,keys,visual,edgeCount:DATA.edges.length,folderRows:byFolder.get(0).length};'
+  "return {g,keys,visual,edgeCount:DATA.edges.length,folderRows:(byFolder.get(0)||[]).length};"
 ].join('\n');
 async function run(m,aces,depth,render=false,center='f:0'){
   const doc=makeDocument();
@@ -141,7 +141,18 @@ async function run(m,aces,depth,render=false,center='f:0'){
   assert.equal(viaOnlyUser.g.visited.get('i:0').from,'i:2');
   assert.equal(viaOnlyUser.g.visited.get('f:0').from,'i:0',
     'user without direct ACL reaches folder through granting group');
+  const nested=await run({
+    identities:[
+      {name:'DOM\\GroupRoot',type:'Group',members:[1],shareKeys:[],edgeCount:0},
+      {name:'DOM\\NestedGroup',type:'Group',members:[2],shareKeys:[],edgeCount:0},
+      {name:'DOM\\NestedUser',type:'User',shareKeys:[],edgeCount:0}
+    ],
+    folders:[],shares:[],maxEdgesPerNode:60
+  },[],2,false,'i:0');
+  assert.equal(nested.g.visited.get('i:1').from,'i:0');
+  assert.equal(nested.g.visited.get('i:2').from,'i:1',
+    'group-centered graph expands nested AD group members');
   assert.ok(html.includes('graphDepth: 2,'),'group tree is default');
   console.log('PASS grouped ACL graph: viaGroup, dual ACL, multi-group, depth 1,');
-  console.log('     missing group ACE, identity-centered routes, original records, drag, reset');
+  console.log('     missing group ACE, identity paths, nested groups, raw rows, drag, reset');
 })().catch(err=>{console.error(err);process.exitCode=1;});

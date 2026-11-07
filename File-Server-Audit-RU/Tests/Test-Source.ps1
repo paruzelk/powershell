@@ -182,6 +182,7 @@ foreach ($marker in @(
     "d.type === 'inferredGroupGrant'",
     'function refineGraphMembershipTopology(graph, centerKey, depth)',
     'const userViaGroupFolders = new Set()',
+    'const centerIsUser = centerIndex >= 0 &&',
     "mode = 'viaFolder'",
     'refineGraphMembershipTopology({ visited, layers, truncated }, centerKey, depth)',
     "linkInfo.reason === 'additionalDirectAcl'",

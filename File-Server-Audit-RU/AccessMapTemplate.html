@@ -1490,8 +1490,13 @@ async function buildEgoGraph(centerKey, depth, cap, perSourceCap) {
   // For a user-centered graph, load the user's recorded via-group grants
   // (not every unrelated folder that the same group can reach).
   const userViaGroupFolders = new Set();
-  if (centerKey.startsWith('i:')) {
-    const idx = parseInt(centerKey.slice(2), 10);
+  const centerIndex = centerKey.startsWith('i:') ?
+    parseInt(centerKey.slice(2), 10) : -1;
+  const centerIsUser = centerIndex >= 0 &&
+    DATA.identities[centerIndex] &&
+    DATA.identities[centerIndex].type === 'User';
+  if (centerIsUser) {
+    const idx = centerIndex;
     (byIdentity.get(idx) || []).forEach(ei => {
       const e = DATA.edges[ei];
       if (e && Number(e[6]) >= 0) {
@@ -1515,7 +1520,7 @@ async function buildEgoGraph(centerKey, depth, cap, perSourceCap) {
         const obj = DATA.identities[parseInt(fKey.slice(2), 10)];
         if (obj && obj.type !== 'Group') mode = 'none';
       }
-      if (centerKey.startsWith('i:') && fKey.startsWith('i:') && fKey !== centerKey) {
+      if (centerIsUser && fKey.startsWith('i:') && fKey !== centerKey) {
         const obj = DATA.identities[parseInt(fKey.slice(2), 10)];
         if (obj && obj.type === 'Group') mode = 'viaFolder';
       }
@@ -1654,7 +1659,8 @@ function refineGraphMembershipTopology(graph, centerKey, depth) {
 
   // User-centered graph: one folder may be reachable both directly and
   // through an AD group. Draw the supplementary group->folder connection.
-  if (centerKey.startsWith('i:')) {
+  if (centerKey.startsWith('i:') &&
+      DATA.identities[parseInt(centerKey.slice(2), 10)]?.type === 'User') {
     const centerIdx = parseInt(centerKey.slice(2), 10);
     const grantedByGroup = new Set();
     (byIdentity.get(centerIdx) || []).forEach(ei => {
