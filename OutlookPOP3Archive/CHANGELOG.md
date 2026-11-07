@@ -1,4 +1,50 @@
-﻿## 2.5.7-FIX13b (2026-10-22)
+﻿## 2.6.2-PREVIEW1 (2026-10-22; candidate pending full CI)
+
+- Introduced append-only SHA-256 Durable Operation Journal for diagnostic Worker; controller-supplied RequestId, durable Intent and terminal outcome, exclusive journal lock and fail-closed replay.
+- Independent PowerShell restart, Worker crash and truncated-tail fault injection tested successfully by the user on the preceding development snapshot; Pester worker journal suite 11 passed, 0 failed.
+- Distinguished diagnostic-only unresolved events from potential PST reconciliation requirements; malformed journal tails conservatively require manual reconciliation.
+- Hardened the release gate: Core/Version, RELEASE, MANIFEST, current docs and test version checks; mandatory Pester/PSScriptAnalyzer and reviewed source-only ZIP packaging with SHA-256.
+- Updated dynamic Worker SelfTest version display; Transaction schema 2.5.4, DuplicateIndex schema 1.2 and Worker protocol 1.0 are unchanged.
+- Production Archive/Resume/Auto and real MailItem.Move continue using FIX13b; 2.6.2 does not activate Worker COM mutations.
+- Full Windows PowerShell 5.1 CI and packaging verification required before promotion.
+
+## 2.6.1-PREVIEW1a (2026-10-22)
+
+- Fixed the Windows PowerShell 5.1 CI manifest validator: version fields are now generated as four separate output lines rather than one concatenated array expression.
+- Added a PS5.1-compatible shared manifest guard and seven behavioral Pester tests, including rejection of collapsed, missing, duplicate and stale metadata.
+- Preserved worker, Archive, Resume and Auto implementations from PREVIEW1; packaging/version metadata updated only.
+
+## 2.6.1-PREVIEW1 (2026-10-22)
+
+- Added typed worker control results (`Succeeded`, `Failed`, `Indeterminate`) with deadlines, elapsed time, spawned PID, exit code and request correlation.
+- Timeout, abrupt crash and invalid/missing response are fail-closed: no automatic retries, recovery disposition `ReconcileBeforeRetry`.
+- Validated STA/timestamps and response process PID; added optional preserved diagnostic request artifacts.
+- Release CI gate checks Core/Version.ps1, MANIFEST.txt, RELEASE.json, README.md and rejects obsolete release documents.
+- Removed legacy root-level FIX test plans and duplicate build notes from release ZIP; active tests and transaction-related code retained.
+- Existing Archive/Resume/Auto, transaction schema and DuplicateIndex schema remain unchanged; worker mail mutations still disabled.
+
+## 2.6.0-PREVIEW1a — CI version-test correction (2026-10-22)
+
+- Fixed `Tests/Core/Version.Tests.ps1` still expecting 0.9.3 after the 0.9.4 version bump.
+- The format check is release-neutral and validates that the manifest matches the declared application version.
+- Worker operations, Outlook Archive/Resume/Auto logic, transaction schemas, and worker protocol are unchanged.
+- CI target remains 170 Pester tests (169 passed / 1 failed in PREVIEW1 before this correction).
+
+## 2.6.0-PREVIEW1a (2026-10-22)
+
+- Introduced a separate Windows PowerShell 5.1 STA worker executable path,
+  versioned JSON request/response envelopes with GUID correlation, atomic
+  staging, validated results and structured failures.
+- Added explicit synthetic process self-test and opt-in read-only Outlook COM
+  `ProbeOutlook`; no COM Move is delegated, and the legacy Archive/Resume/Auto
+  behavior from FIX13b remains unchanged.
+- Added host deadline and best-effort termination of the **spawned child only**;
+  process crashes or timeouts do not silently count as success.
+- Added 19 Pester tests; expected 170 total (previously 151).
+- Deferred durable mutating-operation recovery, reconciliation and production
+  routing to later 2.6.x phases.
+
+## 2.5.7-FIX13b (2026-10-22)
 
 - Fix Windows PowerShell 5.1 `Math.Max(0, <byte difference>)` overload resolution in `Get-OPAStoragePolicyDecision`. At a 7.03 GB source and 35 GB target the negative intermediate is ~-28 GB and previously caused an Int32 conversion error in Plan.
 - Use explicit Int64 operands for physical-vs-target and cumulative logical progress, storage reclaim diagnostics, archive PST growth telemetry, and remaining destination capacity diagnostics.
