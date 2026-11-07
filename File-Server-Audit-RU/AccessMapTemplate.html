@@ -305,6 +305,81 @@
   .aclChildren { margin-left:20px; padding-left:10px; border-left:1px solid var(--border); }
   .aclChildren .aclRow { font-size:12px; }
   .aclViaNote { font-size:10px; color:var(--muted); flex-shrink:0; }
+
+  /* RU_COMPACT_UI_1_0_17
+     One-row graph controls; more vertical space for the graph. Changes are
+     visual only: no new scan/ACL logic, no changes to SVG drag handling. */
+  header { padding:5px 12px; gap:10px; min-height:32px; }
+  header .headerRightGroup { gap:5px; }
+  header h1 { font-size:14px; }
+  .themeToggleBtn { font-size:12px; padding:4px 8px; }
+  #content.content-split { padding:8px 10px 5px; }
+  #content.content-split > .card { padding:7px 11px; margin-bottom:5px; }
+  #content.content-split > .card h2 { font-size:14px; margin-bottom:4px; }
+  #content.content-split > .card .field {
+    min-width:0; font-size:12px; margin:1px 15px 1px 0;
+  }
+  #content.content-split .breadcrumb { font-size:14px; line-height:1.3; margin-bottom:3px; }
+  #content.content-split .folderMetaRow { margin-top:2px; }
+  #content.content-split .groupMemberDetails { margin-top:5px; }
+  .detailTabs { display:flex; flex-wrap:nowrap; align-items:center; gap:4px;
+    margin:0 0 4px; min-height:31px; flex-shrink:0; min-width:0; }
+  .detailTabBtn { padding:6px 12px; min-height:29px; flex-shrink:0; }
+  .graphControlsHost { display:flex; align-items:center; flex:1 1 auto;
+    min-width:0; margin-left:clamp(6px, 1.3vw, 20px); overflow-x:auto;
+    overflow-y:hidden; scrollbar-width:thin; }
+  .detailTabs .graphToolbar { display:flex; align-items:center; gap:5px;
+    padding:0; margin:0; flex:0 0 auto; flex-wrap:nowrap; min-height:29px; }
+  .detailTabs .graphToolbar .groupLabel { margin-right:2px; white-space:nowrap; font-size:11px; }
+  .graphToolbar .depthBtn { min-width:25px; padding:5px 7px; line-height:1.1; }
+  .graphToolbar .zoomBtn { min-width:28px; padding:4px 7px; line-height:1.1; }
+  .graphToolbar .graphRightsToggle { padding:5px 10px; line-height:1.1; border-radius:6px; }
+  .graphToolbar .graphHelpBtn { border-radius:50%; width:26px; min-width:26px;
+    height:26px; font-weight:700; }
+  .graphWrap, .treeWrap { margin-bottom:2px; padding:4px; }
+  .graphWrap .graphToolbar { gap:5px; padding:0 3px 4px; }
+  .graphCanvas { min-height:120px; }
+  svg.graph { min-height:120px; }
+  .graphNote { padding:2px 5px; font-size:10px; line-height:1.25; }
+  .graphLegendToggle { right:9px; bottom:9px; width:24px; height:24px; }
+  .graphCanvas .graphLegendPanel { right:9px; top:6px; bottom:37px; }
+  .paneSplitter { height:5px; margin:3px 0; border-radius:3px; }
+  .aclWrap { margin-bottom:2px; padding:6px; }
+  .aclSummary { padding:0 3px 4px; }
+  .aclToolbar { gap:5px; margin-bottom:5px; }
+  .aclToolbar input { padding:5px 7px; }
+  .treeToolbar { gap:7px; padding:1px 5px 4px; margin-bottom:3px; }
+  footer { padding:3px 10px; min-height:23px; }
+  /* Consistent tactile feedback for all buttons and controls.
+     Press and selected states remain distinct, including keyboard focus. */
+  button {
+    transition:background-color .14s ease, color .14s ease, border-color .14s ease,
+      box-shadow .14s ease, transform .08s ease, filter .12s ease;
+    box-shadow:0 1px 2px rgba(0,0,0,.12);
+    font-weight:500;
+  }
+  button:not(:disabled):hover { background:var(--selected-bg); border-color:var(--accent);
+    box-shadow:0 2px 8px rgba(0,0,0,.20), inset 0 0 0 1px var(--accent); }
+  button:not(:disabled):active { transform:translateY(1px) scale(.97);
+    filter:brightness(.88); box-shadow:inset 0 2px 5px rgba(0,0,0,.38); }
+  button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  button.active, .depthBtn.active, .detailTabBtn.active {
+    background:var(--accent); color:#fff; border-color:var(--accent);
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.20), 0 1px 5px rgba(0,0,0,.18);
+    font-weight:700;
+  }
+  button.active:not(:disabled):hover { filter:brightness(1.12); }
+  .chipBtn.state-show:not(:disabled), .chipBtn.state-show:not(:disabled):hover {
+    background:var(--good); color:#062b17; border-color:var(--good); }
+  .chipBtn.state-hide:not(:disabled), .chipBtn.state-hide:not(:disabled):hover {
+    background:var(--bad); color:#fff; border-color:var(--bad); }
+  button:disabled { box-shadow:none; opacity:.45; cursor:default; }
+  @media (prefers-reduced-motion:reduce) { button { transition:none; } }
+  @media (max-width:1000px) {
+    header { flex-wrap:wrap; }
+    .graphControlsHost { margin-left:6px; }
+    .detailTabs { min-height:30px; }
+  }
 </style>
 </head>
 <body>
@@ -1786,7 +1861,7 @@ function edgeDisplayInfo(edgeInfo) {
 
 let graphRenderToken = 0;
 
-function renderRelationshipGraph(kind, idx, onNavigate, onDepthChange) {
+function renderRelationshipGraph(kind, idx, onNavigate, onDepthChange, controlsHost) {
   // Returns a placeholder synchronously (so the caller can appendChild it
   // right away, same as before) and swaps in the real graph once this
   // node's own share(s) -- and anything the BFS expands into -- are loaded.
@@ -1808,7 +1883,7 @@ function renderRelationshipGraph(kind, idx, onNavigate, onDepthChange) {
       const g = await buildEgoGraph(centerKey, depth, GRAPH_NODE_CAP, MAX_EDGES_PER_NODE);
       if (token !== graphRenderToken) return; // a newer selection superseded this one
       const positions = layoutRadial(g.layers, g.visited);
-      const built = renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDepthChange);
+      const built = renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDepthChange, controlsHost);
       holder.replaceWith(built);
     } catch (err) {
       if (token !== graphRenderToken) return;
@@ -1819,7 +1894,7 @@ function renderRelationshipGraph(kind, idx, onNavigate, onDepthChange) {
   return holder;
 }
 
-function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDepthChange) {
+function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDepthChange, controlsHost) {
   const wrap = document.createElement('div');
   wrap.className = 'graphWrap';
 
@@ -1844,11 +1919,24 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
   rightsToggle.type = 'button';
   rightsToggle.className = 'chipBtn graphRightsToggle';
   toolbar.appendChild(rightsToggle);
-  const hint = document.createElement('span');
-  hint.className = 'groupLabel';
-  hint.textContent = 'Глубина 1 — прямые ACL · глубина 2 — группы и их участники · при прямом ACL и членстве в группе показываются обе связи · перетаскивайте узлы для изменения расположения · кнопка ⌗ сбрасывает расположение';
-  toolbar.appendChild(hint);
-  wrap.appendChild(toolbar);
+  // RU_COMPACT_GRAPH_CONTROLS_1_0_17: controls share the same row as
+  // "Дерево" / "Граф". Detailed help is in a tooltip, not a second text row.
+  const help = document.createElement('button');
+  help.type = 'button';
+  help.className = 'zoomBtn graphHelpBtn';
+  help.textContent = '?';
+  help.title = 'Глубина 1: прямые ACL. Глубина 2: группы и их участники. ' +
+    'При прямом ACL и членстве в группе показываются обе связи. ' +
+    'Перетаскивайте узлы для изменения расположения, колесо мыши — масштаб, ' +
+    'кнопка ⌗ — сброс масштаба и расположения.';
+  help.setAttribute('aria-label', 'Справка по графу: ' + help.title);
+  toolbar.appendChild(help);
+  if (controlsHost) {
+    controlsHost.appendChild(toolbar);
+  } else {
+    // Standalone usage / regression tests remain backward compatible.
+    wrap.appendChild(toolbar);
+  }
   const graphCanvas = document.createElement('div');
   graphCanvas.className = 'graphCanvas';
   wrap.appendChild(graphCanvas);
@@ -2326,11 +2414,20 @@ function renderDetailTabs(onTabChange) {
   bar.className = 'detailTabs';
   [['tree', 'Дерево'], ['graph', 'Граф']].forEach(([tab, label]) => {
     const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'detailTabBtn' + (state.detailTab === tab ? ' active' : '');
     btn.textContent = label;
+    btn.setAttribute('aria-pressed', String(state.detailTab === tab));
     btn.onclick = () => { state.detailTab = tab; onTabChange(); };
     bar.appendChild(btn);
   });
+  if (state.detailTab === 'graph') {
+    const controls = document.createElement('div');
+    controls.className = 'graphControlsHost';
+    controls.setAttribute('aria-label', 'Настройки графа');
+    bar.appendChild(controls);
+    bar._graphControlsHost = controls;
+  }
   return bar;
 }
 
@@ -2486,14 +2583,15 @@ function renderIdentity(idx) {
   const edgeIdxs = byIdentity.get(idx) || [];
   const allRows = edgeIdxs.map(ei => ({ ei, e: DATA.edges[ei] }));
 
-  content.appendChild(renderDetailTabs(() => renderIdentity(idx)));
+  const detailTabs = renderDetailTabs(() => renderIdentity(idx));
+  content.appendChild(detailTabs);
 
   let topContent;
   if (state.detailTab === 'graph') {
     topContent = renderRelationshipGraph('identity', idx, (key) => {
       const kind = key[0], kidx = parseInt(key.slice(2), 10);
       if (kind === 'f') selectFolder(kidx, true); else selectIdentity(kidx, true);
-    }, () => renderIdentity(idx));
+    }, () => renderIdentity(idx), detailTabs._graphControlsHost);
   } else {
     // Every distinct folder this identity directly accesses becomes its OWN tree
     // root -- each expands into its own subfolder structure independently, with
@@ -2872,13 +2970,14 @@ function renderFolder(idx) {
   content.innerHTML = '';
   content.appendChild(folderInfoCard(f));
 
-  content.appendChild(renderDetailTabs(() => renderFolder(idx)));
+  const detailTabs = renderDetailTabs(() => renderFolder(idx));
+  content.appendChild(detailTabs);
 
   const topContent = state.detailTab === 'graph'
     ? renderRelationshipGraph('folder', idx, (key) => {
         const kind = key[0], kidx = parseInt(key.slice(2), 10);
         if (kind === 'f') selectFolder(kidx, true); else selectIdentity(kidx, true);
-      }, () => renderFolder(idx))
+      }, () => renderFolder(idx), detailTabs._graphControlsHost)
     : renderFolderTreeView(
         [idx],
         (folderIdx) => selectFolder(folderIdx, true),

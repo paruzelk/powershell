@@ -201,3 +201,29 @@ if (-not (Test-Path -LiteralPath $graphTest -PathType Leaf)) {
 }
 Write-Host 'PASS: граф различает ACL и доступ через AD-группы.' -ForegroundColor Green
 Write-Host 'Дополнительные тесты JavaScript: node Tests\Test-GroupGraph.js (если установлен Node.js).' -ForegroundColor Cyan
+
+# RU_COMPACT_UI_1_0_17 — единая строка управления и экономия места.
+foreach ($marker in @(
+    'RU_COMPACT_GRAPH_CONTROLS_1_0_17',
+    'RU_COMPACT_UI_1_0_17',
+    'graphControlsHost',
+    'controlsHost.appendChild(toolbar)',
+    'controlsHost.appendChild(toolbar)',
+    'const detailTabs = renderDetailTabs(',
+    'detailTabs._graphControlsHost',
+    'zoomBtn graphHelpBtn',
+    'graphHelpBtn',
+    'button:not(:disabled):active',
+    '.graphControlsHost',
+    'button:focus-visible'
+)) {
+    if (-not $html.Contains($marker)) {
+        throw "Не найдено компактное управление графом: $marker"
+    }
+}
+$compactTest = Join-Path $root 'Tests\Test-CompactUI.js'
+if (-not (Test-Path -LiteralPath $compactTest -PathType Leaf)) {
+    throw 'Отсутствует регрессионный тест компактного интерфейса.'
+}
+Write-Host 'PASS: компактная строка управления графом и состояния нажатия кнопок.' -ForegroundColor Green
+Write-Host 'Проверка JavaScript: node .\Tests\Test-CompactUI.js (при наличии Node.js).' -ForegroundColor Cyan
