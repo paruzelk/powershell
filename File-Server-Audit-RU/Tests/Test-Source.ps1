@@ -181,8 +181,11 @@ foreach ($marker in @(
     'graphDepth: 2,',
     "d.type === 'inferredGroupGrant'",
     'function refineGraphMembershipTopology(graph, centerKey, depth)',
+    'const userViaGroupFolders = new Set()',
+    "mode = 'viaFolder'",
     'refineGraphMembershipTopology({ visited, layers, truncated }, centerKey, depth)',
     "linkInfo.reason === 'additionalDirectAcl'",
+    "linkInfo.reason === 'additionalGroupAcl'",
     "class: 'graphSecondaryEdge'",
     "group.appendChild(badge)",
     "edgeTip += '\\nДополнительный прямой ACL:"

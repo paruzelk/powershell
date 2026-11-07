@@ -70,7 +70,7 @@ const rows=[
 const harnessBody=[
   'precompute();mergeEdges(rows);',
   "const keys=Array.from(adjacency.get('f:0').keys()).sort();",
-  "const g=await buildEgoGraph('f:0',depth,600,60);",
+  "const g=await buildEgoGraph(center||'f:0',depth,600,60);",
   "const positions=layoutRadial(g.layers,g.visited);",
   'let visual=null;',
   'if(render){',
@@ -96,11 +96,11 @@ const harnessBody=[
   '}',
   'return {g,keys,visual,edgeCount:DATA.edges.length,folderRows:byFolder.get(0).length};'
 ].join('\n');
-async function run(m,aces,depth,render=false){
+async function run(m,aces,depth,render=false,center='f:0'){
   const doc=makeDocument();
   const factory=new Function('ACCESS_MAP_MANIFEST','document','window','history','location','console',
-    js+'\nreturn async function(rows,depth,render){\n'+harnessBody+'\n};');
-  return factory(m,doc,{matchMedia:()=>({matches:false})},{},{},console)(aces,depth,render);
+    js+'\nreturn async function(rows,depth,render,center){\n'+harnessBody+'\n};');
+  return factory(m,doc,{matchMedia:()=>({matches:false})},{},{},console)(aces,depth,render,center);
 }
 (async()=>{
   const r=await run(manifest,rows,2,true);
@@ -131,7 +131,17 @@ async function run(m,aces,depth,render=false){
     totalEdgeCount:1},[[0,1,0,0,0,0,0]],2);
   assert.equal(missing.g.visited.get('i:0').edgeInfo.edges[0].type,'inferredGroupGrant');
   assert.equal(missing.g.visited.get('i:1').from,'i:0');
+  const dualUser=await run(manifest,rows,2,false,'i:1');
+  assert.equal(dualUser.g.visited.get('f:0').from,'i:1','user direct folder grant');
+  assert.ok(dualUser.g.extraLinks.some(x=>x.from==='i:0'&&x.to==='f:0'&&
+    x.reason==='additionalGroupAcl'),'user also accesses folder via GroupA');
+  assert.ok(dualUser.g.extraLinks.some(x=>x.from==='i:4'&&x.to==='f:0'&&
+    x.reason==='additionalGroupAcl'),'user also accesses folder via GroupB');
+  const viaOnlyUser=await run(manifest,rows,2,false,'i:2');
+  assert.equal(viaOnlyUser.g.visited.get('i:0').from,'i:2');
+  assert.equal(viaOnlyUser.g.visited.get('f:0').from,'i:0',
+    'user without direct ACL reaches folder through granting group');
   assert.ok(html.includes('graphDepth: 2,'),'group tree is default');
   console.log('PASS grouped ACL graph: viaGroup, dual ACL, multi-group, depth 1,');
-  console.log('     missing group ACE, original records, drag, secondary lines, reset');
+  console.log('     missing group ACE, identity-centered routes, original records, drag, reset');
 })().catch(err=>{console.error(err);process.exitCode=1;});

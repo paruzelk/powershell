@@ -1487,6 +1487,18 @@ function isExpandable(key, isCenter) {
 }
 
 async function buildEgoGraph(centerKey, depth, cap, perSourceCap) {
+  // For a user-centered graph, load the user's recorded via-group grants
+  // (not every unrelated folder that the same group can reach).
+  const userViaGroupFolders = new Set();
+  if (centerKey.startsWith('i:')) {
+    const idx = parseInt(centerKey.slice(2), 10);
+    (byIdentity.get(idx) || []).forEach(ei => {
+      const e = DATA.edges[ei];
+      if (e && Number(e[6]) >= 0) {
+        userViaGroupFolders.add('i:' + e[6] + '|f:' + e[0]);
+      }
+    });
+  }
   const visited = new Map();
   visited.set(centerKey, { hop: 0, from: null });
   let frontier = [centerKey];
@@ -1502,6 +1514,10 @@ async function buildEgoGraph(centerKey, depth, cap, perSourceCap) {
       if (centerKey.startsWith('f:') && fKey.startsWith('i:') && fKey !== centerKey) {
         const obj = DATA.identities[parseInt(fKey.slice(2), 10)];
         if (obj && obj.type !== 'Group') mode = 'none';
+      }
+      if (centerKey.startsWith('i:') && fKey.startsWith('i:') && fKey !== centerKey) {
+        const obj = DATA.identities[parseInt(fKey.slice(2), 10)];
+        if (obj && obj.type === 'Group') mode = 'viaFolder';
       }
       if (mode === 'none') continue;
       // A folder's own share is always already loaded by the time it can
@@ -1519,6 +1535,8 @@ async function buildEgoGraph(centerKey, depth, cap, perSourceCap) {
       nbrs.forEach((edgeInfo, nKey) => {
         if (visited.has(nKey)) return;
         if (mode === 'membershipOnly' && !edgeInfo.edges.some(d => d.type === 'membership')) return;
+        if (mode === 'viaFolder' &&
+            (!nKey.startsWith('f:') || !userViaGroupFolders.has(fKey + '|' + nKey))) return;
         fromThisSource.push({ nKey, fromKey: fKey, edgeInfo, score: bestEdgeScore(edgeInfo) });
       });
       fromThisSource.sort((a, b) => b.score - a.score);
@@ -1632,6 +1650,30 @@ function refineGraphMembershipTopology(graph, centerKey, depth) {
         { edges: edgeInfo.edges.filter(d => d.type === 'membership') },
         'additionalMembership');
     });
+  }
+
+  // User-centered graph: one folder may be reachable both directly and
+  // through an AD group. Draw the supplementary group->folder connection.
+  if (centerKey.startsWith('i:')) {
+    const centerIdx = parseInt(centerKey.slice(2), 10);
+    const grantedByGroup = new Set();
+    (byIdentity.get(centerIdx) || []).forEach(ei => {
+      const e = DATA.edges[ei];
+      if (e && Number(e[6]) >= 0) {
+        grantedByGroup.add('i:' + e[6] + '|f:' + e[0]);
+      }
+    });
+    for (const groupKey of allVisible) {
+      if (!groupKey.startsWith('i:')) continue;
+      const group = DATA.identities[parseInt(groupKey.slice(2), 10)];
+      if (!group || group.type !== 'Group') continue;
+      const groupLinks = adjacency.get(groupKey) || new Map();
+      groupLinks.forEach((edgeInfo, folderKey) => {
+        if (!folderKey.startsWith('f:') ||
+            !grantedByGroup.has(groupKey + '|' + folderKey)) return;
+        addExtra(groupKey, folderKey, edgeInfo, 'additionalGroupAcl');
+      });
+    }
   }
 
   // Specifically keep the separate direct ACL when a folder-connected user
@@ -2016,7 +2058,10 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
     trackLine(linkInfo.to, line, 'x2', 'y2');
     const label = document.createElementNS('http://www.w3.org/2000/svg', 'title');
     label.textContent = (linkInfo.reason === 'additionalDirectAcl' ?
-        'Дополнительная прямая запись ACL' : 'Дополнительное членство в AD-группе') +
+        'Дополнительная прямая запись ACL' :
+        linkInfo.reason === 'additionalGroupAcl' ?
+        'Доступ к этой папке также через AD-группу' :
+        'Дополнительное членство в AD-группе') +
       '\n' + nodeDisplayInfo(linkInfo.from).full + ' ↔ ' +
       nodeDisplayInfo(linkInfo.to).full + '\n' +
       edgeDetailLines(linkInfo.edgeInfo).join('; ');
