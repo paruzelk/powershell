@@ -168,11 +168,17 @@
   .detailTabBtn { padding:6px 14px; font-size:12px; }
   .detailTabBtn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
   .graphWrap { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:8px; margin-bottom:16px; position:relative; flex:1; min-height:0; display:flex; flex-direction:column; }
+  /* RU_GRAPH_VIEWPORT_DRAG_1_0_15: graph-only overlay, no out-of-bounds legend. */
+  .graphCanvas { position:relative; display:flex; flex:1 1 auto; min-height:200px; overflow:hidden; border-radius:4px; }
+  .graphCanvas svg.graph { flex:1 1 auto; min-height:0; height:100%; }
+  .graphCanvas .graphLegendPanel { box-sizing:border-box; top:8px; bottom:48px; max-height:none; min-height:0; overflow-y:auto; overscroll-behavior:contain; }
+  .graphCanvas .graphLegendPanel:focus-visible { outline:2px solid var(--accent); outline-offset:-2px; }
+
   .graphToolbar { display:flex; align-items:center; gap:14px; padding:2px 6px 8px; flex-wrap:wrap; flex-shrink:0; }
   .graphToolbar .groupLabel { font-size:11px; color:var(--muted); margin-right:2px; }
   .graphLegendToggle { position:absolute; right:14px; bottom:14px; width:26px; height:26px; border-radius:50%; background:var(--panel2); border:1px solid var(--border); color:var(--muted); font-size:14px; font-weight:600; font-style:italic; font-family:Georgia,serif; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:5; }
   .graphLegendToggle:hover { color:var(--text); border-color:var(--muted); }
-  .graphLegendPanel { position:absolute; right:14px; bottom:48px; width:315px; max-width:calc(100% - 28px); max-height:65vh; overflow-y:auto; background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:12px 14px; font-size:11px; z-index:5; box-shadow:0 4px 16px rgba(0,0,0,0.4); }
+  .graphLegendPanel { position:absolute; right:14px; bottom:48px; width:315px; max-width:calc(100% - 28px); overflow-y:auto; background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:12px 14px; font-size:11px; z-index:5; box-shadow:0 4px 16px rgba(0,0,0,0.4); }
   .graphLegendExplanation { margin:8px 0 2px; padding:8px; border:1px solid var(--border); border-radius:4px; color:var(--text); line-height:1.5; }
   .graphLegendPanel h4 { margin:0 0 6px; font-size:11px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.03em; }
   .graphLegendPanel h4:not(:first-child) { margin-top:10px; }
@@ -1638,16 +1644,21 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
   hint.textContent = 'Глубина — число переходов от выбранного объекта · права привязаны к соответствующим узлам · в плотных графах наведите курсор на пользователя или группу для просмотра прав · перетаскивайте узлы для изменения расположения · кнопка ⌗ возвращает исходное расположение';
   toolbar.appendChild(hint);
   wrap.appendChild(toolbar);
+  const graphCanvas = document.createElement('div');
+  graphCanvas.className = 'graphCanvas';
+  wrap.appendChild(graphCanvas);
 
   const legendToggle = document.createElement('button');
   legendToggle.className = 'graphLegendToggle';
   legendToggle.textContent = 'i';
   legendToggle.title = 'Показать обозначения';
-  wrap.appendChild(legendToggle);
+  graphCanvas.appendChild(legendToggle);
 
   const legendPanel = document.createElement('div');
   legendPanel.className = 'graphLegendPanel';
   legendPanel.style.display = 'none';
+  legendPanel.tabIndex = 0;
+  legendPanel.setAttribute('aria-label', 'Легенда графа: узлы, права и связи');
   function legendSection(title, rows) {
     const h = document.createElement('h4');
     h.textContent = title;
@@ -1719,11 +1730,15 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
     'На графе для нескольких ACE выбирается наиболее значимая связь. ' +
     'Наведите курсор на линию или узел для просмотра подробностей, включая «Запрет».';
   legendPanel.appendChild(meaning);
-  wrap.appendChild(legendPanel);
+  graphCanvas.appendChild(legendPanel);
   legendToggle.onclick = () => {
     const showing = legendPanel.style.display !== 'none';
     legendPanel.style.display = showing ? 'none' : 'block';
     legendToggle.title = showing ? 'Показать обозначения' : 'Скрыть обозначения';
+    legendToggle.setAttribute('aria-expanded', String(!showing));
+    if (!showing) {
+      legendPanel.scrollTop = 0; // Always start with the "Узлы" legend section.
+    }
   };
 
   let maxAbs = 60;
@@ -1750,7 +1765,7 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
   const nodesLayer = svgEl('g', {});
   svg.appendChild(edgesLayer);
   svg.appendChild(nodesLayer);
-  wrap.appendChild(svg);
+  graphCanvas.appendChild(svg);
 
   // All mutable geometry is keyed by the identity/folder ID, never by
   // absolute screen coordinates. Node labels live inside their <g>.
@@ -1865,10 +1880,8 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
     title.textContent = info.full + (info.status ? '\nСостояние: ' + info.status : '') + edgeTip;
     group.appendChild(title);
     nodesLayer.appendChild(group);
-    // In crowded charts keep the hovered or keyboard-focused node above its
-    // neighbours so its attached rights badge is readable.
-    group.addEventListener('mouseenter', () => nodesLayer.appendChild(group));
-    group.addEventListener('focus', () => nodesLayer.appendChild(group));
+    // Never detach/reappend an SVG node during hover: doing so can invalidate
+    // the active pointer target and make dragging unreliable in Chromium.
     group.addEventListener('keydown', ev => {
       if (!isCenter && (ev.key === 'Enter' || ev.key === ' ')) {
         ev.preventDefault();
@@ -1878,46 +1891,68 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
     return group;
   }
 
+  // RU_GRAPH_POINTER_DRAG_1_0_15: native Pointer Events keep mouse, stylus
+  // and touch drags attached to a stable SVG element. Never reparent that
+  // element on hover, otherwise browsers can cancel the active interaction.
+  function clientToSvgScale() {
+    const rect = svg.getBoundingClientRect ? svg.getBoundingClientRect() : null;
+    const live = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal : null;
+    const coords = (svg.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number);
+    const width = (live && live.width > 0 ? live.width : coords[2]) || vb.w;
+    const height = (live && live.height > 0 ? live.height : coords[3]) || vb.h;
+    const clientW = (rect && rect.width) || 900;
+    const clientH = (rect && rect.height) || 520;
+    return { sx: width / clientW, sy: height / clientH };
+  }
+
   function attachDragHandlers(group, key, pos, isCenter) {
-    let dragging = false, moved = false, startClientX = 0, startClientY = 0, startX = pos.x, startY = pos.y;
-    function clientToSvgScale() {
-      const rect = svg.getBoundingClientRect ? svg.getBoundingClientRect() : null;
-      // Use the current SVG viewBox after zoom/pan. The original fallback
-      // accidentally used vb.width/height even though vb stores w/h.
-      const live = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal : null;
-      const coords = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
-      const viewWidth = (live && live.width > 0 ? live.width : coords[2]) || vb.w;
-      const viewHeight = (live && live.height > 0 ? live.height : coords[3]) || vb.h;
-      const clientW = (rect && rect.width) ? rect.width : 900;
-      const clientH = (rect && rect.height) ? rect.height : 520;
-      return { sx: viewWidth / clientW, sy: viewHeight / clientH };
+    let drag = null;
+    function releasePointer(e, cancelled) {
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      const previous = drag;
+      drag = null;
+      document.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerup', onPointerUp);
+      document.removeEventListener('pointercancel', onPointerCancel);
+      if (group.releasePointerCapture && group.hasPointerCapture &&
+          group.hasPointerCapture(previous.pointerId)) {
+        try { group.releasePointerCapture(previous.pointerId); } catch (_) { }
+      }
+      group.classList.remove('dragging');
+      if (!cancelled && !previous.moved && !isCenter) onNavigate(key);
     }
-    function onMouseMove(e) {
-      if (!dragging) return;
+    function onPointerMove(e) {
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      const dClientX = e.clientX - drag.startClientX;
+      const dClientY = e.clientY - drag.startClientY;
+      if (Math.abs(dClientX) > 2 || Math.abs(dClientY) > 2) drag.moved = true;
+      if (!drag.moved) return;
       const scale = clientToSvgScale();
-      const dx = (e.clientX - startClientX) * scale.sx;
-      const dy = (e.clientY - startClientY) * scale.sy;
-      if (Math.abs(e.clientX - startClientX) > 2 || Math.abs(e.clientY - startClientY) > 2) moved = true;
-      const nx = startX + dx, ny = startY + dy;
-      updateNodePosition(key, nx, ny);
+      const nextX = drag.startX + dClientX * scale.sx;
+      const nextY = drag.startY + dClientY * scale.sy;
+      if (Number.isFinite(nextX) && Number.isFinite(nextY)) {
+        updateNodePosition(key, nextX, nextY);
+      }
+      if (e.cancelable) e.preventDefault();
     }
-    function onMouseUp() {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-      dragging = false;
-      // The center is already the current selection -- dragging it around is
-      // still useful (decluttering a busy graph), but clicking it to
-      // "navigate to itself" would be a no-op at best, so only non-center
-      // nodes trigger navigation on a genuine (non-drag) click.
-      if (!moved && !isCenter) onNavigate(key);
-    }
-    group.addEventListener('mousedown', (e) => {
+    function onPointerUp(e) { releasePointer(e, false); }
+    function onPointerCancel(e) { releasePointer(e, true); }
+    group.addEventListener('pointerdown', e => {
+      if (e.button !== 0 || drag) return;
       e.stopPropagation();
-      dragging = true; moved = false;
-      startClientX = e.clientX; startClientY = e.clientY;
-      startX = pos.x; startY = pos.y;
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
+      if (e.cancelable) e.preventDefault();
+      drag = {
+        pointerId: e.pointerId, moved: false,
+        startClientX: e.clientX, startClientY: e.clientY,
+        startX: pos.x, startY: pos.y
+      };
+      group.classList.add('dragging');
+      if (group.setPointerCapture) {
+        try { group.setPointerCapture(e.pointerId); } catch (_) { }
+      }
+      document.addEventListener('pointermove', onPointerMove);
+      document.addEventListener('pointerup', onPointerUp);
+      document.addEventListener('pointercancel', onPointerCancel);
     });
   }
 
@@ -1931,24 +1966,46 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
     attachDragHandlers(group, key, pos, false);
   });
 
-  let panning = false, panStartClientX = 0, panStartClientY = 0, panStartVb = null;
-  svg.addEventListener('mousedown', (e) => {
-    if (e.target !== svg) return;
-    panning = true;
-    panStartClientX = e.clientX; panStartClientY = e.clientY;
-    const cur = svg.getAttribute('viewBox').split(' ').map(Number);
-    panStartVb = { x: cur[0], y: cur[1], w: cur[2], h: cur[3] };
+  // Pan only on the empty graph background, never when grabbing a node.
+  let pan = null;
+  svg.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || e.target !== svg || pan) return;
+    const coords = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+    pan = {
+      pointerId: e.pointerId, x: e.clientX, y: e.clientY,
+      view: { x: coords[0], y: coords[1], w: coords[2], h: coords[3] }
+    };
+    if (svg.setPointerCapture) {
+      try { svg.setPointerCapture(e.pointerId); } catch (_) { }
+    }
+    if (e.cancelable) e.preventDefault();
   });
-  document.addEventListener('mousemove', (e) => {
-    if (!panning) return;
+  function onPanPointerMove(e) {
+    if (!pan || e.pointerId !== pan.pointerId) return;
     const rect = svg.getBoundingClientRect ? svg.getBoundingClientRect() : null;
-    const clientW = (rect && rect.width) ? rect.width : 900;
-    const clientH = (rect && rect.height) ? rect.height : 520;
-    const dx = (e.clientX - panStartClientX) * (panStartVb.w / clientW);
-    const dy = (e.clientY - panStartClientY) * (panStartVb.h / clientH);
-    svg.setAttribute('viewBox', `${panStartVb.x - dx} ${panStartVb.y - dy} ${panStartVb.w} ${panStartVb.h}`);
-  });
-  document.addEventListener('mouseup', () => { panning = false; });
+    const w = (rect && rect.width) || 900;
+    const h = (rect && rect.height) || 520;
+    const dx = (e.clientX - pan.x) * (pan.view.w / w);
+    const dy = (e.clientY - pan.y) * (pan.view.h / h);
+    svg.setAttribute('viewBox',
+      `${pan.view.x - dx} ${pan.view.y - dy} ${pan.view.w} ${pan.view.h}`);
+    if (e.cancelable) e.preventDefault();
+  }
+  function endPan(e) {
+    if (!pan || e.pointerId !== pan.pointerId) return;
+    if (svg.releasePointerCapture && svg.hasPointerCapture &&
+        svg.hasPointerCapture(pan.pointerId)) {
+      try { svg.releasePointerCapture(pan.pointerId); } catch (_) { }
+    }
+    pan = null;
+  }
+  svg.addEventListener('pointermove', onPanPointerMove);
+  svg.addEventListener('pointerup', endPan);
+  svg.addEventListener('pointercancel', endPan);
+  // If pointer capture is unavailable, document-level handlers still finish.
+  document.addEventListener('pointermove', onPanPointerMove);
+  document.addEventListener('pointerup', endPan);
+  document.addEventListener('pointercancel', endPan);
 
   const MIN_W = 200, MAX_W = 6000;
   function zoomBy(factor, clientX, clientY) {

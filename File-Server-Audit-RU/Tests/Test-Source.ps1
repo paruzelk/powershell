@@ -142,3 +142,34 @@ foreach ($marker in @(
     }
 }
 Write-Host 'PASS: в легенде объяснены красный пунктир, наследуемые и явно назначенные права.' -ForegroundColor Green
+
+# RU_GRAPH_VIEWPORT_DRAG_1_0_15 — корректная прокрутка легенды и Pointer Events.
+foreach ($marker in @(
+    'RU_GRAPH_VIEWPORT_DRAG_1_0_15',
+    'RU_GRAPH_POINTER_DRAG_1_0_15',
+    '.graphCanvas .graphLegendPanel',
+    'graphCanvas.appendChild(legendPanel)',
+    'graphCanvas.appendChild(svg)',
+    'legendPanel.scrollTop = 0',
+    "group.addEventListener('pointerdown'",
+    "document.addEventListener('pointermove', onPointerMove)",
+    "document.addEventListener('pointerup', onPointerUp)",
+    "document.addEventListener('pointercancel', onPointerCancel)",
+    "svg.addEventListener('pointerdown'",
+    'function onPanPointerMove(e)',
+    'updateNodePosition(key, nextX, nextY)'
+)) {
+    if (-not $html.Contains($marker)) {
+        throw "Не найдено исправление графа/легенды: $marker"
+    }
+}
+foreach ($old in @(
+    "group.addEventListener('mouseenter', () => nodesLayer.appendChild(group))",
+    "group.addEventListener('mousedown', (e) => {",
+    'max-height:65vh'
+)) {
+    if ($html.Contains($old)) {
+        throw "Остался старый механизм, нарушающий перетаскивание или прокрутку: $old"
+    }
+}
+Write-Host 'PASS: ограниченная легенда, прокрутка и перетаскивание узлов Pointer Events.' -ForegroundColor Green
