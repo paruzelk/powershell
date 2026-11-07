@@ -466,7 +466,18 @@ function linkAdjacency(k1, k2, edgeDescr) {
   m2.get(k1).edges.push(edgeDescr);
 }
 
+// RU_GROUP_ACL_TOPOLOGY_1_0_16
+// e[6] = -1 for the identity's own ACL; index of granting AD group for
+// an expanded member row. Preserve all rows, but graph the routes correctly.
 function mergeEdges(edgeRows) {
+  const directGroupAces = new Set();
+  for (const e of edgeRows) {
+    if (e[6] < 0 && DATA.identities[e[1]] &&
+        DATA.identities[e[1]].type === 'Group') {
+      directGroupAces.add(e[0] + '|' + e[1]);
+    }
+  }
+  const inferredGrantsSeen = new Set();
   edgeRows.forEach(e => {
     const ei = DATA.edges.length;
     DATA.edges.push(e);
@@ -475,11 +486,31 @@ function mergeEdges(edgeRows) {
     byIdentity.get(identityIdx).push(ei);
     if (!byFolder.has(folderIdx)) byFolder.set(folderIdx, []);
     byFolder.get(folderIdx).push(ei);
-    linkAdjacency('f:' + folderIdx, 'i:' + identityIdx, { type: 'access', e, ei });
-    // Group-membership adjacency ("who else is a member of this group") is
-    // NOT built here -- it's global and cheap, so it's built once, eagerly,
-    // in precompute() from manifest data, and never depends on which
-    // share's access edges happen to be loaded.
+
+    const grantingGroup = Number(e[6]);
+    if (Number.isInteger(grantingGroup) && grantingGroup >= 0) {
+      if (DATA.identities[grantingGroup] &&
+          DATA.identities[grantingGroup].type === 'Group') {
+        const pair = folderIdx + '|' + grantingGroup;
+        if (!directGroupAces.has(pair)) {
+          // A missing group ACE must not become a false direct user grant.
+          const dedupe = pair + '|' + e[2] + '|' + e[3] + '|' + e[5];
+          if (!inferredGrantsSeen.has(dedupe)) {
+            inferredGrantsSeen.add(dedupe);
+            linkAdjacency('f:' + folderIdx, 'i:' + grantingGroup,
+              { type: 'inferredGroupGrant', e, ei });
+          }
+        }
+      } else {
+        // Unresolvable group pointer: retain the route, but mark uncertainty.
+        linkAdjacency('f:' + folderIdx, 'i:' + identityIdx,
+          { type: 'unresolvedGroupGrant', e, ei });
+      }
+    } else {
+      linkAdjacency('f:' + folderIdx, 'i:' + identityIdx,
+        { type: 'access', e, ei });
+    }
+    // Membership adjacency is built once from manifest in precompute().
   });
 }
 
@@ -527,7 +558,7 @@ let state = {
                         // 3 = + their own subfolders in turn; etc. Each subfolder's own children
                         // branch from it specifically -- never pooled with a sibling's.
   detailTab: 'tree',   // 'tree' (folder/subfolder hierarchy) or 'graph' (relationship picture)
-  graphDepth: 1,       // Graph tab's own depth setting: 1/2/3/4/5/Infinity ("Full") -- 1 = direct
+  graphDepth: 2,       // Folder -> group -> members by default; depth 1 = direct ACL
                         // relationships only. Separate from the Tree's `depth` since they mean
                         // different things (relationship hops here vs. subfolder nesting there).
   filterBroken: 0,     // sidebar quick filter, tri-state: 0=off, 1=show only, 2=hide
@@ -1418,7 +1449,10 @@ function svgEl(tag, attrs) {
 function bestEdgeScore(edgeInfo) {
   let best = -1;
   edgeInfo.edges.forEach(d => {
-    const s = d.type === 'membership' ? 40 : ((d.e[3] ? 0 : 1000) + RIGHTS_WEIGHT[d.e[2]]);
+    const s = d.type === 'membership' ? 40 :
+      d.type === 'inferredGroupGrant' ? 30 :
+      d.type === 'unresolvedGroupGrant' ? 20 :
+      ((d.e[3] ? 0 : 1000) + RIGHTS_WEIGHT[d.e[2]]);
     if (s > best) best = s;
   });
   return best;
@@ -1462,7 +1496,13 @@ async function buildEgoGraph(centerKey, depth, cap, perSourceCap) {
   for (let hop = 1; hop <= depth && visited.size < cap; hop++) {
     const candidates = [];
     for (const fKey of frontier) {
-      const mode = isExpandable(fKey, fKey === centerKey);
+      let mode = isExpandable(fKey, fKey === centerKey);
+      // Folder-centric access map: only groups expand to their members;
+      // users must not pull unrelated folder ACLs into this folder's graph.
+      if (centerKey.startsWith('f:') && fKey.startsWith('i:') && fKey !== centerKey) {
+        const obj = DATA.identities[parseInt(fKey.slice(2), 10)];
+        if (obj && obj.type !== 'Group') mode = 'none';
+      }
       if (mode === 'none') continue;
       // A folder's own share is always already loaded by the time it can
       // appear here (it was only ever discovered via an edge that came from
@@ -1503,7 +1543,112 @@ async function buildEgoGraph(centerKey, depth, cap, perSourceCap) {
     frontier = nextFrontier;
     if (nextFrontier.length === 0) break;
   }
-  return { visited, layers, truncated };
+  return refineGraphMembershipTopology({ visited, layers, truncated }, centerKey, depth);
+}
+
+// RU_GRAPH_GROUP_RELATIONSHIPS_1_0_16
+// A graph is not only a BFS spanning tree: one person may have direct ACL
+// access AND belong to one or more groups with ACL access to the same folder.
+// Prefer placing dual-grant users behind their group, but preserve every
+// additional direct/membership relationship as a second visible edge.
+function refineGraphMembershipTopology(graph, centerKey, depth) {
+  const { visited, layers } = graph;
+  const extraLinks = [];
+  const extraKeys = new Set();
+  const limit = 800;
+  const allVisible = new Set(visited.keys());
+
+  function addExtra(from, to, edgeInfo, reason) {
+    if (!edgeInfo || !edgeInfo.edges || !edgeInfo.edges.length ||
+        !allVisible.has(from) || !allVisible.has(to)) return;
+    // The primary spanning-tree edge is drawn separately.
+    const toParent = visited.get(to);
+    const fromParent = visited.get(from);
+    if ((toParent && toParent.from === from) ||
+        (fromParent && fromParent.from === to)) return;
+    const dedupe = from + '|' + to;
+    if (extraKeys.has(dedupe)) return;
+    if (extraLinks.length >= limit) {
+      graph.truncated = true;
+      return;
+    }
+    extraKeys.add(dedupe);
+    extraLinks.push({ from, to, edgeInfo, reason });
+  }
+
+  if (centerKey.startsWith('f:') && depth >= 2) {
+    const firstRing = layers[1] || [];
+    const grantingGroups = firstRing.filter(key => {
+      if (!key.startsWith('i:')) return false;
+      const idn = DATA.identities[parseInt(key.slice(2), 10)];
+      const link = visited.get(key);
+      return idn && idn.type === 'Group' && link &&
+        link.from === centerKey && link.edgeInfo &&
+        link.edgeInfo.edges.some(d =>
+          d.type === 'access' || d.type === 'inferredGroupGrant');
+    }).sort((a,b) => cmpText(
+      DATA.identities[parseInt(a.slice(2), 10)].name,
+      DATA.identities[parseInt(b.slice(2), 10)].name));
+
+    for (const userKey of firstRing.slice()) {
+      if (!userKey.startsWith('i:')) continue;
+      const user = DATA.identities[parseInt(userKey.slice(2), 10)];
+      const direct = visited.get(userKey);
+      if (!user || user.type !== 'User' || !direct ||
+          direct.from !== centerKey || !direct.edgeInfo ||
+          !direct.edgeInfo.edges.some(d => d.type === 'access')) continue;
+      const groupKey = grantingGroups.find(gk => {
+        const link = adjacency.get(gk) && adjacency.get(gk).get(userKey);
+        return link && link.edges.some(d => d.type === 'membership');
+      });
+      if (!groupKey) continue;
+      const groupLink = adjacency.get(groupKey).get(userKey);
+      // Move the user behind their granting group. Keep the folder->user
+      // direct grant as an additional line (never discard it).
+      visited.set(userKey, { hop: 2, from: groupKey, edgeInfo: groupLink });
+      const originalPos = layers[1].indexOf(userKey);
+      if (originalPos >= 0) layers[1].splice(originalPos, 1);
+      if (!layers[2]) layers[2] = [];
+      if (!layers[2].includes(userKey)) layers[2].push(userKey);
+    }
+  }
+
+  // Draw every relevant, visible group-membership connection, even when the
+  // user is connected to TWO groups (the BFS can keep only one parent).
+  for (const groupKey of allVisible) {
+    if (!groupKey.startsWith('i:')) continue;
+    const group = DATA.identities[parseInt(groupKey.slice(2), 10)];
+    if (!group || group.type !== 'Group') continue;
+    const neighbors = adjacency.get(groupKey) || new Map();
+    neighbors.forEach((edgeInfo, memberKey) => {
+      if (!allVisible.has(memberKey) ||
+          !edgeInfo.edges.some(d => d.type === 'membership')) return;
+      // On group-group relationships, sort direction to avoid duplicate
+      // secondary edges while retaining primary parent links.
+      if (memberKey.startsWith('i:') &&
+          DATA.identities[parseInt(memberKey.slice(2), 10)].type === 'Group' &&
+          groupKey > memberKey) return;
+      addExtra(groupKey, memberKey,
+        { edges: edgeInfo.edges.filter(d => d.type === 'membership') },
+        'additionalMembership');
+    });
+  }
+
+  // Specifically keep the separate direct ACL when a folder-connected user
+  // was placed behind a group. This may be a chord across two rings.
+  if (centerKey.startsWith('f:')) {
+    const neighbors = adjacency.get(centerKey) || new Map();
+    neighbors.forEach((edgeInfo, key) => {
+      if (!allVisible.has(key)) return;
+      const directEdges = edgeInfo.edges.filter(d => d.type === 'access');
+      if (directEdges.length) {
+        addExtra(centerKey, key, { edges: directEdges }, 'additionalDirectAcl');
+      }
+    });
+  }
+
+  graph.extraLinks = extraLinks;
+  return graph;
 }
 
 function layoutRadial(layers, visited) {
@@ -1569,10 +1714,22 @@ function nodeDisplayInfo(key) {
 function edgeDisplayInfo(edgeInfo) {
   let best = null, bestScore = -1;
   edgeInfo.edges.forEach(d => {
-    const s = d.type === 'membership' ? 40 : ((d.e[3] ? 0 : 1000) + RIGHTS_WEIGHT[d.e[2]]);
+    const s = d.type === 'membership' ? 40 :
+      d.type === 'inferredGroupGrant' ? 30 :
+      d.type === 'unresolvedGroupGrant' ? 20 :
+      ((d.e[3] ? 0 : 1000) + RIGHTS_WEIGHT[d.e[2]]);
     if (s > bestScore) { bestScore = s; best = d; }
   });
-  if (best.type === 'membership') return { label: 'Состоит в группе', color: effectiveThemeIsLight() ? '#7c3aed' : '#c084fc', dashed: true };
+  if (best.type === 'membership')
+    return { label: 'Состоит в группе', color: effectiveThemeIsLight() ? '#7c3aed' : '#c084fc', dashed: true };
+  if (best.type === 'inferredGroupGrant' || best.type === 'unresolvedGroupGrant') {
+    return {
+      label: best.type === 'inferredGroupGrant' ?
+        'Групповой доступ (ACE группы не найдена)' : 'Доступ через неизвестную группу',
+      color: effectiveThemeIsLight() ? '#606b76' : '#aab5c3',
+      dashed: true, dashPattern: '2,5', inferred: true
+    };
+  }
   const e = best.e;
   let label = displayRight(RIGHTS_LABELS[e[2]]);
   if (e[5]) label = 'Запрет: ' + label;
@@ -1641,7 +1798,7 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
   toolbar.appendChild(rightsToggle);
   const hint = document.createElement('span');
   hint.className = 'groupLabel';
-  hint.textContent = 'Глубина — число переходов от выбранного объекта · права привязаны к соответствующим узлам · в плотных графах наведите курсор на пользователя или группу для просмотра прав · перетаскивайте узлы для изменения расположения · кнопка ⌗ возвращает исходное расположение';
+  hint.textContent = 'Глубина 1 — прямые ACL · глубина 2 — группы и их участники · при прямом ACL и членстве в группе показываются обе связи · перетаскивайте узлы для изменения расположения · кнопка ⌗ сбрасывает расположение';
   toolbar.appendChild(hint);
   wrap.appendChild(toolbar);
   const graphCanvas = document.createElement('div');
@@ -1720,13 +1877,18 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
     lineRow(getEdgeColors()[0],
       'Красная сплошная — явно назначенный «Полный доступ»', false),
     lineRow(effectiveThemeIsLight() ? '#7c3aed' : '#c084fc',
-      'Фиолетовый пунктир — членство в AD-группе', true)
+      'Фиолетовый пунктир — членство в AD-группе', true),
+    lineRow(effectiveThemeIsLight() ? '#606b76' : '#aab5c3',
+      'Мелкий серый пунктир — групповое право определено косвенно (ACE группы в отчёте отсутствует)', true)
   ]);
   const meaning = document.createElement('p');
   meaning.className = 'graphLegendExplanation';
   meaning.textContent = 'Как читать линии: цвет показывает категорию прав NTFS, ' +
     'а сплошная линия или пунктир — их происхождение (явно назначены либо унаследованы). ' +
     'Красный цвет обозначает «Полный доступ», а НЕ запрет (Deny). ' +
+    'Для папки права через AD-группу отображаются в ветке этой группы. ' +
+    'Если у пользователя также есть прямой ACL, к нему ведёт отдельная линия. ' +
+    'Линии членства учитывают раскрытых участников, включая вложенные группы. ' +
     'На графе для нескольких ACE выбирается наиболее значимая связь. ' +
     'Наведите курсор на линию или узел для просмотра подробностей, включая «Запрет».';
   legendPanel.appendChild(meaning);
@@ -1792,7 +1954,14 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
     const seen = new Set();
     for (const item of (edgeInfo.edges || [])) {
       if (item.type === 'membership') {
-        seen.add('Членство в группе');
+        seen.add('Членство в AD-группе (включая вложенное членство)');
+      } else if (item.type === 'inferredGroupGrant') {
+        seen.add('Групповой доступ выводится из записей участников, ' +
+          'но отдельной ACE группы в этой папке нет; право: ' +
+          displayRight(RIGHTS_LABELS[item.e[2]]));
+      } else if (item.type === 'unresolvedGroupGrant') {
+        seen.add('Группа для записи доступа не определена; право: ' +
+          displayRight(RIGHTS_LABELS[item.e[2]]));
       } else if (item.e) {
         seen.add((item.e[5] ? 'Запрет: ' : '') +
           displayRight(RIGHTS_LABELS[item.e[2]]) +
@@ -1813,7 +1982,8 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
       const line = svgEl('line', {
         x1: parentPos.x, y1: parentPos.y, x2: pos.x, y2: pos.y,
         stroke: edisp.color, 'stroke-width': edisp.dashed ? 1.5 : 3,
-        'stroke-dasharray': edisp.dashed ? '5,4' : 'none', opacity: 0.85
+        'stroke-dasharray': edisp.dashPattern || (edisp.dashed ? '5,4' : 'none'),
+        opacity: 0.85
       });
       edgesLayer.appendChild(line);
       trackLine(info.from, line, 'x1', 'y1');
@@ -1825,6 +1995,33 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
         nodeDisplayInfo(key).full + '\n' + edgeDetailLines(info.edgeInfo).join('; ');
       line.appendChild(lineTip);
     });
+  });
+
+  // Supplementary edges represent relationships lost by a pure BFS tree:
+  // multiple group memberships and an additional direct ACL to the folder.
+  // They share the SAME endpoint trackers as primary lines, so dragging an
+  // identity updates every direct and group relationship immediately.
+  (g.extraLinks || []).forEach(linkInfo => {
+    const a = positions.get(linkInfo.from), b = positions.get(linkInfo.to);
+    if (!a || !b) return;
+    const edisp = edgeDisplayInfo(linkInfo.edgeInfo);
+    const line = svgEl('line', {
+      class: 'graphSecondaryEdge', 'data-reason': linkInfo.reason,
+      x1:a.x, y1:a.y, x2:b.x, y2:b.y,
+      stroke: edisp.color, 'stroke-width': edisp.dashed ? 1.6 : 2.5,
+      'stroke-dasharray': edisp.dashPattern || (edisp.dashed ? '5,4' : 'none'),
+      opacity: 0.58
+    });
+    trackLine(linkInfo.from, line, 'x1', 'y1');
+    trackLine(linkInfo.to, line, 'x2', 'y2');
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    label.textContent = (linkInfo.reason === 'additionalDirectAcl' ?
+        'Дополнительная прямая запись ACL' : 'Дополнительное членство в AD-группе') +
+      '\n' + nodeDisplayInfo(linkInfo.from).full + ' ↔ ' +
+      nodeDisplayInfo(linkInfo.to).full + '\n' +
+      edgeDetailLines(linkInfo.edgeInfo).join('; ');
+    line.appendChild(label);
+    edgesLayer.appendChild(line);
   });
 
   function buildNode(key, pos, isCenter) {
@@ -1871,6 +2068,33 @@ function renderRelationshipGraphInner(g, positions, centerKey, onNavigate, onDep
         txt.textContent = shown;
         tag.appendChild(txt);
         group.appendChild(tag);
+      }
+      // A person who is a member of a granting group can ALSO have a
+      // separate direct ACL. Show both, without duplicating the user node.
+      const ownAcl = (g.extraLinks || []).find(link =>
+        link.to === key && link.reason === 'additionalDirectAcl');
+      if (ownAcl) {
+        const direct = edgeDisplayInfo(ownAcl.edgeInfo);
+        edgeTip += '\nДополнительный прямой ACL: ' +
+          edgeDetailLines(ownAcl.edgeInfo).join('; ');
+        const shown = truncateLabel('Прямой ACL: ' + direct.label, 28);
+        const width = Math.min(275, Math.max(80, shown.length * 6.2 + 18));
+        const badge = svgEl('g', { class: 'graphRightsTag',
+          transform: `translate(${r + 10},16)` });
+        badge.appendChild(svgEl('rect', {
+          class:'graphRightsBadge', x:0, y:0, width, height:25, rx:5,
+          stroke:direct.color
+        }));
+        const text = svgEl('text', { class:'graphRightsLabel', x:8, y:17 });
+        text.textContent = shown;
+        badge.appendChild(text);
+        group.appendChild(badge);
+      }
+      const otherMemberships = (g.extraLinks || []).filter(link =>
+        link.to === key && link.reason === 'additionalMembership');
+      if (otherMemberships.length) {
+        edgeTip += '\nТакже состоит в группах: ' +
+          otherMemberships.map(link => nodeDisplayInfo(link.from).full).join(', ');
       }
     }
     const nameLbl = svgEl('text', { class: 'nodeLabel', x: 0, y: r + 16, 'text-anchor': 'middle' });

@@ -173,3 +173,27 @@ foreach ($old in @(
     }
 }
 Write-Host 'PASS: ограниченная легенда, прокрутка и перетаскивание узлов Pointer Events.' -ForegroundColor Green
+
+# RU_GROUP_ACL_TOPOLOGY_1_0_16 — устранение плоских пользователей в графе.
+foreach ($marker in @(
+    'RU_GROUP_ACL_TOPOLOGY_1_0_16',
+    'RU_GRAPH_GROUP_RELATIONSHIPS_1_0_16',
+    'graphDepth: 2,',
+    "d.type === 'inferredGroupGrant'",
+    'function refineGraphMembershipTopology(graph, centerKey, depth)',
+    'refineGraphMembershipTopology({ visited, layers, truncated }, centerKey, depth)',
+    "linkInfo.reason === 'additionalDirectAcl'",
+    "class: 'graphSecondaryEdge'",
+    "group.appendChild(badge)",
+    "edgeTip += '\\nДополнительный прямой ACL:"
+)) {
+    if (-not $html.Contains($marker)) {
+        throw "Нет исправления ACL/членства в графе: $marker"
+    }
+}
+$graphTest = Join-Path $root 'Tests\Test-GroupGraph.js'
+if (-not (Test-Path -LiteralPath $graphTest -PathType Leaf)) {
+    throw 'Отсутствуют регрессионные тесты группового графа.'
+}
+Write-Host 'PASS: граф различает ACL и доступ через AD-группы.' -ForegroundColor Green
+Write-Host 'Дополнительные тесты JavaScript: node Tests\Test-GroupGraph.js (если установлен Node.js).' -ForegroundColor Cyan
