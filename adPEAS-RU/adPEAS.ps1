@@ -3,8 +3,8 @@
     adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
 
 .DESCRIPTION
-    Build: 2026-11-10 10:35:29
-    Version: 2.9.0+20261110-1035
+    Build: 2026-11-10 11:07:12
+    Version: 2.9.0+20261110-1107
 
     AUTHORIZED SECURITY TESTING ONLY!
 
@@ -157662,7 +157662,7 @@ function Collect-BHIssuancePolicies {
 #Requires -Version 5.1
 
 # ===== Script Variables =====
-$Script:adPEASVersion = "2.9.0+20261110-1035"
+$Script:adPEASVersion = "2.9.0+20261110-1107"
 
 # Handle ScriptPath for different execution contexts:
 # - Normal: $MyInvocation.MyCommand.Path is set
