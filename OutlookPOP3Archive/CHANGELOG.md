@@ -1,3 +1,10 @@
+## 2.6.5-BW4k7v2a4 — One-shot controlled synthetic Outlook Move from default Drafts to new test PST (DEV, 2026-11-10)
+
+- Actual operator BW4k7v2a3 observed one original pilot in default `\\bogoderov_e@stios.ru\Drafts` (store 1 of 9), verified independent GetItemFromID, none in the expected test PST. Old SuiteId `2c15cb7c-4c09-4bcf-bca1-9fec458af3a5` and all forensic claims quarantined unchanged.
+- New per-GUID isolated synthetic default-Drafts source, one distinct disposable Unicode PST, separately confirmed first Save and later single `MailItem.Move(targetFolder)`. The default Drafts might be IMAP/server-synced; exact operator consent required before source creation and before Move.
+- Original `create-intent.json`, pre-Move manifest, durable one-shot claim **before COM Move**, optional Move-return observation and read-only independent post-Outlook-restart reconciliation. No automatic retry, no source item cleanup or second Move. Record synthetic SHA256 witness, size/flags drift; SEM-001 unknown raw flag still manual review, not production acceptance.
+- 37 new Pester cases; expected full CI 3480 tests / 118 containers with PS5.1 PSScriptAnalyzer, BW4j6 fault matrix, JSON, BOM source policies and all inherited safety gates. This stage does **not** enable Archive/Resume/Auto worker.
+
 ## 2.6.5-BW4k7v2a3 — Real failed pilot Drafts location, read-only exact-subject search (DEV, 2026-11-06)
 
 - Operator BW4k7v2a2 confirmed exactly one mounted target test PST (271,360 bytes), exact fixture folder and **zero matching or other visible items** in it; original immutable Intent SHA256 d78b80450f84e182fef7549bfae6cc48e1b487eb190e216cecbee7be9e05f606. No manifest and no prior CreatePilot retry.
