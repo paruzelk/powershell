@@ -12,6 +12,8 @@ Application: `0.9.4-rc1-build2.6.3-PREVIEW1`. Target: Windows PowerShell 5.1, Ou
 
 **BW4k7v2a4 DEV (single synthetic one-shot Move experiment):** After the prior BW4k7v2a3 read-only diagnosis found the original test letter in default Drafts, this new [two-consent one-shot Move runbook](docs/2.6.5-bw4k7v2a4-one-shot-move.md) creates a **new** GUID-scoped disposable PST and **one new synthetic default Draft** (which can sync to IMAP), records a SHA256-sealed original content witness, then requires a separate explicit approval and writes a durable claim **before one** MailItem.Move. Old test fixture and original POP3 mail never selected; no retries; production Archive/Resume/Auto still disabled.
 
+**NEW BW4k7v2a5 read-only failed CreatePilot count forensics:** Operator BW4k7v2a4 `CreatePilot` failed after an actual MailItem.Save and verified parent StoreID/FolderID, inside combined `source.Count == 1 && target.Count == 0` assertion. The original SuiteId `7451b8f5-6404-4496-ae7b-5b1cdfb9063a` is quarantined; [new original-suite numeric Restrict-vs-manual count diagnostic](docs/2.6.5-bw4k7v2a5-failed-createpilot-count-readonly.md) performs only read-only, bounded direct Subject enumeration of existing default Drafts and exact disposable PST test folder. No original attempts or messages replayed, created, moved, or deleted.
+
 ## Purpose and safety rules
 
 - Archive old messages from **POP3** PST stores only; IMAP accounts are never archived.
