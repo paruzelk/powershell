@@ -42,4 +42,10 @@ Check ($js.Contains('Точная рекомендация разработчи�
 Check ($js.Contains('Права доступа') -and $js.Contains('Групповые политики')) 'Перевод категорий в приоритетных действиях'
 Check ($release.Contains('Право пользователя в GPO: {UserRightName}')) 'Перевод GPO вошёл в готовый автономный модуль'
 Check ($release.Contains('Обнаружены субъекты с правами DCSync')) 'Перевод результатов DCSync вошёл в сборку'
+$exporter=Read-RU 'src/modules/Reporting/Export-HTMLReport.ps1'
+Check ($exporter.Contains('Все категории')) 'Русский пункт Все категории'
+Check ($exporter.Contains("Accounts='Учётные записи'")) 'Переведено название Accounts без изменения ID'
+Check ($exporter.Contains("Rights='Права доступа'")) 'Переведено название Rights без изменения ID'
+Check ($exporter.Contains('> Развернуть всё</button>')) 'Кнопка раскрытия объектов на русском'
+Check ($js.Contains('Первоочередные меры по устранению рисков')) 'Заголовок приоритетных мер на русском'
 Write-Host "PASS: $n проверок русского текста карточек" -ForegroundColor Green
