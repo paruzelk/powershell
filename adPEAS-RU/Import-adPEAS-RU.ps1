@@ -45,8 +45,23 @@ try {
  }
  if(-not (Test-Path (Join-Path $source 'license/LICENSE.md'))){throw 'Исходная лицензия отсутствует'}
  Write-Host '[RU] PASS: зафиксированная версия и SHA-1 исходников'
+ # Повторный импорт должен обновлять содержимое каталогов, не создавать src/src.
  foreach($x in @(Get-ChildItem -LiteralPath $source -Force)){
-  Copy-Item -LiteralPath $x.FullName -Destination (Join-Path $root $x.Name) -Recurse -Force
+  $dest=Join-Path $root $x.Name
+  if($x.PSIsContainer){
+   if(-not (Test-Path -LiteralPath $dest)){New-Item -ItemType Directory -Path $dest -Force | Out-Null}
+   foreach($child in @(Get-ChildItem -LiteralPath $x.FullName -Force)){
+    $target=Join-Path $dest $child.Name
+    if(Test-Path -LiteralPath $target){Remove-Item -LiteralPath $target -Recurse -Force}
+    Copy-Item -LiteralPath $child.FullName -Destination $target -Recurse -Force
+   }
+  } else {
+   Copy-Item -LiteralPath $x.FullName -Destination $dest -Force
+  }
+ }
+ foreach($bad in @('src/src','docs/docs','images/images','license/license')){
+  $nested=Join-Path $root $bad
+  if(Test-Path -LiteralPath $nested){Remove-Item -LiteralPath $nested -Recurse -Force}
  }
 } finally {
  if(Test-Path -LiteralPath $tmp){Remove-Item -LiteralPath $tmp -Force -Recurse -ErrorAction SilentlyContinue}
