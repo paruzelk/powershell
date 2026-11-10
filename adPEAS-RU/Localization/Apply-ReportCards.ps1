@@ -85,6 +85,8 @@ Write-Host '[RU] Права Windows: переведены 29 названий и
 # быть найдены в предыдущем словаре дословных Show-Line.
 $dynamic=@{
  'src/modules/Checks/Rights/Get-DangerousACLs.ps1'=@{
+   '$countText = if ($IncludePrivileged) { "$(@($dcsyncFindings).Count) account(s)" } else { "$(@($dcsyncFindings).Count) non-privileged account(s)" }'='$countText = if ($IncludePrivileged) { "$(@($dcsyncFindings).Count)" } else { "$(@($dcsyncFindings).Count) (непривилегированные)" }'
+   '$countText = if ($IncludePrivileged) { "$(@($dangerousRightsFindings).Count) account(s)" } else { "$(@($dangerousRightsFindings).Count) non-privileged account(s)" }'='$countText = if ($IncludePrivileged) { "$(@($dangerousRightsFindings).Count)" } else { "$(@($dangerousRightsFindings).Count) (непривилегированные)" }'
    'Show-Line "Found $countText with DCSync rights" -Class Finding'='Show-Line "Обнаружены субъекты с правами DCSync: $countText" -Class Finding'
    'Show-Line "Found $countText with dangerous rights on domain root" -Class Finding'='Show-Line "Обнаружены субъекты с опасными правами на корневой объект домена: $countText" -Class Finding'
  }
