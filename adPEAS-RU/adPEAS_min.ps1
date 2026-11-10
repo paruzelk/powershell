@@ -94122,6 +94122,30 @@ function Get-HTMLTemplate {
             if (check.filteringNote) check.filteringNote = ru.filteringNote;
         });
         document.addEventListener('DOMContentLoaded', function() {
+            // Translate visible finding titles by exact text match. Never modify
+            // LDAP/JSON data attributes, IDs, links, or code/command fragments.
+            const englishTitleMap = Object.create(null);
+            Object.keys(ruFindingTitles).forEach(function(fid) {
+                const finding = findingDefinitions[fid];
+                if (finding && typeof finding.title === 'string') {
+                    englishTitleMap[finding.title.trim()] = ruFindingTitles[fid];
+                }
+            });
+            const auditRoot = document.querySelector('.report-content') ||
+                              document.querySelector('main') || document.body;
+            const walker = document.createTreeWalker(auditRoot, NodeFilter.SHOW_TEXT);
+            let textNode;
+            while ((textNode = walker.nextNode())) {
+                const parent = textNode.parentElement;
+                if (!parent || parent.closest('script,style,pre,code,textarea')) continue;
+                const original = textNode.nodeValue;
+                const label = original.trim();
+                if (Object.prototype.hasOwnProperty.call(englishTitleMap, label)) {
+                    const prefix = original.slice(0, original.indexOf(label));
+                    const suffix = original.slice(original.indexOf(label) + label.length);
+                    textNode.nodeValue = prefix + englishTitleMap[label] + suffix;
+                }
+            }
             document.querySelectorAll('.attr-name').forEach(function(node) {
                 const name = node.textContent.trim();
                 const colon = name.endsWith(':') ? ':' : '';
@@ -100628,7 +100652,7 @@ function Collect-BHIssuancePolicies {
     return $bhPolicies
 }
 #Requires -Version 5.1
-$Script:adPEASVersion = "2.9.0+20261110-1252"
+$Script:adPEASVersion = "2.9.0+20261110-1255"
 if ($MyInvocation.MyCommand.Path) {
     $Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {
