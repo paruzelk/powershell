@@ -29,7 +29,7 @@ foreach($file in @(Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.ps
  }
  if($dst -ne $src){[IO.File]::WriteAllText($file.FullName,$dst,$utf8)}
 }
-if($seen.Count -ne $dictionary.PSObject.Properties.Count){
+if($seen.Count -ne @($dictionary.PSObject.Properties).Count){
  $missing=@($dictionary.PSObject.Properties.Name | Where-Object {-not $seen.ContainsKey($_)})
  throw ('Часть заголовков не найдена: '+($missing -join ', '))
 }
