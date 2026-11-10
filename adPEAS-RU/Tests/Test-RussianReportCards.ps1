@@ -35,6 +35,8 @@ Check ($rights.Contains("'SeDebugPrivilege' = @{")) 'Сохранён канон
 Check ($gpo.Contains('Назначений, удаляющих только стандартных субъектов:')) 'Русская сводка исключений прав GPO'
 Check ($gpo.Contains('Обнаружено назначений прав пользователя с отклонением')) 'Русская сводка отклонений GPO'
 Check ($acl.Contains('Обнаружены субъекты с правами DCSync')) 'Русская сводка DCSync'
+Check ($acl.Contains('$(@($dcsyncFindings).Count) (непривилегированные)')) 'Русская подпись счётчика DCSync'
+Check ($acl.Contains('$(@($dangerousRightsFindings).Count) (непривилегированные)')) 'Русская подпись счётчика ACL'
 Check ($acl.Contains('Обнаружены субъекты с опасными правами на корневой объект')) 'Русская сводка ACL'
 Check ($js.Contains('Первоочередные меры по устранению рисков')) 'Русский блок приоритетных рекомендаций'
 Check ($js.Contains('ruFindingExplanations[findingIdRu]')) 'Используются конкретные русские рекомендации по FindingId'
