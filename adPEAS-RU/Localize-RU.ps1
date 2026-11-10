@@ -158,3 +158,10 @@ foreach($f in $maps.PSObject.Properties){
  if($dst -ne $src){[IO.File]::WriteAllText($path,$dst,$utf8)}
  Write-Host "[RU] $($f.Name): $n замен"
 }
+
+# Каталоги описаний, находок и полей HTML. Раздельные этапы предотвращают
+# случайную замену JS-идентификаторов и машинных атрибутов AD.
+& (Join-Path $PSScriptRoot 'Localization/Apply-Catalogs.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации справочников HTML'}
+& (Join-Path $PSScriptRoot 'Localization/Apply-TooltipUI.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации подсказок HTML'}
