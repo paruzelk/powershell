@@ -20,7 +20,7 @@ $layout=Get-OPA265BW4k7v2a4Layout -SuiteId $SuiteId -LocalAppData $env:LOCALAPPD
 if($Mode -ceq 'Plan'){
     return [pscustomobject][ordered]@{
         Schema='2.6.5-BW4k7v2a5.Plan.1'
-        Status='ReadOnlyPlanNoOutlookOrFileContact'
+        Status='ReadOnlyPlanNoOutlookContactNoFileWrites'
         SuiteId=$SuiteId;ExpectedProfile='Outlook'
         OriginalIntentPath=[string]$layout.IntentPath
         ExpectedTargetPstPath=[string]$layout.PstPath
