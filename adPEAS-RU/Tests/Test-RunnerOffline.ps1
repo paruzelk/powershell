@@ -58,7 +58,7 @@ function Disconnect-adPEAS {
  $marker=Join-Path $env:TEMP 'ADPEAS_TEST_DISCONNECT_MARKER.txt'
  [IO.File]::WriteAllText($marker,'disconnected')
 }
-Export-ModuleMember -Function Connect-adPEAS,Invoke-adPEAS,Disconnect-adPEAS
+# PS1 imported by Import-Module runs as a script, not a .psm1 module.
 '@
  [IO.File]::WriteAllText((Join-Path $tmp 'adPEAS.ps1'),$mock,$utf8)
  $out=Join-Path $tmp 'Reports'
