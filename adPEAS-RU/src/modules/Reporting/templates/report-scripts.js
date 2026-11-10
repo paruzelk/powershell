@@ -1589,124 +1589,124 @@
             modal.setAttribute('aria-labelledby', 'helpModalTitle');
             modal.innerHTML = `
                 <div class="help-header">
-                    <h2 id="helpModalTitle">Report Guide</h2>
-                    <button class="help-close-btn" onclick="hideShortcutHelp()" aria-label="Close help dialog">&times;</button>
+                    <h2 id="helpModalTitle">Руководство по отчёту</h2>
+                    <button class="help-close-btn" onclick="hideShortcutHelp()" aria-label="Закрыть окно справки">&times;</button>
                 </div>
                 <div class="help-content">
                     <div class="help-section">
-                        <h3>Report Structure</h3>
-                        <p>The report is organized by security check categories (Domain, Accounts, Delegation, Rights, etc.). Each category contains multiple checks, and each check can have multiple findings.</p>
+                        <h3>Структура отчёта</h3>
+                        <p>Отчёт сгруппирован по разделам аудита безопасности: домен, учётные записи, делегирование, права доступа и другие. В каждом разделе может быть несколько проверок, а в каждой проверке — несколько результатов.</p>
                         <div class="help-grid">
                             <div class="help-card">
-                                <div class="help-card-title">Summary Cards</div>
-                                <div class="help-card-desc">Quick overview at the top showing total counts by severity level. Click a card to filter.</div>
+                                <div class="help-card-title">Сводные карточки</div>
+                                <div class="help-card-desc">В верхней части отчёта показано количество результатов по уровням критичности. Нажмите карточку, чтобы отфильтровать результаты.</div>
                             </div>
                             <div class="help-card">
-                                <div class="help-card-title">Top Priority Actions</div>
-                                <div class="help-card-desc">AI-scored findings ranked by risk. Start here for the most critical issues.</div>
+                                <div class="help-card-title">Первоочередные меры</div>
+                                <div class="help-card-desc">Обнаруженные проблемы отсортированы по расчётной оценке риска. Начните с нарушений с наивысшим приоритетом.</div>
                             </div>
                             <div class="help-card">
-                                <div class="help-card-title">Categories</div>
-                                <div class="help-card-desc">Expandable sections grouping related security checks together.</div>
+                                <div class="help-card-title">Разделы аудита</div>
+                                <div class="help-card-desc">Раскрываемые разделы объединяют тематически связанные проверки безопасности.</div>
                             </div>
                             <div class="help-card">
-                                <div class="help-card-title">Finding Cards</div>
-                                <div class="help-card-desc">Individual findings with details. Click to expand and see all attributes.</div>
+                                <div class="help-card-title">Карточки результатов</div>
+                                <div class="help-card-desc">Каждая карточка содержит подробности обнаруженного результата. Нажмите её, чтобы раскрыть сведения и атрибуты.</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="help-section">
-                        <h3>Severity Levels</h3>
+                        <h3>Уровни критичности</h3>
                         <div class="help-grid">
                             <div class="help-card">
                                 <div class="help-card-title"><span class="severity-sample finding"></span> Нарушение (красный)</div>
-                                <div class="help-card-desc">Security vulnerability or misconfiguration requiring immediate attention.</div>
+                                <div class="help-card-desc">Уязвимость или опасная настройка, требующая приоритетной проверки и устранения.</div>
                             </div>
                             <div class="help-card">
                                 <div class="help-card-title"><span class="severity-sample hint"></span> Предупреждение (жёлтый)</div>
-                                <div class="help-card-desc">Potentially interesting finding that may warrant investigation.</div>
+                                <div class="help-card-desc">Потенциально значимый результат, требующий дополнительного анализа.</div>
                             </div>
                             <div class="help-card">
                                 <div class="help-card-title"><span class="severity-sample note"></span> Сведения (синий)</div>
-                                <div class="help-card-desc">Informational finding providing context or general information.</div>
+                                <div class="help-card-desc">Справочная информация о конфигурации и состоянии инфраструктуры.</div>
                             </div>
                             <div class="help-card">
                                 <div class="help-card-title"><span class="severity-sample secure"></span> Безопасно (зелёный)</div>
-                                <div class="help-card-desc">Security configuration is properly set - no action needed.</div>
+                                <div class="help-card-desc">Проверенная настройка соответствует ожидаемому безопасному состоянию; исправление не требуется.</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="help-section">
-                        <h3>Interactive Features</h3>
+                        <h3>Интерактивные возможности</h3>
                         <div class="help-grid">
                             <div class="help-card">
-                                <div class="help-card-title">? Help Buttons</div>
-                                <div class="help-card-desc">Click the blue ? buttons next to check titles or findings for detailed explanations and remediation steps.</div>
+                                <div class="help-card-title">Кнопки справки «?»</div>
+                                <div class="help-card-desc">Нажмите кнопку «?» рядом с названием проверки или результатом, чтобы увидеть пояснения, возможные последствия и рекомендации по устранению.</div>
                             </div>
                             <div class="help-card">
-                                <div class="help-card-title">Checkboxes</div>
-                                <div class="help-card-desc">Mark findings as completed. Progress is saved in your browser and persists across sessions.</div>
+                                <div class="help-card-title">Флажки выполнения</div>
+                                <div class="help-card-desc">Отмечайте проверенные или устранённые результаты. Отметки сохраняются в браузере и доступны при повторном открытии отчёта.</div>
                             </div>
                             <div class="help-card">
-                                <div class="help-card-title">Score Badges</div>
-                                <div class="help-card-desc">Each finding shows a calculated risk score badge. Findings are automatically sorted by score, highest first.</div>
+                                <div class="help-card-title">Оценки риска</div>
+                                <div class="help-card-desc">У результата отображается расчётная оценка риска. Карточки автоматически сортируются по убыванию этой оценки.</div>
                             </div>
                             <div class="help-card">
-                                <div class="help-card-title">Filters</div>
-                                <div class="help-card-desc">Use severity and category dropdowns to focus on specific finding types.</div>
+                                <div class="help-card-title">Фильтры</div>
+                                <div class="help-card-desc">Используйте фильтры по критичности и разделам, чтобы отобрать необходимые результаты проверки.</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="help-section">
-                        <h3>Keyboard Shortcuts</h3>
+                        <h3>Горячие клавиши</h3>
                         <div class="shortcut-grid">
                             <div class="shortcut-row">
                                 <span class="shortcut-key">&uarr; / &darr;</span>
-                                <span class="shortcut-desc">Navigate findings</span>
+                                <span class="shortcut-desc">Переход между результатами</span>
                             </div>
                             <div class="shortcut-row">
                                 <span class="shortcut-key">Enter</span>
-                                <span class="shortcut-desc">Expand / Collapse</span>
+                                <span class="shortcut-desc">Развернуть или свернуть</span>
                             </div>
                             <div class="shortcut-row">
-                                <span class="shortcut-key">Space</span>
-                                <span class="shortcut-desc">Mark completed</span>
+                                <span class="shortcut-key">Пробел</span>
+                                <span class="shortcut-desc">Отметить выполненным</span>
                             </div>
                             <div class="shortcut-row">
                                 <span class="shortcut-key">h</span>
-                                <span class="shortcut-desc">Hide completed</span>
+                                <span class="shortcut-desc">Скрыть выполненные</span>
                             </div>
                             <div class="shortcut-row">
                                 <span class="shortcut-key">/</span>
-                                <span class="shortcut-desc">Search</span>
+                                <span class="shortcut-desc">Поиск</span>
                             </div>
                             <div class="shortcut-row">
                                 <span class="shortcut-key">Esc</span>
-                                <span class="shortcut-desc">Close / Clear</span>
+                                <span class="shortcut-desc">Закрыть окно или очистить поле</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="help-section">
-                        <h3>Tips</h3>
-                        <p style="margin-bottom: 8px;"><strong>Start with Top Priority Actions</strong> - These are automatically ranked by exploitability and impact.</p>
-                        <p style="margin-bottom: 8px;"><strong>Use the search</strong> - Quickly find specific accounts, computers, or groups by name.</p>
-                        <p style="margin-bottom: 0;"><strong>Mark as you go</strong> - Check off findings as you remediate them to track progress.</p>
+                        <h3>Советы по работе с отчётом</h3>
+                        <p style="margin-bottom: 8px;"><strong>Начните с первоочередных мер.</strong> Результаты ранжируются по оценке возможности эксплуатации и потенциальным последствиям.</p>
+                        <p style="margin-bottom: 8px;"><strong>Используйте поиск.</strong> Находите учётные записи, компьютеры и группы по имени.</p>
+                        <p style="margin-bottom: 0;"><strong>Отмечайте выполненное.</strong> Устанавливайте флажки после проверки или устранения проблем, чтобы отслеживать ход работы.</p>
                     </div>
 
                     <div class="help-section data-management-section">
-                        <h3>Data Management</h3>
-                        <p style="margin-bottom: 12px;">This report stores preferences and progress in your browser's local storage:</p>
+                        <h3>Хранение данных</h3>
+                        <p style="margin-bottom: 12px;">Настройки и отметки выполнения сохраняются в локальном хранилище браузера:</p>
                         <div class="data-storage-info">
-                            <div class="data-item"><span class="data-icon">&#9745;</span> Completed findings (checkboxes)</div>
-                            <div class="data-item"><span class="data-icon">&#9788;</span> Theme preference (Dark/Light)</div>
-                            <div class="data-item"><span class="data-icon">&#9744;</span> Hide completed toggle state</div>
+                            <div class="data-item"><span class="data-icon">&#9745;</span> Отметки выполненных результатов (флажки)</div>
+                            <div class="data-item"><span class="data-icon">&#9788;</span> Выбранная тема оформления (тёмная или светлая)</div>
+                            <div class="data-item"><span class="data-icon">&#9744;</span> Состояние переключателя «Скрыть выполненные»</div>
                         </div>
-                        <p style="margin: 12px 0; color: var(--text-muted); font-size: 12px;">Data is stored only in this browser and is not sent anywhere. Each report has its own completion tracking.</p>
-                        <button class="clear-data-btn" onclick="clearAdPEASData()" title="Remove all adPEAS data from browser storage">
+                        <p style="margin: 12px 0; color: var(--text-muted); font-size: 12px;">Данные хранятся только в этом браузере и никуда не отправляются. Для каждого отчёта отметки выполнения сохраняются отдельно.</p>
+                        <button class="clear-data-btn" onclick="clearAdPEASData()" title="Удалить сохранённые данные adPEAS из браузера">
                             <span class="clear-data-icon">&#128465;</span> Очистить сохранённые данные
                         </button>
                     </div>

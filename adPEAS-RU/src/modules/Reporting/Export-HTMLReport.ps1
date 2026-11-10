@@ -168,7 +168,15 @@ function Export-HTMLReport {
         $html = $html.Replace('{{NOTE_COUNT}}', [string]$noteCount)
         $html = $html.Replace('{{SECURE_COUNT}}', [string]$secureCount)
         $html = $html.Replace('{{TOTAL_COUNT}}', [string]$totalCount)
-        $html = $html.Replace('{{DISCLAIMER}}', [string](ConvertTo-HtmlEncode $disclaimer))
+        # Localize only the HTML display of the original license notice.
+        # Keep $Script:adPEASDisclaimer and the complete original license intact.
+        $disclaimerForDisplay = [string]$disclaimer
+        $originalCommercialNotice = 'This report was generated using a tool that requires a valid commercial license for consulting or managed service use.'
+        $russianCommercialNotice = 'Этот отчёт сформирован инструментом, для использования которого в консалтинге или при оказании управляемых услуг требуется действующая коммерческая лицензия.'
+        if ($disclaimerForDisplay.Contains($originalCommercialNotice)) {
+            $disclaimerForDisplay = $disclaimerForDisplay.Replace($originalCommercialNotice, $russianCommercialNotice)
+        }
+        $html = $html.Replace('{{DISCLAIMER}}', [string](ConvertTo-HtmlEncode $disclaimerForDisplay))
         $html = $html.Replace('{{NAVIGATION}}', [string]$navHtml)
         $html = $html.Replace('{{FINDINGS_SECTIONS}}', [string]$sectionsHtml)
         # JSON blobs likewise use .Replace() - they contain PowerShell code like "$_" that -replace
