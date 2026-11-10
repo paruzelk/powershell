@@ -6,6 +6,7 @@ on:
     paths:
       - "adPEAS-RU/Import-adPEAS-RU.ps1"
       - "adPEAS-RU/Localize-RU.ps1"
+      - "adPEAS-RU/Localization/**"
       - "adPEAS-RU/Run-AD-Audit-RU.ps1"
       - "adPEAS-RU/Tests/**"
       - ".github/workflows/adpeas-ru.yml"
