@@ -183,3 +183,9 @@ if(-not $?){throw 'Ошибка локализации приоритетных 
 
 & (Join-Path $PSScriptRoot 'Localization/Apply-ReportNavigation.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка перевода навигации HTML'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-ReportHelp.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка перевода справки HTML'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-LicenseNotice.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка перевода лицензионного предупреждения HTML'}
