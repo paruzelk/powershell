@@ -1156,7 +1156,7 @@ jobs:
              '$moved=$read.Move($bindings.TargetFolder)',
              'GetItemFromID','GetDefaultFolder(16)',
              'SourceEntryId','SourceStoreId','TargetFolderId',
-             'Complete Outlook process restart',
+             'Reconcile requires complete Outlook process restart',
              '0x0E070003',
              'UnknownMapiFlagsAutomaticallyWaived=$false',
              'NoSecondMoveOrSaveExecuted=$true',
