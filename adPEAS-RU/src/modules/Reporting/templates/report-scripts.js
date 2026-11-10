@@ -90,7 +90,7 @@
 
         function updateThemeUI(theme) {
             document.getElementById('themeIcon').innerHTML = theme === 'dark' ? '&#9788;' : '&#9790;';
-            document.getElementById('themeLabel').textContent = theme === 'dark' ? 'Light' : 'Dark';
+            document.getElementById('themeLabel').textContent = theme === 'dark' ? 'Светлая' : 'Тёмная';
             // Update ARIA state for theme toggle
             const themeToggle = document.querySelector('.theme-toggle');
             if (themeToggle) {
@@ -2762,10 +2762,10 @@
                         <div class="top-actions-header">
                             <div class="top-actions-title" style="color: var(--note);">
                                 <span class="icon">&#10003;</span>
-                                No Critical Findings
+                                Критических нарушений не обнаружено
                             </div>
                         </div>
-                        <p style="margin: 0; color: var(--text-muted);">No high-priority security issues were detected. Review the hints and notes for potential improvements.</p>
+                        <p style="margin: 0; color: var(--text-muted);">Критические нарушения не выявлены. Проверьте предупреждения и информационные результаты для дальнейшего улучшения защиты.</p>
                     </div>
                 `;
                 return;
@@ -2780,11 +2780,11 @@
                     <div class="top-actions-header">
                         <div class="top-actions-title">
                             <span class="icon">&#9889;</span>
-                            Top Priority Actions
+                            Первоочередные меры по устранению рисков
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <span style="font-size: 12px; color: var(--text-muted);">${totalCriticalCount} критических нарушений всего</span>
-                            <button class="top-actions-toggle" onclick="toggleTopActions()" title="Toggle Top Priority Actions">
+                            <button class="top-actions-toggle" onclick="toggleTopActions()" title="Свернуть или развернуть приоритетные рекомендации">
                                 <span class="toggle-icon">&#9660;</span>
                             </button>
                         </div>
@@ -2816,12 +2816,18 @@
                 // Professional title: checkDescriptions.title > internal check title
                 const displayTitle = checkInfo?.title || item.title;
 
-                // Impact description from checkDescriptions.whyItMatters
-                const impactText = checkInfo?.whyItMatters || '';
-
-                // Remediation from findingDefinitions (best match by findingIds/vulnerabilities/title)
+                // Prefer precise Russian security recommendations. Original definitions
+                // remain intact for risk scoring and original-language reference.
                 const findingDef = findBestFindingDefinition(item.meta || { title: item.title });
-                const remediationText = findingDef?.remediation?.[0] || '';
+                const findingIdRu = findingDef
+                    ? Object.keys(findingDefinitions).find(id => findingDefinitions[id] === findingDef)
+                    : null;
+                const explanationRu = findingIdRu ? (ruFindingExplanations[findingIdRu] || null) : null;
+                const impactText = explanationRu?.impact?.[0] || checkInfo?.whyItMatters || '';
+                const remediationText = explanationRu?.remediation?.[0] ||
+                    'Откройте карточку нарушения, проверьте фактические права и область действия настройки; согласуйте изменение с владельцем системы.';
+                const originalEnglishFix = explanationRu?.remediation?.length
+                    ? '' : (findingDef?.remediation?.[0] || '');
 
                 // Object count for "N affected" label
                 const objectCount = item.meta?.objectCount || 0;
@@ -2831,12 +2837,20 @@
                 if (objectCount > 0) {
                     metaHtml += `<span class="top-action-count">${objectCount} затронуто</span>`;
                 }
-                metaHtml += `<span class="top-action-section">${escapeHtml(item.section)}</span>`;
+                const ruModuleNames = {
+                    domain:'Домен', accounts:'Учётные записи', rights:'Права доступа',
+                    gpo:'Групповые политики', delegation:'Делегирование',
+                    adcs:'AD CS', computer:'Компьютеры', creds:'Учётные данные',
+                    application:'Приложения', shares:'Общие ресурсы',
+                    bloodhound:'BloodHound'
+                };
+                const ruSection = ruModuleNames[String(item.section || '').toLowerCase()] || item.section;
+                metaHtml += `<span class="top-action-section">${escapeHtml(ruSection)}</span>`;
 
                 // Build buttons HTML (info button + score badge)
                 let buttonsHtml = '';
                 if (checkInfo) {
-                    buttonsHtml += `<button class="top-action-info-btn" onclick="event.stopPropagation(); showTopActionInfo(this, '${escapeHtml(objectType)}', '${escapeHtml(checkTitle)}')" data-object-type="${escapeHtml(objectType)}" data-check-title="${escapeHtml(checkTitle)}" title="More Info">?</button>`;
+                    buttonsHtml += `<button class="top-action-info-btn" onclick="event.stopPropagation(); showTopActionInfo(this, '${escapeHtml(objectType)}', '${escapeHtml(checkTitle)}')" data-object-type="${escapeHtml(objectType)}" data-check-title="${escapeHtml(checkTitle)}" title="Подробности проверки">?</button>`;
                 }
                 const scoreClass = item.score >= scoreThresholds.critical ? 'score-critical' : item.score >= scoreThresholds.high ? 'score-high' : item.score >= scoreThresholds.medium ? 'score-medium' : item.score >= scoreThresholds.low ? 'score-low' : 'score-info';
                 const breakdownJson = escapeJsonForAttr(item.breakdown);
@@ -2849,6 +2863,9 @@
                 }
                 if (remediationText) {
                     detailsHtml += `<div class="top-action-fix">&rarr; ${escapeHtml(remediationText)}</div>`;
+                }
+                if (originalEnglishFix) {
+                    detailsHtml += `<details class="top-action-original-en" lang="en" onclick="event.stopPropagation()"><summary>Точная рекомендация разработчика (оригинал EN)</summary><div>${escapeHtml(originalEnglishFix)}</div></details>`;
                 }
 
                 actionsHTML += `
@@ -2946,21 +2963,21 @@
 
             if (checkInfo.summary) {
                 content += '<div class="top-action-tooltip-section">';
-                content += '<div class="top-action-tooltip-label">Summary</div>';
+                content += '<div class="top-action-tooltip-label">Краткое описание</div>';
                 content += '<div class="top-action-tooltip-text">' + escapeHtml(checkInfo.summary) + '</div>';
                 content += '</div>';
             }
 
             if (checkInfo.whyItMatters) {
                 content += '<div class="top-action-tooltip-section">';
-                content += '<div class="top-action-tooltip-label">Why It Matters</div>';
+                content += '<div class="top-action-tooltip-label">Почему это важно</div>';
                 content += '<div class="top-action-tooltip-text">' + escapeHtml(checkInfo.whyItMatters) + '</div>';
                 content += '</div>';
             }
 
             if (checkInfo.whatWeCheck && checkInfo.whatWeCheck.length > 0) {
                 content += '<div class="top-action-tooltip-section">';
-                content += '<div class="top-action-tooltip-label">What We Check</div>';
+                content += '<div class="top-action-tooltip-label">Что проверяется</div>';
                 content += '<ul class="top-action-tooltip-list">';
                 checkInfo.whatWeCheck.forEach(item => {
                     content += '<li>' + escapeHtml(item) + '</li>';

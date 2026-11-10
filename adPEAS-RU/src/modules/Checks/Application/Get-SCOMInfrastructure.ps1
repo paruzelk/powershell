@@ -182,9 +182,9 @@
                 }
 
                 if ($privilegedServiceAccounts -gt 0) {
-                    Show-Line "Found $(@($serviceAccounts).Count) SCOM service account(s), $privilegedServiceAccounts of them privileged in the domain" -Class Finding
+                    Show-Line "Обнаружено служебных учётных записей SCOM: $(@($serviceAccounts).Count); с привилегиями домена: $privilegedServiceAccounts" -Class Finding
                 } else {
-                    Show-Line "Found $(@($serviceAccounts).Count) SCOM service account(s), none of them privileged in the domain" -Class Hint
+                    Show-Line "Обнаружено служебных учётных записей SCOM: $(@($serviceAccounts).Count); привилегированных среди них нет" -Class Hint
                 }
 
                 foreach ($account in $serviceAccounts) {
@@ -213,7 +213,7 @@
             }
 
             if (@($scomGroupsFound).Count -gt 0) {
-                Show-Line "Found $(@($scomGroupsFound).Count) SCOM-related group(s)" -Class Hint
+                Show-Line "Обнаружено групп, связанных с SCOM: $(@($scomGroupsFound).Count)" -Class Hint
 
                 foreach ($group in $scomGroupsFound) {
                     # Add member count without resolving individual members (avoids O(n) LDAP queries)

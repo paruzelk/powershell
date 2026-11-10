@@ -379,9 +379,9 @@
 
                 if (@($shown).Count -gt 0) {
                     if ($headlineClass -eq 'Finding') {
-                        Show-Line "Found $(@($shown).Count) vulnerable GPO local group assignment(s)" -Class Finding
+                        Show-Line "Опасные назначения членства в локальных группах через GPO: $(@($shown).Count)" -Class Finding
                     } else {
-                        Show-Line "Found $(@($shown).Count) GPO local group assignment(s)" -Class $headlineClass
+                        Show-Line "Назначения членства в локальных группах через GPO: $(@($shown).Count)" -Class $headlineClass
                     }
                 } else {
                     # Not Secure: the assignments exist, they just apply nowhere. Calling

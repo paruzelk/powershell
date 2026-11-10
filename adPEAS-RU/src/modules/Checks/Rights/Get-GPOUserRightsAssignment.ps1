@@ -447,20 +447,20 @@
                 if ($removalsOnly.Count -gt 0) {
                     $removalPolicies = @(Get-GPOPolicySummary -Finding $removalsOnly)
 
-                    $text = "$($removalsOnly.Count) assignment(s) only remove default holders - hardening, or a service about to break"
+                    $text = "Назначений, удаляющих только стандартных субъектов: $($removalsOnly.Count). Усиление защиты либо риск нарушения работы службы"
 
                     # Assignments up front, policies in the card, so the unit is named whenever
                     # the two numbers differ - several rights in one GPO is the normal case here.
-                    $countText = "$($removalsOnly.Count) assignment(s)"
+                    $countText = "$($removalsOnly.Count) назначений"
                     if ($removalPolicies.Count -gt 0 -and $removalPolicies.Count -ne $removalsOnly.Count) {
-                        $text += " on $($removalPolicies.Count) GPO(s)"
-                        $countText += " on $($removalPolicies.Count) GPO(s)"
+                        $text += " в $($removalPolicies.Count) GPO"
+                        $countText += " в $($removalPolicies.Count) GPO"
                     }
                     if (-not $showDefaults) { $text += ' (-IncludeDefaults to list)' }
 
                     Show-Line $text -Class "Note"
-                    Show-GPOSuppressedGroup -Group 'Assignments that only remove default holders' `
-                        -Reason 'Hardening more often than not, occasionally a service about to break - never a grant.' `
+                    Show-GPOSuppressedGroup -Group 'Назначения без дополнительных прав (исключены стандартные субъекты)' `
+                         -Reason 'Обычно усиление защиты; проверьте влияние на работу служб. Новые права не выдаются.' `
                         -CountText $countText -Policy $removalPolicies
                 }
 
@@ -477,14 +477,14 @@
                 if (Show-SYSVOLCoverageNote -FileFilter @('GptTmpl.inf')) { $rightsClass = 'Note' }
 
                 if ($deviations.Count -gt 0) {
-                    Show-Line "Found $($deviations.Count) user right assignment(s) that depart from the Windows default:" -Class $headerClass
+                    Show-Line "Обнаружено назначений прав пользователя с отклонением от стандартных параметров Windows: $($deviations.Count)" -Class $headerClass
                 } elseif ($inactiveCount -gt 0) {
                     # Not Secure. Every departure sits on a policy that reaches nothing, which is
                     # a different statement from having none, and the dampening line above
                     # carries the count.
-                    Show-Line "No user right is granted beyond the Windows default by a policy that reaches a machine" -Class $rightsClass
+                    Show-Line "В действующих GPO не обнаружено выдачи прав сверх стандартных настроек Windows" -Class $rightsClass
                 } else {
-                    Show-Line "No user right is granted beyond the Windows default" -Class $rightsClass
+                    Show-Line "Не обнаружено выдачи прав пользователя сверх стандартных настроек Windows" -Class $rightsClass
                 }
 
                 # Findings first, then hints, then the removals.

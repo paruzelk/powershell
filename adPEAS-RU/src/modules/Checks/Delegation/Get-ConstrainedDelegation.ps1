@@ -225,7 +225,7 @@ function Get-ConstrainedDelegation {
 
             $total = @($constrainedAccounts).Count
 
-            Show-Line "Found $total account(s) with Constrained Delegation ($totalComputers computers, $totalUsers users, $totalProtocolTransition with Protocol Transition):" -Class "Finding"
+            Show-Line "Учётные записи с ограниченным делегированием Kerberos: $total (компьютеров: $totalComputers; пользователей: $totalUsers; с переходом протокола: $totalProtocolTransition)" -Class "Finding"
 
             # Called out separately because it is the difference between "delegation exists"
             # and "there is a path to Domain Admin here".

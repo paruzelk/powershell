@@ -79,7 +79,7 @@
 
             $populations = "$totalComputers computers, $totalUsers users"
             if ($totalMSAs -gt 0) { $populations = "$populations, $totalMSAs managed service accounts" }
-            Show-Line "Found $total account(s) with Resource-Based Constrained Delegation ($populations):" -Class "Finding"
+            Show-Line "Учётные записи с делегированием Kerberos на основе ресурса (RBCD): $total ($populations)" -Class "Finding"
 
             # Which of these resources is a domain controller. One query for the whole
             # check, names only - these objects are never displayed.

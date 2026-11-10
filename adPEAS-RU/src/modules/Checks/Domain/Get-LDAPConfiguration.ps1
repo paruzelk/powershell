@@ -196,7 +196,7 @@ function Show-DCPolicySettingSection {
         -Dormant $split.Dormant -Listed:$IncludeInactive
 
     if (@($shown).Count -gt 0) {
-        Show-Line "Found $FoundText in $(@($shown).Count) GPO(s):" -Class Hint
+        Show-Line "Обнаружены настройки $FoundText в групповых политиках: $(@($shown).Count)" -Class Hint
     } else {
         # Every policy that sets it is dormant, which leaves the DCs on whatever the OS
         # defaults to - the same as setting nothing.

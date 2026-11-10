@@ -136,7 +136,7 @@
                 }
 
                 if ($sccmSiteObjects.Count -gt 0) {
-                    Show-Line "Found $($sccmSiteObjects.Count) SCCM site(s) published to Active Directory" -Class Hint
+                    Show-Line "Обнаружено сайтов SCCM, опубликованных в Active Directory: $($sccmSiteObjects.Count)" -Class Hint
 
                     foreach ($site in $sccmSiteObjects) {
                         $siteCode = $site.mSSMSSiteCode
@@ -196,7 +196,7 @@
                 }
 
                 if ($mgmtPoints.Count -gt 0) {
-                    Show-Line "Found $($mgmtPoints.Count) SCCM Management Point(s)" -Class Hint
+                    Show-Line "Обнаружено точек управления SCCM (Management Point): $($mgmtPoints.Count)" -Class Hint
 
                     foreach ($mp in $mgmtPoints) {
                         $mpName = $mp.mSSMSMPName
@@ -312,7 +312,7 @@
             }
 
             if ($sccmServers.Count -gt 0) {
-                Show-Line "Found $($sccmServers.Count) SCCM server(s)" -Class Hint
+                Show-Line "Обнаружено серверов SCCM: $($sccmServers.Count)" -Class Hint
 
                 foreach ($srv in $sccmServers) {
                     $srv | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SCCMServer' -Force
@@ -502,7 +502,7 @@
 
                 if ($pxePoints.Count -gt 0) {
                     $pxeServersFound = $true
-                    Show-Line "Found $($pxePoints.Count) PXE boot server(s)" -Class Hint
+                    Show-Line "Обнаружено серверов загрузки PXE: $($pxePoints.Count)" -Class Hint
 
                     foreach ($pxe in $pxePoints) {
                         $parentDN = $pxe.distinguishedName -replace '^[^,]+,', ''
@@ -531,7 +531,7 @@
 
                 if ($wdsPoints.Count -gt 0) {
                     $pxeServersFound = $true
-                    Show-Line "Found $($wdsPoints.Count) WDS service connection point(s)" -Class Hint
+                    Show-Line "Обнаружено точек подключения службы WDS: $($wdsPoints.Count)" -Class Hint
 
                     foreach ($wds in $wdsPoints) {
                         $parentDN = $wds.distinguishedName -replace '^[^,]+,', ''
@@ -563,7 +563,7 @@
             $serviceAccounts = Get-DomainUser -LDAPFilter "(servicePrincipalName=SMS*)" @PSBoundParameters
 
             if ($serviceAccounts) {
-                Show-Line "Found $(@($serviceAccounts).Count) SCCM service account(s) with SMS* SPN" -Class Hint -FindingId "SCCM_SERVICE_ACCOUNT"
+                Show-Line "Обнаружены служебные учётные записи SCCM с SPN вида SMS*: $(@($serviceAccounts).Count)" -Class Hint -FindingId "SCCM_SERVICE_ACCOUNT"
 
                 foreach ($account in $serviceAccounts) {
                     $account | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SCCMServiceAccount' -Force
@@ -593,7 +593,7 @@
             }
 
             if ($sccmGroupsFound.Count -gt 0) {
-                Show-Line "Found $($sccmGroupsFound.Count) SCCM-related group(s)" -Class Hint
+                Show-Line "Обнаружено групп, связанных с SCCM: $($sccmGroupsFound.Count)" -Class Hint
 
                 # The class each group is shown with, Finding where a broad group is a member.
                 $groupClass = @{}

@@ -931,7 +931,7 @@ function Get-LAPSConfiguration {
 
                     $gpoConfigObjects = @(Get-LAPSGPOConfigObjects -LAPSGPOSettings $lapsGPOSettings)
 
-                    Show-Line "Found $($gpoConfigObjects.Count) GPO(s) deploying LAPS settings" -Class "Hint"
+                    Show-Line "Групповые политики, развёртывающие LAPS: $($gpoConfigObjects.Count)" -Class "Hint"
 
                     foreach ($gpoConfigObject in $gpoConfigObjects) {
                         Show-Object $gpoConfigObject -Class Hint
@@ -1123,7 +1123,7 @@ function Get-LAPSConfiguration {
             Show-Object $coverageSummary -Class $coverageClass
 
             if ($staleLAPSComputers.Count -gt 0) {
-                Show-Line "Found $($staleLAPSComputers.Count) computer(s) whose LAPS password stopped rotating:" -Class "Finding"
+                Show-Line "Компьютеры с прекращённой ротацией пароля LAPS: $($staleLAPSComputers.Count)" -Class "Finding"
                 foreach ($staleObject in ($staleLAPSComputers | Sort-Object daysOverdue -Descending)) {
                     Show-Object $staleObject -Class Finding
                 }

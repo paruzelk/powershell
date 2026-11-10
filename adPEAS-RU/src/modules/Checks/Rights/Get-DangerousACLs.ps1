@@ -462,7 +462,7 @@
             # DCSync findings
             if (@($dcsyncFindings).Count -gt 0) {
                 $countText = if ($IncludePrivileged) { "$(@($dcsyncFindings).Count) account(s)" } else { "$(@($dcsyncFindings).Count) non-privileged account(s)" }
-                Show-Line "Found $countText with DCSync rights" -Class Finding
+                Show-Line "Обнаружены субъекты с правами DCSync: $countText" -Class Finding
 
                 foreach ($finding in $dcsyncFindings) {
                     # Try to resolve the SID to a full AD object (user or group)
@@ -496,7 +496,7 @@
             # Dangerous rights findings
             if (@($dangerousRightsFindings).Count -gt 0) {
                 $countText = if ($IncludePrivileged) { "$(@($dangerousRightsFindings).Count) account(s)" } else { "$(@($dangerousRightsFindings).Count) non-privileged account(s)" }
-                Show-Line "Found $countText with dangerous rights on domain root" -Class Finding
+                Show-Line "Обнаружены субъекты с опасными правами на корневой объект домена: $countText" -Class Finding
 
                 foreach ($finding in $dangerousRightsFindings) {
                     # Try to resolve the SID to a full AD object (user or group)

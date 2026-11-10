@@ -330,7 +330,7 @@
                 }
 
                 if (@($shown).Count -gt 0) {
-                    Show-Line "Found $(@($shown).Count) scheduled task(s) distributed via GPO" -Class $headerClass
+                    Show-Line "Обнаружено задач планировщика, распространяемых через GPO: $(@($shown).Count)" -Class $headerClass
                 } else {
                     Show-Line "No scheduled task is distributed by a policy that is linked and enabled" -Class Note
                 }

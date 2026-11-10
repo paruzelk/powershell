@@ -341,7 +341,7 @@ function Get-DangerousOUPermissions {
                 # delegation on one OU read "in 5 OU(s) and 8 container(s)" (measured).
                 $findingOUDNs = @($nonExchangeFindings | ForEach-Object { $_.Group } |
                     ForEach-Object { [string]$_.DistinguishedName } | Select-Object -Unique)
-                Show-Line "Found $countText with dangerous OU permissions in $(Format-OUContainerCount -DistinguishedName $findingOUDNs)" -Class Finding
+                Show-Line "Обнаружены субъекты с опасными разрешениями OU: $countText; затронутая область: $(Format-OUContainerCount -DistinguishedName $findingOUDNs)" -Class Finding
 
                 foreach ($principalGroup in $nonExchangeFindings) {
                     $sid = $principalGroup.Name
@@ -403,7 +403,7 @@ function Get-DangerousOUPermissions {
             # Display Exchange service group findings as Hint (yellow) - by-design permissions
             # Only shown with -IncludePrivileged (Exchange groups are privileged by design)
             if ($IncludePrivileged -and @($exchangeFindings).Count -gt 0) {
-                Show-Line "Found $(@($exchangeFindings).Count) Exchange service group(s) with OU permissions (by-design, cannot be removed)" -Class Hint
+                Show-Line "Служебные группы Exchange со штатными разрешениями OU (не изменять без проверки Exchange): $(@($exchangeFindings).Count)" -Class Hint
 
                 foreach ($principalGroup in $exchangeFindings) {
                     $sid = $principalGroup.Name

@@ -317,7 +317,7 @@
                     -Dormant $split.Dormant -Listed:$IncludeInactive
 
                 if (@($shown).Count -gt 0) {
-                    Show-Line "Found $(@($shown).Count) vulnerable registry setting(s) deployed via GPO" -Class $headerClass
+                    Show-Line "Обнаружено опасных параметров реестра, применяемых через GPO: $(@($shown).Count)" -Class $headerClass
                 } else {
                     # Not "none deployed". Every one of them is deployed by a policy that
                     # does not apply, which is a different statement.

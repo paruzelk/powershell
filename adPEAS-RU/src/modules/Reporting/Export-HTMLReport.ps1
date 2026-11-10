@@ -964,7 +964,7 @@ function Build-NavigationHtml {
     [void]$nav.AppendLine('<div class="sidebar-section">')
     [void]$nav.AppendLine('    <div class="sidebar-title">Категории</div>')
     [void]$nav.AppendLine('    <a class="nav-item category-filter" data-category="all" href="javascript:void(0)" onclick="filterByCategory(''all'')">')
-    [void]$nav.AppendLine('        All Categories')
+    [void]$nav.AppendLine('        Все категории')
     [void]$nav.AppendLine("        <span class=`"count`">$totalCategoryFindings</span>")
     [void]$nav.AppendLine('    </a>')
 
@@ -982,7 +982,14 @@ function Build-NavigationHtml {
         # [System.Net.WebUtility]::HtmlEncode, which also escapes non-ASCII: a localized
         # category name came out as "Dom&#228;nen" in the sidebar and with the umlaut
         # itself in its own section title, in the same UTF-8 document.
-        $catNameEncoded = ConvertTo-HtmlEncode $catName
+                $ruCategoryNames = @{
+            Accounts='Учётные записи'; ADCS='AD CS'; Delegation='Делегирование'
+            Domain='Домен'; GPO='Групповые политики'; Rights='Права доступа'
+            Creds='Учётные данные'; Computer='Компьютеры'; Application='Приложения'
+            Shares='Общие ресурсы'; Bloodhound='BloodHound'
+        }
+        $nameRu = if($ruCategoryNames.ContainsKey($catName)){$ruCategoryNames[$catName]}else{$catName}
+        $catNameEncoded = ConvertTo-HtmlEncode $nameRu
         $catIdEncoded = ConvertTo-HtmlEncode $catId
 
         [void]$nav.AppendLine("    <a class=`"nav-item category-filter`" data-category=`"$catIdEncoded`" href=`"javascript:void(0)`" onclick=`"filterByCategory('$catIdEncoded')`">")
@@ -1128,7 +1135,7 @@ function Build-FindingCardHtml {
     $titleForAttr = ConvertTo-HtmlEncode $Title  # Keep original for data-check-title lookup
     $objectTypeAttr = if ($resolvedObjectType) { " data-object-type=`"$(ConvertTo-HtmlEncode $resolvedObjectType)`"" } else { "" }
 
-    $helpButtonHtml = "<span class=`"check-help-btn`" data-check-title=`"$titleForAttr`"$objectTypeAttr title=`"Click for more info`">?</span>"
+    $helpButtonHtml = "<span class=`"check-help-btn`" data-check-title=`"$titleForAttr`"$objectTypeAttr title=`"Подробнее о проверке`">?</span>"
 
     # XSS Protection: Encode category for data attribute
     $categoryEncoded = ConvertTo-HtmlEncode $Category
@@ -1138,7 +1145,7 @@ function Build-FindingCardHtml {
 
     # Add Expand/Collapse All button if there are objects
     $expandCollapseBtn = if ($objectCount -gt 1) {
-        "<button class=`"expand-collapse-btn`" onclick=`"event.stopPropagation(); toggleAllObjects('$findingCardId')`" title=`"Expand/Collapse all objects`"><span>&#9654;</span> Expand All</button>"
+        "<button class=`"expand-collapse-btn`" onclick=`"event.stopPropagation(); toggleAllObjects('$findingCardId')`" title=`"Развернуть или свернуть все объекты`"><span>&#9654;</span> Развернуть всё</button>"
     } else { "" }
 
     $cardIndexAttr = if ($CardIndex -ge 0) { " data-card-index=`"$CardIndex`"" } else { "" }
@@ -1391,7 +1398,7 @@ function Build-ObjectDetailHtml {
     [void]$html.AppendLine("                        <span class=`"expand-icon`">&#9654;</span>")
     [void]$html.AppendLine("                    </div>")
     [void]$html.AppendLine("                    <div class=`"object-body`">")
-    [void]$html.AppendLine("                        <div class=`"attr-col-resizer`" title=`"Drag to resize the name column`" aria-hidden=`"true`"></div>")
+    [void]$html.AppendLine("                        <div class=`"attr-col-resizer`" title=`"Перетащите для изменения ширины названий`" aria-hidden=`"true`"></div>")
 
     # Use RenderModel if available, otherwise create one
     if (-not $RenderModel) {

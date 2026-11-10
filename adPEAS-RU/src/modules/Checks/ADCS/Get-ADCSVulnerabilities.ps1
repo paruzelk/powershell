@@ -172,7 +172,7 @@
                 $rootCAs = @(Invoke-LDAPSearch -Filter "(objectClass=certificationAuthority)" -SearchBase $rootCASearchBase -Properties 'cn','distinguishedName','cACertificate' -Scope OneLevel)
 
                 if (@($rootCAs).Count -gt 0) {
-                    Show-Line "Found $(@($rootCAs).Count) trusted Root CA(s) in AD configuration" -Class Note
+                    Show-Line "Обнаружено доверенных корневых центров сертификации в конфигурации AD: $(@($rootCAs).Count)" -Class Note
 
                     foreach ($rootCA in $rootCAs) {
                         $rootCAName = if ($rootCA.cn -is [array]) { $rootCA.cn[0] } else { $rootCA.cn }
@@ -316,7 +316,7 @@
                 $aiaCAs = @(Invoke-LDAPSearch -Filter "(objectClass=certificationAuthority)" -SearchBase $aiaSearchBase -Properties 'cn','distinguishedName','cACertificate' -Scope OneLevel)
 
                 if (@($aiaCAs).Count -gt 0) {
-                    Show-Line "Found $(@($aiaCAs).Count) AIA (Authority Information Access) CA(s)" -Class Note
+                    Show-Line "Обнаружено центров сертификации, опубликованных в AIA: $(@($aiaCAs).Count)" -Class Note
                     foreach ($aiaCA in $aiaCAs) {
                         $aiaCAName = if ($aiaCA.cn -is [array]) { $aiaCA.cn[0] } else { $aiaCA.cn }
                         $aiaCert = $aiaCA.cACertificate
@@ -366,7 +366,7 @@
             }
 
             # Display CA count immediately after search
-            Show-Line "Found $($cas.Count) Certificate Authority(s)" -Class Hint
+            Show-Line "Обнаружено центров сертификации: $($cas.Count)" -Class Hint
 
             # Track CA vulnerabilities for summary
             $caVulnerabilityCount = 0
@@ -1104,7 +1104,7 @@
                 # ===== Output findings with full AD objects =====
                 if (@($allFindings).Count -gt 0) {
                     $countText = if ($IncludePrivileged) { "$(@($allFindings).Count) finding(s)" } else { "$(@($allFindings).Count) non-privileged finding(s)" }
-                    Show-Line "Found $countText with dangerous PKI container permissions" -Class Finding
+                    Show-Line "Обнаружены субъекты с опасными разрешениями на контейнеры PKI: $countText" -Class Finding
 
                     # Group by SID to consolidate multiple containers per principal
                     $groupedFindings = $allFindings | Group-Object -Property SID
@@ -1802,9 +1802,9 @@
             if ($interestingCount -gt 0) {
                 # Show informative message about what we found
                 if ($totalVulnerabilities -gt 0) {
-                    Show-Line "Found $interestingCount of $($templates.Count) templates with findings" -Class Finding
+                    Show-Line "Шаблоны сертификатов с обнаруженными проблемами: $interestingCount из $($templates.Count)" -Class Finding
                 } else {
-                    Show-Line "Found $interestingCount of $($templates.Count) templates with non-privileged enrollment" -Class Hint
+                    Show-Line "Шаблоны сертификатов с правом регистрации непривилегированными субъектами: $interestingCount из $($templates.Count)" -Class Hint
                 }
 
                 # Display all interesting templates

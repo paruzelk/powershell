@@ -243,14 +243,14 @@
 
             # ----- Output -----
             if ($silos.Count -gt 0) {
-                Show-Line "Found $($silos.Count) authentication policy silo(s):" -Class (Get-AuthNHeadlineClass -Class $siloClasses)
+                Show-Line "Обнаружено хранилищ политик проверки подлинности: $($silos.Count)" -Class (Get-AuthNHeadlineClass -Class $siloClasses)
                 for ($i = 0; $i -lt $silos.Count; $i++) { Show-Object $silos[$i] -Class $siloClasses[$i] }
             } else {
                 Show-Line "Хранилища политик проверки подлинности не настроены"
             }
 
             if ($policies.Count -gt 0) {
-                Show-Line "Found $($policies.Count) authentication policy(ies):" -Class (Get-AuthNHeadlineClass -Class $policyClasses)
+                Show-Line "Обнаружено политик проверки подлинности: $($policies.Count)" -Class (Get-AuthNHeadlineClass -Class $policyClasses)
                 for ($i = 0; $i -lt $policies.Count; $i++) { Show-Object $policies[$i] -Class $policyClasses[$i] }
             }
 

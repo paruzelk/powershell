@@ -398,7 +398,7 @@ function Get-PasswordResetRights {
             # Display non-Exchange findings as Finding (red)
             if (@($nonExchangeFindings).Count -gt 0) {
                 $countText = if ($IncludePrivileged) { "$(@($nonExchangeFindings).Count) account(s)" } else { "$(@($nonExchangeFindings).Count) non-privileged account(s)" }
-                Show-Line "Found $countText with password reset rights on OUs containing privileged users" -Class Finding
+                Show-Line "Обнаружены субъекты с правом сброса паролей в OU с привилегированными пользователями: $countText" -Class Finding
 
                 foreach ($principalGroup in $nonExchangeFindings) {
                     $sid = $principalGroup.Name
@@ -465,7 +465,7 @@ function Get-PasswordResetRights {
             # Display Exchange service group findings as Hint (yellow) - by-design permissions
             # Only shown with -IncludePrivileged (Exchange groups are privileged by design)
             if ($IncludePrivileged -and @($exchangeFindings).Count -gt 0) {
-                Show-Line "Found $(@($exchangeFindings).Count) Exchange service group(s) with password reset rights (by-design, cannot be removed)" -Class Hint
+                Show-Line "Служебные группы Exchange с штатными правами сброса паролей (не удалять без проверки Exchange): $(@($exchangeFindings).Count)" -Class Hint
 
                 foreach ($principalGroup in $exchangeFindings) {
                     $sid = $principalGroup.Name

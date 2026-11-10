@@ -73,85 +73,85 @@ $Script:UserRightsBaseline = [ordered]@{
     # =========================================================================
 
     'SeDebugPrivilege' = @{
-        Name = 'Debug programs'
+        Name = 'Отладка программ'
         Tier = 'Finding'
-        Why  = 'Opens any process, including LSASS. A holder reads credentials out of memory on every machine in scope.'
+        Why  = 'Позволяет открывать процессы, включая LSASS, и получать доступ к данным в памяти в пределах назначенной области.'
         # Administrators only, on a member and on a domain controller alike.
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeTcbPrivilege' = @{
-        Name = 'Act as part of the operating system'
+        Name = 'Работа в режиме операционной системы'
         Tier = 'Finding'
-        Why  = 'The holder can create a token for any identity. It is the operating system trust boundary itself.'
+        Why  = 'Даёт возможности, связанные с доверенной частью ОС и созданием маркеров доступа. Назначайте только в исключительных случаях.'
         # Nobody by default. Windows grants this to no principal out of the box.
         Member = @()
         DC     = @()
     }
 
     'SeCreateTokenPrivilege' = @{
-        Name = 'Create a token object'
+        Name = 'Создание объекта токена'
         Tier = 'Finding'
-        Why  = 'Forges an access token directly, with any group membership the holder chooses.'
+        Why  = 'Позволяет создавать маркеры доступа. Ошибочное назначение создаёт высокий риск повышения привилегий.'
         Member = @()
         DC     = @()
     }
 
     'SeImpersonatePrivilege' = @{
-        Name = 'Impersonate a client after authentication'
+        Name = 'Имитация клиента после проверки подлинности'
         Tier = 'Finding'
-        Why  = 'The precondition of the Potato family of local privilege escalations.'
+        Why  = 'Позволяет процессу действовать от имени проверенного клиента. При определённых условиях используется для локального повышения привилегий.'
         # Administrators and the three service identities.
         Member = @('S-1-5-32-544', 'S-1-5-6', 'S-1-5-19', 'S-1-5-20')
         DC     = @('S-1-5-32-544', 'S-1-5-6', 'S-1-5-19', 'S-1-5-20')
     }
 
     'SeAssignPrimaryTokenPrivilege' = @{
-        Name = 'Replace a process level token'
+        Name = 'Замена токена уровня процесса'
         Tier = 'Finding'
-        Why  = 'Starts a process under another identity, which is the second half of a token abuse chain.'
+        Why  = 'Позволяет процессу назначать основной маркер доступа. В сочетании с другими разрешениями может применяться для повышения привилегий.'
         Member = @('S-1-5-19', 'S-1-5-20')
         DC     = @('S-1-5-19', 'S-1-5-20')
     }
 
     'SeLoadDriverPrivilege' = @{
-        Name = 'Load and unload device drivers'
+        Name = 'Загрузка и выгрузка драйверов устройств'
         Tier = 'Finding'
-        Why  = 'Code in the kernel. A signed vulnerable driver turns this into complete control of the machine.'
+        Why  = 'Позволяет загружать драйверы ядра; эксплуатация уязвимого подписанного драйвера может привести к компрометации системы.'
         Member = @('S-1-5-32-544')
         # Print Operators hold it on a domain controller, for printer drivers.
         DC     = @('S-1-5-32-544', 'S-1-5-32-550')
     }
 
     'SeBackupPrivilege' = @{
-        Name = 'Back up files and directories'
+        Name = 'Архивирование файлов и каталогов'
         Tier = 'Finding'
-        Why  = 'Reads every file regardless of its ACL - on a domain controller, that includes the NTDS database.'
+        Why  = 'Разрешает читать файлы в режиме резервного копирования в обход отдельных файловых ACL; на контроллере домена может затронуть базу NTDS.'
         Member = @('S-1-5-32-544', 'S-1-5-32-551')
         DC     = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-549')
     }
 
     'SeRestorePrivilege' = @{
-        Name = 'Restore files and directories'
+        Name = 'Восстановление файлов и каталогов'
         Tier = 'Finding'
-        Why  = 'Writes every file regardless of its ACL, and can set owner. The write half of SeBackupPrivilege.'
+        Why  = 'Разрешает восстановление и запись файлов в обход части файловых ACL, включая операции над владельцем.'
         Member = @('S-1-5-32-544', 'S-1-5-32-551')
         DC     = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-549')
     }
 
     'SeTakeOwnershipPrivilege' = @{
-        Name = 'Take ownership of files or other objects'
+        Name = 'Смена владельцев файлов и других объектов'
         Tier = 'Finding'
-        Why  = 'Ownership carries WriteDacl, so the holder grants itself whatever access it wants afterwards.'
+        Why  = 'Позволяет принять владение объектом и впоследствии изменить его разрешения, если применимы соответствующие права.'
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeEnableDelegationPrivilege' = @{
-        Name = 'Enable computer and user accounts to be trusted for delegation'
+        Name = 'Разрешение доверия учётных записей для делегирования'
         Tier = 'Finding'
-        Why  = 'Configures Kerberos delegation, which is impersonation of any user against the delegated service.'
+        Why  = 'Позволяет изменять параметры доверия к учётным записям для делегирования Kerberos. Ошибочная выдача расширяет риск подмены контекста пользователей.'
         # Administrators in both scopes, which takes the Default values table over the body
         # text where the two disagree. The table gives "Member Server Effective" and "Client
         # Computer Effective" as Administrators; the body says there is "no reason to assign
@@ -169,45 +169,45 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeSyncAgentPrivilege' = @{
-        Name = 'Synchronize directory service data'
+        Name = 'Синхронизация данных службы каталогов'
         Tier = 'Finding'
-        Why  = 'Reads every object and attribute in the directory, password hashes included.'
+        Why  = 'Это право связано с получением данных службы каталогов и требует ограничения доверенными системными субъектами.'
         Member = @()
         DC     = @()
     }
 
     'SeManageVolumePrivilege' = @{
-        Name = 'Perform volume maintenance tasks'
+        Name = 'Обслуживание томов'
         Tier = 'Finding'
-        Why  = 'Raw volume access bypasses the file system and its ACLs entirely.'
+        Why  = 'Даёт доступ к операциям обслуживания тома, которые могут обходить обычные ограничения файловой системы.'
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeSecurityPrivilege' = @{
-        Name = 'Manage auditing and security log'
+        Name = 'Управление аудитом и журналом безопасности'
         # Hint, not Finding. Every other right in the Finding tier hands the holder
         # SYSTEM, the contents of NTDS.dit, kernel code or ownership of any object.
         # This one is anti-forensics: it destroys the record of an intrusion rather
         # than enabling one, so it does not belong beside them.
         Tier = 'Hint'
-        Why  = 'Clears the security log, which is how an intrusion stops being reconstructable.'
+        Why  = 'Позволяет управлять политикой аудита и журналом безопасности. Избыточные права могут затруднить расследование событий.'
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeRelabelPrivilege' = @{
-        Name = 'Modify an object label'
+        Name = 'Изменение метки объекта'
         Tier = 'Finding'
-        Why  = 'Changes the integrity level of an object, defeating the protection a low-integrity sandbox provides.'
+        Why  = 'Позволяет изменять метки целостности объектов и тем самым влиять на ограничения механизма контроля целостности Windows.'
         Member = @()
         DC     = @()
     }
 
     'SeTrustedCredManAccessPrivilege' = @{
-        Name = 'Access Credential Manager as a trusted caller'
+        Name = 'Доступ к диспетчеру учётных данных в качестве доверенного вызывающего'
         Tier = 'Finding'
-        Why  = 'Reads the saved credentials of every user of the machine in cleartext.'
+        Why  = 'Даёт расширенный доступ к сохранённым учётным данным пользователей на компьютере.'
         Member = @()
         DC     = @()
     }
@@ -217,18 +217,18 @@ $Script:UserRightsBaseline = [ordered]@{
     # =========================================================================
 
     'SeRemoteInteractiveLogonRight' = @{
-        Name = 'Allow log on through Remote Desktop Services'
+        Name = 'Вход через службы удалённых рабочих столов'
         Tier = 'Hint'
-        Why  = 'An interactive session on the machine, and with it whatever the account can reach from there.'
+        Why  = 'Разрешает интерактивный вход по RDP; оцените полномочия субъектов на соответствующих компьютерах.'
         Member = @('S-1-5-32-544', 'S-1-5-32-555')
         # A domain controller does not carry Remote Desktop Users in its default policy.
         DC     = @('S-1-5-32-544')
     }
 
     'SeInteractiveLogonRight' = @{
-        Name = 'Allow log on locally'
+        Name = 'Локальный вход в систему'
         Tier = 'Hint'
-        Why  = 'A console session. On a domain controller it is the difference between a member and an admin of the domain.'
+        Why  = 'Разрешает интерактивный вход за консолью. Особенно критично для контроллеров домена и серверов Tier 0.'
         # Administrators, Backup Operators, Users - the three Microsoft documents for
         # workstations and servers. Guests (S-1-5-32-546) used to sit here and does not
         # belong: the same page names Guests as a candidate for "Deny log on locally", so
@@ -248,17 +248,17 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeBatchLogonRight' = @{
-        Name = 'Log on as a batch job'
+        Name = 'Вход в качестве пакетного задания'
         Tier = 'Hint'
-        Why  = 'Runs a scheduled task as the account, which is code execution without an interactive session.'
+        Why  = 'Разрешает запуск пакетных заданий и задач планировщика от имени данной учётной записи.'
         Member = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-559')
         DC     = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-559')
     }
 
     'SeServiceLogonRight' = @{
-        Name = 'Log on as a service'
+        Name = 'Вход в качестве службы'
         Tier = 'Hint'
-        Why  = 'Runs a service as the account. A service starts without anyone logging on.'
+        Why  = 'Разрешает запуск служб Windows от имени данной учётной записи.'
         # Deliberately no baseline. What holds this varies with every product installed on
         # the machine - SQL, Exchange and IIS each add their own service accounts - so any
         # list here would be wrong on most domains in one direction or the other. The
@@ -268,25 +268,25 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeSystemtimePrivilege' = @{
-        Name = 'Change the system time'
+        Name = 'Изменение системного времени'
         Tier = 'Hint'
-        Why  = 'Kerberos rejects a ticket outside its clock skew, so the clock is an authentication dependency.'
+        Why  = 'Позволяет изменять время системы, что может нарушить работу Kerberos и журналирование событий.'
         Member = @('S-1-5-32-544', 'S-1-5-19')
         DC     = @('S-1-5-32-544', 'S-1-5-19', 'S-1-5-32-549')
     }
 
     'SeRemoteShutdownPrivilege' = @{
-        Name = 'Force shutdown from a remote system'
+        Name = 'Принудительное завершение работы из удалённой системы'
         Tier = 'Hint'
-        Why  = 'Denial of service against the machine, remotely and without touching it.'
+        Why  = 'Разрешает удалённое завершение работы компьютера и может использоваться для отказа в обслуживании.'
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544', 'S-1-5-32-549')
     }
 
     'SeShutdownPrivilege' = @{
-        Name = 'Shut down the system'
+        Name = 'Завершение работы системы'
         Tier = 'Hint'
-        Why  = 'Denial of service, and on a domain controller a way to force authentication elsewhere.'
+        Why  = 'Позволяет выключать компьютер; на критических серверах влияет на доступность инфраструктуры.'
         # Users (S-1-5-32-545) is a CLIENT default, not a member-server one: Microsoft gives
         # "Member Server Effective" as Administrators and Backup Operators, and only "Client
         # Computer Effective" adds Users. adPEAS has one non-DC bucket for both, so it has to
@@ -315,9 +315,9 @@ $Script:UserRightsBaseline = [ordered]@{
     # Microsoft page (Domain Controller and Member Server Effective Default Settings).
 
     'SeCreateSymbolicLinkPrivilege' = @{
-        Name = 'Create symbolic links'
+        Name = 'Создание символических ссылок'
         Tier = 'Hint'
-        Why  = 'A symbolic link redirects a file operation of a more privileged process to a path the holder chooses - Microsoft names permission changes, corrupted or destroyed data and denial of service.'
+        Why  = 'Разрешает создавать символические ссылки, которые могут влиять на файловые операции других процессов.'
         # Administrators. The Hyper-V role adds NT VIRTUAL MACHINE\Virtual Machines on a host
         # where it is installed; that is the role, not the Windows default.
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-symbolic-links
@@ -326,9 +326,9 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeDelegateSessionUserImpersonatePrivilege' = @{
-        Name = 'Obtain an impersonation token for another user in the same session'
+        Name = 'Получение токена другого пользователя в том же сеансе'
         Tier = 'Hint'
-        Why  = 'Obtains an impersonation token for another user logged on in the same session, and acts as that user.'
+        Why  = 'Даёт возможность получать маркер имитации другого пользователя того же сеанса при соблюдении условий Windows.'
         # Microsoft documents what the privilege does (Privilege Constants, winnt.h) and
         # publishes no default holder set for it, so the comparison falls back to the
         # identity filter and says so, rather than guessing a default.
@@ -337,9 +337,9 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeAuditPrivilege' = @{
-        Name = 'Generate security audits'
+        Name = 'Формирование аудита безопасности'
         Tier = 'Hint'
-        Why  = 'Writes arbitrary entries into the Security log - enough to roll real events out where the log overwrites, or to stop the machine where it halts on a full log.'
+        Why  = 'Позволяет формировать записи аудита безопасности. При злоупотреблении может затруднить анализ подлинных событий.'
         # LOCAL SERVICE and NETWORK SERVICE, on a member and on a domain controller alike.
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/generate-security-audits
         Member = @('S-1-5-19', 'S-1-5-20')
@@ -352,18 +352,18 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeSystemEnvironmentPrivilege' = @{
-        Name = 'Modify firmware environment values'
+        Name = 'Изменение параметров среды микропрограммы'
         Tier = 'Hint'
-        Why  = 'Writes the firmware environment - on UEFI the NVRAM variables that hold the boot settings - which can make the hardware fail or the machine boot something else.'
+        Why  = 'Позволяет изменять настройки среды UEFI/микропрограммы, в том числе влияющие на загрузку системы.'
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/modify-firmware-environment-values
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeCreateGlobalPrivilege' = @{
-        Name = 'Create global objects'
+        Name = 'Создание глобальных объектов'
         Tier = 'Hint'
-        Why  = 'Creates file mapping and symbolic link objects in the global namespace from any session, where a privileged service expects to find its own - Microsoft calls assigning it a security risk.'
+        Why  = 'Разрешает создавать глобальные объекты ядра Windows; назначение должно быть ограничено доверенными службами.'
         # Administrators, LOCAL SERVICE, NETWORK SERVICE and SERVICE.
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-global-objects
         Member = @('S-1-5-32-544', 'S-1-5-19', 'S-1-5-20', 'S-1-5-6')
@@ -371,18 +371,18 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeProfileSingleProcessPrivilege' = @{
-        Name = 'Profile single process'
+        Name = 'Профилирование отдельного процесса'
         Tier = 'Hint'
-        Why  = 'Samples any process: which run, security software among them, and who else is logged on.'
+        Why  = 'Позволяет собирать статистику работы процессов, потенциально раскрывая сведения о запущенных службах.'
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/profile-single-process
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeSystemProfilePrivilege' = @{
-        Name = 'Profile system performance'
+        Name = 'Профилирование производительности системы'
         Tier = 'Hint'
-        Why  = 'Profiles the whole system: which processes are active, security software among them.'
+        Why  = 'Позволяет профилировать систему в целом и получать дополнительные сведения о работе процессов.'
         # Administrators and NT SERVICE\WdiServiceHost, as the page's own text says - its
         # table lists Administrators alone. The service SID is derived from the service name
         # (SHA-1 of the upper-cased name) and is the same on every machine; checked against

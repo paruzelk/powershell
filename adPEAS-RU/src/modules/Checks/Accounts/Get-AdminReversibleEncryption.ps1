@@ -63,7 +63,7 @@
 
             if ($vulnerableAccounts.Count -gt 0) {
                 $totalAccounts = $vulnerableAccounts.Count
-                Show-Line "Found $totalAccounts account(s) with reversible password encryption:" -Class Finding
+                Show-Line "Обнаружены учётные записи с обратимым шифрованием пароля: $totalAccounts" -Class Finding
 
                 $currentIndex = 0
                 $privilegedCount = 0

@@ -45,7 +45,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'DomainBasicInfo' = @{
-        TitleFormat = "Domain Information"
+        TitleFormat = "Сведения о домене"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Сведения о домене"
@@ -61,7 +61,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'KerberosPolicy' = @{
-        TitleFormat = "Kerberos Policy"
+        TitleFormat = "Политика Kerberos"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Политика Kerberos"
@@ -78,7 +78,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GuestAccount' = @{
-        TitleFormat = "Guest Account Status"
+        TitleFormat = "Состояние учётной записи «Гость»"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Состояние учётной записи «Гость»"
@@ -92,7 +92,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DomainControllers' = @{
-        TitleFormat = "Domain Controllers"
+        TitleFormat = "Контроллеры домена и роли FSMO"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Контроллеры домена и роли FSMO"
@@ -105,7 +105,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SitesAndSubnets' = @{
-        TitleFormat = "Sites and Subnets: {Name}"
+        TitleFormat = "Сайты и подсети Active Directory: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Сайты и подсети Active Directory"
@@ -119,7 +119,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DomainPasswordPolicy' = @{
-        TitleFormat = "Password Policy"
+        TitleFormat = "Доменная политика паролей"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Доменная политика паролей"
@@ -135,7 +135,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'FineGrainedPasswordPolicy' = @{
-        TitleFormat = "Fine-Grained Password Policy: {Name}"
+        TitleFormat = "Тонкие политики паролей (FGPP): {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Тонкие политики паролей (FGPP)"
@@ -153,7 +153,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DomainTrust' = @{
-        TitleFormat = "Domain Trust: {Name}"
+        TitleFormat = "Доверительные отношения домена: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Доверительные отношения домена"
@@ -172,7 +172,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ReadableShare' = @{
-        TitleFormat = "Readable Shares: {Name}"
+        TitleFormat = "Доступные для чтения общие ресурсы: {Name}"
         Module = "Shares"
         Category = "Shares"
         SectionTitle = "Доступные для чтения общие ресурсы"
@@ -195,7 +195,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ShareCredential' = @{
-        TitleFormat = "Credential on a Share: {Context}"
+        TitleFormat = "Учётные данные в общих папках: {Context}"
         Module = "Shares"
         Category = "Shares"
         SectionTitle = "Учётные данные в общих папках"
@@ -211,7 +211,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'NetworkSubnet' = @{
-        TitleFormat = "Network Subnet: {Name}"
+        TitleFormat = "Карта сети: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Карта сети"
@@ -230,7 +230,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'OpenPorts' = @{
-        TitleFormat = "Open Ports: {Name}"
+        TitleFormat = "Открытые сетевые порты: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Открытые сетевые порты"
@@ -247,7 +247,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LDAPConfigGPO' = @{
-        TitleFormat = "LDAP Configuration GPO: {Name}"
+        TitleFormat = "Настройки подписи LDAP в GPO: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Настройки подписи LDAP в GPO"
@@ -265,7 +265,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # The two null session settings, read in the same SYSVOL scan as LDAP signing and
     # reported in a section of their own: they are SMB and RPC controls, not LDAP.
     'NullSessionGPO' = @{
-        TitleFormat = "Null Session GPO: {Name}"
+        TitleFormat = "Параметры анонимного доступа в GPO: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Параметры анонимного доступа в GPO"
@@ -283,7 +283,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # dsHeuristics, read by Get-LDAPConfiguration in a section of its own ahead of the GPO
     # rows: one forest-wide string, and no GPO governs any of its characters.
     'DSHeuristics' = @{
-        TitleFormat = "Directory Service Heuristics"
+        TitleFormat = "Параметры dsHeuristics"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Параметры dsHeuristics"
@@ -300,7 +300,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SMBSigning' = @{
-        TitleFormat = "SMB Signing GPO: {Name}"
+        TitleFormat = "Настройки подписи SMB: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Настройки подписи SMB"
@@ -319,7 +319,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # What is in force on the domain controllers, value by value, decided per setting by
     # GPO precedence - shown under the GPO rows of the two signing checks above.
     'EffectiveLDAPConfig' = @{
-        TitleFormat = "In force on the domain controllers"
+        TitleFormat = "Действующие настройки LDAP"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Действующие настройки LDAP"
@@ -335,7 +335,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'EffectiveNullSession' = @{
-        TitleFormat = "In force on the domain controllers"
+        TitleFormat = "Действующие параметры анонимного доступа"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Действующие параметры анонимного доступа"
@@ -352,7 +352,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'EffectiveSMBSigning' = @{
-        TitleFormat = "In force on the domain controllers"
+        TitleFormat = "Действующие настройки подписи SMB"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Действующие настройки подписи SMB"
@@ -370,7 +370,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # The member computers' side, shown when every policy that sets SMB signing is linked
     # to the Domain Controllers OU only - so no policy reaches a member server or client.
     'EffectiveSMBSigningMembers' = @{
-        TitleFormat = "In force on member servers and clients"
+        TitleFormat = "Подпись SMB: затронутые компьютеры"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Подпись SMB: затронутые компьютеры"
@@ -387,7 +387,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # A linked and enabled policy that weakens SMB signing, shown below the postures with
     # the OUs it reaches.
     'SMBSigningWeakened' = @{
-        TitleFormat = "SMB Signing Weakened: {Name}"
+        TitleFormat = "Ослабление защиты SMB: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Ослабление защиты SMB"
@@ -407,7 +407,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'DomainController' = @{
-        TitleFormat = "Domain Controller: {Name}"
+        TitleFormat = "Контроллеры домена: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Контроллеры домена"
@@ -423,7 +423,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeServer' = @{
-        TitleFormat = "Exchange Server: {Name}{Context}"
+        TitleFormat = "Серверы Exchange: {Name}{Context}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы Exchange"
@@ -439,7 +439,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeServerBasic' = @{
-        TitleFormat = "Exchange Server: {Name}"
+        TitleFormat = "Серверы Exchange: основные сведения: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы Exchange: основные сведения"
@@ -453,7 +453,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeOrganization' = @{
-        TitleFormat = "Exchange Organization: {Name}"
+        TitleFormat = "Организация Exchange: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Организация Exchange"
@@ -468,7 +468,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeConfigServer' = @{
-        TitleFormat = "Exchange Server: {Name}"
+        TitleFormat = "Сервер Exchange в разделе Configuration: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Сервер Exchange в разделе Configuration"
@@ -482,7 +482,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeHybridConfiguration' = @{
-        TitleFormat = "Exchange Hybrid: {Name}"
+        TitleFormat = "Гибридное развёртывание Exchange: {Name}"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Гибридное развёртывание Exchange"
@@ -499,7 +499,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeReceiveConnector' = @{
-        TitleFormat = "Receive Connector: {Name}"
+        TitleFormat = "Принимающие SMTP-соединители Exchange: {Name}"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Принимающие SMTP-соединители Exchange"
@@ -514,7 +514,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangePermissionsModel' = @{
-        TitleFormat = "Exchange Permissions Model: {Name}"
+        TitleFormat = "Модель разрешений Exchange: {Name}"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Модель разрешений Exchange"
@@ -529,7 +529,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeRoleAssignment' = @{
-        TitleFormat = "Exchange Role Assignment: {Name}"
+        TitleFormat = "Назначения ролей управления Exchange: {Name}"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Назначения ролей управления Exchange"
@@ -544,7 +544,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'MSSQLServer' = @{
-        TitleFormat = "MSSQL Server: {Name}"
+        TitleFormat = "Серверы Microsoft SQL Server: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы Microsoft SQL Server"
@@ -558,7 +558,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMServer' = @{
-        TitleFormat = "SCCM Server: {Name}"
+        TitleFormat = "Инфраструктура Configuration Manager (SCCM): {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Инфраструктура Configuration Manager (SCCM)"
@@ -573,7 +573,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMServerBasic' = @{
-        TitleFormat = "SCCM Server: {Name}"
+        TitleFormat = "Серверы SCCM: основные сведения: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы SCCM: основные сведения"
@@ -585,7 +585,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMServiceAccount' = @{
-        TitleFormat = "SCCM Service Account: {Name}"
+        TitleFormat = "Служебные учётные записи SCCM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Служебные учётные записи SCCM"
@@ -598,7 +598,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMGroup' = @{
-        TitleFormat = "SCCM Group: {Name}"
+        TitleFormat = "Группы SCCM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Группы SCCM"
@@ -613,7 +613,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMContainerPermission' = @{
-        TitleFormat = "System Management Container Write Access: {Name}"
+        TitleFormat = "Разрешения контейнера System Management: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Разрешения контейнера System Management"
@@ -629,7 +629,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMSite' = @{
-        TitleFormat = "SCCM Site: {Name}"
+        TitleFormat = "Сайты SCCM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Сайты SCCM"
@@ -643,7 +643,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMManagementPoint' = @{
-        TitleFormat = "SCCM Management Point: {Name}"
+        TitleFormat = "Точки управления SCCM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Точки управления SCCM"
@@ -657,7 +657,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMPXEServer' = @{
-        TitleFormat = "PXE/WDS Server: {Name}"
+        TitleFormat = "Серверы загрузки PXE/WDS: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы загрузки PXE/WDS"
@@ -670,7 +670,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCOMServer' = @{
-        TitleFormat = "SCOM Server: {Name}"
+        TitleFormat = "Инфраструктура Operations Manager (SCOM): {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Инфраструктура Operations Manager (SCOM)"
@@ -685,7 +685,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCOMServerBasic' = @{
-        TitleFormat = "SCOM Server: {Name}"
+        TitleFormat = "Серверы SCOM: основные сведения: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы SCOM: основные сведения"
@@ -697,7 +697,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCOMServiceAccount' = @{
-        TitleFormat = "SCOM Service Account: {Name}"
+        TitleFormat = "Служебные учётные записи SCOM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Служебные учётные записи SCOM"
@@ -709,7 +709,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCOMGroup' = @{
-        TitleFormat = "SCOM Group: {Name}"
+        TitleFormat = "Группы SCOM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Группы SCOM"
@@ -721,7 +721,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ADFSServer' = @{
-        TitleFormat = "AD FS: {Name}"
+        TitleFormat = "Службы федерации AD FS: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Службы федерации AD FS"
@@ -736,7 +736,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'EntraConnect' = @{
-        TitleFormat = "Entra ID Connect: {Name}{Context}"
+        TitleFormat = "Microsoft Entra Connect: {Name}{Context}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Microsoft Entra Connect"
@@ -755,7 +755,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'ExchangeTrustedSubsystem' = @{
-        TitleFormat = "Exchange Group: Exchange Trusted Subsystem"
+        TitleFormat = "Группа Exchange: Exchange Trusted Subsystem"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Группа Exchange Trusted Subsystem"
@@ -770,7 +770,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeWindowsPermissions' = @{
-        TitleFormat = "Exchange Group: Exchange Windows Permissions"
+        TitleFormat = "Группа Exchange: Exchange Windows Permissions"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Группа Exchange Windows Permissions"
@@ -785,7 +785,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeOrganizationManagement' = @{
-        TitleFormat = "Exchange Group: Organization Management"
+        TitleFormat = "Группа Exchange: Organization Management"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Группа Organization Management"
@@ -800,7 +800,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeServersGroup' = @{
-        TitleFormat = "Exchange Group: Exchange Servers"
+        TitleFormat = "Группа Exchange: Exchange Servers"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Группа Exchange Servers"
@@ -818,7 +818,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'CertificateAuthority' = @{
-        TitleFormat = "Certificate Authority: {CAName}"
+        TitleFormat = "Центры сертификации AD CS: {CAName}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Центры сертификации AD CS"
@@ -835,7 +835,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'CertificateTemplate' = @{
-        TitleFormat = "Certificate Template: {Name}"
+        TitleFormat = "Шаблоны сертификатов AD CS: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Шаблоны сертификатов AD CS"
@@ -854,7 +854,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PKIContainer' = @{
-        TitleFormat = "PKI Container ACL: {Name}"
+        TitleFormat = "Разрешения контейнеров PKI: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Разрешения контейнеров PKI"
@@ -873,7 +873,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PKIInfrastructure' = @{
-        TitleFormat = "PKI Trust Infrastructure"
+        TitleFormat = "Инфраструктура доверия PKI"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Инфраструктура доверия PKI"
@@ -888,7 +888,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'RootCA' = @{
-        TitleFormat = "Root CA: {Name}"
+        TitleFormat = "Доверенные корневые центры сертификации: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Доверенные корневые центры сертификации"
@@ -904,7 +904,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'NTAuthCertificate' = @{
-        TitleFormat = "NTAuth Certificate: {Name}"
+        TitleFormat = "Хранилище NTAuth: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Хранилище NTAuth"
@@ -921,7 +921,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AIACA' = @{
-        TitleFormat = "AIA CA: {Name}"
+        TitleFormat = "Центры сертификации в AIA: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Центры сертификации в AIA"
@@ -939,7 +939,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'UnconstrainedDelegation' = @{
-        TitleFormat = "Unconstrained Delegation: {Name}"
+        TitleFormat = "Неограниченное делегирование Kerberos: {Name}"
         Module = "Delegation"
         Category = "Delegation"
         SectionTitle = "Неограниченное делегирование Kerberos"
@@ -958,7 +958,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ConstrainedDelegation' = @{
-        TitleFormat = "Constrained Delegation: {Name}"
+        TitleFormat = "Ограниченное делегирование Kerberos: {Name}"
         Module = "Delegation"
         Category = "Delegation"
         SectionTitle = "Ограниченное делегирование Kerberos"
@@ -975,7 +975,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'RBCDelegation' = @{
-        TitleFormat = "RBCD: {Name}"
+        TitleFormat = "Ограниченное делегирование на основе ресурса (RBCD): {Name}"
         Module = "Delegation"
         Category = "Delegation"
         SectionTitle = "Ограниченное делегирование на основе ресурса (RBCD)"
@@ -997,7 +997,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'PasswordNeverExpires' = @{
-        TitleFormat = "Password Never Expires: {Name}"
+        TitleFormat = "Пароли с неограниченным сроком действия: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Пароли с неограниченным сроком действия"
@@ -1013,7 +1013,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ReversibleEncryption' = @{
-        TitleFormat = "Reversible Encryption: {Name}"
+        TitleFormat = "Обратимое шифрование паролей: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Обратимое шифрование паролей"
@@ -1029,7 +1029,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ComputerObjectACL' = @{
-        TitleFormat = "Explicit Computer Permission: {Computer}"
+        TitleFormat = "Явно назначенные права на компьютеры: {Computer}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Явно назначенные права на компьютеры"
@@ -1045,7 +1045,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'CriticalObjectACL' = @{
-        TitleFormat = "Critical Object Control: {Trustee}"
+        TitleFormat = "Права на критически важные объекты каталога: {Trustee}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Права на критически важные объекты каталога"
@@ -1064,7 +1064,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'RODCPasswordReplication' = @{
-        TitleFormat = "RODC Password Replication: {Name}"
+        TitleFormat = "Политика репликации паролей RODC: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Политика репликации паролей RODC"
@@ -1080,7 +1080,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PasswordNotRequired' = @{
-        TitleFormat = "Password Not Required: {Name}"
+        TitleFormat = "Учётные записи без обязательного пароля: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Учётные записи без обязательного пароля"
@@ -1098,7 +1098,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'InactiveAdmin' = @{
-        TitleFormat = "Inactive Admin: {Name}"
+        TitleFormat = "Неактивные административные учётные записи: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Неактивные административные учётные записи"
@@ -1115,7 +1115,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'gMSA' = @{
-        TitleFormat = "gMSA: {Name}{Context}"
+        TitleFormat = "Групповые управляемые учётные записи служб (gMSA): {Name}{Context}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Групповые управляемые учётные записи служб (gMSA)"
@@ -1135,7 +1135,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'gMSAPassword' = @{
-        TitleFormat = "gMSA Password: {Name}"
+        TitleFormat = "Права чтения паролей gMSA: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Права чтения паролей gMSA"
@@ -1150,7 +1150,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'MSA' = @{
-        TitleFormat = "MSA: {Name}"
+        TitleFormat = "Автономные управляемые учётные записи служб: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Автономные управляемые учётные записи служб"
@@ -1165,7 +1165,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AuthNPolicySilo' = @{
-        TitleFormat = "Authentication Policy Silo: {Name}"
+        TitleFormat = "Хранилища политик проверки подлинности: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Хранилища политик проверки подлинности"
@@ -1184,7 +1184,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AuthNPolicy' = @{
-        TitleFormat = "Authentication Policy: {Name}"
+        TitleFormat = "Политики проверки подлинности: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Политики проверки подлинности"
@@ -1200,7 +1200,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'dMSA' = @{
-        TitleFormat = "dMSA: {Name}{Context}"
+        TitleFormat = "Делегированные управляемые учётные записи служб (dMSA): {Name}{Context}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Делегированные управляемые учётные записи служб (dMSA)"
@@ -1217,7 +1217,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'dMSALink' = @{
-        TitleFormat = "dMSA Link: {Name}"
+        TitleFormat = "Связи делегированных учётных записей dMSA: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Связи делегированных учётных записей dMSA"
@@ -1235,7 +1235,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'NonDefaultOwner' = @{
-        TitleFormat = "Non-Default Owner: {Name}"
+        TitleFormat = "Нестандартные владельцы учётных записей: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Нестандартные владельцы учётных записей"
@@ -1251,7 +1251,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'Tier0Account' = @{
-        TitleFormat = "Tier-0 Account: {Name}{Context}"
+        TitleFormat = "Защита учётных записей уровня 0 (Tier 0): {Name}{Context}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Защита учётных записей уровня 0 (Tier 0)"
@@ -1268,7 +1268,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PrivilegedGroupMember' = @{
-        TitleFormat = "Privileged Group Member: {Name}"
+        TitleFormat = "Участники привилегированных групп: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Участники привилегированных групп"
@@ -1286,7 +1286,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'OperatorGroup' = @{
-        TitleFormat = "Operator Group: {Name}"
+        TitleFormat = "Участники операторских групп: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Участники операторских групп"
@@ -1301,7 +1301,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SIDHistory' = @{
-        TitleFormat = "SID History: {Name}{Context}"
+        TitleFormat = "Возможное злоупотребление sIDHistory: {Name}{Context}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Возможное злоупотребление sIDHistory"
@@ -1322,7 +1322,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AdminSDHolderACL' = @{
-        TitleFormat = "AdminSDHolder ACL: {Name}"
+        TitleFormat = "Права на объект AdminSDHolder: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Права на объект AdminSDHolder"
@@ -1338,7 +1338,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PrivilegedGroupACL' = @{
-        TitleFormat = "Privileged Group ACL: {Name}"
+        TitleFormat = "ACL привилегированных групп вне AdminSDHolder: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "ACL привилегированных групп вне AdminSDHolder"
@@ -1357,7 +1357,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 
     # What step 5b of Get-PrivilegedGroupMembers read, ahead of who may change it.
     'UnprotectedPrivilegedGroups' = @{
-        TitleFormat = "Privileged Groups Outside AdminSDHolder"
+        TitleFormat = "Привилегированные группы без защиты AdminSDHolder"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Привилегированные группы без защиты AdminSDHolder"
@@ -1372,7 +1372,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PrivilegedAccountACL' = @{
-        TitleFormat = "Privileged Account ACL: {Name}"
+        TitleFormat = "Права управления привилегированными учётными записями: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Права управления привилегированными учётными записями"
@@ -1391,7 +1391,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 
     # What step 5c of Get-PrivilegedGroupMembers read, ahead of who may take it over.
     'PrivilegedAccountsRead' = @{
-        TitleFormat = "Privileged Accounts Read"
+        TitleFormat = "Доступ к объектам привилегированных учётных записей"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Доступ к объектам привилегированных учётных записей"
@@ -1406,7 +1406,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LogonScriptPermission' = @{
-        TitleFormat = "Logon Script: {Name}"
+        TitleFormat = "Сценарии входа учётных записей: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Сценарии входа учётных записей"
@@ -1423,7 +1423,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PreWindows2000Access' = @{
-        TitleFormat = "Pre-Windows 2000 Compatible Access: {Name}"
+        TitleFormat = "Группа Pre-Windows 2000 Compatible Access: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Группа Pre-Windows 2000 Compatible Access"
@@ -1442,7 +1442,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'Kerberoastable' = @{
-        TitleFormat = "Kerberoastable: {Name}"
+        TitleFormat = "Учётные записи, допускающие Kerberoasting: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Учётные записи, допускающие Kerberoasting"
@@ -1460,7 +1460,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ASREPRoastable' = @{
-        TitleFormat = "AS-REP Roastable: {Name}"
+        TitleFormat = "Учётные записи, допускающие AS-REP Roasting: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Учётные записи, допускающие AS-REP Roasting"
@@ -1476,7 +1476,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'UnixPassword' = @{
-        TitleFormat = "Unix Password: {Name}"
+        TitleFormat = "Парольные атрибуты UNIX: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Парольные атрибуты UNIX"
@@ -1493,7 +1493,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'CredentialRoaming' = @{
-        TitleFormat = "Roamed Credentials: {Name}"
+        TitleFormat = "Перемещаемые учётные данные: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Перемещаемые учётные данные"
@@ -1510,7 +1510,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'CredentialRoamingPermission' = @{
-        TitleFormat = "Roaming Read Delegated: {Name}"
+        TitleFormat = "Права чтения перемещаемых учётных данных: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Права чтения перемещаемых учётных данных"
@@ -1528,7 +1528,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPPCredential' = @{
-        TitleFormat = "GPP Credential: {Name}"
+        TitleFormat = "Учётные данные в предпочтениях групповой политики: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Учётные данные в предпочтениях групповой политики"
@@ -1545,7 +1545,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SYSVOLCredential' = @{
-        TitleFormat = "SYSVOL Credential: {Name}"
+        TitleFormat = "Учётные данные в сценариях SYSVOL: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Учётные данные в сценариях SYSVOL"
@@ -1561,7 +1561,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSCredential' = @{
-        TitleFormat = "LAPS Credential: {Name}"
+        TitleFormat = "Доступ к паролям LAPS: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Доступ к паролям LAPS"
@@ -1577,7 +1577,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'BitLockerRecoveryKey' = @{
-        TitleFormat = "BitLocker Recovery Key: {ComputerName}"
+        TitleFormat = "Доступ к ключам восстановления BitLocker: {ComputerName}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Доступ к ключам восстановления BitLocker"
@@ -1593,7 +1593,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'BitLockerRecoveryPermission' = @{
-        TitleFormat = "Recovery Read Delegated: {Name}"
+        TitleFormat = "Делегированное чтение ключей BitLocker: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Делегированное чтение ключей BitLocker"
@@ -1611,7 +1611,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PasswordInDescription' = @{
-        TitleFormat = "Password in Description: {Name}"
+        TitleFormat = "Пароли в текстовых атрибутах объектов: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Пароли в текстовых атрибутах объектов"
@@ -1630,7 +1630,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DeletedObject' = @{
-        TitleFormat = "Deleted Object: {Name}"
+        TitleFormat = "Доступные для чтения удалённые объекты: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Доступные для чтения удалённые объекты"
@@ -1648,7 +1648,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DeletedObjectsReader' = @{
-        TitleFormat = "May List Deleted Objects: {Trustee}"
+        TitleFormat = "Права просмотра удалённых объектов: {Trustee}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Права просмотра удалённых объектов"
@@ -1669,7 +1669,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'DangerousACL' = @{
-        TitleFormat = "Dangerous ACL: {Name}"
+        TitleFormat = "Опасные разрешения ACL: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Права доступа к корню домена"
@@ -1686,7 +1686,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DangerousOUPermission' = @{
-        TitleFormat = "Dangerous OU Permission: {Name}"
+        TitleFormat = "Опасные разрешения на OU: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Опасные разрешения на OU"
@@ -1703,7 +1703,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'WeakCertificateMapping' = @{
-        TitleFormat = "Explicit Certificate Mapping: {Name}"
+        TitleFormat = "Небезопасное сопоставление сертификатов: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Небезопасное сопоставление сертификатов"
@@ -1720,7 +1720,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PasswordResetRight' = @{
-        TitleFormat = "Password Reset Right: {Name}"
+        TitleFormat = "Права сброса паролей: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Права сброса паролей"
@@ -1737,7 +1737,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AddComputerRight' = @{
-        TitleFormat = "Add Computer Right: {Name}"
+        TitleFormat = "Права добавления компьютеров в домен: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Права добавления компьютеров в домен"
@@ -1752,7 +1752,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPOUserRights' = @{
-        TitleFormat = "GPO User Right: {UserRightName}"
+        TitleFormat = "Право пользователя в GPO: {UserRightName}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Назначение прав пользователя через GPO"
@@ -1776,7 +1776,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'MachineAccountQuota' = @{
-        TitleFormat = "Machine Account Quota Configuration"
+        TitleFormat = "Квота создания компьютерных учётных записей"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Квота создания компьютерных учётных записей"
@@ -1791,7 +1791,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AddComputerGPO' = @{
-        TitleFormat = "GPO: {Name}"
+        TitleFormat = "Параметры GPO для добавления компьютеров: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Параметры GPO для добавления компьютеров"
@@ -1804,7 +1804,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSPermission' = @{
-        TitleFormat = "LAPS Permission: {Name}"
+        TitleFormat = "Разрешения на чтение LAPS: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Разрешения на чтение LAPS"
@@ -1825,7 +1825,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'ComputerPasswordAge' = @{
-        TitleFormat = "Machine Password Not Rotated: {Name}"
+        TitleFormat = "Возраст паролей компьютерных учётных записей: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Возраст паролей компьютерных учётных записей"
@@ -1841,7 +1841,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'OutdatedComputer' = @{
-        TitleFormat = "Outdated Computer: {Name}"
+        TitleFormat = "Устаревшие версии Windows на компьютерах: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Устаревшие версии Windows на компьютерах"
@@ -1859,7 +1859,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'NonDefaultComputerOwner' = @{
-        TitleFormat = "Non-Default Computer Owner: {Name}"
+        TitleFormat = "Нестандартные владельцы объектов компьютеров: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Нестандартные владельцы объектов компьютеров"
@@ -1877,7 +1877,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSConfiguration' = @{
-        TitleFormat = "LAPS Configuration: {Name}"
+        TitleFormat = "Конфигурация LAPS: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Конфигурация LAPS"
@@ -1896,7 +1896,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSCoverage' = @{
-        TitleFormat = "LAPS Deployment Coverage"
+        TitleFormat = "Охват компьютеров защитой LAPS"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Охват компьютеров защитой LAPS"
@@ -1916,7 +1916,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'GPOPermission' = @{
-        TitleFormat = "GPO Permission: {Name}"
+        TitleFormat = "Разрешение на GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Разрешения на объекты GPO"
@@ -1935,7 +1935,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPOLocalGroup' = @{
-        TitleFormat = "GPO Local Group: {Name}"
+        TitleFormat = "Назначение участников локальных групп через GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Назначение участников локальных групп через GPO"
@@ -1972,7 +1972,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPOScheduledTask' = @{
-        TitleFormat = "GPO Scheduled Task: {Name}"
+        TitleFormat = "Запланированные задания в GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Запланированные задания в GPO"
@@ -1990,7 +1990,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPOScriptPath' = @{
-        TitleFormat = "GPO Script: {Name}"
+        TitleFormat = "Пути сценариев в GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Пути сценариев в GPO"
@@ -2008,7 +2008,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPORegistrySetting' = @{
-        TitleFormat = "GPO Registry Setting: {Name}"
+        TitleFormat = "Параметры реестра в GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Параметры реестра в GPO"
@@ -2028,7 +2028,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPORegistryValue' = @{
-        TitleFormat = "GPO Registry Values: {Name}"
+        TitleFormat = "Значения реестра в GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Значения реестра в GPO"
@@ -2042,7 +2042,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PointAndPrintPolicy' = @{
-        TitleFormat = "Point and Print GPO: {Name}"
+        TitleFormat = "Политики установки драйверов Point and Print: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Политики установки драйверов Point and Print"
@@ -2060,7 +2060,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSStalePassword' = @{
-        TitleFormat = "LAPS Password Not Rotating: {Name}"
+        TitleFormat = "Пароли LAPS, переставшие обновляться: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Пароли LAPS, переставшие обновляться"
@@ -2076,7 +2076,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSGPOConfig' = @{
-        TitleFormat = "LAPS GPO: {Name}"
+        TitleFormat = "Параметры LAPS в групповых политиках: {Name}"
         Module = "Computer"
         Category = "Computer"
         SectionTitle = "Параметры LAPS в групповых политиках"
@@ -2098,7 +2098,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'BloodHoundCollector' = @{
-        TitleFormat = "BloodHound Collection: {Name}"
+        TitleFormat = "Сбор данных BloodHound: {Name}"
         Module = "Bloodhound"
         Category = "BloodHound"
         SectionTitle = "Сбор данных BloodHound"
@@ -2119,7 +2119,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'LDAPStatisticsModule' = @{
-        TitleFormat = "Module: {Name}"
+        TitleFormat = "Статистика LDAP по модулям: {Name}"
         Module = "Statistics"
         Category = "Statistics"
         SectionTitle = "Статистика LDAP по модулям"
@@ -2133,7 +2133,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LDAPStatisticsTotal' = @{
-        TitleFormat = "Total"
+        TitleFormat = "Общая статистика LDAP"
         Module = "Statistics"
         Category = "Statistics"
         SectionTitle = "Общая статистика LDAP"

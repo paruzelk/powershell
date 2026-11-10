@@ -198,7 +198,7 @@ function Get-DomainTrusts {
             }
 
             if (@($trusts).Count -gt 0) {
-                Show-Line "Found $(@($trusts).Count) domain trust(s):" -Class Hint
+                Show-Line "Обнаружено доверительных отношений домена: $(@($trusts).Count)" -Class Hint
 
                 # The interdomain trust accounts. A trust with direction Inbound or
                 # Bidirectional has a user account <flatName>$ in the users container of

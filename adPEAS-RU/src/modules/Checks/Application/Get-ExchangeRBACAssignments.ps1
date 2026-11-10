@@ -390,7 +390,7 @@
 
             $unexpected = @($results | Where-Object { $_.ConsoleClass -eq 'Finding' })
             if (@($unexpected).Count -gt 0) {
-                Show-Line "Found $(@($unexpected).Count) high-value Exchange role assignment(s) beyond the roles Exchange ships assigned" -Class Finding
+                Show-Line "Неожиданные назначения критически важных ролей Exchange сверх стандартной конфигурации: $(@($unexpected).Count)" -Class Finding
             } else {
                 Show-Line "The high-value Exchange roles are assigned only to the role groups Exchange ships them on" -Class Hint
             }

@@ -175,7 +175,7 @@
             }
 
             if (@($vulnerableAccounts).Count -gt 0) {
-                Show-Line "Found $(@($vulnerableAccounts).Count) privileged account(s) with password never expires (password > $PasswordAgeDays days old):" -Class Finding
+                Show-Line "Обнаружены привилегированные учётные записи с неограниченным сроком действия пароля (пароль старше $PasswordAgeDays дней): $(@($vulnerableAccounts).Count)" -Class Finding
 
                 foreach ($user in $vulnerableAccounts) {
                     $user | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'PasswordNeverExpires' -Force

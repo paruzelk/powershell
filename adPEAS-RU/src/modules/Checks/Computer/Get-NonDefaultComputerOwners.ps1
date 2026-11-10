@@ -402,7 +402,7 @@ function Get-NonDefaultComputerOwners {
                 $reassignedInfo = if ($reassigned -gt 0) { ", $reassigned of them owned by somebody other than the creator" } else { "" }
                 # Hint, as NON_DEFAULT_COMPUTER_OWNERS and the Owner row say: the row was
                 # aligned to its card, and this line and the objects stayed red.
-                Show-Line "Found $(@($nonDefaultOwnerComputers).Count) computer(s) with non-default owners$($reassignedInfo):" -Class "Hint"
+                Show-Line "Компьютерные объекты с нестандартными владельцами: $(@($nonDefaultOwnerComputers).Count)$($reassignedInfo)" -Class "Hint"
 
                 # Counted on a line of its own rather than subtracted from the number
                 # above it: these objects really do have a non-default owner, and a
@@ -438,7 +438,7 @@ function Get-NonDefaultComputerOwners {
             # that could not be read is counted above.
             $explicitFindings = @(Get-ComputerExplicitRight -Computers $computersWithOwner)
             if ($explicitFindings.Count -gt 0) {
-                Show-Line "Found $($explicitFindings.Count) explicit permission(s) on computer objects held outside Tier-0:" -Class "Finding"
+                Show-Line "Обнаружено явных разрешений на компьютерные объекты, предоставленных субъектам вне Tier 0: $($explicitFindings.Count)" -Class "Finding"
                 foreach ($explicitFinding in $explicitFindings) {
                     $explicitFinding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'ComputerObjectACL' -Force
                     Show-Object $explicitFinding -Class Finding

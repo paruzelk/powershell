@@ -490,7 +490,7 @@
             }
 
             if (@($exchangeServers).Count -gt 0) {
-                Show-Line "Exchange Organization: $organizationName - Found $(@($exchangeServers).Count) Exchange Server(s)" -Class Hint
+                Show-Line "Организация Exchange: $organizationName. Обнаружено серверов Exchange: $(@($exchangeServers).Count)" -Class Hint
 
                 foreach ($exServer in $exchangeServers) {
                     # Get the raw object to add Exchange-specific attributes
@@ -682,7 +682,7 @@
                     }
                 }
             } else {
-                Show-Line "Exchange Organization: $organizationName - No active Exchange Servers found" -Class Note
+                Show-Line "Организация Exchange: $organizationName. Активные серверы Exchange не обнаружены" -Class Note
             }
 
             # ===== Step 3: Hybrid deployment with Exchange Online =====
@@ -1073,7 +1073,7 @@
                 $unreadConnectors = @($connectorResults | Where-Object { $_.RelayStatus -like 'Unknown*' })
 
                 if (@($riskyConnectors).Count -gt 0) {
-                    Show-Line "Found $(@($riskyConnectors).Count) of $(@($connectorResults).Count) receive connector(s) granting SMTP rights to unauthenticated senders" -Class Finding
+                    Show-Line "Обнаружено SMTP-соединителей с правами для неаутентифицированных отправителей: $(@($riskyConnectors).Count) из $(@($connectorResults).Count)" -Class Finding
                 }
                 elseif (@($unreadConnectors).Count -gt 0) {
                     # A connector whose descriptor did not come back was not assessed. The

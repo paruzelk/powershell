@@ -228,7 +228,7 @@
                     # Count how many have broad group access (critical)
                     $broadGroupCount = @($nonPrivilegedAccessFindings | Where-Object { $_.HasBroadGroupAccess }).Count
                     $broadGroupInfo = if ($broadGroupCount -gt 0) { " ($broadGroupCount with broad group access - CRITICAL)" } else { "" }
-                    Show-Line "Found $(@($nonPrivilegedAccessFindings).Count) gMSA(s) with non-privileged password access$broadGroupInfo`:" -Class Finding
+                    Show-Line "Обнаружены gMSA с чтением паролей непривилегированными субъектами: $(@($nonPrivilegedAccessFindings).Count)$broadGroupInfo`:" -Class Finding
 
                     foreach ($finding in $nonPrivilegedAccessFindings) {
                         # Output the gMSA object itself (Show-Object will display relevant attributes)
@@ -272,7 +272,7 @@
 
                 # What was not analyzed, named rather than left out of the report
                 if (@($undelegatedGMSAs).Count -gt 0) {
-                    Show-Line "No password access is delegated on $(@($undelegatedGMSAs).Count) gMSA(s), or msDS-GroupMSAMembership was not readable: $(@($undelegatedGMSAs) -join ', ')" -Class Note
+                    Show-Line "Для $(@($undelegatedGMSAs).Count) gMSA не делегирован доступ к паролю либо атрибут msDS-GroupMSAMembership недоступен для чтения: $(@($undelegatedGMSAs) -join ', ')" -Class Note
                 }
                 if (@($unparsedGMSAs).Count -gt 0) {
                     Show-Line "msDS-GroupMSAMembership could not be parsed on $(@($unparsedGMSAs).Count) gMSA(s) - their password access is unknown: $(@($unparsedGMSAs) -join ', ')" -Class Note
@@ -529,7 +529,7 @@
                 # Hint, because STANDALONE_MSA_LEGACY says Risk = Hint and BaseScore 20.
                 # A red line against its own card is one statement too many, and a legacy
                 # account type is not a vulnerability.
-                Show-Line "Found $($standaloneMSAs.Count) standalone MSA(s) (legacy, tied to one host):" -Class Hint
+                Show-Line "Обнаружено отдельных MSA (устаревший тип, привязан к одному узлу): $($standaloneMSAs.Count)" -Class Hint
 
                 foreach ($msa in $standaloneMSAs) {
                     $msa | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'MSA' -Force
@@ -642,7 +642,7 @@
                 # Both sides name each other, so the KDC honours the pairing - and the account
                 # is not in the state a migration leaves it in.
                 if (@($irregularLinks).Count -gt 0) {
-                    Show-Line "Found $(@($irregularLinks).Count) account(s) linked to a dMSA outside a regular migration:" -Class Finding
+                    Show-Line "Обнаружено учётных записей с нетипичной связью dMSA вне штатной миграции: $(@($irregularLinks).Count)" -Class Finding
                     foreach ($reported in $irregularLinks) { Show-Object $reported -Class Finding }
                 }
 
@@ -656,7 +656,7 @@
                 }
 
                 if (@($privilegedPredecessors).Count -gt 0) {
-                    Show-Line "Found $(@($privilegedPredecessors).Count) privileged account(s) replaced by a dMSA:" -Class Hint
+                    Show-Line "Обнаружено привилегированных учётных записей, заменённых dMSA: $(@($privilegedPredecessors).Count)" -Class Hint
                     foreach ($reported in $privilegedPredecessors) { Show-Object $reported -Class Hint }
                 }
 

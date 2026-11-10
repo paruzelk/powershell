@@ -315,7 +315,7 @@
 
             # Output results
             if (@($privilegedFindings).Count -gt 0) {
-                Show-Line "Found $(@($privilegedFindings).Count) account(s) with a privileged SID in sIDHistory that no source domain explains:" -Class Finding
+                Show-Line "Учётные записи с привилегированным SID в sIDHistory без подтверждённого исходного домена: $(@($privilegedFindings).Count)" -Class Finding
 
                 foreach ($finding in $privilegedFindings) {
                     $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SIDHistory' -Force
@@ -330,7 +330,7 @@
             # -IncludeNonPrivileged was given: this is not a migration artifact, and the
             # account the SID points at can hold access that no group membership shows.
             if (@($ownDomainFindings).Count -gt 0) {
-                Show-Line "Found $(@($ownDomainFindings).Count) account(s) whose sIDHistory holds a SID of this domain (not a migration artifact):" -Class Finding
+                Show-Line "Учётные записи с SID текущего домена в sIDHistory (не обычный артефакт миграции): $(@($ownDomainFindings).Count)" -Class Finding
 
                 foreach ($finding in $ownDomainFindings) {
                     $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SIDHistory' -Force
@@ -342,7 +342,7 @@
             # A privileged SID of another domain: the documented result of a migration,
             # and worth a look rather than an accusation.
             if (@($foreignPrivilegedFindings).Count -gt 0) {
-                Show-Line "Found $(@($foreignPrivilegedFindings).Count) account(s) whose sIDHistory holds a privileged SID of another domain (check SID filtering on the trust):" -Class Hint
+                Show-Line "Учётные записи с привилегированным SID другого домена в sIDHistory (проверьте фильтрацию SID при доверии): $(@($foreignPrivilegedFindings).Count)" -Class Hint
 
                 foreach ($finding in $foreignPrivilegedFindings) {
                     $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SIDHistory' -Force
@@ -362,7 +362,7 @@
             # Non-privileged findings (migration artifacts) - only if requested
             if ($IncludeNonPrivileged -and @($nonPrivilegedFindings).Count -gt 0) {
                 Show-SubHeader "Следы миграции: непривилегированные SID в sIDHistory..." -ObjectType "SIDHistory"
-                Show-Line "Found $(@($nonPrivilegedFindings).Count) account(s) with non-privileged SIDs in sIDHistory (migration artifacts):" -Class Hint
+                Show-Line "Учётные записи с непривилегированными SID в sIDHistory (возможные следы миграции): $(@($nonPrivilegedFindings).Count)" -Class Hint
 
                 foreach ($finding in $nonPrivilegedFindings) {
                     $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SIDHistory' -Force

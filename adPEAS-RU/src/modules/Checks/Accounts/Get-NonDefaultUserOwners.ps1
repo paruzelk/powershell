@@ -201,7 +201,7 @@
                 # Hint, as NON_DEFAULT_USER_OWNERS and the Owner row say: the row was
                 # aligned to its card, and this line and the object stayed red - a red
                 # heading over a yellow row, in front of a card rated a hint.
-                Show-Line "Found $(@($nonDefaultOwnerUsers).Count) user(s) with non-default owners:" -Class Hint
+                Show-Line "Пользовательские объекты с нестандартным владельцем: $(@($nonDefaultOwnerUsers).Count)" -Class Hint
 
                 foreach ($user in $nonDefaultOwnerUsers) {
                     $user | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'NonDefaultOwner' -Force

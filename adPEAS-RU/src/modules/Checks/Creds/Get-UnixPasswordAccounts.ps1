@@ -130,7 +130,7 @@
             }
 
             if (@($readable).Count -gt 0) {
-                Show-Line "Found $(@($readable).Count) account(s) with readable password attributes:" -Class "Finding"
+                Show-Line "Учётные записи с доступными для чтения парольными атрибутами: $(@($readable).Count)" -Class "Finding"
 
                 foreach ($entry in $readable) {
                     Show-Object $entry.Object -Class $entry.Class

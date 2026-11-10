@@ -445,7 +445,7 @@
                     -Dormant $split.Dormant -Listed:$IncludeInactive
 
                 if (@($shown).Count -gt 0) {
-                    Show-Line "Found SMB Signing configuration in $(@($shown).Count) GPO(s):" -Class Hint
+                    Show-Line "Настройки подписи SMB найдены в групповых политиках: $(@($shown).Count)" -Class Hint
                 } else {
                     # Every policy that configures signing is dormant, which leaves every
                     # machine on the OS default - the same exposure as configuring nothing.

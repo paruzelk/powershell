@@ -92,7 +92,7 @@
             $kerberoastableUsers = @(Get-DomainUser -SPN -Enabled -LDAPFilter $krbtgtExclusion -ShowOwner @connectionParams)
 
             if (@($kerberoastableUsers).Count -gt 0) {
-                Show-Line "Found $(@($kerberoastableUsers).Count) kerberoastable user account(s):" -Class "Finding"
+                Show-Line "Учётные записи, допускающие Kerberoasting: $(@($kerberoastableUsers).Count)" -Class "Finding"
 
                 # Determine testing mode based on OPSEC flag
                 $canTestKerberoasting = -not $OPSEC

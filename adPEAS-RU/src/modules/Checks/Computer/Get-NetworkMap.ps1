@@ -533,7 +533,7 @@ function Get-NetworkMap {
             if ($subnets.Count -eq 0) {
                 Show-Line "Не удалось сопоставить активные компьютеры с IPv4-подсетями" -Class Note
             } else {
-                Show-Line "Found $($subnets.Count) /24 subnet(s) with $($mapped.Count) computer(s) active in the last $ActiveDays days:" -Class Note
+                Show-Line "Обнаружено подсетей /24: $($subnets.Count); компьютеров с активностью за $ActiveDays дней: $($mapped.Count)" -Class Note
             }
 
             foreach ($entry in @($subnets.Values | Sort-Object -Property Network)) {

@@ -185,7 +185,7 @@
             $inactiveInfo = if ($inactiveFilteredCount -gt 0) { " ($inactiveFilteredCount inactive accounts filtered)" } else { "" }
 
             if (@($outdatedComputerDNs).Count -gt 0) {
-                Show-Line "Found $(@($outdatedComputerDNs).Count) computer(s) with an outdated Microsoft operating system:$inactiveInfo" -Class "Finding"
+                Show-Line "Компьютеры с устаревшей версией Microsoft Windows: $(@($outdatedComputerDNs).Count)$inactiveInfo" -Class "Finding"
             }
 
             if (@($esuOnlyComputerDNs).Count -gt 0) {

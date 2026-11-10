@@ -3,8 +3,8 @@
     adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
 
 .DESCRIPTION
-    Build: 2026-11-10 13:00:18
-    Version: 2.9.0+20261110-1300
+    Build: 2026-11-10 13:30:48
+    Version: 2.9.0+20261110-1330
 
     AUTHORIZED SECURITY TESTING ONLY!
 
@@ -3331,85 +3331,85 @@ $Script:UserRightsBaseline = [ordered]@{
     # =========================================================================
 
     'SeDebugPrivilege' = @{
-        Name = 'Debug programs'
+        Name = 'Отладка программ'
         Tier = 'Finding'
-        Why  = 'Opens any process, including LSASS. A holder reads credentials out of memory on every machine in scope.'
+        Why  = 'Позволяет открывать процессы, включая LSASS, и получать доступ к данным в памяти в пределах назначенной области.'
         # Administrators only, on a member and on a domain controller alike.
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeTcbPrivilege' = @{
-        Name = 'Act as part of the operating system'
+        Name = 'Работа в режиме операционной системы'
         Tier = 'Finding'
-        Why  = 'The holder can create a token for any identity. It is the operating system trust boundary itself.'
+        Why  = 'Даёт возможности, связанные с доверенной частью ОС и созданием маркеров доступа. Назначайте только в исключительных случаях.'
         # Nobody by default. Windows grants this to no principal out of the box.
         Member = @()
         DC     = @()
     }
 
     'SeCreateTokenPrivilege' = @{
-        Name = 'Create a token object'
+        Name = 'Создание объекта токена'
         Tier = 'Finding'
-        Why  = 'Forges an access token directly, with any group membership the holder chooses.'
+        Why  = 'Позволяет создавать маркеры доступа. Ошибочное назначение создаёт высокий риск повышения привилегий.'
         Member = @()
         DC     = @()
     }
 
     'SeImpersonatePrivilege' = @{
-        Name = 'Impersonate a client after authentication'
+        Name = 'Имитация клиента после проверки подлинности'
         Tier = 'Finding'
-        Why  = 'The precondition of the Potato family of local privilege escalations.'
+        Why  = 'Позволяет процессу действовать от имени проверенного клиента. При определённых условиях используется для локального повышения привилегий.'
         # Administrators and the three service identities.
         Member = @('S-1-5-32-544', 'S-1-5-6', 'S-1-5-19', 'S-1-5-20')
         DC     = @('S-1-5-32-544', 'S-1-5-6', 'S-1-5-19', 'S-1-5-20')
     }
 
     'SeAssignPrimaryTokenPrivilege' = @{
-        Name = 'Replace a process level token'
+        Name = 'Замена токена уровня процесса'
         Tier = 'Finding'
-        Why  = 'Starts a process under another identity, which is the second half of a token abuse chain.'
+        Why  = 'Позволяет процессу назначать основной маркер доступа. В сочетании с другими разрешениями может применяться для повышения привилегий.'
         Member = @('S-1-5-19', 'S-1-5-20')
         DC     = @('S-1-5-19', 'S-1-5-20')
     }
 
     'SeLoadDriverPrivilege' = @{
-        Name = 'Load and unload device drivers'
+        Name = 'Загрузка и выгрузка драйверов устройств'
         Tier = 'Finding'
-        Why  = 'Code in the kernel. A signed vulnerable driver turns this into complete control of the machine.'
+        Why  = 'Позволяет загружать драйверы ядра; эксплуатация уязвимого подписанного драйвера может привести к компрометации системы.'
         Member = @('S-1-5-32-544')
         # Print Operators hold it on a domain controller, for printer drivers.
         DC     = @('S-1-5-32-544', 'S-1-5-32-550')
     }
 
     'SeBackupPrivilege' = @{
-        Name = 'Back up files and directories'
+        Name = 'Архивирование файлов и каталогов'
         Tier = 'Finding'
-        Why  = 'Reads every file regardless of its ACL - on a domain controller, that includes the NTDS database.'
+        Why  = 'Разрешает читать файлы в режиме резервного копирования в обход отдельных файловых ACL; на контроллере домена может затронуть базу NTDS.'
         Member = @('S-1-5-32-544', 'S-1-5-32-551')
         DC     = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-549')
     }
 
     'SeRestorePrivilege' = @{
-        Name = 'Restore files and directories'
+        Name = 'Восстановление файлов и каталогов'
         Tier = 'Finding'
-        Why  = 'Writes every file regardless of its ACL, and can set owner. The write half of SeBackupPrivilege.'
+        Why  = 'Разрешает восстановление и запись файлов в обход части файловых ACL, включая операции над владельцем.'
         Member = @('S-1-5-32-544', 'S-1-5-32-551')
         DC     = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-549')
     }
 
     'SeTakeOwnershipPrivilege' = @{
-        Name = 'Take ownership of files or other objects'
+        Name = 'Смена владельцев файлов и других объектов'
         Tier = 'Finding'
-        Why  = 'Ownership carries WriteDacl, so the holder grants itself whatever access it wants afterwards.'
+        Why  = 'Позволяет принять владение объектом и впоследствии изменить его разрешения, если применимы соответствующие права.'
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeEnableDelegationPrivilege' = @{
-        Name = 'Enable computer and user accounts to be trusted for delegation'
+        Name = 'Разрешение доверия учётных записей для делегирования'
         Tier = 'Finding'
-        Why  = 'Configures Kerberos delegation, which is impersonation of any user against the delegated service.'
+        Why  = 'Позволяет изменять параметры доверия к учётным записям для делегирования Kerberos. Ошибочная выдача расширяет риск подмены контекста пользователей.'
         # Administrators in both scopes, which takes the Default values table over the body
         # text where the two disagree. The table gives "Member Server Effective" and "Client
         # Computer Effective" as Administrators; the body says there is "no reason to assign
@@ -3427,45 +3427,45 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeSyncAgentPrivilege' = @{
-        Name = 'Synchronize directory service data'
+        Name = 'Синхронизация данных службы каталогов'
         Tier = 'Finding'
-        Why  = 'Reads every object and attribute in the directory, password hashes included.'
+        Why  = 'Это право связано с получением данных службы каталогов и требует ограничения доверенными системными субъектами.'
         Member = @()
         DC     = @()
     }
 
     'SeManageVolumePrivilege' = @{
-        Name = 'Perform volume maintenance tasks'
+        Name = 'Обслуживание томов'
         Tier = 'Finding'
-        Why  = 'Raw volume access bypasses the file system and its ACLs entirely.'
+        Why  = 'Даёт доступ к операциям обслуживания тома, которые могут обходить обычные ограничения файловой системы.'
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeSecurityPrivilege' = @{
-        Name = 'Manage auditing and security log'
+        Name = 'Управление аудитом и журналом безопасности'
         # Hint, not Finding. Every other right in the Finding tier hands the holder
         # SYSTEM, the contents of NTDS.dit, kernel code or ownership of any object.
         # This one is anti-forensics: it destroys the record of an intrusion rather
         # than enabling one, so it does not belong beside them.
         Tier = 'Hint'
-        Why  = 'Clears the security log, which is how an intrusion stops being reconstructable.'
+        Why  = 'Позволяет управлять политикой аудита и журналом безопасности. Избыточные права могут затруднить расследование событий.'
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeRelabelPrivilege' = @{
-        Name = 'Modify an object label'
+        Name = 'Изменение метки объекта'
         Tier = 'Finding'
-        Why  = 'Changes the integrity level of an object, defeating the protection a low-integrity sandbox provides.'
+        Why  = 'Позволяет изменять метки целостности объектов и тем самым влиять на ограничения механизма контроля целостности Windows.'
         Member = @()
         DC     = @()
     }
 
     'SeTrustedCredManAccessPrivilege' = @{
-        Name = 'Access Credential Manager as a trusted caller'
+        Name = 'Доступ к диспетчеру учётных данных в качестве доверенного вызывающего'
         Tier = 'Finding'
-        Why  = 'Reads the saved credentials of every user of the machine in cleartext.'
+        Why  = 'Даёт расширенный доступ к сохранённым учётным данным пользователей на компьютере.'
         Member = @()
         DC     = @()
     }
@@ -3475,18 +3475,18 @@ $Script:UserRightsBaseline = [ordered]@{
     # =========================================================================
 
     'SeRemoteInteractiveLogonRight' = @{
-        Name = 'Allow log on through Remote Desktop Services'
+        Name = 'Вход через службы удалённых рабочих столов'
         Tier = 'Hint'
-        Why  = 'An interactive session on the machine, and with it whatever the account can reach from there.'
+        Why  = 'Разрешает интерактивный вход по RDP; оцените полномочия субъектов на соответствующих компьютерах.'
         Member = @('S-1-5-32-544', 'S-1-5-32-555')
         # A domain controller does not carry Remote Desktop Users in its default policy.
         DC     = @('S-1-5-32-544')
     }
 
     'SeInteractiveLogonRight' = @{
-        Name = 'Allow log on locally'
+        Name = 'Локальный вход в систему'
         Tier = 'Hint'
-        Why  = 'A console session. On a domain controller it is the difference between a member and an admin of the domain.'
+        Why  = 'Разрешает интерактивный вход за консолью. Особенно критично для контроллеров домена и серверов Tier 0.'
         # Administrators, Backup Operators, Users - the three Microsoft documents for
         # workstations and servers. Guests (S-1-5-32-546) used to sit here and does not
         # belong: the same page names Guests as a candidate for "Deny log on locally", so
@@ -3506,17 +3506,17 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeBatchLogonRight' = @{
-        Name = 'Log on as a batch job'
+        Name = 'Вход в качестве пакетного задания'
         Tier = 'Hint'
-        Why  = 'Runs a scheduled task as the account, which is code execution without an interactive session.'
+        Why  = 'Разрешает запуск пакетных заданий и задач планировщика от имени данной учётной записи.'
         Member = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-559')
         DC     = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-559')
     }
 
     'SeServiceLogonRight' = @{
-        Name = 'Log on as a service'
+        Name = 'Вход в качестве службы'
         Tier = 'Hint'
-        Why  = 'Runs a service as the account. A service starts without anyone logging on.'
+        Why  = 'Разрешает запуск служб Windows от имени данной учётной записи.'
         # Deliberately no baseline. What holds this varies with every product installed on
         # the machine - SQL, Exchange and IIS each add their own service accounts - so any
         # list here would be wrong on most domains in one direction or the other. The
@@ -3526,25 +3526,25 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeSystemtimePrivilege' = @{
-        Name = 'Change the system time'
+        Name = 'Изменение системного времени'
         Tier = 'Hint'
-        Why  = 'Kerberos rejects a ticket outside its clock skew, so the clock is an authentication dependency.'
+        Why  = 'Позволяет изменять время системы, что может нарушить работу Kerberos и журналирование событий.'
         Member = @('S-1-5-32-544', 'S-1-5-19')
         DC     = @('S-1-5-32-544', 'S-1-5-19', 'S-1-5-32-549')
     }
 
     'SeRemoteShutdownPrivilege' = @{
-        Name = 'Force shutdown from a remote system'
+        Name = 'Принудительное завершение работы из удалённой системы'
         Tier = 'Hint'
-        Why  = 'Denial of service against the machine, remotely and without touching it.'
+        Why  = 'Разрешает удалённое завершение работы компьютера и может использоваться для отказа в обслуживании.'
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544', 'S-1-5-32-549')
     }
 
     'SeShutdownPrivilege' = @{
-        Name = 'Shut down the system'
+        Name = 'Завершение работы системы'
         Tier = 'Hint'
-        Why  = 'Denial of service, and on a domain controller a way to force authentication elsewhere.'
+        Why  = 'Позволяет выключать компьютер; на критических серверах влияет на доступность инфраструктуры.'
         # Users (S-1-5-32-545) is a CLIENT default, not a member-server one: Microsoft gives
         # "Member Server Effective" as Administrators and Backup Operators, and only "Client
         # Computer Effective" adds Users. adPEAS has one non-DC bucket for both, so it has to
@@ -3573,9 +3573,9 @@ $Script:UserRightsBaseline = [ordered]@{
     # Microsoft page (Domain Controller and Member Server Effective Default Settings).
 
     'SeCreateSymbolicLinkPrivilege' = @{
-        Name = 'Create symbolic links'
+        Name = 'Создание символических ссылок'
         Tier = 'Hint'
-        Why  = 'A symbolic link redirects a file operation of a more privileged process to a path the holder chooses - Microsoft names permission changes, corrupted or destroyed data and denial of service.'
+        Why  = 'Разрешает создавать символические ссылки, которые могут влиять на файловые операции других процессов.'
         # Administrators. The Hyper-V role adds NT VIRTUAL MACHINE\Virtual Machines on a host
         # where it is installed; that is the role, not the Windows default.
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-symbolic-links
@@ -3584,9 +3584,9 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeDelegateSessionUserImpersonatePrivilege' = @{
-        Name = 'Obtain an impersonation token for another user in the same session'
+        Name = 'Получение токена другого пользователя в том же сеансе'
         Tier = 'Hint'
-        Why  = 'Obtains an impersonation token for another user logged on in the same session, and acts as that user.'
+        Why  = 'Даёт возможность получать маркер имитации другого пользователя того же сеанса при соблюдении условий Windows.'
         # Microsoft documents what the privilege does (Privilege Constants, winnt.h) and
         # publishes no default holder set for it, so the comparison falls back to the
         # identity filter and says so, rather than guessing a default.
@@ -3595,9 +3595,9 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeAuditPrivilege' = @{
-        Name = 'Generate security audits'
+        Name = 'Формирование аудита безопасности'
         Tier = 'Hint'
-        Why  = 'Writes arbitrary entries into the Security log - enough to roll real events out where the log overwrites, or to stop the machine where it halts on a full log.'
+        Why  = 'Позволяет формировать записи аудита безопасности. При злоупотреблении может затруднить анализ подлинных событий.'
         # LOCAL SERVICE and NETWORK SERVICE, on a member and on a domain controller alike.
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/generate-security-audits
         Member = @('S-1-5-19', 'S-1-5-20')
@@ -3610,18 +3610,18 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeSystemEnvironmentPrivilege' = @{
-        Name = 'Modify firmware environment values'
+        Name = 'Изменение параметров среды микропрограммы'
         Tier = 'Hint'
-        Why  = 'Writes the firmware environment - on UEFI the NVRAM variables that hold the boot settings - which can make the hardware fail or the machine boot something else.'
+        Why  = 'Позволяет изменять настройки среды UEFI/микропрограммы, в том числе влияющие на загрузку системы.'
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/modify-firmware-environment-values
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeCreateGlobalPrivilege' = @{
-        Name = 'Create global objects'
+        Name = 'Создание глобальных объектов'
         Tier = 'Hint'
-        Why  = 'Creates file mapping and symbolic link objects in the global namespace from any session, where a privileged service expects to find its own - Microsoft calls assigning it a security risk.'
+        Why  = 'Разрешает создавать глобальные объекты ядра Windows; назначение должно быть ограничено доверенными службами.'
         # Administrators, LOCAL SERVICE, NETWORK SERVICE and SERVICE.
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-global-objects
         Member = @('S-1-5-32-544', 'S-1-5-19', 'S-1-5-20', 'S-1-5-6')
@@ -3629,18 +3629,18 @@ $Script:UserRightsBaseline = [ordered]@{
     }
 
     'SeProfileSingleProcessPrivilege' = @{
-        Name = 'Profile single process'
+        Name = 'Профилирование отдельного процесса'
         Tier = 'Hint'
-        Why  = 'Samples any process: which run, security software among them, and who else is logged on.'
+        Why  = 'Позволяет собирать статистику работы процессов, потенциально раскрывая сведения о запущенных службах.'
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/profile-single-process
         Member = @('S-1-5-32-544')
         DC     = @('S-1-5-32-544')
     }
 
     'SeSystemProfilePrivilege' = @{
-        Name = 'Profile system performance'
+        Name = 'Профилирование производительности системы'
         Tier = 'Hint'
-        Why  = 'Profiles the whole system: which processes are active, security software among them.'
+        Why  = 'Позволяет профилировать систему в целом и получать дополнительные сведения о работе процессов.'
         # Administrators and NT SERVICE\WdiServiceHost, as the page's own text says - its
         # table lists Administrators alone. The service SID is derived from the service name
         # (SHA-1 of the upper-cased name) and is the same on every machine; checked against
@@ -29289,7 +29289,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'DomainBasicInfo' = @{
-        TitleFormat = "Domain Information"
+        TitleFormat = "Сведения о домене"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Сведения о домене"
@@ -29305,7 +29305,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'KerberosPolicy' = @{
-        TitleFormat = "Kerberos Policy"
+        TitleFormat = "Политика Kerberos"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Политика Kerberos"
@@ -29322,7 +29322,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GuestAccount' = @{
-        TitleFormat = "Guest Account Status"
+        TitleFormat = "Состояние учётной записи «Гость»"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Состояние учётной записи «Гость»"
@@ -29336,7 +29336,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DomainControllers' = @{
-        TitleFormat = "Domain Controllers"
+        TitleFormat = "Контроллеры домена и роли FSMO"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Контроллеры домена и роли FSMO"
@@ -29349,7 +29349,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SitesAndSubnets' = @{
-        TitleFormat = "Sites and Subnets: {Name}"
+        TitleFormat = "Сайты и подсети Active Directory: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Сайты и подсети Active Directory"
@@ -29363,7 +29363,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DomainPasswordPolicy' = @{
-        TitleFormat = "Password Policy"
+        TitleFormat = "Доменная политика паролей"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Доменная политика паролей"
@@ -29379,7 +29379,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'FineGrainedPasswordPolicy' = @{
-        TitleFormat = "Fine-Grained Password Policy: {Name}"
+        TitleFormat = "Тонкие политики паролей (FGPP): {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Тонкие политики паролей (FGPP)"
@@ -29397,7 +29397,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DomainTrust' = @{
-        TitleFormat = "Domain Trust: {Name}"
+        TitleFormat = "Доверительные отношения домена: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Доверительные отношения домена"
@@ -29416,7 +29416,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ReadableShare' = @{
-        TitleFormat = "Readable Shares: {Name}"
+        TitleFormat = "Доступные для чтения общие ресурсы: {Name}"
         Module = "Shares"
         Category = "Shares"
         SectionTitle = "Доступные для чтения общие ресурсы"
@@ -29439,7 +29439,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ShareCredential' = @{
-        TitleFormat = "Credential on a Share: {Context}"
+        TitleFormat = "Учётные данные в общих папках: {Context}"
         Module = "Shares"
         Category = "Shares"
         SectionTitle = "Учётные данные в общих папках"
@@ -29455,7 +29455,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'NetworkSubnet' = @{
-        TitleFormat = "Network Subnet: {Name}"
+        TitleFormat = "Карта сети: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Карта сети"
@@ -29474,7 +29474,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'OpenPorts' = @{
-        TitleFormat = "Open Ports: {Name}"
+        TitleFormat = "Открытые сетевые порты: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Открытые сетевые порты"
@@ -29491,7 +29491,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LDAPConfigGPO' = @{
-        TitleFormat = "LDAP Configuration GPO: {Name}"
+        TitleFormat = "Настройки подписи LDAP в GPO: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Настройки подписи LDAP в GPO"
@@ -29509,7 +29509,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # The two null session settings, read in the same SYSVOL scan as LDAP signing and
     # reported in a section of their own: they are SMB and RPC controls, not LDAP.
     'NullSessionGPO' = @{
-        TitleFormat = "Null Session GPO: {Name}"
+        TitleFormat = "Параметры анонимного доступа в GPO: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Параметры анонимного доступа в GPO"
@@ -29527,7 +29527,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # dsHeuristics, read by Get-LDAPConfiguration in a section of its own ahead of the GPO
     # rows: one forest-wide string, and no GPO governs any of its characters.
     'DSHeuristics' = @{
-        TitleFormat = "Directory Service Heuristics"
+        TitleFormat = "Параметры dsHeuristics"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Параметры dsHeuristics"
@@ -29544,7 +29544,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SMBSigning' = @{
-        TitleFormat = "SMB Signing GPO: {Name}"
+        TitleFormat = "Настройки подписи SMB: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Настройки подписи SMB"
@@ -29563,7 +29563,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # What is in force on the domain controllers, value by value, decided per setting by
     # GPO precedence - shown under the GPO rows of the two signing checks above.
     'EffectiveLDAPConfig' = @{
-        TitleFormat = "In force on the domain controllers"
+        TitleFormat = "Действующие настройки LDAP"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Действующие настройки LDAP"
@@ -29579,7 +29579,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'EffectiveNullSession' = @{
-        TitleFormat = "In force on the domain controllers"
+        TitleFormat = "Действующие параметры анонимного доступа"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Действующие параметры анонимного доступа"
@@ -29596,7 +29596,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'EffectiveSMBSigning' = @{
-        TitleFormat = "In force on the domain controllers"
+        TitleFormat = "Действующие настройки подписи SMB"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Действующие настройки подписи SMB"
@@ -29614,7 +29614,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # The member computers' side, shown when every policy that sets SMB signing is linked
     # to the Domain Controllers OU only - so no policy reaches a member server or client.
     'EffectiveSMBSigningMembers' = @{
-        TitleFormat = "In force on member servers and clients"
+        TitleFormat = "Подпись SMB: затронутые компьютеры"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Подпись SMB: затронутые компьютеры"
@@ -29631,7 +29631,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # A linked and enabled policy that weakens SMB signing, shown below the postures with
     # the OUs it reaches.
     'SMBSigningWeakened' = @{
-        TitleFormat = "SMB Signing Weakened: {Name}"
+        TitleFormat = "Ослабление защиты SMB: {Name}"
         Module = "Domain"
         Category = "Domain"
         SectionTitle = "Ослабление защиты SMB"
@@ -29651,7 +29651,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'DomainController' = @{
-        TitleFormat = "Domain Controller: {Name}"
+        TitleFormat = "Контроллеры домена: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Контроллеры домена"
@@ -29667,7 +29667,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeServer' = @{
-        TitleFormat = "Exchange Server: {Name}{Context}"
+        TitleFormat = "Серверы Exchange: {Name}{Context}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы Exchange"
@@ -29683,7 +29683,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeServerBasic' = @{
-        TitleFormat = "Exchange Server: {Name}"
+        TitleFormat = "Серверы Exchange: основные сведения: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы Exchange: основные сведения"
@@ -29697,7 +29697,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeOrganization' = @{
-        TitleFormat = "Exchange Organization: {Name}"
+        TitleFormat = "Организация Exchange: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Организация Exchange"
@@ -29712,7 +29712,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeConfigServer' = @{
-        TitleFormat = "Exchange Server: {Name}"
+        TitleFormat = "Сервер Exchange в разделе Configuration: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Сервер Exchange в разделе Configuration"
@@ -29726,7 +29726,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeHybridConfiguration' = @{
-        TitleFormat = "Exchange Hybrid: {Name}"
+        TitleFormat = "Гибридное развёртывание Exchange: {Name}"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Гибридное развёртывание Exchange"
@@ -29743,7 +29743,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeReceiveConnector' = @{
-        TitleFormat = "Receive Connector: {Name}"
+        TitleFormat = "Принимающие SMTP-соединители Exchange: {Name}"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Принимающие SMTP-соединители Exchange"
@@ -29758,7 +29758,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangePermissionsModel' = @{
-        TitleFormat = "Exchange Permissions Model: {Name}"
+        TitleFormat = "Модель разрешений Exchange: {Name}"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Модель разрешений Exchange"
@@ -29773,7 +29773,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeRoleAssignment' = @{
-        TitleFormat = "Exchange Role Assignment: {Name}"
+        TitleFormat = "Назначения ролей управления Exchange: {Name}"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Назначения ролей управления Exchange"
@@ -29788,7 +29788,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'MSSQLServer' = @{
-        TitleFormat = "MSSQL Server: {Name}"
+        TitleFormat = "Серверы Microsoft SQL Server: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы Microsoft SQL Server"
@@ -29802,7 +29802,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMServer' = @{
-        TitleFormat = "SCCM Server: {Name}"
+        TitleFormat = "Инфраструктура Configuration Manager (SCCM): {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Инфраструктура Configuration Manager (SCCM)"
@@ -29817,7 +29817,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMServerBasic' = @{
-        TitleFormat = "SCCM Server: {Name}"
+        TitleFormat = "Серверы SCCM: основные сведения: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы SCCM: основные сведения"
@@ -29829,7 +29829,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMServiceAccount' = @{
-        TitleFormat = "SCCM Service Account: {Name}"
+        TitleFormat = "Служебные учётные записи SCCM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Служебные учётные записи SCCM"
@@ -29842,7 +29842,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMGroup' = @{
-        TitleFormat = "SCCM Group: {Name}"
+        TitleFormat = "Группы SCCM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Группы SCCM"
@@ -29857,7 +29857,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMContainerPermission' = @{
-        TitleFormat = "System Management Container Write Access: {Name}"
+        TitleFormat = "Разрешения контейнера System Management: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Разрешения контейнера System Management"
@@ -29873,7 +29873,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMSite' = @{
-        TitleFormat = "SCCM Site: {Name}"
+        TitleFormat = "Сайты SCCM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Сайты SCCM"
@@ -29887,7 +29887,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMManagementPoint' = @{
-        TitleFormat = "SCCM Management Point: {Name}"
+        TitleFormat = "Точки управления SCCM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Точки управления SCCM"
@@ -29901,7 +29901,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCCMPXEServer' = @{
-        TitleFormat = "PXE/WDS Server: {Name}"
+        TitleFormat = "Серверы загрузки PXE/WDS: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы загрузки PXE/WDS"
@@ -29914,7 +29914,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCOMServer' = @{
-        TitleFormat = "SCOM Server: {Name}"
+        TitleFormat = "Инфраструктура Operations Manager (SCOM): {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Инфраструктура Operations Manager (SCOM)"
@@ -29929,7 +29929,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCOMServerBasic' = @{
-        TitleFormat = "SCOM Server: {Name}"
+        TitleFormat = "Серверы SCOM: основные сведения: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Серверы SCOM: основные сведения"
@@ -29941,7 +29941,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCOMServiceAccount' = @{
-        TitleFormat = "SCOM Service Account: {Name}"
+        TitleFormat = "Служебные учётные записи SCOM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Служебные учётные записи SCOM"
@@ -29953,7 +29953,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SCOMGroup' = @{
-        TitleFormat = "SCOM Group: {Name}"
+        TitleFormat = "Группы SCOM: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Группы SCOM"
@@ -29965,7 +29965,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ADFSServer' = @{
-        TitleFormat = "AD FS: {Name}"
+        TitleFormat = "Службы федерации AD FS: {Name}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Службы федерации AD FS"
@@ -29980,7 +29980,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'EntraConnect' = @{
-        TitleFormat = "Entra ID Connect: {Name}{Context}"
+        TitleFormat = "Microsoft Entra Connect: {Name}{Context}"
         Module = "Application"
         Category = "Infrastructure"
         SectionTitle = "Microsoft Entra Connect"
@@ -29999,7 +29999,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'ExchangeTrustedSubsystem' = @{
-        TitleFormat = "Exchange Group: Exchange Trusted Subsystem"
+        TitleFormat = "Группа Exchange: Exchange Trusted Subsystem"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Группа Exchange Trusted Subsystem"
@@ -30014,7 +30014,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeWindowsPermissions' = @{
-        TitleFormat = "Exchange Group: Exchange Windows Permissions"
+        TitleFormat = "Группа Exchange: Exchange Windows Permissions"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Группа Exchange Windows Permissions"
@@ -30029,7 +30029,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeOrganizationManagement' = @{
-        TitleFormat = "Exchange Group: Organization Management"
+        TitleFormat = "Группа Exchange: Organization Management"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Группа Organization Management"
@@ -30044,7 +30044,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ExchangeServersGroup' = @{
-        TitleFormat = "Exchange Group: Exchange Servers"
+        TitleFormat = "Группа Exchange: Exchange Servers"
         Module = "Application"
         Category = "Exchange"
         SectionTitle = "Группа Exchange Servers"
@@ -30062,7 +30062,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'CertificateAuthority' = @{
-        TitleFormat = "Certificate Authority: {CAName}"
+        TitleFormat = "Центры сертификации AD CS: {CAName}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Центры сертификации AD CS"
@@ -30079,7 +30079,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'CertificateTemplate' = @{
-        TitleFormat = "Certificate Template: {Name}"
+        TitleFormat = "Шаблоны сертификатов AD CS: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Шаблоны сертификатов AD CS"
@@ -30098,7 +30098,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PKIContainer' = @{
-        TitleFormat = "PKI Container ACL: {Name}"
+        TitleFormat = "Разрешения контейнеров PKI: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Разрешения контейнеров PKI"
@@ -30117,7 +30117,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PKIInfrastructure' = @{
-        TitleFormat = "PKI Trust Infrastructure"
+        TitleFormat = "Инфраструктура доверия PKI"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Инфраструктура доверия PKI"
@@ -30132,7 +30132,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'RootCA' = @{
-        TitleFormat = "Root CA: {Name}"
+        TitleFormat = "Доверенные корневые центры сертификации: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Доверенные корневые центры сертификации"
@@ -30148,7 +30148,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'NTAuthCertificate' = @{
-        TitleFormat = "NTAuth Certificate: {Name}"
+        TitleFormat = "Хранилище NTAuth: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Хранилище NTAuth"
@@ -30165,7 +30165,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AIACA' = @{
-        TitleFormat = "AIA CA: {Name}"
+        TitleFormat = "Центры сертификации в AIA: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Центры сертификации в AIA"
@@ -30183,7 +30183,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'UnconstrainedDelegation' = @{
-        TitleFormat = "Unconstrained Delegation: {Name}"
+        TitleFormat = "Неограниченное делегирование Kerberos: {Name}"
         Module = "Delegation"
         Category = "Delegation"
         SectionTitle = "Неограниченное делегирование Kerberos"
@@ -30202,7 +30202,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ConstrainedDelegation' = @{
-        TitleFormat = "Constrained Delegation: {Name}"
+        TitleFormat = "Ограниченное делегирование Kerberos: {Name}"
         Module = "Delegation"
         Category = "Delegation"
         SectionTitle = "Ограниченное делегирование Kerberos"
@@ -30219,7 +30219,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'RBCDelegation' = @{
-        TitleFormat = "RBCD: {Name}"
+        TitleFormat = "Ограниченное делегирование на основе ресурса (RBCD): {Name}"
         Module = "Delegation"
         Category = "Delegation"
         SectionTitle = "Ограниченное делегирование на основе ресурса (RBCD)"
@@ -30241,7 +30241,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'PasswordNeverExpires' = @{
-        TitleFormat = "Password Never Expires: {Name}"
+        TitleFormat = "Пароли с неограниченным сроком действия: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Пароли с неограниченным сроком действия"
@@ -30257,7 +30257,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ReversibleEncryption' = @{
-        TitleFormat = "Reversible Encryption: {Name}"
+        TitleFormat = "Обратимое шифрование паролей: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Обратимое шифрование паролей"
@@ -30273,7 +30273,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ComputerObjectACL' = @{
-        TitleFormat = "Explicit Computer Permission: {Computer}"
+        TitleFormat = "Явно назначенные права на компьютеры: {Computer}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Явно назначенные права на компьютеры"
@@ -30289,7 +30289,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'CriticalObjectACL' = @{
-        TitleFormat = "Critical Object Control: {Trustee}"
+        TitleFormat = "Права на критически важные объекты каталога: {Trustee}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Права на критически важные объекты каталога"
@@ -30308,7 +30308,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'RODCPasswordReplication' = @{
-        TitleFormat = "RODC Password Replication: {Name}"
+        TitleFormat = "Политика репликации паролей RODC: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Политика репликации паролей RODC"
@@ -30324,7 +30324,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PasswordNotRequired' = @{
-        TitleFormat = "Password Not Required: {Name}"
+        TitleFormat = "Учётные записи без обязательного пароля: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Учётные записи без обязательного пароля"
@@ -30342,7 +30342,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'InactiveAdmin' = @{
-        TitleFormat = "Inactive Admin: {Name}"
+        TitleFormat = "Неактивные административные учётные записи: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Неактивные административные учётные записи"
@@ -30359,7 +30359,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'gMSA' = @{
-        TitleFormat = "gMSA: {Name}{Context}"
+        TitleFormat = "Групповые управляемые учётные записи служб (gMSA): {Name}{Context}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Групповые управляемые учётные записи служб (gMSA)"
@@ -30379,7 +30379,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'gMSAPassword' = @{
-        TitleFormat = "gMSA Password: {Name}"
+        TitleFormat = "Права чтения паролей gMSA: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Права чтения паролей gMSA"
@@ -30394,7 +30394,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'MSA' = @{
-        TitleFormat = "MSA: {Name}"
+        TitleFormat = "Автономные управляемые учётные записи служб: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Автономные управляемые учётные записи служб"
@@ -30409,7 +30409,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AuthNPolicySilo' = @{
-        TitleFormat = "Authentication Policy Silo: {Name}"
+        TitleFormat = "Хранилища политик проверки подлинности: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Хранилища политик проверки подлинности"
@@ -30428,7 +30428,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AuthNPolicy' = @{
-        TitleFormat = "Authentication Policy: {Name}"
+        TitleFormat = "Политики проверки подлинности: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Политики проверки подлинности"
@@ -30444,7 +30444,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'dMSA' = @{
-        TitleFormat = "dMSA: {Name}{Context}"
+        TitleFormat = "Делегированные управляемые учётные записи служб (dMSA): {Name}{Context}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Делегированные управляемые учётные записи служб (dMSA)"
@@ -30461,7 +30461,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'dMSALink' = @{
-        TitleFormat = "dMSA Link: {Name}"
+        TitleFormat = "Связи делегированных учётных записей dMSA: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Связи делегированных учётных записей dMSA"
@@ -30479,7 +30479,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'NonDefaultOwner' = @{
-        TitleFormat = "Non-Default Owner: {Name}"
+        TitleFormat = "Нестандартные владельцы учётных записей: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Нестандартные владельцы учётных записей"
@@ -30495,7 +30495,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'Tier0Account' = @{
-        TitleFormat = "Tier-0 Account: {Name}{Context}"
+        TitleFormat = "Защита учётных записей уровня 0 (Tier 0): {Name}{Context}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Защита учётных записей уровня 0 (Tier 0)"
@@ -30512,7 +30512,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PrivilegedGroupMember' = @{
-        TitleFormat = "Privileged Group Member: {Name}"
+        TitleFormat = "Участники привилегированных групп: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Участники привилегированных групп"
@@ -30530,7 +30530,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'OperatorGroup' = @{
-        TitleFormat = "Operator Group: {Name}"
+        TitleFormat = "Участники операторских групп: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Участники операторских групп"
@@ -30545,7 +30545,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SIDHistory' = @{
-        TitleFormat = "SID History: {Name}{Context}"
+        TitleFormat = "Возможное злоупотребление sIDHistory: {Name}{Context}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Возможное злоупотребление sIDHistory"
@@ -30566,7 +30566,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AdminSDHolderACL' = @{
-        TitleFormat = "AdminSDHolder ACL: {Name}"
+        TitleFormat = "Права на объект AdminSDHolder: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Права на объект AdminSDHolder"
@@ -30582,7 +30582,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PrivilegedGroupACL' = @{
-        TitleFormat = "Privileged Group ACL: {Name}"
+        TitleFormat = "ACL привилегированных групп вне AdminSDHolder: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "ACL привилегированных групп вне AdminSDHolder"
@@ -30601,7 +30601,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 
     # What step 5b of Get-PrivilegedGroupMembers read, ahead of who may change it.
     'UnprotectedPrivilegedGroups' = @{
-        TitleFormat = "Privileged Groups Outside AdminSDHolder"
+        TitleFormat = "Привилегированные группы без защиты AdminSDHolder"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Привилегированные группы без защиты AdminSDHolder"
@@ -30616,7 +30616,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PrivilegedAccountACL' = @{
-        TitleFormat = "Privileged Account ACL: {Name}"
+        TitleFormat = "Права управления привилегированными учётными записями: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Права управления привилегированными учётными записями"
@@ -30635,7 +30635,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 
     # What step 5c of Get-PrivilegedGroupMembers read, ahead of who may take it over.
     'PrivilegedAccountsRead' = @{
-        TitleFormat = "Privileged Accounts Read"
+        TitleFormat = "Доступ к объектам привилегированных учётных записей"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Доступ к объектам привилегированных учётных записей"
@@ -30650,7 +30650,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LogonScriptPermission' = @{
-        TitleFormat = "Logon Script: {Name}"
+        TitleFormat = "Сценарии входа учётных записей: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Сценарии входа учётных записей"
@@ -30667,7 +30667,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PreWindows2000Access' = @{
-        TitleFormat = "Pre-Windows 2000 Compatible Access: {Name}"
+        TitleFormat = "Группа Pre-Windows 2000 Compatible Access: {Name}"
         Module = "Accounts"
         Category = "Accounts"
         SectionTitle = "Группа Pre-Windows 2000 Compatible Access"
@@ -30686,7 +30686,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'Kerberoastable' = @{
-        TitleFormat = "Kerberoastable: {Name}"
+        TitleFormat = "Учётные записи, допускающие Kerberoasting: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Учётные записи, допускающие Kerberoasting"
@@ -30704,7 +30704,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'ASREPRoastable' = @{
-        TitleFormat = "AS-REP Roastable: {Name}"
+        TitleFormat = "Учётные записи, допускающие AS-REP Roasting: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Учётные записи, допускающие AS-REP Roasting"
@@ -30720,7 +30720,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'UnixPassword' = @{
-        TitleFormat = "Unix Password: {Name}"
+        TitleFormat = "Парольные атрибуты UNIX: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Парольные атрибуты UNIX"
@@ -30737,7 +30737,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'CredentialRoaming' = @{
-        TitleFormat = "Roamed Credentials: {Name}"
+        TitleFormat = "Перемещаемые учётные данные: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Перемещаемые учётные данные"
@@ -30754,7 +30754,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'CredentialRoamingPermission' = @{
-        TitleFormat = "Roaming Read Delegated: {Name}"
+        TitleFormat = "Права чтения перемещаемых учётных данных: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Права чтения перемещаемых учётных данных"
@@ -30772,7 +30772,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPPCredential' = @{
-        TitleFormat = "GPP Credential: {Name}"
+        TitleFormat = "Учётные данные в предпочтениях групповой политики: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Учётные данные в предпочтениях групповой политики"
@@ -30789,7 +30789,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'SYSVOLCredential' = @{
-        TitleFormat = "SYSVOL Credential: {Name}"
+        TitleFormat = "Учётные данные в сценариях SYSVOL: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Учётные данные в сценариях SYSVOL"
@@ -30805,7 +30805,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSCredential' = @{
-        TitleFormat = "LAPS Credential: {Name}"
+        TitleFormat = "Доступ к паролям LAPS: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Доступ к паролям LAPS"
@@ -30821,7 +30821,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'BitLockerRecoveryKey' = @{
-        TitleFormat = "BitLocker Recovery Key: {ComputerName}"
+        TitleFormat = "Доступ к ключам восстановления BitLocker: {ComputerName}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Доступ к ключам восстановления BitLocker"
@@ -30837,7 +30837,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'BitLockerRecoveryPermission' = @{
-        TitleFormat = "Recovery Read Delegated: {Name}"
+        TitleFormat = "Делегированное чтение ключей BitLocker: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Делегированное чтение ключей BitLocker"
@@ -30855,7 +30855,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PasswordInDescription' = @{
-        TitleFormat = "Password in Description: {Name}"
+        TitleFormat = "Пароли в текстовых атрибутах объектов: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Пароли в текстовых атрибутах объектов"
@@ -30874,7 +30874,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DeletedObject' = @{
-        TitleFormat = "Deleted Object: {Name}"
+        TitleFormat = "Доступные для чтения удалённые объекты: {Name}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Доступные для чтения удалённые объекты"
@@ -30892,7 +30892,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DeletedObjectsReader' = @{
-        TitleFormat = "May List Deleted Objects: {Trustee}"
+        TitleFormat = "Права просмотра удалённых объектов: {Trustee}"
         Module = "Creds"
         Category = "Credentials"
         SectionTitle = "Права просмотра удалённых объектов"
@@ -30913,7 +30913,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'DangerousACL' = @{
-        TitleFormat = "Dangerous ACL: {Name}"
+        TitleFormat = "Опасные разрешения ACL: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Права доступа к корню домена"
@@ -30930,7 +30930,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'DangerousOUPermission' = @{
-        TitleFormat = "Dangerous OU Permission: {Name}"
+        TitleFormat = "Опасные разрешения на OU: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Опасные разрешения на OU"
@@ -30947,7 +30947,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'WeakCertificateMapping' = @{
-        TitleFormat = "Explicit Certificate Mapping: {Name}"
+        TitleFormat = "Небезопасное сопоставление сертификатов: {Name}"
         Module = "ADCS"
         Category = "ADCS"
         SectionTitle = "Небезопасное сопоставление сертификатов"
@@ -30964,7 +30964,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PasswordResetRight' = @{
-        TitleFormat = "Password Reset Right: {Name}"
+        TitleFormat = "Права сброса паролей: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Права сброса паролей"
@@ -30981,7 +30981,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AddComputerRight' = @{
-        TitleFormat = "Add Computer Right: {Name}"
+        TitleFormat = "Права добавления компьютеров в домен: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Права добавления компьютеров в домен"
@@ -30996,7 +30996,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPOUserRights' = @{
-        TitleFormat = "GPO User Right: {UserRightName}"
+        TitleFormat = "Право пользователя в GPO: {UserRightName}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Назначение прав пользователя через GPO"
@@ -31020,7 +31020,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'MachineAccountQuota' = @{
-        TitleFormat = "Machine Account Quota Configuration"
+        TitleFormat = "Квота создания компьютерных учётных записей"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Квота создания компьютерных учётных записей"
@@ -31035,7 +31035,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'AddComputerGPO' = @{
-        TitleFormat = "GPO: {Name}"
+        TitleFormat = "Параметры GPO для добавления компьютеров: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Параметры GPO для добавления компьютеров"
@@ -31048,7 +31048,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSPermission' = @{
-        TitleFormat = "LAPS Permission: {Name}"
+        TitleFormat = "Разрешения на чтение LAPS: {Name}"
         Module = "Rights"
         Category = "Rights"
         SectionTitle = "Разрешения на чтение LAPS"
@@ -31069,7 +31069,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'ComputerPasswordAge' = @{
-        TitleFormat = "Machine Password Not Rotated: {Name}"
+        TitleFormat = "Возраст паролей компьютерных учётных записей: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Возраст паролей компьютерных учётных записей"
@@ -31085,7 +31085,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'OutdatedComputer' = @{
-        TitleFormat = "Outdated Computer: {Name}"
+        TitleFormat = "Устаревшие версии Windows на компьютерах: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Устаревшие версии Windows на компьютерах"
@@ -31103,7 +31103,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'NonDefaultComputerOwner' = @{
-        TitleFormat = "Non-Default Computer Owner: {Name}"
+        TitleFormat = "Нестандартные владельцы объектов компьютеров: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Нестандартные владельцы объектов компьютеров"
@@ -31121,7 +31121,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSConfiguration' = @{
-        TitleFormat = "LAPS Configuration: {Name}"
+        TitleFormat = "Конфигурация LAPS: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Конфигурация LAPS"
@@ -31140,7 +31140,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSCoverage' = @{
-        TitleFormat = "LAPS Deployment Coverage"
+        TitleFormat = "Охват компьютеров защитой LAPS"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Охват компьютеров защитой LAPS"
@@ -31160,7 +31160,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'GPOPermission' = @{
-        TitleFormat = "GPO Permission: {Name}"
+        TitleFormat = "Разрешение на GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Разрешения на объекты GPO"
@@ -31179,7 +31179,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPOLocalGroup' = @{
-        TitleFormat = "GPO Local Group: {Name}"
+        TitleFormat = "Назначение участников локальных групп через GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Назначение участников локальных групп через GPO"
@@ -31216,7 +31216,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPOScheduledTask' = @{
-        TitleFormat = "GPO Scheduled Task: {Name}"
+        TitleFormat = "Запланированные задания в GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Запланированные задания в GPO"
@@ -31234,7 +31234,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPOScriptPath' = @{
-        TitleFormat = "GPO Script: {Name}"
+        TitleFormat = "Пути сценариев в GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Пути сценариев в GPO"
@@ -31252,7 +31252,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPORegistrySetting' = @{
-        TitleFormat = "GPO Registry Setting: {Name}"
+        TitleFormat = "Параметры реестра в GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Параметры реестра в GPO"
@@ -31272,7 +31272,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'GPORegistryValue' = @{
-        TitleFormat = "GPO Registry Values: {Name}"
+        TitleFormat = "Значения реестра в GPO: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Значения реестра в GPO"
@@ -31286,7 +31286,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'PointAndPrintPolicy' = @{
-        TitleFormat = "Point and Print GPO: {Name}"
+        TitleFormat = "Политики установки драйверов Point and Print: {Name}"
         Module = "GPO"
         Category = "GPO"
         SectionTitle = "Политики установки драйверов Point and Print"
@@ -31304,7 +31304,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSStalePassword' = @{
-        TitleFormat = "LAPS Password Not Rotating: {Name}"
+        TitleFormat = "Пароли LAPS, переставшие обновляться: {Name}"
         Module = "Computer"
         Category = "Computers"
         SectionTitle = "Пароли LAPS, переставшие обновляться"
@@ -31320,7 +31320,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LAPSGPOConfig' = @{
-        TitleFormat = "LAPS GPO: {Name}"
+        TitleFormat = "Параметры LAPS в групповых политиках: {Name}"
         Module = "Computer"
         Category = "Computer"
         SectionTitle = "Параметры LAPS в групповых политиках"
@@ -31342,7 +31342,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'BloodHoundCollector' = @{
-        TitleFormat = "BloodHound Collection: {Name}"
+        TitleFormat = "Сбор данных BloodHound: {Name}"
         Module = "Bloodhound"
         Category = "BloodHound"
         SectionTitle = "Сбор данных BloodHound"
@@ -31363,7 +31363,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     # ============================================================================
 
     'LDAPStatisticsModule' = @{
-        TitleFormat = "Module: {Name}"
+        TitleFormat = "Статистика LDAP по модулям: {Name}"
         Module = "Statistics"
         Category = "Statistics"
         SectionTitle = "Статистика LDAP по модулям"
@@ -31377,7 +31377,7 @@ $Script:ObjectTypeDefinitions = [ordered]@{
     }
 
     'LDAPStatisticsTotal' = @{
-        TitleFormat = "Total"
+        TitleFormat = "Общая статистика LDAP"
         Module = "Statistics"
         Category = "Statistics"
         SectionTitle = "Общая статистика LDAP"
@@ -110654,7 +110654,7 @@ function Get-DomainInformation {
                 $dcObj = [PSCustomObject]@{
                     domainControllers = $dcDisplayList -join "`n"
                 }
-                Show-Line "Found $(@($DomainControllers).Count) domain controller(s):" -Class Note
+                Show-Line "Обнаружено контроллеров домена: $(@($DomainControllers).Count)" -Class Note
                 $dcObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DomainControllers' -Force
                 Show-Object $dcObj -Class Note
             } else {
@@ -110668,7 +110668,7 @@ function Get-DomainInformation {
             Show-SubHeader "Поиск сайтов и подсетей Active Directory..." -ObjectType "SitesAndSubnets"
 
             if (@($Sites).Count -gt 0) {
-                Show-Line "Found $(@($Sites).Count) site(s) and $(@($Subnets).Count) subnet(s):" -Class Note
+                Show-Line "Обнаружено сайтов AD: $(@($Sites).Count), подсетей: $(@($Subnets).Count)" -Class Note
 
                 foreach ($siteInfo in $Sites) {
                     # Build site object with subnets and DCs
@@ -111976,7 +111976,7 @@ function Get-DomainTrusts {
             }
 
             if (@($trusts).Count -gt 0) {
-                Show-Line "Found $(@($trusts).Count) domain trust(s):" -Class Hint
+                Show-Line "Обнаружено доверительных отношений домена: $(@($trusts).Count)" -Class Hint
 
                 # The interdomain trust accounts. A trust with direction Inbound or
                 # Bidirectional has a user account <flatName>$ in the users container of
@@ -112364,7 +112364,7 @@ function Show-DCPolicySettingSection {
         -Dormant $split.Dormant -Listed:$IncludeInactive
 
     if (@($shown).Count -gt 0) {
-        Show-Line "Found $FoundText in $(@($shown).Count) GPO(s):" -Class Hint
+        Show-Line "Обнаружены настройки $FoundText в групповых политиках: $(@($shown).Count)" -Class Hint
     } else {
         # Every policy that sets it is dormant, which leaves the DCs on whatever the OS
         # defaults to - the same as setting nothing.
@@ -113477,7 +113477,7 @@ function Get-SMBSigningStatus {
                     -Dormant $split.Dormant -Listed:$IncludeInactive
 
                 if (@($shown).Count -gt 0) {
-                    Show-Line "Found SMB Signing configuration in $(@($shown).Count) GPO(s):" -Class Hint
+                    Show-Line "Настройки подписи SMB найдены в групповых политиках: $(@($shown).Count)" -Class Hint
                 } else {
                     # Every policy that configures signing is dormant, which leaves every
                     # machine on the OS default - the same exposure as configuring nothing.
@@ -115311,7 +115311,7 @@ function Get-PrivilegedGroupMembers {
                     if (@($PreWin2000Rows).Count -gt 0) {
                         $headerClass = 'Hint'
                         if (@($PreWin2000Rows | Where-Object { $_.Class -eq 'Finding' }).Count -gt 0) { $headerClass = 'Finding' }
-                        Show-Line "Found $(@($PreWin2000Rows).Count) broad member(s) in Pre-Windows 2000 Compatible Access:" -Class $headerClass
+                        Show-Line "Обнаружены широко доступные субъекты в группе Pre-Windows 2000 Compatible Access: $(@($PreWin2000Rows).Count)" -Class $headerClass
                         foreach ($row in $PreWin2000Rows) {
                             Show-Object $row.Finding -Class $row.Class
                         }
@@ -115744,7 +115744,7 @@ function Show-UnprotectedGroupACL {
         foreach ($row in $operatorRows) { Show-Object $row -Class Hint }
     }
     if ($hintRows.Count -gt 0) {
-        Show-Line "Found $($hintRows.Count) expected or privileged holder(s) of the same rights" -Class Hint
+        Show-Line "Ожидаемые либо привилегированные субъекты с такими же разрешениями: $($hintRows.Count)" -Class Hint
         foreach ($row in $hintRows) { Show-Object $row -Class Hint }
     }
 
@@ -116147,15 +116147,15 @@ function Show-PrivilegedAccountACL {
     }
 
     if ($accountFindingRows.Count -gt 0) {
-        Show-Line "Found $($accountFindingRows.Count) principal(s) that can take over a privileged account" -Class Finding -FindingId 'PRIVILEGED_ACCOUNT_ACL'
+        Show-Line "Субъекты, способные получить контроль над привилегированной учётной записью: $($accountFindingRows.Count)" -Class Finding -FindingId 'PRIVILEGED_ACCOUNT_ACL'
         foreach ($row in $accountFindingRows) { Show-Object $row -Class Finding }
     }
     if ($accountOperatorRows.Count -gt 0) {
-        Show-Line "Found $($accountOperatorRows.Count) principal(s) that can take over a member of an operator-level group" -Class Hint -FindingId 'PRIVILEGED_ACCOUNT_ACL'
+        Show-Line "Субъекты, способные получить контроль над участником операторской группы: $($accountOperatorRows.Count)" -Class Hint -FindingId 'PRIVILEGED_ACCOUNT_ACL'
         foreach ($row in $accountOperatorRows) { Show-Object $row -Class Hint }
     }
     if ($accountHintRows.Count -gt 0) {
-        Show-Line "Found $($accountHintRows.Count) expected or privileged holder(s) of the same rights" -Class Hint
+        Show-Line "Ожидаемые либо привилегированные субъекты с такими же разрешениями: $($accountHintRows.Count)" -Class Hint
         foreach ($row in $accountHintRows) { Show-Object $row -Class Hint }
     }
 
@@ -117095,14 +117095,14 @@ function Get-AuthenticationPolicySilos {
 
             # ----- Output -----
             if ($silos.Count -gt 0) {
-                Show-Line "Found $($silos.Count) authentication policy silo(s):" -Class (Get-AuthNHeadlineClass -Class $siloClasses)
+                Show-Line "Обнаружено хранилищ политик проверки подлинности: $($silos.Count)" -Class (Get-AuthNHeadlineClass -Class $siloClasses)
                 for ($i = 0; $i -lt $silos.Count; $i++) { Show-Object $silos[$i] -Class $siloClasses[$i] }
             } else {
                 Show-Line "Хранилища политик проверки подлинности не настроены"
             }
 
             if ($policies.Count -gt 0) {
-                Show-Line "Found $($policies.Count) authentication policy(ies):" -Class (Get-AuthNHeadlineClass -Class $policyClasses)
+                Show-Line "Обнаружено политик проверки подлинности: $($policies.Count)" -Class (Get-AuthNHeadlineClass -Class $policyClasses)
                 for ($i = 0; $i -lt $policies.Count; $i++) { Show-Object $policies[$i] -Class $policyClasses[$i] }
             }
 
@@ -117944,7 +117944,7 @@ function Get-InactiveAdminAccounts {
             if (@($inactiveAccounts).Count -gt 0) {
                 $orphanedCount = @($inactiveAccounts | Where-Object { $_.isOrphaned }).Count
                 $orphanedInfo = if ($orphanedCount -gt 0) { ", $orphanedCount orphaned (adminCount=1 but no privileged groups)" } else { "" }
-                Show-Line "Found $(@($inactiveAccounts).Count) inactive privileged account(s) (>$InactiveDays days$orphanedInfo):" -Class Finding
+                Show-Line "Неактивные привилегированные учётные записи (более $InactiveDays дней$orphanedInfo): $(@($inactiveAccounts).Count)" -Class Finding
 
                 foreach ($account in $inactiveAccounts) {
                     $account | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'InactiveAdmin' -Force
@@ -118146,7 +118146,7 @@ function Get-AdminPasswordNeverExpires {
             }
 
             if (@($vulnerableAccounts).Count -gt 0) {
-                Show-Line "Found $(@($vulnerableAccounts).Count) privileged account(s) with password never expires (password > $PasswordAgeDays days old):" -Class Finding
+                Show-Line "Обнаружены привилегированные учётные записи с неограниченным сроком действия пароля (пароль старше $PasswordAgeDays дней): $(@($vulnerableAccounts).Count)" -Class Finding
 
                 foreach ($user in $vulnerableAccounts) {
                     $user | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'PasswordNeverExpires' -Force
@@ -118256,7 +118256,7 @@ function Get-AdminReversibleEncryption {
 
             if ($vulnerableAccounts.Count -gt 0) {
                 $totalAccounts = $vulnerableAccounts.Count
-                Show-Line "Found $totalAccounts account(s) with reversible password encryption:" -Class Finding
+                Show-Line "Обнаружены учётные записи с обратимым шифрованием пароля: $totalAccounts" -Class Finding
 
                 $currentIndex = 0
                 $privilegedCount = 0
@@ -118543,7 +118543,7 @@ function Get-ManagedServiceAccountSecurity {
                     # Count how many have broad group access (critical)
                     $broadGroupCount = @($nonPrivilegedAccessFindings | Where-Object { $_.HasBroadGroupAccess }).Count
                     $broadGroupInfo = if ($broadGroupCount -gt 0) { " ($broadGroupCount with broad group access - CRITICAL)" } else { "" }
-                    Show-Line "Found $(@($nonPrivilegedAccessFindings).Count) gMSA(s) with non-privileged password access$broadGroupInfo`:" -Class Finding
+                    Show-Line "Обнаружены gMSA с чтением паролей непривилегированными субъектами: $(@($nonPrivilegedAccessFindings).Count)$broadGroupInfo`:" -Class Finding
 
                     foreach ($finding in $nonPrivilegedAccessFindings) {
                         # Output the gMSA object itself (Show-Object will display relevant attributes)
@@ -118587,7 +118587,7 @@ function Get-ManagedServiceAccountSecurity {
 
                 # What was not analyzed, named rather than left out of the report
                 if (@($undelegatedGMSAs).Count -gt 0) {
-                    Show-Line "No password access is delegated on $(@($undelegatedGMSAs).Count) gMSA(s), or msDS-GroupMSAMembership was not readable: $(@($undelegatedGMSAs) -join ', ')" -Class Note
+                    Show-Line "Для $(@($undelegatedGMSAs).Count) gMSA не делегирован доступ к паролю либо атрибут msDS-GroupMSAMembership недоступен для чтения: $(@($undelegatedGMSAs) -join ', ')" -Class Note
                 }
                 if (@($unparsedGMSAs).Count -gt 0) {
                     Show-Line "msDS-GroupMSAMembership could not be parsed on $(@($unparsedGMSAs).Count) gMSA(s) - their password access is unknown: $(@($unparsedGMSAs) -join ', ')" -Class Note
@@ -118844,7 +118844,7 @@ function Get-ManagedServiceAccountSecurity {
                 # Hint, because STANDALONE_MSA_LEGACY says Risk = Hint and BaseScore 20.
                 # A red line against its own card is one statement too many, and a legacy
                 # account type is not a vulnerability.
-                Show-Line "Found $($standaloneMSAs.Count) standalone MSA(s) (legacy, tied to one host):" -Class Hint
+                Show-Line "Обнаружено отдельных MSA (устаревший тип, привязан к одному узлу): $($standaloneMSAs.Count)" -Class Hint
 
                 foreach ($msa in $standaloneMSAs) {
                     $msa | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'MSA' -Force
@@ -118957,7 +118957,7 @@ function Get-ManagedServiceAccountSecurity {
                 # Both sides name each other, so the KDC honours the pairing - and the account
                 # is not in the state a migration leaves it in.
                 if (@($irregularLinks).Count -gt 0) {
-                    Show-Line "Found $(@($irregularLinks).Count) account(s) linked to a dMSA outside a regular migration:" -Class Finding
+                    Show-Line "Обнаружено учётных записей с нетипичной связью dMSA вне штатной миграции: $(@($irregularLinks).Count)" -Class Finding
                     foreach ($reported in $irregularLinks) { Show-Object $reported -Class Finding }
                 }
 
@@ -118971,7 +118971,7 @@ function Get-ManagedServiceAccountSecurity {
                 }
 
                 if (@($privilegedPredecessors).Count -gt 0) {
-                    Show-Line "Found $(@($privilegedPredecessors).Count) privileged account(s) replaced by a dMSA:" -Class Hint
+                    Show-Line "Обнаружено привилегированных учётных записей, заменённых dMSA: $(@($privilegedPredecessors).Count)" -Class Hint
                     foreach ($reported in $privilegedPredecessors) { Show-Object $reported -Class Hint }
                 }
 
@@ -119799,7 +119799,7 @@ function Get-SIDHistoryInjection {
 
             # Output results
             if (@($privilegedFindings).Count -gt 0) {
-                Show-Line "Found $(@($privilegedFindings).Count) account(s) with a privileged SID in sIDHistory that no source domain explains:" -Class Finding
+                Show-Line "Учётные записи с привилегированным SID в sIDHistory без подтверждённого исходного домена: $(@($privilegedFindings).Count)" -Class Finding
 
                 foreach ($finding in $privilegedFindings) {
                     $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SIDHistory' -Force
@@ -119814,7 +119814,7 @@ function Get-SIDHistoryInjection {
             # -IncludeNonPrivileged was given: this is not a migration artifact, and the
             # account the SID points at can hold access that no group membership shows.
             if (@($ownDomainFindings).Count -gt 0) {
-                Show-Line "Found $(@($ownDomainFindings).Count) account(s) whose sIDHistory holds a SID of this domain (not a migration artifact):" -Class Finding
+                Show-Line "Учётные записи с SID текущего домена в sIDHistory (не обычный артефакт миграции): $(@($ownDomainFindings).Count)" -Class Finding
 
                 foreach ($finding in $ownDomainFindings) {
                     $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SIDHistory' -Force
@@ -119826,7 +119826,7 @@ function Get-SIDHistoryInjection {
             # A privileged SID of another domain: the documented result of a migration,
             # and worth a look rather than an accusation.
             if (@($foreignPrivilegedFindings).Count -gt 0) {
-                Show-Line "Found $(@($foreignPrivilegedFindings).Count) account(s) whose sIDHistory holds a privileged SID of another domain (check SID filtering on the trust):" -Class Hint
+                Show-Line "Учётные записи с привилегированным SID другого домена в sIDHistory (проверьте фильтрацию SID при доверии): $(@($foreignPrivilegedFindings).Count)" -Class Hint
 
                 foreach ($finding in $foreignPrivilegedFindings) {
                     $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SIDHistory' -Force
@@ -119846,7 +119846,7 @@ function Get-SIDHistoryInjection {
             # Non-privileged findings (migration artifacts) - only if requested
             if ($IncludeNonPrivileged -and @($nonPrivilegedFindings).Count -gt 0) {
                 Show-SubHeader "Следы миграции: непривилегированные SID в sIDHistory..." -ObjectType "SIDHistory"
-                Show-Line "Found $(@($nonPrivilegedFindings).Count) account(s) with non-privileged SIDs in sIDHistory (migration artifacts):" -Class Hint
+                Show-Line "Учётные записи с непривилегированными SID в sIDHistory (возможные следы миграции): $(@($nonPrivilegedFindings).Count)" -Class Hint
 
                 foreach ($finding in $nonPrivilegedFindings) {
                     $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SIDHistory' -Force
@@ -120073,7 +120073,7 @@ function Get-NonDefaultUserOwners {
                 # Hint, as NON_DEFAULT_USER_OWNERS and the Owner row say: the row was
                 # aligned to its card, and this line and the object stayed red - a red
                 # heading over a yellow row, in front of a card rated a hint.
-                Show-Line "Found $(@($nonDefaultOwnerUsers).Count) user(s) with non-default owners:" -Class Hint
+                Show-Line "Пользовательские объекты с нестандартным владельцем: $(@($nonDefaultOwnerUsers).Count)" -Class Hint
 
                 foreach ($user in $nonDefaultOwnerUsers) {
                     $user | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'NonDefaultOwner' -Force
@@ -120462,7 +120462,7 @@ function Get-LogonScriptPermissions {
                     Write-Log "[Get-LogonScriptPermissions] Could not tell the privileged accounts apart: $_"
                 }
 
-                Show-Line "Found $($writable.Count) logon script(s) a principal beyond the administrators may change" -Class Finding -FindingId 'LOGON_SCRIPT_WRITABLE'
+                Show-Line "Сценарии входа, доступные для изменения субъектам вне административных групп: $($writable.Count)" -Class Finding -FindingId 'LOGON_SCRIPT_WRITABLE'
                 foreach ($item in $writable) {
                     $runBy = @($item.Entry.Accounts)
                     $privilegedNames = @($runBy |
@@ -120700,7 +120700,7 @@ function Get-UnconstrainedDelegation {
 
             $populations = "$totalComputers computers, $totalUsers users"
             if ($totalMSAs -gt 0) { $populations = "$populations, $totalMSAs managed service accounts" }
-            Show-Line "Found $total account(s) with Unconstrained Delegation ($populations):" -Class "Finding"
+            Show-Line "Учётные записи с неограниченным делегированием Kerberos: $total ($populations)" -Class "Finding"
 
             foreach ($account in $unconstrainedAccounts) {
                 # Add type marker for HTML report
@@ -120977,7 +120977,7 @@ function Get-ConstrainedDelegation {
 
             $total = @($constrainedAccounts).Count
 
-            Show-Line "Found $total account(s) with Constrained Delegation ($totalComputers computers, $totalUsers users, $totalProtocolTransition with Protocol Transition):" -Class "Finding"
+            Show-Line "Учётные записи с ограниченным делегированием Kerberos: $total (компьютеров: $totalComputers; пользователей: $totalUsers; с переходом протокола: $totalProtocolTransition)" -Class "Finding"
 
             # Called out separately because it is the difference between "delegation exists"
             # and "there is a path to Domain Admin here".
@@ -121095,7 +121095,7 @@ function Get-ResourceBasedConstrainedDelegation {
 
             $populations = "$totalComputers computers, $totalUsers users"
             if ($totalMSAs -gt 0) { $populations = "$populations, $totalMSAs managed service accounts" }
-            Show-Line "Found $total account(s) with Resource-Based Constrained Delegation ($populations):" -Class "Finding"
+            Show-Line "Учётные записи с делегированием Kerberos на основе ресурса (RBCD): $total ($populations)" -Class "Finding"
 
             # Which of these resources is a domain controller. One query for the whole
             # check, names only - these objects are never displayed.
@@ -121696,7 +121696,7 @@ function Get-DangerousACLs {
             # DCSync findings
             if (@($dcsyncFindings).Count -gt 0) {
                 $countText = if ($IncludePrivileged) { "$(@($dcsyncFindings).Count) account(s)" } else { "$(@($dcsyncFindings).Count) non-privileged account(s)" }
-                Show-Line "Found $countText with DCSync rights" -Class Finding
+                Show-Line "Обнаружены субъекты с правами DCSync: $countText" -Class Finding
 
                 foreach ($finding in $dcsyncFindings) {
                     # Try to resolve the SID to a full AD object (user or group)
@@ -121730,7 +121730,7 @@ function Get-DangerousACLs {
             # Dangerous rights findings
             if (@($dangerousRightsFindings).Count -gt 0) {
                 $countText = if ($IncludePrivileged) { "$(@($dangerousRightsFindings).Count) account(s)" } else { "$(@($dangerousRightsFindings).Count) non-privileged account(s)" }
-                Show-Line "Found $countText with dangerous rights on domain root" -Class Finding
+                Show-Line "Обнаружены субъекты с опасными правами на корневой объект домена: $countText" -Class Finding
 
                 foreach ($finding in $dangerousRightsFindings) {
                     # Try to resolve the SID to a full AD object (user or group)
@@ -122347,7 +122347,7 @@ function Get-DangerousOUPermissions {
                 # delegation on one OU read "in 5 OU(s) and 8 container(s)" (measured).
                 $findingOUDNs = @($nonExchangeFindings | ForEach-Object { $_.Group } |
                     ForEach-Object { [string]$_.DistinguishedName } | Select-Object -Unique)
-                Show-Line "Found $countText with dangerous OU permissions in $(Format-OUContainerCount -DistinguishedName $findingOUDNs)" -Class Finding
+                Show-Line "Обнаружены субъекты с опасными разрешениями OU: $countText; затронутая область: $(Format-OUContainerCount -DistinguishedName $findingOUDNs)" -Class Finding
 
                 foreach ($principalGroup in $nonExchangeFindings) {
                     $sid = $principalGroup.Name
@@ -122409,7 +122409,7 @@ function Get-DangerousOUPermissions {
             # Display Exchange service group findings as Hint (yellow) - by-design permissions
             # Only shown with -IncludePrivileged (Exchange groups are privileged by design)
             if ($IncludePrivileged -and @($exchangeFindings).Count -gt 0) {
-                Show-Line "Found $(@($exchangeFindings).Count) Exchange service group(s) with OU permissions (by-design, cannot be removed)" -Class Hint
+                Show-Line "Служебные группы Exchange со штатными разрешениями OU (не изменять без проверки Exchange): $(@($exchangeFindings).Count)" -Class Hint
 
                 foreach ($principalGroup in $exchangeFindings) {
                     $sid = $principalGroup.Name
@@ -123094,7 +123094,7 @@ function Get-PasswordResetRights {
             # Display non-Exchange findings as Finding (red)
             if (@($nonExchangeFindings).Count -gt 0) {
                 $countText = if ($IncludePrivileged) { "$(@($nonExchangeFindings).Count) account(s)" } else { "$(@($nonExchangeFindings).Count) non-privileged account(s)" }
-                Show-Line "Found $countText with password reset rights on OUs containing privileged users" -Class Finding
+                Show-Line "Обнаружены субъекты с правом сброса паролей в OU с привилегированными пользователями: $countText" -Class Finding
 
                 foreach ($principalGroup in $nonExchangeFindings) {
                     $sid = $principalGroup.Name
@@ -123161,7 +123161,7 @@ function Get-PasswordResetRights {
             # Display Exchange service group findings as Hint (yellow) - by-design permissions
             # Only shown with -IncludePrivileged (Exchange groups are privileged by design)
             if ($IncludePrivileged -and @($exchangeFindings).Count -gt 0) {
-                Show-Line "Found $(@($exchangeFindings).Count) Exchange service group(s) with password reset rights (by-design, cannot be removed)" -Class Hint
+                Show-Line "Служебные группы Exchange с штатными правами сброса паролей (не удалять без проверки Exchange): $(@($exchangeFindings).Count)" -Class Hint
 
                 foreach ($principalGroup in $exchangeFindings) {
                     $sid = $principalGroup.Name
@@ -123565,7 +123565,7 @@ function Get-AddComputerRights {
             # Finding 2: delegated CreateChild on the computer container, inherited
             # grants included (show full AD objects)
             if (@($createComputerAccounts).Count -gt 0) {
-                Show-Line "Found $(@($createComputerAccounts).Count) account(s) with CreateChild rights in the computer container ($computersContainerDN):" -Class Finding
+                Show-Line "Учётные записи с правом CreateChild в контейнере компьютеров ($computersContainerDN): $(@($createComputerAccounts).Count)" -Class Finding
 
                 foreach ($account in $createComputerAccounts) {
                     # Check if this is a well-known SID that does NOT belong to the domain partition.
@@ -123675,7 +123675,7 @@ function Get-AddComputerRights {
                 # that grants the privilege to Authenticated Users.
                 $lineClass = if ($effectiveIsDangerous -or -not $effectiveGPO) { "Hint" } else { "Secure" }
                 if (@($shownGPOs).Count -gt 0) {
-                    Show-Line "Found $(@($shownGPOs).Count) GPO(s) configuring SeMachineAccountPrivilege:" -Class $lineClass
+                    Show-Line "Групповые политики, назначающие SeMachineAccountPrivilege: $(@($shownGPOs).Count)" -Class $lineClass
                 } else {
                     Show-Line "No policy that is linked and enabled configures SeMachineAccountPrivilege" -Class Note
                 }
@@ -124471,20 +124471,20 @@ function Get-GPOUserRightsAssignment {
                 if ($removalsOnly.Count -gt 0) {
                     $removalPolicies = @(Get-GPOPolicySummary -Finding $removalsOnly)
 
-                    $text = "$($removalsOnly.Count) assignment(s) only remove default holders - hardening, or a service about to break"
+                    $text = "Назначений, удаляющих только стандартных субъектов: $($removalsOnly.Count). Усиление защиты либо риск нарушения работы службы"
 
                     # Assignments up front, policies in the card, so the unit is named whenever
                     # the two numbers differ - several rights in one GPO is the normal case here.
-                    $countText = "$($removalsOnly.Count) assignment(s)"
+                    $countText = "$($removalsOnly.Count) назначений"
                     if ($removalPolicies.Count -gt 0 -and $removalPolicies.Count -ne $removalsOnly.Count) {
-                        $text += " on $($removalPolicies.Count) GPO(s)"
-                        $countText += " on $($removalPolicies.Count) GPO(s)"
+                        $text += " в $($removalPolicies.Count) GPO"
+                        $countText += " в $($removalPolicies.Count) GPO"
                     }
                     if (-not $showDefaults) { $text += ' (-IncludeDefaults to list)' }
 
                     Show-Line $text -Class "Note"
-                    Show-GPOSuppressedGroup -Group 'Assignments that only remove default holders' `
-                        -Reason 'Hardening more often than not, occasionally a service about to break - never a grant.' `
+                    Show-GPOSuppressedGroup -Group 'Назначения без дополнительных прав (исключены стандартные субъекты)' `
+                         -Reason 'Обычно усиление защиты; проверьте влияние на работу служб. Новые права не выдаются.' `
                         -CountText $countText -Policy $removalPolicies
                 }
 
@@ -124501,14 +124501,14 @@ function Get-GPOUserRightsAssignment {
                 if (Show-SYSVOLCoverageNote -FileFilter @('GptTmpl.inf')) { $rightsClass = 'Note' }
 
                 if ($deviations.Count -gt 0) {
-                    Show-Line "Found $($deviations.Count) user right assignment(s) that depart from the Windows default:" -Class $headerClass
+                    Show-Line "Обнаружено назначений прав пользователя с отклонением от стандартных параметров Windows: $($deviations.Count)" -Class $headerClass
                 } elseif ($inactiveCount -gt 0) {
                     # Not Secure. Every departure sits on a policy that reaches nothing, which is
                     # a different statement from having none, and the dampening line above
                     # carries the count.
-                    Show-Line "No user right is granted beyond the Windows default by a policy that reaches a machine" -Class $rightsClass
+                    Show-Line "В действующих GPO не обнаружено выдачи прав сверх стандартных настроек Windows" -Class $rightsClass
                 } else {
-                    Show-Line "No user right is granted beyond the Windows default" -Class $rightsClass
+                    Show-Line "Не обнаружено выдачи прав пользователя сверх стандартных настроек Windows" -Class $rightsClass
                 }
 
                 # Findings first, then hints, then the removals.
@@ -126078,7 +126078,7 @@ function Get-LAPSConfiguration {
 
                     $gpoConfigObjects = @(Get-LAPSGPOConfigObjects -LAPSGPOSettings $lapsGPOSettings)
 
-                    Show-Line "Found $($gpoConfigObjects.Count) GPO(s) deploying LAPS settings" -Class "Hint"
+                    Show-Line "Групповые политики, развёртывающие LAPS: $($gpoConfigObjects.Count)" -Class "Hint"
 
                     foreach ($gpoConfigObject in $gpoConfigObjects) {
                         Show-Object $gpoConfigObject -Class Hint
@@ -126270,7 +126270,7 @@ function Get-LAPSConfiguration {
             Show-Object $coverageSummary -Class $coverageClass
 
             if ($staleLAPSComputers.Count -gt 0) {
-                Show-Line "Found $($staleLAPSComputers.Count) computer(s) whose LAPS password stopped rotating:" -Class "Finding"
+                Show-Line "Компьютеры с прекращённой ротацией пароля LAPS: $($staleLAPSComputers.Count)" -Class "Finding"
                 foreach ($staleObject in ($staleLAPSComputers | Sort-Object daysOverdue -Descending)) {
                     Show-Object $staleObject -Class Finding
                 }
@@ -126486,7 +126486,7 @@ function Get-OutdatedComputers {
             $inactiveInfo = if ($inactiveFilteredCount -gt 0) { " ($inactiveFilteredCount inactive accounts filtered)" } else { "" }
 
             if (@($outdatedComputerDNs).Count -gt 0) {
-                Show-Line "Found $(@($outdatedComputerDNs).Count) computer(s) with an outdated Microsoft operating system:$inactiveInfo" -Class "Finding"
+                Show-Line "Компьютеры с устаревшей версией Microsoft Windows: $(@($outdatedComputerDNs).Count)$inactiveInfo" -Class "Finding"
             }
 
             if (@($esuOnlyComputerDNs).Count -gt 0) {
@@ -126920,7 +126920,7 @@ function Get-InfrastructureServers {
                 }
 
                 if ($listedDCs.Count -gt 0) {
-                    Show-Line "Found $($listedDCs.Count) Domain Controller(s):" -Class "Hint"
+                    Show-Line "Обнаружено контроллеров домена: $($listedDCs.Count)" -Class "Hint"
                     foreach ($dc in $listedDCs) { $dc | Show-Object -Class Hint }
                 }
                 if ($unregisteredDCs.Count -gt 0) {
@@ -126989,7 +126989,7 @@ function Get-InfrastructureServers {
             }
 
             if ($exchangeServers.Count -gt 0) {
-                Show-Line "Found $($exchangeServers.Count) Exchange Server(s):" -Class "Hint"
+                Show-Line "Обнаружено серверов Exchange: $($exchangeServers.Count)" -Class "Hint"
                 foreach ($exch in $exchangeServers) {
                     $exchKey = "$($exch.sAMAccountName)".TrimEnd('$').ToLowerInvariant()
                     if ($exchangeVersionByName.ContainsKey($exchKey) -and $exchangeVersionByName[$exchKey]) {
@@ -127013,7 +127013,7 @@ function Get-InfrastructureServers {
             $mssqlServers = @(Get-DomainComputer -LDAPFilter "(servicePrincipalName=MSSQLSvc/*)" @PSBoundParameters | Test-AccountActivity -IsEnabled -IncludeDetails)
 
             if ($mssqlServers.Count -gt 0) {
-                Show-Line "Found $($mssqlServers.Count) MSSQL Server(s):" -Class "Hint"
+                Show-Line "Обнаружено серверов SQL Server: $($mssqlServers.Count)" -Class "Hint"
                 foreach ($sql in $mssqlServers) {
                     $sql | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'MSSQLServer' -Force
                     $sql | Show-Object -Class Hint
@@ -127045,7 +127045,7 @@ function Get-InfrastructureServers {
             $sccmServers = @(Get-DomainComputer -LDAPFilter "(|(servicePrincipalName=SMS*)(servicePrincipalName=CCM*))" @PSBoundParameters | Test-AccountActivity -IsEnabled -IncludeDetails)
 
             if ($sccmServers.Count -gt 0) {
-                Show-Line "Found $($sccmServers.Count) SCCM/ConfigMgr Server(s):" -Class "Hint"
+                Show-Line "Обнаружено серверов SCCM/ConfigMgr: $($sccmServers.Count)" -Class "Hint"
                 foreach ($sccm in $sccmServers) {
                     $sccm | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SCCMServerBasic' -Force
                     $sccm | Show-Object -Class Hint
@@ -127073,7 +127073,7 @@ function Get-InfrastructureServers {
             $scomServers = @(Get-DomainComputer -LDAPFilter "(|(servicePrincipalName=MSOMHSvc/*)(servicePrincipalName=MSOMSdkSvc/*))" @PSBoundParameters | Test-AccountActivity -IsEnabled -IncludeDetails)
 
             if ($scomServers.Count -gt 0) {
-                Show-Line "Found $($scomServers.Count) SCOM Server(s):" -Class "Hint"
+                Show-Line "Обнаружено серверов SCOM: $($scomServers.Count)" -Class "Hint"
                 foreach ($scom in $scomServers) {
                     $scom | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SCOMServerBasic' -Force
                     $scom | Show-Object -Class Hint
@@ -127149,7 +127149,7 @@ function Get-InfrastructureServers {
             }
 
             if ($adfsIndicators.Count -gt 0) {
-                Show-Line "Found $($adfsIndicators.Count) AD FS indicator(s):" -Class "Hint"
+                Show-Line "Обнаружено признаков инфраструктуры AD FS: $($adfsIndicators.Count)" -Class "Hint"
                 foreach ($adfsIndicator in $adfsIndicators) {
                     $adfsIndicator | Show-Object -Class Hint
                 }
@@ -127187,7 +127187,7 @@ function Get-InfrastructureServers {
             }
 
             if ($entraConnectIndicators.Count -gt 0) {
-                Show-Line "Found $($entraConnectIndicators.Count) Entra ID Connect indicator(s):" -Class "Hint"
+                Show-Line "Обнаружено признаков Entra ID Connect: $($entraConnectIndicators.Count)" -Class "Hint"
                 foreach ($indicator in $entraConnectIndicators) {
                     # Parse description to extract server name and tenant
                     # Pattern: "...running on computer SERVERNAME configured to synchronize to tenant TENANT.onmicrosoft.com..."
@@ -127633,7 +127633,7 @@ function Get-NonDefaultComputerOwners {
                 $reassignedInfo = if ($reassigned -gt 0) { ", $reassigned of them owned by somebody other than the creator" } else { "" }
                 # Hint, as NON_DEFAULT_COMPUTER_OWNERS and the Owner row say: the row was
                 # aligned to its card, and this line and the objects stayed red.
-                Show-Line "Found $(@($nonDefaultOwnerComputers).Count) computer(s) with non-default owners$($reassignedInfo):" -Class "Hint"
+                Show-Line "Компьютерные объекты с нестандартными владельцами: $(@($nonDefaultOwnerComputers).Count)$($reassignedInfo)" -Class "Hint"
 
                 # Counted on a line of its own rather than subtracted from the number
                 # above it: these objects really do have a non-default owner, and a
@@ -127669,7 +127669,7 @@ function Get-NonDefaultComputerOwners {
             # that could not be read is counted above.
             $explicitFindings = @(Get-ComputerExplicitRight -Computers $computersWithOwner)
             if ($explicitFindings.Count -gt 0) {
-                Show-Line "Found $($explicitFindings.Count) explicit permission(s) on computer objects held outside Tier-0:" -Class "Finding"
+                Show-Line "Обнаружено явных разрешений на компьютерные объекты, предоставленных субъектам вне Tier 0: $($explicitFindings.Count)" -Class "Finding"
                 foreach ($explicitFinding in $explicitFindings) {
                     $explicitFinding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'ComputerObjectACL' -Force
                     Show-Object $explicitFinding -Class Finding
@@ -128367,7 +128367,7 @@ function Get-NetworkMap {
             if ($subnets.Count -eq 0) {
                 Show-Line "Не удалось сопоставить активные компьютеры с IPv4-подсетями" -Class Note
             } else {
-                Show-Line "Found $($subnets.Count) /24 subnet(s) with $($mapped.Count) computer(s) active in the last $ActiveDays days:" -Class Note
+                Show-Line "Обнаружено подсетей /24: $($subnets.Count); компьютеров с активностью за $ActiveDays дней: $($mapped.Count)" -Class Note
             }
 
             foreach ($entry in @($subnets.Values | Sort-Object -Property Network)) {
@@ -129117,7 +129117,7 @@ function Invoke-ShareHunt {
             }
 
             $byComputer = @($readable | Group-Object -Property Computer | Sort-Object -Property Name)
-            Show-Line "Found $($readable.Count) readable share(s) on $($byComputer.Count) computer(s):" -Class Note
+            Show-Line "Доступные для чтения сетевые ресурсы: $($readable.Count) на $($byComputer.Count) компьютерах" -Class Note
 
             foreach ($group in $byComputer) {
                 $shares = @($group.Group | Sort-Object -Property Name)
@@ -129217,7 +129217,7 @@ function Invoke-ShareHunt {
             if ($results.Count -eq 0) {
                 # Not "Secure": a share is read only as far as this account and the limits
                 # allowed, which is never the guarantee that word would make.
-                Show-Line "No credentials found in $($readable.Count) readable share(s)" -Class Note
+                Show-Line "Учётные данные не обнаружены в $($readable.Count) доступных для чтения сетевых ресурсах" -Class Note
                 Write-ShareHuntExport
                 return
             }
@@ -130701,9 +130701,9 @@ function Get-GPOLocalGroupMembership {
 
                 if (@($shown).Count -gt 0) {
                     if ($headlineClass -eq 'Finding') {
-                        Show-Line "Found $(@($shown).Count) vulnerable GPO local group assignment(s)" -Class Finding
+                        Show-Line "Опасные назначения членства в локальных группах через GPO: $(@($shown).Count)" -Class Finding
                     } else {
-                        Show-Line "Found $(@($shown).Count) GPO local group assignment(s)" -Class $headlineClass
+                        Show-Line "Назначения членства в локальных группах через GPO: $(@($shown).Count)" -Class $headlineClass
                     }
                 } else {
                     # Not Secure: the assignments exist, they just apply nowhere. Calling
@@ -131749,7 +131749,7 @@ function Get-GPOScheduledTasks {
                 }
 
                 if (@($shown).Count -gt 0) {
-                    Show-Line "Found $(@($shown).Count) scheduled task(s) distributed via GPO" -Class $headerClass
+                    Show-Line "Обнаружено задач планировщика, распространяемых через GPO: $(@($shown).Count)" -Class $headerClass
                 } else {
                     Show-Line "No scheduled task is distributed by a policy that is linked and enabled" -Class Note
                 }
@@ -132635,7 +132635,7 @@ function Get-GPOScriptPaths {
                     -Dormant $split.Dormant -Listed:$IncludeInactive
 
                 if (@($shown).Count -gt 0) {
-                    Show-Line "Found $(@($shown).Count) script(s) distributed via GPO" -Class Hint
+                    Show-Line "Обнаружено сценариев, распространяемых через GPO: $(@($shown).Count)" -Class Hint
                 } else {
                     Show-Line "No script is distributed by a policy that is linked and enabled" -Class Note
                 }
@@ -133292,7 +133292,7 @@ function Get-GPORegistrySettings {
                     -Dormant $split.Dormant -Listed:$IncludeInactive
 
                 if (@($shown).Count -gt 0) {
-                    Show-Line "Found $(@($shown).Count) vulnerable registry setting(s) deployed via GPO" -Class $headerClass
+                    Show-Line "Обнаружено опасных параметров реестра, применяемых через GPO: $(@($shown).Count)" -Class $headerClass
                 } else {
                     # Not "none deployed". Every one of them is deployed by a policy that
                     # does not apply, which is a different statement.
@@ -134073,7 +134073,7 @@ function Get-GPOPointAndPrint {
                 -Dormant $split.Dormant -Listed:$IncludeInactive
 
             if (@($listed).Count -gt 0) {
-                Show-Line "Found $(@($listed).Count) GPO configuration(s) with Point and Print or printer driver settings" -Class Hint
+                Show-Line "Групповые политики с настройками Point and Print или драйверов принтеров: $(@($listed).Count)" -Class Hint
             } elseif ($settled.Count -gt 0) {
                 # Not the "nothing is deployed" line below: something is deployed, and it is
                 # the hardened kind. Saying nothing is deployed would be false, and saying
@@ -135436,7 +135436,7 @@ function Get-ADCSVulnerabilities {
                 $rootCAs = @(Invoke-LDAPSearch -Filter "(objectClass=certificationAuthority)" -SearchBase $rootCASearchBase -Properties 'cn','distinguishedName','cACertificate' -Scope OneLevel)
 
                 if (@($rootCAs).Count -gt 0) {
-                    Show-Line "Found $(@($rootCAs).Count) trusted Root CA(s) in AD configuration" -Class Note
+                    Show-Line "Обнаружено доверенных корневых центров сертификации в конфигурации AD: $(@($rootCAs).Count)" -Class Note
 
                     foreach ($rootCA in $rootCAs) {
                         $rootCAName = if ($rootCA.cn -is [array]) { $rootCA.cn[0] } else { $rootCA.cn }
@@ -135580,7 +135580,7 @@ function Get-ADCSVulnerabilities {
                 $aiaCAs = @(Invoke-LDAPSearch -Filter "(objectClass=certificationAuthority)" -SearchBase $aiaSearchBase -Properties 'cn','distinguishedName','cACertificate' -Scope OneLevel)
 
                 if (@($aiaCAs).Count -gt 0) {
-                    Show-Line "Found $(@($aiaCAs).Count) AIA (Authority Information Access) CA(s)" -Class Note
+                    Show-Line "Обнаружено центров сертификации, опубликованных в AIA: $(@($aiaCAs).Count)" -Class Note
                     foreach ($aiaCA in $aiaCAs) {
                         $aiaCAName = if ($aiaCA.cn -is [array]) { $aiaCA.cn[0] } else { $aiaCA.cn }
                         $aiaCert = $aiaCA.cACertificate
@@ -135630,7 +135630,7 @@ function Get-ADCSVulnerabilities {
             }
 
             # Display CA count immediately after search
-            Show-Line "Found $($cas.Count) Certificate Authority(s)" -Class Hint
+            Show-Line "Обнаружено центров сертификации: $($cas.Count)" -Class Hint
 
             # Track CA vulnerabilities for summary
             $caVulnerabilityCount = 0
@@ -136368,7 +136368,7 @@ function Get-ADCSVulnerabilities {
                 # ===== Output findings with full AD objects =====
                 if (@($allFindings).Count -gt 0) {
                     $countText = if ($IncludePrivileged) { "$(@($allFindings).Count) finding(s)" } else { "$(@($allFindings).Count) non-privileged finding(s)" }
-                    Show-Line "Found $countText with dangerous PKI container permissions" -Class Finding
+                    Show-Line "Обнаружены субъекты с опасными разрешениями на контейнеры PKI: $countText" -Class Finding
 
                     # Group by SID to consolidate multiple containers per principal
                     $groupedFindings = $allFindings | Group-Object -Property SID
@@ -137066,9 +137066,9 @@ function Get-ADCSVulnerabilities {
             if ($interestingCount -gt 0) {
                 # Show informative message about what we found
                 if ($totalVulnerabilities -gt 0) {
-                    Show-Line "Found $interestingCount of $($templates.Count) templates with findings" -Class Finding
+                    Show-Line "Шаблоны сертификатов с обнаруженными проблемами: $interestingCount из $($templates.Count)" -Class Finding
                 } else {
-                    Show-Line "Found $interestingCount of $($templates.Count) templates with non-privileged enrollment" -Class Hint
+                    Show-Line "Шаблоны сертификатов с правом регистрации непривилегированными субъектами: $interestingCount из $($templates.Count)" -Class Hint
                 }
 
                 # Display all interesting templates
@@ -138372,7 +138372,7 @@ function Get-ExchangeInfrastructure {
             }
 
             if (@($exchangeServers).Count -gt 0) {
-                Show-Line "Exchange Organization: $organizationName - Found $(@($exchangeServers).Count) Exchange Server(s)" -Class Hint
+                Show-Line "Организация Exchange: $organizationName. Обнаружено серверов Exchange: $(@($exchangeServers).Count)" -Class Hint
 
                 foreach ($exServer in $exchangeServers) {
                     # Get the raw object to add Exchange-specific attributes
@@ -138564,7 +138564,7 @@ function Get-ExchangeInfrastructure {
                     }
                 }
             } else {
-                Show-Line "Exchange Organization: $organizationName - No active Exchange Servers found" -Class Note
+                Show-Line "Организация Exchange: $organizationName. Активные серверы Exchange не обнаружены" -Class Note
             }
 
             # ===== Step 3: Hybrid deployment with Exchange Online =====
@@ -138955,7 +138955,7 @@ function Get-ExchangeInfrastructure {
                 $unreadConnectors = @($connectorResults | Where-Object { $_.RelayStatus -like 'Unknown*' })
 
                 if (@($riskyConnectors).Count -gt 0) {
-                    Show-Line "Found $(@($riskyConnectors).Count) of $(@($connectorResults).Count) receive connector(s) granting SMTP rights to unauthenticated senders" -Class Finding
+                    Show-Line "Обнаружено SMTP-соединителей с правами для неаутентифицированных отправителей: $(@($riskyConnectors).Count) из $(@($connectorResults).Count)" -Class Finding
                 }
                 elseif (@($unreadConnectors).Count -gt 0) {
                     # A connector whose descriptor did not come back was not assessed. The
@@ -139758,7 +139758,7 @@ function Get-ExchangeRBACAssignments {
 
             $unexpected = @($results | Where-Object { $_.ConsoleClass -eq 'Finding' })
             if (@($unexpected).Count -gt 0) {
-                Show-Line "Found $(@($unexpected).Count) high-value Exchange role assignment(s) beyond the roles Exchange ships assigned" -Class Finding
+                Show-Line "Неожиданные назначения критически важных ролей Exchange сверх стандартной конфигурации: $(@($unexpected).Count)" -Class Finding
             } else {
                 Show-Line "The high-value Exchange roles are assigned only to the role groups Exchange ships them on" -Class Hint
             }
@@ -139927,7 +139927,7 @@ function Get-SCCMInfrastructure {
                 }
 
                 if ($sccmSiteObjects.Count -gt 0) {
-                    Show-Line "Found $($sccmSiteObjects.Count) SCCM site(s) published to Active Directory" -Class Hint
+                    Show-Line "Обнаружено сайтов SCCM, опубликованных в Active Directory: $($sccmSiteObjects.Count)" -Class Hint
 
                     foreach ($site in $sccmSiteObjects) {
                         $siteCode = $site.mSSMSSiteCode
@@ -139987,7 +139987,7 @@ function Get-SCCMInfrastructure {
                 }
 
                 if ($mgmtPoints.Count -gt 0) {
-                    Show-Line "Found $($mgmtPoints.Count) SCCM Management Point(s)" -Class Hint
+                    Show-Line "Обнаружено точек управления SCCM (Management Point): $($mgmtPoints.Count)" -Class Hint
 
                     foreach ($mp in $mgmtPoints) {
                         $mpName = $mp.mSSMSMPName
@@ -140103,7 +140103,7 @@ function Get-SCCMInfrastructure {
             }
 
             if ($sccmServers.Count -gt 0) {
-                Show-Line "Found $($sccmServers.Count) SCCM server(s)" -Class Hint
+                Show-Line "Обнаружено серверов SCCM: $($sccmServers.Count)" -Class Hint
 
                 foreach ($srv in $sccmServers) {
                     $srv | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SCCMServer' -Force
@@ -140293,7 +140293,7 @@ function Get-SCCMInfrastructure {
 
                 if ($pxePoints.Count -gt 0) {
                     $pxeServersFound = $true
-                    Show-Line "Found $($pxePoints.Count) PXE boot server(s)" -Class Hint
+                    Show-Line "Обнаружено серверов загрузки PXE: $($pxePoints.Count)" -Class Hint
 
                     foreach ($pxe in $pxePoints) {
                         $parentDN = $pxe.distinguishedName -replace '^[^,]+,', ''
@@ -140322,7 +140322,7 @@ function Get-SCCMInfrastructure {
 
                 if ($wdsPoints.Count -gt 0) {
                     $pxeServersFound = $true
-                    Show-Line "Found $($wdsPoints.Count) WDS service connection point(s)" -Class Hint
+                    Show-Line "Обнаружено точек подключения службы WDS: $($wdsPoints.Count)" -Class Hint
 
                     foreach ($wds in $wdsPoints) {
                         $parentDN = $wds.distinguishedName -replace '^[^,]+,', ''
@@ -140354,7 +140354,7 @@ function Get-SCCMInfrastructure {
             $serviceAccounts = Get-DomainUser -LDAPFilter "(servicePrincipalName=SMS*)" @PSBoundParameters
 
             if ($serviceAccounts) {
-                Show-Line "Found $(@($serviceAccounts).Count) SCCM service account(s) with SMS* SPN" -Class Hint -FindingId "SCCM_SERVICE_ACCOUNT"
+                Show-Line "Обнаружены служебные учётные записи SCCM с SPN вида SMS*: $(@($serviceAccounts).Count)" -Class Hint -FindingId "SCCM_SERVICE_ACCOUNT"
 
                 foreach ($account in $serviceAccounts) {
                     $account | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SCCMServiceAccount' -Force
@@ -140384,7 +140384,7 @@ function Get-SCCMInfrastructure {
             }
 
             if ($sccmGroupsFound.Count -gt 0) {
-                Show-Line "Found $($sccmGroupsFound.Count) SCCM-related group(s)" -Class Hint
+                Show-Line "Обнаружено групп, связанных с SCCM: $($sccmGroupsFound.Count)" -Class Hint
 
                 # The class each group is shown with, Finding where a broad group is a member.
                 $groupClass = @{}
@@ -140652,9 +140652,9 @@ function Get-SCOMInfrastructure {
                 }
 
                 if ($privilegedServiceAccounts -gt 0) {
-                    Show-Line "Found $(@($serviceAccounts).Count) SCOM service account(s), $privilegedServiceAccounts of them privileged in the domain" -Class Finding
+                    Show-Line "Обнаружено служебных учётных записей SCOM: $(@($serviceAccounts).Count); с привилегиями домена: $privilegedServiceAccounts" -Class Finding
                 } else {
-                    Show-Line "Found $(@($serviceAccounts).Count) SCOM service account(s), none of them privileged in the domain" -Class Hint
+                    Show-Line "Обнаружено служебных учётных записей SCOM: $(@($serviceAccounts).Count); привилегированных среди них нет" -Class Hint
                 }
 
                 foreach ($account in $serviceAccounts) {
@@ -140683,7 +140683,7 @@ function Get-SCOMInfrastructure {
             }
 
             if (@($scomGroupsFound).Count -gt 0) {
-                Show-Line "Found $(@($scomGroupsFound).Count) SCOM-related group(s)" -Class Hint
+                Show-Line "Обнаружено групп, связанных с SCOM: $(@($scomGroupsFound).Count)" -Class Hint
 
                 foreach ($group in $scomGroupsFound) {
                     # Add member count without resolving individual members (avoids O(n) LDAP queries)
@@ -140813,7 +140813,7 @@ function Get-KerberoastableAccounts {
             $kerberoastableUsers = @(Get-DomainUser -SPN -Enabled -LDAPFilter $krbtgtExclusion -ShowOwner @connectionParams)
 
             if (@($kerberoastableUsers).Count -gt 0) {
-                Show-Line "Found $(@($kerberoastableUsers).Count) kerberoastable user account(s):" -Class "Finding"
+                Show-Line "Учётные записи, допускающие Kerberoasting: $(@($kerberoastableUsers).Count)" -Class "Finding"
 
                 # Determine testing mode based on OPSEC flag
                 $canTestKerberoasting = -not $OPSEC
@@ -141031,7 +141031,7 @@ function Get-ASREPRoastableAccounts {
             $asrepRoastableUsers = @($asrepRoastableUsers) + @($asrepRoastableMSAs)
 
             if (@($asrepRoastableUsers).Count -gt 0) {
-                Show-Line "Found $(@($asrepRoastableUsers).Count) AS-REP Roastable account(s):" -Class "Finding"
+                Show-Line "Учётные записи без обязательной предварительной проверки Kerberos (AS-REP Roasting): $(@($asrepRoastableUsers).Count)" -Class "Finding"
 
                 # Which of them is in Protected Users. One query for the whole check, and
                 # only when there is something to annotate.
@@ -141327,7 +141327,7 @@ function Get-UnixPasswordAccounts {
             }
 
             if (@($readable).Count -gt 0) {
-                Show-Line "Found $(@($readable).Count) account(s) with readable password attributes:" -Class "Finding"
+                Show-Line "Учётные записи с доступными для чтения парольными атрибутами: $(@($readable).Count)" -Class "Finding"
 
                 foreach ($entry in $readable) {
                     Show-Object $entry.Object -Class $entry.Class
@@ -145982,7 +145982,7 @@ function Build-NavigationHtml {
     [void]$nav.AppendLine('<div class="sidebar-section">')
     [void]$nav.AppendLine('    <div class="sidebar-title">Категории</div>')
     [void]$nav.AppendLine('    <a class="nav-item category-filter" data-category="all" href="javascript:void(0)" onclick="filterByCategory(''all'')">')
-    [void]$nav.AppendLine('        All Categories')
+    [void]$nav.AppendLine('        Все категории')
     [void]$nav.AppendLine("        <span class=`"count`">$totalCategoryFindings</span>")
     [void]$nav.AppendLine('    </a>')
 
@@ -146000,7 +146000,14 @@ function Build-NavigationHtml {
         # [System.Net.WebUtility]::HtmlEncode, which also escapes non-ASCII: a localized
         # category name came out as "Dom&#228;nen" in the sidebar and with the umlaut
         # itself in its own section title, in the same UTF-8 document.
-        $catNameEncoded = ConvertTo-HtmlEncode $catName
+                $ruCategoryNames = @{
+            Accounts='Учётные записи'; ADCS='AD CS'; Delegation='Делегирование'
+            Domain='Домен'; GPO='Групповые политики'; Rights='Права доступа'
+            Creds='Учётные данные'; Computer='Компьютеры'; Application='Приложения'
+            Shares='Общие ресурсы'; Bloodhound='BloodHound'
+        }
+        $nameRu = if($ruCategoryNames.ContainsKey($catName)){$ruCategoryNames[$catName]}else{$catName}
+        $catNameEncoded = ConvertTo-HtmlEncode $nameRu
         $catIdEncoded = ConvertTo-HtmlEncode $catId
 
         [void]$nav.AppendLine("    <a class=`"nav-item category-filter`" data-category=`"$catIdEncoded`" href=`"javascript:void(0)`" onclick=`"filterByCategory('$catIdEncoded')`">")
@@ -146146,7 +146153,7 @@ function Build-FindingCardHtml {
     $titleForAttr = ConvertTo-HtmlEncode $Title  # Keep original for data-check-title lookup
     $objectTypeAttr = if ($resolvedObjectType) { " data-object-type=`"$(ConvertTo-HtmlEncode $resolvedObjectType)`"" } else { "" }
 
-    $helpButtonHtml = "<span class=`"check-help-btn`" data-check-title=`"$titleForAttr`"$objectTypeAttr title=`"Click for more info`">?</span>"
+    $helpButtonHtml = "<span class=`"check-help-btn`" data-check-title=`"$titleForAttr`"$objectTypeAttr title=`"Подробнее о проверке`">?</span>"
 
     # XSS Protection: Encode category for data attribute
     $categoryEncoded = ConvertTo-HtmlEncode $Category
@@ -146156,7 +146163,7 @@ function Build-FindingCardHtml {
 
     # Add Expand/Collapse All button if there are objects
     $expandCollapseBtn = if ($objectCount -gt 1) {
-        "<button class=`"expand-collapse-btn`" onclick=`"event.stopPropagation(); toggleAllObjects('$findingCardId')`" title=`"Expand/Collapse all objects`"><span>&#9654;</span> Expand All</button>"
+        "<button class=`"expand-collapse-btn`" onclick=`"event.stopPropagation(); toggleAllObjects('$findingCardId')`" title=`"Развернуть или свернуть все объекты`"><span>&#9654;</span> Развернуть всё</button>"
     } else { "" }
 
     $cardIndexAttr = if ($CardIndex -ge 0) { " data-card-index=`"$CardIndex`"" } else { "" }
@@ -146409,7 +146416,7 @@ function Build-ObjectDetailHtml {
     [void]$html.AppendLine("                        <span class=`"expand-icon`">&#9654;</span>")
     [void]$html.AppendLine("                    </div>")
     [void]$html.AppendLine("                    <div class=`"object-body`">")
-    [void]$html.AppendLine("                        <div class=`"attr-col-resizer`" title=`"Drag to resize the name column`" aria-hidden=`"true`"></div>")
+    [void]$html.AppendLine("                        <div class=`"attr-col-resizer`" title=`"Перетащите для изменения ширины названий`" aria-hidden=`"true`"></div>")
 
     # Use RenderModel if available, otherwise create one
     if (-not $RenderModel) {
@@ -149333,7 +149340,7 @@ function Get-HTMLTemplate {
                 <span class="theme-toggle-stars"></span>
                 <span class="theme-toggle-slider"></span>
                 <span id="themeIcon" aria-hidden="true">&#9788;</span>
-                <span id="themeLabel">Light</span>
+                <span id="themeLabel">Светлая</span>
             </button>
             <button class="btn" onclick="toggleShortcutHelp()" title="Горячие клавиши" aria-label="Показать справку и сочетания клавиш">&#63; Справка</button>
             <button class="btn" onclick="window.print()" aria-label="Печать отчёта или сохранение в PDF">Печать / PDF</button>
@@ -149553,7 +149560,7 @@ function Get-HTMLTemplate {
 
         function updateThemeUI(theme) {
             document.getElementById('themeIcon').innerHTML = theme === 'dark' ? '&#9788;' : '&#9790;';
-            document.getElementById('themeLabel').textContent = theme === 'dark' ? 'Light' : 'Dark';
+            document.getElementById('themeLabel').textContent = theme === 'dark' ? 'Светлая' : 'Тёмная';
             // Update ARIA state for theme toggle
             const themeToggle = document.querySelector('.theme-toggle');
             if (themeToggle) {
@@ -152225,10 +152232,10 @@ function Get-HTMLTemplate {
                         <div class="top-actions-header">
                             <div class="top-actions-title" style="color: var(--note);">
                                 <span class="icon">&#10003;</span>
-                                No Critical Findings
+                                Критических нарушений не обнаружено
                             </div>
                         </div>
-                        <p style="margin: 0; color: var(--text-muted);">No high-priority security issues were detected. Review the hints and notes for potential improvements.</p>
+                        <p style="margin: 0; color: var(--text-muted);">Критические нарушения не выявлены. Проверьте предупреждения и информационные результаты для дальнейшего улучшения защиты.</p>
                     </div>
                 `;
                 return;
@@ -152243,11 +152250,11 @@ function Get-HTMLTemplate {
                     <div class="top-actions-header">
                         <div class="top-actions-title">
                             <span class="icon">&#9889;</span>
-                            Top Priority Actions
+                            Первоочередные меры по устранению рисков
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <span style="font-size: 12px; color: var(--text-muted);">${totalCriticalCount} критических нарушений всего</span>
-                            <button class="top-actions-toggle" onclick="toggleTopActions()" title="Toggle Top Priority Actions">
+                            <button class="top-actions-toggle" onclick="toggleTopActions()" title="Свернуть или развернуть приоритетные рекомендации">
                                 <span class="toggle-icon">&#9660;</span>
                             </button>
                         </div>
@@ -152279,12 +152286,18 @@ function Get-HTMLTemplate {
                 // Professional title: checkDescriptions.title > internal check title
                 const displayTitle = checkInfo?.title || item.title;
 
-                // Impact description from checkDescriptions.whyItMatters
-                const impactText = checkInfo?.whyItMatters || '';
-
-                // Remediation from findingDefinitions (best match by findingIds/vulnerabilities/title)
+                // Prefer precise Russian security recommendations. Original definitions
+                // remain intact for risk scoring and original-language reference.
                 const findingDef = findBestFindingDefinition(item.meta || { title: item.title });
-                const remediationText = findingDef?.remediation?.[0] || '';
+                const findingIdRu = findingDef
+                    ? Object.keys(findingDefinitions).find(id => findingDefinitions[id] === findingDef)
+                    : null;
+                const explanationRu = findingIdRu ? (ruFindingExplanations[findingIdRu] || null) : null;
+                const impactText = explanationRu?.impact?.[0] || checkInfo?.whyItMatters || '';
+                const remediationText = explanationRu?.remediation?.[0] ||
+                    'Откройте карточку нарушения, проверьте фактические права и область действия настройки; согласуйте изменение с владельцем системы.';
+                const originalEnglishFix = explanationRu?.remediation?.length
+                    ? '' : (findingDef?.remediation?.[0] || '');
 
                 // Object count for "N affected" label
                 const objectCount = item.meta?.objectCount || 0;
@@ -152294,12 +152307,20 @@ function Get-HTMLTemplate {
                 if (objectCount > 0) {
                     metaHtml += `<span class="top-action-count">${objectCount} затронуто</span>`;
                 }
-                metaHtml += `<span class="top-action-section">${escapeHtml(item.section)}</span>`;
+                const ruModuleNames = {
+                    domain:'Домен', accounts:'Учётные записи', rights:'Права доступа',
+                    gpo:'Групповые политики', delegation:'Делегирование',
+                    adcs:'AD CS', computer:'Компьютеры', creds:'Учётные данные',
+                    application:'Приложения', shares:'Общие ресурсы',
+                    bloodhound:'BloodHound'
+                };
+                const ruSection = ruModuleNames[String(item.section || '').toLowerCase()] || item.section;
+                metaHtml += `<span class="top-action-section">${escapeHtml(ruSection)}</span>`;
 
                 // Build buttons HTML (info button + score badge)
                 let buttonsHtml = '';
                 if (checkInfo) {
-                    buttonsHtml += `<button class="top-action-info-btn" onclick="event.stopPropagation(); showTopActionInfo(this, '${escapeHtml(objectType)}', '${escapeHtml(checkTitle)}')" data-object-type="${escapeHtml(objectType)}" data-check-title="${escapeHtml(checkTitle)}" title="More Info">?</button>`;
+                    buttonsHtml += `<button class="top-action-info-btn" onclick="event.stopPropagation(); showTopActionInfo(this, '${escapeHtml(objectType)}', '${escapeHtml(checkTitle)}')" data-object-type="${escapeHtml(objectType)}" data-check-title="${escapeHtml(checkTitle)}" title="Подробности проверки">?</button>`;
                 }
                 const scoreClass = item.score >= scoreThresholds.critical ? 'score-critical' : item.score >= scoreThresholds.high ? 'score-high' : item.score >= scoreThresholds.medium ? 'score-medium' : item.score >= scoreThresholds.low ? 'score-low' : 'score-info';
                 const breakdownJson = escapeJsonForAttr(item.breakdown);
@@ -152312,6 +152333,9 @@ function Get-HTMLTemplate {
                 }
                 if (remediationText) {
                     detailsHtml += `<div class="top-action-fix">&rarr; ${escapeHtml(remediationText)}</div>`;
+                }
+                if (originalEnglishFix) {
+                    detailsHtml += `<details class="top-action-original-en" lang="en" onclick="event.stopPropagation()"><summary>Точная рекомендация разработчика (оригинал EN)</summary><div>${escapeHtml(originalEnglishFix)}</div></details>`;
                 }
 
                 actionsHTML += `
@@ -152409,21 +152433,21 @@ function Get-HTMLTemplate {
 
             if (checkInfo.summary) {
                 content += '<div class="top-action-tooltip-section">';
-                content += '<div class="top-action-tooltip-label">Summary</div>';
+                content += '<div class="top-action-tooltip-label">Краткое описание</div>';
                 content += '<div class="top-action-tooltip-text">' + escapeHtml(checkInfo.summary) + '</div>';
                 content += '</div>';
             }
 
             if (checkInfo.whyItMatters) {
                 content += '<div class="top-action-tooltip-section">';
-                content += '<div class="top-action-tooltip-label">Why It Matters</div>';
+                content += '<div class="top-action-tooltip-label">Почему это важно</div>';
                 content += '<div class="top-action-tooltip-text">' + escapeHtml(checkInfo.whyItMatters) + '</div>';
                 content += '</div>';
             }
 
             if (checkInfo.whatWeCheck && checkInfo.whatWeCheck.length > 0) {
                 content += '<div class="top-action-tooltip-section">';
-                content += '<div class="top-action-tooltip-label">What We Check</div>';
+                content += '<div class="top-action-tooltip-label">Что проверяется</div>';
                 content += '<ul class="top-action-tooltip-list">';
                 checkInfo.whatWeCheck.forEach(item => {
                     content += '<li>' + escapeHtml(item) + '</li>';
@@ -157761,7 +157785,7 @@ function Collect-BHIssuancePolicies {
 #Requires -Version 5.1
 
 # ===== Script Variables =====
-$Script:adPEASVersion = "2.9.0+20261110-1300"
+$Script:adPEASVersion = "2.9.0+20261110-1330"
 
 # Handle ScriptPath for different execution contexts:
 # - Normal: $MyInvocation.MyCommand.Path is set

@@ -153,7 +153,7 @@
                     Write-Log "[Get-LogonScriptPermissions] Could not tell the privileged accounts apart: $_"
                 }
 
-                Show-Line "Found $($writable.Count) logon script(s) a principal beyond the administrators may change" -Class Finding -FindingId 'LOGON_SCRIPT_WRITABLE'
+                Show-Line "Сценарии входа, доступные для изменения субъектам вне административных групп: $($writable.Count)" -Class Finding -FindingId 'LOGON_SCRIPT_WRITABLE'
                 foreach ($item in $writable) {
                     $runBy = @($item.Entry.Accounts)
                     $privilegedNames = @($runBy |

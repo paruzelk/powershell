@@ -347,7 +347,7 @@ function Get-GPOPointAndPrint {
                 -Dormant $split.Dormant -Listed:$IncludeInactive
 
             if (@($listed).Count -gt 0) {
-                Show-Line "Found $(@($listed).Count) GPO configuration(s) with Point and Print or printer driver settings" -Class Hint
+                Show-Line "Групповые политики с настройками Point and Print или драйверов принтеров: $(@($listed).Count)" -Class Hint
             } elseif ($settled.Count -gt 0) {
                 # Not the "nothing is deployed" line below: something is deployed, and it is
                 # the hardened kind. Saying nothing is deployed would be false, and saying

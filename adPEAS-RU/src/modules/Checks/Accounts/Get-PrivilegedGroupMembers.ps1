@@ -1689,7 +1689,7 @@
                     if (@($PreWin2000Rows).Count -gt 0) {
                         $headerClass = 'Hint'
                         if (@($PreWin2000Rows | Where-Object { $_.Class -eq 'Finding' }).Count -gt 0) { $headerClass = 'Finding' }
-                        Show-Line "Found $(@($PreWin2000Rows).Count) broad member(s) in Pre-Windows 2000 Compatible Access:" -Class $headerClass
+                        Show-Line "Обнаружены широко доступные субъекты в группе Pre-Windows 2000 Compatible Access: $(@($PreWin2000Rows).Count)" -Class $headerClass
                         foreach ($row in $PreWin2000Rows) {
                             Show-Object $row.Finding -Class $row.Class
                         }
@@ -2122,7 +2122,7 @@ function Show-UnprotectedGroupACL {
         foreach ($row in $operatorRows) { Show-Object $row -Class Hint }
     }
     if ($hintRows.Count -gt 0) {
-        Show-Line "Found $($hintRows.Count) expected or privileged holder(s) of the same rights" -Class Hint
+        Show-Line "Ожидаемые либо привилегированные субъекты с такими же разрешениями: $($hintRows.Count)" -Class Hint
         foreach ($row in $hintRows) { Show-Object $row -Class Hint }
     }
 
@@ -2525,15 +2525,15 @@ function Show-PrivilegedAccountACL {
     }
 
     if ($accountFindingRows.Count -gt 0) {
-        Show-Line "Found $($accountFindingRows.Count) principal(s) that can take over a privileged account" -Class Finding -FindingId 'PRIVILEGED_ACCOUNT_ACL'
+        Show-Line "Субъекты, способные получить контроль над привилегированной учётной записью: $($accountFindingRows.Count)" -Class Finding -FindingId 'PRIVILEGED_ACCOUNT_ACL'
         foreach ($row in $accountFindingRows) { Show-Object $row -Class Finding }
     }
     if ($accountOperatorRows.Count -gt 0) {
-        Show-Line "Found $($accountOperatorRows.Count) principal(s) that can take over a member of an operator-level group" -Class Hint -FindingId 'PRIVILEGED_ACCOUNT_ACL'
+        Show-Line "Субъекты, способные получить контроль над участником операторской группы: $($accountOperatorRows.Count)" -Class Hint -FindingId 'PRIVILEGED_ACCOUNT_ACL'
         foreach ($row in $accountOperatorRows) { Show-Object $row -Class Hint }
     }
     if ($accountHintRows.Count -gt 0) {
-        Show-Line "Found $($accountHintRows.Count) expected or privileged holder(s) of the same rights" -Class Hint
+        Show-Line "Ожидаемые либо привилегированные субъекты с такими же разрешениями: $($accountHintRows.Count)" -Class Hint
         foreach ($row in $accountHintRows) { Show-Object $row -Class Hint }
     }
 

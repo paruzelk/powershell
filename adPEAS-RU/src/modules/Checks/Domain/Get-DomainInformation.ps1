@@ -773,7 +773,7 @@ function Get-DomainInformation {
                 $dcObj = [PSCustomObject]@{
                     domainControllers = $dcDisplayList -join "`n"
                 }
-                Show-Line "Found $(@($DomainControllers).Count) domain controller(s):" -Class Note
+                Show-Line "Обнаружено контроллеров домена: $(@($DomainControllers).Count)" -Class Note
                 $dcObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DomainControllers' -Force
                 Show-Object $dcObj -Class Note
             } else {
@@ -787,7 +787,7 @@ function Get-DomainInformation {
             Show-SubHeader "Поиск сайтов и подсетей Active Directory..." -ObjectType "SitesAndSubnets"
 
             if (@($Sites).Count -gt 0) {
-                Show-Line "Found $(@($Sites).Count) site(s) and $(@($Subnets).Count) subnet(s):" -Class Note
+                Show-Line "Обнаружено сайтов AD: $(@($Sites).Count), подсетей: $(@($Subnets).Count)" -Class Note
 
                 foreach ($siteInfo in $Sites) {
                     # Build site object with subnets and DCs

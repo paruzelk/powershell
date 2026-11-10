@@ -321,7 +321,7 @@
             # Finding 2: delegated CreateChild on the computer container, inherited
             # grants included (show full AD objects)
             if (@($createComputerAccounts).Count -gt 0) {
-                Show-Line "Found $(@($createComputerAccounts).Count) account(s) with CreateChild rights in the computer container ($computersContainerDN):" -Class Finding
+                Show-Line "Учётные записи с правом CreateChild в контейнере компьютеров ($computersContainerDN): $(@($createComputerAccounts).Count)" -Class Finding
 
                 foreach ($account in $createComputerAccounts) {
                     # Check if this is a well-known SID that does NOT belong to the domain partition.
@@ -431,7 +431,7 @@
                 # that grants the privilege to Authenticated Users.
                 $lineClass = if ($effectiveIsDangerous -or -not $effectiveGPO) { "Hint" } else { "Secure" }
                 if (@($shownGPOs).Count -gt 0) {
-                    Show-Line "Found $(@($shownGPOs).Count) GPO(s) configuring SeMachineAccountPrivilege:" -Class $lineClass
+                    Show-Line "Групповые политики, назначающие SeMachineAccountPrivilege: $(@($shownGPOs).Count)" -Class $lineClass
                 } else {
                     Show-Line "No policy that is linked and enabled configures SeMachineAccountPrivilege" -Class Note
                 }

@@ -196,7 +196,7 @@
             if (@($inactiveAccounts).Count -gt 0) {
                 $orphanedCount = @($inactiveAccounts | Where-Object { $_.isOrphaned }).Count
                 $orphanedInfo = if ($orphanedCount -gt 0) { ", $orphanedCount orphaned (adminCount=1 but no privileged groups)" } else { "" }
-                Show-Line "Found $(@($inactiveAccounts).Count) inactive privileged account(s) (>$InactiveDays days$orphanedInfo):" -Class Finding
+                Show-Line "Неактивные привилегированные учётные записи (более $InactiveDays дней$orphanedInfo): $(@($inactiveAccounts).Count)" -Class Finding
 
                 foreach ($account in $inactiveAccounts) {
                     $account | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'InactiveAdmin' -Force

@@ -262,7 +262,7 @@
                     -Dormant $split.Dormant -Listed:$IncludeInactive
 
                 if (@($shown).Count -gt 0) {
-                    Show-Line "Found $(@($shown).Count) script(s) distributed via GPO" -Class Hint
+                    Show-Line "Обнаружено сценариев, распространяемых через GPO: $(@($shown).Count)" -Class Hint
                 } else {
                     Show-Line "No script is distributed by a policy that is linked and enabled" -Class Note
                 }

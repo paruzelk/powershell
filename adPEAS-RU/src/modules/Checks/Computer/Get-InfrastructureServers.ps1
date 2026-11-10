@@ -349,7 +349,7 @@ function Get-InfrastructureServers {
                 }
 
                 if ($listedDCs.Count -gt 0) {
-                    Show-Line "Found $($listedDCs.Count) Domain Controller(s):" -Class "Hint"
+                    Show-Line "Обнаружено контроллеров домена: $($listedDCs.Count)" -Class "Hint"
                     foreach ($dc in $listedDCs) { $dc | Show-Object -Class Hint }
                 }
                 if ($unregisteredDCs.Count -gt 0) {
@@ -418,7 +418,7 @@ function Get-InfrastructureServers {
             }
 
             if ($exchangeServers.Count -gt 0) {
-                Show-Line "Found $($exchangeServers.Count) Exchange Server(s):" -Class "Hint"
+                Show-Line "Обнаружено серверов Exchange: $($exchangeServers.Count)" -Class "Hint"
                 foreach ($exch in $exchangeServers) {
                     $exchKey = "$($exch.sAMAccountName)".TrimEnd('$').ToLowerInvariant()
                     if ($exchangeVersionByName.ContainsKey($exchKey) -and $exchangeVersionByName[$exchKey]) {
@@ -442,7 +442,7 @@ function Get-InfrastructureServers {
             $mssqlServers = @(Get-DomainComputer -LDAPFilter "(servicePrincipalName=MSSQLSvc/*)" @PSBoundParameters | Test-AccountActivity -IsEnabled -IncludeDetails)
 
             if ($mssqlServers.Count -gt 0) {
-                Show-Line "Found $($mssqlServers.Count) MSSQL Server(s):" -Class "Hint"
+                Show-Line "Обнаружено серверов SQL Server: $($mssqlServers.Count)" -Class "Hint"
                 foreach ($sql in $mssqlServers) {
                     $sql | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'MSSQLServer' -Force
                     $sql | Show-Object -Class Hint
@@ -474,7 +474,7 @@ function Get-InfrastructureServers {
             $sccmServers = @(Get-DomainComputer -LDAPFilter "(|(servicePrincipalName=SMS*)(servicePrincipalName=CCM*))" @PSBoundParameters | Test-AccountActivity -IsEnabled -IncludeDetails)
 
             if ($sccmServers.Count -gt 0) {
-                Show-Line "Found $($sccmServers.Count) SCCM/ConfigMgr Server(s):" -Class "Hint"
+                Show-Line "Обнаружено серверов SCCM/ConfigMgr: $($sccmServers.Count)" -Class "Hint"
                 foreach ($sccm in $sccmServers) {
                     $sccm | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SCCMServerBasic' -Force
                     $sccm | Show-Object -Class Hint
@@ -502,7 +502,7 @@ function Get-InfrastructureServers {
             $scomServers = @(Get-DomainComputer -LDAPFilter "(|(servicePrincipalName=MSOMHSvc/*)(servicePrincipalName=MSOMSdkSvc/*))" @PSBoundParameters | Test-AccountActivity -IsEnabled -IncludeDetails)
 
             if ($scomServers.Count -gt 0) {
-                Show-Line "Found $($scomServers.Count) SCOM Server(s):" -Class "Hint"
+                Show-Line "Обнаружено серверов SCOM: $($scomServers.Count)" -Class "Hint"
                 foreach ($scom in $scomServers) {
                     $scom | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SCOMServerBasic' -Force
                     $scom | Show-Object -Class Hint
@@ -578,7 +578,7 @@ function Get-InfrastructureServers {
             }
 
             if ($adfsIndicators.Count -gt 0) {
-                Show-Line "Found $($adfsIndicators.Count) AD FS indicator(s):" -Class "Hint"
+                Show-Line "Обнаружено признаков инфраструктуры AD FS: $($adfsIndicators.Count)" -Class "Hint"
                 foreach ($adfsIndicator in $adfsIndicators) {
                     $adfsIndicator | Show-Object -Class Hint
                 }
@@ -616,7 +616,7 @@ function Get-InfrastructureServers {
             }
 
             if ($entraConnectIndicators.Count -gt 0) {
-                Show-Line "Found $($entraConnectIndicators.Count) Entra ID Connect indicator(s):" -Class "Hint"
+                Show-Line "Обнаружено признаков Entra ID Connect: $($entraConnectIndicators.Count)" -Class "Hint"
                 foreach ($indicator in $entraConnectIndicators) {
                     # Parse description to extract server name and tenant
                     # Pattern: "...running on computer SERVERNAME configured to synchronize to tenant TENANT.onmicrosoft.com..."

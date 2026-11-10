@@ -86,7 +86,7 @@
             $asrepRoastableUsers = @($asrepRoastableUsers) + @($asrepRoastableMSAs)
 
             if (@($asrepRoastableUsers).Count -gt 0) {
-                Show-Line "Found $(@($asrepRoastableUsers).Count) AS-REP Roastable account(s):" -Class "Finding"
+                Show-Line "Учётные записи без обязательной предварительной проверки Kerberos (AS-REP Roasting): $(@($asrepRoastableUsers).Count)" -Class "Finding"
 
                 # Which of them is in Protected Users. One query for the whole check, and
                 # only when there is something to annotate.

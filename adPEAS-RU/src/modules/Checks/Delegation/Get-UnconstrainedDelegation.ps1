@@ -176,7 +176,7 @@ function Get-UnconstrainedDelegation {
 
             $populations = "$totalComputers computers, $totalUsers users"
             if ($totalMSAs -gt 0) { $populations = "$populations, $totalMSAs managed service accounts" }
-            Show-Line "Found $total account(s) with Unconstrained Delegation ($populations):" -Class "Finding"
+            Show-Line "Учётные записи с неограниченным делегированием Kerberos: $total ($populations)" -Class "Finding"
 
             foreach ($account in $unconstrainedAccounts) {
                 # Add type marker for HTML report

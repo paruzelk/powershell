@@ -652,7 +652,7 @@ function Invoke-ShareHunt {
             }
 
             $byComputer = @($readable | Group-Object -Property Computer | Sort-Object -Property Name)
-            Show-Line "Found $($readable.Count) readable share(s) on $($byComputer.Count) computer(s):" -Class Note
+            Show-Line "Доступные для чтения сетевые ресурсы: $($readable.Count) на $($byComputer.Count) компьютерах" -Class Note
 
             foreach ($group in $byComputer) {
                 $shares = @($group.Group | Sort-Object -Property Name)
@@ -752,7 +752,7 @@ function Invoke-ShareHunt {
             if ($results.Count -eq 0) {
                 # Not "Secure": a share is read only as far as this account and the limits
                 # allowed, which is never the guarantee that word would make.
-                Show-Line "No credentials found in $($readable.Count) readable share(s)" -Class Note
+                Show-Line "Учётные данные не обнаружены в $($readable.Count) доступных для чтения сетевых ресурсах" -Class Note
                 Write-ShareHuntExport
                 return
             }
