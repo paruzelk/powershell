@@ -32,6 +32,7 @@ jobs:
           $ErrorActionPreference = "Stop"
           .\adPEAS-RU\Tests\Invoke-CI.ps1
           .\adPEAS-RU\Tests\Test-Import.ps1
+          .\adPEAS-RU\Tests\Test-RunnerOffline.ps1
       - name: JavaScript template syntax check
         shell: pwsh
         run: |
