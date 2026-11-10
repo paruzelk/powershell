@@ -75,7 +75,7 @@
   "Found $(@($readable).Count) account(s) with readable password attributes:": "Учётные записи с доступными для чтения парольными атрибутами: $(@($readable).Count)",
   "Found $($hintRows.Count) expected or privileged holder(s) of the same rights": "Ожидаемые либо привилегированные субъекты с такими же разрешениями: $($hintRows.Count)",
   "Found $($accountHintRows.Count) expected or privileged holder(s) of the same rights": "Ожидаемые либо привилегированные субъекты с такими же разрешениями: $($accountHintRows.Count)",
-  "Found $($scomGroupsFound.Count) SCOM-related group(s)": "Обнаружено групп, связанных с SCOM: $($scomGroupsFound.Count)",
   "Found $($sccmGroupsFound.Count) SCCM-related group(s)": "Обнаружено групп, связанных с SCCM: $($sccmGroupsFound.Count)",
-  "Found $(@($serviceAccounts).Count) SCCM service account(s) with SMS* SPN": "Обнаружены служебные учётные записи SCCM с SPN вида SMS*: $(@($serviceAccounts).Count)"
+  "Found $(@($serviceAccounts).Count) SCCM service account(s) with SMS* SPN": "Обнаружены служебные учётные записи SCCM с SPN вида SMS*: $(@($serviceAccounts).Count)",
+  "Found $(@($scomGroupsFound).Count) SCOM-related group(s)": "Обнаружено групп, связанных с SCOM: $(@($scomGroupsFound).Count)"
 }
