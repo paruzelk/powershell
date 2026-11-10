@@ -1,0 +1,506 @@
+{
+  "schema": "adPEAS.RU.ObjectTypes.1",
+  "locale": "ru-RU",
+  "translations": {
+    "DomainBasicInfo": {
+      "SectionTitle": "Сведения о домене",
+      "Summary": "Общие сведения о домене Active Directory, лесу, SID и функциональных уровнях."
+    },
+    "KerberosPolicy": {
+      "SectionTitle": "Политика Kerberos",
+      "Summary": "Параметры времени действия билетов Kerberos и политики для учётной записи krbtgt."
+    },
+    "GuestAccount": {
+      "SectionTitle": "Состояние учётной записи «Гость»",
+      "Summary": "Проверка встроенной учётной записи «Гость» (RID 501) и её членства в группах."
+    },
+    "DomainControllers": {
+      "SectionTitle": "Контроллеры домена и роли FSMO",
+      "Summary": "Список контроллеров домена и распределение ролей FSMO."
+    },
+    "SitesAndSubnets": {
+      "SectionTitle": "Сайты и подсети Active Directory",
+      "Summary": "Сопоставление сайтов AD, IP-подсетей и контроллеров домена."
+    },
+    "DomainPasswordPolicy": {
+      "SectionTitle": "Доменная политика паролей",
+      "Summary": "Проверка параметров парольной политики домена по умолчанию."
+    },
+    "FineGrainedPasswordPolicy": {
+      "SectionTitle": "Тонкие политики паролей (FGPP)",
+      "Summary": "Анализ тонких политик паролей, переопределяющих доменную политику."
+    },
+    "DomainTrust": {
+      "SectionTitle": "Доверительные отношения домена",
+      "Summary": "Проверка доверительных отношений с доменами и лесами."
+    },
+    "ReadableShare": {
+      "SectionTitle": "Доступные для чтения общие ресурсы",
+      "Summary": "Общие папки компьютеров домена, к которым текущая учётная запись имеет доступ на чтение."
+    },
+    "ShareCredential": {
+      "SectionTitle": "Учётные данные в общих папках",
+      "Summary": "Поиск учётных данных в доступных скриптах и конфигурационных файлах."
+    },
+    "NetworkSubnet": {
+      "SectionTitle": "Карта сети",
+      "Summary": "Анализ IP-подсетей активных компьютеров домена и их организационных единиц."
+    },
+    "OpenPorts": {
+      "SectionTitle": "Открытые сетевые порты",
+      "Summary": "Список открытых TCP-портов просканированных адресов."
+    },
+    "LDAPConfigGPO": {
+      "SectionTitle": "Настройки подписи LDAP в GPO",
+      "Summary": "Проверка подписи LDAP и привязки канала TLS по объектам групповой политики."
+    },
+    "NullSessionGPO": {
+      "SectionTitle": "Параметры анонимного доступа в GPO",
+      "Summary": "Анализ настроек анонимного перечисления SAM и сопоставления SID с именами."
+    },
+    "DSHeuristics": {
+      "SectionTitle": "Параметры dsHeuristics",
+      "Summary": "Проверка параметров службы каталогов, которые могут ослаблять защиту леса AD."
+    },
+    "SMBSigning": {
+      "SectionTitle": "Настройки подписи SMB",
+      "Summary": "Проверка требования цифровой подписи SMB на компьютерах домена."
+    },
+    "EffectiveLDAPConfig": {
+      "SectionTitle": "Действующие настройки LDAP",
+      "Summary": "Определение фактически применённых настроек подписи LDAP и привязки канала."
+    },
+    "EffectiveNullSession": {
+      "SectionTitle": "Действующие параметры анонимного доступа",
+      "Summary": "Определение действующих ограничений анонимных сеансов."
+    },
+    "EffectiveSMBSigning": {
+      "SectionTitle": "Действующие настройки подписи SMB",
+      "Summary": "Определение фактических требований подписи SMB."
+    },
+    "EffectiveSMBSigningMembers": {
+      "SectionTitle": "Подпись SMB: затронутые компьютеры",
+      "Summary": "Перечень компьютеров, на которые распространяется политика подписи SMB."
+    },
+    "SMBSigningWeakened": {
+      "SectionTitle": "Ослабление защиты SMB",
+      "Summary": "Выявление настроек, снижающих требования цифровой подписи SMB."
+    },
+    "DomainController": {
+      "SectionTitle": "Контроллеры домена",
+      "Summary": "Перечень контроллеров домена и их основные параметры."
+    },
+    "ExchangeServer": {
+      "SectionTitle": "Серверы Exchange",
+      "Summary": "Инвентаризация серверов Microsoft Exchange и их настроек."
+    },
+    "ExchangeServerBasic": {
+      "SectionTitle": "Серверы Exchange: основные сведения",
+      "Summary": "Базовая инвентаризация серверов Microsoft Exchange."
+    },
+    "ExchangeOrganization": {
+      "SectionTitle": "Организация Exchange",
+      "Summary": "Анализ объектов организации Microsoft Exchange в Active Directory."
+    },
+    "ExchangeConfigServer": {
+      "SectionTitle": "Сервер Exchange в разделе Configuration",
+      "Summary": "Параметры серверов Exchange в разделе конфигурации AD."
+    },
+    "ExchangeHybridConfiguration": {
+      "SectionTitle": "Гибридное развёртывание Exchange",
+      "Summary": "Проверка конфигурации гибридного взаимодействия Exchange с облачными сервисами."
+    },
+    "ExchangeReceiveConnector": {
+      "SectionTitle": "Принимающие SMTP-соединители Exchange",
+      "Summary": "Проверка принимающих соединителей SMTP и параметров аутентификации."
+    },
+    "ExchangePermissionsModel": {
+      "SectionTitle": "Модель разрешений Exchange",
+      "Summary": "Анализ модели разрешений Exchange и связанных прав в Active Directory."
+    },
+    "ExchangeRoleAssignment": {
+      "SectionTitle": "Назначения ролей управления Exchange",
+      "Summary": "Проверка назначений ролей RBAC в Exchange."
+    },
+    "MSSQLServer": {
+      "SectionTitle": "Серверы Microsoft SQL Server",
+      "Summary": "Инвентаризация серверов SQL Server и связанных служебных учётных записей."
+    },
+    "SCCMServer": {
+      "SectionTitle": "Инфраструктура Configuration Manager (SCCM)",
+      "Summary": "Проверка инфраструктуры Microsoft Configuration Manager."
+    },
+    "SCCMServerBasic": {
+      "SectionTitle": "Серверы SCCM: основные сведения",
+      "Summary": "Базовая инвентаризация серверов Microsoft Configuration Manager."
+    },
+    "SCCMServiceAccount": {
+      "SectionTitle": "Служебные учётные записи SCCM",
+      "Summary": "Проверка учётных записей служб Configuration Manager."
+    },
+    "SCCMGroup": {
+      "SectionTitle": "Группы SCCM",
+      "Summary": "Анализ групп и их участников в инфраструктуре Configuration Manager."
+    },
+    "SCCMContainerPermission": {
+      "SectionTitle": "Разрешения контейнера System Management",
+      "Summary": "Проверка прав доступа к контейнеру System Management в Active Directory."
+    },
+    "SCCMSite": {
+      "SectionTitle": "Сайты SCCM",
+      "Summary": "Параметры сайтов Microsoft Configuration Manager."
+    },
+    "SCCMManagementPoint": {
+      "SectionTitle": "Точки управления SCCM",
+      "Summary": "Инвентаризация точек управления Configuration Manager."
+    },
+    "SCCMPXEServer": {
+      "SectionTitle": "Серверы загрузки PXE/WDS",
+      "Summary": "Проверка серверов сетевой загрузки PXE и служб WDS."
+    },
+    "SCOMServer": {
+      "SectionTitle": "Инфраструктура Operations Manager (SCOM)",
+      "Summary": "Проверка инфраструктуры Microsoft Operations Manager."
+    },
+    "SCOMServerBasic": {
+      "SectionTitle": "Серверы SCOM: основные сведения",
+      "Summary": "Инвентаризация серверов Microsoft Operations Manager."
+    },
+    "SCOMServiceAccount": {
+      "SectionTitle": "Служебные учётные записи SCOM",
+      "Summary": "Проверка прав и настроек учётных записей служб Operations Manager."
+    },
+    "SCOMGroup": {
+      "SectionTitle": "Группы SCOM",
+      "Summary": "Проверка групп Microsoft Operations Manager."
+    },
+    "ADFSServer": {
+      "SectionTitle": "Службы федерации AD FS",
+      "Summary": "Инвентаризация серверов и конфигурации Active Directory Federation Services."
+    },
+    "EntraConnect": {
+      "SectionTitle": "Microsoft Entra Connect",
+      "Summary": "Проверка конфигурации синхронизации идентификаторов Microsoft Entra Connect."
+    },
+    "ExchangeTrustedSubsystem": {
+      "SectionTitle": "Группа Exchange Trusted Subsystem",
+      "Summary": "Проверка привилегий группы Exchange Trusted Subsystem."
+    },
+    "ExchangeWindowsPermissions": {
+      "SectionTitle": "Группа Exchange Windows Permissions",
+      "Summary": "Анализ полномочий группы Exchange Windows Permissions."
+    },
+    "ExchangeOrganizationManagement": {
+      "SectionTitle": "Группа Organization Management",
+      "Summary": "Анализ участников административной группы Organization Management в Exchange."
+    },
+    "ExchangeServersGroup": {
+      "SectionTitle": "Группа Exchange Servers",
+      "Summary": "Проверка состава и полномочий группы Exchange Servers."
+    },
+    "CertificateAuthority": {
+      "SectionTitle": "Центры сертификации AD CS",
+      "Summary": "Инвентаризация центров сертификации Active Directory Certificate Services."
+    },
+    "CertificateTemplate": {
+      "SectionTitle": "Шаблоны сертификатов AD CS",
+      "Summary": "Проверка шаблонов сертификатов, параметров выдачи и прав регистрации."
+    },
+    "PKIContainer": {
+      "SectionTitle": "Разрешения контейнеров PKI",
+      "Summary": "Проверка списков управления доступом к контейнерам инфраструктуры открытых ключей."
+    },
+    "PKIInfrastructure": {
+      "SectionTitle": "Инфраструктура доверия PKI",
+      "Summary": "Анализ компонентов инфраструктуры открытых ключей и цепочек доверия."
+    },
+    "RootCA": {
+      "SectionTitle": "Доверенные корневые центры сертификации",
+      "Summary": "Проверка сертификатов доверенных корневых центров сертификации."
+    },
+    "NTAuthCertificate": {
+      "SectionTitle": "Хранилище NTAuth",
+      "Summary": "Проверка сертификатов в хранилище NTAuth леса Active Directory."
+    },
+    "AIACA": {
+      "SectionTitle": "Центры сертификации в AIA",
+      "Summary": "Проверка опубликованных в Active Directory сертификатов центров сертификации."
+    },
+    "UnconstrainedDelegation": {
+      "SectionTitle": "Неограниченное делегирование Kerberos",
+      "Summary": "Поиск учётных записей и компьютеров с неограниченным делегированием."
+    },
+    "ConstrainedDelegation": {
+      "SectionTitle": "Ограниченное делегирование Kerberos",
+      "Summary": "Проверка разрешённых служб и параметров ограниченного делегирования."
+    },
+    "RBCDelegation": {
+      "SectionTitle": "Ограниченное делегирование на основе ресурса (RBCD)",
+      "Summary": "Анализ разрешений RBCD на целевых компьютерных объектах."
+    },
+    "PasswordNeverExpires": {
+      "SectionTitle": "Пароли с неограниченным сроком действия",
+      "Summary": "Поиск учётных записей с запретом истечения срока действия пароля."
+    },
+    "ReversibleEncryption": {
+      "SectionTitle": "Обратимое шифрование паролей",
+      "Summary": "Выявление учётных записей с хранением паролей в обратимо зашифрованном виде."
+    },
+    "ComputerObjectACL": {
+      "SectionTitle": "Явно назначенные права на компьютеры",
+      "Summary": "Проверка явных разрешений на объекты компьютеров в AD."
+    },
+    "CriticalObjectACL": {
+      "SectionTitle": "Права на критически важные объекты каталога",
+      "Summary": "Анализ ACL схемы, разделов каталога и объектов ролей."
+    },
+    "RODCPasswordReplication": {
+      "SectionTitle": "Политика репликации паролей RODC",
+      "Summary": "Проверка кэширования и репликации паролей на контроллерах домена только для чтения."
+    },
+    "PasswordNotRequired": {
+      "SectionTitle": "Учётные записи без обязательного пароля",
+      "Summary": "Выявление учётных записей с флагом PASSWD_NOTREQD."
+    },
+    "InactiveAdmin": {
+      "SectionTitle": "Неактивные административные учётные записи",
+      "Summary": "Поиск длительно неиспользуемых привилегированных учётных записей."
+    },
+    "gMSA": {
+      "SectionTitle": "Групповые управляемые учётные записи служб (gMSA)",
+      "Summary": "Анализ настроек и использования групповых управляемых учётных записей служб."
+    },
+    "gMSAPassword": {
+      "SectionTitle": "Права чтения паролей gMSA",
+      "Summary": "Проверка субъектов, которым разрешено получать управляемые пароли gMSA."
+    },
+    "MSA": {
+      "SectionTitle": "Автономные управляемые учётные записи служб",
+      "Summary": "Проверка традиционных управляемых учётных записей служб (sMSA)."
+    },
+    "AuthNPolicySilo": {
+      "SectionTitle": "Хранилища политик проверки подлинности",
+      "Summary": "Проверка изолированных групп применения политик проверки подлинности."
+    },
+    "AuthNPolicy": {
+      "SectionTitle": "Политики проверки подлинности",
+      "Summary": "Анализ настроек и назначения политик проверки подлинности."
+    },
+    "dMSA": {
+      "SectionTitle": "Делегированные управляемые учётные записи служб (dMSA)",
+      "Summary": "Проверка делегированных управляемых учётных записей служб."
+    },
+    "dMSALink": {
+      "SectionTitle": "Связи делегированных учётных записей dMSA",
+      "Summary": "Проверка связей между dMSA и заменяемыми учётными записями."
+    },
+    "NonDefaultOwner": {
+      "SectionTitle": "Нестандартные владельцы учётных записей",
+      "Summary": "Поиск пользовательских объектов, у которых назначен нетипичный владелец."
+    },
+    "Tier0Account": {
+      "SectionTitle": "Защита учётных записей уровня 0 (Tier 0)",
+      "Summary": "Оценка защиты учётных записей с доступом к критически важной инфраструктуре AD."
+    },
+    "PrivilegedGroupMember": {
+      "SectionTitle": "Участники привилегированных групп",
+      "Summary": "Анализ состава административных и других привилегированных групп."
+    },
+    "OperatorGroup": {
+      "SectionTitle": "Участники операторских групп",
+      "Summary": "Проверка состава встроенных операторских и широких групп доступа."
+    },
+    "SIDHistory": {
+      "SectionTitle": "Возможное злоупотребление sIDHistory",
+      "Summary": "Проверка атрибута sIDHistory и включённых в него идентификаторов безопасности."
+    },
+    "AdminSDHolderACL": {
+      "SectionTitle": "Права на объект AdminSDHolder",
+      "Summary": "Анализ ACL AdminSDHolder и распространяемых защитных разрешений."
+    },
+    "PrivilegedGroupACL": {
+      "SectionTitle": "ACL привилегированных групп вне AdminSDHolder",
+      "Summary": "Поиск опасных разрешений на группах, не защищённых AdminSDHolder."
+    },
+    "UnprotectedPrivilegedGroups": {
+      "SectionTitle": "Привилегированные группы без защиты AdminSDHolder",
+      "Summary": "Поиск административных групп за пределами защиты AdminSDHolder."
+    },
+    "PrivilegedAccountACL": {
+      "SectionTitle": "Права управления привилегированными учётными записями",
+      "Summary": "Проверка прав изменения и владения административными учётными записями."
+    },
+    "PrivilegedAccountsRead": {
+      "SectionTitle": "Доступ к объектам привилегированных учётных записей",
+      "Summary": "Проверка разрешений на чтение и управление защищаемыми учётными записями."
+    },
+    "LogonScriptPermission": {
+      "SectionTitle": "Сценарии входа учётных записей",
+      "Summary": "Анализ путей сценариев входа и прав их изменения."
+    },
+    "PreWindows2000Access": {
+      "SectionTitle": "Группа Pre-Windows 2000 Compatible Access",
+      "Summary": "Проверка состава группы совместимого доступа с Windows 2000 и её полномочий."
+    },
+    "Kerberoastable": {
+      "SectionTitle": "Учётные записи, допускающие Kerberoasting",
+      "Summary": "Поиск учётных записей служб, для которых доступны билеты Kerberos с возможностью автономного подбора пароля."
+    },
+    "ASREPRoastable": {
+      "SectionTitle": "Учётные записи, допускающие AS-REP Roasting",
+      "Summary": "Поиск учётных записей без обязательной предварительной проверки подлинности Kerberos."
+    },
+    "UnixPassword": {
+      "SectionTitle": "Парольные атрибуты UNIX",
+      "Summary": "Поиск потенциально чувствительных парольных атрибутов UNIX в AD."
+    },
+    "CredentialRoaming": {
+      "SectionTitle": "Перемещаемые учётные данные",
+      "Summary": "Анализ сохранённых в AD данных Credential Roaming."
+    },
+    "CredentialRoamingPermission": {
+      "SectionTitle": "Права чтения перемещаемых учётных данных",
+      "Summary": "Проверка делегированных разрешений на чтение Credential Roaming."
+    },
+    "GPPCredential": {
+      "SectionTitle": "Учётные данные в предпочтениях групповой политики",
+      "Summary": "Поиск раскрытия паролей и других секретов в Group Policy Preferences (GPP)."
+    },
+    "SYSVOLCredential": {
+      "SectionTitle": "Учётные данные в сценариях SYSVOL",
+      "Summary": "Поиск паролей и секретов в доступных сценариях SYSVOL."
+    },
+    "LAPSCredential": {
+      "SectionTitle": "Доступ к паролям LAPS",
+      "Summary": "Проверка разрешений на чтение паролей локальных администраторов из LAPS."
+    },
+    "BitLockerRecoveryKey": {
+      "SectionTitle": "Доступ к ключам восстановления BitLocker",
+      "Summary": "Проверка доступа к ключам и паролям восстановления BitLocker в AD."
+    },
+    "BitLockerRecoveryPermission": {
+      "SectionTitle": "Делегированное чтение ключей BitLocker",
+      "Summary": "Проверка субъектов с делегированными правами чтения данных восстановления BitLocker."
+    },
+    "PasswordInDescription": {
+      "SectionTitle": "Пароли в текстовых атрибутах объектов",
+      "Summary": "Поиск учётных данных в полях описания и других свободно заполняемых атрибутах."
+    },
+    "DeletedObject": {
+      "SectionTitle": "Доступные для чтения удалённые объекты",
+      "Summary": "Проверка чтения удалённых объектов и сохранённых атрибутов."
+    },
+    "DeletedObjectsReader": {
+      "SectionTitle": "Права просмотра удалённых объектов",
+      "Summary": "Определение субъектов, имеющих право перечислять удалённые объекты."
+    },
+    "DangerousACL": {
+      "SectionTitle": "Права доступа к корню домена",
+      "Summary": "Проверка опасных разрешений на корневом объекте домена."
+    },
+    "DangerousOUPermission": {
+      "SectionTitle": "Опасные разрешения на OU",
+      "Summary": "Анализ ACL организационных единиц и возможных путей повышения привилегий."
+    },
+    "WeakCertificateMapping": {
+      "SectionTitle": "Небезопасное сопоставление сертификатов",
+      "Summary": "Проверка явного сопоставления сертификатов и возможных слабых привязок к учётным записям."
+    },
+    "PasswordResetRight": {
+      "SectionTitle": "Права сброса паролей",
+      "Summary": "Проверка субъектов с правом сброса паролей других учётных записей."
+    },
+    "AddComputerRight": {
+      "SectionTitle": "Права добавления компьютеров в домен",
+      "Summary": "Проверка прав создания объектов компьютеров."
+    },
+    "GPOUserRights": {
+      "SectionTitle": "Назначение прав пользователя через GPO",
+      "Summary": "Поиск отступлений от стандартных настроек прав пользователя Windows в GPO."
+    },
+    "MachineAccountQuota": {
+      "SectionTitle": "Квота создания компьютерных учётных записей",
+      "Summary": "Проверка параметра ms-DS-MachineAccountQuota."
+    },
+    "AddComputerGPO": {
+      "SectionTitle": "Параметры GPO для добавления компьютеров",
+      "Summary": "Анализ групповых политик, влияющих на право добавлять компьютеры в домен."
+    },
+    "LAPSPermission": {
+      "SectionTitle": "Разрешения на чтение LAPS",
+      "Summary": "Анализ ACL, позволяющих читать пароли LAPS."
+    },
+    "ComputerPasswordAge": {
+      "SectionTitle": "Возраст паролей компьютерных учётных записей",
+      "Summary": "Проверка давности изменения паролей компьютеров домена."
+    },
+    "OutdatedComputer": {
+      "SectionTitle": "Устаревшие версии Windows на компьютерах",
+      "Summary": "Поиск неподдерживаемых и устаревающих версий Windows."
+    },
+    "NonDefaultComputerOwner": {
+      "SectionTitle": "Нестандартные владельцы объектов компьютеров",
+      "Summary": "Проверка собственников компьютерных объектов в AD."
+    },
+    "LAPSConfiguration": {
+      "SectionTitle": "Конфигурация LAPS",
+      "Summary": "Проверка политики и параметров Windows LAPS и прежней версии LAPS."
+    },
+    "LAPSCoverage": {
+      "SectionTitle": "Охват компьютеров защитой LAPS",
+      "Summary": "Оценка доли компьютеров с управлением паролем локального администратора."
+    },
+    "GPOPermission": {
+      "SectionTitle": "Разрешения на объекты GPO",
+      "Summary": "Проверка списков управления доступом к объектам групповой политики."
+    },
+    "GPOLocalGroup": {
+      "SectionTitle": "Назначение участников локальных групп через GPO",
+      "Summary": "Анализ добавления учётных записей в локальные группы посредством GPO."
+    },
+    "GPOSuppressedGroup": {
+      "SectionTitle": "Объекты, исключённые из этой проверки",
+      "Summary": "Перечень результатов, сознательно исключённых согласно условиям проверки."
+    },
+    "GPOScheduledTask": {
+      "SectionTitle": "Запланированные задания в GPO",
+      "Summary": "Проверка задач, создаваемых и настраиваемых групповыми политиками."
+    },
+    "GPOScriptPath": {
+      "SectionTitle": "Пути сценариев в GPO",
+      "Summary": "Проверка сценариев запуска и входа, заданных через GPO."
+    },
+    "GPORegistrySetting": {
+      "SectionTitle": "Параметры реестра в GPO",
+      "Summary": "Анализ параметров реестра, устанавливаемых объектами групповой политики."
+    },
+    "GPORegistryValue": {
+      "SectionTitle": "Значения реестра в GPO",
+      "Summary": "Проверка значений реестра, изменяемых групповыми политиками."
+    },
+    "PointAndPrintPolicy": {
+      "SectionTitle": "Политики установки драйверов Point and Print",
+      "Summary": "Проверка ограничений Point and Print для установки драйверов принтеров."
+    },
+    "LAPSStalePassword": {
+      "SectionTitle": "Пароли LAPS, переставшие обновляться",
+      "Summary": "Поиск паролей LAPS, не сменявшихся в установленный срок."
+    },
+    "LAPSGPOConfig": {
+      "SectionTitle": "Параметры LAPS в групповых политиках",
+      "Summary": "Проверка параметров Windows LAPS, заданных в GPO."
+    },
+    "BloodHoundCollector": {
+      "SectionTitle": "Сбор данных BloodHound",
+      "Summary": "Сбор графа отношений между объектами, группами и разрешениями AD."
+    },
+    "LDAPStatisticsModule": {
+      "SectionTitle": "Статистика LDAP по модулям",
+      "Summary": "Количество LDAP-запросов и объём данных по каждому модулю."
+    },
+    "LDAPStatisticsTotal": {
+      "SectionTitle": "Общая статистика LDAP",
+      "Summary": "Сводное количество LDAP-запросов, результатов и переданных данных."
+    }
+  }
+}
