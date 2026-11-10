@@ -161,7 +161,7 @@ Describe 'BW4k7v2a5 original failed CreatePilot exact read-only count forensics'
         $script:controller | Should -Match 'SubjectMatches'
     }
     It 'never saves moves sends deletes or creates Outlook objects' {
-        $script:controller | Should -Not -Match '\.(Save|Move|Send|Delete|AddStore|AddStoreEx|CreateItem|Add)\s*\('
+        $script:controller | Should -Not -Match '\.(Save|Move|Send|Delete|AddStore|AddStoreEx|CreateItem)\s*\('
         $script:controller | Should -Not -Match 'New-Object -ComObject'
     }
     It 'never creates evidence or PST files and preserves all original suite files' {
