@@ -11,6 +11,9 @@ on:
       - "adPEAS-RU/Tests/**"
       - ".github/workflows/adpeas-ru.yml"
   workflow_dispatch:
+concurrency:
+  group: adpeas-ru-build
+  cancel-in-progress: true
 permissions:
   contents: write
 jobs:
@@ -62,6 +65,11 @@ jobs:
           if ($LASTEXITCODE -eq 1) {
             git commit -m "adPEAS-RU: full pinned v2.9.0 sources, localized build and verified tests"
             if ($LASTEXITCODE -ne 0) { throw "git commit failed" }
-            git push origin HEAD:adpeas-ru-2.9.0
-            if ($LASTEXITCODE -ne 0) { throw "git push failed" }
+            $remoteRef = (git ls-remote origin "refs/heads/adpeas-ru-2.9.0") -split "\s+" | Select-Object -First 1
+            if ($remoteRef -ne $env:GITHUB_SHA) {
+              Write-Host "A newer source revision is available; skip pushing this superseded build."
+            } else {
+              git push origin HEAD:adpeas-ru-2.9.0
+              if ($LASTEXITCODE -ne 0) { throw "git push failed" }
+            }
           }
