@@ -1189,7 +1189,7 @@ jobs:
              'may be IMAP/server-synced',
              'FileMode.CreateNew','SEM-001',
              'Do not delete the original prior test letter',
-             '3512 Pester tests in 119 containers')){
+             '3480 Pester tests in 118 containers')){
              if($d -cnotmatch [regex]::Escape($word)){$issues.Add(('docs '+$word))}
           }
           if([bool]$m.Integration.ArchiveWorkerEnabled -or
