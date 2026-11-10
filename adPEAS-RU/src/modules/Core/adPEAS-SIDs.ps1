@@ -1,0 +1,1095 @@
+﻿<#
+.SYNOPSIS
+    Central SID definitions for Active Directory Security Checks.
+
+.DESCRIPTION
+    This module provides centralized Security Identifier (SID) definitions used across all adPEAS modules for privileged account detection, ACL analysis, and security checks.
+
+    Categories:
+    - Privileged SIDs: Well-known privileged identities (SYSTEM, Administrators, etc.)
+    - Operator SIDs: Operator groups (Account/Server/Backup/Print Operators)
+    - Privileged RID Suffixes: Domain-relative RIDs for privileged groups (-512, -519, etc.)
+    - DCSync-Specific: Stricter subset for DCSync-specific checks
+    - Exchange Groups: Exchange privileged group names (SIDs vary per installation)
+    - Self-Modification SIDs: SELF, Creator Owner (normal on objects)
+    - Legacy Compatibility SIDs: Pre-Windows 2000 Compatible Access
+    - Container Operator SIDs: Groups expected on containers like CN=Computers
+    - Broad Group SIDs: Everyone, Authenticated Users, Domain Users, etc.
+
+    All modules should use these central definitions instead of maintaining their own copies.
+    This ensures consistency and simplifies maintenance.
+
+    Reference: https://docs.microsoft.com/en-us/windows/security/identity-protection/access-control/security-identifiers
+
+.NOTES
+    Author: Alexander Sturz (@_61106960_)
+    This module must be loaded BEFORE any module that uses SID-based checks.
+#>
+
+# ============================================================================
+# PRIVILEGED SIDs (Well-Known, Static)
+# ============================================================================
+# These are well-known SIDs that are ALWAYS privileged, regardless of domain.
+# Used for direct SID matching in Test-IsPrivileged.
+
+<#
+.SYNOPSIS
+    Well-known privileged SIDs (static, not domain-specific).
+.DESCRIPTION
+    These identities have elevated privileges on any Windows/AD system.
+    Used by Test-IsPrivileged for direct SID matching.
+#>
+$Script:PrivilegedSIDs = @(
+    'S-1-5-18',       # SYSTEM (Local System)
+    'S-1-5-19',       # LOCAL SERVICE
+    'S-1-5-20',       # NETWORK SERVICE
+    'S-1-5-32-544',   # BUILTIN\Administrators
+    'S-1-5-9'         # Enterprise Domain Controllers
+)
+
+# ============================================================================
+# OPERATOR SIDs (Optional Privileged)
+# ============================================================================
+# Operator groups can manage specific resources. Whether they are considered "privileged" depends on context (controlled by -IncludeOperators parameter).
+
+<#
+.SYNOPSIS
+    Operator group SIDs (optional, controlled by -IncludeOperators).
+.DESCRIPTION
+    These BUILTIN groups have specific administrative capabilities:
+    - Account Operators: Can manage users and groups (but not Domain Admins)
+    - Server Operators: Can manage domain servers
+    - Print Operators: Can manage printers and have CreateChild on CN=Computers
+    - Backup Operators: Can backup/restore files, bypassing ACLs
+#>
+$Script:OperatorSIDs = @(
+    'S-1-5-32-548',   # Account Operators
+    'S-1-5-32-549',   # Server Operators
+    'S-1-5-32-550',   # Print Operators
+    'S-1-5-32-551'    # Backup Operators
+)
+
+# ============================================================================
+# PRIVILEGED RID SUFFIXES (Domain-Relative)
+# ============================================================================
+# These RIDs, when appended to a domain SID (S-1-5-21-xxx-xxx-xxx-RID), identify privileged groups that exist in every AD domain.
+
+<#
+.SYNOPSIS
+    Domain-relative RID suffixes for privileged groups.
+.DESCRIPTION
+    These RIDs identify domain-specific privileged groups.
+    Full SID format: <DomainSID>-<RID> (e.g., S-1-5-21-xxx-xxx-xxx-512)
+#>
+$Script:PrivilegedRIDSuffixes = @(
+    '-498',   # Enterprise Read-only Domain Controllers
+    '-500',   # Domain Administrator (built-in)
+    '-502',   # KRBTGT
+    '-512',   # Domain Admins
+    '-516',   # Domain Controllers
+    '-518',   # Schema Admins (forest root)
+    '-519',   # Enterprise Admins (forest root)
+    '-521',   # Read-only Domain Controllers
+    '-526',   # Key Admins
+    '-527'    # Enterprise Key Admins
+)
+
+# ============================================================================
+# OPERATOR RID SUFFIXES (Domain-Relative)
+# ============================================================================
+# Domain-relative groups that have specific administrative capabilities but are not Tier-0.
+# These are "Operator" level (Tier-1) - they can facilitate attacks but don't provide direct domain takeover.
+
+<#
+.SYNOPSIS
+    Domain-relative RID suffixes for Operator-level groups.
+.DESCRIPTION
+    These RIDs identify domain-specific groups with elevated but limited privileges.
+    Full SID format: <DomainSID>-<RID> (e.g., S-1-5-21-xxx-xxx-xxx-517)
+
+    Cert Publishers (-517):
+    - Can write to userCertificate attribute on all objects
+    - NOT direct domain takeover, but can facilitate ESC attacks
+    - Tier-1 (Operator), not Tier-0 (Privileged)
+
+    Group Policy Creator Owners (-520):
+    - Can create policies, and edit and delete the ones it created
+    - Cannot link one anywhere: that is write access to gPLink on the container, which the
+      group does not give, so its policies apply nowhere on their own
+    - Tier-1 (Operator), not Tier-0 (user decision 2026-10-21) - it was Privileged, which
+      also hid the rights the group holds as "expected"
+#>
+$Script:OperatorRIDSuffixes = @(
+    '-517',   # Cert Publishers (can write certificates, Tier-1)
+    '-520'    # Group Policy Creator Owners (can create policies, not link them, Tier-1)
+)
+
+# ============================================================================
+# TIER-0 RID SUFFIXES (Domain Admins, Enterprise Admins, Schema Admins)
+# ============================================================================
+# True Tier-0 groups that represent the highest privilege level in Active Directory.
+# These are the accounts that SHOULD be protected by "Protected Users" group.
+# Note: krbtgt (-502), DC computer accounts (-516), and gMSAs are excluded from
+# "should be protected" checks as Protected Users is not applicable to them.
+
+<#
+.SYNOPSIS
+    Domain-relative RID suffixes for true Tier-0 privileged groups.
+.DESCRIPTION
+    These are the accounts with the highest privilege level in AD:
+    - Domain Admins (-512): Full control over the domain
+    - Enterprise Admins (-519): Full control over the forest (forest root only)
+    - Schema Admins (-518): Can modify AD schema (forest root only)
+    - Built-in Administrator (-500): Default admin account
+
+    Explicitly EXCLUDED from Protected Users applicability:
+    - krbtgt (-502): Service account, cannot use Protected Users
+    - Domain Controllers (-516): Computer accounts, not applicable
+    - RODCs (-521): Computer accounts, not applicable
+#>
+$Script:Tier0RIDSuffixes = @(
+    '-500',   # Built-in Administrator account
+    '-512',   # Domain Admins
+    '-518',   # Schema Admins (forest root only)
+    '-519'    # Enterprise Admins (forest root only)
+)
+
+<#
+.SYNOPSIS
+    Well-known SID for BUILTIN\Administrators group.
+.DESCRIPTION
+    Members of BUILTIN\Administrators on Domain Controllers are effectively Tier-0.
+    This is a static SID that exists on all Windows systems.
+#>
+$Script:Tier0StaticSIDs = @(
+    'S-1-5-32-544'   # BUILTIN\Administrators
+)
+
+<#
+.SYNOPSIS
+    RID suffixes for accounts that are Tier-0 but CANNOT use Protected Users.
+.DESCRIPTION
+    These accounts are privileged but Protected Users membership is not applicable:
+    - krbtgt: Kerberos service account (cannot authenticate interactively)
+    - DC$ accounts: Computer accounts (Protected Users only for users)
+    - gMSAs: Group Managed Service Accounts (cannot use Protected Users)
+#>
+$Script:Tier0ExcludedFromProtectionRIDs = @(
+    '-502',   # krbtgt (service account)
+    '-516',   # Domain Controllers (computer accounts)
+    '-521'    # Read-only Domain Controllers (computer accounts)
+)
+
+# ============================================================================
+# DCSYNC-SPECIFIC SIDs AND RIDs (Stricter Subset)
+# ============================================================================
+# For DCSync vulnerability checks, we use a STRICTER definition of "privileged".
+# Only accounts that LEGITIMATELY should have DCSync rights are included.
+# This excludes groups like Domain Admins because DCSync rights granted to non-standard accounts should be flagged as findings.
+
+<#
+.SYNOPSIS
+    DCSync-specific privileged SIDs (stricter subset).
+.DESCRIPTION
+    Only accounts that LEGITIMATELY should have DCSync rights:
+    - SYSTEM: Has full access by design
+    - Administrators: Built-in local admin group
+    - Enterprise Domain Controllers: Replication between DCs
+#>
+$Script:DCSyncPrivilegedSIDs = @(
+    'S-1-5-18',       # SYSTEM
+    'S-1-5-32-544',   # BUILTIN\Administrators
+    'S-1-5-9'         # Enterprise Domain Controllers
+)
+
+<#
+.SYNOPSIS
+    DCSync-specific RID suffixes (stricter subset).
+.DESCRIPTION
+    Domain-relative RIDs that legitimately should have DCSync rights.
+    Excludes Cert Publishers, Key Admins, etc. which don't need DCSync.
+#>
+$Script:DCSyncPrivilegedRIDSuffixes = @(
+    '-500',   # Domain Administrator
+    '-512',   # Domain Admins
+    '-516',   # Domain Controllers
+    '-518',   # Schema Admins
+    '-519',   # Enterprise Admins
+    '-521'    # Read-only Domain Controllers
+)
+
+# ============================================================================
+# EXCHANGE PRIVILEGED GROUPS (By Name)
+# ============================================================================
+# Exchange groups have variable SIDs per installation, so we match by name.
+# ============================================================================
+# CONTEXT-SPECIFIC IDENTITY FILTERING
+# ============================================================================
+# Different security checks require different filtering logic:
+# - Domain Root ACLs: Broad groups are FINDINGS (should never have GenericAll/DCSync)
+# - OU ACLs: SELF/Creator Owner are normal (self-modification)
+# - CN=Computers: SELF/Creator Owner/Pre-Win2000 are normal (object management)
+
+<#
+.SYNOPSIS
+    Special identity SIDs that are NORMAL on child objects (OUs, Containers).
+.DESCRIPTION
+    These represent "the object itself" or "the creator" - expected ACL entries.
+    Should be filtered out (skipped) when analyzing OUs, containers, and objects.
+    Should NOT be filtered on Domain Root (where they would be findings).
+#>
+$Script:SelfModificationSIDs = @(
+    'S-1-5-10',       # SELF (Principal Self) - object can modify itself
+    'S-1-3-0',        # Creator Owner - creator has rights on created objects
+    'S-1-3-1'         # Creator Group - creator's primary group
+)
+
+<#
+.SYNOPSIS
+    Legacy compatibility SIDs - normal on containers like CN=Computers.
+.DESCRIPTION
+    Pre-Windows 2000 Compatible Access is expected on legacy containers.
+#>
+$Script:LegacyCompatibilitySIDs = @(
+    'S-1-5-32-554'    # BUILTIN\Pre-Windows 2000 Compatible Access
+)
+
+<#
+.SYNOPSIS
+    Operator groups that are EXPECTED to have CreateChild on CN=Computers.
+.DESCRIPTION
+    These are not privileged for other purposes but CAN manage computer
+    accounts by design in the CN=Computers container.
+#>
+$Script:ContainerOperatorSIDs = @(
+    'S-1-5-32-548',   # Account Operators - can create/manage users and computers
+    'S-1-5-32-550'    # Print Operators - legacy, has CreateChild on CN=Computers by default
+)
+
+# ============================================================================
+# BROAD GROUP SIDs (Static, Well-Known)
+# ============================================================================
+# These groups include large numbers of users by default.
+# If found with dangerous rights (GenericAll, DCSync), they are ALWAYS findings (except where explicitly handled, like Authenticated Users + MachineAccountQuota).
+
+<#
+.SYNOPSIS
+    Broad groups that IF found with dangerous rights are ALWAYS a finding.
+.DESCRIPTION
+    These well-known SIDs represent large populations of users:
+    - Everyone: All users including anonymous
+    - Authenticated Users: All domain-authenticated users
+    - Anonymous Logon: Unauthenticated access
+    - BUILTIN\Users: Local users group
+    - BUILTIN\Guests: Guest account group
+#>
+$Script:BroadGroupSIDs = @(
+    'S-1-1-0',        # Everyone
+    'S-1-5-11',       # Authenticated Users
+    'S-1-5-7',        # Anonymous Logon
+    'S-1-5-4',        # Interactive
+    'S-1-5-2',        # Network
+    'S-1-5-32-545',   # BUILTIN\Users
+    'S-1-5-32-546'    # BUILTIN\Guests
+)
+
+<#
+.SYNOPSIS
+    Broad group RID suffixes (domain-relative).
+.DESCRIPTION
+    Domain Users, Domain Guests, and Domain Computers are "broad" groups
+    because they contain many/all domain members by default.
+#>
+# The built-in operator groups and the object classes each may create by design. Both
+# groups carry adminCount=1 and are Tier 1 in the Microsoft model, but Test-IsPrivileged
+# answers IsPrivileged=$false for them - so their default delegations were reported as
+# findings by non-privileged accounts, in every domain, on every container they reach.
+#
+# Bound to the class, not to the group: an explicit GenericAll, WriteDacl or Reset
+# Password for Account Operators on a Tier-0 OU is no default and stays a finding, which
+# is exactly why the blanket SID filter that used to sit in Get-DangerousOUPermissions
+# was removed.
+$Script:DefaultObjectCreators = @{
+    'S-1-5-32-548' = @('user', 'group', 'computer', 'inetOrgPerson', 'msDS-ManagedServiceAccount')  # Account Operators
+    'S-1-5-32-550' = @('printQueue')                                                                # Print Operators
+}
+
+$Script:BroadGroupRIDSuffixes = @(
+    '-513',   # Domain Users
+    '-514',   # Domain Guests
+    '-515'    # Domain Computers
+)
+
+<#
+.SYNOPSIS
+    Well-known service / builtin-support identities that legitimately hold User Rights
+    Assignment privileges by default.
+.DESCRIPTION
+    These principals are the documented default holders of various user rights (e.g.
+    SeImpersonatePrivilege, SeBatchLogonRight) and are NOT meaningful privilege-escalation
+    targets: they are virtual/service identities or builtin support groups you cannot
+    usefully add members to in a domain. Treat them like privileged principals when
+    deciding whether a User Rights Assignment is unexpected.
+#>
+$Script:WellKnownServiceSIDs = @(
+    'S-1-5-6',        # SERVICE
+    'S-1-5-80-0',     # NT SERVICE\ALL SERVICES
+    'S-1-5-90-0',     # Window Manager\Window Manager Group
+    'S-1-5-32-559',   # BUILTIN\Performance Log Users
+    'S-1-5-32-568'    # BUILTIN\IIS_IUSRS
+)
+
+<#
+.SYNOPSIS
+    SID authorities under S-1-5 whose members are synthesised on a machine and can never be
+    directory objects.
+.DESCRIPTION
+    Each of these is derived from a name on the local computer - a SHA-1 of the service or
+    application pool name - so the SID is reproducible from the name but not reversible, and
+    no such object exists in a domain or in the forest.
+
+    They turn up in GptTmpl.inf because installing IIS or a service adds its own identity to a
+    user right, and the GPO then stores the SID. Looking one up in AD returns nothing, which
+    used to send ConvertFrom-SID on to the Foreign Security Principal and Global Catalog
+    fallback - a query that cannot succeed by construction, and on a segment where port 3268
+    is filtered it cost a TCP timeout per GC target per SID and printed a connection error for
+    each.
+
+    The value is what to call them. The sub-authorities are a hash, so the original name is
+    not recoverable; naming the authority is all that can honestly be said, and it is the
+    thing a reader needs - "an IIS application pool holds this right" rather than
+    "(UNRESOLVABLE)", which reads as a missing object somebody should go and find.
+
+    Keyed by the authority RID that follows S-1-5-. The general service authorities only, not
+    the fixed well-known SIDs under them: S-1-5-80-0 is ALL SERVICES and resolves by name from
+    $Script:SIDToName before this table is consulted.
+#>
+$Script:MachineLocalSIDAuthorities = @{
+    '80' = 'NT SERVICE\<service SID>'
+    '82' = 'IIS APPPOOL\<application pool SID>'
+    '83' = 'NT VIRTUAL MACHINE\<virtual machine SID>'
+    '84' = 'Usermode driver SID'
+    '90' = 'Window Manager\<desktop window manager SID>'
+    '94' = 'WinRM Virtual Users\<WinRM SID>'
+    '96' = 'Font Driver Host\<font driver SID>'
+    # Restricted service SIDs, new with Windows 11 24H2 and Server 2025 - the print spooler
+    # runs under one. Its own SID resolves by name from $Script:SIDToName.
+    '99' = 'RESTRICTED SERVICES\<restricted service SID>'
+}
+
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
+
+<#
+.SYNOPSIS
+    Tests if a SID is in the privileged SIDs list.
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    Boolean - $true if the SID is in $Script:PrivilegedSIDs.
+#>
+function Test-IsPrivilegedSID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    return $Script:PrivilegedSIDs -contains $SID
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID is an operator group SID.
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    Boolean - $true if the SID is in $Script:OperatorSIDs.
+#>
+function Test-IsOperatorSID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    return $Script:OperatorSIDs -contains $SID
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID matches a privileged RID suffix.
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    String - The matching RID suffix, or $null if no match.
+#>
+function Test-IsPrivilegedRID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    foreach ($suffix in $Script:PrivilegedRIDSuffixes) {
+        if ($SID -like "*$suffix") {
+            return $suffix
+        }
+    }
+
+    return $null
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID matches an Operator RID suffix.
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    String - The matching RID suffix, or $null if no match.
+#>
+function Test-IsOperatorRID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    foreach ($suffix in $Script:OperatorRIDSuffixes) {
+        if ($SID -like "*$suffix") {
+            return $suffix
+        }
+    }
+
+    return $null
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID is in the DCSync-specific privileged SIDs list.
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    Boolean - $true if the SID is in $Script:DCSyncPrivilegedSIDs.
+#>
+function Test-IsDCSyncPrivilegedSID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    return $Script:DCSyncPrivilegedSIDs -contains $SID
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID matches a DCSync-specific privileged RID suffix.
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    String - The matching RID suffix, or $null if no match.
+#>
+function Test-IsDCSyncPrivilegedRID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    foreach ($suffix in $Script:DCSyncPrivilegedRIDSuffixes) {
+        if ($SID -like "*$suffix") {
+            return $suffix
+        }
+    }
+
+    return $null
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID is a self-modification identity (SELF, Creator Owner, Creator Group).
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    Boolean - $true if the SID is in $Script:SelfModificationSIDs.
+#>
+function Test-IsSelfModificationSID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    return $Script:SelfModificationSIDs -contains $SID
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID is a legacy compatibility identity.
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    Boolean - $true if the SID is in $Script:LegacyCompatibilitySIDs.
+#>
+function Test-IsLegacyCompatibilitySID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    return $Script:LegacyCompatibilitySIDs -contains $SID
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID is a container operator (expected on CN=Computers).
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    Boolean - $true if the SID is in $Script:ContainerOperatorSIDs.
+#>
+function Test-IsContainerOperatorSID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    return $Script:ContainerOperatorSIDs -contains $SID
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID is a broad group SID.
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    Boolean - $true if the SID is in $Script:BroadGroupSIDs.
+#>
+function Test-IsBroadGroupSID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    return $Script:BroadGroupSIDs -contains $SID
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID matches a broad group RID suffix.
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    String - The matching RID suffix, or $null if no match.
+#>
+function Test-IsBroadGroupRID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    foreach ($suffix in $Script:BroadGroupRIDSuffixes) {
+        if ($SID -like "*$suffix") {
+            return $suffix
+        }
+    }
+
+    return $null
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID belongs to a group that holds most of the domain.
+.DESCRIPTION
+    Both halves, because the two lists split by SID shape and not by meaning:
+    $Script:BroadGroupSIDs holds the well-known SIDs (Everyone, Authenticated Users,
+    BUILTIN\Users and so on) while $Script:BroadGroupRIDSuffixes holds the domain-relative
+    ones (-513 Domain Users, -514 Domain Guests, -515 Domain Computers). A caller that
+    asks only Test-IsBroadGroupSID therefore misses Domain Users - the group most likely
+    to appear in a real finding - and has done so twice in this project already.
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    Boolean - $true if the SID names a broad group by either list.
+#>
+function Test-IsBroadTrustee {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string]$SID
+    )
+
+    if (-not $SID) { return $false }
+    return ((Test-IsBroadGroupSID -SID $SID) -or [bool](Test-IsBroadGroupRID -SID $SID))
+}
+
+<#
+.SYNOPSIS
+    Tests if a SID is a well-known service / builtin-support identity that is an expected
+    default holder of user rights (see $Script:WellKnownServiceSIDs).
+.PARAMETER SID
+    The Security Identifier to check.
+.OUTPUTS
+    Boolean - $true if the SID is in $Script:WellKnownServiceSIDs.
+#>
+function Test-IsWellKnownServiceSID {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    return $Script:WellKnownServiceSIDs -contains $SID
+}
+
+# ============================================================================
+# SECURITY SCOPES (Context-Dependent Expected Identities)
+# ============================================================================
+# Scopes define which identities are EXPECTED in specific security contexts.
+# Used by Test-IsExpectedInScope to determine if a finding should be reported.
+#
+# Scope Structure:
+# - ExpectedSIDs: Static SIDs that are expected (SYSTEM, Administrators, etc.)
+# - ExpectedRIDSuffixes: Domain-relative RIDs that are expected (-512, -519, etc.)
+# - AttentionBroadGroups: Broad groups that are "expected but noteworthy" (returns Attention, not Finding)
+# - Description: Human-readable scope description
+
+<#
+.SYNOPSIS
+    Security scope definitions for context-dependent identity checks.
+.DESCRIPTION
+    Each scope defines which identities are EXPECTED to have certain rights.
+    Used by Test-IsExpectedInScope to classify findings.
+
+    Severity returns:
+    - "Expected": Identity is expected in this scope (no finding)
+    - "Attention": Identity is technically expected but security-relevant (soft finding)
+    - "Finding": Identity should NOT have these rights (hard finding)
+#>
+$Script:SecurityScopes = @{
+    # ===== DCSync Scope =====
+    # Who SHOULD have DCSync rights (DS-Replication-Get-Changes-All)?
+    #
+    # The built-in Administrator, Domain Admins and Enterprise Admins as well. They used
+    # to be left out on purpose - "should still be flagged because custom accounts with
+    # DCSync are the real risk" - and that put Domain Admins under "Found 1 non-privileged
+    # account(s) with DCSync rights" in a real domain, for an All Extended Rights ACE on
+    # the domain root. All three are members of BUILTIN\Administrators, which holds the
+    # pair by default (Enterprise Admins in every domain of the forest), so an ACE naming
+    # them grants nothing they lack. The real risk the old note named stays a finding: an
+    # ordinary account or group with the rights, whoever its members are.
+    'DCSync' = @{
+        Description = "Identities that legitimately need DCSync (replication) rights"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544',   # BUILTIN\Administrators
+            'S-1-5-9'         # Enterprise Domain Controllers
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-516',   # Domain Controllers
+            '-519'    # Enterprise Admins
+        )
+        # Read-only domain controllers, by the rights they hold by default and not by
+        # SID alone. An RODC needs DS-Replication-Get-Changes on every naming context it
+        # replicates, or it fails with error 8453 - that one is expected.
+        # DS-Replication-Get-Changes-All is not: Microsoft documents it as a
+        # misconfiguration on these groups, because it replicates passwords to the RODC
+        # as if it were a writable domain controller. Blanket-expected, as -521 was,
+        # that grant was accepted without a word.
+        DefaultRightHolders = @{
+            '-498' = @('DS-Replication-Get-Changes', 'DS-Replication-Get-Changes-In-Filtered-Set')
+            '-521' = @('DS-Replication-Get-Changes', 'DS-Replication-Get-Changes-In-Filtered-Set')
+        }
+        AttentionBroadGroups = @()    # No broad groups allowed
+    }
+
+    # ===== Domain Root ACL Scope =====
+    # Who SHOULD have GenericAll/WriteDACL on the domain root object?
+    'DomainRootACL' = @{
+        Description = "Identities expected to have full control on domain root"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544'    # BUILTIN\Administrators
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519'    # Enterprise Admins
+        )
+        # Key Admins and Enterprise Key Admins write msDS-KeyCredentialLink by design -
+        # that is what Windows Hello for Business needs - and hold nothing else here. Only
+        # a caller that names the rights it is asking about gets this answer, and any other
+        # right of theirs is judged like anybody's.
+        DefaultRightHolders = @{
+            '-526' = @('msDS-KeyCredentialLink')
+            '-527' = @('msDS-KeyCredentialLink')
+        }
+        AttentionBroadGroups = @()  # No broad groups allowed on domain root
+    }
+
+    # ===== OU ACL Scope =====
+    # Who SHOULD have GenericAll/WriteDACL on Organizational Units?
+    'OUACL' = @{
+        Description = "Identities expected to manage OUs"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544'    # BUILTIN\Administrators
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519'    # Enterprise Admins
+        )
+        AttentionBroadGroups = @()
+    }
+
+    # ===== Computer Container ACL Scope =====
+    # Who SHOULD have CreateChild on CN=Computers?
+    'ComputerContainerACL' = @{
+        Description = "Identities expected to create computer accounts in CN=Computers"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544',   # BUILTIN\Administrators
+            'S-1-5-32-548',   # Account Operators (by design)
+            'S-1-5-32-550'    # Print Operators (legacy, by design)
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519'    # Enterprise Admins
+        )
+        AttentionBroadGroups = @()
+    }
+
+    # ===== MachineAccountQuota Scope =====
+    # Who SHOULD be able to create computer accounts via ms-DS-MachineAccountQuota?
+    'MachineAccountQuota' = @{
+        Description = "Identities that can create computer accounts via MAQ"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544'    # BUILTIN\Administrators
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519'    # Enterprise Admins
+        )
+        # Authenticated Users having MAQ > 0 is a default setting
+        # It's "expected" but should be flagged as "Attention"
+        AttentionBroadGroups = @(
+            'S-1-5-11'    # Authenticated Users
+        )
+    }
+
+    # ===== User Object ACL Scope =====
+    # Who SHOULD have write access to user objects?
+    'UserObjectACL' = @{
+        Description = "Identities expected to manage user objects"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544',   # BUILTIN\Administrators
+            'S-1-5-32-548'    # Account Operators (by design)
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519'    # Enterprise Admins
+        )
+        AttentionBroadGroups = @()
+    }
+
+    # ===== GPO Scope =====
+    # Who SHOULD be able to create/edit GPOs?
+    'GPO' = @{
+        Description = "Identities expected to manage Group Policy Objects"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544'    # BUILTIN\Administrators
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519',   # Enterprise Admins
+            '-520'    # Group Policy Creator Owners
+        )
+        AttentionBroadGroups = @()
+    }
+
+    # ===== ADCS (Certificate Services) Scope =====
+    # Who SHOULD have Enroll rights on certificate templates?
+    'ADCSEnroll' = @{
+        Description = "Identities expected to enroll certificates"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544'    # BUILTIN\Administrators
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519',   # Enterprise Admins
+            '-516'    # Domain Controllers (for DC certificates)
+        )
+        # Domain Users/Computers having Enroll is often by design
+        # but can be a vulnerability (ESC1, ESC2, etc.)
+        AttentionBroadGroups = @(
+            'S-1-5-11'    # Authenticated Users
+        )
+    }
+
+    # ===== ADCS Template Write Scope =====
+    # Who SHOULD be able to MODIFY a certificate template object (ESC4)?
+    #
+    # Separate from ADCSEnroll on purpose, and the distinction is the whole point of this
+    # entry. Enrolling and rewriting are different questions with different answers:
+    # Authenticated Users holding Enroll is the normal state of a template, which is why
+    # ADCSEnroll parks that SID in AttentionBroadGroups. Authenticated Users holding
+    # GenericAll or WriteDacl is ESC4 in its worst form - any domain user can add Client
+    # Authentication, set ENROLLEE_SUPPLIES_SUBJECT, drop the manager approval and enrol
+    # as a domain admin. Answering the write question from the enrolment scope dropped
+    # exactly that finding.
+    #
+    # A domain controller (-516) is expected to enrol and is not expected to rewrite a
+    # template, and Cert Publishers (-517) publishes certificates to userCertificate
+    # rather than editing templates - neither belongs here.
+    'ADCSTemplateWrite' = @{
+        Description = "Identities expected to modify certificate templates"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544'    # BUILTIN\Administrators
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519'    # Enterprise Admins
+        )
+        # Empty on purpose: no broad group is expected to hold write rights on a template,
+        # so there is nothing here to downgrade from a finding to a note.
+        AttentionBroadGroups = @()
+    }
+
+    # ===== Kerberos Delegation Scope =====
+    # Who SHOULD have unconstrained/constrained delegation configured?
+    'KerberosDelegation' = @{
+        Description = "Identities expected to have Kerberos delegation"
+        ExpectedSIDs = @()
+        ExpectedRIDSuffixes = @(
+            '-516'    # Domain Controllers (often have delegation)
+        )
+        AttentionBroadGroups = @()
+    }
+
+    # ===== LAPS Read Scope =====
+    # Who SHOULD be able to read LAPS passwords?
+    'LAPSRead' = @{
+        Description = "Identities expected to read LAPS passwords"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544'    # BUILTIN\Administrators
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519'    # Enterprise Admins
+        )
+        AttentionBroadGroups = @()
+    }
+
+    # ===== PKI Container Scope (ESC5) =====
+    # Who SHOULD have write access to PKI containers in Configuration partition?
+    'PKIContainer' = @{
+        Description = "Identities expected to manage PKI containers"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544'    # BUILTIN\Administrators
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519',   # Enterprise Admins
+            '-517'    # Cert Publishers (by design)
+        )
+        AttentionBroadGroups = @()
+    }
+
+    # CN=System Management,CN=System,<domainDN>. Configuration Manager publishes its site
+    # and management point objects here, and clients using AD site discovery believe what
+    # they find. The container is created by hand before SCCM is installed, and the site
+    # server's computer account needs Full Control on it - which is why the caller adds the
+    # site servers it discovered to the expected set rather than this table doing it: their
+    # SIDs are ordinary computer accounts and differ per domain.
+    'SCCMContainer' = @{
+        Description = "Identities expected to manage the SCCM System Management container"
+        ExpectedSIDs = @(
+            'S-1-5-18',       # SYSTEM
+            'S-1-5-32-544'    # BUILTIN\Administrators
+        )
+        ExpectedRIDSuffixes = @(
+            '-500',   # Built-in Administrator
+            '-512',   # Domain Admins
+            '-519'    # Enterprise Admins
+        )
+        AttentionBroadGroups = @()
+    }
+}
+
+<#
+.SYNOPSIS
+    Gets all privileged group SIDs for a specific domain.
+.DESCRIPTION
+    Combines static privileged SIDs with domain-relative SIDs constructed
+    from the provided domain SID. Used for group membership checks.
+.PARAMETER DomainSID
+    The domain SID (e.g., "S-1-5-21-xxx-xxx-xxx").
+.PARAMETER IncludeOperators
+    Include operator groups in the result.
+.PARAMETER StrictDCSync
+    Use stricter DCSync-specific subset.
+.OUTPUTS
+    String[] - Array of complete SID strings.
+#>
+function Get-PrivilegedGroupSIDs {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$DomainSID,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$IncludeOperators,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$StrictDCSync
+    )
+
+    $result = @()
+
+    if ($StrictDCSync) {
+        # DCSync-specific: only BUILTIN\Administrators from static
+        $result += 'S-1-5-32-544'
+
+        # Add domain-relative DCSync privileged groups
+        foreach ($suffix in $Script:DCSyncPrivilegedRIDSuffixes) {
+            $result += "$DomainSID$suffix"
+        }
+    }
+    else {
+        # Standard: BUILTIN\Administrators
+        $result += 'S-1-5-32-544'
+
+        # Add domain-relative privileged groups
+        foreach ($suffix in $Script:PrivilegedRIDSuffixes) {
+            $result += "$DomainSID$suffix"
+        }
+
+        # Add operator groups if requested
+        if ($IncludeOperators) {
+            $result += $Script:OperatorSIDs
+        }
+    }
+
+    return $result
+}
+
+<#
+.SYNOPSIS
+    Gets all Tier-0 group SIDs for a specific domain.
+.DESCRIPTION
+    Returns the SIDs of true Tier-0 groups (Domain Admins, Enterprise Admins, Schema Admins, Administrators).
+    Used by Get-ProtectedUsersStatus to identify accounts that SHOULD be protected.
+.PARAMETER DomainSID
+    The domain SID (e.g., "S-1-5-21-xxx-xxx-xxx").
+.OUTPUTS
+    String[] - Array of complete SID strings for Tier-0 groups.
+#>
+function Get-Tier0GroupSIDs {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$DomainSID
+    )
+
+    $result = @()
+
+    # Add static Tier-0 SID (BUILTIN\Administrators)
+    $result += $Script:Tier0StaticSIDs
+
+    # Add domain-relative Tier-0 groups
+    foreach ($suffix in $Script:Tier0RIDSuffixes) {
+        $result += "$DomainSID$suffix"
+    }
+
+    return $result
+}
+
+<#
+.SYNOPSIS
+    Tests if an account is excluded from Protected Users applicability.
+.DESCRIPTION
+    Checks if the account is one that CANNOT use Protected Users:
+    - krbtgt: Service account
+    - DC$ computer accounts: Computer accounts
+    - gMSA accounts: Group Managed Service Accounts
+.PARAMETER Account
+    AD object with objectSid and objectClass properties.
+.OUTPUTS
+    [PSCustomObject] with:
+    - IsExcluded: $true if account cannot use Protected Users
+    - Reason: Why account is excluded (or $null)
+#>
+function Test-IsExcludedFromProtectedUsers {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        $Account
+    )
+
+    $result = [PSCustomObject]@{
+        IsExcluded = $false
+        Reason = $null
+    }
+
+    # Check objectClass for computer accounts and gMSAs
+    $objectClass = $Account.objectClass
+    if ($objectClass) {
+        if ($objectClass -contains 'computer') {
+            $result.IsExcluded = $true
+            $result.Reason = "Computer account (Protected Users only for users)"
+            return $result
+        }
+        if ($objectClass -contains 'msDS-GroupManagedServiceAccount') {
+            $result.IsExcluded = $true
+            $result.Reason = "gMSA account (cannot use Protected Users)"
+        }
+    }
+
+    # Check for krbtgt by sAMAccountName
+    if ($Account.sAMAccountName -eq 'krbtgt') {
+        $result.IsExcluded = $true
+        $result.Reason = "krbtgt service account (cannot authenticate interactively)"
+        return $result
+    }
+
+    # Check by SID suffix for DC accounts
+    $sid = $Account.objectSid
+    if ($sid) {
+        foreach ($suffix in $Script:Tier0ExcludedFromProtectionRIDs) {
+            if ($sid -like "*$suffix") {
+                $result.IsExcluded = $true
+                $result.Reason = "System account (RID $suffix - cannot use Protected Users)"
+                return $result
+            }
+        }
+    }
+
+    return $result
+}
+

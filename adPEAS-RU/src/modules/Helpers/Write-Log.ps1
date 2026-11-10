@@ -1,0 +1,85 @@
+﻿<#
+.SYNOPSIS
+    Unified logging function that outputs to console and optionally to file.
+
+.DESCRIPTION
+    Write-Log provides a centralized logging mechanism that:
+    - Outputs to console using appropriate PowerShell cmdlets (Write-Verbose, Write-Debug, etc.)
+    - Writes to the log file when $Script:adPEAS_Outputfile is set: Warning and Error always,
+      Info, Verbose and Debug only with $Script:adPEAS_VerboseLogging
+    - Adds timestamps to file output for troubleshooting
+    - Respects PowerShell preference variables ($VerbosePreference, $DebugPreference, etc.)
+
+    This function is a drop-in replacement for Write-Verbose that also writes to the output file.
+
+.PARAMETER Message
+    The log message to output.
+
+.PARAMETER Level
+    The severity level of the message:
+    - Info: General information (Write-Host)
+    - Verbose: Detailed information (Write-Verbose) - DEFAULT
+    - Debug: Debug information (Write-Debug)
+    - Warning: Warning messages (Write-Warning)
+    - Error: Error messages (Write-Warning; every call site prefixes its own message
+      text with "Error:", so the console line is not distinguishable from Warning by
+      Write-Log itself)
+
+.EXAMPLE
+    Write-Log "[Get-DomainUser] Querying users..."
+    # Equivalent to Write-Verbose, but also writes to file if VerboseLogging enabled
+
+.EXAMPLE
+    Write-Log -Message "Connection established" -Level Info
+
+.EXAMPLE
+    Write-Log -Message "Invalid parameter" -Level Warning
+
+.NOTES
+    Author: Alexander Sturz (@_61106960_)
+
+    File output needs $Script:adPEAS_Outputfile (via -Outputfile). Beyond that, the level
+    decides: Warning and Error are written whatever the logging settings are, because a
+    scan that logged an error and said nothing about it in the file cannot be told from a
+    clean scan once the console has scrolled away. Info, Verbose and Debug additionally
+    need $Script:adPEAS_VerboseLogging ($true via -VerboseLogging).
+
+    The file output includes timestamps for each entry in format:
+    yyyy-MM-dd HH:mm:ss [Level] Message
+#>
+
+function Write-Log {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [string]$Message,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Info', 'Verbose', 'Debug', 'Warning', 'Error')]
+        [string]$Level = 'Verbose'
+    )
+
+    # Console output (respects PowerShell preference variables)
+    switch ($Level) {
+        'Verbose' { Write-Verbose $Message }
+        'Debug'   { Write-Debug $Message }
+        'Warning' { Write-Warning $Message }
+        'Error'   { Write-Warning $Message }
+        default   { Write-Host $Message }
+    }
+
+    # File output. Verbose, Debug and Info still need -VerboseLogging, but Warning and
+    # Error reach the output file whenever one is set: a scan that logged an error and
+    # said nothing about it in the report file is indistinguishable from a clean scan
+    # once the console has scrolled away.
+    $fileWorthy = $Script:adPEAS_VerboseLogging -or ($Level -eq 'Warning') -or ($Level -eq 'Error')
+    if ($Script:adPEAS_Outputfile -and $fileWorthy) {
+        try {
+            $timestamp = (Format-adPEASDate (Get-Date) 'yyyy-MM-dd HH:mm:ss')
+            "$timestamp [$Level] $Message" | Add-Content -Path $Script:adPEAS_Outputfile -ErrorAction SilentlyContinue
+        }
+        catch {
+            # Silently ignore file write errors to not disrupt main operations
+        }
+    }
+}

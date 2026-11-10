@@ -1,0 +1,1480 @@
+﻿<#
+.SYNOPSIS
+    adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
+
+.DESCRIPTION
+    Security analysis tool for identifying vulnerabilities and misconfigurations in Active Directory environments.
+
+.EXAMPLE
+    # v2 Style: Two-step (explicit session management)
+    Import-Module .\adPEAS.ps1
+    Connect-adPEAS -Domain "contoso.com" -UseWindowsAuth
+    Invoke-adPEAS
+
+.EXAMPLE
+    # v1 Style: One-step (direct execution with connection parameters)
+    Import-Module .\adPEAS.ps1
+    Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth
+
+.EXAMPLE
+    # v1 Style: With credentials
+    Import-Module .\adPEAS.ps1
+    Invoke-adPEAS -Domain "contoso.com" -Credential (Get-Credential)
+
+.EXAMPLE
+    # v1 Style: With username/password
+    Import-Module .\adPEAS.ps1
+    Invoke-adPEAS -Domain "contoso.com" -Username "john.doe" -Password "P@ssw0rd!"
+
+.EXAMPLE
+    # Write output to file (with ANSI colors by default)
+    Import-Module .\adPEAS.ps1
+    Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth -Outputfile .\adPEAS_out.txt
+
+.EXAMPLE
+    # Write output to file without colors (plain text)
+    Import-Module .\adPEAS.ps1
+    Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth -Outputfile .\adPEAS_out.txt -NoColor
+
+.EXAMPLE
+    # Run specific Modules with existing session
+    Import-Module .\adPEAS.ps1
+    Connect-adPEAS -Domain "contoso.com" -UseWindowsAuth
+    Invoke-adPEAS -Module Domain,Accounts,GPO
+
+.EXAMPLE
+    # OPSEC mode (stealth - no Kerberoast, ASREPRoast, BloodHound collection)
+    Import-Module .\adPEAS.ps1
+    Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth -OPSEC
+
+.NOTES
+    Author: Alexander Sturz (@_61106960_)
+
+.LINK
+    https://github.com/61106960/adPEAS
+#>
+
+#Requires -Version 5.1
+
+# ===== Script Variables =====
+$Script:adPEASVersion = "2.9.0"
+
+# Handle ScriptPath for different execution contexts:
+# - Normal: $MyInvocation.MyCommand.Path is set
+# - ScriptBlock::Create() (obfuscated/embedded): $MyInvocation.MyCommand.Path is $null
+if ($MyInvocation.MyCommand.Path) {
+    $Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+} else {
+    # Running via ScriptBlock (e.g., obfuscated version) - modules are already combined
+    $Script:ScriptPath = $null
+}
+
+# Output Configuration
+$Script:adPEAS_OutputColor = $true
+$Script:adPEAS_Outputfile = $null
+$Script:adPEAS_VerboseLogging = $false
+
+# Activity Threshold Configuration
+# Default: 90 days - accounts inactive longer are considered stale
+# Can be overridden via Invoke-adPEAS -InactiveDays parameter
+$Script:DefaultInactiveDays = 90
+
+# License Configuration
+# EmbeddedLicense is replaced at build time by Build-Release.ps1 (Base64-encoded JSON)
+# RuntimeLicense is set by -License parameter at runtime
+$Script:EmbeddedLicense = $null
+$Script:RuntimeLicense = $null
+
+# ===== Load Modules =====
+# Module loading for development mode (source execution)
+# In standalone builds, these are replaced by inlined module code
+if ($Script:ScriptPath) {
+
+    # Core Modules
+    . "$Script:ScriptPath\modules\Core\adPEAS-Types.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-GUIDs.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-OIDs.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-SIDs.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-UserRights.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-RegistryKeys.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-ErrorCodes.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-InputValidation.ps1"
+    . "$Script:ScriptPath\modules\Core\Write-adPEASOutput.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-AttributeOrder.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-RenderModel.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-FindingDefinitions.ps1"
+    . "$Script:ScriptPath\modules\Core\AttributeTransformers.ps1"
+    . "$Script:ScriptPath\modules\Core\Render-ConsoleObject.ps1"
+    . "$Script:ScriptPath\modules\Core\Render-HtmlObject.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-ScoringDefinitions.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-ObjectTypes.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-SoftwareLifecycle.ps1"
+    . "$Script:ScriptPath\modules\Core\adPEAS-Messages.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-AuthenticatedDirectoryEntry.ps1"
+    . "$Script:ScriptPath\modules\Core\Show-ConnectionError.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-KeyCredentialLink.ps1"
+    . "$Script:ScriptPath\modules\Core\Connect-LDAP.ps1"
+    . "$Script:ScriptPath\modules\Core\Connect-adPEAS.ps1"
+    . "$Script:ScriptPath\modules\Core\Disconnect-adPEAS.ps1"
+    . "$Script:ScriptPath\modules\Core\ConvertFrom-LDAPAttribute.ps1"
+    . "$Script:ScriptPath\modules\Core\Invoke-LDAPSearch.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-DomainObject.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-ObjectACL.ps1"
+    . "$Script:ScriptPath\modules\Core\Set-DomainObject.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-DomainUser.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-DomainComputer.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-DomainDNSRecord.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-DomainGroup.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-DomainGPO.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-CertificateTemplate.ps1"
+    . "$Script:ScriptPath\modules\Core\Set-CertificateTemplate.ps1"
+    . "$Script:ScriptPath\modules\Core\Set-DomainUser.ps1"
+    . "$Script:ScriptPath\modules\Core\Set-DomainGroup.ps1"
+    . "$Script:ScriptPath\modules\Core\Set-DomainComputer.ps1"
+    . "$Script:ScriptPath\modules\Core\Set-DomainGPO.ps1"
+    . "$Script:ScriptPath\modules\Core\Move-DomainObject.ps1"
+    . "$Script:ScriptPath\modules\Core\New-DomainUser.ps1"
+    . "$Script:ScriptPath\modules\Core\New-DomainComputer.ps1"
+    . "$Script:ScriptPath\modules\Core\New-DomainGroup.ps1"
+    . "$Script:ScriptPath\modules\Core\New-DomainGPO.ps1"
+    . "$Script:ScriptPath\modules\Core\Get-CertificateAuthority.ps1"
+
+    # Helper Modules
+    . "$Script:ScriptPath\modules\Helpers\Format-adPEASDate.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-adPEASOutputBasePath.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Resolve-adPEASModules.ps1"
+    . "$Script:ScriptPath\modules\Helpers\New-AcceptAnyCertificateCallback.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Write-Log.ps1"
+    . "$Script:ScriptPath\modules\Helpers\New-SafePassword.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertTo-FormattedACE.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertTo-MailboxRightsName.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-SecurityDescriptor.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertTo-AccessRules.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Test-ACEAppliesToSelf.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Test-LDAPSProtocolSupport.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-GCConnection.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Resolve-CrossDomainIdentity.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-SID.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertTo-SID.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Test-IsPrivileged.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Resolve-SchemaClassName.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-ObjectOwner.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-ADInterval.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-GPPPassword.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-VNCPassword.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-VBE.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Resolve-CredentialAccount.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-Base64OrFile.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-ManagedPassword.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-LAPSEncryptedPassword.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-SupplementalCredentials.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-TSProperties.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-TSClientLicense.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertFrom-DSHeuristics.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-CurrentUserTokenGroups.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-adPEASSession.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Select-KerberosTGT.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Test-KerberosTGTExists.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Ensure-LDAPConnection.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Test-AccountActivity.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-SMBAccess.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Select-NTFSWriteAccess.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-UNCWriteAccess.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Show-Progress.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Kerberos-ASN1.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Kerberos-Crypto.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-PKINITAuth-Native.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-Kerberoast.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-ASREPRoast.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-KerberosAuth.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Request-ServiceTicket.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-UnPACTheHash.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-S4U.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Import-KerberosTicket.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-NTLMImpersonation.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Resolve-adPEASName.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-HostsFileManagement.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-KerberosAuthFlow.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Parse-RegistryPol.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Parse-RegistryXml.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Parse-GptTmpl.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-LAPSGPOConfig.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-LAPSSchemaPresence.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-UnixPasswordFormat.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-CredentialTextMatch.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-PrivilegedAccountFilter.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-PrincipalContainer.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Resolve-GroupNesting.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-GPOEffectiveness.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-DomainControllerGPOContext.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-GPORelativePath.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-CertificateTrustAnchor.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertTo-LDAPDNFilter.ps1"
+    . "$Script:ScriptPath\modules\Helpers\ConvertTo-UACValue.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Format-OUContainerCount.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-OUPermissions.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-GPOLinkage.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Test-adPEASLicense.ps1"
+    . "$Script:ScriptPath\modules\Helpers\NTLM-HTTP.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-HTTPRequest.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Register-adPEASCompleters.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Export-adPEASFile.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Test-RemoteAdminAccess.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-SMBShareAccess.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-PortScan.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-ShareFileCandidate.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-RBCDOperation.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-ShadowCredentialOperation.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Kerberos-PAC.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-TicketForge.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-DCSync.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Invoke-PasswordSpray.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Get-CertificateInfo.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Request-ADCSCertificate.ps1"
+    . "$Script:ScriptPath\modules\Helpers\Search-Value.ps1"
+
+    # Check Modules
+    . "$Script:ScriptPath\modules\Checks\Domain\Get-DomainInformation.ps1"
+    . "$Script:ScriptPath\modules\Checks\Domain\Get-DomainPasswordPolicy.ps1"
+    . "$Script:ScriptPath\modules\Checks\Domain\Get-DomainTrusts.ps1"
+    . "$Script:ScriptPath\modules\Checks\Domain\Get-LDAPConfiguration.ps1"
+    . "$Script:ScriptPath\modules\Checks\Domain\Get-SMBSigningStatus.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-PrivilegedGroupMembers.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-ProtectedUsersStatus.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-AuthenticationPolicySilos.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-RODCPasswordReplication.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-InactiveAdminAccounts.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-AdminPasswordNeverExpires.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-AdminReversibleEncryption.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-ManagedServiceAccountSecurity.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-SIDHistoryInjection.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-NonDefaultUserOwners.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-PasswordNotRequired.ps1"
+    . "$Script:ScriptPath\modules\Checks\Accounts\Get-LogonScriptPermissions.ps1"
+    . "$Script:ScriptPath\modules\Checks\Delegation\Get-UnconstrainedDelegation.ps1"
+    . "$Script:ScriptPath\modules\Checks\Delegation\Get-ConstrainedDelegation.ps1"
+    . "$Script:ScriptPath\modules\Checks\Delegation\Get-ResourceBasedConstrainedDelegation.ps1"
+    . "$Script:ScriptPath\modules\Checks\Rights\Get-DangerousACLs.ps1"
+    . "$Script:ScriptPath\modules\Checks\Rights\Get-CriticalObjectACLs.ps1"
+    . "$Script:ScriptPath\modules\Checks\Rights\Get-DangerousOUPermissions.ps1"
+    . "$Script:ScriptPath\modules\Checks\Rights\Get-PasswordResetRights.ps1"
+    . "$Script:ScriptPath\modules\Checks\Rights\Get-AddComputerRights.ps1"
+    . "$Script:ScriptPath\modules\Checks\Rights\Get-GPOUserRightsAssignment.ps1"
+    . "$Script:ScriptPath\modules\Checks\Rights\Get-LAPSPermissions.ps1"
+    . "$Script:ScriptPath\modules\Checks\Computer\Get-LAPSConfiguration.ps1"
+    . "$Script:ScriptPath\modules\Checks\Computer\Get-OutdatedComputers.ps1"
+    . "$Script:ScriptPath\modules\Checks\Computer\Get-InfrastructureServers.ps1"
+    . "$Script:ScriptPath\modules\Checks\Computer\Get-NonDefaultComputerOwners.ps1"
+    . "$Script:ScriptPath\modules\Checks\Computer\Get-ComputerPasswordAge.ps1"
+    . "$Script:ScriptPath\modules\Checks\Computer\Get-NetworkMap.ps1"
+    . "$Script:ScriptPath\modules\Checks\Shares\Invoke-ShareHunt.ps1"
+    . "$Script:ScriptPath\modules\Checks\GPO\Get-GPOPermissions.ps1"
+    . "$Script:ScriptPath\modules\Checks\GPO\Get-GPOLocalGroupMembership.ps1"
+    . "$Script:ScriptPath\modules\Checks\GPO\Get-GPOScheduledTasks.ps1"
+    . "$Script:ScriptPath\modules\Checks\GPO\Get-GPOScriptPaths.ps1"
+    . "$Script:ScriptPath\modules\Checks\GPO\Get-GPORegistrySettings.ps1"
+    . "$Script:ScriptPath\modules\Checks\GPO\Get-GPOPointAndPrint.ps1"
+    . "$Script:ScriptPath\modules\Checks\ADCS\Get-ADCSTemplate.ps1"
+    . "$Script:ScriptPath\modules\Checks\ADCS\Get-ADCSVulnerabilities.ps1"
+    . "$Script:ScriptPath\modules\Checks\ADCS\Get-WeakCertificateMapping.ps1"
+    . "$Script:ScriptPath\modules\Checks\Application\Get-ExchangeInfrastructure.ps1"
+    . "$Script:ScriptPath\modules\Checks\Application\Get-ExchangeRBACAssignments.ps1"
+    . "$Script:ScriptPath\modules\Checks\Application\Get-SCCMInfrastructure.ps1"
+    . "$Script:ScriptPath\modules\Checks\Application\Get-SCOMInfrastructure.ps1"
+    . "$Script:ScriptPath\modules\Checks\Creds\Get-KerberoastableAccounts.ps1"
+    . "$Script:ScriptPath\modules\Checks\Creds\Get-ASREPRoastableAccounts.ps1"
+    . "$Script:ScriptPath\modules\Checks\Creds\Get-UnixPasswordAccounts.ps1"
+    . "$Script:ScriptPath\modules\Checks\Creds\Get-CredentialExposure.ps1"
+    . "$Script:ScriptPath\modules\Checks\Creds\Get-LAPSCredentialAccess.ps1"
+    . "$Script:ScriptPath\modules\Checks\Creds\Get-BitLockerRecoveryKeyAccess.ps1"
+    . "$Script:ScriptPath\modules\Checks\Creds\Get-CredentialRoaming.ps1"
+    . "$Script:ScriptPath\modules\Checks\Creds\Get-PasswordInDescription.ps1"
+    . "$Script:ScriptPath\modules\Checks\Creds\Get-DeletedObjectAccess.ps1"
+
+    # Reporting Modules
+    . "$Script:ScriptPath\modules\Reporting\Export-HTMLReport.ps1"
+    . "$Script:ScriptPath\modules\Reporting\Convert-adPEASReport.ps1"
+    . "$Script:ScriptPath\modules\Reporting\Compare-adPEASReport.ps1"
+
+    # Collector Modules
+    . "$Script:ScriptPath\modules\Collector\Invoke-adPEASCollector.ps1"
+}
+# ===== Main Function =====
+function Invoke-adPEAS {
+<#
+.SYNOPSIS
+    Main execution function for adPEAS v2.
+
+.DESCRIPTION
+    This function wraps the entire adPEAS execution logic.
+    Can be called with connection parameters or reuse an existing session.
+
+    Connection Parameters (Optional - pass-through to Connect-adPEAS):
+    - Domain, Server, UseLDAPS, TimeoutSeconds
+    - Authentication: UseWindowsAuth, Credential, Username/Password, Certificate/CertificatePassword
+
+    If connection parameters are provided, Invoke-adPEAS will establish a connection automatically.
+    If no parameters are provided, it will reuse an existing session or show help.
+
+    SESSION PERSISTENCE:
+    The LDAP session is always kept alive after Invoke-adPEAS completes.
+    This allows you to:
+    - Check the session with Get-adPEASSession
+    - Run additional Get-Domain* queries
+    - Execute additional scans with Invoke-adPEAS
+    Use Disconnect-adPEAS to explicitly close the session when done.
+
+.PARAMETER Domain
+    The Active Directory domain to analyze (optional).
+
+.PARAMETER Server
+    Specific Domain Controller (FQDN or IP) (optional).
+
+.PARAMETER UseWindowsAuth
+    Use Windows Authentication (current user context).
+
+.PARAMETER Credential
+    PSCredential object for authentication.
+
+.PARAMETER Username
+    Username for authentication (requires -Password).
+
+.PARAMETER Password
+    Password for authentication (requires -Username). Accepts String or SecureString.
+
+.PARAMETER Certificate
+    Path to PKCS#12 certificate file or Base64-encoded certificate for PKINIT authentication.
+
+.PARAMETER CertificatePassword
+    Password for certificate (requires -Certificate). Accepts String or SecureString.
+
+.PARAMETER UseLDAPS
+    Forces LDAPS (Port 636).
+
+.PARAMETER Outputfile
+    Path to output file (without extension). If set, adPEAS writes reports to this path.
+    Generates up to 3 files depending on -Format:
+      - .txt  (Text report, with -Format Text or All)
+      - .html (Interactive HTML report, with -Format HTML or All)
+      - .json (Machine-readable JSON export, with -Format JSON or All)
+    By default, text output includes ANSI color codes (viewable with cat/Get-Content).
+    Use -NoColor to write plain text without color codes.
+
+.PARAMETER Module
+    Array of Modules to execute. Available: Domain, Creds, Rights, Delegation, ADCS, Accounts, GPO, Computer, Application, BloodHound.
+    Default: All Modules.
+
+.PARAMETER ExcludeModule
+    Array of Modules to skip. Everything else runs, which is the short way to say "all but these"
+    without listing the other nine.
+    Can be combined with -Module, in which case it subtracts from that selection.
+    With -OutputAppend, a skipped module keeps the findings the previous run collected for it.
+
+.PARAMETER OPSEC
+    Skips OPSEC-critical and heavy-load checks (Kerberoast, ASREPRoast, BloodHound collection, PasswordInDescription, NonDefaultOwners, OutdatedComputers).
+    These checks enumerate thousands of objects and generate significant LDAP traffic.
+    Also makes no SMB connection to the file servers a GPO script names, or to NETLOGON for the logon scripts of accounts: without -OPSEC, the NTFS permissions of a script a policy runs from NETLOGON or a share, and of the logon script an account's scriptPath names are read, on computers of the domain only.
+
+.PARAMETER NoColor
+    Disables colored console output. Useful for logging or terminals that don't support ANSI colors.
+
+.PARAMETER VerboseLogging
+    Writes verbose log messages (Write-Log) to the output file AND enables -Verbose for console output.
+    Requires -Outputfile to be specified for file logging.
+    Useful for troubleshooting and detailed analysis.
+
+.PARAMETER InactiveDays
+    Threshold in days for account activity analysis. Accounts without login activity
+    within this period are considered inactive/stale. Default: 90 days.
+    This affects checks like Get-LAPSPermissions, Get-LAPSConfiguration, Get-InactiveAdminAccounts, etc.
+
+.PARAMETER IncludePrivileged
+    Include privileged accounts (Domain Admins, Enterprise Admins, etc.) in permission checks.
+    By default, these expected privileged accounts are hidden from output.
+    When enabled, privileged accounts are shown in yellow (Hint) instead of red (Finding).
+
+    Affects fourteen checks - the list named five of them, and how much a default run
+    hides is part of what this switch means:
+      Get-DangerousACLs, Get-DangerousOUPermissions, Get-PasswordResetRights,
+      Get-AddComputerRights, Get-LAPSPermissions, Get-GPOPermissions,
+      Get-PrivilegedGroupMembers, Get-ADCSVulnerabilities, Get-WeakCertificateMapping,
+      Get-CredentialRoaming, Get-BitLockerRecoveryKeyAccess, Get-DeletedObjectAccess.
+
+    Two of them read it as something else, which is worth knowing before setting it:
+    Get-GPOUserRightsAssignment and Get-GPOPointAndPrint take it as -IncludeDefaults,
+    where it adds the assignments and the printer policies that match the Windows
+    default - more rows rather than re-coloured ones.
+
+.PARAMETER TimeoutSeconds
+    Timeout in seconds for LDAP operations.
+    Default: 30 seconds
+    Valid range: 5-600 seconds. Increase for high-latency connections (SOCKS tunnels, VPN).
+    Example: -TimeoutSeconds 120
+
+.PARAMETER OutputAppend
+    Appends findings to an existing report instead of overwriting it.
+    Requires -Outputfile to be specified.
+    When used with -Module, only the specified module's findings are replaced in the report.
+    Previous findings from other modules are preserved using the JSON export file.
+    Example: Run modules individually and build up a combined report:
+      Invoke-adPEAS -Module Domain -Outputfile report -OutputAppend
+      Invoke-adPEAS -Module Accounts -Outputfile report -OutputAppend
+
+.EXAMPLE
+    # v1 Style: Direct execution with connection parameters
+    Import-Module .\adPEAS.ps1
+    Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth
+
+.EXAMPLE
+    # v1 Style: With credentials
+    Import-Module .\adPEAS.ps1
+    Invoke-adPEAS -Domain "contoso.com" -Credential (Get-Credential)
+
+.EXAMPLE
+    # v1 Style: With username/password
+    Import-Module .\adPEAS.ps1
+    Invoke-adPEAS -Domain "contoso.com" -Username "john.doe" -Password "P@ssw0rd!"
+
+.EXAMPLE
+    # v2 Style: Establish session first, then run
+    Import-Module .\adPEAS.ps1
+    Connect-adPEAS -Domain "contoso.com" -UseWindowsAuth
+    Invoke-adPEAS
+
+.EXAMPLE
+    # Write to file with existing session
+    Invoke-adPEAS -Outputfile .\adPEAS_out.txt
+
+.EXAMPLE
+    # Run specific Modules only
+    Invoke-adPEAS -Module Domain,Accounts,GPO
+
+.EXAMPLE
+    Import-Module .\adPEAS.ps1
+    # Run everything except the two slowest Modules
+    Invoke-adPEAS -ExcludeModule Bloodhound,Computer
+
+.EXAMPLE
+    # OPSEC mode (stealth - no Kerberoast, ASREPRoast, BloodHound collection)
+    Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth -OPSEC
+
+.EXAMPLE
+    # Incremental scan: Run modules separately and build up one combined report
+    Connect-adPEAS -Domain "contoso.com" -UseWindowsAuth
+    Invoke-adPEAS -Module Domain -Outputfile .\report -OutputAppend
+    Invoke-adPEAS -Module Accounts -Outputfile .\report -OutputAppend
+    Invoke-adPEAS -Module Rights -Outputfile .\report -OutputAppend
+    # report.html now contains findings from all three modules
+#>
+    [CmdletBinding(DefaultParameterSetName='Default')]
+    param(
+        # ===== Connection Parameters (Optional - Pass-through to Connect-adPEAS) =====
+        [Parameter(Mandatory=$false)]
+        [string]$Domain,
+
+        [Parameter(Mandatory=$false)]
+        [string]$Server,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$UseLDAPS,
+
+        [Parameter(Mandatory=$false, ParameterSetName='WindowsAuth')]
+        [switch]$UseWindowsAuth,
+
+        [Parameter(Mandatory=$false, ParameterSetName='PSCredential')]
+        [System.Management.Automation.PSCredential]$Credential,
+
+        [Parameter(Mandatory=$false, ParameterSetName='UsernamePassword')]
+        [string]$Username,
+
+        [Parameter(Mandatory=$false, ParameterSetName='UsernamePassword')]
+        $Password,  # Accepts SecureString or String
+
+        [Parameter(Mandatory=$false, ParameterSetName='Certificate')]
+        [string]$Certificate,
+
+        [Parameter(Mandatory=$false, ParameterSetName='Certificate')]
+        $CertificatePassword = "",  # Accepts SecureString or String. Default: empty (for unprotected PFX)
+
+        # ===== Execution Parameters =====
+        [Parameter(Mandatory=$false)]
+        [string]$Outputfile,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateSet("Domain","Creds","Rights","Delegation","ADCS","Accounts","GPO","Computer","Application","Shares","Bloodhound")]
+        [string[]]$Module,
+
+        # The literal list is duplicated from $Script:adPEASModules because a ValidateSet
+        # argument has to be a literal. ModuleParameters.Tests.ps1 asserts they agree.
+        [Parameter(Mandatory=$false)]
+        [ValidateSet("Domain","Creds","Rights","Delegation","ADCS","Accounts","GPO","Computer","Application","Shares","Bloodhound")]
+        [string[]]$ExcludeModule,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$OPSEC,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$NoColor,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$VerboseLogging,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1, 3650)]
+        [int]$InactiveDays = 90,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$IncludePrivileged,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(5, 600)]
+        [int]$TimeoutSeconds = 30,
+
+        # ===== Output Format Parameters =====
+        [Parameter(Mandatory=$false)]
+        [ValidateSet('Text', 'HTML', 'JSON', 'All')]
+        [string]$Format = 'All',
+
+        # ===== Append Mode =====
+        [Parameter(Mandatory=$false)]
+        [switch]$OutputAppend,
+
+        # ===== License Parameter =====
+        [Parameter(Mandatory=$false)]
+        [string]$License,
+
+        # ===== Statistics Parameter =====
+        [Parameter(Mandatory=$false)]
+        [switch]$Statistics
+    )
+
+    # Reset script variables for each invocation
+    # NOTE: $StartTime is intentionally local - it is only consumed within this invocation.
+    # Making it $Script: would expose it to Clear-SessionState (called by Connect-adPEAS on
+    # repeated invocations), which would null it before the duration calculation at the end.
+    $StartTime = Get-Date
+    $Script:adPEAS_OutputColor = -not $NoColor
+    $Script:adPEAS_Outputfile = $null
+    $Script:adPEAS_VerboseLogging = $VerboseLogging
+    $Script:DefaultInactiveDays = $InactiveDays
+
+    # Initialize LDAP Statistics tracking (null = disabled, zero overhead)
+    if ($Statistics) {
+        $Script:LDAPStatistics = @{
+            TotalQueries        = 0
+            TotalResults        = 0
+            TotalEstimatedBytes = 0
+            Modules             = [ordered]@{}
+            _ModuleStartQueries = 0
+            _ModuleStartResults = 0
+            _ModuleStartBytes   = 0
+            _CurrentModule      = $null
+        }
+    } else {
+        $Script:LDAPStatistics = $null
+    }
+
+    # Auto-enable -Verbose when -VerboseLogging is used
+    # Set local $VerbosePreference so it propagates to child function calls via scope chain
+    if ($VerboseLogging) {
+        $VerbosePreference = 'Continue'
+    }
+
+    # Validate -OutputAppend requires -Outputfile
+    if ($OutputAppend -and -not $PSBoundParameters['Outputfile']) {
+        Write-Warning "[adPEAS] -OutputAppend requires -Outputfile. Ignoring -OutputAppend."
+        $OutputAppend = [switch]::new($false)
+    }
+
+    # Validate -OutputAppend requires a format that produces JSON (for findings merge)
+    if ($OutputAppend -and $Format -notin @('All', 'JSON')) {
+        Write-Warning "[adPEAS] -OutputAppend requires JSON findings cache. Use -Format All or -Format JSON. Ignoring -OutputAppend."
+        $OutputAppend = [switch]::new($false)
+    }
+
+    # Determine which modules run, before anything is authenticated or written
+    #
+    # Resolved against the canonical list, so $Module ends up normalized in casing and in
+    # the order the module blocks further down actually execute - which is what
+    # "Executing Modules:" then reports, and what -OutputAppend hands to
+    # Merge-FindingsCollection as the categories to replace. A module skipped here is
+    # therefore also one whose findings from the previous run survive the append, which is
+    # what makes -ExcludeModule and -OutputAppend compose.
+    #
+    # Up here rather than at step 2 for the empty case: excluding everything is a typo,
+    # and finding out about it at step 2 would mean after a full authentication and after
+    # the report files were created and truncated.
+    $Module = @(Resolve-adPEASModules -Module $Module -ExcludeModule $ExcludeModule)
+
+    if ($Module.Count -eq 0) {
+        Write-Warning "[adPEAS] -ExcludeModule leaves no module to run. Nothing to do."
+        return
+    }
+
+    # Initialize findings collection if HTML or JSON format requested
+    if ($Format -in @('HTML', 'JSON', 'All')) {
+        Initialize-FindingsCollection
+        Write-Log "[adPEAS] Findings collection enabled (Format: $Format)"
+    }
+
+    # ===== Output File Configuration =====
+    # Determine output file paths based on -Outputfile and -Format parameters
+    $Script:HTMLOutputPath = $null
+    $Script:JSONOutputPath = $null
+    # Track IncludePrivileged mode for HTML report tooltip filtering
+    $Script:IncludePrivilegedMode = $IncludePrivileged.IsPresent
+
+    if ($PSBoundParameters['Outputfile']) {
+        # Resolve to absolute path to ensure consistent file access throughout the script
+        # This is critical because relative paths may fail when functions change working directory
+        $resolvedOutputfile = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Outputfile)
+
+        # Drop one of adPEAS's own extensions if the caller typed it; anything else is part
+        # of the name they chose. See Get-adPEASOutputBasePath.
+        $basePath = Get-adPEASOutputBasePath $resolvedOutputfile
+
+        # Create directory if it doesn't exist
+        $OutputDir = Split-Path -Parent $basePath
+        if ($OutputDir -and -not (Test-Path $OutputDir)) {
+            try {
+                New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+                Write-Warning "[adPEAS] Directory '$OutputDir' did not exist and was created"
+            } catch {
+                Write-Warning "[adPEAS] Could not create directory '$OutputDir': $_"
+                return
+            }
+        }
+
+        # Set output paths based on format
+        if ($Format -in @('Text', 'All')) {
+            $textPath = "$basePath.txt"
+            try {
+                if (-not $OutputAppend) {
+                    # Normal mode: Create/truncate file to verify write access
+                    [io.file]::OpenWrite($textPath).close()
+                }
+                # Append mode: File will be created or appended to by Write-adPEASOutput
+                $Script:adPEAS_Outputfile = $textPath
+            } catch {
+                Write-Warning "[adPEAS] Unable to write text output to '$textPath', please check path and permissions!"
+            }
+        }
+
+        if ($Format -in @('HTML', 'All')) {
+            $Script:HTMLOutputPath = "$basePath.html"
+        }
+
+        # For HTML-only and JSON-only mode, don't write to text file
+        if ($Format -in @('HTML', 'JSON')) {
+            $Script:adPEAS_Outputfile = $null
+        }
+    }
+
+    # Warn if VerboseLogging is enabled without text output (but still enable console verbose)
+    if ($VerboseLogging -and -not $Script:adPEAS_Outputfile) {
+        Write-Warning "[adPEAS] -VerboseLogging: File logging requires -Outputfile with Text format. Verbose messages will be shown in console only."
+        # Keep VerboseLogging = $true so that $VerbosePreference stays 'Continue' for console output
+        # File logging won't happen since $Script:adPEAS_Outputfile is $null
+    }
+
+# ===== Main Logic =====
+try {
+    # ===== License Validation and Banner =====
+    # Priority: runtime -License param > Connect-adPEAS stored license > embedded license
+    $_licJson = $null
+    if ($PSBoundParameters.ContainsKey('License') -and $License -and (Test-Path $License -ErrorAction SilentlyContinue)) {
+        $_licJson = Get-Content $License -Raw -Encoding UTF8
+    }
+    $_disclaimer = Get-adPEASDisclaimer -LicenseJson $_licJson
+    $Script:adPEASDisclaimer = $_disclaimer.Text
+
+    # The logo and the license line under it - on the console only if the import's are not
+    # what it last showed; the text report always starts with them.
+    Show-ScanLogo -Version $Script:adPEASVersion -Disclaimer $_disclaimer
+
+    Write-Log "[adPEAS] Script started: $StartTime"
+    Write-Log "[adPEAS] Version: $Script:adPEASVersion"
+
+    if ($OPSEC) {
+        Write-Log "[adPEAS] OPSEC mode enabled: No ASREPRoast/Kerberoast/BloodHound"
+    }
+
+    # ===== Connection Handling =====
+    # Check if ANY connection/authentication parameters were provided
+    $HasConnectionParams = $PSBoundParameters.ContainsKey('Domain') -or
+                          $PSBoundParameters.ContainsKey('Server') -or
+                          $PSBoundParameters.ContainsKey('UseWindowsAuth') -or
+                          $PSBoundParameters.ContainsKey('Credential') -or
+                          $PSBoundParameters.ContainsKey('Username') -or
+                          $PSBoundParameters.ContainsKey('Password') -or
+                          $PSBoundParameters.ContainsKey('Certificate') -or
+                          $PSBoundParameters.ContainsKey('CertificatePassword') -or
+                          $PSBoundParameters.ContainsKey('UseLDAPS')
+
+    # Check for active LdapConnection (used for all LDAP operations)
+    $hasLdapConnection = ($null -ne $Script:LdapConnection)
+    $HasActiveSession = ($null -ne $Script:LDAPContext) -and $hasLdapConnection
+
+    # Scenario 1: No connection parameters AND no active session ? Show help
+    if (-not $HasConnectionParams -and -not $HasActiveSession) {
+        Show-NoSessionError -Context "Invoke-adPEAS"
+        return
+    }
+
+    # Scenario 2: Active session exists AND no new connection parameters ? Reuse session
+    if ($HasActiveSession -and -not $HasConnectionParams) {
+        Write-Log "[adPEAS] Reusing existing LDAP session"
+        Show-Header "Используется существующее LDAP-подключение"
+
+        # Use LDAP-verified identity if available
+        $AuthenticatedUser = if ($Script:LDAPContext.AuthenticatedUser) {
+            $Script:LDAPContext.AuthenticatedUser
+        } elseif ($Script:LDAPContext.Credential) {
+            $Script:LDAPContext.Credential.UserName
+        } else {
+            "$env:USERDOMAIN\$env:USERNAME"
+        }
+
+        # Build auth method display string
+        $AuthDisplay = switch ($Script:LDAPContext.AuthMethod) {
+            'Kerberos'    { "Kerberos" }
+            'SimpleBind'  { "LDAP SimpleBind" }
+            'WindowsSSPI' { if ($Script:LDAPContext.KerberosUsed) { "Kerberos (SSPI)" } else { "Windows SSPI" } }
+            default       { $Script:LDAPContext.Protocol }  # Fallback to protocol if AuthMethod not set
+        }
+
+        Show-Line "Connected to domain '$($Script:LDAPContext.Domain)' on server '$($Script:LDAPContext.Server)' as '$AuthenticatedUser' via $AuthDisplay"
+    }
+    # Scenario 3: Connection parameters provided ? Establish new connection via Connect-adPEAS
+    elseif ($HasConnectionParams) {
+        Show-Header "Установка LDAP-подключения"
+
+        # Build parameters for Connect-adPEAS (pass-through)
+        $ConnectionParams = @{}
+
+        # Common parameters
+        if ($PSBoundParameters.ContainsKey('Domain')) { $ConnectionParams['Domain'] = $Domain }
+        if ($PSBoundParameters.ContainsKey('Server')) { $ConnectionParams['Server'] = $Server }
+        if ($PSBoundParameters.ContainsKey('UseLDAPS')) { $ConnectionParams['UseLDAPS'] = $true }
+        # Always ignore SSL errors for maximum compatibility in pentesting environments
+        $ConnectionParams['IgnoreSSLErrors'] = $true
+
+        # Authentication parameters (parameter-set specific)
+        if ($PSBoundParameters.ContainsKey('UseWindowsAuth')) { $ConnectionParams['UseWindowsAuth'] = $true }
+        if ($PSBoundParameters.ContainsKey('Credential')) { $ConnectionParams['Credential'] = $Credential }
+        if ($PSBoundParameters.ContainsKey('Username')) { $ConnectionParams['Username'] = $Username }
+        if ($PSBoundParameters.ContainsKey('Password')) { $ConnectionParams['Password'] = $Password }
+        if ($PSBoundParameters.ContainsKey('Certificate')) { $ConnectionParams['Certificate'] = $Certificate }
+        if ($PSBoundParameters.ContainsKey('CertificatePassword')) { $ConnectionParams['CertificatePassword'] = $CertificatePassword }
+
+        # Timeout parameter (pass-through to Connect-adPEAS)
+        if ($PSBoundParameters.ContainsKey('TimeoutSeconds')) { $ConnectionParams['TimeoutSeconds'] = $TimeoutSeconds }
+
+        # License parameter (pass-through to Connect-adPEAS)
+        if ($PSBoundParameters.ContainsKey('License')) { $ConnectionParams['License'] = $License }
+
+        # Authentication method handling
+        $HasAuthMethod = $PSBoundParameters.ContainsKey('UseWindowsAuth') -or
+                        $PSBoundParameters.ContainsKey('Credential') -or
+                        $PSBoundParameters.ContainsKey('Username') -or
+                        $PSBoundParameters.ContainsKey('Certificate')
+
+        if (-not $HasAuthMethod) {
+            # No new auth method specified - check if we can reuse existing session credentials
+            if ($HasActiveSession -and $Script:LDAPContext.Credential) {
+                # Reuse credentials from existing session
+                Write-Log "[adPEAS] Reusing credentials from existing session"
+                $ConnectionParams['Credential'] = $Script:LDAPContext.Credential
+            }
+            elseif ($HasActiveSession -and $Script:LDAPContext.Certificate) {
+                # Reuse certificate auth from existing session
+                Write-Log "[adPEAS] Reusing certificate authentication from existing session"
+                $ConnectionParams['Certificate'] = $Script:LDAPContext.Certificate
+                if ($Script:LDAPContext.CertificatePassword) {
+                    $ConnectionParams['CertificatePassword'] = $Script:LDAPContext.CertificatePassword
+                }
+            }
+            else {
+                # No session or session uses Windows Auth - default to Windows Auth
+                Write-Log "[adPEAS] No authentication method specified - defaulting to Windows Authentication"
+                $ConnectionParams['UseWindowsAuth'] = $true
+            }
+        }
+
+        try {
+            # Call Connect-adPEAS with pass-through parameters (use -Quiet to suppress session info)
+            # Connect-adPEAS handles all auth logic, error messages, and user verification
+            $Connection = Connect-adPEAS @ConnectionParams -Quiet
+
+            if (-not $Connection) {
+                # Connect-adPEAS failed (returned $null)
+                Show-Error -Type Connection
+                return
+            }
+
+            # Use LDAP-verified identity if available
+            $AuthenticatedUser = if ($Connection.AuthenticatedUser) {
+                $Connection.AuthenticatedUser
+            } elseif ($Connection.Credential) {
+                $Connection.Credential.UserName
+            } else {
+                "$env:USERDOMAIN\$env:USERNAME"
+            }
+
+            # Build auth method display string
+            $AuthDisplay = switch ($Connection.AuthMethod) {
+                'Kerberos'    { "Kerberos" }
+                'SimpleBind'  { "LDAP SimpleBind" }
+                'WindowsSSPI' { if ($Connection.KerberosUsed) { "Kerberos (SSPI)" } else { "Windows SSPI" } }
+                default       { $Connection.Protocol }  # Fallback to protocol if AuthMethod not set
+            }
+
+            Show-Line "Successfully connected to domain '$($Connection.Domain)' on server '$($Connection.Server)' as '$AuthenticatedUser' via $AuthDisplay" -Class Note
+        } catch {
+            # Connect-adPEAS threw an error (already displayed by Connect-adPEAS)
+            Show-Error -Type Connection
+            return
+        }
+    }
+
+    # ===== Connection Health Check =====
+    # Verify that the DC is actually reachable by performing a test query
+    Write-Log "[adPEAS] Verifying Domain Controller connectivity..."
+
+    # Use -Quiet mode to suppress detailed output
+    $connectionHealthy = Get-adPEASSession -TestConnection -Quiet
+
+    if (-not $connectionHealthy) {
+        Show-Error -Type HealthCheck -Message "Контроллер домена не отвечает" -Hints @(
+            "The connection was established but queries to the DC are failing",
+            "Possible causes: DC offline, network connectivity lost, firewall blocking LDAP queries"
+        )
+        return
+    }
+
+    Write-Log "[adPEAS] Connection health check passed - DC is reachable"
+
+    # ===== Kerberos Session Health Check =====
+    # For Kerberos-based sessions, verify the TGT is still valid before starting module execution
+    # This catches overnight ticket expiration early, instead of failing on every individual check
+    # Reset SessionInvalid flag from any previous failed run - give fresh TGT check a fair chance
+    if ($Script:LDAPContext -and $Script:LDAPContext['SessionInvalid']) {
+        $Script:LDAPContext.Remove('SessionInvalid')
+        Write-Log "[adPEAS] Cleared SessionInvalid flag from previous run"
+    }
+
+    # Checks that threw during this run. Reset per run so a second scan in the same session
+    # does not inherit the first one's failures. Reported in the Scan Summary.
+    $Script:adPEAS_IncompleteChecks = @()
+    if (-not (Ensure-LDAPConnection)) {
+        # Ensure-LDAPConnection already displayed the error message and set SessionInvalid flag
+        Show-Header "Сводка аудита"
+        Show-Line "Продолжительность: 0 секунд" -Class Hint
+        Show-Line "Аудит прерван: недействительная LDAP-сессия. Отчёты не созданы." -Class Finding
+        Show-Line "Подключитесь повторно через Connect-adPEAS и повторите проверку." -Class Hint
+        return
+    }
+
+    # 2. Apply OPSEC to the module list resolved above
+    #
+    # OPSEC mode excludes BloodHound collection entirely - drop it from the list
+    # so the displayed module list and progress counter reflect what will actually run.
+    if ($OPSEC) {
+        $Module = @($Module | Where-Object { $_ -ne 'Bloodhound' })
+
+        # -Module Bloodhound -OPSEC asks for the one module OPSEC removes. Without this
+        # the run announces an empty module list and produces a report with nothing in
+        # it, which reads like the domain came back clean.
+        if ($Module.Count -eq 0) {
+            Write-Warning "[adPEAS] -OPSEC excludes BloodHound collection, which was the only module selected. Nothing to do."
+            return
+        }
+    }
+
+    Write-Log "[adPEAS] Executing Modules: $($Module -join ', ')"
+    Show-Line "Запуск модулей: $($Module -join ', ')"
+
+    # Module progress counter
+    $moduleCounter = 0
+    $moduleTotal = $Module.Count
+
+    # Category Header Mapping - displayed once per module category
+    $Script:ModuleCategoryHeaders = @{
+        'Domain'     = "Domain Configuration"
+        'Accounts'   = "Privileged Accounts"
+        'Delegation' = "Delegation Settings"
+        'Rights'     = "Access Permissions"
+        'Computer'   = "Computer Security"
+        'GPO'        = "Group Policy Objects"
+        'ADCS'       = "Certificate Services"
+        'Application'= "Application Infrastructure"
+        'Creds'      = "Credential Exposure"
+        'Shares'     = "Shares"
+        'Bloodhound' = "BloodHound Data"
+    }
+
+    # Seed the collection from the previous run (-OutputAppend)
+    #
+    # Has to happen before the first check, not after the last one: the per-module
+    # checkpoints below write to exactly the file this reads, so a merge at the end would
+    # find this run's own output there and silently drop everything the previous run
+    # collected. Seeding first also means an interrupted append run keeps the history it
+    # started from rather than throwing it away with the rest.
+    #
+    # Module names map 1:1 to category names, so the modules being re-run are the
+    # categories whose previous findings are dropped.
+    $appendCachePath = if ($basePath) { "$basePath.json" } else { $null }
+    if ($OutputAppend -and $appendCachePath -and (Test-Path $appendCachePath)) {
+        try {
+            $previousFindings = @(Import-FindingsCache -Path $appendCachePath)
+            $keptFindings = @(Merge-FindingsCollection `
+                -PreviousFindings $previousFindings `
+                -CurrentFindings @() `
+                -ReplacedCategories @($Module))
+
+            Set-FindingsCollection -Findings $keptFindings
+            Show-Line "Appending to existing report: kept $($keptFindings.Count) of $($previousFindings.Count) previous findings, re-running $($Module -join ', ')" -Class Note
+        }
+        catch {
+            Write-Warning "[adPEAS] Could not load previous findings from '$appendCachePath': $_"
+            Write-Warning "[adPEAS] Continuing without append - creating fresh report"
+        }
+    } elseif ($OutputAppend) {
+        Write-Log "[adPEAS] No previous cache found at '$appendCachePath' - first append run"
+    }
+
+    # 3. Execute checks
+
+    # Which modules have finished, and where the checkpoint after each of them goes.
+    #
+    # An ArrayList rather than a plain array because Save-FindingsCheckpoint below is a
+    # nested function: it can read this variable from the enclosing scope, but assigning
+    # to it there would create a new local instead and the additions would be invisible
+    # here. Adding to the list mutates the one object both scopes hold. A $Script:
+    # variable would work too, at the price of an entry in Clear-SessionState for state
+    # that does not outlive this call.
+    $completedModules = [System.Collections.ArrayList]::new()
+    $checkpointPath = if ($Format -in @('All', 'JSON') -and $basePath) { "$basePath.json" } else { $null }
+
+    # Write everything collected so far, after every module.
+    #
+    # Without this a scan that dies - an unhandled error, a closed window, a killed
+    # process - takes the whole JSON with it, and the HTML with that, since both are
+    # generated from this one collection at the very end. The text report never had the
+    # problem: Write-adPEASOutput appends it line by line as it is produced. This closes
+    # the gap for the other two, because Convert-adPEASReport rebuilds an HTML report
+    # from a JSON export without needing a connection.
+    #
+    # Per module, not per check: ten writes instead of forty-odd, and what a crash costs
+    # is at most the module that was running. A failing checkpoint must never take the
+    # scan down with it - the scan is the valuable part, the checkpoint is the insurance.
+    function Save-FindingsCheckpoint {
+        param([string]$ModuleName)
+
+        # A dead session does not stop the module blocks - Invoke-CheckWithContext returns
+        # from every remaining check instead, so every later block still reaches this line
+        # having run nothing. Recording those as completed would put modules into
+        # CompletedModules that were skipped, which is the one thing the field exists to
+        # say. The last checkpoint before the session died is the honest one; leave it.
+        if ($Script:LDAPContext -and $Script:LDAPContext['SessionInvalid']) {
+            Write-Log "[adPEAS] Skipping checkpoint after module '$ModuleName' - session invalid"
+            return
+        }
+
+        [void]$completedModules.Add($ModuleName)
+        if (-not $checkpointPath) { return }
+
+        try {
+            # Only -OutputAppend can leave the collection out of canonical module order,
+            # by seeding it with categories this run does not re-emit. Everything else
+            # arrives in order already, and sorting it would cost real time on a large
+            # collection to change nothing.
+            if ($OutputAppend) {
+                Set-FindingsCollection -Findings @(Sort-FindingsByCategory -Findings (Get-FindingsCollection))
+            }
+            Export-FindingsCache -Path $checkpointPath -Partial -CompletedModules @($completedModules)
+        }
+        catch {
+            Write-Log "[adPEAS] Checkpoint after module '$ModuleName' failed: $_" -Level Warning
+        }
+    }
+
+    # Helper function to run a check with context for HTML reporting
+    function Invoke-CheckWithContext {
+        param(
+            [string]$Category,
+            [string]$CheckName,
+            [string]$Title,
+            [scriptblock]$Check
+        )
+        # Skip all remaining checks if session became invalid (e.g., expired Kerberos TGT)
+        if ($Script:LDAPContext -and $Script:LDAPContext['SessionInvalid']) {
+            Write-Log "[adPEAS] Skipping check '$CheckName' - session invalid"
+            return
+        }
+        Set-CheckContext -Category $Category -CheckName $CheckName -Title $Title
+        try {
+            & $Check
+        } catch {
+            Write-Warning "[adPEAS] Check '$CheckName' failed: $_"
+            Write-Log "[adPEAS] Check '$CheckName' failed: $_" -Level Error
+
+            # The warning above goes to the console only. Without the line below the HTML
+            # report, the JSON export and the text report contain nothing at all about the
+            # failure: the section is simply short or empty, and an empty section reads
+            # exactly like a clean environment. For an audit tool that is the most
+            # expensive kind of defect, because the finding does not go missing visibly.
+            # Emitted while the check context is still set, so it is filed under the right
+            # category and check.
+            Show-Line "This check did not complete - its results are incomplete or absent. Reason: $($_.Exception.Message)" -Class Hint
+            if ($null -eq $Script:adPEAS_IncompleteChecks) { $Script:adPEAS_IncompleteChecks = @() }
+            $Script:adPEAS_IncompleteChecks += $CheckName
+        } finally {
+            Clear-CheckContext
+        }
+    }
+
+    # Helper functions for LDAP Statistics tracking (no-op when $Script:LDAPStatistics is $null)
+    function Enter-StatisticsModule {
+        param([string]$ModuleName)
+        if (-not $Script:LDAPStatistics) { return }
+        $Script:LDAPStatistics._CurrentModule = $ModuleName
+        $Script:LDAPStatistics._ModuleStartQueries = $Script:LDAPStatistics.TotalQueries
+        $Script:LDAPStatistics._ModuleStartResults = $Script:LDAPStatistics.TotalResults
+        $Script:LDAPStatistics._ModuleStartBytes   = $Script:LDAPStatistics.TotalEstimatedBytes
+    }
+
+    function Exit-StatisticsModule {
+        param([string]$ModuleName)
+        if (-not $Script:LDAPStatistics) { return }
+
+        $deltaQueries = $Script:LDAPStatistics.TotalQueries - $Script:LDAPStatistics._ModuleStartQueries
+        $deltaResults = $Script:LDAPStatistics.TotalResults - $Script:LDAPStatistics._ModuleStartResults
+        $deltaBytes   = $Script:LDAPStatistics.TotalEstimatedBytes - $Script:LDAPStatistics._ModuleStartBytes
+
+        $Script:LDAPStatistics.Modules[$ModuleName] = @{
+            Queries        = $deltaQueries
+            Results        = $deltaResults
+            EstimatedBytes = $deltaBytes
+        }
+        $Script:LDAPStatistics._CurrentModule = $null
+
+        # Per-module display
+        $displayName = if ($Script:ModuleCategoryHeaders[$ModuleName]) {
+            $Script:ModuleCategoryHeaders[$ModuleName]
+        } else { $ModuleName }
+
+        Show-SubHeader "LDAP Statistics for $displayName"
+        Show-KeyValue "Queries" $deltaQueries -Class Note
+        Show-KeyValue "Results" $deltaResults -Class Note
+        Show-KeyValue "Estimated Traffic" (Format-ByteSize $deltaBytes) -Class Note
+    }
+
+    function Format-ByteSize {
+        param([long]$Bytes)
+        if ($Bytes -ge 1MB) { return "{0:N1} MB" -f ($Bytes / 1MB) }
+        if ($Bytes -ge 1KB) { return "{0:N1} KB" -f ($Bytes / 1KB) }
+        return "$Bytes Bytes"
+    }
+
+    # Domain Module - baseline context for all subsequent checks
+    if ($Module -contains 'Domain') {
+        $moduleCounter++
+        Enter-StatisticsModule 'Domain'
+        Show-Header "[$moduleCounter/$moduleTotal] Analyzing $($Script:ModuleCategoryHeaders['Domain'])"
+        try {
+            Invoke-CheckWithContext -Category 'Domain' -CheckName 'Get-DomainInformation' -Title 'Domain Information' -Check { Get-DomainInformation }
+            Invoke-CheckWithContext -Category 'Domain' -CheckName 'Get-DomainPasswordPolicy' -Title 'Password Policy' -Check { Get-DomainPasswordPolicy }
+            Invoke-CheckWithContext -Category 'Domain' -CheckName 'Get-DomainTrusts' -Title 'Domain Trusts' -Check { Get-DomainTrusts }
+            Invoke-CheckWithContext -Category 'Domain' -CheckName 'Get-LDAPConfiguration' -Title 'LDAP Configuration' -Check { Get-LDAPConfiguration }
+            Invoke-CheckWithContext -Category 'Domain' -CheckName 'Get-SMBSigningStatus' -Title 'SMB Signing Status' -Check { Get-SMBSigningStatus }
+        } catch {
+            Write-Warning "[adPEAS] Error executing Domain Module: $_"
+        }
+        Exit-StatisticsModule 'Domain'
+        Save-FindingsCheckpoint -ModuleName 'Domain'
+    }
+
+    # Creds Module - immediately actionable findings first
+    if ($Module -contains 'Creds') {
+        $moduleCounter++
+        Enter-StatisticsModule 'Creds'
+        Show-Header "[$moduleCounter/$moduleTotal] Analyzing $($Script:ModuleCategoryHeaders['Creds'])"
+        try {
+            Invoke-CheckWithContext -Category 'Creds' -CheckName 'Get-LAPSCredentialAccess' -Title 'LAPS Credential Access' -Check { Get-LAPSCredentialAccess }
+            Invoke-CheckWithContext -Category 'Creds' -CheckName 'Get-BitLockerRecoveryKeyAccess' -Title 'BitLocker Recovery Key Access' -Check { Get-BitLockerRecoveryKeyAccess -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'Creds' -CheckName 'Get-CredentialRoaming' -Title 'Credential Roaming' -Check { Get-CredentialRoaming -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'Creds' -CheckName 'Get-CredentialExposure' -Title 'Credential Exposure' -Check { Get-CredentialExposure }
+            Invoke-CheckWithContext -Category 'Creds' -CheckName 'Get-PasswordInDescription' -Title 'Passwords in Description/Info' -Check { Get-PasswordInDescription -OPSEC:$OPSEC }
+            Invoke-CheckWithContext -Category 'Creds' -CheckName 'Get-DeletedObjectAccess' -Title 'Deleted Object Access' -Check { Get-DeletedObjectAccess -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'Creds' -CheckName 'Get-KerberoastableAccounts' -Title 'Kerberoastable Accounts' -Check { Get-KerberoastableAccounts -OPSEC:$OPSEC }
+            Invoke-CheckWithContext -Category 'Creds' -CheckName 'Get-ASREPRoastableAccounts' -Title 'ASREProastable Accounts' -Check { Get-ASREPRoastableAccounts -OPSEC:$OPSEC }
+            Invoke-CheckWithContext -Category 'Creds' -CheckName 'Get-UnixPasswordAccounts' -Title 'Unix Password Accounts' -Check { Get-UnixPasswordAccounts }
+        } catch {
+            Write-Warning "[adPEAS] Error executing Creds Module: $_"
+        }
+        Exit-StatisticsModule 'Creds'
+        Save-FindingsCheckpoint -ModuleName 'Creds'
+    }
+
+    # Rights Module - privilege escalation paths
+    if ($Module -contains 'Rights') {
+        $moduleCounter++
+        Enter-StatisticsModule 'Rights'
+        Show-Header "[$moduleCounter/$moduleTotal] Analyzing $($Script:ModuleCategoryHeaders['Rights'])"
+        try {
+            Invoke-CheckWithContext -Category 'Rights' -CheckName 'Get-DangerousACLs' -Title 'Dangerous ACLs' -Check { Get-DangerousACLs -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'Rights' -CheckName 'Get-CriticalObjectACLs' -Title 'Schema, Partitions and Role Object ACLs' -Check { Get-CriticalObjectACLs }
+            Invoke-CheckWithContext -Category 'Rights' -CheckName 'Get-DangerousOUPermissions' -Title 'Dangerous OU Permissions' -Check { Get-DangerousOUPermissions -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'Rights' -CheckName 'Get-PasswordResetRights' -Title 'Password Reset Rights' -Check { Get-PasswordResetRights -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'Rights' -CheckName 'Get-AddComputerRights' -Title 'Add Computer Rights' -Check { Get-AddComputerRights -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'Rights' -CheckName 'Get-GPOUserRightsAssignment' -Title 'GPO User Rights Assignment' -Check { Get-GPOUserRightsAssignment -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'Rights' -CheckName 'Get-LAPSPermissions' -Title 'LAPS Permissions' -Check { Get-LAPSPermissions -IncludePrivileged:$IncludePrivileged }
+        } catch {
+            Write-Warning "[adPEAS] Error executing Rights Module: $_"
+        }
+        Exit-StatisticsModule 'Rights'
+        Save-FindingsCheckpoint -ModuleName 'Rights'
+    }
+
+    # Delegation Module - delegation abuse vectors
+    if ($Module -contains 'Delegation') {
+        $moduleCounter++
+        Enter-StatisticsModule 'Delegation'
+        Show-Header "[$moduleCounter/$moduleTotal] Analyzing $($Script:ModuleCategoryHeaders['Delegation'])"
+        try {
+            Invoke-CheckWithContext -Category 'Delegation' -CheckName 'Get-UnconstrainedDelegation' -Title 'Unconstrained Delegation' -Check { Get-UnconstrainedDelegation }
+            Invoke-CheckWithContext -Category 'Delegation' -CheckName 'Get-ConstrainedDelegation' -Title 'Constrained Delegation' -Check { Get-ConstrainedDelegation }
+            Invoke-CheckWithContext -Category 'Delegation' -CheckName 'Get-ResourceBasedConstrainedDelegation' -Title 'Resource-Based Constrained Delegation' -Check { Get-ResourceBasedConstrainedDelegation }
+        } catch {
+            Write-Warning "[adPEAS] Error executing Delegation Module: $_"
+        }
+        Exit-StatisticsModule 'Delegation'
+        Save-FindingsCheckpoint -ModuleName 'Delegation'
+    }
+
+    # ADCS Module - certificate abuse (often critical)
+    if ($Module -contains 'ADCS') {
+        $moduleCounter++
+        Enter-StatisticsModule 'ADCS'
+        Show-Header "[$moduleCounter/$moduleTotal] Analyzing $($Script:ModuleCategoryHeaders['ADCS'])"
+        try {
+            Invoke-CheckWithContext -Category 'ADCS' -CheckName 'Get-ADCSVulnerabilities' -Title 'ADCS Vulnerabilities' -Check { Get-ADCSVulnerabilities -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'ADCS' -CheckName 'Get-WeakCertificateMapping' -Title 'Explicit Certificate Mappings' -Check { Get-WeakCertificateMapping -IncludePrivileged:$IncludePrivileged }
+        } catch {
+            Write-Warning "[adPEAS] Error executing ADCS Module: $_"
+        }
+        Exit-StatisticsModule 'ADCS'
+        Save-FindingsCheckpoint -ModuleName 'ADCS'
+    }
+
+    # Accounts Module - privileged account hygiene
+    if ($Module -contains 'Accounts') {
+        $moduleCounter++
+        Enter-StatisticsModule 'Accounts'
+        Show-Header "[$moduleCounter/$moduleTotal] Analyzing $($Script:ModuleCategoryHeaders['Accounts'])"
+        try {
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-PrivilegedGroupMembers' -Title 'Privileged Group Members' -Check { Get-PrivilegedGroupMembers -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-SIDHistoryInjection' -Title 'SID History Injection' -Check { Get-SIDHistoryInjection }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-ManagedServiceAccountSecurity' -Title 'Managed Service Account Security' -Check { Get-ManagedServiceAccountSecurity }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-ProtectedUsersStatus' -Title 'Protected Users Status' -Check { Get-ProtectedUsersStatus }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-AuthenticationPolicySilos' -Title 'Authentication Policy Silos' -Check { Get-AuthenticationPolicySilos }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-RODCPasswordReplication' -Title 'RODC Password Replication Policy' -Check { Get-RODCPasswordReplication }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-InactiveAdminAccounts' -Title 'Inactive Admin Accounts' -Check { Get-InactiveAdminAccounts }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-AdminPasswordNeverExpires' -Title 'Admin Password Never Expires' -Check { Get-AdminPasswordNeverExpires }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-AdminReversibleEncryption' -Title 'Admin Reversible Encryption' -Check { Get-AdminReversibleEncryption }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-PasswordNotRequired' -Title 'Password Not Required Accounts' -Check { Get-PasswordNotRequired }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-NonDefaultUserOwners' -Title 'Non-Default User Owners' -Check { Get-NonDefaultUserOwners -OPSEC:$OPSEC }
+            Invoke-CheckWithContext -Category 'Accounts' -CheckName 'Get-LogonScriptPermissions' -Title 'Logon Script Permissions' -Check { Get-LogonScriptPermissions -OPSEC:$OPSEC }
+        } catch {
+            Write-Warning "[adPEAS] Error executing Accounts Module: $_"
+        }
+        Exit-StatisticsModule 'Accounts'
+        Save-FindingsCheckpoint -ModuleName 'Accounts'
+    }
+
+    # GPO Module - GPO abuse vectors
+    if ($Module -contains 'GPO') {
+        $moduleCounter++
+        Enter-StatisticsModule 'GPO'
+        Show-Header "[$moduleCounter/$moduleTotal] Analyzing $($Script:ModuleCategoryHeaders['GPO'])"
+        try {
+            Invoke-CheckWithContext -Category 'GPO' -CheckName 'Get-GPOPermissions' -Title 'GPO Permissions' -Check { Get-GPOPermissions -IncludePrivileged:$IncludePrivileged }
+            Invoke-CheckWithContext -Category 'GPO' -CheckName 'Get-GPOLocalGroupMembership' -Title 'GPO Local Group Membership' -Check { Get-GPOLocalGroupMembership }
+            Invoke-CheckWithContext -Category 'GPO' -CheckName 'Get-GPOScheduledTasks' -Title 'GPO Scheduled Tasks' -Check { Get-GPOScheduledTasks }
+            Invoke-CheckWithContext -Category 'GPO' -CheckName 'Get-GPOScriptPaths' -Title 'GPO Script Paths' -Check { Get-GPOScriptPaths -OPSEC:$OPSEC }
+            Invoke-CheckWithContext -Category 'GPO' -CheckName 'Get-GPORegistrySettings' -Title 'GPO Registry Settings' -Check { Get-GPORegistrySettings }
+            Invoke-CheckWithContext -Category 'GPO' -CheckName 'Get-GPOPointAndPrint' -Title 'Point and Print Policies' -Check { Get-GPOPointAndPrint -IncludeDefaults:$IncludePrivileged }
+        } catch {
+            Write-Warning "[adPEAS] Error executing GPO Module: $_"
+        }
+        Exit-StatisticsModule 'GPO'
+        Save-FindingsCheckpoint -ModuleName 'GPO'
+    }
+
+    # Computer Module - computer security and LAPS configuration
+    if ($Module -contains 'Computer') {
+        $moduleCounter++
+        Enter-StatisticsModule 'Computer'
+        Show-Header "[$moduleCounter/$moduleTotal] Analyzing $($Script:ModuleCategoryHeaders['Computer'])"
+        try {
+            Invoke-CheckWithContext -Category 'Computer' -CheckName 'Get-InfrastructureServers' -Title 'Infrastructure Servers' -Check { Get-InfrastructureServers }
+            Invoke-CheckWithContext -Category 'Computer' -CheckName 'Get-NonDefaultComputerOwners' -Title 'Non-Default Computer Owners' -Check { Get-NonDefaultComputerOwners -OPSEC:$OPSEC }
+            Invoke-CheckWithContext -Category 'Computer' -CheckName 'Get-LAPSConfiguration' -Title 'LAPS Configuration' -Check { Get-LAPSConfiguration -OPSEC:$OPSEC }
+            Invoke-CheckWithContext -Category 'Computer' -CheckName 'Get-OutdatedComputers' -Title 'Outdated Computers' -Check { Get-OutdatedComputers -OPSEC:$OPSEC }
+            Invoke-CheckWithContext -Category 'Computer' -CheckName 'Get-ComputerPasswordAge' -Title 'Machine Account Password Age' -Check { Get-ComputerPasswordAge }
+            Invoke-CheckWithContext -Category 'Computer' -CheckName 'Get-NetworkMap' -Title 'Network Map' -Check { Get-NetworkMap -OPSEC:$OPSEC }
+        } catch {
+            Write-Warning "[adPEAS] Error executing Computer Module: $_"
+        }
+        Exit-StatisticsModule 'Computer'
+        Save-FindingsCheckpoint -ModuleName 'Computer'
+    }
+
+    # Application Module - infrastructure overview (Exchange, SCCM, SCOM)
+    if ($Module -contains 'Application') {
+        $moduleCounter++
+        Enter-StatisticsModule 'Application'
+        Show-Header "[$moduleCounter/$moduleTotal] Analyzing $($Script:ModuleCategoryHeaders['Application'])"
+        try {
+            Invoke-CheckWithContext -Category 'Application' -CheckName 'Get-ExchangeInfrastructure' -Title 'Exchange Infrastructure' -Check { Get-ExchangeInfrastructure }
+            Invoke-CheckWithContext -Category 'Application' -CheckName 'Get-ExchangeRBACAssignments' -Title 'Exchange Role Assignments' -Check { Get-ExchangeRBACAssignments }
+            Invoke-CheckWithContext -Category 'Application' -CheckName 'Get-SCCMInfrastructure' -Title 'SCCM Infrastructure' -Check { Get-SCCMInfrastructure }
+            Invoke-CheckWithContext -Category 'Application' -CheckName 'Get-SCOMInfrastructure' -Title 'SCOM Infrastructure' -Check { Get-SCOMInfrastructure }
+        } catch {
+            Write-Warning "[adPEAS] Error executing Application Module: $_"
+        }
+        Exit-StatisticsModule 'Application'
+        Save-FindingsCheckpoint -ModuleName 'Application'
+    }
+
+    # Shares Module - opt-in: -Module Shares. See $Script:adPEASOptInModules.
+    if ($Module -contains 'Shares') {
+        $moduleCounter++
+        Enter-StatisticsModule 'Shares'
+        Show-Header "[$moduleCounter/$moduleTotal] Analyzing $($Script:ModuleCategoryHeaders['Shares'])"
+        try {
+            Invoke-CheckWithContext -Category 'Shares' -CheckName 'Invoke-ShareHunt' -Title 'Readable Shares' -Check { Invoke-ShareHunt -OPSEC:$OPSEC }
+        } catch {
+            Write-Warning "[adPEAS] Error executing Shares Module: $_"
+        }
+        Exit-StatisticsModule 'Shares'
+        Save-FindingsCheckpoint -ModuleName 'Shares'
+    }
+
+    # Bloodhound Module (excluded from $Module above when -OPSEC is set)
+    if ($Module -contains 'Bloodhound') {
+        $moduleCounter++
+        Enter-StatisticsModule 'Bloodhound'
+        Show-Header "[$moduleCounter/$moduleTotal] Collecting $($Script:ModuleCategoryHeaders['Bloodhound'])"
+
+        try {
+            # Pass output directory to collector if -Outputfile was specified
+            $bhOutputDir = $null
+            if ($Script:adPEAS_Outputfile) {
+                $bhOutputDir = Split-Path -Parent $Script:adPEAS_Outputfile
+            } elseif ($Script:HTMLOutputPath) {
+                $bhOutputDir = Split-Path -Parent $Script:HTMLOutputPath
+            }
+            if ($bhOutputDir) {
+                Invoke-CheckWithContext -Category 'Bloodhound' -CheckName 'Invoke-adPEASCollector' -Title 'BloodHound Collector' -Check { Invoke-adPEASCollector -OutputPath $bhOutputDir }
+            } else {
+                Invoke-CheckWithContext -Category 'Bloodhound' -CheckName 'Invoke-adPEASCollector' -Title 'BloodHound Collector' -Check { Invoke-adPEASCollector }
+            }
+        } catch {
+            Write-Warning "[adPEAS] Error executing Bloodhound Module: $_"
+        }
+        Exit-StatisticsModule 'Bloodhound'
+        Save-FindingsCheckpoint -ModuleName 'Bloodhound'
+    }
+
+    # Check if session became invalid during check execution (e.g., expired Kerberos TGT)
+    $sessionAborted = $Script:LDAPContext -and $Script:LDAPContext['SessionInvalid']
+
+    # 4. -OutputAppend used to merge the previous run in here, after the checks. It cannot
+    # stay: the checkpoints write $basePath.json during the run, so by this point the file
+    # the merge reads has been overwritten with this run's own data. The merge moved to
+    # before the first check, where it also survives an interrupted run instead of being
+    # lost with it.
+
+    # 5. Generate HTML Report if requested
+    if ($Script:HTMLOutputPath -and -not $sessionAborted) {
+        try {
+            Export-HTMLReport -OutputPath $Script:HTMLOutputPath
+            Write-Log "[adPEAS] HTML report generated: $($Script:HTMLOutputPath)"
+        } catch {
+            Write-Warning "[adPEAS] Error generating HTML report: $_"
+            $Script:HTMLOutputPath = $null  # Clear path so we don't show it in summary
+        }
+    }
+
+    # 5b. Generate JSON export (for -Format All or -Format JSON)
+    # JSON path is always basePath.json, used for -OutputAppend cache and Convert-adPEASReport
+    if ($Format -in @('All', 'JSON') -and $basePath -and -not $sessionAborted) {
+        $jsonPath = "$basePath.json"
+        try {
+            # Overwrites the last checkpoint. Without -Partial the cache records
+            # Complete = $true, which is what separates this file from the one an
+            # interrupted run leaves behind. It also picks up everything emitted after
+            # the last module - the statistics summary and the scan summary.
+            Export-FindingsCache -Path $jsonPath -CompletedModules @($completedModules)
+            $Script:JSONOutputPath = $jsonPath
+            Write-Log "[adPEAS] Findings JSON saved to: $jsonPath"
+        }
+        catch {
+            Write-Warning "[adPEAS] Could not save JSON export to '$jsonPath': $_"
+            $Script:JSONOutputPath = $null
+        }
+    }
+
+    # 6. LDAP Statistics Summary (before Scan Summary)
+    if ($Script:LDAPStatistics -and $Script:LDAPStatistics.Modules.Count -gt 0) {
+        Show-Header "Сводная статистика LDAP"
+
+        foreach ($modName in $Script:LDAPStatistics.Modules.Keys) {
+            $modStats = $Script:LDAPStatistics.Modules[$modName]
+            $displayName = if ($Script:ModuleCategoryHeaders[$modName]) {
+                $Script:ModuleCategoryHeaders[$modName]
+            } else { $modName }
+
+            $statsObj = [PSCustomObject]@{
+                Name             = $displayName
+                Queries          = $modStats.Queries
+                Results          = $modStats.Results
+                EstimatedTraffic = Format-ByteSize $modStats.EstimatedBytes
+            }
+            $statsObj | Add-Member '_adPEASObjectType' 'LDAPStatisticsModule' -Force
+            Show-Object $statsObj
+        }
+
+        # Total row
+        $totalObj = [PSCustomObject]@{
+            Name             = "Total"
+            Queries          = $Script:LDAPStatistics.TotalQueries
+            Results          = $Script:LDAPStatistics.TotalResults
+            EstimatedTraffic = Format-ByteSize $Script:LDAPStatistics.TotalEstimatedBytes
+        }
+        $totalObj | Add-Member '_adPEASObjectType' 'LDAPStatisticsTotal' -Force
+        Show-Object $totalObj
+    }
+
+    # 7. Summary
+    $EndTime = Get-Date
+    $Duration = $EndTime - $StartTime
+
+    Show-Header "Сводка аудита"
+    Show-Line "Продолжительность: $([Math]::Round($Duration.TotalSeconds, 1)) seconds" -Class Hint
+
+    if ($sessionAborted) {
+        Show-Line "Аудит прерван: недействительная LDAP-сессия. Отчёты не созданы." -Class Finding
+        Show-Line "Подключитесь повторно через Connect-adPEAS и повторите проверку." -Class Hint
+
+        # The checkpoints are the reason there is something to point at here at all. The
+        # file is marked incomplete and names the modules it covers, so it is worth
+        # naming rather than leaving for the user to find.
+        if ($checkpointPath -and (Test-Path $checkpointPath)) {
+            Show-Line "Partial JSON export from the modules that completed: $checkpointPath" -Class Hint
+            Show-Line "Rebuild a report from it with: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath'" -Class Hint
+        }
+    } else {
+        # Checks that threw are named here, not just warned about on the console. A reader
+        # of the report has to be able to tell "nothing found" from "not looked at".
+        if ($Script:adPEAS_IncompleteChecks -and $Script:adPEAS_IncompleteChecks.Count -gt 0) {
+            $incomplete = @($Script:adPEAS_IncompleteChecks | Select-Object -Unique)
+            Show-Line "$($incomplete.Count) check(s) did not complete - their sections are incomplete and must not be read as clean:" -Class Finding
+            foreach ($name in $incomplete) {
+                Show-Line "  $name" -Class Finding
+            }
+        }
+
+        # 7. Report file notifications (after summary)
+        if ($Script:adPEAS_Outputfile) {
+            Show-Line "Текстовый отчёт сохранён: $Script:adPEAS_Outputfile" -Class Hint
+        }
+        if ($Script:HTMLOutputPath) {
+            Show-Line "HTML-отчёт сохранён: $Script:HTMLOutputPath" -Class Hint
+        }
+        if ($htmlPath) {
+            $cachePath = [System.IO.Path]::ChangeExtension($htmlPath, '.json')
+            if (Test-Path $cachePath) {
+                Show-Line "JSON-данные сохранены: $cachePath" -Class Hint
+            }
+        }
+        if ($Script:JSONOutputPath -and (Test-Path $Script:JSONOutputPath)) {
+            Show-Line "JSON-данные сохранены: $Script:JSONOutputPath" -Class Hint
+        }
+    }
+
+} catch {
+    Show-Line "КРИТИЧЕСКАЯ ОШИБКА: $_" -Class Finding
+    Write-Error $_.ScriptStackTrace
+    return
+}
+finally {
+    # Clean up findings collection (even on early returns, to prevent stale state)
+    Clear-FindingsCollection
+
+    # Session is always kept alive after Invoke-adPEAS completes.
+    # This allows users to run Get-adPEASSession, Get-Domain* queries, or additional scans.
+    # Use Disconnect-adPEAS to explicitly close the session when done.
+    Write-Log "[adPEAS] Session kept alive - use Disconnect-adPEAS to close"
+    Write-Log "[adPEAS] adPEAS v2 completed"
+}
+}
+# ===== End of Invoke-adPEAS Function =====
+
+<#
+.SYNOPSIS
+    The license line adPEAS prints under its logo, which is also the disclaimer of its
+    reports.
+
+.DESCRIPTION
+    A valid license names its licensee, as a note. Without one - or with one that is
+    invalid or expired - the default disclaimer (XOR obfuscated) stands there, as a finding.
+
+.PARAMETER LicenseJson
+    A license read from Invoke-adPEAS -License, which takes priority over the one
+    Connect-adPEAS -License stored and the one embedded at build time.
+
+.OUTPUTS
+    [PSCustomObject] with Text and Class (Note or Finding).
+#>
+function Get-adPEASDisclaimer {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string]$LicenseJson
+    )
+
+    $_licJson = $LicenseJson
+    if (-not $_licJson) {
+        if ($Script:RuntimeLicense) {
+            $_licJson = $Script:RuntimeLicense
+        }
+        elseif ($Script:EmbeddedLicense) {
+            $_licJson = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($Script:EmbeddedLicense))
+        }
+    }
+
+    $_licResult = if ($_licJson) { Test-adPEASLicense -LicenseJson $_licJson } else { $null }
+    if ($_licResult -and $_licResult.IsValid -and -not $_licResult.Expired) {
+        return [PSCustomObject]@{ Text = [string]$_licResult.Message; Class = 'Note' }
+    }
+
+    # Default disclaimer (XOR obfuscated)
+    $_lm="GCQlP2w+KTwjPjhsOy0/bCspIik+LTgpKGw5PyUiK2wtbDgjIyBsOCQtOGw+KT05JT4pP2wtbDotICUobC8jISEpPi8lLSBsICUvKSI/KWwqIz5sLyMiPzkgOCUiK2wjPmwhLSItKykobD8pPjolLylsOT8pYg==";$_lk=0x4C
+    return [PSCustomObject]@{ Text = (-join([Convert]::FromBase64String($_lm)|ForEach-Object{[char]($_-bxor$_lk)})); Class = 'Finding' }
+}
+
+# ===== Module Import Message =====
+# The logo, the license line and the quick start. A scan started right after this shows
+# neither logo nor license line again on the console - Show-ScanLogo reads the flag set
+# here, which any other output clears, and the license line recorded with it.
+$_importDisclaimer = Get-adPEASDisclaimer
+Show-Logo -Version $Script:adPEASVersion
+Show-Line $_importDisclaimer.Text -Class $_importDisclaimer.Class
+Get-adPEASHelp -Section QuickStart
+$Script:adPEASLogoDisclaimer = $_importDisclaimer.Text
+$Script:adPEASLogoOnScreen = $true

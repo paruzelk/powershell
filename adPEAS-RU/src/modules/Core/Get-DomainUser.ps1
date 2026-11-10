@@ -1,0 +1,534 @@
+﻿function Get-DomainUser {
+<#
+.SYNOPSIS
+    Retrieves user objects from Active Directory (wrapper for Get-DomainObject).
+
+.DESCRIPTION
+    Get-DomainUser is a convenience wrapper around Get-DomainObject that provides user-specific filters and functionality:
+
+    - Search by Identity (sAMAccountName, DN, SID, DOMAIN\user)
+    - Filter by specific criteria (AdminCount, SPN, Delegation, etc.)
+    - Flexible property selection
+    - Custom LDAP filters
+    - gMSA-specific features (ShowGMSADetails)
+
+.PARAMETER Identity
+    sAMAccountName, DistinguishedName, SID or DOMAIN\user format.
+    Wildcards are supported.
+
+.PARAMETER SPN
+    Return only users with Service Principal Names.
+
+.PARAMETER AdminCount
+    Return only users with adminCount=1 (privileged accounts).
+
+.PARAMETER Unconstrained
+    Users with Unconstrained Delegation (TRUSTED_FOR_DELEGATION flag).
+
+.PARAMETER Constrained
+    Users with Constrained Delegation (msDS-AllowedToDelegateTo attribute).
+    Includes both regular Constrained Delegation and Protocol Transition variants.
+
+.PARAMETER RBCD
+    Users with Resource-Based Constrained Delegation (msDS-AllowedToActOnBehalfOfOtherIdentity attribute).
+    RBCD allows the target resource to control who can delegate to it.
+
+.PARAMETER TrustedToAuth
+    Users with Protocol Transition (TRUSTED_TO_AUTH_FOR_DELEGATION flag).
+    This is the more dangerous variant of Constrained Delegation with S4U2Self.
+
+.PARAMETER DisallowDelegation
+    Users NOT allowed for delegation (NOT_DELEGATED flag set).
+
+.PARAMETER PreauthNotRequired
+    Users with DONT_REQ_PREAUTH flag (AS-REP Roastable).
+
+.PARAMETER PasswordNotRequired
+    Users with PASSWD_NOTREQD flag.
+
+.PARAMETER PasswordNeverExpires
+    Users with DONT_EXPIRE_PASSWORD flag.
+
+.PARAMETER PasswordMustChange
+    Users where pwdLastSet=0 (must change password at next logon).
+
+.PARAMETER Enabled
+    Only enabled users (ACCOUNTDISABLE flag not set).
+
+.PARAMETER Disabled
+    Only disabled users (ACCOUNTDISABLE flag set).
+
+.PARAMETER LockedOut
+    Only locked out users (lockoutTime > 0).
+
+.PARAMETER SmartcardRequired
+    Users with SMARTCARD_REQUIRED flag set.
+
+.PARAMETER AccountExpired
+    Users where accountExpires is in the past.
+
+.PARAMETER AccountNeverExpires
+    Users where accountExpires is 0 or never set.
+
+.PARAMETER DESOnly
+    Users with USE_DES_KEY_ONLY flag set (weak encryption).
+
+.PARAMETER ReversibleEncryption
+    Users with ENCRYPTED_TEXT_PWD_ALLOWED flag set (security risk).
+
+.PARAMETER GMSA
+    Return only Managed Service Accounts (MSA, gMSA and dMSA).
+    Includes standalone MSA (Server 2008 R2+), Group MSA (Server 2012+) and delegated MSA
+    (Server 2025).
+
+.PARAMETER ShowGMSADetails
+    Shows extended MSA/gMSA information (password access, rotation, SPNs).
+    Must be used together with -GMSA.
+
+.PARAMETER LDAPFilter
+    Custom LDAP filter for special queries.
+
+.PARAMETER Properties
+    Array of attribute names to return.
+    Default: All default properties from Get-DomainObject.
+
+.PARAMETER ShowOwner
+    Include Owner and OwnerSID properties on returned objects.
+
+.PARAMETER ResolveGroups
+    Adds memberOfNested: the groups the account is in that memberOf does not list - its
+    primary group, which Active Directory never writes into memberOf, and every group
+    reached through nesting, each with the group it was reached through. memberOf and
+    memberOfNested together are every group of the account in its domain. The universal
+    groups of other domains of the forest - Enterprise Admins and Schema Admins in the
+    forest root among them - come from the Global Catalog and name their domain. Not
+    found: domain local groups of other domains, and groups of other forests. Costs one
+    query per account and two on the Global Catalog, and as many again per distinct
+    primary group.
+
+.PARAMETER SearchBase
+    Alternative SearchBase (DN). Default: Domain DN.
+
+.PARAMETER Domain
+    Target domain (FQDN).
+
+.PARAMETER Server
+    Specific Domain Controller to query.
+
+.PARAMETER Credential
+    PSCredential object for authentication.
+
+.EXAMPLE
+    Get-DomainUser -Identity "Administrator"
+    Returns the Administrator account.
+
+.EXAMPLE
+    Get-DomainUser -AdminCount
+    Returns all users with adminCount=1.
+
+.EXAMPLE
+    Get-DomainUser -SPN
+    Returns all Kerberoastable users (with SPNs).
+
+.EXAMPLE
+    Get-DomainUser -Unconstrained
+    Returns all users with Unconstrained Delegation.
+
+.EXAMPLE
+    Get-DomainUser -Constrained
+    Returns all users with Constrained Delegation.
+
+.EXAMPLE
+    Get-DomainUser -TrustedToAuth
+    Returns all users with Protocol Transition (S4U2Self).
+
+.EXAMPLE
+    Get-DomainUser -RBCD
+    Returns all users with Resource-Based Constrained Delegation configured.
+
+.EXAMPLE
+    Get-DomainUser -PreauthNotRequired
+    Returns all AS-REP Roastable users.
+
+.EXAMPLE
+    Get-DomainUser -GMSA
+    Returns all Managed Service Accounts (standalone MSA, gMSA and dMSA).
+
+.EXAMPLE
+    Get-DomainUser -GMSA -ShowGMSADetails
+    Returns all MSAs/gMSAs with extended details (password access, rotation interval, etc.).
+
+.EXAMPLE
+    Get-DomainUser -Identity "jdoe" -ResolveGroups
+    Returns jdoe with memberOfNested, e.g. "Domain Users (primary group)" and
+    "Server Operators (via Tier1)".
+
+.OUTPUTS
+    PSCustomObject with user attributes
+
+.NOTES
+    Author: Alexander Sturz (@_61106960_)
+#>
+    [CmdletBinding(DefaultParameterSetName='Default')]
+    param(
+        [Parameter(Position=0, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
+        [Alias('samAccountName', 'Name', 'User')]
+        [string]$Identity,
+
+        # All filter parameters are combinable (no ParameterSetName restriction)
+        [Parameter(Mandatory=$false)]
+        [switch]$SPN,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$AdminCount,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$Unconstrained,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$Constrained,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$RBCD,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$TrustedToAuth,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$DisallowDelegation,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$PreauthNotRequired,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$PasswordNotRequired,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$PasswordNeverExpires,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$PasswordMustChange,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$Enabled,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$Disabled,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$LockedOut,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$SmartcardRequired,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$AccountExpired,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$AccountNeverExpires,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$DESOnly,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$ReversibleEncryption,
+
+        [Parameter(ParameterSetName='GMSA')]
+        [switch]$GMSA,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$ShowGMSADetails,
+
+        [Parameter(Mandatory=$false)]
+        [string]$LDAPFilter,
+
+        [Parameter(Mandatory=$false)]
+        [string[]]$Properties,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$ShowOwner,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$ResolveGroups,
+
+        [Parameter(Mandatory=$false)]
+        [string]$SearchBase,
+
+        [Parameter(Mandatory=$false)]
+        [string]$Domain,
+
+        [Parameter(Mandatory=$false)]
+        [string]$Server,
+
+        [Parameter(Mandatory=$false)]
+        [System.Management.Automation.PSCredential]$Credential,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$Raw,
+
+        # Server-side filter: users whose password was last set at least N days ago.
+        [Parameter(Mandatory=$false)]
+        [int]$PasswordAgeDays = 0,
+
+        # Server-side filter: users that logged in once but not within the last N days (inactive).
+        # Never-logged-in users are excluded (use -NeverLoggedIn). lastLogonTimestamp is coarse.
+        [Parameter(Mandatory=$false)]
+        [int]$InactiveDays = 0,
+
+        # Server-side filter: users that never logged in (lastLogonTimestamp absent).
+        [Parameter(Mandatory=$false)]
+        [switch]$NeverLoggedIn,
+
+        [Parameter(Mandatory=$false)]
+        [int]$ResultLimit = 0
+    )
+
+    begin {
+        Write-Log "[Get-DomainUser] Starting user enumeration (wrapper for Get-DomainObject)"
+
+        # Info: ShowGMSADetails only works with -GMSA
+        if ($ShowGMSADetails -and -not $GMSA) {
+            Write-Log "[Get-DomainUser] -ShowGMSADetails was specified without -GMSA, ignoring extended properties"
+        }
+
+        # -ResolveGroups: the primary group and its chain by SID, for every account of this
+        # call - almost all of them share one. The Global Catalog is asked for once per call
+        # too, not once per account piped in.
+        $primaryGroupCache = @{}
+        $globalCatalog = $null
+        $globalCatalogAsked = $false
+    }
+
+    process {
+        try {
+            # Build base filter depending on what we're searching for
+            if ($GMSA) {
+                # Managed Service Accounts (standalone MSA, gMSA and dMSA)
+                # - Standalone MSA: objectClass=msDS-ManagedServiceAccount (Server 2008 R2+)
+                # - Group MSA (gMSA): objectClass=msDS-GroupManagedServiceAccount (Server 2012+)
+                # - Delegated MSA (dMSA): objectClass=msDS-DelegatedManagedServiceAccount
+                #   (Server 2025). It derives from computer, not from the MSA class, so it
+                #   needs a term of its own - without one no check that asks for managed
+                #   service accounts saw a dMSA, although a completed migration copies the
+                #   SPNs and delegation settings of the account it replaces onto it.
+                #   Measured: on a schema without the class the term matches nothing and
+                #   costs nothing, no error.
+                $Filter = "(|(objectClass=msDS-ManagedServiceAccount)(objectClass=msDS-GroupManagedServiceAccount)(objectClass=msDS-DelegatedManagedServiceAccount))"
+            } else {
+                # Standard users: only user objects, no computers, no gMSAs
+                $Filter = "(&(objectCategory=person)(objectClass=user)(!(objectClass=computer)))"
+            }
+
+            if ($Unconstrained) {
+                # TRUSTED_FOR_DELEGATION Flag (524288) - keep here as it's user-specific context
+                $Filter = "(&$Filter(userAccountControl:1.2.840.113556.1.4.803:=524288))"
+            }
+
+            if ($Constrained) {
+                # Constrained Delegation: Has msDS-AllowedToDelegateTo attribute
+                # This includes both regular Constrained Delegation and Protocol Transition
+                $Filter = "(&$Filter(msDS-AllowedToDelegateTo=*))"
+            }
+
+            if ($RBCD) {
+                # Resource-Based Constrained Delegation: Has msDS-AllowedToActOnBehalfOfOtherIdentity attribute
+                # The target resource controls who can delegate to it (stored as Security Descriptor)
+                $Filter = "(&$Filter(msDS-AllowedToActOnBehalfOfOtherIdentity=*))"
+            }
+
+            # Custom LDAP filter
+            if ($LDAPFilter) {
+                $Filter = "(&$Filter$LDAPFilter)"
+            }
+
+            Write-Log "[Get-DomainUser] Using filter: $Filter"
+
+            # Build parameters for Get-DomainObject
+            $GetParams = @{
+                LDAPFilter = $Filter
+            }
+
+            # Add MSA/gMSA-specific properties if ShowGMSADetails is set (only with -GMSA)
+            if ($ShowGMSADetails -and $GMSA) {
+                if ($Properties) {
+                    # Merge user-specified properties with MSA-specific properties
+                    $MSAProperties = @(
+                        # Standalone MSA attributes (Server 2008 R2+)
+                        'msds-hostserviceaccountbl',
+                        'pwdlastset',
+
+                        # gMSA attributes (Server 2012+)
+                        'msds-managedpasswordinterval',
+                        'msds-groupmsamembership',
+                        'msds-managedpasswordid',
+                        'msds-managedpasswordpreviousid',
+                        'principalsallowedtoretrievemanagedpassword',
+
+                        # Common attributes
+                        'serviceprincipalname',
+                        'objectclass'
+                    )
+                    $GetParams['Properties'] = $Properties + $MSAProperties | Select-Object -Unique
+                }
+                Write-Log "[Get-DomainUser] ShowGMSADetails enabled - MSA/gMSA-specific properties will be included"
+            } elseif ($Properties) {
+                $GetParams['Properties'] = $Properties
+            }
+
+            # The four attributes -ResolveGroups reads, where a property list would leave
+            # them out.
+            if ($ResolveGroups -and $GetParams.ContainsKey('Properties')) {
+                $GetParams['Properties'] = @(@($GetParams['Properties']) + @('distinguishedName', 'memberOf', 'primaryGroupID', 'objectSid') | Select-Object -Unique)
+            }
+
+            # Pass through Identity parameter
+            if ($Identity) {
+                $GetParams['Identity'] = $Identity
+            }
+
+            # Pass through other parameters
+            if ($ShowOwner) { $GetParams['ShowOwner'] = $true }
+            if ($SearchBase) { $GetParams['SearchBase'] = $SearchBase }
+            if ($Domain) { $GetParams['Domain'] = $Domain }
+            if ($Server) { $GetParams['Server'] = $Server }
+            if ($Credential) { $GetParams['Credential'] = $Credential }
+            if ($Raw) { $GetParams['Raw'] = $true }
+
+            # Pass through LDAP-optimized account filters to Get-DomainObject
+            if ($Enabled) { $GetParams['IsEnabled'] = $true }
+            if ($Disabled) { $GetParams['IsDisabled'] = $true }
+            if ($PasswordNeverExpires) { $GetParams['PasswordNeverExpires'] = $true }
+            if ($PasswordNotRequired) { $GetParams['PasswordNotRequired'] = $true }
+            if ($PasswordMustChange) { $GetParams['PasswordMustChange'] = $true }
+            if ($SPN) { $GetParams['HasSPN'] = $true }
+            if ($AdminCount) { $GetParams['AdminCount'] = $true }
+            if ($TrustedToAuth) { $GetParams['TrustedToAuthForDelegation'] = $true }
+            if ($DisallowDelegation) { $GetParams['NotDelegated'] = $true }
+            if ($PreauthNotRequired) { $GetParams['PreauthNotRequired'] = $true }
+            if ($LockedOut) { $GetParams['LockedOut'] = $true }
+            if ($SmartcardRequired) { $GetParams['SmartcardRequired'] = $true }
+            if ($AccountExpired) { $GetParams['AccountExpired'] = $true }
+            if ($AccountNeverExpires) { $GetParams['AccountNeverExpires'] = $true }
+            if ($DESOnly) { $GetParams['DESOnly'] = $true }
+            if ($ReversibleEncryption) { $GetParams['ReversibleEncryption'] = $true }
+            if ($PasswordAgeDays -gt 0) { $GetParams['PasswordAgeDays'] = $PasswordAgeDays }
+            if ($InactiveDays -gt 0) { $GetParams['InactiveDays'] = $InactiveDays }
+            if ($NeverLoggedIn) { $GetParams['NeverLoggedIn'] = $true }
+            if ($ResultLimit -gt 0) { $GetParams['ResultLimit'] = $ResultLimit }
+
+            $Users = @(Get-DomainObject @GetParams)
+
+            Write-Log "[Get-DomainUser] Found $($Users.Count) user(s)"
+
+            # Post-processing for MSA/gMSA details (parse binary attributes, only with -GMSA)
+            if ($ShowGMSADetails -and $GMSA -and $Users.Count -gt 0) {
+                Write-Log "[Get-DomainUser] Parsing MSA/gMSA attributes to readable format..."
+
+                foreach ($User in $Users) {
+                    # Parse msds-groupmsamembership (Security Descriptor)
+                    if ($User.'msds-groupmsamembership') {
+                        $AllowedPrincipals = @()
+                        try {
+                            # Two shapes arrive here. Without -Raw the value has already
+                            # been through ConvertFrom-LDAPAttribute, which turns a security
+                            # descriptor into an object carrying Owner and ACEs; with -Raw
+                            # it is still the byte[] the DC sent. Only the second was
+                            # handled, so in the normal case SetSecurityDescriptorBinaryForm
+                            # threw on a PSCustomObject, the catch below swallowed it and
+                            # the attribute kept its parsed form - which the renderer
+                            # happens to understand, so nothing showed.
+                            $DACL = $null
+                            $ShapeRecognized = $false
+                            $ParsedSD = $User.'msds-groupmsamembership'
+                            if ($ParsedSD -is [byte[]]) {
+                                $ShapeRecognized = $true
+                                $SD = New-Object System.DirectoryServices.ActiveDirectorySecurity
+                                $SD.SetSecurityDescriptorBinaryForm($ParsedSD)
+                                $DACL = $SD.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier])
+                            } elseif ($ParsedSD.PSObject.Properties['ACEs']) {
+                                # Already parsed: the ACE objects carry Type and SID, named
+                                # as ConvertFrom-SecurityDescriptor names them.
+                                $ShapeRecognized = $true
+                                foreach ($ParsedACE in @($ParsedSD.ACEs)) {
+                                    if ($ParsedACE.Type -ne 'Allow') { continue }
+                                    $PrincipalName = $ParsedACE.Name
+                                    if (-not $PrincipalName) { $PrincipalName = $ParsedACE.SID }
+                                    $AllowedPrincipals += [PSCustomObject]@{
+                                        Name = $PrincipalName
+                                        SID = $ParsedACE.SID
+                                        DisplayText = $PrincipalName
+                                    }
+                                }
+                            }
+
+                            foreach ($ACE in $DACL) {
+                                if ($ACE.AccessControlType -eq 'Allow') {
+                                    $TrusteeSID = $ACE.IdentityReference.Value
+
+                                    # Resolve SID to name using LDAP-based ConvertFrom-SID
+                                    $PrincipalName = ConvertFrom-SID -SID $TrusteeSID
+                                    if (-not $PrincipalName) {
+                                        $PrincipalName = $TrusteeSID
+                                    }
+
+                                    # Store as structured object with SID for classification
+                                    $AllowedPrincipals += [PSCustomObject]@{
+                                        Name = $PrincipalName
+                                        SID = $TrusteeSID
+                                        DisplayText = $PrincipalName
+                                    }
+                                    Write-Log "[Get-DomainUser] gMSA '$($User.sAMAccountName)' allows password retrieval by: $PrincipalName"
+                                }
+                            }
+
+                            # Replace the descriptor with structured principal objects
+                            # (includes SID for classification). Only when one of the two
+                            # shapes above was actually recognized - overwriting an
+                            # unexpected one would discard the value the renderer still
+                            # has a legacy path for.
+                            if ($ShapeRecognized) {
+                                $User.'msds-groupmsamembership' = $AllowedPrincipals
+                            }
+                        } catch {
+                            Write-Log "[Get-DomainUser] Error parsing msds-groupmsamembership: $_"
+                        }
+                    }
+
+                    # NOTE: msDS-ManagedPasswordId and msDS-ManagedPasswordPreviousId are already
+                    # parsed into a readable form (RootKeyId + L0/L1/L2 indexes) by Invoke-LDAPSearch.
+                }
+            }
+
+            if ($ResolveGroups -and $Users.Count -gt 0) {
+                $nestingParams = @{}
+                if ($Domain) { $nestingParams['Domain'] = $Domain }
+                if ($Server) { $nestingParams['Server'] = $Server }
+                if ($Credential) { $nestingParams['Credential'] = $Credential }
+
+                # The universal groups of the other domains of the forest are only in the
+                # Global Catalog. Get-GCConnection asks the session's domain controller first,
+                # then the forest root; without one, those groups are left out and it says so.
+                if (-not $globalCatalogAsked) {
+                    $globalCatalog = Get-GCConnection
+                    $globalCatalogAsked = $true
+                }
+
+                foreach ($User in $Users) {
+                    if ($null -eq $User) { continue }
+                    $nestedGroups = @(Resolve-AccountGroupNesting -Account $User -ConnectionParams $nestingParams -PrimaryGroupCache $primaryGroupCache -GlobalCatalog $globalCatalog)
+                    $User | Add-Member -NotePropertyName 'memberOfNested' -NotePropertyValue $nestedGroups -Force
+                }
+            }
+
+            return $Users
+
+        } catch {
+            Write-Log "[Get-DomainUser] Error: $_"
+            throw
+        }
+    }
+
+    end {
+        Write-Log "[Get-DomainUser] User enumeration completed"
+    }
+}

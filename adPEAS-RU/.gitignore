@@ -1,0 +1,34 @@
+# Build artifacts are deliberately NOT ignored. main carries the current dev build
+# so the documented raw-URL download always serves the newest code, and each release
+# carries the stable build as a downloadable asset. Ignoring them here would have no
+# effect anyway - they are tracked, and .gitignore does not apply to tracked files,
+# which is how dev builds used to leak into main one broad `git add` at a time.
+
+# Development tools
+.claude/
+CLAUDE.md
+.vscode/
+
+# Internal test harness (not published)
+tests/
+
+# Logs & temp files
+*.log
+*.tmp
+*.bak
+*~
+temp/
+tmp/
+
+# Certificates & credentials
+*.pfx
+*.pem
+*.key
+*.crt
+*.kirbi
+*.ccache
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini

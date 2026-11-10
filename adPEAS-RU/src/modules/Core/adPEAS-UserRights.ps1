@@ -1,0 +1,491 @@
+﻿<#
+.SYNOPSIS
+    The user rights adPEAS evaluates, and who holds each of them by default.
+
+.DESCRIPTION
+    Get-GPOUserRightsAssignment used to decide by the identity of the holder: a right
+    granted to a privileged SID, an operator group or a well-known service identity was
+    hidden, everything else reported. That is the wrong question asked of the wrong half
+    of the data, and it fails in both directions.
+
+    It hides real findings. Backup Operators holding SeDebugPrivilege is not a Windows
+    default and is a clean path to SYSTEM on every machine in scope - and it was silently
+    suppressed, because the group is on the privileged list.
+
+    It reports expected ones. Which principals hold a right by default depends on the
+    right, not on how privileged the principal looks, and no identity list can express
+    that.
+
+    The question that actually matters is whether an assignment departs from what Windows
+    ships, and this table is what makes that question answerable.
+
+    WHY THE COMPARISON IS EXACT
+
+    The [Privilege Rights] section of GptTmpl.inf is absolute, not additive: the principals
+    listed for a right become the complete set of holders on every machine the GPO reaches.
+    So the GPO's list and the default list are two sets describing the same thing, and the
+    difference between them is meaningful in both directions:
+
+      added   - holders beyond the default. The escalation risk, and the finding.
+      removed - default holders the GPO drops. Usually deliberate hardening, occasionally
+                an operational foot-gun; reported as a note, never as a finding.
+
+    MEMBER AND DOMAIN CONTROLLER DEFAULTS DIFFER
+
+    Server Operators hold rights on a domain controller that nobody holds on a member
+    server, so each right carries both sets. The caller passes the scopes the GPO actually
+    reaches and the union of those baselines is what counts as expected - a holder that is
+    default somewhere the policy applies is not a deviation worth anyone's attention.
+
+    WHERE THE DEFAULTS COME FROM, AND WHAT TO DO WHEN THEY ARE WRONG
+
+    Every entry below is the documented Windows default. A wrong entry produces a false
+    positive (a default reported) or a false negative (a deviation hidden), so a right
+    whose default set is not established here carries $null rather than a guess. A $null
+    baseline is not treated as "nobody holds this by default" - the check falls back to the
+    identity filter for that right and says so in the finding, which keeps the uncertainty
+    visible instead of silently deciding.
+
+.NOTES
+    Author: Alexander Sturz (@_61106960_)
+    Reference: https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment
+#>
+
+# Well-known SIDs used below. Written out rather than referenced by name, because this
+# table has to be readable next to the Windows documentation it mirrors.
+#   S-1-1-0        Everyone                     S-1-5-32-544  Administrators
+#   S-1-5-6        SERVICE                      S-1-5-32-545  Users
+#   S-1-5-11       Authenticated Users          S-1-5-32-546  Guests
+#   S-1-5-18       SYSTEM                       S-1-5-32-548  Account Operators
+#   S-1-5-19       LOCAL SERVICE                S-1-5-32-549  Server Operators
+#   S-1-5-20       NETWORK SERVICE              S-1-5-32-550  Print Operators
+#   S-1-5-32-551   Backup Operators             S-1-5-32-555  Remote Desktop Users
+#   S-1-5-32-559   Performance Log Users        S-1-5-32-568  IIS_IUSRS
+#   S-1-5-90-0     Window Manager\Window Manager Group
+#   S-1-5-80-0     NT SERVICE\ALL SERVICES
+#   S-1-5-99-216390572-1995538116-3857911515-2404958512-2623887229
+#                  RESTRICTED SERVICES\PrintSpoolerService
+
+$Script:UserRightsBaseline = [ordered]@{
+
+    # =========================================================================
+    # Tier 1 - a direct route to SYSTEM, to credentials, or to the domain
+    # =========================================================================
+
+    'SeDebugPrivilege' = @{
+        Name = 'Debug programs'
+        Tier = 'Finding'
+        Why  = 'Opens any process, including LSASS. A holder reads credentials out of memory on every machine in scope.'
+        # Administrators only, on a member and on a domain controller alike.
+        Member = @('S-1-5-32-544')
+        DC     = @('S-1-5-32-544')
+    }
+
+    'SeTcbPrivilege' = @{
+        Name = 'Act as part of the operating system'
+        Tier = 'Finding'
+        Why  = 'The holder can create a token for any identity. It is the operating system trust boundary itself.'
+        # Nobody by default. Windows grants this to no principal out of the box.
+        Member = @()
+        DC     = @()
+    }
+
+    'SeCreateTokenPrivilege' = @{
+        Name = 'Create a token object'
+        Tier = 'Finding'
+        Why  = 'Forges an access token directly, with any group membership the holder chooses.'
+        Member = @()
+        DC     = @()
+    }
+
+    'SeImpersonatePrivilege' = @{
+        Name = 'Impersonate a client after authentication'
+        Tier = 'Finding'
+        Why  = 'The precondition of the Potato family of local privilege escalations.'
+        # Administrators and the three service identities.
+        Member = @('S-1-5-32-544', 'S-1-5-6', 'S-1-5-19', 'S-1-5-20')
+        DC     = @('S-1-5-32-544', 'S-1-5-6', 'S-1-5-19', 'S-1-5-20')
+    }
+
+    'SeAssignPrimaryTokenPrivilege' = @{
+        Name = 'Replace a process level token'
+        Tier = 'Finding'
+        Why  = 'Starts a process under another identity, which is the second half of a token abuse chain.'
+        Member = @('S-1-5-19', 'S-1-5-20')
+        DC     = @('S-1-5-19', 'S-1-5-20')
+    }
+
+    'SeLoadDriverPrivilege' = @{
+        Name = 'Load and unload device drivers'
+        Tier = 'Finding'
+        Why  = 'Code in the kernel. A signed vulnerable driver turns this into complete control of the machine.'
+        Member = @('S-1-5-32-544')
+        # Print Operators hold it on a domain controller, for printer drivers.
+        DC     = @('S-1-5-32-544', 'S-1-5-32-550')
+    }
+
+    'SeBackupPrivilege' = @{
+        Name = 'Back up files and directories'
+        Tier = 'Finding'
+        Why  = 'Reads every file regardless of its ACL - on a domain controller, that includes the NTDS database.'
+        Member = @('S-1-5-32-544', 'S-1-5-32-551')
+        DC     = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-549')
+    }
+
+    'SeRestorePrivilege' = @{
+        Name = 'Restore files and directories'
+        Tier = 'Finding'
+        Why  = 'Writes every file regardless of its ACL, and can set owner. The write half of SeBackupPrivilege.'
+        Member = @('S-1-5-32-544', 'S-1-5-32-551')
+        DC     = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-549')
+    }
+
+    'SeTakeOwnershipPrivilege' = @{
+        Name = 'Take ownership of files or other objects'
+        Tier = 'Finding'
+        Why  = 'Ownership carries WriteDacl, so the holder grants itself whatever access it wants afterwards.'
+        Member = @('S-1-5-32-544')
+        DC     = @('S-1-5-32-544')
+    }
+
+    'SeEnableDelegationPrivilege' = @{
+        Name = 'Enable computer and user accounts to be trusted for delegation'
+        Tier = 'Finding'
+        Why  = 'Configures Kerberos delegation, which is impersonation of any user against the delegated service.'
+        # Administrators in both scopes, which takes the Default values table over the body
+        # text where the two disagree. The table gives "Member Server Effective" and "Client
+        # Computer Effective" as Administrators; the body says there is "no reason to assign
+        # this user right to anyone on member servers and workstations ... because it has no
+        # meaning in those contexts". That sentence is advice, not a statement of the default -
+        # and it is the reason this list used to be empty.
+        #
+        # Empty made a member-scoped GPO that grants Administrators the right - a right the
+        # local effective policy already gives them - a Tier-1 Finding. The union across scopes
+        # masked it for any GPO that also reaches a domain controller, so what was exposed was
+        # the member-only case. Granting it to anybody else there is still reported.
+        # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/enable-computer-and-user-accounts-to-be-trusted-for-delegation
+        Member = @('S-1-5-32-544')
+        DC     = @('S-1-5-32-544')
+    }
+
+    'SeSyncAgentPrivilege' = @{
+        Name = 'Synchronize directory service data'
+        Tier = 'Finding'
+        Why  = 'Reads every object and attribute in the directory, password hashes included.'
+        Member = @()
+        DC     = @()
+    }
+
+    'SeManageVolumePrivilege' = @{
+        Name = 'Perform volume maintenance tasks'
+        Tier = 'Finding'
+        Why  = 'Raw volume access bypasses the file system and its ACLs entirely.'
+        Member = @('S-1-5-32-544')
+        DC     = @('S-1-5-32-544')
+    }
+
+    'SeSecurityPrivilege' = @{
+        Name = 'Manage auditing and security log'
+        # Hint, not Finding. Every other right in the Finding tier hands the holder
+        # SYSTEM, the contents of NTDS.dit, kernel code or ownership of any object.
+        # This one is anti-forensics: it destroys the record of an intrusion rather
+        # than enabling one, so it does not belong beside them.
+        Tier = 'Hint'
+        Why  = 'Clears the security log, which is how an intrusion stops being reconstructable.'
+        Member = @('S-1-5-32-544')
+        DC     = @('S-1-5-32-544')
+    }
+
+    'SeRelabelPrivilege' = @{
+        Name = 'Modify an object label'
+        Tier = 'Finding'
+        Why  = 'Changes the integrity level of an object, defeating the protection a low-integrity sandbox provides.'
+        Member = @()
+        DC     = @()
+    }
+
+    'SeTrustedCredManAccessPrivilege' = @{
+        Name = 'Access Credential Manager as a trusted caller'
+        Tier = 'Finding'
+        Why  = 'Reads the saved credentials of every user of the machine in cleartext.'
+        Member = @()
+        DC     = @()
+    }
+
+    # =========================================================================
+    # Tier 2 - a foothold or a way across, rather than straight up
+    # =========================================================================
+
+    'SeRemoteInteractiveLogonRight' = @{
+        Name = 'Allow log on through Remote Desktop Services'
+        Tier = 'Hint'
+        Why  = 'An interactive session on the machine, and with it whatever the account can reach from there.'
+        Member = @('S-1-5-32-544', 'S-1-5-32-555')
+        # A domain controller does not carry Remote Desktop Users in its default policy.
+        DC     = @('S-1-5-32-544')
+    }
+
+    'SeInteractiveLogonRight' = @{
+        Name = 'Allow log on locally'
+        Tier = 'Hint'
+        Why  = 'A console session. On a domain controller it is the difference between a member and an admin of the domain.'
+        # Administrators, Backup Operators, Users - the three Microsoft documents for
+        # workstations and servers. Guests (S-1-5-32-546) used to sit here and does not
+        # belong: the same page names Guests as a candidate for "Deny log on locally", so
+        # listing it as a default suppressed a finding on a GPO that genuinely grants Guests
+        # a console session.
+        Member = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-545')
+        # Six on a domain controller, not five. S-1-5-9 ENTERPRISE DOMAIN CONTROLLERS is a
+        # documented default here and was missing, which reported the untouched Default
+        # Domain Controllers Policy of every domain as departing from the default.
+        #
+        # It reads like a mistake because a computer account does not open a console session,
+        # but the default is the default: Microsoft names it both in the body text ("the
+        # members of the following groups have this right on domain controllers") and in the
+        # Default Domain Controller Policy row of the Default values table.
+        # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/allow-log-on-locally
+        DC     = @('S-1-5-32-544', 'S-1-5-32-548', 'S-1-5-32-551', 'S-1-5-9', 'S-1-5-32-550', 'S-1-5-32-549')
+    }
+
+    'SeBatchLogonRight' = @{
+        Name = 'Log on as a batch job'
+        Tier = 'Hint'
+        Why  = 'Runs a scheduled task as the account, which is code execution without an interactive session.'
+        Member = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-559')
+        DC     = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-559')
+    }
+
+    'SeServiceLogonRight' = @{
+        Name = 'Log on as a service'
+        Tier = 'Hint'
+        Why  = 'Runs a service as the account. A service starts without anyone logging on.'
+        # Deliberately no baseline. What holds this varies with every product installed on
+        # the machine - SQL, Exchange and IIS each add their own service accounts - so any
+        # list here would be wrong on most domains in one direction or the other. The
+        # check falls back to the identity filter for this right and says so.
+        Member = $null
+        DC     = $null
+    }
+
+    'SeSystemtimePrivilege' = @{
+        Name = 'Change the system time'
+        Tier = 'Hint'
+        Why  = 'Kerberos rejects a ticket outside its clock skew, so the clock is an authentication dependency.'
+        Member = @('S-1-5-32-544', 'S-1-5-19')
+        DC     = @('S-1-5-32-544', 'S-1-5-19', 'S-1-5-32-549')
+    }
+
+    'SeRemoteShutdownPrivilege' = @{
+        Name = 'Force shutdown from a remote system'
+        Tier = 'Hint'
+        Why  = 'Denial of service against the machine, remotely and without touching it.'
+        Member = @('S-1-5-32-544')
+        DC     = @('S-1-5-32-544', 'S-1-5-32-549')
+    }
+
+    'SeShutdownPrivilege' = @{
+        Name = 'Shut down the system'
+        Tier = 'Hint'
+        Why  = 'Denial of service, and on a domain controller a way to force authentication elsewhere.'
+        # Users (S-1-5-32-545) is a CLIENT default, not a member-server one: Microsoft gives
+        # "Member Server Effective" as Administrators and Backup Operators, and only "Client
+        # Computer Effective" adds Users. adPEAS has one non-DC bucket for both, so it has to
+        # pick, and it picks the wider one - dropping Users would report the untouched default
+        # of every workstation baseline GPO, which is the far more common object.
+        Member = @('S-1-5-32-544', 'S-1-5-32-545', 'S-1-5-32-551')
+        # Four on a domain controller, not five. Account Operators (S-1-5-32-548) was here and
+        # is not a documented holder: "By default this setting is Administrators, Backup
+        # Operators, Server Operators, and Print Operators on domain controllers", and both
+        # the Default Domain Controller Policy and the Domain Controller Effective rows name
+        # those same four. The AD DS groups page gives Account Operators exactly one default
+        # right, Allow log on locally - shutdown is not among them.
+        #
+        # The entry most likely came from the Windows Server 2003 page, which did list "Allow
+        # log on locally; Shut down the system" for Account Operators. The modern pages dropped
+        # the second while keeping it on Print, Backup and Server Operators.
+        #
+        # Direction matters: this was a false NEGATIVE. It silently accepted a GPO granting
+        # Account Operators shutdown on domain controllers.
+        # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/shut-down-the-system
+        DC     = @('S-1-5-32-544', 'S-1-5-32-551', 'S-1-5-32-550', 'S-1-5-32-549')
+    }
+
+    # The seven below were not evaluated at all: a GPO granting one of them to Domain Users
+    # passed without a word. Defaults from the "Default values" table of each right's
+    # Microsoft page (Domain Controller and Member Server Effective Default Settings).
+
+    'SeCreateSymbolicLinkPrivilege' = @{
+        Name = 'Create symbolic links'
+        Tier = 'Hint'
+        Why  = 'A symbolic link redirects a file operation of a more privileged process to a path the holder chooses - Microsoft names permission changes, corrupted or destroyed data and denial of service.'
+        # Administrators. The Hyper-V role adds NT VIRTUAL MACHINE\Virtual Machines on a host
+        # where it is installed; that is the role, not the Windows default.
+        # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-symbolic-links
+        Member = @('S-1-5-32-544')
+        DC     = @('S-1-5-32-544')
+    }
+
+    'SeDelegateSessionUserImpersonatePrivilege' = @{
+        Name = 'Obtain an impersonation token for another user in the same session'
+        Tier = 'Hint'
+        Why  = 'Obtains an impersonation token for another user logged on in the same session, and acts as that user.'
+        # Microsoft documents what the privilege does (Privilege Constants, winnt.h) and
+        # publishes no default holder set for it, so the comparison falls back to the
+        # identity filter and says so, rather than guessing a default.
+        Member = $null
+        DC     = $null
+    }
+
+    'SeAuditPrivilege' = @{
+        Name = 'Generate security audits'
+        Tier = 'Hint'
+        Why  = 'Writes arbitrary entries into the Security log - enough to roll real events out where the log overwrites, or to stop the machine where it halts on a full log.'
+        # LOCAL SERVICE and NETWORK SERVICE, on a member and on a domain controller alike.
+        # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/generate-security-audits
+        Member = @('S-1-5-19', 'S-1-5-20')
+        DC     = @('S-1-5-19', 'S-1-5-20')
+        # Accepted, not expected: the print spooler's restricted service SID. The Default
+        # Domain Controllers Policy a Windows Server 2025 domain is created with grants it -
+        # measured - and one created earlier has the same policy without it, which is no
+        # deviation either. Not on a member, where it has not been measured.
+        Optional = @{ DC = @('S-1-5-99-216390572-1995538116-3857911515-2404958512-2623887229') }
+    }
+
+    'SeSystemEnvironmentPrivilege' = @{
+        Name = 'Modify firmware environment values'
+        Tier = 'Hint'
+        Why  = 'Writes the firmware environment - on UEFI the NVRAM variables that hold the boot settings - which can make the hardware fail or the machine boot something else.'
+        # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/modify-firmware-environment-values
+        Member = @('S-1-5-32-544')
+        DC     = @('S-1-5-32-544')
+    }
+
+    'SeCreateGlobalPrivilege' = @{
+        Name = 'Create global objects'
+        Tier = 'Hint'
+        Why  = 'Creates file mapping and symbolic link objects in the global namespace from any session, where a privileged service expects to find its own - Microsoft calls assigning it a security risk.'
+        # Administrators, LOCAL SERVICE, NETWORK SERVICE and SERVICE.
+        # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-global-objects
+        Member = @('S-1-5-32-544', 'S-1-5-19', 'S-1-5-20', 'S-1-5-6')
+        DC     = @('S-1-5-32-544', 'S-1-5-19', 'S-1-5-20', 'S-1-5-6')
+    }
+
+    'SeProfileSingleProcessPrivilege' = @{
+        Name = 'Profile single process'
+        Tier = 'Hint'
+        Why  = 'Samples any process: which run, security software among them, and who else is logged on.'
+        # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/profile-single-process
+        Member = @('S-1-5-32-544')
+        DC     = @('S-1-5-32-544')
+    }
+
+    'SeSystemProfilePrivilege' = @{
+        Name = 'Profile system performance'
+        Tier = 'Hint'
+        Why  = 'Profiles the whole system: which processes are active, security software among them.'
+        # Administrators and NT SERVICE\WdiServiceHost, as the page's own text says - its
+        # table lists Administrators alone. The service SID is derived from the service name
+        # (SHA-1 of the upper-cased name) and is the same on every machine; checked against
+        # sc.exe showsid WdiServiceHost.
+        # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/profile-system-performance
+        Member = @('S-1-5-32-544', 'S-1-5-80-3139157870-2983391045-3678747466-658725712-1809340420')
+        DC     = @('S-1-5-32-544', 'S-1-5-80-3139157870-2983391045-3678747466-658725712-1809340420')
+    }
+}
+
+# SeMachineAccountPrivilege is deliberately absent: Get-AddComputerRights covers it
+# together with ms-DS-MachineAccountQuota, which is the other half of that story.
+# The Se*Deny* rights are absent as well - they take access away.
+
+<#
+.SYNOPSIS
+    Compares the holders a GPO assigns to a right against the Windows default.
+
+.DESCRIPTION
+    Returns what the GPO adds beyond the default and what it removes from it, or nothing
+    when the right is not one adPEAS evaluates. The [Privilege Rights] section is absolute,
+    so both directions are real statements about the machines in scope.
+
+.PARAMETER Right
+    The constant, for instance SeDebugPrivilege.
+
+.PARAMETER HolderSID
+    The SIDs the GPO assigns the right to.
+
+.PARAMETER Scope
+    Which default sets apply: Member, DC, or both when the GPO reaches both kinds of
+    machine. A holder that is default in any scope the policy reaches is not a deviation.
+
+.OUTPUTS
+    Hashtable with Added, Removed, HasBaseline, Tier, Name and Why - or $null for a right
+    outside the table.
+#>
+function Compare-UserRightAssignment {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Right,
+
+        [Parameter(Mandatory=$false)]
+        [AllowNull()]
+        [string[]]$HolderSID,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateSet('Member', 'DC')]
+        [string[]]$Scope = @('Member')
+    )
+
+    $entry = $Script:UserRightsBaseline[$Right]
+    if (-not $entry) { return $null }
+
+    # The union of the baselines for every scope the GPO reaches. A holder that is default
+    # on a domain controller is not a deviation in a policy that also reaches one.
+    $baseline = @()
+    $hasBaseline = $false
+    foreach ($s in @($Scope)) {
+        if ($null -ne $entry[$s]) {
+            $hasBaseline = $true
+            $baseline += @($entry[$s])
+        }
+    }
+
+    # Holders a default may or may not contain, depending on the Windows version the policy
+    # was created by. Never reported as added, never as removed.
+    $optional = @()
+    if ($entry.Optional) {
+        foreach ($s in @($Scope)) {
+            if ($null -ne $entry.Optional[$s]) { $optional += @($entry.Optional[$s]) }
+        }
+    }
+
+    $holders = @($HolderSID | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+
+    if (-not $hasBaseline) {
+        # No documented default for this right. Everything is reported as added and the
+        # caller is told the comparison did not happen, so it can fall back rather than
+        # present a guess as a deviation.
+        return @{
+            Added       = $holders
+            Removed     = @()
+            HasBaseline = $false
+            Tier        = $entry.Tier
+            Name        = $entry.Name
+            Why         = $entry.Why
+        }
+    }
+
+    # Compare-Object is avoided on purpose: it unrolls a single-element side and returns
+    # nothing for two empty ones, both of which have bitten this codebase before.
+    $added = @($holders | Where-Object { ($baseline -notcontains $_) -and ($optional -notcontains $_) })
+    $removed = @($baseline | Where-Object { $holders -notcontains $_ })
+
+    return @{
+        Added       = $added
+        Removed     = $removed
+        HasBaseline = $true
+        Tier        = $entry.Tier
+        Name        = $entry.Name
+        Why         = $entry.Why
+    }
+}

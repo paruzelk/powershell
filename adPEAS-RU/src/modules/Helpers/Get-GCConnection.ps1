@@ -1,0 +1,372 @@
+﻿function Get-GCConnection {
+    <#
+    .SYNOPSIS
+        Returns a lazy-initialized Global Catalog (GC) LdapConnection for cross-domain lookups.
+
+    .DESCRIPTION
+        Creates and caches an LdapConnection to the Global Catalog (port 3268/3269) using Connect-LDAP -AsGlobalCatalog.
+        This ensures all central infrastructure (custom DNS, SSL handling, timeouts, error classification) is reused from the main LDAP connector.
+
+        The GC connection is cached in $Script:GCConnection and reused across the session.
+        It is automatically disposed by Disconnect-adPEAS.
+
+        Tries multiple targets in order:
+        1. Current DC ($Script:LDAPContext.Server)
+        2. Root domain FQDN (derived from RootDomainNamingContext)
+        3. Current domain FQDN ($Script:LDAPContext.Domain)
+
+    .OUTPUTS
+        System.DirectoryServices.Protocols.LdapConnection or $null if unavailable
+    #>
+    [CmdletBinding()]
+    param()
+
+    # Return cached connection if available
+    if ($Script:GCConnection) {
+        return $Script:GCConnection
+    }
+
+    # The failure is cached too, not just the success.
+    #
+    # Without this every caller retried the whole target list. A firewall blocking port 3268
+    # then cost a 2-second TCP probe per target per call and printed "[!] Connection failed:
+    # Server unreachable" once per target per call - four red lines in the middle of one check
+    # for two resolvable names, and the same again for the next check.
+    #
+    # Negative caching is only safe because the result is advisory: the callers degrade to a
+    # local lookup or report the identity as unresolved, so a GC that comes back later in the
+    # session costs a few unresolved names rather than a wrong answer.
+    if ($Script:GCConnectionFailed) {
+        Write-Log "[Get-GCConnection] GC was already found unreachable in this session - not retrying"
+        return $null
+    }
+
+    # Prerequisites: main connection must exist (GC is auxiliary)
+    if (-not $Script:LdapConnection -or
+        -not ($Script:LDAPContext -is [hashtable]) -or
+        -not $Script:LDAPContext.ContainsKey('Domain') -or
+        -not $Script:LDAPContext.ContainsKey('Server')) {
+        Write-Log "[Get-GCConnection] Prerequisites not met - main connection incomplete"
+        return $null
+    }
+
+    # Build target list: current server, root domain, domain FQDN
+    $targets = @()
+    if ($Script:LDAPContext.ContainsKey('Server') -and $Script:LDAPContext['Server']) {
+        $targets += $Script:LDAPContext['Server']
+    }
+
+    # Derive root domain FQDN from RootDomainNamingContext (e.g., "DC=contoso,DC=com" -> "contoso.com")
+    # Critical for child domains where the child DC may not be a GC server
+    $rootDomainFQDN = $null
+    if ($Script:LDAPContext.ContainsKey('RootDomainNamingContext') -and $Script:LDAPContext['RootDomainNamingContext']) {
+        $dcParts = @()
+        $rnc = $Script:LDAPContext['RootDomainNamingContext']
+        while ($rnc -match '^DC=([^,]+),?(.*)$') {
+            $dcParts += $Matches[1]
+            $rnc = $Matches[2]
+        }
+        if ($dcParts.Count -gt 0) {
+            $rootDomainFQDN = ($dcParts -join '.')
+        }
+    }
+
+    if ($rootDomainFQDN -and
+        $rootDomainFQDN -ne $Script:LDAPContext['Server'] -and
+        $rootDomainFQDN -ne $Script:LDAPContext['Domain']) {
+        $targets += $rootDomainFQDN
+        Write-Log "[Get-GCConnection] Added root domain $rootDomainFQDN as GC target"
+    }
+
+    if ($Script:LDAPContext.ContainsKey('Domain') -and
+        $Script:LDAPContext['Domain'] -and
+        $Script:LDAPContext['Domain'] -ne $Script:LDAPContext['Server']) {
+        $targets += $Script:LDAPContext['Domain']
+    }
+
+    # Build common parameters from existing session for Connect-LDAP -AsGlobalCatalog
+    # -SuppressErrorDisplay: this connection is auxiliary and its failure is tolerated, so
+    # Connect-LDAP's "[!] Connection failed" belongs in the log and not in the middle of a
+    # check's output, where it reads as the check itself having failed. The one line a reader
+    # needs is emitted below, once, and it names the consequence rather than the port.
+    $ConnectParams = @{
+        Domain               = $Script:LDAPContext['Domain']
+        AsGlobalCatalog      = $true
+        IgnoreSSLErrors      = $true
+        TimeoutSeconds       = 5
+        SuppressErrorDisplay = $true
+    }
+    if ($Script:LDAPContext.ContainsKey('UseLDAPS') -and $Script:LDAPContext['UseLDAPS']) {
+        $ConnectParams['UseLDAPS'] = $true
+    }
+
+    # Auth: pass Credential or ClientCertificate based on session auth method
+    if ($Script:LDAPContext.ContainsKey('AuthMethod') -and
+        $Script:LDAPContext['AuthMethod'] -eq 'Schannel' -and
+        $Script:LDAPContext.ContainsKey('ClientCertificate') -and
+        $Script:LDAPContext['ClientCertificate']) {
+        # Schannel: pass client certificate for GC connection (no Kerberos tickets, no credentials)
+        $ConnectParams['ClientCertificate'] = $Script:LDAPContext['ClientCertificate']
+        $ConnectParams['UseLDAPS'] = $true
+    }
+    else {
+        $kerbUsed = $Script:LDAPContext.ContainsKey('KerberosUsed') -and ($Script:LDAPContext['KerberosUsed'] -eq $true)
+        $winAuth = $Script:LDAPContext.ContainsKey('AuthMethod') -and ($Script:LDAPContext['AuthMethod'] -eq 'WindowsAuth')
+        $useNegotiate = $kerbUsed -or $winAuth
+
+        if (-not $useNegotiate -and $Script:LDAPCredential) {
+            $ConnectParams['Credential'] = $Script:LDAPCredential
+        }
+    }
+
+    foreach ($GCTarget in $targets) {
+        Write-Log "[Get-GCConnection] Trying GC target: $GCTarget"
+        $ConnectParams['Server'] = $GCTarget
+
+        $GCConn = Connect-LDAP @ConnectParams
+        if ($GCConn) {
+            Write-Log "[Get-GCConnection] GC connection established to $GCTarget"
+            $Script:GCConnection = $GCConn
+            return $GCConn
+        }
+    }
+
+    # Said once per session, as a Note, and it names what the reader loses rather than the port
+    # that was shut. A blocked 3268 is usually a firewall between the tester and the DC, not an
+    # AD finding, and the only thing it changes about the result is that identities from another
+    # domain come back unresolved - which the checks then say on the row.
+    $Script:GCConnectionFailed = $true
+    Write-Log "[Get-GCConnection] All GC connection attempts failed - cross-domain resolution unavailable"
+    Show-Line ("Global Catalog (port 3268) is not reachable on $($targets -join ', ') - identities from " +
+               'another domain cannot be resolved and are reported as unresolved') -Class Note
+    return $null
+}
+
+
+function Get-ForestRootExchangeGroup {
+    <#
+    .SYNOPSIS
+        Finds Exchange's universal security groups in the forest root domain, through the
+        Global Catalog.
+
+    .DESCRIPTION
+        Exchange setup creates its groups once, in OU=Microsoft Exchange Security Groups of
+        the forest root domain, and Setup /PrepareDomain grants them their rights on the
+        domain object of every other domain. A check that reads a child domain therefore
+        finds the ACEs naming those groups and not the groups: Get-DomainGroup searches the
+        domain it is connected to. Get-ExchangeInfrastructure reported the permissions
+        model of every child domain as undeterminable for that reason - while the ACE that
+        decides it was right there.
+
+        Asked by name, in the two OUs Exchange setup puts them in, so that a group of the
+        same name somewhere else in the forest does not stand in for it. The second one is
+        OU=Microsoft Exchange Protected Groups: /ActiveDirectorySplitPermissions:true
+        creates it in the forest root and moves Exchange Windows Permissions into it
+        (Microsoft, "Split permissions in Exchange Server"). Asking the first alone missed
+        that group in exactly the forests where it no longer holds its ACEs - and where it
+        is found answers which permissions model the forest was prepared with.
+
+    .PARAMETER Name
+        The group names (sAMAccountName) to look for.
+
+    .OUTPUTS
+        Hashtable of name -> PSCustomObject with SID and DistinguishedName, for the groups
+        found. Empty when the forest root holds none of them; $null when the Global Catalog
+        could not be asked at all - the two are different answers.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string[]]$Name
+    )
+
+    $rootNC = $null
+    if ($Script:LDAPContext -is [hashtable] -and $Script:LDAPContext.ContainsKey('RootDomainNamingContext')) {
+        $rootNC = [string]$Script:LDAPContext['RootDomainNamingContext']
+    }
+    if (-not $rootNC) {
+        Write-Log "[Get-ForestRootExchangeGroup] No forest root naming context in the session"
+        return $null
+    }
+
+    try {
+        $gcConn = Get-GCConnection
+        if (-not $gcConn) { return $null }
+
+        $nameClauses = ($Name | ForEach-Object { "(sAMAccountName=$(Escape-LDAPFilterValue -Value $_))" }) -join ''
+        $searchBases = @(
+            "OU=Microsoft Exchange Security Groups,$rootNC"
+            "OU=Microsoft Exchange Protected Groups,$rootNC"
+        )
+
+        # -Raw, like Resolve-SIDViaGC: the explicit attribute list then works on the GC
+        # port, and objectSid comes back as the bytes it is. A base that does not exist -
+        # the protected OU in a forest without split permissions - answers with nothing,
+        # not with an error.
+        $gcResults = @()
+        foreach ($searchBase in $searchBases) {
+            $gcResults += @(Invoke-LDAPSearch -Filter "(&(objectClass=group)(|$nameClauses))" -SearchBase $searchBase `
+                -Properties @('sAMAccountName', 'objectSid', 'distinguishedName') -LdapConnection $gcConn -Raw)
+        }
+
+        $found = @{}
+        foreach ($gcResult in $gcResults) {
+            $groupName = [string]$gcResult.sAMAccountName
+            if (-not $groupName -or $null -eq $gcResult.objectSid) { continue }
+
+            $sidValue = $gcResult.objectSid
+            if ($sidValue -is [array] -and $sidValue.Count -gt 0 -and $sidValue[0] -is [byte[]]) { $sidValue = $sidValue[0] }
+            $sidText = if ($sidValue -is [byte[]]) {
+                (New-Object System.Security.Principal.SecurityIdentifier($sidValue, 0)).Value
+            } else {
+                [string]$sidValue
+            }
+
+            $found[$groupName] = [PSCustomObject]@{
+                SID               = $sidText
+                DistinguishedName = [string]$gcResult.distinguishedName
+            }
+        }
+
+        Write-Log "[Get-ForestRootExchangeGroup] Found $($found.Count) of $(@($Name).Count) group(s) in the Exchange OUs of $rootNC"
+        return $found
+    } catch {
+        Write-Log "[Get-ForestRootExchangeGroup] Global Catalog lookup failed: $($_.Exception.Message)"
+        return $null
+    }
+}
+
+
+function Get-ForestDomainSID {
+    <#
+    .SYNOPSIS
+        The domain SIDs of every domain in the forest, through the Global Catalog.
+
+    .DESCRIPTION
+        A domain knows the SID of a partner only where it has a trust object for it, and in
+        a forest that is the parent, the children and - for a tree root - the forest root.
+        A sibling domain has no trust object here, so the trust objects alone cannot say
+        whether a SID belongs to the forest. The Global Catalog holds the head of every
+        domain partition, objectSid included; one search with the forest-wide base
+        Invoke-LDAPSearch uses for an external connection returns them all.
+
+    .OUTPUTS
+        Hashtable domain SID -> DNS name derived from the partition DN. $null when the
+        Global Catalog could not be asked - which is not the same answer as an empty forest.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param()
+
+    try {
+        $gcConn = Get-GCConnection
+        if (-not $gcConn) { return $null }
+
+        # -Raw, like the lookups above: the explicit attribute list then works on the GC
+        # port, and objectSid comes back as the bytes it is.
+        $gcResults = @(Invoke-LDAPSearch -Filter '(objectClass=domainDNS)' -Properties @('objectSid', 'distinguishedName') -LdapConnection $gcConn -Raw)
+
+        $domains = @{}
+        foreach ($gcResult in $gcResults) {
+            if ($null -eq $gcResult.objectSid) { continue }
+            $sidValue = $gcResult.objectSid
+            if ($sidValue -is [array] -and $sidValue.Count -gt 0 -and $sidValue[0] -is [byte[]]) { $sidValue = $sidValue[0] }
+            $sidText = if ($sidValue -is [byte[]]) {
+                (New-Object System.Security.Principal.SecurityIdentifier($sidValue, 0)).Value
+            } else {
+                [string]$sidValue
+            }
+            $dnsName = ([string]$gcResult.distinguishedName -replace '^DC=', '' -replace ',DC=', '.')
+            $domains[$sidText] = $dnsName
+        }
+
+        Write-Log "[Get-ForestDomainSID] Found $($domains.Count) domain(s) in the forest"
+        return $domains
+    } catch {
+        Write-Log "[Get-ForestDomainSID] Global Catalog lookup failed: $($_.Exception.Message)"
+        return $null
+    }
+}
+
+function Resolve-SIDViaGC {
+    <#
+    .SYNOPSIS
+        Attempts to resolve a SID via the Global Catalog for cross-domain/forest resolution.
+
+    .DESCRIPTION
+        Queries the Global Catalog (port 3268/3269) which contains a forest-wide read-only
+        index of all objects. This enables resolving SIDs from any domain in the forest.
+
+        Uses Invoke-LDAPSearch with -LdapConnection for full attribute conversion.
+
+    .PARAMETER SIDHex
+        The SID in LDAP hex format (\XX\XX\XX...) for the objectSid query.
+
+    .PARAMETER SID
+        The SID as string for logging and caching.
+
+    .OUTPUTS
+        String in "DOMAIN\sAMAccountName" format, or $null if resolution fails.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$SIDHex,
+
+        [Parameter(Mandatory=$true)]
+        [string]$SID
+    )
+
+    try {
+        $gcConn = Get-GCConnection
+        if (-not $gcConn) { return $null }
+
+        Write-Log "[Resolve-SIDViaGC] Attempting GC lookup for: $SID"
+
+        # Use Invoke-LDAPSearch with GC connection
+        # CRITICAL: Use -Raw flag to prevent infinite recursion via msDS-AllowedToActOnBehalfOfOtherIdentity
+        # -Raw skips all attribute conversions (including Security Descriptor parsing which would call
+        # ConvertFrom-SID -> Resolve-SIDViaGC again -> infinite loop)
+        # We only need sAMAccountName + distinguishedName for SID resolution
+        # With -Raw, explicit attribute list works correctly (no S.DS.P GC port 3268 bug)
+        # Force array wrapping to prevent PowerShell unwrapping single results to scalar
+        $gcResults = @(Invoke-LDAPSearch -Filter "(objectSid=$SIDHex)" -Properties @("sAMAccountName","distinguishedName") -SizeLimit 1 -LdapConnection $gcConn -Raw)
+
+        $gcResult = if ($gcResults -and $gcResults.Count -gt 0) { $gcResults[0] } else { $null }
+
+        if ($gcResult) {
+            # Raw mode: attributes are returned as-is (strings for text, byte[] for binary)
+            $accountName = $gcResult.sAMAccountName
+            $gcDN = $gcResult.distinguishedName
+
+            if ($accountName -and $gcDN) {
+                # Extract domain NetBIOS name from DN (first DC= component)
+                if ($gcDN -match 'DC=([^,]+)') {
+                    $gcDomainName = $Matches[1].ToUpper()
+                } else {
+                    $gcDomainName = "FOREST"
+                }
+
+                $resolvedName = "${gcDomainName}\$accountName"
+                Write-Log "[Resolve-SIDViaGC] Resolved: $SID -> $resolvedName (via GC)"
+                return $resolvedName
+            }
+        }
+
+        Write-Log "[Resolve-SIDViaGC] No usable results from GC for $SID"
+        return $null
+    } catch {
+        Write-Log "[Resolve-SIDViaGC] Failed for ${SID}: $($_.Exception.Message)"
+
+        # Reset stale GC connection so next call retries
+        if ($_.Exception.InnerException -is [System.DirectoryServices.Protocols.LdapException] -or
+            $_.Exception -is [System.ObjectDisposedException]) {
+            try { if ($Script:GCConnection) { $Script:GCConnection.Dispose() } } catch { }
+            $Script:GCConnection = $null
+            Write-Log "[Resolve-SIDViaGC] Reset stale GC connection"
+        }
+
+        return $null
+    }
+}

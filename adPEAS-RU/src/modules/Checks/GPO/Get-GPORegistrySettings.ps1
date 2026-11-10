@@ -1,0 +1,746 @@
+﻿function Get-GPORegistrySettings {
+    <#
+    .SYNOPSIS
+    Detects security-relevant registry values deployed via Group Policy that enable attacks.
+
+    .DESCRIPTION
+    Analyzes Group Policy Objects for registry values that, when actively set, enable or
+    facilitate credential theft, lateral movement, privilege escalation, or defense evasion.
+
+    All three GPO registry delivery mechanisms are parsed from SYSVOL:
+      - Administrative Templates -> Registry.pol  (PReg binary format)
+      - Group Policy Preferences -> Registry.xml  (XML format)
+      - Security Options         -> GptTmpl.inf   ([Registry Values] section)
+
+    The third one used to be missing, and for a number of entries in the table it is the
+    normal path rather than an alternative: the LAN Manager authentication level, the two
+    anonymous-enumeration restrictions, the Everyone-includes-anonymous switch, both UAC
+    switches and the two machine-password settings all have a Security Option in the GPMC,
+    and that is where an administrator sets them. A domain with "Send LM & NTLM responses"
+    configured that way produced no finding at all, under a line saying no vulnerable
+    registry settings were deployed via GPO.
+
+    Matched values are defined centrally in adPEAS-RegistryKeys.ps1
+    ($Script:DangerousRegistryKeys). Only POSITIVELY SET values are reported - absence of a
+    hardening value is never reported as a finding, because GPO parsing cannot distinguish
+    "not configured in this GPO" from "secure".
+
+    Examples of detected settings: WDigest cleartext caching, the Zerologon/OneLogon
+    VulnerableChannelAllowList, AlwaysInstallElevated, RDP Restricted Admin, UAC disabled,
+    WSUS-over-HTTP, and explicitly disabled defenses. Point and Print has its own check
+    (Get-GPOPointAndPrint) because its exploitability depends on a combination of values.
+
+    Every other value a policy deploys is not judged - an application's settings among
+    them, and Windows settings outside the table. Such values are counted, so that "none
+    of the known vulnerable settings" is not read as "nothing vulnerable is deployed".
+    Values another check judges ($Script:RegistryValuesReadElsewhere, and string values
+    named like a password, which Get-CredentialExposure reads) are not counted.
+    -IncludeUnknown lists them, one object per policy file, so that what no list covers can
+    be read by the person who knows the applications.
+
+    Note: this check sees only what is DEPLOYED via GPO. Values set locally/directly on a
+    host (no Remote Registry) are out of scope by design.
+
+    Requires SMB access to \\domain\SYSVOL.
+
+    .PARAMETER Domain
+    Target domain (optional, uses current domain if not specified)
+
+    .PARAMETER Server
+    Domain Controller to query (optional, uses auto-discovery if not specified)
+
+    .PARAMETER Credential
+    PSCredential object for authentication (optional, uses current user if not specified)
+
+    .PARAMETER IncludeInactive
+    Also list the settings of policies that are not linked or not enabled.
+
+    .PARAMETER IncludeUnknown
+    List the registry values the check does not judge - an application's settings, Windows
+    settings without a rule - one object per policy file. Without it they are counted only.
+
+    .EXAMPLE
+    Get-GPORegistrySettings
+
+    .EXAMPLE
+    Get-GPORegistrySettings -Domain "contoso.com" -Credential (Get-Credential)
+
+    .EXAMPLE
+    Get-GPORegistrySettings -IncludeUnknown
+    Also lists every deployed value the check does not judge, per policy file.
+
+    .NOTES
+    Category: GPO
+    Author: Alexander Sturz (@_61106960_)
+    #>
+
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$false)]
+        [string]$Domain,
+
+        [Parameter(Mandatory=$false)]
+        [string]$Server,
+
+        [Parameter(Mandatory=$false)]
+        [System.Management.Automation.PSCredential]$Credential,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$IncludeInactive,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$IncludeUnknown
+    )
+
+    begin {
+        Write-Log "[Get-GPORegistrySettings] Starting check"
+    }
+
+    process {
+        try {
+            # Connection parameters only, built by hand rather than splatting
+            # $PSBoundParameters. -IncludeInactive belongs to this check and neither
+            # Ensure-LDAPConnection nor Get-DomainGPO has a parameter by that name, so
+            # splatting the lot made the call fail to bind - and the failure is a
+            # terminating error before the first line of output, so the check produced
+            # nothing at all rather than an error anybody could read.
+            $connectionParams = @{}
+            if ($Domain)     { $connectionParams['Domain']     = $Domain }
+            if ($Server)     { $connectionParams['Server']     = $Server }
+            if ($Credential) { $connectionParams['Credential'] = $Credential }
+
+            # Ensure LDAP connection (displays error if needed)
+            if (-not (Ensure-LDAPConnection @connectionParams)) {
+                return
+            }
+
+            $Script:_gpoRegMatches = [System.Collections.ArrayList]::new()
+            $Script:_gpoRegUnjudged = [System.Collections.ArrayList]::new()
+
+            Show-SubHeader "Searching for vulnerable registry settings deployed via GPO..." -ObjectType "GPORegistrySetting"
+
+            $gpos = Get-DomainGPO @connectionParams
+
+            if (-not $gpos) {
+                Show-Line "No GPOs found in domain" -Class Note
+                return
+            }
+
+            $gpoLinkage = Get-GPOLinkage
+
+            # Which policies have a half switched off, indexed the way a SYSVOL path names
+            # them. Get-DomainGPO decodes the flags attribute; nothing used to read it.
+            $gpoStatusMap = Get-GPOStatusMap -GPO $gpos
+
+            # Build GPO GUID to name mapping
+            $gpoNameMap = @{}
+            foreach ($gpo in $gpos) {
+                $gpoNameMap[$gpo.Name] = $gpo.DisplayName
+            }
+            $gpoPathMap = Get-GPOPathMap -GPO $gpos
+
+            # Track SYSVOL access status (exception in Clear-SessionState - cleaned up inline below)
+            $Script:sysvolAccessible = $false
+
+            # SYSVOL Access with Credential Support
+            Invoke-SMBAccess -Description "Scanning GPO registry configuration files" -ScriptBlock {
+                $sysvolPath = "\\$($Script:LDAPContext.Server)\SYSVOL\$($Script:LDAPContext.Domain)\Policies"
+
+                if (-not (Test-Path $sysvolPath)) {
+                    return
+                }
+
+                $Script:sysvolAccessible = $true
+
+                # Single cached SYSVOL listing for all three delivery mechanisms
+                $regFiles = @(Get-CachedSYSVOLFiles -Filter @("Registry.pol", "Registry.xml", "GptTmpl.inf"))
+
+                if ($regFiles.Count -eq 0) {
+                    Write-Log "[Get-GPORegistrySettings] No Registry.pol/Registry.xml/GptTmpl.inf files found in SYSVOL"
+                    return
+                }
+
+                Write-Log "[Get-GPORegistrySettings] Found $($regFiles.Count) registry configuration file(s)"
+
+                $totalFiles = $regFiles.Count
+                $currentIndex = 0
+                foreach ($file in $regFiles) {
+                    $currentIndex++
+                    if ($totalFiles -gt $Script:ProgressThreshold) { Show-Progress -Activity "Scanning GPO registry settings" -Current $currentIndex -Total $totalFiles -ObjectName $file.Name }
+
+                    # Extract GPO GUID from path: ...\Policies\{GUID}\...
+                    if ($file.FullName -notmatch '\\Policies\\(\{[^}]+\})\\') {
+                        continue
+                    }
+                    $gpoGUID = $Matches[1]
+                    $gpoName = if ($gpoNameMap.ContainsKey($gpoGUID)) { $gpoNameMap[$gpoGUID] } else { $gpoGUID }
+
+                    try {
+                        $records = @()
+                        if ($file.Name -ieq 'Registry.pol') {
+                            # Machine\Registry.pol -> HKLM, User\Registry.pol -> HKCU
+                            $hive = if ($file.FullName -match '\\Machine\\') { 'HKLM' } else { 'HKCU' }
+                            $records = @(Parse-PRegRecords -PolFilePath $file.FullName -Hive $hive)
+                        } elseif ($file.Name -ieq 'GptTmpl.inf') {
+                            # Security Options. The hive is per line - MACHINE\ or USER\ -
+                            # so the parser decides it, not the file location. Read through
+                            # the content cache, which holds GptTmpl.inf already.
+                            $hive = 'HKLM/HKCU'
+                            $records = @(Parse-GptTmplRegistryValues -Content (Get-CachedSYSVOLContent -Path $file.FullName))
+                        } else {
+                            $hive = 'HKLM/HKCU'
+                            $records = @(Parse-RegistryXml -XmlFilePath $file.FullName)
+                        }
+                        # The path inside the GPO folder, not the bare file name. Both
+                        # halves of a policy carry a file called Registry.pol, so a bare
+                        # name left the reader unable to tell Machine\ from User\ - and
+                        # those reach different targets.
+                        $source = Get-GPORelativePath -Path $file.FullName
+                        if ($records.Count -gt 0) {
+                            Write-Log "[Get-GPORegistrySettings] Analyzing GPO '$gpoName' - $source ($hive): $($records.Count) registry value(s)"
+                        }
+
+                        foreach ($record in $records) {
+                            $entry = Test-DangerousRegistryRecord -Record $record
+                            if ($entry) {
+                                [void]$Script:_gpoRegMatches.Add([PSCustomObject]@{
+                                    GPOGUID    = $gpoGUID
+                                    GPOName    = $gpoName
+                                    GPOPath    = $gpoPathMap[([string]$gpoGUID).ToUpper()]
+                                    SourceFile = $source
+                                    Entry      = $entry
+                                    Record     = $record
+                                })
+                            } elseif (Test-RegistryRecordUnjudged -Record $record) {
+                                $unjudgedKey = "$($record.Hive)\$(([string]$record.Key) -replace '^\\+', '')\$($record.ValueName)"
+                                [void]$Script:_gpoRegUnjudged.Add([PSCustomObject]@{
+                                    GPOGUID     = $gpoGUID
+                                    GPOName     = $gpoName
+                                    GPOPath     = $gpoPathMap[([string]$gpoGUID).ToUpper()]
+                                    SourceFile  = $source
+                                    RegistryKey = $unjudgedKey
+                                    Value       = (Format-RegistryRecordValue -Record $record)
+                                    # The half of the policy the value depends on, as for a
+                                    # finding - see the _ReachScope assignment below.
+                                    _ReachScope = (Get-GPOHalfFromSource -SourceFile $source -RegistryKey $unjudgedKey)
+                                })
+                            }
+                        }
+                    } catch {
+                        Write-Log "[Get-GPORegistrySettings] Error parsing $($file.FullName): $_"
+                        Register-SYSVOLFileGap -Path $file.FullName -ErrorRecord $_
+                    }
+                }
+                if ($totalFiles -gt $Script:ProgressThreshold) { Show-Progress -Activity "Scanning GPO registry settings" -Completed }
+            }
+
+            # Retrieve results and clean up Script-scoped temp variables
+            $rawMatches = @($Script:_gpoRegMatches)
+            $unjudged = @($Script:_gpoRegUnjudged)
+            $sysvolAccessible = $Script:sysvolAccessible
+            $Script:_gpoRegMatches = $null
+            $Script:_gpoRegUnjudged = $null
+            $Script:sysvolAccessible = $null
+
+            if (-not $sysvolAccessible) {
+                if ((Test-SysvolAccessible) -eq $false) {
+                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                } else {
+                    Show-Line "SYSVOL access failed - cannot analyze GPO registry settings - SMB access failed (authentication/network issue)" -Class Finding
+                }
+                return
+            }
+
+            # What the table does not cover, counted over the policies that apply - see
+            # Test-RegistryRecordUnjudged. First, like what the other GPO checks hold back:
+            # it is a statement about what was left out, and the "Found ..." headline below
+            # heads the settings that are reported. It came last, under the last finding.
+            $unjudgedSplit = Split-GPOFindingByReach -Finding $unjudged -GPOStatusMap $gpoStatusMap `
+                -GPOLinkage $gpoLinkage -ScopeProperty '_ReachScope'
+            # Wrapped as a whole: an if-expression unrolls a one-element array, and .Count of
+            # the single object it leaves is $null on Windows PowerShell 5.1.
+            $unjudgedShown = @(if ($IncludeInactive) { $unjudged } else { $unjudgedSplit.Active })
+            if ($unjudgedShown.Count -gt 0) {
+                $unjudgedPolicies = @($unjudgedShown | ForEach-Object { ([string]$_.GPOGUID).ToUpper() } | Sort-Object -Unique).Count
+                $policyWord = if ($unjudgedPolicies -eq 1) { 'policy' } else { 'policies' }
+                $unjudgedText = "$($unjudgedShown.Count) further registry value(s) from $unjudgedPolicies $policyWord are not on the list of this check - not judged"
+                # Invoke-adPEAS sets the context for each check and passes no -IncludeUnknown;
+                # without one the switch is reachable, as for -IncludeInactive.
+                if (-not $IncludeUnknown -and $null -eq $Script:adPEAS_CurrentCheckContext) { $unjudgedText += ' (-IncludeUnknown to list)' }
+                Show-Line $unjudgedText -Class Note
+            }
+
+            # Resolve findings (handles AlwaysInstallElevated two-hive correlation)
+            $findings = @(Resolve-RegistryFindings -RawMatches $rawMatches)
+
+            if ($findings.Count -gt 0) {
+                # Most severe first. Resolve-RegistryFindings appends the correlated
+                # AlwaysInstallElevated findings after the loop, so without sorting a
+                # Critical one landed behind the Medium ones in the console.
+                $severityRank = @{ 'Critical' = 0; 'High' = 1; 'Medium' = 2; 'Low' = 3; 'Info' = 4 }
+                $findings = @($findings | Sort-Object -Property `
+                    @{ Expression = { if ($severityRank.ContainsKey($_.Severity)) { $severityRank[$_.Severity] } else { 9 } } }, `
+                    @{ Expression = { $_.GPOName } })
+
+                # Which half of the policy each value depends on. Read from the folder the
+                # file came out of, not from the hive it writes.
+                #
+                # For Registry.pol the two agree, because the hive is derived from the folder
+                # in the first place. For a Group Policy Preference item they do not: GPP
+                # carries the hive per item in the XML, and an item under
+                # User\Preferences\Registry can write HKEY_LOCAL_MACHINE - that is a choice
+                # in the GPP editor. Such a value was tested against the computer half of the
+                # GPO: with the user half switched off it was reported at full severity
+                # although it reaches nothing, and with the computer half switched off it was
+                # held back as dormant although it is live - the worse of the two directions.
+                foreach ($finding in $findings) {
+                    $finding | Add-Member -NotePropertyName '_ReachScope' `
+                        -NotePropertyValue (Get-GPOHalfFromSource -SourceFile $finding.SourceFile -RegistryKey $finding.RegistryKey) -Force
+                }
+
+                # A value deployed by a policy that is not linked or not enabled is written
+                # to no registry. Held back rather than dropped - see Show-GPOInactiveSummary.
+                $split = Split-GPOFindingByReach -Finding $findings -GPOStatusMap $gpoStatusMap `
+                    -GPOLinkage $gpoLinkage -ScopeProperty '_ReachScope'
+
+                $shown = if ($IncludeInactive) { @($findings) } else { @($split.Active) }
+
+                # Counted over what is printed, or the number promises more than the body
+                # delivers.
+                $hasFinding = @($shown | Where-Object { $_.ConsoleClass -eq 'Finding' }).Count -gt 0
+                $headerClass = if ($hasFinding) { 'Finding' } else { 'Hint' }
+
+                # Held-back policies first, then the headline for the active ones, then the
+                # active ones - the "Found ..." line heads the finding objects, not the
+                # dampening block.
+                Show-GPOInactiveSummary -Unlinked $split.Unlinked -Disabled $split.Disabled `
+                    -Dormant $split.Dormant -Listed:$IncludeInactive
+
+                if (@($shown).Count -gt 0) {
+                    Show-Line "Found $(@($shown).Count) vulnerable registry setting(s) deployed via GPO" -Class $headerClass
+                } else {
+                    # Not "none deployed". Every one of them is deployed by a policy that
+                    # does not apply, which is a different statement.
+                    Show-Line "No known vulnerable registry setting is deployed by a policy that is linked and enabled" -Class Note
+                }
+
+                foreach ($finding in $shown) {
+                    # $null-guarded, and three-valued. Get-GPOLinkage returns $null when the
+                    # linkage could not be resolved, and .ContainsKey on that throws. This
+                    # loop is the display loop, so the throw was caught check-wide: the
+                    # "Found N vulnerable registry setting(s)" header printed and then not a
+                    # single row followed it.
+                    $linkedOUs = $null
+                    if ($null -ne $gpoLinkage) {
+                        $linkedOUs = @()
+                        if ($gpoLinkage.ContainsKey($finding.GPOGUID)) {
+                            $linkedOUs = @($gpoLinkage[$finding.GPOGUID])
+                        }
+                    }
+                    # Set unconditionally, including when the list is empty: the transformer
+                    # turns that into an explicit "Not linked" row. Only the unresolved case
+                    # needs a string of its own - "Not linked" would be a claim the failed
+                    # lookup cannot support.
+                    #
+                    # Plain assignment, then an override. An "if" whose branch yields @()
+                    # writes nothing to the output stream, so "$x = if (...) { ... } else
+                    # { $empty }" lands $x as $null - and @() is precisely the value that
+                    # means "linked nowhere".
+                    $linkedOUsDisplay = $linkedOUs
+                    if ($null -eq $linkedOUs) {
+                        $linkedOUsDisplay = 'Unknown - linkage could not be resolved'
+                    }
+                    $finding | Add-Member -NotePropertyName 'LinkedOUs' -NotePropertyValue $linkedOUsDisplay -Force
+                    # Which of those links put a domain controller in the policy's scope -
+                    # marked on LinkedOUs, no verdict.
+                    Add-GPODomainControllerReach -Object $finding -Reach (Get-GPODomainControllerReachDetail -Link $linkedOUs -GPOGUID $finding.GPOGUID)
+                    Add-GPOConditionRow -Object $finding -GPOGUID $finding.GPOGUID
+                    $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'GPORegistrySetting' -Force
+
+                    # A value in a policy whose relevant half is switched off reaches no
+                    # registry. Which half is the one the file came out of - see the comment
+                    # at the _ReachScope assignment above for why the hive does not answer
+                    # this for a Preferences item.
+                    $gpoStatus = Get-GPOEffectiveStatus `
+                        -StatusEntry $gpoStatusMap[$finding.GPOGUID] `
+                        -Scope (Get-GPOHalfFromSource -SourceFile $finding.SourceFile -RegistryKey $finding.RegistryKey) `
+                        -Link $linkedOUs
+                    if ($gpoStatus) {
+                        $finding | Add-Member -NotePropertyName 'GPOStatus' -NotePropertyValue $gpoStatus -Force
+                    }
+
+                    # ConsoleClass is what the central table documents per entry. It was
+                    # carried all the way here and then never used, so the Finding/Hint
+                    # distinction the table defines had no effect on the output.
+                    #
+                    # A dormant one is printed as a note whatever the table says: the class
+                    # describes the setting, the colour has to describe today's risk, and
+                    # LinkedOUs and GPOStatus on the row say why it is grey.
+                    $rowClass = if (@($split.Inactive) -contains $finding) {
+                        'Note'
+                    } elseif ($finding.ConsoleClass) {
+                        [string]$finding.ConsoleClass
+                    } else {
+                        'Standard'
+                    }
+                    Show-Object $finding -Class $rowClass
+                }
+            } else {
+                # Names the GPO folders that could not be read, and the policy files that
+                # could not be read or parsed, so "no vulnerable settings" is not mistaken
+                # for "all settings were examined".
+                $null = Show-SYSVOLCoverageNote -FileFilter @('Registry.pol', 'Registry.xml', 'GptTmpl.inf')
+                # "Known": the table is a list, not the registry. It read "No vulnerable
+                # registry settings deployed via GPO" over every value it has no rule for.
+                Show-Line "No known vulnerable registry setting is deployed via GPO" -Class Note
+            }
+
+            # The values the count at the top stands for, with -IncludeUnknown: after the
+            # findings, which are what the check reports. One object per policy file, its
+            # values a row each - a domain's Administrative Templates run to hundreds of
+            # values, and an object per value buried the few that matter. No colour -
+            # nothing here is judged.
+            if ($IncludeUnknown -and $unjudgedShown.Count -gt 0) {
+                $unjudgedGroups = @($unjudgedShown | Group-Object -Property { "$(([string]$_.GPOGUID).ToUpper())|$($_.SourceFile)" } |
+                    Sort-Object -Property @{ Expression = { [string]$_.Group[0].GPOName } }, @{ Expression = { [string]$_.Group[0].SourceFile } })
+                foreach ($group in $unjudgedGroups) {
+                    $first = $group.Group[0]
+                    $inventory = [PSCustomObject][ordered]@{
+                        GPOName           = $first.GPOName
+                        GPOGUID           = $first.GPOGUID
+                        GPOPath           = $first.GPOPath
+                        SourceFile        = $first.SourceFile
+                        RegistryValues    = @($group.Group | Sort-Object -Property RegistryKey | ForEach-Object { "$($_.RegistryKey) = $($_.Value)" })
+                        _adPEASObjectType = 'GPORegistryValue'
+                    }
+                    Show-Object $inventory -Class Standard
+                }
+            }
+
+        } catch {
+            Write-Log "[Get-GPORegistrySettings] Error: $_" -Level Error
+            Show-Line "Error during check - registry settings deployed via GPO could not be evaluated: $_" -Class Finding
+        }
+    }
+
+    end {
+        Write-Log "[Get-GPORegistrySettings] Check completed"
+    }
+}
+
+# =============================================================================
+# Helper: Evaluate one normalized registry record against the dangerous-key table
+# =============================================================================
+function Test-DangerousRegistryRecord {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        $Record
+    )
+
+    if (-not (Test-RegistryRecordApplies -Record $Record)) { return $null }
+
+    $recKey = ([string]$Record.Key -replace '^\\+', '').TrimEnd('\')
+    $recValueName = [string]$Record.ValueName
+    $recHive = [string]$Record.Hive
+
+    foreach ($entry in $Script:DangerousRegistryKeys) {
+        if ($entry.Hive -ne $recHive) { continue }
+        if (-not (Test-RegistryEntryKey -Entry $entry -Key $recKey)) { continue }
+        if ($entry.ValueName -ne '*' -and $entry.ValueName -ine $recValueName) { continue }
+
+        # The number a numeric rule compares. A setting Windows keeps as a REG_SZ number
+        # (AutoAdminLogon "1", CachedLogonsCount "10") is read out of the string, by the
+        # entries that say so; see StoredAsString in the table.
+        $number = $null
+        if ($null -ne $Record.ValueInt) {
+            $number = [int64]$Record.ValueInt
+        } elseif ($entry.StoredAsString -and $null -ne $Record.ValueString) {
+            $stringNumber = [int64]0
+            if ([int64]::TryParse([string]$Record.ValueString, [ref]$stringNumber)) { $number = $stringNumber }
+        }
+
+        # Value name matched - now evaluate the dangerous condition
+        $isMatch = $false
+        switch ($entry.Match) {
+            'Present' {
+                $isMatch = $true
+            }
+            'Equals' {
+                if ($null -ne $number) { $isMatch = ($number -eq [int64]$entry.MatchValue) }
+            }
+            'LessOrEqual' {
+                if ($null -ne $number) { $isMatch = ($number -le [int64]$entry.MatchValue) }
+            }
+            'GreaterThan' {
+                if ($null -ne $number) { $isMatch = ($number -gt [int64]$entry.MatchValue) }
+            }
+            'BitSet' {
+                # For a value that is a flag field rather than a setting, where one bit
+                # among several carries the risk: Schannel's CertificateMappingMethods is
+                # 0x1 subject/issuer, 0x2 issuer, 0x4 UPN, 0x8 subject, and only 0x4 is
+                # ESC10. Equals would miss every combination that has the bit set next to
+                # another one, which is how the value is normally written.
+                if ($null -ne $number) {
+                    $isMatch = (($number -band [int64]$entry.MatchValue) -eq [int64]$entry.MatchValue)
+                }
+            }
+            'AnyBitSet' {
+                # Any one of several bits: SupportedEncryptionTypes with DES-CBC-CRC (0x1),
+                # DES-CBC-MD5 (0x2) or RC4 (0x4) among the types it allows.
+                if ($null -ne $number) {
+                    $isMatch = (($number -band [int64]$entry.MatchValue) -ne 0)
+                }
+            }
+            'UrlNotHttps' {
+                $sv = [string]$Record.ValueString
+                if ($sv -and $sv.Trim().ToLower().StartsWith('http://')) { $isMatch = $true }
+            }
+            'Pattern' {
+                # A string the rule describes, such as a server list entry "TERMSRV/*".
+                $sv = [string]$Record.ValueString
+                if ($sv -and $sv -match [string]$entry.MatchValue) { $isMatch = $true }
+            }
+        }
+
+        if ($isMatch) {
+            return $entry
+        }
+    }
+
+    return $null
+}
+
+# =============================================================================
+# Helper: Whether a table entry names a registry key
+# =============================================================================
+function Test-RegistryEntryKey {
+    <#
+    .SYNOPSIS
+        Whether an entry of $Script:DangerousRegistryKeys names the key, without regard to
+        case: by its Key, or - for a family of keys such as the Office versions and
+        applications - by its KeyPattern.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory=$true)]
+        $Entry,
+
+        [Parameter(Mandatory=$true)]
+        [AllowEmptyString()]
+        [string]$Key
+    )
+
+    if ($Entry.KeyPattern) { return ($Key -match [string]$Entry.KeyPattern) }
+    return ((([string]$Entry.Key) -replace '^\\+', '').TrimEnd('\') -ieq $Key)
+}
+
+# =============================================================================
+# Helper: Whether a registry record writes a value at all
+# =============================================================================
+function Test-RegistryRecordApplies {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory=$true)]
+        $Record
+    )
+
+    # The GPP semantics, which this check's own design principle requires: "only
+    # POSITIVELY SET values are flagged". action="D" deletes the value and disabled="1"
+    # means Group Policy never applies the item, and both used to arrive here as ordinary
+    # configured values - so a GPO that REMOVES EnableLUA, the cleanup an administrator
+    # performs after an audit, was reported as "User Account Control disabled" with
+    # severity High, and a preference item switched off in the editor read as an active
+    # misconfiguration.
+    if ($Record.PSObject.Properties['Action'] -and [string]$Record.Action -eq 'D') { return $false }
+    if ($Record.PSObject.Properties['Disabled'] -and $Record.Disabled) { return $false }
+
+    # Registry.pol says the same with pseudo-values - "**del.<name>", "**delvals.",
+    # "**DeleteValues" and the like. Parse-PRegRecords hands them on; a rule never matched
+    # one only because no rule names a value starting with "**".
+    if (([string]$Record.ValueName).StartsWith('**')) { return $false }
+
+    # A key without a value name and without data creates the key and sets nothing.
+    if (-not [string]$Record.ValueName -and $null -eq $Record.ValueInt -and -not [string]$Record.ValueString) { return $false }
+
+    return $true
+}
+
+# =============================================================================
+# Helper: The value a registry record writes, as one short line
+# =============================================================================
+function Format-RegistryRecordValue {
+    <#
+    .SYNOPSIS
+        The value a registry record writes, for a row of -IncludeUnknown.
+    .DESCRIPTION
+        A number as a number, a string as it is - quoted when empty, cut at 100 characters,
+        because a Preferences item can carry a script or a certificate. Registry.pol hands on
+        no data for a binary value, so that reads "(binary)".
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory=$true)]
+        $Record
+    )
+
+    if ($null -ne $Record.ValueInt) { return [string]$Record.ValueInt }
+    if ($null -ne $Record.ValueString) {
+        $text = [string]$Record.ValueString
+        if ($text.Length -eq 0) { return '""' }
+        if ($text.Length -gt 100) { return $text.Substring(0, 100) + '...' }
+        return $text
+    }
+    return '(binary)'
+}
+
+# =============================================================================
+# Helper: Whether a registry record is one nothing in adPEAS judges
+# =============================================================================
+function Test-RegistryRecordUnjudged {
+    <#
+    .SYNOPSIS
+        $true for a deployed registry value no rule of this check and no other check reads.
+    .DESCRIPTION
+        A value with a rule in $Script:DangerousRegistryKeys is judged whatever it holds -
+        LmCompatibilityLevel 5 was looked at and is fine. So is a value another check reads
+        ($Script:RegistryValuesReadElsewhere), a string value named like a password and the
+        password of a VNC product, which Get-CredentialExposure reports. Everything else is
+        the part of the registry no list covers: an application's settings, and Windows
+        settings without a rule.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory=$true)]
+        $Record
+    )
+
+    if (-not (Test-RegistryRecordApplies -Record $Record)) { return $false }
+
+    $recKey = ([string]$Record.Key -replace '^\\+', '').TrimEnd('\')
+    $recValueName = [string]$Record.ValueName
+    $recHive = [string]$Record.Hive
+
+    foreach ($entry in $Script:DangerousRegistryKeys) {
+        if ($entry.Hive -ne $recHive) { continue }
+        if (-not (Test-RegistryEntryKey -Entry $entry -Key $recKey)) { continue }
+        if ($entry.ValueName -eq '*' -or $entry.ValueName -ieq $recValueName) { return $false }
+    }
+
+    foreach ($reader in $Script:RegistryValuesReadElsewhere) {
+        if ($reader.Key -ine $recKey) { continue }
+        if (@($reader.ValueNames) -contains '*' -or @($reader.ValueNames) -contains $recValueName) { return $false }
+    }
+
+    # The password of a VNC product, of any type - Get-CredentialExposure decrypts it.
+    if (Test-VNCPasswordRecord -Record $Record) { return $false }
+
+    # Get-RegistryPasswordCredential: a string value whose name ends in password, passwd
+    # or pwd. Registry.xml names the type, Registry.pol and GptTmpl.inf number it.
+    if ($recValueName -match '(?i)(password|passwd|pwd)$') {
+        $isString = if ($Record.Type -is [string]) {
+            $Record.Type -match '^REG_(EXPAND_|MULTI_)?SZ$'
+        } else {
+            @(1, 2, 7) -contains [int64]$Record.Type
+        }
+        if ($isString) { return $false }
+    }
+
+    return $true
+}
+
+# =============================================================================
+# Helper: Build display findings from raw matches (AlwaysInstallElevated correlation)
+# =============================================================================
+function Resolve-RegistryFindings {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [AllowEmptyCollection()]
+        [array]$RawMatches
+    )
+
+    $findings = @()
+    $aieMatches = @()
+
+    foreach ($m in $RawMatches) {
+        if ($m.Entry.Id -eq 'AIE_HKLM' -or $m.Entry.Id -eq 'AIE_HKCU') {
+            $aieMatches += $m
+            continue
+        }
+        $findings += (New-RegistryFinding -RegMatch $m)
+    }
+
+    # AlwaysInstallElevated is only exploitable when BOTH HKLM and HKCU are set to 1
+    # within the same GPO. Single-hive matches are suppressed.
+    $aieByGpo = $aieMatches | Group-Object -Property GPOGUID
+    foreach ($group in $aieByGpo) {
+        $ids = @($group.Group | ForEach-Object { $_.Entry.Id } | Sort-Object -Unique)
+        if ($ids -contains 'AIE_HKLM' -and $ids -contains 'AIE_HKCU') {
+            $hklmMatch = @($group.Group | Where-Object { $_.Entry.Id -eq 'AIE_HKLM' })[0]
+            $finding = New-RegistryFinding -RegMatch $hklmMatch
+            $finding.RegistryKey = 'HKLM+HKCU\Software\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated'
+            $finding.ConfiguredValue = '1 (both HKLM and HKCU)'
+            $findings += $finding
+        } else {
+            Write-Log "[Get-GPORegistrySettings] AlwaysInstallElevated set in only one hive for GPO $($group.Name) - not exploitable, skipping"
+        }
+    }
+
+    return $findings
+}
+
+# =============================================================================
+# Helper: Construct a display object for a single match
+# =============================================================================
+function New-RegistryFinding {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        $RegMatch
+    )
+
+    $entry = $RegMatch.Entry
+    $record = $RegMatch.Record
+
+    # Human-readable configured value
+    $configured = '(value present)'
+    if ($null -ne $record.ValueInt) {
+        $configured = [string]$record.ValueInt
+    } elseif ($record.ValueString) {
+        $configured = [string]$record.ValueString
+    }
+
+    # The key and the value name as the table writes them - or as the policy does, where
+    # the entry covers a family of keys (KeyPattern) or every value of one ('*').
+    $keyText = [string]$entry.Key
+    if ($entry.KeyPattern) { $keyText = ([string]$record.Key -replace '^\\+', '').TrimEnd('\') }
+    $valueNameText = [string]$entry.ValueName
+    if ($valueNameText -eq '*') { $valueNameText = [string]$record.ValueName }
+
+    return [PSCustomObject][ordered]@{
+        GPOName           = $RegMatch.GPOName
+        GPOGUID           = $RegMatch.GPOGUID
+        GPOPath           = $RegMatch.GPOPath
+        SourceFile        = $RegMatch.SourceFile
+        RegistryKey       = "$($entry.Hive)\$keyText\$valueNameText"
+        ConfiguredValue   = $configured
+        VulnerabilityName = $entry.VulnerabilityName
+        RiskReason        = $entry.RiskReason
+        Severity          = $entry.Severity
+        # Carried through so the caller can render the row in the class the central table
+        # defines for it. Without it the field existed only in the table and nowhere else.
+        ConsoleClass      = $entry.ConsoleClass
+    }
+}
+
+
+# =============================================================================
+# Parsers (shared helpers, both also used by Get-GPOPointAndPrint)
+#   Registry.pol (PReg binary) -> Parse-PRegRecords  in modules/Helpers/Parse-RegistryPol.ps1
+#   Registry.xml (GPP XML)     -> Parse-RegistryXml  in modules/Helpers/Parse-RegistryXml.ps1
+# =============================================================================

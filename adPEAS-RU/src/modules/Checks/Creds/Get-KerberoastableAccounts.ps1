@@ -1,0 +1,219 @@
+﻿function Get-KerberoastableAccounts {
+    <#
+    .SYNOPSIS
+    Identifies user accounts vulnerable to Kerberoasting attacks.
+
+    .DESCRIPTION
+    Finds user accounts with Service Principal Names (SPNs) that are vulnerable to Kerberoasting - attackers can request TGS tickets and attempt offline password cracking.
+
+    Detects:
+    - User accounts with SPNs set
+    - Enabled accounts only
+    - Excludes krbtgt account
+
+    .PARAMETER Domain
+    Target domain (optional, uses current domain if not specified)
+
+    .PARAMETER Server
+    Domain Controller to query (optional, uses auto-discovery if not specified)
+
+    .PARAMETER Credential
+    PSCredential object for authentication (optional, uses current user if not specified)
+
+    .PARAMETER OPSEC
+    If specified, skips active testing (TGS ticket requests) for stealth.
+    By default, performs active testing to prove vulnerability.
+
+    .EXAMPLE
+    Get-KerberoastableAccounts
+
+    .EXAMPLE
+    Get-KerberoastableAccounts -Domain "contoso.com" -Credential (Get-Credential)
+
+    .NOTES
+    Category: Creds
+    Author: Alexander Sturz (@_61106960_)
+    #>
+
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$false)]
+        [string]$Domain,
+
+        [Parameter(Mandatory=$false)]
+        [string]$Server,
+
+        [Parameter(Mandatory=$false)]
+        [System.Management.Automation.PSCredential]$Credential,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$OPSEC
+    )
+
+    begin {
+        Write-Log "[Get-KerberoastableAccounts] Starting check"
+    }
+
+    process {
+        try {
+            # Build connection parameters (exclude OPSEC which Ensure-LDAPConnection doesn't accept)
+            $connectionParams = @{}
+            if ($Domain) { $connectionParams['Domain'] = $Domain }
+            if ($Server) { $connectionParams['Server'] = $Server }
+            if ($Credential) { $connectionParams['Credential'] = $Credential }
+
+            # Ensure LDAP connection (displays error if needed)
+            if (-not (Ensure-LDAPConnection @connectionParams)) {
+                return
+            }
+
+            Show-SubHeader "Searching for Kerberoastable accounts (users with SPNs)..." -ObjectType "Kerberoastable"
+
+            # Use optimized filters: -SPN (has SPN), -Enabled (not disabled), additional filter: exclude krbtgt.
+            #
+            # krbtgt is excluded by its well-known RID (-502) rather than by its name. The
+            # account can be renamed, and a name-based exclusion then lets it into the
+            # report as a kerberoastable account - which it is by design and which nobody
+            # can act on. Project rule: identity checks are SID based, names are not stable.
+            # The name filter stays as the fallback for a session with no resolved domain SID.
+            # And the per-RODC clones of it. Every read-only domain controller gets its own
+            # krbtgt account with an ordinary RID, so the -502 exclusion does not cover
+            # them; what identifies them is msDS-SecondaryKrbTgtNumber, which only they
+            # carry. Their password is machine-generated and not crackable, and the
+            # remediation this check prints - remove the SPN, set a 25 character password -
+            # cannot be carried out on a KDC key account.
+            $domainSID = $Script:LDAPContext['DomainSID']
+            $krbtgtExclusion = if ($domainSID) {
+                "(&(!(objectSid=$domainSID-502))(!(msDS-SecondaryKrbTgtNumber=*)))"
+            } else {
+                Write-Log "[Get-KerberoastableAccounts] No domain SID in session - excluding krbtgt by name"
+                "(&(!(samAccountName=krbtgt))(!(msDS-SecondaryKrbTgtNumber=*)))"
+            }
+            $kerberoastableUsers = @(Get-DomainUser -SPN -Enabled -LDAPFilter $krbtgtExclusion -ShowOwner @connectionParams)
+
+            if (@($kerberoastableUsers).Count -gt 0) {
+                Show-Line "Found $(@($kerberoastableUsers).Count) kerberoastable user account(s):" -Class "Finding"
+
+                # Determine testing mode based on OPSEC flag
+                $canTestKerberoasting = -not $OPSEC
+
+                if ($OPSEC) {
+                    Show-Line "Skipping hash extraction (OPSEC mode)" -Class "Hint"
+                }
+
+                # Check if credentials are available for in-memory Kerberoasting (non-Kerberos auth)
+                # Kerberos/WindowsSSPI auth has a TGT in the ticket cache - Windows API works directly
+                # All other auth methods (SimpleBind, NTLM Impersonation) need credentials for in-memory TGS requests
+                $authMethod = if ($Script:LDAPContext -and $Script:LDAPContext['AuthMethod']) {
+                    $Script:LDAPContext['AuthMethod']
+                } else {
+                    'Unknown'
+                }
+
+                if ($authMethod -notin @('Kerberos', 'WindowsSSPI') -and $canTestKerberoasting) {
+                    $hasCredentials = $false
+                    if ($Credential) {
+                        $hasCredentials = $true
+                    } elseif ($Script:LDAPContext -and $Script:LDAPContext['Credential']) {
+                        $hasCredentials = $true
+                    }
+
+                    if (-not $hasCredentials) {
+                        Show-Line "Kerberoasting skipped - no credentials available (use -Credential or Connect-adPEAS -Credential)" -Class Finding
+                        $canTestKerberoasting = $false
+                    }
+                }
+
+                $totalUsers = @($kerberoastableUsers).Count
+                $currentIndex = 0
+                $privilegedCount = 0
+                foreach ($user in $kerberoastableUsers) {
+                    $currentIndex++
+                    if ($totalUsers -gt $Script:ProgressThreshold) { Show-Progress -Activity "Analyzing Kerberoastable accounts" -Current $currentIndex -Total $totalUsers -ObjectName $user.sAMAccountName }
+                    # If testing enabled, request TGS and add hash as attribute
+                    # Invoke-Kerberoast automatically selects the right method (Windows API vs In-Memory)
+                    if ($canTestKerberoasting) {
+                        Write-Log "[Get-KerberoastableAccounts] Kerberoasting $($user.sAMAccountName)"
+
+                        try {
+                            # Use pipeline input - Invoke-Kerberoast handles method selection automatically
+                            $kerberoastResult = $user | Invoke-Kerberoast @connectionParams
+
+                            if ($kerberoastResult -and $kerberoastResult.Success -and $kerberoastResult.Hash) {
+                                # Add hash info as attributes to the user object. Without
+                                # the guard the label read "Hashcat (mode , DES-CBC-MD5)"
+                                # for an etype the central table has no mode for.
+                                $hashLabel = "Hashcat mode not available for $($kerberoastResult.EncryptionTypeName)"
+                                if ($null -ne $kerberoastResult.HashcatMode) {
+                                    $hashLabel = "Hashcat (mode $($kerberoastResult.HashcatMode), $($kerberoastResult.EncryptionTypeName))"
+                                }
+                                $user | Add-Member -NotePropertyName 'KerberoastingHash' -NotePropertyValue $kerberoastResult.Hash -Force
+                                $user | Add-Member -NotePropertyName 'KerberoastingHashType' -NotePropertyValue $hashLabel -Force
+                                $user | Add-Member -NotePropertyName 'KerberoastEncryption' -NotePropertyValue $kerberoastResult.EncryptionType -Force
+                            }
+                            elseif ($kerberoastResult -and $kerberoastResult.Error) {
+                                # Check if it's a credential/Kerberos issue
+                                if ($kerberoastResult.Error -match 'NetworkCredentials|Kerberos credential|unable to create|No credentials') {
+                                    $user | Add-Member -NotePropertyName 'KerberoastError' -NotePropertyValue "TGS request failed - no valid Kerberos credentials available" -Force
+                                } else {
+                                    $user | Add-Member -NotePropertyName 'KerberoastError' -NotePropertyValue "TGS request failed: $($kerberoastResult.Error)" -Force
+                                }
+                            }
+                        } catch {
+                            $user | Add-Member -NotePropertyName 'KerberoastError' -NotePropertyValue "Error: $($_.Exception.Message)" -Force
+                        }
+                    }
+
+                    # A kerberoastable Domain Admin and a kerberoastable print service are
+                    # not the same finding: cracking the first one ends the engagement.
+                    # Test-IsPrivileged resolves nested membership and caches per SID, so
+                    # the well-known identities cost nothing and the rest cost one query
+                    # each, once.
+                    #
+                    # -IncludeOperators on purpose. An Account Operator can reset the
+                    # password of most accounts in the domain, which makes its own password
+                    # worth as much as a Tier-0 one to whoever cracks it.
+                    $privileged = Test-IsPrivileged -Identity $user -IncludeOperators
+                    if ($privileged -and $privileged.IsPrivileged) {
+                        $privilegedCount++
+                        $user | Add-Member -NotePropertyName 'PrivilegedRoastTarget' `
+                            -NotePropertyValue $privileged.Reason -Force
+                    }
+
+                    # No msDS-SupportedEncryptionTypes at all is what ENCRYPTION_NOT_CONFIGURED
+                    # is about: the KDC falls back to the domain default, and RC4 stays on the
+                    # table for this account's tickets. But an absent attribute produces no
+                    # row, and the converter writes "Not configured" only for a stored 0 - so
+                    # the card never reached the case it describes. Said here, where every
+                    # account has a service principal name.
+                    $encryptionTypes = $user.PSObject.Properties['msDS-SupportedEncryptionTypes']
+                    if (-not $encryptionTypes -or $null -eq $encryptionTypes.Value) {
+                        $user | Add-Member -NotePropertyName 'msDS-SupportedEncryptionTypes' -NotePropertyValue @('Not configured') -Force
+                    }
+
+                    $user | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'Kerberoastable' -Force
+                    Show-Object $user -Class Finding
+
+                    # Blank line between accounts for readability
+                    Show-EmptyLine
+                }
+                if ($totalUsers -gt $Script:ProgressThreshold) { Show-Progress -Activity "Analyzing Kerberoastable accounts" -Completed }
+
+                if ($privilegedCount -gt 0) {
+                    Show-Line "$privilegedCount of them is/are privileged - cracking one of those passwords is a domain compromise" -Class "Finding"
+                }
+
+            } else {
+                Show-Line "No kerberoastable accounts found" -Class "Secure"
+            }
+
+        } catch {
+            Write-Log "[Get-KerberoastableAccounts] Error: $_" -Level Error
+            Show-Line "Error during check - kerberoastable accounts could not be evaluated: $_" -Class Finding
+        }
+    }
+
+    end {
+        Write-Log "[Get-KerberoastableAccounts] Check completed"
+    }
+}

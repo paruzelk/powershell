@@ -1,0 +1,306 @@
+﻿<#
+.SYNOPSIS
+    Parses msDS-KeyCredentialLink binary blob to extract Shadow Credential metadata.
+
+.DESCRIPTION
+    Decodes the KEYCREDENTIALLINK_BLOB structure (LTV format) to extract human-readable
+    information such as DeviceID, KeyCreationTime, KeyUsage, and KeySource.
+
+    The structure is:
+    - Version (4 bytes): 0x00000200 for version 2
+    - Entries: LTV format (Length 2 bytes, Identifier 1 byte, Value variable)
+      per MS-ADTS 2.2.20 - the identifier is one byte, not two
+
+    Entry Types:
+    - 0x0001: KeyID (SHA256 hash of public key)
+    - 0x0002: KeyHash (SHA256 of entries 3-9)
+    - 0x0003: KeyMaterial (BCRYPT_RSAKEY_BLOB)
+    - 0x0004: KeyUsage (1=NGC, 2=FIDO, 7=FEK)
+    - 0x0005: KeySource (0=AD, 1=AzureAD)
+    - 0x0006: DeviceId (GUID)
+    - 0x0007: CustomKeyInformation
+    - 0x0008: KeyApproximateLastLogonTimeStamp (FILETIME)
+    - 0x0009: KeyCreationTime (FILETIME)
+
+.PARAMETER KeyCredentialBytes
+    The raw binary bytes of the KeyCredentialLink blob.
+
+.PARAMETER DNWithBinary
+    The DNWithBinary string format: B:Length:HexData:DN
+
+.PARAMETER Raw
+    If specified, returns the full parsed object with all fields.
+    Default: Returns a compact display string.
+
+.EXAMPLE
+    ConvertFrom-KeyCredentialLink -KeyCredentialBytes $bytes
+    Returns: "a1b2c3d4-1111-2222-3333-444455556666 | created 2024-01-15 10:30 | NGC | AD"
+
+.EXAMPLE
+    ConvertFrom-KeyCredentialLink -DNWithBinary "B:880:0002000001..." -Raw
+    Returns the full PSCustomObject with all parsed fields.
+
+.OUTPUTS
+    String or PSCustomObject depending on -Raw switch.
+
+.NOTES
+    Author: Alexander Sturz (@_61106960_)
+#>
+
+function ConvertFrom-KeyCredentialLink {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$false, ValueFromPipeline=$true)]
+        [byte[]]$KeyCredentialBytes,
+
+        [Parameter(Mandatory=$false)]
+        [string]$DNWithBinary,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$Raw
+    )
+
+    process {
+        try {
+            # Handle DNWithBinary format: B:Length:HexData:DN
+            if ($DNWithBinary) {
+                if ($DNWithBinary -match '^B:(\d+):([0-9A-Fa-f]+)(?::(.+))?$') {
+                    $HexData = $Matches[2]
+                    # Convert hex string to bytes
+                    $KeyCredentialBytes = [byte[]]::new($HexData.Length / 2)
+                    for ($i = 0; $i -lt $HexData.Length; $i += 2) {
+                        $KeyCredentialBytes[$i / 2] = [Convert]::ToByte($HexData.Substring($i, 2), 16)
+                    }
+                } else {
+                    if ($Raw) {
+                        return [PSCustomObject]@{
+                            Success = $false
+                            Error = "Invalid DNWithBinary format"
+                        }
+                    }
+                    return "[Invalid format]"
+                }
+            }
+
+            if (-not $KeyCredentialBytes -or $KeyCredentialBytes.Length -lt 8) {
+                if ($Raw) {
+                    return [PSCustomObject]@{
+                        Success = $false
+                        Error = "Invalid or empty KeyCredentialLink data"
+                    }
+                }
+                return "[Invalid data]"
+            }
+
+            # Parse Version (4 bytes, little-endian)
+            $Version = [BitConverter]::ToUInt32($KeyCredentialBytes, 0)
+            if ($Version -ne 0x00000200) {
+                if ($Raw) {
+                    return [PSCustomObject]@{
+                        Success = $false
+                        Error = "Unknown version: 0x$($Version.ToString('X8'))"
+                        Version = $Version
+                    }
+                }
+                return "[Unknown version: 0x$($Version.ToString('X8'))]"
+            }
+
+            # Initialize result object
+            $Result = [PSCustomObject]@{
+                Success = $true
+                Version = 2
+                KeyID = $null
+                KeyIDHex = $null
+                DeviceID = $null
+                KeyCreationTime = $null
+                KeyLastLogonTime = $null
+                KeyUsage = $null
+                KeyUsageText = $null
+                KeySource = $null
+                KeySourceText = $null
+                KeyMaterialLength = 0
+                CustomKeyInfo = $null
+                RawBytes = $KeyCredentialBytes
+                ByteLength = $KeyCredentialBytes.Length
+            }
+
+            # Parse LTV entries starting at offset 4
+            # MS-ADTS 2.2.19: Each entry is Length (2 bytes) + Identifier (1 byte) + Data (variable)
+            $Offset = 4
+            while ($Offset + 3 -le $KeyCredentialBytes.Length) {
+                # Length (2 bytes, little-endian) - length of Data field only
+                $EntryLength = [BitConverter]::ToUInt16($KeyCredentialBytes, $Offset)
+                $Offset += 2
+
+                # Identifier/Type (1 byte)
+                $EntryType = $KeyCredentialBytes[$Offset]
+                $Offset += 1
+
+                # Check bounds
+                if ($Offset + $EntryLength -gt $KeyCredentialBytes.Length) {
+                    break
+                }
+
+                # Extract entry data
+                # The [byte[]] cast is what makes the entries below work. A range index on
+                # a PowerShell array returns Object[], not byte[], and the .NET methods
+                # that read these entries differ in how they take that: BitConverter
+                # coerces it, the GUID constructor does not. So the DeviceId entry threw,
+                # its catch fell back to a hex string, and every Shadow Credential was
+                # reported with a dash-less, byte-reversed identifier instead of its GUID -
+                # "d4c3b2a1111122223333444455556666" for a device that is actually
+                # a1b2c3d4-1111-2222-3333-444455556666. The display string exists so an
+                # operator can pass that value to -RemoveDeviceID, and the reversed form
+                # matches nothing, so the removal quietly does nothing.
+                # Invoke-ShadowCredentialOperation parses the same structure and already
+                # casts here; this brings the shared helper in line with it.
+                # Array::Copy rather than a range index, and a plain assignment rather than
+                # one out of an if-expression. Both of the shorter forms produce Object[]:
+                # a range index returns Object[] to begin with, and assigning the result of
+                # an if-expression enumerates whatever the branch produced, so even an
+                # explicit [byte[]] cast inside the branch is unrolled again on the way out.
+                $EntryData = New-Object byte[] $EntryLength
+                if ($EntryLength -gt 0) {
+                    [Array]::Copy($KeyCredentialBytes, $Offset, $EntryData, 0, $EntryLength)
+                }
+                $Offset += $EntryLength
+
+                # Parse based on entry type (1 byte identifier per MS-ADTS 2.2.19)
+                switch ($EntryType) {
+                    0x01 {  # KeyID (SHA256 hash of public key)
+                        if ($EntryData.Length -ge 16) {
+                            $Result.KeyIDHex = [BitConverter]::ToString($EntryData).Replace('-', '').ToLower()
+                            $Result.KeyID = $Result.KeyIDHex.Substring(0, 16) + "..."
+                        }
+                    }
+                    0x02 {  # KeyHash (SHA256 of entries 3-9)
+                        # Not displayed, but parsed for completeness
+                    }
+                    0x03 {  # KeyMaterial (BCRYPT_RSAKEY_BLOB)
+                        $Result.KeyMaterialLength = $EntryLength
+                    }
+                    0x04 {  # KeyUsage
+                        if ($EntryData.Length -ge 1) {
+                            $Result.KeyUsage = $EntryData[0]
+                            $Result.KeyUsageText = switch ($EntryData[0]) {
+                                0x01 { "NGC" }
+                                0x02 { "FIDO" }
+                                0x07 { "FEK" }
+                                default { "0x$($EntryData[0].ToString('X2'))" }
+                            }
+                        }
+                    }
+                    0x05 {  # KeySource
+                        if ($EntryData.Length -ge 1) {
+                            $Result.KeySource = $EntryData[0]
+                            $Result.KeySourceText = switch ($EntryData[0]) {
+                                0x00 { "AD" }
+                                0x01 { "AzureAD" }
+                                default { "0x$($EntryData[0].ToString('X2'))" }
+                            }
+                        }
+                    }
+                    0x06 {  # DeviceId (GUID)
+                        if ($EntryData.Length -eq 16) {
+                            try {
+                                # Must use New-Object constructor syntax for byte array to GUID conversion
+                                # [GUID]$EntryData does NOT work - it silently fails
+                                $Result.DeviceID = (New-Object GUID(,$EntryData)).ToString()
+                            } catch {
+                                $Result.DeviceID = [BitConverter]::ToString($EntryData).Replace('-', '').ToLower()
+                            }
+                        }
+                    }
+                    0x07 {  # CustomKeyInformation
+                        $Result.CustomKeyInfo = [BitConverter]::ToString($EntryData).Replace('-', '').ToLower()
+                    }
+                    0x08 {  # KeyApproximateLastLogonTimeStamp (FILETIME)
+                        if ($EntryData.Length -eq 8) {
+                            try {
+                                $FileTime = [BitConverter]::ToInt64($EntryData, 0)
+                                if ($FileTime -gt 0) {
+                                    $Result.KeyLastLogonTime = [DateTime]::FromFileTimeUtc($FileTime)
+                                }
+                            } catch { }
+                        }
+                    }
+                    0x09 {  # KeyCreationTime (FILETIME)
+                        if ($EntryData.Length -eq 8) {
+                            try {
+                                $FileTime = [BitConverter]::ToInt64($EntryData, 0)
+                                if ($FileTime -gt 0) {
+                                    $Result.KeyCreationTime = [DateTime]::FromFileTimeUtc($FileTime)
+                                }
+                            } catch { }
+                        }
+                    }
+                }
+            }
+
+            # Return based on mode
+            if ($Raw) {
+                return $Result
+            }
+
+            # Build compact display string, one line per key credential:
+            #
+            #   <DeviceID> | created <ts> [| <usage>] [| <source>]
+            #
+            # The DeviceID is unlabelled and never truncated - a GUID at the start of the
+            # line needs no caption, and the full value is what -RemoveDeviceID takes.
+            # When the blob carries no DeviceId entry the KeyID stands in, so the line
+            # still names something instead of falling through to the byte count.
+            #
+            # No "used" field. KeyApproximateLastLogonTimeStamp (entry 0x08) is still parsed
+            # and -Raw exposes it, but it is deliberately not shown. Per MS-KPP the field is
+            # written by the provisioning server at key CREATION, and no Microsoft spec
+            # defines writing it back on each logon: a freshly provisioned key reads equal to
+            # its creation time, and an attacker authenticating with a planted key never
+            # updates it at all. "used never" therefore asserted a non-use the data cannot
+            # support. Authoritative use evidence lives on the KDC (event 4768 / PKINIT), not
+            # in the blob - see the finding tooltip.
+            #
+            # Usage and Source are always spelled out when the blob carries them. NGC/AD is
+            # the common case, but on a domain that runs neither Windows Hello nor Entra,
+            # stating it - and letting an AzureAD source stand out against it - is exactly
+            # the triage signal the operator is after.
+            $Parts = @()
+
+            if ($Result.DeviceID) {
+                $Parts += [string]$Result.DeviceID
+            }
+            elseif ($Result.KeyID) {
+                $Parts += "KeyID $($Result.KeyID)"
+            }
+
+            if ($Result.KeyCreationTime) {
+                $Parts += "created $(Format-adPEASDate $Result.KeyCreationTime 'yyyy-MM-dd HH:mm')"
+            }
+
+            # Nothing identifying and no creation time - the blob is too sparse to name a
+            # key, so fall back to the byte count.
+            if ($Parts.Count -eq 0) {
+                return "KeyCredential ($($KeyCredentialBytes.Length) bytes)"
+            }
+
+            if ($Result.KeyUsageText) {
+                $Parts += [string]$Result.KeyUsageText
+            }
+
+            if ($Result.KeySourceText) {
+                $Parts += [string]$Result.KeySourceText
+            }
+
+            return $Parts -join " | "
+
+        } catch {
+            if ($Raw) {
+                return [PSCustomObject]@{
+                    Success = $false
+                    Error = $_.Exception.Message
+                }
+            }
+            return "[Parse error: $($_.Exception.Message)]"
+        }
+    }
+}
