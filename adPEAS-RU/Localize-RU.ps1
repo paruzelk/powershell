@@ -180,3 +180,6 @@ if(-not $?){throw 'Ошибка перевода названий карточе
 
 & (Join-Path $PSScriptRoot 'Localization/Apply-TopActions.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации приоритетных действий'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-ReportNavigation.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка перевода навигации HTML'}
