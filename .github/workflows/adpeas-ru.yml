@@ -38,6 +38,7 @@ jobs:
           .\adPEAS-RU\Tests\Test-Import.ps1
           .\adPEAS-RU\Tests\Test-RunnerOffline.ps1
           .\adPEAS-RU\Tests\Test-RussianReportCards.ps1
+          .\adPEAS-RU\Tests\Test-RussianReportHelp.ps1
       - name: JavaScript template syntax check
         shell: pwsh
         run: |
