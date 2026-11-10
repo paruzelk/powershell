@@ -47,7 +47,7 @@ if($Server){$conn.Server=$Server}
 if($Credential){[void]$conn.Remove('UseWindowsAuth');$conn.Credential=$Credential}
 $connected=$false
 try{
- $session=Connect-adPEAS @conn
+ $session=Connect-adPEAS @conn -Quiet
  if(-not $session){throw 'Соединение с Active Directory не установлено.'}
  $connected=$true
  $scan=@{Outputfile=$basename;Format=$Format;OPSEC=[bool]$OPSEC}
