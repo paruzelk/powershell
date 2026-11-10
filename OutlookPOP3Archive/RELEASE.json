@@ -61,8 +61,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 119,
-    "ExpectedPesterTests": 3512,
+    "ExpectedTestContainers": 120,
+    "ExpectedPesterTests": 3546,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -568,6 +568,20 @@
     "BW4k7v2a5OriginalCreatePilotRetried": false,
     "BW4k7v2a5OriginalMovePilotExecuted": false,
     "BW4k7v2a5OriginalEvidenceRewritten": false,
-    "BW4k7v2a5ProductionWorkerEnabled": false
+    "BW4k7v2a5ProductionWorkerEnabled": false,
+    "BW4k7v2a6ActualOperatorBodyMismatchCaptured": true,
+    "BW4k7v2a6OriginalFailedSuiteIdAndIntentShaPinned": true,
+    "BW4k7v2a6ReadOnlySyntheticBodyFingerprintOnly": true,
+    "BW4k7v2a6OnlyExactOriginalDraftSubjectRead": true,
+    "BW4k7v2a6TwoBodyReadbacksCompared": true,
+    "BW4k7v2a6NoRawBodyOrSignatureReported": true,
+    "BW4k7v2a6AnyBodyMismatchBlocksMove": true,
+    "BW4k7v2a6OriginalSaveGateProven": false,
+    "BW4k7v2a6LiveOutlookTestedInCI": false,
+    "BW4k7v2a6OriginalPilotRetried": false,
+    "BW4k7v2a6OldMailMovedOrSaved": false,
+    "BW4k7v2a6OriginalEvidenceRewritten": false,
+    "BW4k7v2a6SEM001WaiverGranted": false,
+    "BW4k7v2a6ProductionWriterEnabled": false
   }
 }
