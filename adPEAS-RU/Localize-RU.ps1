@@ -168,3 +168,6 @@ if(-not $?){throw 'Ошибка локализации подсказок HTML'}
 
 & (Join-Path $PSScriptRoot 'Localization/Apply-CheckHeaders.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации заголовков модулей'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-CheckLines.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации сообщений проверок'}
