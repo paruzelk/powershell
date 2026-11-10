@@ -61,8 +61,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 117,
-    "ExpectedPesterTests": 3443,
+    "ExpectedTestContainers": 118,
+    "ExpectedPesterTests": 3480,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -545,6 +545,18 @@
     "BW4k7v2a3NewPstCreatedOrAttached": false,
     "BW4k7v2a3OutlookMailWrittenOrMoved": false,
     "BW4k7v2a3OtherFoldersOrMessageBodiesRead": false,
-    "BW4k7v2a3ProductionWorkerEnabled": false
+    "BW4k7v2a3ProductionWorkerEnabled": false,
+    "BW4k7v2a4OriginalFailedSuiteIdPreserved": true,
+    "BW4k7v2a4NewSyntheticDraftExplicitWriteConsent": true,
+    "BW4k7v2a4OnlyNewUnicodeDisposablePstTarget": true,
+    "BW4k7v2a4OriginalPop3SourceNeverUsedForPilot": true,
+    "BW4k7v2a4DurableClaimBeforeExactlyOneComMove": true,
+    "BW4k7v2a4PostRestartIndependentSourceZeroDestinationOne": true,
+    "BW4k7v2a4SEM001UnknownMapiFlagsStillManualReview": true,
+    "BW4k7v2a4RealOutlookProviderTestExecutedInCI": false,
+    "BW4k7v2a4HistoricalOldFixtureRetried": false,
+    "BW4k7v2a4ProductionWriterEnabled": false,
+    "BW4k7v2a4AutomaticMoveRetryAllowed": false,
+    "BW4k7v2a4OperatorLiveMoveCompleted": false
   }
 }
