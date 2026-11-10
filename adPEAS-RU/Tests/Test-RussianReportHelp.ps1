@@ -64,7 +64,7 @@ Assert-RU ($help.Contains('class="shortcut-grid"')) 'Разметка горяч
 Assert-RU ($export.Contains('Этот отчёт сформирован инструментом, для использования которого в консалтинге или при оказании управляемых услуг требуется действующая коммерческая лицензия.')) 'Юридическое предупреждение переведено корректно'
 Assert-RU ($export.Contains('This report was generated using a tool that requires a valid commercial license for consulting or managed service use.')) 'Оригинальный юридический текст сохранён в коде сопоставления'
 Assert-RU ($export.Contains('$disclaimerForDisplay = [string]$disclaimer')) 'Отображаемый текст отдельно от оригинала'
-Assert-RU ($export.Contains("Replace('{{DISCLAIMER}}', [string](ConvertTo-HtmlEncode "+'$disclaimerForDisplay'+" ))") -eq $false) 'Подстановка лицензии экранирует HTML и сохраняет шаблон'
+Assert-RU ($export.Contains('$html = $html.Replace(''{{DISCLAIMER}}'', [string](ConvertTo-HtmlEncode $disclaimerForDisplay))')) 'Подстановка лицензии экранирует HTML и сохраняет шаблон'
 Assert-RU (Test-Path -LiteralPath $license -PathType Leaf) 'Оригинальная лицензия присутствует в проекте'
 Assert-RU ($main.Contains('adPEASDisclaimer')) 'Исходный механизм юридического предупреждения сохранён'
 Write-Host "PASS: $checks проверок справки и уведомления о лицензии; AD не затронут" -ForegroundColor Green
