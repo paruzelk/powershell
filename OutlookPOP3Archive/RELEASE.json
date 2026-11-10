@@ -61,8 +61,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 118,
-    "ExpectedPesterTests": 3480,
+    "ExpectedTestContainers": 119,
+    "ExpectedPesterTests": 3512,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -557,6 +557,17 @@
     "BW4k7v2a4HistoricalOldFixtureRetried": false,
     "BW4k7v2a4ProductionWriterEnabled": false,
     "BW4k7v2a4AutomaticMoveRetryAllowed": false,
-    "BW4k7v2a4OperatorLiveMoveCompleted": false
+    "BW4k7v2a4OperatorLiveMoveCompleted": false,
+    "BW4k7v2a5ActualCreatePilotFailureAfterSaveObserved": true,
+    "BW4k7v2a5ExactOriginalFailedSuiteIdPreserved": true,
+    "BW4k7v2a5OriginalIntentOnlyReadNotRewritten": true,
+    "BW4k7v2a5OnlyOriginalDefaultDraftsAndTestPstFixtureRead": true,
+    "BW4k7v2a5NumericRestrictAndManualSubjectCountsSeparated": true,
+    "BW4k7v2a5HistoricalFailedPredicateProven": false,
+    "BW4k7v2a5AnyOutlookWriterExecutedInCI": false,
+    "BW4k7v2a5OriginalCreatePilotRetried": false,
+    "BW4k7v2a5OriginalMovePilotExecuted": false,
+    "BW4k7v2a5OriginalEvidenceRewritten": false,
+    "BW4k7v2a5ProductionWorkerEnabled": false
   }
 }
