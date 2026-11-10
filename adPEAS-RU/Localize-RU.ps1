@@ -108,7 +108,7 @@ $json=@'
     "Score Breakdown": "Расчёт оценки риска",
     "No risk score (informational)": "Оценка риска не предусмотрена",
     "Base Score": "Базовая оценка",
-    "Exploitability": "Возможность эксплуатации",
+    "<span class=\"score-tooltip-label\">Exploitability": "<span class=\"score-tooltip-label\">Возможность эксплуатации",
     " critical findings total": " критических нарушений всего",
     " affected</span>": " затронуто</span>",
     "<span>&#9660;</span> Collapse All": "<span>&#9660;</span> Свернуть всё",
