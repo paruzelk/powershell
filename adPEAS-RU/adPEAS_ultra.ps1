@@ -21935,8 +21935,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Domain Information"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Domain Information"
-	    Summary = "Gathers basic information about the Active Directory domain."
+	    SectionTitle = "Сведения о домене"
+	    Summary = "Общие сведения о домене Active Directory, лесу, SID и функциональных уровнях."
 	    WhyItMatters = "Understanding the domain structure, functional levels, and key configurations provides the foundation for all security assessments. Old functional levels may indicate legacy systems with known vulnerabilities."
 	    WhatWeCheck = @(
 	        "Domain and forest names, SIDs, and functional levels"
@@ -21950,8 +21950,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Kerberos Policy"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Kerberos Policy"
-	    Summary = "Reviews Kerberos ticket lifetime and password policies."
+	    SectionTitle = "Политика Kerberos"
+	    Summary = "Параметры времени действия билетов Kerberos и политики для учётной записи krbtgt."
 	    WhyItMatters = "Kerberos policies control ticket lifetimes and the krbtgt password age. Long-lived tickets or old krbtgt passwords increase the window for Golden Ticket attacks."
 	    WhatWeCheck = @(
 	        "TGT maximum lifetime (should be 10 hours or less)"
@@ -21966,8 +21966,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Guest Account Status"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Guest Account Status"
-	    Summary = "Checks if the built-in Guest account (RID 501) is enabled and reviews group memberships."
+	    SectionTitle = "Состояние учётной записи «Гость»"
+	    Summary = "Проверка встроенной учётной записи «Гость» (RID 501) и её членства в группах."
 	    WhyItMatters = "The Guest account allows anonymous access with minimal authentication. An enabled Guest account, especially with privileged group memberships, poses a significant security risk."
 	    WhatWeCheck = @(
 	        "Guest account enabled/disabled status"
@@ -21979,8 +21979,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Domain Controllers"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Domain Controllers and FSMO Roles"
-	    Summary = "Lists the Domain Controllers of the domain and the FSMO roles each of them holds."
+	    SectionTitle = "Контроллеры домена и роли FSMO"
+	    Summary = "Список контроллеров домена и распределение ролей FSMO."
 	    WhyItMatters = "Domain Controllers are Tier-0 assets containing all domain secrets. Understanding the DC infrastructure helps identify critical assets requiring maximum protection."
 	    WhatWeCheck = @(
 	        "All computers with the DC role"
@@ -21991,8 +21991,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Sites and Subnets: {Name}"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Sites and Subnets"
-	    Summary = "Maps AD Sites with associated IP subnets and Domain Controllers."
+	    SectionTitle = "Сайты и подсети Active Directory"
+	    Summary = "Сопоставление сайтов AD, IP-подсетей и контроллеров домена."
 	    WhyItMatters = "Sites and subnets control DC selection for authentication. Misconfigured subnets can cause clients to authenticate to DCs across WAN links, enabling interception. Knowing which DCs serve which site helps identify lateral movement paths."
 	    WhatWeCheck = @(
 	        "All configured AD sites"
@@ -22004,8 +22004,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Password Policy"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Domain Password Policy"
-	    Summary = "Reviews the domain's default password policy settings."
+	    SectionTitle = "Доменная политика паролей"
+	    Summary = "Проверка параметров парольной политики домена по умолчанию."
 	    WhyItMatters = "Weak password policies allow users to set easily guessable passwords, making the domain vulnerable to password spraying and brute force attacks."
 	    WhatWeCheck = @(
 	        "Minimum password length and complexity requirements"
@@ -22019,8 +22019,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Fine-Grained Password Policy: {Name}"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Fine-Grained Password Policies"
-	    Summary = "Identifies Fine-Grained Password Policies that override the default domain policy."
+	    SectionTitle = "Тонкие политики паролей (FGPP)"
+	    Summary = "Анализ тонких политик паролей, переопределяющих доменную политику."
 	    WhyItMatters = "FGPPs allow different password requirements for different user groups. Misconfigured FGPPs may allow weaker passwords for certain accounts, including privileged ones."
 	    WhatWeCheck = @(
 	        "Existing Password Settings Objects (PSOs)"
@@ -22036,8 +22036,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Domain Trust: {Name}"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Domain Trusts"
-	    Summary = "Discovers trust relationships with other domains or forests."
+	    SectionTitle = "Доверительные отношения домена"
+	    Summary = "Проверка доверительных отношений с доменами и лесами."
 	    WhyItMatters = "Trust relationships extend the security boundary. Misconfigured trusts can allow attackers in one domain to compromise another. SID filtering and selective authentication are critical controls."
 	    WhatWeCheck = @(
 	        "All inbound, outbound, and bidirectional trusts"
@@ -22054,8 +22054,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Readable Shares: {Name}"
 	    Module = "Shares"
 	    Category = "Shares"
-	    SectionTitle = "Readable Shares"
-	    Summary = "Lists the shares of the domain's computers that this account can read."
+	    SectionTitle = "Доступные для чтения общие ресурсы"
+	    Summary = "Общие папки компьютеров домена, к которым текущая учётная запись имеет доступ на чтение."
 	    WhyItMatters = "File servers, deployment shares and the shares administrators make for themselves are where scripts and configuration files with credentials end up, and unlike SYSVOL no one reviews who may read them. A share this account can read is a share every account with the same rights can read."
 	    WhatWeCheck = @(
 	        "Enabled Windows computers with a logon in the last 30 days (-ActiveDays), by DNS name - only a name below the domain's own, since the computer account may write dNSHostName itself"
@@ -22076,8 +22076,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Credential on a Share: {Context}"
 	    Module = "Shares"
 	    Category = "Shares"
-	    SectionTitle = "Credentials on Shares"
-	    Summary = "Searches the readable shares for credentials in scripts and configuration files."
+	    SectionTitle = "Учётные данные в общих папках"
+	    Summary = "Поиск учётных данных в доступных скриптах и конфигурационных файлах."
 	    WhyItMatters = "A password in a script or a configuration file on a share is readable by everyone who can read the share - often far more people than the account it belongs to was meant for, and unlike a password in a vault it is never rotated by anyone who knows it is there."
 	    WhatWeCheck = @(
 	        "The files of every readable share, walked breadth-first under limits of depth, files, time and size - the files that carry credentials sit near the top of a share"
@@ -22091,8 +22091,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Network Subnet: {Name}"
 	    Module = "Computer"
 	    Category = "Computers"
-	    SectionTitle = "Network Map"
-	    Summary = "Maps the /24 subnets the active computers of the domain are in, with the OUs they sit in."
+	    SectionTitle = "Карта сети"
+	    Summary = "Анализ IP-подсетей активных компьютеров домена и их организационных единиц."
 	    WhyItMatters = "Which networks hold which systems is the first question of an internal assessment, and scanning for the answer is slow and loud. The domain already knows it: every active computer has a DNS name and an address, and the OU it sits in usually says what it is - workstations, servers, a site. The subnet of the domain controllers is the Tier-0 network."
 	    WhatWeCheck = @(
 	        "Enabled computers with a logon in the last 30 days, by lastLogonTimestamp (-ActiveDays). The attribute is replicated with a delay of 9 to 14 days by default, so a shorter window misses computers in use"
@@ -22109,8 +22109,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Open Ports: {Name}"
 	    Module = "Computer"
 	    Category = "Computers"
-	    SectionTitle = "Open Ports"
-	    Summary = "Lists the open TCP ports of the scanned addresses (Invoke-PortScan)."
+	    SectionTitle = "Открытые сетевые порты"
+	    Summary = "Список открытых TCP-портов просканированных адресов."
 	    WhyItMatters = "Which services a host can be reached on decides what can be done with it next: SMB for shares and relaying, RPC, RDP and WinRM for remote execution, LDAPS for certificate logons, databases and web consoles for credentials of their own. Finding out by hand with Test-NetConnection costs one timeout per closed port."
 	    WhatWeCheck = @(
 	        "A TCP connect scan: a port is open when a connection to it completes. Nothing is sent over it. Refused and filtered are not told apart - Windows answers a refused connection only after retrying it for about a second"
@@ -22125,8 +22125,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "LDAP Configuration GPO: {Name}"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "LDAP Signing Configuration"
-	    Summary = "Checks if LDAP signing and channel binding are configured via GPO."
+	    SectionTitle = "Настройки подписи LDAP в GPO"
+	    Summary = "Проверка подписи LDAP и привязки канала TLS по объектам групповой политики."
 	    WhyItMatters = "Without LDAP signing and channel binding, attackers can perform NTLM relay attacks against LDAP services, potentially adding users to groups or modifying AD objects."
 	    WhatWeCheck = @(
 	        "LDAP server signing requirements on Domain Controllers"
@@ -22140,8 +22140,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Null Session GPO: {Name}"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Null Session Configuration"
-	    Summary = "Checks which GPOs set the null session controls for anonymous SAM enumeration and anonymous SID/name translation."
+	    SectionTitle = "Параметры анонимного доступа в GPO"
+	    Summary = "Анализ настроек анонимного перечисления SAM и сопоставления SID с именами."
 	    WhyItMatters = "A null session is an anonymous connection over SMB. Where anonymous enumeration of SAM accounts and shares is allowed, it lists the accounts and shares of the machine; where anonymous SID/name translation is allowed, it turns SIDs into account names and back. On a domain controller that is the account list of the domain, without a password."
 	    WhatWeCheck = @(
 	        "anonymousSamEnumeration - RestrictAnonymous, 'Network access: Do not allow anonymous enumeration of SAM accounts and shares': Allowed at 0"
@@ -22155,8 +22155,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Directory Service Heuristics"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Directory Service Heuristics"
-	    Summary = "Reads the characters of dsHeuristics that switch a protection off for the whole forest."
+	    SectionTitle = "Параметры dsHeuristics"
+	    Summary = "Проверка параметров службы каталогов, которые могут ослаблять защиту леса AD."
 	    WhyItMatters = "dsHeuristics is one string on CN=Directory Service in the configuration partition, and each of its characters changes how every domain controller of the forest behaves. Four of them switch a protection off: anonymous LDAP operations, anonymous calls to the NSPI address book, AdminSDHolder protection of the operator groups, and the uniqueness checks on UPN and SPN values. None of them is on by default, and no GPO governs them."
 	    WhatWeCheck = @(
 	        "anonymousLDAPAccess - character 7 (fLDAPBlockAnonOps): anonymous LDAP operations beyond rootDSE, allowed at 2"
@@ -22171,8 +22171,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SMB Signing GPO: {Name}"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "SMB Signing Configuration"
-	    Summary = "Checks if SMB signing is required on domain systems."
+	    SectionTitle = "Настройки подписи SMB"
+	    Summary = "Проверка требования цифровой подписи SMB на компьютерах домена."
 	    WhyItMatters = "Without SMB signing, attackers can intercept and relay SMB authentication, gaining unauthorized access to file shares and enabling remote code execution on target systems."
 	    WhatWeCheck = @(
 	        "SMB server signing requirements"
@@ -22187,8 +22187,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "In force on the domain controllers"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "LDAP Signing Configuration"
-	    Summary = "The LDAP security values in force on the domain controllers, each taken from the highest-ranked policy that sets it."
+	    SectionTitle = "Действующие настройки LDAP"
+	    Summary = "Определение фактически применённых настроек подписи LDAP и привязки канала."
 	    WhyItMatters = "Group Policy precedence is per setting: a policy that leaves a value unset does not override another policy's value for it. What the domain controllers enforce is therefore assembled from several policies, and reading one policy alone gives the wrong answer."
 	    WhatWeCheck = @(
 	        "Every policy linked to the Domain Controllers OU or the domain root"
@@ -22202,8 +22202,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "In force on the domain controllers"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "Null Session Configuration"
-	    Summary = "The two null session values in force on the domain controllers, each taken from the highest-ranked policy that sets it."
+	    SectionTitle = "Действующие параметры анонимного доступа"
+	    Summary = "Определение действующих ограничений анонимных сеансов."
 	    WhyItMatters = "Group Policy precedence is per setting: a policy that leaves a value unset does not override another policy's value for it. What the domain controllers enforce is therefore assembled from several policies, and reading one policy alone gives the wrong answer."
 	    WhatWeCheck = @(
 	        "Every policy linked to the Domain Controllers OU or the domain root"
@@ -22218,8 +22218,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "In force on the domain controllers"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "SMB Signing Configuration"
-	    Summary = "The SMB signing values in force on the domain controllers, each taken from the highest-ranked policy that sets it."
+	    SectionTitle = "Действующие настройки подписи SMB"
+	    Summary = "Определение фактических требований подписи SMB."
 	    WhyItMatters = "Group Policy precedence is per setting: a policy that leaves a value unset does not override another policy's value for it. What the domain controllers enforce is therefore assembled from several policies, and reading one policy alone gives the wrong answer."
 	    WhatWeCheck = @(
 	        "Every policy linked to the Domain Controllers OU or the domain root"
@@ -22233,8 +22233,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "In force on member servers and clients"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "SMB Signing Configuration"
-	    Summary = "The SMB signing values in force on member servers and clients when every signing policy is linked to the Domain Controllers OU only."
+	    SectionTitle = "Подпись SMB: затронутые компьютеры"
+	    Summary = "Перечень компьютеров, на которые распространяется политика подписи SMB."
 	    WhyItMatters = "A policy that requires signing on the domain controllers protects connections to the domain controllers. Member servers and clients then sign as their Windows version does by default: before Windows Server 2025 a server enables signing without requiring it, which is the state an SMB relay needs."
 	    WhatWeCheck = @(
 	        "Whether any linked and enabled policy outside the Domain Controllers OU sets SMB signing"
@@ -22247,8 +22247,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SMB Signing Weakened: {Name}"
 	    Module = "Domain"
 	    Category = "Domain"
-	    SectionTitle = "SMB Signing Configuration"
-	    Summary = "A linked and enabled policy that sets SMB server signing to Disabled or Optional, or client signing to Disabled."
+	    SectionTitle = "Ослабление защиты SMB"
+	    Summary = "Выявление настроек, снижающих требования цифровой подписи SMB."
 	    WhyItMatters = "A policy linked to an OU applies to the computers in it ahead of a domain-wide policy, unless the domain-wide link is enforced. Server signing that is not required on those computers lets an attacker relay an NTLM authentication to their SMB service - whatever the domain-wide policy and the domain controllers require."
 	    WhatWeCheck = @(
 	        "ServerSigning: Disabled or Optional - the server does not require signing"
@@ -22262,8 +22262,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Domain Controller: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "Domain Controllers"
-	    Summary = "Enumerates all Domain Controllers in the domain."
+	    SectionTitle = "Контроллеры домена"
+	    Summary = "Перечень контроллеров домена и их основные параметры."
 	    WhyItMatters = "Domain Controllers are the highest-value targets. Understanding the DC infrastructure helps identify Tier 0 assets that require maximum protection."
 	    WhatWeCheck = @(
 	        "All computers with the DC role"
@@ -22277,8 +22277,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Server: {Name}{Context}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "Exchange Servers"
-	    Summary = "Discovers Microsoft Exchange infrastructure with detailed analysis."
+	    SectionTitle = "Серверы Exchange"
+	    Summary = "Инвентаризация серверов Microsoft Exchange и их настроек."
 	    WhyItMatters = "Exchange servers often have dangerous AD permissions and are frequently targeted. Vulnerabilities like ProxyLogon/ProxyShell have enabled widespread compromises."
 	    WhatWeCheck = @(
 	        "Exchange servers and their versions"
@@ -22292,8 +22292,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Server: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "Exchange Servers (Basic)"
-	    Summary = "Identifies Microsoft Exchange servers from the Configuration partition."
+	    SectionTitle = "Серверы Exchange: основные сведения"
+	    Summary = "Базовая инвентаризация серверов Microsoft Exchange."
 	    WhyItMatters = "Exchange servers have significant AD privileges and are high-value targets. The build number decides whether the server still receives security updates, and ProxyLogon and ProxyShell show what an unpatched one is worth."
 	    WhatWeCheck = @(
 	        "msExchExchangeServer objects under CN=Services in the Configuration partition, which is Exchange's own record of its servers"
@@ -22305,8 +22305,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Organization: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "Exchange Organization"
-	    Summary = "Exchange Organization overview from the Configuration partition (forest-wide)."
+	    SectionTitle = "Организация Exchange"
+	    Summary = "Анализ объектов организации Microsoft Exchange в Active Directory."
 	    WhyItMatters = "The Configuration partition is replicated to every domain controller of the forest, so the Exchange organization can be read from any of its domains, a child domain included - as far as the account may read it. Measured against Exchange SE, a domain user sees the organization and its servers, but not its accepted domains, connectors or virtual directories."
 	    WhatWeCheck = @(
 	        "Exchange Organization name"
@@ -22319,8 +22319,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Server: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "Exchange Server (Config Partition)"
-	    Summary = "Exchange server details from the Configuration partition (forest-wide, visible from any domain)."
+	    SectionTitle = "Сервер Exchange в разделе Configuration"
+	    Summary = "Параметры серверов Exchange в разделе конфигурации AD."
 	    WhyItMatters = "The Configuration partition provides Exchange server details visible from any domain in the forest. This includes virtual directories, SMTP connectors and listening ports that reveal the server's attack surface."
 	    WhatWeCheck = @(
 	        "Server FQDN, Exchange version and hosting domain"
@@ -22332,8 +22332,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Hybrid: {Name}"
 	    Module = "Application"
 	    Category = "Exchange"
-	    SectionTitle = "Exchange Hybrid Deployment"
-	    Summary = "Detects whether the Exchange organization is in a hybrid relationship with Exchange Online."
+	    SectionTitle = "Гибридное развёртывание Exchange"
+	    Summary = "Проверка конфигурации гибридного взаимодействия Exchange с облачными сервисами."
 	    WhyItMatters = "A hybrid organization shares one service principal between the on-premises servers and the cloud tenant, and that shared trust is an escalation path: administrative access to an on-premises Exchange server reaches Exchange Online through it, without the trace a cloud-side administrative action would leave. It also changes what an on-premises Exchange finding is worth - the blast radius of every other Exchange issue in this report now includes the tenant. Whether the dedicated hybrid application has been deployed cannot be read from Active Directory, so what is reported is the exposure, not the patch state."
 	    WhatWeCheck = @(
 	        "msExchCoexistenceRelationship objects in the Configuration partition, which the Hybrid Configuration Wizard creates"
@@ -22345,8 +22345,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Receive Connector: {Name}"
 	    Module = "Application"
 	    Category = "Exchange"
-	    SectionTitle = "Exchange SMTP Receive Connectors"
-	    Summary = "Judges each SMTP receive connector by the rights its security descriptor grants to unauthenticated senders."
+	    SectionTitle = "Принимающие SMTP-соединители Exchange"
+	    Summary = "Проверка принимающих соединителей SMTP и параметров аутентификации."
 	    WhyItMatters = "A receive connector's own DACL decides what an SMTP session that presented no credential may do. Granting ms-Exch-SMTP-Accept-Any-Recipient to ANONYMOUS LOGON makes the server relay to any domain; granting the accept-sender rights lets an anonymous sender put an internal address in the From header, which is a phishing campaign that passes SPF, DKIM and every mail-client trust indicator at once. Both are ordinary application-relay configurations that were scoped too widely, and both are invisible from the connector's name."
 	    WhatWeCheck = @(
 	        "ms-Exch-SMTP-* extended rights granted to Anonymous Logon and Everyone"
@@ -22359,8 +22359,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Permissions Model: {Name}"
 	    Module = "Application"
 	    Category = "Exchange"
-	    SectionTitle = "Exchange Permissions Model"
-	    Summary = "Reports whether an Exchange group holds WriteDACL on the domain object - the escalation half of PrivExchange."
+	    SectionTitle = "Модель разрешений Exchange"
+	    Summary = "Анализ модели разрешений Exchange и связанных прав в Active Directory."
 	    WhyItMatters = "WriteDACL on the domain object means being able to rewrite the domain's own access control list - and an entry granting DS-Replication-Get-Changes and -All is DCSync, every password hash in the domain. In the shared permissions model Exchange setup grants that right to an Exchange group, which is what makes the group's membership worth anything to an attacker. The ACE is not immovable: Microsoft documents narrowing it with the inherit-only flag so it no longer applies to the domain object, and preparing the forest with /ActiveDirectorySplitPermissions removes the Exchange Windows Permissions entries from it entirely. The generic ACL check classifies every Exchange group as an expected trustee and hides it unless -IncludePrivileged is set, on the grounds that Exchange permissions are by design - for this one entry that is not true, which is why the distinction is made here instead. Read the two ACE rows together: the effective one is what the verdict rests on, and the inherit-only ones are listed so a reader can see that the same group's other grants stop at child objects rather than reaching the domain."
 	    WhatWeCheck = @(
 	        "WriteDACL, WriteOwner and GenericAll entries on the domain object held by Exchange groups"
@@ -22373,8 +22373,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Role Assignment: {Name}"
 	    Module = "Application"
 	    Category = "Exchange"
-	    SectionTitle = "Exchange Management Role Assignments"
-	    Summary = "Reports who holds the Exchange roles that reach mailbox content or allow self-escalation inside Exchange."
+	    SectionTitle = "Назначения ролей управления Exchange"
+	    Summary = "Проверка назначений ролей RBAC в Exchange."
 	    WhyItMatters = "Exchange RBAC assignments live in the Configuration partition and any domain user can read them. Checking the Organization Management group is not enough, because a role can be assigned directly to one user and that assignment appears in no group membership at all. ApplicationImpersonation lets its holder act as every mailbox in the organization over EWS; Mailbox Import Export exports any mailbox to a file; Role Management lets its holder assign itself the other two. Exchange ships some of these assigned to a role group and others assigned to nobody, so an assignment that is not the shipped one was made deliberately."
 	    WhatWeCheck = @(
 	        "msExchRoleAssignment objects linking a role to a principal"
@@ -22387,8 +22387,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "MSSQL Server: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SQL Servers"
-	    Summary = "Identifies Microsoft SQL Server instances via SPN discovery."
+	    SectionTitle = "Серверы Microsoft SQL Server"
+	    Summary = "Инвентаризация серверов SQL Server и связанных служебных учётных записей."
 	    WhyItMatters = "SQL Servers often contain sensitive data and may have linked servers or xp_cmdshell enabled. They're common targets for lateral movement and data exfiltration."
 	    WhatWeCheck = @(
 	        "MSSQLSvc Service Principal Names"
@@ -22400,8 +22400,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SCCM Server: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SCCM Infrastructure"
-	    Summary = "Discovers System Center Configuration Manager infrastructure."
+	    SectionTitle = "Инфраструктура Configuration Manager (SCCM)"
+	    Summary = "Проверка инфраструктуры Microsoft Configuration Manager."
 	    WhyItMatters = "SCCM enables code execution on all managed clients. Compromising SCCM infrastructure provides domain-wide access, making it a Tier 0 asset."
 	    WhatWeCheck = @(
 	        "SCCM site servers and management points"
@@ -22414,8 +22414,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SCCM Server: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SCCM Servers (Basic)"
-	    Summary = "Identifies SCCM/ConfigMgr servers via SPN discovery."
+	    SectionTitle = "Серверы SCCM: основные сведения"
+	    Summary = "Базовая инвентаризация серверов Microsoft Configuration Manager."
 	    WhyItMatters = "SCCM servers are Tier-0 assets. Basic detection via SMS/CCM Service Principal Names."
 	    WhatWeCheck = @(
 	        "Computers with SMS* or CCM* SPNs"
@@ -22425,8 +22425,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SCCM Service Account: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SCCM Service Accounts"
-	    Summary = "Identifies service accounts used by SCCM infrastructure."
+	    SectionTitle = "Служебные учётные записи SCCM"
+	    Summary = "Проверка учётных записей служб Configuration Manager."
 	    WhyItMatters = "SCCM service accounts often have elevated privileges across managed systems."
 	    WhatWeCheck = @(
 	        "Service accounts with SCCM-related attributes"
@@ -22437,8 +22437,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SCCM Group: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SCCM Groups"
-	    Summary = "Identifies security groups used by SCCM."
+	    SectionTitle = "Группы SCCM"
+	    Summary = "Анализ групп и их участников в инфраструктуре Configuration Manager."
 	    WhyItMatters = "SCCM groups may grant elevated access to SCCM infrastructure."
 	    WhatWeCheck = @(
 	        "Groups with SCCM-related names or attributes"
@@ -22451,8 +22451,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "System Management Container Write Access: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "System Management Container Permissions"
-	    Summary = "Identifies principals that can write to the container Configuration Manager publishes its management points in."
+	    SectionTitle = "Разрешения контейнера System Management"
+	    Summary = "Проверка прав доступа к контейнеру System Management в Active Directory."
 	    WhyItMatters = "A client configured for Active Directory site discovery takes its management point from CN=System Management. Whoever can write there can publish one of their own, and every client that picks it up takes its policy - and its software - from a server the attacker controls. The container is created by hand before setup runs, which is where the extra permissions usually come from."
 	    WhatWeCheck = @(
 	        "Allow ACEs granting GenericAll, GenericWrite, WriteDacl, WriteOwner, WriteProperty or CreateChild"
@@ -22466,8 +22466,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SCCM Site: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SCCM Sites"
-	    Summary = "Identifies SCCM site codes and site hierarchy via AD schema objects."
+	    SectionTitle = "Сайты SCCM"
+	    Summary = "Параметры сайтов Microsoft Configuration Manager."
 	    WhyItMatters = "SCCM site codes identify individual SCCM sites. A Central Administration Site (CAS) controls the entire hierarchy and is a Tier 0 asset."
 	    WhatWeCheck = @(
 	        "mSSMSSite objects in System Management container"
@@ -22479,8 +22479,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SCCM Management Point: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SCCM Management Points"
-	    Summary = "Identifies SCCM Management Points published to Active Directory."
+	    SectionTitle = "Точки управления SCCM"
+	    Summary = "Инвентаризация точек управления Configuration Manager."
 	    WhyItMatters = "Management Points are the primary communication interface for SCCM clients. They reveal site hierarchy and are targets for client poisoning attacks."
 	    WhatWeCheck = @(
 	        "mSSMSManagementPoint objects in System Management container"
@@ -22492,8 +22492,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "PXE/WDS Server: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "PXE/WDS Boot Servers"
-	    Summary = "Identifies PXE boot and WDS servers used for OS deployment."
+	    SectionTitle = "Серверы загрузки PXE/WDS"
+	    Summary = "Проверка серверов сетевой загрузки PXE и служб WDS."
 	    WhyItMatters = "PXE boot servers can be targeted for credential theft or OS deployment manipulation. Compromised PXE infrastructure enables large-scale system compromise."
 	    WhatWeCheck = @(
 	        "connectionPoint objects with netbootserver attribute"
@@ -22504,8 +22504,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SCOM Server: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SCOM Infrastructure"
-	    Summary = "Identifies System Center Operations Manager infrastructure."
+	    SectionTitle = "Инфраструктура Operations Manager (SCOM)"
+	    Summary = "Проверка инфраструктуры Microsoft Operations Manager."
 	    WhyItMatters = "SCOM Run As accounts often have elevated privileges across monitored systems. SCOM infrastructure is a valuable target for lateral movement."
 	    WhatWeCheck = @(
 	        "SCOM management servers"
@@ -22518,8 +22518,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SCOM Server: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SCOM Servers (Basic)"
-	    Summary = "Identifies SCOM servers via SPN discovery."
+	    SectionTitle = "Серверы SCOM: основные сведения"
+	    Summary = "Инвентаризация серверов Microsoft Operations Manager."
 	    WhyItMatters = "SCOM agents run with elevated privileges on monitored systems. Basic detection via SCOM SPNs."
 	    WhatWeCheck = @(
 	        "Computers with MSOMHSvc or MSOMSdkSvc SPNs"
@@ -22529,8 +22529,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SCOM Service Account: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SCOM Service Accounts"
-	    Summary = "Identifies service accounts used by SCOM infrastructure."
+	    SectionTitle = "Служебные учётные записи SCOM"
+	    Summary = "Проверка прав и настроек учётных записей служб Operations Manager."
 	    WhyItMatters = "SCOM service accounts often have elevated privileges for monitoring."
 	    WhatWeCheck = @(
 	        "Service accounts with SCOM-related attributes"
@@ -22540,8 +22540,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SCOM Group: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "SCOM Groups"
-	    Summary = "Identifies security groups used by SCOM."
+	    SectionTitle = "Группы SCOM"
+	    Summary = "Проверка групп Microsoft Operations Manager."
 	    WhyItMatters = "SCOM groups may grant elevated access to monitoring infrastructure."
 	    WhatWeCheck = @(
 	        "Groups with SCOM-related names or attributes"
@@ -22551,8 +22551,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "AD FS: {Name}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "AD FS"
-	    Summary = "Discovers Active Directory Federation Services deployments."
+	    SectionTitle = "Службы федерации AD FS"
+	    Summary = "Инвентаризация серверов и конфигурации Active Directory Federation Services."
 	    WhyItMatters = "AD FS issues the SAML tokens that federated applications and the connected cloud tenant trust. Whoever obtains the token-signing key can mint a token for any user - Golden SAML - and neither an on-premises password reset nor MFA enforced at the identity provider revokes it."
 	    WhatWeCheck = @(
 	        "The DKM container under CN=ADFS,CN=Microsoft,CN=Program Data, which holds the key protecting the token-signing certificate"
@@ -22565,8 +22565,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Entra ID Connect: {Name}{Context}"
 	    Module = "Application"
 	    Category = "Infrastructure"
-	    SectionTitle = "Entra ID Connect"
-	    Summary = "Discovers Azure AD Connect / Entra ID Connect indicators."
+	    SectionTitle = "Microsoft Entra Connect"
+	    Summary = "Проверка конфигурации синхронизации идентификаторов Microsoft Entra Connect."
 	    WhyItMatters = "AD Connect servers synchronize identities to the cloud and have DCSync rights. Compromise enables both on-premises and cloud domain takeover."
 	    WhatWeCheck = @(
 	        "MSOL_ and ADSync service accounts"
@@ -22579,8 +22579,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Group: Exchange Trusted Subsystem"
 	    Module = "Application"
 	    Category = "Exchange"
-	    SectionTitle = "Exchange Trusted Subsystem"
-	    Summary = "Shows the Exchange Trusted Subsystem group and judges each member against what belongs in it."
+	    SectionTitle = "Группа Exchange Trusted Subsystem"
+	    Summary = "Проверка привилегий группы Exchange Trusted Subsystem."
 	    WhyItMatters = "Exchange Trusted Subsystem has WriteDACL permissions on the domain object by default, enabling domain privilege escalation (PrivExchange, Exchange-related vulnerabilities). This is one of the most dangerous Exchange groups."
 	    WhatWeCheck = @(
 	        "Members of Exchange Trusted Subsystem"
@@ -22593,8 +22593,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Group: Exchange Windows Permissions"
 	    Module = "Application"
 	    Category = "Exchange"
-	    SectionTitle = "Exchange Windows Permissions"
-	    Summary = "Shows the Exchange Windows Permissions group and judges each member against what belongs in it."
+	    SectionTitle = "Группа Exchange Windows Permissions"
+	    Summary = "Анализ полномочий группы Exchange Windows Permissions."
 	    WhyItMatters = "Exchange Windows Permissions group has powerful AD permissions including WriteDACL on the domain. Members can potentially grant themselves DCSync rights or modify security descriptors."
 	    WhatWeCheck = @(
 	        "Members of Exchange Windows Permissions"
@@ -22607,8 +22607,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Group: Organization Management"
 	    Module = "Application"
 	    Category = "Exchange"
-	    SectionTitle = "Exchange Organization Management"
-	    Summary = "Shows the Organization Management group and judges each member against what belongs in it."
+	    SectionTitle = "Группа Organization Management"
+	    Summary = "Анализ участников административной группы Organization Management в Exchange."
 	    WhyItMatters = "Organization Management is the highest Exchange administrative role. Members have full control over Exchange configuration and can manage all Exchange objects. Often a path to domain admin via Exchange permission abuse."
 	    WhatWeCheck = @(
 	        "Members of Organization Management"
@@ -22621,8 +22621,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Exchange Group: Exchange Servers"
 	    Module = "Application"
 	    Category = "Exchange"
-	    SectionTitle = "Exchange Servers Group"
-	    Summary = "Shows the Exchange Servers group and judges each member against what belongs in it."
+	    SectionTitle = "Группа Exchange Servers"
+	    Summary = "Проверка состава и полномочий группы Exchange Servers."
 	    WhyItMatters = "Exchange Servers holds the computer accounts of the Exchange servers and with them their rights on the Exchange organization. A user account in it holds those rights as well."
 	    WhatWeCheck = @(
 	        "Members of Exchange Servers"
@@ -22634,8 +22634,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Certificate Authority: {CAName}"
 	    Module = "ADCS"
 	    Category = "ADCS"
-	    SectionTitle = "Certificate Authorities"
-	    Summary = "Discovers Active Directory Certificate Services deployment and analyzes CA certificate security."
+	    SectionTitle = "Центры сертификации AD CS"
+	    Summary = "Инвентаризация центров сертификации Active Directory Certificate Services."
 	    WhyItMatters = "ADCS misconfigurations enable privilege escalation through certificate abuse. Weak CA certificates (short keys, deprecated algorithms, expired) undermine the entire PKI trust chain."
 	    WhatWeCheck = @(
 	        "Enterprise and Standalone Certificate Authorities"
@@ -22650,8 +22650,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Certificate Template: {Name}"
 	    Module = "ADCS"
 	    Category = "ADCS"
-	    SectionTitle = "Certificate Templates"
-	    Summary = "Analyzes certificate templates for escalation vulnerabilities."
+	    SectionTitle = "Шаблоны сертификатов AD CS"
+	    Summary = "Проверка шаблонов сертификатов, параметров выдачи и прав регистрации."
 	    WhyItMatters = "Vulnerable certificate templates (ESC1-ESC4, ESC13, ESC15) allow attackers to obtain certificates for any user or gain group membership, enabling domain compromise through certificate-based authentication."
 	    WhatWeCheck = @(
 	        "Templates allowing enrollee-supplied SANs (ESC1)"
@@ -22668,8 +22668,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "PKI Container ACL: {Name}"
 	    Module = "ADCS"
 	    Category = "ADCS"
-	    SectionTitle = "PKI Container Permissions"
-	    Summary = "Reviews permissions on critical PKI containers in the Configuration partition."
+	    SectionTitle = "Разрешения контейнеров PKI"
+	    Summary = "Проверка списков управления доступом к контейнерам инфраструктуры открытых ключей."
 	    PrimaryFindingId = 'ESC5_PKI_CONTAINER_ACL'
 	    WhyItMatters = "Write access to PKI containers allows attackers to create or modify certificate templates, manipulate the NTAuth store, or modify enrollment services - enabling escalation vulnerabilities (ESC1-4) even if none currently exist."
 	    WhatWeCheck = @(
@@ -22686,8 +22686,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "PKI Trust Infrastructure"
 	    Module = "ADCS"
 	    Category = "ADCS"
-	    SectionTitle = "PKI Trust Infrastructure"
-	    Summary = "Enumerates the AD PKI trust infrastructure including Root CAs, NTAuth Store, and AIA CAs."
+	    SectionTitle = "Инфраструктура доверия PKI"
+	    Summary = "Анализ компонентов инфраструктуры открытых ключей и цепочек доверия."
 	    WhyItMatters = "The PKI trust infrastructure defines which Certificate Authorities are trusted for domain authentication (PKINIT). Rogue or misconfigured trust entries can enable certificate-based attacks across the entire domain or forest."
 	    WhatWeCheck = @(
 	        "Trusted Root CAs in AD configuration partition"
@@ -22700,8 +22700,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Root CA: {Name}"
 	    Module = "ADCS"
 	    Category = "ADCS"
-	    SectionTitle = "Trusted Root CAs"
-	    Summary = "A trusted Root Certificate Authority registered in the AD configuration partition."
+	    SectionTitle = "Доверенные корневые центры сертификации"
+	    Summary = "Проверка сертификатов доверенных корневых центров сертификации."
 	    WhyItMatters = "Root CAs define the top of the certificate trust chain. Rogue or compromised Root CAs allow attackers to issue trusted certificates for any purpose, including domain authentication."
 	    WhatWeCheck = @(
 	        "Certificate subject and thumbprint"
@@ -22715,8 +22715,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "NTAuth Certificate: {Name}"
 	    Module = "ADCS"
 	    Category = "ADCS"
-	    SectionTitle = "NTAuth Store"
-	    Summary = "A certificate in the NTAuth Store, trusted for domain authentication via Kerberos PKINIT."
+	    SectionTitle = "Хранилище NTAuth"
+	    Summary = "Проверка сертификатов в хранилище NTAuth леса Active Directory."
 	    WhyItMatters = "Only certificates issued by CAs listed in the NTAuth Store are accepted for Kerberos PKINIT authentication. Every issuer listed may issue a certificate that logs on as any account, so each entry should be one the forest knows: an Enterprise CA publishes its own certificate there, and anything else was added by other means - a third-party smart card CA, a CA that was removed, or a rogue one."
 	    WhatWeCheck = @(
 	        "Whether an Enterprise CA of this forest holds the certificate, or an earlier certificate of one (renewed since)"
@@ -22731,8 +22731,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "AIA CA: {Name}"
 	    Module = "ADCS"
 	    Category = "ADCS"
-	    SectionTitle = "AIA CAs"
-	    Summary = "An Authority Information Access CA used for certificate chain building and validation."
+	    SectionTitle = "Центры сертификации в AIA"
+	    Summary = "Проверка опубликованных в Active Directory сертификатов центров сертификации."
 	    WhyItMatters = "AIA CAs provide intermediate certificates needed to build complete trust chains. Missing or misconfigured AIA entries can break certificate validation, while unauthorized entries may enable cross-forest trust abuse."
 	    WhatWeCheck = @(
 	        "Certificate thumbprint and validity"
@@ -22744,8 +22744,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Unconstrained Delegation: {Name}"
 	    Module = "Delegation"
 	    Category = "Delegation"
-	    SectionTitle = "Unconstrained Delegation"
-	    Summary = "Identifies computers and users configured for unconstrained Kerberos delegation."
+	    SectionTitle = "Неограниченное делегирование Kerberos"
+	    Summary = "Поиск учётных записей и компьютеров с неограниченным делегированием."
 	    WhyItMatters = "Unconstrained delegation stores TGTs of all authenticating users. Attackers who compromise these systems can steal TGTs and impersonate any user, including Domain Admins."
 	    WhatWeCheck = @(
 	        "Computers with TRUSTED_FOR_DELEGATION flag"
@@ -22762,8 +22762,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Constrained Delegation: {Name}"
 	    Module = "Delegation"
 	    Category = "Delegation"
-	    SectionTitle = "Constrained Delegation"
-	    Summary = "Identifies accounts configured for constrained Kerberos delegation."
+	    SectionTitle = "Ограниченное делегирование Kerberos"
+	    Summary = "Проверка разрешённых служб и параметров ограниченного делегирования."
 	    WhyItMatters = "Constrained delegation with protocol transition allows impersonating any user to the configured services. Restricting the service class is no protection: S4U2Proxy returns a ticket encrypted with the target host's account key, and every SPN registered to that account shares it, so a ticket for time/DC01 can be rewritten to ldap/DC01. Any target on a Domain Controller is therefore a direct path to Domain Admin."
 	    WhatWeCheck = @(
 	        "Accounts with msDS-AllowedToDelegateTo configured"
@@ -22778,8 +22778,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "RBCD: {Name}"
 	    Module = "Delegation"
 	    Category = "Delegation"
-	    SectionTitle = "Resource-Based Constrained Delegation"
-	    Summary = "Identifies computers with Resource-Based Constrained Delegation settings."
+	    SectionTitle = "Ограниченное делегирование на основе ресурса (RBCD)"
+	    Summary = "Анализ разрешений RBCD на целевых компьютерных объектах."
 	    WhyItMatters = "RBCD allows specified accounts to impersonate users to the target computer. If attackers can write to this attribute or control a listed principal, they can compromise the target."
 	    WhatWeCheck = @(
 	        "Computers, users and managed service accounts with msDS-AllowedToActOnBehalfOfOtherIdentity"
@@ -22795,8 +22795,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Password Never Expires: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Password Never Expires"
-	    Summary = "Identifies administrative accounts exempt from password expiration."
+	    SectionTitle = "Пароли с неограниченным сроком действия"
+	    Summary = "Поиск учётных записей с запретом истечения срока действия пароля."
 	    WhyItMatters = "Passwords that never expire remain valid indefinitely if compromised. Privileged accounts should rotate passwords regularly to limit credential exposure windows."
 	    WhatWeCheck = @(
 	        "Privileged accounts with DONT_EXPIRE_PASSWORD flag"
@@ -22810,8 +22810,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Reversible Encryption: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Reversible Encryption"
-	    Summary = "Finds every account storing its password with reversible encryption, and names the privileged ones."
+	    SectionTitle = "Обратимое шифрование паролей"
+	    Summary = "Выявление учётных записей с хранением паролей в обратимо зашифрованном виде."
 	    WhyItMatters = "Reversible encryption allows the actual password to be recovered from AD, effectively storing it in cleartext. This is a severe security risk for any account, especially privileged ones."
 	    WhatWeCheck = @(
 	        "Accounts with 'Store password using reversible encryption' enabled"
@@ -22825,8 +22825,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Explicit Computer Permission: {Computer}"
 	    Module = "Computer"
 	    Category = "Computers"
-	    SectionTitle = "Explicit Permissions on Computer Objects"
-	    Summary = "Finds permissions written on individual computer objects that give a principal outside Tier-0 control over the computer."
+	    SectionTitle = "Явно назначенные права на компьютеры"
+	    Summary = "Проверка явных разрешений на объекты компьютеров в AD."
 	    WhyItMatters = "An entry on the computer object itself - not inherited from an OU - is invisible to a review of OU delegations. Full control, RBCD or key credential writes, the password reset right and all extended rights each end in administrative access to the machine."
 	    WhatWeCheck = @(
 	        "Explicit entries on every computer object, from the descriptors the owner check reads"
@@ -22840,8 +22840,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Critical Object Control: {Trustee}"
 	    Module = "Rights"
 	    Category = "Rights"
-	    SectionTitle = "Schema, Partitions and Role Object ACLs"
-	    Summary = "Finds principals outside Tier-0 that control the schema, the configuration partition, the partitions container, the RID Manager, the infrastructure object or a site."
+	    SectionTitle = "Права на критически важные объекты каталога"
+	    Summary = "Анализ ACL схемы, разделов каталога и объектов ролей."
 	    WhyItMatters = "These objects carry the schema, the configuration and the naming contexts of the forest and two of the operations master roles. Control over the schema changes the default security descriptor of every new object; control over the configuration head reaches the PKI containers, the sites and the partitions below it; control over a role object moves the role or, for the RID Manager, exhausts the identifiers the domain is built from."
 	    WhatWeCheck = @(
 	        "Owner, GenericAll, GenericWrite, WriteDacl, WriteOwner and unrestricted WriteProperty on each of the five objects"
@@ -22858,8 +22858,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "RODC Password Replication: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "RODC Password Replication Policy"
-	    Summary = "Checks which privileged accounts a read-only Domain Controller may cache, or has cached, the password of."
+	    SectionTitle = "Политика репликации паролей RODC"
+	    Summary = "Проверка кэширования и репликации паролей на контроллерах домена только для чтения."
 	    WhyItMatters = "A read-only Domain Controller stands where physical security is weakest, and every password it caches can be taken from it. Its password replication policy decides which accounts it may cache; a privileged account allowed there is a privileged account outside the Tier-0 boundary."
 	    WhatWeCheck = @(
 	        "Each read-only Domain Controller's allow list (msDS-RevealOnDemandGroup) and deny list (msDS-NeverRevealGroup) against the token of every privileged account, primary group included - deny wins"
@@ -22873,8 +22873,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Password Not Required: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Password Not Required Accounts"
-	    Summary = "Identifies enabled user and computer accounts with the PASSWD_NOTREQD flag set."
+	    SectionTitle = "Учётные записи без обязательного пароля"
+	    Summary = "Выявление учётных записей с флагом PASSWD_NOTREQD."
 	    WhyItMatters = "Accounts with the 'Password Not Required' flag can bypass the domain password policy and may have an empty password. While the flag alone does not guarantee an empty password, it indicates a hygiene issue and potential attack vector. A computer account created ahead of its computer carries the flag until a computer joins with it, and created as a pre-Windows 2000 computer it has its name in lowercase as password."
 	    WhatWeCheck = @(
 	        "Enabled user accounts with PASSWD_NOTREQD flag (UAC bit 32)"
@@ -22890,8 +22890,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Inactive Admin: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Inactive Admin Accounts"
-	    Summary = "Finds administrative accounts that haven't been used recently."
+	    SectionTitle = "Неактивные административные учётные записи"
+	    Summary = "Поиск длительно неиспользуемых привилегированных учётных записей."
 	    WhyItMatters = "Inactive privileged accounts increase attack surface. They may have weak passwords, be forgotten during password rotations, or indicate compromised credentials."
 	    WhatWeCheck = @(
 	        "Privileged accounts with no recent logon activity (>180 days)"
@@ -22906,8 +22906,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "gMSA: {Name}{Context}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Group Managed Service Accounts"
-	    Summary = "Reviews Group Managed Service Account configurations and security."
+	    SectionTitle = "Групповые управляемые учётные записи служб (gMSA)"
+	    Summary = "Анализ настроек и использования групповых управляемых учётных записей служб."
 	    WhyItMatters = "gMSAs provide automatic password management but require proper configuration. Excessive password retrieval permissions reduce security benefits and enable credential theft."
 	    WhatWeCheck = @(
 	        "gMSA accounts in the domain"
@@ -22925,8 +22925,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "gMSA Password: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "gMSA Password Access"
-	    Summary = "Reports gMSA passwords that the current user can retrieve."
+	    SectionTitle = "Права чтения паролей gMSA"
+	    Summary = "Проверка субъектов, которым разрешено получать управляемые пароли gMSA."
 	    WhyItMatters = "gMSA password retrieval allows impersonation of the service account. Successfully retrieved passwords indicate the current user has access to these service accounts."
 	    WhatWeCheck = @(
 	        "gMSAs where current user can retrieve msDS-ManagedPassword"
@@ -22939,8 +22939,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "MSA: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Standalone Managed Service Accounts"
-	    Summary = "Identifies standalone Managed Service Accounts (legacy sMSAs)."
+	    SectionTitle = "Автономные управляемые учётные записи служб"
+	    Summary = "Проверка традиционных управляемых учётных записей служб (sMSA)."
 	    WhyItMatters = "Standalone MSAs are less secure than gMSAs - they're tied to a single host and don't support automatic password rotation across multiple servers. They should be migrated to gMSAs."
 	    WhatWeCheck = @(
 	        "Legacy sMSA accounts in the domain"
@@ -22953,8 +22953,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Authentication Policy Silo: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Authentication Policy Silos"
-	    Summary = "Reviews authentication policy silos and authentication policies - whether they restrict anybody, and who can change them."
+	    SectionTitle = "Хранилища политик проверки подлинности"
+	    Summary = "Проверка изолированных групп применения политик проверки подлинности."
 	    WhyItMatters = "A silo restricts where its members may sign on and how long their tickets live, which is how Tier 0 accounts are kept off ordinary machines. It protects only where the KDC applies it: in audit mode, without a policy, for an account that is a member without being assigned or the other way round, or for the built-in Administrator it restricts nothing - and whoever can write to a silo or a policy can turn the protection off."
 	    WhatWeCheck = @(
 	        "Enforcement of each silo (msDS-AuthNPolicySiloEnforced) and of each directly assigned policy (msDS-AuthNPolicyEnforced)"
@@ -22971,8 +22971,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Authentication Policy: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Authentication Policies"
-	    Summary = "Reviews authentication policies - their enforcement, conditions, lifetimes and who can change them."
+	    SectionTitle = "Политики проверки подлинности"
+	    Summary = "Анализ настроек и назначения политик проверки подлинности."
 	    WhyItMatters = "An authentication policy holds the restrictions a silo or a direct assignment applies: the devices an account may sign on from, who may authenticate to a service running as it, and the lifetime of its tickets. A condition that admits every domain computer restricts nothing, and write access to the policy rewrites the restrictions of every account it covers."
 	    WhatWeCheck = @(
 	        "Enforcement of directly assigned policies (for silo members the silo's flag decides)"
@@ -22986,8 +22986,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "dMSA: {Name}{Context}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Delegated Managed Service Accounts"
-	    Summary = "Reviews who may use each delegated Managed Service Account (Windows Server 2025)."
+	    SectionTitle = "Делегированные управляемые учётные записи служб (dMSA)"
+	    Summary = "Проверка делегированных управляемых учётных записей служб."
 	    WhyItMatters = "msDS-GroupMSAMembership names who may request a dMSA's ticket. Once the dMSA has replaced an account, that ticket carries the replaced account's group memberships, so whoever may use the dMSA acts as that account. The attribute exists to name the hosts that run the service; anyone else named there holds the account."
 	    WhatWeCheck = @(
 	        "msDS-GroupMSAMembership (who may use the dMSA)"
@@ -23002,8 +23002,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "dMSA Link: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Delegated Managed Service Account Links"
-	    Summary = "Reviews the accounts that delegated Managed Service Accounts (Windows Server 2025) name as their predecessor."
+	    SectionTitle = "Связи делегированных учётных записей dMSA"
+	    Summary = "Проверка связей между dMSA и заменяемыми учётными записями."
 	    WhyItMatters = "A dMSA names the account it replaces, and once that account names the dMSA back, the KDC issues the dMSA tickets carrying the account's group memberships and hands over the account's keys. A pairing outside a regular migration gives whoever controls the dMSA that account's privileges, and a privileged account replaced by a dMSA lends its privileges to an object that is a member of no privileged group."
 	    WhatWeCheck = @(
 	        "Accounts a dMSA names as predecessor (msDS-ManagedAccountPrecededByLinkBL) against the dMSA they name (msDS-SupersededManagedAccountLink)"
@@ -23019,8 +23019,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Non-Default Owner: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Non-Default User Owners"
-	    Summary = "Identifies user objects with unexpected ownership."
+	    SectionTitle = "Нестандартные владельцы учётных записей"
+	    Summary = "Поиск пользовательских объектов, у которых назначен нетипичный владелец."
 	    WhyItMatters = "Object owners have implicit full control over the object. Non-default user owners may indicate privilege escalation paths - the owner can reset passwords or modify attributes."
 	    WhatWeCheck = @(
 	        "Users where owner is not Domain Admins"
@@ -23034,8 +23034,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Tier-0 Account: {Name}{Context}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Tier-0 Account Protection"
-	    Summary = "Evaluates Protected Users coverage for true Tier-0 accounts."
+	    SectionTitle = "Защита учётных записей уровня 0 (Tier 0)"
+	    Summary = "Оценка защиты учётных записей с доступом к критически важной инфраструктуре AD."
 	    WhyItMatters = "The Protected Users group provides critical protection against credential theft by disabling NTLM, disallowing delegation, and enforcing Kerberos constraints. Tier-0 accounts (Domain Admins, Enterprise Admins, Schema Admins, Administrators) should be protected."
 	    WhatWeCheck = @(
 	        "Members of Domain Admins, Enterprise Admins, Schema Admins, Administrators"
@@ -23050,8 +23050,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Privileged Group Member: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Privileged Group Members"
-	    Summary = "Enumerates members of administrative and privileged groups."
+	    SectionTitle = "Участники привилегированных групп"
+	    Summary = "Анализ состава административных и других привилегированных групп."
 	    WhyItMatters = "Privileged accounts are high-value targets. Understanding who has elevated access helps identify excessive privileges, orphaned accounts, and potential attack paths."
 	    WhatWeCheck = @(
 	        "Domain Admins, Enterprise Admins, Schema Admins"
@@ -23067,8 +23067,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Operator Group: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Operator Group Members"
-	    Summary = "Lists Operator groups with members that could benefit from Protected Users."
+	    SectionTitle = "Участники операторских групп"
+	    Summary = "Проверка состава встроенных операторских и широких групп доступа."
 	    WhyItMatters = "Operator groups (Account, Backup, Server, Print Operators) have elevated privileges. Members should consider Protected Users membership for additional credential protection."
 	    WhatWeCheck = @(
 	        "Operator groups with non-empty membership"
@@ -23081,8 +23081,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SID History: {Name}{Context}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "SID History Injection"
-	    Summary = "Detects accounts with SID History entries."
+	    SectionTitle = "Возможное злоупотребление sIDHistory"
+	    Summary = "Проверка атрибута sIDHistory и включённых в него идентификаторов безопасности."
 	    WhyItMatters = "SID History grants access based on historical SIDs. Attackers can inject privileged SIDs for persistent access that's invisible in normal group membership queries. Legitimate SID History from migrations should be cleaned up."
 	    WhatWeCheck = @(
 	        "Accounts with SID History containing privileged SIDs"
@@ -23097,8 +23097,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "AdminSDHolder ACL: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "AdminSDHolder ACLs"
-	    Summary = "Analyzes ACLs on the AdminSDHolder container."
+	    SectionTitle = "Права на объект AdminSDHolder"
+	    Summary = "Анализ ACL AdminSDHolder и распространяемых защитных разрешений."
 	    WhyItMatters = "AdminSDHolder ACLs propagate to all protected objects (Domain Admins, etc.) hourly via SDProp. Unauthorized ACEs grant persistent backdoor access to privileged accounts that survives permission resets."
 	    WhatWeCheck = @(
 	        "Non-default ACEs on AdminSDHolder container"
@@ -23112,8 +23112,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Privileged Group ACL: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Privileged Groups Outside AdminSDHolder"
-	    Summary = "Analyzes who may change the privileged groups that AdminSDHolder does not protect."
+	    SectionTitle = "ACL привилегированных групп вне AdminSDHolder"
+	    Summary = "Поиск опасных разрешений на группах, не защищённых AdminSDHolder."
 	    WhyItMatters = "SDProp resets only the groups AdminSDHolder protects. Every other group keeps whatever ACEs it is given, and several are privileged in all but name - DnsAdmins load code into the DNS service on the domain controllers, Group Policy Creator Owners create policy, the Exchange groups hold rights on the domain, and a group nested into one of them passes its membership on. Whoever may add a member to such a group, or rewrite its DACL or owner, can make any account a member."
 	    WhatWeCheck = @(
 	        "Every privileged group without adminCount=1, the groups nested into them, and the Exchange groups - and the operator groups dsHeuristics takes out of AdminSDHolder protection, whatever their adminCount says"
@@ -23129,8 +23129,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Privileged Groups Outside AdminSDHolder"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Privileged Groups Outside AdminSDHolder"
-	    Summary = "The privileged groups AdminSDHolder does not protect whose DACL was read."
+	    SectionTitle = "Привилегированные группы без защиты AdminSDHolder"
+	    Summary = "Поиск административных групп за пределами защиты AdminSDHolder."
 	    WhyItMatters = "SDProp resets the DACL of the groups AdminSDHolder protects every hour. Every other privileged group keeps whatever entries it is given, so who may change it has to be read group by group - these are the groups that were."
 	    WhatWeCheck = @(
 	        "groupsRead - the privileged groups without adminCount=1, the groups nested into them (with the group they are nested in) and the Exchange groups"
@@ -23143,8 +23143,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Privileged Account ACL: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Control Over Privileged Accounts"
-	    Summary = "Analyzes who may take over a privileged user or managed service account through the account's own DACL."
+	    SectionTitle = "Права управления привилегированными учётными записями"
+	    Summary = "Проверка прав изменения и владения административными учётными записями."
 	    WhyItMatters = "Whoever may reset the password of a privileged account, add a key credential to it, give it an SPN, map a certificate onto it or rewrite its DACL can act as that account and holds its group rights. AdminSDHolder resets the accounts it protects every hour; every other privileged account - a DnsAdmins member, a Group Policy Creator Owner - keeps the entries it is given, including what an OU delegation passes down."
 	    WhatWeCheck = @(
 	        "Every user and managed service account of this domain found in a privileged group"
@@ -23160,8 +23160,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Privileged Accounts Read"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Control Over Privileged Accounts"
-	    Summary = "The privileged user and managed service accounts whose DACL was read."
+	    SectionTitle = "Доступ к объектам привилегированных учётных записей"
+	    Summary = "Проверка разрешений на чтение и управление защищаемыми учётными записями."
 	    WhyItMatters = "Whoever may take over a privileged account holds the rights of its groups. AdminSDHolder resets the DACL of the accounts it protects every hour; every other account keeps whatever entries it is given, so each one is read."
 	    WhatWeCheck = @(
 	        "accountsRead - the users and managed service accounts of this domain found in a privileged group whose security descriptor was read; computers are left to the computer owner check"
@@ -23174,8 +23174,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Logon Script: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Logon Scripts of Accounts"
-	    Summary = "Analyzes who may change the logon scripts that accounts run from NETLOGON."
+	    SectionTitle = "Сценарии входа учётных записей"
+	    Summary = "Анализ путей сценариев входа и прав их изменения."
 	    WhyItMatters = "Windows runs the logon script an account's scriptPath names at every logon of that account, as that account. Whoever may change the script runs code as every account that has it set, an administrator among them with the administrator's rights. NETLOGON is the scripts folder of SYSVOL, and its file permissions are nobody's GPO permissions."
 	    WhatWeCheck = @(
 	        "The scriptPath of every enabled account, a relative one resolved to \\<domain>\NETLOGON"
@@ -23190,8 +23190,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Pre-Windows 2000 Compatible Access: {Name}"
 	    Module = "Accounts"
 	    Category = "Accounts"
-	    SectionTitle = "Pre-Windows 2000 Compatible Access"
-	    Summary = "Checks the Pre-Windows 2000 Compatible Access group membership."
+	    SectionTitle = "Группа Pre-Windows 2000 Compatible Access"
+	    Summary = "Проверка состава группы совместимого доступа с Windows 2000 и её полномочий."
 	    WhyItMatters = "This group grants read access to all users and groups. If 'Anonymous Logon' or 'Everyone' is a member, unauthenticated attackers can enumerate the entire domain without credentials."
 	    WhatWeCheck = @(
 	        "Group membership including Anonymous Logon"
@@ -23204,8 +23204,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Kerberoastable: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "Kerberoastable Accounts"
-	    Summary = "Identifies user accounts with Service Principal Names that can be Kerberoasted."
+	    SectionTitle = "Учётные записи, допускающие Kerberoasting"
+	    Summary = "Поиск учётных записей служб, для которых доступны билеты Kerberos с возможностью автономного подбора пароля."
 	    WhyItMatters = "Any domain user can request service tickets for accounts with SPNs. These tickets are encrypted with the account's password hash and can be cracked offline to reveal the password."
 	    WhatWeCheck = @(
 	        "User accounts (not computers) with servicePrincipalName"
@@ -23221,8 +23221,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "AS-REP Roastable: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "AS-REP Roastable Accounts"
-	    Summary = "Identifies accounts vulnerable to AS-REP Roasting attacks."
+	    SectionTitle = "Учётные записи, допускающие AS-REP Roasting"
+	    Summary = "Поиск учётных записей без обязательной предварительной проверки подлинности Kerberos."
 	    WhyItMatters = "Accounts with pre-authentication disabled can have their password hashes obtained without any authentication. Anyone can request an AS-REP and crack the password offline."
 	    WhatWeCheck = @(
 	        "Accounts with DONT_REQUIRE_PREAUTH flag"
@@ -23236,8 +23236,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Unix Password: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "Unix Password Attributes"
-	    Summary = "Identifies accounts with Unix or legacy password attributes that may be readable."
+	    SectionTitle = "Парольные атрибуты UNIX"
+	    Summary = "Поиск потенциально чувствительных парольных атрибутов UNIX в AD."
 	    WhyItMatters = "Unix integration attributes like userPassword and sambaNTPassword may contain password hashes readable by non-privileged users, enabling offline cracking."
 	    WhatWeCheck = @(
 	        "Accounts with userPassword, unixUserPassword attributes"
@@ -23252,8 +23252,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Roamed Credentials: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "Roamed Credential Material"
-	    Summary = "Finds users whose DPAPI master keys and private keys are stored in Active Directory."
+	    SectionTitle = "Перемещаемые учётные данные"
+	    Summary = "Анализ сохранённых в AD данных Credential Roaming."
 	    WhyItMatters = "Credential Roaming copies a user's certificates, private keys and DPAPI master keys into attributes on their user object so the profile follows them between machines. A DPAPI master key protects everything else that user stored under DPAPI - saved RDP credentials, browser secrets, WLAN keys, the Credential Manager. The attributes hold ciphertext, not plaintext: a master key is sealed with a pre-key derived from the user's password and with the domain backup key, and the private keys are sealed with those master keys in turn. So the material becomes usable with the user's password or hash, or with the domain backup key that every domain administrator holds - and a roamed client-authentication certificate then impersonates that user without their password."
 	    WhatWeCheck = @(
 	        "Which users carry msPKIDPAPIMasterKeys or msPKIAccountCredentials"
@@ -23268,8 +23268,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Roaming Read Delegated: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "Delegated Credential Roaming Read"
-	    Summary = "Finds principals that have been given an explicit read of another user's private keys and DPAPI master keys."
+	    SectionTitle = "Права чтения перемещаемых учётных данных"
+	    Summary = "Проверка делегированных разрешений на чтение Credential Roaming."
 	    WhyItMatters = "The confidential flag decides whether every authenticated user can read the roaming attributes. A delegated read is the case it says nothing about, and the one most likely to have happened by accident: a delegation wizard pointed at the wrong attribute set, or a script copied from a Credential Roaming rollout guide, hands a helpdesk group a read of another user's private keys. Nothing about the result looks unusual afterwards, and the holder needs no exploit - a plain LDAP read returns the material, and the domain backup key or the target's hash turns it into their private keys and every DPAPI secret of their profile."
 	    WhatWeCheck = @(
 	        "ReadProperty on ms-PKI-DPAPIMasterKeys, ms-PKI-AccountCredentials or ms-PKI-RoamingTimeStamp"
@@ -23285,8 +23285,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "GPP Credential: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "GPP Credential Exposure"
-	    Summary = "Discovers credentials stored in Group Policy Preference files."
+	    SectionTitle = "Учётные данные в предпочтениях групповой политики"
+	    Summary = "Поиск раскрытия паролей и других секретов в Group Policy Preferences (GPP)."
 	    WhyItMatters = "GPP passwords are encrypted with a publicly known AES key (MS14-025). Any domain user can decrypt these passwords, providing immediate credential access without any exploitation."
 	    WhatWeCheck = @(
 	        "Groups.xml, ScheduledTasks.xml, and similar GPP files"
@@ -23301,8 +23301,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "SYSVOL Credential: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "SYSVOL Script Credential Exposure"
-	    Summary = "Discovers credentials stored in SYSVOL and NETLOGON scripts."
+	    SectionTitle = "Учётные данные в сценариях SYSVOL"
+	    Summary = "Поиск паролей и секретов в доступных сценариях SYSVOL."
 	    WhyItMatters = "Login scripts, batch files, and configuration files in SYSVOL/NETLOGON are readable by all domain users. Administrators often embed credentials in these files, exposing them to any authenticated user."
 	    WhatWeCheck = @(
 	        "Login scripts with embedded credentials"
@@ -23316,8 +23316,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "LAPS Credential: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "LAPS Credential Access"
-	    Summary = "Tests which LAPS passwords the current user can read."
+	    SectionTitle = "Доступ к паролям LAPS"
+	    Summary = "Проверка разрешений на чтение паролей локальных администраторов из LAPS."
 	    WhyItMatters = "LAPS passwords provide local administrator access to computers. Unexpected read access indicates potential privilege escalation paths or misconfigured permissions."
 	    WhatWeCheck = @(
 	        "Computers where current user can read ms-Mcs-AdmPwd"
@@ -23331,8 +23331,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "BitLocker Recovery Key: {ComputerName}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "BitLocker Recovery Key Access"
-	    Summary = "Tests which BitLocker recovery keys the current user can read from AD."
+	    SectionTitle = "Доступ к ключам восстановления BitLocker"
+	    Summary = "Проверка доступа к ключам и паролям восстановления BitLocker в AD."
 	    WhyItMatters = "BitLocker recovery keys are escrowed in AD as msFVE-RecoveryInformation child objects, with read access controlled by ACLs. Being able to read a recovery key is often legitimate (recovery and helpdesk roles) and is not by itself a vulnerability, but it is worth reviewing: a readable key lets the holder unlock the computer's encrypted volume offline. Unexpectedly broad read access can indicate over-permissive delegation on the computer OUs."
 	    WhatWeCheck = @(
 	        "msFVE-RecoveryInformation objects where the current user can read msFVE-RecoveryPassword"
@@ -23346,8 +23346,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Recovery Read Delegated: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "Delegated BitLocker Recovery Read"
-	    Summary = "Finds principals that may read the BitLocker recovery passwords of the computers below a container."
+	    SectionTitle = "Делегированное чтение ключей BitLocker"
+	    Summary = "Проверка субъектов с делегированными правами чтения данных восстановления BitLocker."
 	    WhyItMatters = "A recovery password unlocks its volume offline, given the disk or an image of it - a stolen laptop, a retired drive, a virtual machine's disk file. The schema grants the recovery objects to Domain Admins and SYSTEM only, so every other reader was given the right by somebody, usually through the delegation wizard for a helpdesk or recovery role. That can be intended; the row says who holds it, on how many computers, and whether the confidential flag on the attribute lets it work today."
 	    WhatWeCheck = @(
 	        "ReadProperty and ControlAccess on msFVE-RecoveryPassword reaching the msFVE-RecoveryInformation objects below the computers"
@@ -23363,8 +23363,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Password in Description: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "Passwords in Free-Text Attributes"
-	    Summary = "Finds credentials typed into the free-text attributes of any directory object."
+	    SectionTitle = "Пароли в текстовых атрибутах объектов"
+	    Summary = "Поиск учётных данных в полях описания и других свободно заполняемых атрибутах."
 	    WhyItMatters = "Administrators store passwords in the attributes they type into: description, info, comment, adminDescription, and above all extensionAttribute1-15, which is where an initial password tends to end up. Every one of them is readable by any authenticated domain user, so a password there is a password handed to the whole domain - and it sits on groups, organizational units and service accounts as often as on user accounts."
 	    WhatWeCheck = @(
 	        "description, info, comment and adminDescription on every object class"
@@ -23381,8 +23381,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Deleted Object: {Name}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "Readable Deleted Objects"
-	    Summary = "Finds the deleted objects the current user can read, and the credentials they still hold."
+	    SectionTitle = "Доступные для чтения удалённые объекты"
+	    Summary = "Проверка чтения удалённых объектов и сохранённых атрибутов."
 	    WhyItMatters = "With the AD Recycle Bin enabled, a deleted object keeps every attribute in the Deleted Objects container until its lifetime ends - 180 days by default. A password typed into the description of a service account outlives the account, and no check that reads live objects sees it any more. Reading deleted objects takes the show-deleted control and List Contents on the container, which by default only SYSTEM and Administrators hold; an ordinary account that can read them holds a delegation."
 	    WhatWeCheck = @(
 	        "Every deleted object the current user can list in the Deleted Objects container of the domain"
@@ -23398,8 +23398,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "May List Deleted Objects: {Trustee}"
 	    Module = "Creds"
 	    Category = "Credentials"
-	    SectionTitle = "Who May List Deleted Objects"
-	    Summary = "Finds the principals outside Tier 0 that may list the Deleted Objects container."
+	    SectionTitle = "Права просмотра удалённых объектов"
+	    Summary = "Определение субъектов, имеющих право перечислять удалённые объекты."
 	    WhyItMatters = "A deleted object keeps its security descriptor, so whoever may list the container reads of each deleted object what its own ACL allows - for most objects everything an authenticated user could read while it was alive, and with the Recycle Bin that is every attribute it had. Microsoft documents granting List Contents and Read Property on the container to let a team view deleted objects; the question is who was given it."
 	    WhatWeCheck = @(
 	        "List Contents, generic read and full control on CN=Deleted Objects of the domain, as far as the ACE applies to the container itself"
@@ -23414,8 +23414,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Dangerous ACL: {Name}"
 	    Module = "Rights"
 	    Category = "Rights"
-	    SectionTitle = "Domain Root ACLs"
-	    Summary = "Reviews dangerous permissions on the domain root object."
+	    SectionTitle = "Права доступа к корню домена"
+	    Summary = "Проверка опасных разрешений на корневом объекте домена."
 	    WhyItMatters = "Permissions on the domain root can grant DCSync rights, allow GPO linking, or enable domain-wide modifications. Non-default permissions here are critical findings."
 	    WhatWeCheck = @(
 	        "Principals with GenericAll, WriteDACL, WriteOwner"
@@ -23430,8 +23430,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Dangerous OU Permission: {Name}"
 	    Module = "Rights"
 	    Category = "Rights"
-	    SectionTitle = "Dangerous OU Permissions"
-	    Summary = "Identifies dangerous permissions on Organizational Units."
+	    SectionTitle = "Опасные разрешения на OU"
+	    Summary = "Анализ ACL организационных единиц и возможных путей повышения привилегий."
 	    WhyItMatters = "OU permissions can be inherited by all objects within. Attackers with OU write access can modify user/computer objects, reset passwords, or enable delegation."
 	    WhatWeCheck = @(
 	        "Non-default permissions on OUs"
@@ -23446,8 +23446,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Explicit Certificate Mapping: {Name}"
 	    Module = "ADCS"
 	    Category = "ADCS"
-	    SectionTitle = "Explicit Certificate Mappings"
-	    Summary = "Finds accounts a certificate can be mapped to without the CA's SID extension."
+	    SectionTitle = "Небезопасное сопоставление сертификатов"
+	    Summary = "Проверка явного сопоставления сертификатов и возможных слабых привязок к учётным записям."
 	    WhyItMatters = "altSecurityIdentities binds a certificate to an account explicitly, bypassing the SID extension the CA writes. Three of the six formats Active Directory accepts name something an attacker can reproduce in a certificate of their own - a subject name or an e-mail address - so anyone who can enrol for such a certificate authenticates as that account."
 	    WhatWeCheck = @(
 	        "Principals carrying a weak mapping: X509IssuerSubject, X509SubjectOnly, X509RFC822"
@@ -23462,8 +23462,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Password Reset Right: {Name}"
 	    Module = "Rights"
 	    Category = "Rights"
-	    SectionTitle = "Password Reset Rights"
-	    Summary = "Maps who can reset passwords of privileged accounts."
+	    SectionTitle = "Права сброса паролей"
+	    Summary = "Проверка субъектов с правом сброса паролей других учётных записей."
 	    WhyItMatters = "Password reset rights enable account takeover without knowing the current password. These rights on privileged accounts create direct escalation paths."
 	    WhatWeCheck = @(
 	        "Reset Password permissions on OUs containing admins"
@@ -23478,8 +23478,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Add Computer Right: {Name}"
 	    Module = "Rights"
 	    Category = "Rights"
-	    SectionTitle = "Add Computer Rights"
-	    Summary = "Identifies who can join computers to the domain."
+	    SectionTitle = "Права добавления компьютеров в домен"
+	    Summary = "Проверка прав создания объектов компьютеров."
 	    WhyItMatters = "Machine accounts can be used in RBCD attacks and relay scenarios. Excessive rights to create computer accounts expand the attack surface."
 	    WhatWeCheck = @(
 	        "ms-DS-MachineAccountQuota setting"
@@ -23492,8 +23492,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "GPO User Right: {UserRightName}"
 	    Module = "Rights"
 	    Category = "Rights"
-	    SectionTitle = "User Rights via GPO That Depart From the Windows Default"
-	    Summary = "Compares the user rights a GPO assigns against the set Windows ships, and reports the difference."
+	    SectionTitle = "Назначение прав пользователя через GPO"
+	    Summary = "Поиск отступлений от стандартных настроек прав пользователя Windows в GPO."
 	    WhyItMatters = "User Rights Assignment in a GPO grants low-level privileges - SeDebugPrivilege, SeBackupPrivilege, SeImpersonatePrivilege, Remote Desktop logon - across every computer the policy reaches, and the [Privilege Rights] section is absolute: what it lists becomes the complete set of holders. So the question is not who holds a right but whether the assignment departs from what Windows ships. A holder beyond the default is an escalation or lateral-movement path; a default holder removed is usually hardening and occasionally a service about to break."
 	    WhatWeCheck = @(
 	        "GptTmpl.inf [Privilege Rights] in every GPO, compared against the documented Windows defaults"
@@ -23510,8 +23510,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Machine Account Quota Configuration"
 	    Module = "Rights"
 	    Category = "Rights"
-	    SectionTitle = "Machine Account Quota"
-	    Summary = "Displays the ms-DS-MachineAccountQuota domain setting and who can use it."
+	    SectionTitle = "Квота создания компьютерных учётных записей"
+	    Summary = "Проверка параметра ms-DS-MachineAccountQuota."
 	    WhyItMatters = "This setting controls how many computers any authenticated user can join to the domain. Default is 10, which allows RBCD attacks. The quota is a ceiling on SeMachineAccountPrivilege, so it is reachable only by the accounts that hold the privilege on the domain controllers."
 	    WhatWeCheck = @(
 	        "Current quota value"
@@ -23524,8 +23524,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "GPO: {Name}"
 	    Module = "Rights"
 	    Category = "Rights"
-	    SectionTitle = "Add Computer GPO Settings"
-	    Summary = "Identifies GPOs granting SeMachineAccountPrivilege."
+	    SectionTitle = "Параметры GPO для добавления компьютеров"
+	    Summary = "Анализ групповых политик, влияющих на право добавлять компьютеры в домен."
 	    WhyItMatters = "GPOs can grant the right to add computers to the domain, bypassing the quota setting."
 	    WhatWeCheck = @(
 	        "GPOs with SeMachineAccountPrivilege configured"
@@ -23536,8 +23536,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "LAPS Permission: {Name}"
 	    Module = "Rights"
 	    Category = "Rights"
-	    SectionTitle = "LAPS Read Permissions"
-	    Summary = "Maps which principals can read LAPS passwords in each OU."
+	    SectionTitle = "Разрешения на чтение LAPS"
+	    Summary = "Анализ ACL, позволяющих читать пароли LAPS."
 	    WhyItMatters = "LAPS password read access should follow least privilege. Excessive access enables lateral movement for anyone who can read the passwords."
 	    WhatWeCheck = @(
 	        "ACLs granting LAPS password read access"
@@ -23552,8 +23552,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Machine Password Not Rotated: {Name}"
 	    Module = "Computer"
 	    Category = "Computers"
-	    SectionTitle = "Machine Account Password Age"
-	    Summary = "Finds active computers whose machine account password is not rotated."
+	    SectionTitle = "Возраст паролей компьютерных учётных записей"
+	    Summary = "Проверка давности изменения паролей компьютеров домена."
 	    WhyItMatters = "A domain member changes its machine account password itself, every 30 days by default. One that does not keeps a key that never ages out: whoever extracted it once can forge service tickets to the host, and for a Domain Controller the key replicates the whole directory."
 	    WhatWeCheck = @(
 	        "Enabled computers that logged on within the last 30 days and whose machine account password is 90 days old or older"
@@ -23567,8 +23567,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Outdated Computer: {Name}"
 	    Module = "Computer"
 	    Category = "Computers"
-	    SectionTitle = "Outdated Microsoft Operating Systems"
-	    Summary = "Finds computers running an end-of-life Microsoft operating system."
+	    SectionTitle = "Устаревшие версии Windows на компьютерах"
+	    Summary = "Поиск неподдерживаемых и устаревающих версий Windows."
 	    WhyItMatters = "EOL systems no longer receive security updates. They have known, unpatched vulnerabilities that attackers can exploit for initial access or lateral movement."
 	    WhatWeCheck = @(
 	        "Windows XP, Vista, 7, 8/8.1, 10 and 11, Server 2003 through 2022"
@@ -23584,8 +23584,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Non-Default Computer Owner: {Name}"
 	    Module = "Computer"
 	    Category = "Computers"
-	    SectionTitle = "Non-Default Computer Owners"
-	    Summary = "Identifies computer objects with unexpected ownership."
+	    SectionTitle = "Нестандартные владельцы объектов компьютеров"
+	    Summary = "Проверка собственников компьютерных объектов в AD."
 	    WhyItMatters = "Object owners have implicit full control. Non-default computer owners may indicate privilege escalation paths or allow RBCD attacks."
 	    WhatWeCheck = @(
 	        "Computers where owner is not Domain Admins, Enterprise Admins, BUILTIN\Administrators or SYSTEM"
@@ -23601,8 +23601,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "LAPS Configuration: {Name}"
 	    Module = "Computer"
 	    Category = "Computers"
-	    SectionTitle = "LAPS Configuration"
-	    Summary = "Analyzes LAPS deployment and coverage across the domain."
+	    SectionTitle = "Конфигурация LAPS"
+	    Summary = "Проверка политики и параметров Windows LAPS и прежней версии LAPS."
 	    WhyItMatters = "Computers without LAPS likely share local admin passwords. Compromising one system enables lateral movement to all systems with the same password."
 	    WhatWeCheck = @(
 	        "Presence of LAPS schema attributes (Legacy and Windows LAPS)"
@@ -23619,8 +23619,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "LAPS Deployment Coverage"
 	    Module = "Computer"
 	    Category = "Computers"
-	    SectionTitle = "LAPS Deployment Coverage"
-	    Summary = "How many active computers have their local administrator password managed by LAPS, whether those passwords rotate, and whether Windows LAPS manages the DSRM password of the domain controllers."
+	    SectionTitle = "Охват компьютеров защитой LAPS"
+	    Summary = "Оценка доли компьютеров с управлением паролем локального администратора."
 	    WhyItMatters = "Computers without LAPS likely share local admin passwords, and a LAPS password that stopped rotating is as old as the day it stopped. Compromising one such system enables lateral movement to every system with the same password."
 	    WhatWeCheck = @(
 	        "The active computers the figures are measured against, and what was left out - inactive computers and domain controllers"
@@ -23634,8 +23634,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "GPO Permission: {Name}"
 	    Module = "GPO"
 	    Category = "GPO"
-	    SectionTitle = "GPO Permissions"
-	    Summary = "Identifies Group Policy Objects with risky permissions."
+	    SectionTitle = "Разрешения на объекты GPO"
+	    Summary = "Проверка списков управления доступом к объектам групповой политики."
 	    WhyItMatters = "GPO modification rights enable code execution on all computers where the GPO is applied. Attackers can deploy malware, create scheduled tasks, or modify security settings."
 	    WhatWeCheck = @(
 	        "GPOs with write permissions for non-admins, inherited delegations included, with Deny ACEs netted out"
@@ -23652,8 +23652,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "GPO Local Group: {Name}"
 	    Module = "GPO"
 	    Category = "GPO"
-	    SectionTitle = "GPO Local Group Assignments"
-	    Summary = "Reviews GPO-based local group membership configurations."
+	    SectionTitle = "Назначение участников локальных групп через GPO"
+	    Summary = "Анализ добавления учётных записей в локальные группы посредством GPO."
 	    WhyItMatters = "GPOs can add principals to local Administrators groups on target systems. This is legitimate for administration but dangerous if misconfigured or overly broad."
 	    WhatWeCheck = @(
 	        "Restricted Groups settings adding local admins"
@@ -23667,8 +23667,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	'GPOSuppressedGroup' = @{
 	    Module = "GPO"
 	    Category = "GPO"
-	    SectionTitle = "Held Back From This Check"
-	    Summary = "Policies a check counted but did not report in full, because each is low-priority on its own."
+	    SectionTitle = "Объекты, исключённые из этой проверки"
+	    Summary = "Перечень результатов, сознательно исключённых согласно условиям проверки."
 	    WhyItMatters = "A full scan would otherwise bury the findings that matter under policies that reach no machine, assignments that only harden, or configurations that expose nothing. They are collected here so the count is never silently absent and every policy can still be identified by name and GUID - the GUID being the folder under \\<domain>\SYSVOL\<domain>\Policies\. None of them is an exposure by itself; they are shown so a reader can confirm that for themselves rather than take it on trust."
 	    WhatWeCheck = @(
 	        "Why the group was held back - not linked, disabled, hardening-only, or exposes nothing"
@@ -23680,8 +23680,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "GPO Scheduled Task: {Name}"
 	    Module = "GPO"
 	    Category = "GPO"
-	    SectionTitle = "GPO Scheduled Tasks"
-	    Summary = "Analyzes scheduled tasks deployed via Group Policy."
+	    SectionTitle = "Запланированные задания в GPO"
+	    Summary = "Проверка задач, создаваемых и настраиваемых групповыми политиками."
 	    WhyItMatters = "GPO scheduled tasks run with specified privileges on target systems. Tasks running as SYSTEM from writable paths or UNC shares enable privilege escalation."
 	    WhatWeCheck = @(
 	        "Scheduled tasks in GPO configurations, every Exec action of each"
@@ -23697,8 +23697,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "GPO Script: {Name}"
 	    Module = "GPO"
 	    Category = "GPO"
-	    SectionTitle = "GPO Script Paths"
-	    Summary = "Detects Logon/Logoff/Startup/Shutdown scripts deployed via Group Policy."
+	    SectionTitle = "Пути сценариев в GPO"
+	    Summary = "Проверка сценариев запуска и входа, заданных через GPO."
 	    WhyItMatters = "GPO scripts execute automatically on target systems. Startup and Shutdown scripts run as SYSTEM, making them high-value targets for privilege escalation. Scripts loaded from UNC paths expose machine credentials on the network."
 	    WhatWeCheck = @(
 	        "Startup/Shutdown scripts (run as SYSTEM)"
@@ -23714,8 +23714,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "GPO Registry Setting: {Name}"
 	    Module = "GPO"
 	    Category = "GPO"
-	    SectionTitle = "GPO Registry Settings"
-	    Summary = "Detects security-relevant registry values deployed via Group Policy that, when set, enable an attack."
+	    SectionTitle = "Параметры реестра в GPO"
+	    Summary = "Анализ параметров реестра, устанавливаемых объектами групповой политики."
 	    WhyItMatters = "Group Policy can push registry values to every linked system. A single value such as WDigest cleartext caching, AlwaysInstallElevated, RDP Restricted Admin, the Zerologon/OneLogon allow-list, or WSUS-over-HTTP turns the whole scope into an attack surface for credential theft, lateral movement, or privilege escalation. This check parses both delivery mechanisms (Registry.pol and Registry.xml) and reports only values that are actively set to a dangerous state. It sees what is deployed via GPO, not what is set locally on a host."
 	    WhatWeCheck = @(
 	        "Administrative Templates (Registry.pol, PReg binary)"
@@ -23733,8 +23733,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "GPO Registry Values: {Name}"
 	    Module = "GPO"
 	    Category = "GPO"
-	    SectionTitle = "GPO Registry Settings"
-	    Summary = "Lists the registry values a policy file deploys that no rule of Get-GPORegistrySettings judges (-IncludeUnknown)."
+	    SectionTitle = "Значения реестра в GPO"
+	    Summary = "Проверка значений реестра, изменяемых групповыми политиками."
 	    WhyItMatters = "The list of dangerous registry settings covers known Windows attack paths. An application's settings - macro security, remote access tools, update channels - and Windows settings without a rule are not on it. Listed here so that someone who knows the applications can read them."
 	    WhatWeCheck = @(
 	        "Every value a policy deploys through Registry.pol, Registry.xml or GptTmpl.inf that no rule names and no other check reads"
@@ -23746,8 +23746,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Point and Print GPO: {Name}"
 	    Module = "GPO"
 	    Category = "GPO"
-	    SectionTitle = "Point and Print Printer Driver Policies"
-	    Summary = "Shows the Point and Print configuration deployed by each GPO and whether it lets a non-administrator install a printer driver."
+	    SectionTitle = "Политики установки драйверов Point and Print"
+	    Summary = "Проверка ограничений Point and Print для установки драйверов принтеров."
 	    WhyItMatters = "Installing a printer driver means running code as SYSTEM, so Point and Print decides who may execute code on every machine in the GPO scope. No single value settles that question. Since the August 2021 update, RestrictDriverInstallationToAdministrators blocks the install outright unless it is explicitly set to 0, which makes a lone prompt-suppression setting a very common but inert legacy leftover - and makes the combination of both values a straight path from any domain user to SYSTEM. The approved-server settings decide where a driver may come from, but they never compensate for a suppressed elevation prompt. Settings placed in User Configuration are ignored by Windows entirely and only look like a control."
 	    WhatWeCheck = @(
 	        "Point and Print Restrictions (Restricted, prompt settings, trusted servers, forest restriction)"
@@ -23763,8 +23763,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "LAPS Password Not Rotating: {Name}"
 	    Module = "Computer"
 	    Category = "Computers"
-	    SectionTitle = "LAPS Passwords That Stopped Rotating"
-	    Summary = "Computers that have LAPS but whose password expiration time lies in the past."
+	    SectionTitle = "Пароли LAPS, переставшие обновляться"
+	    Summary = "Поиск паролей LAPS, не сменявшихся в установленный срок."
 	    WhyItMatters = "Coverage counts a machine as protected the moment the LAPS attribute exists, which says nothing about whether the password behind it ever changed. An expiration time in the past means the client did not rotate when it was due - and a local administrator password that stopped rotating is as good to an attacker as no LAPS at all."
 	    WhatWeCheck = @(
 	        "ms-Mcs-AdmPwdExpirationTime and msLAPS-PasswordExpirationTime against the current time"
@@ -23778,8 +23778,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "LAPS GPO: {Name}"
 	    Module = "Computer"
 	    Category = "Computer"
-	    SectionTitle = "LAPS GPO Configuration"
-	    Summary = "Shows the LAPS policy settings deployed via Group Policy and where they apply."
+	    SectionTitle = "Параметры LAPS в групповых политиках"
+	    Summary = "Проверка параметров Windows LAPS, заданных в GPO."
 	    WhyItMatters = "The LAPS policy in a GPO decides which local account is managed, how strong the password is, and - for Windows LAPS - whether the password is encrypted in Active Directory and escrowed there at all. These settings are readable from SYSVOL without any LAPS password permissions, so they disclose the managed account name and reveal misconfigurations before a single computer object is touched. A policy with encryption disabled writes the password in cleartext to msLAPS-Password, and a policy with the backup target disabled or pointed only at Microsoft Entra ID leaves this Active Directory without any escrowed password despite LAPS appearing to be deployed."
 	    WhatWeCheck = @(
 	        "Managed account name (AdminAccountName / AdministratorAccountName)"
@@ -23795,8 +23795,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "BloodHound Collection: {Name}"
 	    Module = "Bloodhound"
 	    Category = "BloodHound"
-	    SectionTitle = "BloodHound Data Collection"
-	    Summary = "Collects AD data in BloodHound Community Edition format using adPEAS native collector."
+	    SectionTitle = "Сбор данных BloodHound"
+	    Summary = "Сбор графа отношений между объектами, группами и разрешениями AD."
 	    WhyItMatters = "BloodHound enables graph-based attack path analysis. The collected data helps identify privilege escalation paths, ACL abuses, and delegation attacks that might be missed by individual checks."
 	    WhatWeCheck = @(
 	        "Users, Groups, Computers, OUs, GPOs, Containers"
@@ -23811,8 +23811,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Module: {Name}"
 	    Module = "Statistics"
 	    Category = "Statistics"
-	    SectionTitle = "LDAP Statistics"
-	    Summary = "LDAP query statistics per module."
+	    SectionTitle = "Статистика LDAP по модулям"
+	    Summary = "Количество LDAP-запросов и объём данных по каждому модулю."
 	    WhyItMatters = "Shows the LDAP query load per module to identify expensive operations and estimate network traffic."
 	    WhatWeCheck = @(
 	        "Number of LDAP queries sent"
@@ -23824,8 +23824,8 @@ $Script:ObjectTypeDefinitions = [ordered]@{
 	    TitleFormat = "Total"
 	    Module = "Statistics"
 	    Category = "Statistics"
-	    SectionTitle = "LDAP Statistics"
-	    Summary = "Total LDAP query statistics across all modules."
+	    SectionTitle = "Общая статистика LDAP"
+	    Summary = "Сводное количество LDAP-запросов, результатов и переданных данных."
 	    WhyItMatters = "Provides a complete picture of the scan's LDAP footprint."
 	    WhatWeCheck = @(
 	        "Aggregated LDAP query count and result count"
@@ -91013,6 +91013,53 @@ function Get-HTMLTemplate {
         // Check descriptions (embedded from adPEAS-ObjectTypes.ps1)
         const checkDescriptions = {{CHECK_DESCRIPTIONS_JSON}};
 
+        // RU display catalog. Canonical IDs, data attributes and scoring remain unchanged.
+        const ruFindingTitles = {"KERBEROASTABLE_SPN":"Учётная запись службы, уязвимая к Kerberoasting","ASREP_ROASTABLE":"Учётная запись без предварительной проверки подлинности Kerberos (AS-REP Roasting)","KERBEROAST_WITHOUT_PREAUTH":"Kerberoasting без учётных данных через запись без предварительной проверки подлинности","KERBEROS_HASH_CRACKABLE":"Хеш Kerberos, доступный для автономного подбора пароля","KRBTGT_PASSWORD_OLD":"Пароль учётной записи krbtgt давно не менялся","GUEST_ACCOUNT_ENABLED":"Встроенная учётная запись «Гость» включена","GUEST_ACCOUNT_DISABLED":"Встроенная учётная запись «Гость» отключена","UNCONSTRAINED_DELEGATION":"Разрешено неограниченное делегирование Kerberos","UNCONSTRAINED_DELEGATION_DC":"Неограниченное делегирование на контроллере домена","UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS":"Привилегированные учётные записи передают TGT узлам с неограниченным делегированием","CONSTRAINED_DELEGATION_PROTOCOL_TRANSITION":"Ограниченное делегирование с переходом протокола","GPO_NOT_CURRENTLY_EFFECTIVE":"Этот параметр групповой политики сейчас не применяется","PRIVILEGED_ACCOUNT_AFFECTED":"Затронута привилегированная учётная запись","ROASTABLE_PRIVILEGED_ACCOUNT":"Привилегированная учётная запись допускает подбор пароля по билетам Kerberos","CONSTRAINED_DELEGATION_TO_DC":"Ограниченное делегирование на контроллер домена","CONSTRAINED_DELEGATION_TRANSITION_NO_TARGET":"Переход протокола без указанной цели делегирования","RBCD_DANGEROUS_PRINCIPALS":"Опасные разрешения делегирования на основе ресурса (RBCD)","ESC1_TEMPLATE":"ESC1 — уязвимый шаблон сертификата","ESC_ENROLLMENT_RIGHTS_UNREAD":"Не удалось прочитать права регистрации по шаблону сертификата","ESC2_TEMPLATE":"ESC2 — шаблон сертификата «Любое назначение» или SubCA","ESC3_TEMPLATE":"ESC3 — шаблон сертификата агента запросов","ESC3_TARGET_TEMPLATE":"ESC3 — шаблон для выдачи сертификата от имени другого пользователя","ESC4_TEMPLATE":"ESC4 — опасные права доступа к шаблону сертификата","ESC5_PKI_CONTAINER_ACL":"ESC5 — опасные разрешения на контейнеры PKI","ESC8_WEB_ENROLLMENT":"ESC8 — возможность NTLM Relay к веб-регистрации сертификатов","ADCS_HTTP_AVAILABLE":"Доступна регистрация сертификатов ЦС по HTTP","ADCS_NONPRIV_ENROLLMENT":"Регистрация сертификатов доступна непривилегированным субъектам","ADCS_CLIENT_AUTH_EKU":"В шаблоне разрешено EKU «Проверка подлинности клиента»","ADCS_SMARTCARD_LOGON_EKU":"В шаблоне разрешено EKU «Вход со смарт-картой»","DANGEROUS_ACL_GENERICALL":"Право GenericAll на чувствительном объекте","DANGEROUS_ACL_GENERICWRITE":"Право GenericWrite на чувствительном объекте","DANGEROUS_ACL_WRITEDACL":"Право WriteDACL на чувствительном объекте","DANGEROUS_ACL_WRITEOWNER":"Право WriteOwner на чувствительном объекте","DANGEROUS_ACL_GPO_WRITEPROPERTY":"Право WriteProperty на объекте GPO","DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED":"Право WriteProperty на атрибут GPO, не управляющий содержимым политики","DANGEROUS_ACL_GPO_DELETE":"Разрешение удаления объекта GPO","DANGEROUS_ACL_GPO_EXTENDED":"Право Self или ExtendedRight на объекте GPO","GPO_SYSVOL_WRITABLE":"Право записи в папку GPO в SYSVOL","GPO_NON_DEFAULT_OWNER":"Нестандартный владелец объекта групповой политики","GPO_SYSVOL_GPT_MISSING":"У объекта GPO отсутствует папка или gpt.ini в SYSVOL","GPO_SYSVOL_FOLDER_ORPHANED":"Папка SYSVOL не связана с объектом GPO","GPO_UNLINKED_BROAD_WRITE":"Широкая группа может изменить непривязанный объект GPO","DOMAIN_ROOT_GPLINK_WRITE":"Право записи в атрибут gPLink корневого объекта домена","DOMAIN_ROOT_SID_HISTORY_WRITE":"Право Migrate-SID-History на объекте домена","DOMAIN_ROOT_REPLICA_INSTALL":"Право DS-Install-Replica на объекте домена","CRITICAL_OBJECT_CONTROL":"Управление схемой, конфигурацией, разделами, ролями или сайтами AD","RODC_PRIVILEGED_PASSWORD_ALLOWED":"RODC может кэшировать пароли привилегированных учётных записей","RODC_PRIVILEGED_PASSWORD_REVEALED":"Привилегированные секреты уже кэшированы на RODC","RODC_DENIED_GROUP_MISSING":"Защищаемая группа отсутствует в списке запрета репликации паролей RODC","UNREGISTERED_DOMAIN_CONTROLLER":"Компьютер с ролью контроллера домена не зарегистрирован как контроллер","DOMAIN_ROOT_REANIMATE_TOMBSTONES":"Право Reanimate-Tombstones на объекте домена","DOMAIN_ROOT_MAQ_WRITE":"Право изменения ms-DS-MachineAccountQuota","DOMAIN_ROOT_FSMO_TRANSFER":"Право передачи роли эмулятора PDC на объекте домена","DOMAIN_ROOT_NON_DEFAULT_OWNER":"Нестандартный владелец корневого объекта домена","OU_NON_DEFAULT_OWNER":"Нестандартный владелец организационной единицы","DANGEROUS_ACL_REPLICATION_NO_SECRETS":"Права репликации без секретов: недостаточно одного разрешения для DCSync","DANGEROUS_ACL_REPLICATION_INERT_HALF":"Право репликации неактивно без парного разрешения","DANGEROUS_ACL_DCSYNC_BROAD":"Права DCSync предоставлены широкой группе","DANGEROUS_ACL_BROAD_GROUP":"Широкой группе предоставлены опасные права на объект домена","DANGEROUS_ACL_DCSYNC":"Права DCSync на репликацию данных каталога","OU_PERM_WRITEPROPERTY_ALL":"Разрешение WriteProperty на все свойства объектов OU","OU_PERM_PASSWORD_RESET":"Право сброса паролей в OU","OU_PERM_USERACCOUNTCONTROL":"Право изменения userAccountControl в OU","OU_PERM_USER_ACCOUNT_RESTRICTIONS":"Право изменения набора User-Account-Restrictions в OU","OU_PERM_GROUP_MEMBERSHIP":"Право изменения состава групп через атрибут member в OU","OU_PERM_SELF_ALL_VALIDATED":"Все проверяемые операции записи Validated Writes в OU","OU_PERM_SELF_MEMBERSHIP":"Право на самостоятельное изменение членства в группах OU","OU_PERM_SPN_WRITE":"Право изменения servicePrincipalName в OU","OU_PERM_VALIDATED_SPN":"Разрешение Validated-SPN в OU","OU_PERM_DNSHOSTNAME_WRITE":"Право изменения dNSHostName в OU","OU_PERM_KEYCREDENTIALLINK_WRITE":"Право изменения msDS-KeyCredentialLink в OU","ADMINSDHOLDER_PROPAGATED_RIGHT":"Право на AdminSDHolder, распространяемое SDProp на защищённые объекты","OU_PERM_DNS_HOST_NAME_ATTRIBUTES":"Право изменения DNS-Host-Name-Attributes в OU","OU_PERM_VALIDATED_DNS":"Разрешение Validated-DNS-Host-Name в OU","OU_PERM_SCRIPTPATH":"Право изменения scriptPath в OU","OU_PERM_CONSTRAINED_DELEGATION":"Право изменения msDS-AllowedToDelegateTo в OU","OU_PERM_RBCD":"Право изменения msDS-AllowedToActOnBehalfOfOtherIdentity в OU","OU_PERM_LAPS_READ":"Право чтения паролей LAPS в OU","OU_PERM_CREATE_CHILD":"Право создания дочерних объектов в OU","OU_PERM_CREATE_DMSA":"Право создания делегированных управляемых учётных записей dMSA","OU_PERM_GPLINK":"Право изменения привязок GPO через gPLink в OU","OU_PERM_GPOPTIONS":"Право изменения gPOptions в OU","OU_PERM_GENERICWRITE":"Право GenericWrite в OU","OU_PERM_READALL":"Право чтения всех свойств в OU","PASSWORD_NEVER_EXPIRES":"Срок действия пароля не ограничен","PASSWORD_NOT_REQUIRED":"Установлен флаг PASSWD_NOTREQD: пароль не обязателен","PRECREATED_COMPUTER_ACCOUNT":"Предварительно созданная учётная запись компьютера не использовалась","INTERDOMAIN_TRUST_ACCOUNT":"Учётная запись междоменного доверия","ESX_ADMINS_MEMBER":"Участник группы ESX Admins (администраторы VMware ESXi)","PRIVILEGED_GROUP_MEMBERSHIP":"Членство в привилегированной группе уровня Tier 0","OPERATOR_GROUP_MEMBERSHIP":"Членство в операторской группе или группе с широким доступом","EXCHANGE_GROUP_PERMISSIONS":"Штатные разрешения служебной группы Exchange","EXCHANGE_GROUP_LOW_PRIV_MEMBER":"Непривилегированная учётная запись в служебной группе Exchange","LDAP_SIGNING_NOT_REQUIRED":"Подпись LDAP не обязательна","LDAP_CHANNEL_BINDING_NOT_REQUIRED":"Привязка канала LDAP не обязательна","LDAP_ANONYMOUS_BINDING_ALLOWED":"Разрешены анонимные операции LDAP","DSHEURISTICS_ANONYMOUS_NSPI":"Разрешён анонимный доступ NSPI","DSHEURISTICS_ADMINSDHOLDER_EXCLUSION":"Операторские группы исключены из защиты AdminSDHolder","DSHEURISTICS_UNIQUENESS_DISABLED":"Отключена проверка уникальности UPN или SPN","SID_HISTORY_INJECTION":"Привилегированный SID этого домена в sIDHistory","SID_HISTORY_OWN_DOMAIN":"SID этого домена в атрибуте sIDHistory","SID_HISTORY_FOREIGN_PRIVILEGED":"Привилегированный SID другого домена в sIDHistory","SID_HISTORY_ORPHANED":"SID из недоверенного домена или домена вне леса в sIDHistory","GPO_DANGEROUS_PERMISSIONS":"Опасные разрешения на объект GPO","GPO_SCOPE_DOMAIN_WIDE":"Объект GPO привязан к корню домена и действует на весь домен","LAPS_NOT_DEPLOYED":"Защита LAPS не внедрена","LAPS_PASSWORD_READABLE":"Пароль LAPS доступен для чтения","BITLOCKER_KEY_READABLE":"Ключ восстановления BitLocker доступен для чтения","BITLOCKER_RECOVERY_DELEGATED":"Чтение пароля восстановления BitLocker делегировано субъекту","GPO_USERRIGHT_SEDEBUG":"Право «Отладка программ» (SeDebugPrivilege) назначено через GPO сверх стандартных значений","GPO_USERRIGHT_SETCB":"Право «Работа в режиме операционной системы» (SeTcbPrivilege) назначено через GPO","GPO_USERRIGHT_SECREATETOKEN":"Право «Создание объекта токена» (SeCreateTokenPrivilege) назначено через GPO","GPO_USERRIGHT_SEIMPERSONATE":"Право «Имитация клиента после проверки подлинности» (SeImpersonatePrivilege) выдано через GPO","GPO_USERRIGHT_SEASSIGNPRIMARYTOKEN":"Право «Замена токена уровня процесса» (SeAssignPrimaryTokenPrivilege) выдано через GPO","GPO_USERRIGHT_SELOADDRIVER":"Право «Загрузка и выгрузка драйверов устройств» (SeLoadDriverPrivilege) выдано через GPO","GPO_USERRIGHT_SEBACKUP":"Право «Архивирование файлов и каталогов» (SeBackupPrivilege) выдано через GPO","GPO_USERRIGHT_SERESTORE":"Право «Восстановление файлов и каталогов» (SeRestorePrivilege) выдано через GPO","GPO_USERRIGHT_SETAKEOWNERSHIP":"Право «Смена владельцев файлов и других объектов» (SeTakeOwnershipPrivilege) выдано через GPO","GPO_USERRIGHT_SEENABLEDELEGATION":"Право доверия учётных записей для делегирования (SeEnableDelegationPrivilege) выдано через GPO","GPO_USERRIGHT_SESYNCAGENT":"Право «Синхронизация данных службы каталогов» (SeSyncAgentPrivilege) выдано через GPO","GPO_USERRIGHT_SEMANAGEVOLUME":"Право обслуживания томов (SeManageVolumePrivilege) выдано через GPO","GPO_USERRIGHT_SESECURITY":"Право управления аудитом и журналом безопасности (SeSecurityPrivilege) выдано через GPO","GPO_USERRIGHT_SERELABEL":"Право изменения метки объекта (SeRelabelPrivilege) выдано через GPO","GPO_USERRIGHT_SETRUSTEDCREDMANACCESS":"Доступ к диспетчеру учётных данных как доверенного вызывающего (SeTrustedCredManAccessPrivilege)","GPO_USERRIGHT_SEREMOTEINTERACTIVELOGON":"Право входа через службы удалённых рабочих столов (SeRemoteInteractiveLogonRight) расширено через GPO","GPO_USERRIGHT_SEINTERACTIVELOGON":"Право локального входа (SeInteractiveLogonRight) расширено через GPO","GPO_USERRIGHT_SEBATCHLOGON":"Право пакетного входа (SeBatchLogonRight) расширено через GPO","GPO_USERRIGHT_SESERVICELOGON":"Право входа в качестве службы (SeServiceLogonRight) назначено через GPO","GPO_USERRIGHT_SESYSTEMTIME":"Право изменения системного времени (SeSystemtimePrivilege) расширено через GPO","GPO_USERRIGHT_SEREMOTESHUTDOWN":"Право принудительного удалённого завершения работы (SeRemoteShutdownPrivilege) расширено через GPO","GPO_USERRIGHT_SESHUTDOWN":"Право завершения работы системы (SeShutdownPrivilege) расширено через GPO","GPO_USERRIGHT_SECREATESYMBOLICLINK":"Право создания символических ссылок (SeCreateSymbolicLinkPrivilege) расширено через GPO","GPO_USERRIGHT_SEDELEGATESESSIONUSERIMPERSONATE":"Право получения токена другого пользователя в сеансе (SeDelegateSessionUserImpersonatePrivilege) выдано через GPO","GPO_USERRIGHT_SEAUDIT":"Право формирования аудита безопасности (SeAuditPrivilege) расширено через GPO","GPO_USERRIGHT_SESYSTEMENVIRONMENT":"Право изменения параметров среды микропрограммы (SeSystemEnvironmentPrivilege) расширено через GPO","GPO_USERRIGHT_SECREATEGLOBAL":"Право создания глобальных объектов (SeCreateGlobalPrivilege) расширено через GPO","GPO_USERRIGHT_SEPROFILESINGLEPROCESS":"Право профилирования отдельного процесса (SeProfileSingleProcessPrivilege) расширено через GPO","GPO_USERRIGHT_SESYSTEMPROFILE":"Право профилирования производительности системы (SeSystemProfilePrivilege) расширено через GPO","GPO_USERRIGHT_DEFAULT_REMOVED":"Групповая политика исключает стандартного владельца права пользователя","LAPS_ENCRYPTED_READ_NO_DECRYPTOR":"Доступно чтение зашифрованного пароля LAPS без возможности расшифрования","LAPS_PASSWORD_READ_ACCESS":"Разрешения на чтение пароля LAPS","LAPS_READ_BLOCKED_BY_CONFIDENTIAL":"Чтение всех свойств OU компьютеров ограничено флагом конфиденциальности","SMB_SIGNING_DISABLED":"Цифровая подпись SMB не обязательна","CREDENTIAL_IN_DESCRIPTION":"Учётные данные обнаружены в текстовом атрибуте","DELETED_OBJECT_CREDENTIAL":"Учётные данные сохранились в удалённом объекте","DELETED_OBJECTS_READ_DELEGATED":"Чтение удалённых объектов разрешено вне Tier 0","DELETED_OBJECTS_READ_BROAD":"Широкой группе разрешено читать удалённые объекты","CREDENTIAL_GPP_PASSWORD":"Пароль в предпочтениях групповой политики (GPP)","CREDENTIAL_AUTOADMINLOGON":"Учётные данные AutoAdminLogon в GPO","GPO_REGISTRY_PASSWORD":"Пароль в значении реестра, развёрнутом через GPO","CREDENTIAL_UNATTEND_PASSWORD":"Пароль в файле ответов установки Windows","CREDENTIAL_VNC_PASSWORD":"Пароль VNC доступен для чтения","CREDENTIAL_NET_USE":"Пароль указан прямо в команде net use","CREDENTIAL_SCRIPT_PASSWORD":"Пароль обнаружен в файле сценария","CREDENTIAL_CONNECTION_STRING":"Учётные данные в строке подключения к базе данных","CREDENTIAL_MENTION_REVIEW":"Возможное упоминание учётных данных — требуется проверка","REVERSIBLE_ENCRYPTION":"Пароль хранится с обратимым шифрованием","GMSA_PASSWORD_READABLE":"Управляемый пароль gMSA доступен для получения","SHADOW_CREDENTIALS":"Атрибут ключевых учётных данных msDS-KeyCredentialLink заполнен","TRUST_SID_FILTERING_DISABLED":"Фильтрация SID в доверительных отношениях отключена","RBCD_CONFIGURED":"Настроено ограниченное делегирование на основе ресурса (RBCD)","KERBEROS_TICKET_LIFETIME_EXTENDED":"Срок действия билета Kerberos превышает стандартный","TRUST_USES_RC4":"Доверительные отношения используют Kerberos без AES","TRUST_PASSWORD_STALE":"Пароль доверительных отношений давно не обновлялся","TRUST_BIDIRECTIONAL":"Двусторонние доверительные отношения","TRUST_TRANSITIVE":"Транзитивные доверительные отношения","TRUST_SELECTIVE_AUTH":"Включена выборочная проверка подлинности","TRUST_TREAT_AS_EXTERNAL":"Ослаблена фильтрация SID для лесного доверия","NETWORK_SUBNET_DOMAIN_CONTROLLERS":"Подсеть с контроллерами домена","OS_EXTENDED_SECURITY_UPDATES_ONLY":"ОС вне основной поддержки, доступны только платные ESU","OUTDATED_OS":"Операционная система снята с поддержки","AGING_OS":"Операционная система приближается к окончанию поддержки","EXCHANGE_VULNERABLE_VERSION":"Версия Exchange Server вышла из поддержки","EXCHANGE_SHARED_PERMISSIONS_MODEL":"Модель общих разрешений Exchange: WriteDACL на объекте домена","EXCHANGE_PERMISSIONS_MODEL_CLEAN":"Exchange не имеет действующих прав повышения привилегий на объекте домена","EXCHANGE_AD_SPLIT_PERMISSIONS":"В Exchange применяется разделённая модель разрешений AD","EXCHANGE_SMTP_OPEN_RELAY":"SMTP-соединитель Exchange ретранслирует сообщения анонимных отправителей","EXCHANGE_SMTP_ANONYMOUS_SPOOFING":"Анонимные отправители могут использовать внутренние адреса отправителя","EXCHANGE_SMTP_BROAD_RELAY":"SMTP-соединитель позволяет ретрансляцию всем прошедшим проверку подлинности","EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED":"Анонимная почта считается прошедшей проверку подлинности","EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM":"Анонимные сообщения могут обходить антиспам-защиту Exchange","EXCHANGE_SMTP_BROAD_SPOOFING":"Любая доменная учётная запись может подменить внутреннего отправителя","EXCHANGE_SMTP_CONNECTOR_AUTHENTICATED":"Принимающий SMTP-соединитель требует проверки подлинности","EXCHANGE_SMTP_CONNECTOR_UNREADABLE":"Не удалось прочитать разрешения принимающего SMTP-соединителя","EXCHANGE_HYBRID_DEPLOYMENT":"Гибридный Exchange: компрометация локальной инфраструктуры может затронуть облачный тенант","EXCHANGE_RBAC_MAILBOX_IMPORT_EXPORT":"Назначена роль Mailbox Import Export","EXCHANGE_RBAC_APPLICATION_IMPERSONATION":"Назначена роль ApplicationImpersonation","EXCHANGE_RBAC_ROLE_MANAGEMENT":"Роль Role Management назначена вне группы Organization Management","EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT":"Назначена роль Unscoped Role Management","EXCHANGE_RBAC_MAILBOX_SEARCH":"Роль Mailbox Search назначена вне группы Discovery Management","EXCHANGE_RBAC_AD_PERMISSIONS":"Роль Active Directory Permissions назначена вне Organization Management","EXCHANGE_RBAC_DEFAULT_ASSIGNMENT":"Критически важная роль Exchange назначена стандартной группе ролей","COMPUTER_OBJECT_EXPLICIT_RIGHT":"Явное разрешение на объекте компьютера вне Tier 0","COMPUTER_PASSWORD_NOT_ROTATED":"Пароль компьютерной учётной записи давно не обновлялся","DC_PASSWORD_NOT_ROTATED":"Пароль учётной записи контроллера домена давно не обновлялся","MACHINE_QUOTA_UNRESTRICTED":"Квота создания компьютерных учётных записей не ограничена","INACTIVE_PRIVILEGED_ACCOUNT":"Неактивная привилегированная учётная запись","ORPHANED_ADMIN_ACCOUNT":"Осиротевшая административная запись: adminCount без членства в защищаемой группе","STALE_PASSWORD":"Пароль не менялся продолжительное время","STALE_PASSWORD_MEDIUM":"Предупреждение: пароль не менялся от одного года до пяти лет","WEAK_PASSWORD_POLICY":"Слабая доменная политика паролей","WEAK_FGPP":"Тонкая политика паролей слабее доменной политики по умолчанию","NO_MAX_PASSWORD_AGE":"Максимальный срок действия пароля не ограничен","WEAK_LOCKOUT_DURATION":"Недостаточная продолжительность блокировки учётной записи","NO_ACCOUNT_LOCKOUT":"Политика блокировки учётных записей отключена или слишком слабая","NO_MIN_PASSWORD_AGE":"Минимальный срок действия пароля не установлен","PASSWORD_HISTORY_DISABLED":"История паролей отключена","ESC9_CT_NO_SECURITY_EXTENSION":"ESC9 — шаблон сертификата без расширения безопасности","SCCM_SYSTEM_MANAGEMENT_ACL":"Право записи в контейнер SCCM System Management","SCOM_PRIVILEGED_SERVICE_ACCOUNT":"Привилегированная служебная учётная запись SCOM","SCCM_SITE_HIERARCHY":"Обнаружена иерархия SCCM с несколькими сайтами","SCCM_PXE_EXPOSURE":"Обнаружен сервер сетевой загрузки PXE","SCCM_SERVICE_ACCOUNT":"Служебная учётная запись SCCM с SPN","SCCM_GROUP_BROAD_MEMBER":"Широкая группа состоит в группе, связанной с SCCM","AZURE_AD_CONNECT_EXPOSED":"Возможное раскрытие доступа к серверу Microsoft Entra Connect","ADFS_DKM_CONTAINER":"AD FS развёрнут: ключ подписи токенов хранится в каталоге","MSSQL_SERVICE_ACCOUNT_PRIVILEGED":"SQL Server работает от привилегированной доменной учётной записи","LAPS_PASSWORD_NOT_ROTATED":"Пароль LAPS перестал регулярно обновляться","DSRM_PASSWORD_UNMANAGED":"Пароль DSRM не управляется Windows LAPS","NON_DEFAULT_COMPUTER_OWNERS":"Нестандартный владелец компьютерного объекта","COMPUTER_OWNERSHIP_REASSIGNED":"Владелец компьютерного объекта изменён после создания","NON_DEFAULT_USER_OWNERS":"Нестандартный владелец пользовательского объекта","READABLE_UNIX_PASSWORD_ATTRIBUTES":"Парольные атрибуты UNIX доступны для чтения","STANDALONE_MSA_LEGACY":"Устаревшая автономная управляемая учётная запись службы (sMSA)","GPO_TASK_SYSTEM_UNC_PATH":"Задача GPO запускается от SYSTEM или привилегированной записи по UNC-пути","GPO_TASK_UNQUOTED_PATH":"В задаче GPO не заключён в кавычки путь исполняемого файла","GPO_TASK_CMD_UNQUOTED_PATH":"Задача GPO передаёт cmd.exe путь без кавычек","ESC15_SCHEMA_V1_ENROLLEE_SUBJECT":"ESC15 — шаблон схемы v1 позволяет задавать субъект сертификата заявителю","CREDENTIAL_ROAMING_PRESENT":"Credential Roaming: закрытые ключи и мастер-ключи DPAPI хранятся в AD","CREDENTIAL_ROAMING_READABLE":"Credential Roaming: данные доступны всем прошедшим проверку подлинности","CREDENTIAL_ROAMING_DELEGATED":"Credential Roaming: чтение закрытых и мастер-ключей делегировано","ESC14_WEAK_EXPLICIT_MAPPING":"ESC14 — слабое явное сопоставление сертификатов","ESC14_WRITABLE_MAPPING":"ESC14 — непривилегированный субъект может изменить altSecurityIdentities","ESC13_ISSUANCE_POLICY_GROUP_LINK":"ESC13 — политика выдачи сертификата связана с группой AD","ADCS_CA_WEAK_SIGNATURE":"В сертификате ЦС используется слабый алгоритм подписи","ADCS_CA_SHORT_KEY":"Недостаточная длина ключа сертификата ЦС","ADCS_CA_CERT_EXPIRED":"Срок действия сертификата ЦС истёк","ADCS_CA_CROSS_DOMAIN":"Сервер центра сертификации находится в другом домене","PRIVILEGED_GROUP_ACL":"Возможность управления привилегированной группой вне защиты AdminSDHolder","PRIVILEGED_ACCOUNT_ACL":"Возможность управления привилегированной учётной записью","NTAUTH_FOREIGN_ISSUER":"Хранилище NTAuth содержит издателя вне корпоративных ЦС этого леса","PKI_WEAK_SIGNATURE_ALGORITHM":"В сертификате PKI используется слабый алгоритм подписи","PKI_SHORT_KEY_LENGTH":"Недостаточная длина ключа сертификата PKI","PKI_CERTIFICATE_EXPIRED":"Срок действия сертификата PKI истёк","COMPUTER_CONTAINER_CREATE_BROAD":"Широкой группе разрешено создавать компьютерные объекты","COMPUTER_CONTAINER_CREATE_PERMISSIONS":"Нестандартные разрешения на создание компьютерных объектов","GPO_SEMACHINEACCOUNTPRIVILEGE_BROAD":"Право SeMachineAccountPrivilege назначено через GPO","BLOODHOUND_COLLECTION_COMPLETE":"Сбор данных BloodHound","LDAP_SIGNING_REQUIRED":"Цифровая подпись LDAP обязательна","LDAP_CHANNEL_BINDING_ALWAYS":"Привязка канала LDAP обязательна всегда","LDAP_ANONYMOUS_BINDING_RESTRICTED":"Анонимные подключения LDAP ограничены","ANONYMOUS_SAM_ENUMERATION_ALLOWED":"Разрешено анонимное перечисление учётных записей SAM и общих ресурсов","ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED":"Разрешено анонимное преобразование SID в имена","SMB_SIGNING_REQUIRED":"Цифровая подпись SMB обязательна","ENROLLMENT_REQUIRES_APPROVAL":"Для регистрации сертификата необходимо одобрение","ACCOUNT_DISABLED":"Учётная запись отключена","SMARTCARD_REQUIRED":"Для интерактивного входа обязательна смарт-карта","ACCOUNT_NOT_DELEGATED":"Учётная запись помечена как конфиденциальная и не допускает делегирования","WEB_ENDPOINT_EPA_ENABLED":"Включена расширенная защита проверки подлинности (EPA)","PKI_STRONG_SIGNATURE_ALGORITHM":"Сертификат PKI использует стойкий алгоритм подписи","PKI_STRONG_KEY_LENGTH":"Сертификат PKI использует достаточную длину ключа","PASSWORD_COMPLEXITY_ENABLED":"Требования к сложности пароля включены","LOCKOUT_DURATION_FOREVER":"Разблокировка учётной записи требует действий администратора","PRIMARY_GROUP_IS_DC_GROUP":"У некомуьпьютерной записи основная группа контроллеров домена","TIER0_NOT_IN_PROTECTED_USERS":"Учётная запись уровня Tier 0 отсутствует в группе Protected Users","OPERATOR_GROUP_MEMBERS":"В операторской группе есть активные участники","INACTIVE_ACCOUNT":"Обнаружена неактивная учётная запись","OLD_FUNCTIONAL_LEVEL":"Устаревший функциональный уровень домена или леса","AD_RECYCLE_BIN_DISABLED":"Корзина Active Directory не включена","SYSVOL_FRS_REPLICATION":"Репликация SYSVOL всё ещё использует FRS","TOMBSTONE_LIFETIME_SHORT":"Срок хранения удалённых объектов меньше 180 дней","PREWIN2000_ANONYMOUS_MEMBER":"Anonymous Logon состоит в группе Pre-Windows 2000 Compatible Access","PREWIN2000_DEFAULT_MEMBER":"Authenticated Users состоит в группе Pre-Windows 2000 Compatible Access","PREWIN2000_BROAD_MEMBER":"Широкая группа включена в Pre-Windows 2000 Compatible Access","ANON_LDAP_READABLE_ATTRS":"Атрибуты LDAP доступны анонимному чтению","LAPS_UNPROTECTED_COMPUTERS":"Компьютеры не защищены LAPS","LAPS_COVERAGE_NOT_IN_AD":"Не удаётся определить охват LAPS по данным Active Directory","GPO_WIDE_IMPACT":"Объект GPO влияет на большое количество компьютеров","LAPS_GPO_PASSWORD_LENGTH":"Длина пароля LAPS меньше стандартного значения","LAPS_GPO_PASSWORD_AGE":"Интервал смены пароля LAPS превышает стандартный","LAPS_GPO_DISABLED":"LAPS отключён групповой политикой","LAPS_GPO_NO_POST_AUTH_RESET":"Windows LAPS не сбрасывает пароль после использования","GMSA_ROTATION_INTERVAL_LONG":"Пароль gMSA меняется слишком редко","GMSA_MEMBERSHIP_OWNER":"Дескриптор доступа к паролю gMSA принадлежит непривилегированному субъекту","AUTHN_SILO_NOT_EFFECTIVE":"Хранилище политик проверки подлинности никого не ограничивает","AUTHN_SILO_INCOMPLETE_ENROLLMENT":"Учётная запись не включена в назначенное хранилище политики проверки подлинности","AUTHN_POLICY_EXEMPT_ADMINISTRATOR":"Встроенная запись «Администратор» подпадает под политику проверки подлинности","AUTHN_POLICY_NOT_EFFECTIVE":"Политика проверки подлинности работает в режиме аудита","AUTHN_POLICY_BROAD_CONDITION":"Условие политики проверки подлинности допускает широкую группу","AUTHN_POLICY_OBJECT_WRITABLE":"Объект политики проверки подлинности доступен для записи вне Tier 0","AUTHN_KDC_ARMORING_NOT_SUPPORTED":"Контроллеры домена не поддерживают утверждения и защищённый Kerberos (Armoring)","DMSA_LINK_IRREGULAR":"Учётная запись связана с dMSA вне штатной процедуры миграции","DMSA_LINK_ONE_SIDED":"Ссылка между dMSA и исходной записью существует только в одном направлении","DMSA_PRIVILEGED_PREDECESSOR":"Привилегированная учётная запись заменена на dMSA","DMSA_USABLE_BY_NONPRIVILEGED":"dMSA доступна непривилегированным субъектам","DMSA_MEMBERSHIP_OWNER":"Дескриптор использования dMSA принадлежит непривилегированному субъекту","GMSA_MEMBERSHIP_INFO":"Сведения о разрешениях использования gMSA","ACL_INHERITED_FROM":"Источник наследования ACL","ADMIN_COUNT_INDICATOR":"Установлен adminCount без членства в защищаемой группе","LAPS_ACCOUNT_INFO":"Управляемая учётная запись LAPS","DANGEROUS_RIGHTS_SEVERITY":"Классификация разрешений по уровню риска","DANGEROUS_RIGHTS_AFFECTED_OUS":"Организационные единицы, затронутые опасными разрешениями","ADCS_CLIENT_AUTH_SEVERITY":"Разрешена проверка подлинности клиента","ADCS_MANAGER_APPROVAL":"Состояние одобрения заявок администратором сертификатов","CERT_FLAG_SEVERITY":"Классификация флагов шаблона сертификата","EXCHANGE_WEB_ENDPOINTS":"Защищённость веб-интерфейсов Exchange","CONSTRAINED_DELEGATION":"Настроено ограниченное делегирование Kerberos","LAPS_INSTALLED":"Установлен Windows LAPS","LAPS_LEGACY":"Используется прежняя версия LAPS","META_SEVERITY_PASSTHROUGH":"Индикатор уровня опасности","META_STATUS_INDICATOR":"Индикатор состояния","CREDENTIAL_USERNAME_EXPOSED":"Имя пользователя обнаружено в раскрытых учётных данных","CREDENTIAL_PASSWORD_EXPOSED":"Пароль обнаружен в раскрытых учётных данных","CREDENTIAL_MATCHED_LINE":"Строка с найденными учётными данными","CREDENTIAL_TYPE_INFO":"Тип обнаруженных учётных данных","LAPS_ENCRYPTED_PASSWORD":"Доступно чтение зашифрованного пароля LAPS без ключа расшифрования","NON_DEFAULT_OWNER":"Нестандартный владелец объекта","ENCRYPTION_RC4_ONLY":"Учётная запись поддерживает только RC4 для Kerberos","ENCRYPTION_DES_ENABLED":"Для Kerberos разрешён алгоритм DES","ENCRYPTION_NOT_CONFIGURED":"Типы шифрования не заданы у учётной записи с SPN","ENCRYPTION_AES_ONLY":"Учётная запись Kerberos ограничена шифрованием AES","KERBEROASTABLE_USER_SPN":"Пользовательская учётная запись с SPN допускает Kerberoasting","DANGEROUS_RIGHTS_CONTEXT":"Опасные разрешения с учётом контекста","GPO_SCOPE_SEVERITY":"Состояние применения групповой политики","GPO_LOCAL_GROUP_RISKY_MEMBER":"Широкая группа добавлена в локальную группу через GPO","GPO_LOCAL_GROUP_MEMBER":"Учётная запись добавлена в привилегированную локальную группу через GPO","GPO_LINK_REACHES_DC":"Привязка GPO затрагивает контроллер домена","GPO_TASK_FIELD_SEVERITY":"Классификация параметра запланированного задания","GPO_LINKED_OUS_SEVERITY":"GPO привязан к корню домена","WEB_ENDPOINT_SECURITY":"Классификация защищённости веб-интерфейсов","REGISTRY_ESC10_KDC_BINDING":"ESC10 — Kerberos игнорирует SID-расширение сертификата из-за настройки GPO","REGISTRY_ESC10_KDC_BINDING_COMPAT":"ESC10 — Kerberos принимает сертификаты без SID-расширения из-за настройки GPO","REGISTRY_ESC10_SCHANNEL_UPN":"ESC10 — Schannel сопоставляет сертификаты по UPN из-за настройки GPO","REGISTRY_WDIGEST":"Кэширование учётных данных WDigest в открытом виде включено через GPO","REGISTRY_ONELOGON":"Уязвимый список разрешений защищённого канала Netlogon (Zerologon/OneLogon)","REGISTRY_AUTOLOGON":"Автоматический вход AutoAdminLogon включён через GPO","REGISTRY_LMCOMPAT":"Через GPO разрешена слабая проверка подлинности LM/NTLMv1","REGISTRY_NOLMHASH":"Сохранение LM-хешей разрешено через GPO","REGISTRY_REMOTEUAC":"Удалена фильтрация токенов Remote UAC через GPO","REGISTRY_ALWAYSINSTALLELEVATED":"Установка MSI с повышенными правами AlwaysInstallElevated включена через GPO","REGISTRY_ENABLELUA":"Контроль учётных записей (UAC) отключён через GPO","REGISTRY_RESTRICTEDADMIN":"Режим Restricted Admin для RDP включён через GPO","REGISTRY_WSUS_HTTP":"Сервер обновлений WSUS настроен по незашифрованному HTTP","REGISTRY_DEFENDER_DISABLED":"Антивирус Microsoft Defender отключён через GPO","REGISTRY_RUNASPPL":"Защита процесса LSA (RunAsPPL) явно отключена через GPO","REGISTRY_CREDGUARD":"Credential Guard явно отключён через GPO","REGISTRY_FILTERADMINTOKEN":"Фильтрация UAC для встроенного администратора RID 500 отключена через GPO","REGISTRY_CREDSSP_ORACLE":"Уязвимая настройка CredSSP Encryption Oracle задана через GPO","REGISTRY_MACHINE_PASSWORD_STATIC":"Смена пароля компьютерной учётной записи отключена через GPO","REGISTRY_NULL_SESSION":"Анонимный доступ (Null Session) расширен через GPO","REGISTRY_RDP_NLA":"Проверка подлинности на уровне сети (NLA) для RDP отключена через GPO","REGISTRY_RDP_SECURITYLAYER":"Уровень безопасности RDP понижен через GPO","REGISTRY_RDP_ENCRYPTION":"Для RDP установлен низкий уровень шифрования через GPO","REGISTRY_FIREWALL_DISABLED":"Брандмауэр Windows отключён через GPO","REGISTRY_INSECURE_GUEST_AUTH":"Небезопасный гостевой вход SMB разрешён через GPO","REGISTRY_SMB1_SERVER":"Серверный компонент SMBv1 включён через GPO","REGISTRY_SMB1_CLIENT":"Клиентский компонент SMBv1 включён через GPO","REGISTRY_SMB2_SERVER_DISABLED":"Серверный компонент SMBv2/v3 отключён через GPO","REGISTRY_SMB_UNENCRYPTED_ACCESS":"Разрешён доступ без шифрования к ресурсам SMB, требующим шифрования","REGISTRY_DSRM_ADMIN_LOGON":"Вход администратора DSRM разрешён в любое время через GPO","REGISTRY_PRINT_RPC_PRIVACY":"Усиленная защита конфиденциальности RPC службы печати отключена через GPO","REGISTRY_WSUS_USER_PROXY":"Проверка обновлений WSUS может использовать прокси пользователя","REGISTRY_MACHINE_PASSWORD_AGE":"Период смены пароля компьютера через GPO превышает 30 дней","REGISTRY_SCRIPTBLOCK_LOGGING_OFF":"Журналирование блоков сценариев PowerShell отключено через GPO","REGISTRY_UAC_NO_PROMPT":"Администраторы повышают привилегии без запроса UAC из-за GPO","REGISTRY_LEGACY_TLS":"SSL 3.0 или TLS 1.0 включён через GPO","REGISTRY_WINRM_UNENCRYPTED":"WinRM разрешает незашифрованные подключения через GPO","REGISTRY_WINRM_BASIC":"В WinRM разрешена базовая проверка подлинности через GPO","REGISTRY_CREDSSP_DELEGATE_ANY":"CredSSP делегирует учётные данные любому серверу через GPO","REGISTRY_LLMNR_ON":"Многоадресное разрешение имён LLMNR включено через GPO","REGISTRY_CACHED_LOGONS":"Число кэшируемых входов в домен превышает стандартное значение","REGISTRY_REMOTE_ASSISTANCE_OFFER":"Незапрошенная удалённая помощь разрешена через GPO","REGISTRY_LDAP_CLIENT_SIGNING_OFF":"Подпись LDAP на клиенте отключена через GPO","REGISTRY_KERBEROS_WEAK_ETYPES":"Kerberos разрешает шифрование DES или RC4 через GPO","REGISTRY_OFFICE_MACROS_ON":"Макросы Office запускаются без предупреждения из-за GPO","GPO_POINTANDPRINT_EXPLOITABLE":"Point and Print позволяет непривилегированным пользователям устанавливать драйверы без подтверждения (PrintNightmare)","GPO_POINTANDPRINT_NONADMIN_INSTALL":"Установка драйверов принтеров разрешена неадминистраторам","GPO_POINTANDPRINT_LATENT":"Запросы повышения прав Point and Print скрыты, но эксплуатация сейчас блокируется","GPO_POINTANDPRINT_USER_SCOPE":"Ограничения Point and Print заданы в конфигурации пользователя и игнорируются Windows","GPO_POINTANDPRINT_DRIVER_SOURCE":"Драйверы принтеров могут загружаться с любого сервера печати","GPO_PRINT_SPOOLER_RPC":"Диспетчер печати принимает удалённые RPC-подключения через GPO","GPO_PRINT_QUEUE_SPECIFIC_FILES":"Диспетчер печати может копировать произвольные файлы очереди печати","GPO_PRINT_DRIVER_HARDENING":"Усиленная защита доставки драйверов принтеров отключена","LAPS_GPO_ENCRYPTION_DISABLED":"Шифрование паролей Windows LAPS в AD отключено через GPO","LAPS_GPO_NO_AD_BACKUP":"Windows LAPS не сохраняет пароли в этой Active Directory","LAPS_GPO_EXPIRATION_PROTECTION_DISABLED":"Защита срока действия пароля Windows LAPS отключена через GPO","LAPS_GPO_WEAK_PASSWORD_COMPLEXITY":"Через GPO задана слабая сложность паролей LAPS","LAPS_GPO_NOT_LINKED":"Настройка LAPS содержится в непривязанном объекте GPO","GPO_SCRIPT_OUTSIDE_POLICY_STORE":"Сценарий GPO запускается вне хранилища групповых политик","LOGON_SCRIPT_WRITABLE":"Сценарий входа может изменить непривилегированный субъект","SCRIPTPATH_HARDCODED":"Путь сценария входа задан жёстко","UAC_SEVERITY_OVERRIDE":"Классификация риска параметров контроля учётных записей"};
+        const ruFindingExplanations = {"KERBEROASTABLE_SPN":{"description":"Для пользовательской учётной записи задан SPN. Любой прошедший проверку подлинности пользователь домена может запросить билет службы TGS, зашифрованный ключом этой записи, и попытаться подобрать пароль вне домена.","impact":["Возможна компрометация служебной записи, особенно если у неё слабый пароль или повышенные полномочия."],"remediation":["По возможности используйте gMSA, задавайте длинные случайные пароли, включайте AES и контролируйте запросы TGS."]},"ASREP_ROASTABLE":{"description":"У учётной записи отключена предварительная проверка подлинности Kerberos (DONT_REQUIRE_PREAUTH). Посторонний субъект может запросить AS-REP и попытаться подобрать пароль автономно.","impact":["Подбор пароля возможен без предварительного входа в домен."],"remediation":["Включите предварительную проверку подлинности Kerberos и проверьте необходимость исключений."]},"KERBEROAST_WITHOUT_PREAUTH":{"description":"При наличии записи без предварительной проверки подлинности злоумышленник может запросить билеты служб других учётных записей с SPN без собственных доменных учётных данных.","impact":["Все доступные для Kerberoasting служебные записи оказываются под повышенным риском."],"remediation":["Включите предварительную проверку подлинности для всех записей и применяйте gMSA или длинные случайные пароли для служб."]},"KERBEROS_HASH_CRACKABLE":{"description":"Выделенный из билета Kerberos материал допускает автономную проверку вариантов пароля без новых обращений к контроллеру домена.","impact":["Подобранный пароль может дать доступ от имени соответствующей учётной записи."],"remediation":["Смените слабые пароли, применяйте AES и управляемые учётные записи служб."]},"KRBTGT_PASSWORD_OLD":{"description":"Пароль встроенной учётной записи krbtgt не обновлялся продолжительное время. Он используется в криптографических операциях Kerberos, связанных с билетами домена.","impact":["При компрометации ключей krbtgt возможны поддельные билеты Golden Ticket."],"remediation":["Планируйте штатную двойную смену пароля krbtgt по процедуре Microsoft с учётом репликации всех контроллеров домена."]},"GUEST_ACCOUNT_ENABLED":{"description":"Встроенная запись «Гость» (RID 501) активна и может предоставлять ненужную возможность доступа.","impact":["Дополнительная точка входа и риск анонимного или слабоконтролируемого доступа."],"remediation":["Отключите встроенную запись «Гость» и проверьте членство в группах и явные разрешения."]},"UNCONSTRAINED_DELEGATION":{"description":"На объекте разрешено неограниченное делегирование Kerberos. Узел может получать пересылаемые билеты TGT пользователей, подключающихся к его службам.","impact":["Компрометация узла позволяет злоупотреблять билетами пользователей, включая привилегированных."],"remediation":["Откажитесь от неограниченного делегирования; используйте ограниченное делегирование или RBCD и запретите делегирование привилегированных учётных записей."]},"UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS":{"description":"Привилегированные учётные записи могут передавать билеты TGT компьютерам с неограниченным делегированием.","impact":["Компрометация такого компьютера создаёт риск захвата привилегированных сеансов."],"remediation":["Ограничьте делегирование и пометьте критические записи как конфиденциальные, не допускающие делегирования."]},"CONSTRAINED_DELEGATION_PROTOCOL_TRANSITION":{"description":"Разрешено ограниченное делегирование с переходом протокола (S4U). При неверных границах доверия это может позволить выдавать себя за других пользователей при доступе к разрешённым службам.","impact":["Возможна подмена контекста пользователя на службе назначения."],"remediation":["Проверьте список служб msDS-AllowedToDelegateTo, учётную запись службы и необходимость перехода протокола."]},"RBCD_DANGEROUS_PRINCIPALS":{"description":"Разрешения на ограниченное делегирование на основе ресурса (RBCD) предоставлены субъектам, не соответствующим ожидаемой модели доверия.","impact":["Субъект с соответствующими полномочиями может получать доступ к ресурсу от имени других пользователей."],"remediation":["Ограничьте значения msDS-AllowedToActOnBehalfOfOtherIdentity только доверенными службами и контролируйте ACL объекта компьютера."]},"ESC1_TEMPLATE":{"description":"Шаблон сертификата может позволять заявителю задавать имя субъекта или альтернативные имена, а выданный сертификат — использоваться для проверки подлинности клиента.","impact":["При доступной регистрации возможно получение сертификата для чужой учётной записи."],"remediation":["Ограничьте права регистрации и изменение имени субъекта; проверьте EKU, требования одобрения и полномочия владельцев шаблона."]},"ESC2_TEMPLATE":{"description":"Шаблон AD CS допускает сертификаты для широкого набора назначений, включая Any Purpose или SubCA, при потенциально небезопасных правах регистрации.","impact":["Возможна выдача сертификатов с чрезмерно широкими возможностями использования."],"remediation":["Сузьте EKU и права регистрации; выдавайте такие сертификаты только после административного одобрения."]},"ESC3_TEMPLATE":{"description":"Шаблон выдаёт сертификаты агента запросов, позволяющие подавать запросы от имени других пользователей при наличии соответствующей конфигурации.","impact":["Ошибки прав на агентский шаблон могут привести к выдаче чужих удостоверений."],"remediation":["Ограничьте регистрацию сертификатов агента и настройте политики уполномоченных агентов."]},"ESC4_TEMPLATE":{"description":"На шаблоне AD CS присутствуют разрешения, позволяющие неподходящим субъектам изменять его параметры или список управления доступом.","impact":["Изменение шаблона может создать опасный сценарий регистрации сертификата."],"remediation":["Удалите избыточные WriteDACL, WriteOwner, GenericAll и права изменения параметров шаблона."]},"ESC5_PKI_CONTAINER_ACL":{"description":"Контейнеры PKI в Active Directory имеют опасные разрешения на изменение доверенной инфраструктуры.","impact":["Изменение критических объектов PKI может повлиять на доверие к сертификатам."],"remediation":["Разрешите управление контейнерами PKI только специально уполномоченным администраторам."]},"ESC8_WEB_ENROLLMENT":{"description":"Веб-службы регистрации сертификатов потенциально допускают ретрансляцию NTLM при недостаточной защите канала проверки подлинности.","impact":["В определённых условиях возможна выдача сертификата от имени другого субъекта."],"remediation":["Включите EPA, настройте HTTPS и ограничения NTLM; отключите ненужные службы веб-регистрации."]},"LDAP_SIGNING_NOT_REQUIRED":{"description":"Контроллер домена не требует обязательной подписи LDAP-запросов. Это снижает защиту от подмены и ретрансляции аутентификации.","impact":["Повышается риск атак на целостность LDAP-сеансов и NTLM Relay при наличии других условий."],"remediation":["Включите обязательную подпись LDAP на контроллерах и проверьте совместимость приложений."]},"LDAP_CHANNEL_BINDING_NOT_REQUIRED":{"description":"Для LDAPS не обеспечивается обязательная привязка канала TLS (LDAP Channel Binding).","impact":["При определённых схемах проверки подлинности возможны атаки ретрансляции."],"remediation":["Настройте LDAP Channel Binding на контроллерах домена и проверьте журналы совместимости клиентов."]},"LDAP_ANONYMOUS_BINDING_ALLOWED":{"description":"Некоторые операции LDAP доступны без проверки подлинности.","impact":["Анонимный доступ может раскрывать сведения о структуре домена и учётных записях."],"remediation":["Ограничьте анонимные LDAP-запросы, если они не требуются подтверждённым приложениям."]},"DANGEROUS_ACL_GENERICALL":{"description":"Субъекту предоставлен полный доступ GenericAll к чувствительному объекту каталога.","impact":["Возможны изменение объекта, его разрешений или использование полномочий для повышения привилегий."],"remediation":["Удалите ненужные разрешения GenericAll и делегируйте только конкретные необходимые операции."]},"DANGEROUS_ACL_WRITEDACL":{"description":"Субъект может менять список управления доступом (DACL) чувствительного объекта.","impact":["Право WriteDACL позволяет выдавать себе или другим дополнительные разрешения."],"remediation":["Ограничьте право WriteDACL доверенными администраторами и контролируйте изменения ACL."]},"DANGEROUS_ACL_WRITEOWNER":{"description":"Субъект может изменить владельца чувствительного объекта Active Directory.","impact":["Новый владелец в ряде случаев может изменить DACL и получить дополнительные права."],"remediation":["Ограничьте WriteOwner и пересмотрите нестандартное владение объектом."]},"DANGEROUS_ACL_DCSYNC":{"description":"Обнаружены права репликации, потенциально достаточные для DCSync — получения секретов каталога без входа на контроллер домена.","impact":["Возможна компрометация хешей и секретов учётных записей домена."],"remediation":["Ограничьте DS-Replication-Get-Changes и DS-Replication-Get-Changes-All контроллерами домена и доверенными службами."]},"DANGEROUS_ACL_DCSYNC_BROAD":{"description":"Права DCSync назначены группе с широким составом участников.","impact":["Члены группы могут получить доступ к реплицируемым секретам при наличии необходимых прав."],"remediation":["Отзовите полномочия репликации у широких групп и проверьте фактический состав через вложенные группы."]},"OU_PERM_PASSWORD_RESET":{"description":"На уровне организационной единицы делегировано право сбрасывать пароли учётных записей.","impact":["Неоправданно широкое делегирование позволяет захватить учётные записи в области действия."],"remediation":["Оставьте право сброса паролей только уполномоченным операторам и исключите привилегированные записи."]},"OU_PERM_SPN_WRITE":{"description":"Субъект может изменять servicePrincipalName у объектов в OU.","impact":["Изменение SPN может создать условия для злоупотребления Kerberos и атаки Kerberoasting."],"remediation":["Пересмотрите делегирование WriteProperty на servicePrincipalName и права наследования OU."]},"OU_PERM_KEYCREDENTIALLINK_WRITE":{"description":"Субъект может изменять msDS-KeyCredentialLink у объектов Active Directory.","impact":["Неправомерная запись ключевых учётных данных может позволить альтернативную аутентификацию от имени объекта."],"remediation":["Ограничьте запись msDS-KeyCredentialLink и контролируйте изменения атрибута."]},"PASSWORD_NOT_REQUIRED":{"description":"У учётной записи установлен флаг PASSWD_NOTREQD, который снимает требование наличия пароля на уровне атрибута userAccountControl.","impact":["При дополнительных небезопасных условиях запись может иметь слабую защиту."],"remediation":["Снимите флаг PASSWD_NOTREQD, если он не обоснован, и проверьте фактические параметры пароля."]},"PASSWORD_NEVER_EXPIRES":{"description":"Для учётной записи установлен запрет истечения срока действия пароля.","impact":["При компрометации длительно неизменяемый пароль расширяет период возможного злоупотребления."],"remediation":["Проверьте необходимость исключения и внедрите управляемую ротацию паролей, особенно для служебных записей."]},"GPO_DANGEROUS_PERMISSIONS":{"description":"Обнаружены разрешения на изменение объекта групповой политики, предоставленные субъектам вне ожидаемого административного круга.","impact":["Изменение GPO может затронуть пользователей и компьютеры в области её действия."],"remediation":["Пересмотрите права изменения GPO и связанные разрешения на каталог SYSVOL."]},"GPO_SYSVOL_WRITABLE":{"description":"Папка групповой политики в SYSVOL доступна на запись субъекту вне доверенного административного круга.","impact":["Изменённые сценарии и параметры политики могут выполниться на компьютерах и пользователях."],"remediation":["Ограничьте права NTFS и разрешения общего ресурса на папки политик SYSVOL."]},"GPO_SYSVOL_GPT_MISSING":{"description":"У объекта групповой политики отсутствует соответствующая папка SYSVOL или файл gpt.ini.","impact":["Политика может применяться неполностью или некорректно."],"remediation":["Проверьте репликацию SYSVOL и согласованность данных AD и файлов групповой политики."]},"GPO_NON_DEFAULT_OWNER":{"description":"У объекта GPO назначен владелец, отличный от ожидаемого.","impact":["Владелец может влиять на разрешения объекта даже без явного права изменения его настроек."],"remediation":["Проверьте происхождение владельца и восстановите штатное владение при отсутствии обоснования."]},"LAPS_NOT_DEPLOYED":{"description":"Для части инфраструктуры не обнаружено управление паролями локальных администраторов с помощью LAPS.","impact":["Повторяющиеся или неизменяемые локальные пароли повышают риск бокового перемещения."],"remediation":["Внедрите Windows LAPS и проверьте политику хранения, прав чтения и ротации паролей."]},"LAPS_PASSWORD_READABLE":{"description":"Текущему субъекту или указанной группе доступны пароли локальных администраторов, сохраняемые LAPS.","impact":["Обладатель разрешения может получить административный доступ к соответствующему компьютеру."],"remediation":["Ограничьте чтение атрибутов LAPS и регулярно проверяйте делегирование на OU."]},"BITLOCKER_KEY_READABLE":{"description":"Обнаружен доступ к сведениям восстановления BitLocker в Active Directory.","impact":["Доступ к ключу восстановления может позволить расшифровать защищённый том."],"remediation":["Ограничьте чтение данных восстановления BitLocker уполномоченным администраторам и журналируйте доступ."]},"SMB_SIGNING_DISABLED":{"description":"Цифровая подпись SMB не является обязательной для соответствующей системы или политики.","impact":["При наличии других условий возможны ретрансляция учётных данных и подмена SMB-трафика."],"remediation":["Включите требование подписи SMB на серверах и клиентах с учётом совместимости."]},"REVERSIBLE_ENCRYPTION":{"description":"Пароль учётной записи хранится с использованием обратимого шифрования.","impact":["Такая настройка ослабляет защиту парольных данных при компрометации хранилища."],"remediation":["Отключите обратимое шифрование и измените пароль после корректировки параметра."]},"CREDENTIAL_IN_DESCRIPTION":{"description":"В свободно заполняемом атрибуте объекта обнаружено содержимое, похожее на учётные данные.","impact":["Читающий атрибут субъект может получить доступ к секрету."],"remediation":["Удалите секрет из атрибута, смените затронутые учётные данные и используйте защищённое хранилище."]},"CREDENTIAL_GPP_PASSWORD":{"description":"В предпочтениях групповой политики обнаружены параметры, потенциально раскрывающие пароль.","impact":["Чтение файлов GPP может позволить восстановить секрет и скомпрометировать учётную запись."],"remediation":["Удалите сохранённые секреты из GPP, смените пароли и применяйте современные механизмы управления учётными данными."]},"CREDENTIAL_SCRIPT_PASSWORD":{"description":"В содержимом доступного сценария обнаружен пароль или похожий секрет.","impact":["Субъект с правом чтения файла может использовать обнаруженные учётные данные."],"remediation":["Удалите секрет из сценария и переместите его в защищённое хранилище; смените обнаруженный пароль."]},"RBCD_CONFIGURED":{"description":"Для объекта настроено ограниченное делегирование Kerberos на основе ресурса (RBCD).","impact":["Настройка безопасна только при корректно ограниченном перечне доверенных субъектов."],"remediation":["Проверьте msDS-AllowedToActOnBehalfOfOtherIdentity и соответствие настроек реальной архитектуре."]},"TRUST_SID_FILTERING_DISABLED":{"description":"На доверительных отношениях отключена фильтрация SID.","impact":["SID из внешних областей доверия могут влиять на вычисление прав в ресурсном домене."],"remediation":["Включите подходящие режимы SID Filtering и согласуйте исключения с архитектурой доверия."]},"WEAK_PASSWORD_POLICY":{"description":"Доменная политика паролей не соответствует рекомендуемым параметрам стойкости или защите от перебора.","impact":["Слабые пароли повышают риск несанкционированного доступа."],"remediation":["Пересмотрите длину, историю, сложность и блокировку учётных записей с учётом современных рекомендаций Microsoft."]},"NO_ACCOUNT_LOCKOUT":{"description":"Политика блокировки учётных записей отсутствует либо её параметры допускают слишком большое число попыток.","impact":["Повышается риск атак перебором и распылением паролей."],"remediation":["Настройте порог и длительность блокировки с учётом риска отказа в обслуживании и политики организации."]},"WEAK_FGPP":{"description":"Тонкая политика паролей задаёт менее строгие параметры, чем доменная политика по умолчанию.","impact":["Затронутые пользователи и группы могут иметь более слабые пароли или защиту от перебора."],"remediation":["Сопоставьте приоритеты FGPP, область применения и требования безопасности; скорректируйте ослабленные параметры."]},"INACTIVE_PRIVILEGED_ACCOUNT":{"description":"Привилегированная учётная запись не использовалась дольше установленного порога.","impact":["Неиспользуемые административные учётные записи создают лишнюю поверхность атаки."],"remediation":["Подтвердите владельца и назначение записи, отключите ненужные записи, пересмотрите членство в группах."]},"LAPS_GPO_DISABLED":{"description":"Групповая политика отключает или не активирует механизмы управления локальными паролями LAPS.","impact":["Локальный административный пароль может оставаться неизменным."],"remediation":["Исправьте политику Windows LAPS и проверьте фактическое применение на целевых компьютерах."]},"SYSVOL_FRS_REPLICATION":{"description":"Репликация SYSVOL всё ещё использует устаревшую службу FRS.","impact":["FRS усложняет поддержку и обновление контроллеров домена; возможны проблемы согласованности политик."],"remediation":["Проведите подготовленную миграцию репликации SYSVOL на DFSR согласно документации Microsoft."]},"OLD_FUNCTIONAL_LEVEL":{"description":"Функциональный уровень домена или леса устарел.","impact":["Могут быть недоступны современные возможности и механизмы защиты AD."],"remediation":["Проверьте совместимость всех контроллеров и приложений, после чего рассмотрите повышение функционального уровня."]},"AD_RECYCLE_BIN_DISABLED":{"description":"Корзина Active Directory для леса не включена.","impact":["Восстановление удалённых объектов с сохранением атрибутов и членства в группах затруднено."],"remediation":["Оцените возможность включения корзины AD на поддерживаемом функциональном уровне леса."]},"GPO_POINTANDPRINT_EXPLOITABLE":{"description":"Параметры Point and Print позволяют устанавливать драйверы принтеров без необходимого административного подтверждения.","impact":["При определённых условиях возможен запуск кода с повышенными привилегиями (семейство PrintNightmare)."],"remediation":["Ограничьте серверы печати, требуйте повышение привилегий и примените современные параметры защиты Point and Print."]},"REGISTRY_WDIGEST":{"description":"Политика допускает сохранение учётных данных WDigest в памяти в открытом виде.","impact":["Компрометация компьютера может раскрыть пароли вошедших пользователей."],"remediation":["Отключите хранение паролей WDigest в открытом виде и проверьте соответствующий параметр реестра."]},"REGISTRY_LLMNR_ON":{"description":"Многоадресное разрешение имён LLMNR разрешено политикой.","impact":["LLMNR может упрощать перехват или ретрансляцию аутентификации в локальной сети."],"remediation":["Отключите LLMNR там, где он не требуется, и обеспечьте корректное разрешение имён DNS."]},"REGISTRY_RDP_NLA":{"description":"Политика отключает проверку подлинности на уровне сети для RDP.","impact":["Служба RDP становится доступна до полноценной проверки подлинности пользователя."],"remediation":["Включите Network Level Authentication для RDP и ограничьте сетевой доступ к службе."]},"REGISTRY_SMB1_SERVER":{"description":"На сервере включён устаревший протокол SMBv1.","impact":["Устаревший протокол повышает риск эксплуатации известных уязвимостей и ошибок безопасности."],"remediation":["Отключите SMBv1 после проверки совместимости зависимых систем."]},"REGISTRY_FIREWALL_DISABLED":{"description":"Групповая политика отключает брандмауэр Windows.","impact":["Сетевые службы могут оказаться доступнее, чем предусмотрено политикой безопасности."],"remediation":["Включите профиль брандмауэра и настройте необходимые правила разрешения трафика."]},"REGISTRY_CREDGUARD":{"description":"Через групповую политику явно отключена защита Credential Guard.","impact":["Снижается защищённость секретов проверок подлинности на конечном устройстве."],"remediation":["Проверьте совместимость оборудования и включите Credential Guard для соответствующих систем."]}};
+        const ruAttributeLabels = {"Domain":"Домен","Domain Name":"Имя домена","Domain DNS Name":"DNS-имя домена","Domain DN":"Отличительное имя домена (DN)","Domain SID":"SID домена","Forest":"Лес","Forest Name":"Имя леса","Forest Root Domain":"Корневой домен леса","Forest Functional Level":"Функциональный уровень леса","Domain Functional Level":"Функциональный уровень домена","Functional Level":"Функциональный уровень","Domain Controller":"Контроллер домена","Domain Controllers":"Контроллеры домена","Domain Controller Name":"Имя контроллера домена","Domain Controller IP":"IP-адрес контроллера домена","Server":"Сервер","Server Name":"Имя сервера","Site":"Сайт","Site Name":"Имя сайта","Subnet":"Подсеть","IP Address":"IP-адрес","DNS Name":"DNS-имя","DNS Host Name":"DNS-имя узла","Operating System":"Операционная система","Operating System Version":"Версия операционной системы","OS Version":"Версия ОС","OS":"ОС","OS Name":"Название ОС","Version":"Версия","Status":"Состояние","State":"Состояние","Account Status":"Состояние учётной записи","Account":"Учётная запись","Account Name":"Имя учётной записи","User":"Пользователь","Username":"Имя пользователя","User Name":"Имя пользователя","Display Name":"Отображаемое имя","Description":"Описание","Comment":"Комментарий","Computer":"Компьютер","Computer Name":"Имя компьютера","Group":"Группа","Group Name":"Имя группы","Members":"Участники","Member":"Участник","Member Count":"Количество участников","Group Membership":"Членство в группах","Primary Group":"Основная группа","Distinguished Name":"Отличительное имя (DN)","Object DN":"Отличительное имя объекта","Object Name":"Имя объекта","Object Type":"Тип объекта","Object Class":"Класс объекта","Object SID":"SID объекта","Object GUID":"GUID объекта","Object Owner":"Владелец объекта","Owner":"Владелец","Creator":"Создатель","Created":"Создано","Creation Date":"Дата создания","Created On":"Дата создания","Modified":"Изменено","Last Modified":"Последнее изменение","Last Change":"Последнее изменение","Enabled":"Включено","Disabled":"Отключено","Locked":"Заблокировано","Unlocked":"Разблокировано","Active":"Активна","Inactive":"Неактивна","Account Enabled":"Учётная запись включена","Account Disabled":"Учётная запись отключена","Password":"Пароль","Password Age":"Возраст пароля","Password Last Set":"Дата последней смены пароля","Password Changed":"Пароль изменён","Password Expiration":"Истечение срока действия пароля","Password Expires":"Срок действия пароля","Password Never Expires":"Срок действия пароля не ограничен","Password Policy":"Политика паролей","Minimum Password Length":"Минимальная длина пароля","Min Password Length":"Минимальная длина пароля","Maximum Password Age":"Максимальный срок действия пароля","Minimum Password Age":"Минимальный срок действия пароля","Password History":"История паролей","Password History Length":"Длина истории паролей","Password Complexity":"Сложность пароля","Lockout Threshold":"Порог блокировки","Lockout Duration":"Продолжительность блокировки","Lockout Observation Window":"Окно наблюдения блокировки","Bad Password Count":"Число ошибочных попыток ввода пароля","Failed Logons":"Неудачные входы","Last Logon":"Последний вход","Last Logon Date":"Дата последнего входа","Last Login":"Последний вход","Last Seen":"Последняя активность","Last Logon Timestamp":"Отметка времени последнего входа","Logon Count":"Число входов","User Account Control":"Параметры контроля учётной записи","Account Flags":"Флаги учётной записи","Security Identifier":"Идентификатор безопасности (SID)","SID History":"История SID","SID History Count":"Число SID в истории","Privileges":"Привилегии","Privilege":"Привилегия","Permissions":"Разрешения","Permission":"Разрешение","Access Rights":"Права доступа","Effective Permissions":"Действующие разрешения","Explicit Permissions":"Явные разрешения","Inherited Permissions":"Унаследованные разрешения","Inheritance":"Наследование","Inherited From":"Наследуется от","Access Control List":"Список управления доступом (ACL)","Access Control Entry":"Запись управления доступом (ACE)","ACE Count":"Количество записей ACE","ACL":"Список управления доступом (ACL)","Risk":"Риск","Risk Level":"Уровень риска","Severity":"Уровень опасности","Critical":"Критический","High":"Высокий","Medium":"Средний","Low":"Низкий","Finding":"Нарушение","Findings":"Нарушения","Warning":"Предупреждение","Warnings":"Предупреждения","Hint":"Предупреждение","Note":"Примечание","Secure":"Безопасно","Not Applicable":"Неприменимо","N/A":"Н/Д","None":"Нет","Unknown":"Неизвестно","Not Found":"Не найдено","Not Tested":"Не проверено","Not Checked":"Не проверялось","Not Available":"Недоступно","Not Configured":"Не настроено","Not Set":"Не задано","Not Required":"Не требуется","Required":"Обязательно","Allowed":"Разрешено","Denied":"Запрещено","Read":"Чтение","Write":"Запись","Full Control":"Полный доступ","Read Access":"Доступ на чтение","Write Access":"Доступ на запись","Can Read":"Может читать","Can Write":"Может изменять","Read Permissions":"Разрешения на чтение","Write Permissions":"Разрешения на запись","Access":"Доступ","Access Type":"Тип доступа","Principal":"Субъект безопасности","Security Principal":"Субъект безопасности","Trust":"Доверие","Trust Type":"Тип доверия","Trust Direction":"Направление доверия","Trust Transitivity":"Транзитивность доверия","Trusting Domain":"Доверяющий домен","Trusted Domain":"Доверенный домен","Transitive":"Транзитивное","Non-transitive":"Нетранзитивное","Kerberos":"Kerberos","TGT Lifetime":"Срок действия TGT","Ticket Lifetime":"Срок действия билета","Renewal Lifetime":"Срок обновления билета","Encryption Type":"Тип шифрования","Encryption Types":"Типы шифрования","Service Principal Name":"Имя субъекта-службы (SPN)","Service Principal Names":"Имена субъектов-служб (SPN)","SPNs":"Имена SPN","Delegation":"Делегирование","Delegation Type":"Тип делегирования","Unconstrained Delegation":"Неограниченное делегирование","Constrained Delegation":"Ограниченное делегирование","Resource-Based Constrained Delegation":"Ограниченное делегирование на основе ресурса","Certificate":"Сертификат","Certificate Authority":"Центр сертификации","Certificate Authorities":"Центры сертификации","Certificate Template":"Шаблон сертификата","Template Name":"Имя шаблона","Template":"Шаблон","Issuer":"Издатель","Subject":"Субъект","Valid From":"Действует с","Valid To":"Действует до","Not Before":"Начало срока действия","Not After":"Конец срока действия","Expiration Date":"Дата окончания срока действия","Validity Period":"Срок действия","Key Length":"Длина ключа","Key Size":"Размер ключа","Signature Algorithm":"Алгоритм подписи","Enrollment Rights":"Права регистрации","Enrollment":"Регистрация сертификата","Manager Approval":"Одобрение администратором","Enhanced Key Usage":"Расширенное назначение ключа (EKU)","Authentication":"Проверка подлинности","Authentication Method":"Метод проверки подлинности","Authentication Policy":"Политика проверки подлинности","Client Authentication":"Проверка подлинности клиента","Smart Card Logon":"Вход со смарт-картой","GPO":"Объект групповой политики (GPO)","Group Policy Object":"Объект групповой политики","Group Policy Objects":"Объекты групповой политики","GPO Name":"Имя GPO","GPO GUID":"GUID объекта GPO","GPO Status":"Состояние GPO","GPO Link":"Привязка GPO","GPO Links":"Привязки GPO","Linked OUs":"Связанные OU","Linked OUs/Domain":"Привязанные OU и домен","Applied GPOs":"Применённые GPO","Policy":"Политика","Policy Name":"Имя политики","Policy Setting":"Параметр политики","Policy Value":"Значение политики","Effective Policy":"Действующая политика","Scope":"Область действия","Scope of Management":"Область управления","File Path":"Путь к файлу","Path":"Путь","Script Path":"Путь сценария","Logon Script":"Сценарий входа","Task Name":"Имя задачи","Scheduled Tasks":"Запланированные задания","Registry Key":"Раздел реестра","Registry Value":"Значение реестра","Registry Path":"Путь реестра","Shares":"Общие ресурсы","Share Name":"Имя общего ресурса","Share Path":"Путь общего ресурса","UNC Path":"UNC-путь","Readable":"Доступно для чтения","Writable":"Доступно для записи","Read Only":"Только чтение","Number of Objects":"Количество объектов","Object Count":"Количество объектов","Total Objects":"Всего объектов","Total Count":"Общее количество","Count":"Количество","Total":"Всего","Result":"Результат","Results":"Результаты","Value":"Значение","Values":"Значения","Type":"Тип","Name":"Имя","Source":"Источник","Target":"Назначение","Origin":"Происхождение","Reason":"Причина","Details":"Подробности","Recommendation":"Рекомендация","Recommendations":"Рекомендации","Remediation":"Меры по устранению","Impact":"Последствия","Attack Path":"Вектор атаки","Attack Steps":"Этапы атаки","Command":"Команда","Command Line":"Командная строка","References":"Источники","Tools":"Инструменты","Date":"Дата","Time":"Время","Duration":"Продолжительность","Last Updated":"Последнее обновление","Scan Time":"Время аудита","Scan Duration":"Продолжительность аудита","LDAP Queries":"LDAP-запросы","LDAP Statistics":"Статистика LDAP","Queries":"Запросы","Objects":"Объекты","Affected Objects":"Затронутые объекты","Status Code":"Код состояния"};
+        const ruCheckContext = {"DomainBasicInfo":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Общие сведения о домене Active Directory, лесу, SID и функциональных уровнях.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Общие сведения о домене Active Directory, лесу, SID и функциональных уровнях.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Сведения о домене"},"KerberosPolicy":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Параметры времени действия билетов Kerberos и политики для учётной записи krbtgt.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Параметры времени действия билетов Kerberos и политики для учётной записи krbtgt.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Политика Kerberos"},"GuestAccount":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Проверка встроенной учётной записи «Гость» (RID 501) и её членства в группах.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка встроенной учётной записи «Гость» (RID 501) и её членства в группах.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Состояние учётной записи «Гость»"},"DomainControllers":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Список контроллеров домена и распределение ролей FSMO.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Список контроллеров домена и распределение ролей FSMO.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Контроллеры домена и роли FSMO"},"SitesAndSubnets":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Сопоставление сайтов AD, IP-подсетей и контроллеров домена.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Сопоставление сайтов AD, IP-подсетей и контроллеров домена.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Сайты и подсети Active Directory"},"DomainPasswordPolicy":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Проверка параметров парольной политики домена по умолчанию.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка параметров парольной политики домена по умолчанию.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Доменная политика паролей"},"FineGrainedPasswordPolicy":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Анализ тонких политик паролей, переопределяющих доменную политику.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ тонких политик паролей, переопределяющих доменную политику.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Тонкие политики паролей (FGPP)"},"DomainTrust":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Проверка доверительных отношений с доменами и лесами.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка доверительных отношений с доменами и лесами.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Доверительные отношения домена"},"ReadableShare":{"whyItMatters":"Доступ к общим ресурсам и сценариям может раскрывать секреты или позволять изменять выполняемые файлы.","whatWeCheck":["Общие папки компьютеров домена, к которым текущая учётная запись имеет доступ на чтение.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Общие папки компьютеров домена, к которым текущая учётная запись имеет доступ на чтение.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Доступные для чтения общие ресурсы"},"ShareCredential":{"whyItMatters":"Доступ к общим ресурсам и сценариям может раскрывать секреты или позволять изменять выполняемые файлы.","whatWeCheck":["Поиск учётных данных в доступных скриптах и конфигурационных файлах.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск учётных данных в доступных скриптах и конфигурационных файлах.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Учётные данные в общих папках"},"NetworkSubnet":{"whyItMatters":"Настройки компьютеров и их учётных записей влияют на защиту паролей, администрирование и риск бокового перемещения.","whatWeCheck":["Анализ IP-подсетей активных компьютеров домена и их организационных единиц.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ IP-подсетей активных компьютеров домена и их организационных единиц.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Карта сети"},"OpenPorts":{"whyItMatters":"Настройки компьютеров и их учётных записей влияют на защиту паролей, администрирование и риск бокового перемещения.","whatWeCheck":["Список открытых TCP-портов просканированных адресов.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Список открытых TCP-портов просканированных адресов.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Открытые сетевые порты"},"LDAPConfigGPO":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Проверка подписи LDAP и привязки канала TLS по объектам групповой политики.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка подписи LDAP и привязки канала TLS по объектам групповой политики.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Настройки подписи LDAP в GPO"},"NullSessionGPO":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Анализ настроек анонимного перечисления SAM и сопоставления SID с именами.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ настроек анонимного перечисления SAM и сопоставления SID с именами.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Параметры анонимного доступа в GPO"},"DSHeuristics":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Проверка параметров службы каталогов, которые могут ослаблять защиту леса AD.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка параметров службы каталогов, которые могут ослаблять защиту леса AD.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Параметры dsHeuristics"},"SMBSigning":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Проверка требования цифровой подписи SMB на компьютерах домена.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка требования цифровой подписи SMB на компьютерах домена.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Настройки подписи SMB"},"EffectiveLDAPConfig":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Определение фактически применённых настроек подписи LDAP и привязки канала.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Определение фактически применённых настроек подписи LDAP и привязки канала.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Действующие настройки LDAP"},"EffectiveNullSession":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Определение действующих ограничений анонимных сеансов.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Определение действующих ограничений анонимных сеансов.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Действующие параметры анонимного доступа"},"EffectiveSMBSigning":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Определение фактических требований подписи SMB.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Определение фактических требований подписи SMB.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Действующие настройки подписи SMB"},"EffectiveSMBSigningMembers":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Перечень компьютеров, на которые распространяется политика подписи SMB.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Перечень компьютеров, на которые распространяется политика подписи SMB.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Подпись SMB: затронутые компьютеры"},"SMBSigningWeakened":{"whyItMatters":"Параметры домена влияют на доверие, проверку подлинности и репликацию. Сопоставьте конфигурацию с политикой защиты Active Directory.","whatWeCheck":["Выявление настроек, снижающих требования цифровой подписи SMB.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Выявление настроек, снижающих требования цифровой подписи SMB.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Ослабление защиты SMB"},"DomainController":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Перечень контроллеров домена и их основные параметры.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Перечень контроллеров домена и их основные параметры.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Контроллеры домена"},"ExchangeServer":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Инвентаризация серверов Microsoft Exchange и их настроек.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Инвентаризация серверов Microsoft Exchange и их настроек.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Серверы Exchange"},"ExchangeServerBasic":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Базовая инвентаризация серверов Microsoft Exchange.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Базовая инвентаризация серверов Microsoft Exchange.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Серверы Exchange: основные сведения"},"ExchangeOrganization":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Анализ объектов организации Microsoft Exchange в Active Directory.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ объектов организации Microsoft Exchange в Active Directory.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Организация Exchange"},"ExchangeConfigServer":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Параметры серверов Exchange в разделе конфигурации AD.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Параметры серверов Exchange в разделе конфигурации AD.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Сервер Exchange в разделе Configuration"},"ExchangeHybridConfiguration":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка конфигурации гибридного взаимодействия Exchange с облачными сервисами.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка конфигурации гибридного взаимодействия Exchange с облачными сервисами.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Гибридное развёртывание Exchange"},"ExchangeReceiveConnector":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка принимающих соединителей SMTP и параметров аутентификации.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка принимающих соединителей SMTP и параметров аутентификации.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Принимающие SMTP-соединители Exchange"},"ExchangePermissionsModel":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Анализ модели разрешений Exchange и связанных прав в Active Directory.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ модели разрешений Exchange и связанных прав в Active Directory.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Модель разрешений Exchange"},"ExchangeRoleAssignment":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка назначений ролей RBAC в Exchange.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка назначений ролей RBAC в Exchange.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Назначения ролей управления Exchange"},"MSSQLServer":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Инвентаризация серверов SQL Server и связанных служебных учётных записей.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Инвентаризация серверов SQL Server и связанных служебных учётных записей.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Серверы Microsoft SQL Server"},"SCCMServer":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка инфраструктуры Microsoft Configuration Manager.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка инфраструктуры Microsoft Configuration Manager.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Инфраструктура Configuration Manager (SCCM)"},"SCCMServerBasic":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Базовая инвентаризация серверов Microsoft Configuration Manager.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Базовая инвентаризация серверов Microsoft Configuration Manager.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Серверы SCCM: основные сведения"},"SCCMServiceAccount":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка учётных записей служб Configuration Manager.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка учётных записей служб Configuration Manager.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Служебные учётные записи SCCM"},"SCCMGroup":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Анализ групп и их участников в инфраструктуре Configuration Manager.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ групп и их участников в инфраструктуре Configuration Manager.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Группы SCCM"},"SCCMContainerPermission":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка прав доступа к контейнеру System Management в Active Directory.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка прав доступа к контейнеру System Management в Active Directory.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Разрешения контейнера System Management"},"SCCMSite":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Параметры сайтов Microsoft Configuration Manager.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Параметры сайтов Microsoft Configuration Manager.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Сайты SCCM"},"SCCMManagementPoint":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Инвентаризация точек управления Configuration Manager.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Инвентаризация точек управления Configuration Manager.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Точки управления SCCM"},"SCCMPXEServer":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка серверов сетевой загрузки PXE и служб WDS.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка серверов сетевой загрузки PXE и служб WDS.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Серверы загрузки PXE/WDS"},"SCOMServer":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка инфраструктуры Microsoft Operations Manager.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка инфраструктуры Microsoft Operations Manager.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Инфраструктура Operations Manager (SCOM)"},"SCOMServerBasic":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Инвентаризация серверов Microsoft Operations Manager.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Инвентаризация серверов Microsoft Operations Manager.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Серверы SCOM: основные сведения"},"SCOMServiceAccount":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка прав и настроек учётных записей служб Operations Manager.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка прав и настроек учётных записей служб Operations Manager.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Служебные учётные записи SCOM"},"SCOMGroup":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка групп Microsoft Operations Manager.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка групп Microsoft Operations Manager.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Группы SCOM"},"ADFSServer":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Инвентаризация серверов и конфигурации Active Directory Federation Services.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Инвентаризация серверов и конфигурации Active Directory Federation Services.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Службы федерации AD FS"},"EntraConnect":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка конфигурации синхронизации идентификаторов Microsoft Entra Connect.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка конфигурации синхронизации идентификаторов Microsoft Entra Connect.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Microsoft Entra Connect"},"ExchangeTrustedSubsystem":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка привилегий группы Exchange Trusted Subsystem.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка привилегий группы Exchange Trusted Subsystem.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Группа Exchange Trusted Subsystem"},"ExchangeWindowsPermissions":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Анализ полномочий группы Exchange Windows Permissions.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ полномочий группы Exchange Windows Permissions.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Группа Exchange Windows Permissions"},"ExchangeOrganizationManagement":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Анализ участников административной группы Organization Management в Exchange.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ участников административной группы Organization Management в Exchange.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Группа Organization Management"},"ExchangeServersGroup":{"whyItMatters":"Службы приложений могут обладать высокими правами AD. Применяйте минимальные привилегии и контролируйте служебные записи.","whatWeCheck":["Проверка состава и полномочий группы Exchange Servers.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка состава и полномочий группы Exchange Servers.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Группа Exchange Servers"},"CertificateAuthority":{"whyItMatters":"Ошибки регистрации сертификатов AD CS могут влиять на проверку подлинности. Проверяйте шаблоны, EKU, разрешения и цепочки доверия.","whatWeCheck":["Инвентаризация центров сертификации Active Directory Certificate Services.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Инвентаризация центров сертификации Active Directory Certificate Services.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Центры сертификации AD CS"},"CertificateTemplate":{"whyItMatters":"Ошибки регистрации сертификатов AD CS могут влиять на проверку подлинности. Проверяйте шаблоны, EKU, разрешения и цепочки доверия.","whatWeCheck":["Проверка шаблонов сертификатов, параметров выдачи и прав регистрации.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка шаблонов сертификатов, параметров выдачи и прав регистрации.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Шаблоны сертификатов AD CS"},"PKIContainer":{"whyItMatters":"Ошибки регистрации сертификатов AD CS могут влиять на проверку подлинности. Проверяйте шаблоны, EKU, разрешения и цепочки доверия.","whatWeCheck":["Проверка списков управления доступом к контейнерам инфраструктуры открытых ключей.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка списков управления доступом к контейнерам инфраструктуры открытых ключей.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Разрешения контейнеров PKI"},"PKIInfrastructure":{"whyItMatters":"Ошибки регистрации сертификатов AD CS могут влиять на проверку подлинности. Проверяйте шаблоны, EKU, разрешения и цепочки доверия.","whatWeCheck":["Анализ компонентов инфраструктуры открытых ключей и цепочек доверия.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ компонентов инфраструктуры открытых ключей и цепочек доверия.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Инфраструктура доверия PKI"},"RootCA":{"whyItMatters":"Ошибки регистрации сертификатов AD CS могут влиять на проверку подлинности. Проверяйте шаблоны, EKU, разрешения и цепочки доверия.","whatWeCheck":["Проверка сертификатов доверенных корневых центров сертификации.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка сертификатов доверенных корневых центров сертификации.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Доверенные корневые центры сертификации"},"NTAuthCertificate":{"whyItMatters":"Ошибки регистрации сертификатов AD CS могут влиять на проверку подлинности. Проверяйте шаблоны, EKU, разрешения и цепочки доверия.","whatWeCheck":["Проверка сертификатов в хранилище NTAuth леса Active Directory.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка сертификатов в хранилище NTAuth леса Active Directory.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Хранилище NTAuth"},"AIACA":{"whyItMatters":"Ошибки регистрации сертификатов AD CS могут влиять на проверку подлинности. Проверяйте шаблоны, EKU, разрешения и цепочки доверия.","whatWeCheck":["Проверка опубликованных в Active Directory сертификатов центров сертификации.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка опубликованных в Active Directory сертификатов центров сертификации.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Центры сертификации в AIA"},"UnconstrainedDelegation":{"whyItMatters":"Ошибки делегирования Kerberos могут позволять действия от имени других пользователей. Проверяйте доверенные службы и субъектов.","whatWeCheck":["Поиск учётных записей и компьютеров с неограниченным делегированием.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск учётных записей и компьютеров с неограниченным делегированием.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Неограниченное делегирование Kerberos"},"ConstrainedDelegation":{"whyItMatters":"Ошибки делегирования Kerberos могут позволять действия от имени других пользователей. Проверяйте доверенные службы и субъектов.","whatWeCheck":["Проверка разрешённых служб и параметров ограниченного делегирования.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка разрешённых служб и параметров ограниченного делегирования.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Ограниченное делегирование Kerberos"},"RBCDelegation":{"whyItMatters":"Ошибки делегирования Kerberos могут позволять действия от имени других пользователей. Проверяйте доверенные службы и субъектов.","whatWeCheck":["Анализ разрешений RBCD на целевых компьютерных объектах.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ разрешений RBCD на целевых компьютерных объектах.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Ограниченное делегирование на основе ресурса (RBCD)"},"PasswordNeverExpires":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Поиск учётных записей с запретом истечения срока действия пароля.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск учётных записей с запретом истечения срока действия пароля.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Пароли с неограниченным сроком действия"},"ReversibleEncryption":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Выявление учётных записей с хранением паролей в обратимо зашифрованном виде.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Выявление учётных записей с хранением паролей в обратимо зашифрованном виде.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Обратимое шифрование паролей"},"ComputerObjectACL":{"whyItMatters":"Настройки компьютеров и их учётных записей влияют на защиту паролей, администрирование и риск бокового перемещения.","whatWeCheck":["Проверка явных разрешений на объекты компьютеров в AD.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка явных разрешений на объекты компьютеров в AD.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Явно назначенные права на компьютеры"},"CriticalObjectACL":{"whyItMatters":"Ошибки делегирования прав на объекты AD могут позволить несанкционированное изменение или повышение привилегий. Проверьте ACL, наследование и вложенные группы.","whatWeCheck":["Анализ ACL схемы, разделов каталога и объектов ролей.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ ACL схемы, разделов каталога и объектов ролей.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Права на критически важные объекты каталога"},"RODCPasswordReplication":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка кэширования и репликации паролей на контроллерах домена только для чтения.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка кэширования и репликации паролей на контроллерах домена только для чтения.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Политика репликации паролей RODC"},"PasswordNotRequired":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Выявление учётных записей с флагом PASSWD_NOTREQD.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Выявление учётных записей с флагом PASSWD_NOTREQD.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Учётные записи без обязательного пароля"},"InactiveAdmin":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Поиск длительно неиспользуемых привилегированных учётных записей.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск длительно неиспользуемых привилегированных учётных записей.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Неактивные административные учётные записи"},"gMSA":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Анализ настроек и использования групповых управляемых учётных записей служб.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ настроек и использования групповых управляемых учётных записей служб.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Групповые управляемые учётные записи служб (gMSA)"},"gMSAPassword":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка субъектов, которым разрешено получать управляемые пароли gMSA.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка субъектов, которым разрешено получать управляемые пароли gMSA.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Права чтения паролей gMSA"},"MSA":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка традиционных управляемых учётных записей служб (sMSA).","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка традиционных управляемых учётных записей служб (sMSA).","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Автономные управляемые учётные записи служб"},"AuthNPolicySilo":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка изолированных групп применения политик проверки подлинности.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка изолированных групп применения политик проверки подлинности.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Хранилища политик проверки подлинности"},"AuthNPolicy":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Анализ настроек и назначения политик проверки подлинности.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ настроек и назначения политик проверки подлинности.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Политики проверки подлинности"},"dMSA":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка делегированных управляемых учётных записей служб.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка делегированных управляемых учётных записей служб.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Делегированные управляемые учётные записи служб (dMSA)"},"dMSALink":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка связей между dMSA и заменяемыми учётными записями.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка связей между dMSA и заменяемыми учётными записями.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Связи делегированных учётных записей dMSA"},"NonDefaultOwner":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Поиск пользовательских объектов, у которых назначен нетипичный владелец.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск пользовательских объектов, у которых назначен нетипичный владелец.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Нестандартные владельцы учётных записей"},"Tier0Account":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Оценка защиты учётных записей с доступом к критически важной инфраструктуре AD.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Оценка защиты учётных записей с доступом к критически важной инфраструктуре AD.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Защита учётных записей уровня 0 (Tier 0)"},"PrivilegedGroupMember":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Анализ состава административных и других привилегированных групп.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ состава административных и других привилегированных групп.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Участники привилегированных групп"},"OperatorGroup":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка состава встроенных операторских и широких групп доступа.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка состава встроенных операторских и широких групп доступа.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Участники операторских групп"},"SIDHistory":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка атрибута sIDHistory и включённых в него идентификаторов безопасности.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка атрибута sIDHistory и включённых в него идентификаторов безопасности.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Возможное злоупотребление sIDHistory"},"AdminSDHolderACL":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Анализ ACL AdminSDHolder и распространяемых защитных разрешений.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ ACL AdminSDHolder и распространяемых защитных разрешений.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Права на объект AdminSDHolder"},"PrivilegedGroupACL":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Поиск опасных разрешений на группах, не защищённых AdminSDHolder.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск опасных разрешений на группах, не защищённых AdminSDHolder.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"ACL привилегированных групп вне AdminSDHolder"},"UnprotectedPrivilegedGroups":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Поиск административных групп за пределами защиты AdminSDHolder.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск административных групп за пределами защиты AdminSDHolder.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Привилегированные группы без защиты AdminSDHolder"},"PrivilegedAccountACL":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка прав изменения и владения административными учётными записями.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка прав изменения и владения административными учётными записями.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Права управления привилегированными учётными записями"},"PrivilegedAccountsRead":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка разрешений на чтение и управление защищаемыми учётными записями.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка разрешений на чтение и управление защищаемыми учётными записями.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Доступ к объектам привилегированных учётных записей"},"LogonScriptPermission":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Анализ путей сценариев входа и прав их изменения.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ путей сценариев входа и прав их изменения.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Сценарии входа учётных записей"},"PreWindows2000Access":{"whyItMatters":"Избыточные права и неверные настройки учётных записей создают пути компрометации. Особое внимание уделяйте административным и служебным записям.","whatWeCheck":["Проверка состава группы совместимого доступа с Windows 2000 и её полномочий.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка состава группы совместимого доступа с Windows 2000 и её полномочий.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Группа Pre-Windows 2000 Compatible Access"},"Kerberoastable":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Поиск учётных записей служб, для которых доступны билеты Kerberos с возможностью автономного подбора пароля.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск учётных записей служб, для которых доступны билеты Kerberos с возможностью автономного подбора пароля.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Учётные записи, допускающие Kerberoasting"},"ASREPRoastable":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Поиск учётных записей без обязательной предварительной проверки подлинности Kerberos.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск учётных записей без обязательной предварительной проверки подлинности Kerberos.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Учётные записи, допускающие AS-REP Roasting"},"UnixPassword":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Поиск потенциально чувствительных парольных атрибутов UNIX в AD.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск потенциально чувствительных парольных атрибутов UNIX в AD.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Парольные атрибуты UNIX"},"CredentialRoaming":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Анализ сохранённых в AD данных Credential Roaming.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ сохранённых в AD данных Credential Roaming.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Перемещаемые учётные данные"},"CredentialRoamingPermission":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Проверка делегированных разрешений на чтение Credential Roaming.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка делегированных разрешений на чтение Credential Roaming.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Права чтения перемещаемых учётных данных"},"GPPCredential":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Поиск раскрытия паролей и других секретов в Group Policy Preferences (GPP).","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск раскрытия паролей и других секретов в Group Policy Preferences (GPP).","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Учётные данные в предпочтениях групповой политики"},"SYSVOLCredential":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Поиск паролей и секретов в доступных сценариях SYSVOL.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск паролей и секретов в доступных сценариях SYSVOL.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Учётные данные в сценариях SYSVOL"},"LAPSCredential":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Проверка разрешений на чтение паролей локальных администраторов из LAPS.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка разрешений на чтение паролей локальных администраторов из LAPS.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Доступ к паролям LAPS"},"BitLockerRecoveryKey":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Проверка доступа к ключам и паролям восстановления BitLocker в AD.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка доступа к ключам и паролям восстановления BitLocker в AD.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Доступ к ключам восстановления BitLocker"},"BitLockerRecoveryPermission":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Проверка субъектов с делегированными правами чтения данных восстановления BitLocker.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка субъектов с делегированными правами чтения данных восстановления BitLocker.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Делегированное чтение ключей BitLocker"},"PasswordInDescription":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Поиск учётных данных в полях описания и других свободно заполняемых атрибутах.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск учётных данных в полях описания и других свободно заполняемых атрибутах.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Пароли в текстовых атрибутах объектов"},"DeletedObject":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Проверка чтения удалённых объектов и сохранённых атрибутов.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка чтения удалённых объектов и сохранённых атрибутов.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Доступные для чтения удалённые объекты"},"DeletedObjectsReader":{"whyItMatters":"Обнаруженные секреты и возможность автономного подбора паролей повышают риск компрометации. Ограничьте доступ к результатам аудита.","whatWeCheck":["Определение субъектов, имеющих право перечислять удалённые объекты.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Определение субъектов, имеющих право перечислять удалённые объекты.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Права просмотра удалённых объектов"},"DangerousACL":{"whyItMatters":"Ошибки делегирования прав на объекты AD могут позволить несанкционированное изменение или повышение привилегий. Проверьте ACL, наследование и вложенные группы.","whatWeCheck":["Проверка опасных разрешений на корневом объекте домена.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка опасных разрешений на корневом объекте домена.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Права доступа к корню домена"},"DangerousOUPermission":{"whyItMatters":"Ошибки делегирования прав на объекты AD могут позволить несанкционированное изменение или повышение привилегий. Проверьте ACL, наследование и вложенные группы.","whatWeCheck":["Анализ ACL организационных единиц и возможных путей повышения привилегий.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ ACL организационных единиц и возможных путей повышения привилегий.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Опасные разрешения на OU"},"WeakCertificateMapping":{"whyItMatters":"Ошибки регистрации сертификатов AD CS могут влиять на проверку подлинности. Проверяйте шаблоны, EKU, разрешения и цепочки доверия.","whatWeCheck":["Проверка явного сопоставления сертификатов и возможных слабых привязок к учётным записям.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка явного сопоставления сертификатов и возможных слабых привязок к учётным записям.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Небезопасное сопоставление сертификатов"},"PasswordResetRight":{"whyItMatters":"Ошибки делегирования прав на объекты AD могут позволить несанкционированное изменение или повышение привилегий. Проверьте ACL, наследование и вложенные группы.","whatWeCheck":["Проверка субъектов с правом сброса паролей других учётных записей.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка субъектов с правом сброса паролей других учётных записей.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Права сброса паролей"},"AddComputerRight":{"whyItMatters":"Ошибки делегирования прав на объекты AD могут позволить несанкционированное изменение или повышение привилегий. Проверьте ACL, наследование и вложенные группы.","whatWeCheck":["Проверка прав создания объектов компьютеров.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка прав создания объектов компьютеров.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Права добавления компьютеров в домен"},"GPOUserRights":{"whyItMatters":"Ошибки делегирования прав на объекты AD могут позволить несанкционированное изменение или повышение привилегий. Проверьте ACL, наследование и вложенные группы.","whatWeCheck":["Поиск отступлений от стандартных настроек прав пользователя Windows в GPO.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск отступлений от стандартных настроек прав пользователя Windows в GPO.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Назначение прав пользователя через GPO"},"MachineAccountQuota":{"whyItMatters":"Ошибки делегирования прав на объекты AD могут позволить несанкционированное изменение или повышение привилегий. Проверьте ACL, наследование и вложенные группы.","whatWeCheck":["Проверка параметра ms-DS-MachineAccountQuota.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка параметра ms-DS-MachineAccountQuota.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Квота создания компьютерных учётных записей"},"AddComputerGPO":{"whyItMatters":"Ошибки делегирования прав на объекты AD могут позволить несанкционированное изменение или повышение привилегий. Проверьте ACL, наследование и вложенные группы.","whatWeCheck":["Анализ групповых политик, влияющих на право добавлять компьютеры в домен.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ групповых политик, влияющих на право добавлять компьютеры в домен.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Параметры GPO для добавления компьютеров"},"LAPSPermission":{"whyItMatters":"Ошибки делегирования прав на объекты AD могут позволить несанкционированное изменение или повышение привилегий. Проверьте ACL, наследование и вложенные группы.","whatWeCheck":["Анализ ACL, позволяющих читать пароли LAPS.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ ACL, позволяющих читать пароли LAPS.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Разрешения на чтение LAPS"},"ComputerPasswordAge":{"whyItMatters":"Настройки компьютеров и их учётных записей влияют на защиту паролей, администрирование и риск бокового перемещения.","whatWeCheck":["Проверка давности изменения паролей компьютеров домена.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка давности изменения паролей компьютеров домена.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Возраст паролей компьютерных учётных записей"},"OutdatedComputer":{"whyItMatters":"Настройки компьютеров и их учётных записей влияют на защиту паролей, администрирование и риск бокового перемещения.","whatWeCheck":["Поиск неподдерживаемых и устаревающих версий Windows.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск неподдерживаемых и устаревающих версий Windows.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Устаревшие версии Windows на компьютерах"},"NonDefaultComputerOwner":{"whyItMatters":"Настройки компьютеров и их учётных записей влияют на защиту паролей, администрирование и риск бокового перемещения.","whatWeCheck":["Проверка собственников компьютерных объектов в AD.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка собственников компьютерных объектов в AD.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Нестандартные владельцы объектов компьютеров"},"LAPSConfiguration":{"whyItMatters":"Настройки компьютеров и их учётных записей влияют на защиту паролей, администрирование и риск бокового перемещения.","whatWeCheck":["Проверка политики и параметров Windows LAPS и прежней версии LAPS.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка политики и параметров Windows LAPS и прежней версии LAPS.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Конфигурация LAPS"},"LAPSCoverage":{"whyItMatters":"Настройки компьютеров и их учётных записей влияют на защиту паролей, администрирование и риск бокового перемещения.","whatWeCheck":["Оценка доли компьютеров с управлением паролем локального администратора.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Оценка доли компьютеров с управлением паролем локального администратора.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Охват компьютеров защитой LAPS"},"GPOPermission":{"whyItMatters":"Параметры групповой политики действуют на множество компьютеров и пользователей. Оцените область действия, владельцев и права на SYSVOL.","whatWeCheck":["Проверка списков управления доступом к объектам групповой политики.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка списков управления доступом к объектам групповой политики.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Разрешения на объекты GPO"},"GPOLocalGroup":{"whyItMatters":"Параметры групповой политики действуют на множество компьютеров и пользователей. Оцените область действия, владельцев и права на SYSVOL.","whatWeCheck":["Анализ добавления учётных записей в локальные группы посредством GPO.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ добавления учётных записей в локальные группы посредством GPO.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Назначение участников локальных групп через GPO"},"GPOSuppressedGroup":{"whyItMatters":"Параметры групповой политики действуют на множество компьютеров и пользователей. Оцените область действия, владельцев и права на SYSVOL.","whatWeCheck":["Перечень результатов, сознательно исключённых согласно условиям проверки.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Перечень результатов, сознательно исключённых согласно условиям проверки.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Объекты, исключённые из этой проверки"},"GPOScheduledTask":{"whyItMatters":"Параметры групповой политики действуют на множество компьютеров и пользователей. Оцените область действия, владельцев и права на SYSVOL.","whatWeCheck":["Проверка задач, создаваемых и настраиваемых групповыми политиками.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка задач, создаваемых и настраиваемых групповыми политиками.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Запланированные задания в GPO"},"GPOScriptPath":{"whyItMatters":"Параметры групповой политики действуют на множество компьютеров и пользователей. Оцените область действия, владельцев и права на SYSVOL.","whatWeCheck":["Проверка сценариев запуска и входа, заданных через GPO.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка сценариев запуска и входа, заданных через GPO.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Пути сценариев в GPO"},"GPORegistrySetting":{"whyItMatters":"Параметры групповой политики действуют на множество компьютеров и пользователей. Оцените область действия, владельцев и права на SYSVOL.","whatWeCheck":["Анализ параметров реестра, устанавливаемых объектами групповой политики.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Анализ параметров реестра, устанавливаемых объектами групповой политики.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Параметры реестра в GPO"},"GPORegistryValue":{"whyItMatters":"Параметры групповой политики действуют на множество компьютеров и пользователей. Оцените область действия, владельцев и права на SYSVOL.","whatWeCheck":["Проверка значений реестра, изменяемых групповыми политиками.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка значений реестра, изменяемых групповыми политиками.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Значения реестра в GPO"},"PointAndPrintPolicy":{"whyItMatters":"Параметры групповой политики действуют на множество компьютеров и пользователей. Оцените область действия, владельцев и права на SYSVOL.","whatWeCheck":["Проверка ограничений Point and Print для установки драйверов принтеров.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка ограничений Point and Print для установки драйверов принтеров.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Политики установки драйверов Point and Print"},"LAPSStalePassword":{"whyItMatters":"Настройки компьютеров и их учётных записей влияют на защиту паролей, администрирование и риск бокового перемещения.","whatWeCheck":["Поиск паролей LAPS, не сменявшихся в установленный срок.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Поиск паролей LAPS, не сменявшихся в установленный срок.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Пароли LAPS, переставшие обновляться"},"LAPSGPOConfig":{"whyItMatters":"Настройки компьютеров и их учётных записей влияют на защиту паролей, администрирование и риск бокового перемещения.","whatWeCheck":["Проверка параметров Windows LAPS, заданных в GPO.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Проверка параметров Windows LAPS, заданных в GPO.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Параметры LAPS в групповых политиках"},"BloodHoundCollector":{"whyItMatters":"Граф отношений выявляет возможные цепочки доступа и повышения привилегий. Данные о структуре домена следует защищать.","whatWeCheck":["Сбор графа отношений между объектами, группами и разрешениями AD.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Сбор графа отношений между объектами, группами и разрешениями AD.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Сбор данных BloodHound"},"LDAPStatisticsModule":{"whyItMatters":"Оцените фактические значения и применимость рекомендаций к архитектуре вашего домена.","whatWeCheck":["Количество LDAP-запросов и объём данных по каждому модулю.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Количество LDAP-запросов и объём данных по каждому модулю.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Статистика LDAP по модулям"},"LDAPStatisticsTotal":{"whyItMatters":"Оцените фактические значения и применимость рекомендаций к архитектуре вашего домена.","whatWeCheck":["Сводное количество LDAP-запросов, результатов и переданных данных.","Проверенные параметры и обнаруженные объекты приведены в карточках результатов."],"secureMessage":"Проверяемая конфигурация классифицирована как безопасная.","summary":"Сводное количество LDAP-запросов, результатов и переданных данных.","filteringNote":"Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.","title":"Общая статистика LDAP"}};
+        Object.keys(ruCheckContext).forEach(function(id) {
+            const check = checkDescriptions[id];
+            const ru = ruCheckContext[id];
+            if (!check) return;
+            check.originalEnglish = {
+                whyItMatters: check.whyItMatters,
+                whatWeCheck: check.whatWeCheck,
+                secureMessage: check.secureMessage,
+                filteringNote: check.filteringNote
+            };
+            check.title = ru.title;
+            check.summary = ru.summary;
+            check.whyItMatters = ru.whyItMatters;
+            check.whatWeCheck = ru.whatWeCheck;
+            if (check.secureMessage) check.secureMessage = ru.secureMessage;
+            if (check.filteringNote) check.filteringNote = ru.filteringNote;
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.attr-name').forEach(function(node) {
+                const name = node.textContent.trim();
+                const colon = name.endsWith(':') ? ':' : '';
+                const key = colon ? name.slice(0,-1).trim() : name;
+                if(Object.prototype.hasOwnProperty.call(ruAttributeLabels,key)) {
+                    node.textContent = ruAttributeLabels[key] + colon;
+                }
+            });
+            const statuses = {
+                'Yes':'Да','No':'Нет','True':'Истина','False':'Ложь',
+                'Enabled':'Включено','Disabled':'Отключено',
+                'Not Set':'Не задано','Not Configured':'Не настроено',
+                'Not Found':'Не найдено','Not Tested':'Не проверено',
+                'Unknown':'Неизвестно','None':'Нет','N/A':'Н/Д',
+                'Required':'Обязательно','Allowed':'Разрешено','Denied':'Запрещено'
+            };
+            document.querySelectorAll('.attr-value span').forEach(function(node) {
+                if(node.children.length) return;
+                const key = node.textContent.trim();
+                if(Object.prototype.hasOwnProperty.call(statuses,key)){
+                    node.textContent = statuses[key];
+                }
+            });
+        });
         // Scoring context data for context-aware risk calculation
         const scoringContext = {{SCORING_CONTEXT_JSON}};
 
@@ -91293,16 +91340,29 @@ function Get-HTMLTemplate {
         }
 
         function buildTooltipHtml(finding, findingId, actualSeverity) {
+            const ruExtra = ruFindingExplanations[findingId] || {};
+            const titleRu = ruFindingTitles[findingId] || finding.title;
+            const isSecureRu = actualSeverity === 'secure' ||
+                (finding.risk && finding.risk.toLowerCase() === 'secure');
+            const descriptionRu = ruExtra.description ||
+                ('Краткое русское пояснение: ' + titleRu + '. Для оценки конкретных условий используйте данные карточки и полный технический оригинал EN.');
+            const impactRu = ruExtra.impact || (isSecureRu ?
+                ['Обнаруженный параметр соответствует ожидаемому безопасному состоянию.'] :
+                ['Последствия зависят от полномочий затронутого субъекта и области действия настройки.']);
+            const remediationRu = ruExtra.remediation || (isSecureRu ?
+                ['Сохраните действующие защитные настройки и проверяйте их после изменений инфраструктуры.'] :
+                ['Проверьте необходимость настройки и соответствие принципу минимальных привилегий. Для исправления опирайтесь на документацию Microsoft и действующие политики организации.']);
+            const attackRu = ruExtra.attack || [];
             // Map card severity to display label and CSS class
             // actualSeverity comes from parent card's data-severity attribute
             // If provided, it overrides the static finding.risk from definition
             // Maps SeverityClasses (from adPEAS-Types.ps1) to display labels and CSS classes
             // These values are used for tooltip badges and match the central definitions
             const severityMap = {
-                'finding': { label: 'FINDING', class: 'finding' },
-                'hint': { label: 'HINT', class: 'hint' },
-                'note': { label: 'NOTE', class: 'note' },
-                'secure': { label: 'SECURE', class: 'secure' }  // Blue in CSS
+                'finding': { label: 'НАРУШЕНИЕ', class: 'finding' },
+                'hint': { label: 'ПРЕДУПРЕЖДЕНИЕ', class: 'hint' },
+                'note': { label: 'СВЕДЕНИЯ', class: 'note' },
+                'secure': { label: 'БЕЗОПАСНО', class: 'secure' }  // Blue in CSS
             };
 
             let riskLabel, riskClass;
@@ -91319,7 +91379,7 @@ function Get-HTMLTemplate {
             let html = `
                 <div class="tooltip-header">
                     <div>
-                        <div class="tooltip-title">${escapeHtml(finding.title)}</div>
+                        <div class="tooltip-title">${escapeHtml(ruFindingTitles[findingId] || finding.title)}</div>
                         <span class="tooltip-risk ${riskClass}">${escapeHtml(riskLabel)}</span>
                     </div>
                     <button class="tooltip-close" onclick="hideTooltip()">&times;</button>
@@ -91331,24 +91391,24 @@ function Get-HTMLTemplate {
             html += `
                 <div class="tooltip-section">
                     <div class="tooltip-section-title">
-                        <span class="toggle-icon">&#9660;</span> Description
+                        <span class="toggle-icon">&#9660;</span> Описание
                     </div>
                     <div class="tooltip-section-content">
-                        ${escapeHtml(finding.description)}
+                        ${escapeHtml(descriptionRu)}
                     </div>
                 </div>
             `;
 
             // Impact (collapsed by default)
-            if (finding.impact && finding.impact.length > 0) {
+            if (impactRu && impactRu.length > 0) {
                 html += `
                     <div class="tooltip-section">
                         <div class="tooltip-section-title collapsed">
-                            <span class="toggle-icon">&#9660;</span> Impact
+                            <span class="toggle-icon">&#9660;</span> Последствия
                         </div>
                         <div class="tooltip-section-content collapsed">
                             <ul>
-                                ${finding.impact.map(i => `<li>${escapeHtml(i)}</li>`).join('')}
+                                ${impactRu.map(i => `<li>${escapeHtml(i)}</li>`).join('')}
                             </ul>
                         </div>
                     </div>
@@ -91357,9 +91417,9 @@ function Get-HTMLTemplate {
 
             // Attack/Protection section (collapsible by default)
             // For "Secure" findings, this section describes what attacks are prevented
-            if (finding.attack && finding.attack.length > 0) {
+            if (attackRu && attackRu.length > 0) {
                 const isSecure = actualSeverity === 'secure' || (finding.risk && finding.risk.toLowerCase() === 'secure');
-                const attackSectionTitle = isSecure ? 'Blocked Attack Vectors' : 'Attack Steps';
+                const attackSectionTitle = isSecure ? 'Предотвращаемые угрозы' : 'Этапы атаки';
                 html += `
                     <div class="tooltip-section">
                         <div class="tooltip-section-title collapsed">
@@ -91367,7 +91427,7 @@ function Get-HTMLTemplate {
                         </div>
                         <div class="tooltip-section-content collapsed">
                             <ul>
-                                ${finding.attack.map(a => `<li>${escapeHtml(a)}</li>`).join('')}
+                                ${attackRu.map(a => `<li>${escapeHtml(a)}</li>`).join('')}
                             </ul>
                         </div>
                     </div>
@@ -91376,9 +91436,9 @@ function Get-HTMLTemplate {
 
             // Remediation / Best Practices section
             // For "Secure" findings, this section describes how to maintain the secure configuration
-            if (finding.remediation && finding.remediation.length > 0) {
+            if (remediationRu && remediationRu.length > 0) {
                 const isSecureConfig = actualSeverity === 'secure' || (finding.risk && finding.risk.toLowerCase() === 'secure');
-                const remediationTitle = isSecureConfig ? 'Best Practices' : 'Remediation';
+                const remediationTitle = isSecureConfig ? 'Поддержание защиты' : 'Меры по устранению';
                 html += `
                     <div class="tooltip-section">
                         <div class="tooltip-section-title collapsed">
@@ -91386,7 +91446,7 @@ function Get-HTMLTemplate {
                         </div>
                         <div class="tooltip-section-content collapsed">
                             <ul>
-                                ${finding.remediation.map(r => `<li>${escapeHtml(r)}</li>`).join('')}
+                                ${remediationRu.map(r => `<li>${escapeHtml(r)}</li>`).join('')}
                             </ul>
                         </div>
                     </div>
@@ -91401,7 +91461,7 @@ function Get-HTMLTemplate {
                             <span class="toggle-icon">&#9660;</span> Команды исправления
                         </div>
                         <div class="tooltip-section-content collapsed">
-                            <div class="remediation-disclaimer">&#9888; Example commands for reference only. Always test in a non-production environment first and adapt to your specific situation.</div>
+                            <div class="remediation-disclaimer">&#9888; Команды приведены как примеры. Перед применением проверьте их в тестовой среде и адаптируйте к вашей инфраструктуре.</div>
                             ${finding.remediationCommands.map(cmd => `
                                 <div class="remediation-command">
                                     <div class="remediation-command-desc">${escapeHtml(cmd.description)}</div>
@@ -91421,7 +91481,7 @@ function Get-HTMLTemplate {
                 html += `
                     <div class="tooltip-section">
                         <div class="tooltip-section-title collapsed">
-                            <span class="toggle-icon">&#9660;</span> References
+                            <span class="toggle-icon">&#9660;</span> Источники
                         </div>
                         <div class="tooltip-section-content collapsed tooltip-references">
                             ${finding.references.map(r => `<a href="${escapeHtml(r.url)}" target="_blank" rel="noopener">${escapeHtml(r.title)}</a>`).join('')}
@@ -91435,7 +91495,7 @@ function Get-HTMLTemplate {
                 html += `
                     <div class="tooltip-section">
                         <div class="tooltip-section-title collapsed">
-                            <span class="toggle-icon">&#9660;</span> Tools
+                            <span class="toggle-icon">&#9660;</span> Инструменты
                         </div>
                         <div class="tooltip-section-content collapsed tooltip-tools">
                             ${finding.tools.map(t => {
@@ -91455,6 +91515,13 @@ function Get-HTMLTemplate {
                 `;
             }
 
+            html += '<details class="tooltip-section" lang="en">' +
+                '<summary>Полное техническое описание (оригинал EN)</summary>' +
+                '<p>' + escapeHtml(finding.description) + '</p>' +
+                (finding.impact ? '<p>Impact</p><ul>' + finding.impact.map(i => '<li>' + escapeHtml(i) + '</li>').join('') + '</ul>' : '') +
+                (finding.attack ? '<p>Attack</p><ul>' + finding.attack.map(i => '<li>' + escapeHtml(i) + '</li>').join('') + '</ul>' : '') +
+                (finding.remediation ? '<p>Remediation</p><ul>' + finding.remediation.map(i => '<li>' + escapeHtml(i) + '</li>').join('') + '</ul>' : '') +
+                '</details>';
             // MITRE ATT&CK
             if (finding.mitre) {
                 const mitreUrl = `https://attack.mitre.org/techniques/${finding.mitre.replace('.', '/')}/`;
@@ -91696,7 +91763,7 @@ function Get-HTMLTemplate {
             if (cardSeverity === 'secure' && check.secureMessage) {
                 html += `
                     <div class="check-tooltip-section check-tooltip-secure">
-                        <div class="check-tooltip-section-title">Secure Configuration</div>
+                        <div class="check-tooltip-section-title">Безопасная конфигурация</div>
                         <div class="check-tooltip-section-content">
                             ${escapeHtml(check.secureMessage)}
                         </div>
@@ -91708,7 +91775,7 @@ function Get-HTMLTemplate {
             if (check.whyItMatters) {
                 html += `
                     <div class="check-tooltip-section">
-                        <div class="check-tooltip-section-title">Why It Matters</div>
+                        <div class="check-tooltip-section-title">Почему это важно</div>
                         <div class="check-tooltip-section-content">
                             ${escapeHtml(check.whyItMatters)}
                         </div>
@@ -91720,7 +91787,7 @@ function Get-HTMLTemplate {
             if (check.whatWeCheck && check.whatWeCheck.length > 0) {
                 html += `
                     <div class="check-tooltip-section">
-                        <div class="check-tooltip-section-title">What We Check</div>
+                        <div class="check-tooltip-section-title">Что проверяется</div>
                         <div class="check-tooltip-section-content">
                             <ul>
                                 ${check.whatWeCheck.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
@@ -91730,11 +91797,19 @@ function Get-HTMLTemplate {
                 `;
             }
 
+            if (check.originalEnglish && check.originalEnglish.whyItMatters) {
+                html += '<details class="check-tooltip-section" lang="en">' +
+                    '<summary>Подробные критерии проверки (оригинал EN)</summary>' +
+                    '<p>' + escapeHtml(check.originalEnglish.whyItMatters) + '</p>' +
+                    (check.originalEnglish.whatWeCheck ?
+                        '<ul>' + check.originalEnglish.whatWeCheck.map(i => '<li>' + escapeHtml(i) + '</li>').join('') + '</ul>' : '') +
+                    '</details>';
+            }
             // Filtering Note (documents privilege filtering behavior)
             if (check.filteringNote) {
                 html += `
                     <div class="check-tooltip-section check-tooltip-filtering">
-                        <div class="check-tooltip-section-title">Output Filtering</div>
+                        <div class="check-tooltip-section-title">Фильтрация результатов</div>
                         <div class="check-tooltip-section-content">
                             ${escapeHtml(check.filteringNote)}
                         </div>
@@ -97423,7 +97498,7 @@ function Collect-BHIssuancePolicies {
 	}
 	return $bhPolicies
 }
-$Script:adPEASVersion = "2.9.0+20261110-1107"
+$Script:adPEASVersion = "2.9.0+20261110-1219"
 if ($MyInvocation.MyCommand.Path) {
 	$Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {
