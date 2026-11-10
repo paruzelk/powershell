@@ -14,6 +14,8 @@ Application: `0.9.4-rc1-build2.6.3-PREVIEW1`. Target: Windows PowerShell 5.1, Ou
 
 **NEW BW4k7v2a5 read-only failed CreatePilot count forensics:** Operator BW4k7v2a4 `CreatePilot` failed after an actual MailItem.Save and verified parent StoreID/FolderID, inside combined `source.Count == 1 && target.Count == 0` assertion. The original SuiteId `7451b8f5-6404-4496-ae7b-5b1cdfb9063a` is quarantined; [new original-suite numeric Restrict-vs-manual count diagnostic](docs/2.6.5-bw4k7v2a5-failed-createpilot-count-readonly.md) performs only read-only, bounded direct Subject enumeration of existing default Drafts and exact disposable PST test folder. No original attempts or messages replayed, created, moved, or deleted.
 
+**BW4k7v2a6 read-only semantic Body investigation:** The live BW4k7v2a5 operator output conclusively found the original new synthetic Draft with correct source and destination cardinalities but `BodyMatchesExpected=False`. New [pinned original-suite read-only Body integrity forensic](docs/2.6.5-bw4k7v2a6-body-integrity-readonly.md) compares deterministic expected Body with SHA-256, UTF-8 byte lengths, CR/LF patterns and two MAPI readbacks. It never prints observed Body or signatures, never writes Outlook or moves any mail. Any Body mismatch remains a SEM-001 blocker, not a move waiver.
+
 ## Purpose and safety rules
 
 - Archive old messages from **POP3** PST stores only; IMAP accounts are never archived.
