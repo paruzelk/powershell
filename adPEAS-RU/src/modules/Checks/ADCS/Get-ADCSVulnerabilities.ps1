@@ -164,7 +164,7 @@
 
             # Step 0: PKI Trust Infrastructure Overview (Root CAs, NTAuth Store)
             $configNC = $Script:LDAPContext.ConfigurationNamingContext
-            Show-SubHeader "Checking PKI trust infrastructure..." -ObjectType "PKIInfrastructure"
+            Show-SubHeader "Проверка инфраструктуры доверия PKI..." -ObjectType "PKIInfrastructure"
 
             # --- Root CAs (trusted root certificates in AD) ---
             try {
@@ -300,10 +300,10 @@
                             Show-Object $ntAuthRow.Object -Class $ntAuthRow.Class
                         }
                     } else {
-                        Show-Line "NTAuth Store exists but contains no certificates" -Class Hint
+                        Show-Line "Хранилище NTAuth существует, но сертификатов не содержит" -Class Hint
                     }
                 } else {
-                    Show-Line "No NTAuth Store found - PKINIT certificate authentication may not be configured" -Class Note
+                    Show-Line "Хранилище NTAuth отсутствует; проверка подлинности по сертификату PKINIT может быть не настроена" -Class Note
                 }
             }
             catch {
@@ -347,13 +347,13 @@
             }
 
             # Step 1: Enumerate Certificate Authorities (Infrastructure)
-            Show-SubHeader "Searching for AD CS Infrastructure..." -ObjectType "CertificateAuthority"
+            Show-SubHeader "Поиск компонентов служб сертификатов Active Directory (AD CS)..." -ObjectType "CertificateAuthority"
 
             # Check if query failed (auth error, network issue, etc.)
             $queryError = $caResults | Where-Object { $_._QueryError -eq $true }
             if ($queryError) {
                 Write-Log "[Get-ADCSVulnerabilities] CA query failed: $($queryError.ErrorMessage)"
-                Show-Line "Failed to query Certificate Authorities - LDAP query failed (authentication/network issue)" -Class Finding
+                Show-Line "Не удалось запросить центры сертификации: ошибка LDAP, проверки подлинности или сети" -Class Finding
                 return
             }
 
@@ -361,7 +361,7 @@
             $cas = @($caResults | Where-Object { $_._QueryError -ne $true })
 
             if (@($cas).Count -eq 0) {
-                Show-Line "No Certificate Authorities found - AD CS not deployed" -Class Note
+                Show-Line "Центры сертификации не найдены: AD CS не развёрнуты" -Class Note
                 return
             }
 
@@ -883,7 +883,7 @@
             # - Add themselves to enrollment permissions
             # - Manipulate NTAuth store
             try {
-                Show-SubHeader "Checking PKI container permissions..." -ObjectType "PKIContainer"
+                Show-SubHeader "Проверка разрешений на контейнеры PKI..." -ObjectType "PKIContainer"
 
                 $pkiContainers = @(
                     @{
@@ -1158,18 +1158,18 @@
             }
             catch {
                 Write-Log "[Get-ADCSVulnerabilities] Error during ESC5 check: $_" -Level Warning
-                Show-Line "Error checking PKI container permissions" -Class Hint
+                Show-Line "Ошибка проверки разрешений контейнеров PKI" -Class Hint
             }
 
             # Step 2: Enumerate Certificate Templates (only enabled/published ones)
-            Show-SubHeader "Searching for certificate templates..." -ObjectType "CertificateTemplate"
+            Show-SubHeader "Поиск шаблонов сертификатов AD CS..." -ObjectType "CertificateTemplate"
             $templateResults = @(Get-ADCSTemplate @CredParams)
 
             # Check if query failed (auth error, network issue, etc.)
             $templateQueryError = $templateResults | Where-Object { $_._QueryError -eq $true }
             if ($templateQueryError) {
                 Write-Log "[Get-ADCSVulnerabilities] Template query failed: $($templateQueryError.ErrorMessage)"
-                Show-Line "Failed to query certificate templates - LDAP query failed (authentication/network issue)" -Class Finding
+                Show-Line "Не удалось запросить шаблоны сертификатов: ошибка LDAP, проверки подлинности или сети" -Class Finding
                 return
             }
 

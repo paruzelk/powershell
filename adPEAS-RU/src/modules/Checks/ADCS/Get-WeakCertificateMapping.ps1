@@ -107,7 +107,7 @@
         # ==================================================================
         # 1. Principals that already carry an explicit mapping
         # ==================================================================
-        Show-SubHeader "Analyzing explicit certificate mappings..." -ObjectType "WeakCertificateMapping"
+        Show-SubHeader "Анализ явного сопоставления сертификатов с учётными записями..." -ObjectType "WeakCertificateMapping"
 
         # Two phases, the way Get-NonDefaultUserOwners reads owners across the domain.
         #
@@ -245,7 +245,7 @@
         # and who could map something tomorrow - and under one header the secure verdict of
         # the first read as a verdict on ESC14 as a whole, with the findings of the second
         # contradicting it on the next line.
-        Show-SubHeader "Checking write access to altSecurityIdentities on privileged accounts..." -ObjectType "WeakCertificateMapping"
+        Show-SubHeader "Проверка прав изменения altSecurityIdentities у привилегированных записей..." -ObjectType "WeakCertificateMapping"
 
         $writableFindings = @()
         $exchangeOnlyFindings = @()

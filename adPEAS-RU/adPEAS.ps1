@@ -3,8 +3,8 @@
     adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
 
 .DESCRIPTION
-    Build: 2026-11-10 12:19:47
-    Version: 2.9.0+20261110-1219
+    Build: 2026-11-10 12:52:08
+    Version: 2.9.0+20261110-1252
 
     AUTHORIZED SECURITY TESTING ONLY!
 
@@ -110226,7 +110226,7 @@ function Get-DomainInformation {
             # SubCheck 1: Domain Information
             # Severity: Finding (Anonymous LDAP), Hint (old FL), Note (default)
             # ===================================================================
-            Show-SubHeader "Collecting domain information..." -ObjectType "DomainBasicInfo"
+            Show-SubHeader "Сбор сведений о домене..." -ObjectType "DomainBasicInfo"
 
             # Build functional level texts
             $DomainFuncLevelText = $DomainModeLevel[[int]$DomainFunc]
@@ -110374,7 +110374,7 @@ function Get-DomainInformation {
             }
 
             # Output domain info object
-            Show-Line "Found domain information:" -Class $domainInfoSeverity
+            Show-Line "Получены сведения о домене:" -Class $domainInfoSeverity
             $domainInfoObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DomainBasicInfo' -Force
             Show-Object $domainInfoObj -Class $domainInfoSeverity
 
@@ -110382,7 +110382,7 @@ function Get-DomainInformation {
             # SubCheck 2: Kerberos Policy
             # Severity: Finding (krbtgt > 365d), Hint (krbtgt > 180d), Note (default)
             # ===================================================================
-            Show-SubHeader "Analyzing Kerberos policy..." -ObjectType "KerberosPolicy"
+            Show-SubHeader "Анализ политики Kerberos..." -ObjectType "KerberosPolicy"
 
             # Build Kerberos policy values, from the [Kerberos Policy] section of the
             # domain-linked GPOs (Get-DomainKerberosPolicy). Not "the default" until
@@ -110520,7 +110520,7 @@ function Get-DomainInformation {
             }
 
             # Output Kerberos policy object
-            Show-Line "Found Kerberos policy:" -Class $kerberosSeverity
+            Show-Line "Обнаружена политика Kerberos:" -Class $kerberosSeverity
             $kerberosObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'KerberosPolicy' -Force
             Show-Object $kerberosObj -Class $kerberosSeverity
 
@@ -110528,7 +110528,7 @@ function Get-DomainInformation {
             # SubCheck 3: Guest Account Status
             # Severity: Finding (enabled + privileged), Hint (enabled), Secure (disabled)
             # ===================================================================
-            Show-SubHeader "Checking Guest Account Status..." -ObjectType "GuestAccount"
+            Show-SubHeader "Проверка состояния встроенной учётной записи «Гость»..." -ObjectType "GuestAccount"
 
             if ($GuestInfo) {
                 $statusText = if ($GuestInfo.Enabled) { "ENABLED" } else { "Disabled" }
@@ -110562,7 +110562,7 @@ function Get-DomainInformation {
                 Show-Object $guestObj -Class $guestClass
 
             } else {
-                Show-Line "Guest account not found (unusual - RID 501 should always exist)" -Class Hint
+                Show-Line "Учётная запись «Гость» не найдена: это нетипично, объект с RID 501 обычно существует" -Class Hint
             }
 
             # ===================================================================
@@ -110573,7 +110573,7 @@ function Get-DomainInformation {
             # Controller computer accounts under "Searching for Domain Controllers...", and
             # the report titles a card by the object type of its header - both sections
             # came out as "Domain Controllers" with the inventory's help text.
-            Show-SubHeader "Listing the Domain Controllers and their FSMO roles..." -ObjectType "DomainControllers"
+            Show-SubHeader "Перечисление контроллеров домена и распределения ролей FSMO..." -ObjectType "DomainControllers"
 
             # Query FSMO Roles first to associate with DCs
             $FSMORoles = @{}
@@ -110665,7 +110665,7 @@ function Get-DomainInformation {
             # SubCheck 5: Sites and Subnets
             # Severity: Hint (no subnets), Note (subnets found)
             # ===================================================================
-            Show-SubHeader "Searching for Sites and Subnets..." -ObjectType "SitesAndSubnets"
+            Show-SubHeader "Поиск сайтов и подсетей Active Directory..." -ObjectType "SitesAndSubnets"
 
             if (@($Sites).Count -gt 0) {
                 Show-Line "Found $(@($Sites).Count) site(s) and $(@($Subnets).Count) subnet(s):" -Class Note
@@ -110697,7 +110697,7 @@ function Get-DomainInformation {
                     Show-Object $siteObj -Class Note
                 }
             } else {
-                Show-Line "No AD sites found" -Class Hint
+                Show-Line "Сайты Active Directory не найдены" -Class Hint
             }
 
         } catch {
@@ -111170,7 +111170,7 @@ function Get-DomainPasswordPolicy {
                 return
             }
 
-            Show-SubHeader "Analyzing password policy..." -ObjectType "DomainPasswordPolicy"
+            Show-SubHeader "Анализ политики паролей..." -ObjectType "DomainPasswordPolicy"
 
             $domainDN = $Script:LDAPContext.DomainDN
 
@@ -111431,12 +111431,12 @@ function Get-DomainPasswordPolicy {
                 "Secure"
             }
 
-            Show-Line "Found password policy:" -Class $policySeverity
+            Show-Line "Получена политика паролей:" -Class $policySeverity
             $passwordPolicyObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DomainPasswordPolicy' -Force
             Show-Object $passwordPolicyObj -Class $policySeverity
 
             # ===== Fine-Grained Password Policies (FGPP/PSO) Analysis =====
-            Show-SubHeader "Checking for Fine-Grained Password Policies (FGPP)..." -ObjectType "FineGrainedPasswordPolicy"
+            Show-SubHeader "Поиск тонких политик паролей (FGPP)..." -ObjectType "FineGrainedPasswordPolicy"
 
             # DomainFunctionality might be a string or integer, ensure proper conversion
             $domainFunctionalLevel = 0
@@ -111667,7 +111667,7 @@ function Get-DomainPasswordPolicy {
                             # with nothing behind it and no contribution to the score.
                             Show-Line "$($weakPSONames.Count) Fine-Grained Password Polic$(if($weakPSONames.Count -eq 1){'y'}else{'ies'}) with a weakness: $($weakPSONames -join ', ')" -Class Finding -FindingId 'WEAK_FGPP'
                         } elseif ($cleanPSONames.Count -gt 0 -and $unreadPSONames.Count -eq 0) {
-                            Show-Line "Fine-Grained Password Policies are properly configured" -Class Secure
+                            Show-Line "Тонкие политики паролей настроены корректно" -Class Secure
                         } elseif ($cleanPSONames.Count -gt 0) {
                             Show-Line "No weakness in the Fine-Grained Password Policies that could be read" -Class Note
                         }
@@ -111754,11 +111754,11 @@ function Get-DomainPasswordPolicy {
                         # Not "none configured": where the container cannot be listed, a
                         # policy assigned only to objects this account may not read is not
                         # found either.
-                        Show-Line "No Fine-Grained Password Policy found by name or by assignment" -Class Note
+                        Show-Line "Тонкие политики паролей не обнаружены ни по именам, ни по назначению" -Class Note
                     }
                 }
             } else {
-                Show-Line "Fine-Grained Password Policies not available (requires Domain Functional Level 2008+)" -Raw
+                Show-Line "Тонкие политики паролей недоступны: необходим функциональный уровень домена Windows Server 2008 или выше" -Raw
             }
 
         } catch {
@@ -111960,7 +111960,7 @@ function Get-DomainTrusts {
                 return
             }
 
-            Show-SubHeader "Searching for domain trusts..." -ObjectType "DomainTrust"
+            Show-SubHeader "Поиск доверительных отношений домена..." -ObjectType "DomainTrust"
 
             $trustsRaw = Get-DomainObject -LDAPFilter "(objectClass=trustedDomain)" @PSBoundParameters
 
@@ -112404,7 +112404,7 @@ function Show-DCPolicySettingSection {
             if ($postureClasses -contains $candidate) { $postureClass = $candidate; break }
         }
 
-        Show-Line "In force on the domain controllers, by policy precedence:" -Class $postureClass
+        Show-Line "Действующие параметры контроллеров домена с учётом приоритета политик:" -Class $postureClass
         Show-Object $posture -Class $postureClass
     }
 }
@@ -112507,7 +112507,7 @@ function Get-LDAPConfiguration {
             # sessions instead - see the note at the GPO loop below - so the report could
             # carry a red "Anonymous LDAP Binding Allowed" for a domain where it was blocked,
             # and a green one for a domain where it was open.
-            Show-SubHeader "Checking the directory service heuristics (dsHeuristics)..." -ObjectType "DSHeuristics"
+            Show-SubHeader "Проверка параметров dsHeuristics службы каталогов..." -ObjectType "DSHeuristics"
 
             $unreadHeuristics = "anonymous LDAP and NSPI access, the AdminSDHolder protection of the operator groups and the UPN and SPN uniqueness checks"
             $configDN = $Script:LDAPContext.ConfigurationNamingContext
@@ -112554,7 +112554,7 @@ function Get-LDAPConfiguration {
                         }
                         $heuristicsObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DSHeuristics' -Force
                         $objectClass = if ($hasFinding) { 'Finding' } elseif ($hasUnknown) { 'Note' } else { 'Secure' }
-                        Show-Line "Found directory service heuristics:" -Class $objectClass
+                        Show-Line "Обнаружены параметры службы каталогов:" -Class $objectClass
                         Show-Object $heuristicsObj -Class $objectClass
                     }
                 } catch {
@@ -112565,7 +112565,7 @@ function Get-LDAPConfiguration {
                 Show-Line "The configuration partition is unknown - dsHeuristics, which decides $unreadHeuristics, could not be read" -Class Note
             }
 
-            Show-SubHeader "Analyzing LDAP Signing/Channel Binding via GPO (SYSVOL)..." -ObjectType "LDAPConfigGPO"
+            Show-SubHeader "Анализ настроек подписи LDAP и привязки канала через GPO (SYSVOL)..." -ObjectType "LDAPConfigGPO"
 
             $domainFQDN = $Script:LDAPContext.Domain
             $dcServer = $Script:LDAPContext.Server
@@ -112573,7 +112573,7 @@ function Get-LDAPConfiguration {
             $allGPOs = Get-DomainGPO @connectionParams
 
             if (-not $allGPOs) {
-                Show-Line "No GPOs found" -Class Hint
+                Show-Line "Объекты групповой политики не найдены" -Class Hint
                 return
             }
 
@@ -112962,7 +112962,7 @@ function Get-LDAPConfiguration {
             # Check if SYSVOL was accessible
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - the GPO configuration for LDAP Security was not analyzed" -Class Finding
                 }
@@ -112995,7 +112995,7 @@ function Get-LDAPConfiguration {
             # was listed as an LDAP configuration GPO and could decide the LDAP posture's
             # decidedBy row on its own. Unset, each leaves the domain controllers on the OS
             # default, which this check does not judge.
-            Show-SubHeader "Analyzing null session settings via GPO (SYSVOL)..." -ObjectType "NullSessionGPO"
+            Show-SubHeader "Анализ настроек анонимных сеансов через GPO (SYSVOL)..." -ObjectType "NullSessionGPO"
             $nullSessionClass = { param($Value) switch ($Value) { 'Allowed' { 'Hint' } 'Restricted' { 'Secure' } default { 'Note' } } }
             $nullSessionSection = @{
                 Setting           = @(
@@ -113099,7 +113099,7 @@ function Get-SMBSigningStatus {
                 return
             }
 
-            Show-SubHeader "Analyzing SMB Signing configuration via GPO (SYSVOL)..." -ObjectType "SMBSigning"
+            Show-SubHeader "Анализ требований подписи SMB, заданных через GPO (SYSVOL)..." -ObjectType "SMBSigning"
 
             $domainFQDN = $Script:LDAPContext.Domain
             $dcServer = $Script:LDAPContext.Server
@@ -113107,7 +113107,7 @@ function Get-SMBSigningStatus {
             $allGPOs = Get-DomainGPO @connectionParams
 
             if (-not $allGPOs -or @($allGPOs).Count -eq 0) {
-                Show-Line "No GPOs found" -Class Note
+                Show-Line "Объекты групповой политики не найдены" -Class Note
                 return
             }
 
@@ -113377,7 +113377,7 @@ function Get-SMBSigningStatus {
             # Check if SYSVOL was accessible
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - the GPO configuration for SMB Signing was not analyzed" -Class Finding
                 }
@@ -113481,7 +113481,7 @@ function Get-SMBSigningStatus {
                 } else {
                     # Every policy that configures signing is dormant, which leaves every
                     # machine on the OS default - the same exposure as configuring nothing.
-                    Show-Line "No SMB Signing configuration is deployed by a policy that is linked and enabled" -Class Finding
+                    Show-Line "Привязанные и включённые GPO не задают требования подписи SMB" -Class Finding
                 }
 
                 foreach ($gpoFinding in $shown) {
@@ -113517,7 +113517,7 @@ function Get-SMBSigningStatus {
                     )
                     $postureClass = if ($postureClasses -contains 'Finding') { 'Finding' } elseif ($postureClasses -contains 'Hint') { 'Hint' } else { 'Secure' }
 
-                    Show-Line "In force on the domain controllers, by policy precedence:" -Class $postureClass
+                    Show-Line "Действующие параметры контроллеров домена с учётом приоритета политик:" -Class $postureClass
                     Show-Object $posture -Class $postureClass
                 }
 
@@ -113573,7 +113573,7 @@ function Get-SMBSigningStatus {
                         decidedBy     = 'None (signing is set on the DC OU only)'
                     }
                     $memberPosture | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'EffectiveSMBSigningMembers' -Force
-                    Show-Line "In force on member servers and clients:" -Class $dcOnlyClass
+                    Show-Line "Действующие параметры рядовых серверов и клиентов:" -Class $dcOnlyClass
                     Show-Object $memberPosture -Class $dcOnlyClass
                 }
 
@@ -113602,7 +113602,7 @@ function Get-SMBSigningStatus {
                 }
 
             } else {
-                Show-Line "No SMB Signing configuration found in any GPO - computers rely on OS defaults (varies by Windows version)" -Class Finding
+                Show-Line "Ни одна GPO не задаёт подпись SMB; действуют значения ОС по умолчанию, зависящие от версии Windows" -Class Finding
             }
 
         } catch {
@@ -114098,7 +114098,7 @@ function Get-PrivilegedGroupMembers {
             $accountOperatorMembers = $null
 
             # ===== STEP 1: Query Domain-Specific Privileged Groups =====
-            Show-SubHeader "Searching for privileged group members..." -ObjectType "PrivilegedGroupMember"
+            Show-SubHeader "Поиск участников привилегированных групп..." -ObjectType "PrivilegedGroupMember"
 
             # Build credential params for recursive calls (only relevant params)
             $CredParams = @{}
@@ -114751,7 +114751,7 @@ function Get-PrivilegedGroupMembers {
             }
 
             # ===== STEP 5: Check AdminSDHolder ACLs =====
-            Show-SubHeader "Checking AdminSDHolder ACLs..." -ObjectType "AdminSDHolderACL"
+            Show-SubHeader "Проверка списков управления доступом объекта AdminSDHolder..." -ObjectType "AdminSDHolderACL"
 
             $AdminSDHolderFindings = @()
             # The template's rules, for step 5c; $null while it could not be read.
@@ -115135,10 +115135,10 @@ function Get-PrivilegedGroupMembers {
             if (-not $adminSDHolderRead) {
                 # Without this branch a failed read fell through to the Secure message
                 # below, so a blind check was indistinguishable from a clean one.
-                Show-Line "AdminSDHolder could not be read - its ACLs were not evaluated" -Class Finding
+                Show-Line "Не удалось прочитать AdminSDHolder; права доступа не оценены" -Class Finding
             }
             elseif (@($AdminSDHolderFindings).Count -eq 0) {
-                Show-Line "AdminSDHolder ACLs are secure" -Class Secure
+                Show-Line "Разрешения ACL на AdminSDHolder соответствуют безопасной конфигурации" -Class Secure
             }
 
             # ===== STEP 5b: The DACL of the privileged groups AdminSDHolder does not protect =====
@@ -115197,7 +115197,7 @@ function Get-PrivilegedGroupMembers {
             }
 
             # ===== STEP 6: Check Pre-Windows 2000 Compatible Access =====
-            Show-SubHeader "Checking Pre-Windows 2000 Compatible Access group..." -ObjectType "PreWindows2000Access"
+            Show-SubHeader "Проверка группы Pre-Windows 2000 Compatible Access..." -ObjectType "PreWindows2000Access"
 
             $PreWin2000Findings = @()
             $PreWin2000Rows = @()
@@ -115321,7 +115321,7 @@ function Get-PrivilegedGroupMembers {
                 if (-not $preWin2000Read) {
                     # A failed read used to fall through to the Secure message below, so a
                     # blind check looked exactly like a clean one.
-                    Show-Line "Pre-Windows 2000 Compatible Access group could not be read - its membership was not assessed" -Class Finding
+                    Show-Line "Не удалось прочитать состав Pre-Windows 2000 Compatible Access; членство не оценивалось" -Class Finding
                 }
                 elseif (@($PreWin2000Findings).Count -eq 0 -and @($PreWin2000Unresolved).Count -eq 0) {
                     Show-Line "No dangerous members in Pre-Windows 2000 Compatible Access group" -Class Secure
@@ -115332,7 +115332,7 @@ function Get-PrivilegedGroupMembers {
                 }
             } catch {
                 Write-Log "[Get-PrivilegedGroupMembers] Error checking Pre-Windows 2000 Compatible Access: $_" -Level Error
-                Show-Line "Pre-Windows 2000 Compatible Access group could not be read - its membership was not assessed" -Class Finding
+                Show-Line "Не удалось прочитать состав Pre-Windows 2000 Compatible Access; членство не оценивалось" -Class Finding
             }
 
         } catch {
@@ -115517,7 +115517,7 @@ function Show-UnprotectedGroupACL {
         [hashtable]$AdminSDExcludedGroups = @{}
     )
 
-    Show-SubHeader "Checking the ACLs of privileged groups AdminSDHolder does not protect..." -ObjectType 'PrivilegedGroupACL'
+    Show-SubHeader "Проверка ACL привилегированных групп вне защиты AdminSDHolder..." -ObjectType 'PrivilegedGroupACL'
 
     $accountOperatorsSID = 'S-1-5-32-548'
     $memberGUID = $Script:PropertyGUIDs['member']
@@ -115751,7 +115751,7 @@ function Show-UnprotectedGroupACL {
     if ($findingRows.Count -eq 0 -and $operatorRows.Count -eq 0 -and $hintRows.Count -eq 0) {
         if ($examinedGroups.Count -eq 0) {
             if ($unreadGroups.Count -eq 0) {
-                Show-Line "Every privileged group found is protected by AdminSDHolder" -Class Note
+                Show-Line "Все найденные привилегированные группы защищаются AdminSDHolder" -Class Note
             }
             return
         }
@@ -115948,7 +115948,7 @@ function Show-PrivilegedAccountACL {
         $AccountOperatorMembers
     )
 
-    Show-SubHeader "Checking the ACLs of privileged accounts..." -ObjectType 'PrivilegedAccountACL'
+    Show-SubHeader "Проверка ACL привилегированных учётных записей..." -ObjectType 'PrivilegedAccountACL'
 
     $accountOperatorsSID = 'S-1-5-32-548'
     $allowType = [System.Security.AccessControl.AccessControlType]::Allow
@@ -116264,7 +116264,7 @@ function Get-ProtectedUsersStatus {
                 return
             }
 
-            Show-SubHeader "Analyzing Protected Users coverage for Tier-0 accounts..." -ObjectType "Tier0Account"
+            Show-SubHeader "Проверка включения записей Tier 0 в группу Protected Users..." -ObjectType "Tier0Account"
 
             $domainDN = $Script:LDAPContext.DomainDN
             $domainSID = $Script:LDAPContext.DomainSID
@@ -116928,7 +116928,7 @@ function Get-AuthenticationPolicySilos {
                 if ($PSBoundParameters.ContainsKey($connectionKey)) { $connectionParams[$connectionKey] = $PSBoundParameters[$connectionKey] }
             }
 
-            Show-SubHeader "Analyzing authentication policy silos and authentication policies..." -ObjectType "AuthNPolicySilo"
+            Show-SubHeader "Анализ хранилищ политик проверки подлинности и самих политик..." -ObjectType "AuthNPolicySilo"
 
             $configNC = [string]$Script:LDAPContext.ConfigurationNamingContext
             if (-not $configNC) {
@@ -116950,7 +116950,7 @@ function Get-AuthenticationPolicySilos {
 
             if ($silos.Count -eq 0 -and $policies.Count -eq 0) {
                 # Neither secure nor insecure: the feature is simply not in use.
-                Show-Line "No authentication policy silo and no authentication policy is configured"
+                Show-Line "Хранилища политик и политики проверки подлинности не настроены"
                 return
             }
 
@@ -117098,7 +117098,7 @@ function Get-AuthenticationPolicySilos {
                 Show-Line "Found $($silos.Count) authentication policy silo(s):" -Class (Get-AuthNHeadlineClass -Class $siloClasses)
                 for ($i = 0; $i -lt $silos.Count; $i++) { Show-Object $silos[$i] -Class $siloClasses[$i] }
             } else {
-                Show-Line "No authentication policy silo is configured"
+                Show-Line "Хранилища политик проверки подлинности не настроены"
             }
 
             if ($policies.Count -gt 0) {
@@ -117129,7 +117129,7 @@ function Get-AuthenticationPolicySilos {
             }
 
             if (-not $kdcSupportMissing -and @(@($siloClasses) + @($policyClasses) | Where-Object { $_ -ne 'Standard' }).Count -eq 0) {
-                Show-Line "Every silo is enforced with its members enrolled, and only Tier 0 can change silos and policies" -Class Secure
+                Show-Line "Все хранилища политик применяются к назначенным участникам; изменять их разрешено только Tier 0" -Class Secure
             }
 
         } catch {
@@ -117610,7 +117610,7 @@ function Get-RODCPasswordReplication {
                 return
             }
 
-            Show-SubHeader "Checking the password replication policy of read-only Domain Controllers..." -ObjectType "RODCPasswordReplication"
+            Show-SubHeader "Проверка политики репликации паролей контроллеров домена только для чтения (RODC)..." -ObjectType "RODCPasswordReplication"
 
             # The Domain Controller definition lives in Get-DomainComputer; a read-only one is
             # the one with PARTIAL_SECRETS_ACCOUNT.
@@ -117812,7 +117812,7 @@ function Get-InactiveAdminAccounts {
                 return
             }
 
-            Show-SubHeader "Searching for inactive privileged accounts (>$InactiveDays days)..." -ObjectType "InactiveAdmin"
+            Show-SubHeader "Поиск неактивных привилегированных записей (более $InactiveDays дней)..." -ObjectType "InactiveAdmin"
 
             # Membership in a privileged group OR adminCount=1, not adminCount alone.
             # AdminSDHolder does not protect every group adPEAS counts as privileged or
@@ -118042,7 +118042,7 @@ function Get-AdminPasswordNeverExpires {
                 return
             }
 
-            Show-SubHeader "Searching for privileged accounts with password never expires..." -ObjectType "PasswordNeverExpires"
+            Show-SubHeader "Поиск привилегированных записей с неограниченным сроком действия пароля..." -ObjectType "PasswordNeverExpires"
 
             # Calculate FileTime for password age threshold
             $thresholdDate = (Get-Date).AddDays(-$PasswordAgeDays)
@@ -118243,7 +118243,7 @@ function Get-AdminReversibleEncryption {
                 return
             }
 
-            Show-SubHeader "Searching for accounts with reversible encryption..." -ObjectType "ReversibleEncryption"
+            Show-SubHeader "Поиск учётных записей с обратимым шифрованием пароля..." -ObjectType "ReversibleEncryption"
 
             # Every account, not only the privileged ones. Reversible encryption means the
             # cleartext password is recoverable from the domain controller, and that is the
@@ -118293,7 +118293,7 @@ function Get-AdminReversibleEncryption {
                     Show-Line "$privilegedCount of them is/are privileged - the cleartext password of an administrator is recoverable from the DC" -Class Finding
                 }
             } else {
-                Show-Line "No accounts with reversible password encryption found" -Class Secure
+                Show-Line "Учётных записей с обратимым шифрованием пароля не найдено" -Class Secure
             }
 
         } catch {
@@ -118409,7 +118409,7 @@ function Get-ManagedServiceAccountSecurity {
                 if ($PSBoundParameters.ContainsKey($connectionKey)) { $connectionParams[$connectionKey] = $PSBoundParameters[$connectionKey] }
             }
 
-            Show-SubHeader "Analyzing Managed Service Account security..." -ObjectType "gMSA"
+            Show-SubHeader "Анализ защищённости управляемых учётных записей служб..." -ObjectType "gMSA"
 
             # ===== Check 1: gMSA Password Access Analysis =====
             Write-Log "[Get-ManagedServiceAccountSecurity] Checking gMSA password access permissions"
@@ -118581,7 +118581,7 @@ function Get-ManagedServiceAccountSecurity {
                     if ($unanalyzedCount -gt 0) {
                         Show-Line "gMSA password access is restricted to privileged accounts and service hosts ($unanalyzedCount of $totalGMSAs not analyzed)" -Class Note
                     } else {
-                        Show-Line "All gMSA password access is properly restricted to privileged accounts and service hosts" -Class Secure
+                        Show-Line "Чтение паролей gMSA ограничено привилегированными записями и узлами служб" -Class Secure
                     }
                 }
 
@@ -118661,7 +118661,7 @@ function Get-ManagedServiceAccountSecurity {
 
                 # ===== Check 2: Attempt to read gMSA passwords =====
                 Write-Log "[Get-ManagedServiceAccountSecurity] Attempting to read gMSA passwords"
-                Show-SubHeader "Checking gMSA password access for current user..." -ObjectType "gMSAPassword"
+                Show-SubHeader "Проверка доступа текущего пользователя к паролям gMSA..." -ObjectType "gMSAPassword"
 
                 $passwordsRetrieved = 0
 
@@ -118786,7 +118786,7 @@ function Get-ManagedServiceAccountSecurity {
                     } elseif ($readFailures -gt 0) {
                         Show-Line "Current user cannot retrieve any gMSA passwords ($readFailures of $totalGMSAs could not be tested)" -Class Secure
                     } else {
-                        Show-Line "Current user cannot retrieve any gMSA passwords" -Class Secure
+                        Show-Line "Текущий пользователь не может получить пароли gMSA" -Class Secure
                     }
                 } else {
                     Show-Line "Retrieved $passwordsRetrieved of $($gmsaAccounts.Count) gMSA password(s)" -Class Finding
@@ -118804,7 +118804,7 @@ function Get-ManagedServiceAccountSecurity {
                 })
 
                 if ($gmsasWithoutFindings.Count -gt 0) {
-                    Show-SubHeader "gMSA accounts with proper password access configuration:" -ObjectType "gMSAPassword"
+                    Show-SubHeader "Учётные записи gMSA с корректными разрешениями на чтение пароля:" -ObjectType "gMSAPassword"
                     foreach ($gmsa in $gmsasWithoutFindings) {
                         $gmsa | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'gMSA' -Force
 
@@ -118831,7 +118831,7 @@ function Get-ManagedServiceAccountSecurity {
             # own the MSA result ran on directly under the gMSA objects, reading as one
             # more line about the gMSA above it. The MSA ObjectType carries the section
             # title and the help text already - only the header was missing.
-            Show-SubHeader "Checking for standalone Managed Service Accounts..." -ObjectType "MSA"
+            Show-SubHeader "Поиск автономных управляемых учётных записей служб (sMSA)..." -ObjectType "MSA"
 
             # Get all MSAs (not gMSAs) - these are legacy standalone MSAs
             $standaloneMSAs = @(Get-DomainUser -GMSA @PSBoundParameters |
@@ -118890,7 +118890,7 @@ function Get-ManagedServiceAccountSecurity {
             }
 
             if ($dmsaClass) {
-                Show-SubHeader "Checking delegated Managed Service Account (dMSA) links..." -ObjectType "dMSALink"
+                Show-SubHeader "Проверка связей делегированных управляемых учётных записей dMSA..." -ObjectType "dMSALink"
 
                 $linkedAccounts = @(Get-DomainObject -LDAPFilter '(|(msDS-ManagedAccountPrecededByLinkBL=*)(msDS-SupersededManagedAccountLink=*))' @PSBoundParameters)
 
@@ -118986,7 +118986,7 @@ function Get-ManagedServiceAccountSecurity {
                 }
 
                 if (@($linkedDMSAs).Count -eq 0) {
-                    Show-Line "No account names or is named by a delegated Managed Service Account" -Class Note
+                    Show-Line "Не обнаружены взаимные ссылки между учётными записями и dMSA" -Class Note
                 } else {
                     # The dMSA side - who may use it, which hosts - is on the dMSA object, and
                     # by default only administrators, Account Operators and its creator may
@@ -119013,7 +119013,7 @@ function Get-ManagedServiceAccountSecurity {
                     Where-Object { $_.objectClass -icontains 'msDS-DelegatedManagedServiceAccount' })
 
                 if ($dmsaAccounts.Count -gt 0) {
-                    Show-SubHeader "Checking who may use delegated Managed Service Accounts..." -ObjectType "dMSA"
+                    Show-SubHeader "Проверка субъектов, которым разрешено использовать dMSA..." -ObjectType "dMSA"
 
                     $dmsaDescriptors = Get-ManagedAccountDescriptorMap -ConnectionParams $connectionParams
                     $dmsaUserSIDs = @{}
@@ -119119,7 +119119,7 @@ function Get-ManagedServiceAccountSecurity {
                         if ($unanalyzedDMSAs -gt 0) {
                             Show-Line "dMSA use is restricted to privileged accounts and service hosts ($unanalyzedDMSAs of $($dmsaAccounts.Count) not analyzed)" -Class Note
                         } else {
-                            Show-Line "Every dMSA can be used only by privileged accounts and service hosts" -Class Secure
+                            Show-Line "Использование всех dMSA ограничено привилегированными записями и узлами служб" -Class Secure
                         }
                     }
                 }
@@ -119550,7 +119550,7 @@ function Get-SIDHistoryInjection {
                 return
             }
 
-            Show-SubHeader "Searching for SID History Injection (privileged SIDs in sIDHistory)..." -ObjectType "SIDHistory"
+            Show-SubHeader "Поиск подмены истории SID: привилегированные идентификаторы в sIDHistory..." -ObjectType "SIDHistory"
 
             # Query all objects with sIDHistory attribute set
             $objectsWithSIDHistory = Get-DomainObject -LDAPFilter "(sIDHistory=*)" @connectionParams
@@ -119807,7 +119807,7 @@ function Get-SIDHistoryInjection {
                     Show-Object $finding -Class Finding
                 }
             } else {
-                Show-Line "No account holds a privileged SID in sIDHistory that did not come from a source domain" -Class Secure
+                Show-Line "Не найдены учётные записи с привилегированным SID в sIDHistory, не объясняемым исходным доменом" -Class Secure
             }
 
             # A SID of this domain with any RID. Reported whether or not
@@ -119845,7 +119845,7 @@ function Get-SIDHistoryInjection {
 
             # Non-privileged findings (migration artifacts) - only if requested
             if ($IncludeNonPrivileged -and @($nonPrivilegedFindings).Count -gt 0) {
-                Show-SubHeader "Migration artifacts (non-privileged sIDHistory)..." -ObjectType "SIDHistory"
+                Show-SubHeader "Следы миграции: непривилегированные SID в sIDHistory..." -ObjectType "SIDHistory"
                 Show-Line "Found $(@($nonPrivilegedFindings).Count) account(s) with non-privileged SIDs in sIDHistory (migration artifacts):" -Class Hint
 
                 foreach ($finding in $nonPrivilegedFindings) {
@@ -119945,7 +119945,7 @@ function Get-NonDefaultUserOwners {
                 return
             }
 
-            Show-SubHeader "Searching for users with non-default owners..." -ObjectType "NonDefaultOwner"
+            Show-SubHeader "Поиск пользовательских объектов с нестандартным владельцем..." -ObjectType "NonDefaultOwner"
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
@@ -120084,7 +120084,7 @@ function Get-NonDefaultUserOwners {
                 if ($filteredHealthMailboxes -gt 0) {
                     Show-Line "All users have default owners (filtered $filteredHealthMailboxes Exchange Health Mailboxes)" -Class Secure
                 } else {
-                    Show-Line "All users have default owners" -Class Secure
+                    Show-Line "У всех пользователей стандартные владельцы" -Class Secure
                 }
             }
 
@@ -120160,7 +120160,7 @@ function Get-PasswordNotRequired {
                 return
             }
 
-            Show-SubHeader "Searching for enabled accounts with 'Password Not Required' flag..." -ObjectType "PasswordNotRequired"
+            Show-SubHeader "Поиск включённых записей с признаком «Пароль не требуется»..." -ObjectType "PasswordNotRequired"
 
             # Query enabled user accounts with PASSWD_NOTREQD flag (UAC bit 32)
             $accounts = Get-DomainUser -Enabled -PasswordNotRequired -ShowOwner @PSBoundParameters
@@ -120387,7 +120387,7 @@ function Get-LogonScriptPermissions {
                 return
             }
 
-            Show-SubHeader "Checking who may change the logon scripts accounts run..." -ObjectType "LogonScriptPermission"
+            Show-SubHeader "Проверка прав изменения сценариев входа пользователей..." -ObjectType "LogonScriptPermission"
 
             if ($OPSEC) {
                 Show-Line "OPSEC mode: Skipping the logon scripts of accounts (reading their permissions takes an SMB connection to NETLOGON)" -Class "Hint"
@@ -120672,7 +120672,7 @@ function Get-UnconstrainedDelegation {
                 return
             }
 
-            Show-SubHeader "Searching for accounts with Unconstrained Delegation..." -ObjectType "UnconstrainedDelegation"
+            Show-SubHeader "Поиск учётных записей с неограниченным делегированием Kerberos..." -ObjectType "UnconstrainedDelegation"
 
             $unconstrainedComputers = @(Get-DomainComputer -Unconstrained -Enabled -ShowOwner @PSBoundParameters)
             $unconstrainedUsers = @(Get-DomainUser -Unconstrained -Enabled -ShowOwner @PSBoundParameters)
@@ -120689,7 +120689,7 @@ function Get-UnconstrainedDelegation {
             $unconstrainedAccounts = $unconstrainedComputers + $unconstrainedUsers + $unconstrainedMSAs
 
             if (@($unconstrainedAccounts).Count -eq 0) {
-                Show-Line "No accounts with Unconstrained Delegation found (excluding Domain Controllers)" -Class "Secure"
+                Show-Line "Учётные записи с неограниченным делегированием не найдены (контроллеры домена исключены)" -Class "Secure"
                 return
             }
 
@@ -120725,7 +120725,7 @@ function Get-UnconstrainedDelegation {
                     if ($exposedNames.Count -gt 20) { $shownNames = "$shownNames, ... and $($exposedNames.Count - 20) more" }
                     Show-Line "$($exposedNames.Count) privileged account(s) hand their TGT to these hosts at every Kerberos logon - not sensitive, not in Protected Users: $shownNames" -Class Finding -FindingId 'UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS'
                 } else {
-                    Show-Line "Every privileged account is sensitive or in Protected Users - a coerced Domain Controller still hands over its own TGT" -Class Note
+                    Show-Line "Все привилегированные записи защищены от делегирования либо состоят в Protected Users; однако контроллер домена при определённых воздействиях всё равно может передать собственный TGT" -Class Note
                 }
                 if ($exposure.ProtectedUsersCounted -eq $false) {
                     Show-Line "Protected Users was not counted - it stops delegation only at domain functional level Windows Server 2012 R2 or higher" -Class Note
@@ -120860,7 +120860,7 @@ function Get-ConstrainedDelegation {
                 return
             }
 
-            Show-SubHeader "Searching for accounts with Constrained Delegation..." -ObjectType "ConstrainedDelegation"
+            Show-SubHeader "Поиск учётных записей с ограниченным делегированием Kerberos..." -ObjectType "ConstrainedDelegation"
 
             $constrainedComputers = @(Get-DomainComputer -Constrained -Enabled -ShowOwner @PSBoundParameters)
             $constrainedUsers = @(Get-DomainUser -Constrained -Enabled -ShowOwner @PSBoundParameters)
@@ -120907,7 +120907,7 @@ function Get-ConstrainedDelegation {
                                    $transitionOnlyComputers + $transitionOnlyUsers + $transitionOnlyMSAs
 
             if (@($constrainedAccounts).Count -eq 0) {
-                Show-Line "No accounts with Constrained Delegation found" -Class "Secure"
+                Show-Line "Учётные записи с ограниченным делегированием Kerberos не найдены" -Class "Secure"
                 return
             }
 
@@ -120930,7 +120930,7 @@ function Get-ConstrainedDelegation {
             # A failed DC lookup must not quietly downgrade every finding to "no DC target",
             # which would read as a clean result. Say so instead.
             if ($dcNames.Count -eq 0) {
-                Show-Line "Domain Controllers could not be enumerated - delegation targets are not checked against them" -Class "Note"
+                Show-Line "Не удалось перечислить контроллеры домена; цели делегирования не были с ними сопоставлены" -Class "Note"
             } else {
                 foreach ($account in $constrainedAccounts) {
                     $targetsOnDC = @(
@@ -121071,7 +121071,7 @@ function Get-ResourceBasedConstrainedDelegation {
                 return
             }
 
-            Show-SubHeader "Searching for accounts with RBCD configured..." -ObjectType "RBCDelegation"
+            Show-SubHeader "Поиск учётных записей с настроенным делегированием на основе ресурса (RBCD)..." -ObjectType "RBCDelegation"
 
             $rbcdComputers = @(Get-DomainComputer -RBCD -Enabled -ShowOwner @PSBoundParameters)
             $rbcdUsers = @(Get-DomainUser -RBCD -Enabled -ShowOwner @PSBoundParameters)
@@ -121084,7 +121084,7 @@ function Get-ResourceBasedConstrainedDelegation {
             $rbcdAccounts = $rbcdComputers + $rbcdUsers + $rbcdMSAs
 
             if (@($rbcdAccounts).Count -eq 0) {
-                Show-Line "No accounts with Resource-Based Constrained Delegation found" -Class "Secure"
+                Show-Line "Учётные записи с RBCD не найдены" -Class "Secure"
                 return
             }
 
@@ -121117,7 +121117,7 @@ function Get-ResourceBasedConstrainedDelegation {
                 Write-Log "[Get-ResourceBasedConstrainedDelegation] Domain controllers could not be enumerated: $_" -Level Warning
             }
             if ($dcIdentity.Count -eq 0) {
-                Show-Line "Domain Controllers could not be enumerated - RBCD targets are not checked against them" -Class "Note"
+                Show-Line "Не удалось перечислить контроллеры домена; цели RBCD не были с ними сопоставлены" -Class "Note"
             }
 
             foreach ($account in $rbcdAccounts) {
@@ -121302,7 +121302,7 @@ function Get-DangerousACLs {
             $domainDN = $Script:LDAPContext.DomainDN
 
             # ===== Step 1: Get Domain Root ACLs using Get-ObjectACL =====
-            Show-SubHeader "Analyzing Domain root ACLs..." -ObjectType "DangerousACL"
+            Show-SubHeader "Анализ ACL корневого объекта домена..." -ObjectType "DangerousACL"
 
             Write-Log "[Get-DangerousACLs] Domain DN: $domainDN"
 
@@ -121310,7 +121310,7 @@ function Get-DangerousACLs {
             $aclResult = Get-ObjectACL -DistinguishedName $domainDN -DangerousOnly -AllowOnly @connectionParams
 
             if (-not $aclResult) {
-                Show-Line "Failed to retrieve ACLs for domain root" -Class Note
+                Show-Line "Не удалось получить ACL корневого объекта домена" -Class Note
                 return
             }
 
@@ -121762,7 +121762,7 @@ function Get-DangerousACLs {
             }
 
             if (@($dcsyncFindings).Count -eq 0 -and @($dangerousRightsFindings).Count -eq 0) {
-                Show-Line "No dangerous ACLs detected on domain root" -Class Secure
+                Show-Line "Опасные разрешения ACL на корневом объекте домена не обнаружены" -Class Secure
             }
 
         } catch {
@@ -121860,7 +121860,7 @@ function Get-CriticalObjectACLs {
                 return
             }
 
-            Show-SubHeader "Analyzing the ACLs of the schema, the configuration, the partitions, the role objects and the sites..." -ObjectType "CriticalObjectACL"
+            Show-SubHeader "Анализ ACL схемы, конфигурации, разделов каталога, объектов ролей и сайтов..." -ObjectType "CriticalObjectACL"
 
             $targets = @()
             if ($Script:LDAPContext.SchemaNamingContext) {
@@ -122117,7 +122117,7 @@ function Get-DangerousOUPermissions {
                 return
             }
 
-            Show-SubHeader "Analyzing OU and container permissions..." -ObjectType "DangerousOUPermission"
+            Show-SubHeader "Анализ прав доступа к организационным единицам и контейнерам..." -ObjectType "DangerousOUPermission"
 
             # The organizational units, and the containers directly under the domain root.
             #
@@ -122811,7 +122811,7 @@ function Get-PasswordResetRights {
             $protectedTargetDNs = @{}
             $protectedTargets = 0
 
-            Show-SubHeader "Analyzing password reset rights on OUs with privileged users..." -ObjectType "PasswordResetRight"
+            Show-SubHeader "Проверка прав сброса паролей в OU с привилегированными пользователями..." -ObjectType "PasswordResetRight"
 
             if ($IncludeAllOUs) {
                 # Every organizational unit, and the containers directly under the domain
@@ -122990,7 +122990,7 @@ function Get-PasswordResetRights {
                     # just not one a delegation could reach them through.
                     Show-Line "No other privileged account was found, so no OU or container was analyzed" -Class Note
                 } else {
-                    Show-Line "No OUs with privileged users found to analyze" -Class Note
+                    Show-Line "OU с привилегированными пользователями для анализа не найдены" -Class Note
                 }
                 return
             }
@@ -123317,7 +123317,7 @@ function Get-AddComputerRights {
             $domainDN = $Script:LDAPContext.DomainDN
             $domainFQDN = $Script:LDAPContext.Domain
 
-            Show-SubHeader "Analyzing Add Computer to Domain rights..." -ObjectType "AddComputerRight"
+            Show-SubHeader "Проверка прав добавления компьютеров в домен..." -ObjectType "AddComputerRight"
 
             $hasFindings = $false
             $quotaValue = 0
@@ -123715,7 +123715,7 @@ function Get-AddComputerRights {
                 # not read. A green line over those folders claims more than was looked at.
                 $quotaClass = 'Secure'
                 if (Show-SYSVOLCoverageNote -FileFilter @('GptTmpl.inf')) { $quotaClass = 'Note' }
-                Show-Line "Add Computer to Domain rights properly configured" -Class $quotaClass
+                Show-Line "Права добавления компьютеров в домен настроены корректно" -Class $quotaClass
             }
 
         } catch {
@@ -124148,11 +124148,11 @@ function Get-GPOUserRightsAssignment {
                 return
             }
 
-            Show-SubHeader "Comparing GPO user rights against the Windows defaults..." -ObjectType "GPOUserRights"
+            Show-SubHeader "Сравнение прав пользователя в GPO со стандартными параметрами Windows..." -ObjectType "GPOUserRights"
 
             $gpos = @(Get-DomainGPO @CredParams)
             if ($gpos.Count -eq 0) {
-                Show-Line "No GPOs found" -Class "Note"
+                Show-Line "Объекты групповой политики не найдены" -Class "Note"
                 return
             }
 
@@ -124545,7 +124545,7 @@ function Get-GPOUserRightsAssignment {
                 # all: that is only a clean domain if the folders were readable.
                 $emptyClass = 'Secure'
                 if (Show-SYSVOLCoverageNote -FileFilter @('GptTmpl.inf')) { $emptyClass = 'Note' }
-                Show-Line "Every user right assigned via GPO matches the Windows default" -Class $emptyClass
+                Show-Line "Права пользователя, заданные через GPO, соответствуют стандартным настройкам Windows" -Class $emptyClass
             }
 
         } catch {
@@ -124631,7 +124631,7 @@ function Get-LAPSPermissions {
                 return
             }
 
-            Show-SubHeader "Analyzing LAPS read permissions by OU..." -ObjectType "LAPSPermission"
+            Show-SubHeader "Проверка прав чтения паролей LAPS по организационным единицам..." -ObjectType "LAPSPermission"
 
             # One definition of "does this domain run LAPS", shared with
             # Get-LAPSConfiguration and Get-LAPSCredentialAccess and cached for the session.
@@ -124640,7 +124640,7 @@ function Get-LAPSPermissions {
             $windowsLAPSSchemaPresent = $lapsSchema.NativePresent
 
             if (-not $lapsLegacySchemaPresent -and -not $windowsLAPSSchemaPresent) {
-                Show-Line "No LAPS schema found" -Class Note
+                Show-Line "Атрибуты схемы LAPS не найдены" -Class Note
                 return
             }
 
@@ -125123,7 +125123,7 @@ function Get-LAPSPermissions {
                 }
 
             } elseif ($totalOUs -gt 0 -and $readOUs -le 0) {
-                Show-Line "LAPS read permissions were not evaluated - no security descriptor could be read" -Class Note
+                Show-Line "Права чтения LAPS не проверены: не удалось прочитать ни одного дескриптора безопасности" -Class Note
             } else {
                 Show-Line "No non-privileged accounts with LAPS read access found in the $readScope analyzed" -Class $conclusionClass
             }
@@ -125934,7 +125934,7 @@ function Get-LAPSConfiguration {
             }
 
             # ===== Step 1: Schema Detection =====
-            Show-SubHeader "Checking for LAPS schema attributes..." -ObjectType "LAPSConfiguration"
+            Show-SubHeader "Проверка атрибутов схемы Active Directory для LAPS..." -ObjectType "LAPSConfiguration"
 
             # One definition of "does this domain run LAPS", shared with
             # Get-LAPSCredentialAccess and Get-LAPSPermissions and cached for the session.
@@ -126031,13 +126031,13 @@ function Get-LAPSConfiguration {
             # ===== No LAPS Schema Found =====
             if (-not $lapsLegacySchemaPresent -and -not $windowsLAPSSchemaPresent) {
                 if ($lapsGPOHasLegacy -or $lapsGPOHasNative) {
-                    Show-Line "LAPS GPO settings found, but the LAPS schema is NOT present in AD - LAPS is configured but completely non-functional!" -Class "Finding"
+                    Show-Line "Настройки LAPS обнаружены в GPO, но атрибуты схемы LAPS отсутствуют в AD: конфигурация LAPS неработоспособна" -Class "Finding"
 
                     foreach ($gpoConfigObject in @(Get-LAPSGPOConfigObjects -LAPSGPOSettings $lapsGPOSettings)) {
                         Show-Object $gpoConfigObject -Class Finding
                     }
                 } else {
-                    Show-Line "No LAPS schema found - LAPS is not deployed" -Class "Finding"
+                    Show-Line "Атрибуты схемы LAPS отсутствуют: LAPS не развёрнут" -Class "Finding"
                 }
 
                 # Get active computers grouped by OU (uses $Script:DefaultInactiveDays)
@@ -126051,7 +126051,7 @@ function Get-LAPSConfiguration {
                     -UnprotectedCount $allComputers.Count -CoverageCaveat $coverageCaveat `
                     -DomainControllerLookupFailed:$domainControllerLookupFailed
                 $noSchemaClass = if ($allComputers.Count -eq 0) { 'Note' } elseif ($coverageCaveat) { 'Hint' } else { 'Finding' }
-                Show-Line "Found LAPS deployment coverage:" -Class $noSchemaClass
+                Show-Line "Обнаружен охват компьютеров защитой LAPS:" -Class $noSchemaClass
                 Show-Object $noSchemaSummary -Class $noSchemaClass
 
                 Show-LAPSUnprotectedByOU -Computer $allComputers -CoverageCaveat $coverageCaveat
@@ -126060,9 +126060,9 @@ function Get-LAPSConfiguration {
 
             # Report schema versions - schema presence is a positive indicator (Note = green)
             if ($lapsLegacySchemaPresent -and $windowsLAPSSchemaPresent) {
-                Show-Line "Both LAPS Legacy and Windows LAPS Native schemas present" -Class "Note"
+                Show-Line "Обнаружены атрибуты схемы как прежней версии LAPS, так и Windows LAPS" -Class "Note"
             } elseif ($lapsLegacySchemaPresent) {
-                Show-Line "LAPS Legacy schema present" -Class "Note"
+                Show-Line "Обнаружены атрибуты схемы прежней версии LAPS" -Class "Note"
             } elseif ($windowsLAPSSchemaPresent) {
                 Show-Line "Windows LAPS Native schema present" -Class "Note"
             }
@@ -126074,7 +126074,7 @@ function Get-LAPSConfiguration {
             # already has a coverage percentage in mind.
             if ($lapsGPOSettings -is [hashtable]) {
                 if ($lapsGPOHasLegacy -or $lapsGPOHasNative) {
-                    Show-SubHeader "Analyzing LAPS configuration deployed via GPO..." -ObjectType "LAPSGPOConfig"
+                    Show-SubHeader "Анализ параметров LAPS, заданных групповыми политиками..." -ObjectType "LAPSGPOConfig"
 
                     $gpoConfigObjects = @(Get-LAPSGPOConfigObjects -LAPSGPOSettings $lapsGPOSettings)
 
@@ -126085,15 +126085,15 @@ function Get-LAPSConfiguration {
                     }
                 } else {
                     if ((Test-SysvolAccessible) -eq $false) {
-                        Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                        Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                     } else {
-                        Show-Line "No LAPS-related GPO settings found in SYSVOL - LAPS may be managed via Intune/CSP or local policy instead of GPO" -Class "Hint"
+                        Show-Line "Настройки LAPS не найдены в SYSVOL; управление может выполняться через Intune/CSP или локальную политику" -Class "Hint"
                     }
                 }
             }
 
             # ===== Step 3: Enumerate Computers and Calculate Coverage =====
-            Show-SubHeader "Analyzing LAPS deployment coverage..." -ObjectType "LAPSConfiguration"
+            Show-SubHeader "Проверка охвата компьютеров защитой LAPS..." -ObjectType "LAPSConfiguration"
 
             # Query 1: All enabled computers (for statistics), domain controllers removed
             $allEnabledComputers = @(Get-DomainComputer -Enabled -Properties $ComputerProperties @connectionParams |
@@ -126266,7 +126266,7 @@ function Get-LAPSConfiguration {
             } else {
                 'Secure'
             }
-            Show-Line "Found LAPS deployment coverage:" -Class $coverageClass
+            Show-Line "Обнаружен охват компьютеров защитой LAPS:" -Class $coverageClass
             Show-Object $coverageSummary -Class $coverageClass
 
             if ($staleLAPSComputers.Count -gt 0) {
@@ -126378,7 +126378,7 @@ function Get-OutdatedComputers {
                 return
             }
 
-            Show-SubHeader "Searching for computers with outdated Microsoft operating systems..." -ObjectType "OutdatedComputer"
+            Show-SubHeader "Поиск компьютеров с устаревшими версиями Windows..." -ObjectType "OutdatedComputer"
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
@@ -126547,7 +126547,7 @@ function Get-OutdatedComputers {
             } elseif ($notAssessableCount -eq 0 -and $inactiveFilteredCount -gt 0) {
                 Show-Line "No active computers with an outdated Microsoft operating system ($inactiveFilteredCount inactive accounts filtered)" -Class "Secure"
             } elseif ($notAssessableCount -eq 0) {
-                Show-Line "No computers with an outdated Microsoft operating system found" -Class "Secure"
+                Show-Line "Компьютеры с устаревшими версиями Windows не найдены" -Class "Secure"
             }
 
         } catch {
@@ -126882,7 +126882,7 @@ function Get-InfrastructureServers {
         }
 
         # ===== Domain Controllers =====
-        Show-SubHeader "Searching for Domain Controllers..." -ObjectType "DomainController"
+        Show-SubHeader "Поиск контроллеров домена..." -ObjectType "DomainController"
 
         try {
             # What counts as a domain controller is defined once, in Get-DomainComputer, so
@@ -126931,11 +126931,11 @@ function Get-InfrastructureServers {
                     Show-Line "The configuration partition could not be read - Domain Controllers were not checked against their NTDS Settings" -Class "Note"
                 }
             } else {
-                Show-Line "No Domain Controllers found (unexpected)" -Class "Note"
+                Show-Line "Контроллеры домена не найдены (неожиданный результат)" -Class "Note"
             }
         } catch {
             Write-Log "[Get-InfrastructureServers] Domain Controller enumeration failed: $_" -Level Error
-            Show-Line "Domain Controller enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Не удалось перечислить контроллеры домена; результат неизвестен, их отсутствие не подтверждено" -Class "Note"
         }
 
         # ===== Exchange Servers =====
@@ -126943,7 +126943,7 @@ function Get-InfrastructureServers {
         # sections. ExchangeServer belongs to the analysis in Get-ExchangeInfrastructure,
         # and the report titles a card by its header's object type: both came out as
         # "Exchange Servers" with that analysis's help text.
-        Show-SubHeader "Searching for Exchange Servers..." -ObjectType "ExchangeServerBasic"
+        Show-SubHeader "Поиск серверов Microsoft Exchange..." -ObjectType "ExchangeServerBasic"
 
         try {
             # Exchange records its own servers in the Configuration partition, one
@@ -126999,15 +126999,15 @@ function Get-InfrastructureServers {
                     $exch | Show-Object -Class Hint
                 }
             } else {
-                Show-Line "No Exchange Servers found" -Class "Note"
+                Show-Line "Серверы Exchange не найдены" -Class "Note"
             }
         } catch {
             Write-Log "[Get-InfrastructureServers] Exchange Server enumeration failed: $_" -Level Error
-            Show-Line "Exchange Server enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Ошибка перечисления серверов Exchange; результат неизвестен" -Class "Note"
         }
 
         # ===== MSSQL Servers =====
-        Show-SubHeader "Searching for MSSQL Servers..." -ObjectType "MSSQLServer"
+        Show-SubHeader "Поиск серверов Microsoft SQL Server..." -ObjectType "MSSQLServer"
 
         try {
             $mssqlServers = @(Get-DomainComputer -LDAPFilter "(servicePrincipalName=MSSQLSvc/*)" @PSBoundParameters | Test-AccountActivity -IsEnabled -IncludeDetails)
@@ -127021,7 +127021,7 @@ function Get-InfrastructureServers {
 
                 Show-SPNIdleServers -ServiceName 'MSSQL' -Server $mssqlServers
             } else {
-                Show-Line "No MSSQL Servers found via SPN" -Class "Note"
+                Show-Line "Серверы SQL Server по SPN не обнаружены" -Class "Note"
             }
 
             # The identity the service authenticates as may be a domain account rather
@@ -127034,11 +127034,11 @@ function Get-InfrastructureServers {
                 -PrivilegedFindingId 'MSSQL_SERVICE_ACCOUNT_PRIVILEGED'
         } catch {
             Write-Log "[Get-InfrastructureServers] MSSQL Server enumeration failed: $_" -Level Error
-            Show-Line "MSSQL Server enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Ошибка перечисления SQL Server; результат неизвестен" -Class "Note"
         }
 
         # ===== SCCM/ConfigMgr Servers =====
-        Show-SubHeader "Searching for SCCM/ConfigMgr Servers..." -ObjectType "SCCMServerBasic"
+        Show-SubHeader "Поиск серверов Microsoft Configuration Manager..." -ObjectType "SCCMServerBasic"
 
         try {
             # SCCM SPNs: SMS_Site_*, SMS_MP, SMS_DP, CCMSetup, etc.
@@ -127053,7 +127053,7 @@ function Get-InfrastructureServers {
 
                 Show-SPNIdleServers -ServiceName 'SCCM' -Server $sccmServers
             } else {
-                Show-Line "No SCCM Servers found via SPN" -Class "Note"
+                Show-Line "Серверы SCCM по SPN не обнаружены" -Class "Note"
             }
 
             # The identity the service authenticates as may be a domain account rather
@@ -127066,7 +127066,7 @@ function Get-InfrastructureServers {
         }
 
         # ===== SCOM Servers =====
-        Show-SubHeader "Searching for SCOM Servers..." -ObjectType "SCOMServerBasic"
+        Show-SubHeader "Поиск серверов Microsoft Operations Manager..." -ObjectType "SCOMServerBasic"
 
         try {
             # SCOM SPNs: MSOMHSvc (Health Service), MSOMSdkSvc (SDK Service)
@@ -127081,7 +127081,7 @@ function Get-InfrastructureServers {
 
                 Show-SPNIdleServers -ServiceName 'SCOM' -Server $scomServers
             } else {
-                Show-Line "No SCOM Servers found via SPN" -Class "Note"
+                Show-Line "Серверы SCOM по SPN не обнаружены" -Class "Note"
             }
 
             # The identity the service authenticates as may be a domain account rather
@@ -127094,7 +127094,7 @@ function Get-InfrastructureServers {
         }
 
         # ===== AD FS (Active Directory Federation Services) =====
-        Show-SubHeader "Searching for AD FS..." -ObjectType "ADFSServer"
+        Show-SubHeader "Поиск серверов служб федерации AD FS..." -ObjectType "ADFSServer"
 
         try {
             $adfsIndicators = @()
@@ -127145,7 +127145,7 @@ function Get-InfrastructureServers {
                 }
             } catch {
                 Write-Log "[Get-InfrastructureServers] AD FS server lookup failed: $_" -Level Error
-                Show-Line "AD FS servers could not be enumerated - the DKM container below, if any, still stands" -Class "Note"
+                Show-Line "Не удалось перечислить серверы AD FS; найденные контейнеры DKM при этом отображаются отдельно" -Class "Note"
             }
 
             if ($adfsIndicators.Count -gt 0) {
@@ -127154,15 +127154,15 @@ function Get-InfrastructureServers {
                     $adfsIndicator | Show-Object -Class Hint
                 }
             } else {
-                Show-Line "No AD FS deployment found" -Class "Note"
+                Show-Line "Развёртывание AD FS не обнаружено" -Class "Note"
             }
         } catch {
             Write-Log "[Get-InfrastructureServers] AD FS enumeration failed: $_" -Level Error
-            Show-Line "AD FS enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Ошибка перечисления AD FS; результат неизвестен, отсутствие серверов не подтверждено" -Class "Note"
         }
 
         # ===== Entra ID Connect (Azure AD Connect) =====
-        Show-SubHeader "Searching for Entra ID Connect..." -ObjectType "EntraConnect"
+        Show-SubHeader "Поиск серверов Microsoft Entra Connect..." -ObjectType "EntraConnect"
 
         try {
             $entraConnectIndicators = @()
@@ -127212,11 +127212,11 @@ function Get-InfrastructureServers {
                     $indicator | Show-Object -Class Hint
                 }
             } else {
-                Show-Line "No Entra ID Connect servers found" -Class "Note"
+                Show-Line "Серверы Microsoft Entra Connect не найдены" -Class "Note"
             }
         } catch {
             Write-Log "[Get-InfrastructureServers] Entra ID Connect enumeration failed: $_" -Level Error
-            Show-Line "Entra ID Connect enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Не удалось перечислить серверы Entra ID Connect; результат неизвестен" -Class "Note"
         }
     }
 
@@ -127430,7 +127430,7 @@ function Get-NonDefaultComputerOwners {
                 return
             }
 
-            Show-SubHeader "Searching for computers with non-default owners or explicit permissions..." -ObjectType "NonDefaultComputerOwner"
+            Show-SubHeader "Поиск компьютерных объектов с нестандартными владельцами или явными разрешениями..." -ObjectType "NonDefaultComputerOwner"
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
@@ -127650,11 +127650,11 @@ function Get-NonDefaultComputerOwners {
                     Show-Object $computer -Class Hint
                 }
             } elseif ($unreadableOwners -ge $totalComputers -and $totalComputers -gt 0) {
-                Show-Line "Computer ownership was not evaluated - no security descriptor carried an owner" -Class "Note"
+                Show-Line "Владельцы компьютеров не проверены: дескрипторы безопасности не содержали сведений о владельце" -Class "Note"
             } elseif ($unreadableOwners -gt 0) {
                 Show-Line "The computers whose owner could be read all have default owners ($unreadableOwners of $totalComputers carried no owner in their security descriptor)" -Class "Note"
             } else {
-                Show-Line "All computers have default owners" -Class "Secure"
+                Show-Line "У всех компьютеров стандартные владельцы" -Class "Secure"
             }
 
             # Said next to the finding as well, not only in place of it: a scan that found
@@ -127779,7 +127779,7 @@ function Get-ComputerPasswordAge {
                 return
             }
 
-            Show-SubHeader "Searching for active computers whose machine account password is not rotated..." -ObjectType "ComputerPasswordAge"
+            Show-SubHeader "Поиск активных компьютеров без регулярной смены пароля машинной записи..." -ObjectType "ComputerPasswordAge"
 
             $activeSince = (Get-Date).AddDays(-$ActiveDays).ToFileTime()
             $computers = @(Get-DomainComputer -Enabled -PasswordAgeDays $PasswordAgeDays -LDAPFilter "(lastLogonTimestamp>=$activeSince)" @connectionParams)
@@ -128157,7 +128157,7 @@ function Get-NetworkMap {
                 return
             }
 
-            Show-SubHeader "Mapping the IP subnets of the active computers..." -ObjectType "NetworkSubnet"
+            Show-SubHeader "Построение карты IP-подсетей активных компьютеров..." -ObjectType "NetworkSubnet"
 
             $domainFQDN = ([string]$Script:LDAPContext.Domain).Trim().TrimEnd('.').ToLowerInvariant()
 
@@ -128365,7 +128365,7 @@ function Get-NetworkMap {
             $targets = New-Object System.Collections.Generic.List[string]
 
             if ($subnets.Count -eq 0) {
-                Show-Line "No active computer could be mapped to an IPv4 subnet" -Class Note
+                Show-Line "Не удалось сопоставить активные компьютеры с IPv4-подсетями" -Class Note
             } else {
                 Show-Line "Found $($subnets.Count) /24 subnet(s) with $($mapped.Count) computer(s) active in the last $ActiveDays days:" -Class Note
             }
@@ -128812,7 +128812,7 @@ function Invoke-ShareHunt {
                 return
             }
 
-            Show-SubHeader "Searching for readable shares..." -ObjectType "ReadableShare"
+            Show-SubHeader "Поиск доступных для чтения общих сетевых ресурсов..." -ObjectType "ReadableShare"
 
             # Added to the defaults, not in place of them: a caller naming one more
             # worthless directory still wants Windows and WinSxS skipped.
@@ -129154,7 +129154,7 @@ function Invoke-ShareHunt {
             }
 
             # ===== The credentials in them =====
-            Show-SubHeader "Searching readable shares for credentials..." -ObjectType "ShareCredential"
+            Show-SubHeader "Поиск учётных данных в доступных общих ресурсах..." -ObjectType "ShareCredential"
 
             $searched = $true
 
@@ -129365,7 +129365,7 @@ function Get-GPOPermissions {
             $domainDN = $Script:LDAPContext.DomainDN
 
             # ===== Step 1: Enumerate GPOs =====
-            Show-SubHeader "Searching for dangerous GPO permissions..." -ObjectType "GPOPermission"
+            Show-SubHeader "Поиск опасных разрешений на объекты групповой политики..." -ObjectType "GPOPermission"
 
             $allGPOs = @(Get-DomainGPO @connectionParams)
 
@@ -129374,7 +129374,7 @@ function Get-GPOPermissions {
             $gpoStatusMap = Get-GPOStatusMap -GPO $allGPOs
 
             if (-not $allGPOs -or @($allGPOs).Count -eq 0) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -130461,12 +130461,12 @@ function Get-GPOLocalGroupMembership {
             $domainFQDN = $Script:LDAPContext.Domain
             $Script:vulnerableGPOs = @()
 
-            Show-SubHeader "Searching for GPO local group assignments..." -ObjectType "GPOLocalGroup"
+            Show-SubHeader "Поиск назначений участников локальных групп через GPO..." -ObjectType "GPOLocalGroup"
 
             $gpos = Get-DomainGPO @connectionParams
 
             if (-not $gpos -or @($gpos).Count -eq 0) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -130655,7 +130655,7 @@ function Get-GPOLocalGroupMembership {
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - cannot analyze GPO local group assignments - SMB access failed (authentication/network issue)" -Class Finding
                 }
@@ -131547,12 +131547,12 @@ function Get-GPOScheduledTasks {
             $domainFQDN = $Script:LDAPContext.Domain
             $Script:_gpoScheduledTasks = [System.Collections.ArrayList]::new()
 
-            Show-SubHeader "Searching for GPO scheduled tasks..." -ObjectType "GPOScheduledTask"
+            Show-SubHeader "Поиск запланированных заданий, создаваемых через GPO..." -ObjectType "GPOScheduledTask"
 
             $gpos = Get-DomainGPO @connectionParams
 
             if (-not $gpos) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -131677,7 +131677,7 @@ function Get-GPOScheduledTasks {
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - cannot analyze GPO scheduled tasks - SMB access failed (authentication/network issue)" -Class Finding
                 }
@@ -132461,12 +132461,12 @@ function Get-GPOScriptPaths {
             # per run, cleared when the check ends.
             $Script:_uncWriteAccess = @{ Hosts = @{}; Paths = @{} }
 
-            Show-SubHeader "Searching for GPO-deployed scripts..." -ObjectType "GPOScriptPath"
+            Show-SubHeader "Поиск сценариев, развёрнутых групповыми политиками..." -ObjectType "GPOScriptPath"
 
             $gpos = Get-DomainGPO @connectionParams
 
             if (-not $gpos) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -132598,7 +132598,7 @@ function Get-GPOScriptPaths {
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - cannot analyze GPO scripts - SMB access failed (authentication/network issue)" -Class Finding
                 }
@@ -133092,12 +133092,12 @@ function Get-GPORegistrySettings {
             $Script:_gpoRegMatches = [System.Collections.ArrayList]::new()
             $Script:_gpoRegUnjudged = [System.Collections.ArrayList]::new()
 
-            Show-SubHeader "Searching for vulnerable registry settings deployed via GPO..." -ObjectType "GPORegistrySetting"
+            Show-SubHeader "Поиск небезопасных параметров реестра, развёрнутых через GPO..." -ObjectType "GPORegistrySetting"
 
             $gpos = Get-DomainGPO @connectionParams
 
             if (-not $gpos) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -133219,7 +133219,7 @@ function Get-GPORegistrySettings {
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - cannot analyze GPO registry settings - SMB access failed (authentication/network issue)" -Class Finding
                 }
@@ -133874,12 +133874,12 @@ function Get-GPOPointAndPrint {
                 return
             }
 
-            Show-SubHeader "Analyzing Point and Print printer driver policies..." -ObjectType "PointAndPrintPolicy"
+            Show-SubHeader "Анализ политик установки драйверов принтеров Point and Print..." -ObjectType "PointAndPrintPolicy"
 
             $gpos = Get-DomainGPO @connectionParams
 
             if (-not $gpos) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -133968,7 +133968,7 @@ function Get-GPOPointAndPrint {
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - cannot analyze Point and Print policies - SMB access failed (authentication/network issue)" -Class Finding
                 }
@@ -133980,9 +133980,9 @@ function Get-GPOPointAndPrint {
                 # SYSVOL. It only holds if all of them were actually readable, and every
                 # policy file in them read and parsed.
                 if (Show-SYSVOLCoverageNote -FileFilter @('Registry.pol', 'Registry.xml', 'GptTmpl.inf')) {
-                    Show-Line "No Point and Print or printer driver policy was found in the GPO folders that could be read" -Class Note
+                    Show-Line "В доступных папках GPO не обнаружены настройки Point and Print или политики драйверов принтеров" -Class Note
                 } else {
-                    Show-Line "No GPO configures Point and Print or printer driver policies - the secure Windows default applies" -Class Secure
+                    Show-Line "GPO не задают политики Point and Print и драйверов принтеров; действуют безопасные параметры Windows по умолчанию" -Class Secure
                 }
                 return
             }
@@ -134080,7 +134080,7 @@ function Get-GPOPointAndPrint {
                 # nothing at all would read as a check that found no policies to look at.
                 Show-Line "No linked and enabled policy leaves printer driver installation open to non-administrators" -Class Secure
             } else {
-                Show-Line "No Point and Print configuration is deployed by a policy that is linked and enabled" -Class Note
+                Show-Line "Действующие привязанные GPO не задают настройки Point and Print" -Class Note
             }
 
             if ($exploitable.Count -gt 0) {
@@ -135428,7 +135428,7 @@ function Get-ADCSVulnerabilities {
 
             # Step 0: PKI Trust Infrastructure Overview (Root CAs, NTAuth Store)
             $configNC = $Script:LDAPContext.ConfigurationNamingContext
-            Show-SubHeader "Checking PKI trust infrastructure..." -ObjectType "PKIInfrastructure"
+            Show-SubHeader "Проверка инфраструктуры доверия PKI..." -ObjectType "PKIInfrastructure"
 
             # --- Root CAs (trusted root certificates in AD) ---
             try {
@@ -135564,10 +135564,10 @@ function Get-ADCSVulnerabilities {
                             Show-Object $ntAuthRow.Object -Class $ntAuthRow.Class
                         }
                     } else {
-                        Show-Line "NTAuth Store exists but contains no certificates" -Class Hint
+                        Show-Line "Хранилище NTAuth существует, но сертификатов не содержит" -Class Hint
                     }
                 } else {
-                    Show-Line "No NTAuth Store found - PKINIT certificate authentication may not be configured" -Class Note
+                    Show-Line "Хранилище NTAuth отсутствует; проверка подлинности по сертификату PKINIT может быть не настроена" -Class Note
                 }
             }
             catch {
@@ -135611,13 +135611,13 @@ function Get-ADCSVulnerabilities {
             }
 
             # Step 1: Enumerate Certificate Authorities (Infrastructure)
-            Show-SubHeader "Searching for AD CS Infrastructure..." -ObjectType "CertificateAuthority"
+            Show-SubHeader "Поиск компонентов служб сертификатов Active Directory (AD CS)..." -ObjectType "CertificateAuthority"
 
             # Check if query failed (auth error, network issue, etc.)
             $queryError = $caResults | Where-Object { $_._QueryError -eq $true }
             if ($queryError) {
                 Write-Log "[Get-ADCSVulnerabilities] CA query failed: $($queryError.ErrorMessage)"
-                Show-Line "Failed to query Certificate Authorities - LDAP query failed (authentication/network issue)" -Class Finding
+                Show-Line "Не удалось запросить центры сертификации: ошибка LDAP, проверки подлинности или сети" -Class Finding
                 return
             }
 
@@ -135625,7 +135625,7 @@ function Get-ADCSVulnerabilities {
             $cas = @($caResults | Where-Object { $_._QueryError -ne $true })
 
             if (@($cas).Count -eq 0) {
-                Show-Line "No Certificate Authorities found - AD CS not deployed" -Class Note
+                Show-Line "Центры сертификации не найдены: AD CS не развёрнуты" -Class Note
                 return
             }
 
@@ -136147,7 +136147,7 @@ function Get-ADCSVulnerabilities {
             # - Add themselves to enrollment permissions
             # - Manipulate NTAuth store
             try {
-                Show-SubHeader "Checking PKI container permissions..." -ObjectType "PKIContainer"
+                Show-SubHeader "Проверка разрешений на контейнеры PKI..." -ObjectType "PKIContainer"
 
                 $pkiContainers = @(
                     @{
@@ -136422,18 +136422,18 @@ function Get-ADCSVulnerabilities {
             }
             catch {
                 Write-Log "[Get-ADCSVulnerabilities] Error during ESC5 check: $_" -Level Warning
-                Show-Line "Error checking PKI container permissions" -Class Hint
+                Show-Line "Ошибка проверки разрешений контейнеров PKI" -Class Hint
             }
 
             # Step 2: Enumerate Certificate Templates (only enabled/published ones)
-            Show-SubHeader "Searching for certificate templates..." -ObjectType "CertificateTemplate"
+            Show-SubHeader "Поиск шаблонов сертификатов AD CS..." -ObjectType "CertificateTemplate"
             $templateResults = @(Get-ADCSTemplate @CredParams)
 
             # Check if query failed (auth error, network issue, etc.)
             $templateQueryError = $templateResults | Where-Object { $_._QueryError -eq $true }
             if ($templateQueryError) {
                 Write-Log "[Get-ADCSVulnerabilities] Template query failed: $($templateQueryError.ErrorMessage)"
-                Show-Line "Failed to query certificate templates - LDAP query failed (authentication/network issue)" -Class Finding
+                Show-Line "Не удалось запросить шаблоны сертификатов: ошибка LDAP, проверки подлинности или сети" -Class Finding
                 return
             }
 
@@ -137293,7 +137293,7 @@ function Get-WeakCertificateMapping {
         # ==================================================================
         # 1. Principals that already carry an explicit mapping
         # ==================================================================
-        Show-SubHeader "Analyzing explicit certificate mappings..." -ObjectType "WeakCertificateMapping"
+        Show-SubHeader "Анализ явного сопоставления сертификатов с учётными записями..." -ObjectType "WeakCertificateMapping"
 
         # Two phases, the way Get-NonDefaultUserOwners reads owners across the domain.
         #
@@ -137431,7 +137431,7 @@ function Get-WeakCertificateMapping {
         # and who could map something tomorrow - and under one header the secure verdict of
         # the first read as a verdict on ESC14 as a whole, with the findings of the second
         # contradicting it on the next line.
-        Show-SubHeader "Checking write access to altSecurityIdentities on privileged accounts..." -ObjectType "WeakCertificateMapping"
+        Show-SubHeader "Проверка прав изменения altSecurityIdentities у привилегированных записей..." -ObjectType "WeakCertificateMapping"
 
         $writableFindings = @()
         $exchangeOnlyFindings = @()
@@ -138015,15 +138015,15 @@ function Get-ExchangeInfrastructure {
             }
 
             if (-not $exchangeOrgExists) {
-                Show-SubHeader "Checking for Exchange Organization..." -ObjectType "ExchangeServer"
-                Show-Line "No Exchange Organization detected" -Class Note
+                Show-SubHeader "Проверка объекта организации Exchange..." -ObjectType "ExchangeServer"
+                Show-Line "Объект организации Exchange не обнаружен" -Class Note
                 return
             }
 
             # ===== Step 1b: Exchange Organization Overview (Config Partition - forest-wide) =====
             # Queries the Configuration partition which is visible from any domain in the forest.
             # Outputs: 1 global Organization card + 1 card per Exchange server with VDirs/Connectors.
-            Show-SubHeader "Checking Exchange Organization..." -ObjectType "ExchangeOrganization"
+            Show-SubHeader "Анализ организации Exchange..." -ObjectType "ExchangeOrganization"
 
             $exchangeBase = "CN=Microsoft Exchange,CN=Services,$configDN"
 
@@ -138145,7 +138145,7 @@ function Get-ExchangeInfrastructure {
             }
 
             $orgObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'ExchangeOrganization' -Force
-            Show-Line "Exchange Organization found in Configuration partition" -Class Hint
+            Show-Line "Объект организации Exchange найден в разделе Configuration" -Class Hint
             Show-Object $orgObj -Class Hint
 
             # --- Phase 3: Per-Server Config Cards ---
@@ -138262,7 +138262,7 @@ function Get-ExchangeInfrastructure {
             # ===== Step 2: Enumerate Exchange Servers (Domain Partition - detailed) =====
             # Not "Searching for Exchange servers...": Get-InfrastructureServers announces
             # its inventory of the same servers that way, one letter apart.
-            Show-SubHeader "Checking the Exchange servers and their web endpoints..." -ObjectType "ExchangeServer"
+            Show-SubHeader "Проверка серверов Exchange и их веб-интерфейсов..." -ObjectType "ExchangeServer"
 
             $exchangeServers = @()
 
@@ -138591,7 +138591,7 @@ function Get-ExchangeInfrastructure {
             # nothing to add.
             $hybridOnOrgCard = ($orgConfigHidden -and -not $hybridQueryFailed -and @($hybridRelationships).Count -eq 0)
             if (-not $hybridOnOrgCard) {
-                Show-SubHeader "Checking for an Exchange hybrid deployment..." -ObjectType "ExchangeHybridConfiguration"
+                Show-SubHeader "Проверка конфигурации гибридного развёртывания Exchange..." -ObjectType "ExchangeHybridConfiguration"
             }
 
             if (@($hybridRelationships).Count -gt 0) {
@@ -138626,14 +138626,14 @@ function Get-ExchangeInfrastructure {
                 }
 
                 $hybridObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'ExchangeHybridConfiguration' -Force
-                Show-Line "Exchange hybrid deployment detected" -Class Hint
+                Show-Line "Обнаружено гибридное развёртывание Exchange" -Class Hint
                 Show-Object $hybridObj -Class Hint
             }
             elseif ($hybridQueryFailed) {
                 # Same reasoning as everywhere else in this check: a query that failed
                 # produces the same empty result as a query that found nothing, and only
                 # one of the two justifies the sentence below.
-                Show-Line "Hybrid configuration could not be read - result unknown, not absent" -Class Hint
+                Show-Line "Не удалось прочитать гибридную конфигурацию; её отсутствие не подтверждено" -Class Hint
             }
             elseif (-not $hybridOnOrgCard) {
                 Show-Line "No hybrid configuration found - this organization appears to be purely on-premises" -Class Note
@@ -138656,7 +138656,7 @@ function Get-ExchangeInfrastructure {
             # like the hybrid configuration above, and the section is left out.
             $recvConnectorsOnOrgCard = ($orgConfigHidden -and @($allRecvConnectors).Count -eq 0)
             if (-not $recvConnectorsOnOrgCard) {
-                Show-SubHeader "Checking SMTP receive connector permissions..." -ObjectType "ExchangeReceiveConnector"
+                Show-SubHeader "Проверка разрешений принимающих SMTP-соединителей..." -ObjectType "ExchangeReceiveConnector"
             }
 
             if (@($allRecvConnectors).Count -eq 0) {
@@ -138665,10 +138665,10 @@ function Get-ExchangeInfrastructure {
                 # that was found is a connector this account cannot see.
                 if (-not $recvConnectorsOnOrgCard) {
                     if (@($realServers).Count -gt 0) {
-                        Show-Line "No SMTP receive connector is readable by this account - their permissions are unknown, not clean" -Class Hint
+                        Show-Line "Текущая учётная запись не может прочитать SMTP-соединители; их разрешения неизвестны, безопасность не подтверждена" -Class Hint
                     }
                     else {
-                        Show-Line "No SMTP receive connectors found in the Configuration partition" -Class Note
+                        Show-Line "Принимающие SMTP-соединители не найдены в разделе Configuration" -Class Note
                     }
                 }
             }
@@ -138987,7 +138987,7 @@ function Get-ExchangeInfrastructure {
             # every Exchange group as an expected trustee and drops it unless
             # -IncludePrivileged is set, on the grounds that Exchange permissions are
             # by design. For this one ACE that is not true - it is documented as removable.
-            Show-SubHeader "Checking the Exchange permissions model on the domain object..." -ObjectType "ExchangePermissionsModel"
+            Show-SubHeader "Анализ модели разрешений Exchange на корневом объекте домена..." -ObjectType "ExchangePermissionsModel"
 
             $domainDN = $Script:LDAPContext.DomainDN
 
@@ -139250,7 +139250,7 @@ function Get-ExchangeInfrastructure {
                     # check announces its object ("Analyzing password policy..." ->
                     # "Found password policy:"). The scope stays in the sub-header rather
                     # than being repeated here.
-                    Show-Line "Found Exchange permissions model:" -Class $modelConsoleClass
+                    Show-Line "Обнаружена модель разрешений Exchange:" -Class $modelConsoleClass
                     Show-Object $modelObj -Class $modelConsoleClass
                 }
             }
@@ -139448,7 +139448,7 @@ function Get-ExchangeRBACAssignments {
                 return
             }
 
-            Show-SubHeader "Checking Exchange management role assignments..." -ObjectType "ExchangeRoleAssignment"
+            Show-SubHeader "Проверка назначений ролей управления Exchange..." -ObjectType "ExchangeRoleAssignment"
 
             $configDN = $Script:LDAPContext.ConfigurationNamingContext
             $exchangeBase = "CN=Microsoft Exchange,CN=Services,$configDN"
@@ -139464,7 +139464,7 @@ function Get-ExchangeRBACAssignments {
             }
 
             if (@($exchangeOrgs).Count -eq 0) {
-                Show-Line "No Exchange Organization detected - no role assignments to analyze" -Class Note
+                Show-Line "Объект организации Exchange не найден; назначения ролей не анализировались" -Class Note
                 return
             }
 
@@ -139513,7 +139513,7 @@ function Get-ExchangeRBACAssignments {
             }
             catch {
                 Write-Log "[Get-ExchangeRBACAssignments] Error querying role assignments: $_" -Level Error
-                Show-Line "Exchange role assignments could not be read - result unknown, not empty" -Class Hint
+                Show-Line "Не удалось прочитать назначения ролей Exchange; отсутствие назначений не подтверждено" -Class Hint
                 return
             }
 
@@ -139522,7 +139522,7 @@ function Get-ExchangeRBACAssignments {
                 # of them, so none readable is a container this account may not see rather
                 # than an empty one. Measured with a domain user against Exchange SE, where
                 # the RBAC container is not readable.
-                Show-Line "No Exchange role assignment is readable by this account - result unknown, not empty" -Class Hint
+                Show-Line "Текущая учётная запись не может прочитать назначения ролей Exchange; результат неизвестен" -Class Hint
                 return
             }
 
@@ -139858,7 +139858,7 @@ function Get-SCCMInfrastructure {
             $domainDN = $Script:LDAPContext.DomainDN
 
             # ===== Step 1: Check for SCCM Infrastructure =====
-            Show-SubHeader "Checking for SCCM/MECM infrastructure..." -ObjectType "SCCMServer"
+            Show-SubHeader "Поиск инфраструктуры SCCM/MECM..." -ObjectType "SCCMServer"
 
             $sccmDetected = $false
             $systemManagementPath = "CN=System Management,CN=System,$domainDN"
@@ -139892,7 +139892,7 @@ function Get-SCCMInfrastructure {
 
             # If no SCCM detected, stop here
             if (-not $sccmDetected) {
-                Show-Line "No SCCM/MECM infrastructure detected" -Class Note
+                Show-Line "Инфраструктура SCCM/MECM не обнаружена" -Class Note
                 return
             }
 
@@ -139900,7 +139900,7 @@ function Get-SCCMInfrastructure {
             Show-Line "SCCM/MECM infrastructure detected" -Class Hint
 
             # ===== Step 2: System Management Container Details =====
-            Show-SubHeader "Analyzing System Management container..." -ObjectType "SCCMServer"
+            Show-SubHeader "Анализ контейнера System Management..." -ObjectType "SCCMServer"
 
             # Reuse result from Detection Method 1 (no duplicate query)
             if ($systemMgmt) {
@@ -139916,7 +139916,7 @@ function Get-SCCMInfrastructure {
             }
 
             # ===== Step 3: SCCM Sites via mSSMSSite =====
-            Show-SubHeader "Enumerating SCCM sites from AD schema objects..." -ObjectType "SCCMSite"
+            Show-SubHeader "Перечисление сайтов SCCM по объектам каталога AD..." -ObjectType "SCCMSite"
 
             $sccmSiteInfos = @{}  # Hashtable for cross-reference in Step 4
 
@@ -139969,7 +139969,7 @@ function Get-SCCMInfrastructure {
             }
 
             # ===== Step 4: Management Points + Site Hierarchy =====
-            Show-SubHeader "Enumerating SCCM Management Points and site hierarchy..." -ObjectType "SCCMManagementPoint"
+            Show-SubHeader "Поиск точек управления SCCM и иерархии сайтов..." -ObjectType "SCCMManagementPoint"
 
             $casDetected = $false
 
@@ -140069,7 +140069,7 @@ function Get-SCCMInfrastructure {
                         # normal SCCM build: the finding is "there is one more Tier-0 system
                         # here", not "something is wrong here". Red spends the colour that
                         # the container ACL findings need.
-                        Show-Line "Central Administration Site (CAS) detected - multi-site SCCM hierarchy" -Class Hint -FindingId "SCCM_SITE_HIERARCHY"
+                        Show-Line "Обнаружен центральный административный сайт (CAS): в SCCM есть иерархия нескольких сайтов" -Class Hint -FindingId "SCCM_SITE_HIERARCHY"
                     }
                 } elseif (-not $systemMgmt) {
                     Show-Line "The System Management container does not exist - no management point could be read" -Class Note
@@ -140081,7 +140081,7 @@ function Get-SCCMInfrastructure {
             }
 
             # ===== Step 5: Enumerate SCCM Servers =====
-            Show-SubHeader "Searching for SCCM site servers..." -ObjectType "SCCMServer"
+            Show-SubHeader "Поиск серверов сайтов SCCM..." -ObjectType "SCCMServer"
 
             $sccmServers = [System.Collections.ArrayList]::new()
             $seenServerDNs = @{}
@@ -140110,7 +140110,7 @@ function Get-SCCMInfrastructure {
                     Show-Object $srv -Class Hint
                 }
             } else {
-                Show-Line "No SCCM servers found via SPN detection" -Class Note
+                Show-Line "Поиск SPN не выявил серверы SCCM" -Class Note
             }
 
             # ===== Step 5b: Who can write to the System Management container =====
@@ -140129,7 +140129,7 @@ function Get-SCCMInfrastructure {
             # The site server computer accounts are supposed to have Full Control here, so
             # they are added to the expected set rather than reported. They are the ones the
             # steps above discovered, which is why this runs after them.
-            Show-SubHeader "Checking permissions on the System Management container..." -ObjectType "SCCMContainerPermission"
+            Show-SubHeader "Проверка разрешений на контейнер System Management..." -ObjectType "SCCMContainerPermission"
 
             try {
                 $sccmServerSIDs = @{}
@@ -140283,7 +140283,7 @@ function Get-SCCMInfrastructure {
             }
 
             # ===== Step 6: PXE/WDS Discovery =====
-            Show-SubHeader "Searching for PXE/WDS boot servers..." -ObjectType "SCCMPXEServer"
+            Show-SubHeader "Поиск серверов сетевой загрузки PXE/WDS..." -ObjectType "SCCMPXEServer"
 
             $pxeServersFound = $false
 
@@ -140345,11 +140345,11 @@ function Get-SCCMInfrastructure {
             if ($pxeServersFound) {
                 Show-Line "PXE/WDS servers detected" -Class Hint -FindingId "SCCM_PXE_EXPOSURE"
             } else {
-                Show-Line "No PXE/WDS boot servers found" -Class Note
+                Show-Line "Серверы загрузки PXE/WDS не найдены" -Class Note
             }
 
             # ===== Step 7: SCCM Service Accounts =====
-            Show-SubHeader "Searching for SCCM service accounts..." -ObjectType "SCCMServiceAccount"
+            Show-SubHeader "Поиск служебных учётных записей SCCM..." -ObjectType "SCCMServiceAccount"
 
             $serviceAccounts = Get-DomainUser -LDAPFilter "(servicePrincipalName=SMS*)" @PSBoundParameters
 
@@ -140361,11 +140361,11 @@ function Get-SCCMInfrastructure {
                     Show-Object $account -Class Hint
                 }
             } else {
-                Show-Line "No SCCM service accounts found" -Class Secure
+                Show-Line "Служебные учётные записи SCCM не найдены" -Class Secure
             }
 
             # ===== Step 8: SCCM-Related Groups =====
-            Show-SubHeader "Searching for SCCM-related security groups..." -ObjectType "SCCMGroup"
+            Show-SubHeader "Поиск групп безопасности, связанных с SCCM..." -ObjectType "SCCMGroup"
 
             # Single LDAP query with OR filter (SMS_SiteToSiteConnection_ is SCCM-specific, avoids generic *SMS* false positives)
             $sccmGroupsFound = [System.Collections.ArrayList]::new()
@@ -140450,7 +140450,7 @@ function Get-SCCMInfrastructure {
                     Show-Object $group -Class $groupClass[[string]$group.distinguishedName]
                 }
             } else {
-                Show-Line "No SCCM-related groups found" -Class Note
+                Show-Line "Группы, связанные с SCCM, не найдены" -Class Note
             }
 
         } catch {
@@ -140531,7 +140531,7 @@ function Get-SCOMInfrastructure {
             }
 
             # ===== Step 1: Check for SCOM Infrastructure =====
-            Show-SubHeader "Checking for SCOM infrastructure..." -ObjectType "SCOMServer"
+            Show-SubHeader "Поиск инфраструктуры SCOM..." -ObjectType "SCOMServer"
 
             $scomDetected = $false
 
@@ -140563,7 +140563,7 @@ function Get-SCOMInfrastructure {
 
             # If no SCOM detected, stop here
             if (-not $scomDetected) {
-                Show-Line "No SCOM infrastructure detected" -Class Note
+                Show-Line "Инфраструктура SCOM не обнаружена" -Class Note
                 return
             }
 
@@ -140571,7 +140571,7 @@ function Get-SCOMInfrastructure {
             Show-Line "SCOM infrastructure detected" -Class Hint
 
             # ===== Step 2: Enumerate SCOM Management Servers =====
-            Show-SubHeader "Searching for SCOM management servers..." -ObjectType "SCOMServer"
+            Show-SubHeader "Поиск серверов управления SCOM..." -ObjectType "SCOMServer"
 
             # $srv, not $server: the check declares a [string]$Server parameter, and PowerShell
             # keeps that type constraint on the loop variable, so every AD object was coerced
@@ -140605,11 +140605,11 @@ function Get-SCOMInfrastructure {
                     Show-Object $srv -Class Hint
                 }
             } else {
-                Show-Line "No SCOM management servers found via SPN detection" -Class Note
+                Show-Line "Поиск SPN не выявил серверы управления SCOM" -Class Note
             }
 
             # ===== Step 3: SCOM Service Accounts =====
-            Show-SubHeader "Searching for SCOM service accounts..." -ObjectType "SCOMServiceAccount"
+            Show-SubHeader "Поиск служебных учётных записей SCOM..." -ObjectType "SCOMServiceAccount"
 
             $serviceAccounts = @()
 
@@ -140662,11 +140662,11 @@ function Get-SCOMInfrastructure {
                     Show-Object $account -Class $(if ($account.PSObject.Properties['privilegedServiceAccount']) { 'Finding' } else { 'Hint' })
                 }
             } else {
-                Show-Line "No SCOM service accounts found" -Class Note
+                Show-Line "Служебные учётные записи SCOM не найдены" -Class Note
             }
 
             # ===== Step 4: SCOM-Related Security Groups =====
-            Show-SubHeader "Searching for SCOM-related security groups..." -ObjectType "SCOMGroup"
+            Show-SubHeader "Поиск групп безопасности, связанных с SCOM..." -ObjectType "SCOMGroup"
 
             # Broad LDAP query to get potential SCOM groups
             $allGroups = Get-DomainGroup -LDAPFilter "(|(cn=*SCOM*)(cn=*OpsMgr*)(cn=*Operations Manager*))" @PSBoundParameters
@@ -140701,7 +140701,7 @@ function Get-SCOMInfrastructure {
                     Show-Object $group -Class Hint
                 }
             } else {
-                Show-Line "No SCOM-related groups found" -Class Note
+                Show-Line "Группы, связанные с SCOM, не найдены" -Class Note
             }
 
         } catch {
@@ -140788,7 +140788,7 @@ function Get-KerberoastableAccounts {
                 return
             }
 
-            Show-SubHeader "Searching for Kerberoastable accounts (users with SPNs)..." -ObjectType "Kerberoastable"
+            Show-SubHeader "Поиск учётных записей с SPN, допускающих Kerberoasting..." -ObjectType "Kerberoastable"
 
             # Use optimized filters: -SPN (has SPN), -Enabled (not disabled), additional filter: exclude krbtgt.
             #
@@ -140819,7 +140819,7 @@ function Get-KerberoastableAccounts {
                 $canTestKerberoasting = -not $OPSEC
 
                 if ($OPSEC) {
-                    Show-Line "Skipping hash extraction (OPSEC mode)" -Class "Hint"
+                    Show-Line "Получение хешей пропущено (режим OPSEC)" -Class "Hint"
                 }
 
                 # Check if credentials are available for in-memory Kerberoasting (non-Kerberos auth)
@@ -140840,7 +140840,7 @@ function Get-KerberoastableAccounts {
                     }
 
                     if (-not $hasCredentials) {
-                        Show-Line "Kerberoasting skipped - no credentials available (use -Credential or Connect-adPEAS -Credential)" -Class Finding
+                        Show-Line "Проверка Kerberoasting пропущена: отсутствуют доступные учётные данные (используйте -Credential)" -Class Finding
                         $canTestKerberoasting = $false
                     }
                 }
@@ -141009,7 +141009,7 @@ function Get-ASREPRoastableAccounts {
                 return
             }
 
-            Show-SubHeader "Searching for AS-REP Roastable accounts (DONT_REQ_PREAUTH)..." -ObjectType "ASREPRoastable"
+            Show-SubHeader "Поиск учётных записей без предварительной проверки подлинности Kerberos (AS-REP Roasting)..." -ObjectType "ASREPRoastable"
 
             # -Enabled for the same reason Get-KerberoastableAccounts uses it: a disabled
             # account cannot be roasted, the KDC answers KDC_ERR_CLIENT_REVOKED, and
@@ -141072,7 +141072,7 @@ function Get-ASREPRoastableAccounts {
                 $canTestASREPRoast = -not $OPSEC
 
                 if ($OPSEC) {
-                    Show-Line "Skipping hash extraction (OPSEC mode)" -Class "Hint"
+                    Show-Line "Получение хешей пропущено (режим OPSEC)" -Class "Hint"
                 }
 
                 $totalUsers = @($asrepRoastableUsers).Count
@@ -141177,7 +141177,7 @@ function Get-ASREPRoastableAccounts {
                     Show-Line "Through these accounts, $(@($spnAccounts).Count) kerberoastable account(s) can be roasted without any credentials" -Class "Finding" -FindingId 'KERBEROAST_WITHOUT_PREAUTH'
                 }
             } else {
-                Show-Line "No AS-REP Roastable accounts found" -Class "Secure"
+                Show-Line "Учётных записей, допускающих AS-REP Roasting, не найдено" -Class "Secure"
             }
 
         } catch {
@@ -141254,7 +141254,7 @@ function Get-UnixPasswordAccounts {
                 return
             }
 
-            Show-SubHeader "Searching for accounts with readable password attributes..." -ObjectType "UnixPassword"
+            Show-SubHeader "Поиск учётных записей с доступными для чтения парольными атрибутами..." -ObjectType "UnixPassword"
 
             # Extended LDAP filter for all password-related attributes
             # unixUserPassword: Unix/Linux integration, userPassword: LDAP standard, msSFU30Password: Services for Unix 3.0, sambaNTPassword: Samba NT hash, sambaLMPassword: Samba LM hash
@@ -141333,7 +141333,7 @@ function Get-UnixPasswordAccounts {
                     Show-Object $entry.Object -Class $entry.Class
                 }
             } else {
-                Show-Line "No accounts with readable password attributes found" -Class "Secure"
+                Show-Line "Учётные записи с доступными для чтения парольными атрибутами не найдены" -Class "Secure"
             }
 
             # Named rather than counted: these accounts do carry one of the attributes, and
@@ -142274,7 +142274,7 @@ function Get-CredentialExposure {
                         }
                     }
                     else {
-                        Show-Line "No available drive letter for UNC mapping" -Class "Finding"
+                        Show-Line "Нет свободной буквы диска для подключения UNC-ресурса" -Class "Finding"
                         return
                     }
                 }
@@ -142410,7 +142410,7 @@ function Get-CredentialExposure {
             $dcServer = $Script:LDAPContext.Server
 
             # ===== Single SYSVOL scan: Mount once, enumerate once, analyze all =====
-            Show-SubHeader "Searching for credentials in Group Policy files..." -ObjectType "GPPCredential"
+            Show-SubHeader "Поиск учётных данных в файлах групповых политик..." -ObjectType "GPPCredential"
 
             # Pre-load GPO linkage and name mapping (LDAP queries - must run before SMB block)
             $gpoLinkage = Get-GPOLinkage
@@ -142564,11 +142564,11 @@ function Get-CredentialExposure {
                         # preference file or a Registry.pol that was listed and not read.
                         $gppClass = "Secure"
                         if (Show-SYSVOLCoverageNote -FileFilter @('*.xml', 'Registry.pol')) { $gppClass = "Note" }
-                        Show-Line "No GPP credentials found in SYSVOL" -Class $gppClass
+                        Show-Line "Учётные данные GPP в SYSVOL не обнаружены" -Class $gppClass
                     }
 
                     # ===== Part 2: Sensitive Information Search (script/config files) =====
-                    Show-SubHeader "Searching for sensitive information in SYSVOL/NETLOGON..." -ObjectType "SYSVOLCredential"
+                    Show-SubHeader "Поиск чувствительных данных в SYSVOL и NETLOGON..." -ObjectType "SYSVOLCredential"
 
                     if ($scriptFiles.Count -gt 0) {
                         Write-Log "[Get-CredentialExposure] Analyzing $($scriptFiles.Count) script/config file(s)..."
@@ -142645,7 +142645,7 @@ function Get-CredentialExposure {
                         if ($sysvolFindingsCount -eq 0) {
                             $scriptClass = "Secure"
                             if (Show-SYSVOLCoverageNote -FileFilter $Script:CredentialScanExtensions) { $scriptClass = "Note" }
-                            Show-Line "No sensitive information found in SYSVOL/NETLOGON scripts" -Class $scriptClass
+                            Show-Line "В сценариях SYSVOL/NETLOGON не обнаружены чувствительные данные" -Class $scriptClass
                         }
                     }
                     else {
@@ -142653,7 +142653,7 @@ function Get-CredentialExposure {
                         # allowed to look everywhere.
                         $scriptClass = "Secure"
                         if (Show-SYSVOLCoverageNote -FileFilter $Script:CredentialScanExtensions) { $scriptClass = "Note" }
-                        Show-Line "No sensitive information found in SYSVOL/NETLOGON scripts" -Class $scriptClass
+                        Show-Line "В сценариях SYSVOL/NETLOGON не обнаружены чувствительные данные" -Class $scriptClass
                     }
                 }
             }
@@ -142664,7 +142664,7 @@ function Get-CredentialExposure {
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class "Hint"
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class "Hint"
                 } else {
                     Show-Line "SYSVOL access failed - credentials were not searched for" -Class "Finding"
                 }
@@ -142813,7 +142813,7 @@ function Get-LAPSCredentialAccess {
                 return
             }
 
-            Show-SubHeader "Testing LAPS password read access for current user..." -ObjectType "LAPSCredential"
+            Show-SubHeader "Проверка возможности чтения паролей LAPS текущим пользователем..." -ObjectType "LAPSCredential"
 
             # One definition of "does this domain run LAPS", shared with
             # Get-LAPSConfiguration and Get-LAPSPermissions and cached for the session.
@@ -142822,7 +142822,7 @@ function Get-LAPSCredentialAccess {
             $windowsLAPSSchemaPresent = $lapsSchema.NativePresent
 
             if (-not $lapsLegacySchemaPresent -and -not $windowsLAPSSchemaPresent) {
-                Show-Line "No LAPS schema found" -Class "Note"
+                Show-Line "Атрибуты схемы LAPS не найдены" -Class "Note"
                 return
             }
 
@@ -143135,7 +143135,7 @@ function Get-BitLockerRecoveryKeyAccess {
                 return
             }
 
-            Show-SubHeader "Testing BitLocker recovery key read access for current user..." -ObjectType "BitLockerRecoveryKey"
+            Show-SubHeader "Проверка доступа текущего пользователя к ключам восстановления BitLocker..." -ObjectType "BitLockerRecoveryKey"
 
             # ===== Step 1: Schema / feasibility short-circuit (cached) =====
             # Many environments do not escrow BitLocker recovery keys to AD. Detect this once
@@ -143176,7 +143176,7 @@ function Get-BitLockerRecoveryKeyAccess {
             }
 
             if (-not $bitLockerPresent) {
-                Show-Line "BitLocker recovery escrow is not used in this domain (no msFVE-RecoveryInformation objects found)" -Class "Note"
+                Show-Line "В домене не обнаружено хранение ключей восстановления BitLocker (объекты msFVE-RecoveryInformation отсутствуют)" -Class "Note"
                 return
             }
 
@@ -143346,7 +143346,7 @@ function Show-BitLockerRecoveryDelegation {
         [hashtable]$ConnectionParams = @{}
     )
 
-    Show-SubHeader "Analyzing who may read BitLocker recovery passwords..." -ObjectType "BitLockerRecoveryPermission"
+    Show-SubHeader "Проверка субъектов с доступом к паролям восстановления BitLocker..." -ObjectType "BitLockerRecoveryPermission"
 
     # Parent container per computer, with a count for the row. The pattern strips exactly
     # one RDN, and an escaped comma inside it (CN=PC\, Lab) does not end it.
@@ -143361,7 +143361,7 @@ function Show-BitLockerRecoveryDelegation {
     }
 
     if ($computersByContainer.Count -eq 0) {
-        Show-Line "No computer object found - there is no container whose recovery passwords could be delegated" -Class Note
+        Show-Line "Компьютерные объекты не найдены; контейнеры с делегируемыми ключами восстановления отсутствуют" -Class Note
         return
     }
 
@@ -143792,7 +143792,7 @@ function Get-CredentialRoaming {
                 return
             }
 
-            Show-SubHeader "Checking for roamed DPAPI master keys and private keys in AD..." -ObjectType "CredentialRoaming"
+            Show-SubHeader "Поиск перемещаемых мастер-ключей DPAPI и закрытых ключей в AD..." -ObjectType "CredentialRoaming"
 
             # ----- Step 1: who has roamed material? -----
             #
@@ -144421,7 +144421,7 @@ function Get-PasswordInDescription {
                 return
             }
 
-            Show-SubHeader "Searching for credentials in description/info attributes..." -ObjectType "PasswordInDescription"
+            Show-SubHeader "Поиск учётных данных в атрибутах description и info..." -ObjectType "PasswordInDescription"
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
@@ -144586,7 +144586,7 @@ function Get-PasswordInDescription {
                     # directory was not cleared - it was not fully looked at.
                     Show-Line "Nothing could be reported - every match could not be read again" -Class Note
                 } else {
-                    Show-Line "No credentials found in the free-text attributes of any object" -Class Secure
+                    Show-Line "Учётные данные в свободно заполняемых атрибутах объектов не обнаружены" -Class Secure
                 }
             } else {
                 Write-Log "[Get-PasswordInDescription] Total: $findingCount finding(s), $hintCount hint(s)"
@@ -144700,7 +144700,7 @@ function Get-DeletedObjectAccess {
                 return
             }
 
-            Show-SubHeader "Testing which deleted objects the current user can read..." -ObjectType "DeletedObject"
+            Show-SubHeader "Проверка удалённых объектов, доступных текущему пользователю для чтения..." -ObjectType "DeletedObject"
 
             $domainDN = [string]$Script:LDAPContext.DomainDN
 
@@ -144918,7 +144918,7 @@ function Show-DeletedObjectsReaders {
         [hashtable]$ConnectionParams = @{}
     )
 
-    Show-SubHeader "Analyzing who may list deleted objects..." -ObjectType "DeletedObjectsReader"
+    Show-SubHeader "Анализ прав на перечисление удалённых объектов..." -ObjectType "DeletedObjectsReader"
 
     if (-not $SecurityDescriptor) {
         Show-Line "The ACL of the deleted objects container is readable by administrators only - other readers not checked" -Class Note
@@ -157737,7 +157737,7 @@ function Collect-BHIssuancePolicies {
 #Requires -Version 5.1
 
 # ===== Script Variables =====
-$Script:adPEASVersion = "2.9.0+20261110-1219"
+$Script:adPEASVersion = "2.9.0+20261110-1252"
 
 # Handle ScriptPath for different execution contexts:
 # - Normal: $MyInvocation.MyCommand.Path is set

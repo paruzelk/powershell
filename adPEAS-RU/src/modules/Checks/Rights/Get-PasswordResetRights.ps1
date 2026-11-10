@@ -115,7 +115,7 @@ function Get-PasswordResetRights {
             $protectedTargetDNs = @{}
             $protectedTargets = 0
 
-            Show-SubHeader "Analyzing password reset rights on OUs with privileged users..." -ObjectType "PasswordResetRight"
+            Show-SubHeader "Проверка прав сброса паролей в OU с привилегированными пользователями..." -ObjectType "PasswordResetRight"
 
             if ($IncludeAllOUs) {
                 # Every organizational unit, and the containers directly under the domain
@@ -294,7 +294,7 @@ function Get-PasswordResetRights {
                     # just not one a delegation could reach them through.
                     Show-Line "No other privileged account was found, so no OU or container was analyzed" -Class Note
                 } else {
-                    Show-Line "No OUs with privileged users found to analyze" -Class Note
+                    Show-Line "OU с привилегированными пользователями для анализа не найдены" -Class Note
                 }
                 return
             }

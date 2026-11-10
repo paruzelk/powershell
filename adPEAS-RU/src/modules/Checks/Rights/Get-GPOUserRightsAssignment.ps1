@@ -124,11 +124,11 @@
                 return
             }
 
-            Show-SubHeader "Comparing GPO user rights against the Windows defaults..." -ObjectType "GPOUserRights"
+            Show-SubHeader "Сравнение прав пользователя в GPO со стандартными параметрами Windows..." -ObjectType "GPOUserRights"
 
             $gpos = @(Get-DomainGPO @CredParams)
             if ($gpos.Count -eq 0) {
-                Show-Line "No GPOs found" -Class "Note"
+                Show-Line "Объекты групповой политики не найдены" -Class "Note"
                 return
             }
 
@@ -521,7 +521,7 @@
                 # all: that is only a clean domain if the folders were readable.
                 $emptyClass = 'Secure'
                 if (Show-SYSVOLCoverageNote -FileFilter @('GptTmpl.inf')) { $emptyClass = 'Note' }
-                Show-Line "Every user right assigned via GPO matches the Windows default" -Class $emptyClass
+                Show-Line "Права пользователя, заданные через GPO, соответствуют стандартным настройкам Windows" -Class $emptyClass
             }
 
         } catch {

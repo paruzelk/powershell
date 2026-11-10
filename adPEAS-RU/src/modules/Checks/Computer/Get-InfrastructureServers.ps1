@@ -311,7 +311,7 @@ function Get-InfrastructureServers {
         }
 
         # ===== Domain Controllers =====
-        Show-SubHeader "Searching for Domain Controllers..." -ObjectType "DomainController"
+        Show-SubHeader "Поиск контроллеров домена..." -ObjectType "DomainController"
 
         try {
             # What counts as a domain controller is defined once, in Get-DomainComputer, so
@@ -360,11 +360,11 @@ function Get-InfrastructureServers {
                     Show-Line "The configuration partition could not be read - Domain Controllers were not checked against their NTDS Settings" -Class "Note"
                 }
             } else {
-                Show-Line "No Domain Controllers found (unexpected)" -Class "Note"
+                Show-Line "Контроллеры домена не найдены (неожиданный результат)" -Class "Note"
             }
         } catch {
             Write-Log "[Get-InfrastructureServers] Domain Controller enumeration failed: $_" -Level Error
-            Show-Line "Domain Controller enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Не удалось перечислить контроллеры домена; результат неизвестен, их отсутствие не подтверждено" -Class "Note"
         }
 
         # ===== Exchange Servers =====
@@ -372,7 +372,7 @@ function Get-InfrastructureServers {
         # sections. ExchangeServer belongs to the analysis in Get-ExchangeInfrastructure,
         # and the report titles a card by its header's object type: both came out as
         # "Exchange Servers" with that analysis's help text.
-        Show-SubHeader "Searching for Exchange Servers..." -ObjectType "ExchangeServerBasic"
+        Show-SubHeader "Поиск серверов Microsoft Exchange..." -ObjectType "ExchangeServerBasic"
 
         try {
             # Exchange records its own servers in the Configuration partition, one
@@ -428,15 +428,15 @@ function Get-InfrastructureServers {
                     $exch | Show-Object -Class Hint
                 }
             } else {
-                Show-Line "No Exchange Servers found" -Class "Note"
+                Show-Line "Серверы Exchange не найдены" -Class "Note"
             }
         } catch {
             Write-Log "[Get-InfrastructureServers] Exchange Server enumeration failed: $_" -Level Error
-            Show-Line "Exchange Server enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Ошибка перечисления серверов Exchange; результат неизвестен" -Class "Note"
         }
 
         # ===== MSSQL Servers =====
-        Show-SubHeader "Searching for MSSQL Servers..." -ObjectType "MSSQLServer"
+        Show-SubHeader "Поиск серверов Microsoft SQL Server..." -ObjectType "MSSQLServer"
 
         try {
             $mssqlServers = @(Get-DomainComputer -LDAPFilter "(servicePrincipalName=MSSQLSvc/*)" @PSBoundParameters | Test-AccountActivity -IsEnabled -IncludeDetails)
@@ -450,7 +450,7 @@ function Get-InfrastructureServers {
 
                 Show-SPNIdleServers -ServiceName 'MSSQL' -Server $mssqlServers
             } else {
-                Show-Line "No MSSQL Servers found via SPN" -Class "Note"
+                Show-Line "Серверы SQL Server по SPN не обнаружены" -Class "Note"
             }
 
             # The identity the service authenticates as may be a domain account rather
@@ -463,11 +463,11 @@ function Get-InfrastructureServers {
                 -PrivilegedFindingId 'MSSQL_SERVICE_ACCOUNT_PRIVILEGED'
         } catch {
             Write-Log "[Get-InfrastructureServers] MSSQL Server enumeration failed: $_" -Level Error
-            Show-Line "MSSQL Server enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Ошибка перечисления SQL Server; результат неизвестен" -Class "Note"
         }
 
         # ===== SCCM/ConfigMgr Servers =====
-        Show-SubHeader "Searching for SCCM/ConfigMgr Servers..." -ObjectType "SCCMServerBasic"
+        Show-SubHeader "Поиск серверов Microsoft Configuration Manager..." -ObjectType "SCCMServerBasic"
 
         try {
             # SCCM SPNs: SMS_Site_*, SMS_MP, SMS_DP, CCMSetup, etc.
@@ -482,7 +482,7 @@ function Get-InfrastructureServers {
 
                 Show-SPNIdleServers -ServiceName 'SCCM' -Server $sccmServers
             } else {
-                Show-Line "No SCCM Servers found via SPN" -Class "Note"
+                Show-Line "Серверы SCCM по SPN не обнаружены" -Class "Note"
             }
 
             # The identity the service authenticates as may be a domain account rather
@@ -495,7 +495,7 @@ function Get-InfrastructureServers {
         }
 
         # ===== SCOM Servers =====
-        Show-SubHeader "Searching for SCOM Servers..." -ObjectType "SCOMServerBasic"
+        Show-SubHeader "Поиск серверов Microsoft Operations Manager..." -ObjectType "SCOMServerBasic"
 
         try {
             # SCOM SPNs: MSOMHSvc (Health Service), MSOMSdkSvc (SDK Service)
@@ -510,7 +510,7 @@ function Get-InfrastructureServers {
 
                 Show-SPNIdleServers -ServiceName 'SCOM' -Server $scomServers
             } else {
-                Show-Line "No SCOM Servers found via SPN" -Class "Note"
+                Show-Line "Серверы SCOM по SPN не обнаружены" -Class "Note"
             }
 
             # The identity the service authenticates as may be a domain account rather
@@ -523,7 +523,7 @@ function Get-InfrastructureServers {
         }
 
         # ===== AD FS (Active Directory Federation Services) =====
-        Show-SubHeader "Searching for AD FS..." -ObjectType "ADFSServer"
+        Show-SubHeader "Поиск серверов служб федерации AD FS..." -ObjectType "ADFSServer"
 
         try {
             $adfsIndicators = @()
@@ -574,7 +574,7 @@ function Get-InfrastructureServers {
                 }
             } catch {
                 Write-Log "[Get-InfrastructureServers] AD FS server lookup failed: $_" -Level Error
-                Show-Line "AD FS servers could not be enumerated - the DKM container below, if any, still stands" -Class "Note"
+                Show-Line "Не удалось перечислить серверы AD FS; найденные контейнеры DKM при этом отображаются отдельно" -Class "Note"
             }
 
             if ($adfsIndicators.Count -gt 0) {
@@ -583,15 +583,15 @@ function Get-InfrastructureServers {
                     $adfsIndicator | Show-Object -Class Hint
                 }
             } else {
-                Show-Line "No AD FS deployment found" -Class "Note"
+                Show-Line "Развёртывание AD FS не обнаружено" -Class "Note"
             }
         } catch {
             Write-Log "[Get-InfrastructureServers] AD FS enumeration failed: $_" -Level Error
-            Show-Line "AD FS enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Ошибка перечисления AD FS; результат неизвестен, отсутствие серверов не подтверждено" -Class "Note"
         }
 
         # ===== Entra ID Connect (Azure AD Connect) =====
-        Show-SubHeader "Searching for Entra ID Connect..." -ObjectType "EntraConnect"
+        Show-SubHeader "Поиск серверов Microsoft Entra Connect..." -ObjectType "EntraConnect"
 
         try {
             $entraConnectIndicators = @()
@@ -641,11 +641,11 @@ function Get-InfrastructureServers {
                     $indicator | Show-Object -Class Hint
                 }
             } else {
-                Show-Line "No Entra ID Connect servers found" -Class "Note"
+                Show-Line "Серверы Microsoft Entra Connect не найдены" -Class "Note"
             }
         } catch {
             Write-Log "[Get-InfrastructureServers] Entra ID Connect enumeration failed: $_" -Level Error
-            Show-Line "Entra ID Connect enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Не удалось перечислить серверы Entra ID Connect; результат неизвестен" -Class "Note"
         }
     }
 

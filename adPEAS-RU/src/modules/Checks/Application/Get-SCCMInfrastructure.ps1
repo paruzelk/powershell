@@ -67,7 +67,7 @@
             $domainDN = $Script:LDAPContext.DomainDN
 
             # ===== Step 1: Check for SCCM Infrastructure =====
-            Show-SubHeader "Checking for SCCM/MECM infrastructure..." -ObjectType "SCCMServer"
+            Show-SubHeader "Поиск инфраструктуры SCCM/MECM..." -ObjectType "SCCMServer"
 
             $sccmDetected = $false
             $systemManagementPath = "CN=System Management,CN=System,$domainDN"
@@ -101,7 +101,7 @@
 
             # If no SCCM detected, stop here
             if (-not $sccmDetected) {
-                Show-Line "No SCCM/MECM infrastructure detected" -Class Note
+                Show-Line "Инфраструктура SCCM/MECM не обнаружена" -Class Note
                 return
             }
 
@@ -109,7 +109,7 @@
             Show-Line "SCCM/MECM infrastructure detected" -Class Hint
 
             # ===== Step 2: System Management Container Details =====
-            Show-SubHeader "Analyzing System Management container..." -ObjectType "SCCMServer"
+            Show-SubHeader "Анализ контейнера System Management..." -ObjectType "SCCMServer"
 
             # Reuse result from Detection Method 1 (no duplicate query)
             if ($systemMgmt) {
@@ -125,7 +125,7 @@
             }
 
             # ===== Step 3: SCCM Sites via mSSMSSite =====
-            Show-SubHeader "Enumerating SCCM sites from AD schema objects..." -ObjectType "SCCMSite"
+            Show-SubHeader "Перечисление сайтов SCCM по объектам каталога AD..." -ObjectType "SCCMSite"
 
             $sccmSiteInfos = @{}  # Hashtable for cross-reference in Step 4
 
@@ -178,7 +178,7 @@
             }
 
             # ===== Step 4: Management Points + Site Hierarchy =====
-            Show-SubHeader "Enumerating SCCM Management Points and site hierarchy..." -ObjectType "SCCMManagementPoint"
+            Show-SubHeader "Поиск точек управления SCCM и иерархии сайтов..." -ObjectType "SCCMManagementPoint"
 
             $casDetected = $false
 
@@ -278,7 +278,7 @@
                         # normal SCCM build: the finding is "there is one more Tier-0 system
                         # here", not "something is wrong here". Red spends the colour that
                         # the container ACL findings need.
-                        Show-Line "Central Administration Site (CAS) detected - multi-site SCCM hierarchy" -Class Hint -FindingId "SCCM_SITE_HIERARCHY"
+                        Show-Line "Обнаружен центральный административный сайт (CAS): в SCCM есть иерархия нескольких сайтов" -Class Hint -FindingId "SCCM_SITE_HIERARCHY"
                     }
                 } elseif (-not $systemMgmt) {
                     Show-Line "The System Management container does not exist - no management point could be read" -Class Note
@@ -290,7 +290,7 @@
             }
 
             # ===== Step 5: Enumerate SCCM Servers =====
-            Show-SubHeader "Searching for SCCM site servers..." -ObjectType "SCCMServer"
+            Show-SubHeader "Поиск серверов сайтов SCCM..." -ObjectType "SCCMServer"
 
             $sccmServers = [System.Collections.ArrayList]::new()
             $seenServerDNs = @{}
@@ -319,7 +319,7 @@
                     Show-Object $srv -Class Hint
                 }
             } else {
-                Show-Line "No SCCM servers found via SPN detection" -Class Note
+                Show-Line "Поиск SPN не выявил серверы SCCM" -Class Note
             }
 
             # ===== Step 5b: Who can write to the System Management container =====
@@ -338,7 +338,7 @@
             # The site server computer accounts are supposed to have Full Control here, so
             # they are added to the expected set rather than reported. They are the ones the
             # steps above discovered, which is why this runs after them.
-            Show-SubHeader "Checking permissions on the System Management container..." -ObjectType "SCCMContainerPermission"
+            Show-SubHeader "Проверка разрешений на контейнер System Management..." -ObjectType "SCCMContainerPermission"
 
             try {
                 $sccmServerSIDs = @{}
@@ -492,7 +492,7 @@
             }
 
             # ===== Step 6: PXE/WDS Discovery =====
-            Show-SubHeader "Searching for PXE/WDS boot servers..." -ObjectType "SCCMPXEServer"
+            Show-SubHeader "Поиск серверов сетевой загрузки PXE/WDS..." -ObjectType "SCCMPXEServer"
 
             $pxeServersFound = $false
 
@@ -554,11 +554,11 @@
             if ($pxeServersFound) {
                 Show-Line "PXE/WDS servers detected" -Class Hint -FindingId "SCCM_PXE_EXPOSURE"
             } else {
-                Show-Line "No PXE/WDS boot servers found" -Class Note
+                Show-Line "Серверы загрузки PXE/WDS не найдены" -Class Note
             }
 
             # ===== Step 7: SCCM Service Accounts =====
-            Show-SubHeader "Searching for SCCM service accounts..." -ObjectType "SCCMServiceAccount"
+            Show-SubHeader "Поиск служебных учётных записей SCCM..." -ObjectType "SCCMServiceAccount"
 
             $serviceAccounts = Get-DomainUser -LDAPFilter "(servicePrincipalName=SMS*)" @PSBoundParameters
 
@@ -570,11 +570,11 @@
                     Show-Object $account -Class Hint
                 }
             } else {
-                Show-Line "No SCCM service accounts found" -Class Secure
+                Show-Line "Служебные учётные записи SCCM не найдены" -Class Secure
             }
 
             # ===== Step 8: SCCM-Related Groups =====
-            Show-SubHeader "Searching for SCCM-related security groups..." -ObjectType "SCCMGroup"
+            Show-SubHeader "Поиск групп безопасности, связанных с SCCM..." -ObjectType "SCCMGroup"
 
             # Single LDAP query with OR filter (SMS_SiteToSiteConnection_ is SCCM-specific, avoids generic *SMS* false positives)
             $sccmGroupsFound = [System.Collections.ArrayList]::new()
@@ -659,7 +659,7 @@
                     Show-Object $group -Class $groupClass[[string]$group.distinguishedName]
                 }
             } else {
-                Show-Line "No SCCM-related groups found" -Class Note
+                Show-Line "Группы, связанные с SCCM, не найдены" -Class Note
             }
 
         } catch {

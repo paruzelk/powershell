@@ -199,7 +199,7 @@ function Get-NonDefaultComputerOwners {
                 return
             }
 
-            Show-SubHeader "Searching for computers with non-default owners or explicit permissions..." -ObjectType "NonDefaultComputerOwner"
+            Show-SubHeader "Поиск компьютерных объектов с нестандартными владельцами или явными разрешениями..." -ObjectType "NonDefaultComputerOwner"
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
@@ -419,11 +419,11 @@ function Get-NonDefaultComputerOwners {
                     Show-Object $computer -Class Hint
                 }
             } elseif ($unreadableOwners -ge $totalComputers -and $totalComputers -gt 0) {
-                Show-Line "Computer ownership was not evaluated - no security descriptor carried an owner" -Class "Note"
+                Show-Line "Владельцы компьютеров не проверены: дескрипторы безопасности не содержали сведений о владельце" -Class "Note"
             } elseif ($unreadableOwners -gt 0) {
                 Show-Line "The computers whose owner could be read all have default owners ($unreadableOwners of $totalComputers carried no owner in their security descriptor)" -Class "Note"
             } else {
-                Show-Line "All computers have default owners" -Class "Secure"
+                Show-Line "У всех компьютеров стандартные владельцы" -Class "Secure"
             }
 
             # Said next to the finding as well, not only in place of it: a scan that found

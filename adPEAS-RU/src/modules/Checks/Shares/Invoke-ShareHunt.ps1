@@ -347,7 +347,7 @@ function Invoke-ShareHunt {
                 return
             }
 
-            Show-SubHeader "Searching for readable shares..." -ObjectType "ReadableShare"
+            Show-SubHeader "Поиск доступных для чтения общих сетевых ресурсов..." -ObjectType "ReadableShare"
 
             # Added to the defaults, not in place of them: a caller naming one more
             # worthless directory still wants Windows and WinSxS skipped.
@@ -689,7 +689,7 @@ function Invoke-ShareHunt {
             }
 
             # ===== The credentials in them =====
-            Show-SubHeader "Searching readable shares for credentials..." -ObjectType "ShareCredential"
+            Show-SubHeader "Поиск учётных данных в доступных общих ресурсах..." -ObjectType "ShareCredential"
 
             $searched = $true
 

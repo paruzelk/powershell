@@ -787,7 +787,7 @@ function Get-LAPSConfiguration {
             }
 
             # ===== Step 1: Schema Detection =====
-            Show-SubHeader "Checking for LAPS schema attributes..." -ObjectType "LAPSConfiguration"
+            Show-SubHeader "Проверка атрибутов схемы Active Directory для LAPS..." -ObjectType "LAPSConfiguration"
 
             # One definition of "does this domain run LAPS", shared with
             # Get-LAPSCredentialAccess and Get-LAPSPermissions and cached for the session.
@@ -884,13 +884,13 @@ function Get-LAPSConfiguration {
             # ===== No LAPS Schema Found =====
             if (-not $lapsLegacySchemaPresent -and -not $windowsLAPSSchemaPresent) {
                 if ($lapsGPOHasLegacy -or $lapsGPOHasNative) {
-                    Show-Line "LAPS GPO settings found, but the LAPS schema is NOT present in AD - LAPS is configured but completely non-functional!" -Class "Finding"
+                    Show-Line "Настройки LAPS обнаружены в GPO, но атрибуты схемы LAPS отсутствуют в AD: конфигурация LAPS неработоспособна" -Class "Finding"
 
                     foreach ($gpoConfigObject in @(Get-LAPSGPOConfigObjects -LAPSGPOSettings $lapsGPOSettings)) {
                         Show-Object $gpoConfigObject -Class Finding
                     }
                 } else {
-                    Show-Line "No LAPS schema found - LAPS is not deployed" -Class "Finding"
+                    Show-Line "Атрибуты схемы LAPS отсутствуют: LAPS не развёрнут" -Class "Finding"
                 }
 
                 # Get active computers grouped by OU (uses $Script:DefaultInactiveDays)
@@ -904,7 +904,7 @@ function Get-LAPSConfiguration {
                     -UnprotectedCount $allComputers.Count -CoverageCaveat $coverageCaveat `
                     -DomainControllerLookupFailed:$domainControllerLookupFailed
                 $noSchemaClass = if ($allComputers.Count -eq 0) { 'Note' } elseif ($coverageCaveat) { 'Hint' } else { 'Finding' }
-                Show-Line "Found LAPS deployment coverage:" -Class $noSchemaClass
+                Show-Line "Обнаружен охват компьютеров защитой LAPS:" -Class $noSchemaClass
                 Show-Object $noSchemaSummary -Class $noSchemaClass
 
                 Show-LAPSUnprotectedByOU -Computer $allComputers -CoverageCaveat $coverageCaveat
@@ -913,9 +913,9 @@ function Get-LAPSConfiguration {
 
             # Report schema versions - schema presence is a positive indicator (Note = green)
             if ($lapsLegacySchemaPresent -and $windowsLAPSSchemaPresent) {
-                Show-Line "Both LAPS Legacy and Windows LAPS Native schemas present" -Class "Note"
+                Show-Line "Обнаружены атрибуты схемы как прежней версии LAPS, так и Windows LAPS" -Class "Note"
             } elseif ($lapsLegacySchemaPresent) {
-                Show-Line "LAPS Legacy schema present" -Class "Note"
+                Show-Line "Обнаружены атрибуты схемы прежней версии LAPS" -Class "Note"
             } elseif ($windowsLAPSSchemaPresent) {
                 Show-Line "Windows LAPS Native schema present" -Class "Note"
             }
@@ -927,7 +927,7 @@ function Get-LAPSConfiguration {
             # already has a coverage percentage in mind.
             if ($lapsGPOSettings -is [hashtable]) {
                 if ($lapsGPOHasLegacy -or $lapsGPOHasNative) {
-                    Show-SubHeader "Analyzing LAPS configuration deployed via GPO..." -ObjectType "LAPSGPOConfig"
+                    Show-SubHeader "Анализ параметров LAPS, заданных групповыми политиками..." -ObjectType "LAPSGPOConfig"
 
                     $gpoConfigObjects = @(Get-LAPSGPOConfigObjects -LAPSGPOSettings $lapsGPOSettings)
 
@@ -938,15 +938,15 @@ function Get-LAPSConfiguration {
                     }
                 } else {
                     if ((Test-SysvolAccessible) -eq $false) {
-                        Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                        Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                     } else {
-                        Show-Line "No LAPS-related GPO settings found in SYSVOL - LAPS may be managed via Intune/CSP or local policy instead of GPO" -Class "Hint"
+                        Show-Line "Настройки LAPS не найдены в SYSVOL; управление может выполняться через Intune/CSP или локальную политику" -Class "Hint"
                     }
                 }
             }
 
             # ===== Step 3: Enumerate Computers and Calculate Coverage =====
-            Show-SubHeader "Analyzing LAPS deployment coverage..." -ObjectType "LAPSConfiguration"
+            Show-SubHeader "Проверка охвата компьютеров защитой LAPS..." -ObjectType "LAPSConfiguration"
 
             # Query 1: All enabled computers (for statistics), domain controllers removed
             $allEnabledComputers = @(Get-DomainComputer -Enabled -Properties $ComputerProperties @connectionParams |
@@ -1119,7 +1119,7 @@ function Get-LAPSConfiguration {
             } else {
                 'Secure'
             }
-            Show-Line "Found LAPS deployment coverage:" -Class $coverageClass
+            Show-Line "Обнаружен охват компьютеров защитой LAPS:" -Class $coverageClass
             Show-Object $coverageSummary -Class $coverageClass
 
             if ($staleLAPSComputers.Count -gt 0) {

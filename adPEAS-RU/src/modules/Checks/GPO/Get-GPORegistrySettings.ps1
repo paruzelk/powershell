@@ -117,12 +117,12 @@
             $Script:_gpoRegMatches = [System.Collections.ArrayList]::new()
             $Script:_gpoRegUnjudged = [System.Collections.ArrayList]::new()
 
-            Show-SubHeader "Searching for vulnerable registry settings deployed via GPO..." -ObjectType "GPORegistrySetting"
+            Show-SubHeader "Поиск небезопасных параметров реестра, развёрнутых через GPO..." -ObjectType "GPORegistrySetting"
 
             $gpos = Get-DomainGPO @connectionParams
 
             if (-not $gpos) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -244,7 +244,7 @@
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - cannot analyze GPO registry settings - SMB access failed (authentication/network issue)" -Class Finding
                 }

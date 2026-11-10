@@ -126,7 +126,7 @@ function Get-LAPSCredentialAccess {
                 return
             }
 
-            Show-SubHeader "Testing LAPS password read access for current user..." -ObjectType "LAPSCredential"
+            Show-SubHeader "Проверка возможности чтения паролей LAPS текущим пользователем..." -ObjectType "LAPSCredential"
 
             # One definition of "does this domain run LAPS", shared with
             # Get-LAPSConfiguration and Get-LAPSPermissions and cached for the session.
@@ -135,7 +135,7 @@ function Get-LAPSCredentialAccess {
             $windowsLAPSSchemaPresent = $lapsSchema.NativePresent
 
             if (-not $lapsLegacySchemaPresent -and -not $windowsLAPSSchemaPresent) {
-                Show-Line "No LAPS schema found" -Class "Note"
+                Show-Line "Атрибуты схемы LAPS не найдены" -Class "Note"
                 return
             }
 

@@ -91,7 +91,7 @@
                 return
             }
 
-            Show-SubHeader "Testing which deleted objects the current user can read..." -ObjectType "DeletedObject"
+            Show-SubHeader "Проверка удалённых объектов, доступных текущему пользователю для чтения..." -ObjectType "DeletedObject"
 
             $domainDN = [string]$Script:LDAPContext.DomainDN
 
@@ -309,7 +309,7 @@ function Show-DeletedObjectsReaders {
         [hashtable]$ConnectionParams = @{}
     )
 
-    Show-SubHeader "Analyzing who may list deleted objects..." -ObjectType "DeletedObjectsReader"
+    Show-SubHeader "Анализ прав на перечисление удалённых объектов..." -ObjectType "DeletedObjectsReader"
 
     if (-not $SecurityDescriptor) {
         Show-Line "The ACL of the deleted objects container is readable by administrators only - other readers not checked" -Class Note

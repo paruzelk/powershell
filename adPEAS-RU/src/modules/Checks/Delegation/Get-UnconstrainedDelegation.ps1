@@ -148,7 +148,7 @@ function Get-UnconstrainedDelegation {
                 return
             }
 
-            Show-SubHeader "Searching for accounts with Unconstrained Delegation..." -ObjectType "UnconstrainedDelegation"
+            Show-SubHeader "Поиск учётных записей с неограниченным делегированием Kerberos..." -ObjectType "UnconstrainedDelegation"
 
             $unconstrainedComputers = @(Get-DomainComputer -Unconstrained -Enabled -ShowOwner @PSBoundParameters)
             $unconstrainedUsers = @(Get-DomainUser -Unconstrained -Enabled -ShowOwner @PSBoundParameters)
@@ -165,7 +165,7 @@ function Get-UnconstrainedDelegation {
             $unconstrainedAccounts = $unconstrainedComputers + $unconstrainedUsers + $unconstrainedMSAs
 
             if (@($unconstrainedAccounts).Count -eq 0) {
-                Show-Line "No accounts with Unconstrained Delegation found (excluding Domain Controllers)" -Class "Secure"
+                Show-Line "Учётные записи с неограниченным делегированием не найдены (контроллеры домена исключены)" -Class "Secure"
                 return
             }
 
@@ -201,7 +201,7 @@ function Get-UnconstrainedDelegation {
                     if ($exposedNames.Count -gt 20) { $shownNames = "$shownNames, ... and $($exposedNames.Count - 20) more" }
                     Show-Line "$($exposedNames.Count) privileged account(s) hand their TGT to these hosts at every Kerberos logon - not sensitive, not in Protected Users: $shownNames" -Class Finding -FindingId 'UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS'
                 } else {
-                    Show-Line "Every privileged account is sensitive or in Protected Users - a coerced Domain Controller still hands over its own TGT" -Class Note
+                    Show-Line "Все привилегированные записи защищены от делегирования либо состоят в Protected Users; однако контроллер домена при определённых воздействиях всё равно может передать собственный TGT" -Class Note
                 }
                 if ($exposure.ProtectedUsersCounted -eq $false) {
                     Show-Line "Protected Users was not counted - it stops delegation only at domain functional level Windows Server 2012 R2 or higher" -Class Note

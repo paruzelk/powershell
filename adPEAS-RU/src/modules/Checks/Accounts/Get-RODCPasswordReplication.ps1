@@ -61,7 +61,7 @@
                 return
             }
 
-            Show-SubHeader "Checking the password replication policy of read-only Domain Controllers..." -ObjectType "RODCPasswordReplication"
+            Show-SubHeader "Проверка политики репликации паролей контроллеров домена только для чтения (RODC)..." -ObjectType "RODCPasswordReplication"
 
             # The Domain Controller definition lives in Get-DomainComputer; a read-only one is
             # the one with PARTIAL_SECRETS_ACCOUNT.

@@ -323,7 +323,7 @@ function Get-NetworkMap {
                 return
             }
 
-            Show-SubHeader "Mapping the IP subnets of the active computers..." -ObjectType "NetworkSubnet"
+            Show-SubHeader "Построение карты IP-подсетей активных компьютеров..." -ObjectType "NetworkSubnet"
 
             $domainFQDN = ([string]$Script:LDAPContext.Domain).Trim().TrimEnd('.').ToLowerInvariant()
 
@@ -531,7 +531,7 @@ function Get-NetworkMap {
             $targets = New-Object System.Collections.Generic.List[string]
 
             if ($subnets.Count -eq 0) {
-                Show-Line "No active computer could be mapped to an IPv4 subnet" -Class Note
+                Show-Line "Не удалось сопоставить активные компьютеры с IPv4-подсетями" -Class Note
             } else {
                 Show-Line "Found $($subnets.Count) /24 subnet(s) with $($mapped.Count) computer(s) active in the last $ActiveDays days:" -Class Note
             }

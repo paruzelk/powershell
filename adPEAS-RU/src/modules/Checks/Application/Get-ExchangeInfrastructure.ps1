@@ -133,15 +133,15 @@
             }
 
             if (-not $exchangeOrgExists) {
-                Show-SubHeader "Checking for Exchange Organization..." -ObjectType "ExchangeServer"
-                Show-Line "No Exchange Organization detected" -Class Note
+                Show-SubHeader "Проверка объекта организации Exchange..." -ObjectType "ExchangeServer"
+                Show-Line "Объект организации Exchange не обнаружен" -Class Note
                 return
             }
 
             # ===== Step 1b: Exchange Organization Overview (Config Partition - forest-wide) =====
             # Queries the Configuration partition which is visible from any domain in the forest.
             # Outputs: 1 global Organization card + 1 card per Exchange server with VDirs/Connectors.
-            Show-SubHeader "Checking Exchange Organization..." -ObjectType "ExchangeOrganization"
+            Show-SubHeader "Анализ организации Exchange..." -ObjectType "ExchangeOrganization"
 
             $exchangeBase = "CN=Microsoft Exchange,CN=Services,$configDN"
 
@@ -263,7 +263,7 @@
             }
 
             $orgObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'ExchangeOrganization' -Force
-            Show-Line "Exchange Organization found in Configuration partition" -Class Hint
+            Show-Line "Объект организации Exchange найден в разделе Configuration" -Class Hint
             Show-Object $orgObj -Class Hint
 
             # --- Phase 3: Per-Server Config Cards ---
@@ -380,7 +380,7 @@
             # ===== Step 2: Enumerate Exchange Servers (Domain Partition - detailed) =====
             # Not "Searching for Exchange servers...": Get-InfrastructureServers announces
             # its inventory of the same servers that way, one letter apart.
-            Show-SubHeader "Checking the Exchange servers and their web endpoints..." -ObjectType "ExchangeServer"
+            Show-SubHeader "Проверка серверов Exchange и их веб-интерфейсов..." -ObjectType "ExchangeServer"
 
             $exchangeServers = @()
 
@@ -709,7 +709,7 @@
             # nothing to add.
             $hybridOnOrgCard = ($orgConfigHidden -and -not $hybridQueryFailed -and @($hybridRelationships).Count -eq 0)
             if (-not $hybridOnOrgCard) {
-                Show-SubHeader "Checking for an Exchange hybrid deployment..." -ObjectType "ExchangeHybridConfiguration"
+                Show-SubHeader "Проверка конфигурации гибридного развёртывания Exchange..." -ObjectType "ExchangeHybridConfiguration"
             }
 
             if (@($hybridRelationships).Count -gt 0) {
@@ -744,14 +744,14 @@
                 }
 
                 $hybridObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'ExchangeHybridConfiguration' -Force
-                Show-Line "Exchange hybrid deployment detected" -Class Hint
+                Show-Line "Обнаружено гибридное развёртывание Exchange" -Class Hint
                 Show-Object $hybridObj -Class Hint
             }
             elseif ($hybridQueryFailed) {
                 # Same reasoning as everywhere else in this check: a query that failed
                 # produces the same empty result as a query that found nothing, and only
                 # one of the two justifies the sentence below.
-                Show-Line "Hybrid configuration could not be read - result unknown, not absent" -Class Hint
+                Show-Line "Не удалось прочитать гибридную конфигурацию; её отсутствие не подтверждено" -Class Hint
             }
             elseif (-not $hybridOnOrgCard) {
                 Show-Line "No hybrid configuration found - this organization appears to be purely on-premises" -Class Note
@@ -774,7 +774,7 @@
             # like the hybrid configuration above, and the section is left out.
             $recvConnectorsOnOrgCard = ($orgConfigHidden -and @($allRecvConnectors).Count -eq 0)
             if (-not $recvConnectorsOnOrgCard) {
-                Show-SubHeader "Checking SMTP receive connector permissions..." -ObjectType "ExchangeReceiveConnector"
+                Show-SubHeader "Проверка разрешений принимающих SMTP-соединителей..." -ObjectType "ExchangeReceiveConnector"
             }
 
             if (@($allRecvConnectors).Count -eq 0) {
@@ -783,10 +783,10 @@
                 # that was found is a connector this account cannot see.
                 if (-not $recvConnectorsOnOrgCard) {
                     if (@($realServers).Count -gt 0) {
-                        Show-Line "No SMTP receive connector is readable by this account - their permissions are unknown, not clean" -Class Hint
+                        Show-Line "Текущая учётная запись не может прочитать SMTP-соединители; их разрешения неизвестны, безопасность не подтверждена" -Class Hint
                     }
                     else {
-                        Show-Line "No SMTP receive connectors found in the Configuration partition" -Class Note
+                        Show-Line "Принимающие SMTP-соединители не найдены в разделе Configuration" -Class Note
                     }
                 }
             }
@@ -1105,7 +1105,7 @@
             # every Exchange group as an expected trustee and drops it unless
             # -IncludePrivileged is set, on the grounds that Exchange permissions are
             # by design. For this one ACE that is not true - it is documented as removable.
-            Show-SubHeader "Checking the Exchange permissions model on the domain object..." -ObjectType "ExchangePermissionsModel"
+            Show-SubHeader "Анализ модели разрешений Exchange на корневом объекте домена..." -ObjectType "ExchangePermissionsModel"
 
             $domainDN = $Script:LDAPContext.DomainDN
 
@@ -1368,7 +1368,7 @@
                     # check announces its object ("Analyzing password policy..." ->
                     # "Found password policy:"). The scope stays in the sub-header rather
                     # than being repeated here.
-                    Show-Line "Found Exchange permissions model:" -Class $modelConsoleClass
+                    Show-Line "Обнаружена модель разрешений Exchange:" -Class $modelConsoleClass
                     Show-Object $modelObj -Class $modelConsoleClass
                 }
             }

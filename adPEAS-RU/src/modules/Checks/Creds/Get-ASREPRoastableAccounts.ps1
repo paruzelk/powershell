@@ -64,7 +64,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for AS-REP Roastable accounts (DONT_REQ_PREAUTH)..." -ObjectType "ASREPRoastable"
+            Show-SubHeader "Поиск учётных записей без предварительной проверки подлинности Kerberos (AS-REP Roasting)..." -ObjectType "ASREPRoastable"
 
             # -Enabled for the same reason Get-KerberoastableAccounts uses it: a disabled
             # account cannot be roasted, the KDC answers KDC_ERR_CLIENT_REVOKED, and
@@ -127,7 +127,7 @@
                 $canTestASREPRoast = -not $OPSEC
 
                 if ($OPSEC) {
-                    Show-Line "Skipping hash extraction (OPSEC mode)" -Class "Hint"
+                    Show-Line "Получение хешей пропущено (режим OPSEC)" -Class "Hint"
                 }
 
                 $totalUsers = @($asrepRoastableUsers).Count
@@ -232,7 +232,7 @@
                     Show-Line "Through these accounts, $(@($spnAccounts).Count) kerberoastable account(s) can be roasted without any credentials" -Class "Finding" -FindingId 'KERBEROAST_WITHOUT_PREAUTH'
                 }
             } else {
-                Show-Line "No AS-REP Roastable accounts found" -Class "Secure"
+                Show-Line "Учётных записей, допускающих AS-REP Roasting, не найдено" -Class "Secure"
             }
 
         } catch {

@@ -76,7 +76,7 @@
                 if ($PSBoundParameters.ContainsKey($connectionKey)) { $connectionParams[$connectionKey] = $PSBoundParameters[$connectionKey] }
             }
 
-            Show-SubHeader "Analyzing authentication policy silos and authentication policies..." -ObjectType "AuthNPolicySilo"
+            Show-SubHeader "Анализ хранилищ политик проверки подлинности и самих политик..." -ObjectType "AuthNPolicySilo"
 
             $configNC = [string]$Script:LDAPContext.ConfigurationNamingContext
             if (-not $configNC) {
@@ -98,7 +98,7 @@
 
             if ($silos.Count -eq 0 -and $policies.Count -eq 0) {
                 # Neither secure nor insecure: the feature is simply not in use.
-                Show-Line "No authentication policy silo and no authentication policy is configured"
+                Show-Line "Хранилища политик и политики проверки подлинности не настроены"
                 return
             }
 
@@ -246,7 +246,7 @@
                 Show-Line "Found $($silos.Count) authentication policy silo(s):" -Class (Get-AuthNHeadlineClass -Class $siloClasses)
                 for ($i = 0; $i -lt $silos.Count; $i++) { Show-Object $silos[$i] -Class $siloClasses[$i] }
             } else {
-                Show-Line "No authentication policy silo is configured"
+                Show-Line "Хранилища политик проверки подлинности не настроены"
             }
 
             if ($policies.Count -gt 0) {
@@ -277,7 +277,7 @@
             }
 
             if (-not $kdcSupportMissing -and @(@($siloClasses) + @($policyClasses) | Where-Object { $_ -ne 'Standard' }).Count -eq 0) {
-                Show-Line "Every silo is enforced with its members enrolled, and only Tier 0 can change silos and policies" -Class Secure
+                Show-Line "Все хранилища политик применяются к назначенным участникам; изменять их разрешено только Tier 0" -Class Secure
             }
 
         } catch {

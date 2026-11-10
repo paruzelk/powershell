@@ -71,7 +71,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for privileged accounts with password never expires..." -ObjectType "PasswordNeverExpires"
+            Show-SubHeader "Поиск привилегированных записей с неограниченным сроком действия пароля..." -ObjectType "PasswordNeverExpires"
 
             # Calculate FileTime for password age threshold
             $thresholdDate = (Get-Date).AddDays(-$PasswordAgeDays)

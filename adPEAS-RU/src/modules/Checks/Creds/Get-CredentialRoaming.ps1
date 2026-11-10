@@ -128,7 +128,7 @@
                 return
             }
 
-            Show-SubHeader "Checking for roamed DPAPI master keys and private keys in AD..." -ObjectType "CredentialRoaming"
+            Show-SubHeader "Поиск перемещаемых мастер-ключей DPAPI и закрытых ключей в AD..." -ObjectType "CredentialRoaming"
 
             # ----- Step 1: who has roamed material? -----
             #

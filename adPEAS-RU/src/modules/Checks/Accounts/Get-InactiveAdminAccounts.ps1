@@ -64,7 +64,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for inactive privileged accounts (>$InactiveDays days)..." -ObjectType "InactiveAdmin"
+            Show-SubHeader "Поиск неактивных привилегированных записей (более $InactiveDays дней)..." -ObjectType "InactiveAdmin"
 
             # Membership in a privileged group OR adminCount=1, not adminCount alone.
             # AdminSDHolder does not protect every group adPEAS counts as privileged or

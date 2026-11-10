@@ -68,7 +68,7 @@
             $domainDN = $Script:LDAPContext.DomainDN
 
             # ===== Step 1: Get Domain Root ACLs using Get-ObjectACL =====
-            Show-SubHeader "Analyzing Domain root ACLs..." -ObjectType "DangerousACL"
+            Show-SubHeader "Анализ ACL корневого объекта домена..." -ObjectType "DangerousACL"
 
             Write-Log "[Get-DangerousACLs] Domain DN: $domainDN"
 
@@ -76,7 +76,7 @@
             $aclResult = Get-ObjectACL -DistinguishedName $domainDN -DangerousOnly -AllowOnly @connectionParams
 
             if (-not $aclResult) {
-                Show-Line "Failed to retrieve ACLs for domain root" -Class Note
+                Show-Line "Не удалось получить ACL корневого объекта домена" -Class Note
                 return
             }
 
@@ -528,7 +528,7 @@
             }
 
             if (@($dcsyncFindings).Count -eq 0 -and @($dangerousRightsFindings).Count -eq 0) {
-                Show-Line "No dangerous ACLs detected on domain root" -Class Secure
+                Show-Line "Опасные разрешения ACL на корневом объекте домена не обнаружены" -Class Secure
             }
 
         } catch {

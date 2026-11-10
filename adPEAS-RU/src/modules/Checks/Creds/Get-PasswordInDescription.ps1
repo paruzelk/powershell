@@ -69,7 +69,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for credentials in description/info attributes..." -ObjectType "PasswordInDescription"
+            Show-SubHeader "Поиск учётных данных в атрибутах description и info..." -ObjectType "PasswordInDescription"
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
@@ -234,7 +234,7 @@
                     # directory was not cleared - it was not fully looked at.
                     Show-Line "Nothing could be reported - every match could not be read again" -Class Note
                 } else {
-                    Show-Line "No credentials found in the free-text attributes of any object" -Class Secure
+                    Show-Line "Учётные данные в свободно заполняемых атрибутах объектов не обнаружены" -Class Secure
                 }
             } else {
                 Write-Log "[Get-PasswordInDescription] Total: $findingCount finding(s), $hintCount hint(s)"

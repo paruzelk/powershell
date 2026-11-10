@@ -128,12 +128,12 @@
             $domainFQDN = $Script:LDAPContext.Domain
             $Script:_gpoScheduledTasks = [System.Collections.ArrayList]::new()
 
-            Show-SubHeader "Searching for GPO scheduled tasks..." -ObjectType "GPOScheduledTask"
+            Show-SubHeader "Поиск запланированных заданий, создаваемых через GPO..." -ObjectType "GPOScheduledTask"
 
             $gpos = Get-DomainGPO @connectionParams
 
             if (-not $gpos) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -258,7 +258,7 @@
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - cannot analyze GPO scheduled tasks - SMB access failed (authentication/network issue)" -Class Finding
                 }

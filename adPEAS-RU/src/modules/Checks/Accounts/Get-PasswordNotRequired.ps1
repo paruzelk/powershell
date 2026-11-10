@@ -55,7 +55,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for enabled accounts with 'Password Not Required' flag..." -ObjectType "PasswordNotRequired"
+            Show-SubHeader "Поиск включённых записей с признаком «Пароль не требуется»..." -ObjectType "PasswordNotRequired"
 
             # Query enabled user accounts with PASSWD_NOTREQD flag (UAC bit 32)
             $accounts = Get-DomainUser -Enabled -PasswordNotRequired -ShowOwner @PSBoundParameters

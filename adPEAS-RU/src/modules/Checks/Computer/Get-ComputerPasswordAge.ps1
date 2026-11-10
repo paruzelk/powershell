@@ -84,7 +84,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for active computers whose machine account password is not rotated..." -ObjectType "ComputerPasswordAge"
+            Show-SubHeader "Поиск активных компьютеров без регулярной смены пароля машинной записи..." -ObjectType "ComputerPasswordAge"
 
             $activeSince = (Get-Date).AddDays(-$ActiveDays).ToFileTime()
             $computers = @(Get-DomainComputer -Enabled -PasswordAgeDays $PasswordAgeDays -LDAPFilter "(lastLogonTimestamp>=$activeSince)" @connectionParams)

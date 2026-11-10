@@ -111,7 +111,7 @@ function Get-DangerousOUPermissions {
                 return
             }
 
-            Show-SubHeader "Analyzing OU and container permissions..." -ObjectType "DangerousOUPermission"
+            Show-SubHeader "Анализ прав доступа к организационным единицам и контейнерам..." -ObjectType "DangerousOUPermission"
 
             # The organizational units, and the containers directly under the domain root.
             #

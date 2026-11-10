@@ -67,7 +67,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for Kerberoastable accounts (users with SPNs)..." -ObjectType "Kerberoastable"
+            Show-SubHeader "Поиск учётных записей с SPN, допускающих Kerberoasting..." -ObjectType "Kerberoastable"
 
             # Use optimized filters: -SPN (has SPN), -Enabled (not disabled), additional filter: exclude krbtgt.
             #
@@ -98,7 +98,7 @@
                 $canTestKerberoasting = -not $OPSEC
 
                 if ($OPSEC) {
-                    Show-Line "Skipping hash extraction (OPSEC mode)" -Class "Hint"
+                    Show-Line "Получение хешей пропущено (режим OPSEC)" -Class "Hint"
                 }
 
                 # Check if credentials are available for in-memory Kerberoasting (non-Kerberos auth)
@@ -119,7 +119,7 @@
                     }
 
                     if (-not $hasCredentials) {
-                        Show-Line "Kerberoasting skipped - no credentials available (use -Credential or Connect-adPEAS -Credential)" -Class Finding
+                        Show-Line "Проверка Kerberoasting пропущена: отсутствуют доступные учётные данные (используйте -Credential)" -Class Finding
                         $canTestKerberoasting = $false
                     }
                 }

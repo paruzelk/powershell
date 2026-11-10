@@ -88,12 +88,12 @@
             # per run, cleared when the check ends.
             $Script:_uncWriteAccess = @{ Hosts = @{}; Paths = @{} }
 
-            Show-SubHeader "Searching for GPO-deployed scripts..." -ObjectType "GPOScriptPath"
+            Show-SubHeader "Поиск сценариев, развёрнутых групповыми политиками..." -ObjectType "GPOScriptPath"
 
             $gpos = Get-DomainGPO @connectionParams
 
             if (-not $gpos) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -225,7 +225,7 @@
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - cannot analyze GPO scripts - SMB access failed (authentication/network issue)" -Class Finding
                 }

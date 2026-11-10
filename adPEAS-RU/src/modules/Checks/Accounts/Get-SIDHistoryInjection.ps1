@@ -66,7 +66,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for SID History Injection (privileged SIDs in sIDHistory)..." -ObjectType "SIDHistory"
+            Show-SubHeader "Поиск подмены истории SID: привилегированные идентификаторы в sIDHistory..." -ObjectType "SIDHistory"
 
             # Query all objects with sIDHistory attribute set
             $objectsWithSIDHistory = Get-DomainObject -LDAPFilter "(sIDHistory=*)" @connectionParams
@@ -323,7 +323,7 @@
                     Show-Object $finding -Class Finding
                 }
             } else {
-                Show-Line "No account holds a privileged SID in sIDHistory that did not come from a source domain" -Class Secure
+                Show-Line "Не найдены учётные записи с привилегированным SID в sIDHistory, не объясняемым исходным доменом" -Class Secure
             }
 
             # A SID of this domain with any RID. Reported whether or not
@@ -361,7 +361,7 @@
 
             # Non-privileged findings (migration artifacts) - only if requested
             if ($IncludeNonPrivileged -and @($nonPrivilegedFindings).Count -gt 0) {
-                Show-SubHeader "Migration artifacts (non-privileged sIDHistory)..." -ObjectType "SIDHistory"
+                Show-SubHeader "Следы миграции: непривилегированные SID в sIDHistory..." -ObjectType "SIDHistory"
                 Show-Line "Found $(@($nonPrivilegedFindings).Count) account(s) with non-privileged SIDs in sIDHistory (migration artifacts):" -Class Hint
 
                 foreach ($finding in $nonPrivilegedFindings) {

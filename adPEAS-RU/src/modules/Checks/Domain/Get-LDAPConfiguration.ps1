@@ -236,7 +236,7 @@ function Show-DCPolicySettingSection {
             if ($postureClasses -contains $candidate) { $postureClass = $candidate; break }
         }
 
-        Show-Line "In force on the domain controllers, by policy precedence:" -Class $postureClass
+        Show-Line "Действующие параметры контроллеров домена с учётом приоритета политик:" -Class $postureClass
         Show-Object $posture -Class $postureClass
     }
 }
@@ -339,7 +339,7 @@ function Get-LDAPConfiguration {
             # sessions instead - see the note at the GPO loop below - so the report could
             # carry a red "Anonymous LDAP Binding Allowed" for a domain where it was blocked,
             # and a green one for a domain where it was open.
-            Show-SubHeader "Checking the directory service heuristics (dsHeuristics)..." -ObjectType "DSHeuristics"
+            Show-SubHeader "Проверка параметров dsHeuristics службы каталогов..." -ObjectType "DSHeuristics"
 
             $unreadHeuristics = "anonymous LDAP and NSPI access, the AdminSDHolder protection of the operator groups and the UPN and SPN uniqueness checks"
             $configDN = $Script:LDAPContext.ConfigurationNamingContext
@@ -386,7 +386,7 @@ function Get-LDAPConfiguration {
                         }
                         $heuristicsObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DSHeuristics' -Force
                         $objectClass = if ($hasFinding) { 'Finding' } elseif ($hasUnknown) { 'Note' } else { 'Secure' }
-                        Show-Line "Found directory service heuristics:" -Class $objectClass
+                        Show-Line "Обнаружены параметры службы каталогов:" -Class $objectClass
                         Show-Object $heuristicsObj -Class $objectClass
                     }
                 } catch {
@@ -397,7 +397,7 @@ function Get-LDAPConfiguration {
                 Show-Line "The configuration partition is unknown - dsHeuristics, which decides $unreadHeuristics, could not be read" -Class Note
             }
 
-            Show-SubHeader "Analyzing LDAP Signing/Channel Binding via GPO (SYSVOL)..." -ObjectType "LDAPConfigGPO"
+            Show-SubHeader "Анализ настроек подписи LDAP и привязки канала через GPO (SYSVOL)..." -ObjectType "LDAPConfigGPO"
 
             $domainFQDN = $Script:LDAPContext.Domain
             $dcServer = $Script:LDAPContext.Server
@@ -405,7 +405,7 @@ function Get-LDAPConfiguration {
             $allGPOs = Get-DomainGPO @connectionParams
 
             if (-not $allGPOs) {
-                Show-Line "No GPOs found" -Class Hint
+                Show-Line "Объекты групповой политики не найдены" -Class Hint
                 return
             }
 
@@ -794,7 +794,7 @@ function Get-LDAPConfiguration {
             # Check if SYSVOL was accessible
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - the GPO configuration for LDAP Security was not analyzed" -Class Finding
                 }
@@ -827,7 +827,7 @@ function Get-LDAPConfiguration {
             # was listed as an LDAP configuration GPO and could decide the LDAP posture's
             # decidedBy row on its own. Unset, each leaves the domain controllers on the OS
             # default, which this check does not judge.
-            Show-SubHeader "Analyzing null session settings via GPO (SYSVOL)..." -ObjectType "NullSessionGPO"
+            Show-SubHeader "Анализ настроек анонимных сеансов через GPO (SYSVOL)..." -ObjectType "NullSessionGPO"
             $nullSessionClass = { param($Value) switch ($Value) { 'Allowed' { 'Hint' } 'Restricted' { 'Secure' } default { 'Note' } } }
             $nullSessionSection = @{
                 Setting           = @(

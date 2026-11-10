@@ -139,12 +139,12 @@
             $domainFQDN = $Script:LDAPContext.Domain
             $Script:vulnerableGPOs = @()
 
-            Show-SubHeader "Searching for GPO local group assignments..." -ObjectType "GPOLocalGroup"
+            Show-SubHeader "Поиск назначений участников локальных групп через GPO..." -ObjectType "GPOLocalGroup"
 
             $gpos = Get-DomainGPO @connectionParams
 
             if (-not $gpos -or @($gpos).Count -eq 0) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -333,7 +333,7 @@
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - cannot analyze GPO local group assignments - SMB access failed (authentication/network issue)" -Class Finding
                 }

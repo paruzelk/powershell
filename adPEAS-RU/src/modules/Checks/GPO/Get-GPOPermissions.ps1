@@ -118,7 +118,7 @@
             $domainDN = $Script:LDAPContext.DomainDN
 
             # ===== Step 1: Enumerate GPOs =====
-            Show-SubHeader "Searching for dangerous GPO permissions..." -ObjectType "GPOPermission"
+            Show-SubHeader "Поиск опасных разрешений на объекты групповой политики..." -ObjectType "GPOPermission"
 
             $allGPOs = @(Get-DomainGPO @connectionParams)
 
@@ -127,7 +127,7 @@
             $gpoStatusMap = Get-GPOStatusMap -GPO $allGPOs
 
             if (-not $allGPOs -or @($allGPOs).Count -eq 0) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 

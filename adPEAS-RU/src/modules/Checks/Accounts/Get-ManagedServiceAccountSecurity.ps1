@@ -94,7 +94,7 @@
                 if ($PSBoundParameters.ContainsKey($connectionKey)) { $connectionParams[$connectionKey] = $PSBoundParameters[$connectionKey] }
             }
 
-            Show-SubHeader "Analyzing Managed Service Account security..." -ObjectType "gMSA"
+            Show-SubHeader "Анализ защищённости управляемых учётных записей служб..." -ObjectType "gMSA"
 
             # ===== Check 1: gMSA Password Access Analysis =====
             Write-Log "[Get-ManagedServiceAccountSecurity] Checking gMSA password access permissions"
@@ -266,7 +266,7 @@
                     if ($unanalyzedCount -gt 0) {
                         Show-Line "gMSA password access is restricted to privileged accounts and service hosts ($unanalyzedCount of $totalGMSAs not analyzed)" -Class Note
                     } else {
-                        Show-Line "All gMSA password access is properly restricted to privileged accounts and service hosts" -Class Secure
+                        Show-Line "Чтение паролей gMSA ограничено привилегированными записями и узлами служб" -Class Secure
                     }
                 }
 
@@ -346,7 +346,7 @@
 
                 # ===== Check 2: Attempt to read gMSA passwords =====
                 Write-Log "[Get-ManagedServiceAccountSecurity] Attempting to read gMSA passwords"
-                Show-SubHeader "Checking gMSA password access for current user..." -ObjectType "gMSAPassword"
+                Show-SubHeader "Проверка доступа текущего пользователя к паролям gMSA..." -ObjectType "gMSAPassword"
 
                 $passwordsRetrieved = 0
 
@@ -471,7 +471,7 @@
                     } elseif ($readFailures -gt 0) {
                         Show-Line "Current user cannot retrieve any gMSA passwords ($readFailures of $totalGMSAs could not be tested)" -Class Secure
                     } else {
-                        Show-Line "Current user cannot retrieve any gMSA passwords" -Class Secure
+                        Show-Line "Текущий пользователь не может получить пароли gMSA" -Class Secure
                     }
                 } else {
                     Show-Line "Retrieved $passwordsRetrieved of $($gmsaAccounts.Count) gMSA password(s)" -Class Finding
@@ -489,7 +489,7 @@
                 })
 
                 if ($gmsasWithoutFindings.Count -gt 0) {
-                    Show-SubHeader "gMSA accounts with proper password access configuration:" -ObjectType "gMSAPassword"
+                    Show-SubHeader "Учётные записи gMSA с корректными разрешениями на чтение пароля:" -ObjectType "gMSAPassword"
                     foreach ($gmsa in $gmsasWithoutFindings) {
                         $gmsa | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'gMSA' -Force
 
@@ -516,7 +516,7 @@
             # own the MSA result ran on directly under the gMSA objects, reading as one
             # more line about the gMSA above it. The MSA ObjectType carries the section
             # title and the help text already - only the header was missing.
-            Show-SubHeader "Checking for standalone Managed Service Accounts..." -ObjectType "MSA"
+            Show-SubHeader "Поиск автономных управляемых учётных записей служб (sMSA)..." -ObjectType "MSA"
 
             # Get all MSAs (not gMSAs) - these are legacy standalone MSAs
             $standaloneMSAs = @(Get-DomainUser -GMSA @PSBoundParameters |
@@ -575,7 +575,7 @@
             }
 
             if ($dmsaClass) {
-                Show-SubHeader "Checking delegated Managed Service Account (dMSA) links..." -ObjectType "dMSALink"
+                Show-SubHeader "Проверка связей делегированных управляемых учётных записей dMSA..." -ObjectType "dMSALink"
 
                 $linkedAccounts = @(Get-DomainObject -LDAPFilter '(|(msDS-ManagedAccountPrecededByLinkBL=*)(msDS-SupersededManagedAccountLink=*))' @PSBoundParameters)
 
@@ -671,7 +671,7 @@
                 }
 
                 if (@($linkedDMSAs).Count -eq 0) {
-                    Show-Line "No account names or is named by a delegated Managed Service Account" -Class Note
+                    Show-Line "Не обнаружены взаимные ссылки между учётными записями и dMSA" -Class Note
                 } else {
                     # The dMSA side - who may use it, which hosts - is on the dMSA object, and
                     # by default only administrators, Account Operators and its creator may
@@ -698,7 +698,7 @@
                     Where-Object { $_.objectClass -icontains 'msDS-DelegatedManagedServiceAccount' })
 
                 if ($dmsaAccounts.Count -gt 0) {
-                    Show-SubHeader "Checking who may use delegated Managed Service Accounts..." -ObjectType "dMSA"
+                    Show-SubHeader "Проверка субъектов, которым разрешено использовать dMSA..." -ObjectType "dMSA"
 
                     $dmsaDescriptors = Get-ManagedAccountDescriptorMap -ConnectionParams $connectionParams
                     $dmsaUserSIDs = @{}
@@ -804,7 +804,7 @@
                         if ($unanalyzedDMSAs -gt 0) {
                             Show-Line "dMSA use is restricted to privileged accounts and service hosts ($unanalyzedDMSAs of $($dmsaAccounts.Count) not analyzed)" -Class Note
                         } else {
-                            Show-Line "Every dMSA can be used only by privileged accounts and service hosts" -Class Secure
+                            Show-Line "Использование всех dMSA ограничено привилегированными записями и узлами служб" -Class Secure
                         }
                     }
                 }

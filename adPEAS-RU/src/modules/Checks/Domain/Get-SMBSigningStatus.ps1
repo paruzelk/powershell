@@ -67,7 +67,7 @@
                 return
             }
 
-            Show-SubHeader "Analyzing SMB Signing configuration via GPO (SYSVOL)..." -ObjectType "SMBSigning"
+            Show-SubHeader "Анализ требований подписи SMB, заданных через GPO (SYSVOL)..." -ObjectType "SMBSigning"
 
             $domainFQDN = $Script:LDAPContext.Domain
             $dcServer = $Script:LDAPContext.Server
@@ -75,7 +75,7 @@
             $allGPOs = Get-DomainGPO @connectionParams
 
             if (-not $allGPOs -or @($allGPOs).Count -eq 0) {
-                Show-Line "No GPOs found" -Class Note
+                Show-Line "Объекты групповой политики не найдены" -Class Note
                 return
             }
 
@@ -345,7 +345,7 @@
             # Check if SYSVOL was accessible
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - the GPO configuration for SMB Signing was not analyzed" -Class Finding
                 }
@@ -449,7 +449,7 @@
                 } else {
                     # Every policy that configures signing is dormant, which leaves every
                     # machine on the OS default - the same exposure as configuring nothing.
-                    Show-Line "No SMB Signing configuration is deployed by a policy that is linked and enabled" -Class Finding
+                    Show-Line "Привязанные и включённые GPO не задают требования подписи SMB" -Class Finding
                 }
 
                 foreach ($gpoFinding in $shown) {
@@ -485,7 +485,7 @@
                     )
                     $postureClass = if ($postureClasses -contains 'Finding') { 'Finding' } elseif ($postureClasses -contains 'Hint') { 'Hint' } else { 'Secure' }
 
-                    Show-Line "In force on the domain controllers, by policy precedence:" -Class $postureClass
+                    Show-Line "Действующие параметры контроллеров домена с учётом приоритета политик:" -Class $postureClass
                     Show-Object $posture -Class $postureClass
                 }
 
@@ -541,7 +541,7 @@
                         decidedBy     = 'None (signing is set on the DC OU only)'
                     }
                     $memberPosture | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'EffectiveSMBSigningMembers' -Force
-                    Show-Line "In force on member servers and clients:" -Class $dcOnlyClass
+                    Show-Line "Действующие параметры рядовых серверов и клиентов:" -Class $dcOnlyClass
                     Show-Object $memberPosture -Class $dcOnlyClass
                 }
 
@@ -570,7 +570,7 @@
                 }
 
             } else {
-                Show-Line "No SMB Signing configuration found in any GPO - computers rely on OS defaults (varies by Windows version)" -Class Finding
+                Show-Line "Ни одна GPO не задаёт подпись SMB; действуют значения ОС по умолчанию, зависящие от версии Windows" -Class Finding
             }
 
         } catch {

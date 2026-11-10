@@ -96,7 +96,7 @@
                 return
             }
 
-            Show-SubHeader "Testing BitLocker recovery key read access for current user..." -ObjectType "BitLockerRecoveryKey"
+            Show-SubHeader "Проверка доступа текущего пользователя к ключам восстановления BitLocker..." -ObjectType "BitLockerRecoveryKey"
 
             # ===== Step 1: Schema / feasibility short-circuit (cached) =====
             # Many environments do not escrow BitLocker recovery keys to AD. Detect this once
@@ -137,7 +137,7 @@
             }
 
             if (-not $bitLockerPresent) {
-                Show-Line "BitLocker recovery escrow is not used in this domain (no msFVE-RecoveryInformation objects found)" -Class "Note"
+                Show-Line "В домене не обнаружено хранение ключей восстановления BitLocker (объекты msFVE-RecoveryInformation отсутствуют)" -Class "Note"
                 return
             }
 
@@ -307,7 +307,7 @@ function Show-BitLockerRecoveryDelegation {
         [hashtable]$ConnectionParams = @{}
     )
 
-    Show-SubHeader "Analyzing who may read BitLocker recovery passwords..." -ObjectType "BitLockerRecoveryPermission"
+    Show-SubHeader "Проверка субъектов с доступом к паролям восстановления BitLocker..." -ObjectType "BitLockerRecoveryPermission"
 
     # Parent container per computer, with a count for the row. The pattern strips exactly
     # one RDN, and an escaped comma inside it (CN=PC\, Lab) does not end it.
@@ -322,7 +322,7 @@ function Show-BitLockerRecoveryDelegation {
     }
 
     if ($computersByContainer.Count -eq 0) {
-        Show-Line "No computer object found - there is no container whose recovery passwords could be delegated" -Class Note
+        Show-Line "Компьютерные объекты не найдены; контейнеры с делегируемыми ключами восстановления отсутствуют" -Class Note
         return
     }
 

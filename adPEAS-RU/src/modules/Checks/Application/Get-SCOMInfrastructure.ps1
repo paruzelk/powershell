@@ -61,7 +61,7 @@
             }
 
             # ===== Step 1: Check for SCOM Infrastructure =====
-            Show-SubHeader "Checking for SCOM infrastructure..." -ObjectType "SCOMServer"
+            Show-SubHeader "Поиск инфраструктуры SCOM..." -ObjectType "SCOMServer"
 
             $scomDetected = $false
 
@@ -93,7 +93,7 @@
 
             # If no SCOM detected, stop here
             if (-not $scomDetected) {
-                Show-Line "No SCOM infrastructure detected" -Class Note
+                Show-Line "Инфраструктура SCOM не обнаружена" -Class Note
                 return
             }
 
@@ -101,7 +101,7 @@
             Show-Line "SCOM infrastructure detected" -Class Hint
 
             # ===== Step 2: Enumerate SCOM Management Servers =====
-            Show-SubHeader "Searching for SCOM management servers..." -ObjectType "SCOMServer"
+            Show-SubHeader "Поиск серверов управления SCOM..." -ObjectType "SCOMServer"
 
             # $srv, not $server: the check declares a [string]$Server parameter, and PowerShell
             # keeps that type constraint on the loop variable, so every AD object was coerced
@@ -135,11 +135,11 @@
                     Show-Object $srv -Class Hint
                 }
             } else {
-                Show-Line "No SCOM management servers found via SPN detection" -Class Note
+                Show-Line "Поиск SPN не выявил серверы управления SCOM" -Class Note
             }
 
             # ===== Step 3: SCOM Service Accounts =====
-            Show-SubHeader "Searching for SCOM service accounts..." -ObjectType "SCOMServiceAccount"
+            Show-SubHeader "Поиск служебных учётных записей SCOM..." -ObjectType "SCOMServiceAccount"
 
             $serviceAccounts = @()
 
@@ -192,11 +192,11 @@
                     Show-Object $account -Class $(if ($account.PSObject.Properties['privilegedServiceAccount']) { 'Finding' } else { 'Hint' })
                 }
             } else {
-                Show-Line "No SCOM service accounts found" -Class Note
+                Show-Line "Служебные учётные записи SCOM не найдены" -Class Note
             }
 
             # ===== Step 4: SCOM-Related Security Groups =====
-            Show-SubHeader "Searching for SCOM-related security groups..." -ObjectType "SCOMGroup"
+            Show-SubHeader "Поиск групп безопасности, связанных с SCOM..." -ObjectType "SCOMGroup"
 
             # Broad LDAP query to get potential SCOM groups
             $allGroups = Get-DomainGroup -LDAPFilter "(|(cn=*SCOM*)(cn=*OpsMgr*)(cn=*Operations Manager*))" @PSBoundParameters
@@ -231,7 +231,7 @@
                     Show-Object $group -Class Hint
                 }
             } else {
-                Show-Line "No SCOM-related groups found" -Class Note
+                Show-Line "Группы, связанные с SCOM, не найдены" -Class Note
             }
 
         } catch {

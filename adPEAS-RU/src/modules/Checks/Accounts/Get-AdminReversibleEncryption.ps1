@@ -50,7 +50,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for accounts with reversible encryption..." -ObjectType "ReversibleEncryption"
+            Show-SubHeader "Поиск учётных записей с обратимым шифрованием пароля..." -ObjectType "ReversibleEncryption"
 
             # Every account, not only the privileged ones. Reversible encryption means the
             # cleartext password is recoverable from the domain controller, and that is the
@@ -100,7 +100,7 @@
                     Show-Line "$privilegedCount of them is/are privileged - the cleartext password of an administrator is recoverable from the DC" -Class Finding
                 }
             } else {
-                Show-Line "No accounts with reversible password encryption found" -Class Secure
+                Show-Line "Учётных записей с обратимым шифрованием пароля не найдено" -Class Secure
             }
 
         } catch {

@@ -196,7 +196,7 @@ function Get-DomainPasswordPolicy {
                 return
             }
 
-            Show-SubHeader "Analyzing password policy..." -ObjectType "DomainPasswordPolicy"
+            Show-SubHeader "Анализ политики паролей..." -ObjectType "DomainPasswordPolicy"
 
             $domainDN = $Script:LDAPContext.DomainDN
 
@@ -457,12 +457,12 @@ function Get-DomainPasswordPolicy {
                 "Secure"
             }
 
-            Show-Line "Found password policy:" -Class $policySeverity
+            Show-Line "Получена политика паролей:" -Class $policySeverity
             $passwordPolicyObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DomainPasswordPolicy' -Force
             Show-Object $passwordPolicyObj -Class $policySeverity
 
             # ===== Fine-Grained Password Policies (FGPP/PSO) Analysis =====
-            Show-SubHeader "Checking for Fine-Grained Password Policies (FGPP)..." -ObjectType "FineGrainedPasswordPolicy"
+            Show-SubHeader "Поиск тонких политик паролей (FGPP)..." -ObjectType "FineGrainedPasswordPolicy"
 
             # DomainFunctionality might be a string or integer, ensure proper conversion
             $domainFunctionalLevel = 0
@@ -693,7 +693,7 @@ function Get-DomainPasswordPolicy {
                             # with nothing behind it and no contribution to the score.
                             Show-Line "$($weakPSONames.Count) Fine-Grained Password Polic$(if($weakPSONames.Count -eq 1){'y'}else{'ies'}) with a weakness: $($weakPSONames -join ', ')" -Class Finding -FindingId 'WEAK_FGPP'
                         } elseif ($cleanPSONames.Count -gt 0 -and $unreadPSONames.Count -eq 0) {
-                            Show-Line "Fine-Grained Password Policies are properly configured" -Class Secure
+                            Show-Line "Тонкие политики паролей настроены корректно" -Class Secure
                         } elseif ($cleanPSONames.Count -gt 0) {
                             Show-Line "No weakness in the Fine-Grained Password Policies that could be read" -Class Note
                         }
@@ -780,11 +780,11 @@ function Get-DomainPasswordPolicy {
                         # Not "none configured": where the container cannot be listed, a
                         # policy assigned only to objects this account may not read is not
                         # found either.
-                        Show-Line "No Fine-Grained Password Policy found by name or by assignment" -Class Note
+                        Show-Line "Тонкие политики паролей не обнаружены ни по именам, ни по назначению" -Class Note
                     }
                 }
             } else {
-                Show-Line "Fine-Grained Password Policies not available (requires Domain Functional Level 2008+)" -Raw
+                Show-Line "Тонкие политики паролей недоступны: необходим функциональный уровень домена Windows Server 2008 или выше" -Raw
             }
 
         } catch {

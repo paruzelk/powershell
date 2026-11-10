@@ -73,7 +73,7 @@
             $domainDN = $Script:LDAPContext.DomainDN
             $domainFQDN = $Script:LDAPContext.Domain
 
-            Show-SubHeader "Analyzing Add Computer to Domain rights..." -ObjectType "AddComputerRight"
+            Show-SubHeader "Проверка прав добавления компьютеров в домен..." -ObjectType "AddComputerRight"
 
             $hasFindings = $false
             $quotaValue = 0
@@ -471,7 +471,7 @@
                 # not read. A green line over those folders claims more than was looked at.
                 $quotaClass = 'Secure'
                 if (Show-SYSVOLCoverageNote -FileFilter @('GptTmpl.inf')) { $quotaClass = 'Note' }
-                Show-Line "Add Computer to Domain rights properly configured" -Class $quotaClass
+                Show-Line "Права добавления компьютеров в домен настроены корректно" -Class $quotaClass
             }
 
         } catch {

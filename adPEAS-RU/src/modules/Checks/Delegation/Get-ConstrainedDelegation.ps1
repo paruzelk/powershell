@@ -108,7 +108,7 @@ function Get-ConstrainedDelegation {
                 return
             }
 
-            Show-SubHeader "Searching for accounts with Constrained Delegation..." -ObjectType "ConstrainedDelegation"
+            Show-SubHeader "Поиск учётных записей с ограниченным делегированием Kerberos..." -ObjectType "ConstrainedDelegation"
 
             $constrainedComputers = @(Get-DomainComputer -Constrained -Enabled -ShowOwner @PSBoundParameters)
             $constrainedUsers = @(Get-DomainUser -Constrained -Enabled -ShowOwner @PSBoundParameters)
@@ -155,7 +155,7 @@ function Get-ConstrainedDelegation {
                                    $transitionOnlyComputers + $transitionOnlyUsers + $transitionOnlyMSAs
 
             if (@($constrainedAccounts).Count -eq 0) {
-                Show-Line "No accounts with Constrained Delegation found" -Class "Secure"
+                Show-Line "Учётные записи с ограниченным делегированием Kerberos не найдены" -Class "Secure"
                 return
             }
 
@@ -178,7 +178,7 @@ function Get-ConstrainedDelegation {
             # A failed DC lookup must not quietly downgrade every finding to "no DC target",
             # which would read as a clean result. Say so instead.
             if ($dcNames.Count -eq 0) {
-                Show-Line "Domain Controllers could not be enumerated - delegation targets are not checked against them" -Class "Note"
+                Show-Line "Не удалось перечислить контроллеры домена; цели делегирования не были с ними сопоставлены" -Class "Note"
             } else {
                 foreach ($account in $constrainedAccounts) {
                     $targetsOnDC = @(

@@ -57,7 +57,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for accounts with readable password attributes..." -ObjectType "UnixPassword"
+            Show-SubHeader "Поиск учётных записей с доступными для чтения парольными атрибутами..." -ObjectType "UnixPassword"
 
             # Extended LDAP filter for all password-related attributes
             # unixUserPassword: Unix/Linux integration, userPassword: LDAP standard, msSFU30Password: Services for Unix 3.0, sambaNTPassword: Samba NT hash, sambaLMPassword: Samba LM hash
@@ -136,7 +136,7 @@
                     Show-Object $entry.Object -Class $entry.Class
                 }
             } else {
-                Show-Line "No accounts with readable password attributes found" -Class "Secure"
+                Show-Line "Учётные записи с доступными для чтения парольными атрибутами не найдены" -Class "Secure"
             }
 
             # Named rather than counted: these accounts do carry one of the attributes, and

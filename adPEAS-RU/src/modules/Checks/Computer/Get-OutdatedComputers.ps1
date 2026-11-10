@@ -77,7 +77,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for computers with outdated Microsoft operating systems..." -ObjectType "OutdatedComputer"
+            Show-SubHeader "Поиск компьютеров с устаревшими версиями Windows..." -ObjectType "OutdatedComputer"
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
@@ -246,7 +246,7 @@
             } elseif ($notAssessableCount -eq 0 -and $inactiveFilteredCount -gt 0) {
                 Show-Line "No active computers with an outdated Microsoft operating system ($inactiveFilteredCount inactive accounts filtered)" -Class "Secure"
             } elseif ($notAssessableCount -eq 0) {
-                Show-Line "No computers with an outdated Microsoft operating system found" -Class "Secure"
+                Show-Line "Компьютеры с устаревшими версиями Windows не найдены" -Class "Secure"
             }
 
         } catch {

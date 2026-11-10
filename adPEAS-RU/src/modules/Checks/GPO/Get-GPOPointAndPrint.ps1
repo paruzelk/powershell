@@ -148,12 +148,12 @@ function Get-GPOPointAndPrint {
                 return
             }
 
-            Show-SubHeader "Analyzing Point and Print printer driver policies..." -ObjectType "PointAndPrintPolicy"
+            Show-SubHeader "Анализ политик установки драйверов принтеров Point and Print..." -ObjectType "PointAndPrintPolicy"
 
             $gpos = Get-DomainGPO @connectionParams
 
             if (-not $gpos) {
-                Show-Line "No GPOs found in domain" -Class Note
+                Show-Line "В домене не найдены объекты групповой политики (GPO)" -Class Note
                 return
             }
 
@@ -242,7 +242,7 @@ function Get-GPOPointAndPrint {
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class Hint
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
                     Show-Line "SYSVOL access failed - cannot analyze Point and Print policies - SMB access failed (authentication/network issue)" -Class Finding
                 }
@@ -254,9 +254,9 @@ function Get-GPOPointAndPrint {
                 # SYSVOL. It only holds if all of them were actually readable, and every
                 # policy file in them read and parsed.
                 if (Show-SYSVOLCoverageNote -FileFilter @('Registry.pol', 'Registry.xml', 'GptTmpl.inf')) {
-                    Show-Line "No Point and Print or printer driver policy was found in the GPO folders that could be read" -Class Note
+                    Show-Line "В доступных папках GPO не обнаружены настройки Point and Print или политики драйверов принтеров" -Class Note
                 } else {
-                    Show-Line "No GPO configures Point and Print or printer driver policies - the secure Windows default applies" -Class Secure
+                    Show-Line "GPO не задают политики Point and Print и драйверов принтеров; действуют безопасные параметры Windows по умолчанию" -Class Secure
                 }
                 return
             }
@@ -354,7 +354,7 @@ function Get-GPOPointAndPrint {
                 # nothing at all would read as a check that found no policies to look at.
                 Show-Line "No linked and enabled policy leaves printer driver installation open to non-administrators" -Class Secure
             } else {
-                Show-Line "No Point and Print configuration is deployed by a policy that is linked and enabled" -Class Note
+                Show-Line "Действующие привязанные GPO не задают настройки Point and Print" -Class Note
             }
 
             if ($exploitable.Count -gt 0) {

@@ -476,7 +476,7 @@
             $accountOperatorMembers = $null
 
             # ===== STEP 1: Query Domain-Specific Privileged Groups =====
-            Show-SubHeader "Searching for privileged group members..." -ObjectType "PrivilegedGroupMember"
+            Show-SubHeader "Поиск участников привилегированных групп..." -ObjectType "PrivilegedGroupMember"
 
             # Build credential params for recursive calls (only relevant params)
             $CredParams = @{}
@@ -1129,7 +1129,7 @@
             }
 
             # ===== STEP 5: Check AdminSDHolder ACLs =====
-            Show-SubHeader "Checking AdminSDHolder ACLs..." -ObjectType "AdminSDHolderACL"
+            Show-SubHeader "Проверка списков управления доступом объекта AdminSDHolder..." -ObjectType "AdminSDHolderACL"
 
             $AdminSDHolderFindings = @()
             # The template's rules, for step 5c; $null while it could not be read.
@@ -1513,10 +1513,10 @@
             if (-not $adminSDHolderRead) {
                 # Without this branch a failed read fell through to the Secure message
                 # below, so a blind check was indistinguishable from a clean one.
-                Show-Line "AdminSDHolder could not be read - its ACLs were not evaluated" -Class Finding
+                Show-Line "Не удалось прочитать AdminSDHolder; права доступа не оценены" -Class Finding
             }
             elseif (@($AdminSDHolderFindings).Count -eq 0) {
-                Show-Line "AdminSDHolder ACLs are secure" -Class Secure
+                Show-Line "Разрешения ACL на AdminSDHolder соответствуют безопасной конфигурации" -Class Secure
             }
 
             # ===== STEP 5b: The DACL of the privileged groups AdminSDHolder does not protect =====
@@ -1575,7 +1575,7 @@
             }
 
             # ===== STEP 6: Check Pre-Windows 2000 Compatible Access =====
-            Show-SubHeader "Checking Pre-Windows 2000 Compatible Access group..." -ObjectType "PreWindows2000Access"
+            Show-SubHeader "Проверка группы Pre-Windows 2000 Compatible Access..." -ObjectType "PreWindows2000Access"
 
             $PreWin2000Findings = @()
             $PreWin2000Rows = @()
@@ -1699,7 +1699,7 @@
                 if (-not $preWin2000Read) {
                     # A failed read used to fall through to the Secure message below, so a
                     # blind check looked exactly like a clean one.
-                    Show-Line "Pre-Windows 2000 Compatible Access group could not be read - its membership was not assessed" -Class Finding
+                    Show-Line "Не удалось прочитать состав Pre-Windows 2000 Compatible Access; членство не оценивалось" -Class Finding
                 }
                 elseif (@($PreWin2000Findings).Count -eq 0 -and @($PreWin2000Unresolved).Count -eq 0) {
                     Show-Line "No dangerous members in Pre-Windows 2000 Compatible Access group" -Class Secure
@@ -1710,7 +1710,7 @@
                 }
             } catch {
                 Write-Log "[Get-PrivilegedGroupMembers] Error checking Pre-Windows 2000 Compatible Access: $_" -Level Error
-                Show-Line "Pre-Windows 2000 Compatible Access group could not be read - its membership was not assessed" -Class Finding
+                Show-Line "Не удалось прочитать состав Pre-Windows 2000 Compatible Access; членство не оценивалось" -Class Finding
             }
 
         } catch {
@@ -1895,7 +1895,7 @@ function Show-UnprotectedGroupACL {
         [hashtable]$AdminSDExcludedGroups = @{}
     )
 
-    Show-SubHeader "Checking the ACLs of privileged groups AdminSDHolder does not protect..." -ObjectType 'PrivilegedGroupACL'
+    Show-SubHeader "Проверка ACL привилегированных групп вне защиты AdminSDHolder..." -ObjectType 'PrivilegedGroupACL'
 
     $accountOperatorsSID = 'S-1-5-32-548'
     $memberGUID = $Script:PropertyGUIDs['member']
@@ -2129,7 +2129,7 @@ function Show-UnprotectedGroupACL {
     if ($findingRows.Count -eq 0 -and $operatorRows.Count -eq 0 -and $hintRows.Count -eq 0) {
         if ($examinedGroups.Count -eq 0) {
             if ($unreadGroups.Count -eq 0) {
-                Show-Line "Every privileged group found is protected by AdminSDHolder" -Class Note
+                Show-Line "Все найденные привилегированные группы защищаются AdminSDHolder" -Class Note
             }
             return
         }
@@ -2326,7 +2326,7 @@ function Show-PrivilegedAccountACL {
         $AccountOperatorMembers
     )
 
-    Show-SubHeader "Checking the ACLs of privileged accounts..." -ObjectType 'PrivilegedAccountACL'
+    Show-SubHeader "Проверка ACL привилегированных учётных записей..." -ObjectType 'PrivilegedAccountACL'
 
     $accountOperatorsSID = 'S-1-5-32-548'
     $allowType = [System.Security.AccessControl.AccessControlType]::Allow

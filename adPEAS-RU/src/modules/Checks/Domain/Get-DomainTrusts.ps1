@@ -182,7 +182,7 @@ function Get-DomainTrusts {
                 return
             }
 
-            Show-SubHeader "Searching for domain trusts..." -ObjectType "DomainTrust"
+            Show-SubHeader "Поиск доверительных отношений домена..." -ObjectType "DomainTrust"
 
             $trustsRaw = Get-DomainObject -LDAPFilter "(objectClass=trustedDomain)" @PSBoundParameters
 

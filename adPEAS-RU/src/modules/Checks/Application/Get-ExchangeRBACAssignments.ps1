@@ -80,7 +80,7 @@
                 return
             }
 
-            Show-SubHeader "Checking Exchange management role assignments..." -ObjectType "ExchangeRoleAssignment"
+            Show-SubHeader "Проверка назначений ролей управления Exchange..." -ObjectType "ExchangeRoleAssignment"
 
             $configDN = $Script:LDAPContext.ConfigurationNamingContext
             $exchangeBase = "CN=Microsoft Exchange,CN=Services,$configDN"
@@ -96,7 +96,7 @@
             }
 
             if (@($exchangeOrgs).Count -eq 0) {
-                Show-Line "No Exchange Organization detected - no role assignments to analyze" -Class Note
+                Show-Line "Объект организации Exchange не найден; назначения ролей не анализировались" -Class Note
                 return
             }
 
@@ -145,7 +145,7 @@
             }
             catch {
                 Write-Log "[Get-ExchangeRBACAssignments] Error querying role assignments: $_" -Level Error
-                Show-Line "Exchange role assignments could not be read - result unknown, not empty" -Class Hint
+                Show-Line "Не удалось прочитать назначения ролей Exchange; отсутствие назначений не подтверждено" -Class Hint
                 return
             }
 
@@ -154,7 +154,7 @@
                 # of them, so none readable is a container this account may not see rather
                 # than an empty one. Measured with a domain user against Exchange SE, where
                 # the RBAC container is not readable.
-                Show-Line "No Exchange role assignment is readable by this account - result unknown, not empty" -Class Hint
+                Show-Line "Текущая учётная запись не может прочитать назначения ролей Exchange; результат неизвестен" -Class Hint
                 return
             }
 

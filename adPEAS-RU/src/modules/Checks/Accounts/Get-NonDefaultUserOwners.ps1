@@ -73,7 +73,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for users with non-default owners..." -ObjectType "NonDefaultOwner"
+            Show-SubHeader "Поиск пользовательских объектов с нестандартным владельцем..." -ObjectType "NonDefaultOwner"
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
@@ -212,7 +212,7 @@
                 if ($filteredHealthMailboxes -gt 0) {
                     Show-Line "All users have default owners (filtered $filteredHealthMailboxes Exchange Health Mailboxes)" -Class Secure
                 } else {
-                    Show-Line "All users have default owners" -Class Secure
+                    Show-Line "У всех пользователей стандартные владельцы" -Class Secure
                 }
             }
 

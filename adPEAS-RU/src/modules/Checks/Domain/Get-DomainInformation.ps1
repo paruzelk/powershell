@@ -345,7 +345,7 @@ function Get-DomainInformation {
             # SubCheck 1: Domain Information
             # Severity: Finding (Anonymous LDAP), Hint (old FL), Note (default)
             # ===================================================================
-            Show-SubHeader "Collecting domain information..." -ObjectType "DomainBasicInfo"
+            Show-SubHeader "Сбор сведений о домене..." -ObjectType "DomainBasicInfo"
 
             # Build functional level texts
             $DomainFuncLevelText = $DomainModeLevel[[int]$DomainFunc]
@@ -493,7 +493,7 @@ function Get-DomainInformation {
             }
 
             # Output domain info object
-            Show-Line "Found domain information:" -Class $domainInfoSeverity
+            Show-Line "Получены сведения о домене:" -Class $domainInfoSeverity
             $domainInfoObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DomainBasicInfo' -Force
             Show-Object $domainInfoObj -Class $domainInfoSeverity
 
@@ -501,7 +501,7 @@ function Get-DomainInformation {
             # SubCheck 2: Kerberos Policy
             # Severity: Finding (krbtgt > 365d), Hint (krbtgt > 180d), Note (default)
             # ===================================================================
-            Show-SubHeader "Analyzing Kerberos policy..." -ObjectType "KerberosPolicy"
+            Show-SubHeader "Анализ политики Kerberos..." -ObjectType "KerberosPolicy"
 
             # Build Kerberos policy values, from the [Kerberos Policy] section of the
             # domain-linked GPOs (Get-DomainKerberosPolicy). Not "the default" until
@@ -639,7 +639,7 @@ function Get-DomainInformation {
             }
 
             # Output Kerberos policy object
-            Show-Line "Found Kerberos policy:" -Class $kerberosSeverity
+            Show-Line "Обнаружена политика Kerberos:" -Class $kerberosSeverity
             $kerberosObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'KerberosPolicy' -Force
             Show-Object $kerberosObj -Class $kerberosSeverity
 
@@ -647,7 +647,7 @@ function Get-DomainInformation {
             # SubCheck 3: Guest Account Status
             # Severity: Finding (enabled + privileged), Hint (enabled), Secure (disabled)
             # ===================================================================
-            Show-SubHeader "Checking Guest Account Status..." -ObjectType "GuestAccount"
+            Show-SubHeader "Проверка состояния встроенной учётной записи «Гость»..." -ObjectType "GuestAccount"
 
             if ($GuestInfo) {
                 $statusText = if ($GuestInfo.Enabled) { "ENABLED" } else { "Disabled" }
@@ -681,7 +681,7 @@ function Get-DomainInformation {
                 Show-Object $guestObj -Class $guestClass
 
             } else {
-                Show-Line "Guest account not found (unusual - RID 501 should always exist)" -Class Hint
+                Show-Line "Учётная запись «Гость» не найдена: это нетипично, объект с RID 501 обычно существует" -Class Hint
             }
 
             # ===================================================================
@@ -692,7 +692,7 @@ function Get-DomainInformation {
             # Controller computer accounts under "Searching for Domain Controllers...", and
             # the report titles a card by the object type of its header - both sections
             # came out as "Domain Controllers" with the inventory's help text.
-            Show-SubHeader "Listing the Domain Controllers and their FSMO roles..." -ObjectType "DomainControllers"
+            Show-SubHeader "Перечисление контроллеров домена и распределения ролей FSMO..." -ObjectType "DomainControllers"
 
             # Query FSMO Roles first to associate with DCs
             $FSMORoles = @{}
@@ -784,7 +784,7 @@ function Get-DomainInformation {
             # SubCheck 5: Sites and Subnets
             # Severity: Hint (no subnets), Note (subnets found)
             # ===================================================================
-            Show-SubHeader "Searching for Sites and Subnets..." -ObjectType "SitesAndSubnets"
+            Show-SubHeader "Поиск сайтов и подсетей Active Directory..." -ObjectType "SitesAndSubnets"
 
             if (@($Sites).Count -gt 0) {
                 Show-Line "Found $(@($Sites).Count) site(s) and $(@($Subnets).Count) subnet(s):" -Class Note
@@ -816,7 +816,7 @@ function Get-DomainInformation {
                     Show-Object $siteObj -Class Note
                 }
             } else {
-                Show-Line "No AD sites found" -Class Hint
+                Show-Line "Сайты Active Directory не найдены" -Class Hint
             }
 
         } catch {

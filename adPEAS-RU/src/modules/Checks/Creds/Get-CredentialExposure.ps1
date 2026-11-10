@@ -912,7 +912,7 @@ function Get-CredentialExposure {
                         }
                     }
                     else {
-                        Show-Line "No available drive letter for UNC mapping" -Class "Finding"
+                        Show-Line "Нет свободной буквы диска для подключения UNC-ресурса" -Class "Finding"
                         return
                     }
                 }
@@ -1048,7 +1048,7 @@ function Get-CredentialExposure {
             $dcServer = $Script:LDAPContext.Server
 
             # ===== Single SYSVOL scan: Mount once, enumerate once, analyze all =====
-            Show-SubHeader "Searching for credentials in Group Policy files..." -ObjectType "GPPCredential"
+            Show-SubHeader "Поиск учётных данных в файлах групповых политик..." -ObjectType "GPPCredential"
 
             # Pre-load GPO linkage and name mapping (LDAP queries - must run before SMB block)
             $gpoLinkage = Get-GPOLinkage
@@ -1202,11 +1202,11 @@ function Get-CredentialExposure {
                         # preference file or a Registry.pol that was listed and not read.
                         $gppClass = "Secure"
                         if (Show-SYSVOLCoverageNote -FileFilter @('*.xml', 'Registry.pol')) { $gppClass = "Note" }
-                        Show-Line "No GPP credentials found in SYSVOL" -Class $gppClass
+                        Show-Line "Учётные данные GPP в SYSVOL не обнаружены" -Class $gppClass
                     }
 
                     # ===== Part 2: Sensitive Information Search (script/config files) =====
-                    Show-SubHeader "Searching for sensitive information in SYSVOL/NETLOGON..." -ObjectType "SYSVOLCredential"
+                    Show-SubHeader "Поиск чувствительных данных в SYSVOL и NETLOGON..." -ObjectType "SYSVOLCredential"
 
                     if ($scriptFiles.Count -gt 0) {
                         Write-Log "[Get-CredentialExposure] Analyzing $($scriptFiles.Count) script/config file(s)..."
@@ -1283,7 +1283,7 @@ function Get-CredentialExposure {
                         if ($sysvolFindingsCount -eq 0) {
                             $scriptClass = "Secure"
                             if (Show-SYSVOLCoverageNote -FileFilter $Script:CredentialScanExtensions) { $scriptClass = "Note" }
-                            Show-Line "No sensitive information found in SYSVOL/NETLOGON scripts" -Class $scriptClass
+                            Show-Line "В сценариях SYSVOL/NETLOGON не обнаружены чувствительные данные" -Class $scriptClass
                         }
                     }
                     else {
@@ -1291,7 +1291,7 @@ function Get-CredentialExposure {
                         # allowed to look everywhere.
                         $scriptClass = "Secure"
                         if (Show-SYSVOLCoverageNote -FileFilter $Script:CredentialScanExtensions) { $scriptClass = "Note" }
-                        Show-Line "No sensitive information found in SYSVOL/NETLOGON scripts" -Class $scriptClass
+                        Show-Line "В сценариях SYSVOL/NETLOGON не обнаружены чувствительные данные" -Class $scriptClass
                     }
                 }
             }
@@ -1302,7 +1302,7 @@ function Get-CredentialExposure {
 
             if (-not $sysvolAccessible) {
                 if ((Test-SysvolAccessible) -eq $false) {
-                    Show-Line "Skipped - SYSVOL not accessible" -Class "Hint"
+                    Show-Line "Пропущено: SYSVOL недоступен" -Class "Hint"
                 } else {
                     Show-Line "SYSVOL access failed - credentials were not searched for" -Class "Finding"
                 }

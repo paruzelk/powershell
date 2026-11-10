@@ -78,7 +78,7 @@
                 return
             }
 
-            Show-SubHeader "Checking who may change the logon scripts accounts run..." -ObjectType "LogonScriptPermission"
+            Show-SubHeader "Проверка прав изменения сценариев входа пользователей..." -ObjectType "LogonScriptPermission"
 
             if ($OPSEC) {
                 Show-Line "OPSEC mode: Skipping the logon scripts of accounts (reading their permissions takes an SMB connection to NETLOGON)" -Class "Hint"

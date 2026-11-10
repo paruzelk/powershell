@@ -55,7 +55,7 @@
                 return
             }
 
-            Show-SubHeader "Searching for accounts with RBCD configured..." -ObjectType "RBCDelegation"
+            Show-SubHeader "Поиск учётных записей с настроенным делегированием на основе ресурса (RBCD)..." -ObjectType "RBCDelegation"
 
             $rbcdComputers = @(Get-DomainComputer -RBCD -Enabled -ShowOwner @PSBoundParameters)
             $rbcdUsers = @(Get-DomainUser -RBCD -Enabled -ShowOwner @PSBoundParameters)
@@ -68,7 +68,7 @@
             $rbcdAccounts = $rbcdComputers + $rbcdUsers + $rbcdMSAs
 
             if (@($rbcdAccounts).Count -eq 0) {
-                Show-Line "No accounts with Resource-Based Constrained Delegation found" -Class "Secure"
+                Show-Line "Учётные записи с RBCD не найдены" -Class "Secure"
                 return
             }
 
@@ -101,7 +101,7 @@
                 Write-Log "[Get-ResourceBasedConstrainedDelegation] Domain controllers could not be enumerated: $_" -Level Warning
             }
             if ($dcIdentity.Count -eq 0) {
-                Show-Line "Domain Controllers could not be enumerated - RBCD targets are not checked against them" -Class "Note"
+                Show-Line "Не удалось перечислить контроллеры домена; цели RBCD не были с ними сопоставлены" -Class "Note"
             }
 
             foreach ($account in $rbcdAccounts) {

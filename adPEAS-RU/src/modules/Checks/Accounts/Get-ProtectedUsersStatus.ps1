@@ -81,7 +81,7 @@
                 return
             }
 
-            Show-SubHeader "Analyzing Protected Users coverage for Tier-0 accounts..." -ObjectType "Tier0Account"
+            Show-SubHeader "Проверка включения записей Tier 0 в группу Protected Users..." -ObjectType "Tier0Account"
 
             $domainDN = $Script:LDAPContext.DomainDN
             $domainSID = $Script:LDAPContext.DomainSID

@@ -74,7 +74,7 @@
                 return
             }
 
-            Show-SubHeader "Analyzing the ACLs of the schema, the configuration, the partitions, the role objects and the sites..." -ObjectType "CriticalObjectACL"
+            Show-SubHeader "Анализ ACL схемы, конфигурации, разделов каталога, объектов ролей и сайтов..." -ObjectType "CriticalObjectACL"
 
             $targets = @()
             if ($Script:LDAPContext.SchemaNamingContext) {

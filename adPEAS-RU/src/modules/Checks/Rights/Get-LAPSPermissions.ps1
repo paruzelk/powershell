@@ -64,7 +64,7 @@
                 return
             }
 
-            Show-SubHeader "Analyzing LAPS read permissions by OU..." -ObjectType "LAPSPermission"
+            Show-SubHeader "Проверка прав чтения паролей LAPS по организационным единицам..." -ObjectType "LAPSPermission"
 
             # One definition of "does this domain run LAPS", shared with
             # Get-LAPSConfiguration and Get-LAPSCredentialAccess and cached for the session.
@@ -73,7 +73,7 @@
             $windowsLAPSSchemaPresent = $lapsSchema.NativePresent
 
             if (-not $lapsLegacySchemaPresent -and -not $windowsLAPSSchemaPresent) {
-                Show-Line "No LAPS schema found" -Class Note
+                Show-Line "Атрибуты схемы LAPS не найдены" -Class Note
                 return
             }
 
@@ -556,7 +556,7 @@
                 }
 
             } elseif ($totalOUs -gt 0 -and $readOUs -le 0) {
-                Show-Line "LAPS read permissions were not evaluated - no security descriptor could be read" -Class Note
+                Show-Line "Права чтения LAPS не проверены: не удалось прочитать ни одного дескриптора безопасности" -Class Note
             } else {
                 Show-Line "No non-privileged accounts with LAPS read access found in the $readScope analyzed" -Class $conclusionClass
             }
