@@ -1,3 +1,9 @@
+## 2.6.5-BW4k7v2a6 — original failed synthetic Draft Body mismatch fingerprint, read-only (DEV, 2026-11-10)
+
+- Live BW4k7v2a5 reported exact original SuiteId `7451b8f5-6404-4496-ae7b-5b1cdfb9063a`, `OriginalIntentSha256=d31a549a4b9baca30a9bcce661230d2f545b1e538d7da4bbccf1a33f6b16e1f8`, source exact subject one, target zero, matching parent/ID and **BodyMatchesExpected=False**. Its prior read-only classifier did not include Body mismatch in status: this stage rectifies that gap without modifying old files.
+- Strict original intent SHA pin, only default Drafts original exact synthetic, target fresh PST fixture empty. Read original plaintext Body and independently reopen exact EntryID; compute **SHA256, UTF8 byte lengths, UTF16 code units, CRLF/lone CR/lone LF counts, prefix length, line-ending/trailing-whitespace/suffix classification**. Do not print actual Body, signature, message text or excerpts.
+- Regardless of cause, every Body mismatch remains SEM-001 blocked and the historical SuiteId never receives Move/Save/retry or archive/resume/auto permission. 34 new tests, full **3546 Pester / 120 containers**, Windows PowerShell 5.1, PSScriptAnalyzer, UTF8 BOM, strict JSON and inherited BW4j6 matrix gates.
+
 ## 2.6.5-BW4k7v2a5 — read-only failed CreatePilot count forensics (DEV, 2026-11-10)
 
 - Actual operator BW4k7v2a4 `CreatePilot` failed immediately after Save at source one/target zero exact-subject count gate; original fresh Draft parent already verified, but the old code did not separately report `Restrict.Count` or PowerShell pipeline output count. The new original SuiteId `7451b8f5-6404-4496-ae7b-5b1cdfb9063a` and all prior historical fixtures are quarantined from retries.
