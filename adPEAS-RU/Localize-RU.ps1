@@ -165,3 +165,6 @@ foreach($f in $maps.PSObject.Properties){
 if(-not $?){throw 'Ошибка локализации справочников HTML'}
 & (Join-Path $PSScriptRoot 'Localization/Apply-TooltipUI.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации подсказок HTML'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-CheckHeaders.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации заголовков модулей'}
