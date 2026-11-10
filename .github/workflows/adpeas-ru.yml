@@ -32,10 +32,16 @@ jobs:
           $ErrorActionPreference = "Stop"
           .\adPEAS-RU\Tests\Invoke-CI.ps1
           .\adPEAS-RU\Tests\Test-Import.ps1
-      - name: JavaScript syntax check
+      - name: JavaScript template syntax check
         shell: pwsh
         run: |
-          node --check .\adPEAS-RU\src\modules\Reporting\templates\report-scripts.js
+          $jsPath = ".\adPEAS-RU\src\modules\Reporting\templates\report-scripts.js"
+          $source = Get-Content -LiteralPath $jsPath -Raw -Encoding UTF8
+          # Report JS contains literal {{PLACEHOLDERS}} until Export-HTMLReport expands them.
+          $runnable = [regex]::Replace($source, '\{\{[A-Z0-9_]+\}\}', 'null')
+          $tempJs = Join-Path $env:RUNNER_TEMP "adpeas-expanded-report-check.js"
+          [IO.File]::WriteAllText($tempJs, $runnable, (New-Object System.Text.UTF8Encoding($false)))
+          node --check $tempJs
       - name: Upload full source and build artifacts
         uses: actions/upload-artifact@v4
         with:
