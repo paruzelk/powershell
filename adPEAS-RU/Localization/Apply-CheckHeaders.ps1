@@ -29,8 +29,11 @@ foreach($file in @(Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.ps
  }
  if($dst -ne $src){[IO.File]::WriteAllText($file.FullName,$dst,$utf8)}
 }
-if($seen.Count -ne @($dictionary.PSObject.Properties).Count){
- $missing=@($dictionary.PSObject.Properties.Name | Where-Object {-not $seen.ContainsKey($_)})
+$expected=@()
+foreach($p in $dictionary.PSObject.Properties){$expected += [string]$p.Name}
+$missing=@()
+foreach($name in $expected){if(-not $seen.ContainsKey($name)){$missing += $name}}
+if($missing.Count -gt 0){
  throw ('Часть заголовков не найдена: '+($missing -join ', '))
 }
 Write-Host "[RU] PASS: $($seen.Count) заголовков реальных проверок локализованы"
