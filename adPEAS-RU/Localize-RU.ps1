@@ -171,3 +171,9 @@ if(-not $?){throw 'Ошибка локализации заголовков мо
 
 & (Join-Path $PSScriptRoot 'Localization/Apply-CheckLines.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации сообщений проверок'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-ReportCards.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка перевода названий карточек и прав Windows'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-TopActions.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации приоритетных действий'}
