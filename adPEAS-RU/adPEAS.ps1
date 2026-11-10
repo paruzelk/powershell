@@ -3,8 +3,8 @@
     adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
 
 .DESCRIPTION
-    Build: 2026-11-10 13:30:48
-    Version: 2.9.0+20261110-1330
+    Build: 2026-11-10 13:37:22
+    Version: 2.9.0+20261110-1337
 
     AUTHORIZED SECURITY TESTING ONLY!
 
@@ -121695,7 +121695,7 @@ function Get-DangerousACLs {
             # ===== Step 4: Output findings with full AD objects =====
             # DCSync findings
             if (@($dcsyncFindings).Count -gt 0) {
-                $countText = if ($IncludePrivileged) { "$(@($dcsyncFindings).Count) account(s)" } else { "$(@($dcsyncFindings).Count) non-privileged account(s)" }
+                $countText = if ($IncludePrivileged) { "$(@($dcsyncFindings).Count)" } else { "$(@($dcsyncFindings).Count) (непривилегированные)" }
                 Show-Line "Обнаружены субъекты с правами DCSync: $countText" -Class Finding
 
                 foreach ($finding in $dcsyncFindings) {
@@ -121729,7 +121729,7 @@ function Get-DangerousACLs {
 
             # Dangerous rights findings
             if (@($dangerousRightsFindings).Count -gt 0) {
-                $countText = if ($IncludePrivileged) { "$(@($dangerousRightsFindings).Count) account(s)" } else { "$(@($dangerousRightsFindings).Count) non-privileged account(s)" }
+                $countText = if ($IncludePrivileged) { "$(@($dangerousRightsFindings).Count)" } else { "$(@($dangerousRightsFindings).Count) (непривилегированные)" }
                 Show-Line "Обнаружены субъекты с опасными правами на корневой объект домена: $countText" -Class Finding
 
                 foreach ($finding in $dangerousRightsFindings) {
@@ -157785,7 +157785,7 @@ function Collect-BHIssuancePolicies {
 #Requires -Version 5.1
 
 # ===== Script Variables =====
-$Script:adPEASVersion = "2.9.0+20261110-1330"
+$Script:adPEASVersion = "2.9.0+20261110-1337"
 
 # Handle ScriptPath for different execution contexts:
 # - Normal: $MyInvocation.MyCommand.Path is set

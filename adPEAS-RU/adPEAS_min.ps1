@@ -76915,7 +76915,7 @@ function Get-DangerousACLs {
                 }
             }
             if (@($dcsyncFindings).Count -gt 0) {
-                $countText = if ($IncludePrivileged) { "$(@($dcsyncFindings).Count) account(s)" } else { "$(@($dcsyncFindings).Count) non-privileged account(s)" }
+                $countText = if ($IncludePrivileged) { "$(@($dcsyncFindings).Count)" } else { "$(@($dcsyncFindings).Count) (непривилегированные)" }
                 Show-Line "Обнаружены субъекты с правами DCSync: $countText" -Class Finding
                 foreach ($finding in $dcsyncFindings) {
                     $sidHex = ConvertTo-LDAPSIDHex -SID $finding.SID
@@ -76942,7 +76942,7 @@ function Get-DangerousACLs {
                 }
             }
             if (@($dangerousRightsFindings).Count -gt 0) {
-                $countText = if ($IncludePrivileged) { "$(@($dangerousRightsFindings).Count) account(s)" } else { "$(@($dangerousRightsFindings).Count) non-privileged account(s)" }
+                $countText = if ($IncludePrivileged) { "$(@($dangerousRightsFindings).Count)" } else { "$(@($dangerousRightsFindings).Count) (непривилегированные)" }
                 Show-Line "Обнаружены субъекты с опасными правами на корневой объект домена: $countText" -Class Finding
                 foreach ($finding in $dangerousRightsFindings) {
                     $sidHex = ConvertTo-LDAPSIDHex -SID $finding.SID
@@ -100676,7 +100676,7 @@ function Collect-BHIssuancePolicies {
     return $bhPolicies
 }
 #Requires -Version 5.1
-$Script:adPEASVersion = "2.9.0+20261110-1330"
+$Script:adPEASVersion = "2.9.0+20261110-1337"
 if ($MyInvocation.MyCommand.Path) {
     $Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {
