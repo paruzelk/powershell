@@ -11,9 +11,11 @@ param([Parameter(Mandatory=$true)][string]$ProjectRoot)
 Set-StrictMode -Off
 $ErrorActionPreference='Stop'
 $path=Join-Path $ProjectRoot 'src/modules/Reporting/templates/report-scripts.js'
-$js=[IO.File]::ReadAllText($path,[Text.Encoding]::UTF8)
+$js=[IO.File]::ReadAllText($path,[Text.Encoding]::UTF8).Replace("`r`n","`n")
 $changes=0
 function Change-Exact([string]$Before,[string]$After){
+ $Before=$Before.Replace("`r`n","`n")
+ $After=$After.Replace("`r`n","`n")
  if(-not $script:js.Contains($Before)){throw "Не найден ожидаемый фрагмент JS: $($Before.Substring(0,[Math]::Min(85,$Before.Length)))"}
  $script:js=$script:js.Replace($Before,$After)
  $script:changes++
