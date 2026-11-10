@@ -1,3 +1,9 @@
+## 2.6.5-BW4k7v2a5 — read-only failed CreatePilot count forensics (DEV, 2026-11-10)
+
+- Actual operator BW4k7v2a4 `CreatePilot` failed immediately after Save at source one/target zero exact-subject count gate; original fresh Draft parent already verified, but the old code did not separately report `Restrict.Count` or PowerShell pipeline output count. The new original SuiteId `7451b8f5-6404-4496-ae7b-5b1cdfb9063a` and all prior historical fixtures are quarantined from retries.
+- New **read-only** exact source/target folder diagnostic independently records bounded full Items.Count, direct Subject equality, Restrict.Count, enumerated Restrict count, matching synthetic subject by-ID/Body/To identity and original CreateIntent SHA256. Does not claim the original transient post-Save predicate was proved.
+- No PST attachments, Save, Move, Send, Delete, evidence-file mutation or production worker. 32 new Pester cases; full 3512 tests / 119 containers plus inherited Windows PowerShell 5.1, PSScriptAnalyzer, JSON, UTF-8 BOM and BW4j6 matrix gates.
+
 ## 2.6.5-BW4k7v2a4 — One-shot controlled synthetic Outlook Move from default Drafts to new test PST (DEV, 2026-11-10)
 
 - Actual operator BW4k7v2a3 observed one original pilot in default `\\bogoderov_e@stios.ru\Drafts` (store 1 of 9), verified independent GetItemFromID, none in the expected test PST. Old SuiteId `2c15cb7c-4c09-4bcf-bca1-9fec458af3a5` and all forensic claims quarantined unchanged.
