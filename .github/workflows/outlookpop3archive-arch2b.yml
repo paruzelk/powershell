@@ -1817,7 +1817,7 @@ jobs:
              if($mover -cnotmatch [regex]::Escape($token)){$bad.Add(('mover '+$token))}
           }
           foreach($token in @('[object]$SemanticWitness',
-             "$stepEntry['SourceSemanticWitness']",
+             'SourceSemanticWitness',
              "PSBoundParameters.ContainsKey('SemanticWitness')")){
              if($transaction -cnotmatch [regex]::Escape($token)){$bad.Add(('journal '+$token))}
           }
