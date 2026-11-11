@@ -1543,11 +1543,10 @@ jobs:
              if($t -cnotmatch [regex]::Escape($token)){$bad.Add(('Pester '+$token))}
           }
           foreach($token in @('3625 Pester tests in 122 containers',
-              '9 (\x600x09\x60) → 25',
-              '1952 → 2076','Original source',
+              'MSGFLAG_HASATTACH',
+              '1952','2076','Original source',
               'PR_HASATTACH','Attachments.Count',
               'SEM-001','no Outlook COM')){
-             if($token -like '*x09*'){continue}
              if($d -cnotmatch [regex]::Escape($token)){$bad.Add(('docs '+$token))}
           }
           if([bool]$m.Integration.ArchiveWorkerEnabled -or
