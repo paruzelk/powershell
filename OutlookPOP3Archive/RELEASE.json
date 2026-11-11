@@ -12,6 +12,8 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH2b DEV: real core MailMover captures original saved source Body/HTML/recipients/state/attachment-bytes SHA witness BEFORE claimed Move; no raw user mail in journal.",
+    "ARCH2b DEV: original journal witness joined with completion in ArchiveVerifier; both main Archive/Resume invoke RequireSemanticWitness, MailItem.Size only diagnostic; DEV writers still closed.",
     "ARCH2a DEV: main legacy Move Started checkpoint and force-flush before Outlook COM, failed COM means Move Indeterminate and immediate STOP; no skip/retry.",
     "ARCH2a DEV: full original step journal check before Resume, reject unresolved or truncated claims; Archive/Resume/Auto closed until ARCH2b integrates BW4k semantic/verifier into main runtime.",
     "ARCH1 persistent COM provider boundary ADR, handoff, delivery roadmap; stop new Size/FLAGS-only MAPI research.",
@@ -65,8 +67,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 124,
-    "ExpectedPesterTests": 3709,
+    "ExpectedTestContainers": 125,
+    "ExpectedPesterTests": 3754,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -640,6 +642,19 @@
     "ARCH2aCopyVerifyDeleteProven": false,
     "ARCH2aAnyActualOutlookMoveExecutedInCI": false,
     "ARCH2aProductionWriterEnabled": false,
-    "ARCH2aSafeFor90GBProduction": false
+    "ARCH2aSafeFor90GBProduction": false,
+    "ARCH2bExistingMainMoverCapturesActualSavedSourceWitness": true,
+    "ARCH2bMoveStartedPersistsSourceWitnessBeforeCom": true,
+    "ARCH2bOriginalJournalWitnessJoinedWithCompletion": true,
+    "ARCH2bMainVerifierRequiresOriginalWitness": true,
+    "ARCH2bUserBodyHtmlRecipientsStateCompared": true,
+    "ARCH2bAttachmentPayloadByteSha256Compared": true,
+    "ARCH2bProviderMailItemSizeDiagnosticOnly": true,
+    "ARCH2bUnsupportedAttachmentsFailClosed": true,
+    "ARCH2bOldOneShotClaimsNeverRetried": true,
+    "ARCH2bRealOutlookEndToEndCertified": false,
+    "ARCH2bProductionWriterEnabled": false,
+    "ARCH2bLargeAndEmbeddedAttachmentsCertified": false,
+    "ARCH2bSafeFor90GBProduction": false
   }
 }
