@@ -4752,15 +4752,15 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Enable AES encryption for the service account"
+                Description = "Включить шифрование AES для учётной записи службы"
                 Command = "Set-ADUser -Identity 'SERVICE_ACCOUNT' -KerberosEncryptionType AES128,AES256"
             }
             @{
-                Description = "Set a strong random password (25+ chars)"
+                Description = "Задать надёжный случайный пароль длиной не менее 25 символов"
                 Command = "`$NewPwd = [System.Web.Security.Membership]::GeneratePassword(25,5); Set-ADAccountPassword -Identity 'SERVICE_ACCOUNT' -NewPassword (ConvertTo-SecureString `$NewPwd -AsPlainText -Force)"
             }
             @{
-                Description = "Remove the SPN if the service is no longer needed"
+                Description = "Удалить SPN, если служба больше не используется"
                 Command = "Set-ADUser -Identity 'SERVICE_ACCOUNT' -ServicePrincipalNames @{Remove='SPN_VALUE'}"
             }
         )
@@ -4802,11 +4802,11 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Enable Kerberos pre-authentication for the account"
+                Description = "Включить предварительную проверку подлинности Kerberos для учётной записи"
                 Command = "Set-ADAccountControl -Identity 'USERNAME' -DoesNotRequirePreAuth `$false"
             }
             @{
-                Description = "Find all accounts with pre-auth disabled"
+                Description = "Найти все учётные записи с отключённой предварительной проверкой Kerberos"
                 Command = "Get-ADUser -Filter {DoesNotRequirePreAuth -eq `$true} -Properties DoesNotRequirePreAuth"
             }
         )
@@ -4844,7 +4844,7 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Find the accounts without pre-authentication"
+                Description = "Найти учётные записи, не требующие предварительной проверки Kerberos"
                 Command = "Get-ADUser -Filter {DoesNotRequirePreAuth -eq `$true} -Properties DoesNotRequirePreAuth | Select-Object Name,SamAccountName"
             }
         )
@@ -4883,19 +4883,19 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Crack Kerberoast hash (RC4/NTLM)"
+                Description = "Проверить стойкость хеша Kerberoast (RC4/NTLM)"
                 Command = "hashcat -m 13100 -a 0 hash.txt wordlist.txt -r rules/best64.rule"
             }
             @{
-                Description = "Crack Kerberoast hash (AES256)"
+                Description = "Проверить стойкость хеша Kerberoast (AES256)"
                 Command = "hashcat -m 19700 -a 0 hash.txt wordlist.txt -r rules/best64.rule"
             }
             @{
-                Description = "Crack AS-REP hash"
+                Description = "Проверить стойкость хеша AS-REP"
                 Command = "hashcat -m 18200 -a 0 hash.txt wordlist.txt -r rules/best64.rule"
             }
             @{
-                Description = "Using John the Ripper"
+                Description = "Проверка с помощью John the Ripper"
                 Command = "john --wordlist=wordlist.txt --rules=best64 hash.txt"
             }
         )
@@ -4938,11 +4938,11 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Reset krbtgt password (use Microsoft script for production)"
+                Description = "Сбросить пароль krbtgt (в рабочей среде используйте скрипт Microsoft)"
                 Command = "Set-ADAccountPassword -Identity 'krbtgt' -Reset -NewPassword (ConvertTo-SecureString -AsPlainText 'NewRandomPassword123!' -Force)"
             }
             @{
-                Description = "Check krbtgt last password change"
+                Description = "Проверить дату последней смены пароля krbtgt"
                 Command = "Get-ADUser krbtgt -Properties PasswordLastSet | Select-Object Name, PasswordLastSet"
             }
         )
@@ -4984,23 +4984,23 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Disable Guest account via PowerShell"
+                Description = "Отключить учётную запись «Гость» через PowerShell"
                 Command = "Disable-ADAccount -Identity 'Guest'"
             }
             @{
-                Description = "Verify Guest account is disabled"
+                Description = "Убедиться, что учётная запись «Гость» отключена"
                 Command = "Get-ADUser -Identity 'Guest' -Properties Enabled | Select-Object Name,Enabled,SID"
             }
             @{
-                Description = "Disable Guest account via Group Policy (domain-wide enforcement)"
-                Command = "# In Group Policy Management: Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > Security Options > 'Accounts: Guest account status' = Disabled"
+                Description = "Отключить «Гостя» через групповую политику во всём домене"
+                Command = "# GPMC → Конфигурация компьютера → Политики → Параметры Windows → Безопасность → Локальные политики → Параметры безопасности → «Учётные записи: состояние Гостя» = Отключена"
             }
             @{
-                Description = "Remove Guest account from all group memberships"
+                Description = "Удалить учётную запись «Гость» из всех групп"
                 Command = "Get-ADUser -Identity 'Guest' -Properties MemberOf | Select-Object -ExpandProperty MemberOf | ForEach-Object { Remove-ADGroupMember -Identity `$_ -Members 'Guest' -Confirm:`$false }"
             }
             @{
-                Description = "Check for permissions explicitly granted to Guest account"
+                Description = "Проверить разрешения, непосредственно выданные учётной записи «Гость»"
                 Command = "(Get-Acl 'AD:\DC=domain,DC=com').Access | Where-Object {`$_.IdentityReference -like '*Guest*'} | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
         )
@@ -5070,19 +5070,19 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Remove unconstrained delegation from computer"
+                Description = "Отключить неограниченное делегирование для компьютера"
                 Command = "Set-ADComputer -Identity 'COMPUTERNAME' -TrustedForDelegation `$false"
             }
             @{
-                Description = "Add admin account to Protected Users group"
+                Description = "Добавить административную учётную запись в группу Protected Users"
                 Command = "Add-ADGroupMember -Identity 'Protected Users' -Members 'ADMIN_ACCOUNT'"
             }
             @{
-                Description = "Make account sensitive (cannot be delegated)"
+                Description = "Отметить учётную запись как конфиденциальную: делегирование запрещено"
                 Command = "Set-ADUser -Identity 'ADMIN_ACCOUNT' -AccountNotDelegated `$true"
             }
             @{
-                Description = "Disable Print Spooler on Domain Controller"
+                Description = "Отключить службу диспетчера печати на контроллере домена"
                 Command = "Invoke-Command -ComputerName 'DC_NAME' -ScriptBlock { Stop-Service Spooler; Set-Service Spooler -StartupType Disabled }"
             }
         )
@@ -5122,15 +5122,15 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Add a privileged account to Protected Users, so its TGT is never forwarded"
+                Description = "Добавить привилегированную учётную запись в Protected Users, чтобы её TGT не передавался при делегировании"
                 Command = "Add-ADGroupMember -Identity 'Protected Users' -Members 'ADMIN_ACCOUNT'"
             }
             @{
-                Description = "Mark an account as sensitive and not delegatable"
+                Description = "Запретить делегирование конфиденциальной учётной записи"
                 Command = "Set-ADUser -Identity 'ADMIN_ACCOUNT' -AccountNotDelegated `$true"
             }
             @{
-                Description = "Disable the Print Spooler on a domain controller"
+                Description = "Отключить диспетчер печати на контроллере домена"
                 Command = "Invoke-Command -ComputerName 'DC_NAME' -ScriptBlock { Stop-Service Spooler; Set-Service Spooler -StartupType Disabled }"
             }
         )
@@ -5168,15 +5168,15 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Mark an account as sensitive and not delegatable"
+                Description = "Запретить делегирование конфиденциальной учётной записи"
                 Command = "Set-ADUser -Identity 'ADMIN_ACCOUNT' -AccountNotDelegated `$true"
             }
             @{
-                Description = "Add a privileged user to Protected Users"
+                Description = "Добавить привилегированного пользователя в Protected Users"
                 Command = "Add-ADGroupMember -Identity 'Protected Users' -Members 'ADMIN_ACCOUNT'"
             }
             @{
-                Description = "List the accounts with adminCount that can still be delegated"
+                Description = "Найти учётные записи с adminCount, для которых делегирование остаётся разрешённым"
                 Command = "Get-ADUser -LDAPFilter '(&(adminCount=1)(!(userAccountControl:1.2.840.113556.1.4.803:=1048576)))' | Select-Object SamAccountName"
             }
         )
@@ -5214,15 +5214,15 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Disable protocol transition (TrustedToAuthForDelegation flag)"
+                Description = "Отключить переход между протоколами (флаг TrustedToAuthForDelegation)"
                 Command = "Set-ADAccountControl -Identity 'ACCOUNT_NAME' -TrustedToAuthForDelegation `$false"
             }
             @{
-                Description = "Find all accounts with protocol transition enabled"
+                Description = "Найти все учётные записи с включённым переходом между протоколами"
                 Command = "Get-ADObject -LDAPFilter '(userAccountControl:1.2.840.113556.1.4.803:=16777216)' -Properties userAccountControl,servicePrincipalName,msDS-AllowedToDelegateTo"
             }
             @{
-                Description = "Enable auditing for Kerberos service ticket operations"
+                Description = "Включить аудит операций с билетами служб Kerberos"
                 Command = "auditpol /set /subcategory:'Kerberos Service Ticket Operations' /success:enable /failure:enable"
             }
         )
@@ -5260,11 +5260,11 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Show the status and the links of the GPO"
+                Description = "Показать состояние и привязки групповой политики"
                 Command = "Get-GPO -Name 'GPO_NAME' | Select-Object DisplayName,GpoStatus; Get-GPOReport -Name 'GPO_NAME' -ReportType Xml"
             }
             @{
-                Description = "Delete a GPO that is no longer needed"
+                Description = "Удалить больше не нужную групповую политику"
                 Command = "Remove-GPO -Name 'GPO_NAME'"
             }
         )
@@ -5331,15 +5331,15 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Show the SPNs and the group memberships of the account"
+                Description = "Показать SPN и членство учётной записи в группах"
                 Command = "Get-ADUser -Identity 'ACCOUNT_NAME' -Properties servicePrincipalName,memberOf,userAccountControl,pwdLastSet"
             }
             @{
-                Description = "Remove the SPN that makes the account kerberoastable"
+                Description = "Удалить SPN, из-за которого учётная запись уязвима к Kerberoasting"
                 Command = "Set-ADUser -Identity 'ACCOUNT_NAME' -ServicePrincipalNames @{Remove='SERVICE/HOST'}"
             }
             @{
-                Description = "Require Kerberos pre-authentication again"
+                Description = "Вновь потребовать предварительную проверку Kerberos"
                 Command = "Set-ADAccountControl -Identity 'ACCOUNT_NAME' -DoesNotRequirePreAuth `$false"
             }
         )
@@ -5380,11 +5380,11 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Show the current delegation targets of the account"
+                Description = "Показать текущие цели делегирования учётной записи"
                 Command = "Get-ADObject -Identity 'ACCOUNT_DN' -Properties msDS-AllowedToDelegateTo | Select-Object -ExpandProperty msDS-AllowedToDelegateTo"
             }
             @{
-                Description = "Remove all delegation targets from the account"
+                Description = "Удалить все цели делегирования учётной записи"
                 Command = "Set-ADObject -Identity 'ACCOUNT_DN' -Clear msDS-AllowedToDelegateTo"
             }
         )
@@ -5423,11 +5423,11 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Clear protocol transition on the account"
+                Description = "Сбросить флаг перехода между протоколами для учётной записи"
                 Command = "Set-ADAccountControl -Identity 'ACCOUNT_NAME' -TrustedToAuthForDelegation `$false"
             }
             @{
-                Description = "Find every account carrying the flag without a target list"
+                Description = "Найти все учётные записи с этим флагом, но без списка целей"
                 Command = "Get-ADObject -LDAPFilter '(&(userAccountControl:1.2.840.113556.1.4.803:=16777216)(!(msDS-AllowedToDelegateTo=*)))' -Properties userAccountControl"
             }
         )
@@ -5465,19 +5465,19 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "View current RBCD configuration for a computer"
+                Description = "Показать текущие настройки RBCD у компьютера"
                 Command = "Get-ADComputer 'COMPUTERNAME' -Properties msDS-AllowedToActOnBehalfOfOtherIdentity,PrincipalsAllowedToDelegateToAccount | Select-Object Name,@{Name='AllowedPrincipals';Expression={`$_.PrincipalsAllowedToDelegateToAccount}}"
             }
             @{
-                Description = "Remove ALL RBCD delegation from a computer (complete removal)"
+                Description = "Полностью удалить все настройки делегирования RBCD у компьютера"
                 Command = "Set-ADComputer 'COMPUTERNAME' -Clear 'msDS-AllowedToActOnBehalfOfOtherIdentity'"
             }
             @{
-                Description = "Remove ALL RBCD delegation using friendly property name"
+                Description = "Удалить все настройки RBCD через понятное имя свойства"
                 Command = "Set-ADComputer 'COMPUTERNAME' -PrincipalsAllowedToDelegateToAccount `$null"
             }
             @{
-                Description = "Find all computers with RBCD configured"
+                Description = "Найти компьютеры с настроенным RBCD"
                 Command = "Get-ADComputer -Filter {msDS-AllowedToActOnBehalfOfOtherIdentity -like '*'} -Properties msDS-AllowedToActOnBehalfOfOtherIdentity,PrincipalsAllowedToDelegateToAccount | Select-Object Name,DNSHostName,@{Name='AllowedPrincipals';Expression={`$_.PrincipalsAllowedToDelegateToAccount}}"
             }
         )
@@ -5522,54 +5522,54 @@ $Script:FindingDefinitions = @{
         )
         RemediationCommands = @(
             @{
-                Description = "Remove both enrollee-supplied-subject flags from the template (requires Enterprise Admin)"
+                Description = "Удалить оба флага, разрешающих заявителю указать субъект сертификата (требуются права Enterprise Admins)"
                 Command = @'
-# Get template DN (replace 'VulnerableTemplate' with actual template name)
+# Получить DN шаблона (замените VulnerableTemplate на реальное имя шаблона)
 $templateName = "VulnerableTemplate"
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateDN = "CN=$templateName,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Get current flag value
+# Прочитать текущее значение флагов
 $template = Get-ADObject -Identity $templateDN -Properties msPKI-Certificate-Name-Flag
 $currentFlag = $template.'msPKI-Certificate-Name-Flag'
 
-# Remove CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT (0x00000001) and
-# CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT_ALT_NAME (0x00010000).
+# Убрать флаг CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT (0x00000001) и
+# флаг CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT_ALT_NAME (0x00010000).
 #
-# Both are ESC1: whoever may supply the SAN writes another account's UPN into it.
-# This command used to clear 0x1 alone, so a template flagged for the SAN variant was
-# reported as remediated and stayed exactly as exploitable as before.
+# Оба связаны с ESC1: заявитель может указать в SAN чужой UPN.
+# Прежняя команда удаляла только 0x1, поэтому при включённом варианте SAN
+# шаблон ошибочно считался исправленным, хотя уязвимость сохранялась.
 $newFlag = $currentFlag -band (-bnot 0x00010001)
 
-# Update template
+# Обновить шаблон
 Set-ADObject -Identity $templateDN -Replace @{'msPKI-Certificate-Name-Flag' = $newFlag}
 '@
             }
             @{
-                Description = "Require CA Manager approval (CT_FLAG_PEND_ALL_REQUESTS = 0x00000002)"
+                Description = "Требовать одобрение менеджера УЦ (CT_FLAG_PEND_ALL_REQUESTS = 0x00000002)"
                 Command = @'
 $templateName = "VulnerableTemplate"
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateDN = "CN=$templateName,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Get current enrollment flag
+# Прочитать текущий флаг регистрации
 $template = Get-ADObject -Identity $templateDN -Properties msPKI-Enrollment-Flag
 $currentFlag = $template.'msPKI-Enrollment-Flag'
 
-# Add CT_FLAG_PEND_ALL_REQUESTS (0x00000002)
+# Добавить флаг CT_FLAG_PEND_ALL_REQUESTS (0x00000002)
 $newFlag = $currentFlag -bor 0x00000002
 
-# Update template
+# Обновить шаблон
 Set-ADObject -Identity $templateDN -Replace @{'msPKI-Enrollment-Flag' = $newFlag}
 '@
             }
             @{
-                Description = "Remove template from CA (stop issuing certificates immediately)"
+                Description = "Отозвать публикацию шаблона в УЦ, чтобы немедленно прекратить выпуск сертификатов"
                 Command = @'
-# On the CA server, remove the vulnerable template
+# Удалить уязвимый шаблон на сервере УЦ
 certutil -deltemplate "VulnerableTemplate"
 
-# Or via PowerShell (run on CA server)
+# Либо выполнить через PowerShell на сервере УЦ
 $caName = "$env:COMPUTERNAME\$(certutil -dump | Select-String 'Config:' | ForEach-Object { ($_ -split '\\')[-1].Trim() })"
 Remove-CATemplate -Name "VulnerableTemplate" -Force
 '@
@@ -5610,11 +5610,11 @@ Remove-CATemplate -Name "VulnerableTemplate" -Force
         )
         RemediationCommands = @(
             @{
-                Description = "Show the template's DACL in SDDL, where a generic-bit ACE is visible as GA"
+                Description = "Показать DACL шаблона в формате SDDL: общие права ACE отображаются как GA"
                 Command = "(Get-Acl -Path `"AD:CN=TEMPLATENAME,CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=DOMAIN,DC=COM`").Sddl"
             }
             @{
-                Description = "List who holds Certificate-Enrollment on the template"
+                Description = "Перечислить субъектов с правом Certificate-Enrollment на шаблон"
                 Command = "(Get-Acl -Path `"AD:CN=TEMPLATENAME,CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=DOMAIN,DC=COM`").Access | Where-Object { `$_.ObjectType -eq '0e10c968-78fb-11d2-90d4-00c04f79dc55' }"
             }
         )
@@ -5654,35 +5654,35 @@ Remove-CATemplate -Name "VulnerableTemplate" -Force
         )
         RemediationCommands = @(
             @{
-                Description = "Remove 'Any Purpose' EKU and set specific EKUs (requires Enterprise Admin)"
+                Description = "Удалить EKU Any Purpose и задать конкретные EKU (требуются права Enterprise Admins)"
                 Command = @'
 $templateName = "VulnerableTemplate"
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateDN = "CN=$templateName,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Define specific EKUs (replace with required OIDs)
-# Common EKUs:
-# 1.3.6.1.5.5.7.3.2 = Client Authentication
-# 1.3.6.1.5.5.7.3.1 = Server Authentication
-# 1.3.6.1.4.1.311.10.3.12 = Document Signing
+# Задать конкретные EKU (замените на необходимые OID)
+# Распространённые EKU:
+# 1.3.6.1.5.5.7.3.2 = Проверка подлинности клиента
+# 1.3.6.1.5.5.7.3.1 = Проверка подлинности сервера
+# 1.3.6.1.4.1.311.10.3.12 = Подпись документов
 $specificEKUs = @(
     "1.3.6.1.5.5.7.3.2"  # Client Authentication
 )
 
-# Update template EKUs (removes Any Purpose OID 2.5.29.37.0)
+# Обновить EKU шаблона (удаляет OID Any Purpose 2.5.29.37.0)
 Set-ADObject -Identity $templateDN -Replace @{'msPKI-Certificate-Application-Policy' = $specificEKUs}
 '@
             }
             @{
-                Description = "Unpublish the template from every CA - the way to take a SubCA template out of use"
+                Description = "Отменить публикацию шаблона на всех УЦ для прекращения использования шаблона SubCA"
                 Command = @'
-# CT_FLAG_IS_CA is bit 0x80 of the template's "flags" attribute (MS-CRTD 2.4), not of
-# msPKI-Enrollment-Flag, where 0x80 is not assigned at all. The predecessor of this
-# command cleared an undefined bit in the wrong attribute, returned no error, and left the
-# SubCA capability exactly where it was.
+# CT_FLAG_IS_CA — бит 0x80 атрибута flags шаблона (MS-CRTD 2.4), а не
+# msPKI-Enrollment-Flag: в последнем бит 0x80 вообще не определён. Прежняя
+# команда сбрасывала неопределённый бит не того атрибута, не сообщала об ошибке
+# и оставляла возможность SubCA без изменений.
 #
-# Clearing the bit is also not a supported change on a V1 default template. Taking the
-# template off the CAs is, and it is what stops the enrollment:
+# Сброс бита также не поддерживается у стандартного шаблона V1. Поэтому
+# прекращать выпуск следует, отменив публикацию шаблона на УЦ:
 $configNC = (Get-ADRootDSE).configurationNamingContext
 Get-ADObject -SearchBase "CN=Enrollment Services,CN=Public Key Services,CN=Services,$configNC" `
     -LDAPFilter '(objectClass=pKIEnrollmentService)' -Properties certificateTemplates |
@@ -5692,7 +5692,7 @@ Get-ADObject -SearchBase "CN=Enrollment Services,CN=Public Key Services,CN=Servi
 '@
             }
             @{
-                Description = "Read the flag that actually carries the SubCA capability, to confirm the state"
+                Description = "Проверить фактический флаг, разрешающий использование шаблона как SubCA"
                 Command = @'
 $configNC = (Get-ADRootDSE).configurationNamingContext
 Get-ADObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC" `
@@ -5701,23 +5701,23 @@ Get-ADObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Ser
 '@
             }
             @{
-                Description = "Restrict enrollment permissions to specific groups only"
+                Description = "Разрешить регистрацию сертификатов только определённым группам"
                 Command = @'
 $templateName = "VulnerableTemplate"
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateDN = "CN=$templateName,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Remove Authenticated Users / Domain Users enrollment rights
+# Удалить право регистрации у Authenticated Users и Domain Users
 $template = Get-ADObject -Identity $templateDN
 $acl = Get-Acl -Path "AD:\$templateDN"
 
-# Remove enrollment rights for Authenticated Users
+# Удалить право регистрации у Authenticated Users
 $sid = New-Object System.Security.Principal.SecurityIdentifier("S-1-5-11")  # Authenticated Users
 $acl.Access | Where-Object {$_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]) -eq $sid -and $_.ActiveDirectoryRights -match "ExtendedRight"} | ForEach-Object {
     $acl.RemoveAccessRule($_) | Out-Null
 }
 
-# Add specific group (replace with your group)
+# Добавить определённую группу (замените на нужную)
 $groupSID = (Get-ADGroup "SpecificEnrollmentGroup").SID
 $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
     $groupSID,
@@ -5770,16 +5770,16 @@ Set-Acl -Path "AD:\$templateDN" -AclObject $acl
         )
         RemediationCommands = @(
             @{
-                Description = "Restrict enrollment permissions on Certificate Request Agent template (requires Enterprise Admin)"
+                Description = "Ограничить регистрацию сертификатов по шаблону Certificate Request Agent (требуются права Enterprise Admins)"
                 Command = @'
 $templateName = "EnrollmentAgent"  # Or your Certificate Request Agent template name
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateDN = "CN=$templateName,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Get current ACL
+# Получить текущий ACL
 $acl = Get-Acl -Path "AD:\$templateDN"
 
-# Remove Authenticated Users / Domain Users enrollment rights
+# Удалить право регистрации у Authenticated Users и Domain Users
 $authenticatedUsersSID = New-Object System.Security.Principal.SecurityIdentifier("S-1-5-11")  # Authenticated Users
 $domainUsersSID = (Get-ADGroup "Domain Users").SID
 
@@ -5791,7 +5791,7 @@ $acl.Access | Where-Object {
     $acl.RemoveAccessRule($_) | Out-Null
 }
 
-# Add specific trusted group only
+# Добавить только указанную доверенную группу
 $trustedGroupSID = (Get-ADGroup "EnrollmentAgentAdmins").SID
 $enrollmentGuid = [Guid]"0e10c968-78fb-11d2-90d4-00c04f79dc55"  # Certificate-Enrollment
 $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
@@ -5806,12 +5806,12 @@ Set-Acl -Path "AD:\$templateDN" -AclObject $acl
 '@
             }
             @{
-                Description = "Configure CA enrollment agent restrictions (run on CA server)"
+                Description = "Настроить ограничения агента регистрации сертификатов на сервере УЦ"
                 Command = @'
-# Enable enrollment agent restrictions on the CA
+# Включить ограничения агентов регистрации на УЦ
 certutil -setreg policy\EnableEnrollmentAgentRestrictions 1
 
-# Create restriction policy file (example: restrict to specific templates)
+# Создать файл политики ограничений (например, разрешить только нужные шаблоны)
 $restrictionXml = @"
 <EnrollmentAgentRestrictions>
   <EnrollmentAgentRestriction>
@@ -5826,29 +5826,29 @@ $restrictionXml = @"
 </EnrollmentAgentRestrictions>
 "@
 
-# Save and apply restrictions
+# Сохранить и применить ограничения
 $restrictionXml | Out-File "C:\EnrollmentAgentRestrictions.xml"
 certutil -setreg policy\EnrollmentAgentRestrictions "@C:\EnrollmentAgentRestrictions.xml"
 
-# Restart CA service
+# Перезапустить службу центра сертификации
 net stop certsvc
 net start certsvc
 '@
             }
             @{
-                Description = "Disable template or require manager approval"
+                Description = "Отключить шаблон или потребовать одобрение заявки менеджером УЦ"
                 Command = @'
 $templateName = "EnrollmentAgent"
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateDN = "CN=$templateName,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Option 1: Require CA Manager approval
+# Вариант 1: потребовать одобрение менеджера УЦ
 $template = Get-ADObject -Identity $templateDN -Properties msPKI-Enrollment-Flag
 $currentFlag = $template.'msPKI-Enrollment-Flag'
 $newFlag = $currentFlag -bor 0x00000002  # CT_FLAG_PEND_ALL_REQUESTS
 Set-ADObject -Identity $templateDN -Replace @{'msPKI-Enrollment-Flag' = $newFlag}
 
-# Option 2: Remove template from CA entirely
+# Вариант 2: полностью отменить публикацию шаблона на УЦ
 # certutil -deltemplate "EnrollmentAgent"
 '@
             }
@@ -5892,10 +5892,10 @@ Set-ADObject -Identity $templateDN -Replace @{'msPKI-Enrollment-Flag' = $newFlag
         )
         RemediationCommands = @(
             @{
-                Description = "Enable and configure enrollment agent restrictions on the CA (run on the CA server)"
+                Description = "Включить и настроить ограничения агентов регистрации на сервере УЦ"
                 Command = @'
-# Without this setting ANY enrollment agent certificate can enroll on behalf of ANY user
-# for EVERY template that requires an agent signature.
+# Без этого ограничения ЛЮБОЙ сертификат агента регистрации позволяет подавать
+# запрос от имени ЛЮБОГО пользователя по ЛЮБОМУ шаблону с подписью агента.
 certutil -setreg policy\EnableEnrollmentAgentRestrictions 1
 
 $restrictionXml = @"
@@ -5922,7 +5922,7 @@ net start certsvc
 '@
             }
             @{
-                Description = "Require CA manager approval for this template (requires Enterprise Admin)"
+                Description = "Требовать одобрение менеджера УЦ для шаблона (нужны права Enterprise Admins)"
                 Command = @'
 $templateName = "TargetTemplateName"
 $configNC = (Get-ADRootDSE).configurationNamingContext
@@ -5934,11 +5934,11 @@ Set-ADObject -Identity $templateDN -Replace @{'msPKI-Enrollment-Flag' = $newFlag
 '@
             }
             @{
-                Description = "List issued certificates that carry the Certificate Request Agent EKU (run on the CA server)"
+                Description = "Найти выданные сертификаты с EKU Certificate Request Agent (запускать на сервере УЦ)"
                 Command = @'
 certutil -view -restrict "Disposition=20" -out "RequestID,CommonName,CertificateTemplate,NotAfter"
-# Cross-check the CertificateTemplate column against templates whose EKUs include
-# 1.3.6.1.4.1.311.20.2.1 and revoke agent certificates that are no longer needed:
+# Сопоставьте столбец CertificateTemplate с шаблонами, EKU которых включает
+# 1.3.6.1.4.1.311.20.2.1, и отзовите неиспользуемые сертификаты агента:
 # certutil -revoke <RequestID> 4
 '@
             }
@@ -5982,16 +5982,16 @@ certutil -view -restrict "Disposition=20" -out "RequestID,CommonName,Certificate
         )
         RemediationCommands = @(
             @{
-                Description = "Remove dangerous write permissions from certificate template (requires Enterprise Admin)"
+                Description = "Удалить опасные разрешения записи для шаблона сертификата (нужны права Enterprise Admins)"
                 Command = @'
 $templateName = "VulnerableTemplate"
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateDN = "CN=$templateName,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Get current ACL
+# Получить текущий ACL
 $acl = Get-Acl -Path "AD:\$templateDN"
 
-# Define dangerous permissions to remove
+# Определить опасные разрешения, которые нужно удалить
 $dangerousRights = @(
     [System.DirectoryServices.ActiveDirectoryRights]::WriteProperty,
     [System.DirectoryServices.ActiveDirectoryRights]::WriteDacl,
@@ -6000,9 +6000,9 @@ $dangerousRights = @(
     [System.DirectoryServices.ActiveDirectoryRights]::GenericAll
 )
 
-# Remove dangerous rights for non-admin users
+# Удалить опасные права непривилегированных пользователей
 $acl.Access | Where-Object {
-    # Keep only Domain Admins, Enterprise Admins, and SYSTEM
+    # Оставить только Domain Admins, Enterprise Admins и SYSTEM
     $sid = $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier])
     $isAdmin = ($sid.Value -match '-512$') -or  # Domain Admins
                ($sid.Value -match '-519$') -or  # Enterprise Admins
@@ -6017,12 +6017,12 @@ Set-Acl -Path "AD:\$templateDN" -AclObject $acl
 '@
             }
             @{
-                Description = "Audit all certificate template ACLs for dangerous permissions"
+                Description = "Проверить ACL всех шаблонов сертификатов на опасные разрешения"
                 Command = @'
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateContainer = "CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Get all certificate templates
+# Получить все шаблоны сертификатов
 $templates = Get-ADObject -SearchBase $templateContainer -Filter {objectClass -eq "pKICertificateTemplate"} -Properties nTSecurityDescriptor
 
 $dangerousTemplates = @()
@@ -6030,7 +6030,7 @@ $dangerousTemplates = @()
 foreach ($template in $templates) {
     $acl = $template.nTSecurityDescriptor
 
-    # Check for dangerous permissions granted to non-admin users
+    # Проверить опасные разрешения, выданные непривилегированным субъектам
     $acl.Access | Where-Object {
         $sid = $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier])
         $isAdmin = ($sid.Value -match '-512$|-519$') -or ($sid.Value -eq 'S-1-5-18')
@@ -6048,10 +6048,10 @@ foreach ($template in $templates) {
     }
 }
 
-# Display results
+# Показать результаты
 $dangerousTemplates | Format-Table -AutoSize
 
-# Export to CSV
+# Экспортировать данные в CSV
 $dangerousTemplates | Export-Csv "DangerousTemplateACLs.csv" -NoTypeInformation
 '@
             }
@@ -6100,7 +6100,7 @@ $dangerousTemplates | Export-Csv "DangerousTemplateACLs.csv" -NoTypeInformation
         )
         RemediationCommands = @(
             @{
-                Description = "Audit all PKI container ACLs for dangerous permissions (requires Enterprise Admin)"
+                Description = "Проверить ACL всех контейнеров PKI на опасные разрешения (нужны права Enterprise Admins)"
                 Command = @'
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $pkiContainers = @(
@@ -6116,7 +6116,7 @@ $dangerousContainers = @()
 foreach ($containerDN in $pkiContainers) {
     $acl = Get-Acl -Path "AD:\$containerDN"
 
-    # Check for dangerous permissions granted to non-admin users
+    # Проверить опасные разрешения, выданные непривилегированным субъектам
     $acl.Access | Where-Object {
         $sid = $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier])
         $isAdmin = ($sid.Value -match '-512$|-519$') -or ($sid.Value -eq 'S-1-5-18')  # Domain/Enterprise Admins or SYSTEM
@@ -6134,23 +6134,23 @@ foreach ($containerDN in $pkiContainers) {
     }
 }
 
-# Display results
+# Показать результаты
 $dangerousContainers | Format-Table -AutoSize
 
-# Export to CSV
+# Экспортировать данные в CSV
 $dangerousContainers | Export-Csv "DangerousPKIContainerACLs.csv" -NoTypeInformation
 '@
             }
             @{
-                Description = "Remove dangerous write permissions from PKI containers (requires Enterprise Admin)"
+                Description = "Удалить опасные разрешения записи на контейнеры PKI (нужны права Enterprise Admins)"
                 Command = @'
 $containerDN = "CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"  # Replace with vulnerable container DN
 $configNC = (Get-ADRootDSE).configurationNamingContext
 
-# Get current ACL
+# Получить текущий ACL
 $acl = Get-Acl -Path "AD:\$containerDN"
 
-# Define dangerous permissions to remove
+# Определить опасные разрешения, которые нужно удалить
 $dangerousRights = @(
     [System.DirectoryServices.ActiveDirectoryRights]::GenericAll,
     [System.DirectoryServices.ActiveDirectoryRights]::WriteDacl,
@@ -6158,10 +6158,10 @@ $dangerousRights = @(
     [System.DirectoryServices.ActiveDirectoryRights]::WriteProperty
 )
 
-# Remove dangerous rights for non-admin users
+# Удалить опасные права непривилегированных пользователей
 $acl.Access | Where-Object {
     $sid = $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier])
-    # Keep only Domain Admins (512), Enterprise Admins (519), and SYSTEM
+    # Оставить только Domain Admins (512), Enterprise Admins (519) и SYSTEM
     $isAdmin = ($sid.Value -match '-512$|-519$') -or ($sid.Value -eq 'S-1-5-18')
 
     -not $isAdmin -and ($_.ActiveDirectoryRights -band $dangerousRights)
@@ -6173,16 +6173,16 @@ Set-Acl -Path "AD:\$containerDN" -AclObject $acl
 '@
             }
             @{
-                Description = "Monitor PKI container modifications (enable auditing)"
+                Description = "Включить аудит изменений контейнеров PKI"
                 Command = @'
-# Enable auditing on PKI containers (requires Domain Admin or Enterprise Admin)
+# Включить аудит контейнеров PKI (нужны права Domain Admin или Enterprise Admin)
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $containerDN = "CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Get current ACL
+# Получить текущий ACL
 $acl = Get-Acl -Path "AD:\$containerDN" -Audit
 
-# Add audit rule for Everyone - Write operations
+# Добавить правило аудита операций записи для Everyone
 $everyoneSID = New-Object System.Security.Principal.SecurityIdentifier("S-1-1-0")  # Everyone
 $auditRule = New-Object System.DirectoryServices.ActiveDirectoryAuditRule(
     $everyoneSID,
@@ -6234,38 +6234,38 @@ Set-Acl -Path "AD:\$containerDN" -AclObject $acl
         )
         RemediationCommands = @(
             @{
-                Description = "Read the EPA setting of the web enrollment endpoint (extendedProtection tokenChecking)"
+                Description = "Прочитать настройки EPA веб-регистрации сертификатов (extendedProtection tokenChecking)"
                 Command = 'C:\Windows\System32\inetsrv\appcmd.exe list config "Default Web Site/CertSrv" -section:system.webServer/security/authentication/windowsAuthentication'
             }
             @{
-                Description = "Enable Extended Protection for Authentication (EPA) on IIS"
+                Description = "Включить расширенную защиту проверки подлинности (EPA) в IIS"
                 Command = @'
-# Run on CA server hosting web enrollment
-# Enable EPA for Default Web Site
+# Выполнять на сервере УЦ с установленной веб-регистрацией
+# Включить EPA для Default Web Site
 Import-Module WebAdministration
 Set-WebConfigurationProperty -PSPath 'MACHINE/WEBROOT/APPHOST' -Filter 'system.webServer/security/authentication/windowsAuthentication' -Name 'extendedProtection.tokenChecking' -Value 'Require' -Location 'Default Web Site'
 
-# Or via appcmd.exe
+# Либо использовать appcmd.exe
 C:\Windows\System32\inetsrv\appcmd.exe set config "Default Web Site" -section:system.webServer/security/authentication/windowsAuthentication /extendedProtection.tokenChecking:Require /commit:apphost
 '@
             }
             @{
-                Description = "Disable NTLM and require Kerberos for web enrollment"
+                Description = "Отключить NTLM и потребовать Kerberos для веб-регистрации сертификатов"
                 Command = @'
-# Disable NTLM provider and keep only Negotiate (Kerberos)
+# Отключить NTLM и оставить только Negotiate (Kerberos)
 Set-WebConfigurationProperty -PSPath 'MACHINE/WEBROOT/APPHOST' -Filter 'system.webServer/security/authentication/windowsAuthentication' -Name 'providers' -Value @{value='Negotiate'}
 
-# Verify settings
+# Проверить настройки
 Get-WebConfigurationProperty -PSPath 'MACHINE/WEBROOT/APPHOST' -Filter 'system.webServer/security/authentication/windowsAuthentication' -Name 'providers'
 '@
             }
             @{
-                Description = "Disable web enrollment if not required"
+                Description = "Отключить веб-регистрацию сертификатов, если она не нужна"
                 Command = @'
-# Remove CertSrv web application
+# Удалить веб-приложение CertSrv
 Remove-WebApplication -Name 'CertSrv' -Site 'Default Web Site'
 
-# Or uninstall the Web Enrollment role
+# Либо удалить роль Web Enrollment
 Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
 '@
             }
@@ -6302,15 +6302,15 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Enable Require SSL in IIS for Certificate Authority Web Enrollment"
+                Description = "Включить обязательный SSL в IIS для веб-регистрации сертификатов УЦ"
                 Command = "Import-Module WebAdministration; Set-WebConfigurationProperty -Filter '/system.webServer/security/access' -Name 'sslFlags' -Value 'Ssl' -PSPath 'IIS:\' -Location 'Default Web Site/CertSrv'"
             }
             @{
-                Description = "Enable Extended Protection for Authentication (EPA) for CA Web Enrollment"
+                Description = "Включить EPA для веб-регистрации сертификатов УЦ"
                 Command = "Import-Module WebAdministration; Set-WebConfigurationProperty -Filter '/system.webServer/security/authentication/windowsAuthentication' -Name 'extendedProtection.tokenChecking' -Value 'Required' -PSPath 'IIS:\' -Location 'Default Web Site/CertSrv'"
             }
             @{
-                Description = "Restart IIS to apply changes"
+                Description = "Перезапустить IIS для применения изменений"
                 Command = "iisreset /restart"
             }
         )
@@ -6344,15 +6344,15 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Remove enrollment permission for broad groups (via Certificate Templates Console)"
-                Command = "# Use certtmpl.msc - Security tab - Remove 'Enroll' permission for Everyone/Domain Users/Authenticated Users"
+                Description = "Удалить право регистрации у широких групп через консоль шаблонов сертификатов"
+                Command = "# certtmpl.msc → «Безопасность» → удалите Enroll у Everyone, Domain Users и Authenticated Users"
             }
             @{
-                Description = "Add specific group with enrollment permission"
-                Command = "# Use certtmpl.msc - Security tab - Add specific security group and grant 'Enroll' permission"
+                Description = "Предоставить право регистрации только конкретной группе"
+                Command = "# certtmpl.msc → «Безопасность» → добавьте нужную группу и выдайте Enroll"
             }
             @{
-                Description = "View template enrollment permissions"
+                Description = "Показать разрешения регистрации для шаблона"
                 Command = "(Get-Acl 'AD:\CN=<TemplateName>,CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=domain,DC=com').Access | Where-Object { `$_.ActiveDirectoryRights -match 'Enroll' } | Format-Table IdentityReference, ActiveDirectoryRights"
             }
         )
@@ -6385,12 +6385,12 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Remove Client Authentication EKU from template (if not required)"
-                Command = "# Use certtmpl.msc - Extensions tab - Application Policies - Remove 'Client Authentication'"
+                Description = "Удалить EKU Client Authentication из шаблона, если он не требуется"
+                Command = "# certtmpl.msc → «Расширения» → «Политики приложений» → удалите Client Authentication"
             }
             @{
-                Description = "Enable Manager Approval for templates with Client Authentication EKU"
-                Command = "# Use certtmpl.msc - Issuance Requirements tab - check 'CA certificate manager approval'"
+                Description = "Требовать одобрение менеджера УЦ для шаблонов с EKU Client Authentication"
+                Command = "# certtmpl.msc → «Требования к выдаче» → включите одобрение менеджером УЦ"
             }
         )
         References = @(
@@ -6421,12 +6421,12 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Remove Smartcard Logon EKU from template (if not required)"
-                Command = "# Use certtmpl.msc - Extensions tab - Application Policies - Remove 'Smart Card Logon'"
+                Description = "Удалить EKU Smart Card Logon из шаблона, если он не нужен"
+                Command = "# certtmpl.msc → «Расширения» → «Политики приложений» → удалите Smart Card Logon"
             }
             @{
-                Description = "Enable Manager Approval for templates with Smartcard Logon EKU"
-                Command = "# Use certtmpl.msc - Issuance Requirements tab - check 'CA certificate manager approval'"
+                Description = "Требовать одобрение менеджера УЦ для шаблонов с EKU Smart Card Logon"
+                Command = "# certtmpl.msc → «Требования к выдаче» → включите одобрение менеджером УЦ"
             }
         )
         References = @(
@@ -6464,11 +6464,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Remove GenericAll ACE from object (replace values)"
+                Description = "Удалить ACE с GenericAll у объекта (подставьте значения)"
                 Command = "`$Acl = Get-Acl 'AD:\CN=TARGET,DC=domain,DC=com'; `$Acl.RemoveAccessRule((`$Acl.Access | Where-Object { `$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -eq 'GenericAll' })); Set-Acl -AclObject `$Acl 'AD:\CN=TARGET,DC=domain,DC=com'"
             }
             @{
-                Description = "View current ACL of the object"
+                Description = "Показать текущий ACL объекта"
                 Command = "(Get-Acl 'AD:\CN=TARGET,DC=domain,DC=com').Access | Format-Table IdentityReference, ActiveDirectoryRights, AccessControlType"
             }
         )
@@ -6510,16 +6510,16 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL of the object"
+                Description = "Показать текущий ACL объекта"
                 Command = "(Get-Acl 'AD:\CN=TARGET,DC=domain,DC=com').Access | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove GenericWrite ACE from Active Directory object"
+                Description = "Удалить ACE с GenericWrite у объекта Active Directory"
                 Command = "`$acl = Get-Acl 'AD:\CN=TARGET,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'GenericWrite'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\CN=TARGET,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Enable auditing for attribute changes on sensitive objects (Event ID 5136)"
-                Command = "# In Group Policy: Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy Configuration > DS Access > Audit Directory Service Changes = Success, Failure"
+                Description = "Включить аудит изменений атрибутов важных объектов (событие 5136)"
+                Command = "# GPO → Конфигурация компьютера → Политики → Параметры Windows → Расширенный аудит → Доступ к службе каталогов → Аудит изменений службы каталогов = Успех, Отказ"
             }
         )
         References = @(
@@ -6555,16 +6555,16 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View who has WriteDACL on the object"
+                Description = "Показать субъектов с правом WriteDACL для объекта"
                 Command = "(Get-Acl 'AD:\CN=TARGET,DC=domain,DC=com').Access | Where-Object { `$_.ActiveDirectoryRights -match 'WriteDacl' } | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteDACL ACE from Active Directory object"
+                Description = "Удалить ACE с WriteDACL у объекта Active Directory"
                 Command = "`$acl = Get-Acl 'AD:\CN=TARGET,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'WriteDacl'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\CN=TARGET,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Enable auditing for DACL modifications (Event ID 4670)"
-                Command = "# In Group Policy: Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy Configuration > Object Access > Audit Authorization Policy Change = Success, Failure"
+                Description = "Включить аудит изменения DACL (событие 4670)"
+                Command = "# GPO → Конфигурация компьютера → Политики → Параметры Windows → Расширенный аудит → Доступ к объектам → Аудит изменения политики авторизации = Успех, Отказ"
             }
         )
         References = @(
@@ -6600,20 +6600,20 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View who has WriteOwner on the object"
+                Description = "Показать субъектов с правом WriteOwner для объекта"
                 Command = "(Get-Acl 'AD:\CN=TARGET,DC=domain,DC=com').Access | Where-Object { `$_.ActiveDirectoryRights -match 'WriteOwner' } | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteOwner ACE from Active Directory object"
+                Description = "Удалить ACE с WriteOwner у объекта Active Directory"
                 Command = "`$acl = Get-Acl 'AD:\CN=TARGET,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'WriteOwner'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\CN=TARGET,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Check current owner of the object"
+                Description = "Проверить текущего владельца объекта"
                 Command = "(Get-Acl 'AD:\CN=TARGET,DC=domain,DC=com').Owner"
             }
             @{
-                Description = "Enable auditing for ownership changes (Event ID 4780)"
-                Command = "# In Group Policy: Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy Configuration > DS Access > Audit Directory Service Changes = Success, Failure"
+                Description = "Включить аудит смены владельца (событие 4780)"
+                Command = "# GPO → Конфигурация компьютера → Политики → Параметры Windows → Расширенный аудит → Доступ к службе каталогов → Аудит изменений службы каталогов = Успех, Отказ"
             }
         )
         References = @(
@@ -6652,7 +6652,7 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL of the GPO object"
+                Description = "Показать текущий ACL объекта GPO"
                 Command = "(Get-Acl 'AD:\CN=<GUID>,CN=Policies,CN=System,DC=domain,DC=com').Access | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
         )
@@ -6777,15 +6777,15 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show the NTFS permissions of one policy folder"
+                Description = "Показать разрешения NTFS для папки одной групповой политики"
                 Command = 'icacls "\\<domain>\SYSVOL\<domain>\Policies\{<GUID>}"'
             }
             @{
-                Description = "List every policy folder whose permissions differ from the Policies folder they are in"
+                Description = "Найти папки политик, у которых разрешения отличаются от родительского каталога Policies"
                 Command = 'Get-ChildItem "\\<domain>\SYSVOL\<domain>\Policies" -Directory | ForEach-Object { [PSCustomObject]@{ GPO = $_.Name; Trustees = ((Get-Acl $_.FullName).Access | Where-Object { $_.FileSystemRights -match "Write|Modify|FullControl" } | ForEach-Object { $_.IdentityReference.Value }) -join ", " } }'
             }
             @{
-                Description = "Remove one trustee from a policy folder"
+                Description = "Удалить запись доступа для заданного субъекта из папки политики"
                 Command = 'icacls "\\<domain>\SYSVOL\<domain>\Policies\{<GUID>}" /remove:g "DOMAIN\<account>"'
             }
         )
@@ -6824,11 +6824,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show the current owner of every GPO in the domain"
+                Description = "Показать текущих владельцев всех GPO домена"
                 Command = 'Get-ADObject -LDAPFilter ''(objectClass=groupPolicyContainer)'' -SearchBase "CN=Policies,CN=System,$((Get-ADDomain).DistinguishedName)" | ForEach-Object { [PSCustomObject]@{ GPO = $_.Name; Owner = (Get-Acl "AD:$($_.DistinguishedName)").Owner } }'
             }
             @{
-                Description = "Reassign the owner of one GPO to Domain Admins"
+                Description = "Назначить владельцем заданной GPO группу Domain Admins"
                 Command = '$acl = Get-Acl "AD:\CN=<GUID>,CN=Policies,CN=System,DC=domain,DC=com"; $acl.SetOwner((New-Object System.Security.Principal.NTAccount("DOMAIN\Domain Admins"))); Set-Acl -Path "AD:\CN=<GUID>,CN=Policies,CN=System,DC=domain,DC=com" -AclObject $acl'
             }
         )
@@ -6859,11 +6859,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show which domain controllers hold the gpt.ini of one policy"
+                Description = "Показать контроллеры домена, содержащие gpt.ini указанной политики"
                 Command = 'Get-ADDomainController -Filter * | ForEach-Object { [PSCustomObject]@{ DC = $_.HostName; GptIni = Test-Path "\\$($_.HostName)\SYSVOL\<domain>\Policies\{<GUID>}\gpt.ini" } }'
             }
             @{
-                Description = "Show the SYSVOL replication backlog between two domain controllers (DFS Replication)"
+                Description = "Показать очередь репликации SYSVOL между двумя контроллерами домена (DFS Replication)"
                 Command = 'Get-DfsrBacklog -GroupName "Domain System Volume" -FolderName "SYSVOL Share" -SourceComputerName "<DC1>" -DestinationComputerName "<DC2>"'
             }
         )
@@ -6888,7 +6888,7 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "List the folders in SYSVOL\Policies that no policy object has (GroupPolicy module)"
+                Description = "Найти папки SYSVOL\Policies без соответствующего объекта GPO (модуль GroupPolicy)"
                 Command = '$ids = (Get-GPO -All).Id | ForEach-Object { "{$_}" }; Get-ChildItem "\\<domain>\SYSVOL\<domain>\Policies" -Directory | Where-Object { $_.Name -match "^\{" -and $_.Name -notin $ids }'
             }
         )
@@ -6913,11 +6913,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show who may edit one policy (GroupPolicy module)"
+                Description = "Показать субъектов, способных изменять заданную GPO (модуль GroupPolicy)"
                 Command = 'Get-GPPermission -Name "<GPO name>" -All | Where-Object { $_.Permission -match "Edit|Custom" }'
             }
             @{
-                Description = "List the policies that nothing links (GroupPolicy module)"
+                Description = "Найти GPO без каких-либо привязок (модуль GroupPolicy)"
                 Command = 'Get-GPO -All | Where-Object { -not ([xml](Get-GPOReport -Guid $_.Id -ReportType Xml)).GPO.LinksTo } | Select-Object DisplayName, Id'
             }
         )
@@ -6955,11 +6955,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show which principals hold write access to gPLink on the domain object"
+                Description = "Показать права записи gPLink на корневом объекте домена"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Access | Where-Object { $_.ActiveDirectoryRights -match "WriteProperty" -and $_.ObjectType -eq "f30e3bbe-9ff0-11d1-b603-0000f80367c1" } | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize'
             }
             @{
-                Description = "List the GPOs currently linked at the domain root"
+                Description = "Перечислить GPO, привязанные к корню домена"
                 Command = 'Get-ADObject -Identity "DC=DOMAIN,DC=COM" -Properties gPLink | Select-Object -ExpandProperty gPLink'
             }
         )
@@ -6997,11 +6997,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show which principals hold Migrate-SID-History on the domain object"
+                Description = "Показать субъектов с правом Migrate-SID-History на объекте домена"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Access | Where-Object { $_.ObjectType -eq "ba33815a-4f93-4c76-87f3-57574bff8109" } | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize'
             }
             @{
-                Description = "Find accounts carrying any sIDHistory at all, as the starting point for a review"
+                Description = "Найти учётные записи с любыми значениями sIDHistory для последующего анализа"
                 Command = 'Get-ADObject -LDAPFilter "(sIDHistory=*)" -Properties sIDHistory | Select-Object Name,DistinguishedName,sIDHistory'
             }
         )
@@ -7039,11 +7039,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show which principals hold DS-Install-Replica on the domain object"
+                Description = "Показать субъектов с правом DS-Install-Replica на объекте домена"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Access | Where-Object { $_.ObjectType -eq "9923a32a-3607-11d2-b9be-0000f87a36b2" } | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize'
             }
             @{
-                Description = "List the nTDSDSA objects, which is what a promoted replica actually creates"
+                Description = "Перечислить объекты nTDSDSA, создаваемые при повышении сервера до контроллера домена"
                 Command = '$configNC = (Get-ADRootDSE).configurationNamingContext; Get-ADObject -SearchBase $configNC -LDAPFilter "(objectClass=nTDSDSA)" | Select-Object DistinguishedName'
             }
         )
@@ -7079,7 +7079,7 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show the owner and the access rules of the RID Manager"
+                Description = "Показать владельца и записи ACL объекта RID Manager"
                 Command = "`$dn = 'CN=RID Manager`$,CN=System,' + (Get-ADDomain).DistinguishedName; `$acl = Get-Acl -Path ('AD:' + `$dn); `$acl.Owner; `$acl.Access | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
         )
@@ -7115,11 +7115,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show the allow and deny lists of a read-only Domain Controller"
+                Description = "Показать списки разрешения и запрета репликации паролей RODC"
                 Command = "Get-ADDomainControllerPasswordReplicationPolicy -Identity 'RODC_NAME' -Allowed; Get-ADDomainControllerPasswordReplicationPolicy -Identity 'RODC_NAME' -Denied"
             }
             @{
-                Description = "Deny a privileged group for every read-only Domain Controller"
+                Description = "Добавить привилегированную группу в запрет репликации паролей всех RODC"
                 Command = "Add-ADGroupMember -Identity 'Denied RODC Password Replication Group' -Members 'GROUP_NAME'"
             }
         )
@@ -7150,7 +7150,7 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "List the accounts whose secrets a read-only Domain Controller holds"
+                Description = "Найти учётные записи, секреты которых хранятся на RODC"
                 Command = "Get-ADDomainControllerPasswordReplicationPolicyUsage -Identity 'RODC_NAME' -RevealedAccounts"
             }
         )
@@ -7178,7 +7178,7 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Add the Denied RODC Password Replication Group to the deny list"
+                Description = "Добавить группу Denied RODC Password Replication Group в список запрета"
                 Command = "Add-ADDomainControllerPasswordReplicationPolicy -Identity 'RODC_NAME' -DeniedList 'Denied RODC Password Replication Group'"
             }
         )
@@ -7211,11 +7211,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "List the NTDS Settings objects and the computer accounts their servers refer to"
+                Description = "Показать объекты NTDS Settings и связанные с их серверами учётные записи компьютеров"
                 Command = '$configNC = (Get-ADRootDSE).configurationNamingContext; Get-ADObject -SearchBase "CN=Sites,$configNC" -LDAPFilter "(objectClass=server)" -Properties serverReference | Select-Object Name,serverReference'
             }
             @{
-                Description = "Return a computer account that is not a Domain Controller to a workstation account"
+                Description = "Вернуть учётной записи компьютера, не являющегося DC, тип рабочей станции"
                 Command = "Set-ADComputer -Identity 'COMPUTERNAME' -Replace @{userAccountControl=4096}"
             }
         )
@@ -7253,11 +7253,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show which principals hold Reanimate-Tombstones on the domain object"
+                Description = "Показать субъектов с правом Reanimate-Tombstones на объекте домена"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Access | Where-Object { $_.ObjectType -eq "45ec5156-db7e-47bb-b53f-dbeb2d03c40f" } | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize'
             }
             @{
-                Description = "List the deleted objects that could be reanimated"
+                Description = "Найти удалённые объекты, которые можно восстановить через reanimation"
                 Command = 'Get-ADObject -IncludeDeletedObjects -LDAPFilter "(isDeleted=TRUE)" -Properties lastKnownParent | Select-Object Name,DistinguishedName,lastKnownParent'
             }
         )
@@ -7295,11 +7295,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show which principals can write ms-DS-MachineAccountQuota on the domain object"
+                Description = "Показать права записи ms-DS-MachineAccountQuota на корневом объекте домена"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Access | Where-Object { $_.ActiveDirectoryRights -match "WriteProperty" -and $_.ObjectType -eq "d064fb68-1480-11d3-91c1-0000f87a57d4" } | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize'
             }
             @{
-                Description = "Read the current quota and set it to 0"
+                Description = "Проверить текущую квоту создания компьютеров и установить её равной 0"
                 Command = 'Get-ADObject -Identity "DC=DOMAIN,DC=COM" -Properties ms-DS-MachineAccountQuota; Set-ADDomain -Identity "DOMAIN.COM" -Replace @{ "ms-DS-MachineAccountQuota" = 0 }'
             }
         )
@@ -7335,11 +7335,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show which domain controller holds the PDC emulator role today"
+                Description = "Показать контроллер домена, на котором сейчас находится роль эмулятора PDC"
                 Command = 'Get-ADDomain | Select-Object PDCEmulator'
             }
             @{
-                Description = "Show which principals hold Change-PDC on the domain object"
+                Description = "Показать субъектов с правом Change-PDC на объекте домена"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Access | Where-Object { $_.ObjectType -eq "bae50096-4752-11d1-9052-00c04fc2d4cf" } | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize'
             }
         )
@@ -7377,11 +7377,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show the current owner of the domain object"
+                Description = "Показать текущего владельца корневого объекта домена"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Owner'
             }
             @{
-                Description = "Reassign the owner to Domain Admins"
+                Description = "Назначить владельцем корневого объекта домена группу Domain Admins"
                 Command = '$acl = Get-Acl -Path "AD:DC=DOMAIN,DC=COM"; $acl.SetOwner((New-Object System.Security.Principal.NTAccount("DOMAIN\Domain Admins"))); Set-Acl -Path "AD:DC=DOMAIN,DC=COM" -AclObject $acl'
             }
         )
@@ -7419,11 +7419,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show the owner of every OU in the domain"
+                Description = "Показать владельцев всех OU в домене"
                 Command = 'Get-ADOrganizationalUnit -Filter * | ForEach-Object { [PSCustomObject]@{ OU = $_.DistinguishedName; Owner = (Get-Acl -Path "AD:$($_.DistinguishedName)").Owner } }'
             }
             @{
-                Description = "Reassign the owner of one OU to Domain Admins"
+                Description = "Назначить владельцем выбранной OU группу Domain Admins"
                 Command = '$acl = Get-Acl -Path "AD:OU=NAME,DC=DOMAIN,DC=COM"; $acl.SetOwner((New-Object System.Security.Principal.NTAccount("DOMAIN\Domain Admins"))); Set-Acl -Path "AD:OU=NAME,DC=DOMAIN,DC=COM" -AclObject $acl'
             }
         )
@@ -7461,11 +7461,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show every principal holding either replication right on the domain object"
+                Description = "Показать все субъекты с любым из разрешений репликации на объекте домена"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Access | Where-Object { $_.ObjectType -in @("1131f6aa-9c07-11d1-f79f-00c04fc2dcd2","1131f6ad-9c07-11d1-f79f-00c04fc2dcd2") } | Format-Table IdentityReference,ObjectType,AccessControlType -AutoSize'
             }
             @{
-                Description = "Remove the replication right from a specific principal"
+                Description = "Удалить право репликации для конкретного субъекта"
                 Command = '$acl = Get-Acl -Path "AD:DC=DOMAIN,DC=COM"; $ace = $acl.Access | Where-Object { $_.IdentityReference -eq "DOMAIN\USER" -and $_.ObjectType -eq "1131f6aa-9c07-11d1-f79f-00c04fc2dcd2" }; $ace | ForEach-Object { $acl.RemoveAccessRule($_) }; Set-Acl -Path "AD:DC=DOMAIN,DC=COM" -AclObject $acl'
             }
         )
@@ -7503,7 +7503,7 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show the principals holding Get-Changes-All or the filtered-set right"
+                Description = "Показать субъектов с разрешениями Get-Changes-All или In-Filtered-Set"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Access | Where-Object { $_.ObjectType -in @("1131f6ad-9c07-11d1-f79f-00c04fc2dcd2","89e95b76-444d-4c62-991a-0facbeda640c") } | Format-Table IdentityReference,ObjectType,AccessControlType -AutoSize'
             }
         )
@@ -7542,11 +7542,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show the replication rights granted to broad groups on the domain object"
+                Description = "Показать разрешения репликации, выданные широким группам на объекте домена"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Access | Where-Object { $_.IdentityReference -match "Everyone|Authenticated Users|Domain Users|Users$" -and $_.ObjectType -in @("1131f6aa-9c07-11d1-f79f-00c04fc2dcd2","1131f6ad-9c07-11d1-f79f-00c04fc2dcd2") } | Format-Table IdentityReference,ObjectType,AccessControlType -AutoSize'
             }
             @{
-                Description = "Remove the ACE for a named broad group"
+                Description = "Удалить ACE, выданную указанной широкой группе"
                 Command = '$acl = Get-Acl -Path "AD:DC=DOMAIN,DC=COM"; $ace = $acl.Access | Where-Object { $_.IdentityReference -eq "NT AUTHORITY\Authenticated Users" -and $_.ObjectType -eq "1131f6ad-9c07-11d1-f79f-00c04fc2dcd2" }; $ace | ForEach-Object { $acl.RemoveAccessRule($_) }; Set-Acl -Path "AD:DC=DOMAIN,DC=COM" -AclObject $acl'
             }
         )
@@ -7584,11 +7584,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show the ACEs on the domain object that name a broad group"
+                Description = "Показать ACE на объекте домена, относящиеся к широкой группе"
                 Command = '(Get-Acl -Path "AD:DC=DOMAIN,DC=COM").Access | Where-Object { $_.IdentityReference -match "Everyone|Authenticated Users|Domain Users|INTERACTIVE|Pre-Windows 2000" } | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize'
             }
             @{
-                Description = "Remove one such ACE after identifying it"
+                Description = "После проверки удалить выбранную ACE"
                 Command = '$acl = Get-Acl -Path "AD:DC=DOMAIN,DC=COM"; $ace = $acl.Access | Where-Object { $_.IdentityReference -eq "NT AUTHORITY\Authenticated Users" -and $_.ActiveDirectoryRights -match "WriteDacl|GenericAll" }; $ace | ForEach-Object { $acl.RemoveAccessRule($_) }; Set-Acl -Path "AD:DC=DOMAIN,DC=COM" -AclObject $acl'
             }
         )
@@ -7627,12 +7627,12 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View accounts with replication rights on domain"
+                Description = "Показать учётные записи с разрешениями репликации в домене"
                 Command = "(Get-Acl 'AD:\DC=domain,DC=com').Access | Where-Object { `$_.ObjectType -in @('1131f6aa-9c07-11d1-f79f-00c04fc2dcd2','1131f6ad-9c07-11d1-f79f-00c04fc2dcd2') } | Format-Table IdentityReference, ObjectType"
             }
             @{
-                Description = "Remove replication rights from user (replace values)"
-                Command = "`$guid1 = [GUID]'1131f6aa-9c07-11d1-f79f-00c04fc2dcd2'; `$guid2 = [GUID]'1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'; # Use ADSI to remove specific extended rights"
+                Description = "Удалить права репликации у пользователя (замените значения)"
+                Command = "`$guid1 = [GUID]'1131f6aa-9c07-11d1-f79f-00c04fc2dcd2'; `$guid2 = [GUID]'1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'; # Используйте ADSI для удаления конкретных расширенных прав"
             }
         )
         References = @(
@@ -7675,19 +7675,19 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on an OU"
+                Description = "Показать текущий ACL организационной единицы OU"
                 Command = "(Get-Acl 'AD:\OU=Users,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'WriteProperty'} | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,InheritedObjectType -AutoSize"
             }
             @{
-                Description = "Remove specific WriteProperty ACE from OU"
+                Description = "Удалить конкретную ACE WriteProperty из ACL OU"
                 Command = "`$ou = 'AD:\OU=Users,DC=domain,DC=com'; `$acl = Get-Acl `$ou; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\User' -and `$_.ActiveDirectoryRights -match 'WriteProperty'}; `$acl.RemoveAccessRule(`$ace); Set-Acl -AclObject `$acl -Path `$ou"
             }
             @{
-                Description = "Grant specific attribute write permission instead of all properties (example: telephoneNumber)"
+                Description = "Вместо права записи всех свойств делегировать только конкретный атрибут (например, telephoneNumber)"
                 Command = "dsacls 'OU=Users,DC=domain,DC=com' /G 'DOMAIN\User:WP;telephoneNumber'"
             }
             @{
-                Description = "Find all OUs where a specific principal has WriteProperty permissions"
+                Description = "Найти OU, где заданный субъект обладает WriteProperty"
                 Command = "Get-ADOrganizationalUnit -Filter * | ForEach-Object { `$acl = Get-Acl `$_.DistinguishedName; `$writePerms = `$acl.Access | Where-Object {`$_.IdentityReference -like '*USERNAME*' -and `$_.ActiveDirectoryRights -match 'WriteProperty'}; if (`$writePerms) { [PSCustomObject]@{OU=`$_.Name; DN=`$_.DistinguishedName; Rights=`$writePerms.ActiveDirectoryRights} } }"
             }
         )
@@ -7728,7 +7728,7 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View who has password reset rights on OU"
+                Description = "Показать субъектов с правом сброса пароля в OU"
                 Command = "(Get-Acl 'AD:\OU=Users,DC=domain,DC=com').Access | Where-Object { `$_.ObjectType -eq '00299570-246d-11d0-a768-00aa006e0529' } | Format-Table IdentityReference"
             }
         )
@@ -7768,19 +7768,19 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on OU to identify principals with WriteProperty on userAccountControl"
+                Description = "Показать субъектов с WriteProperty на атрибут userAccountControl в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'bf967a68-0de6-11d0-a285-00aa003049e2'} | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteProperty permission on userAccountControl attribute from specific principal"
+                Description = "Удалить WriteProperty на userAccountControl у указанного субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'bf967a68-0de6-11d0-a285-00aa003049e2'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=TARGET_OU,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Enable auditing for userAccountControl modifications (Event ID 4738)"
-                Command = "# Configure via Group Policy: Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy > Account Management > Audit User Account Management = Success, Failure"
+                Description = "Включить аудит изменений userAccountControl (событие 4738)"
+                Command = "# GPO → Конфигурация компьютера → Политики → Параметры Windows → Расширенный аудит → Управление учётными записями → Аудит управления пользователями = Успех, Отказ"
             }
             @{
-                Description = "Find all users in OU with DONT_REQUIRE_PREAUTH flag set (AS-REP Roastable)"
+                Description = "Найти пользователей OU с флагом DONT_REQUIRE_PREAUTH (риск AS-REP Roasting)"
                 Command = "Get-ADUser -Filter * -SearchBase 'OU=TARGET_OU,DC=domain,DC=com' -Properties userAccountControl | Where-Object {`$_.userAccountControl -band 0x400000} | Select-Object Name,SamAccountName,UserAccountControl"
             }
         )
@@ -7822,20 +7822,20 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on OU to identify principals with WriteProperty on User-Account-Restrictions property set"
+                Description = "Показать субъектов с WriteProperty на набор User-Account-Restrictions в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq '4c164200-20c0-11d0-a768-00aa006e0529'} | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteProperty permission on User-Account-Restrictions property set from specific principal"
+                Description = "Удалить WriteProperty на набор User-Account-Restrictions у субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq '4c164200-20c0-11d0-a768-00aa006e0529'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=TARGET_OU,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "List all attributes included in User-Account-Restrictions property set"
-                Command = "# User-Account-Restrictions property set (GUID 4c164200-20c0-11d0-a768-00aa006e0529) includes: userAccountControl, pwdLastSet, accountExpires, logonHours, userParameters, homeDirectory, homeDrive, scriptPath, profilePath, userWorkstations"
+                Description = "Перечислить атрибуты набора User-Account-Restrictions"
+                Command = "# Набор User-Account-Restrictions (GUID 4c164200-20c0-11d0-a768-00aa006e0529) включает: userAccountControl, pwdLastSet, accountExpires, logonHours, userParameters, homeDirectory, homeDrive, scriptPath, profilePath, userWorkstations"
             }
             @{
-                Description = "Enable auditing for User-Account-Restrictions modifications"
-                Command = "# Configure via Group Policy: Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy > DS Access > Audit Directory Service Changes = Success, Failure"
+                Description = "Включить аудит изменений свойств User-Account-Restrictions"
+                Command = "# GPO → Конфигурация компьютера → Параметры Windows → Расширенная политика аудита → Доступ к службе каталогов → Аудит изменений = Успех, Отказ"
             }
         )
         References = @(
@@ -7875,20 +7875,20 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on OU to identify principals with WriteProperty on member attribute"
+                Description = "Показать субъектов с WriteProperty на атрибут member в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'bf9679c0-0de6-11d0-a285-00aa003049e2'} | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteProperty permission on member attribute from specific principal"
+                Description = "Удалить WriteProperty на member у указанного субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'bf9679c0-0de6-11d0-a285-00aa003049e2'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=TARGET_OU,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Identify privileged groups in the OU that are vulnerable"
+                Description = "Найти привилегированные группы OU с опасными разрешениями"
                 Command = "Get-ADGroup -Filter * -SearchBase 'OU=TARGET_OU,DC=domain,DC=com' -Properties AdminCount,Member | Where-Object {`$_.AdminCount -eq 1 -or `$_.Name -match 'Admin|Operator'} | Select-Object Name,DistinguishedName,@{Name='MemberCount';Expression={(`$_.Member | Measure-Object).Count}}"
             }
             @{
-                Description = "Enable auditing for group membership changes (Event IDs 4728, 4732, 4756)"
-                Command = "# Configure via Group Policy: Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy > Account Management > Audit Security Group Management = Success, Failure"
+                Description = "Включить аудит изменения членства в группах (события 4728, 4732, 4756)"
+                Command = "# GPO → Конфигурация компьютера → Параметры Windows → Расширенная политика аудита → Управление учётными записями → Аудит изменений групп безопасности = Успех, Отказ"
             }
         )
         References = @(
@@ -7928,11 +7928,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Show the principals holding Self with no ObjectType on the OU"
+                Description = "Показать субъектов с правом Self без ObjectType на OU"
                 Command = '(Get-Acl -Path "AD:OU=TARGET_OU,DC=DOMAIN,DC=COM").Access | Where-Object { $_.ActiveDirectoryRights -match "Self" -and $_.ObjectType -eq [GUID]::Empty } | Format-Table IdentityReference,ActiveDirectoryRights,InheritanceFlags,AccessControlType -AutoSize'
             }
             @{
-                Description = "Remove the blanket validated-write delegation from a specific principal"
+                Description = "Удалить общее разрешение проверяемой записи (validated write) у указанного субъекта"
                 Command = '$acl = Get-Acl -Path "AD:OU=TARGET_OU,DC=DOMAIN,DC=COM"; $ace = $acl.Access | Where-Object { $_.IdentityReference -eq "DOMAIN\USER" -and $_.ActiveDirectoryRights -match "Self" -and $_.ObjectType -eq [GUID]::Empty }; $ace | ForEach-Object { $acl.RemoveAccessRule($_) }; Set-Acl -Path "AD:OU=TARGET_OU,DC=DOMAIN,DC=COM" -AclObject $acl'
             }
         )
@@ -7973,20 +7973,20 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on OU to identify principals with the Self right on the member attribute"
+                Description = "Показать субъектов с Self на атрибут member в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'Self' -and `$_.ObjectType -eq 'bf9679c0-0de6-11d0-a285-00aa003049e2'} | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove the Self-Membership permission from a specific principal"
+                Description = "Удалить Self-Membership у указанного субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'Self' -and `$_.ObjectType -eq 'bf9679c0-0de6-11d0-a285-00aa003049e2'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=TARGET_OU,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Identify privileged groups in the OU that the right can be used against"
+                Description = "Найти привилегированные группы OU, на которые распространяется это разрешение"
                 Command = "Get-ADGroup -Filter * -SearchBase 'OU=TARGET_OU,DC=domain,DC=com' -Properties AdminCount,Member | Where-Object {`$_.AdminCount -eq 1 -or `$_.Name -match 'Admin|Operator'} | Select-Object Name,DistinguishedName"
             }
             @{
-                Description = "Enable auditing for group membership changes (Event IDs 4728, 4732, 4756)"
-                Command = "# Configure via Group Policy: Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy > Account Management > Audit Security Group Management = Success, Failure"
+                Description = "Включить аудит изменения членства в группах (события 4728, 4732, 4756)"
+                Command = "# GPO → Конфигурация компьютера → Параметры Windows → Расширенная политика аудита → Управление учётными записями → Аудит изменений групп безопасности = Успех, Отказ"
             }
         )
         References = @(
@@ -8027,20 +8027,20 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on OU to identify principals with WriteProperty on servicePrincipalName"
+                Description = "Показать субъектов с WriteProperty на servicePrincipalName в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'f3a64788-5306-11d1-a9c5-0000f80367c1'} | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteProperty permission on servicePrincipalName from specific principal"
+                Description = "Удалить WriteProperty на servicePrincipalName у указанного субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'f3a64788-5306-11d1-a9c5-0000f80367c1'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=TARGET_OU,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Find all user accounts with SPNs in the OU (potential Kerberoasting targets)"
+                Description = "Найти пользователей со SPN в OU (потенциальные цели Kerberoasting)"
                 Command = "Get-ADUser -Filter {ServicePrincipalName -like '*'} -SearchBase 'OU=TARGET_OU,DC=domain,DC=com' -Properties ServicePrincipalName,AdminCount | Select-Object Name,SamAccountName,@{Name='SPNs';Expression={`$_.ServicePrincipalName -join '; '}},AdminCount"
             }
             @{
-                Description = "Enable auditing for SPN changes on user accounts (Event ID 4742)"
-                Command = "# Configure via Group Policy: Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy > Account Management > Audit User Account Management = Success, Failure"
+                Description = "Включить аудит изменений SPN (событие 4742)"
+                Command = "# GPO → Конфигурация компьютера → Политики → Параметры Windows → Расширенный аудит → Управление учётными записями → Аудит управления пользователями = Успех, Отказ"
             }
         )
         References = @(
@@ -8080,11 +8080,11 @@ Uninstall-WindowsFeature -Name ADCS-Web-Enrollment
         )
         RemediationCommands = @(
             @{
-                Description = "Find who has Validated-SPN rights on OU"
+                Description = "Показать права Validated-SPN в OU"
                 Command = "(Get-Acl 'AD:\OU=Users,DC=domain,DC=com').Access | Where-Object { `$_.ObjectType -eq 'f3a64788-5306-11d1-a9c5-0000f80367c1' }"
             }
             @{
-                Description = "Remove Validated-SPN ACE from OU (replace PRINCIPAL_SID with actual SID)"
+                Description = "Удалить ACE Validated-SPN из OU (подставьте реальный PRINCIPAL_SID)"
                 Command = @'
 `$ou = 'OU=Users,DC=domain,DC=com'
 `$acl = Get-Acl "AD:\`$ou"
@@ -8094,7 +8094,7 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
 '@
             }
             @{
-                Description = "Enable auditing for SPN changes"
+                Description = "Включить аудит изменений SPN"
                 Command = "auditpol /set /subcategory:'Directory Service Changes' /success:enable"
             }
         )
@@ -8134,19 +8134,19 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL for dNSHostName attribute on OU"
+                Description = "Показать ACL атрибута dNSHostName в OU"
                 Command = "(Get-Acl 'AD:\OU=Computers,DC=domain,DC=com').Access | Where-Object {`$_.ObjectType -eq '72e39547-7b18-11d1-adef-00c04fd8d5cd'} | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteProperty permission for dNSHostName from specific principal"
+                Description = "Удалить WriteProperty на dNSHostName у указанного субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=Computers,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\User' -and `$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq '72e39547-7b18-11d1-adef-00c04fd8d5cd'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=Computers,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Monitor dNSHostName changes via Event ID 5136 (Directory Service Changes)"
+                Description = "Отслеживать изменения dNSHostName по событию 5136"
                 Command = "Get-WinEvent -FilterHashtable @{LogName='Security'; Id=5136; StartTime=(Get-Date).AddDays(-7)} | Where-Object {`$_.Message -match 'dNSHostName'} | Select-Object TimeCreated,@{Name='Computer';Expression={`$_.Properties[10].Value}},@{Name='Attribute';Expression={`$_.Properties[8].Value}},@{Name='NewValue';Expression={`$_.Properties[11].Value}} | Format-Table -AutoSize"
             }
             @{
-                Description = "Confirm that computers keep the validated write on their own dNSHostName (SELF, Self right) - it is granted by default, so nothing needs to be added, and an unvalidated WriteProperty for SELF would be the weakening this finding is about"
+                Description = "Проверить наличие у компьютеров штатного проверяемого права Self на собственный dNSHostName: добавлять WriteProperty для SELF не нужно"
                 Command = "(Get-Acl 'AD:\CN=COMPUTER01,OU=Computers,DC=domain,DC=com').Access | Where-Object { `$_.IdentityReference -eq 'NT AUTHORITY\SELF' -and `$_.ObjectType -eq '72e39547-7b18-11d1-adef-00c04fd8d5cd' } | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
         )
@@ -8187,11 +8187,11 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "Show who may write msDS-KeyCredentialLink on an OU"
+                Description = "Показать субъектов с записью msDS-KeyCredentialLink в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object { `$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq '5b47d60f-6090-40b2-9f37-2a4de88f3063' } | Format-Table IdentityReference,ActiveDirectoryRights,IsInherited,AccessControlType -AutoSize"
             }
             @{
-                Description = "List the accounts in the OU that carry key credentials"
+                Description = "Найти учётные записи OU с заполненными ключевыми учётными данными"
                 Command = "Get-ADObject -SearchBase 'OU=TARGET_OU,DC=domain,DC=com' -LDAPFilter '(msDS-KeyCredentialLink=*)' -Properties msDS-KeyCredentialLink | Select-Object Name,DistinguishedName"
             }
         )
@@ -8229,7 +8229,7 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "Show the explicit ACEs and the owner of AdminSDHolder"
+                Description = "Показать явные ACE и владельца AdminSDHolder"
                 Command = "`$acl = Get-Acl 'AD:\CN=AdminSDHolder,CN=System,DC=domain,DC=com'; `$acl.Owner; `$acl.Access | Where-Object { -not `$_.IsInherited } | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
         )
@@ -8269,19 +8269,19 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL for DNS-Host-Name-Attributes property set on OU"
+                Description = "Показать ACL набора DNS-Host-Name-Attributes в OU"
                 Command = "(Get-Acl 'AD:\OU=Computers,DC=domain,DC=com').Access | Where-Object {`$_.ObjectType -eq '72e39547-7b18-11d1-adef-00c04fd8d5cd'} | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteProperty permission for DNS-Host-Name-Attributes property set from specific principal"
+                Description = "Удалить WriteProperty на набор DNS-Host-Name-Attributes у указанного субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=Computers,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\User' -and `$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq '72e39547-7b18-11d1-adef-00c04fd8d5cd'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=Computers,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Grant the Validated-DNS-Host-Name validated write instead - a Self right on 72e39547-7b18-11d1-adef-00c04fd8d5cd, not an extended right"
+                Description = "Вместо этого разрешить Validated-DNS-Host-Name: право Self на 72e39547-7b18-11d1-adef-00c04fd8d5cd (не ExtendedRight)"
                 Command = "`$ouPath = 'AD:\OU=Computers,DC=domain,DC=com'; `$acl = Get-Acl `$ouPath; `$sid = (Get-ADGroup 'DOMAIN\GroupName').SID; `$ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(`$sid, 'Self', 'Allow', '72e39547-7b18-11d1-adef-00c04fd8d5cd', 'Descendents', 'bf967a86-0de6-11d0-a285-00aa003049e2'); `$acl.AddAccessRule(`$ace); Set-Acl -Path `$ouPath -AclObject `$acl"
             }
             @{
-                Description = "Find all computers with non-default dNSHostName values (potential indicators of modification)"
+                Description = "Найти компьютеры с нестандартным dNSHostName"
                 Command = "Get-ADComputer -Filter * -Properties dNSHostName | Where-Object { `$_.dNSHostName -ne (`$_.Name + '.' + (Get-ADDomain).DNSRoot) } | Select-Object Name,dNSHostName,DistinguishedName"
             }
         )
@@ -8353,19 +8353,19 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on OU to identify principals with WriteProperty on scriptPath"
+                Description = "Показать субъектов с WriteProperty на scriptPath в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'bf9679a8-0de6-11d0-a285-00aa003049e2'} | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteProperty permission on scriptPath from specific principal"
+                Description = "Удалить WriteProperty на scriptPath у указанного субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'bf9679a8-0de6-11d0-a285-00aa003049e2'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=TARGET_OU,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Find all users in OU with scriptPath configured"
+                Description = "Найти пользователей OU с указанным scriptPath"
                 Command = "Get-ADUser -Filter {scriptPath -like '*'} -SearchBase 'OU=TARGET_OU,DC=domain,DC=com' -Properties scriptPath,AdminCount | Select-Object Name,SamAccountName,scriptPath,AdminCount"
             }
             @{
-                Description = "Clear scriptPath attribute from all users in OU (prepare for GPO-based scripts)"
+                Description = "Очистить scriptPath у пользователей OU перед переходом на сценарии через GPO"
                 Command = "Get-ADUser -Filter {scriptPath -like '*'} -SearchBase 'OU=TARGET_OU,DC=domain,DC=com' | Set-ADUser -Clear scriptPath"
             }
         )
@@ -8406,11 +8406,11 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "Find who can write msDS-AllowedToDelegateTo on OU"
+                Description = "Показать, кому разрешена запись msDS-AllowedToDelegateTo в OU"
                 Command = "(Get-Acl 'AD:\OU=Servers,DC=domain,DC=com').Access | Where-Object { `$_.ObjectType -eq '800d94d7-b7a1-42a1-b14d-7cae1423d07f' -and `$_.ActiveDirectoryRights -match 'WriteProperty' }"
             }
             @{
-                Description = "Remove dangerous ACE from OU (replace PRINCIPAL_SID with actual SID)"
+                Description = "Удалить опасную ACE из OU (подставьте реальный PRINCIPAL_SID)"
                 Command = @'
 `$ou = 'OU=Servers,DC=domain,DC=com'
 `$acl = Get-Acl "AD:\`$ou"
@@ -8420,7 +8420,7 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
 '@
             }
             @{
-                Description = "Enable auditing for Directory Service Changes"
+                Description = "Включить аудит изменений службы каталогов"
                 Command = "auditpol /set /subcategory:'Directory Service Changes' /success:enable"
             }
         )
@@ -8461,19 +8461,19 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on OU to identify principals with WriteProperty on msDS-AllowedToActOnBehalfOfOtherIdentity"
+                Description = "Показать субъектов с WriteProperty на msDS-AllowedToActOnBehalfOfOtherIdentity в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq '3f78c3e5-f79a-46bd-a0b8-9d18116ddc79'} | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteProperty permission on msDS-AllowedToActOnBehalfOfOtherIdentity from specific principal"
+                Description = "Удалить WriteProperty на msDS-AllowedToActOnBehalfOfOtherIdentity у субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq '3f78c3e5-f79a-46bd-a0b8-9d18116ddc79'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=TARGET_OU,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Find all computers with RBCD configured in the OU"
+                Description = "Найти компьютеры OU с настроенным RBCD"
                 Command = "Get-ADComputer -Filter * -SearchBase 'OU=TARGET_OU,DC=domain,DC=com' -Properties msDS-AllowedToActOnBehalfOfOtherIdentity | Where-Object {`$_.'msDS-AllowedToActOnBehalfOfOtherIdentity'} | Select-Object Name,@{Name='AllowedPrincipals';Expression={([System.Security.Principal.SecurityIdentifier]`$_.'msDS-AllowedToActOnBehalfOfOtherIdentity').Value}}"
             }
             @{
-                Description = "Lower ms-DS-MachineAccountQuota to prevent unauthorized machine account creation"
+                Description = "Уменьшить ms-DS-MachineAccountQuota, чтобы запретить несанкционированное создание компьютеров"
                 Command = "Set-ADDomain -Identity 'domain.com' -Replace @{'ms-DS-MachineAccountQuota'=0}"
             }
         )
@@ -8548,19 +8548,19 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on OU to identify principals with CreateChild rights"
+                Description = "Показать субъекты с правом CreateChild в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'CreateChild'} | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove CreateChild permission from specific principal"
+                Description = "Удалить разрешение CreateChild у указанного субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'CreateChild'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=TARGET_OU,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Check current ms-DS-MachineAccountQuota (default is 10)"
+                Description = "Проверить текущую квоту ms-DS-MachineAccountQuota (по умолчанию 10)"
                 Command = "Get-ADDomain | Select-Object -ExpandProperty DistinguishedName | ForEach-Object { Get-ADObject `$_ -Properties 'ms-DS-MachineAccountQuota' | Select-Object 'ms-DS-MachineAccountQuota' }"
             }
             @{
-                Description = "Lower ms-DS-MachineAccountQuota to 0 (prevent unauthorized computer account creation)"
+                Description = "Установить ms-DS-MachineAccountQuota равной 0"
                 Command = "Set-ADDomain -Identity 'domain.com' -Replace @{'ms-DS-MachineAccountQuota'=0}"
             }
         )
@@ -8601,15 +8601,15 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "List who may create dMSAs on an OU - the dMSA class (0feb936f-47b3-49f2-9386-1dedc2c23765) or every class"
+                Description = "Показать субъектов, способных создавать dMSA в OU: класс dMSA или все классы объектов"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object { `$_.AccessControlType -eq 'Allow' -and `$_.ActiveDirectoryRights -match 'CreateChild|GenericAll' -and `$_.ObjectType -in @([guid]'0feb936f-47b3-49f2-9386-1dedc2c23765', [guid]::Empty) } | Format-Table IdentityReference, ActiveDirectoryRights, ObjectType, IsInherited -AutoSize"
             }
             @{
-                Description = "Show which domain controllers run Windows Server 2025 (build 26100) - only those issue dMSA tickets"
+                Description = "Показать контроллеры домена на Windows Server 2025 (сборка 26100), выпускающие билеты dMSA"
                 Command = "Get-ADDomainController -Filter * | Select-Object HostName, OperatingSystem, OperatingSystemVersion"
             }
             @{
-                Description = "List every account linked to a dMSA, with both sides of the link and the migration state"
+                Description = "Найти связи учётных записей с dMSA, обе стороны связи и состояние миграции"
                 Command = "Get-ADObject -LDAPFilter '(|(msDS-ManagedAccountPrecededByLinkBL=*)(msDS-SupersededManagedAccountLink=*))' -Properties 'msDS-ManagedAccountPrecededByLinkBL', 'msDS-SupersededManagedAccountLink', 'msDS-SupersededServiceAccountState', userAccountControl | Select-Object Name, 'msDS-ManagedAccountPrecededByLinkBL', 'msDS-SupersededManagedAccountLink', 'msDS-SupersededServiceAccountState', userAccountControl"
             }
         )
@@ -8648,20 +8648,20 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on OU to identify principals with WriteProperty on gPLink"
+                Description = "Показать субъектов с WriteProperty на gPLink в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'f30e3bbe-9ff0-11d1-b603-0000f80367c1'} | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove WriteProperty permission on gPLink from specific principal"
+                Description = "Удалить WriteProperty на gPLink у указанного субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'f30e3bbe-9ff0-11d1-b603-0000f80367c1'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=TARGET_OU,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "View GPOs currently linked to OU"
+                Description = "Показать GPO, привязанные к OU"
                 Command = "Get-ADOrganizationalUnit -Identity 'OU=TARGET_OU,DC=domain,DC=com' -Properties gPLink | Select-Object Name,DistinguishedName,gPLink"
             }
             @{
-                Description = "Enable auditing for GPO link changes (Event ID 5136)"
-                Command = "# Configure via Group Policy: Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy > DS Access > Audit Directory Service Changes = Success, Failure"
+                Description = "Включить аудит изменения привязок GPO (событие 5136)"
+                Command = "# GPO → Конфигурация компьютера → Параметры Windows → Расширенная политика аудита → Доступ к службе каталогов → Аудит изменений = Успех, Отказ"
             }
         )
         References = @(
@@ -8697,11 +8697,11 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "Show the principals that may write gPOptions on the OU"
+                Description = "Показать субъектов с правом изменения gPOptions в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'WriteProperty' -and `$_.ObjectType -eq 'f30e3bbf-9ff0-11d1-b603-0000f80367c1'} | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "List the OUs that block inheritance"
+                Description = "Найти OU с блокированием наследования GPO"
                 Command = "Get-ADOrganizationalUnit -LDAPFilter '(gPOptions=1)' | Select-Object Name,DistinguishedName"
             }
         )
@@ -8741,20 +8741,20 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "View current ACL on OU to identify principals with GenericWrite"
+                Description = "Показать субъектов с GenericWrite в OU"
                 Command = "(Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'GenericWrite'} | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove GenericWrite permission from specific principal"
+                Description = "Удалить GenericWrite у указанного субъекта"
                 Command = "`$acl = Get-Acl 'AD:\OU=TARGET_OU,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\USER' -and `$_.ActiveDirectoryRights -match 'GenericWrite'}; `$ace | ForEach-Object {`$acl.RemoveAccessRule(`$_)}; Set-Acl -Path 'AD:\OU=TARGET_OU,DC=domain,DC=com' -AclObject `$acl"
             }
             @{
-                Description = "Delegate specific task using Delegation of Control Wizard (safer than GenericWrite)"
-                Command = "# Use Active Directory Users and Computers > OU > Right-click > Delegate Control > Choose specific task (e.g., Reset user passwords) instead of granting GenericWrite"
+                Description = "Делегировать конкретную задачу через мастер делегирования управления вместо GenericWrite"
+                Command = "# «Пользователи и компьютеры AD» → OU → «Делегировать управление» → конкретная задача (например, сброс пароля), а не GenericWrite"
             }
             @{
-                Description = "List common delegation tasks that can replace GenericWrite"
-                Command = "# Common delegation tasks: Reset user passwords, Modify group membership, Manage user accounts, Join computer to domain - Use Delegation of Control Wizard for granular permissions"
+                Description = "Показать типовые задачи, которыми можно заменить общее разрешение GenericWrite"
+                Command = "# Типовые задачи: сброс паролей, изменение групп, управление пользователями, присоединение компьютеров. Используйте мастер делегирования управления"
             }
         )
         References = @(
@@ -8817,15 +8817,15 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "Enable password expiration for a single user account"
+                Description = "Включить срок действия пароля для одной учётной записи"
                 Command = "Set-ADUser -Identity 'USERNAME' -PasswordNeverExpires `$false"
             }
             @{
-                Description = "Enable password expiration for all users in a specific OU"
+                Description = "Включить срок действия пароля для всех пользователей указанной OU"
                 Command = "Get-ADUser -Filter {PasswordNeverExpires -eq `$true} -SearchBase 'OU=Users,DC=domain,DC=com' | Set-ADUser -PasswordNeverExpires `$false"
             }
             @{
-                Description = "View all users with PasswordNeverExpires flag set"
+                Description = "Найти пользователей с флагом PasswordNeverExpires"
                 Command = "Get-ADUser -Filter {PasswordNeverExpires -eq `$true} -Properties PasswordNeverExpires,PasswordLastSet | Select-Object Name,SamAccountName,PasswordNeverExpires,PasswordLastSet"
             }
         )
@@ -8863,19 +8863,19 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "Remove PasswordNotRequired flag from a single user account"
+                Description = "Снять флаг PasswordNotRequired у конкретного пользователя"
                 Command = "Set-ADUser -Identity 'USERNAME' -PasswordNotRequired `$false"
             }
             @{
-                Description = "Remove flag from all users in a specific OU (using LDAP filter for userAccountControl bit 32)"
+                Description = "Снять флаг у всех пользователей OU (LDAP-фильтр по биту 32 userAccountControl)"
                 Command = "Get-ADUser -LDAPFilter '(&(objectClass=user)(userAccountControl:1.2.840.113556.1.4.803:=32))' -SearchBase 'OU=Users,DC=domain,DC=com' | Set-ADUser -PasswordNotRequired `$false"
             }
             @{
-                Description = "Find all enabled accounts with PasswordNotRequired flag set"
+                Description = "Найти включённые учётные записи с флагом PasswordNotRequired"
                 Command = "Get-ADUser -Filter {PasswordNotRequired -eq `$true -and Enabled -eq `$true} -Properties PasswordNotRequired,PasswordLastSet | Select-Object Name,SamAccountName,PasswordNotRequired,PasswordLastSet,Enabled"
             }
             @{
-                Description = "Set a strong password after removing the flag"
+                Description = "После снятия флага назначить надёжный пароль"
                 Command = "`$NewPwd = ConvertTo-SecureString -String 'NewStrongPassword123!' -AsPlainText -Force; Set-ADAccountPassword -Identity 'USERNAME' -NewPassword `$NewPwd -Reset"
             }
         )
@@ -8912,15 +8912,15 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "List the enabled computer accounts that carry the flag, with their last logon"
+                Description = "Найти включённые компьютерные записи с флагом и датой последнего входа"
                 Command = "Get-ADComputer -LDAPFilter '(&(userAccountControl:1.2.840.113556.1.4.803:=32)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))' -Properties lastLogonTimestamp,pwdLastSet | Select-Object Name,lastLogonTimestamp,pwdLastSet"
             }
             @{
-                Description = "Delete a pre-created account that is no longer needed"
+                Description = "Удалить больше не нужную заранее созданную учётную запись"
                 Command = "Remove-ADComputer -Identity 'COMPUTERNAME'"
             }
             @{
-                Description = "Set a random password on a pre-created account that has not been joined yet, and remove the flag"
+                Description = "Задать случайный пароль ещё не присоединённому компьютеру и снять флаг"
                 Command = "Set-ADAccountPassword -Identity 'COMPUTERNAME$' -Reset -NewPassword (ConvertTo-SecureString -AsPlainText -Force ([guid]::NewGuid().ToString() + [guid]::NewGuid().ToString())); Set-ADAccountControl -Identity 'COMPUTERNAME$' -PasswordNotRequired `$false"
             }
         )
@@ -9040,37 +9040,37 @@ Set-Acl -Path "AD:\`$ou" -AclObject `$acl
         )
         RemediationCommands = @(
             @{
-                Description = "List all members of Domain Admins group (including nested)"
+                Description = "Вывести всех участников группы «Администраторы домена» (Domain Admins), включая вложенные группы"
                 Command = "Get-ADGroupMember -Identity 'Domain Admins' -Recursive | Select-Object Name,SamAccountName,ObjectClass,DistinguishedName | Format-Table -AutoSize"
             }
             @{
-                Description = "List all members of Enterprise Admins group (including nested)"
+                Description = "Вывести всех участников группы «Администраторы предприятия» (Enterprise Admins), включая вложенные группы"
                 Command = "Get-ADGroupMember -Identity 'Enterprise Admins' -Recursive | Select-Object Name,SamAccountName,ObjectClass,DistinguishedName | Format-Table -AutoSize"
             }
             @{
-                Description = "List all members of Schema Admins group (including nested)"
+                Description = "Вывести всех участников группы «Администраторы схемы» (Schema Admins), включая вложенные группы"
                 Command = "Get-ADGroupMember -Identity 'Schema Admins' -Recursive | Select-Object Name,SamAccountName,ObjectClass,DistinguishedName | Format-Table -AutoSize"
             }
             @{
-                Description = "Remove specific user from Domain Admins group"
+                Description = "Удалить указанного пользователя из группы «Администраторы домена» (Domain Admins)"
                 Command = "Remove-ADGroupMember -Identity 'Domain Admins' -Members 'USERNAME' -Confirm:`$false"
             }
             @{
-                Description = "Audit all privileged group memberships (Tier 0 groups)"
+                Description = "Проверить членство во всех привилегированных группах уровня Tier 0"
                 Command = "`$privilegedGroups = @('Domain Admins','Enterprise Admins','Schema Admins','Administrators','Account Operators','Server Operators','Backup Operators','Print Operators'); `$privilegedGroups | ForEach-Object { Write-Host `"Group: `$_`" -ForegroundColor Cyan; Get-ADGroupMember -Identity `$_ -Recursive -ErrorAction SilentlyContinue | Select-Object Name,SamAccountName | Format-Table -AutoSize }"
             }
             @{
-                Description = "Add a Tier 0 user account to Protected Users - a user account, and after checking what it depends on"
+                Description = "Добавить пользователя Tier 0 в группу Protected Users только после проверки зависимостей его аутентификации"
                 Command = @'
-# Protected Users ends NTLM, CredSSP, Digest, RC4 and delegation for the member and stops
-# its credentials being cached. For a user account that is the point; for a computer
-# account or a gMSA it has no effect and Microsoft advises against it, so neither belongs
-# in this group - and this finding attaches to all three kinds of member.
+# Группа Protected Users запрещает NTLM, CredSSP, Digest, RC4 и делегирование
+# для своих членов, а также кэширование их учётных данных. Это мера для пользователей;
+# для компьютерных учётных записей и gMSA защита не действует, и Microsoft не советует
+# добавлять их в группу. Находка относится ко всем трём типам учётных записей.
 Add-ADGroupMember -Identity 'Protected Users' -Members 'TIER0_USER_ACCOUNT'
 
-# For a computer account or a gMSA, use these instead:
+# Для компьютера или gMSA вместо добавления в Protected Users используйте:
 Set-ADAccountControl -Identity 'TIER0_COMPUTER$' -AccountNotDelegated $true
-Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryptionTypes' = 24 }  # AES128 + AES256 only
+Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryptionTypes' = 24 }  # Только AES128 и AES256
 '@
             }
         )
@@ -9170,19 +9170,19 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "Remove a specific user from an Exchange service group"
+                Description = "Удалить указанного пользователя из служебной группы Exchange"
                 Command = "Remove-ADGroupMember -Identity 'Exchange Trusted Subsystem' -Members 'CN=User Name,OU=Users,DC=contoso,DC=com' -Confirm:`$false"
             }
             @{
-                Description = "List all members of Exchange service groups to audit membership"
+                Description = "Перечислить участников служебных групп Exchange для проверки полномочий"
                 Command = "Get-ADGroup -Filter ""Name -like 'Exchange*'"" | ForEach-Object { Write-Host `"Group: `$(`$_.Name)`" -ForegroundColor Yellow; Get-ADGroupMember -Identity `$_ | Select-Object Name, ObjectClass, SamAccountName }"
             }
             @{
-                Description = "Find all Exchange security groups in the domain"
+                Description = "Найти все группы безопасности Exchange в домене"
                 Command = "Get-ADGroup -Filter ""(Name -like 'Exchange*') -and (GroupCategory -eq 'Security')"" -Properties Description | Select-Object Name, GroupScope, Description"
             }
             @{
-                Description = "Check recent group membership changes in Security Event Log (Event ID 4728, 4732, 4756)"
+                Description = "Проверить последние изменения групп по событиям 4728, 4732 и 4756"
                 Command = "Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4728,4732,4756; StartTime=(Get-Date).AddDays(-7)} | Where-Object { `$_.Message -match 'Exchange' } | Select-Object TimeCreated, Message | Format-List"
             }
         )
@@ -9222,20 +9222,20 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "Enable LDAP signing requirement via registry on Domain Controller (Value 2 = Require Signing)"
+                Description = "Включить обязательную подпись LDAP на контроллере домена через реестр (значение 2)"
                 Command = "New-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Services\NTDS\Parameters' -Name LdapServerIntegrity -Value 2 -PropertyType DWORD -Force"
             }
             @{
-                Description = "Verify current LDAP signing configuration on Domain Controller"
+                Description = "Проверить текущие настройки обязательной подписи LDAP на контроллере домена"
                 Command = "Get-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Services\NTDS\Parameters' -Name LdapServerIntegrity | Select-Object LdapServerIntegrity"
             }
             @{
-                Description = "Configure LDAP signing via Group Policy (preferred method for consistent configuration)"
-                Command = "# In Group Policy Management: Default Domain Controller Policy > Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > Security Options > 'Domain controller: LDAP server signing requirements' = Require signing"
+                Description = "Настроить обязательную подпись LDAP через GPO (предпочтительный способ)"
+                Command = "# GPMC → Default Domain Controllers Policy → Конфигурация компьютера → Безопасность → Локальные политики → «Контроллер домена: требования подписи LDAP-сервера» = Требовать подпись"
             }
             @{
-                Description = "Test LDAP signing enforcement before deployment (check for unsigned binds)"
-                Command = "# Use Event Viewer on DC: Security log Event ID 2889 indicates unsigned LDAP binds. Filter by Task Category 'LDAP Interface' to identify clients requiring updates"
+                Description = "Перед внедрением проверить LDAP-подключения без подписи"
+                Command = "# На DC проверьте событие 2889: обращения LDAP без подписи. По категории LDAP Interface определите клиентов, нуждающихся в исправлении"
             }
         )
         References = @(
@@ -9277,20 +9277,20 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "Enable LDAP channel binding enforcement on Domain Controller (Value 2 = Always require channel binding)"
+                Description = "Включить обязательную привязку LDAP к TLS-каналу на DC (значение 2)"
                 Command = "New-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Services\NTDS\Parameters' -Name LdapEnforceChannelBinding -Value 2 -PropertyType DWORD -Force"
             }
             @{
-                Description = "Set to 'When Supported' mode for initial testing (Value 1 = Only enforce for updated clients)"
+                Description = "Для начальной проверки использовать режим «При поддержке» (значение 1)"
                 Command = "New-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Services\NTDS\Parameters' -Name LdapEnforceChannelBinding -Value 1 -PropertyType DWORD -Force"
             }
             @{
-                Description = "Verify current LDAP channel binding configuration on Domain Controller"
+                Description = "Проверить текущее значение LDAP Channel Binding на контроллере домена"
                 Command = "Get-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Services\NTDS\Parameters' -Name LdapEnforceChannelBinding -ErrorAction SilentlyContinue | Select-Object LdapEnforceChannelBinding"
             }
             @{
-                Description = "Configure LDAP channel binding via Group Policy (Server 2025+)"
-                Command = "# In Group Policy Management: Default Domain Controller Policy > Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > Security Options > 'Domain controller: LDAP server channel binding token requirements' = Always"
+                Description = "Настроить LDAP Channel Binding через GPO (Windows Server 2025+)"
+                Command = "# GPMC → Default Domain Controllers Policy → Конфигурация компьютера → Безопасность → «Контроллер домена: требования к привязке LDAP-канала» = Всегда"
             }
         )
         References = @(
@@ -9329,16 +9329,16 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "Show the current dsHeuristics value (character 7 is fLDAPBlockAnonOps)"
+                Description = "Показать dsHeuristics: седьмой символ отвечает за fLDAPBlockAnonOps"
                 Command = "Get-ADObject 'CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=domain,DC=com' -Properties dsHeuristics | Select-Object dsHeuristics"
             }
             @{
-                Description = "Set character 7 back to 0, leaving every other character as it is"
+                Description = "Вернуть седьмой символ dsHeuristics к 0, сохранив остальные"
                 Command = "`$dn = 'CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=domain,DC=com'; `$current = (Get-ADObject `$dn -Properties dsHeuristics).dsHeuristics; if (`$current.Length -ge 7) { `$new = `$current.Substring(0,6) + '0' + `$current.Substring(7); Set-ADObject `$dn -Replace @{dsHeuristics=`$new} }"
             }
             @{
-                Description = "Test anonymous LDAP access (should fail after the change)"
-                Command = "# From non-domain-joined system: ldapsearch -x -h dc01.domain.com -b 'DC=domain,DC=com' '(objectClass=user)' sAMAccountName"
+                Description = "Проверить анонимный LDAP-доступ (после изменения должен блокироваться)"
+                Command = "# Вне домена выполните: ldapsearch -x -h dc01.domain.com -b 'DC=domain,DC=com' '(objectClass=user)' sAMAccountName"
             }
         )
         References = @(
@@ -9373,11 +9373,11 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "Show the current dsHeuristics value (character 8 is fAllowAnonNSPI)"
+                Description = "Показать dsHeuristics: восьмой символ отвечает за fAllowAnonNSPI"
                 Command = "Get-ADObject 'CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=domain,DC=com' -Properties dsHeuristics | Select-Object dsHeuristics"
             }
             @{
-                Description = "Set character 8 back to 0, leaving every other character as it is"
+                Description = "Вернуть восьмой символ dsHeuristics к 0, сохранив остальные"
                 Command = "`$dn = 'CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=domain,DC=com'; `$current = (Get-ADObject `$dn -Properties dsHeuristics).dsHeuristics; if (`$current.Length -ge 8) { `$new = `$current.Substring(0,7) + '0' + `$current.Substring(8); Set-ADObject `$dn -Replace @{dsHeuristics=`$new} }"
             }
         )
@@ -9413,15 +9413,15 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "Show the current dsHeuristics value (character 16 is dwAdminSDExMask)"
+                Description = "Показать dsHeuristics: шестнадцатый символ отвечает за dwAdminSDExMask"
                 Command = "Get-ADObject 'CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=domain,DC=com' -Properties dsHeuristics | Select-Object dsHeuristics"
             }
             @{
-                Description = "Set character 16 back to 0, leaving every other character as it is"
+                Description = "Вернуть шестнадцатый символ dsHeuristics к 0, сохранив остальные"
                 Command = "`$dn = 'CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=domain,DC=com'; `$current = (Get-ADObject `$dn -Properties dsHeuristics).dsHeuristics; if (`$current.Length -ge 16) { `$new = `$current.Substring(0,15) + '0' + `$current.Substring(16); Set-ADObject `$dn -Replace @{dsHeuristics=`$new} }"
             }
             @{
-                Description = "List the members of the four operator groups, by SID so a localized domain works too"
+                Description = "Перечислить участников четырёх операторских групп по SID, независимо от языка домена"
                 Command = "foreach (`$sid in 'S-1-5-32-548','S-1-5-32-549','S-1-5-32-550','S-1-5-32-551') { Get-ADGroupMember -Identity `$sid -Recursive | Select-Object @{n='Group';e={`$sid}}, SamAccountName, objectClass }"
             }
         )
@@ -9459,19 +9459,19 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "Show the current dsHeuristics value (character 21 is DoNotVerifyUPNAndOrSPNUniqueness)"
+                Description = "Показать dsHeuristics: двадцать первый символ отвечает за DoNotVerifyUPNAndOrSPNUniqueness"
                 Command = "Get-ADObject 'CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=domain,DC=com' -Properties dsHeuristics | Select-Object dsHeuristics"
             }
             @{
-                Description = "Set character 21 back to 0, leaving every other character as it is"
+                Description = "Вернуть двадцать первый символ dsHeuristics к 0, сохранив остальные"
                 Command = "`$dn = 'CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=domain,DC=com'; `$current = (Get-ADObject `$dn -Properties dsHeuristics).dsHeuristics; if (`$current.Length -ge 21) { `$new = `$current.Substring(0,20) + '0' + `$current.Substring(21); Set-ADObject `$dn -Replace @{dsHeuristics=`$new} }"
             }
             @{
-                Description = "List duplicate SPNs in the forest"
+                Description = "Найти повторяющиеся SPN в лесу"
                 Command = "setspn -X -F"
             }
             @{
-                Description = "List UPNs that more than one account holds"
+                Description = "Найти UPN, назначенные более чем одной учётной записи"
                 Command = "Get-ADObject -LDAPFilter '(userPrincipalName=*)' -Properties userPrincipalName | Group-Object userPrincipalName | Where-Object { `$_.Count -gt 1 } | Select-Object Name, Count"
             }
         )
@@ -9515,19 +9515,19 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "Find all users with SID History"
+                Description = "Найти пользователей с заполненным SID History"
                 Command = "Get-ADUser -Filter {SIDHistory -like '*'} -Properties SIDHistory,SamAccountName | Select-Object SamAccountName,@{Name='SIDHistory';Expression={`$_.SIDHistory -join '; '}}"
             }
             @{
-                Description = "Remove all SID History entries from a specific user"
+                Description = "Удалить все значения SID History у указанного пользователя"
                 Command = "Get-ADUser 'USERNAME' -Properties SIDHistory | ForEach-Object { Set-ADUser `$_ -Remove @{SIDHistory=`$_.SIDHistory.Value} }"
             }
             @{
-                Description = "Remove SID History from all users in a specific OU"
+                Description = "Удалить SID History у пользователей конкретной OU"
                 Command = "Get-ADUser -SearchBase 'OU=MigratedUsers,DC=domain,DC=com' -Filter {SIDHistory -like '*'} -Properties SIDHistory | ForEach-Object { Set-ADUser `$_ -Remove @{SIDHistory=`$_.SIDHistory.Value} }"
             }
             @{
-                Description = "Enable SID Filtering on a trust to block SID History injection (quarantine trust)"
+                Description = "Включить фильтрацию SID в доверии для защиты от внедрения SID History"
                 Command = "netdom trust TRUSTINGDOMAIN /domain:TRUSTEDDOMAIN /quarantine:yes"
             }
         )
@@ -9571,15 +9571,15 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "Show the SID History entries of this account"
+                Description = "Показать значения SID History этой учётной записи"
                 Command = "Get-ADUser 'USERNAME' -Properties SIDHistory | Select-Object -ExpandProperty SIDHistory"
             }
             @{
-                Description = "Resolve the referenced SID to see what it is"
+                Description = "Разрешить указанный SID в имя субъекта для определения его принадлежности"
                 Command = "(New-Object System.Security.Principal.SecurityIdentifier('SID')).Translate([System.Security.Principal.NTAccount])"
             }
             @{
-                Description = "Remove all SID History entries from this account"
+                Description = "Удалить все значения SID History у этой учётной записи"
                 Command = "Get-ADUser 'USERNAME' -Properties SIDHistory | ForEach-Object { Set-ADUser `$_ -Remove @{SIDHistory=`$_.SIDHistory.Value} }"
             }
         )
@@ -9618,15 +9618,15 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "Show the SID filtering state of every trust"
+                Description = "Показать состояние фильтрации SID во всех доверительных отношениях"
                 Command = "Get-ADTrust -Filter * | Select-Object Name,Direction,SIDFilteringQuarantined,SIDFilteringForestAware"
             }
             @{
-                Description = "Enforce SID filtering on an external trust"
+                Description = "Включить фильтрацию SID для внешнего доверия"
                 Command = "netdom trust TRUSTINGDOMAIN /domain:TRUSTEDDOMAIN /quarantine:yes"
             }
             @{
-                Description = "Remove all SID History entries from this account once the migration is complete"
+                Description = "После завершения миграции удалить SID History у учётной записи"
                 Command = "Get-ADUser 'USERNAME' -Properties SIDHistory | ForEach-Object { Set-ADUser `$_ -Remove @{SIDHistory=`$_.SIDHistory.Value} }"
             }
         )
@@ -9658,11 +9658,11 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "List the accounts that carry sIDHistory from one source domain (replace the domain SID)"
+                Description = "Найти учётные записи с sIDHistory из указанного исходного домена (подставьте SID домена)"
                 Command = "Get-ADObject -LDAPFilter '(sIDHistory=*)' -Properties sIDHistory | Where-Object { `$_.sIDHistory.Value -like 'S-1-5-21-1111111111-2222222222-3333333333-*' } | Select-Object Name, sIDHistory"
             }
             @{
-                Description = "Remove all SID History entries from an account once its resources no longer need them"
+                Description = "Удалить SID History у учётной записи, когда ресурсам больше не требуются прежние SID"
                 Command = "Get-ADUser 'USERNAME' -Properties SIDHistory | ForEach-Object { Set-ADUser `$_ -Remove @{SIDHistory=`$_.SIDHistory.Value} }"
             }
         )
@@ -9705,19 +9705,19 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "View current GPO permissions"
+                Description = "Показать текущие разрешения GPO"
                 Command = "Get-GPPermission -Name 'GPO_NAME' -All | Format-Table Trustee,Permission,Inherited -AutoSize"
             }
             @{
-                Description = "Remove all permissions for a specific user/group from a GPO (set to None)"
+                Description = "Удалить все разрешения для указанного пользователя или группы в GPO (значение None)"
                 Command = "Set-GPPermission -Name 'GPO_NAME' -PermissionLevel None -TargetName 'DOMAIN\User' -TargetType User -Replace"
             }
             @{
-                Description = "Grant read-only access instead of write access to a GPO"
+                Description = "Вместо записи предоставить только чтение GPO"
                 Command = "Set-GPPermission -Name 'GPO_NAME' -PermissionLevel GpoRead -TargetName 'DOMAIN\Group' -TargetType Group -Replace"
             }
             @{
-                Description = "Find all GPOs with write permissions for a specific principal"
+                Description = "Найти все GPO, для которых у субъекта есть права записи"
                 Command = "Get-GPO -All | ForEach-Object { `$perms = Get-GPPermission -Guid `$_.Id -All | Where-Object { `$_.Trustee.Name -eq 'USERNAME' -and `$_.Permission -match 'Edit|Write' }; if (`$perms) { [PSCustomObject]@{GPOName=`$_.DisplayName; Permission=`$perms.Permission} } }"
             }
         )
@@ -9761,29 +9761,29 @@ Set-ADComputer -Identity 'TIER0_COMPUTER$' -Replace @{ 'msDS-SupportedEncryption
         )
         RemediationCommands = @(
             @{
-                Description = "List all GPOs linked at domain root"
+                Description = "Перечислить GPO, связанные с корнем домена"
                 Command = "Get-ADDomain | Select-Object -ExpandProperty LinkedGroupPolicyObjects | ForEach-Object { Get-GPO -Guid (`$_ -replace '.*\{|\}.*') } | Select-Object DisplayName,Id,GpoStatus"
             }
             @{
-                Description = "Unlink a GPO from the domain root"
+                Description = "Удалить привязку GPO к корню домена"
                 Command = "Remove-GPLink -Name 'GPO_NAME' -Target (Get-ADDomain).DistinguishedName"
             }
             @{
-                Description = "Link a GPO to a specific OU instead of domain root"
+                Description = "Привязать GPO к конкретной OU вместо корня домена"
                 Command = "New-GPLink -Name 'GPO_NAME' -Target 'OU=Workstations,DC=domain,DC=com' -LinkEnabled Yes"
             }
             @{
-                Description = "Apply security filtering to limit GPO scope - Domain Computers keeps read, which MS16-072 made a precondition"
+                Description = "Ограничить область применения GPO фильтром безопасности; сохраните чтение для Domain Computers согласно MS16-072"
                 Command = @'
-# Since MS16-072 / KB3163622 group policy is retrieved in the security context of the
-# COMPUTER account, user policies included. Removing Authenticated Users without leaving
-# a computer-side read behind stops the GPO applying to users altogether - and the outage
-# does not look like a permission problem. Microsoft's own MS16-072 guidance is this
-# extra step, so it comes first here.
+# После MS16-072 / KB3163622 групповая политика запрашивается от имени учётной
+# записи КОМПЬЮТЕРА, в том числе при обработке пользовательской политики. Если удалить
+# Authenticated Users и не сохранить чтение для компьютера, пользовательская GPO
+# перестанет применяться; причина может выглядеть как обычный сбой политики.
+# Microsoft рекомендует сохранять право чтения: это первый шаг исправления.
 Set-GPPermission -Name 'GPO_NAME' -TargetName 'Domain Computers' -TargetType Group -PermissionLevel GpoRead
 
-# Only then narrow the scope. GpoApply on a user group alone is not enough for a user
-# policy; the computers that the users log on to need the read above.
+# Только после этого сужайте область применения. Права GpoApply для группы
+# пользователей недостаточно: компьютеры их входа тоже должны читать GPO.
 Set-GPPermission -Name 'GPO_NAME' -TargetName 'DOMAIN\SpecificGroup' -TargetType Group -PermissionLevel GpoApply
 Set-GPPermission -Name 'GPO_NAME' -TargetName 'Authenticated Users' -TargetType Group -PermissionLevel None -Replace
 '@
@@ -9828,19 +9828,19 @@ Set-GPPermission -Name 'GPO_NAME' -TargetName 'Authenticated Users' -TargetType 
         )
         RemediationCommands = @(
             @{
-                Description = "Update Active Directory schema to support Windows LAPS (one-time forest-wide operation)"
+                Description = "Обновить схему AD для Windows LAPS (однократная операция на весь лес)"
                 Command = "Update-LapsADSchema"
             }
             @{
-                Description = "Grant computer objects permission to update their LAPS passwords in a specific OU"
+                Description = "Предоставить компьютерам право обновлять свои пароли LAPS в указанной OU"
                 Command = "Set-LapsADComputerSelfPermission -Identity 'OU=Workstations,DC=domain,DC=com'"
             }
             @{
-                Description = "Enable LAPS via Group Policy (Computer Configuration -> Policies -> Administrative Templates -> System -> LAPS)"
-                Command = "# Set 'Enable password backup' to Enabled in GPO, then configure password complexity, length, and maximum age settings"
+                Description = "Включить LAPS через GPO: Конфигурация компьютера → Политики → Административные шаблоны → Система → LAPS"
+                Command = "# Включите в GPO резервное копирование паролей и настройте сложность, длину и срок действия"
             }
             @{
-                Description = "Verify LAPS deployment status for all computers in an OU"
+                Description = "Проверить развёртывание LAPS на компьютерах указанной OU"
                 Command = "Get-ADComputer -Filter * -SearchBase 'OU=Workstations,DC=domain,DC=com' -Properties ms-Mcs-AdmPwdExpirationTime | Select-Object Name,DNSHostName,ms-Mcs-AdmPwdExpirationTime"
             }
         )
@@ -9883,19 +9883,19 @@ Set-GPPermission -Name 'GPO_NAME' -TargetName 'Authenticated Users' -TargetType 
         )
         RemediationCommands = @(
             @{
-                Description = "Grant specific group permission to read LAPS passwords for computers in an OU"
+                Description = "Предоставить определённой группе право чтения паролей LAPS компьютеров OU"
                 Command = "Set-LapsADReadPasswordPermission -Identity 'OU=Workstations,DC=domain,DC=com' -AllowedPrincipals 'DOMAIN\IT-Admins'"
             }
             @{
-                Description = "View current LAPS password read permissions on an OU using Active Directory ACL"
+                Description = "Показать текущие разрешения чтения паролей LAPS в ACL OU"
                 Command = "(Get-Acl 'AD:\OU=Workstations,DC=domain,DC=com').Access | Where-Object {`$_.ObjectType -eq 'ms-Mcs-AdmPwd' -or `$_.ObjectType -eq 'msLAPS-Password'} | Select-Object IdentityReference,ActiveDirectoryRights,AccessControlType"
             }
             @{
-                Description = "Enable auditing for LAPS password reads (requires legacy LAPS PowerShell module for Set-AdmPwdAuditing)"
+                Description = "Включить аудит чтения паролей LAPS (для Set-AdmPwdAuditing нужен модуль старого LAPS)"
                 Command = "Import-Module AdmPwd.PS; Set-AdmPwdAuditing -OrgUnit 'OU=Workstations,DC=domain,DC=com' -AuditedPrincipals 'DOMAIN\IT-Admins'"
             }
             @{
-                Description = "Query who has read access to LAPS passwords in a specific OU"
+                Description = "Показать субъектов с правом чтения паролей LAPS в выбранной OU"
                 Command = "Find-AdmPwdExtendedRights -Identity 'OU=Workstations,DC=domain,DC=com' | Select-Object ExtendedRightHolders"
             }
         )
@@ -9940,11 +9940,11 @@ Set-GPPermission -Name 'GPO_NAME' -TargetName 'Authenticated Users' -TargetType 
         )
         RemediationCommands = @(
             @{
-                Description = "List who has read access to BitLocker recovery passwords on an OU"
+                Description = "Показать субъектов с правом чтения ключей восстановления BitLocker в OU"
                 Command = "(Get-Acl 'AD:\OU=Workstations,DC=domain,DC=com').Access | Where-Object {`$_.ObjectType -eq '43061ac1-c8ad-4ccc-b785-2bfac20fc60a'} | Select-Object IdentityReference,ActiveDirectoryRights,AccessControlType,IsInherited"
             }
             @{
-                Description = "View escrowed BitLocker recovery information for a computer (RSAT BitLocker tools)"
+                Description = "Показать сохранённые данные восстановления BitLocker у компьютера (средства RSAT BitLocker)"
                 Command = "Get-ADObject -Filter {objectClass -eq 'msFVE-RecoveryInformation'} -SearchBase 'CN=COMPUTER01,OU=Workstations,DC=domain,DC=com' -Properties msFVE-RecoveryPassword"
             }
         )
@@ -9985,7 +9985,7 @@ Set-GPPermission -Name 'GPO_NAME' -TargetName 'Authenticated Users' -TargetType 
         )
         RemediationCommands = @(
             @{
-                Description = "Show the ACEs on a container that reach the recovery passwords below its computers"
+                Description = "Показать ACE контейнера, распространяющиеся на пароли восстановления его компьютеров"
                 Command = @'
 $recoveryInformation = [guid]'ea715d30-8f53-40d0-bd1e-6109186d782c'
 $recoveryPassword    = [guid]'43061ac1-c8ad-4ccc-b785-2bfac20fc60a'
@@ -9999,7 +9999,7 @@ $recoveryPassword    = [guid]'43061ac1-c8ad-4ccc-b785-2bfac20fc60a'
 '@
             }
             @{
-                Description = "Remove one delegated read. Check the output above first - the ACE may be inherited, in which case it has to go from the container it is inherited from"
+                Description = "Удалить делегированное право чтения после проверки наследования ACE"
                 Command = @'
 $acl = Get-Acl "AD:\<container DN>"
 $ace = $acl.Access | Where-Object {
@@ -10882,11 +10882,11 @@ Set-Acl -Path "AD:\<container DN>" -AclObject $acl
         )
         RemediationCommands = @(
             @{
-                Description = "Show who can read the encrypted LAPS password on an OU - the attribute's GUID is read from this forest's schema rather than written down"
+                Description = "Показать субъектов с правом чтения зашифрованного пароля LAPS в OU (GUID атрибута берётся из схемы)"
                 Command = '$schema = (Get-ADRootDSE).schemaNamingContext; $guid = [guid]::new([byte[]](Get-ADObject -SearchBase $schema -LDAPFilter "(lDAPDisplayName=msLAPS-EncryptedPassword)" -Properties schemaIDGUID).schemaIDGUID); (Get-Acl -Path "AD:OU=TARGET_OU,DC=DOMAIN,DC=COM").Access | Where-Object { $_.ObjectType -eq $guid } | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize'
             }
             @{
-                Description = "Read the configured decryptor from the LAPS policy"
+                Description = "Показать назначенного в политике LAPS субъекта, способного расшифровывать пароли"
                 Command = 'Get-ADObject -LDAPFilter "(objectClass=groupPolicyContainer)" -Properties displayName | ForEach-Object { $_.displayName }  # then inspect ADPasswordEncryptionPrincipal in the Windows LAPS policy'
             }
         )
@@ -10926,19 +10926,19 @@ Set-Acl -Path "AD:\<container DN>" -AclObject $acl
         )
         RemediationCommands = @(
             @{
-                Description = "Enumerate who has LAPS password read permissions on a specific OU"
+                Description = "Перечислить права чтения паролей LAPS в конкретной OU"
                 Command = "Find-AdmPwdExtendedRights -Identity 'OU=Workstations,DC=domain,DC=com' | Select-Object ExtendedRightHolders,ObjectDN"
             }
             @{
-                Description = "View detailed ACL entries for LAPS password attributes on an OU"
+                Description = "Показать подробные ACE для парольных атрибутов LAPS в OU"
                 Command = "(Get-Acl 'AD:\OU=Workstations,DC=domain,DC=com').Access | Where-Object {`$_.ObjectType -eq 'ms-Mcs-AdmPwd' -or `$_.ObjectType -eq 'msLAPS-Password'} | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType,IsInherited -AutoSize"
             }
             @{
-                Description = "Remove explicit LAPS read permission for a specific principal using Active Directory ACL manipulation"
+                Description = "Удалить явное право чтения LAPS у указанного субъекта через ACL Active Directory"
                 Command = "`$ou = [ADSI]'LDAP://OU=Workstations,DC=domain,DC=com'; `$acl = `$ou.PSBase.ObjectSecurity; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\Username' -and `$_.ObjectType -eq 'ms-Mcs-AdmPwd'}; `$acl.RemoveAccessRule(`$ace); `$ou.PSBase.CommitChanges()"
             }
             @{
-                Description = "Grant LAPS read permission to appropriate security group only"
+                Description = "Предоставить право чтения LAPS только утверждённой группе безопасности"
                 Command = "Set-LapsADReadPasswordPermission -Identity 'OU=Workstations,DC=domain,DC=com' -AllowedPrincipals 'DOMAIN\Tier1-Admins'"
             }
         )
@@ -10976,7 +10976,7 @@ Set-Acl -Path "AD:\<container DN>" -AclObject $acl
         )
         RemediationCommands = @(
             @{
-                Description = "Read the confidential flag on the LAPS password attributes"
+                Description = "Проверить флаг конфиденциальности атрибутов пароля LAPS"
                 Command = @'
 $schema = (Get-ADRootDSE).schemaNamingContext
 Get-ADObject -SearchBase $schema `
@@ -11025,20 +11025,20 @@ Get-ADObject -SearchBase $schema `
         )
         RemediationCommands = @(
             @{
-                Description = "Enable SMB server signing (require signing for inbound connections)"
+                Description = "Включить обязательную подпись SMB на сервере (для входящих соединений)"
                 Command = "Set-SmbServerConfiguration -RequireSecuritySignature `$true -Force"
             }
             @{
-                Description = "Enable SMB client signing (require signing for outbound connections)"
+                Description = "Включить обязательную подпись SMB на клиенте (для исходящих соединений)"
                 Command = "Set-SmbClientConfiguration -RequireSecuritySignature `$true -Force"
             }
             @{
-                Description = "Verify current SMB signing configuration"
+                Description = "Проверить текущие параметры подписи SMB"
                 Command = "Get-SmbServerConfiguration | Select-Object RequireSecuritySignature,EnableSecuritySignature; Get-SmbClientConfiguration | Select-Object RequireSecuritySignature,EnableSecuritySignature"
             }
             @{
-                Description = "Configure SMB signing via Group Policy (recommended for domain-wide enforcement)"
-                Command = "# In Group Policy Management: Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > Security Options > 'Microsoft network server: Digitally sign communications (always)' = Enabled AND 'Microsoft network client: Digitally sign communications (always)' = Enabled"
+                Description = "Настроить подпись SMB через GPO (рекомендуется для всего домена)"
+                Command = "# GPMC → Конфигурация компьютера → Безопасность → Локальные политики → «Сетевой сервер Microsoft: подписывать сообщения (всегда)» = Включено И «Сетевой клиент Microsoft: подписывать сообщения (всегда)» = Включено"
             }
         )
         References = @(
@@ -11086,19 +11086,19 @@ Get-ADObject -SearchBase $schema `
         )
         RemediationCommands = @(
             @{
-                Description = "Find all users with potentially sensitive data in description field"
+                Description = "Найти пользователей с потенциально конфиденциальной информацией в поле description"
                 Command = "Get-ADUser -Filter {Description -like '*pass*' -or Description -like '*pwd*' -or Description -like '*pw:*'} -Properties Description | Select-Object SamAccountName,Description"
             }
             @{
-                Description = "Clear description field for a specific user"
+                Description = "Очистить поле description у выбранного пользователя"
                 Command = "Set-ADUser -Identity 'USERNAME' -Description `$null"
             }
             @{
-                Description = "Find all users with potentially sensitive data in info field"
+                Description = "Найти пользователей с потенциально конфиденциальной информацией в поле info"
                 Command = "Get-ADUser -Filter * -Properties Info | Where-Object {`$_.Info -match 'pass|pwd|pw:|secret|credential'} | Select-Object SamAccountName,Info"
             }
             @{
-                Description = "Clear info field for a specific user"
+                Description = "Очистить поле info у выбранного пользователя"
                 Command = "Set-ADUser -Identity 'USERNAME' -Clear Info"
             }
         )
@@ -11140,11 +11140,11 @@ Get-ADObject -SearchBase $schema `
         )
         RemediationCommands = @(
             @{
-                Description = "List the deleted objects with their description and info"
+                Description = "Показать удалённые объекты с их полями description и info"
                 Command = 'Get-ADObject -LDAPFilter "(isDeleted=TRUE)" -IncludeDeletedObjects -Properties description,info,lastKnownParent | Select-Object Name,description,info,lastKnownParent'
             }
             @{
-                Description = "Recycle one deleted object - its attributes are removed and it can no longer be restored"
+                Description = "Утилизировать удалённый объект без возможности дальнейшего восстановления его атрибутов"
                 Command = 'Get-ADObject -Identity "<objectGUID>" -IncludeDeletedObjects | Remove-ADObject'
             }
         )
@@ -11187,11 +11187,11 @@ Get-ADObject -SearchBase $schema `
         )
         RemediationCommands = @(
             @{
-                Description = "Show the owner and the ACL of the Deleted Objects container"
+                Description = "Показать владельца и ACL контейнера Deleted Objects"
                 Command = 'dsacls "CN=Deleted Objects,DC=DOMAIN,DC=COM"'
             }
             @{
-                Description = "Remove every ACE of one principal from the container"
+                Description = "Удалить все ACE указанного субъекта из контейнера"
                 Command = 'dsacls "CN=Deleted Objects,DC=DOMAIN,DC=COM" /R "DOMAIN\principal"'
             }
         )
@@ -11226,11 +11226,11 @@ Get-ADObject -SearchBase $schema `
         )
         RemediationCommands = @(
             @{
-                Description = "Show the owner and the ACL of the Deleted Objects container"
+                Description = "Показать владельца и ACL контейнера Deleted Objects"
                 Command = 'dsacls "CN=Deleted Objects,DC=DOMAIN,DC=COM"'
             }
             @{
-                Description = "Remove every ACE of the group from the container"
+                Description = "Удалить все ACE группы из контейнера"
                 Command = 'dsacls "CN=Deleted Objects,DC=DOMAIN,DC=COM" /R "NT AUTHORITY\Authenticated Users"'
             }
         )
@@ -11271,30 +11271,30 @@ Get-ADObject -SearchBase $schema `
         )
         RemediationCommands = @(
             @{
-                Description = "Find all XML files in SYSVOL containing cpassword attributes (recursively)"
+                Description = "Найти в SYSVOL все XML-файлы с атрибутом cpassword (рекурсивно)"
                 Command = "Get-ChildItem -Path '\\domain.com\SYSVOL\domain.com\Policies' -Recurse -Include *.xml | Select-String -Pattern 'cpassword' | Select-Object Path,LineNumber"
             }
             @{
-                Description = "Find specific GPP files that commonly contain passwords (Groups.xml, ScheduledTasks.xml, Services.xml, DataSources.xml)"
+                Description = "Найти GPP-файлы, в которых часто встречаются пароли (Groups.xml, ScheduledTasks.xml, Services.xml, DataSources.xml)"
                 Command = "`$gpoPath = '\\domain.com\SYSVOL\domain.com\Policies'; Get-ChildItem -Path `$gpoPath -Recurse -Include Groups.xml,ScheduledTasks.xml,Services.xml,DataSources.xml,Printers.xml,Drives.xml | ForEach-Object { if (Select-String -Path `$_.FullName -Pattern 'cpassword' -Quiet) { `$_ } }"
             }
             @{
-                Description = "Remove cpassword from GPP via GPMC (recommended method - opens GPO for manual cleanup)"
-                Command = "# In GPMC: Navigate to GPO > User/Computer Configuration > Preferences, locate the affected preference item, change Action to 'Delete' or remove the password field, save changes, then after GPO refresh cycles complete, delete the entire preference item"
+                Description = "Удалить cpassword из GPP через GPMC (рекомендуемый способ — ручная очистка GPO)"
+                Command = "# GPMC → GPO → Конфигурация пользователя или компьютера → Предпочтения: найдите элемент, задайте Delete или очистите пароль; дождитесь применения и удалите элемент"
             }
             @{
-                Description = "Delete specific GPP XML file after backing up (use with caution - ensure GPO is no longer needed)"
-                Command = "# Backup first: Copy-Item 'PATH_TO_GPP_FILE.xml' 'PATH_TO_BACKUP_LOCATION'; Remove-Item 'PATH_TO_GPP_FILE.xml' -Force"
+                Description = "После резервного копирования удалить XML-файл GPP (осторожно: проверьте, нужна ли политика)"
+                Command = "# Сначала сделайте копию: Copy-Item 'PATH_TO_GPP_FILE.xml' 'PATH_TO_BACKUP_LOCATION'; Remove-Item 'PATH_TO_GPP_FILE.xml' -Force"
             }
             @{
-                Description = "Change the password the file carried - this is the step that revokes it"
+                Description = "Изменить пароль, который содержался в файле, чтобы прежнее значение перестало действовать"
                 Command = @'
-# A domain account:
+# Для доменной учётной записи:
 Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -AsSecureString)
 
-# A local account on many machines is what a GPP item usually deploys, and one shared
-# local password is the problem rather than the GPO. Hand that account to LAPS, which
-# gives every machine its own, instead of setting a new shared one.
+# Предпочтения GPP часто создают одинаковую локальную учётную запись на разных
+# компьютерах. Опасен именно общий пароль, а не сам факт наличия GPO. Используйте
+# LAPS: он выдаёт каждому компьютеру собственный пароль вместо общего.
 '@
             }
         )
@@ -11338,32 +11338,32 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Search SYSVOL for Registry.xml files containing AutoAdminLogon settings"
+                Description = "Найти Registry.xml с AutoAdminLogon в SYSVOL"
                 Command = "Get-ChildItem -Path '\\domain.com\SYSVOL\domain.com\Policies' -Recurse -Include Registry.xml | Select-String -Pattern 'AutoAdminLogon|DefaultUserName|DefaultPassword' | Select-Object Path,LineNumber"
             }
             @{
-                Description = "Remove the preference item in GPMC - this finding comes from Registry.xml, which is Group Policy Preferences"
+                Description = "Удалить элемент предпочтений через GPMC: находка относится к Registry.xml (Group Policy Preferences)"
                 Command = @'
-# Remove-GPRegistryValue works on the registry policy path (Registry.pol, Administrative
-# Templates) and does nothing to a value deployed through the Preferences extension. This
-# finding is read out of Registry.xml, so the cmdlet was guaranteed to miss it and report
-# either an error or a success without effect.
+# Remove-GPRegistryValue работает с политиками реестра (Registry.pol, административные
+# шаблоны), но не удаляет параметры Preferences. Эта находка получена из
+# Registry.xml, поэтому прежняя команда не могла устранить проблему и могла
+# завершаться ошибкой либо сообщать об успехе без реального изменения.
 #
-# GPMC: the GPO > Computer Configuration (or User Configuration) > Preferences >
-#       Windows Settings > Registry > delete the item that sets AutoAdminLogon,
-#       DefaultUserName and DefaultPassword.
+# В GPMC откройте GPO → Конфигурация компьютера (или пользователя) → Предпочтения →
+# Параметры Windows → Реестр → удалите элемент, задающий AutoAdminLogon,
+# DefaultUserName и DefaultPassword.
 #
-# A preference item with Action "Update" does not take the value back off the clients it
-# already reached, so add an item with Action "Delete" for the same three values, let it
-# apply, and remove that item afterwards as well.
+# Элемент предпочтений с действием Update не удаляет значения на компьютерах,
+# где они уже применились. Создайте для тех же параметров действие Delete,
+# дождитесь применения и после этого удалите временный элемент.
 '@
             }
             @{
-                Description = "Find the Registry.xml items in a GPO folder, to know which GPO to open"
+                Description = "Найти элементы Registry.xml в папке GPO, чтобы определить нужную политику"
                 Command = "Get-ChildItem -Path '\\domain.com\SYSVOL\domain.com\Policies' -Recurse -Include Registry.xml | Where-Object { Select-String -Path `$_.FullName -Pattern 'DefaultPassword' -Quiet } | Select-Object FullName"
             }
             @{
-                Description = "Disable AutoAdminLogon locally on a specific computer"
+                Description = "Отключить AutoAdminLogon локально на конкретном компьютере"
                 Command = "Set-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon' -Name 'AutoAdminLogon' -Value 0"
             }
         )
@@ -11400,7 +11400,7 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Remove a value an Administrative Template deploys (Registry.pol)"
+                Description = "Удалить параметр, развёрнутый административным шаблоном (Registry.pol)"
                 Command = "Remove-GPRegistryValue -Name 'GPO_NAME' -Key 'HKLM\Software\VENDOR\KEY' -ValueName 'VALUE_NAME'"
             }
         )
@@ -11436,7 +11436,7 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Find answer files in SYSVOL"
+                Description = "Найти файлы автоматической установки Windows в SYSVOL"
                 Command = "Get-ChildItem -Path '\\domain.com\SYSVOL\domain.com' -Recurse -Include *.xml | Where-Object { Select-String -Path `$_.FullName -Pattern 'urn:schemas-microsoft-com:unattend' -Quiet } | Select-Object FullName"
             }
         )
@@ -11472,7 +11472,7 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Find VNC connection files and VNC .ini files in SYSVOL"
+                Description = "Найти файлы подключений VNC и конфигурационные файлы .ini VNC в SYSVOL"
                 Command = "Get-ChildItem -Path '\\domain.com\SYSVOL\domain.com' -Recurse -Include *.vnc,*vnc*.ini -ErrorAction SilentlyContinue | Select-Object FullName"
             }
         )
@@ -11514,19 +11514,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Search SYSVOL for login scripts containing 'net use' with passwords"
+                Description = "Найти в SYSVOL сценарии входа с командами net use и паролями"
                 Command = "Get-ChildItem -Path '\\domain.com\SYSVOL\domain.com\' -Recurse -Include *.bat,*.cmd,*.vbs,*.ps1 | Select-String -Pattern 'net use.*\/user:.*' | Select-Object Path,LineNumber,Line"
             }
             @{
-                Description = "Find specific patterns for net use commands with embedded credentials"
+                Description = "Найти шаблоны команд net use со встроенными учётными данными"
                 Command = "`$patterns = 'net use .* \/user:', 'net use .* /user:', 'password'; Get-ChildItem '\\domain.com\SYSVOL' -Recurse -Include *.bat,*.cmd | ForEach-Object { Select-String -Path `$_.FullName -Pattern `$patterns }"
             }
             @{
-                Description = "Remove login script path from all users in a specific OU"
+                Description = "Очистить путь сценария входа у пользователей указанной OU"
                 Command = "Get-ADUser -Filter * -SearchBase 'OU=Users,DC=domain,DC=com' -Properties scriptPath | Where-Object {`$_.scriptPath} | Set-ADUser -Clear scriptPath"
             }
             @{
-                Description = "List all users with login scripts assigned to identify affected accounts"
+                Description = "Найти пользователей с назначенными сценариями входа для оценки области воздействия"
                 Command = "Get-ADUser -Filter {scriptPath -like '*'} -Properties scriptPath,distinguishedName | Select-Object Name,scriptPath,distinguishedName"
             }
         )
@@ -11567,19 +11567,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Search SYSVOL for script files with common password patterns"
+                Description = "Найти сценарии в SYSVOL с распространёнными признаками встроенных паролей"
                 Command = "`$patterns = 'password\s*=', 'pwd\s*=', 'passwd\s*=', 'credential', 'SecureString', 'ConvertTo-SecureString', '-AsPlainText'; Get-ChildItem '\\domain.com\SYSVOL' -Recurse -Include *.ps1,*.vbs,*.bat,*.cmd,*.ini,*.config | Select-String -Pattern `$patterns | Select-Object Path,LineNumber,Line"
             }
             @{
-                Description = "Install PowerShell SecretManagement module for secure credential storage"
+                Description = "Установить модуль PowerShell SecretManagement для защищённого хранения секретов"
                 Command = "Install-Module -Name Microsoft.PowerShell.SecretManagement -Force -Scope CurrentUser; Install-Module -Name Microsoft.PowerShell.SecretStore -Force -Scope CurrentUser"
             }
             @{
-                Description = "Register a SecretStore vault and store credentials securely"
+                Description = "Зарегистрировать хранилище SecretStore и сохранить учётные данные безопасно"
                 Command = "Register-SecretVault -Name LocalVault -ModuleName Microsoft.PowerShell.SecretStore -DefaultVault; Set-Secret -Name 'ServiceAccountPassword' -Secret (Read-Host -AsSecureString -Prompt 'Enter Password')"
             }
             @{
-                Description = "Retrieve credentials from SecretStore vault in scripts instead of hardcoding"
+                Description = "Получать учётные данные из SecretStore вместо их записи в коде сценария"
                 Command = "`$password = Get-Secret -Name 'ServiceAccountPassword' -AsPlainText; `$credential = New-Object System.Management.Automation.PSCredential('domain\user', (Get-Secret -Name 'ServiceAccountPassword'))"
             }
         )
@@ -11622,19 +11622,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Search SYSVOL for files containing database connection strings"
+                Description = "Найти файлы в SYSVOL со строками подключения к базам данных"
                 Command = "`$patterns = 'Server=', 'Data Source=', 'Initial Catalog=', 'User ID=', 'Password=', 'connection\s*string'; Get-ChildItem '\\domain.com\SYSVOL' -Recurse -Include *.config,*.xml,*.ini,*.ps1,*.vbs | Select-String -Pattern `$patterns | Select-Object Path,LineNumber,Line"
             }
             @{
-                Description = "Convert SQL Server connection string to Windows Integrated Authentication (remove credentials)"
-                Command = "# Replace: 'Server=myServer;Database=myDB;User Id=sa;Password=P@ss;' with: 'Server=myServer;Database=myDB;Integrated Security=SSPI;Trusted_Connection=Yes;Encrypt=True;'"
+                Description = "Перевести строку подключения SQL Server на интегрированную аутентификацию Windows"
+                Command = "# Замените: 'Server=myServer;Database=myDB;User Id=sa;Password=P@ss;' на: 'Server=myServer;Database=myDB;Integrated Security=SSPI;Trusted_Connection=Yes;Encrypt=True;'"
             }
             @{
-                Description = "Find all connection strings with embedded credentials in configuration files"
+                Description = "Найти строки подключения со встроенными учётными данными в конфигурационных файлах"
                 Command = "Get-ChildItem -Path '\\domain.com\SYSVOL' -Recurse -Include *.config | ForEach-Object { Select-Xml -Path `$_.FullName -XPath '//connectionStrings/add[@connectionString]' | Where-Object { `$_.Node.connectionString -match 'password=|pwd=' } | Select-Object @{Name='File';Expression={`$_.Path}}, @{Name='Name';Expression={`$_.Node.name}}, @{Name='ConnectionString';Expression={`$_.Node.connectionString}} }"
             }
             @{
-                Description = "Store database credentials securely in Azure Key Vault (alternative to hardcoded connection strings)"
+                Description = "Хранить учётные данные базы данных в Azure Key Vault вместо открытых строк подключения"
                 Command = "# Install-Module Az.KeyVault; `$secret = ConvertTo-SecureString 'MySecretPassword' -AsPlainText -Force; Set-AzKeyVaultSecret -VaultName 'MyVault' -Name 'DbPassword' -SecretValue `$secret"
             }
         )
@@ -11708,19 +11708,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Disable reversible encryption for a single user account"
+                Description = "Отключить обратимое шифрование пароля у выбранного пользователя"
                 Command = "Set-ADUser -Identity 'USERNAME' -AllowReversiblePasswordEncryption `$false"
             }
             @{
-                Description = "Disable reversible encryption for all users in a specific OU"
+                Description = "Отключить обратимое шифрование паролей у всех пользователей OU"
                 Command = "Get-ADUser -Filter {AllowReversiblePasswordEncryption -eq `$true} -SearchBase 'OU=Users,DC=domain,DC=com' | Set-ADUser -AllowReversiblePasswordEncryption `$false"
             }
             @{
-                Description = "Find all users with reversible encryption enabled"
+                Description = "Найти пользователей с включённым обратимым шифрованием пароля"
                 Command = "Get-ADUser -Filter {AllowReversiblePasswordEncryption -eq `$true} -Properties AllowReversiblePasswordEncryption,PasswordLastSet | Select-Object Name,SamAccountName,AllowReversiblePasswordEncryption,PasswordLastSet"
             }
             @{
-                Description = "Force password change after disabling (required to remove stored reversible password)"
+                Description = "После отключения функции потребовать смену пароля для удаления его обратимой копии"
                 Command = "Set-ADUser -Identity 'USERNAME' -ChangePasswordAtLogon `$true"
             }
         )
@@ -11760,19 +11760,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "View which principals can retrieve the gMSA password"
+                Description = "Показать субъектов, которым разрешено получать пароль gMSA"
                 Command = "Get-ADServiceAccount -Identity 'GMSA_NAME' -Properties PrincipalsAllowedToRetrieveManagedPassword | Select-Object Name,PrincipalsAllowedToRetrieveManagedPassword"
             }
             @{
-                Description = "Set specific security group as the only principal allowed to retrieve gMSA password"
+                Description = "Назначить только выбранную группу получателем пароля gMSA"
                 Command = "Set-ADServiceAccount -Identity 'GMSA_NAME' -PrincipalsAllowedToRetrieveManagedPassword 'DOMAIN\Tier1-Servers'"
             }
             @{
-                Description = "Add additional principals to retrieve gMSA password (append to existing list)"
+                Description = "Добавить субъекты к текущему списку разрешённых получателей пароля gMSA"
                 Command = "`$current = (Get-ADServiceAccount -Identity 'GMSA_NAME' -Properties PrincipalsAllowedToRetrieveManagedPassword).PrincipalsAllowedToRetrieveManagedPassword; `$current += Get-ADComputer 'SERVER01'; Set-ADServiceAccount -Identity 'GMSA_NAME' -PrincipalsAllowedToRetrieveManagedPassword `$current"
             }
             @{
-                Description = "Find all gMSA accounts and check their retrieval permissions"
+                Description = "Найти все gMSA и проверить их права получения пароля"
                 Command = "Get-ADServiceAccount -Filter {ObjectClass -eq 'msDS-GroupManagedServiceAccount'} -Properties PrincipalsAllowedToRetrieveManagedPassword | Select-Object Name,PrincipalsAllowedToRetrieveManagedPassword"
             }
         )
@@ -11814,20 +11814,20 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "View all key credentials in msDS-KeyCredentialLink for a user or computer"
+                Description = "Показать все ключевые учётные данные из msDS-KeyCredentialLink у пользователя или компьютера"
                 Command = "Get-ADUser -Identity 'USERNAME' -Properties msDS-KeyCredentialLink | Select-Object Name,msDS-KeyCredentialLink"
             }
             @{
-                Description = "Clear all key credentials from msDS-KeyCredentialLink attribute (WARNING: Breaks Windows Hello for Business if configured)"
+                Description = "Очистить msDS-KeyCredentialLink (ВНИМАНИЕ: нарушит работу Windows Hello для бизнеса, если он используется)"
                 Command = "Set-ADUser -Identity 'USERNAME' -Clear msDS-KeyCredentialLink"
             }
             @{
-                Description = "View ACL permissions on msDS-KeyCredentialLink to identify who can write to this attribute"
+                Description = "Проверить ACL msDS-KeyCredentialLink и найти субъектов с правом записи"
                 Command = "(Get-Acl 'AD:\CN=User,OU=Users,DC=domain,DC=com').Access | Where-Object {`$_.ObjectType -eq '5b47d60f-6090-40b2-9f37-2a4de88f3063'} | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "Enable auditing for changes to msDS-KeyCredentialLink (Event ID 5136 for directory service changes)"
-                Command = "# In Group Policy: Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy Configuration > DS Access > Audit Directory Service Changes = Success, Failure"
+                Description = "Включить аудит изменений msDS-KeyCredentialLink (событие 5136)"
+                Command = "# GPO → Конфигурация компьютера → Политики → Параметры Windows → Расширенный аудит → Доступ к службе каталогов → Аудит изменений службы каталогов = Успех, Отказ"
             }
         )
         References = @(
@@ -11869,15 +11869,15 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Enable SID Filtering (quarantine) on trust"
+                Description = "Включить фильтрацию SID (режим карантина) для доверия"
                 Command = "netdom trust TRUSTINGDOMAIN /domain:TRUSTEDDOMAIN /quarantine:yes"
             }
             @{
-                Description = "Verify SID Filtering status on all trusts"
+                Description = "Проверить состояние фильтрации SID во всех довериях"
                 Command = "Get-ADTrust -Filter * | Select-Object Name,Direction,SIDFilteringQuarantined,TrustType"
             }
             @{
-                Description = "Enable SID Filtering using PowerShell (alternative method)"
+                Description = "Включить фильтрацию SID через PowerShell (альтернативный метод)"
                 Command = "Set-ADTrust -Identity 'TrustedDomain' -SIDFilteringQuarantined `$true"
             }
         )
@@ -11916,11 +11916,11 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show who may act on behalf of others against this resource"
+                Description = "Показать субъектов, которым разрешено действовать от имени других на этом ресурсе"
                 Command = "(Get-ADComputer -Identity 'RESOURCE' -Properties msDS-AllowedToActOnBehalfOfOtherIdentity).'msDS-AllowedToActOnBehalfOfOtherIdentity'.Access | Select-Object IdentityReference, AccessControlType"
             }
             @{
-                Description = "Remove the delegation entirely"
+                Description = "Полностью удалить настройки делегирования"
                 Command = "Set-ADComputer -Identity 'RESOURCE' -Clear msDS-AllowedToActOnBehalfOfOtherIdentity"
             }
         )
@@ -11958,12 +11958,12 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Read the values where Group Policy keeps them - the Default Domain Policy's GptTmpl.inf (another domain-linked GPO may override them)"
+                Description = "Показать действующие значения в GptTmpl.inf политики Default Domain Policy (другая GPO домена может их переопределить)"
                 Command = "Get-Content '\\domain.com\SYSVOL\domain.com\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}\MACHINE\Microsoft\Windows NT\SecEdit\GptTmpl.inf' | Select-String -Pattern 'MaxTicketAge|MaxRenewAge|MaxServiceAge|MaxClockSkew'"
             }
             @{
-                Description = "The policy path that sets them"
-                Command = "# Default Domain Policy -> Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies -> Kerberos Policy"
+                Description = "Показать путь к параметрам политики"
+                Command = "# Default Domain Policy → Конфигурация компьютера → Параметры Windows → Безопасность → Политики учётных записей → Политика Kerberos"
             }
         )
         References = @(
@@ -12000,19 +12000,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "View the encryption types of every trust object"
+                Description = "Показать типы шифрования у всех объектов доверия"
                 Command = "Get-ADObject -LDAPFilter '(objectClass=trustedDomain)' -Properties trustPartner,trustType,trustDirection,msDS-SupportedEncryptionTypes | Select-Object trustPartner,trustType,trustDirection,msDS-SupportedEncryptionTypes"
             }
             @{
-                Description = "Add AES and keep RC4 for older clients (run on a DC of the trusted domain, naming the trusting one; repeat on the other side)"
+                Description = "Добавить AES, сохранив RC4 для старых клиентов (выполнить на DC доверенного домена, указав доверяющий; повторить с другой стороны)"
                 Command = "ksetup /setenctypeattr <trustingdomain> RC4-HMAC-MD5 AES128-CTS-HMAC-SHA1-96 AES256-CTS-HMAC-SHA1-96"
             }
             @{
-                Description = "AES only: in Active Directory Domains and Trusts, Properties of the trust"
-                Command = "# Trusts tab > the trust > Properties > 'The other domain supports Kerberos AES Encryption' - for incoming and outgoing, in both domains"
+                Description = "Оставить только AES через свойства доверия в консоли «Домены и доверие Active Directory»"
+                Command = "# Вкладка «Доверия» → Свойства доверия → «Другой домен поддерживает Kerberos AES»; проверьте обе стороны доверия"
             }
             @{
-                Description = "Monitor for RC4 usage in Kerberos (Event ID 4769 with encryption type 0x17)"
+                Description = "Отслеживать применение RC4 в Kerberos по событию 4769, тип шифрования 0x17"
                 Command = "Get-WinEvent -FilterHashtable @{LogName='Security';ID=4769} -MaxEvents 100 | Where-Object {`$_.Message -match '0x17'} | Select-Object TimeCreated,Message | Format-Table -Wrap"
             }
         )
@@ -12048,15 +12048,15 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "List the interdomain trust accounts and when their password was last set"
+                Description = "Показать междоменные учётные записи доверия и даты последней смены пароля"
                 Command = "Get-ADUser -LDAPFilter '(userAccountControl:1.2.840.113556.1.4.803:=2048)' -Properties pwdLastSet | Select-Object SamAccountName, @{n='PasswordLastSet';e={[DateTime]::FromFileTime(`$_.pwdLastSet)}}"
             }
             @{
-                Description = "Verify the trust"
+                Description = "Проверить работоспособность доверия"
                 Command = "netdom trust <trustingdomain> /domain:<trusteddomain> /verify"
             }
             @{
-                Description = "Reset the trust password on this side (run on each side with the same password)"
+                Description = "Сбросить пароль доверия на этой стороне (используйте одинаковый пароль с обеих сторон)"
                 Command = "netdom trust <thisdomain> /domain:<otherdomain> /resetOneSide /passwordT:<password> /userO:administrator /passwordO:*"
             }
         )
@@ -12180,11 +12180,11 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show the trust attributes, so the flag can be confirmed before changing anything"
+                Description = "Показать атрибуты доверия для проверки флага перед изменением"
                 Command = "Get-ADTrust -Filter * | Select-Object Name, Direction, ForestTransitive, SIDFilteringForestAware, SIDFilteringQuarantined, TrustAttributes"
             }
             @{
-                Description = "Stop honouring SID history across the trust"
+                Description = "Запретить перенос SID History через доверие"
                 Command = "netdom trust THIS.DOMAIN /domain:TRUSTED.FOREST /EnableSIDHistory:no"
             }
         )
@@ -12280,20 +12280,20 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Identify all computers with end-of-life operating systems in the domain"
+                Description = "Найти компьютеры домена с ОС, срок поддержки которых завершён"
                 Command = "Get-ADComputer -Filter * -Properties OperatingSystem,OperatingSystemVersion | Where-Object {`$_.OperatingSystem -match 'Windows (XP|Vista|7|8|Server 2003|Server 2008|Server 2012)'} | Select-Object Name,OperatingSystem,OperatingSystemVersion,DistinguishedName"
             }
             @{
-                Description = "Check current OS version and build on local system"
+                Description = "Проверить версию и сборку ОС на локальном компьютере"
                 Command = "Get-ComputerInfo | Select-Object WindowsProductName,WindowsVersion,OsBuildNumber,OsHardwareAbstractionLayer"
             }
             @{
-                Description = "Perform in-place upgrade to Windows Server 2025 (requires setup media)"
-                Command = "# Mount Server 2025 ISO, then run: D:\setup.exe /auto upgrade /dynamicupdate enable /compat scanonly (test first), then: D:\setup.exe /auto upgrade /dynamicupdate enable (actual upgrade)"
+                Description = "Обновить Windows Server на месте до версии 2025 (нужен установочный носитель)"
+                Command = "# Смонтируйте ISO Server 2025; сначала тест: D:\setup.exe /auto upgrade /dynamicupdate enable /compat scanonly; затем обновление: D:\setup.exe /auto upgrade /dynamicupdate enable"
             }
             @{
-                Description = "Migrate server roles to new Windows Server using Windows Server Migration Tools"
-                Command = "# On source server: Export-SmigServerSetting -Path C:\Migration -Verbose; On destination server: Import-SmigServerSetting -Path C:\Migration -SourcePhysicalAddress <MAC> -TargetPhysicalAddress <MAC> -Verbose"
+                Description = "Перенести серверные роли на новую Windows Server через средства миграции"
+                Command = "# На исходном сервере: Export-SmigServerSetting -Path C:\Migration -Verbose; на целевом: Import-SmigServerSetting -Path C:\Migration -SourcePhysicalAddress <MAC> -TargetPhysicalAddress <MAC> -Verbose"
             }
         )
         References = @(
@@ -12362,20 +12362,20 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Check current Exchange Server version and build number"
+                Description = "Проверить версию и номер сборки Exchange Server"
                 Command = "Get-Command Exsetup.exe | ForEach-Object {`$_.FileVersionInfo}"
             }
             @{
-                Description = "Download and run Exchange Server Health Checker script to identify missing patches"
+                Description = "Запустить Exchange Server Health Checker для выявления отсутствующих исправлений"
                 Command = "`$url='https://aka.ms/ExchangeHealthChecker'; `$path='C:\Temp\HealthChecker.ps1'; Invoke-WebRequest -Uri `$url -OutFile `$path; Set-Location C:\Temp; .\HealthChecker.ps1"
             }
             @{
-                Description = "Check for latest Exchange security updates"
-                Command = "# Visit https://learn.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates to identify latest CU and SU for your Exchange version"
+                Description = "Проверить наличие последних обновлений безопасности Exchange"
+                Command = "# Проверьте последние CU и SU Exchange: https://learn.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates"
             }
             @{
-                Description = "Enable Extended Protection for Authentication (mitigates NTLM relay attacks)"
-                Command = "# Run Exchange Emergency Mitigation Service (EEMS): Get-Mitigations.ps1 script from Microsoft, or manually configure via IIS Manager for each virtual directory"
+                Description = "Включить Extended Protection for Authentication для защиты от ретрансляции NTLM"
+                Command = "# Используйте EEMS: скрипт Microsoft Get-Mitigations.ps1 либо настройки виртуальных каталогов IIS"
             }
         )
         References = @(
@@ -12416,12 +12416,12 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show the Exchange ACEs currently on the domain object"
+                Description = "Показать ACE Exchange на корневом объекте домена"
                 Command = "(Get-Acl 'AD:\DC=domain,DC=com').Access | Where-Object { `$_.IdentityReference -match 'Exchange' -and `$_.ActiveDirectoryRights -match 'WriteDacl|WriteOwner|GenericAll' } | Format-Table IdentityReference,ActiveDirectoryRights,PropagationFlags,InheritanceFlags -AutoSize"
             }
             @{
-                Description = "Switch the organization to Active Directory split permissions"
-                Command = "# Run from the Exchange installation media: .\Setup.exe /PrepareAD /ActiveDirectorySplitPermissions:true /IAcceptExchangeServerLicenseTerms"
+                Description = "Перевести Exchange на модель разделённых разрешений Active Directory"
+                Command = "# С установочного носителя Exchange: .\Setup.exe /PrepareAD /ActiveDirectorySplitPermissions:true /IAcceptExchangeServerLicenseTerms"
             }
         )
         References = @(
@@ -12474,7 +12474,7 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show which Exchange groups still hold entries on the domain object"
+                Description = "Показать группы Exchange с оставшимися ACE на объекте домена"
                 Command = "(Get-Acl 'AD:\DC=domain,DC=com').Access | Where-Object { `$_.IdentityReference -match 'Exchange' } | Format-Table IdentityReference,ActiveDirectoryRights,PropagationFlags,InheritedObjectType -AutoSize"
             }
         )
@@ -12511,15 +12511,15 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show which principals hold relay rights on each receive connector"
+                Description = "Показать субъектов с правами ретрансляции почты на каждом соединителе приёма"
                 Command = "Get-ReceiveConnector | ForEach-Object { Get-ADPermission `$_.Identity | Where-Object { `$_.ExtendedRights -like '*Accept-Any-Recipient*' } | Select-Object Identity,User,ExtendedRights }"
             }
             @{
-                Description = "Remove the anonymous relay permission from a connector"
+                Description = "Удалить разрешение анонимной ретрансляции у соединителя"
                 Command = "Get-ReceiveConnector 'CONNECTOR_NAME' | Remove-ADPermission -User 'NT AUTHORITY\ANONYMOUS LOGON' -ExtendedRights 'Ms-Exch-SMTP-Accept-Any-Recipient'"
             }
             @{
-                Description = "Show the remote IP ranges a connector accepts"
+                Description = "Показать удалённые IP-диапазоны, разрешённые соединителем"
                 Command = "Get-ReceiveConnector | Select-Object Name,Bindings,RemoteIPRanges,PermissionGroups,AuthMechanism"
             }
         )
@@ -12557,11 +12557,11 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show which connectors let anonymous sessions choose the sender"
+                Description = "Найти соединители, позволяющие анонимно выбирать адрес отправителя"
                 Command = "Get-ReceiveConnector | ForEach-Object { Get-ADPermission `$_.Identity | Where-Object { `$_.User -like '*ANONYMOUS LOGON*' -and `$_.ExtendedRights -like '*Accept-A*-Sender*' } | Select-Object Identity,User,ExtendedRights }"
             }
             @{
-                Description = "Remove the anonymous sender-spoofing permission from a connector"
+                Description = "Удалить разрешение подмены отправителя у анонимных подключений соединителя"
                 Command = "Get-ReceiveConnector 'CONNECTOR_NAME' | Remove-ADPermission -User 'NT AUTHORITY\ANONYMOUS LOGON' -ExtendedRights 'Ms-Exch-SMTP-Accept-Authoritative-Domain-Sender'"
             }
         )
@@ -12618,7 +12618,7 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show the anonymous grants on the connector"
+                Description = "Показать анонимные разрешения соединителя"
                 Command = "Get-ADPermission -Identity 'CONNECTOR' -User 'NT AUTHORITY\ANONYMOUS LOGON' | Format-Table ExtendedRights -AutoSize"
             }
         )
@@ -12655,7 +12655,7 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show the anonymous grants on the connector"
+                Description = "Показать анонимные разрешения соединителя"
                 Command = "Get-ADPermission -Identity 'CONNECTOR' -User 'NT AUTHORITY\ANONYMOUS LOGON' | Format-Table ExtendedRights -AutoSize"
             }
         )
@@ -12694,7 +12694,7 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show who holds sender rights on the connector"
+                Description = "Показать субъектов с правами отправителя на соединителе"
                 Command = "Get-ADPermission -Identity 'CONNECTOR' | Where-Object { `$_.ExtendedRights -like '*Sender*' } | Format-Table User, ExtendedRights -AutoSize"
             }
         )
@@ -12768,11 +12768,11 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Check whether the dedicated hybrid application is configured"
-                Command = "# Run on an Exchange server: .\HealthChecker.ps1 -Server SERVERNAME  (reports the hybrid application state)"
+                Description = "Проверить настройку выделенного гибридного приложения Exchange"
+                Command = "# На сервере Exchange: .\HealthChecker.ps1 -Server SERVERNAME (проверяет гибридное приложение)"
             }
             @{
-                Description = "Show the hybrid configuration recorded on-premises"
+                Description = "Показать сохранённую локальную гибридную конфигурацию"
                 Command = "Get-HybridConfiguration | Format-List"
             }
         )
@@ -12809,15 +12809,15 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show every holder of the Mailbox Import Export role"
+                Description = "Показать субъектов с ролью Mailbox Import Export"
                 Command = "Get-ManagementRoleAssignment -Role 'Mailbox Import Export' | Select-Object Name,RoleAssigneeName,RoleAssigneeType,AssignmentMethod"
             }
             @{
-                Description = "Remove a Mailbox Import Export role assignment"
+                Description = "Удалить назначение роли Mailbox Import Export"
                 Command = "Remove-ManagementRoleAssignment -Identity 'ASSIGNMENT_NAME' -Confirm:`$false"
             }
             @{
-                Description = "Review recent mailbox export requests"
+                Description = "Проверить недавние запросы экспорта почтовых ящиков"
                 Command = "Get-MailboxExportRequest | Select-Object Name,Mailbox,FilePath,Status,RequestQueue"
             }
         )
@@ -12856,15 +12856,15 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show every holder of ApplicationImpersonation"
+                Description = "Показать субъектов с ролью ApplicationImpersonation"
                 Command = "Get-ManagementRoleAssignment -Role ApplicationImpersonation | Select-Object Name,RoleAssigneeName,RoleAssigneeType,CustomRecipientWriteScope"
             }
             @{
-                Description = "Remove an ApplicationImpersonation assignment"
+                Description = "Удалить назначение роли ApplicationImpersonation"
                 Command = "Remove-ManagementRoleAssignment -Identity 'ASSIGNMENT_NAME' -Confirm:`$false"
             }
             @{
-                Description = "Scope an assignment to a defined set of mailboxes instead of the whole organization"
+                Description = "Ограничить назначение конкретными почтовыми ящиками вместо всей организации"
                 Command = "New-ManagementScope -Name 'AppMailboxes' -RecipientRestrictionFilter { Department -eq 'Service' }; Set-ManagementRoleAssignment -Identity 'ASSIGNMENT_NAME' -CustomRecipientWriteScope 'AppMailboxes'"
             }
         )
@@ -12900,11 +12900,11 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show every holder of Role Management"
+                Description = "Показать субъектов с ролью Role Management"
                 Command = "Get-ManagementRoleAssignment -Role 'Role Management' | Select-Object Name,RoleAssigneeName,RoleAssigneeType"
             }
             @{
-                Description = "List role assignments created recently"
+                Description = "Перечислить назначения ролей, созданные недавно"
                 Command = "Search-AdminAuditLog -Cmdlets New-ManagementRoleAssignment -StartDate (Get-Date).AddDays(-90) | Select-Object RunDate,Caller,ObjectModified"
             }
         )
@@ -12940,11 +12940,11 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show every holder of the unscoped role management capability"
+                Description = "Показать субъектов с полномочием управления ролями без области действия"
                 Command = "Get-ManagementRoleAssignment -Role 'Unscoped Role Management' | Select-Object Name,RoleAssigneeName,RoleAssigneeType"
             }
             @{
-                Description = "List all unscoped top-level roles in the organization"
+                Description = "Найти все роли верхнего уровня без области действия"
                 Command = "Get-ManagementRole | Where-Object { `$_.RoleType -eq 'UnScoped' } | Select-Object Name,RoleType,Description"
             }
         )
@@ -12980,11 +12980,11 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show every holder of the Mailbox Search role"
+                Description = "Показать субъектов с ролью Mailbox Search"
                 Command = "Get-ManagementRoleAssignment -Role 'Mailbox Search' | Select-Object Name,RoleAssigneeName,RoleAssigneeType"
             }
             @{
-                Description = "List existing discovery searches"
+                Description = "Перечислить существующие поисковые запросы обнаружения данных"
                 Command = "Get-MailboxSearch | Select-Object Name,CreatedBy,SearchQuery,TargetMailbox,Status"
             }
         )
@@ -13019,11 +13019,11 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show every holder of the Active Directory Permissions role"
+                Description = "Показать субъектов с ролью Active Directory Permissions"
                 Command = "Get-ManagementRoleAssignment -Role 'Active Directory Permissions' | Select-Object Name,RoleAssigneeName,RoleAssigneeType"
             }
             @{
-                Description = "Review recent Add-ADPermission calls"
+                Description = "Проверить недавние вызовы Add-ADPermission"
                 Command = "Search-AdminAuditLog -Cmdlets Add-ADPermission -StartDate (Get-Date).AddDays(-90) | Select-Object RunDate,Caller,ObjectModified,CmdletParameters"
             }
         )
@@ -13054,7 +13054,7 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show the membership of the Exchange role groups"
+                Description = "Показать состав ролевых групп Exchange"
                 Command = "Get-RoleGroup | ForEach-Object { Write-Host `$_.Name; Get-RoleGroupMember `$_.Name | Select-Object Name,RecipientType }"
             }
         )
@@ -13086,7 +13086,7 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show the explicit entries on a computer object"
+                Description = "Показать явные записи ACL объекта компьютера"
                 Command = "(Get-Acl -Path ('AD:' + (Get-ADComputer 'COMPUTERNAME').DistinguishedName)).Access | Where-Object { -not `$_.IsInherited } | Format-Table IdentityReference,ActiveDirectoryRights,ObjectType,AccessControlType -AutoSize"
             }
         )
@@ -13122,11 +13122,11 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Read the rotation settings on the computer"
+                Description = "Проверить параметры смены пароля компьютера"
                 Command = "Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters' | Select-Object DisablePasswordChange,MaximumPasswordAge"
             }
             @{
-                Description = "Change the machine account password now (run on the computer)"
+                Description = "Немедленно изменить пароль учётной записи компьютера (выполнять на нём)"
                 Command = "Nltest /sc_change_pwd:DOMAIN_NAME"
             }
         )
@@ -13160,7 +13160,7 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Read the rotation settings on the Domain Controller"
+                Description = "Проверить настройки ротации пароля на контроллере домена"
                 Command = "Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters' | Select-Object DisablePasswordChange,MaximumPasswordAge"
             }
         )
@@ -13235,15 +13235,15 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Find all privileged accounts inactive for more than 90 days"
+                Description = "Найти привилегированные учётные записи, неактивные более 90 дней"
                 Command = "`$privilegedGroups = @('Domain Admins','Enterprise Admins','Schema Admins','Administrators'); `$inactiveDate = (Get-Date).AddDays(-90); Get-ADUser -Filter {(Enabled -eq `$true) -and (LastLogonDate -lt `$inactiveDate)} -Properties LastLogonDate,MemberOf | Where-Object { `$_.MemberOf | Where-Object { `$privilegedGroups -contains (`$_ -replace '^CN=([^,]+).*','`$1') } } | Select-Object Name,SamAccountName,LastLogonDate,@{Name='DaysSinceLastLogon';Expression={(New-TimeSpan -Start `$_.LastLogonDate -End (Get-Date)).Days}}"
             }
             @{
-                Description = "Disable inactive privileged account"
+                Description = "Отключить неактивную привилегированную учётную запись"
                 Command = "Disable-ADAccount -Identity 'USERNAME'"
             }
             @{
-                Description = "Remove privileged group membership from inactive account"
+                Description = "Удалить неактивную запись из привилегированной группы"
                 Command = "Remove-ADGroupMember -Identity 'Domain Admins' -Members 'USERNAME' -Confirm:`$false"
             }
         )
@@ -13281,15 +13281,15 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Find orphaned admin accounts (AdminCount=1 but not in protected groups)"
+                Description = "Найти административные записи с adminCount=1 вне защищённых групп"
                 Command = "`$protectedGroups = @('Domain Admins','Enterprise Admins','Schema Admins','Administrators','Account Operators','Server Operators','Print Operators','Backup Operators'); Get-ADUser -Filter {AdminCount -eq 1} -Properties MemberOf | Where-Object { -not (`$_.MemberOf | Where-Object { `$protectedGroups -contains (`$_ -replace '^CN=([^,]+).*','`$1') }) } | Select-Object SamAccountName,DistinguishedName"
             }
             @{
-                Description = "Clear AdminCount attribute on orphaned account"
+                Description = "Очистить adminCount у записи, больше не являющейся привилегированной"
                 Command = "Set-ADUser -Identity 'USERNAME' -Clear AdminCount"
             }
             @{
-                Description = "Manually trigger SDProp to update ACLs (runs on PDC Emulator)"
+                Description = "Принудительно запустить SDProp для обновления ACL (выполняется на эмуляторе PDC)"
                 Command = "Invoke-Command -ComputerName PDC_EMULATOR -ScriptBlock { `$rootDSE = [ADSI]'LDAP://RootDSE'; `$rootDSE.Put('FixUpInheritance','1'); `$rootDSE.SetInfo() }"
             }
         )
@@ -13333,15 +13333,15 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Find all accounts with passwords older than 5 years"
+                Description = "Найти учётные записи с паролями старше пяти лет"
                 Command = "`$staleDate = (Get-Date).AddYears(-5); Get-ADUser -Filter {PasswordLastSet -lt `$staleDate} -Properties PasswordLastSet | Select-Object Name,SamAccountName,PasswordLastSet,@{Name='DaysSincePasswordChange';Expression={(New-TimeSpan -Start `$_.PasswordLastSet -End (Get-Date)).Days}}"
             }
             @{
-                Description = "Force password change at next logon"
+                Description = "Требовать сменить пароль при следующем входе"
                 Command = "Set-ADUser -Identity 'USERNAME' -ChangePasswordAtLogon `$true"
             }
             @{
-                Description = "Set new random password and force change (for compromised accounts)"
+                Description = "Установить новый случайный пароль и потребовать смены (для скомпрометированных записей)"
                 Command = "`$newPwd = [System.Web.Security.Membership]::GeneratePassword(20,5); Set-ADAccountPassword -Identity 'USERNAME' -NewPassword (ConvertTo-SecureString `$newPwd -AsPlainText -Force) -Reset; Set-ADUser -Identity 'USERNAME' -ChangePasswordAtLogon `$true"
             }
         )
@@ -13416,19 +13416,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "View current domain password policy"
+                Description = "Показать текущую парольную политику домена"
                 Command = "Get-ADDefaultDomainPasswordPolicy"
             }
             @{
-                Description = "Set minimum password length to 14 characters and enable complexity"
+                Description = "Установить минимальную длину пароля 14 символов и включить требования сложности"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity (Get-ADDomain).DistinguishedName -MinPasswordLength 14 -ComplexityEnabled `$true"
             }
             @{
-                Description = "Configure password history and lockout settings"
+                Description = "Настроить историю паролей и блокировку учётных записей"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity (Get-ADDomain).DistinguishedName -PasswordHistoryCount 24 -LockoutDuration 00:30:00 -LockoutObservationWindow 00:30:00 -LockoutThreshold 5"
             }
             @{
-                Description = "Set all recommended password policy settings at once"
+                Description = "Установить все рекомендованные параметры парольной политики одновременно"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity (Get-ADDomain).DistinguishedName -MinPasswordLength 14 -ComplexityEnabled `$true -PasswordHistoryCount 24 -MaxPasswordAge 90.00:00:00 -MinPasswordAge 1.00:00:00 -ReversibleEncryptionEnabled `$false -LockoutThreshold 5 -LockoutDuration 00:30:00 -LockoutObservationWindow 00:30:00"
             }
         )
@@ -13469,15 +13469,15 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "List every PSO with the settings that matter and who it applies to"
+                Description = "Перечислить все PSO, их важные настройки и области применения"
                 Command = "Get-ADFineGrainedPasswordPolicy -Filter * | Select-Object Name,Precedence,MinPasswordLength,ComplexityEnabled,ReversibleEncryptionEnabled,LockoutThreshold,AppliesTo"
             }
             @{
-                Description = "Raise one PSO to the domain default"
+                Description = "Установить для PSO значения доменной политики по умолчанию"
                 Command = "Set-ADFineGrainedPasswordPolicy -Identity 'PSO_NAME' -MinPasswordLength 14 -ComplexityEnabled `$true -ReversibleEncryptionEnabled `$false -LockoutThreshold 5"
             }
             @{
-                Description = "Who the policy currently covers"
+                Description = "Показать пользователей и группы, к которым сейчас применяется политика"
                 Command = "Get-ADFineGrainedPasswordPolicySubject -Identity 'PSO_NAME'"
             }
         )
@@ -13516,19 +13516,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "View current domain password policy"
+                Description = "Показать текущую парольную политику домена"
                 Command = "Get-ADDefaultDomainPasswordPolicy -Identity 'domain.com' | Select-Object MaxPasswordAge,MinPasswordAge,LockoutDuration,LockoutThreshold,ComplexityEnabled"
             }
             @{
-                Description = "Set maximum password age to 365 days"
+                Description = "Установить максимальный срок действия пароля 365 дней"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -MaxPasswordAge '365.00:00:00'"
             }
             @{
-                Description = "Set maximum password age to 180 days (stricter policy)"
+                Description = "Установить максимальный срок действия пароля 180 дней (более строго)"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -MaxPasswordAge '180.00:00:00'"
             }
             @{
-                Description = "Set comprehensive password policy (365 days max age + complexity)"
+                Description = "Настроить парольную политику: срок 365 дней и проверка сложности"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -MaxPasswordAge '365.00:00:00' -MinPasswordAge '1.00:00:00' -MinPasswordLength 14 -ComplexityEnabled `$true -ReversibleEncryptionEnabled `$false"
             }
         )
@@ -13566,19 +13566,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "View current account lockout settings"
+                Description = "Показать текущие настройки блокировки учётных записей"
                 Command = "Get-ADDefaultDomainPasswordPolicy -Identity 'domain.com' | Select-Object LockoutDuration,LockoutThreshold,LockoutObservationWindow"
             }
             @{
-                Description = "Set lockout duration to 30 minutes with 5 failed attempts threshold"
+                Description = "Блокировать на 30 минут после пяти неудачных попыток"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -LockoutDuration '00:30:00' -LockoutThreshold 5 -LockoutObservationWindow '00:30:00'"
             }
             @{
-                Description = "Set lockout duration to 60 minutes (stricter policy)"
+                Description = "Блокировать на 60 минут (более строго)"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -LockoutDuration '01:00:00' -LockoutThreshold 5 -LockoutObservationWindow '01:00:00'"
             }
             @{
-                Description = "Set permanent lockout (requires manual unlock by administrator)"
+                Description = "Включить бессрочную блокировку до ручной разблокировки администратором"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -LockoutDuration '00:00:00' -LockoutThreshold 3 -LockoutObservationWindow '00:30:00'"
             }
         )
@@ -13617,19 +13617,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "View current account lockout policy settings"
+                Description = "Показать текущие параметры политики блокировки учётных записей"
                 Command = "Get-ADDefaultDomainPasswordPolicy -Identity 'domain.com' | Select-Object LockoutDuration,LockoutThreshold,LockoutObservationWindow"
             }
             @{
-                Description = "Enable account lockout policy with recommended settings (10 failed attempts, 30 minute lockout)"
+                Description = "Включить блокировку: 10 ошибок входа, 30 минут блокировки"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -LockoutThreshold 10 -LockoutDuration '00:30:00' -LockoutObservationWindow '00:30:00'"
             }
             @{
-                Description = "Enable stricter account lockout policy (5 failed attempts, 1 hour lockout)"
+                Description = "Применить более строгую блокировку: пять ошибок, один час"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -LockoutThreshold 5 -LockoutDuration '01:00:00' -LockoutObservationWindow '01:00:00'"
             }
             @{
-                Description = "Enable permanent lockout requiring administrator unlock (3 failed attempts)"
+                Description = "Включить блокировку до решения администратора после трёх ошибок входа"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -LockoutThreshold 3 -LockoutDuration '00:00:00' -LockoutObservationWindow '00:15:00'"
             }
         )
@@ -13666,19 +13666,19 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "View current password age settings"
+                Description = "Показать текущие сроки действия паролей"
                 Command = "Get-ADDefaultDomainPasswordPolicy -Identity 'domain.com' | Select-Object MinPasswordAge,MaxPasswordAge,PasswordHistoryCount"
             }
             @{
-                Description = "Set minimum password age to 1 day (recommended to prevent password history bypass)"
+                Description = "Установить минимальный возраст пароля один день, чтобы затруднить обход истории"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -MinPasswordAge '1.00:00:00'"
             }
             @{
-                Description = "Set minimum password age to 2 days (stricter policy)"
+                Description = "Установить минимальный возраст пароля два дня (более строго)"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -MinPasswordAge '2.00:00:00'"
             }
             @{
-                Description = "Configure comprehensive password policy with minimum age and history enforcement"
+                Description = "Настроить парольную политику с минимальным возрастом и историей паролей"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -MinPasswordAge '1.00:00:00' -MaxPasswordAge '365.00:00:00' -PasswordHistoryCount 24 -ComplexityEnabled `$true"
             }
         )
@@ -13711,15 +13711,15 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Show the password history and the minimum age of the domain"
+                Description = "Показать историю паролей и минимальный срок действия в домене"
                 Command = "Get-ADDefaultDomainPasswordPolicy | Select-Object PasswordHistoryCount, MinPasswordAge"
             }
             @{
-                Description = "Remember 24 passwords (the domain head; the Default Domain Policy is where it is normally set)"
+                Description = "Запоминать 24 предыдущих пароля (обычно задаётся Default Domain Policy)"
                 Command = "Set-ADDefaultDomainPasswordPolicy -Identity 'domain.com' -PasswordHistoryCount 24"
             }
             @{
-                Description = "The same on a fine-grained password policy"
+                Description = "Установить аналогичные параметры в детализированной парольной политике"
                 Command = "Set-ADFineGrainedPasswordPolicy -Identity '<policy name>' -PasswordHistoryCount 24"
             }
         )
@@ -13756,27 +13756,27 @@ Set-ADAccountPassword -Identity 'ACCOUNTNAME' -Reset -NewPassword (Read-Host -As
         )
         RemediationCommands = @(
             @{
-                Description = "Remove CT_FLAG_NO_SECURITY_EXTENSION flag from certificate template"
+                Description = "Удалить CT_FLAG_NO_SECURITY_EXTENSION из шаблона сертификата"
                 Command = @'
 $templateName = "VulnerableTemplate"
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateDN = "CN=$templateName,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Get current enrollment flag
+# Прочитать текущий флаг регистрации
 $template = Get-ADObject -Identity $templateDN -Properties msPKI-Enrollment-Flag
 $currentFlag = $template.'msPKI-Enrollment-Flag'
 
-# Remove CT_FLAG_NO_SECURITY_EXTENSION (0x80000)
+# Удалить CT_FLAG_NO_SECURITY_EXTENSION (0x80000)
 $newFlag = $currentFlag -band (-bnot 0x80000)
 
-# Update template
+# Обновить шаблон
 Set-ADObject -Identity $templateDN -Replace @{'msPKI-Enrollment-Flag' = $newFlag}
 '@
             }
             @{
-                Description = "Enable StrongCertificateBindingEnforcement on all Domain Controllers"
+                Description = "Включить StrongCertificateBindingEnforcement на всех контроллерах домена"
                 Command = @'
-# Set registry value on all DCs (run via GPO or remotely)
+# Настроить реестр на всех DC (через GPO или удалённо)
 $DCs = Get-ADDomainController -Filter *
 foreach ($DC in $DCs) {
     Invoke-Command -ComputerName $DC.HostName -ScriptBlock {
@@ -13786,9 +13786,9 @@ foreach ($DC in $DCs) {
 '@
             }
             @{
-                Description = "Verify certificate template includes szOID_NTDS_CA_SECURITY_EXT"
+                Description = "Проверить наличие szOID_NTDS_CA_SECURITY_EXT в шаблоне сертификата"
                 Command = @'
-# Check if template properly includes security extension
+# Проверить, включает ли шаблон расширение безопасности
 $templateName = "VulnerableTemplate"
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateDN = "CN=$templateName,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
@@ -13837,11 +13837,11 @@ if (($template.'msPKI-Enrollment-Flag' -band 0x80000) -eq 0x80000) {
         )
         RemediationCommands = @(
             @{
-                Description = "Show who can write to the container"
+                Description = "Показать субъектов, способных изменять контейнер"
                 Command = "(Get-Acl -Path 'AD:\CN=System Management,CN=System,DOMAIN_DN').Access | Where-Object { `$_.AccessControlType -eq 'Allow' -and `$_.ActiveDirectoryRights -match 'GenericAll|GenericWrite|WriteDacl|WriteOwner|CreateChild' }"
             }
             @{
-                Description = "Show what is currently published in it"
+                Description = "Показать текущее содержимое опубликованных объектов контейнера"
                 Command = "Get-ADObject -SearchBase 'CN=System Management,CN=System,DOMAIN_DN' -LDAPFilter '(objectClass=mSSMSManagementPoint)' -Properties mSSMSMPName,mSSMSSiteCode"
             }
         )
@@ -13881,11 +13881,11 @@ if (($template.'msPKI-Enrollment-Flag' -band 0x80000) -eq 0x80000) {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the group memberships of the account"
+                Description = "Показать членство учётной записи в группах"
                 Command = "Get-ADUser -Identity 'ACCOUNT_NAME' -Properties memberOf | Select-Object -ExpandProperty memberOf"
             }
             @{
-                Description = "Show which SCOM accounts are configured (run on a management server)"
+                Description = "Показать настроенные учётные записи SCOM (на сервере управления)"
                 Command = "Get-SCOMRunAsAccount | Select-Object Name, UserName, AccountType"
             }
         )
@@ -14014,7 +14014,7 @@ if (($template.'msPKI-Enrollment-Flag' -band 0x80000) -eq 0x80000) {
         )
         RemediationCommands = @(
             @{
-                Description = "Remove Domain Users from the group"
+                Description = "Удалить Domain Users из группы"
                 Command = "Remove-ADGroupMember -Identity 'GROUP_NAME' -Members 'Domain Users' -Confirm:`$false"
             }
         )
@@ -14053,28 +14053,28 @@ if (($template.'msPKI-Enrollment-Flag' -band 0x80000) -eq 0x80000) {
         )
         RemediationCommands = @(
             @{
-                Description = "View current AD DS Connector account permissions (MSOL account)"
+                Description = "Показать права учётной записи AD DS Connector (MSOL)"
                 Command = "Import-Module ADSync; Get-ADSyncConnectorAccount -Connector 'Contoso.com' | Select-Object UserName,PasswordNeverExpires,PasswordLastSet"
             }
             @{
-                Description = "Review MSOL account DCSync permissions on domain root"
+                Description = "Проверить разрешения DCSync учётной записи MSOL на корне домена"
                 Command = "(Get-Acl 'AD:\DC=contoso,DC=com').Access | Where-Object {`$_.IdentityReference -like '*MSOL*' -and (`$_.ActiveDirectoryRights -match 'GenericAll|Replicating Directory Changes')} | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "Enable Entra Connect audit logging (requires 250MB-500MB log size)"
-                Command = "# On Entra Connect server: wevtutil sl 'Microsoft-Windows-ADSync/Admin' /ms:524288000; # Then monitor event log: Get-WinEvent -LogName 'Microsoft-Windows-ADSync/Admin' -MaxEvents 50"
+                Description = "Включить журналирование Entra Connect (нужно 250–500 МБ для журнала)"
+                Command = "# На сервере Entra Connect: wevtutil sl 'Microsoft-Windows-ADSync/Admin' /ms:524288000; # затем журнал: Get-WinEvent -LogName 'Microsoft-Windows-ADSync/Admin' -MaxEvents 50"
             }
             @{
-                Description = "Monitor for interactive sign-ins by MSOL account (should only be non-interactive)"
+                Description = "Отслеживать интерактивные входы MSOL (в норме используются неинтерактивные)"
                 Command = "Get-ADUser -Filter {SamAccountName -like 'MSOL_*'} -Properties LastLogonDate,whenCreated | Select-Object Name,SamAccountName,LastLogonDate,whenCreated | Format-Table -AutoSize"
             }
             @{
-                Description = "Audit Office 365 Unified Audit Logs for suspicious MSOL account activity"
-                Command = "# In Microsoft 365 Compliance Center: Search Unified Audit Log for UserIds starting with MSOL_ with interactive logon events"
+                Description = "Проверить объединённый журнал Microsoft 365 на подозрительные действия MSOL"
+                Command = "# В Microsoft 365 Compliance Center: проверьте интерактивные события MSOL_ в Unified Audit Log"
             }
             @{
-                Description = "Restrict RDP and interactive access to Entra Connect server"
-                Command = "# Use GPO: Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > User Rights Assignment > 'Allow log on through Remote Desktop Services' = Only specific admin accounts"
+                Description = "Ограничить RDP и интерактивный доступ к серверу Entra Connect"
+                Command = "# GPO → Конфигурация компьютера → Локальные политики → Права пользователя → «Вход через службы удалённых рабочих столов» = только утверждённые администраторы"
             }
         )
         References = @(
@@ -14116,11 +14116,11 @@ if (($template.'msPKI-Enrollment-Flag' -band 0x80000) -eq 0x80000) {
         )
         RemediationCommands = @(
             @{
-                Description = "Show who can read the DKM container"
+                Description = "Показать субъектов с правом чтения контейнера DKM"
                 Command = "Get-Acl -Path 'AD:\CN=ADFS,CN=Microsoft,CN=Program Data,DOMAIN_DN' | Select-Object -ExpandProperty Access"
             }
             @{
-                Description = "Show the AD FS token-signing certificate and its validity"
+                Description = "Показать сертификат подписи токенов AD FS и срок его действия"
                 Command = "Get-AdfsCertificate -CertificateType Token-Signing"
             }
         )
@@ -14160,11 +14160,11 @@ if (($template.'msPKI-Enrollment-Flag' -band 0x80000) -eq 0x80000) {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the group memberships of the service account"
+                Description = "Показать группы служебной учётной записи"
                 Command = "Get-ADUser -Identity 'ACCOUNT_NAME' -Properties memberOf | Select-Object -ExpandProperty memberOf"
             }
             @{
-                Description = "Show which account each SQL Server service runs under (run on the SQL host)"
+                Description = "Показать учётную запись каждой службы SQL Server (выполнять на сервере SQL)"
                 Command = "Get-CimInstance Win32_Service | Where-Object { `$_.Name -match '^(MSSQL|SQLAgent|SQLSERVERAGENT)' } | Select-Object Name, StartName"
             }
         )
@@ -14202,15 +14202,15 @@ if (($template.'msPKI-Enrollment-Flag' -band 0x80000) -eq 0x80000) {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the expiration time recorded in the directory"
+                Description = "Показать дату истечения, записанную в каталоге"
                 Command = "Get-ADComputer -Identity 'COMPUTER_NAME' -Properties 'ms-Mcs-AdmPwdExpirationTime','msLAPS-PasswordExpirationTime'"
             }
             @{
-                Description = "Force an immediate rotation on the machine (Windows LAPS, run on the machine)"
+                Description = "Принудительно обновить пароль на компьютере через Windows LAPS"
                 Command = "Reset-LapsPassword"
             }
             @{
-                Description = "Check whether the LAPS policy still reaches the machine"
+                Description = "Проверить, применяется ли политика LAPS к компьютеру"
                 Command = "Get-LapsDiagnostics"
             }
         )
@@ -14243,11 +14243,11 @@ if (($template.'msPKI-Enrollment-Flag' -band 0x80000) -eq 0x80000) {
         )
         RemediationCommands = @(
             @{
-                Description = "Reset the DSRM password of a domain controller (run on it; prompts for the new password)"
+                Description = "Сбросить пароль DSRM контроллера домена (на DC с запросом нового пароля)"
                 Command = "ntdsutil `"set dsrm password`" `"reset password on server null`" q q"
             }
             @{
-                Description = "Show whether Windows LAPS manages the DSRM password of a domain controller"
+                Description = "Проверить, управляет ли Windows LAPS паролем DSRM на контроллере домена"
                 Command = "Get-LapsADPassword -Identity 'DC_NAME' | Select-Object ComputerName, Source, ExpirationTimestamp"
             }
         )
@@ -14322,11 +14322,11 @@ if (($template.'msPKI-Enrollment-Flag' -band 0x80000) -eq 0x80000) {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the current owner and the recorded creator of the computer object"
+                Description = "Показать текущего владельца и создателя объекта компьютера"
                 Command = "Get-ADComputer -Identity 'COMPUTER_NAME' -Properties nTSecurityDescriptor,mS-DS-CreatorSID | Select-Object Name,@{n='Owner';e={`$_.nTSecurityDescriptor.Owner}},mS-DS-CreatorSID"
             }
             @{
-                Description = "Reset the owner to Domain Admins"
+                Description = "Назначить владельцем группу Domain Admins"
                 Command = "`$acl = Get-Acl -Path 'AD:\COMPUTER_DN'; `$acl.SetOwner((New-Object System.Security.Principal.NTAccount('DOMAIN\Domain Admins'))); Set-Acl -Path 'AD:\COMPUTER_DN' -AclObject `$acl"
             }
         )
@@ -14401,24 +14401,24 @@ if (($template.'msPKI-Enrollment-Flag' -band 0x80000) -eq 0x80000) {
         )
         RemediationCommands = @(
             @{
-                Description = "Find all users with Unix password attributes populated"
+                Description = "Найти пользователей с заполненными Unix-атрибутами паролей"
                 Command = "Get-ADUser -Filter * -Properties unixUserPassword,userPassword,msSFU30Password,sambaNTPassword,sambaLMPassword | Where-Object {`$_.unixUserPassword -or `$_.userPassword -or `$_.msSFU30Password -or `$_.sambaNTPassword -or `$_.sambaLMPassword} | Select-Object Name,SamAccountName,@{Name='HasUnixPassword';Expression={[bool]`$_.unixUserPassword}},@{Name='HasUserPassword';Expression={[bool]`$_.userPassword}},@{Name='HasSFU30Password';Expression={[bool]`$_.msSFU30Password}}"
             }
             @{
-                Description = "Clear Unix password attributes from a specific user"
+                Description = "Очистить Unix-атрибуты пароля у указанного пользователя"
                 Command = "Set-ADUser -Identity 'USERNAME' -Clear unixUserPassword,userPassword,msSFU30Password,sambaNTPassword,sambaLMPassword"
             }
             @{
-                Description = "Clear Unix password attributes from all affected users (bulk operation)"
+                Description = "Массово очистить Unix-атрибуты пароля у затронутых пользователей"
                 Command = "Get-ADUser -Filter * -Properties unixUserPassword,userPassword,msSFU30Password,sambaNTPassword,sambaLMPassword | Where-Object {`$_.unixUserPassword -or `$_.userPassword -or `$_.msSFU30Password -or `$_.sambaNTPassword -or `$_.sambaLMPassword} | ForEach-Object { Set-ADUser -Identity `$_.SamAccountName -Clear unixUserPassword,userPassword,msSFU30Password,sambaNTPassword,sambaLMPassword; Write-Host `"Cleared Unix password attributes from `$(`$_.SamAccountName)`" }"
             }
             @{
-                Description = "Mark the attributes confidential, which is what takes the read away. Forest-wide and needs Schema Admin - test first, a reader with only generic read loses access"
+                Description = "Сделать атрибуты конфиденциальными через схему леса (нужны права Schema Admins; проверить совместимость)"
                 Command = @'
-# The predecessor of this command denied read on CN=Schema itself, which controls access
-# to the schema objects and not to the values in the domain partition - it changed
-# nothing about who can read userPassword on a user. The mechanism for "this attribute is
-# no longer readable by everyone" is the fCONFIDENTIAL bit in searchFlags (bit 7, 128).
+# Прежняя команда запрещала чтение CN=Schema, что ограничивает доступ к схеме,
+# но не к значениям пользовательских атрибутов раздела домена. На чтение
+# userPassword это не влияло. Для ограничения чтения атрибута используется
+# бит fCONFIDENTIAL в searchFlags (бит 7, значение 128).
 $schema = (Get-ADRootDSE).schemaNamingContext
 foreach ($name in 'unixUserPassword', 'msSFU30Password', 'sambaNTPassword', 'sambaLMPassword') {
     $attr = Get-ADObject -SearchBase $schema -LDAPFilter "(lDAPDisplayName=$name)" -Properties searchFlags
@@ -14429,7 +14429,7 @@ foreach ($name in 'unixUserPassword', 'msSFU30Password', 'sambaNTPassword', 'sam
 '@
             }
             @{
-                Description = "Restrict the read on one OU instead, if the forest-wide schema change is not wanted"
+                Description = "Ограничить чтение на уровне отдельной OU вместо изменения схемы леса"
                 Command = "dsacls 'OU=Unix,DC=domain,DC=com' /D 'NT AUTHORITY\Authenticated Users:RP;unixUserPassword'"
             }
         )
@@ -14475,24 +14475,24 @@ foreach ($name in 'unixUserPassword', 'msSFU30Password', 'sambaNTPassword', 'sam
         )
         RemediationCommands = @(
             @{
-                Description = "Find all standalone Managed Service Accounts (sMSA) in the domain"
+                Description = "Найти все автономные управляемые служебные учётные записи sMSA"
                 Command = "Get-ADServiceAccount -Filter {ObjectClass -eq 'msDS-ManagedServiceAccount'} -Properties ObjectClass | Where-Object {`$_.ObjectClass -notcontains 'msDS-GroupManagedServiceAccount'} | Select-Object Name,SamAccountName,DistinguishedName,Enabled"
             }
             @{
-                Description = "Create KDS Root Key (required for gMSA, one-time setup per forest)"
-                Command = "# For production (10 hour wait): Add-KdsRootKey -EffectiveTime ((Get-Date).AddHours(-10)); # For testing (immediate): Add-KdsRootKey -EffectiveImmediately"
+                Description = "Создать корневой ключ KDS (однократно для леса, необходимо для gMSA)"
+                Command = "# Для продуктивной среды (10 часов): Add-KdsRootKey -EffectiveTime ((Get-Date).AddHours(-10)); # для теста (сразу): Add-KdsRootKey -EffectiveImmediately"
             }
             @{
-                Description = "Create security group for gMSA password retrieval authorization"
+                Description = "Создать группу безопасности для субъектов, получающих пароли gMSA"
                 Command = "New-ADGroup -Name 'gMSA-ServiceServers' -GroupScope Global -GroupCategory Security -Path 'OU=Groups,DC=domain,DC=com' -Description 'Servers authorized to retrieve gMSA passwords'"
             }
             @{
-                Description = "Create new Group Managed Service Account (gMSA)"
+                Description = "Создать групповую управляемую учётную запись gMSA"
                 Command = "New-ADServiceAccount -Name 'gMSA_ServiceName' -DNSHostName 'gMSA_ServiceName.domain.com' -PrincipalsAllowedToRetrieveManagedPassword 'gMSA-ServiceServers' -ManagedPasswordIntervalInDays 30"
             }
             @{
-                Description = "Verify gMSA creation and test password retrieval on target server"
-                Command = "# On Domain Controller: Get-ADServiceAccount -Identity 'gMSA_ServiceName' -Properties *; # On target server: Test-ADServiceAccount -Identity 'gMSA_ServiceName'"
+                Description = "Проверить создание gMSA и возможность получить пароль на целевом сервере"
+                Command = "# На DC: Get-ADServiceAccount -Identity 'gMSA_ServiceName' -Properties *; # на целевом сервере: Test-ADServiceAccount -Identity 'gMSA_ServiceName'"
             }
         )
         References = @(
@@ -14531,20 +14531,20 @@ foreach ($name in 'unixUserPassword', 'msSFU30Password', 'sambaNTPassword', 'sam
         )
         RemediationCommands = @(
             @{
-                Description = "List every UNC path a scheduled task in SYSVOL names (replace the domain name)"
+                Description = "Найти все UNC-пути в задачах планировщика SYSVOL (замените имя домена)"
                 Command = "Get-ChildItem '\\contoso.com\SYSVOL\contoso.com\Policies' -Recurse -Filter ScheduledTasks.xml | ForEach-Object { `$file = `$_.FullName; `$xml = New-Object System.Xml.XmlDocument; `$xml.Load(`$file); `$xml.SelectNodes('//Exec/Command | //Exec/Arguments | //Properties/@appName | //Properties/@args') | Where-Object { `$_.InnerText -match '\\\\' } | ForEach-Object { [PSCustomObject]@{ File = `$file; Value = `$_.InnerText } } }"
             }
             @{
-                Description = "Show who besides Administrators and SYSTEM may write the file or folder (NTFS; the share permissions apply on top and are read with Get-SmbShareAccess on the file server)"
+                Description = "Показать субъектов кроме Administrators и SYSTEM с правом записи файлов и папок (NTFS и права общего ресурса)"
                 Command = "(Get-Acl '\\server\share\path').Access | Where-Object { `$_.AccessControlType -eq 'Allow' -and `$_.FileSystemRights -match 'Write|Modify|FullControl|CreateFiles' -and `$_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value -notmatch '^S-1-5-32-544`$|^S-1-5-18`$' } | Format-Table IdentityReference,FileSystemRights,IsInherited -AutoSize"
             }
             @{
-                Description = "Remove explicit write access of Everyone, Authenticated Users, Users and Domain Users. Inherited entries have to be changed where they are defined. Do not add a Deny entry for Domain Users instead: every administrator account is a member of that group too, and the Deny would lock the administrators out"
+                Description = "Удалить явные права записи для Everyone, Authenticated Users, Users и Domain Users; наследуемые ACE удаляются у источника, Deny не добавлять"
                 Command = "`$path = '\\server\share\path'; `$acl = Get-Acl `$path; `$acl.Access | Where-Object { -not `$_.IsInherited -and `$_.AccessControlType -eq 'Allow' -and `$_.FileSystemRights -match 'Write|Modify|FullControl|CreateFiles' -and `$_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value -match '^S-1-1-0`$|^S-1-5-11`$|^S-1-5-32-545`$|-513`$' } | ForEach-Object { [void]`$acl.RemoveAccessRule(`$_) }; Set-Acl -Path `$path -AclObject `$acl"
             }
             @{
-                Description = "Modify the GPO scheduled task to use a local path instead of UNC (requires Group Policy Editor or XML editing)"
-                Command = "# Edit GPO via Group Policy Management Console: Computer Configuration > Preferences > Control Panel Settings > Scheduled Tasks > [Task] > Actions > replace the UNC path with a local path only administrators can write, for example a folder below C:\Program Files - not a new folder in the root of C:, which inherits write access for Authenticated Users"
+                Description = "Изменить задачу GPO на локальный путь вместо UNC (через редактор GPO или XML)"
+                Command = "# GPMC → GPO → Конфигурация компьютера → Предпочтения → Задачи планировщика: замените UNC на локальный путь с записью только для администраторов, например внутри C:\Program Files, не в корне C:\"
             }
         )
         References = @(
@@ -14579,11 +14579,11 @@ foreach ($name in 'unixUserPassword', 'msSFU30Password', 'sambaNTPassword', 'sam
         )
         RemediationCommands = @(
             @{
-                Description = "List every scheduled task program in SYSVOL whose path contains a space and is not quoted (replace the domain name)"
+                Description = "Найти задачи SYSVOL с путями, содержащими пробелы без кавычек (замените домен)"
                 Command = "Get-ChildItem '\\contoso.com\SYSVOL\contoso.com\Policies' -Recurse -Filter ScheduledTasks.xml | ForEach-Object { `$file = `$_.FullName; `$xml = New-Object System.Xml.XmlDocument; `$xml.Load(`$file); `$xml.SelectNodes('//Exec/Command | //Properties/@appName') | Where-Object { `$_.InnerText -match '\s' -and `$_.InnerText -notmatch '^`".*`"`$' } | ForEach-Object { [PSCustomObject]@{ File = `$file; Program = `$_.InnerText } } }"
             }
             @{
-                Description = "Show who besides Administrators and SYSTEM may create files in the root of the system drive - what planting C:\Program.exe would need"
+                Description = "Показать субъектов кроме Administrators и SYSTEM с правом создавать файлы в корне системного диска"
                 Command = "(Get-Acl 'C:\').Access | Where-Object { `$_.AccessControlType -eq 'Allow' -and `$_.PropagationFlags -notmatch 'InheritOnly' -and `$_.FileSystemRights -match 'Write|Modify|FullControl|CreateFiles' -and `$_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value -notmatch '^S-1-5-32-544`$|^S-1-5-18`$' } | Format-Table IdentityReference,FileSystemRights -AutoSize"
             }
         )
@@ -14619,7 +14619,7 @@ foreach ($name in 'unixUserPassword', 'msSFU30Password', 'sambaNTPassword', 'sam
         )
         RemediationCommands = @(
             @{
-                Description = "List every scheduled task in SYSVOL that hands cmd.exe a command line (replace the domain name)"
+                Description = "Найти задачи SYSVOL, передающие командную строку в cmd.exe (замените домен)"
                 Command = "Get-ChildItem '\\contoso.com\SYSVOL\contoso.com\Policies' -Recurse -Filter ScheduledTasks.xml | ForEach-Object { `$file = `$_.FullName; `$xml = New-Object System.Xml.XmlDocument; `$xml.Load(`$file); `$xml.SelectNodes('//Exec') | Where-Object { `$_.Command -match 'cmd(\.exe)?`"?`$' } | ForEach-Object { [PSCustomObject]@{ File = `$file; Command = `$_.Command; Arguments = `$_.Arguments } } }"
             }
         )
@@ -14662,42 +14662,42 @@ foreach ($name in 'unixUserPassword', 'msSFU30Password', 'sambaNTPassword', 'sam
         )
         RemediationCommands = @(
             @{
-                Description = "Duplicate Schema v1 template to v2+ (GUI method - run on CA or admin workstation)"
+                Description = "Дублировать шаблон Schema v1 до версии v2+ через GUI (на УЦ или административной станции)"
                 Command = @'
-# 1. Open Certificate Templates MMC (certtmpl.msc)
-# 2. Right-click the vulnerable v1 template and select "Duplicate Template"
-# 3. In the "Compatibility" tab, ensure Windows Server 2008 R2 or later (creates v2+)
-# 4. In the "Subject Name" tab, select "Build from this Active Directory information"
-# 5. Configure other settings as needed
-# 6. Save the new template
-# 7. Publish the new template on the CA
-# 8. Unpublish the old v1 template
+# 1. Откройте консоль шаблонов сертификатов (certtmpl.msc)
+# 2. Щёлкните по уязвимому шаблону v1 и выберите «Дублировать шаблон»
+# 3. На вкладке «Совместимость» выберите Windows Server 2008 R2 или новее (v2+)
+# 4. На вкладке «Имя субъекта» выберите построение из сведений Active Directory
+# 5. Настройте прочие необходимые параметры
+# 6. Сохраните новый шаблон
+# 7. Опубликуйте новый шаблон на УЦ
+# 8. Отмените публикацию старого шаблона v1
 
 Write-Host "[!] This is a manual process requiring the Certificate Templates MMC" -ForegroundColor Yellow
 '@
             }
             @{
-                Description = "Unpublish vulnerable v1 template from CA"
+                Description = "Отменить публикацию уязвимого шаблона v1 в УЦ"
                 Command = @'
-# Run on CA server
+# Выполнять на сервере УЦ
 $templateName = "VulnerableV1Template"
 certutil -deltemplate "$templateName"
 
-# Or via PowerShell (requires RSAT-ADCS-Mgmt)
+# Либо через PowerShell (требуется RSAT-ADCS-Mgmt)
 $caName = "$env:COMPUTERNAME\$((certutil -dump | Select-String 'Config:' | ForEach-Object { ($_ -split '\\')[-1].Trim() }))"
 Remove-CATemplate -Name "$templateName" -Force
 '@
             }
             @{
-                Description = "Disable Application Policies extension on CA (prevents EKUwu attack)"
+                Description = "Отключить расширение Application Policies на УЦ (защита от EKUwu)"
                 Command = @'
-# Run on CA server to block arbitrary Application Policy injection
+# Выполнять на УЦ для запрета произвольных политик приложения
 certutil -setreg policy\DisableExtensionList +1.3.6.1.4.1.311.21.10
 
-# Restart Certificate Services
+# Перезапустить службы сертификатов
 net stop certsvc && net start certsvc
 
-# Verify setting
+# Проверить значение параметра
 certutil -getreg policy\DisableExtensionList
 '@
             }
@@ -14746,14 +14746,14 @@ certutil -getreg policy\DisableExtensionList
         )
         RemediationCommands = @(
             @{
-                Description = "List every user carrying roamed credential material, without retrieving the blobs"
+                Description = "Найти пользователей с перемещаемыми учётными данными без чтения самих секретов"
                 Command = @'
 Get-ADUser -LDAPFilter '(msPKIDPAPIMasterKeys=*)' -Properties msPKIRoamingTimeStamp |
     Select-Object SamAccountName, msPKIRoamingTimeStamp
 '@
             }
             @{
-                Description = "Read the confidential flag on both attributes (bit 7, value 128)"
+                Description = "Проверить флаг конфиденциальности двух атрибутов (бит 7, значение 128)"
                 Command = @'
 Get-ADObject -SearchBase (Get-ADRootDSE).schemaNamingContext `
     -LDAPFilter '(|(lDAPDisplayName=msPKIAccountCredentials)(lDAPDisplayName=msPKIDPAPIMasterKeys))' `
@@ -14763,7 +14763,7 @@ Get-ADObject -SearchBase (Get-ADRootDSE).schemaNamingContext `
 '@
             }
             @{
-                Description = "Mark both attributes confidential. Forest-wide and needs Schema Admin - test first, a reader with only generic read loses access"
+                Description = "Сделать оба атрибута конфиденциальными на уровне леса (нужны Schema Admins; проверить чтение приложениями)"
                 Command = @'
 $schema = (Get-ADRootDSE).schemaNamingContext
 foreach ($name in 'ms-PKI-AccountCredentials', 'ms-PKI-DPAPIMasterKeys') {
@@ -14814,7 +14814,7 @@ foreach ($name in 'ms-PKI-AccountCredentials', 'ms-PKI-DPAPIMasterKeys') {
         )
         RemediationCommands = @(
             @{
-                Description = "Mark both attributes confidential. Forest-wide and needs Schema Admin"
+                Description = "Сделать оба атрибута конфиденциальными на уровне леса (нужны Schema Admins)"
                 Command = @'
 $schema = (Get-ADRootDSE).schemaNamingContext
 foreach ($name in 'ms-PKI-AccountCredentials', 'ms-PKI-DPAPIMasterKeys') {
@@ -14825,7 +14825,7 @@ foreach ($name in 'ms-PKI-AccountCredentials', 'ms-PKI-DPAPIMasterKeys') {
 '@
             }
             @{
-                Description = "The honest verification - run as a low-privileged user and expect nothing back"
+                Description = "Проверить чтение атрибутов от имени непривилегированного пользователя: данных быть не должно"
                 Command = @'
 Get-ADUser <targetuser> -Properties msPKIAccountCredentials, msPKIDPAPIMasterKeys |
     Select-Object Name,
@@ -14873,7 +14873,7 @@ Get-ADUser <targetuser> -Properties msPKIAccountCredentials, msPKIDPAPIMasterKey
         )
         RemediationCommands = @(
             @{
-                Description = "Show the delegated read ACEs on a container, resolved to attribute names"
+                Description = "Показать делегированные ACE чтения контейнера с расшифровкой имён атрибутов"
                 Command = @'
 $roaming = @{
     'b8dfa744-31dc-4ef1-ac7c-84baf7ef9da7' = 'ms-PKI-AccountCredentials'
@@ -14887,7 +14887,7 @@ $roaming = @{
 '@
             }
             @{
-                Description = "Remove one delegated read. Check the output above first - the ACE may be inherited, in which case it has to go from the container it is inherited from"
+                Description = "Удалить делегированное право чтения после проверки наследования ACE"
                 Command = @'
 $acl = Get-Acl "AD:\<container DN>"
 $ace = $acl.Access | Where-Object {
@@ -14931,12 +14931,12 @@ Set-Acl -Path "AD:\<container DN>" -AclObject $acl
         )
         RemediationCommands = @(
             @{
-                Description = "List every principal carrying a weak explicit mapping"
+                Description = "Найти субъектов с явно заданной слабой привязкой сертификата"
                 Command = @'
 Get-ADObject -LDAPFilter '(altSecurityIdentities=*)' -Properties altSecurityIdentities |
     ForEach-Object {
         foreach ($m in $_.altSecurityIdentities) {
-            # Strong: <SKI>, <SHA1-PUKEY>, <SR>. Weak: <RFC822>, <S> without <SR>.
+            # Надёжные: <SKI>, <SHA1-PUKEY>, <SR>. Слабые: <RFC822>, <S> без <SR>.
             if ($m -match '<SKI>|<SHA1-PUKEY>|<SR>') { continue }
             if ($m -match '<RFC822>|<S>') {
                 [PSCustomObject]@{ Account = $_.Name; Mapping = $m }
@@ -14946,7 +14946,7 @@ Get-ADObject -LDAPFilter '(altSecurityIdentities=*)' -Properties altSecurityIden
 '@
             }
             @{
-                Description = "Replace a weak mapping with the issuer and serial number of the intended certificate"
+                Description = "Заменить слабую привязку на издателя и серийный номер нужного сертификата"
                 Command = @'
 $cert = Get-PfxCertificate -FilePath .\intended.cer
 $issuer = ($cert.Issuer -split ',\s*') [array]::Reverse($issuer)
@@ -14984,7 +14984,7 @@ Set-ADUser -Identity 'targetuser' -Replace @{ altSecurityIdentities = $strong }
         )
         RemediationCommands = @(
             @{
-                Description = "Show who holds write access to altSecurityIdentities on an account"
+                Description = "Показать права записи altSecurityIdentities у учётной записи"
                 Command = @'
 $dn = 'CN=Administrator,CN=Users,DC=contoso,DC=com'
 $altSecGuid = [GUID]'00fbf30c-91fe-11d1-aebc-0000f80367c1'
@@ -15026,41 +15026,41 @@ $altSecGuid = [GUID]'00fbf30c-91fe-11d1-aebc-0000f80367c1'
         )
         RemediationCommands = @(
             @{
-                Description = "Remove msDS-OIDToGroupLink attribute from issuance policy OID"
+                Description = "Удалить msDS-OIDToGroupLink у OID политики выдачи сертификатов"
                 Command = @'
-# Find OID objects with group links
+# Найти объекты OID, связанные с группами
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $oidContainer = "CN=OID,CN=Public Key Services,CN=Services,$configNC"
 $linkedOIDs = Get-ADObject -SearchBase $oidContainer -Filter {msDS-OIDToGroupLink -like "*"} -Properties msDS-OIDToGroupLink,displayName
 
 foreach ($oid in $linkedOIDs) {
     Write-Host "[!] OID: $($oid.displayName) linked to: $($oid.'msDS-OIDToGroupLink')" -ForegroundColor Yellow
-    # Remove the link
+    # Удалить связь
     Set-ADObject -Identity $oid.DistinguishedName -Clear msDS-OIDToGroupLink
     Write-Host "[+] Removed group link from OID: $($oid.displayName)" -ForegroundColor Green
 }
 '@
             }
             @{
-                Description = "Remove issuance policy from vulnerable certificate template"
+                Description = "Удалить политику выдачи из уязвимого шаблона сертификата"
                 Command = @'
 $templateName = "VulnerableTemplate"
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $templateDN = "CN=$templateName,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
 
-# Get current policies
+# Получить действующие политики
 $template = Get-ADObject -Identity $templateDN -Properties msPKI-Certificate-Policy
 Write-Host "[!] Current policies: $($template.'msPKI-Certificate-Policy')" -ForegroundColor Yellow
 
-# Remove all policies (or selectively remove specific OID)
+# Удалить все политики либо только указанный OID
 Set-ADObject -Identity $templateDN -Clear msPKI-Certificate-Policy
 Write-Host "[+] Removed issuance policies from template" -ForegroundColor Green
 '@
             }
             @{
-                Description = "List all OID-to-Group links in the environment"
+                Description = "Найти все связи OID с группами в среде"
                 Command = @'
-# Audit all OID-to-Group links
+# Проверить все связи OID с группами
 $configNC = (Get-ADRootDSE).configurationNamingContext
 $oidContainer = "CN=OID,CN=Public Key Services,CN=Services,$configNC"
 $linkedOIDs = Get-ADObject -SearchBase $oidContainer -Filter {msDS-OIDToGroupLink -like "*"} -Properties msDS-OIDToGroupLink,displayName,msPKI-Cert-Template-OID
@@ -15107,15 +15107,15 @@ foreach ($oid in $linkedOIDs) {
         )
         RemediationCommands = @(
             @{
-                Description = "Configure CA to use SHA-256 hash algorithm"
+                Description = "Настроить алгоритм SHA-256 для подписи на УЦ"
                 Command = "certutil -setreg ca\csp\CNGHashAlgorithm SHA256"
             }
             @{
-                Description = "Restart Certificate Services to apply changes"
+                Description = "Перезапустить службы сертификатов для применения изменений"
                 Command = "Restart-Service -Name CertSvc"
             }
             @{
-                Description = "Verify current hash algorithm configuration"
+                Description = "Проверить текущий алгоритм хеширования УЦ"
                 Command = "certutil -getreg ca\csp\CNGHashAlgorithm"
             }
         )
@@ -15148,16 +15148,16 @@ foreach ($oid in $linkedOIDs) {
         )
         RemediationCommands = @(
             @{
-                Description = "Renew CA certificate with 4096-bit key (generates new key)"
+                Description = "Обновить сертификат УЦ с ключом 4096 бит (создаётся новый ключ)"
                 Command = "certutil -renewCert"
             }
             @{
-                Description = "Check current CA certificate key length"
+                Description = "Проверить текущую длину ключа сертификата УЦ"
                 Command = "certutil -cainfo cert | findstr `"Public Key Length`""
             }
             @{
-                Description = "Configure default key length for new CA certificates"
-                Command = "# Renew CA cert via GUI (certsrv.msc) - specify 4096-bit key during renewal wizard"
+                Description = "Настроить длину ключа для новых сертификатов УЦ"
+                Command = "# Обновите сертификат УЦ через certsrv.msc, выбрав ключ 4096 бит"
             }
         )
         References = @(
@@ -15190,15 +15190,15 @@ foreach ($oid in $linkedOIDs) {
         )
         RemediationCommands = @(
             @{
-                Description = "Renew CA certificate with new key"
+                Description = "Обновить сертификат УЦ с новым ключом"
                 Command = "certutil -renewCert"
             }
             @{
-                Description = "Renew CA certificate keeping existing key"
+                Description = "Обновить сертификат УЦ с сохранением существующего ключа"
                 Command = "certutil -renewCert ReuseKeys"
             }
             @{
-                Description = "Install renewed subordinate CA certificate"
+                Description = "Установить обновлённый сертификат подчинённого УЦ"
                 Command = "certutil -installCert <CACertFileName>"
             }
         )
@@ -15246,7 +15246,7 @@ foreach ($oid in $linkedOIDs) {
         )
         RemediationCommands = @(
             @{
-                Description = "Show who may change the membership, the permissions or the owner of a group"
+                Description = "Показать субъектов, способных менять состав группы, ACL или её владельца"
                 Command = @'
 $acl = Get-Acl "AD:\<group DN>"
 $acl.Owner
@@ -15291,7 +15291,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show who may take over an account through its DACL or its owner"
+                Description = "Показать субъектов, способных получить контроль над учётной записью через DACL или право владения"
                 Command = @'
 $acl = Get-Acl "AD:\<account DN>"
 $acl.Owner
@@ -15337,7 +15337,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "List the NTAuth store as this machine has cached it from the directory"
+                Description = "Показать хранилище NTAuth из локального кэша каталога"
                 Command = "certutil -enterprise -viewstore NTAuth"
             }
         )
@@ -15370,15 +15370,15 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Configure CA to use SHA-256 hash algorithm"
+                Description = "Настроить алгоритм SHA-256 для подписи на УЦ"
                 Command = "certutil -setreg ca\csp\CNGHashAlgorithm SHA256"
             }
             @{
-                Description = "Restart Certificate Services to apply changes"
+                Description = "Перезапустить службы сертификатов для применения изменений"
                 Command = "Restart-Service -Name CertSvc"
             }
             @{
-                Description = "Disable weak algorithms in certificate validation (registry)"
+                Description = "Отключить слабые алгоритмы при проверке сертификатов (реестр)"
                 Command = "New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Cryptography\OID\EncodingType 0\CertDllCreateCertificateChainEngine\Config' -Force; Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Cryptography\OID\EncodingType 0\CertDllCreateCertificateChainEngine\Config' -Name 'WeakSignatureHashAlgorithm' -Value 'SHA1;MD5;MD2'"
             }
         )
@@ -15410,16 +15410,16 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Identify templates with short key sizes"
+                Description = "Найти шаблоны сертификатов с недостаточной длиной ключа"
                 Command = "certutil -dstemplate | findstr `"[ msPKI-Minimal-Key-Size`" | findstr /v `"1024 2048 4096`""
             }
             @{
-                Description = "Update certificate template minimum key size to 2048 (via GUI: Certificate Templates Console - Cryptography tab)"
-                Command = "# Use Certificate Templates Console (certtmpl.msc) to modify template properties - set Minimum key size to 2048 or 4096"
+                Description = "Увеличить минимальную длину ключа шаблона до 2048 бит через консоль шаблонов сертификатов, вкладка «Криптография»"
+                Command = "# В certtmpl.msc установите минимальную длину ключа 2048 или 4096 бит"
             }
             @{
-                Description = "Force reenrollment with new key size"
-                Command = "# Use Certificate Templates Console - Right-click template - Reenroll All Certificate Holders"
+                Description = "Повторно выпустить сертификаты с новым размером ключа"
+                Command = "# В certtmpl.msc → шаблон → повторная регистрация всех владельцев сертификатов"
             }
         )
         References = @(
@@ -15451,15 +15451,15 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Renew CA certificate with new key"
+                Description = "Обновить сертификат УЦ с новым ключом"
                 Command = "certutil -renewCert"
             }
             @{
-                Description = "Renew CA certificate keeping existing key"
+                Description = "Обновить сертификат УЦ с сохранением существующего ключа"
                 Command = "certutil -renewCert ReuseKeys"
             }
             @{
-                Description = "Publish renewed certificate to Active Directory (Standalone CA)"
+                Description = "Опубликовать обновлённый сертификат автономного УЦ в Active Directory"
                 Command = "certutil -f -dspublish <RootCACertificate-File> RootCA"
             }
         )
@@ -15498,11 +15498,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show who may create child objects in the computer container"
+                Description = "Показать субъектов с правом создания дочерних объектов в контейнере Computers"
                 Command = "(Get-Acl 'AD:\CN=Computers,DC=domain,DC=com').Access | Where-Object { `$_.ActiveDirectoryRights -match 'CreateChild' } | Format-Table IdentityReference, ObjectType"
             }
             @{
-                Description = "Remove the broad group's entry (replace the identity, then verify)"
+                Description = "Удалить ACE широкой группы (подставьте субъект и проверьте результат)"
                 Command = "`$acl = Get-Acl 'AD:\CN=Computers,DC=domain,DC=com'; `$ace = `$acl.Access | Where-Object { `$_.IdentityReference -like '*Domain Users*' }; `$acl.RemoveAccessRule(`$ace); Set-Acl 'AD:\CN=Computers,DC=domain,DC=com' `$acl"
             }
         )
@@ -15541,19 +15541,19 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "View ACL on Computers container (check for Create Computer Object rights)"
+                Description = "Проверить ACL контейнера Computers на право Create Computer Object"
                 Command = "(Get-Acl 'AD:\CN=Computers,DC=domain,DC=com').Access | Where-Object {`$_.ActiveDirectoryRights -match 'CreateChild' -and `$_.ObjectType -eq 'bf967a86-0de6-11d0-a285-00aa003049e2'} | Format-Table IdentityReference,ActiveDirectoryRights,AccessControlType -AutoSize"
             }
             @{
-                Description = "Remove Create Computer permission from Computers container"
+                Description = "Удалить разрешение создания компьютеров из контейнера Computers"
                 Command = "`$dn = 'AD:\CN=Computers,DC=domain,DC=com'; `$acl = Get-Acl `$dn; `$ace = `$acl.Access | Where-Object {`$_.IdentityReference -eq 'DOMAIN\User' -and `$_.ActiveDirectoryRights -match 'CreateChild'}; `$acl.RemoveAccessRule(`$ace); Set-Acl -AclObject `$acl -Path `$dn"
             }
             @{
-                Description = "Set ms-DS-MachineAccountQuota to 0 (disable regular users from creating computers)"
+                Description = "Установить ms-DS-MachineAccountQuota равной 0 для запрета создания компьютеров обычными пользователями"
                 Command = "Set-ADDomain -Identity (Get-ADDomain).DistinguishedName -Replace @{'ms-DS-MachineAccountQuota'='0'}"
             }
             @{
-                Description = "Find all OUs where specific principal can create computer objects"
+                Description = "Найти OU, где конкретный субъект может создавать объекты компьютеров"
                 Command = "Get-ADOrganizationalUnit -Filter * | ForEach-Object { `$acl = Get-Acl `$_.DistinguishedName; `$createPerms = `$acl.Access | Where-Object {`$_.IdentityReference -like '*USERNAME*' -and `$_.ActiveDirectoryRights -match 'CreateChild' -and `$_.ObjectType -eq 'bf967a86-0de6-11d0-a285-00aa003049e2'}; if (`$createPerms) { [PSCustomObject]@{OU=`$_.Name; DN=`$_.DistinguishedName} } }"
             }
         )
@@ -15623,11 +15623,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Start BloodHound CE with Docker"
+                Description = "Запустить BloodHound CE через Docker"
                 Command = "docker-compose -f docker-compose.yml up -d"
             }
             @{
-                Description = "Import data via BloodHound API"
+                Description = "Импортировать собранные данные через API BloodHound"
                 Command = "curl -X POST -F 'file=@bloodhound_data.zip' http://localhost:8080/api/v2/file-upload"
             }
         )
@@ -16024,7 +16024,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Verify strong signature algorithm configuration"
+                Description = "Проверить использование надёжного алгоритма цифровой подписи"
                 Command = "certutil -getreg ca\csp\CNGHashAlgorithm"
             }
         )
@@ -16062,7 +16062,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Verify strong key length configuration"
+                Description = "Проверить достаточную длину ключа"
                 Command = "certutil -cainfo cert | findstr `"Public Key Length`""
             }
         )
@@ -16160,11 +16160,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Put a user account back in Domain Users as its primary group"
+                Description = "Вернуть пользователя в основную группу Domain Users"
                 Command = "Set-ADUser -Identity 'ACCOUNT' -Replace @{ primaryGroupID = 513 }"
             }
             @{
-                Description = "List every object whose primary group is a domain controller group"
+                Description = "Найти объекты, основная группа которых относится к контроллерам домена"
                 Command = "Get-ADObject -LDAPFilter '(|(primaryGroupID=516)(primaryGroupID=521)(primaryGroupID=498))' -Properties primaryGroupID,objectClass"
             }
         )
@@ -16204,11 +16204,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Add a Tier 0 user account to Protected Users - a user account, and after checking what it depends on"
+                Description = "Добавить пользователя Tier 0 в группу Protected Users только после проверки зависимостей его аутентификации"
                 Command = "Add-ADGroupMember -Identity 'Protected Users' -Members 'TIER0_USER_ACCOUNT'"
             }
             @{
-                Description = "Show who is in the group today"
+                Description = "Показать текущих участников группы"
                 Command = "Get-ADGroupMember -Identity 'Protected Users'"
             }
         )
@@ -16324,11 +16324,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Check whether the Recycle Bin is enabled"
+                Description = "Проверить, включена ли корзина Active Directory"
                 Command = "Get-ADOptionalFeature -Filter { Name -like 'Recycle*' } | Select-Object Name, EnabledScopes"
             }
             @{
-                Description = "Enable it for the forest"
+                Description = "Включить корзину Active Directory во всём лесу"
                 Command = "Enable-ADOptionalFeature -Identity 'Recycle Bin Feature' -Scope ForestOrConfigurationSet -Target '<forest root domain>'"
             }
         )
@@ -16358,11 +16358,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the global migration state (run on a domain controller)"
+                Description = "Показать глобальное состояние миграции (выполнять на контроллере домена)"
                 Command = "dfsrmig /getglobalstate"
             }
             @{
-                Description = "Start or continue the migration, one state at a time, waiting for each to converge"
+                Description = "Начать или продолжить миграцию по одному состоянию с ожиданием завершения каждого этапа"
                 Command = "dfsrmig /setglobalstate 1; dfsrmig /getmigrationstate  # then 2, then 3"
             }
         )
@@ -16393,11 +16393,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the tombstone lifetime (empty means 60 days)"
+                Description = "Показать срок хранения удалённых объектов tombstoneLifetime (пустое значение означает 60 дней)"
                 Command = "Get-ADObject ('CN=Directory Service,CN=Windows NT,CN=Services,' + (Get-ADRootDSE).configurationNamingContext) -Properties tombstoneLifetime | Select-Object tombstoneLifetime"
             }
             @{
-                Description = "Set it to 180 days"
+                Description = "Установить срок хранения удалённых объектов 180 дней"
                 Command = "Set-ADObject ('CN=Directory Service,CN=Windows NT,CN=Services,' + (Get-ADRootDSE).configurationNamingContext) -Replace @{tombstoneLifetime=180}"
             }
         )
@@ -16434,11 +16434,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "List the members of the group, language-independently by its well-known SID"
+                Description = "Вывести участников группы по общеизвестному SID без зависимости от языка домена"
                 Command = "Get-ADGroup -Identity 'S-1-5-32-554' -Properties member | Select-Object -ExpandProperty member"
             }
             @{
-                Description = "Remove Anonymous Logon from the group"
+                Description = "Удалить Anonymous Logon из группы"
                 Command = "Remove-ADGroupMember -Identity 'S-1-5-32-554' -Members 'CN=S-1-5-7,CN=ForeignSecurityPrincipals,DC=DOMAIN,DC=COM' -Confirm:`$false"
             }
         )
@@ -16474,7 +16474,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the current members"
+                Description = "Показать текущих участников группы"
                 Command = "Get-ADGroupMember -Identity 'S-1-5-32-554'"
             }
         )
@@ -16511,11 +16511,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "List the members of the group, language-independently by its well-known SID"
+                Description = "Вывести участников группы по общеизвестному SID без зависимости от языка домена"
                 Command = "Get-ADGroup -Identity 'S-1-5-32-554' -Properties member | Select-Object -ExpandProperty member"
             }
             @{
-                Description = "Remove a member from the group"
+                Description = "Удалить указанного участника из группы"
                 Command = "Remove-ADGroupMember -Identity 'S-1-5-32-554' -Members 'MEMBER_DN' -Confirm:`$false"
             }
         )
@@ -16650,11 +16650,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Windows LAPS: the policy value that sets the length"
-                Command = "# Computer Configuration\Administrative Templates\System\LAPS\Password Settings -> Password Length"
+                Description = "Windows LAPS: параметр политики, задающий длину пароля"
+                Command = "# Конфигурация компьютера\Административные шаблоны\Система\LAPS\Параметры пароля → Длина пароля"
             }
             @{
-                Description = "Read the configured length from a client"
+                Description = "Прочитать настроенную длину пароля на клиентском компьютере"
                 Command = "Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\LAPS' -Name PasswordLength"
             }
         )
@@ -16687,11 +16687,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Windows LAPS: the policy value that sets the interval"
-                Command = "# Computer Configuration\Administrative Templates\System\LAPS\Password Settings -> Password Age (Days)"
+                Description = "Windows LAPS: параметр политики, задающий интервал смены пароля"
+                Command = "# Конфигурация компьютера\Административные шаблоны\Система\LAPS\Параметры пароля → Возраст пароля (дней)"
             }
             @{
-                Description = "Read the configured interval from a client"
+                Description = "Прочитать настроенный интервал смены пароля на клиентском компьютере"
                 Command = "Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\LAPS' -Name PasswordAgeDays"
             }
         )
@@ -16728,15 +16728,15 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "The policy value behind this finding"
-                Command = "# Computer Configuration\Administrative Templates\LAPS -> Enable local admin password management"
+                Description = "Показать параметр политики, относящийся к результату проверки"
+                Command = "# Конфигурация компьютера\Административные шаблоны\LAPS → Управление паролем локального администратора"
             }
             @{
-                Description = "Force a rotation on one machine after re-enabling (Legacy LAPS)"
+                Description = "Принудительно обновить пароль на компьютере после повторного включения Legacy LAPS"
                 Command = "Reset-AdmPwdPassword -ComputerName 'COMPUTER_NAME'"
             }
             @{
-                Description = "Find the machines whose expiration time stopped moving"
+                Description = "Найти компьютеры, где перестала изменяться дата истечения пароля"
                 Command = "Get-ADComputer -Filter * -Properties ms-Mcs-AdmPwdExpirationTime | Where-Object { `$_.'ms-Mcs-AdmPwdExpirationTime' } | Select-Object Name,@{n='Expires';e={[DateTime]::FromFileTime(`$_.'ms-Mcs-AdmPwdExpirationTime')}}"
             }
         )
@@ -16766,11 +16766,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "The policy value behind this finding"
-                Command = "# Computer Configuration\Administrative Templates\System\LAPS -> Post-authentication actions"
+                Description = "Показать параметр политики, относящийся к результату проверки"
+                Command = "# Конфигурация компьютера\Административные шаблоны\Система\LAPS → Действия после проверки подлинности"
             }
             @{
-                Description = "Read the configured action from a client"
+                Description = "Прочитать настроенное действие политики на клиентском компьютере"
                 Command = "Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\LAPS' -Name PostAuthenticationActions"
             }
         )
@@ -16804,11 +16804,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the rotation interval of every gMSA in the domain"
+                Description = "Показать интервал смены пароля для всех gMSA домена"
                 Command = "Get-ADServiceAccount -Filter * -Properties msDS-ManagedPasswordInterval | Select-Object Name,msDS-ManagedPasswordInterval"
             }
             @{
-                Description = "Create a replacement with the default 30-day interval"
+                Description = "Создать заменяющую gMSA со стандартным интервалом 30 дней"
                 Command = "New-ADServiceAccount -Name 'GMSA_NAME' -DNSHostName 'GMSA_NAME.contoso.com' -ManagedPasswordIntervalInDays 30"
             }
         )
@@ -16845,11 +16845,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the owner of the password access descriptor of every gMSA"
+                Description = "Показать владельца дескриптора разрешённых получателей пароля каждой gMSA"
                 Command = "Get-ADServiceAccount -Filter * -Properties msDS-GroupMSAMembership | ForEach-Object { `$sd = New-Object System.DirectoryServices.ActiveDirectorySecurity; `$sd.SetSecurityDescriptorBinaryForm(`$_.'msDS-GroupMSAMembership'); [PSCustomObject]@{ Name = `$_.Name; Owner = `$sd.GetOwner([System.Security.Principal.NTAccount]) } }"
             }
             @{
-                Description = "Rewrite the descriptor with the intended readers, which also resets its owner"
+                Description = "Перезаписать дескриптор только разрешёнными субъектами, одновременно сбросив владельца"
                 Command = "Set-ADServiceAccount -Identity 'GMSA_NAME' -PrincipalsAllowedToRetrieveManagedPassword 'GMSA_HOSTS'"
             }
         )
@@ -16879,11 +16879,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "List every silo with its enforcement, policies and members"
+                Description = "Перечислить все изолированные хранилища аутентификации с политиками, членством и состоянием принудительного применения"
                 Command = "Get-ADAuthenticationPolicySilo -Filter * -Properties * | Select-Object Name, Enforce, UserAuthenticationPolicy, ComputerAuthenticationPolicy, ServiceAuthenticationPolicy, Members"
             }
             @{
-                Description = "Enforce a silo"
+                Description = "Включить принудительное применение ограничений изолированного хранилища аутентификации"
                 Command = "Set-ADAuthenticationPolicySilo -Identity 'SILO_NAME' -Enforce `$true"
             }
         )
@@ -16912,11 +16912,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Enroll an account in a silo - both halves"
+                Description = "Добавить учётную запись в изолированное хранилище аутентификации с обеих сторон связи"
                 Command = "Grant-ADAuthenticationPolicySiloAccess -Identity 'SILO_NAME' -Account 'ACCOUNT'; Set-ADAccountAuthenticationPolicySilo -Identity 'ACCOUNT' -AuthenticationPolicySilo 'SILO_NAME'"
             }
             @{
-                Description = "Compare membership and assignment of a silo"
+                Description = "Сопоставить членство и назначения изолированного хранилища аутентификации"
                 Command = "Get-ADObject -Filter `"Name -eq 'SILO_NAME'`" -SearchBase `"CN=AuthN Silos,CN=AuthN Policy Configuration,CN=Services,`$((Get-ADRootDSE).configurationNamingContext)`" -Properties 'msDS-AuthNPolicySiloMembers', 'msDS-AssignedAuthNPolicySiloBL' | Select-Object 'msDS-AuthNPolicySiloMembers', 'msDS-AssignedAuthNPolicySiloBL'"
             }
         )
@@ -16965,7 +16965,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "List the policies with their enforcement and the accounts assigned directly"
+                Description = "Показать политики аутентификации, их принудительное применение и напрямую назначенные записи"
                 Command = "Get-ADAuthenticationPolicy -Filter * -Properties * | Select-Object Name, Enforce, UserTGTLifetimeMins, @{ Name = 'AssignedAccounts'; Expression = { `$_.'msDS-AssignedAuthNPolicyBL' } }"
             }
         )
@@ -16991,7 +16991,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Restrict sign-on to the devices of a silo"
+                Description = "Ограничить вход устройствами, относящимися к изолированному хранилищу аутентификации"
                 Command = "Set-ADAuthenticationPolicy -Identity 'POLICY_NAME' -UserAllowedToAuthenticateFrom 'O:SYG:SYD:(XA;OICI;CR;;;WD;(@USER.ad://ext/AuthenticationSilo == `"SILO_NAME`"))'"
             }
         )
@@ -17021,7 +17021,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show who may write to a silo"
+                Description = "Показать субъектов с правом записи параметров изолированного хранилища"
                 Command = "(Get-Acl `"AD:CN=SILO_NAME,CN=AuthN Silos,CN=AuthN Policy Configuration,CN=Services,`$((Get-ADRootDSE).configurationNamingContext)`").Access | Where-Object { `$_.ActiveDirectoryRights -match 'Write|GenericAll' } | Format-Table IdentityReference, ActiveDirectoryRights, ObjectType, IsInherited -AutoSize"
             }
         )
@@ -17050,7 +17050,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the setting in force on a domain controller"
+                Description = "Показать действующую настройку на контроллере домена"
                 Command = "Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\KDC\Parameters' -ErrorAction SilentlyContinue | Select-Object EnableCbacAndArmor, CbacAndArmorLevel"
             }
         )
@@ -17082,11 +17082,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show both sides of the link, the migration state and whether the account is enabled"
+                Description = "Показать обе стороны связи dMSA, состояние миграции и активности записи"
                 Command = "Get-ADObject -Identity 'CN=ACCOUNT,OU=OU,DC=domain,DC=com' -Properties 'msDS-ManagedAccountPrecededByLinkBL', 'msDS-SupersededManagedAccountLink', 'msDS-SupersededServiceAccountState', userAccountControl, whenChanged | Format-List Name, msDS-*, userAccountControl, whenChanged"
             }
             @{
-                Description = "Remove an unintended pairing on both sides"
+                Description = "Удалить ненужную связь с обеих сторон"
                 Command = "Set-ADObject -Identity 'CN=DMSA,OU=OU,DC=domain,DC=com' -Clear 'msDS-ManagedAccountPrecededByLink'; Set-ADObject -Identity 'CN=ACCOUNT,OU=OU,DC=domain,DC=com' -Clear 'msDS-SupersededManagedAccountLink', 'msDS-SupersededServiceAccountState'"
             }
         )
@@ -17121,11 +17121,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show when the dMSA was created and changed, who owns it and what it names"
+                Description = "Показать время создания и изменения dMSA, владельца и связанные объекты"
                 Command = "Get-ADObject -Identity 'CN=DMSA,OU=OU,DC=domain,DC=com' -Properties whenCreated, whenChanged, 'msDS-ManagedAccountPrecededByLink', 'msDS-DelegatedMSAState', nTSecurityDescriptor | Select-Object Name, whenCreated, whenChanged, 'msDS-ManagedAccountPrecededByLink', 'msDS-DelegatedMSAState', @{ Name = 'Owner'; Expression = { `$_.nTSecurityDescriptor.Owner } }"
             }
             @{
-                Description = "Remove the link from the dMSA"
+                Description = "Удалить связь со стороны dMSA"
                 Command = "Set-ADObject -Identity 'CN=DMSA,OU=OU,DC=domain,DC=com' -Clear 'msDS-ManagedAccountPrecededByLink'"
             }
         )
@@ -17159,7 +17159,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "List the principals allowed to use the dMSA"
+                Description = "Показать субъектов, которым разрешено использовать dMSA"
                 Command = "Get-ADServiceAccount -Identity 'DMSA_NAME' -Properties PrincipalsAllowedToRetrieveManagedPassword | Select-Object -ExpandProperty PrincipalsAllowedToRetrieveManagedPassword"
             }
         )
@@ -17192,11 +17192,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "List the principals allowed to use the dMSA"
+                Description = "Показать субъектов, которым разрешено использовать dMSA"
                 Command = "Get-ADServiceAccount -Identity 'DMSA_NAME' -Properties PrincipalsAllowedToRetrieveManagedPassword | Select-Object -ExpandProperty PrincipalsAllowedToRetrieveManagedPassword"
             }
             @{
-                Description = "Allow only the hosts that run the service"
+                Description = "Разрешить использование только компьютерам, на которых работает служба"
                 Command = "Set-ADServiceAccount -Identity 'DMSA_NAME' -PrincipalsAllowedToRetrieveManagedPassword 'SERVICE_HOSTS'"
             }
         )
@@ -17227,7 +17227,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Rewrite the descriptor with the intended principals, which also resets its owner"
+                Description = "Перезаписать дескриптор разрешёнными субъектами, одновременно сбросив владельца"
                 Command = "Set-ADServiceAccount -Identity 'DMSA_NAME' -PrincipalsAllowedToRetrieveManagedPassword 'SERVICE_HOSTS'"
             }
         )
@@ -17370,8 +17370,8 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Remove Client Authentication EKU from template (if not required)"
-                Command = "# Use certtmpl.msc - Extensions tab - Application Policies - Remove 'Client Authentication'"
+                Description = "Удалить EKU Client Authentication из шаблона, если он не требуется"
+                Command = "# certtmpl.msc → «Расширения» → «Политики приложений» → удалите Client Authentication"
             }
         )
         MITRE = "T1649"
@@ -17393,8 +17393,8 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Enable CA manager approval requirement"
-                Command = "# Use certtmpl.msc - Issuance Requirements tab - check 'CA certificate manager approval'"
+                Description = "Включить обязательное одобрение заявки менеджером УЦ"
+                Command = "# certtmpl.msc → «Требования к выдаче» → включите одобрение менеджером УЦ"
             }
         )
         MITRE = "T1649"
@@ -17417,15 +17417,15 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Disable ENROLLEE_SUPPLIES_SUBJECT flag via Certificate Templates Console"
-                Command = "# Use certtmpl.msc - Subject Name tab - uncheck 'Supply in the request'"
+                Description = "Отключить ENROLLEE_SUPPLIES_SUBJECT через консоль шаблонов сертификатов"
+                Command = "# certtmpl.msc → «Имя субъекта» → снимите флажок «Указывать в запросе»"
             }
             @{
-                Description = "Enable PEND_ALL_REQUESTS flag (require CA manager approval)"
-                Command = "# Use certtmpl.msc - Issuance Requirements tab - check 'CA certificate manager approval'"
+                Description = "Включить PEND_ALL_REQUESTS для обязательного одобрения менеджером УЦ"
+                Command = "# certtmpl.msc → «Требования к выдаче» → включите одобрение менеджером УЦ"
             }
             @{
-                Description = "View template flags via certutil"
+                Description = "Проверить флаги шаблона через certutil"
                 Command = "certutil -dstemplate <TemplateName> | findstr `"msPKI-Certificate-Name-Flag msPKI-Enrollment-Flag`""
             }
         )
@@ -17463,11 +17463,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Check the Extended Protection state of every virtual directory"
-                Command = "# Run Microsoft's script on the Exchange server: .\ExchangeExtendedProtectionManagement.ps1 -ShowExtendedProtection"
+                Description = "Проверить Extended Protection для всех виртуальных каталогов"
+                Command = "# На сервере Exchange запустите скрипт Microsoft: .\ExchangeExtendedProtectionManagement.ps1 -ShowExtendedProtection"
             }
             @{
-                Description = "Show whether MRSProxy is published on each EWS virtual directory"
+                Description = "Показать, опубликован ли MRSProxy для каждого виртуального каталога EWS"
                 Command = "Get-WebServicesVirtualDirectory -ADPropertiesOnly | Select-Object Identity,MRSProxyEnabled"
             }
         )
@@ -17495,15 +17495,15 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Remove constrained delegation target SPNs"
+                Description = "Удалить SPN целей ограниченного делегирования"
                 Command = "Set-ADUser -Identity 'ACCOUNT_NAME' -Clear msDS-AllowedToDelegateTo"
             }
             @{
-                Description = "List all target SPNs for constrained delegation"
+                Description = "Показать все SPN целей ограниченного делегирования"
                 Command = "Get-ADUser -Identity 'ACCOUNT_NAME' -Properties msDS-AllowedToDelegateTo | Select-Object -ExpandProperty msDS-AllowedToDelegateTo"
             }
             @{
-                Description = "Find all accounts with constrained delegation"
+                Description = "Найти все учётные записи с ограниченным делегированием"
                 Command = "Get-ADObject -LDAPFilter '(msDS-AllowedToDelegateTo=*)' -Properties msDS-AllowedToDelegateTo,userAccountControl"
             }
         )
@@ -17681,11 +17681,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Allow only AES on one account (24 = AES128 + AES256)"
+                Description = "Разрешить только AES для учётной записи (24 = AES128 + AES256)"
                 Command = 'Set-ADUser -Identity <account> -Replace @{ "msDS-SupportedEncryptionTypes" = 24 }'
             }
             @{
-                Description = "List every enabled account with an SPN that permits RC4"
+                Description = "Найти включённые учётные записи со SPN, допускающие RC4"
                 Command = 'Get-ADUser -LDAPFilter "(&(servicePrincipalName=*)(!userAccountControl:1.2.840.113556.1.4.803:=2))" -Properties msDS-SupportedEncryptionTypes | Where-Object { -not $_."msDS-SupportedEncryptionTypes" -or ($_."msDS-SupportedEncryptionTypes" -band 4) }'
             }
         )
@@ -18004,11 +18004,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the value on every domain controller"
+                Description = "Показать значение параметра на каждом контроллере домена"
                 Command = "Get-ADDomainController -Filter * | ForEach-Object { Invoke-Command -ComputerName `$_.HostName -ScriptBlock { Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Kdc' -Name StrongCertificateBindingEnforcement -ErrorAction SilentlyContinue } }"
             }
             @{
-                Description = "Find the templates that make this exploitable"
+                Description = "Найти шаблоны сертификатов, из-за которых возможно использование уязвимости"
                 Command = "Get-ADObject -SearchBase `"CN=Certificate Templates,CN=Public Key Services,CN=Services,`$((Get-ADRootDSE).configurationNamingContext)`" -LDAPFilter '(msPKI-Enrollment-Flag:1.2.840.113556.1.4.804:=524288)' -Properties displayName"
             }
         )
@@ -18656,7 +18656,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show whether a machine accepts SMBv1"
+                Description = "Проверить, принимает ли компьютер SMBv1"
                 Command = "Get-SmbServerConfiguration | Select-Object EnableSMB1Protocol, AuditSmb1Access"
             }
         )
@@ -18711,7 +18711,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show whether a machine serves SMBv2 and SMBv3"
+                Description = "Проверить, поддерживает ли компьютер SMBv2 и SMBv3"
                 Command = "Get-SmbServerConfiguration | Select-Object EnableSMB2Protocol"
             }
         )
@@ -18739,7 +18739,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the encryption settings of a server"
+                Description = "Показать настройки шифрования сервера"
                 Command = "Get-SmbServerConfiguration | Select-Object EncryptData, RejectUnencryptedAccess"
             }
         )
@@ -18775,11 +18775,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the value on a domain controller"
+                Description = "Показать значение параметра на контроллере домена"
                 Command = "Get-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Lsa' -Name DsrmAdminLogonBehavior -ErrorAction SilentlyContinue"
             }
             @{
-                Description = "Remove the value on a domain controller, after removing it from the policy that writes it"
+                Description = "Удалить параметр на контроллере домена после исключения его из применяемой GPO"
                 Command = "Remove-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Lsa' -Name DsrmAdminLogonBehavior"
             }
         )
@@ -18808,7 +18808,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the value on a print server"
+                Description = "Показать значение параметра на сервере печати"
                 Command = "Get-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Print' -Name RpcAuthnLevelPrivacyEnabled -ErrorAction SilentlyContinue"
             }
         )
@@ -18835,7 +18835,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the update server and the proxy behavior on a computer"
+                Description = "Показать адрес сервера обновлений и параметры прокси на компьютере"
                 Command = "Get-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate' | Select-Object WUServer, SetProxyBehaviorForUpdateDetection"
             }
         )
@@ -18862,11 +18862,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the value on a computer"
+                Description = "Показать значение параметра на компьютере"
                 Command = "Get-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Services\Netlogon\Parameters' -Name MaximumPasswordAge -ErrorAction SilentlyContinue"
             }
             @{
-                Description = "Change the machine account password of the local computer now"
+                Description = "Немедленно изменить пароль локальной учётной записи компьютера"
                 Command = "Reset-ComputerMachinePassword -Server 'DC_NAME'"
             }
         )
@@ -18894,7 +18894,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the setting on a computer"
+                Description = "Показать параметр на компьютере"
                 Command = "Get-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging' -ErrorAction SilentlyContinue"
             }
         )
@@ -18921,7 +18921,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the setting on a computer"
+                Description = "Показать параметр на компьютере"
                 Command = "Get-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System' -Name ConsentPromptBehaviorAdmin"
             }
         )
@@ -18948,7 +18948,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show every protocol setting Schannel has on a computer"
+                Description = "Показать настройки протоколов Schannel на компьютере"
                 Command = "Get-ChildItem 'HKLM:\System\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols' -Recurse | Get-ItemProperty | Select-Object PSPath, Enabled, DisabledByDefault"
             }
         )
@@ -18976,7 +18976,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the WinRM policy values on a computer"
+                Description = "Показать параметры политики WinRM на компьютере"
                 Command = "Get-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\WinRM\Service', 'HKLM:\Software\Policies\Microsoft\Windows\WinRM\Client' -ErrorAction SilentlyContinue | Select-Object PSPath, AllowUnencryptedTraffic, AllowBasic"
             }
         )
@@ -19028,7 +19028,7 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the delegation lists on a computer"
+                Description = "Показать списки делегирования на компьютере"
                 Command = "Get-ChildItem 'HKLM:\Software\Policies\Microsoft\Windows\CredentialsDelegation' -ErrorAction SilentlyContinue | Get-ItemProperty"
             }
         )
@@ -19591,11 +19591,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show the scripts a GPO runs and where they come from"
+                Description = "Показать сценарии, запускаемые GPO, и их источники"
                 Command = "Get-GPOReport -Name 'GPO_NAME' -ReportType Xml | Select-String -Pattern 'Script'"
             }
             @{
-                Description = "Show who may write the script file"
+                Description = "Показать субъектов с правом записи файла сценария"
                 Command = "(Get-Acl '\\SERVER\SHARE\script.bat').Access | Format-Table IdentityReference, FileSystemRights, AccessControlType -AutoSize"
             }
         )
@@ -19641,11 +19641,11 @@ $acl.Access | Where-Object {
         )
         RemediationCommands = @(
             @{
-                Description = "Show who besides Administrators and SYSTEM may write a logon script (replace the domain and the script name)"
+                Description = "Показать субъектов кроме Administrators и SYSTEM с правом изменения сценария входа (замените домен и имя файла)"
                 Command = "(Get-Acl '\\contoso.com\NETLOGON\logon.bat').Access | Where-Object { `$_.AccessControlType -eq 'Allow' -and `$_.FileSystemRights -match 'Write|Modify|FullControl|CreateFiles|Delete|ChangePermissions|TakeOwnership' } | Format-Table IdentityReference,FileSystemRights,IsInherited -AutoSize"
             }
             @{
-                Description = "List the accounts that run a given logon script"
+                Description = "Найти учётные записи, выполняющие заданный сценарий входа"
                 Command = "Get-ADUser -LDAPFilter '(scriptPath=logon.bat)' -Properties scriptPath | Select-Object SamAccountName, Enabled, scriptPath"
             }
         )
@@ -100682,7 +100682,7 @@ function Collect-BHIssuancePolicies {
     return $bhPolicies
 }
 #Requires -Version 5.1
-$Script:adPEASVersion = "2.9.0+20261110-1421"
+$Script:adPEASVersion = "2.9.0+20261111-0754"
 if ($MyInvocation.MyCommand.Path) {
     $Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {
