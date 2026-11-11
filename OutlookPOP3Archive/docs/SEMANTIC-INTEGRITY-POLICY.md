@@ -1,5 +1,9 @@
 # SEM-001 — Semantic integrity of Outlook POP3 archiving (normative)
 
+## ARCH2a runtime enforcement (2026-11-11)
+
+[ARCH2a design/stop rules](2.6.5-arch2a-move-outcome-fence.md) block `Archive`, `Resume` and `Auto` in this DEV build while full Body/HTML/recipient/state/attachment-byte SHA proof is absent in the integrated main verifier. The main MailMover no longer labels COM `Move()` failure as safe skipped work: original attempt is journaled before COM and failed/ambiguous outcomes stop immediately. An incomplete original Move Started is NOT authorized for retry by visible source item or incidental PST state. **No universal MAPI-field waiver or production activation.**
+
 ## ARCH1 operational clarification (2026-11-11, binding on future development)
 
 **Read first:** [ADR on COM provider boundary and a binding investigation stop-rule](ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md), [handoff](PROJECT-HANDOFF-ARCH1.md), [delivery roadmap](DELIVERY-ROADMAP.md). This clarification **does not relax** any content/attachment requirement, nor retroactively approve the unexplained historic `0x00010000` or the newer `MSGFLAG_HASATTACH` drift.
