@@ -1428,7 +1428,7 @@ jobs:
              if($c -cnotmatch [regex]::Escape($token)){$issues.Add(('controller '+$token))}
           }
           $save=$c.IndexOf('$source.Save()')
-          $manifest=$c.IndexOf("$stage='Seal immutable original source pre-Move manifest'")
+          $manifest=$c.IndexOf('$stage=''Seal immutable original source pre-Move manifest''')
           $claim=$c.IndexOf('Write-OPA265BW4k7v2a1JsonOnce -Path $layout.MoveClaimPath')
           $move=$c.IndexOf('$moved=$read.Move(')
           if($save -lt 0 -or $manifest -le $save -or $claim -le $manifest -or
