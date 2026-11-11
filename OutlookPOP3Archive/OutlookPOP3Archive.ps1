@@ -114,6 +114,13 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# ARCH2a DEV safety: block all mutating modes before Outlook discovery,
+# PST mounting, claim creation or other file writes. Disabled diagnostic
+# worker integration flags do not disable the direct legacy COM writer.
+# Read-only Analyze and Plan remain available, but no production permit.
+. (Join-Path $PSScriptRoot 'Core/Archive/ARCH2aMoveOutcomeFence.ps1')
+[void](Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode $Mode)
+
 if (-not [string]::IsNullOrWhiteSpace($Transaction) -and $Mode -ne 'Resume') {
     throw '-Transaction can only be used with -Mode Resume. Specify -Mode Resume explicitly.'
 }
