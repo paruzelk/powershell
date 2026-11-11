@@ -1,5 +1,9 @@
 ﻿# Architecture — 2.6.3-PREVIEW1
 
+## 2026-11-11 ARCH2a fail-closed main Move and Resume enforcement
+
+[ARCH2a runbook](2.6.5-arch2a-move-outcome-fence.md). Legacy main `MailMover.ps1` no longer continues after a claimed COM `MailItem.Move()` failure; `Move Started` is persisted and force-flushed before COM, `Move Indeterminate` stops the batch, and resumed work rejects any incomplete full original step journal. `OutlookPOP3Archive.ps1` closes `Archive`, `Resume`, `Auto` before Outlook initialization. The existing `ArchiveVerifier.ps1` still does **not** have complete BW4k Body/HTML/byte-SHA attachment integration, so production writer and 90GB use stay blocked. See roadmap ARCH2b.
+
 ## 2026-11-11 ARCH1 delivery-first decision
 
 The current archive runtime is **NOT** the newly tested BW4k one-shot worker. `OutlookPOP3Archive.ps1` directly dispatches existing `Core/Archive/MailMover.ps1`. Old `MailItem.Move()` catches a COM error as `MoveFailed` and continues; the present `ArchiveVerifier.ps1` lacks complete Body/HTMLBody/attachment byte-SHA witness integration. `RELEASE.Integration.*WorkerEnabled=false` does **NOT** disable this legacy direct Archive CLI. Production is not certified.
