@@ -1,5 +1,9 @@
 # ARCH1 — фактический аудит готовности к рабочему архивированию
 
+> **Исторический снимок ARCH1.** В ARCH2b оригинальный hash-only witness пользовательского содержимого интегрирован в main `MailMover` и `ArchiveVerifier`, включая SHA-256 байтов файловых вложений; см. [ARCH2b runbook](2.6.5-arch2b-semantic-verifier.md). Это не реальный Outlook acceptance, DEV Archive/Resume/Auto по-прежнему заблокированы. Старые статические недостатки этого файла сохраняются как архивный факт, а не текущий verdict.
+
+
+
 > **ИСТОРИЧЕСКИЙ снимок кода, не текущее состояние ARCH2a.** В ARCH2a старый `MoveFailed` / `continue` заменён на `Move Indeterminate` и `throw`, плюс full-journal Resume fence. При этом основной `ArchiveVerifier.ps1` всё ещё неполон и writer modes закрыты. См. [ARCH2a](2.6.5-arch2a-move-outcome-fence.md).
 
 
