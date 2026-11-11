@@ -14,7 +14,7 @@ function Check([bool]$Ok,[string]$Message){
  Write-Host "PASS: $Message"
 }
 $entries=@{}
-foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json')){
+foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json','FullTechnical-Report-04.ru-RU.json')){
  $path=Join-Path $ProjectRoot ('Localization/'+$name)
  Check (Test-Path -LiteralPath $path) ("Словарь $name")
  $json=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($path,[Text.Encoding]::UTF8))
@@ -23,7 +23,7 @@ foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','
   $entries[$prop.Name]=$prop.Value
  }
 }
-Check ($entries.Count -eq 60) '60 русских технических переводов'
+Check ($entries.Count -eq 91) '91 русских технических переводов'
 foreach($id in @('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','KERBEROASTABLE_SPN','REGISTRY_ESC10_KDC_BINDING','REGISTRY_WSUS_HTTP')){
  Check ($entries.ContainsKey($id)) ("Есть полный перевод для "+$id)
 }

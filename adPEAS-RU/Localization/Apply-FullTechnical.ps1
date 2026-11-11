@@ -12,7 +12,7 @@ param([Parameter(Mandatory=$true)][string]$ProjectRoot)
 Set-StrictMode -Off
 $ErrorActionPreference='Stop'
 $entries=[ordered]@{}
-foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json')){
+foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json','FullTechnical-Report-04.ru-RU.json')){
  $src=Join-Path $ProjectRoot ('Localization/'+$name)
  $catalog=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($src,[Text.Encoding]::UTF8))
  foreach($prop in $catalog.translations.PSObject.Properties){
@@ -21,7 +21,7 @@ foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','
  }
 }
 $entryCount=$entries.Count
-if($entryCount -ne 60){throw "Ожидалось 60 технических переводов, найдено $entryCount"}
+if($entryCount -ne 91){throw "Ожидалось 91 технических переводов, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
 foreach($id in $required){
  if(-not $entries.Contains($id)){throw "Нет полного перевода $id"}
