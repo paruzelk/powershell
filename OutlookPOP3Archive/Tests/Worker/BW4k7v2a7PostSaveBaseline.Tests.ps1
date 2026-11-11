@@ -110,7 +110,7 @@ Describe 'BW4k7v2a7 strict new disposable post-Save synthetic Body baseline and 
     }
     It 'controller has no immediate post-Save Restrict cardinality assertion' {
         $postSave=$script:c.IndexOf('$source.Save()')
-        $seal=$script:c.IndexOf("$stage='Seal immutable original source pre-Move manifest'")
+        $seal=$script:c.IndexOf('$stage=''Seal immutable original source pre-Move manifest''')
         $chunk=$script:c.Substring($postSave,$seal-$postSave)
         $chunk | Should -Not -Match 'Get-OPA265BW4k7v2a7SubjectItems'
         $chunk | Should -Match 'GetItemFromID'
