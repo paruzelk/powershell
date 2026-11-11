@@ -805,6 +805,9 @@ function Save-OPAArchiveTransaction {
         [string]$ArchivePst,
         [string]$TargetFolderPath,
         [string]$SourceFolderPath,
+        # ARCH2b: source user-content/attachment SHA witness, captured
+        # BEFORE MailItem.Move. No raw mail/body/attachment bytes in journal.
+        [object]$SemanticWitness,
         [switch]$WriteCheckpoint
     )
 
@@ -823,6 +826,14 @@ function Save-OPAArchiveTransaction {
         TargetFolderPath = $TargetFolderPath
         SourceFolderPath = $SourceFolderPath
         ReceivedTime     = if ($PSBoundParameters.ContainsKey('ReceivedTime')) { $ReceivedTime.ToString('o') } else { $null }
+    }
+
+    if ($PSBoundParameters.ContainsKey('SemanticWitness')) {
+        if ($null -eq $SemanticWitness -or
+            -not (Test-OPA265ARCH2bWitnessSchema -Witness $SemanticWitness)) {
+            throw 'ARCH2b invalid or missing source witness: refuse to claim Move.'
+        }
+        $stepEntry['SourceSemanticWitness'] = $SemanticWitness
     }
 
     # 1. Durable append (cheap) — survives a crash even when the checkpoint
