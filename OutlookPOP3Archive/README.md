@@ -18,6 +18,8 @@ Application: `0.9.4-rc1-build2.6.3-PREVIEW1`. Target: Windows PowerShell 5.1, Ou
 
 **BW4k7v2a7 DEV new one-time synthetic Outlook Move:** The real BW4k7v2a6 result found an exact 82-byte source template prefix plus a 3-character whitespace suffix after `MailItem.Save()`, with stable twice-read actual Body SHA256. [New isolated one-shot runbook](docs/2.6.5-bw4k7v2a7-postsave-synthetic-baseline.md) captures the actual post-Save Body as immutable pre-Move witness via EntryID (not immediate Items.Restrict), allows only narrow known three-character synthetic fixture suffix, and independently checks source-one/target-zero before separate operator-approved Move. Old Suites preserved; SEM-001 not waived; production remains disabled.
 
+**BW4k7v2a8 original one-shot MAPI attachment forensics:** Actual operator BW4k7v2a7 cross-store `MailItem.Move()` from new test Drafts to disposable PST succeeded and independently reconciled after Outlook restart (source 0, destination 1, full tested semantic content SHA preserved). **PR_MESSAGE_FLAGS 9 → 25** (only `MSGFLAG_HASATTACH` bit 0x10 changed), **MailItem.Size 1952 → 2076** (+124 bytes), so SEM-001 remains blocked. [New read-only original-fixture diagnostic](docs/2.6.5-bw4k7v2a8-readonly-attachment-attribution.md) pins original manifest/claim/return SHA hashes and destination EntryID, checks `PR_HASATTACH`, actual `Attachments.Count`, optional hidden/method flags and `PR_MESSAGE_SIZE` without exposing attachment names, file bytes or email bodies. No Move/retry, no PST write, no source attachment inventory invention, no production worker.
+
 ## Purpose and safety rules
 
 - Archive old messages from **POP3** PST stores only; IMAP accounts are never archived.
