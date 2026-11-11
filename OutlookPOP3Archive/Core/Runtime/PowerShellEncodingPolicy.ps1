@@ -1,6 +1,8 @@
 ﻿#requires -Version 5.1
 # Technical specification TZ-ENC-001: new/changed PowerShell code MUST have UTF-8 BOM.
-# Existing 82 BOM-less files are protected by an immutable whole-set checksum.
+# Reviewed ARCH2b migration (2026-11-11): ArchiveVerifier.ps1 is now BOM.
+# Remaining 81 BOM-less LEGACY files are protected by the updated pinned SHA256.
+# Original immutable 82-file snapshot SHA256: ace042f4ab915f2c1bd274685ea0e041e1f94f05c82418bed5a893ae153967ca.
 function Get-OPAPowerShellEncodingInventory {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][string]$ProjectRoot)
@@ -56,7 +58,7 @@ function Assert-OPAPowerShellEncodingPolicy {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)][string]$ProjectRoot,
-        [ValidateRange(0,10000)][int]$LegacyCount=82,
+        [ValidateRange(0,10000)][int]$LegacyCount=81,
         [string]$LegacySha256='ace042f4ab915f2c1bd274685ea0e041e1f94f05c82418bed5a893ae153967ca'
     )
     if ($LegacySha256 -cnotmatch '^[a-f0-9]{64}$') {
