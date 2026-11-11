@@ -12,6 +12,8 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH1 persistent COM provider boundary ADR, handoff, delivery roadmap; stop new Size/FLAGS-only MAPI research.",
+    "Read-only source audit exposes existing Archive CLI, legacy MoveFailed/continue and missing full semantic verifier integration; no production claim.",
     "Read-only 2.6.3 MailMove evidence classification with durable Intent fingerprint",
     "Source/destination StoreID, folder and PST identity checking; no mutation",
     "All classifications require manual review and forbid automatic retry",
@@ -61,8 +63,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 122,
-    "ExpectedPesterTests": 3625,
+    "ExpectedTestContainers": 123,
+    "ExpectedPesterTests": 3660,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -609,6 +611,20 @@
     "BW4k7v2a8AnyMailboxOrPstWriteInCI": false,
     "BW4k7v2a8OriginalOneShotMoveRetried": false,
     "BW4k7v2a8SEM001FlagDriftWaived": false,
-    "BW4k7v2a8ProductionWriterEnabled": false
+    "BW4k7v2a8ProductionWriterEnabled": false,
+    "ARCH1DeliveryPivotAndStopRuleDocumented": true,
+    "ARCH1ContextHandoffWritten": true,
+    "ARCH1SourceReadinessAuditAvailable": true,
+    "ARCH1AmbiguousLegacyMoveFailedContinueFlagged": true,
+    "ARCH1LegacyVerifierFullSemanticIntegrationNotYetProven": true,
+    "ARCH1YearGroupingCodePresentNotEndToEndCertified": true,
+    "ARCH1LegacyDirectArchiveNotAutomaticallyDisabledByWorkerFlags": true,
+    "ARCH1HistoricRealOneShotClaimsPreserved": true,
+    "ARCH1NoMAPIForensicsOnlyBranchWithoutUserDefect": true,
+    "ARCH1ReadyFor90GBProduction": false,
+    "ARCH1AnyOutlookMessageMovedByNewBuild": false,
+    "ARCH1AnyOriginalEvidenceRewritten": false,
+    "ARCH1CopyVerifyDeleteAlreadyProven": false,
+    "ARCH1ProductionWorkerEnabled": false
   }
 }
