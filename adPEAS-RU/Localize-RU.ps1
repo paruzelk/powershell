@@ -202,6 +202,9 @@ if(-not $?){throw 'Ошибка перевода динамических стр
 & (Join-Path $PSScriptRoot 'Localization/Apply-AdditionalCheckMessages.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка расширенной локализации результатов проверок'}
 
+& (Join-Path $PSScriptRoot 'Localization/Apply-StageAVisibleMessages.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка безопасного перевода Reporting, Helpers и Collector'}
+
 & (Join-Path $PSScriptRoot 'Localization/Apply-ReportDisplay.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка перевода отображаемых значений отчёта'}
 
