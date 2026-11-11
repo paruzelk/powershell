@@ -65,4 +65,7 @@ Check (($entries['ESC1_TEMPLATE'].remediation -join ' ') -match '0x10000') 'Со
 Check (($entries['GPO_SYSVOL_WRITABLE'].remediation -join ' ') -match 'dcgpofix') 'Сохранено предупреждение против неосторожного dcgpofix'
 Check (($entries['OU_PERM_KEYCREDENTIALLINK_WRITE'].remediation -join ' ') -match 'SetAccessRuleProtection') 'Указаны последствия разрыва наследования ACL'
 
+Check (@($entries.GetEnumerator() | Where-Object { @($_.Value.attack).Count -gt 0 }).Count -eq 115) '115 русских сценариев Attack (только там, где они есть в оригинале)'
+Check (@($entries['GPO_WIDE_IMPACT'].attack).Count -eq 0) 'Пустой Attack у GPO_WIDE_IMPACT согласован с оригиналом'
+Check (@($entries['GPO_UNLINKED_BROAD_WRITE'].attack).Count -eq 0) 'Пустой Attack у GPO_UNLINKED_BROAD_WRITE согласован с оригиналом'
 Write-Host "PASS: $n проверок технического перевода; AD не затронут" -ForegroundColor Green

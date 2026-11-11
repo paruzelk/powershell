@@ -12,6 +12,11 @@
 param([Parameter(Mandatory=$true)][string]$ProjectRoot)
 Set-StrictMode -Off
 $ErrorActionPreference='Stop'
+# Snapshot of the canonical EN PowerShell definitions before modifying display files.
+$coreDefinitions=Join-Path $ProjectRoot 'src/modules/Core/adPEAS-FindingDefinitions.ps1'
+if(-not (Test-Path -LiteralPath $coreDefinitions -PathType Leaf)){throw 'Отсутствует исходный справочник adPEAS'}
+$coreDefinitionsHashBefore=(Get-FileHash -LiteralPath $coreDefinitions -Algorithm SHA256).Hash
+
 $entries=[ordered]@{}
 foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json','FullTechnical-Report-04.ru-RU.json','FullTechnical-Brief-05.ru-RU.json','FullTechnical-Catalog-06a.ru-RU.json','FullTechnical-Catalog-06b.ru-RU.json','FullTechnical-Catalog-06c.ru-RU.json','FullTechnical-Catalog-06d.ru-RU.json','FullTechnical-Catalog-06e.ru-RU.json')){
  $src=Join-Path $ProjectRoot ('Localization/'+$name)
@@ -126,6 +131,9 @@ $js=$js.Replace($old,$replacement)
 if($js.Contains('Исходное подробное описание EN (перевод пока не завершён)')) { throw 'Найдена устаревшая пометка EN' }
 $enc=New-Object Text.UTF8Encoding($true)
 [IO.File]::WriteAllText($path,$js,$enc)
+$coreDefinitionsHashAfter=(Get-FileHash -LiteralPath $coreDefinitions -Algorithm SHA256).Hash
+if($coreDefinitionsHashBefore -ne $coreDefinitionsHashAfter){throw 'ОШИБКА: локализация изменила канонические определения adPEAS'}
+
 $withAttack=@($entries.Values | Where-Object { @($_.attack).Count -gt 0 }).Count
 Write-Host "[RU] PASS: $entryCount типов находок имеют русское описание, последствия и рекомендации; сценарии: $withAttack"
 Write-Host '[RU] PASS: исходные описания EN доступны отдельно; FindingId и команды не изменены'
