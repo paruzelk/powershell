@@ -180,6 +180,14 @@ function Test-OPAArchiveItemFingerprint {
         [Parameter(Mandatory=$true)][object]$Expected
     )
     if ([int]$Item.Class -ne 43) { return $false }
+    # Cheap identity checks precede any attachment SaveAsFile/read/hash work.
+    if ([string]$Item.Subject -cne [string]$Expected.Subject) { return $false }
+    if (-not [string]::IsNullOrWhiteSpace([string]$Expected.Sender) -and
+        [string]$Item.SenderEmailAddress -ine [string]$Expected.Sender) { return $false }
+    if (-not [string]::IsNullOrWhiteSpace([string]$Expected.InternetMessageId)) {
+        $actualMessageId = [string](Get-OPAInternetMessageId -Item $Item)
+        if ($actualMessageId -cne [string]$Expected.InternetMessageId) { return $false }
+    }
     # Legacy Size fingerprints remain supported for older read-only tests.
     # For ARCH2b the ORIGINAL source semantic witness is authoritative:
     # provider-controlled MailItem.Size is diagnostic, NOT a data hash.
@@ -193,13 +201,6 @@ function Test-OPAArchiveItemFingerprint {
         catch { return $false }
     }
     elseif ($null -ne $Expected.Size -and [int64]$Item.Size -ne [int64]$Expected.Size) { return $false }
-    if ([string]$Item.Subject -cne [string]$Expected.Subject) { return $false }
-    if (-not [string]::IsNullOrWhiteSpace([string]$Expected.Sender) -and
-        [string]$Item.SenderEmailAddress -ine [string]$Expected.Sender) { return $false }
-    if (-not [string]::IsNullOrWhiteSpace([string]$Expected.InternetMessageId)) {
-        $actualMessageId = [string](Get-OPAInternetMessageId -Item $Item)
-        if ($actualMessageId -cne [string]$Expected.InternetMessageId) { return $false }
-    }
     return $true
 }
 
@@ -398,6 +399,6 @@ function Test-OPAArchiveMoves {
         EntryIdsVerified = ($missing.Count -eq 0)
         Verified = ($missing.Count -eq 0)
         SemanticWitnessRequired = [bool]$RequireSemanticWitness
-        AllRequiredOriginalSemanticWitnessesPresent = ($missing.ToArray() -notmatch 'ARCH2b_PREMOVE_SEMANTIC_WITNESS_MISSING_OR_INVALID').Count -eq 0
+        AllRequiredOriginalSemanticWitnessesPresent = (@($missing.ToArray() -match 'ARCH2b_PREMOVE_SEMANTIC_WITNESS_MISSING_OR_INVALID')).Count -eq 0
     }
 }
