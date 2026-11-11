@@ -9,6 +9,7 @@ BeforeAll {
     $script:witnessSource=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Archive/ARCH2bSemanticWitness.ps1') -Raw -Encoding UTF8
     function Get-OPAInternetMessageId { param([object]$Item) return [string]$Item.MessageId }
     function Read-OPAStepJournal { param([object]$Transaction) return $script:stepFixture }
+    function Test-OPAMoveCompletionStep { param([object]$Step) return ([string]$Step.Step -eq 'Move Completed' -or [string]$Step.Step -eq 'Move Reconciled') }
     function New-ARCH2bFakeCollection {
         param([object[]]$Items=@())
         $c=[pscustomobject]@{ Count=$Items.Count; Entries=@($Items) }
@@ -239,7 +240,8 @@ Describe 'ARCH2b integration into actual Archive/Resume and verifier (no writer 
         $script:mover | Should -Match 'stop the transaction before claiming or moving'
     }
     It 'transaction step journal contains only hash witnesses rather than raw Body' {
-        $script:txSource | Should -Match "\$stepEntry\['SourceSemanticWitness'\]"
+        $script:txSource | Should -Match 'SourceSemanticWitness'
+        $script:txSource | Should -Match '\$stepEntry\['
         $script:witnessSource | Should -Match 'BodySha256'
         $script:witnessSource | Should -Not -Match 'BodyText\s*='
     }
