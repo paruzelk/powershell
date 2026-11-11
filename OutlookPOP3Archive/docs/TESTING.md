@@ -1,5 +1,12 @@
 ﻿# Testing — 2.6.3-PREVIEW1
 
+## ARCH1 delivery tests and context-restoration gate (2026-11-11)
+
+New `Tests/Runtime/ARCH1DeliveryReadiness.Tests.ps1` checks a **static source-only** readiness classifier and zero Outlook/COM writers. It is NOT a live mailbox acceptance test. New [handoff](PROJECT-HANDOFF-ARCH1.md), [ADR](ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md), [roadmap](DELIVERY-ROADMAP.md) and [implementation audit](ARCH1-IMPLEMENTATION-AUDIT.md) are normative for future tests and releases. The operator has already completed 4/5 original BW4j real fixture Move tests (Attachment256K not independently proven), and an additional BW4k7v2a7 synthetic Move; do not repeat historical one-shot claims.
+
+**ARCH2's mandatory next test:** prove ambiguous COM Move outcome is never treated as an automatically retryable skip, including timeout/crash; integrate pre/post Body/HTML and SHA256 of actual bytes of attachments into the production-capable archiving path. Unexplained provider Size/flags drift only authorizes new diagnostics when user content/recovery is demonstrably at risk. No broad implicit flag waiver. Live 90GB/archive end-to-end NOT yet certified.
+
+
 Run from the OutlookPOP3Archive directory under Windows PowerShell 5.1 (Pester 5+ and PSScriptAnalyzer both installed).
 
 ```powershell
