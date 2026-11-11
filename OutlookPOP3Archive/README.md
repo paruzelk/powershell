@@ -16,6 +16,8 @@ Application: `0.9.4-rc1-build2.6.3-PREVIEW1`. Target: Windows PowerShell 5.1, Ou
 
 **BW4k7v2a6 read-only semantic Body investigation:** The live BW4k7v2a5 operator output conclusively found the original new synthetic Draft with correct source and destination cardinalities but `BodyMatchesExpected=False`. New [pinned original-suite read-only Body integrity forensic](docs/2.6.5-bw4k7v2a6-body-integrity-readonly.md) compares deterministic expected Body with SHA-256, UTF-8 byte lengths, CR/LF patterns and two MAPI readbacks. It never prints observed Body or signatures, never writes Outlook or moves any mail. Any Body mismatch remains a SEM-001 blocker, not a move waiver.
 
+**BW4k7v2a7 DEV new one-time synthetic Outlook Move:** The real BW4k7v2a6 result found an exact 82-byte source template prefix plus a 3-character whitespace suffix after `MailItem.Save()`, with stable twice-read actual Body SHA256. [New isolated one-shot runbook](docs/2.6.5-bw4k7v2a7-postsave-synthetic-baseline.md) captures the actual post-Save Body as immutable pre-Move witness via EntryID (not immediate Items.Restrict), allows only narrow known three-character synthetic fixture suffix, and independently checks source-one/target-zero before separate operator-approved Move. Old Suites preserved; SEM-001 not waived; production remains disabled.
+
 ## Purpose and safety rules
 
 - Archive old messages from **POP3** PST stores only; IMAP accounts are never archived.
