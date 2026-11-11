@@ -2,7 +2,7 @@
   "schema": "adPEAS-RU.SourceVerifiedAttack.1",
   "locale": "ru-RU",
   "reference": "Original adPEAS 2.9.0 findingDefinitions embedded in the user-provided report. The private report itself is not committed.",
-  "count": 36,
+  "count": 38,
   "translations": {
     "ESC1_TEMPLATE": {
       "attack": [
@@ -322,6 +322,14 @@
         "5. Использует PKINIT для аутентификации от имени администратора домена."
       ],
       "sourceEnglishAttackStepCount": 5
+    },
+    "GPO_WIDE_IMPACT": {
+      "attack": [],
+      "sourceEnglishAttackStepCount": 0
+    },
+    "GPO_UNLINKED_BROAD_WRITE": {
+      "attack": [],
+      "sourceEnglishAttackStepCount": 0
     }
   }
 }

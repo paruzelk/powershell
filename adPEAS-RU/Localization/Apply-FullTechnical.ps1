@@ -21,6 +21,42 @@ foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','
   $entries[$prop.Name]=$prop.Value
  }
 }
+# Source-checked field overlays. No English originals, FindingId, risk or commands are changed.
+$coreSource=Join-Path $ProjectRoot 'Localization/SourceVerifiedCore-07.ru-RU.json'
+$coreOverlay=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($coreSource,[Text.Encoding]::UTF8))
+if(@($coreOverlay.translations.PSObject.Properties).Count -ne 10){throw 'Ожидалось 10 предметных переводов Impact/Remediation'}
+foreach($p in $coreOverlay.translations.PSObject.Properties){
+ if(-not $entries.Contains($p.Name)){throw "Неизвестный FindingId: $($p.Name)"}
+ $v=$p.Value
+ if(@($v.impact).Count -ne [int]$v.sourceEnglishImpactCount){throw "Несовпадение количества Impact: $($p.Name)"}
+ if(@($v.remediation).Count -ne [int]$v.sourceEnglishRemediationCount){throw "Несовпадение количества Remediation: $($p.Name)"}
+ if($v.PSObject.Properties['description']){
+  if([string]::IsNullOrWhiteSpace([string]$v.description)){throw "Пустое описание: $($p.Name)"}
+  $entries[$p.Name].description=[string]$v.description
+ }
+ $entries[$p.Name].impact=@($v.impact)
+ $entries[$p.Name].remediation=@($v.remediation)
+}
+$attackSource=Join-Path $ProjectRoot 'Localization/SourceVerifiedAttack-07.ru-RU.json'
+$attackOverlay=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($attackSource,[Text.Encoding]::UTF8))
+if(@($attackOverlay.translations.PSObject.Properties).Count -ne 38){throw 'Ожидалось 38 сверенных случаев Attack (36 переводов, 2 пустых оригинала)'}
+$attackSteps=0
+foreach($p in $attackOverlay.translations.PSObject.Properties){
+ if(-not $entries.Contains($p.Name)){throw "Неизвестный FindingId: $($p.Name)"}
+ $v=$p.Value
+ $steps=@($v.attack)
+ if($steps.Count -ne [int]$v.sourceEnglishAttackStepCount){throw "Несовпадение количества шагов оригинала Attack: $($p.Name)"}
+ for($i=0;$i -lt $steps.Count;$i++){
+  if([string]$steps[$i] -notmatch "^\s*$($i+1)\.\s+[А-Яа-яЁё]"){
+   throw "Не переведён или неверно пронумерован шаг Attack $($i+1): $($p.Name)"
+  }
+ }
+ $entries[$p.Name].attack=$steps
+ $attackSteps+=$steps.Count
+}
+if($attackSteps -ne 139){throw "Ожидалось 139 переведённых шагов Attack, найдено $attackSteps"}
+Write-Host "[RU] PASS: 36 цепочек Attack (139 шагов) и 10 полных полей Impact/Remediation сверены с источником; 2 недопустимых сценария очищены"
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')

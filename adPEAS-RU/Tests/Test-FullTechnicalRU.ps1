@@ -47,4 +47,22 @@ Check ($compiled.Contains('StrongCertificateBindingEnforcement = 2')) 'Сохр�
 Check ($compiled.Contains('HKEY_LOCAL_MACHINE')) 'Сохранены пути реестра'
 Check ($compiled.Contains('Get-ADGroupMember -Identity')) 'Исполняемые команды не удалены'
 Check (-not $compiled.Contains('Исходное подробное описание EN (перевод пока не завершён)')) 'В автономной сборке нет устаревшей пометки EN'
+# Находки без сценария атаки в оригинале не должны получать искусственные сценарии.
+$attackChecked=(ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceVerifiedAttack-07.ru-RU.json'),[Text.Encoding]::UTF8))).translations
+$coreChecked=(ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceVerifiedCore-07.ru-RU.json'),[Text.Encoding]::UTF8))).translations
+Check (@($attackChecked.PSObject.Properties).Count -eq 38) '38 сверенных идентификаторов Attack'
+Check (@($coreChecked.PSObject.Properties).Count -eq 10) '10 приоритетных сверок Impact и Remediation'
+foreach($e in $attackChecked.PSObject.Properties){
+ $id=$e.Name
+ $a=@($entries[$id].attack)
+ Check ($a.Count -eq [int]$e.Value.sourceEnglishAttackStepCount) ("Сохранено число шагов Attack: "+$id)
+}
+foreach($id in @('GPO_WIDE_IMPACT','GPO_UNLINKED_BROAD_WRITE')){
+ Check (@($entries[$id].attack).Count -eq 0) ("Нет вымышленного Attack там, где он отсутствует в оригинале: "+$id)
+}
+Check ($entries['ESC8_WEB_ENROLLMENT'].description -match 'tokenChecking') 'Сохранена оговорка о неопределённом состоянии EPA'
+Check (($entries['ESC1_TEMPLATE'].remediation -join ' ') -match '0x10000') 'Сохранён второй флаг SAN и предупреждение о совместимости'
+Check (($entries['GPO_SYSVOL_WRITABLE'].remediation -join ' ') -match 'dcgpofix') 'Сохранено предупреждение против неосторожного dcgpofix'
+Check (($entries['OU_PERM_KEYCREDENTIALLINK_WRITE'].remediation -join ' ') -match 'SetAccessRuleProtection') 'Указаны последствия разрыва наследования ACL'
+
 Write-Host "PASS: $n проверок технического перевода; AD не затронут" -ForegroundColor Green
