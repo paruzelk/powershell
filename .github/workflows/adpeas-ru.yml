@@ -41,6 +41,7 @@ jobs:
           .\adPEAS-RU\Tests\Test-RussianReportHelp.ps1
           .\adPEAS-RU\Tests\Test-RemediationTranslations.ps1
           .\adPEAS-RU\Tests\Test-FullTechnicalRU.ps1
+          .\adPEAS-RU\Tests\Test-ReportSourceInventory.ps1
       - name: JavaScript template syntax check
         shell: pwsh
         run: |

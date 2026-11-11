@@ -1,0 +1,181 @@
+{
+  "schema": "adPEAS-RU.ReportDisplay.1",
+  "locale": "ru-RU",
+  "exact": {
+    "Privileged groups outside AdminSDHolder's protection:": "Привилегированные группы, не защищённые AdminSDHolder:",
+    "WriteProperty on member - may add a member to every protected group": "WriteProperty на member — позволяет добавлять участников во все защищённые группы",
+    "Self on member - may add itself to every protected group": "Self на member — позволяет добавлять себя во все защищённые группы",
+    "All extended rights - may reset the password of every protected account": "Все расширенные права — позволяют сбрасывать пароли всех защищённых учётных записей",
+    "Password reset right - may reset the password of every protected account": "Право сброса пароля — позволяет сбрасывать пароли всех защищённых учётных записей",
+    "WriteProperty on msDS-KeyCredentialLink - may add a key credential to every protected account and log on as it": "WriteProperty на msDS-KeyCredentialLink — позволяет добавлять ключи аутентификации защищённым записям и входить от их имени",
+    "WriteProperty on servicePrincipalName - may give every protected account an SPN and roast its password": "WriteProperty на servicePrincipalName — позволяет назначать SPN защищённым записям и создавать риск Kerberoasting",
+    "WriteProperty on altSecurityIdentities - may map a certificate onto every protected account": "WriteProperty на altSecurityIdentities — позволяет сопоставлять сертификат с защищённой учётной записью",
+    "WriteProperty on userAccountControl - may turn off pre-authentication or the password requirement on every protected account": "WriteProperty на userAccountControl — позволяет отключать предварительную проверку Kerberos или требование пароля",
+    "WriteProperty on member - may add a member to the group": "WriteProperty на member — позволяет изменять состав группы",
+    "Self on member - may add itself to the group": "Self на member — позволяет добавить собственную учётную запись в группу",
+    "Owner of the group - may rewrite its DACL": "Владелец группы — может изменять её DACL",
+    "All extended rights - may reset the password of the account": "Все расширенные права — позволяют сбросить пароль учётной записи",
+    "WriteProperty on member - may add itself to the group": "WriteProperty на member — позволяет добавить себя в группу",
+    "WriteDacl on group - may rewrite membership permissions": "WriteDacl группы — позволяет изменять разрешения на членство",
+    "GenericAll (Full Control)": "GenericAll (полный доступ)",
+    "GenericWrite (Write Properties)": "GenericWrite (изменение свойств)",
+    "WriteDacl (Modify Permissions)": "WriteDacl (изменение разрешений)",
+    "WriteOwner (Take Ownership)": "WriteOwner (смена владельца)",
+    "CreateChild (Create Objects)": "CreateChild (создание объектов)",
+    "DeleteChild (Delete Objects)": "DeleteChild (удаление объектов)",
+    "DeleteTree (Delete Subtree)": "DeleteTree (удаление поддерева)",
+    "Self (Validated Write)": "Self (проверяемая запись)",
+    "All Extended Rights": "Все расширенные права",
+    "Owner of the OU": "Владелец OU",
+    "Owner of the domain object": "Владелец объекта домена",
+    "Read / Write": "Чтение / запись",
+    "SYSVOL not accessible": "SYSVOL недоступен",
+    "No readable share found": "Общие ресурсы, доступные для чтения, не обнаружены",
+    "No members found in privileged groups": "Участники привилегированных групп не обнаружены",
+    "No dangerous members in Pre-Windows 2000 Compatible Access group": "В группе Pre-Windows 2000 Compatible Access опасных участников не обнаружено",
+    "Found 0 accounts with DCSync rights": "Субъекты с правами DCSync не обнаружены",
+    "SYSVOL is not accessible - GPO user rights could not be evaluated": "SYSVOL недоступен: не удалось проверить права пользователей из GPO",
+    "Only the site servers and the expected administrators can write to the System Management container": "Запись в контейнер System Management разрешена только серверам сайта и утверждённым администраторам",
+    "System Management container not found - sites, management points and its permissions were not read": "Контейнер System Management не найден; сайты, точки управления и права доступа не проверены",
+    "No hybrid configuration found - this organization appears to be purely on-premises": "Гибридная конфигурация не найдена: организация, вероятно, использует только локальную инфраструктуру Exchange",
+    "SCOM infrastructure detected": "Обнаружена инфраструктура SCOM",
+    "SCCM/MECM infrastructure detected": "Обнаружена инфраструктура SCCM/MECM",
+    "PXE/WDS servers detected": "Обнаружены серверы PXE/WDS",
+    "Who can add computers to the domain:": "Субъекты, которым разрешено добавлять компьютеры в домен:",
+    "Privileged accounts read:": "Прочитанные привилегированные учётные записи:",
+    "Password Never Expires": "Срок действия пароля не ограничен",
+    "Trust account": "Учётная запись доверия",
+    "Security configuration is properly set": "Проверяемая конфигурация соответствует требованиям безопасности",
+    "Error during check": "Ошибка выполнения проверки"
+  },
+  "regex": [
+    [
+      "^Found (\\d+) GPO\\(s\\) with dangerous permissions, a writable SYSVOL folder or a non-default owner(?: \\((.*)\\))?$",
+      "Обнаружено GPO с опасными разрешениями, доступной для записи папкой SYSVOL или нестандартным владельцем: $1 ($2)"
+    ],
+    [
+      "^Privileged groups outside AdminSDHolder's protection:$",
+      "Привилегированные группы вне защиты AdminSDHolder:"
+    ],
+    [
+      "^Account Operators \\((no members|\\d+ member\\(s\\))\\) control (all \\d+|\\d+ of them) - the default of every new group$",
+      "Группа Account Operators ($1) по умолчанию управляет $2 незащищёнными группами"
+    ],
+    [
+      "^Account Operators \\((no members|\\d+ member\\(s\\))\\) control (all \\d+|\\d+ of them) - the default of every new user$",
+      "Группа Account Operators ($1) по умолчанию управляет $2 незащищёнными учётными записями"
+    ],
+    [
+      "^Account Operators \\(no members\\) control all (\\d+) - the default of every new group$",
+      "Группа Account Operators (нет участников) по умолчанию имеет права управления для всех $1 незащищённых групп"
+    ],
+    [
+      "^Found (\\d+) principal\\(s\\) that can take over a privileged group AdminSDHolder does not protect$",
+      "Субъекты, способные получить контроль над привилегированными группами вне защиты AdminSDHolder: $1"
+    ],
+    [
+      "^Found (\\d+) principal\\(s\\) that can take over an operator-level group AdminSDHolder does not protect$",
+      "Субъекты, способные получить контроль над операторскими группами вне защиты AdminSDHolder: $1"
+    ],
+    [
+      "^Found (\\d+) non-Tier-0 principal\\(s\\) with control over an object the forest or the domain runs on$",
+      "Субъекты вне Tier 0 с управлением критическими объектами домена или леса: $1"
+    ],
+    [
+      "^Found (\\d+) non-privileged account\\(s\\) with LAPS read access$",
+      "Непривилегированные записи с доступом на чтение LAPS: $1"
+    ],
+    [
+      "^Found (\\d+) privileged account\\(s\\) with LAPS read access \\(expected\\)$",
+      "Привилегированные записи со штатным доступом на чтение LAPS: $1"
+    ],
+    [
+      "^Found (\\d+) Exchange service group\\(s\\) with LAPS read access \\(by-design, cannot be removed\\)$",
+      "Служебные группы Exchange со штатным доступом на чтение LAPS: $1 (проверьте зависимости перед изменением)"
+    ],
+    [
+      "^Found (\\d+) member\\(s\\) in (.+):$",
+      "Участники группы $2: $1"
+    ],
+    [
+      "^Found (\\d+) SCOM management server\\(s\\)$",
+      "Обнаружено серверов управления SCOM: $1"
+    ],
+    [
+      "^Found (\\d+) privileged group\\(s\\):$",
+      "Обнаружено привилегированных групп: $1"
+    ],
+    [
+      "^Found (\\d+) Fine-Grained Password Polic(?:y|ies):$",
+      "Обнаружено детализированных политик паролей (FGPP): $1"
+    ],
+    [
+      "^Found (\\d+) (?:GPO\\(s\\)|policies) with (.+)$",
+      "Обнаружено групповых политик: $1. Признак: $2"
+    ],
+    [
+      "^No dangerous OU permissions detected in the (.+) analyzed$",
+      "В проверенной области $1 опасных разрешений OU не обнаружено"
+    ],
+    [
+      "^No dangerous password reset rights detected in the (.+) analyzed$",
+      "В проверенной области $1 опасных прав сброса пароля не обнаружено"
+    ],
+    [
+      "^No non-privileged accounts with LAPS read access found in the (.+) analyzed$",
+      "В проверенной области $1 нет непривилегированных субъектов с доступом на чтение LAPS"
+    ],
+    [
+      "^([0-9]+) of them by ownership alone$",
+      "Только из-за нестандартного владельца: $1"
+    ],
+    [
+      "^([0-9]+) with a writable policy folder$",
+      "С правами записи в папку GPO: $1"
+    ],
+    [
+      "^Found ([0-9]+) of ([0-9]+) receive connector\\(s\\) granting SMTP rights to unauthenticated senders$",
+      "SMTP-соединители с разрешениями для неаутентифицированных отправителей: $1 из $2"
+    ],
+    [
+      "^No dangerous permissions, no non-default owner and no unexpected SYSVOL write access on (\\d+) of (\\d+) GPO\\(s\\)$",
+      "У $1 из $2 групповых политик не обнаружены опасные разрешения, нестандартные владельцы или неожиданные права записи в SYSVOL"
+    ],
+    [
+      "^No principal outside Tier-0 controls the schema, the configuration, the partitions, a role object or a site$",
+      "Субъекты вне Tier 0 не управляют схемой, конфигурацией, разделами, объектами ролей или сайтами"
+    ],
+    [
+      "^Account Operators \\(no members\\) control (.*) - the default of every new user$",
+      "Группа Account Operators (нет участников) по умолчанию имеет права управления для $1 незащищённых учётных записей"
+    ],
+    [
+      "^Tier-0 Account: (.*)$",
+      "Учётная запись Tier 0: $1"
+    ],
+    [
+      "^GPO Local Group: (.*)$",
+      "Локальная группа в GPO: $1"
+    ],
+    [
+      "^Scheduled Task: (.*)$",
+      "Запланированная задача: $1"
+    ],
+    [
+      "^Fine-Grained Policy: (.*)$",
+      "Детализированная политика паролей: $1"
+    ],
+    [
+      "^Add Computer Right: (.*)$",
+      "Право добавления компьютеров в домен: $1"
+    ],
+    [
+      "^Trust: (.*)$",
+      "Доверительное отношение: $1"
+    ],
+    [
+      "^Object: (.*)$",
+      "Объект: $1"
+    ]
+  ]
+}

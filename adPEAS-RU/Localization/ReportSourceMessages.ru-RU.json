@@ -1,0 +1,95 @@
+{
+  "schema": "adPEAS-RU.ReportSourceMessages.1",
+  "locale": "ru-RU",
+  "files": {
+    "src/modules/Checks/GPO/Get-GPOPermissions.ps1": {
+      "$summary = \"Found $(@($vulnerableGPOs).Count) GPO(s) with dangerous permissions, a writable SYSVOL folder or a non-default owner\"": "$summary = \"Обнаружено GPO с опасными разрешениями, доступной для записи папкой SYSVOL или нестандартным владельцем: $(@($vulnerableGPOs).Count)\"",
+      "$summaryDetail += \"$ownerOnlyCount of them by ownership alone\"": "$summaryDetail += \"только из-за владельца: $ownerOnlyCount\"",
+      "$summaryDetail += \"$sysvolCount with a writable policy folder\"": "$summaryDetail += \"папки политики доступны для записи: $sysvolCount\"",
+      "Show-Line \"SYSVOL was not reachable - the NTFS permissions of the policy folders were not examined\"": "Show-Line \"SYSVOL недоступен: права NTFS на папки групповых политик не проверялись\"",
+      "Show-Line \"The NTFS permissions of $(@($Script:_gpoSysvolUnread).Count) of $(@($allGPOs).Count) policy folder(s) in SYSVOL could not be read - who may rewrite their content is unknown\"": "Show-Line \"Не удалось прочитать разрешения NTFS для $(@($Script:_gpoSysvolUnread).Count) из $(@($allGPOs).Count) папок политик в SYSVOL; субъекты, способные изменять их содержимое, неизвестны\"",
+      "Show-Line \"  not read: $unreadFolder\"": "Show-Line \"  не прочитано: $unreadFolder\"",
+      "Show-Line \"  ... and $(@($Script:_gpoSysvolUnread).Count - 10) more\"": "Show-Line \"  ... и ещё $(@($Script:_gpoSysvolUnread).Count - 10)\"",
+      "Show-Line \"$(@($missingLines).Count) GPO(s) have no folder or no gpt.ini in SYSVOL on $($Script:LDAPContext.Server) - Group Policy processing aborts where they are linked\"": "Show-Line \"Для $(@($missingLines).Count) GPO нет папки или gpt.ini в SYSVOL на $($Script:LDAPContext.Server); обработка привязанных политик будет прервана\"",
+      "Show-Line \"  ... and $(@($missingLines).Count - 10) more\"": "Show-Line \"  ... и ещё $(@($missingLines).Count - 10)\"",
+      "Show-Line \"$(@($Script:_gpoSysvolOrphans).Count) folder(s) in SYSVOL\\Policies on $($Script:LDAPContext.Server) belong to no GPO this account can read - deleted, or hidden from it\"": "Show-Line \"Папки без доступного для чтения объекта GPO в SYSVOL\\Policies на $($Script:LDAPContext.Server): $(@($Script:_gpoSysvolOrphans).Count). Объект мог быть удалён или скрыт правами\"",
+      "Show-Line \"  ... and $(@($Script:_gpoSysvolOrphans).Count - 10) more\"": "Show-Line \"  ... и ещё $(@($Script:_gpoSysvolOrphans).Count - 10)\"",
+      "Show-Line \"No dangerous permissions, no non-default owner and no unexpected SYSVOL write access on $readCount of $(@($allGPOs).Count) GPO(s)\"": "Show-Line \"У $readCount из $(@($allGPOs).Count) GPO не обнаружены опасные разрешения, нестандартные владельцы или неожиданные права записи в SYSVOL\"",
+      "Show-Line \"Error during check - GPO permissions could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить разрешения GPO: $_\""
+    },
+    "src/modules/Checks/Accounts/Get-PrivilegedGroupMembers.ps1": {
+      "Show-Line \"Privileged groups outside AdminSDHolder's protection:\"": "Show-Line \"Привилегированные группы вне защиты AdminSDHolder:\"",
+      "$aoReach = if ($accountOperatorGroups.Count -eq $examinedGroups.Count) { \"all $($examinedGroups.Count)\" } else { \"$($accountOperatorGroups.Count) of them\" }": "$aoReach = if ($accountOperatorGroups.Count -eq $examinedGroups.Count) { \"$($examinedGroups.Count) из $($examinedGroups.Count)\" } else { \"$($accountOperatorGroups.Count) из $($examinedGroups.Count)\" }",
+      "$aoMembers = \" ($AccountOperatorMembers member(s))\"": "$aoMembers = \" (участников: $AccountOperatorMembers)\"",
+      "$aoMembers = ' (no members)'": "$aoMembers = ' (нет участников)'",
+      "Show-Line \"Account Operators$aoMembers control $aoReach - the default of every new group\"": "Show-Line \"Группа Account Operators$aoMembers по умолчанию имеет права управления: $aoReach группами, не защищёнными AdminSDHolder\"",
+      "Show-Line \"Account Operators$aoMembers control $aoReach - the default of every new user\"": "Show-Line \"Группа Account Operators$aoMembers по умолчанию имеет права управления: $aoReach учётными записями, не защищёнными AdminSDHolder\"",
+      "Show-Line (\"Found $($findingRows.Count) principal(s) that can take over a privileged group AdminSDHolder \" +": "Show-Line (\"Обнаружены субъекты, способные получить контроль над привилегированной группой вне защиты AdminSDHolder: $($findingRows.Count). \" +",
+      "\"does not protect\") -Class Finding": "\"Проверьте их фактические права.\") -Class Finding",
+      "Show-Line (\"Found $($operatorRows.Count) principal(s) that can take over an operator-level group AdminSDHolder \" +": "Show-Line (\"Обнаружены субъекты, способные получить контроль над операторской группой вне защиты AdminSDHolder: $($operatorRows.Count). \" +",
+      "\"does not protect\") -Class Hint": "\"Проверьте разрешения этих субъектов.\") -Class Hint",
+      "Show-Line \"No members found in privileged groups\"": "Show-Line \"Участники привилегированных групп не найдены\"",
+      "Show-Line \"No dangerous members in Pre-Windows 2000 Compatible Access group\"": "Show-Line \"В группе Pre-Windows 2000 Compatible Access опасные участники не обнаружены\"",
+      "Show-Line \"Privileged accounts read:\"": "Show-Line \"Прочитанные привилегированные учётные записи:\"",
+      "Show-Line \"No privileged user or service account of this domain was found to read\"": "Show-Line \"Не найдено привилегированных пользовательских или служебных учётных записей домена\"",
+      "Show-Line \"Error during the group ACL analysis - the privileged groups AdminSDHolder does not protect could not be evaluated: $_\"": "Show-Line \"Ошибка анализа ACL групп: не удалось оценить привилегированные группы вне защиты AdminSDHolder: $_\"",
+      "Show-Line \"Error during the account ACL analysis - the privileged accounts could not be evaluated: $_\"": "Show-Line \"Ошибка анализа ACL привилегированных учётных записей: $_\"",
+      "Show-Line \"Error during check - privileged group memberships could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить членство в привилегированных группах: $_\"",
+      "$aoReach = if ($accountOperatorAccounts.Count -eq $examinedAccounts) { \"all $examinedAccounts\" } else { \"$($accountOperatorAccounts.Count) of them\" }": "$aoReach = if ($accountOperatorAccounts.Count -eq $examinedAccounts) { \"$examinedAccounts из $examinedAccounts\" } else { \"$($accountOperatorAccounts.Count) из $examinedAccounts\" }"
+    },
+    "src/modules/Checks/Rights/Get-CriticalObjectACLs.ps1": {
+      "Show-Line \"The ACL of the $label could not be read - not checked\"": "Show-Line \"ACL объекта $label прочитать не удалось: проверка не выполнена\"",
+      "Show-Line \"The sites could not be enumerated - their ACLs were not checked\"": "Show-Line \"Сайты AD не удалось перечислить: их ACL не проверены\"",
+      "Show-Line \"Found $($findings.Count) non-Tier-0 principal(s) with control over an object the forest or the domain runs on\"": "Show-Line \"Найдены субъекты вне Tier 0 с правами управления критически важными объектами леса или домена: $($findings.Count)\"",
+      "Show-Line \"No principal outside Tier-0 controls the schema, the configuration, the partitions, a role object or a site\"": "Show-Line \"У субъектов вне Tier 0 нет прав управления схемой, конфигурацией, разделами, объектами ролей или сайтами\"",
+      "Show-Line \"Error during check - the ACLs of the schema, partitions, role objects and sites could not be evaluated: $_\"": "Show-Line \"Ошибка проверки ACL схемы, разделов, объектов ролей и сайтов: $_\""
+    },
+    "src/modules/Checks/Rights/Get-DangerousOUPermissions.ps1": {
+      "Show-Line \"No organizational units or containers returned - permissions were not evaluated\"": "Show-Line \"Организационные единицы и контейнеры не получены: разрешения не проверялись\"",
+      "Show-Line \"OU permissions were not evaluated - no security descriptor could be read\"": "Show-Line \"Разрешения OU не проверены: дескрипторы безопасности не удалось прочитать\"",
+      "Show-Line \"No dangerous OU permissions detected in the $readScope analyzed\"": "Show-Line \"В проверенной области $readScope опасные разрешения OU не обнаружены\"",
+      "Show-Line \"Error during check - OU permissions could not be evaluated: $_\"": "Show-Line \"Ошибка проверки разрешений OU: $_\""
+    },
+    "src/modules/Checks/Rights/Get-PasswordResetRights.ps1": {
+      "Show-Line \"No other privileged account was found, so no OU or container was analyzed\"": "Show-Line \"Других привилегированных учётных записей не найдено, поэтому OU и контейнеры не анализировались\"",
+      "Show-Line \"Password reset rights were not evaluated - no security descriptor could be read\"": "Show-Line \"Права сброса паролей не проверены: дескрипторы безопасности недоступны\"",
+      "Show-Line \"No dangerous password reset rights detected in the $readScope analyzed\"": "Show-Line \"В проверенной области $readScope опасные права сброса паролей не обнаружены\"",
+      "Show-Line \"Error during check - password reset rights could not be evaluated: $_\"": "Show-Line \"Ошибка проверки разрешений на сброс паролей: $_\""
+    },
+    "src/modules/Checks/Rights/Get-LAPSPermissions.ps1": {
+      "Show-Line \"Found $($allReaderSIDs.Keys.Count) non-privileged account(s) with LAPS read access\"": "Show-Line \"Непривилегированные учётные записи с доступом на чтение паролей LAPS: $($allReaderSIDs.Keys.Count)\"",
+      "Show-Line \"Found $($privilegedReaderSIDs.Keys.Count) privileged account(s) with LAPS read access (expected)\"": "Show-Line \"Привилегированные учётные записи с ожидаемым доступом на чтение LAPS: $($privilegedReaderSIDs.Keys.Count)\"",
+      "Show-Line \"Found $($exchangeReaderSIDs.Keys.Count) Exchange service group(s) with LAPS read access (by-design, cannot be removed)\"": "Show-Line \"Служебные группы Exchange со штатным доступом на чтение LAPS: $($exchangeReaderSIDs.Keys.Count). Удаление прав без проверки Exchange недопустимо\"",
+      "Show-Line \"No non-privileged accounts with LAPS read access found in the $readScope analyzed\"": "Show-Line \"В проверенной области $readScope непривилегированных субъектов с доступом на чтение LAPS не обнаружено\"",
+      "Show-Line \"Error during check - LAPS read permissions could not be evaluated: $_\"": "Show-Line \"Ошибка проверки разрешений на чтение LAPS: $_\""
+    },
+    "src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1": {
+      "Show-Line \"Protected Users feature not available (requires Domain Functional Level 2012 R2+)\"": "Show-Line \"Механизм Protected Users недоступен (требуется функциональный уровень домена Windows Server 2012 R2 или выше)\"",
+      "Show-Line \"Protected Users group not found (should exist at this functional level)\"": "Show-Line \"Группа Protected Users не найдена, хотя должна существовать на текущем функциональном уровне домена\"",
+      "Show-Line \"Protected Tier-0 accounts:\"": "Show-Line \"Защищённые учётные записи Tier 0:\"",
+      "Show-Line \"Operator groups with members (consider for Protected Users):\"": "Show-Line \"Операторские группы с участниками (проверьте возможность включения пользователей в Protected Users):\"",
+      "Show-Line \"Error during check - the Protected Users coverage could not be evaluated: $_\"": "Show-Line \"Ошибка проверки охвата группы Protected Users: $_\""
+    },
+    "src/modules/Checks/Domain/Get-LDAPConfiguration.ps1": {
+      "Show-Line \"SYSVOL access failed - the GPO configuration for LDAP Security was not analyzed\"": "Show-Line \"Доступ к SYSVOL отсутствует: настройки безопасности LDAP в GPO не анализировались\"",
+      "Show-Line \"The configuration partition is unknown - dsHeuristics, which decides $unreadHeuristics, could not be read\"": "Show-Line \"Раздел конфигурации недоступен: не удалось прочитать dsHeuristics для параметров $unreadHeuristics\"",
+      "Show-Line \"Error during check - the LDAP signing and channel binding configuration could not be evaluated: $_\"": "Show-Line \"Ошибка проверки подписи LDAP и LDAP Channel Binding: $_\""
+    },
+    "src/modules/Checks/Domain/Get-SMBSigningStatus.ps1": {
+      "Show-Line \"SYSVOL access failed - the GPO configuration for SMB Signing was not analyzed\"": "Show-Line \"Доступ к SYSVOL отсутствует: настройки подписи SMB в GPO не анализировались\"",
+      "Show-Line \"SMB signing is weakened by:\"": "Show-Line \"Подпись SMB ослабляется следующими настройками:\"",
+      "Show-Line \"Error during check - the SMB signing configuration could not be evaluated: $_\"": "Show-Line \"Ошибка проверки настроек подписи SMB: $_\""
+    },
+    "src/modules/Checks/Delegation/Get-UnconstrainedDelegation.ps1": {
+      "Show-Line \"Protected Users was not counted - it stops delegation only at domain functional level Windows Server 2012 R2 or higher\"": "Show-Line \"Защита Protected Users не учитывалась: она запрещает делегирование только на функциональном уровне домена Windows Server 2012 R2 или выше\"",
+      "Show-Line \"Privileged accounts could not be checked against these hosts - the sensitive flag and Protected Users were not evaluated\"": "Show-Line \"Не удалось проверить привилегированные записи на этих узлах: флаг запрета делегирования и Protected Users не оценены\"",
+      "Show-Line \"Error during check - unconstrained delegation could not be evaluated: $_\"": "Show-Line \"Ошибка проверки неограниченного делегирования Kerberos: $_\""
+    },
+    "src/modules/Checks/Delegation/Get-ConstrainedDelegation.ps1": {
+      "Show-Line \"Error during check - constrained delegation could not be evaluated: $_\"": "Show-Line \"Ошибка проверки ограниченного делегирования Kerberos: $_\""
+    },
+    "src/modules/Checks/Delegation/Get-ResourceBasedConstrainedDelegation.ps1": {
+      "Show-Line \"Error during check - resource-based constrained delegation could not be evaluated: $_\"": "Show-Line \"Ошибка проверки RBCD — делегирования на основе ресурса: $_\""
+    }
+  }
+}

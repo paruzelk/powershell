@@ -195,3 +195,9 @@ if(-not $?){throw 'Ошибка перевода описаний и комме�
 
 & (Join-Path $PSScriptRoot 'Localization/Apply-FullTechnical.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка перевода подробных технических описаний'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-ReportSourceMessages.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка перевода динамических строк HTML-отчёта'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-ReportDisplay.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка перевода отображаемых значений отчёта'}
