@@ -9,6 +9,8 @@
 | Этап | Результат | Чёткий критерий выхода | Статус |
 |---|---|---|---|
 | ARCH1 — аудит и архитектурный поворот | Реальный source inventory, фиксированные ADR/handoff/SEM stop-rule, автоматический read-only audit | Нет новых Move; DEV CI/ZIP PASS; список блокеров подтверждён исходным кодом | Выполняется в этом билде |
+| ARCH2a — durable Move claim / no-blind-retry | Исправить COM catch/continue и блокировать неразрешённый Resume, закрыть mutating DEV CLI | Source & synthetic CI PASS, никаких Outlook/PST изменений; writer не активирован | Выполняется |
+| ARCH2b — semantic verifier integration | BW4k witness в основной ArchiveVerifier, Body/HTML/recipients/attachment byte SHA + crash windows | Не удалять/не отмечать завершённым без полного pre/post witness; после isolated real Outlook test | Следующий |
 | ARCH2 — один безопасный шаг архивации | Исправить ambiguous `MoveFailed`, durable claim, read-only reconcile; интегрировать semantic/attachment SHA из уже сделанных BW4k свидетелей в основной код; оценить Move против Copy/Verify/Delete | Сбой в любом окне не даёт автоматического повторного Move или незаметного удаления; содержимое подтверждено | Следующий |
 | ARCH3 — годовая маршрутизация и folder scope | `-ArchiveGrouping Year`, папки Inbox/Sent данного POP3/Custom, exclude Outbox и не-MailItem; PST part при превышении лимита | План + архивные пути и число писем совпадают; Sent чужого хранилища не захватывается | После ARCH2 |
 | ARCH4 — Resume, дедупликация, долгие пачки | Свести основной транзакционный журнал/дедупликацию с recovery-политикой и отчётом, безопасный лимит | Прерывание после каждого шага, повторный запуск без невидимых дублей/потери; полный journal match | После ARCH3 |
