@@ -1,5 +1,10 @@
 ﻿# Recovery and ambiguous worker outcomes — 2.6.3-PREVIEW1
 
+## ARCH1 unresolved Move safety reminder (2026-11-11)
+
+The main `Core/Archive/MailMover.ps1` currently has a `MoveFailed` handler that records skipped/continues after COM `MailItem.Move()` failure. An exception or timeout can leave move outcome ambiguous: **do not classify it as a harmless retryable skip**. ARCH2 must integrate write-once intent/claim, fail-closed reconciliation and complete content/attachment witnesses with the normal Archive/Resume path. The existing diagnostic Worker switches set to false are **not** a safety switch for direct legacy CLI. Do not run on 90GB data until this gap is closed. [Project handoff](PROJECT-HANDOFF-ARCH1.md), [ADR](ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md).
+
+
 `Indeterminate` **never** means that an operation did not execute. It means the controller could not validate a complete response. A timeout can occur after a COM side effect but before the child writes its JSON response.
 
 Worker 2.6.2 **does not implement MailItem.Move**, so it cannot autonomously modify PSTs and then reconcile them. For future worker-driven Move, the sequence must be: durable Move Started intent, bounded operation, durable Move Completed when proved, and after any unknown outcome independent comparison of source and archive item identities before retrying.
