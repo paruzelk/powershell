@@ -957,7 +957,7 @@ try {
                 -SourceFolder $sourceFolders `
                 -ArchiveStores $archiveStores `
                 -ExpectedMoved ([int]$tx.State.Executed) `
-                -ExpectedMoves $expectedMoves -RequireSemanticWitness -RequireSemanticWitness
+                -ExpectedMoves $expectedMoves -RequireSemanticWitness
 
             # Reconstruct physical message bytes from unique completed
             # planned items instead of trusting potentially stale checkpoint
@@ -1495,7 +1495,7 @@ try {
             -SourceFolder $sourceFolders `
             -ArchiveStores $archiveStores `
             -ExpectedMoved ([int]$completion.CompletedCount) `
-            -ExpectedMoves $expectedMoves
+            -ExpectedMoves $expectedMoves -RequireSemanticWitness
 
         if ($completion.CompletedCount -ne $expectedMoves.Count) {
             throw "Resume completion journal is inconsistent: completed=$($completion.CompletedCount); destination pairs=$($expectedMoves.Count)."
