@@ -61,8 +61,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 121,
-    "ExpectedPesterTests": 3585,
+    "ExpectedTestContainers": 122,
+    "ExpectedPesterTests": 3625,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -595,6 +595,20 @@
     "BW4k7v2a7RealOutlookProviderTestedInCI": false,
     "BW4k7v2a7OldSuiteIdMoveOrSaveRetried": false,
     "BW4k7v2a7AutomaticMoveRetryAllowed": false,
-    "BW4k7v2a7ProductionWriterEnabled": false
+    "BW4k7v2a7ProductionWriterEnabled": false,
+    "BW4k7v2a8RealOneShotSourceZeroDestinationOneObserved": true,
+    "BW4k7v2a8RealOneShotSemanticContentMatchObserved": true,
+    "BW4k7v2a8OriginalRawMapiFlag9Destination25": true,
+    "BW4k7v2a8OriginalSize1952Destination2076": true,
+    "BW4k7v2a8HasAttachBit0x10Identified": true,
+    "BW4k7v2a8OriginalManifestClaimReturnHashesPinned": true,
+    "BW4k7v2a8ReadOnlyExactDestinationAttachmentMetadata": true,
+    "BW4k7v2a8OriginalPreMoveAttachmentCountKnown": false,
+    "BW4k7v2a8SizeDeltaRootCauseProven": false,
+    "BW4k7v2a8RealOutlookCOMRunInCI": false,
+    "BW4k7v2a8AnyMailboxOrPstWriteInCI": false,
+    "BW4k7v2a8OriginalOneShotMoveRetried": false,
+    "BW4k7v2a8SEM001FlagDriftWaived": false,
+    "BW4k7v2a8ProductionWriterEnabled": false
   }
 }
