@@ -123,7 +123,7 @@ function Get-OPA265ARCH2bMailSemanticWitness {
                 (Get-OPA265ARCH2bTextSha256 -Text ([string]$r.Address)))) | Out-Null
         }
         finally {
-            if($null -ne $r -and
+            if($null -ne $r -and [Runtime.InteropServices.Marshal]::IsComObject($r) -and
                (Get-Command -Name Release-OPAComObject -ErrorAction SilentlyContinue)){
                 Release-OPAComObject -Object $r
             }
