@@ -1,0 +1,42 @@
+{
+  "schema": "adPEAS-RU.StageA.HelpersADCS.1",
+  "files": {
+    "src/modules/Helpers/Request-ADCSCertificate.ps1": {
+      "Show-Line \"Certificate saved as PFX:\"": "Show-Line \"Сертификат сохранён в формате PFX:\"",
+      "Show-Line \"Usage with Connect-adPEAS:\"": "Show-Line \"Использование через Connect-adPEAS:\"",
+      "Show-Line \"Retrieving certificate (Request ID: $RetrieveID) from CA '$CAServer'\"": "Show-Line \"Получение сертификата (ID запроса: $RetrieveID) из ЦС '$CAServer'\"",
+      "Show-Line \"Loaded enrollment-agent certificate '$($oboAgentCert.Subject)' (Certificate Request Agent EKU present)\"": "Show-Line \"Загружен сертификат агента регистрации '$($oboAgentCert.Subject)' (EKU Certificate Request Agent присутствует)\"",
+      "Show-Line \"Agent certificate '$($oboAgentCert.Subject)' does NOT advertise the Certificate Request Agent EKU - the CA may reject the request\"": "Show-Line \"Сертификат агента '$($oboAgentCert.Subject)' НЕ содержит EKU Certificate Request Agent — ЦС может отклонить запрос\"",
+      "Show-Line \"Found $($allCAs.Count) Certificate Authority(ies) in Active Directory\"": "Show-Line \"В Active Directory найдено центров сертификации: $($allCAs.Count)\"",
+      "Show-Line \"Available templates across all CAs:\"": "Show-Line \"Шаблоны, доступные на всех ЦС:\"",
+      "Show-Line \"$($candidateCAs.Count) CAs publish template '$TemplateName' - will try in order with automatic fallback:\"": "Show-Line \"На $($candidateCAs.Count) ЦС опубликован шаблон '$TemplateName' — попытки по порядку с автоматическим переходом к следующему:\"",
+      "Show-Line \"Auto-discovered CA: $($candidateCAs[0].Name) ($($candidateCAs[0].DNSHostName))\"": "Show-Line \"Автоматически найден ЦС: $($candidateCAs[0].Name) ($($candidateCAs[0].DNSHostName))\"",
+      "Show-Line \"HTTPS not available on '$testHost', falling back to HTTP\"": "Show-Line \"HTTPS недоступен на '$testHost' — переход на HTTP\"",
+      "Show-Line \"Web Enrollment unavailable on '$testHost', using COM/RPC (ICertRequest) instead\"": "Show-Line \"Веб-регистрация сертификатов недоступна на '$testHost' — вместо неё используется COM/RPC (ICertRequest)\"",
+      "Show-Line \"CA '$($candidateCA.Name)' ($testHost) not usable ($Method) - trying next CA\"": "Show-Line \"ЦС '$($candidateCA.Name)' ($testHost) недоступен для выбранного способа ($Method) — переход к следующему ЦС\"",
+      "Show-Line \"Requesting certificate from CA '$CAServer' (method: $resolvedMethod) using template '$TemplateName'\"": "Show-Line \"Запрос сертификата у ЦС '$CAServer' (метод: $resolvedMethod) по шаблону '$TemplateName'\"",
+      "Show-Line \"Backing up template '$TemplateName' before modification\"": "Show-Line \"Создание резервной копии шаблона '$TemplateName' перед изменением\"",
+      "Show-Line \"Template backup saved to: $templateBackupPath\"": "Show-Line \"Резервная копия шаблона сохранена: $templateBackupPath\"",
+      "Show-Line \"Modifying template '$TemplateName' for certificate request\"": "Show-Line \"Изменение шаблона '$TemplateName' для запроса сертификата\"",
+      "Show-Line \"Template modified successfully (ENROLLEE_SUPPLIES_SUBJECT, Client Auth EKU, Exportable Key, No Manager Approval)\"": "Show-Line \"Шаблон успешно изменён (ENROLLEE_SUPPLIES_SUBJECT, EKU Client Auth, экспортируемый ключ, одобрение администратора ЦС не требуется)\"",
+      "Show-Line \"Attempting to restore original template from backup\"": "Show-Line \"Попытка восстановить исходный шаблон из резервной копии\"",
+      "Show-Line \"Original template restored successfully\"": "Show-Line \"Исходный шаблон успешно восстановлен\"",
+      "Show-Line \"Subject '$cnValue' looks like a UPN but no SAN was set - the certificate will NOT map to that user. Use -UPN or -Impersonate for impersonation.\"": "Show-Line \"Subject '$cnValue' выглядит как UPN, но SAN не задан — сертификат НЕ будет сопоставлен с этим пользователем. Для указания личности используйте -UPN или -Impersonate.\"",
+      "Show-Line \"Subject '$cnValue' looks like a DNS/FQDN but no SAN was set - the certificate will NOT map to that host. Use -DNS or -Impersonate.\"": "Show-Line \"Subject '$cnValue' выглядит как DNS/FQDN, но SAN не задан — сертификат НЕ будет сопоставлен с этим узлом. Используйте -DNS или -Impersonate.\"",
+      "Show-Line \"Auto-resolved SID for '$sidTargetIdentity': $resolvedSID (embedding NTDS CA Security Extension for strong mapping)\"": "Show-Line \"Автоматически определён SID для '$sidTargetIdentity': $resolvedSID (встраивается расширение безопасности NTDS CA для строгого сопоставления)\"",
+      "Show-Line \"Could not resolve a SID for '$sidTargetIdentity'. On patched DCs the certificate may not map - supply -SID explicitly, or use -NoSID to silence this.\"": "Show-Line \"Не удалось определить SID для '$sidTargetIdentity'. На обновлённых DC сертификат может не сопоставиться с записью — задайте -SID явно либо используйте -NoSID для подавления предупреждения.\"",
+      "Show-Line \"Generated $KeyLength-bit RSA key pair and PKCS#10 CSR\"": "Show-Line \"Создана пара ключей RSA длиной $KeyLength бит и запрос PKCS#10 CSR\"",
+      "Show-Line \"Wrapping request as enroll-on-behalf-of '$OnBehalfOf' (signed by agent certificate)\"": "Show-Line \"Упаковка запроса на сертификат от имени '$OnBehalfOf' (подпись сертификатом агента)\"",
+      "Show-Line \"Certificate issued via COM/RPC (Request ID: $($comResult.RequestID))\"": "Show-Line \"Сертификат выдан через COM/RPC (ID запроса: $($comResult.RequestID))\"",
+      "Show-Line \"Web Enrollment transport error ($($submitResult.ErrorMessage)), attempting COM/RPC fallback...\"": "Show-Line \"Ошибка транспорта веб-регистрации ($($submitResult.ErrorMessage)) — попытка перейти на COM/RPC...\"",
+      "Show-Line \"Certificate issued via COM/RPC fallback (Request ID: $($comResult.RequestID))\"": "Show-Line \"Сертификат выдан через резервный COM/RPC (ID запроса: $($comResult.RequestID))\"",
+      "Show-Line \"Certificate request is pending approval (Request ID: $($submitResult.RequestID))\"": "Show-Line \"Запрос сертификата ожидает одобрения (ID запроса: $($submitResult.RequestID))\"",
+      "Show-Line \"The CA administrator must approve this request before the certificate can be retrieved.\"": "Show-Line \"Для получения сертификата администратор ЦС должен сначала одобрить запрос.\"",
+      "Show-Line \"Private key saved for retrieval: $savedKeyPath\"": "Show-Line \"Закрытый ключ сохранён для последующего получения сертификата: $savedKeyPath\"",
+      "Show-Line \"After approval, retrieve with:\"": "Show-Line \"После одобрения получите сертификат командой:\"",
+      "Show-Line \"Certificate issued (Request ID: $($submitResult.RequestID))\"": "Show-Line \"Сертификат выдан (ID запроса: $($submitResult.RequestID))\"",
+      "Show-Line \"Restoring original template '$TemplateName' from backup\"": "Show-Line \"Восстановление исходного шаблона '$TemplateName' из резервной копии\"",
+      "Show-Line \"Backup file kept for audit: $templateBackupPath\"": "Show-Line \"Резервный файл сохранён для аудита: $templateBackupPath\""
+    }
+  }
+}
