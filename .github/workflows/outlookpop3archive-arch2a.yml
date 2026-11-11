@@ -1718,7 +1718,7 @@ jobs:
              'Assert-OPA265ARCH2aNoUnresolvedMove',
              'unterminated step journal',
              '$moveCompleted -or $moveAttemptClaimed',
-             'Stop this entire transaction')){
+             'STOP this entire transaction')){
              if($mover -cnotmatch [regex]::Escape($token)){$bad.Add(('mover '+$token))}
           }
           if($mover -cmatch [regex]::Escape("Reason='MoveFailed'")){$bad.Add('old MoveFailed catch/continue still present')}
