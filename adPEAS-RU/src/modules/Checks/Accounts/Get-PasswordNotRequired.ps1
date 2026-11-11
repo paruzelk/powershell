@@ -142,7 +142,7 @@
                 }
 
                 if (@($ordinaryAccounts).Count -gt 0) {
-                    Show-Line "$(@($ordinaryAccounts).Count) further enabled account(s) carry the 'Password Not Required' flag" -Class Hint
+                    Show-Line "Дополнительно обнаружены включённые учётные записи с флагом PASSWD_NOTREQD («пароль не требуется»): $(@($ordinaryAccounts).Count)" -Class Hint
                     foreach ($user in $ordinaryAccounts) { Show-Object $user -Class Hint }
                 }
 
@@ -150,7 +150,7 @@
                     Show-Line "Trust account(s) carrying the flag by design, not assessed: $(($trustAccounts | ForEach-Object { $_.sAMAccountName }) -join ', ')" -Class Note
                 }
             } elseif ($computerAccounts.Count -eq 0) {
-                Show-Line "No enabled accounts with 'Password Not Required' flag found" -Class Secure
+                Show-Line "Включённых учётных записей с флагом PASSWD_NOTREQD («пароль не требуется») не обнаружено" -Class Secure
             }
 
             if ($computerAccounts.Count -gt 0) {
@@ -182,7 +182,7 @@
                 }
 
                 if ($usedComputers.Count -gt 0) {
-                    Show-Line "$($usedComputers.Count) further enabled computer account(s) carry the 'Password Not Required' flag" -Class Hint
+                    Show-Line "Дополнительно обнаружены включённые учётные записи компьютеров с флагом PASSWD_NOTREQD («пароль не требуется»): $($usedComputers.Count)" -Class Hint
                     foreach ($computer in $usedComputers) { Show-Object $computer -Class Hint }
                 }
             }

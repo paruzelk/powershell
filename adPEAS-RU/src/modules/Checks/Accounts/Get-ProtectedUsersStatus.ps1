@@ -377,7 +377,7 @@
             # Show unprotected accounts (the main concern)
             if (@($unprotectedTier0).Count -gt 0) {
                 # Combined summary with unprotected count - use "Found" wording for consistency
-                $summaryText = "Found $($unprotectedTier0.Count) unprotected Tier-0 account(s) ($totalProtected of $totalEligible in Protected Users, $coveragePercent%):"
+                $summaryText = "Учётные записи Tier 0 вне Protected Users: $($unprotectedTier0.Count); защищено: $totalProtected из $totalEligible ($coveragePercent%):"
                 Show-Line $summaryText -Class $severity
 
                 foreach ($item in $unprotectedTier0) {
@@ -397,7 +397,7 @@
                 }
             } else {
                 # All accounts are protected (100% coverage)
-                $summaryText = "Found $totalEligible Tier-0 account(s) - all in Protected Users ($coveragePercent%)"
+                $summaryText = "Все учётные записи Tier 0 находятся в Protected Users: $totalEligible из $totalEligible ($coveragePercent%)"
                 Show-Line $summaryText -Class $severity
             }
 

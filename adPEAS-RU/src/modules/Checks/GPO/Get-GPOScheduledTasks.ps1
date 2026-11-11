@@ -332,7 +332,7 @@
                 if (@($shown).Count -gt 0) {
                     Show-Line "Обнаружено задач планировщика, распространяемых через GPO: $(@($shown).Count)" -Class $headerClass
                 } else {
-                    Show-Line "No scheduled task is distributed by a policy that is linked and enabled" -Class Note
+                    Show-Line "Активные привязанные GPO не распространяют запланированные задания" -Class Note
                 }
 
                 foreach ($task in $shown) {
@@ -363,7 +363,7 @@
                 # read; the coverage line says which folders were skipped and which task
                 # files could not be read or parsed.
                 $null = Show-SYSVOLCoverageNote -FileFilter @('ScheduledTasks.xml')
-                Show-Line "No scheduled tasks distributed via GPO in $($gpos.Count) analyzed GPO(s)" -Class Note
+                Show-Line "Задачи, распространяемые через GPO, не обнаружены; проанализировано политик: $($gpos.Count)" -Class Note
             }
 
         } catch {

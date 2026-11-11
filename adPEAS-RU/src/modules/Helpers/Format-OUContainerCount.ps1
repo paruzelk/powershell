@@ -30,7 +30,7 @@ function Format-OUContainerCount {
     $ouCount = @($dns | Where-Object { $_ -match '^OU=' }).Count
     $containerCount = $dns.Count - $ouCount
 
-    if ($containerCount -eq 0) { return "$ouCount OU(s)" }
-    if ($ouCount -eq 0) { return "$containerCount container(s)" }
-    return "$ouCount OU(s) and $containerCount container(s)"
+    if ($containerCount -eq 0) { return "$ouCount OU" }
+    if ($ouCount -eq 0) { return "$containerCount контейнеров" }
+    return "$ouCount OU и $containerCount контейнеров"
 }

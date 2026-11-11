@@ -505,7 +505,7 @@
                     }
                 }
             } else {
-                Show-Line "No gMSA accounts found in domain" -Class Note
+                Show-Line "Учётные записи gMSA в домене не обнаружены" -Class Note
             }
 
             # ===== Check 3: Standalone MSA Detection =====
@@ -538,7 +538,7 @@
 
                 Show-Line "Recommendation: Migrate standalone MSAs to gMSAs for improved security" -Class Hint
             } else {
-                Show-Line "No standalone MSAs found" -Class Note
+                Show-Line "Автономные управляемые учётные записи служб (sMSA) не обнаружены" -Class Note
             }
 
             # ===== Check 4: Delegated Managed Service Account links =====

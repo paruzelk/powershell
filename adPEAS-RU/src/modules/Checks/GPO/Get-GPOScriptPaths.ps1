@@ -264,7 +264,7 @@
                 if (@($shown).Count -gt 0) {
                     Show-Line "Обнаружено сценариев, распространяемых через GPO: $(@($shown).Count)" -Class Hint
                 } else {
-                    Show-Line "No script is distributed by a policy that is linked and enabled" -Class Note
+                    Show-Line "Активные привязанные GPO не распространяют сценарии" -Class Note
                 }
 
                 foreach ($finding in $shown) {
@@ -287,7 +287,7 @@
                 # without a trace unless the coverage line names it, and so does a
                 # scripts.ini that could not be read.
                 $null = Show-SYSVOLCoverageNote -FileFilter @('scripts.ini', 'psscripts.ini')
-                Show-Line "No scripts distributed via GPO" -Class Note
+                Show-Line "Сценарии, распространяемые через GPO, не обнаружены" -Class Note
             }
 
         } catch {

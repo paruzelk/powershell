@@ -8,7 +8,7 @@
                                "report-scripts.js",
                                "report-styles.css"
                            ],
-    "UntranslatedCandidateCount":  587,
+    "UntranslatedCandidateCount":  564,
     "UntranslatedCandidates":  [
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-AdminPasswordNeverExpires.ps1",
@@ -62,18 +62,8 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-InactiveAdminAccounts.ps1",
-                                       "Line":  206,
-                                       "Text":  "No inactive privileged accounts found"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-InactiveAdminAccounts.ps1",
                                        "Line":  211,
                                        "Text":  "Error during check - inactive privileged accounts could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-LogonScriptPermissions.ps1",
-                                       "Line":  84,
-                                       "Text":  "OPSEC mode: Skipping the logon scripts of accounts (reading their permissions takes an SMB connection to NETLOGON)"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-LogonScriptPermissions.ps1",
@@ -157,18 +147,8 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  508,
-                                       "Text":  "No gMSA accounts found in domain"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
                                        "Line":  539,
                                        "Text":  "Recommendation: Migrate standalone MSAs to gMSAs for improved security"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  541,
-                                       "Text":  "No standalone MSAs found"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
@@ -232,11 +212,6 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-NonDefaultUserOwners.ps1",
-                                       "Line":  80,
-                                       "Text":  "OPSEC mode: Skipping user owner enumeration (would check all enabled users)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-NonDefaultUserOwners.ps1",
                                        "Line":  213,
                                        "Text":  "All users have default owners (filtered $filteredHealthMailboxes Exchange Health Mailboxes)"
                                    },
@@ -252,23 +227,8 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-PasswordNotRequired.ps1",
-                                       "Line":  153,
-                                       "Text":  "No enabled accounts with \u0027Password Not Required\u0027 flag found"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-PasswordNotRequired.ps1",
                                        "Line":  192,
                                        "Text":  "Error during check - accounts without a password requirement could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
-                                       "Line":  959,
-                                       "Text":  "Found $summaryText across $TotalGroups privileged group(s):"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-RODCPasswordReplication.ps1",
-                                       "Line":  71,
-                                       "Text":  "No read-only Domain Controller in this domain - there is no password replication policy to check"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-RODCPasswordReplication.ps1",
@@ -284,11 +244,6 @@
                                        "File":  "src\\modules\\Checks\\ADCS\\Get-ADCSTemplate.ps1",
                                        "Line":  526,
                                        "Text":  "Error during check - certificate templates could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                                       "Line":  201,
-                                       "Text":  "No trusted Root CAs found in AD configuration"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
@@ -332,16 +287,6 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                                       "Line":  235,
-                                       "Text":  "All $(@($candidates).Count) explicit certificate mapping(s) use a strong format"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                                       "Line":  238,
-                                       "Text":  "No principal uses an explicit certificate mapping"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
                                        "Line":  285,
                                        "Text":  "The property set containing altSecurityIdentities could not be read - a delegation naming the set is not examined"
                                    },
@@ -354,11 +299,6 @@
                                        "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
                                        "Line":  464,
                                        "Text":  "Found $(@($writableFindings).Count) privileged principal(s) whose altSecurityIdentities a non-privileged principal may write"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                                       "Line":  491,
-                                       "Text":  "No non-privileged principal can write altSecurityIdentities on a privileged account"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
@@ -579,11 +519,6 @@
                                        "File":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
                                        "Line":  619,
                                        "Text":  "Error during check - the network map could not be built: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Computer\\Get-NonDefaultComputerOwners.ps1",
-                                       "Line":  206,
-                                       "Text":  "OPSEC mode: Skipping computer owner enumeration (would check all computers)"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Computer\\Get-NonDefaultComputerOwners.ps1",
@@ -922,11 +857,6 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Domain\\Get-DomainInformation.ps1",
-                                       "Line":  679,
-                                       "Text":  "Found $($statusText.ToLower()) Guest account"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Domain\\Get-DomainInformation.ps1",
                                        "Line":  780,
                                        "Text":  "No domain controllers found"
                                    },
@@ -967,11 +897,6 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Domain\\Get-DomainTrusts.ps1",
-                                       "Line":  373,
-                                       "Text":  "No external domain trusts found (isolated domain)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Domain\\Get-DomainTrusts.ps1",
                                        "Line":  378,
                                        "Text":  "Error during check - domain trusts could not be evaluated: $_"
                                    },
@@ -989,16 +914,6 @@
                                        "File":  "src\\modules\\Checks\\GPO\\Get-GPOLocalGroupMembership.ps1",
                                        "Line":  338,
                                        "Text":  "SYSVOL access failed - cannot analyze GPO local group assignments - SMB access failed (authentication/network issue)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\GPO\\Get-GPOLocalGroupMembership.ps1",
-                                       "Line":  389,
-                                       "Text":  "No local group assignment is made by a policy that is linked and enabled"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\GPO\\Get-GPOLocalGroupMembership.ps1",
-                                       "Line":  424,
-                                       "Text":  "No vulnerable GPO local group assignments found in $(@($gpos).Count) analyzed GPO(s)"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\GPO\\Get-GPOLocalGroupMembership.ps1",
@@ -1027,16 +942,6 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\GPO\\Get-GPORegistrySettings.ps1",
-                                       "Line":  324,
-                                       "Text":  "No known vulnerable registry setting is deployed by a policy that is linked and enabled"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\GPO\\Get-GPORegistrySettings.ps1",
-                                       "Line":  395,
-                                       "Text":  "No known vulnerable registry setting is deployed via GPO"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\GPO\\Get-GPORegistrySettings.ps1",
                                        "Line":  422,
                                        "Text":  "Error during check - registry settings deployed via GPO could not be evaluated: $_"
                                    },
@@ -1047,16 +952,6 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\GPO\\Get-GPOScheduledTasks.ps1",
-                                       "Line":  335,
-                                       "Text":  "No scheduled task is distributed by a policy that is linked and enabled"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\GPO\\Get-GPOScheduledTasks.ps1",
-                                       "Line":  366,
-                                       "Text":  "No scheduled tasks distributed via GPO in $($gpos.Count) analyzed GPO(s)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\GPO\\Get-GPOScheduledTasks.ps1",
                                        "Line":  371,
                                        "Text":  "Error during check - scheduled tasks deployed via GPO could not be evaluated: $_"
                                    },
@@ -1064,16 +959,6 @@
                                        "File":  "src\\modules\\Checks\\GPO\\Get-GPOScriptPaths.ps1",
                                        "Line":  230,
                                        "Text":  "SYSVOL access failed - cannot analyze GPO scripts - SMB access failed (authentication/network issue)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\GPO\\Get-GPOScriptPaths.ps1",
-                                       "Line":  267,
-                                       "Text":  "No script is distributed by a policy that is linked and enabled"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\GPO\\Get-GPOScriptPaths.ps1",
-                                       "Line":  290,
-                                       "Text":  "No scripts distributed via GPO"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\GPO\\Get-GPOScriptPaths.ps1",

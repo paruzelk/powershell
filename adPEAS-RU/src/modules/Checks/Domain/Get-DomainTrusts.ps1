@@ -370,7 +370,7 @@ function Get-DomainTrusts {
             }
 
             if (@($trusts).Count -eq 0) {
-                Show-Line "No external domain trusts found (isolated domain)" -Class Note
+                Show-Line "Внешние доверительные отношения домена не обнаружены (изолированный домен)" -Class Note
             }
 
         } catch {

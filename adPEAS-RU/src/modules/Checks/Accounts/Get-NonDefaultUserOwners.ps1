@@ -77,7 +77,7 @@
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
-                Show-Line "OPSEC mode: Skipping user owner enumeration (would check all enabled users)" -Class "Hint"
+                Show-Line "Режим OPSEC: проверка владельцев пользователей пропущена (потребовалось бы перечисление всех включённых записей)" -Class "Hint"
                 return
             }
 

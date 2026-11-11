@@ -184,7 +184,7 @@
             }
 
             if (@($recentAccounts).Count -gt 0) {
-                Show-Line "$(@($recentAccounts).Count) further privileged account(s) carry the flag with a password newer than $PasswordAgeDays days:" -Class Hint
+                Show-Line "Дополнительно обнаружены привилегированные записи с бессрочным паролем, изменённым менее $PasswordAgeDays дней назад: $(@($recentAccounts).Count)" -Class Hint
 
                 foreach ($user in $recentAccounts) {
                     $user | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'PasswordNeverExpires' -Force

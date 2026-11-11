@@ -650,7 +650,7 @@ function Get-DomainInformation {
             Show-SubHeader "Проверка состояния встроенной учётной записи «Гость»..." -ObjectType "GuestAccount"
 
             if ($GuestInfo) {
-                $statusText = if ($GuestInfo.Enabled) { "ENABLED" } else { "Disabled" }
+                $statusText = if ($GuestInfo.Enabled) { "Включена" } else { "Отключена" }
 
                 # Determine severity
                 if ($GuestInfo.Enabled) {
@@ -676,7 +676,7 @@ function Get-DomainInformation {
                     $guestObj | Add-Member -NotePropertyName 'memberOf' -NotePropertyValue $GuestInfo.MemberOf -Force
                 }
 
-                Show-Line "Found $($statusText.ToLower()) Guest account" -Class $guestClass
+                Show-Line "Учётная запись Guest: $($statusText.ToLower())" -Class $guestClass
                 $guestObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'GuestAccount' -Force
                 Show-Object $guestObj -Class $guestClass
 

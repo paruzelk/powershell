@@ -386,7 +386,7 @@
                 } else {
                     # Not Secure: the assignments exist, they just apply nowhere. Calling
                     # the domain clean here would be a different statement.
-                    Show-Line "No local group assignment is made by a policy that is linked and enabled" -Class Note
+                    Show-Line "Активные привязанные GPO не назначают участников локальных групп" -Class Note
                 }
 
                 foreach ($finding in $shown) {
@@ -421,7 +421,7 @@
                 # GptTmpl.inf or Groups.xml could not be read or parsed.
                 $groupClass = 'Secure'
                 if (Show-SYSVOLCoverageNote -FileFilter @('GptTmpl.inf', 'Groups.xml')) { $groupClass = 'Note' }
-                Show-Line "No vulnerable GPO local group assignments found in $(@($gpos).Count) analyzed GPO(s)" -Class $groupClass
+                Show-Line "Небезопасных назначений в локальные группы через GPO не обнаружено; проанализировано политик: $(@($gpos).Count)" -Class $groupClass
             }
 
         } catch {

@@ -232,10 +232,10 @@
             }
         }
         elseif (@($candidates).Count -gt 0) {
-            Show-Line "All $(@($candidates).Count) explicit certificate mapping(s) use a strong format" -Class Secure
+            Show-Line "Все явные сопоставления сертификатов используют надёжный формат; проверено: $(@($candidates).Count)" -Class Secure
         }
         else {
-            Show-Line "No principal uses an explicit certificate mapping" -Class Secure
+            Show-Line "Учётных записей с явно заданным сопоставлением сертификатов не обнаружено" -Class Secure
         }
 
         # ==================================================================
@@ -488,7 +488,7 @@
         # non-privileged principal, so counting it here meant the green verdict - which is
         # exactly what this line claims - could never be printed in a domain with Exchange.
         if (@($writableFindings).Count -eq 0 -and -not $writeAnalysisFailed) {
-            Show-Line "No non-privileged principal can write altSecurityIdentities on a privileged account" -Class Secure
+            Show-Line "Непривилегированных субъектов с правом изменять altSecurityIdentities привилегированной учётной записи не обнаружено" -Class Secure
         }
     }
 

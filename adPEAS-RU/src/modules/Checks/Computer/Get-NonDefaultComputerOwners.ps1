@@ -203,7 +203,7 @@ function Get-NonDefaultComputerOwners {
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
-                Show-Line "OPSEC mode: Skipping computer owner enumeration (would check all computers)" -Class "Hint"
+                Show-Line "Режим OPSEC: проверка владельцев объектов компьютеров пропущена (требуется перечисление компьютеров)" -Class "Hint"
                 return
             }
 

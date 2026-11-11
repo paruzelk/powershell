@@ -332,7 +332,7 @@ function Get-DangerousOUPermissions {
 
             # Display non-Exchange findings as Finding (red)
             if (@($nonExchangeFindings).Count -gt 0) {
-                $countText = if ($IncludePrivileged) { "$(@($nonExchangeFindings).Count) account(s)" } else { "$(@($nonExchangeFindings).Count) non-privileged account(s)" }
+                $countText = if ($IncludePrivileged) { "$(@($nonExchangeFindings).Count) учётных записей" } else { "$(@($nonExchangeFindings).Count) непривилегированных учётных записей" }
 
                 # The places the accounts below hold their rights, and no others. This used
                 # to count every OU with any finding, so one where only an Exchange service

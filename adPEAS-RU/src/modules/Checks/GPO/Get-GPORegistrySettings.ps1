@@ -263,10 +263,10 @@
             if ($unjudgedShown.Count -gt 0) {
                 $unjudgedPolicies = @($unjudgedShown | ForEach-Object { ([string]$_.GPOGUID).ToUpper() } | Sort-Object -Unique).Count
                 $policyWord = if ($unjudgedPolicies -eq 1) { 'policy' } else { 'policies' }
-                $unjudgedText = "$($unjudgedShown.Count) further registry value(s) from $unjudgedPolicies $policyWord are not on the list of this check - not judged"
+                $unjudgedText = "Дополнительные значения реестра вне перечня этой проверки: $($unjudgedShown.Count); объектов GPO: $unjudgedPolicies. Оценка безопасности для них не выполнялась"
                 # Invoke-adPEAS sets the context for each check and passes no -IncludeUnknown;
                 # without one the switch is reachable, as for -IncludeInactive.
-                if (-not $IncludeUnknown -and $null -eq $Script:adPEAS_CurrentCheckContext) { $unjudgedText += ' (-IncludeUnknown to list)' }
+                if (-not $IncludeUnknown -and $null -eq $Script:adPEAS_CurrentCheckContext) { $unjudgedText += ' (для просмотра используйте -IncludeUnknown)' }
                 Show-Line $unjudgedText -Class Note
             }
 
@@ -321,7 +321,7 @@
                 } else {
                     # Not "none deployed". Every one of them is deployed by a policy that
                     # does not apply, which is a different statement.
-                    Show-Line "No known vulnerable registry setting is deployed by a policy that is linked and enabled" -Class Note
+                    Show-Line "Активные привязанные GPO не развёртывают известных небезопасных настроек реестра" -Class Note
                 }
 
                 foreach ($finding in $shown) {
@@ -392,7 +392,7 @@
                 $null = Show-SYSVOLCoverageNote -FileFilter @('Registry.pol', 'Registry.xml', 'GptTmpl.inf')
                 # "Known": the table is a list, not the registry. It read "No vulnerable
                 # registry settings deployed via GPO" over every value it has no rule for.
-                Show-Line "No known vulnerable registry setting is deployed via GPO" -Class Note
+                Show-Line "Известных небезопасных настроек реестра, развёрнутых через GPO, не обнаружено" -Class Note
             }
 
             # The values the count at the top stands for, with -IncludeUnknown: after the

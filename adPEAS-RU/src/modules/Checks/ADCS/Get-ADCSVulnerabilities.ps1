@@ -198,7 +198,7 @@
                         Show-Object $rootCAObj -Class Note
                     }
                 } else {
-                    Show-Line "No trusted Root CAs found in AD configuration" -Class Note
+                    Show-Line "В конфигурации AD не обнаружены доверенные корневые центры сертификации (CA)" -Class Note
                 }
             }
             catch {

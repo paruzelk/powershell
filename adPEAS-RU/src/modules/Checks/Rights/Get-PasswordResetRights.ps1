@@ -289,7 +289,7 @@ function Get-PasswordResetRights {
             if ($privilegedOUs.Keys.Count -eq 0) {
                 Write-Log "[Get-PasswordResetRights] No OUs with privileged users found"
                 if ($protectedTargets -gt 0) {
-                    Show-Line "$protectedTargets privileged account(s) have inheritance disabled - a delegation on their OU does not reach them" -Class Secure
+                    Show-Line "У привилегированных учётных записей отключено наследование разрешений: $protectedTargets. Делегирование прав на родительской OU на них не распространяется" -Class Secure
                     # Not "no OUs with privileged users": those accounts are in an OU, it is
                     # just not one a delegation could reach them through.
                     Show-Line "Других привилегированных учётных записей не найдено, поэтому OU и контейнеры не анализировались" -Class Note
@@ -373,7 +373,7 @@ function Get-PasswordResetRights {
             # Secure, and said once for the whole scan: it is the reason the scope is
             # smaller than the list of privileged accounts, and it is a control working.
             if ($protectedTargets -gt 0) {
-                Show-Line "$protectedTargets privileged account(s) have inheritance disabled - a delegation on their OU does not reach them" -Class Secure
+                Show-Line "У привилегированных учётных записей отключено наследование разрешений: $protectedTargets. Делегирование прав на родительской OU на них не распространяется" -Class Secure
             }
             $coverageIncomplete = Show-OUPermissionsCoverageNote -UnreadOUs $unreadOUs -TotalOUs $totalOUs
             $conclusionClass = 'Secure'

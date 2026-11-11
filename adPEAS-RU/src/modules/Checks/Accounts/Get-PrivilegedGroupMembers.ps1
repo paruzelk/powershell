@@ -941,22 +941,22 @@
                 # Build summary message with accurate counts by type
                 $summaryParts = @()
                 if ($UserCount -gt 0) {
-                    $summaryParts += "$UserCount user(s)"
+                    $summaryParts += "$UserCount пользователей"
                 }
                 if ($gMSACount -gt 0) {
-                    $summaryParts += "$gMSACount gMSA(s)"
+                    $summaryParts += "$gMSACount записей gMSA"
                 }
                 if ($dMSACount -gt 0) {
-                    $summaryParts += "$dMSACount dMSA(s)"
+                    $summaryParts += "$dMSACount записей dMSA"
                 }
                 if ($ComputerCount -gt 0) {
-                    $summaryParts += "$ComputerCount computer(s)"
+                    $summaryParts += "$ComputerCount компьютеров"
                 }
                 if ($ForeignCount -gt 0) {
-                    $summaryParts += "$ForeignCount foreign principal(s)"
+                    $summaryParts += "$ForeignCount внешних субъектов"
                 }
                 $summaryText = $summaryParts -join ", "
-                Show-Line "Found $summaryText across $TotalGroups privileged group(s):" -Class Finding
+                Show-Line "Обнаружены участники привилегированных групп: $summaryText; проверено групп: $TotalGroups" -Class Finding
             }
 
             # What those foreign principals are, said once. $Script:AllForeignMembers was

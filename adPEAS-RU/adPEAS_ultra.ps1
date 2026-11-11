@@ -56009,9 +56009,9 @@ function Format-OUContainerCount {
 	$dns = @($DistinguishedName | Where-Object { $_ })
 	$ouCount = @($dns | Where-Object { $_ -match '^OU=' }).Count
 	$containerCount = $dns.Count - $ouCount
-	if ($containerCount -eq 0) { return "$ouCount OU(s)" }
-	if ($ouCount -eq 0) { return "$containerCount container(s)" }
-	return "$ouCount OU(s) and $containerCount container(s)"
+	if ($containerCount -eq 0) { return "$ouCount OU" }
+	if ($ouCount -eq 0) { return "$containerCount контейнеров" }
+	return "$ouCount OU и $containerCount контейнеров"
 }
 function Get-ACEInheritanceSource {
 	[CmdletBinding()]
@@ -68243,7 +68243,7 @@ function Get-DomainInformation {
 	        Show-Object $kerberosObj -Class $kerberosSeverity
 	        Show-SubHeader "Проверка состояния встроенной учётной записи «Гость»..." -ObjectType "GuestAccount"
 	        if ($GuestInfo) {
-	            $statusText = if ($GuestInfo.Enabled) { "ENABLED" } else { "Disabled" }
+	            $statusText = if ($GuestInfo.Enabled) { "Включена" } else { "Отключена" }
 	            if ($GuestInfo.Enabled) {
 	                if ($GuestInfo.IsPrivileged) {
 	                    $guestClass = "Finding"
@@ -68259,7 +68259,7 @@ function Get-DomainInformation {
 	            if (@($GuestInfo.MemberOf).Count -gt 0) {
 	                $guestObj | Add-Member -NotePropertyName 'memberOf' -NotePropertyValue $GuestInfo.MemberOf -Force
 	            }
-	            Show-Line "Found $($statusText.ToLower()) Guest account" -Class $guestClass
+	            Show-Line "Учётная запись Guest: $($statusText.ToLower())" -Class $guestClass
 	            $guestObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'GuestAccount' -Force
 	            Show-Object $guestObj -Class $guestClass
 	        } else {
@@ -69113,7 +69113,7 @@ function Get-DomainTrusts {
 	            }
 	        }
 	        if (@($trusts).Count -eq 0) {
-	            Show-Line "No external domain trusts found (isolated domain)" -Class Note
+	            Show-Line "Внешние доверительные отношения домена не обнаружены (изолированный домен)" -Class Note
 	        }
 	    } catch {
 	        Show-Line "Error during check - domain trusts could not be evaluated: $_" -Class Finding
@@ -70488,22 +70488,22 @@ function Get-PrivilegedGroupMembers {
 	        if ($TotalMembers -gt 0) {
 	            $summaryParts = @()
 	            if ($UserCount -gt 0) {
-	                $summaryParts += "$UserCount user(s)"
+	                $summaryParts += "$UserCount пользователей"
 	            }
 	            if ($gMSACount -gt 0) {
-	                $summaryParts += "$gMSACount gMSA(s)"
+	                $summaryParts += "$gMSACount записей gMSA"
 	            }
 	            if ($dMSACount -gt 0) {
-	                $summaryParts += "$dMSACount dMSA(s)"
+	                $summaryParts += "$dMSACount записей dMSA"
 	            }
 	            if ($ComputerCount -gt 0) {
-	                $summaryParts += "$ComputerCount computer(s)"
+	                $summaryParts += "$ComputerCount компьютеров"
 	            }
 	            if ($ForeignCount -gt 0) {
-	                $summaryParts += "$ForeignCount foreign principal(s)"
+	                $summaryParts += "$ForeignCount внешних субъектов"
 	            }
 	            $summaryText = $summaryParts -join ", "
-	            Show-Line "Found $summaryText across $TotalGroups privileged group(s):" -Class Finding
+	            Show-Line "Обнаружены участники привилегированных групп: $summaryText; проверено групп: $TotalGroups" -Class Finding
 	        }
 	        if (@($Script:AllForeignMembers).Count -gt 0) {
 	            $foreignBySID = @{}
@@ -71646,7 +71646,7 @@ function Get-ProtectedUsersStatus {
 	            'Finding'
 	        }
 	        if (@($unprotectedTier0).Count -gt 0) {
-	            $summaryText = "Found $($unprotectedTier0.Count) unprotected Tier-0 account(s) ($totalProtected of $totalEligible in Protected Users, $coveragePercent%):"
+	            $summaryText = "Учётные записи Tier 0 вне Protected Users: $($unprotectedTier0.Count); защищено: $totalProtected из $totalEligible ($coveragePercent%):"
 	            Show-Line $summaryText -Class $severity
 	            foreach ($item in $unprotectedTier0) {
 	                $account = $item.Account
@@ -71657,7 +71657,7 @@ function Get-ProtectedUsersStatus {
 	                Show-Object $account -Class Finding
 	            }
 	        } else {
-	            $summaryText = "Found $totalEligible Tier-0 account(s) - all in Protected Users ($coveragePercent%)"
+	            $summaryText = "Все учётные записи Tier 0 находятся в Protected Users: $totalEligible из $totalEligible ($coveragePercent%)"
 	            Show-Line $summaryText -Class $severity
 	        }
 	        if (@($protectedTier0).Count -gt 0) {
@@ -72261,7 +72261,7 @@ function Get-RODCPasswordReplication {
 	        $rodcs = @(Get-DomainComputer -DomainController @PSBoundParameters | Test-AccountActivity -IsEnabled |
 	            Where-Object { @($_.userAccountControl) -contains 'PARTIAL_SECRETS_ACCOUNT' })
 	        if ($rodcs.Count -eq 0) {
-	            Show-Line "No read-only Domain Controller in this domain - there is no password replication policy to check" -Class Note
+	            Show-Line "Контроллеры домена только для чтения (RODC) не обнаружены; политику репликации паролей проверять не требуется" -Class Note
 	            return
 	        }
 	        $privilegedFilter = Get-PrivilegedAccountFilter -IncludeOperators @PSBoundParameters
@@ -72445,7 +72445,7 @@ function Get-InactiveAdminAccounts {
 	                Show-Object $account -Class Finding
 	            }
 	        } else {
-	            Show-Line "No inactive privileged accounts found" -Class Secure
+	            Show-Line "Неактивных привилегированных учётных записей не обнаружено" -Class Secure
 	        }
 	    } catch {
 	        Show-Line "Error during check - inactive privileged accounts could not be evaluated: $_" -Class Finding
@@ -72528,7 +72528,7 @@ function Get-AdminPasswordNeverExpires {
 	            }
 	        }
 	        if (@($recentAccounts).Count -gt 0) {
-	            Show-Line "$(@($recentAccounts).Count) further privileged account(s) carry the flag with a password newer than $PasswordAgeDays days:" -Class Hint
+	            Show-Line "Дополнительно обнаружены привилегированные записи с бессрочным паролем, изменённым менее $PasswordAgeDays дней назад: $(@($recentAccounts).Count)" -Class Hint
 	            foreach ($user in $recentAccounts) {
 	                $user | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'PasswordNeverExpires' -Force
 	                Show-Object $user -Class Hint
@@ -72861,7 +72861,7 @@ function Get-ManagedServiceAccountSecurity {
 	                }
 	            }
 	        } else {
-	            Show-Line "No gMSA accounts found in domain" -Class Note
+	            Show-Line "Учётные записи gMSA в домене не обнаружены" -Class Note
 	        }
 	        Show-SubHeader "Поиск автономных управляемых учётных записей служб (sMSA)..." -ObjectType "MSA"
 	        $standaloneMSAs = @(Get-DomainUser -GMSA @PSBoundParameters |
@@ -72877,7 +72877,7 @@ function Get-ManagedServiceAccountSecurity {
 	            }
 	            Show-Line "Recommendation: Migrate standalone MSAs to gMSAs for improved security" -Class Hint
 	        } else {
-	            Show-Line "No standalone MSAs found" -Class Note
+	            Show-Line "Автономные управляемые учётные записи служб (sMSA) не обнаружены" -Class Note
 	        }
 	        $schemaDN = $null
 	        if ($Script:LDAPContext) {
@@ -73493,7 +73493,7 @@ function Get-NonDefaultUserOwners {
 	        }
 	        Show-SubHeader "Поиск пользовательских объектов с нестандартным владельцем..." -ObjectType "NonDefaultOwner"
 	        if ($OPSEC) {
-	            Show-Line "OPSEC mode: Skipping user owner enumeration (would check all enabled users)" -Class "Hint"
+	            Show-Line "Режим OPSEC: проверка владельцев пользователей пропущена (потребовалось бы перечисление всех включённых записей)" -Class "Hint"
 	            return
 	        }
 	        $usersWithOwner = @(Get-DomainUser -ShowOwner -Properties 'distinguishedName' @connectionParams)
@@ -73641,14 +73641,14 @@ function Get-PasswordNotRequired {
 	                foreach ($user in $privilegedAccounts) { Show-Object $user -Class Finding }
 	            }
 	            if (@($ordinaryAccounts).Count -gt 0) {
-	                Show-Line "$(@($ordinaryAccounts).Count) further enabled account(s) carry the 'Password Not Required' flag" -Class Hint
+	                Show-Line "Дополнительно обнаружены включённые учётные записи с флагом PASSWD_NOTREQD («пароль не требуется»): $(@($ordinaryAccounts).Count)" -Class Hint
 	                foreach ($user in $ordinaryAccounts) { Show-Object $user -Class Hint }
 	            }
 	            if (@($trustAccounts).Count -gt 0) {
 	                Show-Line "Trust account(s) carrying the flag by design, not assessed: $(($trustAccounts | ForEach-Object { $_.sAMAccountName }) -join ', ')" -Class Note
 	            }
 	        } elseif ($computerAccounts.Count -eq 0) {
-	            Show-Line "No enabled accounts with 'Password Not Required' flag found" -Class Secure
+	            Show-Line "Включённых учётных записей с флагом PASSWD_NOTREQD («пароль не требуется») не обнаружено" -Class Secure
 	        }
 	        if ($computerAccounts.Count -gt 0) {
 	            $unusedComputers = @()
@@ -73671,7 +73671,7 @@ function Get-PasswordNotRequired {
 	                foreach ($computer in $unusedComputers) { Show-Object $computer -Class Finding }
 	            }
 	            if ($usedComputers.Count -gt 0) {
-	                Show-Line "$($usedComputers.Count) further enabled computer account(s) carry the 'Password Not Required' flag" -Class Hint
+	                Show-Line "Дополнительно обнаружены включённые учётные записи компьютеров с флагом PASSWD_NOTREQD («пароль не требуется»): $($usedComputers.Count)" -Class Hint
 	                foreach ($computer in $usedComputers) { Show-Object $computer -Class Hint }
 	            }
 	        }
@@ -73703,7 +73703,7 @@ function Get-LogonScriptPermissions {
 	        }
 	        Show-SubHeader "Проверка прав изменения сценариев входа пользователей..." -ObjectType "LogonScriptPermission"
 	        if ($OPSEC) {
-	            Show-Line "OPSEC mode: Skipping the logon scripts of accounts (reading their permissions takes an SMB connection to NETLOGON)" -Class "Hint"
+	            Show-Line "Режим OPSEC: проверка сценариев входа пропущена (для чтения разрешений требуется SMB-подключение к NETLOGON)" -Class "Hint"
 	            return
 	        }
 	        $Script:_uncWriteAccess = @{ Hosts = @{}; Paths = @{} }
@@ -74700,7 +74700,7 @@ function Get-DangerousOUPermissions {
 	            }
 	        }
 	        if (@($nonExchangeFindings).Count -gt 0) {
-	            $countText = if ($IncludePrivileged) { "$(@($nonExchangeFindings).Count) account(s)" } else { "$(@($nonExchangeFindings).Count) non-privileged account(s)" }
+	            $countText = if ($IncludePrivileged) { "$(@($nonExchangeFindings).Count) учётных записей" } else { "$(@($nonExchangeFindings).Count) непривилегированных учётных записей" }
 	            $findingOUDNs = @($nonExchangeFindings | ForEach-Object { $_.Group } |
 	                ForEach-Object { [string]$_.DistinguishedName } | Select-Object -Unique)
 	            Show-Line "Обнаружены субъекты с опасными разрешениями OU: $countText; затронутая область: $(Format-OUContainerCount -DistinguishedName $findingOUDNs)" -Class Finding
@@ -75032,7 +75032,7 @@ function Get-PasswordResetRights {
 	        $protectedTargets = $protectedTargetDNs.Count
 	        if ($privilegedOUs.Keys.Count -eq 0) {
 	            if ($protectedTargets -gt 0) {
-	                Show-Line "$protectedTargets privileged account(s) have inheritance disabled - a delegation on their OU does not reach them" -Class Secure
+	                Show-Line "У привилегированных учётных записей отключено наследование разрешений: $protectedTargets. Делегирование прав на родительской OU на них не распространяется" -Class Secure
 	                Show-Line "Других привилегированных учётных записей не найдено, поэтому OU и контейнеры не анализировались" -Class Note
 	            } else {
 	                Show-Line "OU с привилегированными пользователями для анализа не найдены" -Class Note
@@ -75083,7 +75083,7 @@ function Get-PasswordResetRights {
 	        $readOUs = $totalOUs - @($unreadOUs).Count
 	        $readScope = Format-OUContainerCount -DistinguishedName @(@($privilegedOUs.Keys) | Where-Object { $unreadOUs -notcontains $_ })
 	        if ($protectedTargets -gt 0) {
-	            Show-Line "$protectedTargets privileged account(s) have inheritance disabled - a delegation on their OU does not reach them" -Class Secure
+	            Show-Line "У привилегированных учётных записей отключено наследование разрешений: $protectedTargets. Делегирование прав на родительской OU на них не распространяется" -Class Secure
 	        }
 	        $coverageIncomplete = Show-OUPermissionsCoverageNote -UnreadOUs $unreadOUs -TotalOUs $totalOUs
 	        $conclusionClass = 'Secure'
@@ -77350,7 +77350,7 @@ function Get-NonDefaultComputerOwners {
 	        }
 	        Show-SubHeader "Поиск компьютерных объектов с нестандартными владельцами или явными разрешениями..." -ObjectType "NonDefaultComputerOwner"
 	        if ($OPSEC) {
-	            Show-Line "OPSEC mode: Skipping computer owner enumeration (would check all computers)" -Class "Hint"
+	            Show-Line "Режим OPSEC: проверка владельцев объектов компьютеров пропущена (требуется перечисление компьютеров)" -Class "Hint"
 	            return
 	        }
 	        $computersWithOwner = @(Get-DomainComputer -ShowOwner -Properties $FilterProperties @connectionParams |
@@ -79135,7 +79135,7 @@ function Get-GPOLocalGroupMembership {
 	                    Show-Line "Назначения членства в локальных группах через GPO: $(@($shown).Count)" -Class $headlineClass
 	                }
 	            } else {
-	                Show-Line "No local group assignment is made by a policy that is linked and enabled" -Class Note
+	                Show-Line "Активные привязанные GPO не назначают участников локальных групп" -Class Note
 	            }
 	            foreach ($finding in $shown) {
 	                $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'GPOLocalGroup' -Force
@@ -79153,7 +79153,7 @@ function Get-GPOLocalGroupMembership {
 	        } else {
 	            $groupClass = 'Secure'
 	            if (Show-SYSVOLCoverageNote -FileFilter @('GptTmpl.inf', 'Groups.xml')) { $groupClass = 'Note' }
-	            Show-Line "No vulnerable GPO local group assignments found in $(@($gpos).Count) analyzed GPO(s)" -Class $groupClass
+	            Show-Line "Небезопасных назначений в локальные группы через GPO не обнаружено; проанализировано политик: $(@($gpos).Count)" -Class $groupClass
 	        }
 	    } catch {
 	        Show-Line "Error during check - GPO local group assignments could not be evaluated: $_" -Class Finding
@@ -79676,7 +79676,7 @@ function Get-GPOScheduledTasks {
 	            if (@($shown).Count -gt 0) {
 	                Show-Line "Обнаружено задач планировщика, распространяемых через GPO: $(@($shown).Count)" -Class $headerClass
 	            } else {
-	                Show-Line "No scheduled task is distributed by a policy that is linked and enabled" -Class Note
+	                Show-Line "Активные привязанные GPO не распространяют запланированные задания" -Class Note
 	            }
 	            foreach ($task in $shown) {
 	                $taskClass = if (@($split.Inactive) -contains $task) {
@@ -79697,7 +79697,7 @@ function Get-GPOScheduledTasks {
 	            }
 	        } else {
 	            $null = Show-SYSVOLCoverageNote -FileFilter @('ScheduledTasks.xml')
-	            Show-Line "No scheduled tasks distributed via GPO in $($gpos.Count) analyzed GPO(s)" -Class Note
+	            Show-Line "Задачи, распространяемые через GPO, не обнаружены; проанализировано политик: $($gpos.Count)" -Class Note
 	        }
 	    } catch {
 	        Show-Line "Error during check - scheduled tasks deployed via GPO could not be evaluated: $_" -Class Finding
@@ -80151,7 +80151,7 @@ function Get-GPOScriptPaths {
 	            if (@($shown).Count -gt 0) {
 	                Show-Line "Обнаружено сценариев, распространяемых через GPO: $(@($shown).Count)" -Class Hint
 	            } else {
-	                Show-Line "No script is distributed by a policy that is linked and enabled" -Class Note
+	                Show-Line "Активные привязанные GPO не распространяют сценарии" -Class Note
 	            }
 	            foreach ($finding in $shown) {
 	                $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'GPOScriptPath' -Force
@@ -80164,7 +80164,7 @@ function Get-GPOScriptPaths {
 	            }
 	        } else {
 	            $null = Show-SYSVOLCoverageNote -FileFilter @('scripts.ini', 'psscripts.ini')
-	            Show-Line "No scripts distributed via GPO" -Class Note
+	            Show-Line "Сценарии, распространяемые через GPO, не обнаружены" -Class Note
 	        }
 	    } catch {
 	        Show-Line "Error during check - scripts deployed via GPO could not be evaluated: $_" -Class Finding
@@ -80473,8 +80473,8 @@ function Get-GPORegistrySettings {
 	        if ($unjudgedShown.Count -gt 0) {
 	            $unjudgedPolicies = @($unjudgedShown | ForEach-Object { ([string]$_.GPOGUID).ToUpper() } | Sort-Object -Unique).Count
 	            $policyWord = if ($unjudgedPolicies -eq 1) { 'policy' } else { 'policies' }
-	            $unjudgedText = "$($unjudgedShown.Count) further registry value(s) from $unjudgedPolicies $policyWord are not on the list of this check - not judged"
-	            if (-not $IncludeUnknown -and $null -eq $Script:adPEAS_CurrentCheckContext) { $unjudgedText += ' (-IncludeUnknown to list)' }
+	            $unjudgedText = "Дополнительные значения реестра вне перечня этой проверки: $($unjudgedShown.Count); объектов GPO: $unjudgedPolicies. Оценка безопасности для них не выполнялась"
+	            if (-not $IncludeUnknown -and $null -eq $Script:adPEAS_CurrentCheckContext) { $unjudgedText += ' (для просмотра используйте -IncludeUnknown)' }
 	            Show-Line $unjudgedText -Class Note
 	        }
 	        $findings = @(Resolve-RegistryFindings -RawMatches $rawMatches)
@@ -80497,7 +80497,7 @@ function Get-GPORegistrySettings {
 	            if (@($shown).Count -gt 0) {
 	                Show-Line "Обнаружено опасных параметров реестра, применяемых через GPO: $(@($shown).Count)" -Class $headerClass
 	            } else {
-	                Show-Line "No known vulnerable registry setting is deployed by a policy that is linked and enabled" -Class Note
+	                Show-Line "Активные привязанные GPO не развёртывают известных небезопасных настроек реестра" -Class Note
 	            }
 	            foreach ($finding in $shown) {
 	                $linkedOUs = $null
@@ -80533,7 +80533,7 @@ function Get-GPORegistrySettings {
 	            }
 	        } else {
 	            $null = Show-SYSVOLCoverageNote -FileFilter @('Registry.pol', 'Registry.xml', 'GptTmpl.inf')
-	            Show-Line "No known vulnerable registry setting is deployed via GPO" -Class Note
+	            Show-Line "Известных небезопасных настроек реестра, развёрнутых через GPO, не обнаружено" -Class Note
 	        }
 	        if ($IncludeUnknown -and $unjudgedShown.Count -gt 0) {
 	            $unjudgedGroups = @($unjudgedShown | Group-Object -Property { "$(([string]$_.GPOGUID).ToUpper())|$($_.SourceFile)" } |
@@ -81624,7 +81624,7 @@ function Get-ADCSVulnerabilities {
 	                    Show-Object $rootCAObj -Class Note
 	                }
 	            } else {
-	                Show-Line "No trusted Root CAs found in AD configuration" -Class Note
+	                Show-Line "В конфигурации AD не обнаружены доверенные корневые центры сертификации (CA)" -Class Note
 	            }
 	        }
 	        catch {
@@ -82752,10 +82752,10 @@ function Get-WeakCertificateMapping {
 	        }
 	    }
 	    elseif (@($candidates).Count -gt 0) {
-	        Show-Line "All $(@($candidates).Count) explicit certificate mapping(s) use a strong format" -Class Secure
+	        Show-Line "Все явные сопоставления сертификатов используют надёжный формат; проверено: $(@($candidates).Count)" -Class Secure
 	    }
 	    else {
-	        Show-Line "No principal uses an explicit certificate mapping" -Class Secure
+	        Show-Line "Учётных записей с явно заданным сопоставлением сертификатов не обнаружено" -Class Secure
 	    }
 	    Show-SubHeader "Проверка прав изменения altSecurityIdentities у привилегированных записей..." -ObjectType "WeakCertificateMapping"
 	    $writableFindings = @()
@@ -82891,7 +82891,7 @@ function Get-WeakCertificateMapping {
 	        }
 	    }
 	    if (@($writableFindings).Count -eq 0 -and -not $writeAnalysisFailed) {
-	        Show-Line "No non-privileged principal can write altSecurityIdentities on a privileged account" -Class Secure
+	        Show-Line "Непривилегированных субъектов с правом изменять altSecurityIdentities привилегированной учётной записи не обнаружено" -Class Secure
 	    }
 	}
 }
@@ -91099,7 +91099,7 @@ function Get-HTMLTemplate {
             });
         });
         // Russian presentation-only text transformation: no mutation of audit data.
-        const ruReportDisplay = {"schema":"adPEAS-RU.ReportDisplay.1","locale":"ru-RU","exact":{"Privileged groups outside AdminSDHolder\u0027s protection:":"Привилегированные группы, не защищённые AdminSDHolder:","WriteProperty on member - may add a member to every protected group":"WriteProperty на member — позволяет добавлять участников во все защищённые группы","Self on member - may add itself to every protected group":"Self на member — позволяет добавлять себя во все защищённые группы","All extended rights - may reset the password of every protected account":"Все расширенные права — позволяют сбрасывать пароли всех защищённых учётных записей","Password reset right - may reset the password of every protected account":"Право сброса пароля — позволяет сбрасывать пароли всех защищённых учётных записей","WriteProperty on msDS-KeyCredentialLink - may add a key credential to every protected account and log on as it":"WriteProperty на msDS-KeyCredentialLink — позволяет добавлять ключи аутентификации защищённым записям и входить от их имени","WriteProperty on servicePrincipalName - may give every protected account an SPN and roast its password":"WriteProperty на servicePrincipalName — позволяет назначать SPN защищённым записям и создавать риск Kerberoasting","WriteProperty on altSecurityIdentities - may map a certificate onto every protected account":"WriteProperty на altSecurityIdentities — позволяет сопоставлять сертификат с защищённой учётной записью","WriteProperty on userAccountControl - may turn off pre-authentication or the password requirement on every protected account":"WriteProperty на userAccountControl — позволяет отключать предварительную проверку Kerberos или требование пароля","WriteProperty on member - may add a member to the group":"WriteProperty на member — позволяет изменять состав группы","Self on member - may add itself to the group":"Self на member — позволяет добавить собственную учётную запись в группу","Owner of the group - may rewrite its DACL":"Владелец группы — может изменять её DACL","All extended rights - may reset the password of the account":"Все расширенные права — позволяют сбросить пароль учётной записи","WriteProperty on member - may add itself to the group":"WriteProperty на member — позволяет добавить себя в группу","WriteDacl on group - may rewrite membership permissions":"WriteDacl группы — позволяет изменять разрешения на членство","GenericAll (Full Control)":"GenericAll (полный доступ)","GenericWrite (Write Properties)":"GenericWrite (изменение свойств)","WriteDacl (Modify Permissions)":"WriteDacl (изменение разрешений)","WriteOwner (Take Ownership)":"WriteOwner (смена владельца)","CreateChild (Create Objects)":"CreateChild (создание объектов)","DeleteChild (Delete Objects)":"DeleteChild (удаление объектов)","DeleteTree (Delete Subtree)":"DeleteTree (удаление поддерева)","Self (Validated Write)":"Self (проверяемая запись)","All Extended Rights":"Все расширенные права","Owner of the OU":"Владелец OU","Owner of the domain object":"Владелец объекта домена","Read / Write":"Чтение / запись","SYSVOL not accessible":"SYSVOL недоступен","No readable share found":"Общие ресурсы, доступные для чтения, не обнаружены","No members found in privileged groups":"Участники привилегированных групп не обнаружены","No dangerous members in Pre-Windows 2000 Compatible Access group":"В группе Pre-Windows 2000 Compatible Access опасных участников не обнаружено","Found 0 accounts with DCSync rights":"Субъекты с правами DCSync не обнаружены","SYSVOL is not accessible - GPO user rights could not be evaluated":"SYSVOL недоступен: не удалось проверить права пользователей из GPO","Only the site servers and the expected administrators can write to the System Management container":"Запись в контейнер System Management разрешена только серверам сайта и утверждённым администраторам","System Management container not found - sites, management points and its permissions were not read":"Контейнер System Management не найден; сайты, точки управления и права доступа не проверены","No hybrid configuration found - this organization appears to be purely on-premises":"Гибридная конфигурация не найдена: организация, вероятно, использует только локальную инфраструктуру Exchange","SCOM infrastructure detected":"Обнаружена инфраструктура SCOM","SCCM/MECM infrastructure detected":"Обнаружена инфраструктура SCCM/MECM","PXE/WDS servers detected":"Обнаружены серверы PXE/WDS","Who can add computers to the domain:":"Субъекты, которым разрешено добавлять компьютеры в домен:","Privileged accounts read:":"Прочитанные привилегированные учётные записи:","Password Never Expires":"Срок действия пароля не ограничен","Trust account":"Учётная запись доверия","Security configuration is properly set":"Проверяемая конфигурация соответствует требованиям безопасности","Error during check":"Ошибка выполнения проверки"},"regex":[["^Found (\\d+) GPO\\(s\\) with dangerous permissions, a writable SYSVOL folder or a non-default owner(?: \\((.*)\\))?$","Обнаружено GPO с опасными разрешениями, доступной для записи папкой SYSVOL или нестандартным владельцем: $1 ($2)"],["^Privileged groups outside AdminSDHolder\u0027s protection:$","Привилегированные группы вне защиты AdminSDHolder:"],["^Account Operators \\((no members|\\d+ member\\(s\\))\\) control (all \\d+|\\d+ of them) - the default of every new group$","Группа Account Operators ($1) по умолчанию управляет $2 незащищёнными группами"],["^Account Operators \\((no members|\\d+ member\\(s\\))\\) control (all \\d+|\\d+ of them) - the default of every new user$","Группа Account Operators ($1) по умолчанию управляет $2 незащищёнными учётными записями"],["^Account Operators \\(no members\\) control all (\\d+) - the default of every new group$","Группа Account Operators (нет участников) по умолчанию имеет права управления для всех $1 незащищённых групп"],["^Found (\\d+) principal\\(s\\) that can take over a privileged group AdminSDHolder does not protect$","Субъекты, способные получить контроль над привилегированными группами вне защиты AdminSDHolder: $1"],["^Found (\\d+) principal\\(s\\) that can take over an operator-level group AdminSDHolder does not protect$","Субъекты, способные получить контроль над операторскими группами вне защиты AdminSDHolder: $1"],["^Found (\\d+) non-Tier-0 principal\\(s\\) with control over an object the forest or the domain runs on$","Субъекты вне Tier 0 с управлением критическими объектами домена или леса: $1"],["^Found (\\d+) non-privileged account\\(s\\) with LAPS read access$","Непривилегированные записи с доступом на чтение LAPS: $1"],["^Found (\\d+) privileged account\\(s\\) with LAPS read access \\(expected\\)$","Привилегированные записи со штатным доступом на чтение LAPS: $1"],["^Found (\\d+) Exchange service group\\(s\\) with LAPS read access \\(by-design, cannot be removed\\)$","Служебные группы Exchange со штатным доступом на чтение LAPS: $1 (проверьте зависимости перед изменением)"],["^Found (\\d+) member\\(s\\) in (.+):$","Участники группы $2: $1"],["^Found (\\d+) SCOM management server\\(s\\)$","Обнаружено серверов управления SCOM: $1"],["^Found (\\d+) privileged group\\(s\\):$","Обнаружено привилегированных групп: $1"],["^Found (\\d+) Fine-Grained Password Polic(?:y|ies):$","Обнаружено детализированных политик паролей (FGPP): $1"],["^Found (\\d+) (?:GPO\\(s\\)|policies) with (.+)$","Обнаружено групповых политик: $1. Признак: $2"],["^No dangerous OU permissions detected in the (.+) analyzed$","В проверенной области $1 опасных разрешений OU не обнаружено"],["^No dangerous password reset rights detected in the (.+) analyzed$","В проверенной области $1 опасных прав сброса пароля не обнаружено"],["^No non-privileged accounts with LAPS read access found in the (.+) analyzed$","В проверенной области $1 нет непривилегированных субъектов с доступом на чтение LAPS"],["^([0-9]+) of them by ownership alone$","Только из-за нестандартного владельца: $1"],["^([0-9]+) with a writable policy folder$","С правами записи в папку GPO: $1"],["^Found ([0-9]+) of ([0-9]+) receive connector\\(s\\) granting SMTP rights to unauthenticated senders$","SMTP-соединители с разрешениями для неаутентифицированных отправителей: $1 из $2"],["^No dangerous permissions, no non-default owner and no unexpected SYSVOL write access on (\\d+) of (\\d+) GPO\\(s\\)$","У $1 из $2 групповых политик не обнаружены опасные разрешения, нестандартные владельцы или неожиданные права записи в SYSVOL"],["^No principal outside Tier-0 controls the schema, the configuration, the partitions, a role object or a site$","Субъекты вне Tier 0 не управляют схемой, конфигурацией, разделами, объектами ролей или сайтами"],["^Account Operators \\(no members\\) control (.*) - the default of every new user$","Группа Account Operators (нет участников) по умолчанию имеет права управления для $1 незащищённых учётных записей"],["^Tier-0 Account: (.*)$","Учётная запись Tier 0: $1"],["^GPO Local Group: (.*)$","Локальная группа в GPO: $1"],["^Scheduled Task: (.*)$","Запланированная задача: $1"],["^Fine-Grained Policy: (.*)$","Детализированная политика паролей: $1"],["^Add Computer Right: (.*)$","Право добавления компьютеров в домен: $1"],["^Trust: (.*)$","Доверительное отношение: $1"],["^Object: (.*)$","Объект: $1"]]};
+        const ruReportDisplay = {"schema":"adPEAS-RU.ReportDisplay.1","locale":"ru-RU","exact":{"Privileged groups outside AdminSDHolder\u0027s protection:":"Привилегированные группы, не защищённые AdminSDHolder:","WriteProperty on member - may add a member to every protected group":"WriteProperty на member — позволяет добавлять участников во все защищённые группы","Self on member - may add itself to every protected group":"Self на member — позволяет добавлять себя во все защищённые группы","All extended rights - may reset the password of every protected account":"Все расширенные права — позволяют сбрасывать пароли всех защищённых учётных записей","Password reset right - may reset the password of every protected account":"Право сброса пароля — позволяет сбрасывать пароли всех защищённых учётных записей","WriteProperty on msDS-KeyCredentialLink - may add a key credential to every protected account and log on as it":"WriteProperty на msDS-KeyCredentialLink — позволяет добавлять ключи аутентификации защищённым записям и входить от их имени","WriteProperty on servicePrincipalName - may give every protected account an SPN and roast its password":"WriteProperty на servicePrincipalName — позволяет назначать SPN защищённым записям и создавать риск Kerberoasting","WriteProperty on altSecurityIdentities - may map a certificate onto every protected account":"WriteProperty на altSecurityIdentities — позволяет сопоставлять сертификат с защищённой учётной записью","WriteProperty on userAccountControl - may turn off pre-authentication or the password requirement on every protected account":"WriteProperty на userAccountControl — позволяет отключать предварительную проверку Kerberos или требование пароля","WriteProperty on member - may add a member to the group":"WriteProperty на member — позволяет изменять состав группы","Self on member - may add itself to the group":"Self на member — позволяет добавить собственную учётную запись в группу","Owner of the group - may rewrite its DACL":"Владелец группы — может изменять её DACL","All extended rights - may reset the password of the account":"Все расширенные права — позволяют сбросить пароль учётной записи","WriteProperty on member - may add itself to the group":"WriteProperty на member — позволяет добавить себя в группу","WriteDacl on group - may rewrite membership permissions":"WriteDacl группы — позволяет изменять разрешения на членство","GenericAll (Full Control)":"GenericAll (полный доступ)","GenericWrite (Write Properties)":"GenericWrite (изменение свойств)","WriteDacl (Modify Permissions)":"WriteDacl (изменение разрешений)","WriteOwner (Take Ownership)":"WriteOwner (смена владельца)","CreateChild (Create Objects)":"CreateChild (создание объектов)","DeleteChild (Delete Objects)":"DeleteChild (удаление объектов)","DeleteTree (Delete Subtree)":"DeleteTree (удаление поддерева)","Self (Validated Write)":"Self (проверяемая запись)","All Extended Rights":"Все расширенные права","Owner of the OU":"Владелец OU","Owner of the domain object":"Владелец объекта домена","Read / Write":"Чтение / запись","SYSVOL not accessible":"SYSVOL недоступен","No readable share found":"Общие ресурсы, доступные для чтения, не обнаружены","No members found in privileged groups":"Участники привилегированных групп не обнаружены","No dangerous members in Pre-Windows 2000 Compatible Access group":"В группе Pre-Windows 2000 Compatible Access опасных участников не обнаружено","Found 0 accounts with DCSync rights":"Субъекты с правами DCSync не обнаружены","SYSVOL is not accessible - GPO user rights could not be evaluated":"SYSVOL недоступен: не удалось проверить права пользователей из GPO","Only the site servers and the expected administrators can write to the System Management container":"Запись в контейнер System Management разрешена только серверам сайта и утверждённым администраторам","System Management container not found - sites, management points and its permissions were not read":"Контейнер System Management не найден; сайты, точки управления и права доступа не проверены","No hybrid configuration found - this organization appears to be purely on-premises":"Гибридная конфигурация не найдена: организация, вероятно, использует только локальную инфраструктуру Exchange","SCOM infrastructure detected":"Обнаружена инфраструктура SCOM","SCCM/MECM infrastructure detected":"Обнаружена инфраструктура SCCM/MECM","PXE/WDS servers detected":"Обнаружены серверы PXE/WDS","Who can add computers to the domain:":"Субъекты, которым разрешено добавлять компьютеры в домен:","Privileged accounts read:":"Прочитанные привилегированные учётные записи:","Password Never Expires":"Срок действия пароля не ограничен","Trust account":"Учётная запись доверия","Security configuration is properly set":"Проверяемая конфигурация соответствует требованиям безопасности","Error during check":"Ошибка выполнения проверки","No scripts distributed via GPO":"Сценарии, распространяемые через GPO, не обнаружены","No gMSA accounts found in domain":"Учётные записи gMSA в домене не обнаружены","No standalone MSAs found":"Автономные управляемые учётные записи служб (sMSA) не обнаружены","No external domain trusts found (isolated domain)":"Внешние доверительные отношения домена не обнаружены (изолированный домен)","No trusted Root CAs found in AD configuration":"В конфигурации AD не обнаружены доверенные корневые центры сертификации (CA)","No principal uses an explicit certificate mapping":"Учётных записей с явно заданным сопоставлением сертификатов не обнаружено","No non-privileged principal can write altSecurityIdentities on a privileged account":"Непривилегированных субъектов с правом изменения altSecurityIdentities привилегированной учётной записи не обнаружено","No scheduled tasks distributed via GPO":"Задачи, распространяемые через GPO, не обнаружены"},"regex":[["^Found (\\d+) GPO\\(s\\) with dangerous permissions, a writable SYSVOL folder or a non-default owner(?: \\((.*)\\))?$","Обнаружено GPO с опасными разрешениями, доступной для записи папкой SYSVOL или нестандартным владельцем: $1 ($2)"],["^Privileged groups outside AdminSDHolder\u0027s protection:$","Привилегированные группы вне защиты AdminSDHolder:"],["^Account Operators \\((no members|\\d+ member\\(s\\))\\) control (all \\d+|\\d+ of them) - the default of every new group$","Группа Account Operators ($1) по умолчанию управляет $2 незащищёнными группами"],["^Account Operators \\((no members|\\d+ member\\(s\\))\\) control (all \\d+|\\d+ of them) - the default of every new user$","Группа Account Operators ($1) по умолчанию управляет $2 незащищёнными учётными записями"],["^Account Operators \\(no members\\) control all (\\d+) - the default of every new group$","Группа Account Operators (нет участников) по умолчанию имеет права управления для всех $1 незащищённых групп"],["^Found (\\d+) principal\\(s\\) that can take over a privileged group AdminSDHolder does not protect$","Субъекты, способные получить контроль над привилегированными группами вне защиты AdminSDHolder: $1"],["^Found (\\d+) principal\\(s\\) that can take over an operator-level group AdminSDHolder does not protect$","Субъекты, способные получить контроль над операторскими группами вне защиты AdminSDHolder: $1"],["^Found (\\d+) non-Tier-0 principal\\(s\\) with control over an object the forest or the domain runs on$","Субъекты вне Tier 0 с управлением критическими объектами домена или леса: $1"],["^Found (\\d+) non-privileged account\\(s\\) with LAPS read access$","Непривилегированные записи с доступом на чтение LAPS: $1"],["^Found (\\d+) privileged account\\(s\\) with LAPS read access \\(expected\\)$","Привилегированные записи со штатным доступом на чтение LAPS: $1"],["^Found (\\d+) Exchange service group\\(s\\) with LAPS read access \\(by-design, cannot be removed\\)$","Служебные группы Exchange со штатным доступом на чтение LAPS: $1 (проверьте зависимости перед изменением)"],["^Found (\\d+) member\\(s\\) in (.+):$","Участники группы $2: $1"],["^Found (\\d+) SCOM management server\\(s\\)$","Обнаружено серверов управления SCOM: $1"],["^Found (\\d+) privileged group\\(s\\):$","Обнаружено привилегированных групп: $1"],["^Found (\\d+) Fine-Grained Password Polic(?:y|ies):$","Обнаружено детализированных политик паролей (FGPP): $1"],["^Found (\\d+) (?:GPO\\(s\\)|policies) with (.+)$","Обнаружено групповых политик: $1. Признак: $2"],["^No dangerous OU permissions detected in the (.+) analyzed$","В проверенной области $1 опасных разрешений OU не обнаружено"],["^No dangerous password reset rights detected in the (.+) analyzed$","В проверенной области $1 опасных прав сброса пароля не обнаружено"],["^No non-privileged accounts with LAPS read access found in the (.+) analyzed$","В проверенной области $1 нет непривилегированных субъектов с доступом на чтение LAPS"],["^([0-9]+) of them by ownership alone$","Только из-за нестандартного владельца: $1"],["^([0-9]+) with a writable policy folder$","С правами записи в папку GPO: $1"],["^Found ([0-9]+) of ([0-9]+) receive connector\\(s\\) granting SMTP rights to unauthenticated senders$","SMTP-соединители с разрешениями для неаутентифицированных отправителей: $1 из $2"],["^No dangerous permissions, no non-default owner and no unexpected SYSVOL write access on (\\d+) of (\\d+) GPO\\(s\\)$","У $1 из $2 групповых политик не обнаружены опасные разрешения, нестандартные владельцы или неожиданные права записи в SYSVOL"],["^No principal outside Tier-0 controls the schema, the configuration, the partitions, a role object or a site$","Субъекты вне Tier 0 не управляют схемой, конфигурацией, разделами, объектами ролей или сайтами"],["^Account Operators \\(no members\\) control (.*) - the default of every new user$","Группа Account Operators (нет участников) по умолчанию имеет права управления для $1 незащищённых учётных записей"],["^Tier-0 Account: (.*)$","Учётная запись Tier 0: $1"],["^GPO Local Group: (.*)$","Локальная группа в GPO: $1"],["^Scheduled Task: (.*)$","Запланированная задача: $1"],["^Fine-Grained Policy: (.*)$","Детализированная политика паролей: $1"],["^Add Computer Right: (.*)$","Право добавления компьютеров в домен: $1"],["^Trust: (.*)$","Доверительное отношение: $1"],["^Object: (.*)$","Объект: $1"],["^Found (\\d+) user\\(s\\) across (\\d+) privileged group\\(s\\):$","Обнаружено пользователей в привилегированных группах: $1; проверено групп: $2"],["^Found (\\d+) unprotected Tier-0 account\\(s\\) \\((\\d+) of (\\d+) in Protected Users, (\\d+)%\\):$","Учётных записей Tier 0 вне Protected Users: $1; защищено: $2 из $3 ($4%):"],["^(\\d+) further enabled computer account\\(s\\) carry the \u0027Password Not Required\u0027 flag$","Дополнительно обнаружены включённые учётные записи компьютеров с флагом PASSWD_NOTREQD: $1"],["^(\\d+) further privileged account\\(s\\) carry the flag with a password newer than (\\d+) days:$","Привилегированных записей с бессрочным паролем, изменённым менее $2 дней назад: $1"],["^(\\d+) privileged account\\(s\\) have inheritance disabled - a delegation on their OU does not reach them$","Привилегированных записей с отключённым наследованием прав: $1. Делегирование с родительской OU на них не распространяется"],["^OPSEC mode: Skipping user owner enumeration \\(would check all enabled users\\)$","Режим OPSEC: пропущена проверка владельцев учётных записей пользователей"],["^OPSEC mode: Skipping the logon scripts of accounts \\(reading their permissions takes an SMB connection to NETLOGON\\)$","Режим OPSEC: пропущена проверка сценариев входа (требуется SMB-подключение к NETLOGON)"],["^No scheduled tasks distributed via GPO in (\\d+) analyzed GPO\\(s\\)$","Задачи, распространяемые через GPO, не обнаружены; проанализировано политик: $1"],["^No vulnerable GPO local group assignments found in (\\d+) analyzed GPO\\(s\\)$","Небезопасных назначений в локальные группы через GPO не обнаружено; проверено политик: $1"],["^No read-only Domain Controller in this domain - there is no password replication policy to check$","Контроллеры домена только для чтения (RODC) не обнаружены; проверка политики репликации паролей не требуется"],["^Found (disabled|enabled) Guest account$","Обнаружена учётная запись Guest: $1"],["^Domain:\\s*(.+)$","Домен: $1"],["^(\\d+) further registry value\\(s\\) from (\\d+) policies are not on the list of this check - not judged$","Дополнительных значений реестра вне перечня проверки: $1; политик GPO: $2. Оценка не выполнялась"],["^(\\d+) further registry value\\(s\\) from (\\d+) policy are not on the list of this check - not judged$","Дополнительных значений реестра вне перечня проверки: $1; политик GPO: $2. Оценка не выполнялась"],["^(\\d+) OU\\(s\\) and (\\d+) container\\(s\\)$","$1 OU и $2 контейнеров"],["^(\\d+) OU\\(s\\)$","$1 OU"],["^(\\d+) container\\(s\\)$","$1 контейнеров"]]};
         const ruDisplayPatterns = ruReportDisplay.regex.map(function(entry) {
             return [new RegExp(entry[0], 'u'), entry[1]];
         });
@@ -97632,7 +97632,7 @@ function Collect-BHIssuancePolicies {
 	}
 	return $bhPolicies
 }
-$Script:adPEASVersion = "2.9.0+20261111-1151"
+$Script:adPEASVersion = "2.9.0+20261111-1228"
 if ($MyInvocation.MyCommand.Path) {
 	$Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {

@@ -203,7 +203,7 @@
                     Show-Object $account -Class Finding
                 }
             } else {
-                Show-Line "No inactive privileged accounts found" -Class Secure
+                Show-Line "Неактивных привилегированных учётных записей не обнаружено" -Class Secure
             }
 
         } catch {

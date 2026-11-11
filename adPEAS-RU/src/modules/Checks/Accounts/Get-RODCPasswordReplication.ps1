@@ -68,7 +68,7 @@
             $rodcs = @(Get-DomainComputer -DomainController @PSBoundParameters | Test-AccountActivity -IsEnabled |
                 Where-Object { @($_.userAccountControl) -contains 'PARTIAL_SECRETS_ACCOUNT' })
             if ($rodcs.Count -eq 0) {
-                Show-Line "No read-only Domain Controller in this domain - there is no password replication policy to check" -Class Note
+                Show-Line "Контроллеры домена только для чтения (RODC) не обнаружены; политику репликации паролей проверять не требуется" -Class Note
                 return
             }
 

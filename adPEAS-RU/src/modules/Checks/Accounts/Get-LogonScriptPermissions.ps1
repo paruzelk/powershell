@@ -81,7 +81,7 @@
             Show-SubHeader "Проверка прав изменения сценариев входа пользователей..." -ObjectType "LogonScriptPermission"
 
             if ($OPSEC) {
-                Show-Line "OPSEC mode: Skipping the logon scripts of accounts (reading their permissions takes an SMB connection to NETLOGON)" -Class "Hint"
+                Show-Line "Режим OPSEC: проверка сценариев входа пропущена (для чтения разрешений требуется SMB-подключение к NETLOGON)" -Class "Hint"
                 return
             }
 
