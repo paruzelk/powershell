@@ -2,6 +2,9 @@
 
 ## ARCH2a runtime enforcement (2026-11-11)
 
+**Next phase ARCH2b** must integrate full pre/post semantic verification (including attachment byte SHA256) into the *main* Archive/Resume path before any DEV writer gate can be reopened. Until then, `Move Indeterminate` can never be represented as a skippable mail item.
+
+
 [ARCH2a design/stop rules](2.6.5-arch2a-move-outcome-fence.md) block `Archive`, `Resume` and `Auto` in this DEV build while full Body/HTML/recipient/state/attachment-byte SHA proof is absent in the integrated main verifier. The main MailMover no longer labels COM `Move()` failure as safe skipped work: original attempt is journaled before COM and failed/ambiguous outcomes stop immediately. An incomplete original Move Started is NOT authorized for retry by visible source item or incidental PST state. **No universal MAPI-field waiver or production activation.**
 
 ## ARCH1 operational clarification (2026-11-11, binding on future development)
