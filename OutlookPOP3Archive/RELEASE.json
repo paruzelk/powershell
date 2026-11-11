@@ -12,6 +12,8 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH2a DEV: main legacy Move Started checkpoint and force-flush before Outlook COM, failed COM means Move Indeterminate and immediate STOP; no skip/retry.",
+    "ARCH2a DEV: full original step journal check before Resume, reject unresolved or truncated claims; Archive/Resume/Auto closed until ARCH2b integrates BW4k semantic/verifier into main runtime.",
     "ARCH1 persistent COM provider boundary ADR, handoff, delivery roadmap; stop new Size/FLAGS-only MAPI research.",
     "Read-only source audit exposes existing Archive CLI, legacy MoveFailed/continue and missing full semantic verifier integration; no production claim.",
     "Read-only 2.6.3 MailMove evidence classification with durable Intent fingerprint",
@@ -63,8 +65,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 123,
-    "ExpectedPesterTests": 3660,
+    "ExpectedTestContainers": 124,
+    "ExpectedPesterTests": 3709,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -625,6 +627,19 @@
     "ARCH1AnyOutlookMessageMovedByNewBuild": false,
     "ARCH1AnyOriginalEvidenceRewritten": false,
     "ARCH1CopyVerifyDeleteAlreadyProven": false,
-    "ARCH1ProductionWorkerEnabled": false
+    "ARCH1ProductionWorkerEnabled": false,
+    "ARCH2aActualLegacyMoverNoBlindComRetry": true,
+    "ARCH2aDurableMoveStartedCheckpointBeforeCom": true,
+    "ARCH2aForceFlushJournalBeforeMove": true,
+    "ARCH2aMoveIndeterminateStopsEntireBatch": true,
+    "ARCH2aUnresolvedFullJournalBlocksResume": true,
+    "ARCH2aTruncatedOriginalJournalBlocksResume": true,
+    "ARCH2aDevelopmentArchiveResumeAutoClosed": true,
+    "ARCH2aHistoricalOneShotClaimsImmutable": true,
+    "ARCH2aSemanticVerifierIntegrated": false,
+    "ARCH2aCopyVerifyDeleteProven": false,
+    "ARCH2aAnyActualOutlookMoveExecutedInCI": false,
+    "ARCH2aProductionWriterEnabled": false,
+    "ARCH2aSafeFor90GBProduction": false
   }
 }
