@@ -780,6 +780,7 @@ function Move-OPAItemsWithLimit {
         }
 
         $item = $null; $moved = $null; $moveCompleted = $false; $moveAttemptClaimed = $false
+        $semanticPreflightBlocked = $false
         try {
             try { $item = Get-OPAItemByEntryIdFromSourceFolder -Namespace $Namespace -SourceFolder $source -EntryId ([string]$candidate.EntryId) }
             catch {
@@ -839,11 +840,19 @@ function Move-OPAItemsWithLimit {
             else { $index = Import-OPADuplicateIndex -ArchivePst $dest.Path; $allIndexes[$dest.Path] = $index }
             if (Test-OPADuplicateEntry -Index $index -SourceEntryId ([string]$candidate.EntryId)) { continue }
 
+            # ARCH2b: persist the exact ALREADY-SAVED source message user
+            # content (including by-value attachment BYTE SHA256) before
+            # the one-shot COM call. An inability to capture is a hard stop.
+            # The captured witness is never rebaselined after the Move.
+            $semanticPreflightBlocked = $true
+            $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item
+            $semanticPreflightBlocked = $false
+
             # ARCH2a: claim before any possible Outlook provider mutation.
             # The checkpoint plus explicit Flush(true) are the last durability
             # boundary before calling COM. If any part fails, stop; never move.
             $moveAttemptClaimed = $true
-            Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Move Started' -Message ("Starting Move: {0}" -f [string]$candidate.Subject) -EntryId $candidate.EntryId -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -ReceivedTime $dt -WriteCheckpoint
+            Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Move Started' -Message ("Starting Move: {0}" -f [string]$candidate.Subject) -EntryId $candidate.EntryId -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -ReceivedTime $dt -SemanticWitness $sourceSemanticWitness -WriteCheckpoint
             Sync-OPAStepJournalStreams
 
             try {
@@ -930,6 +939,11 @@ function Move-OPAItemsWithLimit {
             # post-move durability must stop the batch and be recovered from
             # DuplicateIndex/the step journal; silently counting it as skipped
             # could allow a duplicate move on a later run.
+            if ($semanticPreflightBlocked) {
+                # If even one required content field or attachment cannot be
+                # hashed, stop the transaction before claiming or moving.
+                throw
+            }
             if ($moveCompleted -or $moveAttemptClaimed) {
                 # ARCH2a: do NOT fall into the old 'Unexpected / Skipped'
                 # handler once a Move attempt was claimed. A failed COM call
