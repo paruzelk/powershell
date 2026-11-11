@@ -240,7 +240,9 @@ Describe 'BW4k7v2a8 exact post-Move HASATTACH and size read-only attribution' {
         $script:controller | Should -Not -Match 'RawBody\s*='
     }
     It 'no source before-Move attachment count inferred from flags' {
-        $script:controller | Should -Match 'SourceRawMapiFlags'
+        $policy=Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../Core/Worker/BW4k7v2a8AttachmentAttributionPolicy265.ps1') -Raw -Encoding UTF8
+        $policy | Should -Match 'SourceRawMapiFlags'
+        $policy | Should -Match 'OriginalPreMoveAttachmentCountKnown=\$false'
         $script:controller | Should -Match 'AttachmentCountReadComplete'
     }
 }
