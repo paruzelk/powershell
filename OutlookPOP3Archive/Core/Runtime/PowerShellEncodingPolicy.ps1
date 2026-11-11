@@ -59,7 +59,7 @@ function Assert-OPAPowerShellEncodingPolicy {
     param(
         [Parameter(Mandatory=$true)][string]$ProjectRoot,
         [ValidateRange(0,10000)][int]$LegacyCount=81,
-        [string]$LegacySha256='ace042f4ab915f2c1bd274685ea0e041e1f94f05c82418bed5a893ae153967ca'
+        [string]$LegacySha256='1eb47d549a50d8386b6f2bd58d17445270461b5afe6fefe1eed0b1f2b6241678'
     )
     if ($LegacySha256 -cnotmatch '^[a-f0-9]{64}$') {
         throw 'Encoding policy: invalid trusted legacy snapshot digest.'
