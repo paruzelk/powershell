@@ -1,0 +1,48 @@
+{
+  "schema": "adPEAS-RU.StageA.HelpersBasic.1",
+  "files": {
+    "src/modules/Helpers/Ensure-LDAPConnection.ps1": {
+      "Show-Line \"Aborting scan - LDAP session is no longer valid. Re-authenticate with Connect-adPEAS.\"": "Show-Line \"Аудит прерван: LDAP-сеанс больше не действителен. Подключитесь повторно с помощью Connect-adPEAS.\""
+    },
+    "src/modules/Helpers/Get-adPEASSession.ps1": {
+      "Show-SubHeader \"Checking connection health...\"": "Show-SubHeader \"Проверка состояния подключения...\"",
+      "Show-Line \"Health:\"": "Show-Line \"Состояние:\"",
+      "Show-SubHeader \"Displaying active session information...\"": "Show-SubHeader \"Сведения об активном сеансе...\"",
+      "Show-Line \"Connection:\"": "Show-Line \"Подключение:\"",
+      "Show-Line \"Authentication:\"": "Show-Line \"Аутентификация:\"",
+      "Show-Line \"  Identity Mismatch: DETECTED\"": "Show-Line \"  Несовпадение личности: ОБНАРУЖЕНО\"",
+      "Show-Line \"Session:\"": "Show-Line \"Сеанс:\"",
+      "Show-Line \"Help:\"": "Show-Line \"Справка:\""
+    },
+    "src/modules/Helpers/Get-CertificateInfo.ps1": {
+      "Show-SubHeader \"Certificate Information\"": "Show-SubHeader \"Сведения о сертификате\"",
+      "Show-Line \"General:\"": "Show-Line \"Общие сведения:\"",
+      "Show-Line \"Validity:\"": "Show-Line \"Срок действия:\"",
+      "Show-Line \"Key Information:\"": "Show-Line \"Сведения о ключе:\"",
+      "Show-Line \"Extended Key Usage:\"": "Show-Line \"Расширенное использование ключа (EKU):\"",
+      "Show-Line \"Subject Alternative Name:\"": "Show-Line \"Альтернативное имя субъекта (SAN):\"",
+      "Show-Line \"Certificate Template:\"": "Show-Line \"Шаблон сертификата:\"",
+      "Show-Line \"PKINIT Assessment:\"": "Show-Line \"Оценка PKINIT:\"",
+      "Show-Line \"Identities:\"": "Show-Line \"Идентификаторы:\"",
+      "Show-Line \"Usage:\"": "Show-Line \"Назначение:\""
+    },
+    "src/modules/Helpers/Get-GPOEffectiveness.ps1": {
+      "Show-Line \"$Count of the findings below sit on a policy that is not linked or not enabled\"": "Show-Line \"$Count из приведённых ниже находок относятся к политике без действующей связи либо к отключённой политике\""
+    },
+    "src/modules/Helpers/Get-OUPermissions.ps1": {
+      "Show-Line \"The security descriptor of $($unread.Count) of $TotalOUs object(s) could not be read - the result below is incomplete\"": "Show-Line \"Не удалось прочитать дескриптор безопасности у $($unread.Count) из $TotalOUs объектов — приведённый ниже результат неполный\"",
+      "Show-Line \"  not read: $unreadDN\"": "Show-Line \"  не прочитано: $unreadDN\"",
+      "Show-Line \"  ... and $($unread.Count - 10) more\"": "Show-Line \"  ... и ещё $($unread.Count - 10)\""
+    },
+    "src/modules/Helpers/Invoke-SMBAccess.ps1": {
+      "Show-Line \"SYSVOL was not reachable - no file-based check below could run. This is not a clean result.\"": "Show-Line \"SYSVOL недоступен — перечисленные далее проверки файлов не выполнялись. Это НЕ подтверждение безопасности.\"",
+      "Show-Line \"$($coverage.SkippedCount) SYSVOL folder(s) could not be read - the result below is incomplete\"": "Show-Line \"Не удалось прочитать папок SYSVOL: $($coverage.SkippedCount); результат ниже неполный\"",
+      "Show-Line \"  not read: $path\"": "Show-Line \"  не прочитано: $path\"",
+      "Show-Line \"  ... and $($coverage.SkippedCount - 10) more\"": "Show-Line \"  ... и ещё $($coverage.SkippedCount - 10)\"",
+      "Show-Line \"$($fileGaps.Count) SYSVOL file(s) could not be read or parsed - the result below is incomplete\"": "Show-Line \"Не удалось прочитать или разобрать файлов SYSVOL: $($fileGaps.Count); приведённый ниже результат неполный\"",
+      "Show-Line \"  not evaluated: $($gap.Path) - $($gap.Reason)\"": "Show-Line \"  не проверено: $($gap.Path) — $($gap.Reason)\"",
+      "Show-Line \"  ... and $($fileGaps.Count - 10) more\"": "Show-Line \"  ... и ещё $($fileGaps.Count - 10)\"",
+      "Show-Line \"Skipping - SYSVOL not accessible\"": "Show-Line \"Пропуск: SYSVOL недоступен\""
+    }
+  }
+}
