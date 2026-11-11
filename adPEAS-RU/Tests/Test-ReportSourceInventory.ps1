@@ -63,7 +63,7 @@ if(-not (Test-Path (Join-Path $ProjectRoot 'src/modules/Reporting/templates/diff
  throw 'Шаблон сравнения отчётов отсутствует'
 }
 # Выявляем потенциальные остатки — предупреждаем, не выдаём их за переведённые.
-$items=New-Object 'System.Collections.Generic.List[Object]'
+$items=@()
 foreach($file in $files){
  $lineNum=0
  foreach($line in [IO.File]::ReadAllLines($file.FullName,[Text.Encoding]::UTF8)){
@@ -75,7 +75,7 @@ foreach($file in $files){
   $value=[string]$candidateMatch.Groups[2].Value
   if($value -match '^\s*\$'){continue}
   $shortPath=$file.FullName.Substring($ProjectRoot.Length).TrimStart([char]'\',[char]'/')
-  $items.Add([pscustomobject]@{File=$shortPath;Line=$lineNum;Text=$value}) | Out-Null
+  $items += [pscustomobject]@{File=$shortPath;Line=$lineNum;Text=$value}
  }
 }
 $result=[ordered]@{
