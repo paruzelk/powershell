@@ -1,3 +1,5 @@
+> **ARCH1 binding release gate (2026-11-11):** Before any new build, read [project handoff](PROJECT-HANDOFF-ARCH1.md), [ADR COM boundary](ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md) and [delivery roadmap](DELIVERY-ROADMAP.md). Release only if original historical evidence is preserved, no new Size/FLAGS-only research branch, and production not claimed ready without Archive/Verifier safety integration. ARCH1 is a source-only audit, **not** 90GB production approval. Internal version still `2.6.3-PREVIEW1` in this DEV line; a future RC must align release metadata and runtime.
+
 # OutlookPOP3Archive — mandatory build and release procedure
 
 Applies to every release and development ZIP from 2.6.2 onward. **Never package the whole `paruzelk/powershell` repository.** Only the `OutlookPOP3Archive` project may appear in the archive.
