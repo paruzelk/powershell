@@ -1,5 +1,7 @@
 # ADR-ARCH1 — Граница ответственности Outlook COM и прекращение бесконечных MAPI-исследований
 
+**ARCH2b — устранение второго интеграционного пробела (2026-11-11):** [runbook](2.6.5-arch2b-semantic-verifier.md). Основной `MailMover` сохраняет source Body/HTML/recipients/attachment SHA witness *до Move* в оригинальный durable журнал; `ArchiveVerifier` сверяет целевой MailItem, не требуя побайтового совпадения `MailItem.Size`. Никаких новых BW Size/FLAGS исследований, никаких SEM-001 waiver. Production и все DEV mutating modes ещё заблокированы — сначала isolated real Outlook acceptance (ARCH2c).
+
 **Новая реализация ARCH2a (2026-11-11):** [описание](2.6.5-arch2a-move-outcome-fence.md). Обнаруженный в ARCH1 старый обработчик `MoveFailed` / `continue` заменён остановкой по `Move Indeterminate` и полной проверкой исходного journal при Resume. Главный `Archive/Resume/Auto` **заблокирован**, пока нет полной semantic/attachment-byte проверки. Это **не** отменяет остановку MAPI-форензики и **не** доказывает готовность к 90GB.
 
 **Статус:** ПРИНЯТО для дальнейшей разработки OutlookPOP3Archive, 2026-11-11.  
