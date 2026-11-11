@@ -1,0 +1,39 @@
+{
+  "schema": "adPEAS-RU.StageB.Checks.01",
+  "locale": "ru-RU",
+  "files": {
+    "src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1": {
+      "Show-Line \"msDS-GroupMSAMembership of a dMSA is owned by a principal that is not privileged: $(@($ownedDMSAs) -join ', ')\"": "Show-Line \"Дескриптором msDS-GroupMSAMembership записи dMSA владеет непривилегированный субъект: $(@($ownedDMSAs) -join ', ')\"",
+      "Show-Line \"No principal may use $(@($unusedDMSAs).Count) dMSA(s), or msDS-GroupMSAMembership was not readable: $(@($unusedDMSAs) -join ', ')\"": "Show-Line \"У $(@($unusedDMSAs).Count) записей dMSA нет субъектов, которым разрешено использование, либо не удалось прочитать msDS-GroupMSAMembership: $(@($unusedDMSAs) -join ', ')\"",
+      "Show-Line \"msDS-GroupMSAMembership could not be parsed on $(@($unparsedDMSAs).Count) dMSA(s) - who may use them is unknown: $(@($unparsedDMSAs) -join ', ')\"": "Show-Line \"Не удалось разобрать msDS-GroupMSAMembership у $(@($unparsedDMSAs).Count) записей dMSA — неизвестно, кто может их использовать: $(@($unparsedDMSAs) -join ', ')\"",
+      "Show-Line \"dMSA use is restricted to privileged accounts and service hosts ($unanalyzedDMSAs of $($dmsaAccounts.Count) not analyzed)\"": "Show-Line \"Использовать dMSA разрешено только привилегированным записям и служебным узлам (не проверено $unanalyzedDMSAs из $($dmsaAccounts.Count))\""
+    },
+    "src/modules/Checks/ADCS/Get-WeakCertificateMapping.ps1": {
+      "Show-Line \"Found $countText\"": "Show-Line \"Обнаружено: $countText\""
+    },
+    "src/modules/Checks/Application/Get-ExchangeInfrastructure.ps1": {
+      "Show-Line \"$($serviceGroup.Name) group not found\"": "Show-Line \"Группа $($serviceGroup.Name) не найдена\"",
+      "Show-Line \"Found $(@($groupMembers).Count) member(s) in $($serviceGroup.Name):\"": "Show-Line \"Найдено участников: $(@($groupMembers).Count); группа: $($serviceGroup.Name)\""
+    },
+    "src/modules/Checks/Application/Get-ExchangeRBACAssignments.ps1": {
+      "Show-Line \"None of the high-value Exchange roles is assigned ($(@($roleAssignments).Count) role assignment(s) examined)\"": "Show-Line \"Ни одна критичная роль Exchange не назначена (проверено назначений ролей: $(@($roleAssignments).Count))\"",
+      "Show-Line \"The high-value Exchange roles are assigned only to the role groups Exchange ships them on\"": "Show-Line \"Критичные роли Exchange назначены только стандартным группам ролей Exchange\"",
+      "Show-Line \"Error during Exchange role assignment check: $_\"": "Show-Line \"Ошибка проверки назначений ролей Exchange: $_\""
+    },
+    "src/modules/Checks/Application/Get-SCCMInfrastructure.ps1": {
+      "Show-Line \"SCCM/MECM infrastructure detected\"": "Show-Line \"Обнаружена инфраструктура SCCM/MECM\"",
+      "Show-Line \"System Management container found at: $systemManagementPath\"": "Show-Line \"Контейнер System Management найден по пути: $systemManagementPath\"",
+      "Show-Line \"The System Management container does not exist - no site object could be read\"": "Show-Line \"Контейнер System Management отсутствует — объекты сайтов прочитать не удалось\"",
+      "Show-Line \"No mSSMSManagementPoint objects found in System Management container\"": "Show-Line \"Объекты mSSMSManagementPoint в контейнере System Management не обнаружены\"",
+      "Show-Line \"$($containerFindings.Count) principal(s) can write to the System Management container and are not a site server\"": "Show-Line \"Обнаружено субъектов с правом записи в System Management, не являющихся серверами сайта: $($containerFindings.Count)\"",
+      "Show-Line \"Only the site servers and the expected administrators can write to the System Management container\"": "Show-Line \"Запись в System Management разрешена только серверам сайтов и ожидаемым администраторам\"",
+      "Show-Line \"PXE/WDS servers detected\"": "Show-Line \"Обнаружены серверы PXE/WDS\"",
+      "Show-Line \"$broadGroupCount SCCM-related group(s) have a broad group as member\"": "Show-Line \"Групп, связанных с SCCM, в состав которых входит широкая группа: $broadGroupCount\""
+    },
+    "src/modules/Checks/Application/Get-SCOMInfrastructure.ps1": {
+      "Show-Line \"SCOM infrastructure detected\"": "Show-Line \"Обнаружена инфраструктура SCOM\"",
+      "Show-Line \"Found $(@($scomServers).Count) SCOM management server(s)\"": "Show-Line \"Найдено управляющих серверов SCOM: $(@($scomServers).Count)\"",
+      "Show-Line \"Error during check - the SCOM infrastructure could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить инфраструктуру SCOM: $_\""
+    }
+  }
+}
