@@ -9,10 +9,10 @@ Describe 'TZ-ENC-001: every new or modified PowerShell file must be UTF-8 with B
         $script:EncodingTestPath=Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
         [void][IO.Directory]::CreateDirectory($script:EncodingTestPath)
     }
-    It 'validates the exact pre-policy 82-file legacy snapshot for this project' {
+    It 'validates the exact reviewed 81-file legacy snapshot after ARCH2b verifier BOM migration' {
         $e=Assert-OPAPowerShellEncodingPolicy -ProjectRoot $script:ProjectRoot
-        $e.LegacyBomlessFiles | Should -Be 82
-        $e.LegacyBomlessSha256 | Should -BeExactly 'ace042f4ab915f2c1bd274685ea0e041e1f94f05c82418bed5a893ae153967ca'
+        $e.LegacyBomlessFiles | Should -Be 81
+        $e.LegacyBomlessSha256 | Should -BeExactly '1eb47d549a50d8386b6f2bd58d17445270461b5afe6fefe1eed0b1f2b6241678'
         $e.Utf8BomFiles | Should -BeGreaterThan 0
     }
     It 'accepts a new ASCII-only script with explicit UTF-8 BOM bytes' {
@@ -47,7 +47,7 @@ Describe 'TZ-ENC-001: every new or modified PowerShell file must be UTF-8 with B
     It 'documents mandatory signature EF BB BF and existing legacy migration' {
         $spec=Get-Content -LiteralPath (Join-Path $script:ProjectRoot 'docs/TECHNICAL_SPECIFICATION.md') -Encoding UTF8 -Raw
         $spec | Should -Match 'EF BB BF'
-        $spec | Should -Match '82'
+        $spec | Should -Match '81'
         $spec | Should -Match 'ТЗ-ENC-001'
     }
     It 'enforces editor UTF-8 BOM default for ps1, psm1 and psd1' {
