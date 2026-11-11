@@ -1,0 +1,28 @@
+{
+  "schema": "adPEAS-RU.StageA.HelpersOperations2.1",
+  "files": {
+    "src/modules/Helpers/Invoke-RBCDOperation.ps1": {
+      "Show-Line \"RBCD entry already exists for $DelegateName on: $TargetSAMAccountName\"": "Show-Line \"Запись RBCD для $DelegateName на $TargetSAMAccountName уже существует\"",
+      "Show-Line \"Successfully configured RBCD on target: $TargetSAMAccountName\"": "Show-Line \"RBCD успешно настроено на целевом объекте: $TargetSAMAccountName\"",
+      "Show-Line \"No RBCD configuration found on: $TargetSAMAccountName\"": "Show-Line \"Настройка RBCD не найдена на: $TargetSAMAccountName\"",
+      "Show-Line \"Existing RBCD principals:\"": "Show-Line \"Существующие субъекты RBCD:\"",
+      "Show-Line \"Successfully removed '$($PrincipalToRemove.Name)' from RBCD configuration on: $TargetSAMAccountName\"": "Show-Line \"Субъект '$($PrincipalToRemove.Name)' успешно удалён из RBCD на: $TargetSAMAccountName\"",
+      "Show-Line \"Successfully cleared RBCD configuration from: $TargetSAMAccountName\"": "Show-Line \"Настройка RBCD успешно очищена на: $TargetSAMAccountName\"",
+      "Show-Line \"Successfully cleared all $ACECount RBCD entries from: $TargetSAMAccountName\"": "Show-Line \"Удалены все записи RBCD ($ACECount) на: $TargetSAMAccountName\"",
+      "Show-Line \"To remove a specific principal, use: -Principal <name>\"": "Show-Line \"Для удаления отдельного субъекта используйте: -Principal <name>\"",
+      "Show-Line \"To remove ALL principals, use: -Force\"": "Show-Line \"Для удаления ВСЕХ субъектов используйте: -Force\""
+    },
+    "src/modules/Helpers/Invoke-ShadowCredentialOperation.ps1": {
+      "Show-Line \"Successfully added Shadow Credential to: $TargetSAMAccountName\"": "Show-Line \"Ключ Shadow Credentials успешно добавлен для: $TargetSAMAccountName\"",
+      "Show-Line \"Usage with Rubeus:\"": "Show-Line \"Использование через Rubeus:\"",
+      "Show-Line \"Usage with adPEAS Connect-adPEAS:\"": "Show-Line \"Использование через adPEAS Connect-adPEAS:\"",
+      "Show-Line \"No Shadow Credentials found on: $TargetSAMAccountName\"": "Show-Line \"Ключи Shadow Credentials не найдены у: $TargetSAMAccountName\"",
+      "Show-Line \"Existing Shadow Credentials:\"": "Show-Line \"Существующие ключи Shadow Credentials:\"",
+      "Show-Line \"Successfully removed Shadow Credential with DeviceID '$DeviceID' from: $TargetSAMAccountName\"": "Show-Line \"Ключ Shadow Credentials с DeviceID '$DeviceID' успешно удалён у: $TargetSAMAccountName\"",
+      "Show-Line \"Successfully cleared Shadow Credential from: $TargetSAMAccountName\"": "Show-Line \"Ключ Shadow Credentials успешно удалён у: $TargetSAMAccountName\"",
+      "Show-Line \"Successfully cleared all $CredentialCount Shadow Credentials from: $TargetSAMAccountName\"": "Show-Line \"Все ключи Shadow Credentials ($CredentialCount) удалены у: $TargetSAMAccountName\"",
+      "Show-Line \"To delete a specific credential, use: -DeviceID <GUID>\"": "Show-Line \"Для удаления отдельного ключа используйте: -DeviceID <GUID>\"",
+      "Show-Line \"To delete ALL credentials, use: -Force\"": "Show-Line \"Для удаления ВСЕХ ключей используйте: -Force\""
+    }
+  }
+}
