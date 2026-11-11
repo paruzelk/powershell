@@ -1,0 +1,34 @@
+{
+  "schema": "adPEAS-RU.StageA.ReportingCollector.1",
+  "source": "Pinned adPEAS RU 2.9.0 inventory",
+  "comment": "Only quoted display messages; all interpolations and suffixes preserved.",
+  "files": {
+    "src/modules/Collector/Invoke-adPEASCollector.ps1": {
+      "Show-SubHeader \"Collecting BloodHound CE data...\"": "Show-SubHeader \"Сбор данных BloodHound CE...\"",
+      "Show-Line \"Collected $totalObjects objects from $domainName`: $summaryString\"": "Show-Line \"Собрано объектов: $totalObjects; домен: $domainName`: $summaryString\"",
+      "Show-Line \"Output: $outputDir (JSON files)\"": "Show-Line \"Результат: $outputDir (файлы JSON)\"",
+      "Show-Line \"Output: $OutputPath\"": "Show-Line \"Результат: $OutputPath\""
+    },
+    "src/modules/Reporting/Compare-adPEASReport.ps1": {
+      "Show-Line \"Baseline: $(Split-Path -Leaf $Baseline) ($($baselineMeta.Date), $($baselineMeta.Domain), adPEAS $($baselineMeta.Version))\"": "Show-Line \"Исходный отчёт: $(Split-Path -Leaf $Baseline) ($($baselineMeta.Date), $($baselineMeta.Domain), adPEAS $($baselineMeta.Version))\"",
+      "Show-Line \"Current:  $(Split-Path -Leaf $Current) ($($currentMeta.Date), $($currentMeta.Domain), adPEAS $($currentMeta.Version))\"": "Show-Line \"Текущий отчёт: $(Split-Path -Leaf $Current) ($($currentMeta.Date), $($currentMeta.Domain), adPEAS $($currentMeta.Version))\"",
+      "Show-Line \"$displayName (was: $($f.Severity))\"": "Show-Line \"$displayName (было: $($f.Severity))\"",
+      "Show-Line \"The following categories were not scanned in both reports and are excluded from the comparison above.\"": "Show-Line \"Следующие категории проверялись не в обоих отчётах и исключены из приведённого выше сравнения.\"",
+      "Show-Line \"Only in current scan: $($onlyInCurrent -join ', ') ($($scopeOnlyCurrent.Count) finding(s) not compared)\"": "Show-Line \"Только в текущем аудите: $($onlyInCurrent -join ', ') (результатов вне сравнения: $($scopeOnlyCurrent.Count))\"",
+      "Show-Line \"Only in baseline scan: $($onlyInBaseline -join ', ') ($($scopeOnlyBaseline.Count) finding(s) not compared)\"": "Show-Line \"Только в исходном аудите: $($onlyInBaseline -join ', ') (результатов вне сравнения: $($scopeOnlyBaseline.Count))\"",
+      "Show-Line \"HTML diff report saved to: $htmlPath\"": "Show-Line \"HTML-отчёт об изменениях сохранён: $htmlPath\"",
+      "Show-Line \"Text diff report saved to: $textPath\"": "Show-Line \"Текстовый отчёт об изменениях сохранён: $textPath\""
+    },
+    "src/modules/Reporting/Convert-adPEASReport.ps1": {
+      "Show-Line \"Source: $InputJson\"": "Show-Line \"Источник: $InputJson\"",
+      "Show-Line \"Domain: $sourceDomain, Server: $sourceServer\"": "Show-Line \"Домен: $sourceDomain, сервер: $sourceServer\"",
+      "Show-Line \"Original scan: $sourceDate (adPEAS $sourceVersion)\"": "Show-Line \"Исходный аудит: $sourceDate (adPEAS $sourceVersion)\"",
+      "Show-Line \"Findings: $findingCount\"": "Show-Line \"Находок: $findingCount\"",
+      "Show-Line \"Regenerating with adPEAS $currentVersion (updated definitions/scoring)\"": "Show-Line \"Повторное формирование отчёта средствами adPEAS $currentVersion (обновлённые определения и оценка риска)\"",
+      "Show-Line \"Source scan was interrupted - covers only these modules: $covered\"": "Show-Line \"Исходный аудит был прерван — проверены только следующие модули: $covered\"",
+      "Show-Line \"HTML report saved to: $htmlPath\"": "Show-Line \"HTML-отчёт сохранён: $htmlPath\"",
+      "Show-Line \"JSON export saved to: $jsonPath\"": "Show-Line \"Экспорт JSON сохранён: $jsonPath\"",
+      "Show-Line \"Text report saved to: $textPath\"": "Show-Line \"Текстовый отчёт сохранён: $textPath\""
+    }
+  }
+}
