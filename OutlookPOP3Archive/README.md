@@ -1,5 +1,21 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
+## Обязательное направление после BW4k7v2a8: ARCH1, не продолжение MAPI форензики
+
+**ПЕРЕД СЛЕДУЮЩИМ БИЛДОМ:** читать [постоянный handoff](docs/PROJECT-HANDOFF-ARCH1.md), [ADR COM boundary и stop-rule](docs/ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md), [roadmap до RC](docs/DELIVERY-ROADMAP.md) и [фактический аудит основного кода](docs/ARCH1-IMPLEMENTATION-AUDIT.md). При потере контекста **не возвращаться к новым BW4k7v2a9 и исследованию Size/FLAGS без конкретной потери пользовательских данных**. Функциональный следующий этап — ARCH2: отладка основного `MailMover.ps1`, исключение неоднозначного silent skip и интеграция уже имеющихся семантических проверок в `ArchiveVerifier.ps1`.
+
+**Важно:** по существующему коду есть прямой режим `-Mode Archive`, который вызывает `MailItem.Move()` и может менять письма даже при `RELEASE.Integration.ArchiveWorkerEnabled=false`. ARCH1 только читает код, не разрешает production. Это **отдельная внешняя DEV-сборка 2.6.5-ARCH1**, но внутренний `Core/Version.ps1` / `RELEASE.Build=2.6.3-PREVIEW1` пока сохраняется ради совместимости существующих тестов; синхронизация внутреннего build — отдельная задача перед RC.
+
+**Read-only аудит:**
+~~~powershell
+.\Core\Diagnostics\Invoke-OPA265ARCH1DeliveryReadinessAudit.ps1 -Mode Plan | Format-List
+$arch1 = .\Core\Diagnostics\Invoke-OPA265ARCH1DeliveryReadinessAudit.ps1 -Mode Audit
+$arch1.Readiness | Format-List *
+$arch1.Readiness.AuditRows | Format-Table -AutoSize
+~~~
+
+
+
 Application: `0.9.4-rc1-build2.6.3-PREVIEW1`. Target: Windows PowerShell 5.1, Outlook 2016/2019.
 
 **Status:** 2.6.3-PREVIEW1 development candidate: read-only interrupted Move reconciliation; CI pending. Production `Archive`, `Resume`, `Plan` and `Auto` still use the existing FIX13b Outlook COM code. Mail movement is **not delegated** to a worker. Keep FIX13b as the tested archiving baseline.
