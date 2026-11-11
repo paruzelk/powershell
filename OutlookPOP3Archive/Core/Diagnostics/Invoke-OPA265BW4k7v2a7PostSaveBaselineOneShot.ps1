@@ -159,6 +159,11 @@ function Assert-OPA265BW4k7v2a7SourceAndTarget {
        [string]::IsNullOrWhiteSpace([string]$Manifest.TargetFolderId) -or
        [string]$Manifest.SemanticSha256 -cnotmatch '^[a-f0-9]{64}$' -or
        [string]$Manifest.IntentSha256 -cnotmatch '^[a-f0-9]{64}$' -or
+       [string]$Manifest.SyntheticSavedActualBodySha256 -cnotmatch '^[a-f0-9]{64}$' -or
+       [string]$Manifest.SyntheticExpectedTemplateBodySha256 -cnotmatch '^[a-f0-9]{64}$' -or
+       [string]$Manifest.SyntheticBaselinePolicy -cne 'BW4k7v2a7-ONLY-NEW-DISPOSABLE' -or
+       -not [bool]$Manifest.SyntheticSavedBodyPinnedAsExactPreMoveWitness -or
+       [bool]$Manifest.ProductionContentNormalizationWaiverGranted -or
        [int]$Manifest.SourceItemCount -ne 1 -or
        [bool]$Manifest.MoveAttempted -or
        [bool]$Manifest.ProductionReady -or [bool]$Manifest.WriterPermit){
@@ -422,7 +427,8 @@ try{
        [string]$oldIntent.PstPath -cne [string]$layout.PstPath -or
        [string]$oldIntent.DefaultDraftsStoreId -cne [string]$manifest.SourceStoreId -or
        [string]$oldIntent.DefaultDraftsFolderId -cne [string]$manifest.SourceFolderId -or
-       [string]$oldIntent.Pop3DeliveryStoreId -cne [string]$scope.Pop3DeliveryStoreId){
+       [string]$oldIntent.Pop3DeliveryStoreId -cne [string]$scope.Pop3DeliveryStoreId -or
+       [string]$oldIntent.SavedBodyBaselinePolicy -cne 'BW4k7v2a7-ONLY-NEW-DISPOSABLE'){
         throw 'BW4k7v2a7 sealed creation intent mismatch.'
     }
     $sourceMatches=Get-OPA265BW4k7v2a7SubjectItems -Folder $bindings.Drafts -Subject $layout.Subject
@@ -444,6 +450,15 @@ try{
         if([string]$witness.SemanticSha256 -cne [string]$manifest.SemanticSha256){
             throw 'BW4k7v2a7 original pre-Move semantic witness changed.'
         }
+        $bodyReview=Get-OPA265BW4k7v2a7PostSaveBodyBaseline -ExpectedSyntheticBody ([string]$layout.Body) -ActuallySavedBody ([string]$witness.Body)
+        if(-not [bool]$bodyReview.ApprovedForNewDisposableSyntheticFixtureBaseline -or
+           [string]$bodyReview.ActualSavedSha256 -cne [string]$manifest.SyntheticSavedActualBodySha256 -or
+           [string]$bodyReview.OriginalExpectedSha256 -cne [string]$manifest.SyntheticExpectedTemplateBodySha256 -or
+           [string]$manifest.SyntheticBaselinePolicy -cne 'BW4k7v2a7-ONLY-NEW-DISPOSABLE' -or
+           -not [bool]$manifest.SyntheticSavedBodyPinnedAsExactPreMoveWitness -or
+           [bool]$manifest.ProductionContentNormalizationWaiverGranted){
+            throw 'BW4k7v2a7 source saved Body changed relative to sealed pre-Move baseline.'
+        }
         if($Mode -ceq 'ReviewPilot'){
             return [pscustomobject][ordered]@{
                 Schema='2.6.5-BW4k7v2a7.PreMoveReadOnly.1'
@@ -453,6 +468,11 @@ try{
                 TargetPstPath=[string]$layout.PstPath
                 SourceMatches=1;DestinationMatches=0
                 SourceContentMatch=$true
+                PostSaveBodyBaselineMatchesManifest=$true
+                ActualSavedBodySha256=[string]$bodyReview.ActualSavedSha256
+                PostSaveBodyClassification=[string]$bodyReview.Status
+                PinnedSavedBodyIsMoveComparisonBaseline=$true
+                ProductionTemplateNormalizationWaived=$false
                 OriginalRawMapiFlags=[object]$manifest.SourceRawMapiFlags
                 CurrentRawMapiFlags=[object]$witness.Flags.RawValue
                 NoMailMoveOrWrite=$true
