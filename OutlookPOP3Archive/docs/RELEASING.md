@@ -1,3 +1,5 @@
+> **ARCH2a DEV release (2026-11-11):** [read-only documentation and fail-closed real Archive/Resume/Auto guard](2.6.5-arch2a-move-outcome-fence.md). Main `MailMover` now durably claims `Move Started`, aborts on `Move Indeterminate`, refuses to retry incomplete original journal. **No production activation until ARCH2b integrates byte-SHA semantic verifier and real isolated failure-window tests**. Historic claims immutable. Expected 3709 tests/124 containers; external DEV version 2.6.5-ARCH2a, internal 2.6.3-PREVIEW1 retained temporarily.
+
 > **ARCH1 binding release gate (2026-11-11):** Before any new build, read [project handoff](PROJECT-HANDOFF-ARCH1.md), [ADR COM boundary](ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md) and [delivery roadmap](DELIVERY-ROADMAP.md). Release only if original historical evidence is preserved, no new Size/FLAGS-only research branch, and production not claimed ready without Archive/Verifier safety integration. ARCH1 is a source-only audit, **not** 90GB production approval. Internal version still `2.6.3-PREVIEW1` in this DEV line; a future RC must align release metadata and runtime.
 
 # OutlookPOP3Archive — mandatory build and release procedure
