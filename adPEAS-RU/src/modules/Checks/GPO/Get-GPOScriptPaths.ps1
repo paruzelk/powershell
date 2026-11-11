@@ -227,7 +227,7 @@
                 if ((Test-SysvolAccessible) -eq $false) {
                     Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
-                    Show-Line "SYSVOL access failed - cannot analyze GPO scripts - SMB access failed (authentication/network issue)" -Class Finding
+                    Show-Line "Нет доступа к SYSVOL — сценарии GPO не оценивались (ошибка SMB: сеть или аутентификация)" -Class Finding
                 }
                 return
             }
@@ -292,7 +292,7 @@
 
         } catch {
             Write-Log "[Get-GPOScriptPaths] Error: $_" -Level Error
-            Show-Line "Error during check - scripts deployed via GPO could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить сценарии GPO: $_" -Class Finding
         } finally {
             $Script:_uncWriteAccess = $null
         }

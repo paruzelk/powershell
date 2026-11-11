@@ -200,16 +200,16 @@
                 if ($totalUsers -gt $Script:ProgressThreshold) { Show-Progress -Activity "Analyzing Kerberoastable accounts" -Completed }
 
                 if ($privilegedCount -gt 0) {
-                    Show-Line "$privilegedCount of them is/are privileged - cracking one of those passwords is a domain compromise" -Class "Finding"
+                    Show-Line "Из них привилегированных: $privilegedCount — подбор одного из таких паролей означает компрометацию домена" -Class "Finding"
                 }
 
             } else {
-                Show-Line "No kerberoastable accounts found" -Class "Secure"
+                Show-Line "Записей, уязвимых к Kerberoasting, не обнаружено" -Class "Secure"
             }
 
         } catch {
             Write-Log "[Get-KerberoastableAccounts] Error: $_" -Level Error
-            Show-Line "Error during check - kerberoastable accounts could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить записи, уязвимые к Kerberoasting: $_" -Class Finding
         }
     }
 

@@ -177,7 +177,7 @@
             # Nothing after this point runs when there is no material, which is the point of
             # the ordering above: no schema read, and no container ACL sweep either.
             if ($byDN.Count -eq 0) {
-                Show-Line "No user object carries roamed credential material" -Class Secure
+                Show-Line "Объекты пользователей с материалами перенесённых учётных данных не обнаружены" -Class Secure
                 return
             }
 
@@ -238,12 +238,12 @@
             }
 
             if ($confidential.Confidential -eq $false) {
-                Show-Line "Found $countText" -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
+                Show-Line "Обнаружено: $countText" -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
                 Show-Line ("The attributes are not marked confidential in the schema, so reading them follows the " +
                            "ordinary read permissions of the user object - in a default domain every authenticated " +
                            "user can read them") -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
             } else {
-                Show-Line "Found $countText" -Class Hint -FindingId 'CREDENTIAL_ROAMING_PRESENT'
+                Show-Line "Обнаружено: $countText" -Class Hint -FindingId 'CREDENTIAL_ROAMING_PRESENT'
 
                 if ($confidential.Confidential -eq $true) {
                     Show-Line ("Both attributes are marked confidential in the schema, so reading them needs the " +
@@ -269,7 +269,7 @@
         }
         catch {
             Write-Log "[Get-CredentialRoaming] Error: $_" -Level Error
-            Show-Line "Error during check: $_" -Class Finding
+            Show-Line "Ошибка проверки: $_" -Class Finding
         }
     }
 

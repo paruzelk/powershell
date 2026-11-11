@@ -133,15 +133,15 @@
 
             if ($deletedObjects.Count -eq 0) {
                 if ($readsAsAdministrator) {
-                    Show-Line "No deleted object exists in the domain" -Class Note
+                    Show-Line "Удалённых объектов в домене не обнаружено" -Class Note
                 } else {
-                    Show-Line "No deleted object is visible to this account - it may not list them, or there is none" -Class Note
+                    Show-Line "Текущей учётной записи не виден ни один удалённый объект — возможно, нет разрешения на просмотр либо объекты отсутствуют" -Class Note
                 }
             } else {
                 if ($readsAsAdministrator) {
-                    Show-Line "This account can read $($deletedObjects.Count) deleted object(s) - as a member of Administrators" -Class Note
+                    Show-Line "Текущая запись может прочитать $($deletedObjects.Count) удалённых объектов как участник группы Administrators" -Class Note
                 } else {
-                    Show-Line "This account can read $($deletedObjects.Count) deleted object(s) through a delegation on the deleted objects container" -Class Hint -FindingId 'DELETED_OBJECTS_READ_DELEGATED'
+                    Show-Line "Текущая запись может прочитать $($deletedObjects.Count) удалённых объектов по делегированному праву на контейнере удалённых объектов" -Class Hint -FindingId 'DELETED_OBJECTS_READ_DELEGATED'
                 }
 
                 $freeTextAttributes = @($Script:CredentialTextBaseAttributes) + @($Script:CredentialTextExchangeAttributes) + @($Script:CredentialTextCloudAttributes)
@@ -167,13 +167,13 @@
 
                     $display = ConvertTo-DeletedObjectDisplay -DeletedObject $deletedObject
                     if ($passwordAttribute) {
-                        Show-Line "Password attribute $passwordAttribute set on deleted $($display.Kind) '$($display.Name)'" -Class Finding
+                        Show-Line "Парольный атрибут $passwordAttribute установлен у удалённого объекта $($display.Kind) '$($display.Name)'" -Class Finding
                         $class = 'Finding'
                     } elseif ($credentialMatch.Tier -eq 1) {
-                        Show-Line "Probable credential found in $($credentialMatch.Attribute) of deleted $($display.Kind) '$($display.Name)'" -Class Finding
+                        Show-Line "Возможно действующие учётные данные найдены в атрибуте $($credentialMatch.Attribute) удалённого объекта $($display.Kind) '$($display.Name)'" -Class Finding
                         $class = 'Finding'
                     } else {
-                        Show-Line "Possible credential mention in $($credentialMatch.Attribute) of deleted $($display.Kind) '$($display.Name)'" -Class Hint
+                        Show-Line "Возможное упоминание учётных данных в атрибуте $($credentialMatch.Attribute) удалённого объекта $($display.Kind) '$($display.Name)'" -Class Hint
                         $class = 'Hint'
                     }
                     $display.Object | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DeletedObject' -Force
@@ -182,7 +182,7 @@
                 }
 
                 if ($reported -eq 0) {
-                    Show-Line "None of the $($deletedObjects.Count) deleted object(s) holds a credential in a free-text or password attribute" -Class Secure
+                    Show-Line "Ни один из $($deletedObjects.Count) удалённых объектов не содержит учётных данных в текстовом или парольном атрибуте" -Class Secure
                 }
             }
 
@@ -193,12 +193,12 @@
                 Show-DeletedObjectsReaders -ContainerDN $containerDN -SecurityDescriptor $containerSD -IncludePrivileged:$IncludePrivileged -ConnectionParams $connectionParams
             } catch {
                 Write-Log "[Get-DeletedObjectAccess] ACL analysis failed: $_" -Level Error
-                Show-Line "Error during the ACL analysis - who may list deleted objects could not be evaluated: $_" -Class Finding
+                Show-Line "Ошибка анализа ACL: не удалось определить, кто может перечислять удалённые объекты: $_" -Class Finding
             }
 
         } catch {
             Write-Log "[Get-DeletedObjectAccess] Error: $_" -Level Error
-            Show-Line "Error during check - deleted object access could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить доступ к удалённым объектам: $_" -Class Finding
         }
     }
 
@@ -312,13 +312,13 @@ function Show-DeletedObjectsReaders {
     Show-SubHeader "Анализ прав на перечисление удалённых объектов..." -ObjectType "DeletedObjectsReader"
 
     if (-not $SecurityDescriptor) {
-        Show-Line "The ACL of the deleted objects container is readable by administrators only - other readers not checked" -Class Note
+        Show-Line "ACL контейнера удалённых объектов доступен для чтения только администраторам — другие читатели не проверялись" -Class Note
         return
     }
 
     $aclResult = Get-ObjectACL -DistinguishedName $ContainerDN -SecurityDescriptor $SecurityDescriptor -AllowOnly @ConnectionParams
     if (-not $aclResult) {
-        Show-Line "The ACL of the deleted objects container could not be parsed - who may list deleted objects was not checked" -Class Note
+        Show-Line "Не удалось разобрать ACL контейнера удалённых объектов — субъекты с правом перечисления не проверялись" -Class Note
         return
     }
 
@@ -385,7 +385,7 @@ function Show-DeletedObjectsReaders {
     $unexpected = @($readers | Where-Object { -not $_._Expected })
     if ($unexpected.Count -gt 0) {
         $headlineClass = if (@($unexpected | Where-Object { $_.deletedObjectsRights -match 'broad group' }).Count -gt 0) { 'Finding' } else { 'Hint' }
-        Show-Line "Found $($unexpected.Count) principal(s) outside Tier 0 that may list deleted objects" -Class $headlineClass
+        Show-Line "Найдено субъектов вне Tier 0, которым может быть доступно перечисление удалённых объектов: $($unexpected.Count)" -Class $headlineClass
     } else {
         Show-Line "Only Tier 0$(if ($exchangeReads) { ' and the Exchange service groups' }) may list deleted objects" -Class Secure
     }

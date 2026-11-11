@@ -650,7 +650,7 @@ function Show-LAPSUnprotectedByOU {
 
     $class = if ($CoverageCaveat) { 'Hint' } else { 'Finding' }
     $what = if ($CoverageCaveat) { 'without a LAPS attribute in Active Directory' } else { 'without LAPS protection' }
-    Show-Line "Found $total computer(s) $what, by OU:" -Class $class
+    Show-Line "Обнаружено $total компьютеров $what, по OU:" -Class $class
 
     foreach ($ouEntry in ($byOU.GetEnumerator() | Sort-Object { $_.Value.Count } -Descending)) {
         $lapsFinding = [PSCustomObject]@{
@@ -782,7 +782,7 @@ function Get-LAPSConfiguration {
             # Registry.pol. Its two siblings abstain under -OPSEC and say so; this one ran
             # at full volume without a word.
             if ($OPSEC) {
-                Show-Line "OPSEC mode: Skipping LAPS configuration check (would query every computer and walk SYSVOL)" -Class "Hint"
+                Show-Line "Режим OPSEC: проверка конфигурации LAPS пропущена (потребовался бы опрос всех компьютеров и обход SYSVOL)" -Class "Hint"
                 return
             }
 
@@ -917,7 +917,7 @@ function Get-LAPSConfiguration {
             } elseif ($lapsLegacySchemaPresent) {
                 Show-Line "Обнаружены атрибуты схемы прежней версии LAPS" -Class "Note"
             } elseif ($windowsLAPSSchemaPresent) {
-                Show-Line "Windows LAPS Native schema present" -Class "Note"
+                Show-Line "Схема Windows LAPS Native присутствует" -Class "Note"
             }
 
             # ===== Step 2: GPO Configuration (LAPS managed account name + policy metadata) =====
@@ -1138,7 +1138,7 @@ function Get-LAPSConfiguration {
             # indistinguishable from a domain with nothing to report: the output just
             # stopped, and no line said the coverage figure was never computed.
             Write-Log "[Get-LAPSConfiguration] Error: $_" -Level Error
-            Show-Line "Error during check - the LAPS configuration could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить конфигурацию LAPS: $_" -Class Finding
         }
     }
 

@@ -113,12 +113,12 @@
             }
 
             if ($domainControllers.Count -gt 0) {
-                Show-Line "$($domainControllers.Count) Domain Controller(s) have not changed their machine account password in $PasswordAgeDays days or more:" -Class Finding
+                Show-Line "$($domainControllers.Count) контроллеров домена не меняли пароль машинной записи в течение $PasswordAgeDays дней или дольше:" -Class Finding
                 foreach ($computer in $domainControllers) { Show-Object $computer -Class Finding }
             }
 
             if ($members.Count -gt 0) {
-                Show-Line "$($members.Count) active computer(s) have not changed their machine account password in $PasswordAgeDays days or more:" -Class Hint
+                Show-Line "$($members.Count) активных компьютеров не меняли пароль машинной записи в течение $PasswordAgeDays дней или дольше:" -Class Hint
                 foreach ($computer in $members) { Show-Object $computer -Class Hint }
             }
 

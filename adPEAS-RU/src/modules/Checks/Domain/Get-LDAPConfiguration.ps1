@@ -350,7 +350,7 @@ function Get-LDAPConfiguration {
                     $dsHeuristics = if ($dirService) { [string]$dirService.dSHeuristics } else { '' }
 
                     if (-not $dirService) {
-                        Show-Line "The Directory Service object could not be read - dsHeuristics, which decides $unreadHeuristics, is unknown" -Class Note
+                        Show-Line "Объект Directory Service прочитать не удалось — значение dsHeuristics, определяющее $unreadHeuristics, неизвестно" -Class Note
                     } else {
                         # One object with a row per heuristic, set or not - an unset
                         # attribute is the default, and the default of every heuristic read
@@ -391,7 +391,7 @@ function Get-LDAPConfiguration {
                     }
                 } catch {
                     Write-Log "[Get-LDAPConfiguration] Could not read dsHeuristics: $_" -Level Warning
-                    Show-Line "The Directory Service object could not be read - dsHeuristics, which decides $unreadHeuristics, is unknown" -Class Note
+                    Show-Line "Объект Directory Service прочитать не удалось — значение dsHeuristics, определяющее $unreadHeuristics, неизвестно" -Class Note
                 }
             } else {
                 Show-Line "Раздел конфигурации недоступен: не удалось прочитать dsHeuristics для параметров $unreadHeuristics" -Class Note

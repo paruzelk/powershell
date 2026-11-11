@@ -336,7 +336,7 @@ function Get-NetworkMap {
             Write-Log "[Get-NetworkMap] $($computers.Count) enabled computer(s) with a logon in the last $ActiveDays days"
 
             if ($computers.Count -eq 0) {
-                Show-Line "No enabled computer logged on within the last $ActiveDays days" -Class Note
+                Show-Line "Нет включённых компьютеров со входом за последние $ActiveDays дней" -Class Note
                 return
             }
 
@@ -506,25 +506,25 @@ function Get-NetworkMap {
             # ===== Output =====
             # First what was left out, then the headline and the subnets.
             if ($outsideDomain -gt 0) {
-                Show-Line "$outsideDomain active computer(s) with a DNS name outside $domainFQDN - not resolved" -Class Note
+                Show-Line "$outsideDomain активных компьютеров с DNS-именем вне $domainFQDN — адреса не определялись" -Class Note
             }
             if ($withoutName -gt 0) {
-                Show-Line "$withoutName active computer(s) without a DNS name (dNSHostName) - not mapped" -Class Note
+                Show-Line "$withoutName активных компьютеров без DNS-имени (dNSHostName) — не отображены на карте" -Class Note
             }
             if ($notInZones -gt 0) {
-                Show-Line "OPSEC mode: $notInZones active computer(s) not found in the AD-integrated DNS zones - not resolved by DNS query" -Class Note
+                Show-Line "Режим OPSEC: $notInZones активных компьютеров не найдены в DNS-зонах, интегрированных с AD — запрос DNS не выполнялся" -Class Note
             } elseif ($queried -gt 0 -and $zonesRead -eq 0) {
                 $askedServer = if ($dnsServer) { $dnsServer } else { 'the DNS resolver of this machine' }
-                Show-Line "No AD-integrated DNS zone of these names could be read - addresses by DNS query to $askedServer" -Class Note
+                Show-Line "Не удалось прочитать DNS-зоны этих имён, интегрированные с AD — запрос DNS выполняется к $askedServer" -Class Note
             }
             if ($withoutAddress -gt 0) {
-                Show-Line "$withoutAddress active computer(s) without a usable IPv4 address in DNS - not mapped" -Class Note
+                Show-Line "$withoutAddress активных компьютеров без пригодного IPv4-адреса в DNS — не отображены на карте" -Class Note
             }
             if ($ipv6Only -gt 0) {
-                Show-Line "$ipv6Only active computer(s) with IPv6 addresses only - IPv6 is not mapped" -Class Note
+                Show-Line "$ipv6Only активных компьютеров только с IPv6-адресами — IPv6 не отображается на карте" -Class Note
             }
             if ($dcLookupFailed) {
-                Show-Line "The domain controllers could not be determined - no subnet counts them" -Class Note
+                Show-Line "Контроллеры домена определить не удалось — ни одна подсеть их не учитывает" -Class Note
             }
 
             # The subnets of the list -ExportTargets writes, in the order shown.
@@ -591,7 +591,7 @@ function Get-NetworkMap {
             }) | Sort-Object -Property Network, Prefix)
 
             if ($emptySubnets.Count -gt 0) {
-                Show-Line "$($emptySubnets.Count) subnet(s) defined in Sites and Services without an active computer:" -Class Note
+                Show-Line "$($emptySubnets.Count) подсетей в Active Directory Sites and Services не содержат активных компьютеров:" -Class Note
                 $emptyObject = [PSCustomObject][ordered]@{
                     Name              = 'Sites and Services, no active computer'
                     adSubnet          = @($emptySubnets | ForEach-Object { $_.Label })
@@ -603,20 +603,20 @@ function Get-NetworkMap {
 
             if ($ExportTargets) {
                 if ($targets.Count -eq 0) {
-                    Show-Line "No subnet to write to $ExportTargets" -Class Note
+                    Show-Line "Нет подсетей для записи в $ExportTargets" -Class Note
                 } else {
                     $export = Export-adPEASFile -Path $ExportTargets -Content (($targets -join "`r`n") + "`r`n") -Type Text -Force -SanitizeFilename:$false
                     if ($export.Success) {
-                        Show-Line "Wrote $($targets.Count) subnet(s) to $($export.Path)" -Class Note
+                        Show-Line "Записано $($targets.Count) подсетей в $($export.Path)" -Class Note
                     } else {
-                        Show-Line "The subnet list could not be written to ${ExportTargets}: $($export.Message)" -Class Hint
+                        Show-Line "Список подсетей не удалось записать в ${ExportTargets}: $($export.Message)" -Class Hint
                     }
                 }
             }
 
         } catch {
             Write-Log "[Get-NetworkMap] Error: $_" -Level Error
-            Show-Line "Error during check - the network map could not be built: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось построить карту сети: $_" -Class Finding
         }
     }
 

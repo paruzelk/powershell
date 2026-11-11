@@ -246,7 +246,7 @@
                 if ((Test-SysvolAccessible) -eq $false) {
                     Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
-                    Show-Line "SYSVOL access failed - cannot analyze GPO registry settings - SMB access failed (authentication/network issue)" -Class Finding
+                    Show-Line "Нет доступа к SYSVOL — параметры реестра, развёрнутые GPO, не оценивались (ошибка SMB: сеть или аутентификация)" -Class Finding
                 }
                 return
             }
@@ -419,7 +419,7 @@
 
         } catch {
             Write-Log "[Get-GPORegistrySettings] Error: $_" -Level Error
-            Show-Line "Error during check - registry settings deployed via GPO could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить параметры реестра, развёрнутые GPO: $_" -Class Finding
         }
     }
 

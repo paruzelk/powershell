@@ -67951,7 +67951,7 @@ function Get-DomainInformation {
 	            }
 	            $KrbtgtAccount = @(Get-DomainObject -LDAPFilter $krbtgtFilter @PSBoundParameters)[0]
 	            if (-not $KrbtgtAccount) {
-	                Show-Line "The krbtgt account could not be read - its password age is unknown" -Class Note
+	                Show-Line "Учётную запись krbtgt прочитать не удалось — возраст её пароля неизвестен" -Class Note
 	            }
 	            if ($KrbtgtAccount -and $KrbtgtAccount.pwdLastSet) {
 	                $PwdLastSet = $KrbtgtAccount.pwdLastSet
@@ -68323,7 +68323,7 @@ function Get-DomainInformation {
 	            $dcObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DomainControllers' -Force
 	            Show-Object $dcObj -Class Note
 	        } else {
-	            Show-Line "No domain controllers found" -Class Note
+	            Show-Line "Контроллеры домена не обнаружены" -Class Note
 	        }
 	        Show-SubHeader "Поиск сайтов и подсетей Active Directory..." -ObjectType "SitesAndSubnets"
 	        if (@($Sites).Count -gt 0) {
@@ -68353,7 +68353,7 @@ function Get-DomainInformation {
 	            Show-Line "Сайты Active Directory не найдены" -Class Hint
 	        }
 	    } catch {
-	        Show-Line "Error during check - the domain information could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить сведения о домене: $_" -Class Finding
 	    }
 	}
 }
@@ -68881,13 +68881,13 @@ function Get-DomainPasswordPolicy {
 	                    } elseif ($cleanPSONames.Count -gt 0 -and $unreadPSONames.Count -eq 0) {
 	                        Show-Line "Тонкие политики паролей настроены корректно" -Class Secure
 	                    } elseif ($cleanPSONames.Count -gt 0) {
-	                        Show-Line "No weakness in the Fine-Grained Password Policies that could be read" -Class Note
+	                        Show-Line "Слабых параметров в доступных для чтения политиках FGPP не обнаружено" -Class Note
 	                    }
 	                    if ($unreadPSONames.Count -gt 0) {
-	                        Show-Line "Could not be read in full, and therefore not assessed: $($unreadPSONames -join ', ')" -Class Note
+	                        Show-Line "Не удалось прочитать полностью, поэтому не оценивались: $($unreadPSONames -join ', ')" -Class Note
 	                    }
 	                    if ($unassignedPSONames.Count -gt 0) {
-	                        Show-Line "Assigned to no user and no group, and therefore not assessed: $($unassignedPSONames -join ', ')" -Class Note
+	                        Show-Line "Ни пользователям, ни группам не назначены, поэтому не оценивались: $($unassignedPSONames -join ', ')" -Class Note
 	                    }
 	                }
 	                } catch {
@@ -68940,7 +68940,7 @@ function Get-DomainPasswordPolicy {
 	            Show-Line "Тонкие политики паролей недоступны: необходим функциональный уровень домена Windows Server 2008 или выше" -Raw
 	        }
 	    } catch {
-	        Show-Line "Error during check - the password policy could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить политику паролей: $_" -Class Finding
 	    }
 	}
 }
@@ -69116,7 +69116,7 @@ function Get-DomainTrusts {
 	            Show-Line "Внешние доверительные отношения домена не обнаружены (изолированный домен)" -Class Note
 	        }
 	    } catch {
-	        Show-Line "Error during check - domain trusts could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить доверительные отношения домена: $_" -Class Finding
 	    }
 	}
 }
@@ -69279,7 +69279,7 @@ function Get-LDAPConfiguration {
 	                $dirService = @(Get-DomainObject -Identity $dirServiceDN -Properties 'dSHeuristics' @connectionParams)[0]
 	                $dsHeuristics = if ($dirService) { [string]$dirService.dSHeuristics } else { '' }
 	                if (-not $dirService) {
-	                    Show-Line "The Directory Service object could not be read - dsHeuristics, which decides $unreadHeuristics, is unknown" -Class Note
+	                    Show-Line "Объект Directory Service прочитать не удалось — значение dsHeuristics, определяющее $unreadHeuristics, неизвестно" -Class Note
 	                } else {
 	                    $heuristics = ConvertFrom-DSHeuristics -Value $dsHeuristics
 	                    $excludedNames = @($heuristics.AdminSDExcludedGroups | ForEach-Object { $_.Name })
@@ -69312,7 +69312,7 @@ function Get-LDAPConfiguration {
 	                    Show-Object $heuristicsObj -Class $objectClass
 	                }
 	            } catch {
-	                Show-Line "The Directory Service object could not be read - dsHeuristics, which decides $unreadHeuristics, is unknown" -Class Note
+	                Show-Line "Объект Directory Service прочитать не удалось — значение dsHeuristics, определяющее $unreadHeuristics, неизвестно" -Class Note
 	            }
 	        } else {
 	            Show-Line "Раздел конфигурации недоступен: не удалось прочитать dsHeuristics для параметров $unreadHeuristics" -Class Note
@@ -73060,18 +73060,18 @@ function Get-ManagedServiceAccountSecurity {
 	                    $ownedDMSAs += "$ownedName ($ownerName)"
 	                }
 	                if (@($ownedDMSAs).Count -gt 0) {
-	                    Show-Line "msDS-GroupMSAMembership of a dMSA is owned by a principal that is not privileged: $(@($ownedDMSAs) -join ', ')" -Class Finding -FindingId 'DMSA_MEMBERSHIP_OWNER'
+	                    Show-Line "Дескриптором msDS-GroupMSAMembership записи dMSA владеет непривилегированный субъект: $(@($ownedDMSAs) -join ', ')" -Class Finding -FindingId 'DMSA_MEMBERSHIP_OWNER'
 	                }
 	                if (@($unusedDMSAs).Count -gt 0) {
-	                    Show-Line "No principal may use $(@($unusedDMSAs).Count) dMSA(s), or msDS-GroupMSAMembership was not readable: $(@($unusedDMSAs) -join ', ')" -Class Note
+	                    Show-Line "У $(@($unusedDMSAs).Count) записей dMSA нет субъектов, которым разрешено использование, либо не удалось прочитать msDS-GroupMSAMembership: $(@($unusedDMSAs) -join ', ')" -Class Note
 	                }
 	                if (@($unparsedDMSAs).Count -gt 0) {
-	                    Show-Line "msDS-GroupMSAMembership could not be parsed on $(@($unparsedDMSAs).Count) dMSA(s) - who may use them is unknown: $(@($unparsedDMSAs) -join ', ')" -Class Note
+	                    Show-Line "Не удалось разобрать msDS-GroupMSAMembership у $(@($unparsedDMSAs).Count) записей dMSA — неизвестно, кто может их использовать: $(@($unparsedDMSAs) -join ', ')" -Class Note
 	                }
 	                if (@($usableByOthers).Count -eq 0 -and @($ownedDMSAs).Count -eq 0 -and $dmsaUserSIDs.Count -gt 0) {
 	                    $unanalyzedDMSAs = $dmsaAccounts.Count - $dmsaUserSIDs.Count
 	                    if ($unanalyzedDMSAs -gt 0) {
-	                        Show-Line "dMSA use is restricted to privileged accounts and service hosts ($unanalyzedDMSAs of $($dmsaAccounts.Count) not analyzed)" -Class Note
+	                        Show-Line "Использовать dMSA разрешено только привилегированным записям и служебным узлам (не проверено $unanalyzedDMSAs из $($dmsaAccounts.Count))" -Class Note
 	                    } else {
 	                        Show-Line "Использование всех dMSA ограничено привилегированными записями и узлами служб" -Class Secure
 	                    }
@@ -73886,7 +73886,7 @@ function Get-UnconstrainedDelegation {
 	            if ($exposedNames.Count -gt 0) {
 	                $shownNames = @($exposedNames | Select-Object -First 20) -join ', '
 	                if ($exposedNames.Count -gt 20) { $shownNames = "$shownNames, ... and $($exposedNames.Count - 20) more" }
-	                Show-Line "$($exposedNames.Count) privileged account(s) hand their TGT to these hosts at every Kerberos logon - not sensitive, not in Protected Users: $shownNames" -Class Finding -FindingId 'UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS'
+	                Show-Line "$($exposedNames.Count) привилегированных учётных записей передают TGT этим узлам при каждом входе Kerberos — они не отмечены как чувствительные и не состоят в Protected Users: $shownNames" -Class Finding -FindingId 'UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS'
 	            } else {
 	                Show-Line "Все привилегированные записи защищены от делегирования либо состоят в Protected Users; однако контроллер домена при определённых воздействиях всё равно может передать собственный TGT" -Class Note
 	            }
@@ -74009,10 +74009,10 @@ function Get-ConstrainedDelegation {
 	        $total = @($constrainedAccounts).Count
 	        Show-Line "Учётные записи с ограниченным делегированием Kerberos: $total (компьютеров: $totalComputers; пользователей: $totalUsers; с переходом протокола: $totalProtocolTransition)" -Class "Finding"
 	        if ($totalOnDC -gt 0) {
-	            Show-Line "$totalOnDC of them delegate to a Domain Controller - treat these as a direct path to Domain Admin" -Class "Finding"
+	            Show-Line "Из них $totalOnDC делегируют доступ к контроллеру домена — рассматривайте как прямой путь к Domain Admin" -Class "Finding"
 	        }
 	        if ($totalNoTarget -gt 0) {
-	            Show-Line "$totalNoTarget carry protocol transition without any delegation target" -Class "Hint"
+	            Show-Line "$totalNoTarget имеют переход протокола без единой целевой службы делегирования" -Class "Hint"
 	        }
 	        $totalAccounts = @($constrainedAccounts).Count
 	        $currentIndex = 0
@@ -74413,7 +74413,7 @@ function Get-DangerousACLs {
 	            Show-Line "Опасные разрешения ACL на корневом объекте домена не обнаружены" -Class Secure
 	        }
 	    } catch {
-	        Show-Line "Error during check - domain root ACLs could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить ACL корневого объекта домена: $_" -Class Finding
 	    }
 	}
 }
@@ -74665,7 +74665,7 @@ function Get-DangerousOUPermissions {
 	        $conclusionClass = 'Secure'
 	        if ($coverageIncomplete) { $conclusionClass = 'Note' }
 	        if ($neutralisedByDeny -gt 0) {
-	            Show-Line "$neutralisedByDeny delegation(s) are cancelled by an explicit Deny ACE for the same trustee and are not reported as access" -Class Note
+	            Show-Line "$neutralisedByDeny делегирований нейтрализованы явным ACE Deny для того же субъекта и не учитываются как предоставленный доступ" -Class Note
 	        }
 	        if (@($allFindings).Count -eq 0) {
 	            if ($totalOUs -gt 0 -and $readOUs -le 0) {
@@ -75314,7 +75314,7 @@ function Get-AddComputerRights {
 	        })[0]
 	        $effectiveIsDangerous = $effectiveGPO -and ($effectiveGPO._HasAuthenticatedUsers -or $effectiveGPO._HasEveryone)
 	        if ($quotaValue -eq 0) {
-	            Show-Line "ms-DS-MachineAccountQuota is 0 - computer creation restricted to explicit permissions" -Class Secure
+	            Show-Line "ms-DS-MachineAccountQuota равна 0 — создание компьютерных записей ограничено явно назначенными разрешениями" -Class Secure
 	        } else {
 	            if ($effectiveGPO -and -not $effectiveIsDangerous) {
 	                $restrictedTo = if (@($effectiveGPO.Accounts).Count -gt 0) { @($effectiveGPO.Accounts) -join ', ' } else { "nobody" }
@@ -75345,7 +75345,7 @@ function Get-AddComputerRights {
 	                privilegeGrantedBy          = $grantedBy
 	            }
 	            $quotaObject | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'MachineAccountQuota' -Force
-	            Show-Line "Who can add computers to the domain:" -Class $quotaClass
+	            Show-Line "Кто может добавлять компьютеры в домен:" -Class $quotaClass
 	            Show-Object $quotaObject -Class $quotaClass
 	            $hasFindings = $true
 	        }
@@ -75408,7 +75408,7 @@ function Get-AddComputerRights {
 	            if (@($shownGPOs).Count -gt 0) {
 	                Show-Line "Групповые политики, назначающие SeMachineAccountPrivilege: $(@($shownGPOs).Count)" -Class $lineClass
 	            } else {
-	                Show-Line "No policy that is linked and enabled configures SeMachineAccountPrivilege" -Class Note
+	                Show-Line "Ни одна связанная и включённая политика не задаёт SeMachineAccountPrivilege" -Class Note
 	            }
 	            $scopePriorityMap = @{ "DomainControllers" = 1; "Domain" = 2; "OtherOU" = 3; "NotLinked" = 4 }
 	            $sortedGPOs = @($shownGPOs | Sort-Object @{Expression={$scopePriorityMap[$_._PrecedenceScope]}}, _PrecedenceOrder)
@@ -75433,7 +75433,7 @@ function Get-AddComputerRights {
 	            Show-Line "Права добавления компьютеров в домен настроены корректно" -Class $quotaClass
 	        }
 	    } catch {
-	        Show-Line "Error during check - the rights to add computers to the domain could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить права добавления компьютеров в домен: $_" -Class Finding
 	    }
 	}
 }
@@ -75839,16 +75839,16 @@ function Get-GPOUserRightsAssignment {
 	                Show-Object $finding -Class $class
 	            }
 	        } elseif ((Test-SysvolAccessible) -eq $false) {
-	            Show-Line "SYSVOL is not accessible - GPO user rights could not be evaluated" -Class "Note"
+	            Show-Line "SYSVOL недоступен — права пользователей, назначаемые GPO, не оценивались" -Class "Note"
 	        } elseif (-not $sysvolScanned) {
-	            Show-Line "SYSVOL access failed - GPO user rights could not be evaluated - SMB access failed (authentication/network issue)" -Class "Finding"
+	            Show-Line "Нет доступа к SYSVOL — права пользователей через GPO не оценивались (ошибка SMB: сеть или аутентификация)" -Class "Finding"
 	        } else {
 	            $emptyClass = 'Secure'
 	            if (Show-SYSVOLCoverageNote -FileFilter @('GptTmpl.inf')) { $emptyClass = 'Note' }
 	            Show-Line "Права пользователя, заданные через GPO, соответствуют стандартным настройкам Windows" -Class $emptyClass
 	        }
 	    } catch {
-	        Show-Line "Error during check: $_" -Class "Finding"
+	        Show-Line "Ошибка проверки: $_" -Class "Finding"
 	    } finally {
 	        $Script:gpoUserRightsFindings = $null
 	    }
@@ -76526,7 +76526,7 @@ function Show-LAPSUnprotectedByOU {
 	if ($byOU.Count -eq 0) { return }
 	$class = if ($CoverageCaveat) { 'Hint' } else { 'Finding' }
 	$what = if ($CoverageCaveat) { 'without a LAPS attribute in Active Directory' } else { 'without LAPS protection' }
-	Show-Line "Found $total computer(s) $what, by OU:" -Class $class
+	Show-Line "Обнаружено $total компьютеров $what, по OU:" -Class $class
 	foreach ($ouEntry in ($byOU.GetEnumerator() | Sort-Object { $_.Value.Count } -Descending)) {
 	    $lapsFinding = [PSCustomObject]@{
 	        ouName = $ouEntry.Key
@@ -76571,7 +76571,7 @@ function Get-LAPSConfiguration {
 	            return
 	        }
 	        if ($OPSEC) {
-	            Show-Line "OPSEC mode: Skipping LAPS configuration check (would query every computer and walk SYSVOL)" -Class "Hint"
+	            Show-Line "Режим OPSEC: проверка конфигурации LAPS пропущена (потребовался бы опрос всех компьютеров и обход SYSVOL)" -Class "Hint"
 	            return
 	        }
 	        Show-SubHeader "Проверка атрибутов схемы Active Directory для LAPS..." -ObjectType "LAPSConfiguration"
@@ -76649,7 +76649,7 @@ function Get-LAPSConfiguration {
 	        } elseif ($lapsLegacySchemaPresent) {
 	            Show-Line "Обнаружены атрибуты схемы прежней версии LAPS" -Class "Note"
 	        } elseif ($windowsLAPSSchemaPresent) {
-	            Show-Line "Windows LAPS Native schema present" -Class "Note"
+	            Show-Line "Схема Windows LAPS Native присутствует" -Class "Note"
 	        }
 	        if ($lapsGPOSettings -is [hashtable]) {
 	            if ($lapsGPOHasLegacy -or $lapsGPOHasNative) {
@@ -76786,7 +76786,7 @@ function Get-LAPSConfiguration {
 	            Show-LAPSUnprotectedByOU -Computer $computersWithoutLAPS -CoverageCaveat $coverageCaveat
 	        }
 	    } catch {
-	        Show-Line "Error during check - the LAPS configuration could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить конфигурацию LAPS: $_" -Class Finding
 	    }
 	}
 }
@@ -76818,7 +76818,7 @@ function Get-OutdatedComputers {
 	        }
 	        Show-SubHeader "Поиск компьютеров с устаревшими версиями Windows..." -ObjectType "OutdatedComputer"
 	        if ($OPSEC) {
-	            Show-Line "OPSEC mode: Skipping outdated computer check (would check all enabled computers)" -Class "Hint"
+	            Show-Line "Режим OPSEC: проверка устаревших компьютеров пропущена (потребовалась бы проверка всех включённых компьютеров)" -Class "Hint"
 	            return
 	        }
 	        $computers = @(Get-DomainComputer -Enabled -Properties $FilterProperties @connectionParams)
@@ -76875,12 +76875,12 @@ function Get-OutdatedComputers {
 	            Show-Line "Компьютеры с устаревшей версией Microsoft Windows: $(@($outdatedComputerDNs).Count)$inactiveInfo" -Class "Finding"
 	        }
 	        if (@($esuOnlyComputerDNs).Count -gt 0) {
-	            Show-Line "$(@($esuOnlyComputerDNs).Count) computer(s) are past general support and inside the paid ESU window:" -Class "Hint"
+	            Show-Line "$(@($esuOnlyComputerDNs).Count) компьютеров вышли из общей поддержки, но находятся в периоде платной расширенной поддержки ESU:" -Class "Hint"
 	        }
 	        if ($notAssessableCount -gt 0) {
-	            Show-Line "$notAssessableCount active computer(s) run a Microsoft operating system this lifecycle table cannot place:" -Class "Note"
+	            Show-Line "$notAssessableCount активных компьютеров используют Microsoft ОС, которую невозможно классифицировать по данной таблице жизненного цикла:" -Class "Note"
 	            foreach ($osLabel in ($notAssessableOS.Keys | Sort-Object)) {
-	                Show-Line "  $osLabel - $($notAssessableOS[$osLabel]) computer(s)" -Class "Hint"
+	                Show-Line "  $osLabel — $($notAssessableOS[$osLabel]) компьютеров" -Class "Hint"
 	            }
 	        }
 	        $findingDNs = @($outdatedComputerDNs) + @($esuOnlyComputerDNs)
@@ -76907,12 +76907,12 @@ function Get-OutdatedComputers {
 	                }
 	            }
 	        } elseif ($notAssessableCount -eq 0 -and $inactiveFilteredCount -gt 0) {
-	            Show-Line "No active computers with an outdated Microsoft operating system ($inactiveFilteredCount inactive accounts filtered)" -Class "Secure"
+	            Show-Line "Активных компьютеров с устаревшей Microsoft ОС не обнаружено (отфильтровано неактивных записей: $inactiveFilteredCount)" -Class "Secure"
 	        } elseif ($notAssessableCount -eq 0) {
 	            Show-Line "Компьютеры с устаревшими версиями Windows не найдены" -Class "Secure"
 	        }
 	    } catch {
-	        Show-Line "Error during check - outdated operating systems could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить устаревшие операционные системы: $_" -Class Finding
 	    }
 	}
 }
@@ -76935,7 +76935,7 @@ function Show-SPNServiceAccounts {
 	    $accounts = @(Get-DomainObject -LDAPFilter "(&$SPNFilter(!(objectCategory=computer)))" `
 	        -Properties 'sAMAccountName', 'servicePrincipalName', 'objectClass', 'objectSid' @ConnectionParams)
 	} catch {
-	    Show-Line "$ServiceName service accounts could not be read - result unknown, not empty" -Class "Note"
+	    Show-Line "Учётные записи службы $ServiceName прочитать не удалось — результат неизвестен, а не пуст" -Class "Note"
 	    return
 	}
 	if (@($accounts).Count -eq 0) { return }
@@ -76971,12 +76971,12 @@ function Show-SPNServiceAccounts {
 	        $privileged += "$($account.sAMAccountName) ($via)"
 	    }
 	}
-	Show-Line "$ServiceName also runs under $(@($described).Count) domain account(s), host from the SPN: $(@($described) -join '; ')" -Class "Hint"
+	Show-Line "Служба $ServiceName также работает под $(@($described).Count) доменными записями; узел определён по SPN: $(@($described) -join '; ')" -Class "Hint"
 	if (@($privileged).Count -gt 0) {
-	    Show-Line "$(@($privileged).Count) of them hold privileged rights in the domain, and whoever controls the service or its host holds them too: $(@($privileged) -join '; ')" -Class "Finding" -FindingId $PrivilegedFindingId
+	    Show-Line "Из них $(@($privileged).Count) имеют привилегии в домене; управляющий службой или её узлом также получает эти полномочия: $(@($privileged) -join '; ')" -Class "Finding" -FindingId $PrivilegedFindingId
 	}
 	if (@($unevaluated).Count -gt 0) {
-	    Show-Line "The privileges of $(@($unevaluated).Count) of them could not be evaluated - result unknown, not unprivileged: $(@($unevaluated) -join '; ')" -Class "Note"
+	    Show-Line "Для $(@($unevaluated).Count) записей не удалось оценить полномочия — результат неизвестен, а не отсутствие привилегий: $(@($unevaluated) -join '; ')" -Class "Note"
 	}
 }
 function Show-SPNIdleServers {
@@ -76994,7 +76994,7 @@ function Show-SPNIdleServers {
 	})
 	if (@($idle).Count -eq 0) { return }
 	$names = @($idle | ForEach-Object { "$($_.sAMAccountName)" -replace '\$$', '' })
-	Show-Line "$(@($idle).Count) of the $ServiceName computer account(s) show no recent logon - possibly decommissioned: $(@($names) -join ', ')" -Class "Note"
+	Show-Line "У $(@($idle).Count) компьютерных записей службы $ServiceName нет недавних входов — возможно, узлы выведены из эксплуатации: $(@($names) -join ', ')" -Class "Note"
 }
 function Get-RegisteredDomainControllerDN {
 	[CmdletBinding()]
@@ -77070,11 +77070,11 @@ function Get-InfrastructureServers {
 	                foreach ($dc in $listedDCs) { $dc | Show-Object -Class Hint }
 	            }
 	            if ($unregisteredDCs.Count -gt 0) {
-	                Show-Line "$($unregisteredDCs.Count) computer account(s) carry the Domain Controller role without being registered as Domain Controllers:" -Class "Finding"
+	                Show-Line "$($unregisteredDCs.Count) компьютерных записей имеют роль контроллера домена, но не зарегистрированы как контроллеры домена:" -Class "Finding"
 	                foreach ($dc in $unregisteredDCs) { $dc | Show-Object -Class Finding }
 	            }
 	            if ($null -eq $registered) {
-	                Show-Line "The configuration partition could not be read - Domain Controllers were not checked against their NTDS Settings" -Class "Note"
+	                Show-Line "Раздел конфигурации прочитать не удалось — записи контроллеров домена не сверялись с NTDS Settings" -Class "Note"
 	            }
 	        } else {
 	            Show-Line "Контроллеры домена не найдены (неожиданный результат)" -Class "Note"
@@ -77159,7 +77159,7 @@ function Get-InfrastructureServers {
 	        Show-SPNServiceAccounts -ServiceName 'SCCM' -SPNFilter "(|(servicePrincipalName=SMS*)(servicePrincipalName=CCM*))" `
 	            -SPNPrefix @('SMS_', 'CCM') -ConnectionParams $PSBoundParameters
 	    } catch {
-	        Show-Line "SCCM Server enumeration failed - result unknown, not empty" -Class "Note"
+	        Show-Line "Не удалось перечислить серверы SCCM — результат неизвестен, а не пуст" -Class "Note"
 	    }
 	    Show-SubHeader "Поиск серверов Microsoft Operations Manager..." -ObjectType "SCOMServerBasic"
 	    try {
@@ -77177,7 +77177,7 @@ function Get-InfrastructureServers {
 	        Show-SPNServiceAccounts -ServiceName 'SCOM' -SPNFilter "(|(servicePrincipalName=MSOMHSvc/*)(servicePrincipalName=MSOMSdkSvc/*))" `
 	            -SPNPrefix @('MSOMHSvc/', 'MSOMSdkSvc/') -ConnectionParams $PSBoundParameters
 	    } catch {
-	        Show-Line "SCOM Server enumeration failed - result unknown, not empty" -Class "Note"
+	        Show-Line "Не удалось перечислить серверы SCOM — результат неизвестен, а не пуст" -Class "Note"
 	    }
 	    Show-SubHeader "Поиск серверов служб федерации AD FS..." -ObjectType "ADFSServer"
 	    try {
@@ -77470,7 +77470,7 @@ function Get-NonDefaultComputerOwners {
 	            $clusterOwned = @($nonDefaultOwnerComputers | Where-Object {
 	                $_.PSObject.Properties['ownerKind'] -and "$($_.ownerKind)" -like 'Computer account*' }).Count
 	            if ($clusterOwned -gt 0) {
-	                Show-Line "$clusterOwned of them are owned by a computer account, which is how a cluster owns the objects it creates" -Class "Note"
+	                Show-Line "$clusterOwned из них принадлежат компьютерной записи — так кластер владеет создаваемыми объектами" -Class "Note"
 	            }
 	            foreach ($computer in $nonDefaultOwnerComputers) {
 	                $computer | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'NonDefaultComputerOwner' -Force
@@ -77479,12 +77479,12 @@ function Get-NonDefaultComputerOwners {
 	        } elseif ($unreadableOwners -ge $totalComputers -and $totalComputers -gt 0) {
 	            Show-Line "Владельцы компьютеров не проверены: дескрипторы безопасности не содержали сведений о владельце" -Class "Note"
 	        } elseif ($unreadableOwners -gt 0) {
-	            Show-Line "The computers whose owner could be read all have default owners ($unreadableOwners of $totalComputers carried no owner in their security descriptor)" -Class "Note"
+	            Show-Line "Среди компьютеров, для которых владелец прочитан, все имеют стандартного владельца ($unreadableOwners из $totalComputers без владельца в дескрипторе безопасности)" -Class "Note"
 	        } else {
 	            Show-Line "У всех компьютеров стандартные владельцы" -Class "Secure"
 	        }
 	        if ($unreadableOwners -gt 0 -and @($nonDefaultOwnerComputers).Count -gt 0) {
-	            Show-Line "$unreadableOwners of $totalComputers computer object(s) carried no owner in their security descriptor and were not evaluated" -Class "Finding"
+	            Show-Line "$unreadableOwners из $totalComputers объектов компьютеров не имеют владельца в дескрипторе безопасности и не оценивались" -Class "Finding"
 	        }
 	        $explicitFindings = @(Get-ComputerExplicitRight -Computers $computersWithOwner)
 	        if ($explicitFindings.Count -gt 0) {
@@ -77495,7 +77495,7 @@ function Get-NonDefaultComputerOwners {
 	            }
 	        }
 	    } catch {
-	        Show-Line "Error during check - computer ownership could not be evaluated: $_" -Class "Finding"
+	        Show-Line "Ошибка проверки: не удалось оценить владельцев компьютерных объектов: $_" -Class "Finding"
 	    }
 	}
 }
@@ -77546,11 +77546,11 @@ function Get-ComputerPasswordAge {
 	            }
 	        }
 	        if ($domainControllers.Count -gt 0) {
-	            Show-Line "$($domainControllers.Count) Domain Controller(s) have not changed their machine account password in $PasswordAgeDays days or more:" -Class Finding
+	            Show-Line "$($domainControllers.Count) контроллеров домена не меняли пароль машинной записи в течение $PasswordAgeDays дней или дольше:" -Class Finding
 	            foreach ($computer in $domainControllers) { Show-Object $computer -Class Finding }
 	        }
 	        if ($members.Count -gt 0) {
-	            Show-Line "$($members.Count) active computer(s) have not changed their machine account password in $PasswordAgeDays days or more:" -Class Hint
+	            Show-Line "$($members.Count) активных компьютеров не меняли пароль машинной записи в течение $PasswordAgeDays дней или дольше:" -Class Hint
 	            foreach ($computer in $members) { Show-Object $computer -Class Hint }
 	        }
 	    } catch {
@@ -77703,7 +77703,7 @@ function Get-NetworkMap {
 	        $computers = @(Get-DomainComputer -Enabled -LDAPFilter "(lastLogonTimestamp>=$since)" `
 	            -Properties 'dNSHostName', 'operatingSystem' @connectionParams)
 	        if ($computers.Count -eq 0) {
-	            Show-Line "No enabled computer logged on within the last $ActiveDays days" -Class Note
+	            Show-Line "Нет включённых компьютеров со входом за последние $ActiveDays дней" -Class Note
 	            return
 	        }
 	        $dcSet = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
@@ -77833,25 +77833,25 @@ function Get-NetworkMap {
 	        }
 	        if ($queried -gt 0 -and $total -gt $Script:ProgressThreshold) { Show-Progress -Activity "Resolving computer names" -Completed }
 	        if ($outsideDomain -gt 0) {
-	            Show-Line "$outsideDomain active computer(s) with a DNS name outside $domainFQDN - not resolved" -Class Note
+	            Show-Line "$outsideDomain активных компьютеров с DNS-именем вне $domainFQDN — адреса не определялись" -Class Note
 	        }
 	        if ($withoutName -gt 0) {
-	            Show-Line "$withoutName active computer(s) without a DNS name (dNSHostName) - not mapped" -Class Note
+	            Show-Line "$withoutName активных компьютеров без DNS-имени (dNSHostName) — не отображены на карте" -Class Note
 	        }
 	        if ($notInZones -gt 0) {
-	            Show-Line "OPSEC mode: $notInZones active computer(s) not found in the AD-integrated DNS zones - not resolved by DNS query" -Class Note
+	            Show-Line "Режим OPSEC: $notInZones активных компьютеров не найдены в DNS-зонах, интегрированных с AD — запрос DNS не выполнялся" -Class Note
 	        } elseif ($queried -gt 0 -and $zonesRead -eq 0) {
 	            $askedServer = if ($dnsServer) { $dnsServer } else { 'the DNS resolver of this machine' }
-	            Show-Line "No AD-integrated DNS zone of these names could be read - addresses by DNS query to $askedServer" -Class Note
+	            Show-Line "Не удалось прочитать DNS-зоны этих имён, интегрированные с AD — запрос DNS выполняется к $askedServer" -Class Note
 	        }
 	        if ($withoutAddress -gt 0) {
-	            Show-Line "$withoutAddress active computer(s) without a usable IPv4 address in DNS - not mapped" -Class Note
+	            Show-Line "$withoutAddress активных компьютеров без пригодного IPv4-адреса в DNS — не отображены на карте" -Class Note
 	        }
 	        if ($ipv6Only -gt 0) {
-	            Show-Line "$ipv6Only active computer(s) with IPv6 addresses only - IPv6 is not mapped" -Class Note
+	            Show-Line "$ipv6Only активных компьютеров только с IPv6-адресами — IPv6 не отображается на карте" -Class Note
 	        }
 	        if ($dcLookupFailed) {
-	            Show-Line "The domain controllers could not be determined - no subnet counts them" -Class Note
+	            Show-Line "Контроллеры домена определить не удалось — ни одна подсеть их не учитывает" -Class Note
 	        }
 	        $targets = New-Object System.Collections.Generic.List[string]
 	        if ($subnets.Count -eq 0) {
@@ -77895,7 +77895,7 @@ function Get-NetworkMap {
 	            }
 	        }) | Sort-Object -Property Network, Prefix)
 	        if ($emptySubnets.Count -gt 0) {
-	            Show-Line "$($emptySubnets.Count) subnet(s) defined in Sites and Services without an active computer:" -Class Note
+	            Show-Line "$($emptySubnets.Count) подсетей в Active Directory Sites and Services не содержат активных компьютеров:" -Class Note
 	            $emptyObject = [PSCustomObject][ordered]@{
 	                Name              = 'Sites and Services, no active computer'
 	                adSubnet          = @($emptySubnets | ForEach-Object { $_.Label })
@@ -77906,18 +77906,18 @@ function Get-NetworkMap {
 	        }
 	        if ($ExportTargets) {
 	            if ($targets.Count -eq 0) {
-	                Show-Line "No subnet to write to $ExportTargets" -Class Note
+	                Show-Line "Нет подсетей для записи в $ExportTargets" -Class Note
 	            } else {
 	                $export = Export-adPEASFile -Path $ExportTargets -Content (($targets -join "`r`n") + "`r`n") -Type Text -Force -SanitizeFilename:$false
 	                if ($export.Success) {
-	                    Show-Line "Wrote $($targets.Count) subnet(s) to $($export.Path)" -Class Note
+	                    Show-Line "Записано $($targets.Count) подсетей в $($export.Path)" -Class Note
 	                } else {
-	                    Show-Line "The subnet list could not be written to ${ExportTargets}: $($export.Message)" -Class Hint
+	                    Show-Line "Список подсетей не удалось записать в ${ExportTargets}: $($export.Message)" -Class Hint
 	                }
 	            }
 	        }
 	    } catch {
-	        Show-Line "Error during check - the network map could not be built: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось построить карту сети: $_" -Class Finding
 	    }
 	}
 }
@@ -78039,13 +78039,13 @@ function Invoke-ShareHunt {
 	            if ($ExportShares) {
 	                $paths = @($readable | ForEach-Object { $_.Path } | Sort-Object)
 	                if ($paths.Count -eq 0) {
-	                    Show-Line "No readable share to write to $ExportShares" -Class Note
+	                    Show-Line "Нет доступных для чтения общих ресурсов, которые можно записать в $ExportShares" -Class Note
 	                } else {
 	                    $export = Export-adPEASFile -Path $ExportShares -Content (($paths -join "`r`n") + "`r`n") -Type Text -Force -SanitizeFilename:$false
 	                    if ($export.Success) {
-	                        Show-Line "Wrote $($paths.Count) share(s) to $($export.Path)" -Class Note
+	                        Show-Line "Записано общих ресурсов: $($paths.Count); файл: $($export.Path)" -Class Note
 	                    } else {
-	                        Show-Line "The share list could not be written to ${ExportShares}: $($export.Message)" -Class Hint
+	                        Show-Line "Список общих ресурсов не удалось записать в ${ExportShares}: $($export.Message)" -Class Hint
 	                    }
 	                }
 	            }
@@ -78097,14 +78097,14 @@ function Invoke-ShareHunt {
 	                }
 	                $export = Export-adPEASFile -Path $ExportFindings -Content $document -Type Json -JsonDepth 6 -Force -SanitizeFilename:$false
 	                if ($export.Success) {
-	                    Show-Line "Wrote $($results.Count) finding(s) and $($readable.Count) share(s) to $($export.Path)" -Class Note
+	                    Show-Line "Записано находок: $($results.Count), общих ресурсов: $($readable.Count); файл: $($export.Path)" -Class Note
 	                } else {
-	                    Show-Line "The findings could not be written to ${ExportFindings}: $($export.Message)" -Class Hint
+	                    Show-Line "Результаты не удалось записать в ${ExportFindings}: $($export.Message)" -Class Hint
 	                }
 	            }
 	        }
 	        if ($OPSEC) {
-	            Show-Line "OPSEC mode: Skipping the share hunt (would connect to every computer over SMB)" -Class Hint
+	            Show-Line "Режим OPSEC: поиск общих ресурсов пропущен (потребовались бы SMB-подключения ко всем компьютерам)" -Class Hint
 	            return
 	        }
 	        $standalone = ($null -eq $Script:adPEAS_CurrentCheckContext)
@@ -78220,20 +78220,20 @@ function Invoke-ShareHunt {
 	        }
 	        Show-Progress -Activity 'Share hunt' -Completed
 	        if ($outsideDomain -gt 0) {
-	            Show-Line "$outsideDomain active computer(s) with a DNS name outside $domainFQDN - not contacted" -Class Note
+	            Show-Line "$outsideDomain активных компьютеров с DNS-именем вне $domainFQDN — подключения не выполнялись" -Class Note
 	        }
 	        if ($withoutName -gt 0) {
-	            Show-Line "$withoutName active computer(s) without a DNS name (dNSHostName) - not contacted" -Class Note
+	            Show-Line "$withoutName активных компьютеров без DNS-имени (dNSHostName) — подключения не выполнялись" -Class Note
 	        }
 	        if ($unreachable -gt 0) {
-	            Show-Line "$unreachable of $($targets.Count) computer(s) do not answer on port 445" -Class Note
+	            Show-Line "$unreachable из $($targets.Count) компьютеров не отвечают на порту 445" -Class Note
 	        }
 	        if ($listFailed.Count -gt 0) {
 	            $failedTotal = 0
 	            foreach ($value in $listFailed.Values) { $failedTotal += $value }
 	            $reasons = @($listFailed.GetEnumerator() | Sort-Object -Property @{ Expression = { $_.Value }; Descending = $true }, @{ Expression = { [string]$_.Key }; Descending = $false } |
 	                ForEach-Object { "$($_.Value) $($_.Key)" })
-	            Show-Line "$failedTotal computer(s) did not list their shares: $($reasons -join ', ')" -Class Note
+	            Show-Line "$failedTotal компьютеров не предоставили список общих ресурсов: $($reasons -join ', ')" -Class Note
 	        }
 	        if ($leftOutAdmin -gt 0) {
 	            $text = "$leftOutAdmin administrative share(s) left out"
@@ -78247,13 +78247,13 @@ function Invoke-ShareHunt {
 	        }
 	        if ($notReadable -gt 0) {
 	            if ($namedShares.Count -gt 0) {
-	                Show-Line "$notReadable named share(s) are not there or cannot be read by this account" -Class Note
+	                Show-Line "$notReadable именованных общих ресурсов отсутствуют или недоступны для чтения текущей записи" -Class Note
 	            } else {
-	                Show-Line "$notReadable share(s) are listed but cannot be read by this account" -Class Note
+	                Show-Line "$notReadable перечисленных общих ресурсов недоступны для чтения текущей записи" -Class Note
 	            }
 	        }
 	        if ($readable.Count -eq 0) {
-	            Show-Line "No readable share found" -Class Note
+	            Show-Line "Доступных для чтения общих ресурсов не обнаружено" -Class Note
 	            Write-ShareHuntExport
 	            return
 	        }
@@ -78279,7 +78279,7 @@ function Invoke-ShareHunt {
 	            Show-Object $hostObject -Class Note
 	        }
 	        if ($ListSharesOnly) {
-	            Show-Line "No file was read - the shares were only listed (-ListSharesOnly)" -Class Note
+	            Show-Line "Файлы не читались — выполнено только перечисление общих ресурсов (-ListSharesOnly)" -Class Note
 	            Write-ShareHuntExport
 	            return
 	        }
@@ -78320,10 +78320,10 @@ function Invoke-ShareHunt {
 	        }
 	        Show-Progress -Activity 'Share hunt' -Completed
 	        if ($unreadable -gt 0) {
-	            Show-Line "$unreadable file(s) could not be read" -Class Note
+	            Show-Line "Не удалось прочитать файлов: $unreadable" -Class Note
 	        }
 	        if ($tooLarge -gt 0) {
-	            Show-Line "$tooLarge file(s) over $MaxFileSizeKB KB not read" -Class Note
+	            Show-Line "$tooLarge файлов размером свыше $MaxFileSizeKB КБ не читались" -Class Note
 	        }
 	        if ($results.Count -eq 0) {
 	            Show-Line "Учётные данные не обнаружены в $($readable.Count) доступных для чтения сетевых ресурсах" -Class Note
@@ -78339,7 +78339,7 @@ function Invoke-ShareHunt {
 	        }
 	        Write-ShareHuntExport
 	    } catch {
-	        Show-Line "Error during check - the shares could not be searched: $_" -Class Finding
+	        Show-Line "Ошибка проверки: поиск общих ресурсов завершился неудачно: $_" -Class Finding
 	    }
 	}
 }
@@ -79109,7 +79109,7 @@ function Get-GPOLocalGroupMembership {
 	            if ((Test-SysvolAccessible) -eq $false) {
 	                Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
 	            } else {
-	                Show-Line "SYSVOL access failed - cannot analyze GPO local group assignments - SMB access failed (authentication/network issue)" -Class Finding
+	                Show-Line "Не удалось получить доступ к SYSVOL — назначения локальных групп через GPO не оценивались (ошибка SMB: аутентификация или сеть)" -Class Finding
 	            }
 	            return
 	        }
@@ -79156,7 +79156,7 @@ function Get-GPOLocalGroupMembership {
 	            Show-Line "Небезопасных назначений в локальные группы через GPO не обнаружено; проанализировано политик: $(@($gpos).Count)" -Class $groupClass
 	        }
 	    } catch {
-	        Show-Line "Error during check - GPO local group assignments could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить назначения локальных групп через GPO: $_" -Class Finding
 	    }
 	}
 }
@@ -79637,7 +79637,7 @@ function Get-GPOScheduledTasks {
 	            if ((Test-SysvolAccessible) -eq $false) {
 	                Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
 	            } else {
-	                Show-Line "SYSVOL access failed - cannot analyze GPO scheduled tasks - SMB access failed (authentication/network issue)" -Class Finding
+	                Show-Line "Нет доступа к SYSVOL — запланированные задания GPO не оценивались (ошибка SMB: сеть или аутентификация)" -Class Finding
 	            }
 	            return
 	        }
@@ -79661,7 +79661,7 @@ function Get-GPOScheduledTasks {
 	                -Dormant $split.Dormant -Listed:$IncludeInactive
 	            if ($deleteTasks.Count -gt 0) {
 	                if ($IncludeInactive) {
-	                    Show-Line "$($deleteTasks.Count) of the task items below delete their task - nothing runs" -Class Note
+	                    Show-Line "$($deleteTasks.Count) элементов заданий ниже удаляют свои задания — ничего не запускается" -Class Note
 	                } else {
 	                    $deleteText = "$($deleteTasks.Count) task item(s) hidden - they delete their task, nothing runs"
 	                    if ($null -eq $Script:adPEAS_CurrentCheckContext) { $deleteText += ' (-IncludeInactive to list)' }
@@ -79700,7 +79700,7 @@ function Get-GPOScheduledTasks {
 	            Show-Line "Задачи, распространяемые через GPO, не обнаружены; проанализировано политик: $($gpos.Count)" -Class Note
 	        }
 	    } catch {
-	        Show-Line "Error during check - scheduled tasks deployed via GPO could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить задания, развёрнутые через GPO: $_" -Class Finding
 	    }
 	}
 }
@@ -80131,7 +80131,7 @@ function Get-GPOScriptPaths {
 	            if ((Test-SysvolAccessible) -eq $false) {
 	                Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
 	            } else {
-	                Show-Line "SYSVOL access failed - cannot analyze GPO scripts - SMB access failed (authentication/network issue)" -Class Finding
+	                Show-Line "Нет доступа к SYSVOL — сценарии GPO не оценивались (ошибка SMB: сеть или аутентификация)" -Class Finding
 	            }
 	            return
 	        }
@@ -80167,7 +80167,7 @@ function Get-GPOScriptPaths {
 	            Show-Line "Сценарии, распространяемые через GPO, не обнаружены" -Class Note
 	        }
 	    } catch {
-	        Show-Line "Error during check - scripts deployed via GPO could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить сценарии GPO: $_" -Class Finding
 	    } finally {
 	        $Script:_uncWriteAccess = $null
 	    }
@@ -80463,7 +80463,7 @@ function Get-GPORegistrySettings {
 	            if ((Test-SysvolAccessible) -eq $false) {
 	                Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
 	            } else {
-	                Show-Line "SYSVOL access failed - cannot analyze GPO registry settings - SMB access failed (authentication/network issue)" -Class Finding
+	                Show-Line "Нет доступа к SYSVOL — параметры реестра, развёрнутые GPO, не оценивались (ошибка SMB: сеть или аутентификация)" -Class Finding
 	            }
 	            return
 	        }
@@ -80552,7 +80552,7 @@ function Get-GPORegistrySettings {
 	            }
 	        }
 	    } catch {
-	        Show-Line "Error during check - registry settings deployed via GPO could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить параметры реестра, развёрнутые GPO: $_" -Class Finding
 	    }
 	}
 }
@@ -80852,7 +80852,7 @@ function Get-GPOPointAndPrint {
 	            if ((Test-SysvolAccessible) -eq $false) {
 	                Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
 	            } else {
-	                Show-Line "SYSVOL access failed - cannot analyze Point and Print policies - SMB access failed (authentication/network issue)" -Class Finding
+	                Show-Line "Нет доступа к SYSVOL — политики Point and Print не оценивались (ошибка SMB: сеть или аутентификация)" -Class Finding
 	            }
 	            return
 	        }
@@ -80905,12 +80905,12 @@ function Get-GPOPointAndPrint {
 	        if (@($listed).Count -gt 0) {
 	            Show-Line "Групповые политики с настройками Point and Print или драйверов принтеров: $(@($listed).Count)" -Class Hint
 	        } elseif ($settled.Count -gt 0) {
-	            Show-Line "No linked and enabled policy leaves printer driver installation open to non-administrators" -Class Secure
+	            Show-Line "Среди связанных и включённых политик не обнаружено разрешения непривилегированным пользователям устанавливать драйверы принтеров без повышения прав" -Class Secure
 	        } else {
 	            Show-Line "Действующие привязанные GPO не задают настройки Point and Print" -Class Note
 	        }
 	        if ($exploitable.Count -gt 0) {
-	            Show-Line "$($exploitable.Count) GPO configuration(s) let non-administrators install printer drivers without an elevation prompt" -Class Finding
+	            Show-Line "$($exploitable.Count) конфигураций GPO позволяют пользователям без административных прав устанавливать драйверы принтеров без запроса повышения прав" -Class Finding
 	        }
 	        foreach ($object in $listed) {
 	            if (@($split.Inactive) -contains $object) {
@@ -80920,7 +80920,7 @@ function Get-GPOPointAndPrint {
 	            }
 	        }
 	    } catch {
-	        Show-Line "Error during check - Point and Print settings could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить параметры Point and Print: $_" -Class Finding
 	    }
 	}
 }
@@ -82745,7 +82745,7 @@ function Get-WeakCertificateMapping {
 	        } else {
 	            "$(@($weakFindings).Count) principal(s) with a weak explicit certificate mapping"
 	        }
-	        Show-Line "Found $countText" -Class $mappingClass -FindingId 'ESC14_WEAK_EXPLICIT_MAPPING'
+	        Show-Line "Обнаружено: $countText" -Class $mappingClass -FindingId 'ESC14_WEAK_EXPLICIT_MAPPING'
 	        if ($noTrustAnchor) { Show-NoTrustAnchorNote }
 	        foreach ($finding in ($weakFindings | Sort-Object -Property @{Expression = { -not $_.IsPrivileged }})) {
 	            Show-Object $finding.Object -Class $mappingClass
@@ -83835,7 +83835,7 @@ function Get-ExchangeInfrastructure {
 	                            continue
 	                        }
 	                    }
-	                    Show-Line "$($serviceGroup.Name) group not found" -Class Note
+	                    Show-Line "Группа $($serviceGroup.Name) не найдена" -Class Note
 	                    continue
 	                }
 	                $groupMembers = @($groupObject.member | Where-Object { $_ })
@@ -83843,7 +83843,7 @@ function Get-ExchangeInfrastructure {
 	                    Show-Line "Группа $($serviceGroup.Name) существует, но не имеет участников (нетипичное состояние)" -Class Note
 	                    continue
 	                }
-	                Show-Line "Found $(@($groupMembers).Count) member(s) in $($serviceGroup.Name):" -Class Hint
+	                Show-Line "Найдено участников: $(@($groupMembers).Count); группа: $($serviceGroup.Name)" -Class Hint
 	                $groupObject | Add-Member -NotePropertyName '_isExchangeGroup' -NotePropertyValue $true -Force
 	                $groupObject | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue $serviceGroup.ObjectType -Force
 	                Show-Object $groupObject -Class Hint
@@ -84069,14 +84069,14 @@ function Get-ExchangeRBACAssignments {
 	            $results += $resultObj
 	        }
 	        if (@($results).Count -eq 0) {
-	            Show-Line "None of the high-value Exchange roles is assigned ($(@($roleAssignments).Count) role assignment(s) examined)" -Class Secure
+	            Show-Line "Ни одна критичная роль Exchange не назначена (проверено назначений ролей: $(@($roleAssignments).Count))" -Class Secure
 	            return
 	        }
 	        $unexpected = @($results | Where-Object { $_.ConsoleClass -eq 'Finding' })
 	        if (@($unexpected).Count -gt 0) {
 	            Show-Line "Неожиданные назначения критически важных ролей Exchange сверх стандартной конфигурации: $(@($unexpected).Count)" -Class Finding
 	        } else {
-	            Show-Line "The high-value Exchange roles are assigned only to the role groups Exchange ships them on" -Class Hint
+	            Show-Line "Критичные роли Exchange назначены только стандартным группам ролей Exchange" -Class Hint
 	        }
 	        $ordered = @($results | Sort-Object -Property `
 	            @{ Expression = { if ($_.ConsoleClass -eq 'Finding') { 0 } else { 1 } } }, `
@@ -84087,7 +84087,7 @@ function Get-ExchangeRBACAssignments {
 	        }
 	    }
 	    catch {
-	        Show-Line "Error during Exchange role assignment check: $_" -Class Finding
+	        Show-Line "Ошибка проверки назначений ролей Exchange: $_" -Class Finding
 	    }
 	}
 }
@@ -84134,10 +84134,10 @@ function Get-SCCMInfrastructure {
 	            Show-Line "Инфраструктура SCCM/MECM не обнаружена" -Class Note
 	            return
 	        }
-	        Show-Line "SCCM/MECM infrastructure detected" -Class Hint
+	        Show-Line "Обнаружена инфраструктура SCCM/MECM" -Class Hint
 	        Show-SubHeader "Анализ контейнера System Management..." -ObjectType "SCCMServer"
 	        if ($systemMgmt) {
-	            Show-Line "System Management container found at: $systemManagementPath" -Class Hint
+	            Show-Line "Контейнер System Management найден по пути: $systemManagementPath" -Class Hint
 	        } else {
 	            Show-Line "Контейнер System Management не найден — сайты, точки управления и его разрешения не прочитаны" -Class Hint
 	        }
@@ -84175,7 +84175,7 @@ function Get-SCCMInfrastructure {
 	                    Show-Object $siteObj -Class Hint
 	                }
 	            } elseif (-not $systemMgmt) {
-	                Show-Line "The System Management container does not exist - no site object could be read" -Class Note
+	                Show-Line "Контейнер System Management отсутствует — объекты сайтов прочитать не удалось" -Class Note
 	            } else {
 	                Show-Line "Контейнер System Management отсутствует — прочитать объекты сайтов не удалось" -Class Note
 	            }
@@ -84250,7 +84250,7 @@ function Get-SCCMInfrastructure {
 	            } elseif (-not $systemMgmt) {
 	                Show-Line "Контейнер System Management отсутствует — прочитать точки управления не удалось" -Class Note
 	            } else {
-	                Show-Line "No mSSMSManagementPoint objects found in System Management container" -Class Note
+	                Show-Line "Объекты mSSMSManagementPoint в контейнере System Management не обнаружены" -Class Note
 	            }
 	        } catch {
 	        }
@@ -84337,7 +84337,7 @@ function Get-SCCMInfrastructure {
 	                    }
 	                }
 	                if ($containerFindings.Count -gt 0) {
-	                    Show-Line "$($containerFindings.Count) principal(s) can write to the System Management container and are not a site server" -Class Finding
+	                    Show-Line "Обнаружено субъектов с правом записи в System Management, не являющихся серверами сайта: $($containerFindings.Count)" -Class Finding
 	                    foreach ($containerFinding in $containerFindings.Values) {
 	                        $sidHex = ConvertTo-LDAPSIDHex -SID $containerFinding.SID
 	                        $aceObject = $null
@@ -84359,7 +84359,7 @@ function Get-SCCMInfrastructure {
 	                        Show-Object $aceObject -Class $(if ([string]$aceObject.dangerousRightsSeverity -in @('Expected', 'Attention', 'Hint')) { 'Hint' } else { 'Finding' })
 	                    }
 	                } else {
-	                    Show-Line "Only the site servers and the expected administrators can write to the System Management container" -Class Secure
+	                    Show-Line "Запись в System Management разрешена только серверам сайтов и ожидаемым администраторам" -Class Secure
 	                }
 	            }
 	        }
@@ -84411,7 +84411,7 @@ function Get-SCCMInfrastructure {
 	        } catch {
 	        }
 	        if ($pxeServersFound) {
-	            Show-Line "PXE/WDS servers detected" -Class Hint -FindingId "SCCM_PXE_EXPOSURE"
+	            Show-Line "Обнаружены серверы PXE/WDS" -Class Hint -FindingId "SCCM_PXE_EXPOSURE"
 	        } else {
 	            Show-Line "Серверы загрузки PXE/WDS не найдены" -Class Note
 	        }
@@ -84481,7 +84481,7 @@ function Get-SCCMInfrastructure {
 	            }
 	            $broadGroupCount = @($groupClass.Values | Where-Object { $_ -eq 'Finding' }).Count
 	            if ($broadGroupCount -gt 0) {
-	                Show-Line "$broadGroupCount SCCM-related group(s) have a broad group as member" -Class Finding
+	                Show-Line "Групп, связанных с SCCM, в состав которых входит широкая группа: $broadGroupCount" -Class Finding
 	            }
 	            foreach ($group in $sccmGroupsFound) {
 	                Show-Object $group -Class $groupClass[[string]$group.distinguishedName]
@@ -84536,7 +84536,7 @@ function Get-SCOMInfrastructure {
 	            Show-Line "Инфраструктура SCOM не обнаружена" -Class Note
 	            return
 	        }
-	        Show-Line "SCOM infrastructure detected" -Class Hint
+	        Show-Line "Обнаружена инфраструктура SCOM" -Class Hint
 	        Show-SubHeader "Поиск серверов управления SCOM..." -ObjectType "SCOMServer"
 	        $scomServers = @()
 	        $seenServerDNs = @{}
@@ -84553,7 +84553,7 @@ function Get-SCOMInfrastructure {
 	            }
 	        }
 	        if (@($scomServers).Count -gt 0) {
-	            Show-Line "Found $(@($scomServers).Count) SCOM management server(s)" -Class Hint
+	            Show-Line "Найдено управляющих серверов SCOM: $(@($scomServers).Count)" -Class Hint
 	            foreach ($srv in $scomServers) {
 	                $srv | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SCOMServer' -Force
 	                Show-Object $srv -Class Hint
@@ -84627,7 +84627,7 @@ function Get-SCOMInfrastructure {
 	            Show-Line "Группы, связанные с SCOM, не найдены" -Class Note
 	        }
 	    } catch {
-	        Show-Line "Error during check - the SCOM infrastructure could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить инфраструктуру SCOM: $_" -Class Finding
 	    }
 	}
 }
@@ -84728,13 +84728,13 @@ function Get-KerberoastableAccounts {
 	            }
 	            if ($totalUsers -gt $Script:ProgressThreshold) { Show-Progress -Activity "Analyzing Kerberoastable accounts" -Completed }
 	            if ($privilegedCount -gt 0) {
-	                Show-Line "$privilegedCount of them is/are privileged - cracking one of those passwords is a domain compromise" -Class "Finding"
+	                Show-Line "Из них привилегированных: $privilegedCount — подбор одного из таких паролей означает компрометацию домена" -Class "Finding"
 	            }
 	        } else {
-	            Show-Line "No kerberoastable accounts found" -Class "Secure"
+	            Show-Line "Записей, уязвимых к Kerberoasting, не обнаружено" -Class "Secure"
 	        }
 	    } catch {
-	        Show-Line "Error during check - kerberoastable accounts could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить записи, уязвимые к Kerberoasting: $_" -Class Finding
 	    }
 	}
 }
@@ -84923,10 +84923,10 @@ function Get-UnixPasswordAccounts {
 	            $withheldNames = @($withheld | ForEach-Object {
 	                if ($_.sAMAccountName) { $_.sAMAccountName } else { $_.distinguishedName }
 	            })
-	            Show-Line "The value was not readable on: $($withheldNames -join ', ')" -Class "Note"
+	            Show-Line "Не удалось прочитать значение у следующих объектов: $($withheldNames -join ', ')" -Class "Note"
 	        }
 	    } catch {
-	        Show-Line "Error during check - Unix password attributes could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить парольные атрибуты Unix: $_" -Class Finding
 	    }
 	}
 }
@@ -85371,8 +85371,8 @@ function Get-CredentialExposure {
 	process {
 	    try {
 	        if ($Path) {
-	            Show-Line "Scanning Custom Path for Credentials" -Class "Note"
-	            Show-Line "Target: $Path" -Class "Hint"
+	            Show-Line "Поиск учётных данных по указанному пути" -Class "Note"
+	            Show-Line "Цель: $Path" -Class "Hint"
 	            Show-EmptyLine
 	            $useTempDrive = $false
 	            $tempDriveLetter = $null
@@ -85387,7 +85387,7 @@ function Get-CredentialExposure {
 	                        $useTempDrive = $true
 	                    }
 	                    catch {
-	                        Show-Line "Failed to connect to $Path with provided credentials: $_" -Class "Finding"
+	                        Show-Line "Не удалось подключиться к $Path с указанными учётными данными: $_" -Class "Finding"
 	                        return
 	                    }
 	                }
@@ -85398,12 +85398,12 @@ function Get-CredentialExposure {
 	            }
 	            elseif ($Path -match '^\\\\') {
 	                if (-not (Test-Path $Path)) {
-	                    Show-Line "Cannot access path: $Path (try using -Credential for authentication)" -Class "Finding"
+	                    Show-Line "Путь недоступен: $Path (для аутентификации попробуйте параметр -Credential)" -Class "Finding"
 	                    return
 	                }
 	            }
 	            elseif (-not (Test-Path $Path)) {
-	                Show-Line "Cannot access path: $Path" -Class "Finding"
+	                Show-Line "Путь недоступен: $Path" -Class "Finding"
 	                return
 	            }
 	            try {
@@ -85470,7 +85470,7 @@ function Get-CredentialExposure {
 	                }
 	            }
 	            else {
-	                Show-Line "No script/config files found in path" -Class "Note"
+	                Show-Line "Файлы сценариев или конфигураций по указанному пути не найдены" -Class "Note"
 	            }
 	            }
 	            finally {
@@ -85822,9 +85822,9 @@ function Get-LAPSCredentialAccess {
 	        }
 	        if (@($readableComputers).Count -gt 0) {
 	            if ($readerIsPrivileged) {
-	                Show-Line "Found $(@($readableComputers).Count) computer(s) with readable LAPS password - expected for this account:" -Class "Hint"
+	                Show-Line "Обнаружено компьютеров с доступным для чтения паролем LAPS: $(@($readableComputers).Count); для текущей записи это ожидаемо:" -Class "Hint"
 	            } else {
-	                Show-Line "Found $(@($readableComputers).Count) computer(s) with readable LAPS password:" -Class "Finding"
+	                Show-Line "Обнаружено компьютеров с доступным для чтения паролем LAPS: $(@($readableComputers).Count)" -Class "Finding"
 	            }
 	            $totalComputers = @($readableComputers).Count
 	            $currentIndex = 0
@@ -85842,13 +85842,13 @@ function Get-LAPSCredentialAccess {
 	            }
 	            if ($totalComputers -gt $Script:ProgressThreshold) { Show-Progress -Activity "Checking LAPS credential access" -Completed }
 	        } else {
-	            Show-Line "No readable LAPS passwords found" -Class "Secure"
+	            Show-Line "Доступных для чтения паролей LAPS не обнаружено" -Class "Secure"
 	        }
 	        if ($withheldCount -gt 0) {
-	            Show-Line "$withheldCount computer(s) have a LAPS password stored that this account may not read" -Class "Note"
+	            Show-Line "У $withheldCount компьютеров хранится пароль LAPS, который текущая учётная запись не может прочитать" -Class "Note"
 	        }
 	    } catch {
-	        Show-Line "Error during check - LAPS password access could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить доступ к паролям LAPS: $_" -Class Finding
 	    }
 	}
 }
@@ -85917,7 +85917,7 @@ function Get-BitLockerRecoveryKeyAccess {
 	        if ($withheldObjects.Count -gt 0) {
 	        }
 	        if ($recoveryObjects.Count -gt 0) {
-	            Show-Line "Found $($recoveryObjects.Count) readable BitLocker recovery key(s):" -Class "Hint"
+	            Show-Line "Найдено доступных для чтения ключей восстановления BitLocker: $($recoveryObjects.Count)" -Class "Hint"
 	            $totalObjects = $recoveryObjects.Count
 	            $currentIndex = 0
 	            foreach ($recoveryObject in $recoveryObjects) {
@@ -86228,7 +86228,7 @@ function Get-CredentialRoaming {
 	            }
 	        }
 	        if ($byDN.Count -eq 0) {
-	            Show-Line "No user object carries roamed credential material" -Class Secure
+	            Show-Line "Объекты пользователей с материалами перенесённых учётных данных не обнаружены" -Class Secure
 	            return
 	        }
 	        $confidential = Get-CredentialRoamingConfidentiality @CredParams
@@ -86261,12 +86261,12 @@ function Get-CredentialRoaming {
 	            "$($findings.Count) user(s) carry roamed credential material in Active Directory"
 	        }
 	        if ($confidential.Confidential -eq $false) {
-	            Show-Line "Found $countText" -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
+	            Show-Line "Обнаружено: $countText" -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
 	            Show-Line ("The attributes are not marked confidential in the schema, so reading them follows the " +
 	                       "ordinary read permissions of the user object - in a default domain every authenticated " +
 	                       "user can read them") -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
 	        } else {
-	            Show-Line "Found $countText" -Class Hint -FindingId 'CREDENTIAL_ROAMING_PRESENT'
+	            Show-Line "Обнаружено: $countText" -Class Hint -FindingId 'CREDENTIAL_ROAMING_PRESENT'
 	            if ($confidential.Confidential -eq $true) {
 	                Show-Line ("Both attributes are marked confidential in the schema, so reading them needs the " +
 	                           "Control Access right and generic read does not grant it") -Class Secure
@@ -86285,7 +86285,7 @@ function Get-CredentialRoaming {
 	                   "an AD backup - the confidential flag protects against ordinary users, not against Tier 0") -Class Note
 	    }
 	    catch {
-	        Show-Line "Error during check: $_" -Class Finding
+	        Show-Line "Ошибка проверки: $_" -Class Finding
 	    }
 	}
 }
@@ -86526,7 +86526,7 @@ function Get-PasswordInDescription {
 	        }
 	        Show-SubHeader "Поиск учётных данных в атрибутах description и info..." -ObjectType "PasswordInDescription"
 	        if ($OPSEC) {
-	            Show-Line "OPSEC mode: Skipping password-in-description check (would check all users and computers)" -Class "Hint"
+	            Show-Line "Режим OPSEC: поиск паролей в описаниях пропущен (потребовалась бы проверка всех пользователей и компьютеров)" -Class "Hint"
 	            return
 	        }
 	        $findingCount = 0
@@ -86600,15 +86600,15 @@ function Get-PasswordInDescription {
 	                        $fullObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'PasswordInDescription' -Force
 	                        $fullObj | Add-Member -NotePropertyName '_adPEASContext' -NotePropertyValue "$objectType - $bestAttrName attribute" -Force
 	                        if ($bestTier -eq 1) {
-	                            Show-Line "Probable credential found in $bestAttrName of $objectType '$shownName'" -Class Finding
+	                            Show-Line "Вероятные учётные данные найдены в $bestAttrName объекта $objectType '$shownName'" -Class Finding
 	                        } else {
-	                            Show-Line "Possible credential mention in $bestAttrName of $objectType '$shownName'" -Class Hint
+	                            Show-Line "Возможное упоминание учётных данных найдено в $bestAttrName объекта $objectType '$shownName'" -Class Hint
 	                        }
 	                        Show-Object $fullObj -Class $(if ($bestTier -eq 1) { 'Finding' } else { 'Hint' })
 	                        if ($bestTier -eq 1) { $findingCount++ } else { $hintCount++ }
 	                    } else {
 	                        $unreadableCount++
-	                        Show-Line "Matched but could not be read again: $accountName" -Class Note
+	                        Show-Line "Совпадение найдено, но повторно прочитать объект не удалось: $accountName" -Class Note
 	                    }
 	                }
 	        }
@@ -86617,14 +86617,14 @@ function Get-PasswordInDescription {
 	        }
 	        if ($findingCount -eq 0 -and $hintCount -eq 0) {
 	            if ($unreadableCount -gt 0) {
-	                Show-Line "Nothing could be reported - every match could not be read again" -Class Note
+	                Show-Line "Нечего показать: ни одно совпадение не удалось прочитать повторно" -Class Note
 	            } else {
 	                Show-Line "Учётные данные в свободно заполняемых атрибутах объектов не обнаружены" -Class Secure
 	            }
 	        } else {
 	        }
 	    } catch {
-	        Show-Line "Error during check - credentials in free-text attributes could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить наличие учётных данных в текстовых атрибутах: $_" -Class Finding
 	    }
 	}
 }
@@ -86665,15 +86665,15 @@ function Get-DeletedObjectAccess {
 	        $readsAsAdministrator = Test-SIDInTokenGroups -SID 'S-1-5-32-544'
 	        if ($deletedObjects.Count -eq 0) {
 	            if ($readsAsAdministrator) {
-	                Show-Line "No deleted object exists in the domain" -Class Note
+	                Show-Line "Удалённых объектов в домене не обнаружено" -Class Note
 	            } else {
-	                Show-Line "No deleted object is visible to this account - it may not list them, or there is none" -Class Note
+	                Show-Line "Текущей учётной записи не виден ни один удалённый объект — возможно, нет разрешения на просмотр либо объекты отсутствуют" -Class Note
 	            }
 	        } else {
 	            if ($readsAsAdministrator) {
-	                Show-Line "This account can read $($deletedObjects.Count) deleted object(s) - as a member of Administrators" -Class Note
+	                Show-Line "Текущая запись может прочитать $($deletedObjects.Count) удалённых объектов как участник группы Administrators" -Class Note
 	            } else {
-	                Show-Line "This account can read $($deletedObjects.Count) deleted object(s) through a delegation on the deleted objects container" -Class Hint -FindingId 'DELETED_OBJECTS_READ_DELEGATED'
+	                Show-Line "Текущая запись может прочитать $($deletedObjects.Count) удалённых объектов по делегированному праву на контейнере удалённых объектов" -Class Hint -FindingId 'DELETED_OBJECTS_READ_DELEGATED'
 	            }
 	            $freeTextAttributes = @($Script:CredentialTextBaseAttributes) + @($Script:CredentialTextExchangeAttributes) + @($Script:CredentialTextCloudAttributes)
 	            $passwordAttributes = @('unixUserPassword', 'userPassword', 'msSFU30Password', 'sambaNTPassword', 'sambaLMPassword')
@@ -86692,13 +86692,13 @@ function Get-DeletedObjectAccess {
 	                if ($credentialMatch.Tier -eq 0 -and -not $passwordAttribute) { continue }
 	                $display = ConvertTo-DeletedObjectDisplay -DeletedObject $deletedObject
 	                if ($passwordAttribute) {
-	                    Show-Line "Password attribute $passwordAttribute set on deleted $($display.Kind) '$($display.Name)'" -Class Finding
+	                    Show-Line "Парольный атрибут $passwordAttribute установлен у удалённого объекта $($display.Kind) '$($display.Name)'" -Class Finding
 	                    $class = 'Finding'
 	                } elseif ($credentialMatch.Tier -eq 1) {
-	                    Show-Line "Probable credential found in $($credentialMatch.Attribute) of deleted $($display.Kind) '$($display.Name)'" -Class Finding
+	                    Show-Line "Возможно действующие учётные данные найдены в атрибуте $($credentialMatch.Attribute) удалённого объекта $($display.Kind) '$($display.Name)'" -Class Finding
 	                    $class = 'Finding'
 	                } else {
-	                    Show-Line "Possible credential mention in $($credentialMatch.Attribute) of deleted $($display.Kind) '$($display.Name)'" -Class Hint
+	                    Show-Line "Возможное упоминание учётных данных в атрибуте $($credentialMatch.Attribute) удалённого объекта $($display.Kind) '$($display.Name)'" -Class Hint
 	                    $class = 'Hint'
 	                }
 	                $display.Object | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DeletedObject' -Force
@@ -86706,16 +86706,16 @@ function Get-DeletedObjectAccess {
 	                $reported++
 	            }
 	            if ($reported -eq 0) {
-	                Show-Line "None of the $($deletedObjects.Count) deleted object(s) holds a credential in a free-text or password attribute" -Class Secure
+	                Show-Line "Ни один из $($deletedObjects.Count) удалённых объектов не содержит учётных данных в текстовом или парольном атрибуте" -Class Secure
 	            }
 	        }
 	        try {
 	            Show-DeletedObjectsReaders -ContainerDN $containerDN -SecurityDescriptor $containerSD -IncludePrivileged:$IncludePrivileged -ConnectionParams $connectionParams
 	        } catch {
-	            Show-Line "Error during the ACL analysis - who may list deleted objects could not be evaluated: $_" -Class Finding
+	            Show-Line "Ошибка анализа ACL: не удалось определить, кто может перечислять удалённые объекты: $_" -Class Finding
 	        }
 	    } catch {
-	        Show-Line "Error during check - deleted object access could not be evaluated: $_" -Class Finding
+	        Show-Line "Ошибка проверки: не удалось оценить доступ к удалённым объектам: $_" -Class Finding
 	    }
 	}
 }
@@ -86768,12 +86768,12 @@ function Show-DeletedObjectsReaders {
 	)
 	Show-SubHeader "Анализ прав на перечисление удалённых объектов..." -ObjectType "DeletedObjectsReader"
 	if (-not $SecurityDescriptor) {
-	    Show-Line "The ACL of the deleted objects container is readable by administrators only - other readers not checked" -Class Note
+	    Show-Line "ACL контейнера удалённых объектов доступен для чтения только администраторам — другие читатели не проверялись" -Class Note
 	    return
 	}
 	$aclResult = Get-ObjectACL -DistinguishedName $ContainerDN -SecurityDescriptor $SecurityDescriptor -AllowOnly @ConnectionParams
 	if (-not $aclResult) {
-	    Show-Line "The ACL of the deleted objects container could not be parsed - who may list deleted objects was not checked" -Class Note
+	    Show-Line "Не удалось разобрать ACL контейнера удалённых объектов — субъекты с правом перечисления не проверялись" -Class Note
 	    return
 	}
 	$rightsBySID = [ordered]@{}
@@ -86829,7 +86829,7 @@ function Show-DeletedObjectsReaders {
 	$unexpected = @($readers | Where-Object { -not $_._Expected })
 	if ($unexpected.Count -gt 0) {
 	    $headlineClass = if (@($unexpected | Where-Object { $_.deletedObjectsRights -match 'broad group' }).Count -gt 0) { 'Finding' } else { 'Hint' }
-	    Show-Line "Found $($unexpected.Count) principal(s) outside Tier 0 that may list deleted objects" -Class $headlineClass
+	    Show-Line "Найдено субъектов вне Tier 0, которым может быть доступно перечисление удалённых объектов: $($unexpected.Count)" -Class $headlineClass
 	} else {
 	    Show-Line "Only Tier 0$(if ($exchangeReads) { ' and the Exchange service groups' }) may list deleted objects" -Class Secure
 	}
@@ -97716,7 +97716,7 @@ function Collect-BHIssuancePolicies {
 	}
 	return $bhPolicies
 }
-$Script:adPEASVersion = "2.9.0+20261111-1820"
+$Script:adPEASVersion = "2.9.0+20261111-1944"
 if ($MyInvocation.MyCommand.Path) {
 	$Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {

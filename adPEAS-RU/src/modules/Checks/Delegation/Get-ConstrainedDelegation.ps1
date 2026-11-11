@@ -230,10 +230,10 @@ function Get-ConstrainedDelegation {
             # Called out separately because it is the difference between "delegation exists"
             # and "there is a path to Domain Admin here".
             if ($totalOnDC -gt 0) {
-                Show-Line "$totalOnDC of them delegate to a Domain Controller - treat these as a direct path to Domain Admin" -Class "Finding"
+                Show-Line "Из них $totalOnDC делегируют доступ к контроллеру домена — рассматривайте как прямой путь к Domain Admin" -Class "Finding"
             }
             if ($totalNoTarget -gt 0) {
-                Show-Line "$totalNoTarget carry protocol transition without any delegation target" -Class "Hint"
+                Show-Line "$totalNoTarget имеют переход протокола без единой целевой службы делегирования" -Class "Hint"
             }
 
             $totalAccounts = @($constrainedAccounts).Count

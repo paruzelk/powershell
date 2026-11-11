@@ -98,7 +98,7 @@
             }
 
             # ===== SCOM Detected - Continue with detailed enumeration =====
-            Show-Line "SCOM infrastructure detected" -Class Hint
+            Show-Line "Обнаружена инфраструктура SCOM" -Class Hint
 
             # ===== Step 2: Enumerate SCOM Management Servers =====
             Show-SubHeader "Поиск серверов управления SCOM..." -ObjectType "SCOMServer"
@@ -128,7 +128,7 @@
             }
 
             if (@($scomServers).Count -gt 0) {
-                Show-Line "Found $(@($scomServers).Count) SCOM management server(s)" -Class Hint
+                Show-Line "Найдено управляющих серверов SCOM: $(@($scomServers).Count)" -Class Hint
 
                 foreach ($srv in $scomServers) {
                     $srv | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'SCOMServer' -Force
@@ -236,7 +236,7 @@
 
         } catch {
             Write-Log "[Get-SCOMInfrastructure] Error: $_" -Level Error
-            Show-Line "Error during check - the SCOM infrastructure could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить инфраструктуру SCOM: $_" -Class Finding
         }
     }
 

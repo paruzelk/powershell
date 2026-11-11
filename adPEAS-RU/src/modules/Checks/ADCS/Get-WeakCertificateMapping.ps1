@@ -223,7 +223,7 @@
             } else {
                 "$(@($weakFindings).Count) principal(s) with a weak explicit certificate mapping"
             }
-            Show-Line "Found $countText" -Class $mappingClass -FindingId 'ESC14_WEAK_EXPLICIT_MAPPING'
+            Show-Line "Обнаружено: $countText" -Class $mappingClass -FindingId 'ESC14_WEAK_EXPLICIT_MAPPING'
             if ($noTrustAnchor) { Show-NoTrustAnchorNote }
 
             # Privileged targets first: those are the ones worth the reader's attention.

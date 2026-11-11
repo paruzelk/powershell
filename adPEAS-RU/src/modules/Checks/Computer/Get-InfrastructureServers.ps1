@@ -63,7 +63,7 @@ function Show-SPNServiceAccounts {
             -Properties 'sAMAccountName', 'servicePrincipalName', 'objectClass', 'objectSid' @ConnectionParams)
     } catch {
         Write-Log "[Get-InfrastructureServers] $ServiceName service account lookup failed: $_" -Level Error
-        Show-Line "$ServiceName service accounts could not be read - result unknown, not empty" -Class "Note"
+        Show-Line "Учётные записи службы $ServiceName прочитать не удалось — результат неизвестен, а не пуст" -Class "Note"
         return
     }
 
@@ -113,13 +113,13 @@ function Show-SPNServiceAccounts {
         }
     }
 
-    Show-Line "$ServiceName also runs under $(@($described).Count) domain account(s), host from the SPN: $(@($described) -join '; ')" -Class "Hint"
+    Show-Line "Служба $ServiceName также работает под $(@($described).Count) доменными записями; узел определён по SPN: $(@($described) -join '; ')" -Class "Hint"
 
     if (@($privileged).Count -gt 0) {
-        Show-Line "$(@($privileged).Count) of them hold privileged rights in the domain, and whoever controls the service or its host holds them too: $(@($privileged) -join '; ')" -Class "Finding" -FindingId $PrivilegedFindingId
+        Show-Line "Из них $(@($privileged).Count) имеют привилегии в домене; управляющий службой или её узлом также получает эти полномочия: $(@($privileged) -join '; ')" -Class "Finding" -FindingId $PrivilegedFindingId
     }
     if (@($unevaluated).Count -gt 0) {
-        Show-Line "The privileges of $(@($unevaluated).Count) of them could not be evaluated - result unknown, not unprivileged: $(@($unevaluated) -join '; ')" -Class "Note"
+        Show-Line "Для $(@($unevaluated).Count) записей не удалось оценить полномочия — результат неизвестен, а не отсутствие привилегий: $(@($unevaluated) -join '; ')" -Class "Note"
     }
 }
 
@@ -163,7 +163,7 @@ function Show-SPNIdleServers {
     if (@($idle).Count -eq 0) { return }
 
     $names = @($idle | ForEach-Object { "$($_.sAMAccountName)" -replace '\$$', '' })
-    Show-Line "$(@($idle).Count) of the $ServiceName computer account(s) show no recent logon - possibly decommissioned: $(@($names) -join ', ')" -Class "Note"
+    Show-Line "У $(@($idle).Count) компьютерных записей службы $ServiceName нет недавних входов — возможно, узлы выведены из эксплуатации: $(@($names) -join ', ')" -Class "Note"
 }
 <#
 .SYNOPSIS
@@ -353,11 +353,11 @@ function Get-InfrastructureServers {
                     foreach ($dc in $listedDCs) { $dc | Show-Object -Class Hint }
                 }
                 if ($unregisteredDCs.Count -gt 0) {
-                    Show-Line "$($unregisteredDCs.Count) computer account(s) carry the Domain Controller role without being registered as Domain Controllers:" -Class "Finding"
+                    Show-Line "$($unregisteredDCs.Count) компьютерных записей имеют роль контроллера домена, но не зарегистрированы как контроллеры домена:" -Class "Finding"
                     foreach ($dc in $unregisteredDCs) { $dc | Show-Object -Class Finding }
                 }
                 if ($null -eq $registered) {
-                    Show-Line "The configuration partition could not be read - Domain Controllers were not checked against their NTDS Settings" -Class "Note"
+                    Show-Line "Раздел конфигурации прочитать не удалось — записи контроллеров домена не сверялись с NTDS Settings" -Class "Note"
                 }
             } else {
                 Show-Line "Контроллеры домена не найдены (неожиданный результат)" -Class "Note"
@@ -491,7 +491,7 @@ function Get-InfrastructureServers {
                 -SPNPrefix @('SMS_', 'CCM') -ConnectionParams $PSBoundParameters
         } catch {
             Write-Log "[Get-InfrastructureServers] SCCM Server enumeration failed: $_" -Level Error
-            Show-Line "SCCM Server enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Не удалось перечислить серверы SCCM — результат неизвестен, а не пуст" -Class "Note"
         }
 
         # ===== SCOM Servers =====
@@ -519,7 +519,7 @@ function Get-InfrastructureServers {
                 -SPNPrefix @('MSOMHSvc/', 'MSOMSdkSvc/') -ConnectionParams $PSBoundParameters
         } catch {
             Write-Log "[Get-InfrastructureServers] SCOM Server enumeration failed: $_" -Level Error
-            Show-Line "SCOM Server enumeration failed - result unknown, not empty" -Class "Note"
+            Show-Line "Не удалось перечислить серверы SCOM — результат неизвестен, а не пуст" -Class "Note"
         }
 
         # ===== AD FS (Active Directory Federation Services) =====

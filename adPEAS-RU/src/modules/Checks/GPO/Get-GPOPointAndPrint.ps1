@@ -244,7 +244,7 @@ function Get-GPOPointAndPrint {
                 if ((Test-SysvolAccessible) -eq $false) {
                     Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
-                    Show-Line "SYSVOL access failed - cannot analyze Point and Print policies - SMB access failed (authentication/network issue)" -Class Finding
+                    Show-Line "Нет доступа к SYSVOL — политики Point and Print не оценивались (ошибка SMB: сеть или аутентификация)" -Class Finding
                 }
                 return
             }
@@ -352,13 +352,13 @@ function Get-GPOPointAndPrint {
                 # Not the "nothing is deployed" line below: something is deployed, and it is
                 # the hardened kind. Saying nothing is deployed would be false, and saying
                 # nothing at all would read as a check that found no policies to look at.
-                Show-Line "No linked and enabled policy leaves printer driver installation open to non-administrators" -Class Secure
+                Show-Line "Среди связанных и включённых политик не обнаружено разрешения непривилегированным пользователям устанавливать драйверы принтеров без повышения прав" -Class Secure
             } else {
                 Show-Line "Действующие привязанные GPO не задают настройки Point and Print" -Class Note
             }
 
             if ($exploitable.Count -gt 0) {
-                Show-Line "$($exploitable.Count) GPO configuration(s) let non-administrators install printer drivers without an elevation prompt" -Class Finding
+                Show-Line "$($exploitable.Count) конфигураций GPO позволяют пользователям без административных прав устанавливать драйверы принтеров без запроса повышения прав" -Class Finding
             }
 
             foreach ($object in $listed) {
@@ -371,7 +371,7 @@ function Get-GPOPointAndPrint {
 
         } catch {
             Write-Log "[Get-GPOPointAndPrint] Error: $_" -Level Error
-            Show-Line "Error during check - Point and Print settings could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить параметры Point and Print: $_" -Class Finding
         }
     }
 

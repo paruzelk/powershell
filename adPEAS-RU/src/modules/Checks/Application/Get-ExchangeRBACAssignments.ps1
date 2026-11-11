@@ -384,7 +384,7 @@
             }
 
             if (@($results).Count -eq 0) {
-                Show-Line "None of the high-value Exchange roles is assigned ($(@($roleAssignments).Count) role assignment(s) examined)" -Class Secure
+                Show-Line "Ни одна критичная роль Exchange не назначена (проверено назначений ролей: $(@($roleAssignments).Count))" -Class Secure
                 return
             }
 
@@ -392,7 +392,7 @@
             if (@($unexpected).Count -gt 0) {
                 Show-Line "Неожиданные назначения критически важных ролей Exchange сверх стандартной конфигурации: $(@($unexpected).Count)" -Class Finding
             } else {
-                Show-Line "The high-value Exchange roles are assigned only to the role groups Exchange ships them on" -Class Hint
+                Show-Line "Критичные роли Exchange назначены только стандартным группам ролей Exchange" -Class Hint
             }
 
             # Findings first, then the shipped defaults, each group by role name so repeated
@@ -408,7 +408,7 @@
         }
         catch {
             Write-Log "[Get-ExchangeRBACAssignments] Error: $_" -Level Error
-            Show-Line "Error during Exchange role assignment check: $_" -Class Finding
+            Show-Line "Ошибка проверки назначений ролей Exchange: $_" -Class Finding
         }
     }
 

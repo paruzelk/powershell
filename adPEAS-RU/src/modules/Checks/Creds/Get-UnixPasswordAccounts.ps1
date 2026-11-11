@@ -145,12 +145,12 @@
                 $withheldNames = @($withheld | ForEach-Object {
                     if ($_.sAMAccountName) { $_.sAMAccountName } else { $_.distinguishedName }
                 })
-                Show-Line "The value was not readable on: $($withheldNames -join ', ')" -Class "Note"
+                Show-Line "Не удалось прочитать значение у следующих объектов: $($withheldNames -join ', ')" -Class "Note"
             }
 
         } catch {
             Write-Log "[Get-UnixPasswordAccounts] Error: $_" -Level Error
-            Show-Line "Error during check - Unix password attributes could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить парольные атрибуты Unix: $_" -Class Finding
         }
     }
 

@@ -302,9 +302,9 @@ function Get-LAPSCredentialAccess {
                 if ($readerIsPrivileged) {
                     # A hint, and the headline says why - not a finding to be explained away
                     # in the card after the reader has already counted it.
-                    Show-Line "Found $(@($readableComputers).Count) computer(s) with readable LAPS password - expected for this account:" -Class "Hint"
+                    Show-Line "Обнаружено компьютеров с доступным для чтения паролем LAPS: $(@($readableComputers).Count); для текущей записи это ожидаемо:" -Class "Hint"
                 } else {
-                    Show-Line "Found $(@($readableComputers).Count) computer(s) with readable LAPS password:" -Class "Finding"
+                    Show-Line "Обнаружено компьютеров с доступным для чтения паролем LAPS: $(@($readableComputers).Count)" -Class "Finding"
                 }
                 $totalComputers = @($readableComputers).Count
                 $currentIndex = 0
@@ -324,19 +324,19 @@ function Get-LAPSCredentialAccess {
                 }
                 if ($totalComputers -gt $Script:ProgressThreshold) { Show-Progress -Activity "Checking LAPS credential access" -Completed }
             } else {
-                Show-Line "No readable LAPS passwords found" -Class "Secure"
+                Show-Line "Доступных для чтения паролей LAPS не обнаружено" -Class "Secure"
             }
 
             # Say so rather than staying silent: these computers do have a LAPS password
             # stored, the directory just did not hand it over. That is a different fact
             # from "no LAPS in this domain" and it changes what the reader does next.
             if ($withheldCount -gt 0) {
-                Show-Line "$withheldCount computer(s) have a LAPS password stored that this account may not read" -Class "Note"
+                Show-Line "У $withheldCount компьютеров хранится пароль LAPS, который текущая учётная запись не может прочитать" -Class "Note"
             }
 
         } catch {
             Write-Log "[Get-LAPSCredentialAccess] Error: $_" -Level Error
-            Show-Line "Error during check - LAPS password access could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить доступ к паролям LAPS: $_" -Class Finding
         }
     }
 

@@ -106,14 +106,14 @@
             }
 
             # ===== SCCM Detected - Continue with detailed enumeration =====
-            Show-Line "SCCM/MECM infrastructure detected" -Class Hint
+            Show-Line "Обнаружена инфраструктура SCCM/MECM" -Class Hint
 
             # ===== Step 2: System Management Container Details =====
             Show-SubHeader "Анализ контейнера System Management..." -ObjectType "SCCMServer"
 
             # Reuse result from Detection Method 1 (no duplicate query)
             if ($systemMgmt) {
-                Show-Line "System Management container found at: $systemManagementPath" -Class Hint
+                Show-Line "Контейнер System Management найден по пути: $systemManagementPath" -Class Hint
             } else {
                 # SCCM was detected by SPN or by group name, which this module supports
                 # deliberately. Everything the three steps below read lives inside this
@@ -169,7 +169,7 @@
                         Show-Object $siteObj -Class Hint
                     }
                 } elseif (-not $systemMgmt) {
-                    Show-Line "The System Management container does not exist - no site object could be read" -Class Note
+                    Show-Line "Контейнер System Management отсутствует — объекты сайтов прочитать не удалось" -Class Note
                 } else {
                     Show-Line "Контейнер System Management отсутствует — прочитать объекты сайтов не удалось" -Class Note
                 }
@@ -283,7 +283,7 @@
                 } elseif (-not $systemMgmt) {
                     Show-Line "Контейнер System Management отсутствует — прочитать точки управления не удалось" -Class Note
                 } else {
-                    Show-Line "No mSSMSManagementPoint objects found in System Management container" -Class Note
+                    Show-Line "Объекты mSSMSManagementPoint в контейнере System Management не обнаружены" -Class Note
                 }
             } catch {
                 Write-Log "[Get-SCCMInfrastructure] Error querying mSSMSManagementPoint: $_" -Level Warning
@@ -457,7 +457,7 @@
                     }
 
                     if ($containerFindings.Count -gt 0) {
-                        Show-Line "$($containerFindings.Count) principal(s) can write to the System Management container and are not a site server" -Class Finding
+                        Show-Line "Обнаружено субъектов с правом записи в System Management, не являющихся серверами сайта: $($containerFindings.Count)" -Class Finding
 
                         foreach ($containerFinding in $containerFindings.Values) {
                             $sidHex = ConvertTo-LDAPSIDHex -SID $containerFinding.SID
@@ -482,7 +482,7 @@
                             Show-Object $aceObject -Class $(if ([string]$aceObject.dangerousRightsSeverity -in @('Expected', 'Attention', 'Hint')) { 'Hint' } else { 'Finding' })
                         }
                     } else {
-                        Show-Line "Only the site servers and the expected administrators can write to the System Management container" -Class Secure
+                        Show-Line "Запись в System Management разрешена только серверам сайтов и ожидаемым администраторам" -Class Secure
                     }
                 }
             }
@@ -552,7 +552,7 @@
             }
 
             if ($pxeServersFound) {
-                Show-Line "PXE/WDS servers detected" -Class Hint -FindingId "SCCM_PXE_EXPOSURE"
+                Show-Line "Обнаружены серверы PXE/WDS" -Class Hint -FindingId "SCCM_PXE_EXPOSURE"
             } else {
                 Show-Line "Серверы загрузки PXE/WDS не найдены" -Class Note
             }
@@ -653,7 +653,7 @@
 
                 $broadGroupCount = @($groupClass.Values | Where-Object { $_ -eq 'Finding' }).Count
                 if ($broadGroupCount -gt 0) {
-                    Show-Line "$broadGroupCount SCCM-related group(s) have a broad group as member" -Class Finding
+                    Show-Line "Групп, связанных с SCCM, в состав которых входит широкая группа: $broadGroupCount" -Class Finding
                 }
                 foreach ($group in $sccmGroupsFound) {
                     Show-Object $group -Class $groupClass[[string]$group.distinguishedName]

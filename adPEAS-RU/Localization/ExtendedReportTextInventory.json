@@ -8,7 +8,7 @@
                           "src/modules/Reporting/templates/report-scripts.js",
                           "src/modules/Reporting/templates/diff-template.html"
                       ],
-    "candidateCount":  602,
+    "candidateCount":  451,
     "candidates":  [
                        {
                            "kind":  "DirectShow",
@@ -21,30 +21,6 @@
                            "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
                            "line":  763,
                            "snippet":  "Show-Line \"Found $(@($usableByOthers).Count) dMSA(s) that principals beyond administrators and service hosts may use$broadInfo`:\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  792,
-                           "snippet":  "Show-Line \"msDS-GroupMSAMembership of a dMSA is owned by a principal that is not privileged: $(@($ownedDMSAs) -join \u0027, \u0027)\" -Class Finding -FindingId \u0027DMSA_MEMBERSHIP_OWNER\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  796,
-                           "snippet":  "Show-Line \"No principal may use $(@($unusedDMSAs).Count) dMSA(s), or msDS-GroupMSAMembership was not readable: $(@($unusedDMSAs) -join \u0027, \u0027)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  799,
-                           "snippet":  "Show-Line \"msDS-GroupMSAMembership could not be parsed on $(@($unparsedDMSAs).Count) dMSA(s) - who may use them is unknown: $(@($unparsedDMSAs) -join \u0027, \u0027)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  805,
-                           "snippet":  "Show-Line \"dMSA use is restricted to privileged accounts and service hosts ($unanalyzedDMSAs of $($dmsaAccounts.Count) not analyzed)\" -Class Note"
                        },
                        {
                            "kind":  "DynamicSummary",
@@ -151,12 +127,6 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                           "line":  226,
-                           "snippet":  "Show-Line \"Found $countText\" -Class $mappingClass -FindingId \u0027ESC14_WEAK_EXPLICIT_MAPPING\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
                            "line":  535,
                            "snippet":  "Show-Line (\"No issuer is published in the NTAuth store, so no certificate can \" +"
                        },
@@ -165,336 +135,6 @@
                            "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
                            "line":  1422,
                            "snippet":  "Show-SubHeader $serviceGroup.Title -ObjectType $serviceGroup.ObjectType"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  1443,
-                           "snippet":  "Show-Line \"$($serviceGroup.Name) group not found\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  1457,
-                           "snippet":  "Show-Line \"Found $(@($groupMembers).Count) member(s) in $($serviceGroup.Name):\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeRBACAssignments.ps1",
-                           "line":  387,
-                           "snippet":  "Show-Line \"None of the high-value Exchange roles is assigned ($(@($roleAssignments).Count) role assignment(s) examined)\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeRBACAssignments.ps1",
-                           "line":  395,
-                           "snippet":  "Show-Line \"The high-value Exchange roles are assigned only to the role groups Exchange ships them on\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeRBACAssignments.ps1",
-                           "line":  411,
-                           "snippet":  "Show-Line \"Error during Exchange role assignment check: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  109,
-                           "snippet":  "Show-Line \"SCCM/MECM infrastructure detected\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  116,
-                           "snippet":  "Show-Line \"System Management container found at: $systemManagementPath\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  172,
-                           "snippet":  "Show-Line \"The System Management container does not exist - no site object could be read\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  286,
-                           "snippet":  "Show-Line \"No mSSMSManagementPoint objects found in System Management container\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  460,
-                           "snippet":  "Show-Line \"$($containerFindings.Count) principal(s) can write to the System Management container and are not a site server\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  485,
-                           "snippet":  "Show-Line \"Only the site servers and the expected administrators can write to the System Management container\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  555,
-                           "snippet":  "Show-Line \"PXE/WDS servers detected\" -Class Hint -FindingId \"SCCM_PXE_EXPOSURE\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  656,
-                           "snippet":  "Show-Line \"$broadGroupCount SCCM-related group(s) have a broad group as member\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCOMInfrastructure.ps1",
-                           "line":  101,
-                           "snippet":  "Show-Line \"SCOM infrastructure detected\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCOMInfrastructure.ps1",
-                           "line":  131,
-                           "snippet":  "Show-Line \"Found $(@($scomServers).Count) SCOM management server(s)\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCOMInfrastructure.ps1",
-                           "line":  239,
-                           "snippet":  "Show-Line \"Error during check - the SCOM infrastructure could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-ComputerPasswordAge.ps1",
-                           "line":  116,
-                           "snippet":  "Show-Line \"$($domainControllers.Count) Domain Controller(s) have not changed their machine account password in $PasswordAgeDays days or more:\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-ComputerPasswordAge.ps1",
-                           "line":  121,
-                           "snippet":  "Show-Line \"$($members.Count) active computer(s) have not changed their machine account password in $PasswordAgeDays days or more:\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-InfrastructureServers.ps1",
-                           "line":  66,
-                           "snippet":  "Show-Line \"$ServiceName service accounts could not be read - result unknown, not empty\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-InfrastructureServers.ps1",
-                           "line":  116,
-                           "snippet":  "Show-Line \"$ServiceName also runs under $(@($described).Count) domain account(s), host from the SPN: $(@($described) -join \u0027; \u0027)\" -Class \"Hint\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-InfrastructureServers.ps1",
-                           "line":  119,
-                           "snippet":  "Show-Line \"$(@($privileged).Count) of them hold privileged rights in the domain, and whoever controls the service or its host holds them too: $(@($privileged) -join \u0027; \u0027)\" -Class \"Finding\" -FindingId $PrivilegedFindingId"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-InfrastructureServers.ps1",
-                           "line":  122,
-                           "snippet":  "Show-Line \"The privileges of $(@($unevaluated).Count) of them could not be evaluated - result unknown, not unprivileged: $(@($unevaluated) -join \u0027; \u0027)\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-InfrastructureServers.ps1",
-                           "line":  166,
-                           "snippet":  "Show-Line \"$(@($idle).Count) of the $ServiceName computer account(s) show no recent logon - possibly decommissioned: $(@($names) -join \u0027, \u0027)\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-InfrastructureServers.ps1",
-                           "line":  356,
-                           "snippet":  "Show-Line \"$($unregisteredDCs.Count) computer account(s) carry the Domain Controller role without being registered as Domain Controllers:\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-InfrastructureServers.ps1",
-                           "line":  360,
-                           "snippet":  "Show-Line \"The configuration partition could not be read - Domain Controllers were not checked against their NTDS Settings\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-InfrastructureServers.ps1",
-                           "line":  494,
-                           "snippet":  "Show-Line \"SCCM Server enumeration failed - result unknown, not empty\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-InfrastructureServers.ps1",
-                           "line":  522,
-                           "snippet":  "Show-Line \"SCOM Server enumeration failed - result unknown, not empty\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-LAPSConfiguration.ps1",
-                           "line":  653,
-                           "snippet":  "Show-Line \"Found $total computer(s) $what, by OU:\" -Class $class"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-LAPSConfiguration.ps1",
-                           "line":  785,
-                           "snippet":  "Show-Line \"OPSEC mode: Skipping LAPS configuration check (would query every computer and walk SYSVOL)\" -Class \"Hint\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-LAPSConfiguration.ps1",
-                           "line":  920,
-                           "snippet":  "Show-Line \"Windows LAPS Native schema present\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-LAPSConfiguration.ps1",
-                           "line":  1141,
-                           "snippet":  "Show-Line \"Error during check - the LAPS configuration could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  339,
-                           "snippet":  "Show-Line \"No enabled computer logged on within the last $ActiveDays days\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  509,
-                           "snippet":  "Show-Line \"$outsideDomain active computer(s) with a DNS name outside $domainFQDN - not resolved\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  512,
-                           "snippet":  "Show-Line \"$withoutName active computer(s) without a DNS name (dNSHostName) - not mapped\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  515,
-                           "snippet":  "Show-Line \"OPSEC mode: $notInZones active computer(s) not found in the AD-integrated DNS zones - not resolved by DNS query\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  518,
-                           "snippet":  "Show-Line \"No AD-integrated DNS zone of these names could be read - addresses by DNS query to $askedServer\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  521,
-                           "snippet":  "Show-Line \"$withoutAddress active computer(s) without a usable IPv4 address in DNS - not mapped\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  524,
-                           "snippet":  "Show-Line \"$ipv6Only active computer(s) with IPv6 addresses only - IPv6 is not mapped\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  527,
-                           "snippet":  "Show-Line \"The domain controllers could not be determined - no subnet counts them\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  594,
-                           "snippet":  "Show-Line \"$($emptySubnets.Count) subnet(s) defined in Sites and Services without an active computer:\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  606,
-                           "snippet":  "Show-Line \"No subnet to write to $ExportTargets\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  610,
-                           "snippet":  "Show-Line \"Wrote $($targets.Count) subnet(s) to $($export.Path)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  612,
-                           "snippet":  "Show-Line \"The subnet list could not be written to ${ExportTargets}: $($export.Message)\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NetworkMap.ps1",
-                           "line":  619,
-                           "snippet":  "Show-Line \"Error during check - the network map could not be built: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NonDefaultComputerOwners.ps1",
-                           "line":  414,
-                           "snippet":  "Show-Line \"$clusterOwned of them are owned by a computer account, which is how a cluster owns the objects it creates\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NonDefaultComputerOwners.ps1",
-                           "line":  424,
-                           "snippet":  "Show-Line \"The computers whose owner could be read all have default owners ($unreadableOwners of $totalComputers carried no owner in their security descriptor)\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NonDefaultComputerOwners.ps1",
-                           "line":  433,
-                           "snippet":  "Show-Line \"$unreadableOwners of $totalComputers computer object(s) carried no owner in their security descriptor and were not evaluated\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-NonDefaultComputerOwners.ps1",
-                           "line":  452,
-                           "snippet":  "Show-Line \"Error during check - computer ownership could not be evaluated: $_\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-OutdatedComputers.ps1",
-                           "line":  84,
-                           "snippet":  "Show-Line \"OPSEC mode: Skipping outdated computer check (would check all enabled computers)\" -Class \"Hint\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-OutdatedComputers.ps1",
-                           "line":  194,
-                           "snippet":  "Show-Line \"$(@($esuOnlyComputerDNs).Count) computer(s) are past general support and inside the paid ESU window:\" -Class \"Hint\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-OutdatedComputers.ps1",
-                           "line":  202,
-                           "snippet":  "Show-Line \"$notAssessableCount active computer(s) run a Microsoft operating system this lifecycle table cannot place:\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-OutdatedComputers.ps1",
-                           "line":  204,
-                           "snippet":  "Show-Line \"  $osLabel - $($notAssessableOS[$osLabel]) computer(s)\" -Class \"Hint\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-OutdatedComputers.ps1",
-                           "line":  247,
-                           "snippet":  "Show-Line \"No active computers with an outdated Microsoft operating system ($inactiveFilteredCount inactive accounts filtered)\" -Class \"Secure\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-OutdatedComputers.ps1",
-                           "line":  256,
-                           "snippet":  "Show-Line \"Error during check - outdated operating systems could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  178,
-                           "snippet":  "Show-Line \"Found $($recoveryObjects.Count) readable BitLocker recovery key(s):\" -Class \"Hint\""
                        },
                        {
                            "kind":  "DirectShow",
@@ -535,36 +175,6 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
-                           "line":  886,
-                           "snippet":  "Show-Line \"Scanning Custom Path for Credentials\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
-                           "line":  887,
-                           "snippet":  "Show-Line \"Target: $Path\" -Class \"Hint\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
-                           "line":  910,
-                           "snippet":  "Show-Line \"Failed to connect to $Path with provided credentials: $_\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
-                           "line":  922,
-                           "snippet":  "Show-Line \"Cannot access path: $Path (try using -Credential for authentication)\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
-                           "line":  927,
-                           "snippet":  "Show-Line \"Cannot access path: $Path\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
                            "line":  944,
                            "snippet":  "Show-Line $result.Headline -Class $result.Class"
                        },
@@ -579,12 +189,6 @@
                            "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
                            "line":  1001,
                            "snippet":  "Show-Line $result.Headline -Class $result.Class"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
-                           "line":  1013,
-                           "snippet":  "Show-Line \"No script/config files found in path\" -Class \"Note\""
                        },
                        {
                            "kind":  "DirectShow",
@@ -605,12 +209,6 @@
                            "snippet":  "Show-Line $result.Headline -Class $result.Class"
                        },
                        {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  180,
-                           "snippet":  "Show-Line \"No user object carries roamed credential material\" -Class Secure"
-                       },
-                       {
                            "kind":  "DynamicSummary",
                            "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
                            "line":  234,
@@ -619,20 +217,8 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  241,
-                           "snippet":  "Show-Line \"Found $countText\" -Class Finding -FindingId \u0027CREDENTIAL_ROAMING_READABLE\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
                            "line":  242,
                            "snippet":  "Show-Line (\"The attributes are not marked confidential in the schema, so reading them follows the \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  246,
-                           "snippet":  "Show-Line \"Found $countText\" -Class Hint -FindingId \u0027CREDENTIAL_ROAMING_PRESENT\u0027"
                        },
                        {
                            "kind":  "DirectShow",
@@ -651,12 +237,6 @@
                            "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
                            "line":  267,
                            "snippet":  "Show-Line (\"Reading these attributes is not constrained for anybody with DCSync, a copy of ntds.dit or \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  272,
-                           "snippet":  "Show-Line \"Error during check: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",
@@ -697,218 +277,8 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  136,
-                           "snippet":  "Show-Line \"No deleted object exists in the domain\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  138,
-                           "snippet":  "Show-Line \"No deleted object is visible to this account - it may not list them, or there is none\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  142,
-                           "snippet":  "Show-Line \"This account can read $($deletedObjects.Count) deleted object(s) - as a member of Administrators\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  144,
-                           "snippet":  "Show-Line \"This account can read $($deletedObjects.Count) deleted object(s) through a delegation on the deleted objects container\" -Class Hint -FindingId \u0027DELETED_OBJECTS_READ_DELEGATED\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  170,
-                           "snippet":  "Show-Line \"Password attribute $passwordAttribute set on deleted $($display.Kind) \u0027$($display.Name)\u0027\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  173,
-                           "snippet":  "Show-Line \"Probable credential found in $($credentialMatch.Attribute) of deleted $($display.Kind) \u0027$($display.Name)\u0027\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  176,
-                           "snippet":  "Show-Line \"Possible credential mention in $($credentialMatch.Attribute) of deleted $($display.Kind) \u0027$($display.Name)\u0027\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  185,
-                           "snippet":  "Show-Line \"None of the $($deletedObjects.Count) deleted object(s) holds a credential in a free-text or password attribute\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  196,
-                           "snippet":  "Show-Line \"Error during the ACL analysis - who may list deleted objects could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  201,
-                           "snippet":  "Show-Line \"Error during check - deleted object access could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  315,
-                           "snippet":  "Show-Line \"The ACL of the deleted objects container is readable by administrators only - other readers not checked\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  321,
-                           "snippet":  "Show-Line \"The ACL of the deleted objects container could not be parsed - who may list deleted objects was not checked\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  388,
-                           "snippet":  "Show-Line \"Found $($unexpected.Count) principal(s) outside Tier 0 that may list deleted objects\" -Class $headlineClass"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
                            "line":  390,
                            "snippet":  "Show-Line \"Only Tier 0$(if ($exchangeReads) { \u0027 and the Exchange service groups\u0027 }) may list deleted objects\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-KerberoastableAccounts.ps1",
-                           "line":  203,
-                           "snippet":  "Show-Line \"$privilegedCount of them is/are privileged - cracking one of those passwords is a domain compromise\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-KerberoastableAccounts.ps1",
-                           "line":  207,
-                           "snippet":  "Show-Line \"No kerberoastable accounts found\" -Class \"Secure\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-KerberoastableAccounts.ps1",
-                           "line":  212,
-                           "snippet":  "Show-Line \"Error during check - kerberoastable accounts could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-LAPSCredentialAccess.ps1",
-                           "line":  305,
-                           "snippet":  "Show-Line \"Found $(@($readableComputers).Count) computer(s) with readable LAPS password - expected for this account:\" -Class \"Hint\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-LAPSCredentialAccess.ps1",
-                           "line":  307,
-                           "snippet":  "Show-Line \"Found $(@($readableComputers).Count) computer(s) with readable LAPS password:\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-LAPSCredentialAccess.ps1",
-                           "line":  327,
-                           "snippet":  "Show-Line \"No readable LAPS passwords found\" -Class \"Secure\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-LAPSCredentialAccess.ps1",
-                           "line":  334,
-                           "snippet":  "Show-Line \"$withheldCount computer(s) have a LAPS password stored that this account may not read\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-LAPSCredentialAccess.ps1",
-                           "line":  339,
-                           "snippet":  "Show-Line \"Error during check - LAPS password access could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-PasswordInDescription.ps1",
-                           "line":  76,
-                           "snippet":  "Show-Line \"OPSEC mode: Skipping password-in-description check (would check all users and computers)\" -Class \"Hint\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-PasswordInDescription.ps1",
-                           "line":  210,
-                           "snippet":  "Show-Line \"Probable credential found in $bestAttrName of $objectType \u0027$shownName\u0027\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-PasswordInDescription.ps1",
-                           "line":  212,
-                           "snippet":  "Show-Line \"Possible credential mention in $bestAttrName of $objectType \u0027$shownName\u0027\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-PasswordInDescription.ps1",
-                           "line":  222,
-                           "snippet":  "Show-Line \"Matched but could not be read again: $accountName\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-PasswordInDescription.ps1",
-                           "line":  235,
-                           "snippet":  "Show-Line \"Nothing could be reported - every match could not be read again\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-PasswordInDescription.ps1",
-                           "line":  245,
-                           "snippet":  "Show-Line \"Error during check - credentials in free-text attributes could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-UnixPasswordAccounts.ps1",
-                           "line":  148,
-                           "snippet":  "Show-Line \"The value was not readable on: $($withheldNames -join \u0027, \u0027)\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-UnixPasswordAccounts.ps1",
-                           "line":  153,
-                           "snippet":  "Show-Line \"Error during check - Unix password attributes could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Delegation\\Get-ConstrainedDelegation.ps1",
-                           "line":  233,
-                           "snippet":  "Show-Line \"$totalOnDC of them delegate to a Domain Controller - treat these as a direct path to Domain Admin\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Delegation\\Get-ConstrainedDelegation.ps1",
-                           "line":  236,
-                           "snippet":  "Show-Line \"$totalNoTarget carry protocol transition without any delegation target\" -Class \"Hint\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Delegation\\Get-UnconstrainedDelegation.ps1",
-                           "line":  202,
-                           "snippet":  "Show-Line \"$($exposedNames.Count) privileged account(s) hand their TGT to these hosts at every Kerberos logon - not sensitive, not in Protected Users: $shownNames\" -Class Finding -FindingId \u0027UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-DomainInformation.ps1",
-                           "line":  200,
-                           "snippet":  "Show-Line \"The krbtgt account could not be read - its password age is unknown\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-DomainInformation.ps1",
-                           "line":  780,
-                           "snippet":  "Show-Line \"No domain controllers found\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-DomainInformation.ps1",
-                           "line":  824,
-                           "snippet":  "Show-Line \"Error during check - the domain information could not be evaluated: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",
@@ -925,38 +295,8 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Domain\\Get-DomainPasswordPolicy.ps1",
-                           "line":  698,
-                           "snippet":  "Show-Line \"No weakness in the Fine-Grained Password Policies that could be read\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-DomainPasswordPolicy.ps1",
-                           "line":  702,
-                           "snippet":  "Show-Line \"Could not be read in full, and therefore not assessed: $($unreadPSONames -join \u0027, \u0027)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-DomainPasswordPolicy.ps1",
-                           "line":  706,
-                           "snippet":  "Show-Line \"Assigned to no user and no group, and therefore not assessed: $($unassignedPSONames -join \u0027, \u0027)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-DomainPasswordPolicy.ps1",
                            "line":  743,
                            "snippet":  "Show-Line \"Found $($assignedPSOs.Count) Fine-Grained Password Polic$(if($assignedPSOs.Count -eq 1){\u0027y\u0027}else{\u0027ies\u0027}) $($foundBy):\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-DomainPasswordPolicy.ps1",
-                           "line":  792,
-                           "snippet":  "Show-Line \"Error during check - the password policy could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-DomainTrusts.ps1",
-                           "line":  378,
-                           "snippet":  "Show-Line \"Error during check - domain trusts could not be evaluated: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",
@@ -978,30 +318,6 @@
                        },
                        {
                            "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-LDAPConfiguration.ps1",
-                           "line":  353,
-                           "snippet":  "Show-Line \"The Directory Service object could not be read - dsHeuristics, which decides $unreadHeuristics, is unknown\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-LDAPConfiguration.ps1",
-                           "line":  394,
-                           "snippet":  "Show-Line \"The Directory Service object could not be read - dsHeuristics, which decides $unreadHeuristics, is unknown\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOLocalGroupMembership.ps1",
-                           "line":  338,
-                           "snippet":  "Show-Line \"SYSVOL access failed - cannot analyze GPO local group assignments - SMB access failed (authentication/network issue)\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOLocalGroupMembership.ps1",
-                           "line":  429,
-                           "snippet":  "Show-Line \"Error during check - GPO local group assignments could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\GPO\\Get-GPOPermissions.ps1",
                            "line":  1003,
                            "snippet":  "Show-Line $missingLine -Class $missingClass"
@@ -1017,12 +333,6 @@
                            "source":  "src\\modules\\Checks\\GPO\\Get-GPOPermissions.ps1",
                            "line":  1030,
                            "snippet":  "Show-Line $summary -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOPointAndPrint.ps1",
-                           "line":  247,
-                           "snippet":  "Show-Line \"SYSVOL access failed - cannot analyze Point and Print policies - SMB access failed (authentication/network issue)\" -Class Finding"
                        },
                        {
                            "kind":  "DynamicSummary",
@@ -1044,51 +354,9 @@
                        },
                        {
                            "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOPointAndPrint.ps1",
-                           "line":  355,
-                           "snippet":  "Show-Line \"No linked and enabled policy leaves printer driver installation open to non-administrators\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOPointAndPrint.ps1",
-                           "line":  361,
-                           "snippet":  "Show-Line \"$($exploitable.Count) GPO configuration(s) let non-administrators install printer drivers without an elevation prompt\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOPointAndPrint.ps1",
-                           "line":  374,
-                           "snippet":  "Show-Line \"Error during check - Point and Print settings could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPORegistrySettings.ps1",
-                           "line":  249,
-                           "snippet":  "Show-Line \"SYSVOL access failed - cannot analyze GPO registry settings - SMB access failed (authentication/network issue)\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\GPO\\Get-GPORegistrySettings.ps1",
                            "line":  270,
                            "snippet":  "Show-Line $unjudgedText -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPORegistrySettings.ps1",
-                           "line":  422,
-                           "snippet":  "Show-Line \"Error during check - registry settings deployed via GPO could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOScheduledTasks.ps1",
-                           "line":  263,
-                           "snippet":  "Show-Line \"SYSVOL access failed - cannot analyze GPO scheduled tasks - SMB access failed (authentication/network issue)\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOScheduledTasks.ps1",
-                           "line":  317,
-                           "snippet":  "Show-Line \"$($deleteTasks.Count) of the task items below delete their task - nothing runs\" -Class Note"
                        },
                        {
                            "kind":  "DirectShow",
@@ -1098,147 +366,15 @@
                        },
                        {
                            "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOScheduledTasks.ps1",
-                           "line":  371,
-                           "snippet":  "Show-Line \"Error during check - scheduled tasks deployed via GPO could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOScriptPaths.ps1",
-                           "line":  230,
-                           "snippet":  "Show-Line \"SYSVOL access failed - cannot analyze GPO scripts - SMB access failed (authentication/network issue)\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\GPO\\Get-GPOScriptPaths.ps1",
-                           "line":  295,
-                           "snippet":  "Show-Line \"Error during check - scripts deployed via GPO could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Rights\\Get-AddComputerRights.ps1",
-                           "line":  269,
-                           "snippet":  "Show-Line \"ms-DS-MachineAccountQuota is 0 - computer creation restricted to explicit permissions\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Rights\\Get-AddComputerRights.ps1",
-                           "line":  316,
-                           "snippet":  "Show-Line \"Who can add computers to the domain:\" -Class $quotaClass"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Rights\\Get-AddComputerRights.ps1",
-                           "line":  436,
-                           "snippet":  "Show-Line \"No policy that is linked and enabled configures SeMachineAccountPrivilege\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Rights\\Get-AddComputerRights.ps1",
-                           "line":  479,
-                           "snippet":  "Show-Line \"Error during check - the rights to add computers to the domain could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Rights\\Get-DangerousACLs.ps1",
-                           "line":  539,
-                           "snippet":  "Show-Line \"Error during check - domain root ACLs could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Rights\\Get-DangerousOUPermissions.ps1",
-                           "line":  289,
-                           "snippet":  "Show-Line \"$neutralisedByDeny delegation(s) are cancelled by an explicit Deny ACE for the same trustee and are not reported as access\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Rights\\Get-GPOUserRightsAssignment.ps1",
                            "line":  461,
                            "snippet":  "Show-Line $text -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Rights\\Get-GPOUserRightsAssignment.ps1",
-                           "line":  513,
-                           "snippet":  "Show-Line \"SYSVOL is not accessible - GPO user rights could not be evaluated\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Rights\\Get-GPOUserRightsAssignment.ps1",
-                           "line":  518,
-                           "snippet":  "Show-Line \"SYSVOL access failed - GPO user rights could not be evaluated - SMB access failed (authentication/network issue)\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Rights\\Get-GPOUserRightsAssignment.ps1",
-                           "line":  529,
-                           "snippet":  "Show-Line \"Error during check: $_\" -Class \"Finding\""
                        },
                        {
                            "kind":  "DynamicSummary",
                            "source":  "src\\modules\\Checks\\Rights\\Get-PasswordResetRights.ps1",
                            "line":  400,
                            "snippet":  "$countText = if ($IncludePrivileged) { \"$(@($nonExchangeFindings).Count) account(s)\" } else { \"$(@($nonExchangeFindings).Count) non-privileged account(s)\" }"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  377,
-                           "snippet":  "Show-Line \"No readable share to write to $ExportShares\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  381,
-                           "snippet":  "Show-Line \"Wrote $($paths.Count) share(s) to $($export.Path)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  383,
-                           "snippet":  "Show-Line \"The share list could not be written to ${ExportShares}: $($export.Message)\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  437,
-                           "snippet":  "Show-Line \"Wrote $($results.Count) finding(s) and $($readable.Count) share(s) to $($export.Path)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  439,
-                           "snippet":  "Show-Line \"The findings could not be written to ${ExportFindings}: $($export.Message)\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  445,
-                           "snippet":  "Show-Line \"OPSEC mode: Skipping the share hunt (would connect to every computer over SMB)\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  612,
-                           "snippet":  "Show-Line \"$outsideDomain active computer(s) with a DNS name outside $domainFQDN - not contacted\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  615,
-                           "snippet":  "Show-Line \"$withoutName active computer(s) without a DNS name (dNSHostName) - not contacted\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  618,
-                           "snippet":  "Show-Line \"$unreachable of $($targets.Count) computer(s) do not answer on port 445\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  625,
-                           "snippet":  "Show-Line \"$failedTotal computer(s) did not list their shares: $($reasons -join \u0027, \u0027)\" -Class Note"
                        },
                        {
                            "kind":  "DirectShow",
@@ -1255,50 +391,8 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  642,
-                           "snippet":  "Show-Line \"$notReadable named share(s) are not there or cannot be read by this account\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  644,
-                           "snippet":  "Show-Line \"$notReadable share(s) are listed but cannot be read by this account\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  649,
-                           "snippet":  "Show-Line \"No readable share found\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  686,
-                           "snippet":  "Show-Line \"No file was read - the shares were only listed (-ListSharesOnly)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  746,
-                           "snippet":  "Show-Line \"$unreadable file(s) could not be read\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  749,
-                           "snippet":  "Show-Line \"$tooLarge file(s) over $MaxFileSizeKB KB not read\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
                            "line":  762,
                            "snippet":  "Show-Line $result.Headline -Class $result.Class"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Shares\\Invoke-ShareHunt.ps1",
-                           "line":  772,
-                           "snippet":  "Show-Line \"Error during check - the shares could not be searched: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",

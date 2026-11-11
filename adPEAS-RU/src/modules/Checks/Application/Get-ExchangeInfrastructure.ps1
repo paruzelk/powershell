@@ -1440,7 +1440,7 @@
                                 continue
                             }
                         }
-                        Show-Line "$($serviceGroup.Name) group not found" -Class Note
+                        Show-Line "Группа $($serviceGroup.Name) не найдена" -Class Note
                         continue
                     }
 
@@ -1454,7 +1454,7 @@
                         continue
                     }
 
-                    Show-Line "Found $(@($groupMembers).Count) member(s) in $($serviceGroup.Name):" -Class Hint
+                    Show-Line "Найдено участников: $(@($groupMembers).Count); группа: $($serviceGroup.Name)" -Class Hint
 
                     $groupObject | Add-Member -NotePropertyName '_isExchangeGroup' -NotePropertyValue $true -Force
                     $groupObject | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue $serviceGroup.ObjectType -Force

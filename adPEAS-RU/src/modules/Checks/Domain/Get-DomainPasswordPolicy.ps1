@@ -695,15 +695,15 @@ function Get-DomainPasswordPolicy {
                         } elseif ($cleanPSONames.Count -gt 0 -and $unreadPSONames.Count -eq 0) {
                             Show-Line "Тонкие политики паролей настроены корректно" -Class Secure
                         } elseif ($cleanPSONames.Count -gt 0) {
-                            Show-Line "No weakness in the Fine-Grained Password Policies that could be read" -Class Note
+                            Show-Line "Слабых параметров в доступных для чтения политиках FGPP не обнаружено" -Class Note
                         }
 
                         if ($unreadPSONames.Count -gt 0) {
-                            Show-Line "Could not be read in full, and therefore not assessed: $($unreadPSONames -join ', ')" -Class Note
+                            Show-Line "Не удалось прочитать полностью, поэтому не оценивались: $($unreadPSONames -join ', ')" -Class Note
                         }
 
                         if ($unassignedPSONames.Count -gt 0) {
-                            Show-Line "Assigned to no user and no group, and therefore not assessed: $($unassignedPSONames -join ', ')" -Class Note
+                            Show-Line "Ни пользователям, ни группам не назначены, поэтому не оценивались: $($unassignedPSONames -join ', ')" -Class Note
                         }
 
                     }
@@ -789,7 +789,7 @@ function Get-DomainPasswordPolicy {
 
         } catch {
             Write-Log "[Get-DomainPasswordPolicy] Error: $_" -Level Error
-            Show-Line "Error during check - the password policy could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить политику паролей: $_" -Class Finding
         }
     }
 

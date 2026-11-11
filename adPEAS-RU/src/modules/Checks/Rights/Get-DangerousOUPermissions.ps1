@@ -286,7 +286,7 @@ function Get-DangerousOUPermissions {
             # not to any one OU. Note rather than Secure: the delegation is still in
             # the DACL, and removing the Deny ACE is all it takes to make it effective.
             if ($neutralisedByDeny -gt 0) {
-                Show-Line "$neutralisedByDeny delegation(s) are cancelled by an explicit Deny ACE for the same trustee and are not reported as access" -Class Note
+                Show-Line "$neutralisedByDeny делегирований нейтрализованы явным ACE Deny для того же субъекта и не учитываются как предоставленный доступ" -Class Note
             }
 
             # Display findings

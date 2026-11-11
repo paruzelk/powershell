@@ -73,7 +73,7 @@
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
-                Show-Line "OPSEC mode: Skipping password-in-description check (would check all users and computers)" -Class "Hint"
+                Show-Line "Режим OPSEC: поиск паролей в описаниях пропущен (потребовалась бы проверка всех пользователей и компьютеров)" -Class "Hint"
                 return
             }
 
@@ -207,9 +207,9 @@
                             $fullObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'PasswordInDescription' -Force
                             $fullObj | Add-Member -NotePropertyName '_adPEASContext' -NotePropertyValue "$objectType - $bestAttrName attribute" -Force
                             if ($bestTier -eq 1) {
-                                Show-Line "Probable credential found in $bestAttrName of $objectType '$shownName'" -Class Finding
+                                Show-Line "Вероятные учётные данные найдены в $bestAttrName объекта $objectType '$shownName'" -Class Finding
                             } else {
-                                Show-Line "Possible credential mention in $bestAttrName of $objectType '$shownName'" -Class Hint
+                                Show-Line "Возможное упоминание учётных данных найдено в $bestAttrName объекта $objectType '$shownName'" -Class Hint
                             }
                             Show-Object $fullObj -Class $(if ($bestTier -eq 1) { 'Finding' } else { 'Hint' })
                             if ($bestTier -eq 1) { $findingCount++ } else { $hintCount++ }
@@ -219,7 +219,7 @@
                             # be read back - deleted in between, or moved out of reach.
                             $unreadableCount++
                             Write-Log "[Get-PasswordInDescription] Candidate could not be re-read: $accountName"
-                            Show-Line "Matched but could not be read again: $accountName" -Class Note
+                            Show-Line "Совпадение найдено, но повторно прочитать объект не удалось: $accountName" -Class Note
                         }
                     }
             }
@@ -232,7 +232,7 @@
                 if ($unreadableCount -gt 0) {
                     # Not green: a candidate matched and could not be read back, so the
                     # directory was not cleared - it was not fully looked at.
-                    Show-Line "Nothing could be reported - every match could not be read again" -Class Note
+                    Show-Line "Нечего показать: ни одно совпадение не удалось прочитать повторно" -Class Note
                 } else {
                     Show-Line "Учётные данные в свободно заполняемых атрибутах объектов не обнаружены" -Class Secure
                 }
@@ -242,7 +242,7 @@
 
         } catch {
             Write-Log "[Get-PasswordInDescription] Error: $_" -Level Error
-            Show-Line "Error during check - credentials in free-text attributes could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить наличие учётных данных в текстовых атрибутах: $_" -Class Finding
         }
     }
 

@@ -199,7 +199,7 @@ function Get-UnconstrainedDelegation {
                 if ($exposedNames.Count -gt 0) {
                     $shownNames = @($exposedNames | Select-Object -First 20) -join ', '
                     if ($exposedNames.Count -gt 20) { $shownNames = "$shownNames, ... and $($exposedNames.Count - 20) more" }
-                    Show-Line "$($exposedNames.Count) privileged account(s) hand their TGT to these hosts at every Kerberos logon - not sensitive, not in Protected Users: $shownNames" -Class Finding -FindingId 'UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS'
+                    Show-Line "$($exposedNames.Count) привилегированных учётных записей передают TGT этим узлам при каждом входе Kerberos — они не отмечены как чувствительные и не состоят в Protected Users: $shownNames" -Class Finding -FindingId 'UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS'
                 } else {
                     Show-Line "Все привилегированные записи защищены от делегирования либо состоят в Protected Users; однако контроллер домена при определённых воздействиях всё равно может передать собственный TGT" -Class Note
                 }

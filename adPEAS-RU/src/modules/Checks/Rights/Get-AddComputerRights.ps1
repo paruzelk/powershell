@@ -266,7 +266,7 @@
             # Finding 1: MachineAccountQuota as object
             # Note: Quota > 0 is a Hint (not Finding) - it's a configuration worth noting but not critical
             if ($quotaValue -eq 0) {
-                Show-Line "ms-DS-MachineAccountQuota is 0 - computer creation restricted to explicit permissions" -Class Secure
+                Show-Line "ms-DS-MachineAccountQuota равна 0 — создание компьютерных записей ограничено явно назначенными разрешениями" -Class Secure
             } else {
                 # Three different statements, because three different things are true.
                 # Without a policy the documented default applies - Authenticated Users
@@ -313,7 +313,7 @@
                     privilegeGrantedBy          = $grantedBy
                 }
                 $quotaObject | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'MachineAccountQuota' -Force
-                Show-Line "Who can add computers to the domain:" -Class $quotaClass
+                Show-Line "Кто может добавлять компьютеры в домен:" -Class $quotaClass
                 Show-Object $quotaObject -Class $quotaClass
                 $hasFindings = $true
             }
@@ -433,7 +433,7 @@
                 if (@($shownGPOs).Count -gt 0) {
                     Show-Line "Групповые политики, назначающие SeMachineAccountPrivilege: $(@($shownGPOs).Count)" -Class $lineClass
                 } else {
-                    Show-Line "No policy that is linked and enabled configures SeMachineAccountPrivilege" -Class Note
+                    Show-Line "Ни одна связанная и включённая политика не задаёт SeMachineAccountPrivilege" -Class Note
                 }
 
                 # Show all GPOs that define SeMachineAccountPrivilege, sorted by precedence
@@ -476,7 +476,7 @@
 
         } catch {
             Write-Log "[Get-AddComputerRights] Error: $_" -Level Error
-            Show-Line "Error during check - the rights to add computers to the domain could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить права добавления компьютеров в домен: $_" -Class Finding
         }
     }
 

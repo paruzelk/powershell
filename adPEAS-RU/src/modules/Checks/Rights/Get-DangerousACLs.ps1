@@ -536,7 +536,7 @@
             # check indistinguishable from a domain with nothing to report: both produced
             # no objects and no message at all.
             Write-Log "[Get-DangerousACLs] Error: $_" -Level Error
-            Show-Line "Error during check - domain root ACLs could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить ACL корневого объекта домена: $_" -Class Finding
         }
     }
 

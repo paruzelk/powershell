@@ -260,7 +260,7 @@
                 if ((Test-SysvolAccessible) -eq $false) {
                     Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
-                    Show-Line "SYSVOL access failed - cannot analyze GPO scheduled tasks - SMB access failed (authentication/network issue)" -Class Finding
+                    Show-Line "Нет доступа к SYSVOL — запланированные задания GPO не оценивались (ошибка SMB: сеть или аутентификация)" -Class Finding
                 }
                 return
             }
@@ -314,7 +314,7 @@
 
                 if ($deleteTasks.Count -gt 0) {
                     if ($IncludeInactive) {
-                        Show-Line "$($deleteTasks.Count) of the task items below delete their task - nothing runs" -Class Note
+                        Show-Line "$($deleteTasks.Count) элементов заданий ниже удаляют свои задания — ничего не запускается" -Class Note
                     } else {
                         $deleteText = "$($deleteTasks.Count) task item(s) hidden - they delete their task, nothing runs"
                         # Invoke-adPEAS sets the context for each check; without one the
@@ -368,7 +368,7 @@
 
         } catch {
             Write-Log "[Get-GPOScheduledTasks] Error: $_" -Level Error
-            Show-Line "Error during check - scheduled tasks deployed via GPO could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить задания, развёрнутые через GPO: $_" -Class Finding
         }
     }
 

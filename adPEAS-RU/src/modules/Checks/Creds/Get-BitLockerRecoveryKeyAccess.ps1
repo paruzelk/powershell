@@ -175,7 +175,7 @@
             }
 
             if ($recoveryObjects.Count -gt 0) {
-                Show-Line "Found $($recoveryObjects.Count) readable BitLocker recovery key(s):" -Class "Hint"
+                Show-Line "Найдено доступных для чтения ключей восстановления BitLocker: $($recoveryObjects.Count)" -Class "Hint"
 
                 $totalObjects = $recoveryObjects.Count
                 $currentIndex = 0

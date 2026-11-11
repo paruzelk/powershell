@@ -510,12 +510,12 @@
                 }
             } elseif ((Test-SysvolAccessible) -eq $false) {
                 # SYSVOL could not be read - report honestly instead of implying a clean result
-                Show-Line "SYSVOL is not accessible - GPO user rights could not be evaluated" -Class "Note"
+                Show-Line "SYSVOL недоступен — права пользователей, назначаемые GPO, не оценивались" -Class "Note"
             } elseif (-not $sysvolScanned) {
                 # SYSVOL answers in general, but this scan never got to read the Policies
                 # path. Without this branch the check fell through to the Secure message
                 # below and reported a blind scan as a clean domain.
-                Show-Line "SYSVOL access failed - GPO user rights could not be evaluated - SMB access failed (authentication/network issue)" -Class "Finding"
+                Show-Line "Нет доступа к SYSVOL — права пользователей через GPO не оценивались (ошибка SMB: сеть или аутентификация)" -Class "Finding"
             } else {
                 # Same question as above, on the branch where no GPO carried a user right at
                 # all: that is only a clean domain if the folders were readable.
@@ -526,7 +526,7 @@
 
         } catch {
             Write-Log "[Get-GPOUserRightsAssignment] Error: $_" -Level Error
-            Show-Line "Error during check: $_" -Class "Finding"
+            Show-Line "Ошибка проверки: $_" -Class "Finding"
         } finally {
             $Script:gpoUserRightsFindings = $null
         }

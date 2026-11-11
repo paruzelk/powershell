@@ -81,7 +81,7 @@
 
             # OPSEC mode: Skip heavy-load enumeration
             if ($OPSEC) {
-                Show-Line "OPSEC mode: Skipping outdated computer check (would check all enabled computers)" -Class "Hint"
+                Show-Line "Режим OPSEC: проверка устаревших компьютеров пропущена (потребовалась бы проверка всех включённых компьютеров)" -Class "Hint"
                 return
             }
 
@@ -191,7 +191,7 @@
             if (@($esuOnlyComputerDNs).Count -gt 0) {
                 # The reader gets the conclusion; the card says what ESU means and that
                 # the extension may never have been bought.
-                Show-Line "$(@($esuOnlyComputerDNs).Count) computer(s) are past general support and inside the paid ESU window:" -Class "Hint"
+                Show-Line "$(@($esuOnlyComputerDNs).Count) компьютеров вышли из общей поддержки, но находятся в периоде платной расширенной поддержки ESU:" -Class "Hint"
             }
 
             if ($notAssessableCount -gt 0) {
@@ -199,9 +199,9 @@
                 # does not know: "counting them told the reader a number they could do
                 # nothing with". This counter did exactly that - a number, no name, no
                 # version, nothing to act on. Now it says which build is missing.
-                Show-Line "$notAssessableCount active computer(s) run a Microsoft operating system this lifecycle table cannot place:" -Class "Note"
+                Show-Line "$notAssessableCount активных компьютеров используют Microsoft ОС, которую невозможно классифицировать по данной таблице жизненного цикла:" -Class "Note"
                 foreach ($osLabel in ($notAssessableOS.Keys | Sort-Object)) {
-                    Show-Line "  $osLabel - $($notAssessableOS[$osLabel]) computer(s)" -Class "Hint"
+                    Show-Line "  $osLabel — $($notAssessableOS[$osLabel]) компьютеров" -Class "Hint"
                 }
             }
 
@@ -244,7 +244,7 @@
                     }
                 }
             } elseif ($notAssessableCount -eq 0 -and $inactiveFilteredCount -gt 0) {
-                Show-Line "No active computers with an outdated Microsoft operating system ($inactiveFilteredCount inactive accounts filtered)" -Class "Secure"
+                Show-Line "Активных компьютеров с устаревшей Microsoft ОС не обнаружено (отфильтровано неактивных записей: $inactiveFilteredCount)" -Class "Secure"
             } elseif ($notAssessableCount -eq 0) {
                 Show-Line "Компьютеры с устаревшими версиями Windows не найдены" -Class "Secure"
             }
@@ -253,7 +253,7 @@
             # Say so on the console, not only in the log - an aborted check is otherwise
             # indistinguishable from a domain without an outdated machine.
             Write-Log "[Get-OutdatedComputers] Error: $_" -Level Error
-            Show-Line "Error during check - outdated operating systems could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить устаревшие операционные системы: $_" -Class Finding
         }
     }
 

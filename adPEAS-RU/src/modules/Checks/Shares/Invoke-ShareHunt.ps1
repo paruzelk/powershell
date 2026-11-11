@@ -374,13 +374,13 @@ function Invoke-ShareHunt {
                 if ($ExportShares) {
                     $paths = @($readable | ForEach-Object { $_.Path } | Sort-Object)
                     if ($paths.Count -eq 0) {
-                        Show-Line "No readable share to write to $ExportShares" -Class Note
+                        Show-Line "Нет доступных для чтения общих ресурсов, которые можно записать в $ExportShares" -Class Note
                     } else {
                         $export = Export-adPEASFile -Path $ExportShares -Content (($paths -join "`r`n") + "`r`n") -Type Text -Force -SanitizeFilename:$false
                         if ($export.Success) {
-                            Show-Line "Wrote $($paths.Count) share(s) to $($export.Path)" -Class Note
+                            Show-Line "Записано общих ресурсов: $($paths.Count); файл: $($export.Path)" -Class Note
                         } else {
-                            Show-Line "The share list could not be written to ${ExportShares}: $($export.Message)" -Class Hint
+                            Show-Line "Список общих ресурсов не удалось записать в ${ExportShares}: $($export.Message)" -Class Hint
                         }
                     }
                 }
@@ -434,15 +434,15 @@ function Invoke-ShareHunt {
                     }
                     $export = Export-adPEASFile -Path $ExportFindings -Content $document -Type Json -JsonDepth 6 -Force -SanitizeFilename:$false
                     if ($export.Success) {
-                        Show-Line "Wrote $($results.Count) finding(s) and $($readable.Count) share(s) to $($export.Path)" -Class Note
+                        Show-Line "Записано находок: $($results.Count), общих ресурсов: $($readable.Count); файл: $($export.Path)" -Class Note
                     } else {
-                        Show-Line "The findings could not be written to ${ExportFindings}: $($export.Message)" -Class Hint
+                        Show-Line "Результаты не удалось записать в ${ExportFindings}: $($export.Message)" -Class Hint
                     }
                 }
             }
 
             if ($OPSEC) {
-                Show-Line "OPSEC mode: Skipping the share hunt (would connect to every computer over SMB)" -Class Hint
+                Show-Line "Режим OPSEC: поиск общих ресурсов пропущен (потребовались бы SMB-подключения ко всем компьютерам)" -Class Hint
                 return
             }
 
@@ -609,20 +609,20 @@ function Invoke-ShareHunt {
 
             # ===== Output: what was left out, then the readable shares =====
             if ($outsideDomain -gt 0) {
-                Show-Line "$outsideDomain active computer(s) with a DNS name outside $domainFQDN - not contacted" -Class Note
+                Show-Line "$outsideDomain активных компьютеров с DNS-именем вне $domainFQDN — подключения не выполнялись" -Class Note
             }
             if ($withoutName -gt 0) {
-                Show-Line "$withoutName active computer(s) without a DNS name (dNSHostName) - not contacted" -Class Note
+                Show-Line "$withoutName активных компьютеров без DNS-имени (dNSHostName) — подключения не выполнялись" -Class Note
             }
             if ($unreachable -gt 0) {
-                Show-Line "$unreachable of $($targets.Count) computer(s) do not answer on port 445" -Class Note
+                Show-Line "$unreachable из $($targets.Count) компьютеров не отвечают на порту 445" -Class Note
             }
             if ($listFailed.Count -gt 0) {
                 $failedTotal = 0
                 foreach ($value in $listFailed.Values) { $failedTotal += $value }
                 $reasons = @($listFailed.GetEnumerator() | Sort-Object -Property @{ Expression = { $_.Value }; Descending = $true }, @{ Expression = { [string]$_.Key }; Descending = $false } |
                     ForEach-Object { "$($_.Value) $($_.Key)" })
-                Show-Line "$failedTotal computer(s) did not list their shares: $($reasons -join ', ')" -Class Note
+                Show-Line "$failedTotal компьютеров не предоставили список общих ресурсов: $($reasons -join ', ')" -Class Note
             }
             if ($leftOutAdmin -gt 0) {
                 $text = "$leftOutAdmin administrative share(s) left out"
@@ -639,14 +639,14 @@ function Invoke-ShareHunt {
                 # that cannot be read is a permission, a named one that cannot be read may
                 # simply not exist on that computer.
                 if ($namedShares.Count -gt 0) {
-                    Show-Line "$notReadable named share(s) are not there or cannot be read by this account" -Class Note
+                    Show-Line "$notReadable именованных общих ресурсов отсутствуют или недоступны для чтения текущей записи" -Class Note
                 } else {
-                    Show-Line "$notReadable share(s) are listed but cannot be read by this account" -Class Note
+                    Show-Line "$notReadable перечисленных общих ресурсов недоступны для чтения текущей записи" -Class Note
                 }
             }
 
             if ($readable.Count -eq 0) {
-                Show-Line "No readable share found" -Class Note
+                Show-Line "Доступных для чтения общих ресурсов не обнаружено" -Class Note
                 Write-ShareHuntExport
                 return
             }
@@ -683,7 +683,7 @@ function Invoke-ShareHunt {
                 # Said as a note rather than left to be inferred from a missing section: a
                 # reader who does not know the switch was used would otherwise read the
                 # absence of credentials as a result.
-                Show-Line "No file was read - the shares were only listed (-ListSharesOnly)" -Class Note
+                Show-Line "Файлы не читались — выполнено только перечисление общих ресурсов (-ListSharesOnly)" -Class Note
                 Write-ShareHuntExport
                 return
             }
@@ -743,10 +743,10 @@ function Invoke-ShareHunt {
             Write-Log "[Invoke-ShareHunt] $fileTotal file(s) searched, $($results.Count) finding(s)"
 
             if ($unreadable -gt 0) {
-                Show-Line "$unreadable file(s) could not be read" -Class Note
+                Show-Line "Не удалось прочитать файлов: $unreadable" -Class Note
             }
             if ($tooLarge -gt 0) {
-                Show-Line "$tooLarge file(s) over $MaxFileSizeKB KB not read" -Class Note
+                Show-Line "$tooLarge файлов размером свыше $MaxFileSizeKB КБ не читались" -Class Note
             }
 
             if ($results.Count -eq 0) {
@@ -769,7 +769,7 @@ function Invoke-ShareHunt {
 
         } catch {
             Write-Log "[Invoke-ShareHunt] Error: $_" -Level Error
-            Show-Line "Error during check - the shares could not be searched: $_" -Class Finding
+            Show-Line "Ошибка проверки: поиск общих ресурсов завершился неудачно: $_" -Class Finding
         }
 
         Write-Log "[Invoke-ShareHunt] Check completed"

@@ -335,7 +335,7 @@
                 if ((Test-SysvolAccessible) -eq $false) {
                     Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
-                    Show-Line "SYSVOL access failed - cannot analyze GPO local group assignments - SMB access failed (authentication/network issue)" -Class Finding
+                    Show-Line "Не удалось получить доступ к SYSVOL — назначения локальных групп через GPO не оценивались (ошибка SMB: аутентификация или сеть)" -Class Finding
                 }
                 return
             }
@@ -426,7 +426,7 @@
 
         } catch {
             Write-Log "[Get-GPOLocalGroupMembership] Error: $_" -Level Error
-            Show-Line "Error during check - GPO local group assignments could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить назначения локальных групп через GPO: $_" -Class Finding
         }
     }
 

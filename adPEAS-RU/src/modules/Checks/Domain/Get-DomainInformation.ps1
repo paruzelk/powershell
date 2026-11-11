@@ -197,7 +197,7 @@ function Get-DomainInformation {
                 if (-not $KrbtgtAccount) {
                     # Said rather than skipped: the krbtgt password age is the Golden Ticket
                     # window, and silence here reads as "in order".
-                    Show-Line "The krbtgt account could not be read - its password age is unknown" -Class Note
+                    Show-Line "Учётную запись krbtgt прочитать не удалось — возраст её пароля неизвестен" -Class Note
                 }
 
                 if ($KrbtgtAccount -and $KrbtgtAccount.pwdLastSet) {
@@ -777,7 +777,7 @@ function Get-DomainInformation {
                 $dcObj | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'DomainControllers' -Force
                 Show-Object $dcObj -Class Note
             } else {
-                Show-Line "No domain controllers found" -Class Note
+                Show-Line "Контроллеры домена не обнаружены" -Class Note
             }
 
             # ===================================================================
@@ -821,7 +821,7 @@ function Get-DomainInformation {
 
         } catch {
             Write-Log "[Get-DomainInformation] Error: $_" -Level Error
-            Show-Line "Error during check - the domain information could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить сведения о домене: $_" -Class Finding
         }
     }
 

@@ -411,7 +411,7 @@ function Get-NonDefaultComputerOwners {
                 $clusterOwned = @($nonDefaultOwnerComputers | Where-Object {
                     $_.PSObject.Properties['ownerKind'] -and "$($_.ownerKind)" -like 'Computer account*' }).Count
                 if ($clusterOwned -gt 0) {
-                    Show-Line "$clusterOwned of them are owned by a computer account, which is how a cluster owns the objects it creates" -Class "Note"
+                    Show-Line "$clusterOwned из них принадлежат компьютерной записи — так кластер владеет создаваемыми объектами" -Class "Note"
                 }
 
                 foreach ($computer in $nonDefaultOwnerComputers) {
@@ -421,7 +421,7 @@ function Get-NonDefaultComputerOwners {
             } elseif ($unreadableOwners -ge $totalComputers -and $totalComputers -gt 0) {
                 Show-Line "Владельцы компьютеров не проверены: дескрипторы безопасности не содержали сведений о владельце" -Class "Note"
             } elseif ($unreadableOwners -gt 0) {
-                Show-Line "The computers whose owner could be read all have default owners ($unreadableOwners of $totalComputers carried no owner in their security descriptor)" -Class "Note"
+                Show-Line "Среди компьютеров, для которых владелец прочитан, все имеют стандартного владельца ($unreadableOwners из $totalComputers без владельца в дескрипторе безопасности)" -Class "Note"
             } else {
                 Show-Line "У всех компьютеров стандартные владельцы" -Class "Secure"
             }
@@ -430,7 +430,7 @@ function Get-NonDefaultComputerOwners {
             # three non-default owners and could not read a hundred more descriptors is
             # not the same result as one that read all of them.
             if ($unreadableOwners -gt 0 -and @($nonDefaultOwnerComputers).Count -gt 0) {
-                Show-Line "$unreadableOwners of $totalComputers computer object(s) carried no owner in their security descriptor and were not evaluated" -Class "Finding"
+                Show-Line "$unreadableOwners из $totalComputers объектов компьютеров не имеют владельца в дескрипторе безопасности и не оценивались" -Class "Finding"
             }
 
             # And the other way to control a computer object: an entry someone put on it,
@@ -449,7 +449,7 @@ function Get-NonDefaultComputerOwners {
             # Say so on the console, not only in the log - an aborted check is otherwise
             # indistinguishable from a domain with nothing to report.
             Write-Log "[Get-NonDefaultComputerOwners] Error: $_" -Level Error
-            Show-Line "Error during check - computer ownership could not be evaluated: $_" -Class "Finding"
+            Show-Line "Ошибка проверки: не удалось оценить владельцев компьютерных объектов: $_" -Class "Finding"
         }
     }
 

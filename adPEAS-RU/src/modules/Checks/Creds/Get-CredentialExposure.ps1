@@ -883,8 +883,8 @@ function Get-CredentialExposure {
         try {
             # Mode 1: Custom Path scanning (standalone mode)
             if ($Path) {
-                Show-Line "Scanning Custom Path for Credentials" -Class "Note"
-                Show-Line "Target: $Path" -Class "Hint"
+                Show-Line "Поиск учётных данных по указанному пути" -Class "Note"
+                Show-Line "Цель: $Path" -Class "Hint"
                 Show-EmptyLine
 
                 # Check if UNC path and credentials provided - use temporary drive mapping
@@ -907,7 +907,7 @@ function Get-CredentialExposure {
                             Write-Log "[Get-CredentialExposure] Mapped $Path to ${tempDriveLetter}:"
                         }
                         catch {
-                            Show-Line "Failed to connect to $Path with provided credentials: $_" -Class "Finding"
+                            Show-Line "Не удалось подключиться к $Path с указанными учётными данными: $_" -Class "Finding"
                             return
                         }
                     }
@@ -919,12 +919,12 @@ function Get-CredentialExposure {
                 elseif ($Path -match '^\\\\') {
                     # UNC path without credentials - test access with current user
                     if (-not (Test-Path $Path)) {
-                        Show-Line "Cannot access path: $Path (try using -Credential for authentication)" -Class "Finding"
+                        Show-Line "Путь недоступен: $Path (для аутентификации попробуйте параметр -Credential)" -Class "Finding"
                         return
                     }
                 }
                 elseif (-not (Test-Path $Path)) {
-                    Show-Line "Cannot access path: $Path" -Class "Finding"
+                    Show-Line "Путь недоступен: $Path" -Class "Finding"
                     return
                 }
 
@@ -1010,7 +1010,7 @@ function Get-CredentialExposure {
                     }
                 }
                 else {
-                    Show-Line "No script/config files found in path" -Class "Note"
+                    Show-Line "Файлы сценариев или конфигураций по указанному пути не найдены" -Class "Note"
                 }
 
                 }

@@ -789,20 +789,20 @@
                         $ownedDMSAs += "$ownedName ($ownerName)"
                     }
                     if (@($ownedDMSAs).Count -gt 0) {
-                        Show-Line "msDS-GroupMSAMembership of a dMSA is owned by a principal that is not privileged: $(@($ownedDMSAs) -join ', ')" -Class Finding -FindingId 'DMSA_MEMBERSHIP_OWNER'
+                        Show-Line "Дескриптором msDS-GroupMSAMembership записи dMSA владеет непривилегированный субъект: $(@($ownedDMSAs) -join ', ')" -Class Finding -FindingId 'DMSA_MEMBERSHIP_OWNER'
                     }
 
                     if (@($unusedDMSAs).Count -gt 0) {
-                        Show-Line "No principal may use $(@($unusedDMSAs).Count) dMSA(s), or msDS-GroupMSAMembership was not readable: $(@($unusedDMSAs) -join ', ')" -Class Note
+                        Show-Line "У $(@($unusedDMSAs).Count) записей dMSA нет субъектов, которым разрешено использование, либо не удалось прочитать msDS-GroupMSAMembership: $(@($unusedDMSAs) -join ', ')" -Class Note
                     }
                     if (@($unparsedDMSAs).Count -gt 0) {
-                        Show-Line "msDS-GroupMSAMembership could not be parsed on $(@($unparsedDMSAs).Count) dMSA(s) - who may use them is unknown: $(@($unparsedDMSAs) -join ', ')" -Class Note
+                        Show-Line "Не удалось разобрать msDS-GroupMSAMembership у $(@($unparsedDMSAs).Count) записей dMSA — неизвестно, кто может их использовать: $(@($unparsedDMSAs) -join ', ')" -Class Note
                     }
 
                     if (@($usableByOthers).Count -eq 0 -and @($ownedDMSAs).Count -eq 0 -and $dmsaUserSIDs.Count -gt 0) {
                         $unanalyzedDMSAs = $dmsaAccounts.Count - $dmsaUserSIDs.Count
                         if ($unanalyzedDMSAs -gt 0) {
-                            Show-Line "dMSA use is restricted to privileged accounts and service hosts ($unanalyzedDMSAs of $($dmsaAccounts.Count) not analyzed)" -Class Note
+                            Show-Line "Использовать dMSA разрешено только привилегированным записям и служебным узлам (не проверено $unanalyzedDMSAs из $($dmsaAccounts.Count))" -Class Note
                         } else {
                             Show-Line "Использование всех dMSA ограничено привилегированными записями и узлами служб" -Class Secure
                         }
