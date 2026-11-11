@@ -62,6 +62,32 @@ foreach($p in $attackOverlay.translations.PSObject.Properties){
 if($attackSteps -ne 139){throw "Ожидалось 139 переведённых шагов Attack, найдено $attackSteps"}
 Write-Host "[RU] PASS: 36 цепочек Attack (139 шагов) и 10 полных полей Impact/Remediation сверены с источником; 2 недопустимых сценария очищены"
 
+
+# Дополнение ранее сокращённых Attack по пунктам исходного adPEAS 2.9.0.
+$secondAttackCount=0
+$secondAttackSteps=0
+foreach($name in @('SourceVerifiedAttack-09a.ru-RU.json',
+                  'SourceVerifiedAttack-09b.ru-RU.json',
+                  'SourceVerifiedAttack-09c.ru-RU.json')){
+ $source=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($p in $source.translations.PSObject.Properties){
+  $id=$p.Name
+  if(-not $entries.Contains($id)){throw "Неизвестный FindingId: $id"}
+  $parts=@($p.Value.attack)
+  if($parts.Count -ne [int]$p.Value.sourceEnglishAttackStepCount){throw "Не совпало число шагов Attack: $id"}
+  foreach($part in $parts){
+   if([string]::IsNullOrWhiteSpace([string]$part) -or [string]$part -notmatch '[А-Яа-яЁё]'){throw "Непереведённый шаг Attack: $id"}
+  }
+  $entries[$id].attack=$parts
+  $secondAttackCount++
+  $secondAttackSteps+=$parts.Count
+ }
+}
+if($secondAttackCount -ne 52 -or $secondAttackSteps -ne 189){
+ throw "Неполный набор исправлений Attack: $secondAttackCount записей; $secondAttackSteps пунктов"
+}
+Write-Host "[RU] PASS: 52 сценария Attack приведены к структуре оригинала, проверено 189 пунктов"
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')

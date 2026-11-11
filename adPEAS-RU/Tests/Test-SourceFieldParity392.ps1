@@ -72,6 +72,7 @@ if($original.attack -ne 304 -or $original.impact -ne 377 -or $original.remediati
 if($russian.attack -ne 115){throw "Ожидалось 115 русских Attack, найдено $($russian.attack)"}
 if($missing.Count -ne 189){throw "Ожидалось 189 ещё не переведённых Attack, найдено $($missing.Count)"}
 if($unexpected.Count -ne 0){throw "Обнаружен вымышленный Attack: $($unexpected -join ', ')"}
+if($drift.Count -ne 0){throw "Переведённые Attack имеют расхождения числа пунктов: $($drift -join ', ')"}
 $result=[ordered]@{
  Schema='adPEAS-RU.SourceFieldParity392.1'
  FindingCount=392

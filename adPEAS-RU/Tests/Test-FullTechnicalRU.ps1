@@ -76,4 +76,16 @@ Check (($merged.PSObject.Properties['OU_PERM_KEYCREDENTIALLINK_WRITE'].Value.rem
 Check (@($merged.PSObject.Properties | Where-Object { @($_.Value.attack).Count -gt 0 }).Count -eq 115) '115 русских сценариев Attack (только там, где они есть в оригинале)'
 Check (@($merged.PSObject.Properties['GPO_WIDE_IMPACT'].Value.attack).Count -eq 0) 'Пустой Attack у GPO_WIDE_IMPACT согласован с оригиналом'
 Check (@($merged.PSObject.Properties['GPO_UNLINKED_BROAD_WRITE'].Value.attack).Count -eq 0) 'Пустой Attack у GPO_UNLINKED_BROAD_WRITE согласован с оригиналом'
+
+$checked09=0
+foreach($name in @('SourceVerifiedAttack-09a.ru-RU.json','SourceVerifiedAttack-09b.ru-RU.json','SourceVerifiedAttack-09c.ru-RU.json')){
+ $overlay=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($p in $overlay.translations.PSObject.Properties){
+  $observed=@($merged.PSObject.Properties[$p.Name].Value.attack).Count
+  Check ($observed -eq [int]$p.Value.sourceEnglishAttackStepCount) ("Шаги Attack согласованы с оригиналом: "+$p.Name)
+  $checked09++
+ }
+}
+Check ($checked09 -eq 52) '52 ранее сокращённых Attack проверены по количеству пунктов'
+
 Write-Host "PASS: $n проверок технического перевода; AD не затронут" -ForegroundColor Green

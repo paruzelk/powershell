@@ -77,10 +77,29 @@ foreach($p in $sections.PSObject.Properties){
       title=[string]$ru.SectionTitle;summary=[string]$ru.Summary
       whyItMatters=$whyText
       whatWeCheck=@([string]$ru.Summary,'Проверенные параметры и обнаруженные объекты приведены в карточках результатов.')
-      secureMessage='Проверяемая конфигурация классифицирована как безопасная.'
+      secureMessage=''
       filteringNote='Некоторые штатные разрешения привилегированных записей скрыты; для их отображения включите -IncludePrivileged.'
     }
 }
+
+# Индивидуальные сообщения о результате проверки: отсутствие находки != полнота проверки.
+$secureTexts=@{}
+foreach($name in @('CheckSecureMessages-08a.ru-RU.json','CheckSecureMessages-08b.ru-RU.json',
+                  'CheckSecureMessages-08c.ru-RU.json','CheckSecureMessages-08d.ru-RU.json')){
+ $source=Load-RU $name
+ foreach($p in $source.translations.PSObject.Properties){
+  $id=$p.Name
+  if($secureTexts.ContainsKey($id)){throw "Дублируется перевод результата проверки: $id"}
+  if(-not $ctx.Contains($id)){throw "Неизвестная проверка: $id"}
+  $message=[string]$p.Value
+  if([string]::IsNullOrWhiteSpace($message) -or $message -notmatch '[А-Яа-яЁё]'){throw "Нет русского сообщения: $id"}
+  $secureTexts[$id]=$message
+  $ctx[$id].secureMessage=$message
+ }
+}
+if($secureTexts.Count -ne 94){throw "Ожидалось 94 проверенных secureMessage, найдено $($secureTexts.Count)"}
+Write-Host "[RU] PASS: 94 результата проверок переведены без подмены статуса и области оценки"
+
 $jsPath=Join-Path $ProjectRoot 'src/modules/Reporting/templates/report-scripts.js'
 $js=[IO.File]::ReadAllText($jsPath,[Text.Encoding]::UTF8)
 $mark='        // Scoring context data for context-aware risk calculation'
