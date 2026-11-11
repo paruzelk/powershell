@@ -1,0 +1,70 @@
+{
+  "schema": "adPEAS-RU.StageB.Checks.04",
+  "locale": "ru-RU",
+  "files": {
+    "src/modules/Checks/Delegation/Get-ConstrainedDelegation.ps1": {
+      "Show-Line \"$totalOnDC of them delegate to a Domain Controller - treat these as a direct path to Domain Admin\"": "Show-Line \"Из них $totalOnDC делегируют доступ к контроллеру домена — рассматривайте как прямой путь к Domain Admin\"",
+      "Show-Line \"$totalNoTarget carry protocol transition without any delegation target\"": "Show-Line \"$totalNoTarget имеют переход протокола без единой целевой службы делегирования\""
+    },
+    "src/modules/Checks/Delegation/Get-UnconstrainedDelegation.ps1": {
+      "Show-Line \"$($exposedNames.Count) privileged account(s) hand their TGT to these hosts at every Kerberos logon - not sensitive, not in Protected Users: $shownNames\"": "Show-Line \"$($exposedNames.Count) привилегированных учётных записей передают TGT этим узлам при каждом входе Kerberos — они не отмечены как чувствительные и не состоят в Protected Users: $shownNames\""
+    },
+    "src/modules/Checks/Domain/Get-DomainInformation.ps1": {
+      "Show-Line \"The krbtgt account could not be read - its password age is unknown\"": "Show-Line \"Учётную запись krbtgt прочитать не удалось — возраст её пароля неизвестен\"",
+      "Show-Line \"No domain controllers found\"": "Show-Line \"Контроллеры домена не обнаружены\"",
+      "Show-Line \"Error during check - the domain information could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить сведения о домене: $_\""
+    },
+    "src/modules/Checks/Domain/Get-DomainPasswordPolicy.ps1": {
+      "Show-Line \"No weakness in the Fine-Grained Password Policies that could be read\"": "Show-Line \"Слабых параметров в доступных для чтения политиках FGPP не обнаружено\"",
+      "Show-Line \"Could not be read in full, and therefore not assessed: $($unreadPSONames -join ', ')\"": "Show-Line \"Не удалось прочитать полностью, поэтому не оценивались: $($unreadPSONames -join ', ')\"",
+      "Show-Line \"Assigned to no user and no group, and therefore not assessed: $($unassignedPSONames -join ', ')\"": "Show-Line \"Ни пользователям, ни группам не назначены, поэтому не оценивались: $($unassignedPSONames -join ', ')\"",
+      "Show-Line \"Error during check - the password policy could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить политику паролей: $_\""
+    },
+    "src/modules/Checks/Domain/Get-DomainTrusts.ps1": {
+      "Show-Line \"Error during check - domain trusts could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить доверительные отношения домена: $_\""
+    },
+    "src/modules/Checks/Domain/Get-LDAPConfiguration.ps1": {
+      "Show-Line \"The Directory Service object could not be read - dsHeuristics, which decides $unreadHeuristics, is unknown\"": "Show-Line \"Объект Directory Service прочитать не удалось — значение dsHeuristics, определяющее $unreadHeuristics, неизвестно\""
+    },
+    "src/modules/Checks/GPO/Get-GPOLocalGroupMembership.ps1": {
+      "Show-Line \"SYSVOL access failed - cannot analyze GPO local group assignments - SMB access failed (authentication/network issue)\"": "Show-Line \"Не удалось получить доступ к SYSVOL — назначения локальных групп через GPO не оценивались (ошибка SMB: аутентификация или сеть)\"",
+      "Show-Line \"Error during check - GPO local group assignments could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить назначения локальных групп через GPO: $_\""
+    },
+    "src/modules/Checks/GPO/Get-GPOPointAndPrint.ps1": {
+      "Show-Line \"SYSVOL access failed - cannot analyze Point and Print policies - SMB access failed (authentication/network issue)\"": "Show-Line \"Нет доступа к SYSVOL — политики Point and Print не оценивались (ошибка SMB: сеть или аутентификация)\"",
+      "Show-Line \"No linked and enabled policy leaves printer driver installation open to non-administrators\"": "Show-Line \"Среди связанных и включённых политик не обнаружено разрешения непривилегированным пользователям устанавливать драйверы принтеров без повышения прав\"",
+      "Show-Line \"$($exploitable.Count) GPO configuration(s) let non-administrators install printer drivers without an elevation prompt\"": "Show-Line \"$($exploitable.Count) конфигураций GPO позволяют пользователям без административных прав устанавливать драйверы принтеров без запроса повышения прав\"",
+      "Show-Line \"Error during check - Point and Print settings could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить параметры Point and Print: $_\""
+    },
+    "src/modules/Checks/GPO/Get-GPORegistrySettings.ps1": {
+      "Show-Line \"SYSVOL access failed - cannot analyze GPO registry settings - SMB access failed (authentication/network issue)\"": "Show-Line \"Нет доступа к SYSVOL — параметры реестра, развёрнутые GPO, не оценивались (ошибка SMB: сеть или аутентификация)\"",
+      "Show-Line \"Error during check - registry settings deployed via GPO could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить параметры реестра, развёрнутые GPO: $_\""
+    },
+    "src/modules/Checks/GPO/Get-GPOScheduledTasks.ps1": {
+      "Show-Line \"SYSVOL access failed - cannot analyze GPO scheduled tasks - SMB access failed (authentication/network issue)\"": "Show-Line \"Нет доступа к SYSVOL — запланированные задания GPO не оценивались (ошибка SMB: сеть или аутентификация)\"",
+      "Show-Line \"$($deleteTasks.Count) of the task items below delete their task - nothing runs\"": "Show-Line \"$($deleteTasks.Count) элементов заданий ниже удаляют свои задания — ничего не запускается\"",
+      "Show-Line \"Error during check - scheduled tasks deployed via GPO could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить задания, развёрнутые через GPO: $_\""
+    },
+    "src/modules/Checks/GPO/Get-GPOScriptPaths.ps1": {
+      "Show-Line \"SYSVOL access failed - cannot analyze GPO scripts - SMB access failed (authentication/network issue)\"": "Show-Line \"Нет доступа к SYSVOL — сценарии GPO не оценивались (ошибка SMB: сеть или аутентификация)\"",
+      "Show-Line \"Error during check - scripts deployed via GPO could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить сценарии GPO: $_\""
+    },
+    "src/modules/Checks/Rights/Get-AddComputerRights.ps1": {
+      "Show-Line \"ms-DS-MachineAccountQuota is 0 - computer creation restricted to explicit permissions\"": "Show-Line \"ms-DS-MachineAccountQuota равна 0 — создание компьютерных записей ограничено явно назначенными разрешениями\"",
+      "Show-Line \"Who can add computers to the domain:\"": "Show-Line \"Кто может добавлять компьютеры в домен:\"",
+      "Show-Line \"No policy that is linked and enabled configures SeMachineAccountPrivilege\"": "Show-Line \"Ни одна связанная и включённая политика не задаёт SeMachineAccountPrivilege\"",
+      "Show-Line \"Error during check - the rights to add computers to the domain could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить права добавления компьютеров в домен: $_\""
+    },
+    "src/modules/Checks/Rights/Get-DangerousACLs.ps1": {
+      "Show-Line \"Error during check - domain root ACLs could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить ACL корневого объекта домена: $_\""
+    },
+    "src/modules/Checks/Rights/Get-DangerousOUPermissions.ps1": {
+      "Show-Line \"$neutralisedByDeny delegation(s) are cancelled by an explicit Deny ACE for the same trustee and are not reported as access\"": "Show-Line \"$neutralisedByDeny делегирований нейтрализованы явным ACE Deny для того же субъекта и не учитываются как предоставленный доступ\""
+    },
+    "src/modules/Checks/Rights/Get-GPOUserRightsAssignment.ps1": {
+      "Show-Line \"SYSVOL is not accessible - GPO user rights could not be evaluated\"": "Show-Line \"SYSVOL недоступен — права пользователей, назначаемые GPO, не оценивались\"",
+      "Show-Line \"SYSVOL access failed - GPO user rights could not be evaluated - SMB access failed (authentication/network issue)\"": "Show-Line \"Нет доступа к SYSVOL — права пользователей через GPO не оценивались (ошибка SMB: сеть или аутентификация)\"",
+      "Show-Line \"Error during check: $_\"": "Show-Line \"Ошибка проверки: $_\""
+    }
+  }
+}
