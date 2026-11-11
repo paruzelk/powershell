@@ -1,0 +1,25 @@
+{
+  "schema": "adPEAS-RU.StageB.Checks.05",
+  "locale": "ru-RU",
+  "files": {
+    "src/modules/Checks/Shares/Invoke-ShareHunt.ps1": {
+      "Show-Line \"No readable share to write to $ExportShares\"": "Show-Line \"Нет доступных для чтения общих ресурсов, которые можно записать в $ExportShares\"",
+      "Show-Line \"Wrote $($paths.Count) share(s) to $($export.Path)\"": "Show-Line \"Записано общих ресурсов: $($paths.Count); файл: $($export.Path)\"",
+      "Show-Line \"The share list could not be written to ${ExportShares}: $($export.Message)\"": "Show-Line \"Список общих ресурсов не удалось записать в ${ExportShares}: $($export.Message)\"",
+      "Show-Line \"Wrote $($results.Count) finding(s) and $($readable.Count) share(s) to $($export.Path)\"": "Show-Line \"Записано находок: $($results.Count), общих ресурсов: $($readable.Count); файл: $($export.Path)\"",
+      "Show-Line \"The findings could not be written to ${ExportFindings}: $($export.Message)\"": "Show-Line \"Результаты не удалось записать в ${ExportFindings}: $($export.Message)\"",
+      "Show-Line \"OPSEC mode: Skipping the share hunt (would connect to every computer over SMB)\"": "Show-Line \"Режим OPSEC: поиск общих ресурсов пропущен (потребовались бы SMB-подключения ко всем компьютерам)\"",
+      "Show-Line \"$outsideDomain active computer(s) with a DNS name outside $domainFQDN - not contacted\"": "Show-Line \"$outsideDomain активных компьютеров с DNS-именем вне $domainFQDN — подключения не выполнялись\"",
+      "Show-Line \"$withoutName active computer(s) without a DNS name (dNSHostName) - not contacted\"": "Show-Line \"$withoutName активных компьютеров без DNS-имени (dNSHostName) — подключения не выполнялись\"",
+      "Show-Line \"$unreachable of $($targets.Count) computer(s) do not answer on port 445\"": "Show-Line \"$unreachable из $($targets.Count) компьютеров не отвечают на порту 445\"",
+      "Show-Line \"$failedTotal computer(s) did not list their shares: $($reasons -join ', ')\"": "Show-Line \"$failedTotal компьютеров не предоставили список общих ресурсов: $($reasons -join ', ')\"",
+      "Show-Line \"$notReadable named share(s) are not there or cannot be read by this account\"": "Show-Line \"$notReadable именованных общих ресурсов отсутствуют или недоступны для чтения текущей записи\"",
+      "Show-Line \"$notReadable share(s) are listed but cannot be read by this account\"": "Show-Line \"$notReadable перечисленных общих ресурсов недоступны для чтения текущей записи\"",
+      "Show-Line \"No readable share found\"": "Show-Line \"Доступных для чтения общих ресурсов не обнаружено\"",
+      "Show-Line \"No file was read - the shares were only listed (-ListSharesOnly)\"": "Show-Line \"Файлы не читались — выполнено только перечисление общих ресурсов (-ListSharesOnly)\"",
+      "Show-Line \"$unreadable file(s) could not be read\"": "Show-Line \"Не удалось прочитать файлов: $unreadable\"",
+      "Show-Line \"$tooLarge file(s) over $MaxFileSizeKB KB not read\"": "Show-Line \"$tooLarge файлов размером свыше $MaxFileSizeKB КБ не читались\"",
+      "Show-Line \"Error during check - the shares could not be searched: $_\"": "Show-Line \"Ошибка проверки: поиск общих ресурсов завершился неудачно: $_\""
+    }
+  }
+}
