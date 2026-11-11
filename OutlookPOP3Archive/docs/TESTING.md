@@ -1,5 +1,9 @@
 ﻿# Testing — 2.6.3-PREVIEW1
 
+## ARCH2a fail-closed existing COM move safety tests (2026-11-11)
+
+[ARCH2a runbook](2.6.5-arch2a-move-outcome-fence.md). New `Tests/Archive/ARCH2aMoveOutcomeFence.Tests.ps1` adds 49 pure source/journal/CLI tests (total expected 3709 tests in 124 containers). They exercise unresolved `Move Started`, duplicate attempt, unknown planned IDs, `Move Indeterminate`, and source missing/untreated checkpoint conditions; static checks require `-WriteCheckpoint` and forced journal flush before `MailItem.Move`, no old catch/continue, and blocked DEV writer modes. **These tests do not simulate an Outlook provider and do not certify 90GB.** Next ARCH2b integrates true semantic witnesses into normal archive/verify/resume before any real disposable-pst test.
+
 ## ARCH1 delivery tests and context-restoration gate (2026-11-11)
 
 New `Tests/Runtime/ARCH1DeliveryReadiness.Tests.ps1` checks a **static source-only** readiness classifier and zero Outlook/COM writers. It is NOT a live mailbox acceptance test. New [handoff](PROJECT-HANDOFF-ARCH1.md), [ADR](ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md), [roadmap](DELIVERY-ROADMAP.md) and [implementation audit](ARCH1-IMPLEMENTATION-AUDIT.md) are normative for future tests and releases. The operator has already completed 4/5 original BW4j real fixture Move tests (Attachment256K not independently proven), and an additional BW4k7v2a7 synthetic Move; do not repeat historical one-shot claims.
