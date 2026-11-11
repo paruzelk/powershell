@@ -1333,6 +1333,15 @@ try {
             }
         }
         finally { if ($null -ne $arch2aFs) { $arch2aFs.Dispose() } }
+        $lastOriginalLine = [string](Get-Content -LiteralPath $arch2aOriginalJournal -Encoding UTF8 -Tail 1)
+        try {
+            $lastOriginalRecord = ConvertFrom-Json -InputObject $lastOriginalLine -ErrorAction Stop
+            if ($null -eq $lastOriginalRecord -or
+                $lastOriginalRecord.PSObject.Properties.Name -notcontains 'Step') {
+                throw 'Last record is not a step entry.'
+            }
+        }
+        catch { throw 'ARCH2a Resume STOP: malformed last journal record; manual reconciliation required.' }
         $arch2aFullOriginalSteps = @(Read-OPAStepJournal -Transaction $tx)
         [void](Assert-OPA265ARCH2aNoUnresolvedMove -Transaction $tx -JournalSteps $arch2aFullOriginalSteps)
 
