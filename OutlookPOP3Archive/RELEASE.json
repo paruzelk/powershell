@@ -61,8 +61,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 120,
-    "ExpectedPesterTests": 3546,
+    "ExpectedTestContainers": 121,
+    "ExpectedPesterTests": 3585,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
@@ -582,6 +582,19 @@
     "BW4k7v2a6OldMailMovedOrSaved": false,
     "BW4k7v2a6OriginalEvidenceRewritten": false,
     "BW4k7v2a6SEM001WaiverGranted": false,
-    "BW4k7v2a6ProductionWriterEnabled": false
+    "BW4k7v2a6ProductionWriterEnabled": false,
+    "BW4k7v2a7HistoricalFailedSuiteIdsQuarantined": true,
+    "BW4k7v2a7SyntheticPostSaveBodyPinnedAsBaseline": true,
+    "BW4k7v2a7KnownThreeCharacterSuffixOnlyForDisposableFixture": true,
+    "BW4k7v2a7NoImmediatePostSaveRestrictGate": true,
+    "BW4k7v2a7SubjectQueryHasExplicitNumericCount": true,
+    "BW4k7v2a7DistinctOperatorCreateAndMoveConsent": true,
+    "BW4k7v2a7DurableClaimBeforeExactlyOneMove": true,
+    "BW4k7v2a7IndependentReviewBeforeMoveAndPostRestartReconcile": true,
+    "BW4k7v2a7ProductionContentNormalizationWaiver": false,
+    "BW4k7v2a7RealOutlookProviderTestedInCI": false,
+    "BW4k7v2a7OldSuiteIdMoveOrSaveRetried": false,
+    "BW4k7v2a7AutomaticMoveRetryAllowed": false,
+    "BW4k7v2a7ProductionWriterEnabled": false
   }
 }
