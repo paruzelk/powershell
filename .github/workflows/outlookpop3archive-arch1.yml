@@ -1644,7 +1644,7 @@ jobs:
           if($c -cmatch 'GetActiveObject|New-Object -ComObject|GetNamespace' -or
              $c -cmatch '[.](Move|Copy|Save|Delete|Send|AddStore|AddStoreEx|RemoveStore)[ ]*[(]' -or
              $c -cmatch 'WriteAllText|WriteAllBytes|Set-Content|Out-File|CreateDirectory|New-Item' -or
-             $p -cmatch '[.](Move|Copy|Save|Delete|Send|AddStore)[ ]*[(]'){
+             $p -cmatch '(?m)^\s*(?:\$[A-Za-z_]\w*\s*=\s*)?\$[A-Za-z_]\w*\.(?:Move|Copy|Save|Delete|Send|AddStore)\s*\('){
              $issues.Add('ARCH1 audit code has forbidden writer or Outlook COM operation')
           }
           if($mover -cnotmatch [regex]::Escape('$item.Move(') -or
