@@ -1,5 +1,7 @@
 # Техническое задание OutlookPOP3Archive — требования к исходному коду
 
+**ARCH2a (2026-11-11):** основное `MailMover.ps1` исправлено на stop/fail-closed при COM-неопределённости и запрет слепого `Resume`; новый основной guard закрывает `Archive`, `Resume`, `Auto` до полного semantic+attachment-byte verifier (ARCH2b). См. [runbook](2.6.5-arch2a-move-outcome-fence.md). **Нельзя отключать safety guard только чтобы запустить 90GB архив.**
+
 **Новая обязательная маршрутизация разработки (2026-11-11):** после BW4k7v2a8 не продолжать MAPI-форензику без конкретной новой угрозы пользовательским данным. [Постоянный handoff](PROJECT-HANDOFF-ARCH1.md), [ADR COM boundary](ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md), [roadmap до RC](DELIVERY-ROADMAP.md) и [аудит исходников](ARCH1-IMPLEMENTATION-AUDIT.md) обязательны перед новым билдом. Не отменяет правила UTF-8 BOM и SEM-001.
 
 
