@@ -1,5 +1,9 @@
 ﻿# Architecture — 2.6.3-PREVIEW1
 
+## 2026-11-11 ARCH2b actual main user-content verifier integration
+
+[ARCH2b design and limitations](2.6.5-arch2b-semantic-verifier.md). The original saved source MailItem is hashed, including byte SHA256 for supported file attachments, BEFORE any Move claim. The hash-only witness is written into the durable `Move Started` step; `Get-OPAExpectedMovesFromTransaction` carries it into `Test-OPAArchiveMoves`, which now has `-RequireSemanticWitness` in both main Archive and Resume. After target lookup, `Test-OPAArchiveItemFingerprint` re-hashes actual destination content and compares it without treating provider-driven `MailItem.Size` drift as corruption. Legacy read-only verifier API remains compatible unless new strict flag is passed. **Archive/Resume/Auto still closed.** Unsupported attachment types/limits and crash-temp cleanup need ARCH2c.
+
 ## 2026-11-11 ARCH2a fail-closed main Move and Resume enforcement
 
 [ARCH2a runbook](2.6.5-arch2a-move-outcome-fence.md). Legacy main `MailMover.ps1` no longer continues after a claimed COM `MailItem.Move()` failure; `Move Started` is persisted and force-flushed before COM, `Move Indeterminate` stops the batch, and resumed work rejects any incomplete full original step journal. `OutlookPOP3Archive.ps1` closes `Archive`, `Resume`, `Auto` before Outlook initialization. The existing `ArchiveVerifier.ps1` still does **not** have complete BW4k Body/HTML/byte-SHA attachment integration, so production writer and 90GB use stay blocked. See roadmap ARCH2b.
