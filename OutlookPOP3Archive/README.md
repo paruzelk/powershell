@@ -1,5 +1,13 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
+## ARCH2a — защита основного Move/Resume от неоднозначного COM-исхода
+
+**Новый DEV-билд 2.6.5-ARCH2a:** [описание и ограничения](docs/2.6.5-arch2a-move-outcome-fence.md). Это реальное изменение основного `MailMover.ps1`: завершение batch при исключении `MailItem.Move()`, надёжная запись `Move Started` до COM, `Move Indeterminate` вместо `Skipped`, отказ от `Resume` по неполному/неоднозначному original journal. До интеграции полного семантического verifier в ARCH2b режимы **`-Mode Archive`, `-Mode Resume`, `-Mode Auto` заблокированы на входе**, включая `-WhatIf`. Existing `Analyze` / `Plan` остаются доступны. Это **не production RC** и **не разрешение архивировать 90 ГБ**. Не удалять этот guard ради обхода.
+
+Восстановление контекста проекта: [PROJECT-HANDOFF-ARCH1](docs/PROJECT-HANDOFF-ARCH1.md), [ADR COM boundary](docs/ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md), [DELIVERY-ROADMAP](docs/DELIVERY-ROADMAP.md). Никакого нового BW4k7v2a9 из-за необъяснённого `MailItem.Size` или `PR_MESSAGE_FLAGS`.
+
+
+
 ## Обязательное направление после BW4k7v2a8: ARCH1, не продолжение MAPI форензики
 
 **ПЕРЕД СЛЕДУЮЩИМ БИЛДОМ:** читать [постоянный handoff](docs/PROJECT-HANDOFF-ARCH1.md), [ADR COM boundary и stop-rule](docs/ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md), [roadmap до RC](docs/DELIVERY-ROADMAP.md) и [фактический аудит основного кода](docs/ARCH1-IMPLEMENTATION-AUDIT.md). При потере контекста **не возвращаться к новым BW4k7v2a9 и исследованию Size/FLAGS без конкретной потери пользовательских данных**. Функциональный следующий этап — ARCH2: отладка основного `MailMover.ps1`, исключение неоднозначного silent skip и интеграция уже имеющихся семантических проверок в `ArchiveVerifier.ps1`.
