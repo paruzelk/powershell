@@ -14,7 +14,7 @@ function Check([bool]$Ok,[string]$Message){
  Write-Host "PASS: $Message"
 }
 $entries=@{}
-foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json','FullTechnical-Report-04.ru-RU.json')){
+foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json','FullTechnical-Report-04.ru-RU.json','FullTechnical-Brief-05.ru-RU.json','FullTechnical-Catalog-06a.ru-RU.json','FullTechnical-Catalog-06b.ru-RU.json','FullTechnical-Catalog-06c.ru-RU.json','FullTechnical-Catalog-06d.ru-RU.json','FullTechnical-Catalog-06e.ru-RU.json')){
  $path=Join-Path $ProjectRoot ('Localization/'+$name)
  Check (Test-Path -LiteralPath $path) ("Словарь $name")
  $json=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($path,[Text.Encoding]::UTF8))
@@ -23,14 +23,16 @@ foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','
   $entries[$prop.Name]=$prop.Value
  }
 }
-Check ($entries.Count -eq 91) '91 русских технических переводов'
+Check ($entries.Count -eq 392) '392 русских технических описания находок'
 foreach($id in @('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','KERBEROASTABLE_SPN','REGISTRY_ESC10_KDC_BINDING','REGISTRY_WSUS_HTTP')){
  Check ($entries.ContainsKey($id)) ("Есть полный перевод для "+$id)
 }
 foreach($entry in $entries.GetEnumerator()){
  $d=$entry.Value
  Check (-not [string]::IsNullOrWhiteSpace([string]$d.description)) ("Непустое описание: "+$entry.Key)
- Check ($null -ne $d.impact -and $null -ne $d.remediation -and $null -ne $d.attack) ("Все четыре раздела: "+$entry.Key)
+ Check ($null -ne $d.impact -and $null -ne $d.remediation -and $null -ne $d.attack) ("Структурные поля присутствуют: "+$entry.Key)
+ Check (@($d.impact).Count -gt 0 -and @($d.remediation).Count -gt 0) ("Заполнены последствия и рекомендации: "+$entry.Key)
+ Check ([string]$d.description -match '[А-Яа-яЁё]') ("Русский текст: "+$entry.Key)
 }
 $js=[IO.File]::ReadAllText((Join-Path $ProjectRoot 'src/modules/Reporting/templates/report-scripts.js'),[Text.Encoding]::UTF8)
 $compiled=[IO.File]::ReadAllText((Join-Path $ProjectRoot 'adPEAS.ps1'),[Text.Encoding]::UTF8)

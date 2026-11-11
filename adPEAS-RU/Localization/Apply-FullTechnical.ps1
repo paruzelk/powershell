@@ -3,7 +3,8 @@
 .SYNOPSIS
     Подробные русские технические описания находок AD.
 .DESCRIPTION
-    Переводит отображение Description, Impact, Attack и Remediation.
+    Добавляет русские Description, Impact и Remediation для всех FindingId.
+    Attack выводится только при наличии проверенного русского пояснения.
     Канонические определения FindingId, риск, триггеры, команды и ссылки
     остаются неизменными. Английский текст доступен отдельно для сверки.
 #>
@@ -12,7 +13,7 @@ param([Parameter(Mandatory=$true)][string]$ProjectRoot)
 Set-StrictMode -Off
 $ErrorActionPreference='Stop'
 $entries=[ordered]@{}
-foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json','FullTechnical-Report-04.ru-RU.json')){
+foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json','FullTechnical-Report-04.ru-RU.json','FullTechnical-Brief-05.ru-RU.json','FullTechnical-Catalog-06a.ru-RU.json','FullTechnical-Catalog-06b.ru-RU.json','FullTechnical-Catalog-06c.ru-RU.json','FullTechnical-Catalog-06d.ru-RU.json','FullTechnical-Catalog-06e.ru-RU.json')){
  $src=Join-Path $ProjectRoot ('Localization/'+$name)
  $catalog=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($src,[Text.Encoding]::UTF8))
  foreach($prop in $catalog.translations.PSObject.Properties){
@@ -21,7 +22,7 @@ foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','
  }
 }
 $entryCount=$entries.Count
-if($entryCount -ne 91){throw "Ожидалось 91 технических переводов, найдено $entryCount"}
+if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
 foreach($id in $required){
  if(-not $entries.Contains($id)){throw "Нет полного перевода $id"}
@@ -53,9 +54,9 @@ $old=@'
                 '</details>';
 '@
 $replacement=@'
-            // Accurate human-reviewed Russian translation is presented only when
-            // all four technical sections have been translated for this FindingId.
-            // Original EN remains separately available for verification.
+            // Curated Russian description, impact and remediation for every FindingId.
+            // Attack is shown only when an individual RU explanation exists.
+            // English originals remain available separately for comparison.
             const ruFull = ruFullFindingTechnical[findingId] || null;
             if (ruFull) {
                 const addRuList = (label, values) =>
@@ -89,5 +90,6 @@ $js=$js.Replace($old,$replacement)
 if($js.Contains('Исходное подробное описание EN (перевод пока не завершён)')) { throw 'Найдена устаревшая пометка EN' }
 $enc=New-Object Text.UTF8Encoding($true)
 [IO.File]::WriteAllText($path,$js,$enc)
-Write-Host "[RU] PASS: полные русские технические описания $entryCount находок"
+$withAttack=@($entries.Values | Where-Object { @($_.attack).Count -gt 0 }).Count
+Write-Host "[RU] PASS: $entryCount типов находок имеют русское описание, последствия и рекомендации; сценарии: $withAttack"
 Write-Host '[RU] PASS: исходные описания EN доступны отдельно; FindingId и команды не изменены'

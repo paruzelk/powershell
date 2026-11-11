@@ -9,7 +9,7 @@
 param([string]$ProjectRoot=(Split-Path -Parent $PSScriptRoot))
 $ErrorActionPreference='Stop'
 $full=@{}
-foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json','FullTechnical-Report-04.ru-RU.json')){
+foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json','FullTechnical-Report-04.ru-RU.json','FullTechnical-Brief-05.ru-RU.json','FullTechnical-Catalog-06a.ru-RU.json','FullTechnical-Catalog-06b.ru-RU.json','FullTechnical-Catalog-06c.ru-RU.json','FullTechnical-Catalog-06d.ru-RU.json','FullTechnical-Catalog-06e.ru-RU.json')){
  $obj=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
  foreach($p in $obj.translations.PSObject.Properties){
   if($full.ContainsKey($p.Name)){throw "Повторная запись $($p.Name)"}
@@ -26,4 +26,4 @@ $js=[IO.File]::ReadAllText((Join-Path $ProjectRoot 'src/modules/Reporting/templa
 if($js.Contains('Исходное подробное описание EN (перевод пока не завершён)')){throw 'Осталась устаревшая пометка EN'}
 if(-not $js.Contains('Сверить с исходным текстом на английском (EN)')){throw 'Недоступен оригинал для сверки'}
 if(-not $js.Contains('ruPolishReportPresentation')){throw 'Нет русификации HTML-значений'}
-Write-Host "PASS: $($ids.Count) типов находок имеют русский текст; расширенные переводы: $($full.Count)"
+Write-Host "PASS: $($ids.Count) типов находок из отчёта покрыты; описаний всего: $($full.Count)"
