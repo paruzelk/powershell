@@ -605,6 +605,20 @@ function Move-OPAItemsWithLimit {
         if (-not (Test-Path -LiteralPath $stepJournalPath -PathType Leaf)) {
             throw 'ARCH2a Resume STOP: original step journal missing; manual reconciliation required.'
         }
+        # Read-OPAJsonlLocal tolerates a malformed LAST record, which could
+        # hide a Move Started. In ARCH2a Resume that is not acceptable: stop
+        # BEFORE the reader can silently omit an ambiguous attempt.
+        $fs = $null
+        try {
+            $fs = [IO.File]::Open($stepJournalPath,
+                [IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
+            if ($fs.Length -lt 2) { throw 'ARCH2a Resume STOP: original step journal empty or truncated.' }
+            $fs.Position = $fs.Length - 1
+            if ($fs.ReadByte() -ne 10) {
+                throw 'ARCH2a Resume STOP: unterminated step journal; manual read-only recovery required.'
+            }
+        }
+        finally { if ($null -ne $fs) { $fs.Dispose() } }
         $journalSteps = @(Read-OPAStepJournal -Transaction $Transaction)
         [void](Assert-OPA265ARCH2aNoUnresolvedMove -Transaction $Transaction -JournalSteps $journalSteps)
     }
