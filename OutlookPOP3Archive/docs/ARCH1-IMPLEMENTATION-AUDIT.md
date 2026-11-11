@@ -1,5 +1,9 @@
 # ARCH1 — фактический аудит готовности к рабочему архивированию
 
+> **ИСТОРИЧЕСКИЙ снимок кода, не текущее состояние ARCH2a.** В ARCH2a старый `MoveFailed` / `continue` заменён на `Move Indeterminate` и `throw`, плюс full-journal Resume fence. При этом основной `ArchiveVerifier.ps1` всё ещё неполон и writer modes закрыты. См. [ARCH2a](2.6.5-arch2a-move-outcome-fence.md).
+
+
+
 **Проверено в исходниках коммита BW4k7v2a8 `ed32971f09577a6d589820892e99a3827f4e431e`, 2026-11-11.** Это **статический** аудит наличия функций и явных опасных участков, а не Outlook live acceptance или утверждение работы на 90GB. Результат можно пересчитать [read-only скриптом](../Core/Diagnostics/Invoke-OPA265ARCH1DeliveryReadinessAudit.ps1).
 
 | Компонент | Код найден | Что действительно установлено | Недостающий доказанный критерий |
