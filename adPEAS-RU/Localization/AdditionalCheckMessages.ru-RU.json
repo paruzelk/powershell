@@ -8,11 +8,17 @@
       "$summaryParts += \"$dMSACount dMSA(s)\"": "$summaryParts += \"$dMSACount записей dMSA\"",
       "$summaryParts += \"$ComputerCount computer(s)\"": "$summaryParts += \"$ComputerCount компьютеров\"",
       "$summaryParts += \"$ForeignCount foreign principal(s)\"": "$summaryParts += \"$ForeignCount внешних субъектов\"",
-      "Show-Line \"Found $summaryText across $TotalGroups privileged group(s):\" -Class Finding": "Show-Line \"Обнаружены участники привилегированных групп: $summaryText; проверено групп: $TotalGroups\" -Class Finding"
+      "Show-Line \"Found $summaryText across $TotalGroups privileged group(s):\" -Class Finding": "Show-Line \"Обнаружены участники привилегированных групп: $summaryText; проверено групп: $TotalGroups\" -Class Finding",
+      "Show-Line \"$($foreignBySID.Count) of them come from a trusted domain - adPEAS cannot read the object behind the SID, so a group there is not expanded:\"": "Show-Line \"Участников из доверенного домена: $($foreignBySID.Count). adPEAS не может прочитать объекты по этим SID, поэтому группы из другого домена не раскрыты:\"",
+      "Show-Line \"$(@($dcPrimaryFindings).Count) account(s) that are not computers hold a domain controller group as their primary group:\"": "Show-Line \"Учётных записей, не являющихся компьютерами, у которых первичная группа принадлежит к группам контроллеров домена: $(@($dcPrimaryFindings).Count)\"",
+      "Show-Line \"$(@($inheritedControllers).Count) principal(s) can rewrite AdminSDHolder through an inherited ACE - remove it at the parent:\"": "Show-Line \"Субъектов с унаследованным ACE, позволяющим изменить AdminSDHolder: $(@($inheritedControllers).Count). Удаляйте разрешение у родителя:\"",
+      "Show-Line \"$(@($denyTrustees).Count) Deny ACE trustee(s) on AdminSDHolder - a Deny here can hide the template from the people who audit it:\"": "Show-Line \"Субъектов в ACE типа Deny у AdminSDHolder: $(@($denyTrustees).Count). Такой запрет способен скрывать шаблон от проверяющих:\"",
+      "Show-Line \"$(@($PreWin2000Unresolved).Count) member(s) of Pre-Windows 2000 Compatible Access could not be resolved to a SID and were not assessed\"": "Show-Line \"Участников Pre-Windows 2000 Compatible Access, которые не разрешены до SID и потому не оценивались: $(@($PreWin2000Unresolved).Count)\""
     },
     "src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1": {
       "$summaryText = \"Found $($unprotectedTier0.Count) unprotected Tier-0 account(s) ($totalProtected of $totalEligible in Protected Users, $coveragePercent%):\"": "$summaryText = \"Учётные записи Tier 0 вне Protected Users: $($unprotectedTier0.Count); защищено: $totalProtected из $totalEligible ($coveragePercent%):\"",
-      "$summaryText = \"Found $totalEligible Tier-0 account(s) - all in Protected Users ($coveragePercent%)\"": "$summaryText = \"Все учётные записи Tier 0 находятся в Protected Users: $totalEligible из $totalEligible ($coveragePercent%)\""
+      "$summaryText = \"Found $totalEligible Tier-0 account(s) - all in Protected Users ($coveragePercent%)\"": "$summaryText = \"Все учётные записи Tier 0 находятся в Protected Users: $totalEligible из $totalEligible ($coveragePercent%)\"",
+      "Show-Line \"$($excludedAccounts.Count) account(s) excluded from metric (not applicable for Protected Users):\"": "Show-Line \"Учётных записей, исключённых из показателя как неприменимых к Protected Users: $($excludedAccounts.Count)\""
     },
     "src/modules/Checks/Accounts/Get-PasswordNotRequired.ps1": {
       "Show-Line \"$(@($ordinaryAccounts).Count) further enabled account(s) carry the 'Password Not Required' flag\"": "Show-Line \"Дополнительно обнаружены включённые учётные записи с флагом PASSWD_NOTREQD («пароль не требуется»): $(@($ordinaryAccounts).Count)\"",
@@ -32,7 +38,9 @@
       "Show-Line \"Error during check - privileged accounts whose password never expires could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: оценить привилегированные записи с бессрочным паролем не удалось: $_\""
     },
     "src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1": {
-      "Show-Line \"OPSEC mode: Skipping user owner enumeration (would check all enabled users)\"": "Show-Line \"Режим OPSEC: проверка владельцев пользователей пропущена (потребовалось бы перечисление всех включённых записей)\""
+      "Show-Line \"OPSEC mode: Skipping user owner enumeration (would check all enabled users)\"": "Show-Line \"Режим OPSEC: проверка владельцев пользователей пропущена (потребовалось бы перечисление всех включённых записей)\"",
+      "Show-Line \"All users have default owners (filtered $filteredHealthMailboxes Exchange Health Mailboxes)\"": "Show-Line \"Все проверенные пользователи имеют ожидаемых владельцев; исключено почтовых объектов Exchange Health Mailboxes: $filteredHealthMailboxes\"",
+      "Show-Line \"Error during check - the owners of user accounts could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить владельцев пользовательских записей: $_\""
     },
     "src/modules/Checks/Accounts/Get-LogonScriptPermissions.ps1": {
       "Show-Line \"OPSEC mode: Skipping the logon scripts of accounts (reading their permissions takes an SMB connection to NETLOGON)\"": "Show-Line \"Режим OPSEC: проверка сценариев входа пропущена (для чтения разрешений требуется SMB-подключение к NETLOGON)\"",
@@ -62,7 +70,15 @@
       "Show-Line \"gMSA password access could not be tested - every read failed\"": "Show-Line \"Проверить доступ к паролям gMSA не удалось: все запросы чтения завершились ошибкой\"",
       "Show-Line \"Current user cannot retrieve any gMSA passwords ($readFailures of $totalGMSAs could not be tested)\"": "Show-Line \"Текущий пользователь не смог получить ни один пароль gMSA; не проверено $readFailures из $totalGMSAs\"",
       "Show-Line \"Retrieved $passwordsRetrieved of $($gmsaAccounts.Count) gMSA password(s)\"": "Show-Line \"Получено управляемых паролей gMSA: $passwordsRetrieved из $($gmsaAccounts.Count)\"",
-      "Show-Line \"Error during check - managed service accounts could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: управляемые учётные записи служб оценить не удалось: $_\""
+      "Show-Line \"Error during check - managed service accounts could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: управляемые учётные записи служб оценить не удалось: $_\"",
+      "Show-Line \"Successfully retrieved password for gMSA: $gmsaName\"": "Show-Line \"Успешно получен пароль gMSA: $gmsaName\"",
+      "Show-Line \"Use NT hash with: Pass-the-Hash, Overpass-the-Hash, or DCSync impersonation\"": "Show-Line \"NT-хеш можно использовать для Pass-the-Hash, Overpass-the-Hash или имитации DCSync\"",
+      "Show-Line \"Recommendation: Migrate standalone MSAs to gMSAs for improved security\"": "Show-Line \"Рекомендация: замените автономные sMSA групповыми gMSA для повышения безопасности\"",
+      "Show-Line \"dMSA migration started: $(@($startedPairs) -join ', ')\"": "Show-Line \"Начата миграция на dMSA: $(@($startedPairs) -join ', ')\"",
+      "Show-Line \"dMSA migration completed: $(@($completedPairs) -join ', ')\"": "Show-Line \"Миграция на dMSA завершена: $(@($completedPairs) -join ', ')\"",
+      "Show-Line \"Account(s) naming a dMSA that does not name them back: $(@($stalePairs) -join ', ')\"": "Show-Line \"Учётные записи с указанием dMSA, которая не ссылается на них в ответ: $(@($stalePairs) -join ', ')\"",
+      "Show-Line \"The dMSA objects are not readable by this account - who may use each dMSA was not evaluated\"": "Show-Line \"Текущая учётная запись не может прочитать объекты dMSA — проверка прав использования каждой dMSA не выполнена\"",
+      "Show-Line \"Non-privileged principals allowed to use it: $userList\"": "Show-Line \"Непривилегированные субъекты с правом использования этой записи: $userList\""
     },
     "src/modules/Checks/Accounts/Get-RODCPasswordReplication.ps1": {
       "Show-Line \"No read-only Domain Controller in this domain - there is no password replication policy to check\"": "Show-Line \"Контроллеры домена только для чтения (RODC) не обнаружены; политику репликации паролей проверять не требуется\"",
@@ -90,7 +106,10 @@
       "Show-Line \"All $(@($candidates).Count) explicit certificate mapping(s) use a strong format\"": "Show-Line \"Все явные сопоставления сертификатов используют надёжный формат; проверено: $(@($candidates).Count)\"",
       "Show-Line \"Could not read explicit certificate mappings: $($_.Exception.Message)\"": "Show-Line \"Не удалось прочитать явные сопоставления сертификатов: $($_.Exception.Message)\"",
       "Show-Line \"The property set containing altSecurityIdentities could not be read - a delegation naming the set is not examined\"": "Show-Line \"Не удалось прочитать набор свойств с altSecurityIdentities; делегирование на этот набор не проверено\"",
-      "Show-Line \"Error during check - who may write altSecurityIdentities could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось определить субъектов с правом изменять altSecurityIdentities: $_\""
+      "Show-Line \"Error during check - who may write altSecurityIdentities could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось определить субъектов с правом изменять altSecurityIdentities: $_\"",
+      "Show-Line \"Found $(@($writableFindings).Count) privileged principal(s) whose altSecurityIdentities a non-privileged principal may write\"": "Show-Line \"Найдено привилегированных субъектов, у которых непривилегированная запись может изменять altSecurityIdentities: $(@($writableFindings).Count)\"",
+      "Show-Line \"$(@($exchangeOnlyFindings).Count) privileged account(s) writable only by Exchange service groups (by design):\"": "Show-Line \"Привилегированных записей, изменяемых только служебными группами Exchange по штатной модели: $(@($exchangeOnlyFindings).Count)\"",
+      "Show-Line \"$(@($exchangeOnlyFindings).Count) privileged account(s) writable only by Exchange service groups (by design) - use -IncludePrivileged\"": "Show-Line \"Привилегированных записей, изменяемых только служебными группами Exchange по штатной модели: $(@($exchangeOnlyFindings).Count). Для включения используйте -IncludePrivileged\""
     },
     "src/modules/Checks/GPO/Get-GPOLocalGroupMembership.ps1": {
       "Show-Line \"No vulnerable GPO local group assignments found in $(@($gpos).Count) analyzed GPO(s)\"": "Show-Line \"Небезопасных назначений в локальные группы через GPO не обнаружено; проанализировано политик: $(@($gpos).Count)\"",
@@ -126,7 +145,8 @@
       "return \"$ouCount OU(s) and $containerCount container(s)\"": "return \"$ouCount OU и $containerCount контейнеров\""
     },
     "src/modules/Checks/Accounts/Get-InactiveAdminAccounts.ps1": {
-      "Show-Line \"No inactive privileged accounts found\"": "Show-Line \"Неактивных привилегированных учётных записей не обнаружено\""
+      "Show-Line \"No inactive privileged accounts found\"": "Show-Line \"Неактивных привилегированных учётных записей не обнаружено\"",
+      "Show-Line \"Error during check - inactive privileged accounts could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить неактивные привилегированные учётные записи: $_\""
     },
     "src/modules/Checks/Accounts/Get-AdminReversibleEncryption.ps1": {
       "Show-Line \"$privilegedCount of them is/are privileged - the cleartext password of an administrator is recoverable from the DC\"": "Show-Line \"Из обнаруженных записей привилегированных: $privilegedCount; пароль администратора можно восстановить из данных контроллера домена в открытом виде\"",
@@ -146,6 +166,46 @@
       "Show-Line \"$protectedCount of them is/are in Protected Users - AES-only AS-REP, slower to crack\"": "Show-Line \"Из найденных записей в Protected Users: $protectedCount; AS-REP только с AES, автономный подбор сложнее\"",
       "Show-Line \"Through these accounts, $(@($spnAccounts).Count) kerberoastable account(s) can be roasted without any credentials\"": "Show-Line \"Через эти записи доступен Kerberoasting без учётных данных для записей со SPN: $(@($spnAccounts).Count)\"",
       "Show-Line \"Error during check - AS-REP roastable accounts could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: учётные записи, уязвимые к AS-REP Roasting, оценить не удалось: $_\""
+    },
+    "src/modules/Checks/Accounts/Get-SIDHistoryInjection.ps1": {
+      "Show-Line \"Error during check - SID history could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить sIDHistory: $_\""
+    },
+    "src/modules/Checks/ADCS/Get-ADCSTemplate.ps1": {
+      "Show-Line \"Error during check - certificate templates could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить шаблоны сертификатов: $_\""
+    },
+    "src/modules/Checks/Application/Get-ExchangeInfrastructure.ps1": {
+      "Show-Line \"No hybrid configuration found - this organization appears to be purely on-premises\"": "Show-Line \"Гибридная конфигурация не обнаружена: вероятно, организация использует только локальный Exchange\"",
+      "Show-Line \"$(@($unreadConnectors).Count) of $(@($connectorResults).Count) receive connector(s) could not be assessed - their permissions are unknown, not clean\"": "Show-Line \"Принимающих соединителей с неоценёнными разрешениями: $(@($unreadConnectors).Count) из $(@($connectorResults).Count). Их безопасность неизвестна, а не подтверждена\"",
+      "Show-Line \"No receive connector grants relay or sender-spoofing rights to unauthenticated senders\"": "Show-Line \"Ни один проверенный принимающий соединитель не выдаёт анонимным отправителям права ретрансляции или подмены отправителя\"",
+      "Show-Line \"Neither Exchange Windows Permissions nor Exchange Trusted Subsystem exists$absentScope - the permissions model is unknown\"": "Show-Line \"Не найдены ни Exchange Windows Permissions, ни Exchange Trusted Subsystem$absentScope — модель разрешений неизвестна\"",
+      "Show-Line \"The domain object ACL could not be read - the permissions model is unknown, not clean\"": "Show-Line \"Не удалось прочитать ACL доменного объекта — модель разрешений неизвестна, безопасность не подтверждена\"",
+      "Show-Line \"$($serviceGroup.Name) is in the forest root domain ($($rootServiceGroups[$serviceGroup.Name].DistinguishedName)) - a scan of that domain reports its members\"": "Show-Line \"Группа $($serviceGroup.Name) находится в корневом домене леса ($($rootServiceGroups[$serviceGroup.Name].DistinguishedName)); её участников показывает аудит этого домена\"",
+      "Show-Line \"$($serviceGroup.Name) group exists but has no members (unusual)\"": "Show-Line \"Группа $($serviceGroup.Name) существует, но не имеет участников (нетипичное состояние)\"",
+      "Show-Line \"$($serviceGroup.Name) could not be read - result unknown, not empty\"": "Show-Line \"Не удалось прочитать группу $($serviceGroup.Name) — результат неизвестен, а не означает отсутствие участников\"",
+      "Show-Line \"Error during check - the Exchange infrastructure could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить инфраструктуру Exchange: $_\""
+    },
+    "src/modules/Checks/Application/Get-SCCMInfrastructure.ps1": {
+      "Show-Line \"System Management container not found - sites, management points and its permissions were not read\"": "Show-Line \"Контейнер System Management не найден — сайты, точки управления и его разрешения не прочитаны\"",
+      "Show-Line \"No mSSMSSite objects found in System Management container\"": "Show-Line \"Контейнер System Management отсутствует — прочитать объекты сайтов не удалось\"",
+      "Show-Line \"The System Management container does not exist - no management point could be read\"": "Show-Line \"Контейнер System Management отсутствует — прочитать точки управления не удалось\"",
+      "Show-Line \"The System Management container does not exist - its permissions could not be read\"": "Show-Line \"Контейнер System Management отсутствует — прочитать его разрешения не удалось\"",
+      "Show-Line \"The security descriptor of the System Management container could not be read - result unknown, not clean\"": "Show-Line \"Не удалось прочитать дескриптор безопасности контейнера System Management — состояние неизвестно, безопасность не подтверждена\"",
+      "Show-Line \"The System Management container permissions could not be analysed - result unknown, not clean\"": "Show-Line \"Не удалось оценить разрешения контейнера System Management — состояние неизвестно, безопасность не подтверждена\"",
+      "Show-Line \"Error during check - the SCCM infrastructure could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить инфраструктуру SCCM: $_\""
+    },
+    "src/modules/Checks/Computer/Get-ComputerPasswordAge.ps1": {
+      "Show-Line \"Every computer that logged on in the last $ActiveDays days has changed its machine account password within $PasswordAgeDays days\"": "Show-Line \"Все компьютеры, входившие в домен за последние $ActiveDays дней, сменили пароль машинной записи в течение $PasswordAgeDays дней\"",
+      "Show-Line \"Error during check - the machine account password age could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось определить возраст паролей машинных учётных записей: $_\""
+    },
+    "src/modules/Checks/Creds/Get-BitLockerRecoveryKeyAccess.ps1": {
+      "Show-Line \"No readable BitLocker recovery keys found\"": "Show-Line \"Ключи восстановления BitLocker, доступные для чтения текущей записью, не обнаружены\"",
+      "Show-Line \"$($withheldObjects.Count) escrowed recovery key(s) exist that this account may not read\"": "Show-Line \"Сохранённых ключей восстановления, которые текущая запись не может прочитать: $($withheldObjects.Count)\"",
+      "Show-Line \"Error during the delegation analysis - who may read the recovery passwords could not be evaluated: $_\"": "Show-Line \"Ошибка анализа делегирования: не удалось определить, кто может читать пароли восстановления: $_\"",
+      "Show-Line \"Error during check - BitLocker recovery key access could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить доступ к ключам восстановления BitLocker: $_\""
+    },
+    "src/modules/Checks/Creds/Get-CredentialExposure.ps1": {
+      "Show-Line \"SYSVOL access failed - credentials were not searched for\"": "Show-Line \"Не удалось получить доступ к SYSVOL — поиск учётных данных не выполнен\"",
+      "Show-Line \"Error during check - credentials in SYSVOL and NETLOGON could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить учётные данные в SYSVOL и NETLOGON: $_\""
     }
   }
 }
