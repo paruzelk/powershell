@@ -1314,6 +1314,28 @@ try {
             throw "Transaction '$($tx.TransactionId)' contains no PlannedItems. Nothing can be resumed safely."
         }
 
+        # ARCH2a second line of defense: the original Resume entrypoint
+        # must reject ambiguous claims even when the completed/index tally
+        # falsely reports ZERO remaining items (and never invokes MailMover).
+        # No reconciliation by index or source-presence is retry authority.
+        $arch2aOriginalJournal = Get-OPAStepJournalPath -Transaction $tx
+        if (-not (Test-Path -LiteralPath $arch2aOriginalJournal -PathType Leaf)) {
+            throw 'ARCH2a Resume STOP: original step journal missing; do not retry any Move.'
+        }
+        $arch2aFs = $null
+        try {
+            $arch2aFs = [IO.File]::Open($arch2aOriginalJournal,
+                [IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
+            if ($arch2aFs.Length -lt 2) { throw 'ARCH2a Resume STOP: original step journal empty.' }
+            $arch2aFs.Position = $arch2aFs.Length - 1
+            if ($arch2aFs.ReadByte() -ne 10) {
+                throw 'ARCH2a Resume STOP: original step journal is unterminated.'
+            }
+        }
+        finally { if ($null -ne $arch2aFs) { $arch2aFs.Dispose() } }
+        $arch2aFullOriginalSteps = @(Read-OPAStepJournal -Transaction $tx)
+        [void](Assert-OPA265ARCH2aNoUnresolvedMove -Transaction $tx -JournalSteps $arch2aFullOriginalSteps)
+
         $index = Get-OPACombinedDuplicateIndexForTransaction -Transaction $tx
         $repairedSteps = Repair-OPAArchiveTransactionStepsFromDuplicateIndex `
             -Transaction $tx `
