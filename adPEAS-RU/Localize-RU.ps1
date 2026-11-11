@@ -205,6 +205,9 @@ if(-not $?){throw 'Ошибка расширенной локализации р
 & (Join-Path $PSScriptRoot 'Localization/Apply-StageAVisibleMessages.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка безопасного перевода Reporting, Helpers и Collector'}
 
+& (Join-Path $PSScriptRoot 'Localization/Apply-StageBVisibleMessages.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка проверки точечных переводов Checks на этапе B'}
+
 & (Join-Path $PSScriptRoot 'Localization/Apply-ReportDisplay.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка перевода отображаемых значений отчёта'}
 
