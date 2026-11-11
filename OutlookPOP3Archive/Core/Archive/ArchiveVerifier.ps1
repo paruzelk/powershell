@@ -1,4 +1,4 @@
-# FIX9: verification reads actual Outlook source and archive items. A journal
+﻿# FIX9: verification reads actual Outlook source and archive items. A journal
 # entry or DuplicateIndex entry is evidence of intent, not proof of location.
 function Get-OPAFolderByPath {
     [CmdletBinding()]
