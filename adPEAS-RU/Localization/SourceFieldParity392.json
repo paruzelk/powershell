@@ -205,58 +205,7 @@
                                 ],
     "OriginalAttackAbsentCount":  88,
     "AttackStepCountDifferences":  [
-                                       "ACCOUNT_DISABLED",
-                                       "ADMINSDHOLDER_PROPAGATED_RIGHT",
-                                       "AD_RECYCLE_BIN_DISABLED",
-                                       "ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED",
-                                       "COMPUTER_CONTAINER_CREATE_PERMISSIONS",
-                                       "DANGEROUS_ACL_DCSYNC",
-                                       "DANGEROUS_ACL_GENERICWRITE",
-                                       "DANGEROUS_ACL_GPO_DELETE",
-                                       "DANGEROUS_ACL_GPO_WRITEPROPERTY",
-                                       "DANGEROUS_ACL_REPLICATION_INERT_HALF",
-                                       "DANGEROUS_ACL_REPLICATION_NO_SECRETS",
-                                       "DANGEROUS_ACL_WRITEDACL",
-                                       "DANGEROUS_ACL_WRITEOWNER",
-                                       "DOMAIN_ROOT_GPLINK_WRITE",
-                                       "DOMAIN_ROOT_NON_DEFAULT_OWNER",
-                                       "GPO_SCOPE_DOMAIN_WIDE",
-                                       "GPO_SEMACHINEACCOUNTPRIVILEGE_BROAD",
-                                       "GPO_SYSVOL_WRITABLE",
-                                       "GPO_USERRIGHT_SEASSIGNPRIMARYTOKEN",
-                                       "GPO_USERRIGHT_SEAUDIT",
-                                       "GPO_USERRIGHT_SEBATCHLOGON",
-                                       "GPO_USERRIGHT_SEDEBUG",
-                                       "GPO_USERRIGHT_SEENABLEDELEGATION",
-                                       "GPO_USERRIGHT_SELOADDRIVER",
-                                       "GPO_USERRIGHT_SEREMOTESHUTDOWN",
-                                       "GPO_USERRIGHT_SESECURITY",
-                                       "GPO_USERRIGHT_SESHUTDOWN",
-                                       "GPO_USERRIGHT_SESYSTEMENVIRONMENT",
-                                       "GPO_USERRIGHT_SETAKEOWNERSHIP",
-                                       "INACTIVE_PRIVILEGED_ACCOUNT",
-                                       "KRBTGT_PASSWORD_OLD",
-                                       "LDAP_ANONYMOUS_BINDING_RESTRICTED",
-                                       "MACHINE_QUOTA_UNRESTRICTED",
-                                       "NO_ACCOUNT_LOCKOUT",
-                                       "OU_PERM_CREATE_CHILD",
-                                       "OU_PERM_GPLINK",
-                                       "OU_PERM_GPOPTIONS",
-                                       "OU_PERM_GROUP_MEMBERSHIP",
-                                       "OU_PERM_KEYCREDENTIALLINK_WRITE",
-                                       "OU_PERM_PASSWORD_RESET",
-                                       "PASSWORD_COMPLEXITY_ENABLED",
-                                       "PASSWORD_NEVER_EXPIRES",
-                                       "PASSWORD_NOT_REQUIRED",
-                                       "PREWIN2000_DEFAULT_MEMBER",
-                                       "PRIVILEGED_GROUP_ACL",
-                                       "PRIVILEGED_GROUP_MEMBERSHIP",
-                                       "SMB_SIGNING_DISABLED",
-                                       "SMB_SIGNING_REQUIRED",
-                                       "STALE_PASSWORD",
-                                       "STALE_PASSWORD_MEDIUM",
-                                       "TIER0_NOT_IN_PROTECTED_USERS",
-                                       "WEAK_PASSWORD_POLICY"
+
                                    ],
     "RussianImpactWithNoSource":  15,
     "RussianRemediationWithNoSource":  15,
@@ -268,7 +217,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  1,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  2
                    },
@@ -394,7 +343,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  4,
                        "RemediationRU":  3
                    },
@@ -412,7 +361,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  3
                    },
@@ -439,7 +388,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  2
                    },
@@ -583,7 +532,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  2
                    },
@@ -817,7 +766,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  4,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  4
                    },
@@ -844,7 +793,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  3,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  2
                    },
@@ -853,7 +802,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  4,
                        "RemediationRU":  4
                    },
@@ -871,7 +820,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  3,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  4
                    },
@@ -889,7 +838,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  3
                    },
@@ -898,7 +847,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  3,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  3
                    },
@@ -907,7 +856,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  2,
-                       "AttackRU":  1,
+                       "AttackRU":  2,
                        "RemediationEN":  3,
                        "RemediationRU":  2
                    },
@@ -916,7 +865,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  1,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -1042,7 +991,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  3
                    },
@@ -1060,7 +1009,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  2
                    },
@@ -1690,7 +1639,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  6,
                        "RemediationRU":  4
                    },
@@ -1717,7 +1666,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  3
                    },
@@ -1744,7 +1693,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  5,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  5
                    },
@@ -1807,7 +1756,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  1,
                        "RemediationRU":  2
                    },
@@ -1816,7 +1765,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  3,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  2
                    },
@@ -1834,7 +1783,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  1,
                        "RemediationRU":  2
                    },
@@ -1870,7 +1819,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  2,
                        "RemediationRU":  2
                    },
@@ -1888,7 +1837,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  2,
                        "RemediationRU":  2
                    },
@@ -1915,7 +1864,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  2
                    },
@@ -1960,7 +1909,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  1,
                        "RemediationRU":  2
                    },
@@ -1978,7 +1927,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  2
                    },
@@ -1996,7 +1945,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  1,
                        "RemediationRU":  2
                    },
@@ -2014,7 +1963,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  1,
                        "RemediationRU":  2
                    },
@@ -2041,7 +1990,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  1,
                        "RemediationRU":  2
                    },
@@ -2104,7 +2053,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  3
                    },
@@ -2167,7 +2116,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  5,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  4
                    },
@@ -2374,7 +2323,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  5,
-                       "AttackRU":  1,
+                       "AttackRU":  5,
                        "RemediationEN":  4,
                        "RemediationRU":  2
                    },
@@ -2437,7 +2386,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  2
                    },
@@ -2509,7 +2458,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  1,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  2
                    },
@@ -2617,7 +2566,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  3,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  5,
                        "RemediationRU":  3
                    },
@@ -2662,7 +2611,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  2
                    },
@@ -2671,7 +2620,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  3
                    },
@@ -2680,7 +2629,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  3,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  3
                    },
@@ -2689,7 +2638,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  4,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  4
                    },
@@ -2707,7 +2656,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  6,
                        "RemediationRU":  2
                    },
@@ -2815,7 +2764,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  1,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  2
                    },
@@ -2833,7 +2782,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  4,
                        "RemediationRU":  2
                    },
@@ -2842,7 +2791,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  4,
                        "RemediationRU":  2
                    },
@@ -2923,7 +2872,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  1,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  2
                    },
@@ -2959,7 +2908,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  3,
-                       "AttackRU":  2,
+                       "AttackRU":  3,
                        "RemediationEN":  4,
                        "RemediationRU":  3
                    },
@@ -2968,7 +2917,7 @@
                        "ImpactEN":  6,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  9,
                        "RemediationRU":  3
                    },
@@ -3571,7 +3520,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  1,
+                       "AttackRU":  4,
                        "RemediationEN":  7,
                        "RemediationRU":  2
                    },
@@ -3580,7 +3529,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  5,
-                       "AttackRU":  1,
+                       "AttackRU":  5,
                        "RemediationEN":  4,
                        "RemediationRU":  2
                    },
@@ -3589,7 +3538,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  2,
                        "AttackEN":  5,
-                       "AttackRU":  2,
+                       "AttackRU":  5,
                        "RemediationEN":  7,
                        "RemediationRU":  2
                    },
@@ -3598,7 +3547,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  2,
                        "AttackEN":  4,
-                       "AttackRU":  1,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  2
                    },
@@ -3625,7 +3574,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  5,
                        "AttackEN":  4,
-                       "AttackRU":  2,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  4
                    },
@@ -3769,7 +3718,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  1,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  2
                    },
