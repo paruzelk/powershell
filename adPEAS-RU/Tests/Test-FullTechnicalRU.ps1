@@ -1,0 +1,48 @@
+﻿#Requires -Version 5.1
+<#
+.SYNOPSIS
+    Автономные проверки полных русских технических описаний находок.
+#>
+[CmdletBinding()]
+param([string]$ProjectRoot=(Split-Path -Parent $PSScriptRoot))
+Set-StrictMode -Off
+$ErrorActionPreference='Stop'
+$n=0
+function Check([bool]$Ok,[string]$Message){
+ if(-not $Ok){throw "FAIL: $Message"}
+ $script:n++
+ Write-Host "PASS: $Message"
+}
+$entries=@{}
+foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json')){
+ $path=Join-Path $ProjectRoot ('Localization/'+$name)
+ Check (Test-Path -LiteralPath $path) ("Словарь $name")
+ $json=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($path,[Text.Encoding]::UTF8))
+ foreach($prop in $json.translations.PSObject.Properties){
+  Check (-not $entries.ContainsKey($prop.Name)) ("Уникальный FindingId: "+$prop.Name)
+  $entries[$prop.Name]=$prop.Value
+ }
+}
+Check ($entries.Count -eq 26) '26 подробных технических переводов'
+foreach($id in @('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','KERBEROASTABLE_SPN','REGISTRY_ESC10_KDC_BINDING','REGISTRY_WSUS_HTTP')){
+ Check ($entries.ContainsKey($id)) ("Есть полный перевод для "+$id)
+}
+foreach($entry in $entries.GetEnumerator()){
+ $d=$entry.Value
+ Check (-not [string]::IsNullOrWhiteSpace([string]$d.description)) ("Непустое описание: "+$entry.Key)
+ Check ($null -ne $d.impact -and $null -ne $d.remediation -and $null -ne $d.attack) ("Все четыре раздела: "+$entry.Key)
+}
+$js=[IO.File]::ReadAllText((Join-Path $ProjectRoot 'src/modules/Reporting/templates/report-scripts.js'),[Text.Encoding]::UTF8)
+$compiled=[IO.File]::ReadAllText((Join-Path $ProjectRoot 'adPEAS.ps1'),[Text.Encoding]::UTF8)
+Check ($js.Contains('const ruFullFindingTechnical = ')) 'Полные переводы внедрены в JavaScript'
+Check ($js.Contains('Подробное техническое описание')) 'Русский заголовок полного описания'
+Check ($js.Contains('Показать исходное описание на английском (EN)')) 'Оригинал английского текста доступен для сверки'
+Check ($js.Contains('Исходное подробное описание EN (перевод пока не завершён)')) 'Не переведённые находки обозначены честно'
+Check ($compiled.Contains('В GPO не задано требование LDAP Channel Binding')) 'Технический перевод LDAP Channel Binding включён в сборку'
+Check ($compiled.Contains('событие 3039')) 'Указаны события аудита LDAP Channel Binding'
+Check ($compiled.Contains('LDAP Simple Bind через LDAPS')) 'Сохранено уточнение о Simple Bind и CBT'
+Check ($compiled.Contains('StrongCertificateBindingEnforcement = 2')) 'Сохранён параметр строгой привязки сертификата'
+Check ($compiled.Contains('HKEY_LOCAL_MACHINE')) 'Сохранены пути реестра'
+Check ($compiled.Contains('Get-ADGroupMember -Identity')) 'Исполняемые команды не удалены'
+Check ($compiled.Contains('Исходное подробное описание EN (перевод пока не завершён)')) 'Нет ложной маркировки остальных находок как переведённых'
+Write-Host "PASS: $n проверок технического перевода; AD не затронут" -ForegroundColor Green
