@@ -1,0 +1,89 @@
+{
+  "schema": "adPEAS-RU.AdditionalCheckMessages.1",
+  "locale": "ru-RU",
+  "files": {
+    "src/modules/Checks/Accounts/Get-PrivilegedGroupMembers.ps1": {
+      "$summaryParts += \"$UserCount user(s)\"": "$summaryParts += \"$UserCount пользователей\"",
+      "$summaryParts += \"$gMSACount gMSA(s)\"": "$summaryParts += \"$gMSACount записей gMSA\"",
+      "$summaryParts += \"$dMSACount dMSA(s)\"": "$summaryParts += \"$dMSACount записей dMSA\"",
+      "$summaryParts += \"$ComputerCount computer(s)\"": "$summaryParts += \"$ComputerCount компьютеров\"",
+      "$summaryParts += \"$ForeignCount foreign principal(s)\"": "$summaryParts += \"$ForeignCount внешних субъектов\"",
+      "Show-Line \"Found $summaryText across $TotalGroups privileged group(s):\" -Class Finding": "Show-Line \"Обнаружены участники привилегированных групп: $summaryText; проверено групп: $TotalGroups\" -Class Finding"
+    },
+    "src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1": {
+      "$summaryText = \"Found $($unprotectedTier0.Count) unprotected Tier-0 account(s) ($totalProtected of $totalEligible in Protected Users, $coveragePercent%):\"": "$summaryText = \"Учётные записи Tier 0 вне Protected Users: $($unprotectedTier0.Count); защищено: $totalProtected из $totalEligible ($coveragePercent%):\"",
+      "$summaryText = \"Found $totalEligible Tier-0 account(s) - all in Protected Users ($coveragePercent%)\"": "$summaryText = \"Все учётные записи Tier 0 находятся в Protected Users: $totalEligible из $totalEligible ($coveragePercent%)\""
+    },
+    "src/modules/Checks/Accounts/Get-PasswordNotRequired.ps1": {
+      "Show-Line \"$(@($ordinaryAccounts).Count) further enabled account(s) carry the 'Password Not Required' flag\"": "Show-Line \"Дополнительно обнаружены включённые учётные записи с флагом PASSWD_NOTREQD («пароль не требуется»): $(@($ordinaryAccounts).Count)\"",
+      "Show-Line \"$($usedComputers.Count) further enabled computer account(s) carry the 'Password Not Required' flag\"": "Show-Line \"Дополнительно обнаружены включённые учётные записи компьютеров с флагом PASSWD_NOTREQD («пароль не требуется»): $($usedComputers.Count)\"",
+      "Show-Line \"No enabled accounts with 'Password Not Required' flag found\"": "Show-Line \"Включённых учётных записей с флагом PASSWD_NOTREQD («пароль не требуется») не обнаружено\""
+    },
+    "src/modules/Checks/Accounts/Get-AdminPasswordNeverExpires.ps1": {
+      "Show-Line \"$(@($recentAccounts).Count) further privileged account(s) carry the flag with a password newer than $PasswordAgeDays days:\"": "Show-Line \"Дополнительно обнаружены привилегированные записи с бессрочным паролем, изменённым менее $PasswordAgeDays дней назад: $(@($recentAccounts).Count)\""
+    },
+    "src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1": {
+      "Show-Line \"OPSEC mode: Skipping user owner enumeration (would check all enabled users)\"": "Show-Line \"Режим OPSEC: проверка владельцев пользователей пропущена (потребовалось бы перечисление всех включённых записей)\""
+    },
+    "src/modules/Checks/Accounts/Get-LogonScriptPermissions.ps1": {
+      "Show-Line \"OPSEC mode: Skipping the logon scripts of accounts (reading their permissions takes an SMB connection to NETLOGON)\"": "Show-Line \"Режим OPSEC: проверка сценариев входа пропущена (для чтения разрешений требуется SMB-подключение к NETLOGON)\""
+    },
+    "src/modules/Checks/Computer/Get-NonDefaultComputerOwners.ps1": {
+      "Show-Line \"OPSEC mode: Skipping computer owner enumeration (would check all computers)\"": "Show-Line \"Режим OPSEC: проверка владельцев объектов компьютеров пропущена (требуется перечисление компьютеров)\""
+    },
+    "src/modules/Checks/Domain/Get-DomainTrusts.ps1": {
+      "Show-Line \"No external domain trusts found (isolated domain)\"": "Show-Line \"Внешние доверительные отношения домена не обнаружены (изолированный домен)\""
+    },
+    "src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1": {
+      "Show-Line \"No gMSA accounts found in domain\"": "Show-Line \"Учётные записи gMSA в домене не обнаружены\"",
+      "Show-Line \"No standalone MSAs found\"": "Show-Line \"Автономные управляемые учётные записи служб (sMSA) не обнаружены\""
+    },
+    "src/modules/Checks/Accounts/Get-RODCPasswordReplication.ps1": {
+      "Show-Line \"No read-only Domain Controller in this domain - there is no password replication policy to check\"": "Show-Line \"Контроллеры домена только для чтения (RODC) не обнаружены; политику репликации паролей проверять не требуется\""
+    },
+    "src/modules/Checks/ADCS/Get-ADCSVulnerabilities.ps1": {
+      "Show-Line \"No trusted Root CAs found in AD configuration\"": "Show-Line \"В конфигурации AD не обнаружены доверенные корневые центры сертификации (CA)\""
+    },
+    "src/modules/Checks/ADCS/Get-WeakCertificateMapping.ps1": {
+      "Show-Line \"No principal uses an explicit certificate mapping\"": "Show-Line \"Учётных записей с явно заданным сопоставлением сертификатов не обнаружено\"",
+      "Show-Line \"No non-privileged principal can write altSecurityIdentities on a privileged account\"": "Show-Line \"Непривилегированных субъектов с правом изменять altSecurityIdentities привилегированной учётной записи не обнаружено\"",
+      "Show-Line \"All $(@($candidates).Count) explicit certificate mapping(s) use a strong format\"": "Show-Line \"Все явные сопоставления сертификатов используют надёжный формат; проверено: $(@($candidates).Count)\""
+    },
+    "src/modules/Checks/GPO/Get-GPOLocalGroupMembership.ps1": {
+      "Show-Line \"No vulnerable GPO local group assignments found in $(@($gpos).Count) analyzed GPO(s)\"": "Show-Line \"Небезопасных назначений в локальные группы через GPO не обнаружено; проанализировано политик: $(@($gpos).Count)\"",
+      "Show-Line \"No local group assignment is made by a policy that is linked and enabled\"": "Show-Line \"Активные привязанные GPO не назначают участников локальных групп\""
+    },
+    "src/modules/Checks/GPO/Get-GPOScheduledTasks.ps1": {
+      "Show-Line \"No scheduled tasks distributed via GPO in $($gpos.Count) analyzed GPO(s)\"": "Show-Line \"Задачи, распространяемые через GPO, не обнаружены; проанализировано политик: $($gpos.Count)\"",
+      "Show-Line \"No scheduled task is distributed by a policy that is linked and enabled\"": "Show-Line \"Активные привязанные GPO не распространяют запланированные задания\""
+    },
+    "src/modules/Checks/GPO/Get-GPOScriptPaths.ps1": {
+      "Show-Line \"No scripts distributed via GPO\"": "Show-Line \"Сценарии, распространяемые через GPO, не обнаружены\"",
+      "Show-Line \"No script is distributed by a policy that is linked and enabled\"": "Show-Line \"Активные привязанные GPO не распространяют сценарии\""
+    },
+    "src/modules/Checks/GPO/Get-GPORegistrySettings.ps1": {
+      "$unjudgedText = \"$($unjudgedShown.Count) further registry value(s) from $unjudgedPolicies $policyWord are not on the list of this check - not judged\"": "$unjudgedText = \"Дополнительные значения реестра вне перечня этой проверки: $($unjudgedShown.Count); объектов GPO: $unjudgedPolicies. Оценка безопасности для них не выполнялась\"",
+      "$unjudgedText += ' (-IncludeUnknown to list)'": "$unjudgedText += ' (для просмотра используйте -IncludeUnknown)'",
+      "Show-Line \"No known vulnerable registry setting is deployed via GPO\"": "Show-Line \"Известных небезопасных настроек реестра, развёрнутых через GPO, не обнаружено\"",
+      "Show-Line \"No known vulnerable registry setting is deployed by a policy that is linked and enabled\"": "Show-Line \"Активные привязанные GPO не развёртывают известных небезопасных настроек реестра\""
+    },
+    "src/modules/Checks/Domain/Get-DomainInformation.ps1": {
+      "$statusText = if ($GuestInfo.Enabled) { \"ENABLED\" } else { \"Disabled\" }": "$statusText = if ($GuestInfo.Enabled) { \"Включена\" } else { \"Отключена\" }",
+      "Show-Line \"Found $($statusText.ToLower()) Guest account\"": "Show-Line \"Учётная запись Guest: $($statusText.ToLower())\""
+    },
+    "src/modules/Checks/Rights/Get-PasswordResetRights.ps1": {
+      "Show-Line \"$protectedTargets privileged account(s) have inheritance disabled - a delegation on their OU does not reach them\"": "Show-Line \"У привилегированных учётных записей отключено наследование разрешений: $protectedTargets. Делегирование прав на родительской OU на них не распространяется\""
+    },
+    "src/modules/Checks/Rights/Get-DangerousOUPermissions.ps1": {
+      "$countText = if ($IncludePrivileged) { \"$(@($nonExchangeFindings).Count) account(s)\" } else { \"$(@($nonExchangeFindings).Count) non-privileged account(s)\" }": "$countText = if ($IncludePrivileged) { \"$(@($nonExchangeFindings).Count) учётных записей\" } else { \"$(@($nonExchangeFindings).Count) непривилегированных учётных записей\" }"
+    },
+    "src/modules/Helpers/Format-OUContainerCount.ps1": {
+      "if ($containerCount -eq 0) { return \"$ouCount OU(s)\" }": "if ($containerCount -eq 0) { return \"$ouCount OU\" }",
+      "if ($ouCount -eq 0) { return \"$containerCount container(s)\" }": "if ($ouCount -eq 0) { return \"$containerCount контейнеров\" }",
+      "return \"$ouCount OU(s) and $containerCount container(s)\"": "return \"$ouCount OU и $containerCount контейнеров\""
+    },
+    "src/modules/Checks/Accounts/Get-InactiveAdminAccounts.ps1": {
+      "Show-Line \"No inactive privileged accounts found\"": "Show-Line \"Неактивных привилегированных учётных записей не обнаружено\""
+    }
+  }
+}

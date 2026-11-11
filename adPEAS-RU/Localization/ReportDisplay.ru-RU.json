@@ -46,7 +46,15 @@
     "Password Never Expires": "Срок действия пароля не ограничен",
     "Trust account": "Учётная запись доверия",
     "Security configuration is properly set": "Проверяемая конфигурация соответствует требованиям безопасности",
-    "Error during check": "Ошибка выполнения проверки"
+    "Error during check": "Ошибка выполнения проверки",
+    "No scripts distributed via GPO": "Сценарии, распространяемые через GPO, не обнаружены",
+    "No gMSA accounts found in domain": "Учётные записи gMSA в домене не обнаружены",
+    "No standalone MSAs found": "Автономные управляемые учётные записи служб (sMSA) не обнаружены",
+    "No external domain trusts found (isolated domain)": "Внешние доверительные отношения домена не обнаружены (изолированный домен)",
+    "No trusted Root CAs found in AD configuration": "В конфигурации AD не обнаружены доверенные корневые центры сертификации (CA)",
+    "No principal uses an explicit certificate mapping": "Учётных записей с явно заданным сопоставлением сертификатов не обнаружено",
+    "No non-privileged principal can write altSecurityIdentities on a privileged account": "Непривилегированных субъектов с правом изменения altSecurityIdentities привилегированной учётной записи не обнаружено",
+    "No scheduled tasks distributed via GPO": "Задачи, распространяемые через GPO, не обнаружены"
   },
   "regex": [
     [
@@ -176,6 +184,74 @@
     [
       "^Object: (.*)$",
       "Объект: $1"
+    ],
+    [
+      "^Found (\\d+) user\\(s\\) across (\\d+) privileged group\\(s\\):$",
+      "Обнаружено пользователей в привилегированных группах: $1; проверено групп: $2"
+    ],
+    [
+      "^Found (\\d+) unprotected Tier-0 account\\(s\\) \\((\\d+) of (\\d+) in Protected Users, (\\d+)%\\):$",
+      "Учётных записей Tier 0 вне Protected Users: $1; защищено: $2 из $3 ($4%):"
+    ],
+    [
+      "^(\\d+) further enabled computer account\\(s\\) carry the 'Password Not Required' flag$",
+      "Дополнительно обнаружены включённые учётные записи компьютеров с флагом PASSWD_NOTREQD: $1"
+    ],
+    [
+      "^(\\d+) further privileged account\\(s\\) carry the flag with a password newer than (\\d+) days:$",
+      "Привилегированных записей с бессрочным паролем, изменённым менее $2 дней назад: $1"
+    ],
+    [
+      "^(\\d+) privileged account\\(s\\) have inheritance disabled - a delegation on their OU does not reach them$",
+      "Привилегированных записей с отключённым наследованием прав: $1. Делегирование с родительской OU на них не распространяется"
+    ],
+    [
+      "^OPSEC mode: Skipping user owner enumeration \\(would check all enabled users\\)$",
+      "Режим OPSEC: пропущена проверка владельцев учётных записей пользователей"
+    ],
+    [
+      "^OPSEC mode: Skipping the logon scripts of accounts \\(reading their permissions takes an SMB connection to NETLOGON\\)$",
+      "Режим OPSEC: пропущена проверка сценариев входа (требуется SMB-подключение к NETLOGON)"
+    ],
+    [
+      "^No scheduled tasks distributed via GPO in (\\d+) analyzed GPO\\(s\\)$",
+      "Задачи, распространяемые через GPO, не обнаружены; проанализировано политик: $1"
+    ],
+    [
+      "^No vulnerable GPO local group assignments found in (\\d+) analyzed GPO\\(s\\)$",
+      "Небезопасных назначений в локальные группы через GPO не обнаружено; проверено политик: $1"
+    ],
+    [
+      "^No read-only Domain Controller in this domain - there is no password replication policy to check$",
+      "Контроллеры домена только для чтения (RODC) не обнаружены; проверка политики репликации паролей не требуется"
+    ],
+    [
+      "^Found (disabled|enabled) Guest account$",
+      "Обнаружена учётная запись Guest: $1"
+    ],
+    [
+      "^Domain:\\s*(.+)$",
+      "Домен: $1"
+    ],
+    [
+      "^(\\d+) further registry value\\(s\\) from (\\d+) policies are not on the list of this check - not judged$",
+      "Дополнительных значений реестра вне перечня проверки: $1; политик GPO: $2. Оценка не выполнялась"
+    ],
+    [
+      "^(\\d+) further registry value\\(s\\) from (\\d+) policy are not on the list of this check - not judged$",
+      "Дополнительных значений реестра вне перечня проверки: $1; политик GPO: $2. Оценка не выполнялась"
+    ],
+    [
+      "^(\\d+) OU\\(s\\) and (\\d+) container\\(s\\)$",
+      "$1 OU и $2 контейнеров"
+    ],
+    [
+      "^(\\d+) OU\\(s\\)$",
+      "$1 OU"
+    ],
+    [
+      "^(\\d+) container\\(s\\)$",
+      "$1 контейнеров"
     ]
   ]
 }

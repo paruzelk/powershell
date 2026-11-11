@@ -42,6 +42,11 @@ jobs:
           .\adPEAS-RU\Tests\Test-RemediationTranslations.ps1
           .\adPEAS-RU\Tests\Test-FullTechnicalRU.ps1
           .\adPEAS-RU\Tests\Test-ReportSourceInventory.ps1
+      - name: Extended report text coverage (offline)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Stop"
+          .\\adPEAS-RU\\Tests\\Test-AdditionalCheckMessages.ps1
       - name: JavaScript template syntax check
         shell: pwsh
         run: |
@@ -52,11 +57,24 @@ jobs:
           $tempJs = Join-Path $env:RUNNER_TEMP "adpeas-expanded-report-check.js"
           [IO.File]::WriteAllText($tempJs, $runnable, (New-Object System.Text.UTF8Encoding($false)))
           node --check $tempJs
+      - name: Package verified RU build for public download
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Stop"
+          $archive = "adPEAS-RU-2.9.0-REPORT-RU-20261111.zip"
+          if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force }
+          Compress-Archive -Path "adPEAS-RU" -DestinationPath $archive -CompressionLevel Optimal
+          $hash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          [IO.File]::WriteAllText("adPEAS-RU-2.9.0-REPORT-RU-20261111.sha256", "$hash  $archive"+[Environment]::NewLine, (New-Object Text.UTF8Encoding($false)))
+          Write-Host "RU BUILD ZIP SHA-256: $hash"
       - name: Upload full source and build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: adPEAS-RU-2.9.0-full-source
-          path: adPEAS-RU
+          path: |
+            adPEAS-RU
+            adPEAS-RU-2.9.0-REPORT-RU-20261111.zip
+            adPEAS-RU-2.9.0-REPORT-RU-20261111.sha256
           retention-days: 7
       - name: Commit complete project to dedicated branch
         shell: powershell
@@ -64,7 +82,7 @@ jobs:
           $ErrorActionPreference = "Stop"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- adPEAS-RU
+          git add -A -- adPEAS-RU adPEAS-RU-2.9.0-REPORT-RU-20261111.zip adPEAS-RU-2.9.0-REPORT-RU-20261111.sha256
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -m "adPEAS-RU: full pinned v2.9.0 sources, localized build and verified tests"
