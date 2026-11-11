@@ -1,5 +1,9 @@
 ﻿# Testing — 2.6.3-PREVIEW1
 
+## ARCH2b main semantic witness integration tests (2026-11-11)
+
+[ARCH2b runbook](2.6.5-arch2b-semantic-verifier.md). New `Tests/Archive/ARCH2bSemanticWitness.Tests.ps1`: 45 pure/synthetic Pester tests for Unicode, Body/HTML, sender/recipients, user state, attachment SaveAsFile byte SHA256, changed file bytes/names, expected harmless MailItem.Size drift, missing/duplicated original witness, production never ready and integration into actual `MailMover` and `ArchiveVerifier`. Full expected **3754 tests / 125 containers**. CI uses fake MailItem objects, not real Outlook. Next ARCH2c requires a controlled disposable PST with independent post-restart reconciliation, not repeat historic BW4j one-shot fixtures.
+
 ## ARCH2a fail-closed existing COM move safety tests (2026-11-11)
 
 [ARCH2a runbook](2.6.5-arch2a-move-outcome-fence.md). New `Tests/Archive/ARCH2aMoveOutcomeFence.Tests.ps1` adds 49 pure source/journal/CLI tests (total expected 3709 tests in 124 containers). They exercise unresolved `Move Started`, duplicate attempt, unknown planned IDs, `Move Indeterminate`, and source missing/untreated checkpoint conditions; static checks require `-WriteCheckpoint` and forced journal flush before `MailItem.Move`, no old catch/continue, and blocked DEV writer modes. **These tests do not simulate an Outlook provider and do not certify 90GB.** Next ARCH2b integrates true semantic witnesses into normal archive/verify/resume before any real disposable-pst test.
