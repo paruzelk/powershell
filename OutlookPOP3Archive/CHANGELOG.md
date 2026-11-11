@@ -1,3 +1,9 @@
+## 2.6.5-BW4k7v2a8 — successful real one-shot Move, read-only HASATTACH and +124-byte attribution (DEV, 2026-11-11)
+
+- BW4k7v2a7 live one-shot move was confirmed after Outlook restart: exact synthetic source=0, target=1, semantic SHA matches actual saved pre-Move witness, no duplicate/retry. The first Reconcile call failed only because Outlook was still closed; the second after start succeeded. Original user output: `PR_MESSAGE_FLAGS 9 → 25` (XOR `0x10 MSGFLAG_HASATTACH`) and `MailItem.Size 1952 → 2076` (+124 bytes). Production SEM-001 still blocked.
+- New exact old-suite **read-only** forensic with pinned manifest, one-shot claim, Move return SHA and destination EntryID. Independently revalidate exact source zero/target one, semantic SHA, original Outlook profile and unique mounted disposable PST. Read only destination `PR_MESSAGE_FLAGS`, `PR_HASATTACH`, actual `Attachments.Count`, optional per-attachment hidden/method/flags/size/type/position metadata and `PR_MESSAGE_SIZE`. Never read filenames, payload bytes or other mail bodies. Original pre-Move attachment count and root cause of size drift stay **UNKNOWN**.
+- 40 new pure Pester tests, full **3625 tests in 122 containers**, Windows PowerShell 5.1/PSScriptAnalyzer, UTF8 BOM, JSON release guards and BW4j6 synthetic matrix. No Outlook COM in CI; no production archive/resume/auto, no Move retry, no SEM-001 waiver.
+
 ## 2.6.5-BW4k7v2a7 — fresh isolated one-shot Move with actual post-Save synthetic Body baseline (DEV, 2026-11-11)
 
 - Operator BW4k7v2a6 proved source template full 82 bytes preserved and exactly 3 trailing whitespace characters added (one CRLF plus SPACE/TAB), independently read twice with identical SHA256; zero destination matches and no historical Move. Exact suffix order not known. Old BW4k7v2a1 and BW4k7v2a4 SuiteIds now quarantined from the new v2a7 policy.
