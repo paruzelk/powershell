@@ -619,6 +619,17 @@ function Move-OPAItemsWithLimit {
             }
         }
         finally { if ($null -ne $fs) { $fs.Dispose() } }
+        # Do not trust Read-OPAJsonlLocal's intentional tolerance of a
+        # malformed LAST record: that record could be the missing claim.
+        $lastOriginalLine = [string](Get-Content -LiteralPath $stepJournalPath -Encoding UTF8 -Tail 1)
+        try {
+            $lastOriginalRecord = ConvertFrom-Json -InputObject $lastOriginalLine -ErrorAction Stop
+            if ($null -eq $lastOriginalRecord -or
+                $lastOriginalRecord.PSObject.Properties.Name -notcontains 'Step') {
+                throw 'Last record is not a step entry.'
+            }
+        }
+        catch { throw 'ARCH2a Resume STOP: last original journal record malformed; manual reconciliation required.' }
         $journalSteps = @(Read-OPAStepJournal -Transaction $Transaction)
         [void](Assert-OPA265ARCH2aNoUnresolvedMove -Transaction $Transaction -JournalSteps $journalSteps)
     }
