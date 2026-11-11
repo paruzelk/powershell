@@ -222,13 +222,13 @@
                 }
                 if ($totalObjects -gt $Script:ProgressThreshold) { Show-Progress -Activity "Checking BitLocker recovery key access" -Completed }
             } else {
-                Show-Line "No readable BitLocker recovery keys found" -Class "Secure"
+                Show-Line "Ключи восстановления BitLocker, доступные для чтения текущей записью, не обнаружены" -Class "Secure"
             }
 
             # These volumes do have a recovery key escrowed, the directory just did not hand
             # it over. That is a different fact from "no BitLocker escrow here".
             if ($withheldObjects.Count -gt 0) {
-                Show-Line "$($withheldObjects.Count) escrowed recovery key(s) exist that this account may not read" -Class "Note"
+                Show-Line "Сохранённых ключей восстановления, которые текущая запись не может прочитать: $($withheldObjects.Count)" -Class "Note"
             }
 
             # ===== Step 4: who else may read the recovery passwords =====
@@ -241,12 +241,12 @@
                 Show-BitLockerRecoveryDelegation -IncludePrivileged:$IncludePrivileged -ConnectionParams $connectionParams
             } catch {
                 Write-Log "[Get-BitLockerRecoveryKeyAccess] Delegation analysis failed: $_" -Level Error
-                Show-Line "Error during the delegation analysis - who may read the recovery passwords could not be evaluated: $_" -Class Finding
+                Show-Line "Ошибка анализа делегирования: не удалось определить, кто может читать пароли восстановления: $_" -Class Finding
             }
 
         } catch {
             Write-Log "[Get-BitLockerRecoveryKeyAccess] Error: $_" -Level Error
-            Show-Line "Error during check - BitLocker recovery key access could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить доступ к ключам восстановления BitLocker: $_" -Class Finding
         }
     }
 

@@ -3,8 +3,8 @@
     adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
 
 .DESCRIPTION
-    Build: 2026-11-11 17:17:13
-    Version: 2.9.0+20261111-1717
+    Build: 2026-11-11 17:26:56
+    Version: 2.9.0+20261111-1726
 
     AUTHORIZED SECURITY TESTING ONLY!
 
@@ -114612,7 +114612,7 @@ function Get-PrivilegedGroupMembers {
                 }
 
                 if ($foreignBySID.Count -gt 0) {
-                    Show-Line "$($foreignBySID.Count) of them come from a trusted domain - adPEAS cannot read the object behind the SID, so a group there is not expanded:" -Class Hint
+                    Show-Line "Участников из доверенного домена: $($foreignBySID.Count). adPEAS не может прочитать объекты по этим SID, поэтому группы из другого домена не раскрыты:" -Class Hint
                     foreach ($foreignSID in ($foreignBySID.Keys | Sort-Object)) {
                         $entry = $foreignBySID[$foreignSID]
                         Show-Line "  $($entry.Name) in $(@($entry.Groups) -join ', ')" -Class Hint
@@ -114740,7 +114740,7 @@ function Get-PrivilegedGroupMembers {
                 }
 
                 if (@($dcPrimaryFindings).Count -gt 0) {
-                    Show-Line "$(@($dcPrimaryFindings).Count) account(s) that are not computers hold a domain controller group as their primary group:" -Class Finding
+                    Show-Line "Учётных записей, не являющихся компьютерами, у которых первичная группа принадлежит к группам контроллеров домена: $(@($dcPrimaryFindings).Count)" -Class Finding
                     foreach ($dcFinding in $dcPrimaryFindings) {
                         Show-Object $dcFinding -Class Finding
                     }
@@ -115113,14 +115113,14 @@ function Get-PrivilegedGroupMembers {
                     }
 
                     if (@($inheritedControllers).Count -gt 0) {
-                        Show-Line "$(@($inheritedControllers).Count) principal(s) can rewrite AdminSDHolder through an inherited ACE - remove it at the parent:" -Class Finding
+                        Show-Line "Субъектов с унаследованным ACE, позволяющим изменить AdminSDHolder: $(@($inheritedControllers).Count). Удаляйте разрешение у родителя:" -Class Finding
                         foreach ($controller in $inheritedControllers) {
                             Show-Line "  $controller" -Class Finding
                         }
                     }
 
                     if (@($denyTrustees).Count -gt 0) {
-                        Show-Line "$(@($denyTrustees).Count) Deny ACE trustee(s) on AdminSDHolder - a Deny here can hide the template from the people who audit it:" -Class Hint
+                        Show-Line "Субъектов в ACE типа Deny у AdminSDHolder: $(@($denyTrustees).Count). Такой запрет способен скрывать шаблон от проверяющих:" -Class Hint
                         foreach ($denied in $denyTrustees) {
                             Show-Line "  $denied" -Class Hint
                         }
@@ -115328,7 +115328,7 @@ function Get-PrivilegedGroupMembers {
                 }
 
                 if (@($PreWin2000Unresolved).Count -gt 0) {
-                    Show-Line "$(@($PreWin2000Unresolved).Count) member(s) of Pre-Windows 2000 Compatible Access could not be resolved to a SID and were not assessed" -Class Hint
+                    Show-Line "Участников Pre-Windows 2000 Compatible Access, которые не разрешены до SID и потому не оценивались: $(@($PreWin2000Unresolved).Count)" -Class Hint
                 }
             } catch {
                 Write-Log "[Get-PrivilegedGroupMembers] Error checking Pre-Windows 2000 Compatible Access: $_" -Level Error
@@ -116601,7 +116601,7 @@ function Get-ProtectedUsersStatus {
 
             # Show excluded accounts (informational)
             if (@($excludedAccounts.Keys).Count -gt 0) {
-                Show-Line "$($excludedAccounts.Count) account(s) excluded from metric (not applicable for Protected Users):" -Class Note
+                Show-Line "Учётных записей, исключённых из показателя как неприменимых к Protected Users: $($excludedAccounts.Count)" -Class Note
 
                 foreach ($sid in $excludedAccounts.Keys) {
                     $info = $excludedAccounts[$sid]
@@ -117956,7 +117956,7 @@ function Get-InactiveAdminAccounts {
 
         } catch {
             Write-Log "[Get-InactiveAdminAccounts] Error: $_" -Level Error
-            Show-Line "Error during check - inactive privileged accounts could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить неактивные привилегированные учётные записи: $_" -Class Finding
         }
     }
 
@@ -118713,7 +118713,7 @@ function Get-ManagedServiceAccountSecurity {
                                 if ($parsedPassword -and $parsedPassword.CurrentNTHash) {
                                     $passwordsRetrieved++
 
-                                    Show-Line "Successfully retrieved password for gMSA: $gmsaName" -Class Finding
+                                    Show-Line "Успешно получен пароль gMSA: $gmsaName" -Class Finding
 
                                     # Create gMSA password object for consistent display
                                     $queryHours = [Math]::Round($parsedPassword.QueryPasswordInterval.TotalHours, 1)
@@ -118737,7 +118737,7 @@ function Get-ManagedServiceAccountSecurity {
                                     # It was printed at Show-Object's neutral default.
                                     Show-Object $gmsaPasswordObj -Class Finding
 
-                                    Show-Line "Use NT hash with: Pass-the-Hash, Overpass-the-Hash, or DCSync impersonation" -Class Hint
+                                    Show-Line "NT-хеш можно использовать для Pass-the-Hash, Overpass-the-Hash или имитации DCSync" -Class Hint
                                     Show-EmptyLine
                                 } else {
                                     Write-Log "[Get-ManagedServiceAccountSecurity] Failed to parse password blob for $gmsaName"
@@ -118851,7 +118851,7 @@ function Get-ManagedServiceAccountSecurity {
                     Show-Object $msa -Class Hint
                 }
 
-                Show-Line "Recommendation: Migrate standalone MSAs to gMSAs for improved security" -Class Hint
+                Show-Line "Рекомендация: замените автономные sMSA групповыми gMSA для повышения безопасности" -Class Hint
             } else {
                 Show-Line "Автономные управляемые учётные записи служб (sMSA) не обнаружены" -Class Note
             }
@@ -118976,13 +118976,13 @@ function Get-ManagedServiceAccountSecurity {
                 }
 
                 if (@($startedPairs).Count -gt 0) {
-                    Show-Line "dMSA migration started: $(@($startedPairs) -join ', ')" -Class Note
+                    Show-Line "Начата миграция на dMSA: $(@($startedPairs) -join ', ')" -Class Note
                 }
                 if (@($completedPairs).Count -gt 0) {
-                    Show-Line "dMSA migration completed: $(@($completedPairs) -join ', ')" -Class Note
+                    Show-Line "Миграция на dMSA завершена: $(@($completedPairs) -join ', ')" -Class Note
                 }
                 if (@($stalePairs).Count -gt 0) {
-                    Show-Line "Account(s) naming a dMSA that does not name them back: $(@($stalePairs) -join ', ')" -Class Note
+                    Show-Line "Учётные записи с указанием dMSA, которая не ссылается на них в ответ: $(@($stalePairs) -join ', ')" -Class Note
                 }
 
                 if (@($linkedDMSAs).Count -eq 0) {
@@ -118999,7 +118999,7 @@ function Get-ManagedServiceAccountSecurity {
                         Write-Log "[Get-ManagedServiceAccountSecurity] Could not read the dMSA $(@($linkedDMSAs)[0]): $_"
                     }
                     if (-not $readableDMSA) {
-                        Show-Line "The dMSA objects are not readable by this account - who may use each dMSA was not evaluated" -Class Note
+                        Show-Line "Текущая учётная запись не может прочитать объекты dMSA — проверка прав использования каждой dMSA не выполнена" -Class Note
                     }
                 }
 
@@ -119089,7 +119089,7 @@ function Get-ManagedServiceAccountSecurity {
                                 if ($_.IsBroadGroup) { $prefix = '[CRITICAL] ' }
                                 "$prefix$($_.Principal) ($($_.SID))"
                             }) -join ', '
-                            Show-Line "Non-privileged principals allowed to use it: $userList" -Class Hint
+                            Show-Line "Непривилегированные субъекты с правом использования этой записи: $userList" -Class Hint
                         }
                     }
 
@@ -119857,7 +119857,7 @@ function Get-SIDHistoryInjection {
 
         } catch {
             Write-Log "[Get-SIDHistoryInjection] Error: $_" -Level Error
-            Show-Line "Error during check - SID history could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить sIDHistory: $_" -Class Finding
         }
     }
 
@@ -120082,7 +120082,7 @@ function Get-NonDefaultUserOwners {
 
             } else {
                 if ($filteredHealthMailboxes -gt 0) {
-                    Show-Line "All users have default owners (filtered $filteredHealthMailboxes Exchange Health Mailboxes)" -Class Secure
+                    Show-Line "Все проверенные пользователи имеют ожидаемых владельцев; исключено почтовых объектов Exchange Health Mailboxes: $filteredHealthMailboxes" -Class Secure
                 } else {
                     Show-Line "У всех пользователей стандартные владельцы" -Class Secure
                 }
@@ -120090,7 +120090,7 @@ function Get-NonDefaultUserOwners {
 
         } catch {
             Write-Log "[Get-NonDefaultUserOwners] Error: $_" -Level Error
-            Show-Line "Error during check - the owners of user accounts could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить владельцев пользовательских записей: $_" -Class Finding
         }
     }
 
@@ -127785,7 +127785,7 @@ function Get-ComputerPasswordAge {
             $computers = @(Get-DomainComputer -Enabled -PasswordAgeDays $PasswordAgeDays -LDAPFilter "(lastLogonTimestamp>=$activeSince)" @connectionParams)
 
             if ($computers.Count -eq 0) {
-                Show-Line "Every computer that logged on in the last $ActiveDays days has changed its machine account password within $PasswordAgeDays days" -Class Secure
+                Show-Line "Все компьютеры с отметкой доменного входа за последние $ActiveDays дней обновили пароль своей машинной учётной записи в пределах $PasswordAgeDays дней" -Class Secure
                 return
             }
 
@@ -127819,7 +127819,7 @@ function Get-ComputerPasswordAge {
 
         } catch {
             Write-Log "[Get-ComputerPasswordAge] Error: $_" -Level Error
-            Show-Line "Error during check - the machine account password age could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось определить возраст паролей машинных учётных записей: $_" -Class Finding
         }
     }
 
@@ -135249,7 +135249,7 @@ function Get-ADCSTemplate {
 
         } catch {
             Write-Log "[Get-ADCSTemplate] Error: $_" -Level Error
-            Show-Line "Error during check - certificate templates could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить шаблоны сертификатов: $_" -Class Finding
         }
     }
 
@@ -137647,7 +137647,7 @@ function Get-WeakCertificateMapping {
         if (@($writableFindings).Count -gt 0) {
             # Same dampening as above, and for the same reason: the mapping an attacker
             # would add still needs an issuer the domain accepts.
-            Show-Line "Found $(@($writableFindings).Count) privileged principal(s) whose altSecurityIdentities a non-privileged principal may write" -Class $mappingClass -FindingId 'ESC14_WRITABLE_MAPPING'
+            Show-Line "Найдено привилегированных субъектов, у которых непривилегированная запись может изменять altSecurityIdentities: $(@($writableFindings).Count)" -Class $mappingClass -FindingId 'ESC14_WRITABLE_MAPPING'
             if ($noTrustAnchor) { Show-NoTrustAnchorNote }
             foreach ($finding in $writableFindings) {
                 Show-Object $finding -Class $mappingClass
@@ -137661,12 +137661,12 @@ function Get-WeakCertificateMapping {
             # many there are, so a reader who has not met the switch can still learn that
             # Exchange reaches these accounts.
             if ($IncludePrivileged) {
-                Show-Line "$(@($exchangeOnlyFindings).Count) privileged account(s) writable only by Exchange service groups (by design):" -Class Hint
+                Show-Line "Привилегированных записей, изменяемых только служебными группами Exchange по штатной модели: $(@($exchangeOnlyFindings).Count)" -Class Hint
                 foreach ($finding in $exchangeOnlyFindings) {
                     Show-Object $finding -Class Hint
                 }
             } else {
-                Show-Line "$(@($exchangeOnlyFindings).Count) privileged account(s) writable only by Exchange service groups (by design) - use -IncludePrivileged" -Class Note
+                Show-Line "Привилегированных записей, изменяемых только служебными группами Exchange по штатной модели: $(@($exchangeOnlyFindings).Count). Для включения используйте -IncludePrivileged" -Class Note
             }
         }
 
@@ -138636,7 +138636,7 @@ function Get-ExchangeInfrastructure {
                 Show-Line "Не удалось прочитать гибридную конфигурацию; её отсутствие не подтверждено" -Class Hint
             }
             elseif (-not $hybridOnOrgCard) {
-                Show-Line "No hybrid configuration found - this organization appears to be purely on-premises" -Class Note
+                Show-Line "Гибридная конфигурация не обнаружена: вероятно, организация использует только локальный Exchange" -Class Note
             }
 
             # ===== Step 4: SMTP receive connector permissions =====
@@ -138961,10 +138961,10 @@ function Get-ExchangeInfrastructure {
                     # A connector whose descriptor did not come back was not assessed. The
                     # secure line below would claim a result for it, which is the one thing
                     # an unread object must never produce.
-                    Show-Line "$(@($unreadConnectors).Count) of $(@($connectorResults).Count) receive connector(s) could not be assessed - their permissions are unknown, not clean" -Class Hint
+                    Show-Line "Принимающих соединителей с неоценёнными разрешениями: $(@($unreadConnectors).Count) из $(@($connectorResults).Count). Их безопасность неизвестна, а не подтверждена" -Class Hint
                 }
                 else {
-                    Show-Line "No receive connector grants relay or sender-spoofing rights to unauthenticated senders" -Class Secure
+                    Show-Line "Ни один проверенный принимающий соединитель не выдаёт анонимным отправителям права ретрансляции или подмены отправителя" -Class Secure
                 }
 
                 foreach ($connectorObj in $connectorResults) {
@@ -139074,7 +139074,7 @@ function Get-ExchangeInfrastructure {
                 $absentScope = if ($rootNC -and $rootNC -ne $domainDN) {
                     if ($forestRootAsked) { ' in this domain or in the forest root' } else { ' in this domain, and the forest root could not be asked through the Global Catalog' }
                 } else { '' }
-                Show-Line "Neither Exchange Windows Permissions nor Exchange Trusted Subsystem exists$absentScope - the permissions model is unknown" -Class Note
+                Show-Line "Не найдены ни Exchange Windows Permissions, ни Exchange Trusted Subsystem$absentScope — модель разрешений неизвестна" -Class Note
             }
             else {
                 $domainACEs = @()
@@ -139091,7 +139091,7 @@ function Get-ExchangeInfrastructure {
                 }
 
                 if (-not $domainACLReadable) {
-                    Show-Line "The domain object ACL could not be read - the permissions model is unknown, not clean" -Class Hint
+                    Show-Line "Не удалось прочитать ACL доменного объекта — модель разрешений неизвестна, безопасность не подтверждена" -Class Hint
                 }
                 else {
                     # WriteDacl is the one that matters, but WriteOwner and GenericAll reach
@@ -139318,7 +139318,7 @@ function Get-ExchangeInfrastructure {
                                 $rootServiceGroups = Get-ForestRootExchangeGroup -Name @($exchangeServiceGroups | ForEach-Object { $_.Name })
                             }
                             if ($rootServiceGroups -and $rootServiceGroups.ContainsKey($serviceGroup.Name)) {
-                                Show-Line "$($serviceGroup.Name) is in the forest root domain ($($rootServiceGroups[$serviceGroup.Name].DistinguishedName)) - a scan of that domain reports its members" -Class Note
+                                Show-Line "Группа $($serviceGroup.Name) находится в корневом домене леса ($($rootServiceGroups[$serviceGroup.Name].DistinguishedName)); её участников показывает аудит этого домена" -Class Note
                                 continue
                             }
                         }
@@ -139332,7 +139332,7 @@ function Get-ExchangeInfrastructure {
                     $groupMembers = @($groupObject.member | Where-Object { $_ })
 
                     if (@($groupMembers).Count -eq 0) {
-                        Show-Line "$($serviceGroup.Name) group exists but has no members (unusual)" -Class Note
+                        Show-Line "Группа $($serviceGroup.Name) существует, но не имеет участников (нетипичное состояние)" -Class Note
                         continue
                     }
 
@@ -139344,7 +139344,7 @@ function Get-ExchangeInfrastructure {
                 }
                 catch {
                     Write-Log "[Get-ExchangeInfrastructure] Error checking $($serviceGroup.Name): $_" -Level Error
-                    Show-Line "$($serviceGroup.Name) could not be read - result unknown, not empty" -Class Note
+                    Show-Line "Не удалось прочитать группу $($serviceGroup.Name) — результат неизвестен, а не означает отсутствие участников" -Class Note
                 }
             }
 
@@ -139354,7 +139354,7 @@ function Get-ExchangeInfrastructure {
         }
         catch {
             Write-Log "[Get-ExchangeInfrastructure] Error: $_" -Level Error
-            Show-Line "Error during check - the Exchange infrastructure could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить инфраструктуру Exchange: $_" -Class Finding
         }
     }
 
@@ -139912,7 +139912,7 @@ function Get-SCCMInfrastructure {
                 # rather than that it found nothing: Invoke-LDAPSearch answers a missing
                 # SearchBase with an empty result and no error, and the two are
                 # indistinguishable from the caller's side.
-                Show-Line "System Management container not found - sites, management points and its permissions were not read" -Class Hint
+                Show-Line "Контейнер System Management не найден — сайты, точки управления и его разрешения не прочитаны" -Class Hint
             }
 
             # ===== Step 3: SCCM Sites via mSSMSSite =====
@@ -139962,7 +139962,7 @@ function Get-SCCMInfrastructure {
                 } elseif (-not $systemMgmt) {
                     Show-Line "The System Management container does not exist - no site object could be read" -Class Note
                 } else {
-                    Show-Line "No mSSMSSite objects found in System Management container" -Class Note
+                    Show-Line "Контейнер System Management отсутствует — прочитать объекты сайтов не удалось" -Class Note
                 }
             } catch {
                 Write-Log "[Get-SCCMInfrastructure] Error querying mSSMSSite: $_" -Level Warning
@@ -140072,7 +140072,7 @@ function Get-SCCMInfrastructure {
                         Show-Line "Обнаружен центральный административный сайт (CAS): в SCCM есть иерархия нескольких сайтов" -Class Hint -FindingId "SCCM_SITE_HIERARCHY"
                     }
                 } elseif (-not $systemMgmt) {
-                    Show-Line "The System Management container does not exist - no management point could be read" -Class Note
+                    Show-Line "Контейнер System Management отсутствует — прочитать точки управления не удалось" -Class Note
                 } else {
                     Show-Line "No mSSMSManagementPoint objects found in System Management container" -Class Note
                 }
@@ -140174,12 +140174,12 @@ function Get-SCCMInfrastructure {
                     # Named apart from the unreadable case below. Both leave the
                     # permissions unknown, but one is a missing read right on an existing
                     # container and the other is a container nobody created.
-                    Show-Line "The System Management container does not exist - its permissions could not be read" -Class Note
+                    Show-Line "Контейнер System Management отсутствует — прочитать его разрешения не удалось" -Class Note
                 } elseif (-not $containerRaw -or -not $containerRaw.nTSecurityDescriptor) {
                     # Reading the security descriptor needs READ_CONTROL, which a plain
                     # domain user has on this container - but say so rather than let an
                     # unreadable ACL look like a clean one.
-                    Show-Line "The security descriptor of the System Management container could not be read - result unknown, not clean" -Class Note
+                    Show-Line "Не удалось прочитать дескриптор безопасности контейнера System Management — состояние неизвестно, безопасность не подтверждена" -Class Note
                 } else {
                     $sccmDescriptor = New-Object System.DirectoryServices.ActiveDirectorySecurity
                     $sccmDescriptor.SetSecurityDescriptorBinaryForm($containerRaw.nTSecurityDescriptor)
@@ -140279,7 +140279,7 @@ function Get-SCCMInfrastructure {
             }
             catch {
                 Write-Log "[Get-SCCMInfrastructure] Error reading the System Management container ACL: $_" -Level Warning
-                Show-Line "The System Management container permissions could not be analysed - result unknown, not clean" -Class Note
+                Show-Line "Не удалось оценить разрешения контейнера System Management — состояние неизвестно, безопасность не подтверждена" -Class Note
             }
 
             # ===== Step 6: PXE/WDS Discovery =====
@@ -140455,7 +140455,7 @@ function Get-SCCMInfrastructure {
 
         } catch {
             Write-Log "[Get-SCCMInfrastructure] Error: $_" -Level Error
-            Show-Line "Error during check - the SCCM infrastructure could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить инфраструктуру SCCM: $_" -Class Finding
         }
     }
 
@@ -142666,13 +142666,13 @@ function Get-CredentialExposure {
                 if ((Test-SysvolAccessible) -eq $false) {
                     Show-Line "Пропущено: SYSVOL недоступен" -Class "Hint"
                 } else {
-                    Show-Line "SYSVOL access failed - credentials were not searched for" -Class "Finding"
+                    Show-Line "Не удалось получить доступ к SYSVOL — поиск учётных данных не выполнен" -Class "Finding"
                 }
             }
 
         } catch {
             Write-Log "[Get-CredentialExposure] Error: $_" -Level Error
-            Show-Line "Error during check - credentials in SYSVOL and NETLOGON could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить учётные данные в SYSVOL и NETLOGON: $_" -Class Finding
         }
     }
 
@@ -143261,13 +143261,13 @@ function Get-BitLockerRecoveryKeyAccess {
                 }
                 if ($totalObjects -gt $Script:ProgressThreshold) { Show-Progress -Activity "Checking BitLocker recovery key access" -Completed }
             } else {
-                Show-Line "No readable BitLocker recovery keys found" -Class "Secure"
+                Show-Line "Ключи восстановления BitLocker, доступные для чтения текущей записью, не обнаружены" -Class "Secure"
             }
 
             # These volumes do have a recovery key escrowed, the directory just did not hand
             # it over. That is a different fact from "no BitLocker escrow here".
             if ($withheldObjects.Count -gt 0) {
-                Show-Line "$($withheldObjects.Count) escrowed recovery key(s) exist that this account may not read" -Class "Note"
+                Show-Line "Сохранённых ключей восстановления, которые текущая запись не может прочитать: $($withheldObjects.Count)" -Class "Note"
             }
 
             # ===== Step 4: who else may read the recovery passwords =====
@@ -143280,12 +143280,12 @@ function Get-BitLockerRecoveryKeyAccess {
                 Show-BitLockerRecoveryDelegation -IncludePrivileged:$IncludePrivileged -ConnectionParams $connectionParams
             } catch {
                 Write-Log "[Get-BitLockerRecoveryKeyAccess] Delegation analysis failed: $_" -Level Error
-                Show-Line "Error during the delegation analysis - who may read the recovery passwords could not be evaluated: $_" -Class Finding
+                Show-Line "Ошибка анализа делегирования: не удалось определить, кто может читать пароли восстановления: $_" -Class Finding
             }
 
         } catch {
             Write-Log "[Get-BitLockerRecoveryKeyAccess] Error: $_" -Level Error
-            Show-Line "Error during check - BitLocker recovery key access could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить доступ к ключам восстановления BitLocker: $_" -Class Finding
         }
     }
 
@@ -157957,7 +157957,7 @@ function Collect-BHIssuancePolicies {
 #Requires -Version 5.1
 
 # ===== Script Variables =====
-$Script:adPEASVersion = "2.9.0+20261111-1717"
+$Script:adPEASVersion = "2.9.0+20261111-1726"
 
 # Handle ScriptPath for different execution contexts:
 # - Normal: $MyInvocation.MyCommand.Path is set

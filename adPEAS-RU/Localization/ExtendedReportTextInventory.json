@@ -1,39 +1,15 @@
 ﻿{
     "schema":  "adPEAS-RU.ReportTextCoverage.1",
     "locale":  "ru-RU",
-    "translatedNewRules":  97,
+    "translatedNewRules":  143,
     "sources":  200,
     "htmlTemplates":  [
                           "src/modules/Reporting/templates/report-template.html",
                           "src/modules/Reporting/templates/report-scripts.js",
                           "src/modules/Reporting/templates/diff-template.html"
                       ],
-    "candidateCount":  795,
+    "candidateCount":  749,
     "candidates":  [
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-InactiveAdminAccounts.ps1",
-                           "line":  211,
-                           "snippet":  "Show-Line \"Error during check - inactive privileged accounts could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  401,
-                           "snippet":  "Show-Line \"Successfully retrieved password for gMSA: $gmsaName\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  425,
-                           "snippet":  "Show-Line \"Use NT hash with: Pass-the-Hash, Overpass-the-Hash, or DCSync impersonation\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  539,
-                           "snippet":  "Show-Line \"Recommendation: Migrate standalone MSAs to gMSAs for improved security\" -Class Hint"
-                       },
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
@@ -43,38 +19,8 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  664,
-                           "snippet":  "Show-Line \"dMSA migration started: $(@($startedPairs) -join \u0027, \u0027)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  667,
-                           "snippet":  "Show-Line \"dMSA migration completed: $(@($completedPairs) -join \u0027, \u0027)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  670,
-                           "snippet":  "Show-Line \"Account(s) naming a dMSA that does not name them back: $(@($stalePairs) -join \u0027, \u0027)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  687,
-                           "snippet":  "Show-Line \"The dMSA objects are not readable by this account - who may use each dMSA was not evaluated\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
                            "line":  763,
                            "snippet":  "Show-Line \"Found $(@($usableByOthers).Count) dMSA(s) that principals beyond administrators and service hosts may use$broadInfo`:\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  777,
-                           "snippet":  "Show-Line \"Non-privileged principals allowed to use it: $userList\" -Class Hint"
                        },
                        {
                            "kind":  "DirectShow",
@@ -101,28 +47,10 @@
                            "snippet":  "Show-Line \"dMSA use is restricted to privileged accounts and service hosts ($unanalyzedDMSAs of $($dmsaAccounts.Count) not analyzed)\" -Class Note"
                        },
                        {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-NonDefaultUserOwners.ps1",
-                           "line":  213,
-                           "snippet":  "Show-Line \"All users have default owners (filtered $filteredHealthMailboxes Exchange Health Mailboxes)\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-NonDefaultUserOwners.ps1",
-                           "line":  221,
-                           "snippet":  "Show-Line \"Error during check - the owners of user accounts could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
                            "kind":  "DynamicSummary",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
                            "line":  958,
                            "snippet":  "$summaryText = $summaryParts -join \", \""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
-                           "line":  993,
-                           "snippet":  "Show-Line \"$($foreignBySID.Count) of them come from a trusted domain - adPEAS cannot read the object behind the SID, so a group there is not expanded:\" -Class Hint"
                        },
                        {
                            "kind":  "DirectShow",
@@ -133,38 +61,14 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
-                           "line":  1121,
-                           "snippet":  "Show-Line \"$(@($dcPrimaryFindings).Count) account(s) that are not computers hold a domain controller group as their primary group:\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
-                           "line":  1494,
-                           "snippet":  "Show-Line \"$(@($inheritedControllers).Count) principal(s) can rewrite AdminSDHolder through an inherited ACE - remove it at the parent:\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
                            "line":  1496,
                            "snippet":  "Show-Line \"  $controller\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
-                           "line":  1501,
-                           "snippet":  "Show-Line \"$(@($denyTrustees).Count) Deny ACE trustee(s) on AdminSDHolder - a Deny here can hide the template from the people who audit it:\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
                            "line":  1503,
                            "snippet":  "Show-Line \"  $denied\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
-                           "line":  1709,
-                           "snippet":  "Show-Line \"$(@($PreWin2000Unresolved).Count) member(s) of Pre-Windows 2000 Compatible Access could not be resolved to a SID and were not assessed\" -Class Hint"
                        },
                        {
                            "kind":  "DynamicSummary",
@@ -216,27 +120,9 @@
                        },
                        {
                            "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ProtectedUsersStatus.ps1",
-                           "line":  421,
-                           "snippet":  "Show-Line \"$($excludedAccounts.Count) account(s) excluded from metric (not applicable for Protected Users):\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-SIDHistoryInjection.ps1",
                            "line":  358,
                            "snippet":  "Show-Line (\"$(@($orphanedAccounts).Count) account(s) carry sIDHistory from $(@($orphanedDomainSIDs).Count) domain(s) this domain \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-SIDHistoryInjection.ps1",
-                           "line":  376,
-                           "snippet":  "Show-Line \"Error during check - SID history could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSTemplate.ps1",
-                           "line":  526,
-                           "snippet":  "Show-Line \"Error during check - certificate templates could not be evaluated: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",
@@ -271,56 +157,8 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                           "line":  464,
-                           "snippet":  "Show-Line \"Found $(@($writableFindings).Count) privileged principal(s) whose altSecurityIdentities a non-privileged principal may write\" -Class $mappingClass -FindingId \u0027ESC14_WRITABLE_MAPPING\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                           "line":  478,
-                           "snippet":  "Show-Line \"$(@($exchangeOnlyFindings).Count) privileged account(s) writable only by Exchange service groups (by design):\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                           "line":  483,
-                           "snippet":  "Show-Line \"$(@($exchangeOnlyFindings).Count) privileged account(s) writable only by Exchange service groups (by design) - use -IncludePrivileged\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
                            "line":  535,
                            "snippet":  "Show-Line (\"No issuer is published in the NTAuth store, so no certificate can \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  757,
-                           "snippet":  "Show-Line \"No hybrid configuration found - this organization appears to be purely on-premises\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  1082,
-                           "snippet":  "Show-Line \"$(@($unreadConnectors).Count) of $(@($connectorResults).Count) receive connector(s) could not be assessed - their permissions are unknown, not clean\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  1085,
-                           "snippet":  "Show-Line \"No receive connector grants relay or sender-spoofing rights to unauthenticated senders\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  1195,
-                           "snippet":  "Show-Line \"Neither Exchange Windows Permissions nor Exchange Trusted Subsystem exists$absentScope - the permissions model is unknown\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  1212,
-                           "snippet":  "Show-Line \"The domain object ACL could not be read - the permissions model is unknown, not clean\" -Class Hint"
                        },
                        {
                            "kind":  "DirectShow",
@@ -331,38 +169,14 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  1439,
-                           "snippet":  "Show-Line \"$($serviceGroup.Name) is in the forest root domain ($($rootServiceGroups[$serviceGroup.Name].DistinguishedName)) - a scan of that domain reports its members\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
                            "line":  1443,
                            "snippet":  "Show-Line \"$($serviceGroup.Name) group not found\" -Class Note"
                        },
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  1453,
-                           "snippet":  "Show-Line \"$($serviceGroup.Name) group exists but has no members (unusual)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
                            "line":  1457,
                            "snippet":  "Show-Line \"Found $(@($groupMembers).Count) member(s) in $($serviceGroup.Name):\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  1465,
-                           "snippet":  "Show-Line \"$($serviceGroup.Name) could not be read - result unknown, not empty\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                           "line":  1475,
-                           "snippet":  "Show-Line \"Error during check - the Exchange infrastructure could not be evaluated: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",
@@ -397,44 +211,14 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  124,
-                           "snippet":  "Show-Line \"System Management container not found - sites, management points and its permissions were not read\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
                            "line":  172,
                            "snippet":  "Show-Line \"The System Management container does not exist - no site object could be read\" -Class Note"
                        },
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  174,
-                           "snippet":  "Show-Line \"No mSSMSSite objects found in System Management container\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  284,
-                           "snippet":  "Show-Line \"The System Management container does not exist - no management point could be read\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
                            "line":  286,
                            "snippet":  "Show-Line \"No mSSMSManagementPoint objects found in System Management container\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  386,
-                           "snippet":  "Show-Line \"The System Management container does not exist - its permissions could not be read\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  391,
-                           "snippet":  "Show-Line \"The security descriptor of the System Management container could not be read - result unknown, not clean\" -Class Note"
                        },
                        {
                            "kind":  "DirectShow",
@@ -451,12 +235,6 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  491,
-                           "snippet":  "Show-Line \"The System Management container permissions could not be analysed - result unknown, not clean\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
                            "line":  555,
                            "snippet":  "Show-Line \"PXE/WDS servers detected\" -Class Hint -FindingId \"SCCM_PXE_EXPOSURE\""
                        },
@@ -465,12 +243,6 @@
                            "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
                            "line":  656,
                            "snippet":  "Show-Line \"$broadGroupCount SCCM-related group(s) have a broad group as member\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                           "line":  667,
-                           "snippet":  "Show-Line \"Error during check - the SCCM infrastructure could not be evaluated: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",
@@ -493,12 +265,6 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Computer\\Get-ComputerPasswordAge.ps1",
-                           "line":  93,
-                           "snippet":  "Show-Line \"Every computer that logged on in the last $ActiveDays days has changed its machine account password within $PasswordAgeDays days\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-ComputerPasswordAge.ps1",
                            "line":  116,
                            "snippet":  "Show-Line \"$($domainControllers.Count) Domain Controller(s) have not changed their machine account password in $PasswordAgeDays days or more:\" -Class Finding"
                        },
@@ -507,12 +273,6 @@
                            "source":  "src\\modules\\Checks\\Computer\\Get-ComputerPasswordAge.ps1",
                            "line":  121,
                            "snippet":  "Show-Line \"$($members.Count) active computer(s) have not changed their machine account password in $PasswordAgeDays days or more:\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Computer\\Get-ComputerPasswordAge.ps1",
-                           "line":  127,
-                           "snippet":  "Show-Line \"Error during check - the machine account password age could not be evaluated: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",
@@ -739,30 +499,6 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  225,
-                           "snippet":  "Show-Line \"No readable BitLocker recovery keys found\" -Class \"Secure\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  231,
-                           "snippet":  "Show-Line \"$($withheldObjects.Count) escrowed recovery key(s) exist that this account may not read\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  244,
-                           "snippet":  "Show-Line \"Error during the delegation analysis - who may read the recovery passwords could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  249,
-                           "snippet":  "Show-Line \"Error during check - BitLocker recovery key access could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
                            "line":  507,
                            "snippet":  "Show-Line (\"No non-privileged principal holds a delegated read of the BitLocker recovery passwords, but \" +"
                        },
@@ -867,18 +603,6 @@
                            "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
                            "line":  1267,
                            "snippet":  "Show-Line $result.Headline -Class $result.Class"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
-                           "line":  1307,
-                           "snippet":  "Show-Line \"SYSVOL access failed - credentials were not searched for\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
-                           "line":  1313,
-                           "snippet":  "Show-Line \"Error during check - credentials in SYSVOL and NETLOGON could not be evaluated: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",

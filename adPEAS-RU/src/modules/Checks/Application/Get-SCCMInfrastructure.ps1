@@ -121,7 +121,7 @@
                 # rather than that it found nothing: Invoke-LDAPSearch answers a missing
                 # SearchBase with an empty result and no error, and the two are
                 # indistinguishable from the caller's side.
-                Show-Line "System Management container not found - sites, management points and its permissions were not read" -Class Hint
+                Show-Line "Контейнер System Management не найден — сайты, точки управления и его разрешения не прочитаны" -Class Hint
             }
 
             # ===== Step 3: SCCM Sites via mSSMSSite =====
@@ -171,7 +171,7 @@
                 } elseif (-not $systemMgmt) {
                     Show-Line "The System Management container does not exist - no site object could be read" -Class Note
                 } else {
-                    Show-Line "No mSSMSSite objects found in System Management container" -Class Note
+                    Show-Line "Контейнер System Management отсутствует — прочитать объекты сайтов не удалось" -Class Note
                 }
             } catch {
                 Write-Log "[Get-SCCMInfrastructure] Error querying mSSMSSite: $_" -Level Warning
@@ -281,7 +281,7 @@
                         Show-Line "Обнаружен центральный административный сайт (CAS): в SCCM есть иерархия нескольких сайтов" -Class Hint -FindingId "SCCM_SITE_HIERARCHY"
                     }
                 } elseif (-not $systemMgmt) {
-                    Show-Line "The System Management container does not exist - no management point could be read" -Class Note
+                    Show-Line "Контейнер System Management отсутствует — прочитать точки управления не удалось" -Class Note
                 } else {
                     Show-Line "No mSSMSManagementPoint objects found in System Management container" -Class Note
                 }
@@ -383,12 +383,12 @@
                     # Named apart from the unreadable case below. Both leave the
                     # permissions unknown, but one is a missing read right on an existing
                     # container and the other is a container nobody created.
-                    Show-Line "The System Management container does not exist - its permissions could not be read" -Class Note
+                    Show-Line "Контейнер System Management отсутствует — прочитать его разрешения не удалось" -Class Note
                 } elseif (-not $containerRaw -or -not $containerRaw.nTSecurityDescriptor) {
                     # Reading the security descriptor needs READ_CONTROL, which a plain
                     # domain user has on this container - but say so rather than let an
                     # unreadable ACL look like a clean one.
-                    Show-Line "The security descriptor of the System Management container could not be read - result unknown, not clean" -Class Note
+                    Show-Line "Не удалось прочитать дескриптор безопасности контейнера System Management — состояние неизвестно, безопасность не подтверждена" -Class Note
                 } else {
                     $sccmDescriptor = New-Object System.DirectoryServices.ActiveDirectorySecurity
                     $sccmDescriptor.SetSecurityDescriptorBinaryForm($containerRaw.nTSecurityDescriptor)
@@ -488,7 +488,7 @@
             }
             catch {
                 Write-Log "[Get-SCCMInfrastructure] Error reading the System Management container ACL: $_" -Level Warning
-                Show-Line "The System Management container permissions could not be analysed - result unknown, not clean" -Class Note
+                Show-Line "Не удалось оценить разрешения контейнера System Management — состояние неизвестно, безопасность не подтверждена" -Class Note
             }
 
             # ===== Step 6: PXE/WDS Discovery =====
@@ -664,7 +664,7 @@
 
         } catch {
             Write-Log "[Get-SCCMInfrastructure] Error: $_" -Level Error
-            Show-Line "Error during check - the SCCM infrastructure could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить инфраструктуру SCCM: $_" -Class Finding
         }
     }
 

@@ -461,7 +461,7 @@
         if (@($writableFindings).Count -gt 0) {
             # Same dampening as above, and for the same reason: the mapping an attacker
             # would add still needs an issuer the domain accepts.
-            Show-Line "Found $(@($writableFindings).Count) privileged principal(s) whose altSecurityIdentities a non-privileged principal may write" -Class $mappingClass -FindingId 'ESC14_WRITABLE_MAPPING'
+            Show-Line "Найдено привилегированных субъектов, у которых непривилегированная запись может изменять altSecurityIdentities: $(@($writableFindings).Count)" -Class $mappingClass -FindingId 'ESC14_WRITABLE_MAPPING'
             if ($noTrustAnchor) { Show-NoTrustAnchorNote }
             foreach ($finding in $writableFindings) {
                 Show-Object $finding -Class $mappingClass
@@ -475,12 +475,12 @@
             # many there are, so a reader who has not met the switch can still learn that
             # Exchange reaches these accounts.
             if ($IncludePrivileged) {
-                Show-Line "$(@($exchangeOnlyFindings).Count) privileged account(s) writable only by Exchange service groups (by design):" -Class Hint
+                Show-Line "Привилегированных записей, изменяемых только служебными группами Exchange по штатной модели: $(@($exchangeOnlyFindings).Count)" -Class Hint
                 foreach ($finding in $exchangeOnlyFindings) {
                     Show-Object $finding -Class Hint
                 }
             } else {
-                Show-Line "$(@($exchangeOnlyFindings).Count) privileged account(s) writable only by Exchange service groups (by design) - use -IncludePrivileged" -Class Note
+                Show-Line "Привилегированных записей, изменяемых только служебными группами Exchange по штатной модели: $(@($exchangeOnlyFindings).Count). Для включения используйте -IncludePrivileged" -Class Note
             }
         }
 

@@ -90,7 +90,7 @@
             $computers = @(Get-DomainComputer -Enabled -PasswordAgeDays $PasswordAgeDays -LDAPFilter "(lastLogonTimestamp>=$activeSince)" @connectionParams)
 
             if ($computers.Count -eq 0) {
-                Show-Line "Every computer that logged on in the last $ActiveDays days has changed its machine account password within $PasswordAgeDays days" -Class Secure
+                Show-Line "Все компьютеры с отметкой доменного входа за последние $ActiveDays дней обновили пароль своей машинной учётной записи в пределах $PasswordAgeDays дней" -Class Secure
                 return
             }
 
@@ -124,7 +124,7 @@
 
         } catch {
             Write-Log "[Get-ComputerPasswordAge] Error: $_" -Level Error
-            Show-Line "Error during check - the machine account password age could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось определить возраст паролей машинных учётных записей: $_" -Class Finding
         }
     }
 

@@ -754,7 +754,7 @@
                 Show-Line "Не удалось прочитать гибридную конфигурацию; её отсутствие не подтверждено" -Class Hint
             }
             elseif (-not $hybridOnOrgCard) {
-                Show-Line "No hybrid configuration found - this organization appears to be purely on-premises" -Class Note
+                Show-Line "Гибридная конфигурация не обнаружена: вероятно, организация использует только локальный Exchange" -Class Note
             }
 
             # ===== Step 4: SMTP receive connector permissions =====
@@ -1079,10 +1079,10 @@
                     # A connector whose descriptor did not come back was not assessed. The
                     # secure line below would claim a result for it, which is the one thing
                     # an unread object must never produce.
-                    Show-Line "$(@($unreadConnectors).Count) of $(@($connectorResults).Count) receive connector(s) could not be assessed - their permissions are unknown, not clean" -Class Hint
+                    Show-Line "Принимающих соединителей с неоценёнными разрешениями: $(@($unreadConnectors).Count) из $(@($connectorResults).Count). Их безопасность неизвестна, а не подтверждена" -Class Hint
                 }
                 else {
-                    Show-Line "No receive connector grants relay or sender-spoofing rights to unauthenticated senders" -Class Secure
+                    Show-Line "Ни один проверенный принимающий соединитель не выдаёт анонимным отправителям права ретрансляции или подмены отправителя" -Class Secure
                 }
 
                 foreach ($connectorObj in $connectorResults) {
@@ -1192,7 +1192,7 @@
                 $absentScope = if ($rootNC -and $rootNC -ne $domainDN) {
                     if ($forestRootAsked) { ' in this domain or in the forest root' } else { ' in this domain, and the forest root could not be asked through the Global Catalog' }
                 } else { '' }
-                Show-Line "Neither Exchange Windows Permissions nor Exchange Trusted Subsystem exists$absentScope - the permissions model is unknown" -Class Note
+                Show-Line "Не найдены ни Exchange Windows Permissions, ни Exchange Trusted Subsystem$absentScope — модель разрешений неизвестна" -Class Note
             }
             else {
                 $domainACEs = @()
@@ -1209,7 +1209,7 @@
                 }
 
                 if (-not $domainACLReadable) {
-                    Show-Line "The domain object ACL could not be read - the permissions model is unknown, not clean" -Class Hint
+                    Show-Line "Не удалось прочитать ACL доменного объекта — модель разрешений неизвестна, безопасность не подтверждена" -Class Hint
                 }
                 else {
                     # WriteDacl is the one that matters, but WriteOwner and GenericAll reach
@@ -1436,7 +1436,7 @@
                                 $rootServiceGroups = Get-ForestRootExchangeGroup -Name @($exchangeServiceGroups | ForEach-Object { $_.Name })
                             }
                             if ($rootServiceGroups -and $rootServiceGroups.ContainsKey($serviceGroup.Name)) {
-                                Show-Line "$($serviceGroup.Name) is in the forest root domain ($($rootServiceGroups[$serviceGroup.Name].DistinguishedName)) - a scan of that domain reports its members" -Class Note
+                                Show-Line "Группа $($serviceGroup.Name) находится в корневом домене леса ($($rootServiceGroups[$serviceGroup.Name].DistinguishedName)); её участников показывает аудит этого домена" -Class Note
                                 continue
                             }
                         }
@@ -1450,7 +1450,7 @@
                     $groupMembers = @($groupObject.member | Where-Object { $_ })
 
                     if (@($groupMembers).Count -eq 0) {
-                        Show-Line "$($serviceGroup.Name) group exists but has no members (unusual)" -Class Note
+                        Show-Line "Группа $($serviceGroup.Name) существует, но не имеет участников (нетипичное состояние)" -Class Note
                         continue
                     }
 
@@ -1462,7 +1462,7 @@
                 }
                 catch {
                     Write-Log "[Get-ExchangeInfrastructure] Error checking $($serviceGroup.Name): $_" -Level Error
-                    Show-Line "$($serviceGroup.Name) could not be read - result unknown, not empty" -Class Note
+                    Show-Line "Не удалось прочитать группу $($serviceGroup.Name) — результат неизвестен, а не означает отсутствие участников" -Class Note
                 }
             }
 
@@ -1472,7 +1472,7 @@
         }
         catch {
             Write-Log "[Get-ExchangeInfrastructure] Error: $_" -Level Error
-            Show-Line "Error during check - the Exchange infrastructure could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить инфраструктуру Exchange: $_" -Class Finding
         }
     }
 

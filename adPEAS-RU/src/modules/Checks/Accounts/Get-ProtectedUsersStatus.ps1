@@ -418,7 +418,7 @@
 
             # Show excluded accounts (informational)
             if (@($excludedAccounts.Keys).Count -gt 0) {
-                Show-Line "$($excludedAccounts.Count) account(s) excluded from metric (not applicable for Protected Users):" -Class Note
+                Show-Line "Учётных записей, исключённых из показателя как неприменимых к Protected Users: $($excludedAccounts.Count)" -Class Note
 
                 foreach ($sid in $excludedAccounts.Keys) {
                     $info = $excludedAccounts[$sid]

@@ -210,7 +210,7 @@
 
             } else {
                 if ($filteredHealthMailboxes -gt 0) {
-                    Show-Line "All users have default owners (filtered $filteredHealthMailboxes Exchange Health Mailboxes)" -Class Secure
+                    Show-Line "Все проверенные пользователи имеют ожидаемых владельцев; исключено почтовых объектов Exchange Health Mailboxes: $filteredHealthMailboxes" -Class Secure
                 } else {
                     Show-Line "У всех пользователей стандартные владельцы" -Class Secure
                 }
@@ -218,7 +218,7 @@
 
         } catch {
             Write-Log "[Get-NonDefaultUserOwners] Error: $_" -Level Error
-            Show-Line "Error during check - the owners of user accounts could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить владельцев пользовательских записей: $_" -Class Finding
         }
     }
 

@@ -373,7 +373,7 @@
 
         } catch {
             Write-Log "[Get-SIDHistoryInjection] Error: $_" -Level Error
-            Show-Line "Error during check - SID history could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить sIDHistory: $_" -Class Finding
         }
     }
 

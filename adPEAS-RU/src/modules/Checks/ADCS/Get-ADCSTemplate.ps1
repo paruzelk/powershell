@@ -523,7 +523,7 @@ function Get-ADCSTemplate {
 
         } catch {
             Write-Log "[Get-ADCSTemplate] Error: $_" -Level Error
-            Show-Line "Error during check - certificate templates could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить шаблоны сертификатов: $_" -Class Finding
         }
     }
 

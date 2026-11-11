@@ -398,7 +398,7 @@
                                 if ($parsedPassword -and $parsedPassword.CurrentNTHash) {
                                     $passwordsRetrieved++
 
-                                    Show-Line "Successfully retrieved password for gMSA: $gmsaName" -Class Finding
+                                    Show-Line "Успешно получен пароль gMSA: $gmsaName" -Class Finding
 
                                     # Create gMSA password object for consistent display
                                     $queryHours = [Math]::Round($parsedPassword.QueryPasswordInterval.TotalHours, 1)
@@ -422,7 +422,7 @@
                                     # It was printed at Show-Object's neutral default.
                                     Show-Object $gmsaPasswordObj -Class Finding
 
-                                    Show-Line "Use NT hash with: Pass-the-Hash, Overpass-the-Hash, or DCSync impersonation" -Class Hint
+                                    Show-Line "NT-хеш можно использовать для Pass-the-Hash, Overpass-the-Hash или имитации DCSync" -Class Hint
                                     Show-EmptyLine
                                 } else {
                                     Write-Log "[Get-ManagedServiceAccountSecurity] Failed to parse password blob for $gmsaName"
@@ -536,7 +536,7 @@
                     Show-Object $msa -Class Hint
                 }
 
-                Show-Line "Recommendation: Migrate standalone MSAs to gMSAs for improved security" -Class Hint
+                Show-Line "Рекомендация: замените автономные sMSA групповыми gMSA для повышения безопасности" -Class Hint
             } else {
                 Show-Line "Автономные управляемые учётные записи служб (sMSA) не обнаружены" -Class Note
             }
@@ -661,13 +661,13 @@
                 }
 
                 if (@($startedPairs).Count -gt 0) {
-                    Show-Line "dMSA migration started: $(@($startedPairs) -join ', ')" -Class Note
+                    Show-Line "Начата миграция на dMSA: $(@($startedPairs) -join ', ')" -Class Note
                 }
                 if (@($completedPairs).Count -gt 0) {
-                    Show-Line "dMSA migration completed: $(@($completedPairs) -join ', ')" -Class Note
+                    Show-Line "Миграция на dMSA завершена: $(@($completedPairs) -join ', ')" -Class Note
                 }
                 if (@($stalePairs).Count -gt 0) {
-                    Show-Line "Account(s) naming a dMSA that does not name them back: $(@($stalePairs) -join ', ')" -Class Note
+                    Show-Line "Учётные записи с указанием dMSA, которая не ссылается на них в ответ: $(@($stalePairs) -join ', ')" -Class Note
                 }
 
                 if (@($linkedDMSAs).Count -eq 0) {
@@ -684,7 +684,7 @@
                         Write-Log "[Get-ManagedServiceAccountSecurity] Could not read the dMSA $(@($linkedDMSAs)[0]): $_"
                     }
                     if (-not $readableDMSA) {
-                        Show-Line "The dMSA objects are not readable by this account - who may use each dMSA was not evaluated" -Class Note
+                        Show-Line "Текущая учётная запись не может прочитать объекты dMSA — проверка прав использования каждой dMSA не выполнена" -Class Note
                     }
                 }
 
@@ -774,7 +774,7 @@
                                 if ($_.IsBroadGroup) { $prefix = '[CRITICAL] ' }
                                 "$prefix$($_.Principal) ($($_.SID))"
                             }) -join ', '
-                            Show-Line "Non-privileged principals allowed to use it: $userList" -Class Hint
+                            Show-Line "Непривилегированные субъекты с правом использования этой записи: $userList" -Class Hint
                         }
                     }
 

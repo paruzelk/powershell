@@ -1304,13 +1304,13 @@ function Get-CredentialExposure {
                 if ((Test-SysvolAccessible) -eq $false) {
                     Show-Line "Пропущено: SYSVOL недоступен" -Class "Hint"
                 } else {
-                    Show-Line "SYSVOL access failed - credentials were not searched for" -Class "Finding"
+                    Show-Line "Не удалось получить доступ к SYSVOL — поиск учётных данных не выполнен" -Class "Finding"
                 }
             }
 
         } catch {
             Write-Log "[Get-CredentialExposure] Error: $_" -Level Error
-            Show-Line "Error during check - credentials in SYSVOL and NETLOGON could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить учётные данные в SYSVOL и NETLOGON: $_" -Class Finding
         }
     }
 

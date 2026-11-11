@@ -8,28 +8,8 @@
                                "report-scripts.js",
                                "report-styles.css"
                            ],
-    "UntranslatedCandidateCount":  524,
+    "UntranslatedCandidateCount":  491,
     "UntranslatedCandidates":  [
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-InactiveAdminAccounts.ps1",
-                                       "Line":  211,
-                                       "Text":  "Error during check - inactive privileged accounts could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  401,
-                                       "Text":  "Successfully retrieved password for gMSA: $gmsaName"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  425,
-                                       "Text":  "Use NT hash with: Pass-the-Hash, Overpass-the-Hash, or DCSync impersonation"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  539,
-                                       "Text":  "Recommendation: Migrate standalone MSAs to gMSAs for improved security"
-                                   },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
                                        "Line":  654,
@@ -37,33 +17,8 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  664,
-                                       "Text":  "dMSA migration started: $(@($startedPairs) -join \u0027, \u0027)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  667,
-                                       "Text":  "dMSA migration completed: $(@($completedPairs) -join \u0027, \u0027)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  670,
-                                       "Text":  "Account(s) naming a dMSA that does not name them back: $(@($stalePairs) -join \u0027, \u0027)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  687,
-                                       "Text":  "The dMSA objects are not readable by this account - who may use each dMSA was not evaluated"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
                                        "Line":  763,
                                        "Text":  "Found $(@($usableByOthers).Count) dMSA(s) that principals beyond administrators and service hosts may use$broadInfo`:"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  777,
-                                       "Text":  "Non-privileged principals allowed to use it: $userList"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
@@ -86,34 +41,9 @@
                                        "Text":  "dMSA use is restricted to privileged accounts and service hosts ($unanalyzedDMSAs of $($dmsaAccounts.Count) not analyzed)"
                                    },
                                    {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-NonDefaultUserOwners.ps1",
-                                       "Line":  213,
-                                       "Text":  "All users have default owners (filtered $filteredHealthMailboxes Exchange Health Mailboxes)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-NonDefaultUserOwners.ps1",
-                                       "Line":  221,
-                                       "Text":  "Error during check - the owners of user accounts could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-SIDHistoryInjection.ps1",
-                                       "Line":  376,
-                                       "Text":  "Error during check - SID history could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-ADCSTemplate.ps1",
-                                       "Line":  526,
-                                       "Text":  "Error during check - certificate templates could not be evaluated: $_"
-                                   },
-                                   {
                                        "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
                                        "Line":  226,
                                        "Text":  "Found $countText"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                                       "Line":  464,
-                                       "Text":  "Found $(@($writableFindings).Count) privileged principal(s) whose altSecurityIdentities a non-privileged principal may write"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
@@ -122,33 +52,8 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                                       "Line":  757,
-                                       "Text":  "No hybrid configuration found - this organization appears to be purely on-premises"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                                       "Line":  1085,
-                                       "Text":  "No receive connector grants relay or sender-spoofing rights to unauthenticated senders"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                                       "Line":  1195,
-                                       "Text":  "Neither Exchange Windows Permissions nor Exchange Trusted Subsystem exists$absentScope - the permissions model is unknown"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                                       "Line":  1212,
-                                       "Text":  "The domain object ACL could not be read - the permissions model is unknown, not clean"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
                                        "Line":  1457,
                                        "Text":  "Found $(@($groupMembers).Count) member(s) in $($serviceGroup.Name):"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
-                                       "Line":  1475,
-                                       "Text":  "Error during check - the Exchange infrastructure could not be evaluated: $_"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Application\\Get-ExchangeRBACAssignments.ps1",
@@ -177,23 +82,8 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                                       "Line":  124,
-                                       "Text":  "System Management container not found - sites, management points and its permissions were not read"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
                                        "Line":  172,
                                        "Text":  "The System Management container does not exist - no site object could be read"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                                       "Line":  174,
-                                       "Text":  "No mSSMSSite objects found in System Management container"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                                       "Line":  284,
-                                       "Text":  "The System Management container does not exist - no management point could be read"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
@@ -202,33 +92,13 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                                       "Line":  386,
-                                       "Text":  "The System Management container does not exist - its permissions could not be read"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                                       "Line":  391,
-                                       "Text":  "The security descriptor of the System Management container could not be read - result unknown, not clean"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
                                        "Line":  485,
                                        "Text":  "Only the site servers and the expected administrators can write to the System Management container"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                                       "Line":  491,
-                                       "Text":  "The System Management container permissions could not be analysed - result unknown, not clean"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
                                        "Line":  555,
                                        "Text":  "PXE/WDS servers detected"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Application\\Get-SCCMInfrastructure.ps1",
-                                       "Line":  667,
-                                       "Text":  "Error during check - the SCCM infrastructure could not be evaluated: $_"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Application\\Get-SCOMInfrastructure.ps1",
@@ -244,16 +114,6 @@
                                        "File":  "src\\modules\\Checks\\Application\\Get-SCOMInfrastructure.ps1",
                                        "Line":  239,
                                        "Text":  "Error during check - the SCOM infrastructure could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Computer\\Get-ComputerPasswordAge.ps1",
-                                       "Line":  93,
-                                       "Text":  "Every computer that logged on in the last $ActiveDays days has changed its machine account password within $PasswordAgeDays days"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Computer\\Get-ComputerPasswordAge.ps1",
-                                       "Line":  127,
-                                       "Text":  "Error during check - the machine account password age could not be evaluated: $_"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Computer\\Get-InfrastructureServers.ps1",
@@ -367,21 +227,6 @@
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                                       "Line":  225,
-                                       "Text":  "No readable BitLocker recovery keys found"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                                       "Line":  244,
-                                       "Text":  "Error during the delegation analysis - who may read the recovery passwords could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                                       "Line":  249,
-                                       "Text":  "Error during check - BitLocker recovery key access could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
                                        "Line":  507,
                                        "Text":  "No non-privileged principal holds a delegated read of the BitLocker recovery passwords, but "
                                    },
@@ -434,16 +279,6 @@
                                        "File":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
                                        "Line":  1013,
                                        "Text":  "No script/config files found in path"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
-                                       "Line":  1307,
-                                       "Text":  "SYSVOL access failed - credentials were not searched for"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialExposure.ps1",
-                                       "Line":  1313,
-                                       "Text":  "Error during check - credentials in SYSVOL and NETLOGON could not be evaluated: $_"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",

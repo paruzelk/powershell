@@ -990,7 +990,7 @@
                 }
 
                 if ($foreignBySID.Count -gt 0) {
-                    Show-Line "$($foreignBySID.Count) of them come from a trusted domain - adPEAS cannot read the object behind the SID, so a group there is not expanded:" -Class Hint
+                    Show-Line "Участников из доверенного домена: $($foreignBySID.Count). adPEAS не может прочитать объекты по этим SID, поэтому группы из другого домена не раскрыты:" -Class Hint
                     foreach ($foreignSID in ($foreignBySID.Keys | Sort-Object)) {
                         $entry = $foreignBySID[$foreignSID]
                         Show-Line "  $($entry.Name) in $(@($entry.Groups) -join ', ')" -Class Hint
@@ -1118,7 +1118,7 @@
                 }
 
                 if (@($dcPrimaryFindings).Count -gt 0) {
-                    Show-Line "$(@($dcPrimaryFindings).Count) account(s) that are not computers hold a domain controller group as their primary group:" -Class Finding
+                    Show-Line "Учётных записей, не являющихся компьютерами, у которых первичная группа принадлежит к группам контроллеров домена: $(@($dcPrimaryFindings).Count)" -Class Finding
                     foreach ($dcFinding in $dcPrimaryFindings) {
                         Show-Object $dcFinding -Class Finding
                     }
@@ -1491,14 +1491,14 @@
                     }
 
                     if (@($inheritedControllers).Count -gt 0) {
-                        Show-Line "$(@($inheritedControllers).Count) principal(s) can rewrite AdminSDHolder through an inherited ACE - remove it at the parent:" -Class Finding
+                        Show-Line "Субъектов с унаследованным ACE, позволяющим изменить AdminSDHolder: $(@($inheritedControllers).Count). Удаляйте разрешение у родителя:" -Class Finding
                         foreach ($controller in $inheritedControllers) {
                             Show-Line "  $controller" -Class Finding
                         }
                     }
 
                     if (@($denyTrustees).Count -gt 0) {
-                        Show-Line "$(@($denyTrustees).Count) Deny ACE trustee(s) on AdminSDHolder - a Deny here can hide the template from the people who audit it:" -Class Hint
+                        Show-Line "Субъектов в ACE типа Deny у AdminSDHolder: $(@($denyTrustees).Count). Такой запрет способен скрывать шаблон от проверяющих:" -Class Hint
                         foreach ($denied in $denyTrustees) {
                             Show-Line "  $denied" -Class Hint
                         }
@@ -1706,7 +1706,7 @@
                 }
 
                 if (@($PreWin2000Unresolved).Count -gt 0) {
-                    Show-Line "$(@($PreWin2000Unresolved).Count) member(s) of Pre-Windows 2000 Compatible Access could not be resolved to a SID and were not assessed" -Class Hint
+                    Show-Line "Участников Pre-Windows 2000 Compatible Access, которые не разрешены до SID и потому не оценивались: $(@($PreWin2000Unresolved).Count)" -Class Hint
                 }
             } catch {
                 Write-Log "[Get-PrivilegedGroupMembers] Error checking Pre-Windows 2000 Compatible Access: $_" -Level Error
