@@ -154,6 +154,7 @@ if ($Mode -in @('Archive','Plan','Auto') -and $OlderThanMonths -eq 0 -and -not $
 . "$PSScriptRoot\Core\Archive\ArchivePlanner.ps1"
 . "$PSScriptRoot\Core\Archive\ArchiveTransaction.ps1"
 . "$PSScriptRoot\Core\Archive\AutoRecoveryPolicy.ps1"
+. "$PSScriptRoot\Core\Archive\ARCH2bSemanticWitness.ps1"
 . "$PSScriptRoot\Core\Archive\MailMover.ps1"
 . "$PSScriptRoot\Core\Archive\ArchiveVerifier.ps1"
 . "$PSScriptRoot\Core\Archive\ArchiveReport.ps1"
@@ -956,7 +957,7 @@ try {
                 -SourceFolder $sourceFolders `
                 -ArchiveStores $archiveStores `
                 -ExpectedMoved ([int]$tx.State.Executed) `
-                -ExpectedMoves $expectedMoves
+                -ExpectedMoves $expectedMoves -RequireSemanticWitness -RequireSemanticWitness
 
             # Reconstruct physical message bytes from unique completed
             # planned items instead of trusting potentially stale checkpoint
