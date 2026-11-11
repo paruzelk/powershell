@@ -189,3 +189,6 @@ if(-not $?){throw 'Ошибка перевода справки HTML'}
 
 & (Join-Path $PSScriptRoot 'Localization/Apply-LicenseNotice.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка перевода лицензионного предупреждения HTML'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-RemediationTranslations.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка перевода описаний и комментариев команд исправления'}
