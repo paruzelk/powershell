@@ -1,5 +1,9 @@
 ﻿# Recovery and ambiguous worker outcomes — 2.6.3-PREVIEW1
 
+## ARCH2a runtime no-blind-retry fence (2026-11-11)
+
+The previous legacy `MoveFailed` catch/continue has been replaced with `Move Indeterminate` + immediate throw after durable `Move Started`. Before actual COM the step journal and checkpoint are saved and explicitly flushed to disk. A future Resume must scan the **full original step journal** and reject missing/unterminated journal, a missing original plan, repeated `Move Started` or any attempt without a closing `Move Completed`. A visible source message is **not** sufficient to retry. This is a safety improvement, not a finished autonomous reconciliation protocol. Current DEV CLI Archive/Resume/Auto are blocked at entrypoint. See [ARCH2a runbook](2.6.5-arch2a-move-outcome-fence.md).
+
 ## ARCH1 unresolved Move safety reminder (2026-11-11)
 
 The main `Core/Archive/MailMover.ps1` currently has a `MoveFailed` handler that records skipped/continues after COM `MailItem.Move()` failure. An exception or timeout can leave move outcome ambiguous: **do not classify it as a harmless retryable skip**. ARCH2 must integrate write-once intent/claim, fail-closed reconciliation and complete content/attachment witnesses with the normal Archive/Resume path. The existing diagnostic Worker switches set to false are **not** a safety switch for direct legacy CLI. Do not run on 90GB data until this gap is closed. [Project handoff](PROJECT-HANDOFF-ARCH1.md), [ADR](ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md).
