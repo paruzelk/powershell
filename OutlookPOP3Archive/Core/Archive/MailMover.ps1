@@ -595,6 +595,20 @@ function Move-OPAItemsWithLimit {
     $sourceFolders = @($SourceFolders) | Where-Object { $_ }
     if ($sourceFolders.Count -eq 0) { return [int]$Transaction.State.Executed }
 
+    # ARCH2a: a prior Move Started without durable Move Completed is NOT an
+    # ordinary skipped item, even if the original source still looks present.
+    # Before any Resume, scan the FULL original journal, not its 200-step
+    # in-memory checkpoint tail. Never infer retry permission from COM state.
+    if ($Resume) {
+        . (Join-Path $PSScriptRoot 'ARCH2aMoveOutcomeFence.ps1')
+        $stepJournalPath = Get-OPAStepJournalPath -Transaction $Transaction
+        if (-not (Test-Path -LiteralPath $stepJournalPath -PathType Leaf)) {
+            throw 'ARCH2a Resume STOP: original step journal missing; manual reconciliation required.'
+        }
+        $journalSteps = @(Read-OPAStepJournal -Transaction $Transaction)
+        [void](Assert-OPA265ARCH2aNoUnresolvedMove -Transaction $Transaction -JournalSteps $journalSteps)
+    }
+
     # --- Shared duplicate index (one physical file per source directory) ---
     $allIndexes = @{}
     $sharedIndex = $null
@@ -740,7 +754,7 @@ function Move-OPAItemsWithLimit {
             continue
         }
 
-        $item = $null; $moved = $null; $moveCompleted = $false
+        $item = $null; $moved = $null; $moveCompleted = $false; $moveAttemptClaimed = $false
         try {
             try { $item = Get-OPAItemByEntryIdFromSourceFolder -Namespace $Namespace -SourceFolder $source -EntryId ([string]$candidate.EntryId) }
             catch {
@@ -800,19 +814,33 @@ function Move-OPAItemsWithLimit {
             else { $index = Import-OPADuplicateIndex -ArchivePst $dest.Path; $allIndexes[$dest.Path] = $index }
             if (Test-OPADuplicateEntry -Index $index -SourceEntryId ([string]$candidate.EntryId)) { continue }
 
-            Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Move Started' -Message ("Starting Move: {0}" -f [string]$candidate.Subject) -EntryId $candidate.EntryId -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -ReceivedTime $dt
+            # ARCH2a: claim before any possible Outlook provider mutation.
+            # The checkpoint plus explicit Flush(true) are the last durability
+            # boundary before calling COM. If any part fails, stop; never move.
+            $moveAttemptClaimed = $true
+            Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Move Started' -Message ("Starting Move: {0}" -f [string]$candidate.Subject) -EntryId $candidate.EntryId -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -ReceivedTime $dt -WriteCheckpoint
+            Sync-OPAStepJournalStreams
 
             try {
                 $moved = $item.Move($dest.Folder)
                 $moveCompleted = $true
             }
             catch {
-                # A single item may be locked by an open Inspector, another
-                # Outlook operation, a provider restriction, or transient COM
-                # state. Treat it as skippable work; never abort the batch.
-                $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason='MoveFailed'; Message=$_.Exception.Message; Time=(Get-Date).ToString('o')}) | Out-Null
-                Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message ("Move skipped: {0} | {1}" -f [string]$candidate.Subject,$_.Exception.Message) -EntryId ([string]$candidate.EntryId) -ReceivedTime $dt -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath
-                continue
+                # ARCH2a: an Outlook COM exception cannot establish whether
+                # a cross-store Move already reached the destination. Preserve
+                # the original one-shot claim and STOP this entire transaction.
+                # Never classify this message as skipped or select another
+                # candidate; only independent read-only reconciliation is safe.
+                $originalMoveError = [string]$_.Exception.Message
+                try {
+                    Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Failed' -Step 'Move Indeterminate' -Message 'Outlook COM Move outcome unknown; independent reconciliation required; no automatic retry.' -EntryId ([string]$candidate.EntryId) -ReceivedTime $dt -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -WriteCheckpoint
+                    Sync-OPAStepJournalStreams
+                }
+                catch {
+                    Write-Warning ('ARCH2a could not seal Move Indeterminate; preserve original Move Started claim and stop: '+[string]$_.Exception.Message)
+                }
+                throw ('ARCH2a MOVE OUTCOME UNKNOWN, transaction stopped, never retry original source EntryID='+
+                    [string]$candidate.EntryId+'; original COM error: '+$originalMoveError)
             }
 
             $archiveId = [string]$moved.EntryID
@@ -877,8 +905,10 @@ function Move-OPAItemsWithLimit {
             # post-move durability must stop the batch and be recovered from
             # DuplicateIndex/the step journal; silently counting it as skipped
             # could allow a duplicate move on a later run.
-            if ($moveCompleted) {
-                # Move succeeded; make its journal event durable before unwinding.
+            if ($moveCompleted -or $moveAttemptClaimed) {
+                # ARCH2a: do NOT fall into the old 'Unexpected / Skipped'
+                # handler once a Move attempt was claimed. A failed COM call
+                # may have completed in Outlook while its response was lost.
                 Sync-OPAStepJournalStreams
                 throw
             }
