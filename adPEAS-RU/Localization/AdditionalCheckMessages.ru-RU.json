@@ -17,16 +17,30 @@
     "src/modules/Checks/Accounts/Get-PasswordNotRequired.ps1": {
       "Show-Line \"$(@($ordinaryAccounts).Count) further enabled account(s) carry the 'Password Not Required' flag\"": "Show-Line \"Дополнительно обнаружены включённые учётные записи с флагом PASSWD_NOTREQD («пароль не требуется»): $(@($ordinaryAccounts).Count)\"",
       "Show-Line \"$($usedComputers.Count) further enabled computer account(s) carry the 'Password Not Required' flag\"": "Show-Line \"Дополнительно обнаружены включённые учётные записи компьютеров с флагом PASSWD_NOTREQD («пароль не требуется»): $($usedComputers.Count)\"",
-      "Show-Line \"No enabled accounts with 'Password Not Required' flag found\"": "Show-Line \"Включённых учётных записей с флагом PASSWD_NOTREQD («пароль не требуется») не обнаружено\""
+      "Show-Line \"No enabled accounts with 'Password Not Required' flag found\"": "Show-Line \"Включённых учётных записей с флагом PASSWD_NOTREQD («пароль не требуется») не обнаружено\"",
+      "Show-Line \"$(@($emptyPassword).Count) account(s) carry the flag and have never had a password set\"": "Show-Line \"Учётных записей с флагом «пароль не требуется», для которых пароль никогда не задавался: $(@($emptyPassword).Count)\"",
+      "Show-Line \"$(@($privilegedAccounts).Count) privileged account(s) are exempt from the password policy\"": "Show-Line \"Привилегированных записей, на которые не распространяется требование пароля: $(@($privilegedAccounts).Count)\"",
+      "Show-Line \"Trust account(s) carrying the flag by design, not assessed: $(($trustAccounts | ForEach-Object { $_.sAMAccountName }) -join ', ')\"": "Show-Line \"Учётные записи доверительных отношений с этим флагом по назначению не оценивались: $(($trustAccounts | ForEach-Object { $_.sAMAccountName }) -join ', ')\"",
+      "Show-Line \"$($unusedComputers.Count) computer account(s) carry the flag and have never logged on - the password may be empty or the computer name\"": "Show-Line \"Учётных записей компьютеров с флагом, которые ни разу не входили: $($unusedComputers.Count); пароль может быть пустым или совпадать с именем компьютера\"",
+      "Show-Line \"Error during check - accounts without a password requirement could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: записи с отключённым требованием пароля оценить не удалось: $_\""
     },
     "src/modules/Checks/Accounts/Get-AdminPasswordNeverExpires.ps1": {
-      "Show-Line \"$(@($recentAccounts).Count) further privileged account(s) carry the flag with a password newer than $PasswordAgeDays days:\"": "Show-Line \"Дополнительно обнаружены привилегированные записи с бессрочным паролем, изменённым менее $PasswordAgeDays дней назад: $(@($recentAccounts).Count)\""
+      "Show-Line \"$(@($recentAccounts).Count) further privileged account(s) carry the flag with a password newer than $PasswordAgeDays days:\"": "Show-Line \"Дополнительно обнаружены привилегированные записи с бессрочным паролем, изменённым менее $PasswordAgeDays дней назад: $(@($recentAccounts).Count)\"",
+      "Show-Line \"No privileged account has 'password never expires' set\"": "Show-Line \"Привилегированных учётных записей с бессрочным паролем не обнаружено\"",
+      "Show-Line \"$(@($smartcardAccounts).Count) privileged account(s) carry the flag but require a smart card to log on:\"": "Show-Line \"Привилегированных записей с бессрочным паролем, для входа в которые требуется смарт-карта: $(@($smartcardAccounts).Count)\"",
+      "Show-Line \"No privileged account has 'password never expires' set (filtered $(@($candidates).Count) candidate(s) with orphaned adminCount)\"": "Show-Line \"Привилегированных записей с бессрочным паролем не обнаружено; исключено кандидатов с устаревшим adminCount: $(@($candidates).Count)\"",
+      "Show-Line \"Error during check - privileged accounts whose password never expires could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: оценить привилегированные записи с бессрочным паролем не удалось: $_\""
     },
     "src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1": {
       "Show-Line \"OPSEC mode: Skipping user owner enumeration (would check all enabled users)\"": "Show-Line \"Режим OPSEC: проверка владельцев пользователей пропущена (потребовалось бы перечисление всех включённых записей)\""
     },
     "src/modules/Checks/Accounts/Get-LogonScriptPermissions.ps1": {
-      "Show-Line \"OPSEC mode: Skipping the logon scripts of accounts (reading their permissions takes an SMB connection to NETLOGON)\"": "Show-Line \"Режим OPSEC: проверка сценариев входа пропущена (для чтения разрешений требуется SMB-подключение к NETLOGON)\""
+      "Show-Line \"OPSEC mode: Skipping the logon scripts of accounts (reading their permissions takes an SMB connection to NETLOGON)\"": "Show-Line \"Режим OPSEC: проверка сценариев входа пропущена (для чтения разрешений требуется SMB-подключение к NETLOGON)\"",
+      "Show-Line \"No enabled account runs a logon script\"": "Show-Line \"Включённых учётных записей со сценарием входа не обнаружено\"",
+      "Show-Line \"$($distinctReasons.Count) logon script(s) could not be checked - who may change them was not evaluated: $reasonText\"": "Show-Line \"Сценариев входа, для которых не удалось проверить права изменения: $($distinctReasons.Count). Причины: $reasonText\"",
+      "Show-Line \"$localAccounts account(s) run a logon script from a local path, which exists on each computer and is not read over the network\"": "Show-Line \"Учётных записей со сценарием входа по локальному пути: $localAccounts; файл находится на каждом компьютере и не считывается по сети\"",
+      "Show-Line \"Only administrators and privileged accounts may change the $readClean logon script(s) read\"": "Show-Line \"Прочитано сценариев входа: $readClean; изменять их могут только администраторы и привилегированные записи\"",
+      "Show-Line \"Error during check - the logon scripts of accounts could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: сценарии входа учётных записей оценить не удалось: $_\""
     },
     "src/modules/Checks/Computer/Get-NonDefaultComputerOwners.ps1": {
       "Show-Line \"OPSEC mode: Skipping computer owner enumeration (would check all computers)\"": "Show-Line \"Режим OPSEC: проверка владельцев объектов компьютеров пропущена (требуется перечисление компьютеров)\""
@@ -36,18 +50,47 @@
     },
     "src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1": {
       "Show-Line \"No gMSA accounts found in domain\"": "Show-Line \"Учётные записи gMSA в домене не обнаружены\"",
-      "Show-Line \"No standalone MSAs found\"": "Show-Line \"Автономные управляемые учётные записи служб (sMSA) не обнаружены\""
+      "Show-Line \"No standalone MSAs found\"": "Show-Line \"Автономные управляемые учётные записи служб (sMSA) не обнаружены\"",
+      "Show-Line \"Non-privileged password readers: $readerList\"": "Show-Line \"Непривилегированные субъекты с правом чтения управляемого пароля: $readerList\"",
+      "Show-Line \"gMSA password access could not be analyzed - no membership descriptor could be read\"": "Show-Line \"Доступ к паролям gMSA оценить не удалось: не прочитан ни один дескриптор разрешений\"",
+      "Show-Line \"gMSA password access is restricted to privileged accounts and service hosts ($unanalyzedCount of $totalGMSAs not analyzed)\"": "Show-Line \"Чтение паролей gMSA ограничено привилегированными субъектами и служебными узлами; не проверено $unanalyzedCount из $totalGMSAs gMSA\"",
+      "Show-Line \"msDS-GroupMSAMembership could not be parsed on $(@($unparsedGMSAs).Count) gMSA(s) - their password access is unknown: $(@($unparsedGMSAs) -join ', ')\"": "Show-Line \"Не удалось разобрать msDS-GroupMSAMembership у $(@($unparsedGMSAs).Count) gMSA; право чтения их паролей неизвестно: $(@($unparsedGMSAs) -join ', ')\"",
+      "Show-Line \"msDS-GroupMSAMembership is owned by a principal that is not privileged: $ownerList\"": "Show-Line \"Владелец msDS-GroupMSAMembership — непривилегированный субъект: $ownerList\"",
+      "Show-Line \"gMSA(s) rotating their password less often than every 90 days: $(@($longIntervals) -join ', ')\"": "Show-Line \"gMSA со сменой пароля реже одного раза в 90 дней: $(@($longIntervals) -join ', ')\"",
+      "Show-Line \"gMSA(s) with an expiry date - the account stops authenticating when it passes: $(@($expiringGMSAs) -join ', ')\"": "Show-Line \"gMSA с датой окончания действия: после её наступления запись перестанет проходить аутентификацию: $(@($expiringGMSAs) -join ', ')\"",
+      "Show-Line \"gMSA password retrieval cannot be tested over an unencrypted connection - rerun with -UseLDAPS\"": "Show-Line \"Проверять получение пароля gMSA по нешифрованному соединению нельзя — повторите запуск с -UseLDAPS\"",
+      "Show-Line \"gMSA password access could not be tested - every read failed\"": "Show-Line \"Проверить доступ к паролям gMSA не удалось: все запросы чтения завершились ошибкой\"",
+      "Show-Line \"Current user cannot retrieve any gMSA passwords ($readFailures of $totalGMSAs could not be tested)\"": "Show-Line \"Текущий пользователь не смог получить ни один пароль gMSA; не проверено $readFailures из $totalGMSAs\"",
+      "Show-Line \"Retrieved $passwordsRetrieved of $($gmsaAccounts.Count) gMSA password(s)\"": "Show-Line \"Получено управляемых паролей gMSA: $passwordsRetrieved из $($gmsaAccounts.Count)\"",
+      "Show-Line \"Error during check - managed service accounts could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: управляемые учётные записи служб оценить не удалось: $_\""
     },
     "src/modules/Checks/Accounts/Get-RODCPasswordReplication.ps1": {
-      "Show-Line \"No read-only Domain Controller in this domain - there is no password replication policy to check\"": "Show-Line \"Контроллеры домена только для чтения (RODC) не обнаружены; политику репликации паролей проверять не требуется\""
+      "Show-Line \"No read-only Domain Controller in this domain - there is no password replication policy to check\"": "Show-Line \"Контроллеры домена только для чтения (RODC) не обнаружены; политику репликации паролей проверять не требуется\"",
+      "Show-Line \"$rodcName - $($exposedNames.Count) privileged account(s) may have their password cached, allowed and not denied by its password replication policy: $(Format-RODCAccountList $exposedNames)\"": "Show-Line \"$rodcName — привилегированных записей, чьи пароли МОГУТ кэшироваться по политике репликации RODC: $($exposedNames.Count); перечень: $(Format-RODCAccountList $exposedNames)\"",
+      "Show-Line \"$rodcName - the secrets of $($revealedNames.Count) privileged account(s) are cached on it already: $(Format-RODCAccountList $revealedNames)\"": "Show-Line \"$rodcName — секреты привилегированных записей УЖЕ кэшированы: $($revealedNames.Count); перечень: $(Format-RODCAccountList $revealedNames)\"",
+      "Show-Line \"$rodcName - the Denied RODC Password Replication Group is not on its deny list\"": "Show-Line \"$rodcName — группа Denied RODC Password Replication Group отсутствует в списке запрета репликации паролей\"",
+      "Show-Line \"$rodcName - $unresolvedDenied member(s) of its deny list could not be resolved and were not counted\"": "Show-Line \"$rodcName — не удалось разрешить субъектов в списке запрета RODC: $unresolvedDenied; они не учитывались\"",
+      "Show-Line \"$rodcName - no privileged account may have its password cached, and none has\"": "Show-Line \"$rodcName — политика запрещает кэширование паролей привилегированных записей; кэшированных секретов таких записей не обнаружено\"",
+      "Show-Line \"Error during check - the password replication policy of the read-only Domain Controllers could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: политику репликации паролей контроллеров RODC оценить не удалось: $_\""
     },
     "src/modules/Checks/ADCS/Get-ADCSVulnerabilities.ps1": {
-      "Show-Line \"No trusted Root CAs found in AD configuration\"": "Show-Line \"В конфигурации AD не обнаружены доверенные корневые центры сертификации (CA)\""
+      "Show-Line \"No trusted Root CAs found in AD configuration\"": "Show-Line \"В конфигурации AD не обнаружены доверенные корневые центры сертификации (CA)\"",
+      "Show-Line \"NTAuth Store contains $(@($certList).Count) certificate(s) trusted for domain authentication (PKINIT)\"": "Show-Line \"В хранилище NTAuth находится сертификатов, доверенных для доменной аутентификации PKINIT: $(@($certList).Count)\"",
+      "Show-Line \"$expiredCount NTAuth certificate(s) have expired and can be removed from the store\"": "Show-Line \"Сертификатов NTAuth с истёкшим сроком действия, которые можно удалить после проверки зависимостей: $expiredCount\"",
+      "Show-Line \"$weakCount NTAuth certificate(s) are signed with a weak hash algorithm\"": "Show-Line \"Сертификатов NTAuth со слабым алгоритмом хеширования подписи: $weakCount\"",
+      "Show-Line \"PKI container permissions are properly restricted\"": "Show-Line \"Разрешения на контейнерах PKI ограничены ожидающимся образом\"",
+      "Show-Line \"No enabled certificate templates found\"": "Show-Line \"Включённые шаблоны сертификатов не обнаружены\"",
+      "Show-Line \"Which templates are published to a CA could not be determined - disabled templates may appear below\"": "Show-Line \"Не удалось определить, какие шаблоны опубликованы на ЦС; ниже могут отображаться отключённые шаблоны\"",
+      "Show-Line \"No findings in $($templates.Count) analyzed template(s) - all enrollment restricted to privileged users\"": "Show-Line \"Нарушений не обнаружено в $($templates.Count) проверенных шаблонах; регистрация сертификатов ограничена привилегированными пользователями\"",
+      "Show-Line \"Error during check - certificate services vulnerabilities could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: уязвимости служб сертификатов оценить не удалось: $_\""
     },
     "src/modules/Checks/ADCS/Get-WeakCertificateMapping.ps1": {
       "Show-Line \"No principal uses an explicit certificate mapping\"": "Show-Line \"Учётных записей с явно заданным сопоставлением сертификатов не обнаружено\"",
       "Show-Line \"No non-privileged principal can write altSecurityIdentities on a privileged account\"": "Show-Line \"Непривилегированных субъектов с правом изменять altSecurityIdentities привилегированной учётной записи не обнаружено\"",
-      "Show-Line \"All $(@($candidates).Count) explicit certificate mapping(s) use a strong format\"": "Show-Line \"Все явные сопоставления сертификатов используют надёжный формат; проверено: $(@($candidates).Count)\""
+      "Show-Line \"All $(@($candidates).Count) explicit certificate mapping(s) use a strong format\"": "Show-Line \"Все явные сопоставления сертификатов используют надёжный формат; проверено: $(@($candidates).Count)\"",
+      "Show-Line \"Could not read explicit certificate mappings: $($_.Exception.Message)\"": "Show-Line \"Не удалось прочитать явные сопоставления сертификатов: $($_.Exception.Message)\"",
+      "Show-Line \"The property set containing altSecurityIdentities could not be read - a delegation naming the set is not examined\"": "Show-Line \"Не удалось прочитать набор свойств с altSecurityIdentities; делегирование на этот набор не проверено\"",
+      "Show-Line \"Error during check - who may write altSecurityIdentities could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось определить субъектов с правом изменять altSecurityIdentities: $_\""
     },
     "src/modules/Checks/GPO/Get-GPOLocalGroupMembership.ps1": {
       "Show-Line \"No vulnerable GPO local group assignments found in $(@($gpos).Count) analyzed GPO(s)\"": "Show-Line \"Небезопасных назначений в локальные группы через GPO не обнаружено; проанализировано политик: $(@($gpos).Count)\"",
@@ -84,6 +127,25 @@
     },
     "src/modules/Checks/Accounts/Get-InactiveAdminAccounts.ps1": {
       "Show-Line \"No inactive privileged accounts found\"": "Show-Line \"Неактивных привилегированных учётных записей не обнаружено\""
+    },
+    "src/modules/Checks/Accounts/Get-AdminReversibleEncryption.ps1": {
+      "Show-Line \"$privilegedCount of them is/are privileged - the cleartext password of an administrator is recoverable from the DC\"": "Show-Line \"Из обнаруженных записей привилегированных: $privilegedCount; пароль администратора можно восстановить из данных контроллера домена в открытом виде\"",
+      "Show-Line \"Error during check - accounts with reversible encryption could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: оценить записи с обратимым шифрованием пароля не удалось: $_\""
+    },
+    "src/modules/Checks/Accounts/Get-AuthenticationPolicySilos.ps1": {
+      "Show-Line \"The configuration naming context is not known - authentication policy silos were not checked\"": "Show-Line \"Раздел конфигурации AD неизвестен — хранилища политик проверки подлинности не проверялись\"",
+      "Show-Line \"The authentication policy configuration could not be read - not checked\"": "Show-Line \"Не удалось прочитать конфигурацию политик проверки подлинности — проверка не выполнена\"",
+      "Show-Line \"The DCs support claims and Kerberos armoring ($($kdc.Detail)) - client support is not checked\"": "Show-Line \"Контроллеры домена поддерживают claims и защищённый Kerberos (Armoring) ($($kdc.Detail)); поддержка клиентами не проверялась\"",
+      "Show-Line \"The DCs do not support claims and Kerberos armoring ($($kdc.Detail)) - the KDC cannot evaluate the conditions\"": "Show-Line \"Контроллеры домена не поддерживают claims и Kerberos Armoring ($($kdc.Detail)); KDC не может оценить условия политики\"",
+      "Show-Line \"Whether the DCs support claims and Kerberos armoring could not be read ($($kdc.Detail)) - not checked\"": "Show-Line \"Сведения о поддержке claims и Kerberos Armoring контроллерами домена недоступны ($($kdc.Detail)); проверка не выполнена\"",
+      "Show-Line \"Error during check - authentication policy silos could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: хранилища политик проверки подлинности оценить не удалось: $_\""
+    },
+    "src/modules/Checks/Creds/Get-ASREPRoastableAccounts.ps1": {
+      "Show-Line \"Protected Users membership could not be read - members are not marked below\"": "Show-Line \"Не удалось прочитать состав Protected Users; принадлежность учётных записей к группе ниже не отмечена\"",
+      "Show-Line \"$privilegedCount of them is/are privileged - this hash needs no credentials at all to obtain\"": "Show-Line \"Из найденных учётных записей привилегированных: $privilegedCount; для получения AS-REP-хеша не требуются учётные данные\"",
+      "Show-Line \"$protectedCount of them is/are in Protected Users - AES-only AS-REP, slower to crack\"": "Show-Line \"Из найденных записей в Protected Users: $protectedCount; AS-REP только с AES, автономный подбор сложнее\"",
+      "Show-Line \"Through these accounts, $(@($spnAccounts).Count) kerberoastable account(s) can be roasted without any credentials\"": "Show-Line \"Через эти записи доступен Kerberoasting без учётных данных для записей со SPN: $(@($spnAccounts).Count)\"",
+      "Show-Line \"Error during check - AS-REP roastable accounts could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: учётные записи, уязвимые к AS-REP Roasting, оценить не удалось: $_\""
     }
   }
 }
