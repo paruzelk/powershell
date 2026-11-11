@@ -1,5 +1,9 @@
 # SEM-001 — Semantic integrity of Outlook POP3 archiving (normative)
 
+## ARCH2b integrated source/destination semantic witness (2026-11-11)
+
+See [ARCH2b verifier runbook](2.6.5-arch2b-semantic-verifier.md). Before COM Move, the main archiver obtains actual saved source MailItem hashes (Subject/sender/recipient set/Body/HTML/dates/Unread and by-value attachment payload bytes via SHA256) and durably stores them on `Move Started`. Later `ArchiveVerifier.ps1` compares a fresh destination witness. `MailItem.Size` drift alone is not proof of content corruption. Missing or unsupported semantic evidence is **BLOCK**, never a global MAPI waiver. Temporary copies from `Attachment.SaveAsFile` must be treated as sensitive. ARCH2b still has no production permit and mutating modes are closed until ARCH2c live acceptance.
+
 ## ARCH2a runtime enforcement (2026-11-11)
 
 **Next phase ARCH2b** must integrate full pre/post semantic verification (including attachment byte SHA256) into the *main* Archive/Resume path before any DEV writer gate can be reopened. Until then, `Move Indeterminate` can never be represented as a skippable mail item.
