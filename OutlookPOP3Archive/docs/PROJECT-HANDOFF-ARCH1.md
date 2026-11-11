@@ -1,5 +1,11 @@
 # НАЧНИ ЗДЕСЬ — OutlookPOP3Archive: контекст и запрет повторять MAPI-исследования
 
+**CURRENT DELIVERY BUILD: ARCH2a**, см. [no-blind-retry/mutating-mode closure](2.6.5-arch2a-move-outcome-fence.md). После ARCH1 аудита оператор подтвердил **3660 tests / 123 containers PASS**, `LegacyMoveFailureContinuePatternDetected=True`, `LegacyVerifierIncludesFullBodyHtmlAttachmentWitness=False`. ARCH2a **исправляет основной COM-exception catch**: `Move Started` durable checkpoint/flush перед COM; `Move Indeterminate` и STOP при исключении; full-journal unresolved claim блокирует Resume. Основные CLI writer modes Archive/Resume/Auto **закрыты даже с -WhatIf**, пока ARCH2b не интегрирует полный content/attachment verifier. Не использовать более старый ARCH1 handoff как доказательство, что старый `MoveFailed` catch всё ещё существует в ARCH2a — это исторический результат на исходнике ARCH1. Не считать его исправление доказательством общей production готовности.
+
+**СЛЕДУЮЩИЙ ШАГ:** ARCH2b — интегрировать уже проверенные BW4k semantic+attachment-byte witnesses в реальный основной `ArchiveVerifier.ps1` и всю Archive/Resume последовательность; затем новый изолированный end-to-end набор. Не создавать отдельную ветку исследования флагов MAPI.
+
+
+
 **Актуально с 2026-11-11.** Это главный handoff-файл проекта. Читать ПЕРЕД созданием следующей ветки или плана. **Ветка разработки после BW4k7v2a8 — ARCH, не BW.** Редактировать файл после значимых интеграционных результатов.
 
 ## Цель пользователя
