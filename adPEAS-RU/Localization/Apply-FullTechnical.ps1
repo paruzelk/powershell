@@ -12,7 +12,7 @@ param([Parameter(Mandatory=$true)][string]$ProjectRoot)
 Set-StrictMode -Off
 $ErrorActionPreference='Stop'
 $entries=[ordered]@{}
-foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json')){
+foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json','FullTechnical-Report-03.ru-RU.json')){
  $src=Join-Path $ProjectRoot ('Localization/'+$name)
  $catalog=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($src,[Text.Encoding]::UTF8))
  foreach($prop in $catalog.translations.PSObject.Properties){
@@ -21,7 +21,7 @@ foreach($name in @('FullTechnical-01.ru-RU.json','FullTechnical-02.ru-RU.json'))
  }
 }
 $entryCount=$entries.Count
-if($entryCount -ne 26){throw "Ожидалось 26 полных переводов, найдено $entryCount"}
+if($entryCount -ne 60){throw "Ожидалось 60 технических переводов, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
 foreach($id in $required){
  if(-not $entries.Contains($id)){throw "Нет полного перевода $id"}
@@ -73,9 +73,7 @@ $replacement=@'
                     '</details>';
             }
             html += '<details class="tooltip-section" lang="en">' +
-                '<summary>' + (ruFull
-                    ? 'Показать исходное описание на английском (EN)'
-                    : 'Исходное подробное описание EN (перевод пока не завершён)') + '</summary>' +
+                '<summary>Сверить с исходным текстом на английском (EN)</summary>' +
                 '<p>' + escapeHtml(finding.description) + '</p>' +
                 (finding.impact ? '<p>Impact</p><ul>' + finding.impact.map(i => '<li>' + escapeHtml(i) + '</li>').join('') + '</ul>' : '') +
                 (finding.attack ? '<p>Attack</p><ul>' + finding.attack.map(i => '<li>' + escapeHtml(i) + '</li>').join('') + '</ul>' : '') +
@@ -87,6 +85,8 @@ $replacement=$replacement.Replace("`r`n","`n")
 if(-not $js.Contains($old)){throw 'Не найден точный HTML-блок исходного технического описания'}
 if([regex]::Matches($js,[regex]::Escape($old)).Count -ne 1){throw 'Несколько неоднозначных HTML-блоков'}
 $js=$js.Replace($old,$replacement)
+# Старые уведомления об отсутствии перевода не должны попадать в интерфейс.
+if($js.Contains('Исходное подробное описание EN (перевод пока не завершён)')) { throw 'Найдена устаревшая пометка EN' }
 $enc=New-Object Text.UTF8Encoding($true)
 [IO.File]::WriteAllText($path,$js,$enc)
 Write-Host "[RU] PASS: полные русские технические описания $entryCount находок"

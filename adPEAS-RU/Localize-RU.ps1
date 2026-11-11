@@ -204,3 +204,6 @@ if(-not $?){throw 'Ошибка расширенной локализации р
 
 & (Join-Path $PSScriptRoot 'Localization/Apply-ReportDisplay.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка перевода отображаемых значений отчёта'}
+
+& (Join-Path $PSScriptRoot 'Localization/Apply-ReportHtmlPolish.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации оставшихся HTML-подписей'}
