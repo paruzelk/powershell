@@ -1626,12 +1626,12 @@ function Show-OUPermissionsCoverageNote {
     $unread = @($UnreadOUs | Where-Object { $_ })
     if ($unread.Count -eq 0) { return $false }
 
-    Show-Line "The security descriptor of $($unread.Count) of $TotalOUs object(s) could not be read - the result below is incomplete" -Class Finding
+    Show-Line "Не удалось прочитать дескриптор безопасности у $($unread.Count) из $TotalOUs объектов — приведённый ниже результат неполный" -Class Finding
     foreach ($unreadDN in ($unread | Select-Object -First 10)) {
-        Show-Line "  not read: $unreadDN" -Class Hint
+        Show-Line "  не прочитано: $unreadDN" -Class Hint
     }
     if ($unread.Count -gt 10) {
-        Show-Line "  ... and $($unread.Count - 10) more" -Class Hint
+        Show-Line "  ... и ещё $($unread.Count - 10)" -Class Hint
     }
 
     return $true

@@ -588,7 +588,7 @@ function Invoke-PortScan {
                 return
             }
 
-            Show-SubHeader "Scanning for open ports..." -ObjectType "OpenPorts"
+            Show-SubHeader "Поиск открытых портов..." -ObjectType "OpenPorts"
 
             # Every address once, with every name it was reached under.
             $scanTargets = New-Object 'System.Collections.Generic.Dictionary[string,object]'
@@ -724,35 +724,35 @@ function Invoke-PortScan {
 
             # ===== What was not scanned, and the result =====
             if ($invalidTargets.Count -gt 0) {
-                Show-Line "$($invalidTargets.Count) target(s) skipped: $($invalidTargets -join ', ')" -Class Hint
+                Show-Line "Пропущено целей с некорректными адресами: $($invalidTargets.Count); список: $($invalidTargets -join ', ')" -Class Hint
             }
             if ($outsideDomain -gt 0) {
-                Show-Line "$outsideDomain active computer(s) with a DNS name outside $domainFQDN - not scanned" -Class Note
+                Show-Line "Не проверено активных компьютеров: $outsideDomain; их DNS-имена находятся вне $domainFQDN" -Class Note
             }
             if ($withoutDnsName -gt 0) {
-                Show-Line "$withoutDnsName active computer(s) without a DNS name (dNSHostName) - not scanned" -Class Note
+                Show-Line "Активных компьютеров без DNS-имени (dNSHostName), не проверенных сканированием: $withoutDnsName" -Class Note
             }
             if ($givenNameless -gt 0) {
-                Show-Line "$givenNameless target(s) without a name - not scanned" -Class Note
+                Show-Line "Целей без имени, не проверенных сканированием: $givenNameless" -Class Note
             }
             if ($unresolved.Count -gt 0) {
                 $shown = @($unresolved | Select-Object -First 10)
                 $more = if ($unresolved.Count -gt $shown.Count) { " and $($unresolved.Count - $shown.Count) more" } else { '' }
-                Show-Line "$($unresolved.Count) name(s) without an address - not scanned: $($shown -join ', ')$more" -Class Note
+                Show-Line "Не удалось разрешить адрес для имён: $($unresolved.Count); сканирование пропущено: $($shown -join ', ')$more" -Class Note
             }
 
             if ($addresses.Count -eq 0) {
-                Show-Line "No address to scan" -Class Note
+                Show-Line "Нет адресов для сканирования" -Class Note
                 return
             }
 
             $seconds = [Math]::Round($clock.Elapsed.TotalSeconds, 1)
-            Show-Line "Scanned $($addresses.Count) address(es) on $($ports.Count) port(s) in $seconds s" -Class Note
+            Show-Line "Проверено адресов: $($addresses.Count), портов: $($ports.Count), время: $seconds с" -Class Note
 
             if ($openTotal -eq 0) {
-                Show-Line "No open port found" -Class Note
+                Show-Line "Открытых портов не обнаружено" -Class Note
             } else {
-                Show-Line "Found $openTotal open port(s) on $($openByAddress.Count) address(es):" -Class Note
+                Show-Line "Найдено открытых портов: $openTotal на адресах: $($openByAddress.Count)" -Class Note
             }
 
             $exportRows = New-Object System.Collections.Generic.List[object]
@@ -794,16 +794,16 @@ function Invoke-PortScan {
 
             if ($ExportOpenPorts) {
                 if ($exportRows.Count -eq 0) {
-                    Show-Line "No open port to write to $ExportOpenPorts" -Class Note
+                    Show-Line "Нет открытых портов для записи в $ExportOpenPorts" -Class Note
                 } else {
                     # Comma, not the list separator of this machine's culture: a German
                     # Windows would write semicolons, which Import-Csv elsewhere does not read.
                     $csv = @($exportRows | ConvertTo-Csv -NoTypeInformation)
                     $export = Export-adPEASFile -Path $ExportOpenPorts -Content (($csv -join "`r`n") + "`r`n") -Type Text -Force -SanitizeFilename:$false
                     if ($export.Success) {
-                        Show-Line "Wrote $($exportRows.Count) open port(s) to $($export.Path)" -Class Note
+                        Show-Line "Записано открытых портов: $($exportRows.Count); файл: $($export.Path)" -Class Note
                     } else {
-                        Show-Line "The open ports could not be written to ${ExportOpenPorts}: $($export.Message)" -Class Hint
+                        Show-Line "Не удалось записать открытые порты в ${ExportOpenPorts}: $($export.Message)" -Class Hint
                     }
                 }
             }
@@ -811,7 +811,7 @@ function Invoke-PortScan {
         } catch {
             Show-Progress -Activity 'Port scan' -Completed
             Write-Log "[Invoke-PortScan] Error: $_" -Level Error
-            Show-Line "Error during the port scan: $_" -Class Finding
+            Show-Line "Ошибка сканирования портов: $_" -Class Finding
         }
     }
 }

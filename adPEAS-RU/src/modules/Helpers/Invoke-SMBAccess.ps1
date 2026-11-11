@@ -419,31 +419,31 @@ function Show-SYSVOLCoverageNote {
     $coverage = Get-SYSVOLCacheCoverage
 
     if ($null -ne $coverage -and -not $coverage.Reachable) {
-        Show-Line "SYSVOL was not reachable - no file-based check below could run. This is not a clean result." -Class Finding
+        Show-Line "SYSVOL недоступен — перечисленные далее проверки файлов не выполнялись. Это НЕ подтверждение безопасности." -Class Finding
         return $true
     }
 
     $incomplete = $false
 
     if ($null -ne $coverage -and $coverage.SkippedCount -gt 0) {
-        Show-Line "$($coverage.SkippedCount) SYSVOL folder(s) could not be read - the result below is incomplete" -Class Finding
+        Show-Line "Не удалось прочитать папок SYSVOL: $($coverage.SkippedCount); результат ниже неполный" -Class Finding
         foreach ($path in ($coverage.SkippedPaths | Select-Object -First 10)) {
-            Show-Line "  not read: $path" -Class Hint
+            Show-Line "  не прочитано: $path" -Class Hint
         }
         if ($coverage.SkippedCount -gt 10) {
-            Show-Line "  ... and $($coverage.SkippedCount - 10) more" -Class Hint
+            Show-Line "  ... и ещё $($coverage.SkippedCount - 10)" -Class Hint
         }
         $incomplete = $true
     }
 
     $fileGaps = @(Get-SYSVOLFileGap -FileFilter $FileFilter)
     if ($fileGaps.Count -gt 0) {
-        Show-Line "$($fileGaps.Count) SYSVOL file(s) could not be read or parsed - the result below is incomplete" -Class Finding
+        Show-Line "Не удалось прочитать или разобрать файлов SYSVOL: $($fileGaps.Count); приведённый ниже результат неполный" -Class Finding
         foreach ($gap in ($fileGaps | Select-Object -First 10)) {
-            Show-Line "  not evaluated: $($gap.Path) - $($gap.Reason)" -Class Hint
+            Show-Line "  не проверено: $($gap.Path) — $($gap.Reason)" -Class Hint
         }
         if ($fileGaps.Count -gt 10) {
-            Show-Line "  ... and $($fileGaps.Count - 10) more" -Class Hint
+            Show-Line "  ... и ещё $($fileGaps.Count - 10)" -Class Hint
         }
         $incomplete = $true
     }
@@ -809,7 +809,7 @@ function Reset-SMBShareAccessCache {
 .EXAMPLE
     $sysvolStatus = Test-SysvolAccessible
     if ($sysvolStatus -eq $false) {
-        Show-Line "Skipping - SYSVOL not accessible" -Class Hint
+        Show-Line "Пропуск: SYSVOL недоступен" -Class Hint
         return
     }
 #>

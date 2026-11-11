@@ -330,7 +330,7 @@
                     Message = "Shadow Credential successfully added. Certificate saved as PFX."
                 }
             } else {
-                Show-Line "Successfully added Shadow Credential to: $TargetSAMAccountName" -Class Hint
+                Show-Line "Ключ Shadow Credentials успешно добавлен для: $TargetSAMAccountName" -Class Hint
                 Show-KeyValue "Device ID:" $DeviceGUID
                 Show-KeyValue "Key ID:" $([Convert]::ToBase64String($KeyHash))
                 Show-KeyValue "PFX Path:" $PFXPath
@@ -340,14 +340,14 @@
                     Show-KeyValue "PFX Password:" "(none)" -Class Note
                 }
                 Show-EmptyLine
-                Show-Line "Usage with Rubeus:" -Class Note
+                Show-Line "Использование через Rubeus:" -Class Note
                 if ($CertPassword) {
                     Show-Line "Rubeus.exe asktgt /user:$TargetSAMAccountName /certificate:$PFXPath /password:`"$CertPassword`" /domain:$($Script:LDAPContext.Domain) /dc:$($Script:LDAPContext.Server) /getcredentials /show"
                 } else {
                     Show-Line "Rubeus.exe asktgt /user:$TargetSAMAccountName /certificate:$PFXPath /domain:$($Script:LDAPContext.Domain) /dc:$($Script:LDAPContext.Server) /getcredentials /show"
                 }
                 Show-EmptyLine
-                Show-Line "Usage with adPEAS Connect-adPEAS:" -Class Note
+                Show-Line "Использование через adPEAS Connect-adPEAS:" -Class Note
                 if ($CertPassword) {
                     Show-Line "Connect-adPEAS -Domain $($Script:LDAPContext.Domain) -Certificate `'$PFXPath`' -CertificatePassword `'$CertPassword`'"
                 } else {
@@ -398,7 +398,7 @@
                         Message = "No Shadow Credentials to clear"
                     }
                 } else {
-                    Show-Line "No Shadow Credentials found on: $TargetSAMAccountName" -Class Note
+                    Show-Line "Ключи Shadow Credentials не найдены у: $TargetSAMAccountName" -Class Note
                 }
                 return $null
             }
@@ -506,7 +506,7 @@
                     } else {
                         Write-Warning "[!] No Shadow Credential with DeviceID '$DeviceID' found on: $TargetSAMAccountName"
                         Show-EmptyLine
-                        Show-Line "Existing Shadow Credentials:" -Class Hint
+                        Show-Line "Существующие ключи Shadow Credentials:" -Class Hint
 
                         foreach ($cred in $ParsedCredentials) {
                             Show-KeyValue "DeviceID:" $cred.DeviceID
@@ -548,7 +548,7 @@
                         Message = "Shadow Credential with DeviceID '$DeviceID' removed"
                     }
                 } else {
-                    Show-Line "Successfully removed Shadow Credential with DeviceID '$DeviceID' from: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Ключ Shadow Credentials с DeviceID '$DeviceID' успешно удалён у: $TargetSAMAccountName" -Class Hint
                 }
 
             } elseif ($CredentialCount -eq 1) {
@@ -577,7 +577,7 @@
                         Message = "Shadow Credential successfully cleared"
                     }
                 } else {
-                    Show-Line "Successfully cleared Shadow Credential from: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Ключ Shadow Credentials успешно удалён у: $TargetSAMAccountName" -Class Hint
                 }
 
             } elseif ($Force) {
@@ -606,7 +606,7 @@
                         Message = "All $CredentialCount Shadow Credentials successfully cleared"
                     }
                 } else {
-                    Show-Line "Successfully cleared all $CredentialCount Shadow Credentials from: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Все ключи Shadow Credentials ($CredentialCount) удалены у: $TargetSAMAccountName" -Class Hint
                 }
 
             } else {
@@ -624,10 +624,10 @@
                 } else {
                     Write-Warning "[!] Multiple Shadow Credentials ($CredentialCount) found on: $TargetSAMAccountName"
                     Show-EmptyLine
-                    Show-Line "To delete a specific credential, use: -DeviceID <GUID>" -Class Note
-                    Show-Line "To delete ALL credentials, use: -Force" -Class Note
+                    Show-Line "Для удаления отдельного ключа используйте: -DeviceID <GUID>" -Class Note
+                    Show-Line "Для удаления ВСЕХ ключей используйте: -Force" -Class Note
                     Show-EmptyLine
-                    Show-Line "Existing Shadow Credentials:" -Class Hint
+                    Show-Line "Существующие ключи Shadow Credentials:" -Class Hint
 
                     $index = 1
                     foreach ($cred in $ParsedCredentials) {

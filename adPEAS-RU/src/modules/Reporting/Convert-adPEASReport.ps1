@@ -103,13 +103,13 @@
             $findingCount = if ($cache.FindingCount) { $cache.FindingCount } else { 0 }
 
             # Display source info
-            Show-Line "Source: $InputJson" -Class Note -NoCollect
-            Show-Line "Domain: $sourceDomain, Server: $sourceServer" -Class Note -NoCollect
-            Show-Line "Original scan: $sourceDate (adPEAS $sourceVersion)" -Class Note -NoCollect
-            Show-Line "Findings: $findingCount" -Class Note -NoCollect
+            Show-Line "Источник: $InputJson" -Class Note -NoCollect
+            Show-Line "Домен: $sourceDomain, сервер: $sourceServer" -Class Note -NoCollect
+            Show-Line "Исходный аудит: $sourceDate (adPEAS $sourceVersion)" -Class Note -NoCollect
+            Show-Line "Находок: $findingCount" -Class Note -NoCollect
             $currentVersion = if ($Script:adPEASVersion) { $Script:adPEASVersion } else { '2.0.0' }
             if ($sourceVersion -ne $currentVersion -and $sourceVersion -ne 'Unknown') {
-                Show-Line "Regenerating with adPEAS $currentVersion (updated definitions/scoring)" -Class Hint -NoCollect
+                Show-Line "Повторное формирование отчёта средствами adPEAS $currentVersion (обновлённые определения и оценка риска)" -Class Hint -NoCollect
             }
 
             # A scan writes this file after every module, so one left behind by an
@@ -123,7 +123,7 @@
             if ($null -ne $cache.Complete -and -not $cache.Complete) {
                 $covered = if ($cache.CompletedModules) { @($cache.CompletedModules) -join ', ' } else { 'unknown' }
                 Write-Warning "[Convert-adPEASReport] This export is from an interrupted scan - it covers only: $covered"
-                Show-Line "Source scan was interrupted - covers only these modules: $covered" -Class Finding -NoCollect
+                Show-Line "Исходный аудит был прерван — проверены только следующие модули: $covered" -Class Finding -NoCollect
             }
 
             # 2. Import findings from already-parsed cache (avoids re-reading the file)
@@ -196,7 +196,7 @@
                 try {
                     Export-HTMLReport -OutputPath $htmlPath
                     $htmlWritten = $true
-                    Show-Line "HTML report saved to: $htmlPath" -Class Hint -NoCollect
+                    Show-Line "HTML-отчёт сохранён: $htmlPath" -Class Hint -NoCollect
                 } catch {
                     Write-Warning "[Convert-adPEASReport] Error generating HTML report: $_"
                 }
@@ -212,7 +212,7 @@
                 $jsonPath = "$resolvedBase.json"
                 try {
                     Export-FindingsCache -Path $jsonPath
-                    Show-Line "JSON export saved to: $jsonPath" -Class Hint -NoCollect
+                    Show-Line "Экспорт JSON сохранён: $jsonPath" -Class Hint -NoCollect
                 } catch {
                     Write-Warning "[Convert-adPEASReport] Error saving JSON: $_"
                 }
@@ -234,7 +234,7 @@
                 Invoke-FindingsReplay -Findings $findings
 
                 $Script:adPEAS_Outputfile = $null
-                Show-Line "Text report saved to: $textPath" -Class Hint -NoCollect
+                Show-Line "Текстовый отчёт сохранён: $textPath" -Class Hint -NoCollect
             }
 
             # Show HTML path again after text replay (the earlier message scrolls away).
@@ -243,7 +243,7 @@
             # after a failed export as well, printing "HTML report saved to: ..." right
             # after the warning and naming a file that does not exist.
             if ($Format -eq 'All' -and $htmlWritten) {
-                Show-Line "HTML report saved to: $htmlPath" -Class Hint -NoCollect
+                Show-Line "HTML-отчёт сохранён: $htmlPath" -Class Hint -NoCollect
             }
 
         } finally {

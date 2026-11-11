@@ -1374,7 +1374,7 @@ function Save-IssuedCertificatePFX {
     $OutputPath = $exportResult.Path
 
     # Display results
-    Show-Line "Certificate saved as PFX:" -Class Hint
+    Show-Line "Сертификат сохранён в формате PFX:" -Class Hint
     Show-KeyValue "PFX Path:" $OutputPath
     if ($pfxPassword) {
         Show-KeyValue "PFX Password:" $pfxPassword
@@ -1404,7 +1404,7 @@ function Save-IssuedCertificatePFX {
 
     # Show usage hints
     $domainHint = if ($Script:LDAPContext -and $Script:LDAPContext['Domain']) { $Script:LDAPContext['Domain'] } else { '<domain>' }
-    Show-Line "Usage with Connect-adPEAS:" -Class Note
+    Show-Line "Использование через Connect-adPEAS:" -Class Note
     if ($pfxPassword) {
         Show-Line "Connect-adPEAS -Domain $domainHint -Certificate '$OutputPath' -CertificatePassword '$pfxPassword'"
     } else {
@@ -1572,7 +1572,7 @@ function Invoke-ADCSRetrieve {
     $rsa = $restored.RSA
 
     try {
-        Show-Line "Retrieving certificate (Request ID: $RetrieveID) from CA '$CAServer'" -Class Note
+        Show-Line "Получение сертификата (ID запроса: $RetrieveID) из ЦС '$CAServer'" -Class Note
 
         # Try HTTPS then HTTP unless -UseHTTP forces HTTP
         $httpModes = if ($UseHTTP) { @($true) } else { @($false, $true) }
@@ -1974,10 +1974,10 @@ function Request-ADCSCertificate {
                 }
             }
             if ($hasAgentEku) {
-                Show-Line "Loaded enrollment-agent certificate '$($oboAgentCert.Subject)' (Certificate Request Agent EKU present)" -Class Note
+                Show-Line "Загружен сертификат агента регистрации '$($oboAgentCert.Subject)' (EKU Certificate Request Agent присутствует)" -Class Note
             }
             else {
-                Show-Line "Agent certificate '$($oboAgentCert.Subject)' does NOT advertise the Certificate Request Agent EKU - the CA may reject the request" -Class Hint
+                Show-Line "Сертификат агента '$($oboAgentCert.Subject)' НЕ содержит EKU Certificate Request Agent — ЦС может отклонить запрос" -Class Hint
             }
         }
 
@@ -2038,7 +2038,7 @@ function Request-ADCSCertificate {
             }
 
             # Log all discovered CAs and their templates
-            Show-Line "Found $($allCAs.Count) Certificate Authority(ies) in Active Directory" -Class Note
+            Show-Line "В Active Directory найдено центров сертификации: $($allCAs.Count)" -Class Note
             foreach ($ca in $allCAs) {
                 $templateCount = @($ca.CertificateTemplates).Count
                 Write-Verbose "$FunctionPrefix CA '$($ca.Name)' ($($ca.DNSHostName)) - $templateCount published template(s)"
@@ -2054,7 +2054,7 @@ function Request-ADCSCertificate {
                 Write-Warning "[!] Template '$TemplateName' is not published on any CA"
                 $allTemplates = @($allCAs | ForEach-Object { $_.CertificateTemplates } | Sort-Object -Unique)
                 if ($allTemplates.Count -gt 0) {
-                    Show-Line "Available templates across all CAs:"
+                    Show-Line "Шаблоны, доступные на всех ЦС:"
                     foreach ($tmpl in $allTemplates) {
                         Show-Line "  - $tmpl"
                     }
@@ -2070,13 +2070,13 @@ function Request-ADCSCertificate {
             }
 
             if ($candidateCAs.Count -gt 1) {
-                Show-Line "$($candidateCAs.Count) CAs publish template '$TemplateName' - will try in order with automatic fallback:" -Class Note
+                Show-Line "На $($candidateCAs.Count) ЦС опубликован шаблон '$TemplateName' — попытки по порядку с автоматическим переходом к следующему:" -Class Note
                 foreach ($ca in $candidateCAs) {
                     Show-Line "  - $($ca.Name) ($($ca.DNSHostName))"
                 }
             }
             else {
-                Show-Line "Auto-discovered CA: $($candidateCAs[0].Name) ($($candidateCAs[0].DNSHostName))" -Class Note
+                Show-Line "Автоматически найден ЦС: $($candidateCAs[0].Name) ($($candidateCAs[0].DNSHostName))" -Class Note
             }
         }
 
@@ -2161,7 +2161,7 @@ function Request-ADCSCertificate {
                             $resolvedUseHTTP = ($protocol -eq 'http')
                             Write-Log "$FunctionPrefix Web Enrollment reachable: $testUrl (HTTP $statusCode) -> method=Web"
                             if ($protocol -eq 'http' -and -not $UseHTTP) {
-                                Show-Line "HTTPS not available on '$testHost', falling back to HTTP" -Class Hint
+                                Show-Line "HTTPS недоступен на '$testHost' — переход на HTTP" -Class Hint
                             }
                             $caSelected = $true
                             break
@@ -2187,7 +2187,7 @@ function Request-ADCSCertificate {
                     $resolvedCAName = $candidateCAName
                     $resolvedMethod = 'COM'
                     if ($webEligible) {
-                        Show-Line "Web Enrollment unavailable on '$testHost', using COM/RPC (ICertRequest) instead" -Class Hint
+                        Show-Line "Веб-регистрация сертификатов недоступна на '$testHost' — вместо неё используется COM/RPC (ICertRequest)" -Class Hint
                     }
                     Write-Log "$FunctionPrefix Selected COM/RPC for CA '$candidateCAName' on '$testHost'"
                     $caSelected = $true
@@ -2201,7 +2201,7 @@ function Request-ADCSCertificate {
 
             # Nothing worked for this candidate
             if ($candidateCAs.Count -gt 1 -or -not $candidateCA._Explicit) {
-                Show-Line "CA '$($candidateCA.Name)' ($testHost) not usable ($Method) - trying next CA" -Class Note
+                Show-Line "ЦС '$($candidateCA.Name)' ($testHost) недоступен для выбранного способа ($Method) — переход к следующему ЦС" -Class Note
             }
         }
 
@@ -2218,7 +2218,7 @@ function Request-ADCSCertificate {
             return $null
         }
 
-        Show-Line "Requesting certificate from CA '$CAServer' (method: $resolvedMethod) using template '$TemplateName'" -Class Note
+        Show-Line "Запрос сертификата у ЦС '$CAServer' (метод: $resolvedMethod) по шаблону '$TemplateName'" -Class Note
 
         # === Step 1c: ModifyTemplate - Backup and modify template (ESC4) ===
         $templateBackupPath = $null
@@ -2240,7 +2240,7 @@ function Request-ADCSCertificate {
             $timestamp = (Format-adPEASDate (Get-Date) 'yyyyMMdd_HHmmss')
             $templateBackupPath = "${TemplateName}_backup_${timestamp}.json"
 
-            Show-Line "Backing up template '$TemplateName' before modification" -Class Note
+            Show-Line "Создание резервной копии шаблона '$TemplateName' перед изменением" -Class Note
             try {
                 Set-CertificateTemplate -Identity $TemplateName -Export $templateBackupPath @templateParams
             }
@@ -2254,10 +2254,10 @@ function Request-ADCSCertificate {
                 return $null
             }
 
-            Show-Line "Template backup saved to: $templateBackupPath" -Class Hint
+            Show-Line "Резервная копия шаблона сохранена: $templateBackupPath" -Class Hint
 
             # Modify template for ESC1 exploitation
-            Show-Line "Modifying template '$TemplateName' for certificate request" -Class Note
+            Show-Line "Изменение шаблона '$TemplateName' для запроса сертификата" -Class Note
             try {
                 Set-CertificateTemplate -Identity $TemplateName `
                     -AllowEnrolleeSuppliesSubject `
@@ -2267,7 +2267,7 @@ function Request-ADCSCertificate {
                     @templateParams -Confirm:$false
 
                 $templateModified = $true
-                Show-Line "Template modified successfully (ENROLLEE_SUPPLIES_SUBJECT, Client Auth EKU, Exportable Key, No Manager Approval)" -Class Hint
+                Show-Line "Шаблон успешно изменён (ENROLLEE_SUPPLIES_SUBJECT, EKU Client Auth, экспортируемый ключ, одобрение администратора ЦС не требуется)" -Class Hint
             }
             catch {
                 # Permission pre-check failure: no changes were made, skip restore
@@ -2277,10 +2277,10 @@ function Request-ADCSCertificate {
 
                 # Other errors: changes may have been partially applied, attempt restore
                 Write-Warning "[!] Failed to modify template: $_"
-                Show-Line "Attempting to restore original template from backup" -Class Note
+                Show-Line "Попытка восстановить исходный шаблон из резервной копии" -Class Note
                 try {
                     Set-CertificateTemplate -Identity $TemplateName -Import $templateBackupPath @templateParams -Confirm:$false
-                    Show-Line "Original template restored successfully" -Class Hint
+                    Show-Line "Исходный шаблон успешно восстановлен" -Class Hint
                 }
                 catch {
                     Write-Warning "[!] CRITICAL: Failed to restore template! Manual restore required from: $templateBackupPath"
@@ -2428,10 +2428,10 @@ function Request-ADCSCertificate {
             if ($resolvedSANs.Count -eq 0 -and -not $OnBehalfOf) {
                 $cnValue = if ($resolvedSubjectDN -match 'CN=([^,]+)') { $Matches[1].Trim() } else { '' }
                 if ($cnValue -match '@') {
-                    Show-Line "Subject '$cnValue' looks like a UPN but no SAN was set - the certificate will NOT map to that user. Use -UPN or -Impersonate for impersonation." -Class Finding
+                    Show-Line "Subject '$cnValue' выглядит как UPN, но SAN не задан — сертификат НЕ будет сопоставлен с этим пользователем. Для указания личности используйте -UPN или -Impersonate." -Class Finding
                 }
                 elseif ($cnValue -match '^[^@\s]+\.[^@\s]+$') {
-                    Show-Line "Subject '$cnValue' looks like a DNS/FQDN but no SAN was set - the certificate will NOT map to that host. Use -DNS or -Impersonate." -Class Finding
+                    Show-Line "Subject '$cnValue' выглядит как DNS/FQDN, но SAN не задан — сертификат НЕ будет сопоставлен с этим узлом. Используйте -DNS или -Impersonate." -Class Finding
                 }
             }
 
@@ -2477,10 +2477,10 @@ function Request-ADCSCertificate {
                         Write-Log "$FunctionPrefix SID auto-resolution threw: $_"
                     }
                     if ($resolvedSID) {
-                        Show-Line "Auto-resolved SID for '$sidTargetIdentity': $resolvedSID (embedding NTDS CA Security Extension for strong mapping)" -Class Hint
+                        Show-Line "Автоматически определён SID для '$sidTargetIdentity': $resolvedSID (встраивается расширение безопасности NTDS CA для строгого сопоставления)" -Class Hint
                     }
                     else {
-                        Show-Line "Could not resolve a SID for '$sidTargetIdentity'. On patched DCs the certificate may not map - supply -SID explicitly, or use -NoSID to silence this." -Class Hint
+                        Show-Line "Не удалось определить SID для '$sidTargetIdentity'. На обновлённых DC сертификат может не сопоставиться с записью — задайте -SID явно либо используйте -NoSID для подавления предупреждения." -Class Hint
                     }
                 }
                 elseif (-not $Script:LdapConnection) {
@@ -2511,7 +2511,7 @@ function Request-ADCSCertificate {
                 return $null
             }
 
-            Show-Line "Generated $KeyLength-bit RSA key pair and PKCS#10 CSR" -Class Note
+            Show-Line "Создана пара ключей RSA длиной $KeyLength бит и запрос PKCS#10 CSR" -Class Note
 
             $rsa = $csrResult.RSAKey
             try {
@@ -2521,7 +2521,7 @@ function Request-ADCSCertificate {
                 $submissionBase64 = $csrResult.CSRBase64
                 $submissionIsPKCS7 = $false
                 if ($OnBehalfOf) {
-                    Show-Line "Wrapping request as enroll-on-behalf-of '$OnBehalfOf' (signed by agent certificate)" -Class Note
+                    Show-Line "Упаковка запроса на сертификат от имени '$OnBehalfOf' (подпись сертификатом агента)" -Class Note
                     $p7Base64 = New-EnrollOnBehalfOfRequest -InnerCsrDer $csrResult.CSRBytes `
                         -OnBehalfOf $OnBehalfOf -AgentCert $oboAgentCert
                     if (-not $p7Base64) {
@@ -2554,7 +2554,7 @@ function Request-ADCSCertificate {
                             ErrorMessage = $null
                             RawResponse  = $null
                         }
-                        Show-Line "Certificate issued via COM/RPC (Request ID: $($comResult.RequestID))" -Class Hint
+                        Show-Line "Сертификат выдан через COM/RPC (ID запроса: $($comResult.RequestID))" -Class Hint
                     }
                     else {
                         Write-Warning "[!] COM/RPC request failed: $($comResult.ErrorMessage)"
@@ -2578,7 +2578,7 @@ function Request-ADCSCertificate {
                         $submitResult.ErrorMessage -match 'connect|connection|timeout|refused|unreachable')
 
                     if ($isTransportFailure -and $comEligible -and $resolvedCAName) {
-                        Show-Line "Web Enrollment transport error ($($submitResult.ErrorMessage)), attempting COM/RPC fallback..." -Class Hint
+                        Show-Line "Ошибка транспорта веб-регистрации ($($submitResult.ErrorMessage)) — попытка перейти на COM/RPC..." -Class Hint
                         Write-Log "$FunctionPrefix Web Enrollment transport failure, trying COM/RPC with CA '$resolvedCAName'"
 
                         $comResult = Submit-COMRequest -CAServer $CAServer `
@@ -2597,7 +2597,7 @@ function Request-ADCSCertificate {
                                 ErrorMessage = $null
                                 RawResponse  = $null
                             }
-                            Show-Line "Certificate issued via COM/RPC fallback (Request ID: $($comResult.RequestID))" -Class Hint
+                            Show-Line "Сертификат выдан через резервный COM/RPC (ID запроса: $($comResult.RequestID))" -Class Hint
                         }
                         else {
                             Write-Warning "[!] Both Web Enrollment and COM/RPC failed"
@@ -2617,8 +2617,8 @@ function Request-ADCSCertificate {
                 }
 
                 if ($submitResult.Status -eq 'Pending') {
-                    Show-Line "Certificate request is pending approval (Request ID: $($submitResult.RequestID))" -Class Hint
-                    Show-Line "The CA administrator must approve this request before the certificate can be retrieved."
+                    Show-Line "Запрос сертификата ожидает одобрения (ID запроса: $($submitResult.RequestID))" -Class Hint
+                    Show-Line "Для получения сертификата администратор ЦС должен сначала одобрить запрос."
 
                     # Persist the private key so the certificate can be paired into a
                     # PFX after approval via -RetrieveID. Without this the key is lost
@@ -2635,8 +2635,8 @@ function Request-ADCSCertificate {
                     }
 
                     if ($savedKeyPath) {
-                        Show-Line "Private key saved for retrieval: $savedKeyPath" -Class Hint
-                        Show-Line "After approval, retrieve with:" -Class Note
+                        Show-Line "Закрытый ключ сохранён для последующего получения сертификата: $savedKeyPath" -Class Hint
+                        Show-Line "После одобрения получите сертификат командой:" -Class Note
                         Show-Line "Request-ADCSCertificate -RetrieveID $($submitResult.RequestID) -CAServer '$CAServer' -KeyFile '$savedKeyPath'"
                     }
 
@@ -2667,7 +2667,7 @@ function Request-ADCSCertificate {
                 }
                 else {
                     # HTTP/HTTPS path - need to retrieve via certsrv
-                    Show-Line "Certificate issued (Request ID: $($submitResult.RequestID))" -Class Hint
+                    Show-Line "Сертификат выдан (ID запроса: $($submitResult.RequestID))" -Class Hint
 
                     $issuedCert = Get-CertsrvCertificate -CAServer $CAServer `
                         -RequestID $submitResult.RequestID `
@@ -2701,15 +2701,15 @@ function Request-ADCSCertificate {
             # === Template Restore (always runs if template was modified) ===
             if ($templateModified -and $templateBackupPath) {
                 Show-EmptyLine
-                Show-Line "Restoring original template '$TemplateName' from backup" -Class Note
+                Show-Line "Восстановление исходного шаблона '$TemplateName' из резервной копии" -Class Note
                 try {
                     $restoreParams = @{}
                     if ($Domain) { $restoreParams['Domain'] = $Domain }
                     if ($Server) { $restoreParams['Server'] = $Server }
 
                     Set-CertificateTemplate -Identity $TemplateName -Import $templateBackupPath @restoreParams -Confirm:$false
-                    Show-Line "Original template restored successfully" -Class Hint
-                    Show-Line "Backup file kept for audit: $templateBackupPath" -Class Note
+                    Show-Line "Исходный шаблон успешно восстановлен" -Class Hint
+                    Show-Line "Резервный файл сохранён для аудита: $templateBackupPath" -Class Note
                 }
                 catch {
                     Write-Warning "[!] CRITICAL: Failed to restore template '$TemplateName'!"

@@ -43846,7 +43846,7 @@ function Get-adPEASSession {
         if (-not $Script:LDAPContext -or -not $hasLdapConnection) {
             if ($TestConnection) {
                 if (-not $Quiet) {
-                    Show-SubHeader "Checking connection health..."
+                    Show-SubHeader "Проверка состояния подключения..."
                     Show-KeyValue "Session Variables:" "FAIL: No active session found" -Class Finding
                     return
                 }
@@ -43859,8 +43859,8 @@ function Get-adPEASSession {
         if ($TestConnection) {
             try {
                 if (-not $Quiet) {
-                    Show-Line "Health:" -Class Hint
-                    Show-SubHeader "Checking connection health..."
+                    Show-Line "Состояние:" -Class Hint
+                    Show-SubHeader "Проверка состояния подключения..."
                 }
                 $testResults = @{
                     SessionExists = $true
@@ -43929,8 +43929,8 @@ function Get-adPEASSession {
             }
         }
         else {
-            Show-SubHeader "Displaying active session information..."
-            Show-Line "Connection:" -Class Hint
+            Show-SubHeader "Сведения об активном сеансе..."
+            Show-Line "Подключение:" -Class Hint
             Show-KeyValue "Domain:" $Script:LDAPContext.Domain
             if ($Script:LDAPContext.DomainSID) {
                 Show-KeyValue "Domain SID:" $Script:LDAPContext.DomainSID
@@ -43942,7 +43942,7 @@ function Get-adPEASSession {
             Show-KeyValue "Protocol:" "$($Script:LDAPContext.Protocol) (Port $($Script:LDAPContext.Port))"
             Show-KeyValue "Domain DN:" $Script:LDAPContext.DomainDN
             Show-EmptyLine
-            Show-Line "Authentication:" -Class Hint
+            Show-Line "Аутентификация:" -Class Hint
             if ($Script:LDAPContext.KerberosUsed -and $Script:LDAPContext.TGTInfo -and $Script:LDAPContext.TGTInfo.UserName) {
                 $TGTUser = "$($Script:LDAPContext.TGTInfo.UserName)@$($Script:LDAPContext.TGTInfo.Domain)"
                 Show-KeyValue "Authenticated as:" $TGTUser
@@ -43960,7 +43960,7 @@ function Get-adPEASSession {
                 }
                 if ($Script:LDAPContext.IdentityMismatch) {
                     Show-KeyValue "Local Identity:" $Script:LDAPContext.LocalIdentity
-                    Show-Line "  Identity Mismatch: DETECTED" -Class Hint
+                    Show-Line "  Несовпадение личности: ОБНАРУЖЕНО" -Class Hint
                 }
                 if ($Script:LDAPContext.AuthenticatedUserDN) {
                     Show-KeyValue "Distinguished Name:" $Script:LDAPContext.AuthenticatedUserDN
@@ -44064,7 +44064,7 @@ function Get-adPEASSession {
                 }
             }
             Show-EmptyLine
-            Show-Line "Session:" -Class Hint
+            Show-Line "Сеанс:" -Class Hint
             if ($Script:LDAPContext.SessionStartTime) {
                 $sessionDuration = (Get-Date) - $Script:LDAPContext.SessionStartTime
                 Show-KeyValue "Session Started:" (Format-adPEASDate $Script:LDAPContext.SessionStartTime 'yyyy-MM-dd HH:mm:ss')
@@ -44100,7 +44100,7 @@ function Get-adPEASSession {
                 Show-KeyValue "Connection State:" "Connected"
             }
             Show-EmptyLine
-            Show-Line "Help:" -Class Hint
+            Show-Line "Справка:" -Class Hint
             Show-KeyValue "Get-adPEASSession -TestConnection" "Test connection health"
             Show-KeyValue "Disconnect-adPEAS" "End the session"
             Show-EmptyLine
@@ -44583,7 +44583,7 @@ function Ensure-LDAPConnection {
                 Write-Log "[Ensure-LDAPConnection] TGT validation failed: $errorDetails"
                 Show-ConnectionError -ErrorType "AuthenticationFailed" -Details $errorDetails -NoThrow
                 $Script:LDAPContext['SessionInvalid'] = $true
-                Show-Line "Aborting scan - LDAP session is no longer valid. Re-authenticate with Connect-adPEAS." -Class Finding
+                Show-Line "Аудит прерван: LDAP-сеанс больше не действителен. Подключитесь повторно с помощью Connect-adPEAS." -Class Finding
                 return $false
             }
         }
@@ -44997,28 +44997,28 @@ function Show-SYSVOLCoverageNote {
     )
     $coverage = Get-SYSVOLCacheCoverage
     if ($null -ne $coverage -and -not $coverage.Reachable) {
-        Show-Line "SYSVOL was not reachable - no file-based check below could run. This is not a clean result." -Class Finding
+        Show-Line "SYSVOL недоступен — перечисленные далее проверки файлов не выполнялись. Это НЕ подтверждение безопасности." -Class Finding
         return $true
     }
     $incomplete = $false
     if ($null -ne $coverage -and $coverage.SkippedCount -gt 0) {
-        Show-Line "$($coverage.SkippedCount) SYSVOL folder(s) could not be read - the result below is incomplete" -Class Finding
+        Show-Line "Не удалось прочитать папок SYSVOL: $($coverage.SkippedCount); результат ниже неполный" -Class Finding
         foreach ($path in ($coverage.SkippedPaths | Select-Object -First 10)) {
-            Show-Line "  not read: $path" -Class Hint
+            Show-Line "  не прочитано: $path" -Class Hint
         }
         if ($coverage.SkippedCount -gt 10) {
-            Show-Line "  ... and $($coverage.SkippedCount - 10) more" -Class Hint
+            Show-Line "  ... и ещё $($coverage.SkippedCount - 10)" -Class Hint
         }
         $incomplete = $true
     }
     $fileGaps = @(Get-SYSVOLFileGap -FileFilter $FileFilter)
     if ($fileGaps.Count -gt 0) {
-        Show-Line "$($fileGaps.Count) SYSVOL file(s) could not be read or parsed - the result below is incomplete" -Class Finding
+        Show-Line "Не удалось прочитать или разобрать файлов SYSVOL: $($fileGaps.Count); приведённый ниже результат неполный" -Class Finding
         foreach ($gap in ($fileGaps | Select-Object -First 10)) {
-            Show-Line "  not evaluated: $($gap.Path) - $($gap.Reason)" -Class Hint
+            Show-Line "  не проверено: $($gap.Path) — $($gap.Reason)" -Class Hint
         }
         if ($fileGaps.Count -gt 10) {
-            Show-Line "  ... and $($fileGaps.Count - 10) more" -Class Hint
+            Show-Line "  ... и ещё $($fileGaps.Count - 10)" -Class Hint
         }
         $incomplete = $true
     }
@@ -56671,7 +56671,7 @@ function Show-GPOInactiveSummary {
         'the policy is disabled'
     }
     if ($Listed) {
-        Show-Line "$Count of the findings below sit on a policy that is not linked or not enabled" -Class Note
+        Show-Line "$Count из приведённых ниже находок относятся к политике без действующей связи либо к отключённой политике" -Class Note
         return
     }
     $rows = @(@($Dormant) | Where-Object { $_ } | Sort-Object `
@@ -58700,12 +58700,12 @@ function Show-OUPermissionsCoverageNote {
     )
     $unread = @($UnreadOUs | Where-Object { $_ })
     if ($unread.Count -eq 0) { return $false }
-    Show-Line "The security descriptor of $($unread.Count) of $TotalOUs object(s) could not be read - the result below is incomplete" -Class Finding
+    Show-Line "Не удалось прочитать дескриптор безопасности у $($unread.Count) из $TotalOUs объектов — приведённый ниже результат неполный" -Class Finding
     foreach ($unreadDN in ($unread | Select-Object -First 10)) {
-        Show-Line "  not read: $unreadDN" -Class Hint
+        Show-Line "  не прочитано: $unreadDN" -Class Hint
     }
     if ($unread.Count -gt 10) {
-        Show-Line "  ... and $($unread.Count - 10) more" -Class Hint
+        Show-Line "  ... и ещё $($unread.Count - 10)" -Class Hint
     }
     return $true
 }
@@ -62542,7 +62542,7 @@ function Invoke-PortScan {
                 Write-Error "No target to scan. Name one with -Target or pipe targets in; -DomainComputers scans the active computers of the domain."
                 return
             }
-            Show-SubHeader "Scanning for open ports..." -ObjectType "OpenPorts"
+            Show-SubHeader "Поиск открытых портов..." -ObjectType "OpenPorts"
             $scanTargets = New-Object 'System.Collections.Generic.Dictionary[string,object]'
             $invalidTargets = New-Object System.Collections.Generic.List[string]
             $unresolved = New-Object System.Collections.Generic.List[string]
@@ -62651,32 +62651,32 @@ function Invoke-PortScan {
             Show-Progress -Activity 'Port scan' -Completed
             Write-Log "[Invoke-PortScan] $openTotal open port(s) on $($openByAddress.Count) of $($addresses.Count) address(es)"
             if ($invalidTargets.Count -gt 0) {
-                Show-Line "$($invalidTargets.Count) target(s) skipped: $($invalidTargets -join ', ')" -Class Hint
+                Show-Line "Пропущено целей с некорректными адресами: $($invalidTargets.Count); список: $($invalidTargets -join ', ')" -Class Hint
             }
             if ($outsideDomain -gt 0) {
-                Show-Line "$outsideDomain active computer(s) with a DNS name outside $domainFQDN - not scanned" -Class Note
+                Show-Line "Не проверено активных компьютеров: $outsideDomain; их DNS-имена находятся вне $domainFQDN" -Class Note
             }
             if ($withoutDnsName -gt 0) {
-                Show-Line "$withoutDnsName active computer(s) without a DNS name (dNSHostName) - not scanned" -Class Note
+                Show-Line "Активных компьютеров без DNS-имени (dNSHostName), не проверенных сканированием: $withoutDnsName" -Class Note
             }
             if ($givenNameless -gt 0) {
-                Show-Line "$givenNameless target(s) without a name - not scanned" -Class Note
+                Show-Line "Целей без имени, не проверенных сканированием: $givenNameless" -Class Note
             }
             if ($unresolved.Count -gt 0) {
                 $shown = @($unresolved | Select-Object -First 10)
                 $more = if ($unresolved.Count -gt $shown.Count) { " and $($unresolved.Count - $shown.Count) more" } else { '' }
-                Show-Line "$($unresolved.Count) name(s) without an address - not scanned: $($shown -join ', ')$more" -Class Note
+                Show-Line "Не удалось разрешить адрес для имён: $($unresolved.Count); сканирование пропущено: $($shown -join ', ')$more" -Class Note
             }
             if ($addresses.Count -eq 0) {
-                Show-Line "No address to scan" -Class Note
+                Show-Line "Нет адресов для сканирования" -Class Note
                 return
             }
             $seconds = [Math]::Round($clock.Elapsed.TotalSeconds, 1)
-            Show-Line "Scanned $($addresses.Count) address(es) on $($ports.Count) port(s) in $seconds s" -Class Note
+            Show-Line "Проверено адресов: $($addresses.Count), портов: $($ports.Count), время: $seconds с" -Class Note
             if ($openTotal -eq 0) {
-                Show-Line "No open port found" -Class Note
+                Show-Line "Открытых портов не обнаружено" -Class Note
             } else {
-                Show-Line "Found $openTotal open port(s) on $($openByAddress.Count) address(es):" -Class Note
+                Show-Line "Найдено открытых портов: $openTotal на адресах: $($openByAddress.Count)" -Class Note
             }
             $exportRows = New-Object System.Collections.Generic.List[object]
             foreach ($address in $addresses) {
@@ -62711,21 +62711,21 @@ function Invoke-PortScan {
             }
             if ($ExportOpenPorts) {
                 if ($exportRows.Count -eq 0) {
-                    Show-Line "No open port to write to $ExportOpenPorts" -Class Note
+                    Show-Line "Нет открытых портов для записи в $ExportOpenPorts" -Class Note
                 } else {
                     $csv = @($exportRows | ConvertTo-Csv -NoTypeInformation)
                     $export = Export-adPEASFile -Path $ExportOpenPorts -Content (($csv -join "`r`n") + "`r`n") -Type Text -Force -SanitizeFilename:$false
                     if ($export.Success) {
-                        Show-Line "Wrote $($exportRows.Count) open port(s) to $($export.Path)" -Class Note
+                        Show-Line "Записано открытых портов: $($exportRows.Count); файл: $($export.Path)" -Class Note
                     } else {
-                        Show-Line "The open ports could not be written to ${ExportOpenPorts}: $($export.Message)" -Class Hint
+                        Show-Line "Не удалось записать открытые порты в ${ExportOpenPorts}: $($export.Message)" -Class Hint
                     }
                 }
             }
         } catch {
             Show-Progress -Activity 'Port scan' -Completed
             Write-Log "[Invoke-PortScan] Error: $_" -Level Error
-            Show-Line "Error during the port scan: $_" -Class Finding
+            Show-Line "Ошибка сканирования портов: $_" -Class Finding
         }
     }
 }
@@ -62983,9 +62983,9 @@ function Invoke-RBCDOperation {
                 }
             } else {
                 if ($AlreadyExists) {
-                    Show-Line "RBCD entry already exists for $DelegateName on: $TargetSAMAccountName" -Class Note
+                    Show-Line "Запись RBCD для $DelegateName на $TargetSAMAccountName уже существует" -Class Note
                 } else {
-                    Show-Line "Successfully configured RBCD on target: $TargetSAMAccountName" -Class Hint
+                    Show-Line "RBCD успешно настроено на целевом объекте: $TargetSAMAccountName" -Class Hint
                     Show-KeyValue "Attacker (can impersonate):" $DelegateName
                     Show-KeyValue "Target (receives impersonation):" $TargetSAMAccountName
                 }
@@ -63013,7 +63013,7 @@ function Invoke-RBCDOperation {
                         Message = "No RBCD configuration to clear"
                     }
                 } else {
-                    Show-Line "No RBCD configuration found on: $TargetSAMAccountName" -Class Note
+                    Show-Line "Настройка RBCD не найдена на: $TargetSAMAccountName" -Class Note
                 }
                 return $null
             }
@@ -63064,7 +63064,7 @@ function Invoke-RBCDOperation {
                     } else {
                         Write-Warning "[!] Principal '$Principal' not found in RBCD configuration on: $TargetSAMAccountName"
                         Show-EmptyLine
-                        Show-Line "Existing RBCD principals:" -Class Hint
+                        Show-Line "Существующие субъекты RBCD:" -Class Hint
                         foreach ($configuredPrincipal in $ConfiguredPrincipals) {
                             Show-KeyValue "Principal:" "$($configuredPrincipal.Name) ($($configuredPrincipal.SID))"
                         }
@@ -63113,7 +63113,7 @@ function Invoke-RBCDOperation {
                         Message = "RBCD entry for '$($PrincipalToRemove.Name)' removed"
                     }
                 } else {
-                    Show-Line "Successfully removed '$($PrincipalToRemove.Name)' from RBCD configuration on: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Субъект '$($PrincipalToRemove.Name)' успешно удалён из RBCD на: $TargetSAMAccountName" -Class Hint
                 }
             } elseif ($ACECount -eq 1) {
                 $ModifyRequest = New-Object System.DirectoryServices.Protocols.ModifyRequest
@@ -63136,7 +63136,7 @@ function Invoke-RBCDOperation {
                         Message = "RBCD configuration successfully cleared"
                     }
                 } else {
-                    Show-Line "Successfully cleared RBCD configuration from: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Настройка RBCD успешно очищена на: $TargetSAMAccountName" -Class Hint
                 }
             } elseif ($Force) {
                 $ModifyRequest = New-Object System.DirectoryServices.Protocols.ModifyRequest
@@ -63159,7 +63159,7 @@ function Invoke-RBCDOperation {
                         Message = "All $ACECount RBCD entries successfully cleared"
                     }
                 } else {
-                    Show-Line "Successfully cleared all $ACECount RBCD entries from: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Удалены все записи RBCD ($ACECount) на: $TargetSAMAccountName" -Class Hint
                 }
             } else {
                 if ($PassThru) {
@@ -63175,10 +63175,10 @@ function Invoke-RBCDOperation {
                 } else {
                     Write-Warning "[!] Multiple RBCD principals ($ACECount) found on: $TargetSAMAccountName"
                     Show-EmptyLine
-                    Show-Line "To remove a specific principal, use: -Principal <name>" -Class Note
-                    Show-Line "To remove ALL principals, use: -Force" -Class Note
+                    Show-Line "Для удаления отдельного субъекта используйте: -Principal <name>" -Class Note
+                    Show-Line "Для удаления ВСЕХ субъектов используйте: -Force" -Class Note
                     Show-EmptyLine
-                    Show-Line "Existing RBCD principals:" -Class Hint
+                    Show-Line "Существующие субъекты RBCD:" -Class Hint
                     $index = 1
                     foreach ($configuredPrincipal in $ConfiguredPrincipals) {
                         Show-KeyValue "[$index] Principal:" "$($configuredPrincipal.Name)"
@@ -63361,7 +63361,7 @@ function Invoke-ShadowCredentialOperation {
                     Message = "Shadow Credential successfully added. Certificate saved as PFX."
                 }
             } else {
-                Show-Line "Successfully added Shadow Credential to: $TargetSAMAccountName" -Class Hint
+                Show-Line "Ключ Shadow Credentials успешно добавлен для: $TargetSAMAccountName" -Class Hint
                 Show-KeyValue "Device ID:" $DeviceGUID
                 Show-KeyValue "Key ID:" $([Convert]::ToBase64String($KeyHash))
                 Show-KeyValue "PFX Path:" $PFXPath
@@ -63371,14 +63371,14 @@ function Invoke-ShadowCredentialOperation {
                     Show-KeyValue "PFX Password:" "(none)" -Class Note
                 }
                 Show-EmptyLine
-                Show-Line "Usage with Rubeus:" -Class Note
+                Show-Line "Использование через Rubeus:" -Class Note
                 if ($CertPassword) {
                     Show-Line "Rubeus.exe asktgt /user:$TargetSAMAccountName /certificate:$PFXPath /password:`"$CertPassword`" /domain:$($Script:LDAPContext.Domain) /dc:$($Script:LDAPContext.Server) /getcredentials /show"
                 } else {
                     Show-Line "Rubeus.exe asktgt /user:$TargetSAMAccountName /certificate:$PFXPath /domain:$($Script:LDAPContext.Domain) /dc:$($Script:LDAPContext.Server) /getcredentials /show"
                 }
                 Show-EmptyLine
-                Show-Line "Usage with adPEAS Connect-adPEAS:" -Class Note
+                Show-Line "Использование через adPEAS Connect-adPEAS:" -Class Note
                 if ($CertPassword) {
                     Show-Line "Connect-adPEAS -Domain $($Script:LDAPContext.Domain) -Certificate `'$PFXPath`' -CertificatePassword `'$CertPassword`'"
                 } else {
@@ -63420,7 +63420,7 @@ function Invoke-ShadowCredentialOperation {
                         Message = "No Shadow Credentials to clear"
                     }
                 } else {
-                    Show-Line "No Shadow Credentials found on: $TargetSAMAccountName" -Class Note
+                    Show-Line "Ключи Shadow Credentials не найдены у: $TargetSAMAccountName" -Class Note
                 }
                 return $null
             }
@@ -63508,7 +63508,7 @@ function Invoke-ShadowCredentialOperation {
                     } else {
                         Write-Warning "[!] No Shadow Credential with DeviceID '$DeviceID' found on: $TargetSAMAccountName"
                         Show-EmptyLine
-                        Show-Line "Existing Shadow Credentials:" -Class Hint
+                        Show-Line "Существующие ключи Shadow Credentials:" -Class Hint
                         foreach ($cred in $ParsedCredentials) {
                             Show-KeyValue "DeviceID:" $cred.DeviceID
                             Show-KeyValue "KeyID:" $cred.KeyID
@@ -63543,7 +63543,7 @@ function Invoke-ShadowCredentialOperation {
                         Message = "Shadow Credential with DeviceID '$DeviceID' removed"
                     }
                 } else {
-                    Show-Line "Successfully removed Shadow Credential with DeviceID '$DeviceID' from: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Ключ Shadow Credentials с DeviceID '$DeviceID' успешно удалён у: $TargetSAMAccountName" -Class Hint
                 }
             } elseif ($CredentialCount -eq 1) {
                 $ModifyRequest = New-Object System.DirectoryServices.Protocols.ModifyRequest
@@ -63566,7 +63566,7 @@ function Invoke-ShadowCredentialOperation {
                         Message = "Shadow Credential successfully cleared"
                     }
                 } else {
-                    Show-Line "Successfully cleared Shadow Credential from: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Ключ Shadow Credentials успешно удалён у: $TargetSAMAccountName" -Class Hint
                 }
             } elseif ($Force) {
                 $ModifyRequest = New-Object System.DirectoryServices.Protocols.ModifyRequest
@@ -63589,7 +63589,7 @@ function Invoke-ShadowCredentialOperation {
                         Message = "All $CredentialCount Shadow Credentials successfully cleared"
                     }
                 } else {
-                    Show-Line "Successfully cleared all $CredentialCount Shadow Credentials from: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Все ключи Shadow Credentials ($CredentialCount) удалены у: $TargetSAMAccountName" -Class Hint
                 }
             } else {
                 if ($PassThru) {
@@ -63605,10 +63605,10 @@ function Invoke-ShadowCredentialOperation {
                 } else {
                     Write-Warning "[!] Multiple Shadow Credentials ($CredentialCount) found on: $TargetSAMAccountName"
                     Show-EmptyLine
-                    Show-Line "To delete a specific credential, use: -DeviceID <GUID>" -Class Note
-                    Show-Line "To delete ALL credentials, use: -Force" -Class Note
+                    Show-Line "Для удаления отдельного ключа используйте: -DeviceID <GUID>" -Class Note
+                    Show-Line "Для удаления ВСЕХ ключей используйте: -Force" -Class Note
                     Show-EmptyLine
-                    Show-Line "Existing Shadow Credentials:" -Class Hint
+                    Show-Line "Существующие ключи Shadow Credentials:" -Class Hint
                     $index = 1
                     foreach ($cred in $ParsedCredentials) {
                         Show-KeyValue "[$index] DeviceID:" $cred.DeviceID
@@ -67109,8 +67109,8 @@ function Invoke-DCSync {
         $outputFormats = @($JustNTHash, $JustAES, $JustLM, $JustCleartext)
         $selectedFormats = ($outputFormats | Where-Object { $_ }).Count
         if ($selectedFormats -gt 1) {
-            Show-Line "DCSync failed: Only one output format can be specified at a time" -Class Finding
-            Show-Line "Choose one: -JustNTHash, -JustAES, -JustLM, or -JustCleartext" -Class Note
+            Show-Line "Ошибка DCSync: одновременно можно выбрать только один формат вывода" -Class Finding
+            Show-Line "Выберите один параметр: -JustNTHash, -JustAES, -JustLM или -JustCleartext" -Class Note
             return [PSCustomObject]@{
                 PSTypeName = 'adPEAS.DCSync.Result'
                 Success    = $false
@@ -67120,8 +67120,8 @@ function Invoke-DCSync {
         $accountTypes = @($AllAccounts, $UsersOnly, $ComputersOnly)
         $selectedTypes = ($accountTypes | Where-Object { $_ }).Count
         if ($selectedTypes -gt 1) {
-            Show-Line "DCSync failed: Only one account type can be specified at a time" -Class Finding
-            Show-Line "Choose one: -AllAccounts, -UsersOnly, or -ComputersOnly" -Class Note
+            Show-Line "Ошибка DCSync: одновременно можно выбрать только один тип учётных записей" -Class Finding
+            Show-Line "Выберите один параметр: -AllAccounts, -UsersOnly или -ComputersOnly" -Class Note
             return [PSCustomObject]@{
                 PSTypeName = 'adPEAS.DCSync.Result'
                 Success    = $false
@@ -67135,7 +67135,7 @@ function Invoke-DCSync {
             }
             catch {
                 if ($_.Exception.Message -notmatch 'already exists') {
-                    Show-Line "DCSync failed: Could not compile C# interop code" -Class Finding
+                    Show-Line "Ошибка DCSync: не удалось скомпилировать код взаимодействия с C#" -Class Finding
                     return [PSCustomObject]@{
                         PSTypeName = 'adPEAS.DCSync.Result'
                         Success    = $false
@@ -67150,8 +67150,8 @@ function Invoke-DCSync {
                 Write-Log "[Invoke-DCSync] Using session domain: $Domain"
             }
             else {
-                Show-Line "DCSync failed: No domain specified and no active adPEAS session found." -Class Finding
-                Show-Line "Please specify -Domain parameter or run Connect-adPEAS first." -Class Note
+                Show-Line "Ошибка DCSync: домен не указан и активный сеанс adPEAS не найден." -Class Finding
+                Show-Line "Укажите параметр -Domain или сначала выполните Connect-adPEAS." -Class Note
                 return [PSCustomObject]@{
                     PSTypeName = 'adPEAS.DCSync.Result'
                     Success    = $false
@@ -67172,8 +67172,8 @@ function Invoke-DCSync {
                     Write-Log "[Invoke-DCSync] Auto-discovered DC: $Server (IP: $($dcResult.IP))"
                 }
                 else {
-                    Show-Line "DCSync failed: Could not locate reachable Domain Controller for domain '$Domain'" -Class Finding
-                    Show-Line "Verify domain name and network connectivity (Port 88 + 389/636)" -Class Note
+                    Show-Line "Ошибка DCSync: не удалось найти доступный контроллер домена для '$Domain'" -Class Finding
+                    Show-Line "Проверьте имя домена и сетевую доступность (порты 88 и 389/636)" -Class Note
                     return [PSCustomObject]@{
                         PSTypeName = 'adPEAS.DCSync.Result'
                         Success    = $false
@@ -67201,16 +67201,16 @@ function Invoke-DCSync {
                     Write-Log "[Invoke-DCSync] Using session authentication: $SessionAuthMethod"
                 }
                 else {
-                    Show-Line "Warning: Current session uses $SessionAuthMethod (incompatible with RPC)" -Class Hint
-                    Show-Line "DCSync will attempt to use current Windows user context instead" -Class Note
-                    Show-Line "If this fails, provide explicit credentials via -Credential parameter" -Class Note
+                    Show-Line "Предупреждение: текущий сеанс использует $SessionAuthMethod (несовместимо с RPC)" -Class Hint
+                    Show-Line "Вместо этого DCSync попробует использовать контекст текущего пользователя Windows" -Class Note
+                    Show-Line "Если попытка завершится ошибкой, передайте явные учётные данные через -Credential" -Class Note
                     Write-Log "[Invoke-DCSync] Session auth '$SessionAuthMethod' incompatible with RPC, falling back to current user context"
                 }
             }
             else {
-                Show-Line "No adPEAS session found - using current Windows user context for DCSync" -Class Note
-                Show-Line "Authentication: Current logged-on user ($env:USERDOMAIN\$env:USERNAME)" -Class Note
-                Show-Line "If access is denied, provide credentials via -Credential parameter" -Class Hint
+                Show-Line "Сеанс adPEAS не найден — для DCSync используется контекст текущего пользователя Windows" -Class Note
+                Show-Line "Аутентификация: текущий пользователь Windows ($env:USERDOMAIN\$env:USERNAME)" -Class Note
+                Show-Line "При отказе в доступе передайте учётные данные через -Credential" -Class Hint
                 Write-Log "[Invoke-DCSync] No session found, using current Windows user context"
             }
         }
@@ -67227,7 +67227,7 @@ function Invoke-DCSync {
                 Write-Log "[Invoke-DCSync] Resolved SID $Identity to: $targetUser"
             }
             else {
-                Show-Line "DCSync failed: Could not resolve SID '$Identity' to an account name" -Class Finding
+                Show-Line "Ошибка DCSync: не удалось сопоставить SID '$Identity' с именем учётной записи" -Class Finding
                 return [PSCustomObject]@{
                     PSTypeName       = 'adPEAS.DCSync.Result'
                     Success          = $false
@@ -67255,7 +67255,7 @@ function Invoke-DCSync {
                 $connectionParams['Credential'] = $Credential
             }
             if (-not (Ensure-LDAPConnection @connectionParams)) {
-                Show-Line "DCSync failed: Could not establish LDAP connection for account enumeration" -Class Finding
+                Show-Line "Ошибка DCSync: не удалось установить LDAP-соединение для перечисления учётных записей" -Class Finding
                 return [PSCustomObject]@{
                     PSTypeName = 'adPEAS.DCSync.Result'
                     Success    = $false
@@ -67296,12 +67296,12 @@ function Invoke-DCSync {
                     Write-Log "[Invoke-DCSync] Found $($accountsToSync.Count) accounts to replicate"
                 }
                 else {
-                    Show-Line "No accounts found matching the specified criteria" -Class Hint
+                    Show-Line "Учётные записи, соответствующие заданным условиям, не найдены" -Class Hint
                     return
                 }
             }
             catch {
-                Show-Line "DCSync failed: Could not query accounts - $($_.Exception.Message)" -Class Finding
+                Show-Line "Ошибка DCSync: не удалось запросить учётные записи — $($_.Exception.Message)" -Class Finding
                 return [PSCustomObject]@{
                     PSTypeName       = 'adPEAS.DCSync.Result'
                     Success          = $false
@@ -67337,7 +67337,7 @@ function Invoke-DCSync {
             )
             if (-not $rpcResult.Success) {
                 Write-Log "[Invoke-DCSync] Replication failed for $identityLabel : $($rpcResult.Error)"
-                Show-Line "DCSync failed for $identityLabel : $($rpcResult.Error)" -Class Finding
+                Show-Line "Ошибка DCSync для $identityLabel : $($rpcResult.Error)" -Class Finding
                 if ($accountsToSync.Count -eq 1) {
                     return [PSCustomObject]@{
                         PSTypeName       = 'adPEAS.DCSync.Result'
@@ -67593,10 +67593,10 @@ function Invoke-DCSync {
         if ($OutputFile -and $OutputFileContent.Count -gt 0) {
             try {
                 $OutputFileContent | Out-File -FilePath $OutputFile -Force -Encoding ASCII
-                Show-Line "Exported $($OutputFileContent.Count) entries to: $OutputFile" -Class Note
+                Show-Line "Экспортировано записей: $($OutputFileContent.Count); файл: $OutputFile" -Class Note
             }
             catch {
-                Show-Line "Failed to write output file: $($_.Exception.Message)" -Class Finding
+                Show-Line "Не удалось записать выходной файл: $($_.Exception.Message)" -Class Finding
             }
         }
     }
@@ -68105,25 +68105,25 @@ function Get-CertificateInfo {
                     Identities         = $identities
                 }
             }
-            Show-SubHeader "Certificate Information"
-            Show-Line "General:" -Class Hint
+            Show-SubHeader "Сведения о сертификате"
+            Show-Line "Общие сведения:" -Class Hint
             Show-KeyValue "Subject:" $cert.Subject
             Show-KeyValue "Issuer:" $cert.Issuer
             Show-KeyValue "Serial Number:" $cert.SerialNumber
             Show-KeyValue "Thumbprint:" $cert.Thumbprint
             Show-EmptyLine
-            Show-Line "Validity:" -Class Hint
+            Show-Line "Срок действия:" -Class Hint
             Show-KeyValue "Not Before:" (Format-adPEASDate $cert.NotBefore 'yyyy-MM-dd HH:mm:ss')
             Show-KeyValue "Not After:" (Format-adPEASDate $cert.NotAfter 'yyyy-MM-dd HH:mm:ss')
             Show-KeyValue "Status:" $validityStatus -Class $validityClass
             Show-EmptyLine
-            Show-Line "Key Information:" -Class Hint
+            Show-Line "Сведения о ключе:" -Class Hint
             Show-KeyValue "Has Private Key:" $cert.HasPrivateKey.ToString()
             Show-KeyValue "Key Algorithm:" $keyAlgo
             Show-KeyValue "Signature Algorithm:" $cert.SignatureAlgorithm.FriendlyName
             Show-EmptyLine
             if ($ekuNames.Count -gt 0) {
-                Show-Line "Extended Key Usage:" -Class Hint
+                Show-Line "Расширенное использование ключа (EKU):" -Class Hint
                 $idx = 1
                 foreach ($ekuName in $ekuNames) {
                     Show-KeyValue "[$idx]:" $ekuName
@@ -68132,7 +68132,7 @@ function Get-CertificateInfo {
                 Show-EmptyLine
             }
             if ($sanEntries.Count -gt 0) {
-                Show-Line "Subject Alternative Name:" -Class Hint
+                Show-Line "Альтернативное имя субъекта (SAN):" -Class Hint
                 $idx = 1
                 foreach ($entry in $sanEntries) {
                     Show-KeyValue "[$idx]:" $entry
@@ -68141,7 +68141,7 @@ function Get-CertificateInfo {
                 Show-EmptyLine
             }
             if ($templateName -or $templateInfo) {
-                Show-Line "Certificate Template:" -Class Hint
+                Show-Line "Шаблон сертификата:" -Class Hint
                 if ($templateName) {
                     Show-KeyValue "Template Name:" $templateName
                 }
@@ -68151,7 +68151,7 @@ function Get-CertificateInfo {
                 Show-EmptyLine
             }
             if ($ekuExt) {
-                Show-Line "PKINIT Assessment:" -Class Hint
+                Show-Line "Оценка PKINIT:" -Class Hint
                 if ($isPKINITCapable) {
                     Show-KeyValue "PKINIT Capable:" "True" -Class Note
                     if ($pkInitEKUs.Count -gt 0) {
@@ -68164,14 +68164,14 @@ function Get-CertificateInfo {
                 }
                 if ($identities.Count -gt 0) {
                     Show-EmptyLine
-                    Show-Line "Identities:" -Class Hint
+                    Show-Line "Идентификаторы:" -Class Hint
                     $idx = 1
                     foreach ($id in $identities) {
                         Show-KeyValue "[$idx] $($id.Type):" $id.Value
                         $idx++
                     }
                     Show-EmptyLine
-                    Show-Line "Usage:" -Class Hint
+                    Show-Line "Назначение:" -Class Hint
                     $certPathHint = $Certificate
                     if ($certPathHint.Length -gt 60) {
                         $certPathHint = "cert.pfx"
@@ -69177,7 +69177,7 @@ function Save-IssuedCertificatePFX {
         return $null
     }
     $OutputPath = $exportResult.Path
-    Show-Line "Certificate saved as PFX:" -Class Hint
+    Show-Line "Сертификат сохранён в формате PFX:" -Class Hint
     Show-KeyValue "PFX Path:" $OutputPath
     if ($pfxPassword) {
         Show-KeyValue "PFX Password:" $pfxPassword
@@ -69201,7 +69201,7 @@ function Save-IssuedCertificatePFX {
     }
     Show-EmptyLine
     $domainHint = if ($Script:LDAPContext -and $Script:LDAPContext['Domain']) { $Script:LDAPContext['Domain'] } else { '<domain>' }
-    Show-Line "Usage with Connect-adPEAS:" -Class Note
+    Show-Line "Использование через Connect-adPEAS:" -Class Note
     if ($pfxPassword) {
         Show-Line "Connect-adPEAS -Domain $domainHint -Certificate '$OutputPath' -CertificatePassword '$pfxPassword'"
     } else {
@@ -69328,7 +69328,7 @@ function Invoke-ADCSRetrieve {
     }
     $rsa = $restored.RSA
     try {
-        Show-Line "Retrieving certificate (Request ID: $RetrieveID) from CA '$CAServer'" -Class Note
+        Show-Line "Получение сертификата (ID запроса: $RetrieveID) из ЦС '$CAServer'" -Class Note
         $httpModes = if ($UseHTTP) { @($true) } else { @($false, $true) }
         $issuedCert = $null
         foreach ($httpMode in $httpModes) {
@@ -69444,10 +69444,10 @@ function Request-ADCSCertificate {
                 }
             }
             if ($hasAgentEku) {
-                Show-Line "Loaded enrollment-agent certificate '$($oboAgentCert.Subject)' (Certificate Request Agent EKU present)" -Class Note
+                Show-Line "Загружен сертификат агента регистрации '$($oboAgentCert.Subject)' (EKU Certificate Request Agent присутствует)" -Class Note
             }
             else {
-                Show-Line "Agent certificate '$($oboAgentCert.Subject)' does NOT advertise the Certificate Request Agent EKU - the CA may reject the request" -Class Hint
+                Show-Line "Сертификат агента '$($oboAgentCert.Subject)' НЕ содержит EKU Certificate Request Agent — ЦС может отклонить запрос" -Class Hint
             }
         }
         $candidateCAs = @()
@@ -69488,7 +69488,7 @@ function Request-ADCSCertificate {
                 Write-Warning "[!] No Certificate Authorities found in Active Directory. Specify -CAServer manually."
                 return $null
             }
-            Show-Line "Found $($allCAs.Count) Certificate Authority(ies) in Active Directory" -Class Note
+            Show-Line "В Active Directory найдено центров сертификации: $($allCAs.Count)" -Class Note
             foreach ($ca in $allCAs) {
                 $templateCount = @($ca.CertificateTemplates).Count
                 Write-Verbose "$FunctionPrefix CA '$($ca.Name)' ($($ca.DNSHostName)) - $templateCount published template(s)"
@@ -69501,7 +69501,7 @@ function Request-ADCSCertificate {
                 Write-Warning "[!] Template '$TemplateName' is not published on any CA"
                 $allTemplates = @($allCAs | ForEach-Object { $_.CertificateTemplates } | Sort-Object -Unique)
                 if ($allTemplates.Count -gt 0) {
-                    Show-Line "Available templates across all CAs:"
+                    Show-Line "Шаблоны, доступные на всех ЦС:"
                     foreach ($tmpl in $allTemplates) {
                         Show-Line "  - $tmpl"
                     }
@@ -69514,13 +69514,13 @@ function Request-ADCSCertificate {
                 return $null
             }
             if ($candidateCAs.Count -gt 1) {
-                Show-Line "$($candidateCAs.Count) CAs publish template '$TemplateName' - will try in order with automatic fallback:" -Class Note
+                Show-Line "На $($candidateCAs.Count) ЦС опубликован шаблон '$TemplateName' — попытки по порядку с автоматическим переходом к следующему:" -Class Note
                 foreach ($ca in $candidateCAs) {
                     Show-Line "  - $($ca.Name) ($($ca.DNSHostName))"
                 }
             }
             else {
-                Show-Line "Auto-discovered CA: $($candidateCAs[0].Name) ($($candidateCAs[0].DNSHostName))" -Class Note
+                Show-Line "Автоматически найден ЦС: $($candidateCAs[0].Name) ($($candidateCAs[0].DNSHostName))" -Class Note
             }
         }
         $CAServer = $null
@@ -69583,7 +69583,7 @@ function Request-ADCSCertificate {
                             $resolvedUseHTTP = ($protocol -eq 'http')
                             Write-Log "$FunctionPrefix Web Enrollment reachable: $testUrl (HTTP $statusCode) -> method=Web"
                             if ($protocol -eq 'http' -and -not $UseHTTP) {
-                                Show-Line "HTTPS not available on '$testHost', falling back to HTTP" -Class Hint
+                                Show-Line "HTTPS недоступен на '$testHost' — переход на HTTP" -Class Hint
                             }
                             $caSelected = $true
                             break
@@ -69606,7 +69606,7 @@ function Request-ADCSCertificate {
                     $resolvedCAName = $candidateCAName
                     $resolvedMethod = 'COM'
                     if ($webEligible) {
-                        Show-Line "Web Enrollment unavailable on '$testHost', using COM/RPC (ICertRequest) instead" -Class Hint
+                        Show-Line "Веб-регистрация сертификатов недоступна на '$testHost' — вместо неё используется COM/RPC (ICertRequest)" -Class Hint
                     }
                     Write-Log "$FunctionPrefix Selected COM/RPC for CA '$candidateCAName' on '$testHost'"
                     $caSelected = $true
@@ -69618,7 +69618,7 @@ function Request-ADCSCertificate {
                 }
             }
             if ($candidateCAs.Count -gt 1 -or -not $candidateCA._Explicit) {
-                Show-Line "CA '$($candidateCA.Name)' ($testHost) not usable ($Method) - trying next CA" -Class Note
+                Show-Line "ЦС '$($candidateCA.Name)' ($testHost) недоступен для выбранного способа ($Method) — переход к следующему ЦС" -Class Note
             }
         }
         if (-not $CAServer) {
@@ -69633,7 +69633,7 @@ function Request-ADCSCertificate {
             }
             return $null
         }
-        Show-Line "Requesting certificate from CA '$CAServer' (method: $resolvedMethod) using template '$TemplateName'" -Class Note
+        Show-Line "Запрос сертификата у ЦС '$CAServer' (метод: $resolvedMethod) по шаблону '$TemplateName'" -Class Note
         $templateBackupPath = $null
         $templateModified = $false
         if ($ModifyTemplate) {
@@ -69646,7 +69646,7 @@ function Request-ADCSCertificate {
             }
             $timestamp = (Format-adPEASDate (Get-Date) 'yyyyMMdd_HHmmss')
             $templateBackupPath = "${TemplateName}_backup_${timestamp}.json"
-            Show-Line "Backing up template '$TemplateName' before modification" -Class Note
+            Show-Line "Создание резервной копии шаблона '$TemplateName' перед изменением" -Class Note
             try {
                 Set-CertificateTemplate -Identity $TemplateName -Export $templateBackupPath @templateParams
             }
@@ -69658,8 +69658,8 @@ function Request-ADCSCertificate {
                 Write-Warning "[!] Template backup file was not created. Aborting to prevent data loss."
                 return $null
             }
-            Show-Line "Template backup saved to: $templateBackupPath" -Class Hint
-            Show-Line "Modifying template '$TemplateName' for certificate request" -Class Note
+            Show-Line "Резервная копия шаблона сохранена: $templateBackupPath" -Class Hint
+            Show-Line "Изменение шаблона '$TemplateName' для запроса сертификата" -Class Note
             try {
                 Set-CertificateTemplate -Identity $TemplateName `
                     -AllowEnrolleeSuppliesSubject `
@@ -69668,17 +69668,17 @@ function Request-ADCSCertificate {
                     -RemoveManagerApproval `
                     @templateParams -Confirm:$false
                 $templateModified = $true
-                Show-Line "Template modified successfully (ENROLLEE_SUPPLIES_SUBJECT, Client Auth EKU, Exportable Key, No Manager Approval)" -Class Hint
+                Show-Line "Шаблон успешно изменён (ENROLLEE_SUPPLIES_SUBJECT, EKU Client Auth, экспортируемый ключ, одобрение администратора ЦС не требуется)" -Class Hint
             }
             catch {
                 if ("$_" -match "Insufficient permissions to modify template") {
                     return $null
                 }
                 Write-Warning "[!] Failed to modify template: $_"
-                Show-Line "Attempting to restore original template from backup" -Class Note
+                Show-Line "Попытка восстановить исходный шаблон из резервной копии" -Class Note
                 try {
                     Set-CertificateTemplate -Identity $TemplateName -Import $templateBackupPath @templateParams -Confirm:$false
-                    Show-Line "Original template restored successfully" -Class Hint
+                    Show-Line "Исходный шаблон успешно восстановлен" -Class Hint
                 }
                 catch {
                     Write-Warning "[!] CRITICAL: Failed to restore template! Manual restore required from: $templateBackupPath"
@@ -69794,10 +69794,10 @@ function Request-ADCSCertificate {
             if ($resolvedSANs.Count -eq 0 -and -not $OnBehalfOf) {
                 $cnValue = if ($resolvedSubjectDN -match 'CN=([^,]+)') { $Matches[1].Trim() } else { '' }
                 if ($cnValue -match '@') {
-                    Show-Line "Subject '$cnValue' looks like a UPN but no SAN was set - the certificate will NOT map to that user. Use -UPN or -Impersonate for impersonation." -Class Finding
+                    Show-Line "Subject '$cnValue' выглядит как UPN, но SAN не задан — сертификат НЕ будет сопоставлен с этим пользователем. Для указания личности используйте -UPN или -Impersonate." -Class Finding
                 }
                 elseif ($cnValue -match '^[^@\s]+\.[^@\s]+$') {
-                    Show-Line "Subject '$cnValue' looks like a DNS/FQDN but no SAN was set - the certificate will NOT map to that host. Use -DNS or -Impersonate." -Class Finding
+                    Show-Line "Subject '$cnValue' выглядит как DNS/FQDN, но SAN не задан — сертификат НЕ будет сопоставлен с этим узлом. Используйте -DNS или -Impersonate." -Class Finding
                 }
             }
             $resolvedSID = $null
@@ -69834,10 +69834,10 @@ function Request-ADCSCertificate {
                         Write-Log "$FunctionPrefix SID auto-resolution threw: $_"
                     }
                     if ($resolvedSID) {
-                        Show-Line "Auto-resolved SID for '$sidTargetIdentity': $resolvedSID (embedding NTDS CA Security Extension for strong mapping)" -Class Hint
+                        Show-Line "Автоматически определён SID для '$sidTargetIdentity': $resolvedSID (встраивается расширение безопасности NTDS CA для строгого сопоставления)" -Class Hint
                     }
                     else {
-                        Show-Line "Could not resolve a SID for '$sidTargetIdentity'. On patched DCs the certificate may not map - supply -SID explicitly, or use -NoSID to silence this." -Class Hint
+                        Show-Line "Не удалось определить SID для '$sidTargetIdentity'. На обновлённых DC сертификат может не сопоставиться с записью — задайте -SID явно либо используйте -NoSID для подавления предупреждения." -Class Hint
                     }
                 }
                 elseif (-not $Script:LdapConnection) {
@@ -69865,13 +69865,13 @@ function Request-ADCSCertificate {
                 Write-Warning "[!] Failed to generate CSR: $_"
                 return $null
             }
-            Show-Line "Generated $KeyLength-bit RSA key pair and PKCS#10 CSR" -Class Note
+            Show-Line "Создана пара ключей RSA длиной $KeyLength бит и запрос PKCS#10 CSR" -Class Note
             $rsa = $csrResult.RSAKey
             try {
                 $submissionBase64 = $csrResult.CSRBase64
                 $submissionIsPKCS7 = $false
                 if ($OnBehalfOf) {
-                    Show-Line "Wrapping request as enroll-on-behalf-of '$OnBehalfOf' (signed by agent certificate)" -Class Note
+                    Show-Line "Упаковка запроса на сертификат от имени '$OnBehalfOf' (подпись сертификатом агента)" -Class Note
                     $p7Base64 = New-EnrollOnBehalfOfRequest -InnerCsrDer $csrResult.CSRBytes `
                         -OnBehalfOf $OnBehalfOf -AgentCert $oboAgentCert
                     if (-not $p7Base64) {
@@ -69899,7 +69899,7 @@ function Request-ADCSCertificate {
                             ErrorMessage = $null
                             RawResponse  = $null
                         }
-                        Show-Line "Certificate issued via COM/RPC (Request ID: $($comResult.RequestID))" -Class Hint
+                        Show-Line "Сертификат выдан через COM/RPC (ID запроса: $($comResult.RequestID))" -Class Hint
                     }
                     else {
                         Write-Warning "[!] COM/RPC request failed: $($comResult.ErrorMessage)"
@@ -69917,7 +69917,7 @@ function Request-ADCSCertificate {
                     $isTransportFailure = ($submitResult.Status -eq 'Error' -and
                         $submitResult.ErrorMessage -match 'connect|connection|timeout|refused|unreachable')
                     if ($isTransportFailure -and $comEligible -and $resolvedCAName) {
-                        Show-Line "Web Enrollment transport error ($($submitResult.ErrorMessage)), attempting COM/RPC fallback..." -Class Hint
+                        Show-Line "Ошибка транспорта веб-регистрации ($($submitResult.ErrorMessage)) — попытка перейти на COM/RPC..." -Class Hint
                         Write-Log "$FunctionPrefix Web Enrollment transport failure, trying COM/RPC with CA '$resolvedCAName'"
                         $comResult = Submit-COMRequest -CAServer $CAServer `
                             -CAName $resolvedCAName `
@@ -69934,7 +69934,7 @@ function Request-ADCSCertificate {
                                 ErrorMessage = $null
                                 RawResponse  = $null
                             }
-                            Show-Line "Certificate issued via COM/RPC fallback (Request ID: $($comResult.RequestID))" -Class Hint
+                            Show-Line "Сертификат выдан через резервный COM/RPC (ID запроса: $($comResult.RequestID))" -Class Hint
                         }
                         else {
                             Write-Warning "[!] Both Web Enrollment and COM/RPC failed"
@@ -69952,8 +69952,8 @@ function Request-ADCSCertificate {
                     }
                 }
                 if ($submitResult.Status -eq 'Pending') {
-                    Show-Line "Certificate request is pending approval (Request ID: $($submitResult.RequestID))" -Class Hint
-                    Show-Line "The CA administrator must approve this request before the certificate can be retrieved."
+                    Show-Line "Запрос сертификата ожидает одобрения (ID запроса: $($submitResult.RequestID))" -Class Hint
+                    Show-Line "Для получения сертификата администратор ЦС должен сначала одобрить запрос."
                     $savedKeyPath = $null
                     try {
                         $cnForKey = if ($resolvedSubjectDN -match 'CN=([^,]+)') { $Matches[1].Trim() } else { 'certificate' }
@@ -69965,8 +69965,8 @@ function Request-ADCSCertificate {
                         Write-Warning "[!] Could not save the private key for later retrieval: $_"
                     }
                     if ($savedKeyPath) {
-                        Show-Line "Private key saved for retrieval: $savedKeyPath" -Class Hint
-                        Show-Line "After approval, retrieve with:" -Class Note
+                        Show-Line "Закрытый ключ сохранён для последующего получения сертификата: $savedKeyPath" -Class Hint
+                        Show-Line "После одобрения получите сертификат командой:" -Class Note
                         Show-Line "Request-ADCSCertificate -RetrieveID $($submitResult.RequestID) -CAServer '$CAServer' -KeyFile '$savedKeyPath'"
                     }
                     if ($PassThru) {
@@ -69990,7 +69990,7 @@ function Request-ADCSCertificate {
                     Write-Log "$FunctionPrefix Certificate retrieved from COM result"
                 }
                 else {
-                    Show-Line "Certificate issued (Request ID: $($submitResult.RequestID))" -Class Hint
+                    Show-Line "Сертификат выдан (ID запроса: $($submitResult.RequestID))" -Class Hint
                     $issuedCert = Get-CertsrvCertificate -CAServer $CAServer `
                         -RequestID $submitResult.RequestID `
                         -Credential $Credential `
@@ -70019,14 +70019,14 @@ function Request-ADCSCertificate {
         finally {
             if ($templateModified -and $templateBackupPath) {
                 Show-EmptyLine
-                Show-Line "Restoring original template '$TemplateName' from backup" -Class Note
+                Show-Line "Восстановление исходного шаблона '$TemplateName' из резервной копии" -Class Note
                 try {
                     $restoreParams = @{}
                     if ($Domain) { $restoreParams['Domain'] = $Domain }
                     if ($Server) { $restoreParams['Server'] = $Server }
                     Set-CertificateTemplate -Identity $TemplateName -Import $templateBackupPath @restoreParams -Confirm:$false
-                    Show-Line "Original template restored successfully" -Class Hint
-                    Show-Line "Backup file kept for audit: $templateBackupPath" -Class Note
+                    Show-Line "Исходный шаблон успешно восстановлен" -Class Hint
+                    Show-Line "Резервный файл сохранён для аудита: $templateBackupPath" -Class Note
                 }
                 catch {
                     Write-Warning "[!] CRITICAL: Failed to restore template '$TemplateName'!"
@@ -97592,18 +97592,18 @@ function Convert-adPEASReport {
             $sourceVersion = if ($cache.adPEASVersion) { $cache.adPEASVersion } else { 'Unknown' }
             $sourceDate = if ($cache.ExportDate) { $cache.ExportDate } else { 'Unknown' }
             $findingCount = if ($cache.FindingCount) { $cache.FindingCount } else { 0 }
-            Show-Line "Source: $InputJson" -Class Note -NoCollect
-            Show-Line "Domain: $sourceDomain, Server: $sourceServer" -Class Note -NoCollect
-            Show-Line "Original scan: $sourceDate (adPEAS $sourceVersion)" -Class Note -NoCollect
-            Show-Line "Findings: $findingCount" -Class Note -NoCollect
+            Show-Line "Источник: $InputJson" -Class Note -NoCollect
+            Show-Line "Домен: $sourceDomain, сервер: $sourceServer" -Class Note -NoCollect
+            Show-Line "Исходный аудит: $sourceDate (adPEAS $sourceVersion)" -Class Note -NoCollect
+            Show-Line "Находок: $findingCount" -Class Note -NoCollect
             $currentVersion = if ($Script:adPEASVersion) { $Script:adPEASVersion } else { '2.0.0' }
             if ($sourceVersion -ne $currentVersion -and $sourceVersion -ne 'Unknown') {
-                Show-Line "Regenerating with adPEAS $currentVersion (updated definitions/scoring)" -Class Hint -NoCollect
+                Show-Line "Повторное формирование отчёта средствами adPEAS $currentVersion (обновлённые определения и оценка риска)" -Class Hint -NoCollect
             }
             if ($null -ne $cache.Complete -and -not $cache.Complete) {
                 $covered = if ($cache.CompletedModules) { @($cache.CompletedModules) -join ', ' } else { 'unknown' }
                 Write-Warning "[Convert-adPEASReport] This export is from an interrupted scan - it covers only: $covered"
-                Show-Line "Source scan was interrupted - covers only these modules: $covered" -Class Finding -NoCollect
+                Show-Line "Исходный аудит был прерван — проверены только следующие модули: $covered" -Class Finding -NoCollect
             }
             $findings = Import-FindingsFromCache -Cache $cache
             if (@($findings).Count -eq 0) {
@@ -97654,7 +97654,7 @@ function Convert-adPEASReport {
                 try {
                     Export-HTMLReport -OutputPath $htmlPath
                     $htmlWritten = $true
-                    Show-Line "HTML report saved to: $htmlPath" -Class Hint -NoCollect
+                    Show-Line "HTML-отчёт сохранён: $htmlPath" -Class Hint -NoCollect
                 } catch {
                     Write-Warning "[Convert-adPEASReport] Error generating HTML report: $_"
                 }
@@ -97666,7 +97666,7 @@ function Convert-adPEASReport {
                 $jsonPath = "$resolvedBase.json"
                 try {
                     Export-FindingsCache -Path $jsonPath
-                    Show-Line "JSON export saved to: $jsonPath" -Class Hint -NoCollect
+                    Show-Line "Экспорт JSON сохранён: $jsonPath" -Class Hint -NoCollect
                 } catch {
                     Write-Warning "[Convert-adPEASReport] Error saving JSON: $_"
                 }
@@ -97680,10 +97680,10 @@ function Convert-adPEASReport {
                 [System.IO.File]::WriteAllText($textPath, "", $utf8Encoding)
                 Invoke-FindingsReplay -Findings $findings
                 $Script:adPEAS_Outputfile = $null
-                Show-Line "Text report saved to: $textPath" -Class Hint -NoCollect
+                Show-Line "Текстовый отчёт сохранён: $textPath" -Class Hint -NoCollect
             }
             if ($Format -eq 'All' -and $htmlWritten) {
-                Show-Line "HTML report saved to: $htmlPath" -Class Hint -NoCollect
+                Show-Line "HTML-отчёт сохранён: $htmlPath" -Class Hint -NoCollect
             }
         } finally {
             $Script:LDAPContext = $previousLDAPContext
@@ -97843,8 +97843,8 @@ function Compare-adPEASReport {
                 $added = [System.Collections.ArrayList]@($added | Where-Object { $_.Category -notin $onlyInCurrent })
             }
             Show-Output -Class Info -Value "adPEAS Report Comparison" -NoCollect
-            Show-Line "Baseline: $(Split-Path -Leaf $Baseline) ($($baselineMeta.Date), $($baselineMeta.Domain), adPEAS $($baselineMeta.Version))" -Class Note -NoCollect
-            Show-Line "Current:  $(Split-Path -Leaf $Current) ($($currentMeta.Date), $($currentMeta.Domain), adPEAS $($currentMeta.Version))" -Class Note -NoCollect
+            Show-Line "Исходный отчёт: $(Split-Path -Leaf $Baseline) ($($baselineMeta.Date), $($baselineMeta.Domain), adPEAS $($baselineMeta.Version))" -Class Note -NoCollect
+            Show-Line "Текущий отчёт: $(Split-Path -Leaf $Current) ($($currentMeta.Date), $($currentMeta.Domain), adPEAS $($currentMeta.Version))" -Class Note -NoCollect
             Show-Output -Class Info -Value "Comparison Summary" -NoCollect
             Show-Output -Key "New findings (added)" -Value "$($added.Count)" -Class $(if ($added.Count -gt 0) { 'Finding' } else { 'Note' }) -NoCollect
             Show-Output -Key "Remediated findings (removed)" -Value "$($removed.Count)" -Class $(if ($removed.Count -gt 0) { 'Secure' } else { 'Note' }) -NoCollect
@@ -97869,7 +97869,7 @@ function Compare-adPEASReport {
                     Show-SubHeader $group.Name -NoCollect
                     foreach ($f in $group.Group) {
                         $displayName = Get-FindingDisplayName -Finding $f
-                        Show-Line "$displayName (was: $($f.Severity))" -Class Secure -NoCollect
+                        Show-Line "$displayName (было: $($f.Severity))" -Class Secure -NoCollect
                     }
                 }
             }
@@ -97897,12 +97897,12 @@ function Compare-adPEASReport {
             }
             if ($onlyInBaseline.Count -gt 0 -or $onlyInCurrent.Count -gt 0) {
                 Show-Output -Class Info -Value "Scan Scope Differences" -NoCollect
-                Show-Line "The following categories were not scanned in both reports and are excluded from the comparison above." -Class Note -NoCollect
+                Show-Line "Следующие категории проверялись не в обоих отчётах и исключены из приведённого выше сравнения." -Class Note -NoCollect
                 if ($onlyInCurrent.Count -gt 0) {
-                    Show-Line "Only in current scan: $($onlyInCurrent -join ', ') ($($scopeOnlyCurrent.Count) finding(s) not compared)" -Class Hint -NoCollect
+                    Show-Line "Только в текущем аудите: $($onlyInCurrent -join ', ') (результатов вне сравнения: $($scopeOnlyCurrent.Count))" -Class Hint -NoCollect
                 }
                 if ($onlyInBaseline.Count -gt 0) {
-                    Show-Line "Only in baseline scan: $($onlyInBaseline -join ', ') ($($scopeOnlyBaseline.Count) finding(s) not compared)" -Class Hint -NoCollect
+                    Show-Line "Только в исходном аудите: $($onlyInBaseline -join ', ') (результатов вне сравнения: $($scopeOnlyBaseline.Count))" -Class Hint -NoCollect
                 }
             }
             if ($OutputPath) {
@@ -97916,13 +97916,13 @@ function Compare-adPEASReport {
                         -SharedCategories $sharedCategories `
                         -OnlyInBaseline $onlyInBaseline -OnlyInCurrent $onlyInCurrent `
                         -ScopeOnlyBaseline $scopeOnlyBaseline -ScopeOnlyCurrent $scopeOnlyCurrent
-                    Show-Line "HTML diff report saved to: $htmlPath" -Class Hint -NoCollect
+                    Show-Line "HTML-отчёт об изменениях сохранён: $htmlPath" -Class Hint -NoCollect
                 } catch {
                     Write-Warning "[Compare-adPEASReport] Error generating HTML diff report: $_"
                 }
             }
             if ($OutputPath) {
-                Show-Line "Text diff report saved to: $textPath" -Class Hint -NoCollect
+                Show-Line "Текстовый отчёт об изменениях сохранён: $textPath" -Class Hint -NoCollect
             }
         } finally {
             $Script:adPEAS_Outputfile = $previousOutputfile
@@ -98672,7 +98672,7 @@ function Invoke-adPEASCollector {
             $domainName = $Script:LDAPContext.Domain.ToUpper()
             $domainDN = $Script:LDAPContext.DomainDN
             $domainSID = $null
-            Show-SubHeader "Collecting BloodHound CE data..." -ObjectType "BloodHoundCollector"
+            Show-SubHeader "Сбор данных BloodHound CE..." -ObjectType "BloodHoundCollector"
             $domainObj = @(Get-DomainObject -LDAPFilter "(distinguishedName=$domainDN)" @connectionParams)[0]
             if ($domainObj.objectSid) {
                 $domainSID = Convert-SidToString -SidInput $domainObj.objectSid
@@ -98942,12 +98942,12 @@ function Invoke-adPEASCollector {
                            @($collectedData.RootCAs).Count + @($collectedData.AIACAs).Count +
                            @($collectedData.NTAuthStores).Count + @($collectedData.IssuancePolicies).Count
             $summaryString = $Script:CollectedParts -join ", "
-            Show-Line "Collected $totalObjects objects from $domainName`: $summaryString" -Class Hint -FindingId 'BLOODHOUND_COLLECTION_COMPLETE'
+            Show-Line "Собрано объектов: $totalObjects; домен: $domainName`: $summaryString" -Class Hint -FindingId 'BLOODHOUND_COLLECTION_COMPLETE'
             if ($NoZip) {
-                Show-Line "Output: $outputDir (JSON files)" -Class Note
+                Show-Line "Результат: $outputDir (файлы JSON)" -Class Note
             }
             else {
-                Show-Line "Output: $OutputPath" -Class Note
+                Show-Line "Результат: $OutputPath" -Class Note
             }
         }
         catch {
@@ -100846,7 +100846,7 @@ function Collect-BHIssuancePolicies {
     return $bhPolicies
 }
 #Requires -Version 5.1
-$Script:adPEASVersion = "2.9.0+20261111-1726"
+$Script:adPEASVersion = "2.9.0+20261111-1820"
 if ($MyInvocation.MyCommand.Path) {
     $Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {

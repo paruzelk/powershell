@@ -195,8 +195,8 @@
             # 6. Output report
             Show-Output -Class Info -Value "adPEAS Report Comparison" -NoCollect
 
-            Show-Line "Baseline: $(Split-Path -Leaf $Baseline) ($($baselineMeta.Date), $($baselineMeta.Domain), adPEAS $($baselineMeta.Version))" -Class Note -NoCollect
-            Show-Line "Current:  $(Split-Path -Leaf $Current) ($($currentMeta.Date), $($currentMeta.Domain), adPEAS $($currentMeta.Version))" -Class Note -NoCollect
+            Show-Line "Исходный отчёт: $(Split-Path -Leaf $Baseline) ($($baselineMeta.Date), $($baselineMeta.Domain), adPEAS $($baselineMeta.Version))" -Class Note -NoCollect
+            Show-Line "Текущий отчёт: $(Split-Path -Leaf $Current) ($($currentMeta.Date), $($currentMeta.Domain), adPEAS $($currentMeta.Version))" -Class Note -NoCollect
 
             # Summary
             Show-Output -Class Info -Value "Comparison Summary" -NoCollect
@@ -230,7 +230,7 @@
                     Show-SubHeader $group.Name -NoCollect
                     foreach ($f in $group.Group) {
                         $displayName = Get-FindingDisplayName -Finding $f
-                        Show-Line "$displayName (was: $($f.Severity))" -Class Secure -NoCollect
+                        Show-Line "$displayName (было: $($f.Severity))" -Class Secure -NoCollect
                     }
                 }
             }
@@ -264,13 +264,13 @@
             # Scope differences (different scan modules between baseline and current)
             if ($onlyInBaseline.Count -gt 0 -or $onlyInCurrent.Count -gt 0) {
                 Show-Output -Class Info -Value "Scan Scope Differences" -NoCollect
-                Show-Line "The following categories were not scanned in both reports and are excluded from the comparison above." -Class Note -NoCollect
+                Show-Line "Следующие категории проверялись не в обоих отчётах и исключены из приведённого выше сравнения." -Class Note -NoCollect
 
                 if ($onlyInCurrent.Count -gt 0) {
-                    Show-Line "Only in current scan: $($onlyInCurrent -join ', ') ($($scopeOnlyCurrent.Count) finding(s) not compared)" -Class Hint -NoCollect
+                    Show-Line "Только в текущем аудите: $($onlyInCurrent -join ', ') (результатов вне сравнения: $($scopeOnlyCurrent.Count))" -Class Hint -NoCollect
                 }
                 if ($onlyInBaseline.Count -gt 0) {
-                    Show-Line "Only in baseline scan: $($onlyInBaseline -join ', ') ($($scopeOnlyBaseline.Count) finding(s) not compared)" -Class Hint -NoCollect
+                    Show-Line "Только в исходном аудите: $($onlyInBaseline -join ', ') (результатов вне сравнения: $($scopeOnlyBaseline.Count))" -Class Hint -NoCollect
                 }
             }
 
@@ -286,7 +286,7 @@
                         -SharedCategories $sharedCategories `
                         -OnlyInBaseline $onlyInBaseline -OnlyInCurrent $onlyInCurrent `
                         -ScopeOnlyBaseline $scopeOnlyBaseline -ScopeOnlyCurrent $scopeOnlyCurrent
-                    Show-Line "HTML diff report saved to: $htmlPath" -Class Hint -NoCollect
+                    Show-Line "HTML-отчёт об изменениях сохранён: $htmlPath" -Class Hint -NoCollect
                 } catch {
                     Write-Warning "[Compare-adPEASReport] Error generating HTML diff report: $_"
                 }
@@ -294,7 +294,7 @@
 
             # File output notification
             if ($OutputPath) {
-                Show-Line "Text diff report saved to: $textPath" -Class Hint -NoCollect
+                Show-Line "Текстовый отчёт об изменениях сохранён: $textPath" -Class Hint -NoCollect
             }
 
         } finally {

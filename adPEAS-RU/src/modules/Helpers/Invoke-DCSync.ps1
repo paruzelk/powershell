@@ -1820,8 +1820,8 @@ function Invoke-DCSync {
         $outputFormats = @($JustNTHash, $JustAES, $JustLM, $JustCleartext)
         $selectedFormats = ($outputFormats | Where-Object { $_ }).Count
         if ($selectedFormats -gt 1) {
-            Show-Line "DCSync failed: Only one output format can be specified at a time" -Class Finding
-            Show-Line "Choose one: -JustNTHash, -JustAES, -JustLM, or -JustCleartext" -Class Note
+            Show-Line "Ошибка DCSync: одновременно можно выбрать только один формат вывода" -Class Finding
+            Show-Line "Выберите один параметр: -JustNTHash, -JustAES, -JustLM или -JustCleartext" -Class Note
             return [PSCustomObject]@{
                 PSTypeName = 'adPEAS.DCSync.Result'
                 Success    = $false
@@ -1833,8 +1833,8 @@ function Invoke-DCSync {
         $accountTypes = @($AllAccounts, $UsersOnly, $ComputersOnly)
         $selectedTypes = ($accountTypes | Where-Object { $_ }).Count
         if ($selectedTypes -gt 1) {
-            Show-Line "DCSync failed: Only one account type can be specified at a time" -Class Finding
-            Show-Line "Choose one: -AllAccounts, -UsersOnly, or -ComputersOnly" -Class Note
+            Show-Line "Ошибка DCSync: одновременно можно выбрать только один тип учётных записей" -Class Finding
+            Show-Line "Выберите один параметр: -AllAccounts, -UsersOnly или -ComputersOnly" -Class Note
             return [PSCustomObject]@{
                 PSTypeName = 'adPEAS.DCSync.Result'
                 Success    = $false
@@ -1850,7 +1850,7 @@ function Invoke-DCSync {
             }
             catch {
                 if ($_.Exception.Message -notmatch 'already exists') {
-                    Show-Line "DCSync failed: Could not compile C# interop code" -Class Finding
+                    Show-Line "Ошибка DCSync: не удалось скомпилировать код взаимодействия с C#" -Class Finding
                     return [PSCustomObject]@{
                         PSTypeName = 'adPEAS.DCSync.Result'
                         Success    = $false
@@ -1867,8 +1867,8 @@ function Invoke-DCSync {
                 Write-Log "[Invoke-DCSync] Using session domain: $Domain"
             }
             else {
-                Show-Line "DCSync failed: No domain specified and no active adPEAS session found." -Class Finding
-                Show-Line "Please specify -Domain parameter or run Connect-adPEAS first." -Class Note
+                Show-Line "Ошибка DCSync: домен не указан и активный сеанс adPEAS не найден." -Class Finding
+                Show-Line "Укажите параметр -Domain или сначала выполните Connect-adPEAS." -Class Note
                 return [PSCustomObject]@{
                     PSTypeName = 'adPEAS.DCSync.Result'
                     Success    = $false
@@ -1894,8 +1894,8 @@ function Invoke-DCSync {
                     Write-Log "[Invoke-DCSync] Auto-discovered DC: $Server (IP: $($dcResult.IP))"
                 }
                 else {
-                    Show-Line "DCSync failed: Could not locate reachable Domain Controller for domain '$Domain'" -Class Finding
-                    Show-Line "Verify domain name and network connectivity (Port 88 + 389/636)" -Class Note
+                    Show-Line "Ошибка DCSync: не удалось найти доступный контроллер домена для '$Domain'" -Class Finding
+                    Show-Line "Проверьте имя домена и сетевую доступность (порты 88 и 389/636)" -Class Note
                     return [PSCustomObject]@{
                         PSTypeName = 'adPEAS.DCSync.Result'
                         Success    = $false
@@ -1945,17 +1945,17 @@ function Invoke-DCSync {
                 }
                 else {
                     # Session has incompatible auth (SimpleBind/Schannel) - warn and try current user context
-                    Show-Line "Warning: Current session uses $SessionAuthMethod (incompatible with RPC)" -Class Hint
-                    Show-Line "DCSync will attempt to use current Windows user context instead" -Class Note
-                    Show-Line "If this fails, provide explicit credentials via -Credential parameter" -Class Note
+                    Show-Line "Предупреждение: текущий сеанс использует $SessionAuthMethod (несовместимо с RPC)" -Class Hint
+                    Show-Line "Вместо этого DCSync попробует использовать контекст текущего пользователя Windows" -Class Note
+                    Show-Line "Если попытка завершится ошибкой, передайте явные учётные данные через -Credential" -Class Note
                     Write-Log "[Invoke-DCSync] Session auth '$SessionAuthMethod' incompatible with RPC, falling back to current user context"
                 }
             }
             else {
                 # No session - use current Windows user context
-                Show-Line "No adPEAS session found - using current Windows user context for DCSync" -Class Note
-                Show-Line "Authentication: Current logged-on user ($env:USERDOMAIN\$env:USERNAME)" -Class Note
-                Show-Line "If access is denied, provide credentials via -Credential parameter" -Class Hint
+                Show-Line "Сеанс adPEAS не найден — для DCSync используется контекст текущего пользователя Windows" -Class Note
+                Show-Line "Аутентификация: текущий пользователь Windows ($env:USERDOMAIN\$env:USERNAME)" -Class Note
+                Show-Line "При отказе в доступе передайте учётные данные через -Credential" -Class Hint
                 Write-Log "[Invoke-DCSync] No session found, using current Windows user context"
             }
         }
@@ -1978,7 +1978,7 @@ function Invoke-DCSync {
                 Write-Log "[Invoke-DCSync] Resolved SID $Identity to: $targetUser"
             }
             else {
-                Show-Line "DCSync failed: Could not resolve SID '$Identity' to an account name" -Class Finding
+                Show-Line "Ошибка DCSync: не удалось сопоставить SID '$Identity' с именем учётной записи" -Class Finding
                 return [PSCustomObject]@{
                     PSTypeName       = 'adPEAS.DCSync.Result'
                     Success          = $false
@@ -2015,7 +2015,7 @@ function Invoke-DCSync {
             }
 
             if (-not (Ensure-LDAPConnection @connectionParams)) {
-                Show-Line "DCSync failed: Could not establish LDAP connection for account enumeration" -Class Finding
+                Show-Line "Ошибка DCSync: не удалось установить LDAP-соединение для перечисления учётных записей" -Class Finding
                 return [PSCustomObject]@{
                     PSTypeName = 'adPEAS.DCSync.Result'
                     Success    = $false
@@ -2064,12 +2064,12 @@ function Invoke-DCSync {
                     Write-Log "[Invoke-DCSync] Found $($accountsToSync.Count) accounts to replicate"
                 }
                 else {
-                    Show-Line "No accounts found matching the specified criteria" -Class Hint
+                    Show-Line "Учётные записи, соответствующие заданным условиям, не найдены" -Class Hint
                     return
                 }
             }
             catch {
-                Show-Line "DCSync failed: Could not query accounts - $($_.Exception.Message)" -Class Finding
+                Show-Line "Ошибка DCSync: не удалось запросить учётные записи — $($_.Exception.Message)" -Class Finding
                 return [PSCustomObject]@{
                     PSTypeName       = 'adPEAS.DCSync.Result'
                     Success          = $false
@@ -2126,7 +2126,7 @@ function Invoke-DCSync {
             if (-not $rpcResult.Success) {
                 Write-Log "[Invoke-DCSync] Replication failed for $identityLabel : $($rpcResult.Error)"
                 # Log error but continue with next account in multi-account mode
-                Show-Line "DCSync failed for $identityLabel : $($rpcResult.Error)" -Class Finding
+                Show-Line "Ошибка DCSync для $identityLabel : $($rpcResult.Error)" -Class Finding
 
                 if ($accountsToSync.Count -eq 1) {
                     # Single account mode - return error object
@@ -2460,10 +2460,10 @@ function Invoke-DCSync {
         if ($OutputFile -and $OutputFileContent.Count -gt 0) {
             try {
                 $OutputFileContent | Out-File -FilePath $OutputFile -Force -Encoding ASCII
-                Show-Line "Exported $($OutputFileContent.Count) entries to: $OutputFile" -Class Note
+                Show-Line "Экспортировано записей: $($OutputFileContent.Count); файл: $OutputFile" -Class Note
             }
             catch {
-                Show-Line "Failed to write output file: $($_.Exception.Message)" -Class Finding
+                Show-Line "Не удалось записать выходной файл: $($_.Exception.Message)" -Class Finding
             }
         }
     }  # End process block

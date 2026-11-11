@@ -64,7 +64,7 @@
         if (-not $Script:LDAPContext -or -not $hasLdapConnection) {
             if ($TestConnection) {
                 if (-not $Quiet) {
-                    Show-SubHeader "Checking connection health..."
+                    Show-SubHeader "Проверка состояния подключения..."
                     Show-KeyValue "Session Variables:" "FAIL: No active session found" -Class Finding
                     return
                 }
@@ -80,8 +80,8 @@
             try {
                 # Only show output if not in Quiet mode
                 if (-not $Quiet) {
-                    Show-Line "Health:" -Class Hint
-                    Show-SubHeader "Checking connection health..."
+                    Show-Line "Состояние:" -Class Hint
+                    Show-SubHeader "Проверка состояния подключения..."
                 }
 
                 $testResults = @{
@@ -170,10 +170,10 @@
         # Show Session Information (default)
         else {
             # Use SubHeader for session info (big ===== headers reserved for Invoke-adPEAS modules)
-            Show-SubHeader "Displaying active session information..."
+            Show-SubHeader "Сведения об активном сеансе..."
 
             # Connection Details
-            Show-Line "Connection:" -Class Hint
+            Show-Line "Подключение:" -Class Hint
             Show-KeyValue "Domain:" $Script:LDAPContext.Domain
 
             # Display Domain SID
@@ -190,7 +190,7 @@
 
             # Authentication Details
             Show-EmptyLine
-            Show-Line "Authentication:" -Class Hint
+            Show-Line "Аутентификация:" -Class Hint
 
             if ($Script:LDAPContext.KerberosUsed -and $Script:LDAPContext.TGTInfo -and $Script:LDAPContext.TGTInfo.UserName) {
                 # For Kerberos auth (Hash/Key/PKINIT), show TGT user
@@ -217,7 +217,7 @@
 
                 if ($Script:LDAPContext.IdentityMismatch) {
                     Show-KeyValue "Local Identity:" $Script:LDAPContext.LocalIdentity
-                    Show-Line "  Identity Mismatch: DETECTED" -Class Hint
+                    Show-Line "  Несовпадение личности: ОБНАРУЖЕНО" -Class Hint
                 }
 
                 # Show DN and UPN if available
@@ -353,7 +353,7 @@
 
             # Session Metadata
             Show-EmptyLine
-            Show-Line "Session:" -Class Hint
+            Show-Line "Сеанс:" -Class Hint
             if ($Script:LDAPContext.SessionStartTime) {
                 $sessionDuration = (Get-Date) - $Script:LDAPContext.SessionStartTime
                 # Through Format-adPEASDate like every other date: handed over as a DateTime,
@@ -399,7 +399,7 @@
 
             # Hints
             Show-EmptyLine
-            Show-Line "Help:" -Class Hint
+            Show-Line "Справка:" -Class Hint
             Show-KeyValue "Get-adPEASSession -TestConnection" "Test connection health"
             Show-KeyValue "Disconnect-adPEAS" "End the session"
             Show-EmptyLine

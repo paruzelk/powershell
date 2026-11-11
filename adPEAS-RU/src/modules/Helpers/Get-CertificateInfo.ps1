@@ -335,10 +335,10 @@
             }
 
             # === Console Output ===
-            Show-SubHeader "Certificate Information"
+            Show-SubHeader "Сведения о сертификате"
 
             # --- General ---
-            Show-Line "General:" -Class Hint
+            Show-Line "Общие сведения:" -Class Hint
             Show-KeyValue "Subject:" $cert.Subject
             Show-KeyValue "Issuer:" $cert.Issuer
             Show-KeyValue "Serial Number:" $cert.SerialNumber
@@ -346,14 +346,14 @@
             Show-EmptyLine
 
             # --- Validity ---
-            Show-Line "Validity:" -Class Hint
+            Show-Line "Срок действия:" -Class Hint
             Show-KeyValue "Not Before:" (Format-adPEASDate $cert.NotBefore 'yyyy-MM-dd HH:mm:ss')
             Show-KeyValue "Not After:" (Format-adPEASDate $cert.NotAfter 'yyyy-MM-dd HH:mm:ss')
             Show-KeyValue "Status:" $validityStatus -Class $validityClass
             Show-EmptyLine
 
             # --- Key Information ---
-            Show-Line "Key Information:" -Class Hint
+            Show-Line "Сведения о ключе:" -Class Hint
             Show-KeyValue "Has Private Key:" $cert.HasPrivateKey.ToString()
             Show-KeyValue "Key Algorithm:" $keyAlgo
             Show-KeyValue "Signature Algorithm:" $cert.SignatureAlgorithm.FriendlyName
@@ -361,7 +361,7 @@
 
             # --- Extended Key Usage ---
             if ($ekuNames.Count -gt 0) {
-                Show-Line "Extended Key Usage:" -Class Hint
+                Show-Line "Расширенное использование ключа (EKU):" -Class Hint
                 $idx = 1
                 foreach ($ekuName in $ekuNames) {
                     Show-KeyValue "[$idx]:" $ekuName
@@ -372,7 +372,7 @@
 
             # --- Subject Alternative Name ---
             if ($sanEntries.Count -gt 0) {
-                Show-Line "Subject Alternative Name:" -Class Hint
+                Show-Line "Альтернативное имя субъекта (SAN):" -Class Hint
                 $idx = 1
                 foreach ($entry in $sanEntries) {
                     Show-KeyValue "[$idx]:" $entry
@@ -383,7 +383,7 @@
 
             # --- Certificate Template ---
             if ($templateName -or $templateInfo) {
-                Show-Line "Certificate Template:" -Class Hint
+                Show-Line "Шаблон сертификата:" -Class Hint
                 if ($templateName) {
                     Show-KeyValue "Template Name:" $templateName
                 }
@@ -395,7 +395,7 @@
 
             # --- PKINIT Assessment ---
             if ($ekuExt) {
-                Show-Line "PKINIT Assessment:" -Class Hint
+                Show-Line "Оценка PKINIT:" -Class Hint
 
                 if ($isPKINITCapable) {
                     Show-KeyValue "PKINIT Capable:" "True" -Class Note
@@ -410,7 +410,7 @@
 
                 if ($identities.Count -gt 0) {
                     Show-EmptyLine
-                    Show-Line "Identities:" -Class Hint
+                    Show-Line "Идентификаторы:" -Class Hint
                     $idx = 1
                     foreach ($id in $identities) {
                         Show-KeyValue "[$idx] $($id.Type):" $id.Value
@@ -419,7 +419,7 @@
 
                     # Usage hints
                     Show-EmptyLine
-                    Show-Line "Usage:" -Class Hint
+                    Show-Line "Назначение:" -Class Hint
 
                     $certPathHint = $Certificate
                     if ($certPathHint.Length -gt 60) {

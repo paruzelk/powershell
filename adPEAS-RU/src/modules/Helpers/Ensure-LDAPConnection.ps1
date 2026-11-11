@@ -92,7 +92,7 @@ function Ensure-LDAPConnection {
 
                 # Mark session as invalid to prevent repeated error messages on subsequent checks
                 $Script:LDAPContext['SessionInvalid'] = $true
-                Show-Line "Aborting scan - LDAP session is no longer valid. Re-authenticate with Connect-adPEAS." -Class Finding
+                Show-Line "Аудит прерван: LDAP-сеанс больше не действителен. Подключитесь повторно с помощью Connect-adPEAS." -Class Finding
 
                 # Return false - caller should handle this gracefully
                 return $false

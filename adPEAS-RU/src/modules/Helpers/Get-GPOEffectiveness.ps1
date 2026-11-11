@@ -713,7 +713,7 @@ function Show-GPOInactiveSummary {
     }
 
     if ($Listed) {
-        Show-Line "$Count of the findings below sit on a policy that is not linked or not enabled" -Class Note
+        Show-Line "$Count из приведённых ниже находок относятся к политике без действующей связи либо к отключённой политике" -Class Note
         return
     }
 

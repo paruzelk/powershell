@@ -199,9 +199,9 @@
                 }
             } else {
                 if ($AlreadyExists) {
-                    Show-Line "RBCD entry already exists for $DelegateName on: $TargetSAMAccountName" -Class Note
+                    Show-Line "Запись RBCD для $DelegateName на $TargetSAMAccountName уже существует" -Class Note
                 } else {
-                    Show-Line "Successfully configured RBCD on target: $TargetSAMAccountName" -Class Hint
+                    Show-Line "RBCD успешно настроено на целевом объекте: $TargetSAMAccountName" -Class Hint
                     Show-KeyValue "Attacker (can impersonate):" $DelegateName
                     Show-KeyValue "Target (receives impersonation):" $TargetSAMAccountName
                 }
@@ -237,7 +237,7 @@
                         Message = "No RBCD configuration to clear"
                     }
                 } else {
-                    Show-Line "No RBCD configuration found on: $TargetSAMAccountName" -Class Note
+                    Show-Line "Настройка RBCD не найдена на: $TargetSAMAccountName" -Class Note
                 }
                 return $null
             }
@@ -304,7 +304,7 @@
                     } else {
                         Write-Warning "[!] Principal '$Principal' not found in RBCD configuration on: $TargetSAMAccountName"
                         Show-EmptyLine
-                        Show-Line "Existing RBCD principals:" -Class Hint
+                        Show-Line "Существующие субъекты RBCD:" -Class Hint
                         foreach ($configuredPrincipal in $ConfiguredPrincipals) {
                             Show-KeyValue "Principal:" "$($configuredPrincipal.Name) ($($configuredPrincipal.SID))"
                         }
@@ -364,7 +364,7 @@
                         Message = "RBCD entry for '$($PrincipalToRemove.Name)' removed"
                     }
                 } else {
-                    Show-Line "Successfully removed '$($PrincipalToRemove.Name)' from RBCD configuration on: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Субъект '$($PrincipalToRemove.Name)' успешно удалён из RBCD на: $TargetSAMAccountName" -Class Hint
                 }
 
             } elseif ($ACECount -eq 1) {
@@ -393,7 +393,7 @@
                         Message = "RBCD configuration successfully cleared"
                     }
                 } else {
-                    Show-Line "Successfully cleared RBCD configuration from: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Настройка RBCD успешно очищена на: $TargetSAMAccountName" -Class Hint
                 }
 
             } elseif ($Force) {
@@ -422,7 +422,7 @@
                         Message = "All $ACECount RBCD entries successfully cleared"
                     }
                 } else {
-                    Show-Line "Successfully cleared all $ACECount RBCD entries from: $TargetSAMAccountName" -Class Hint
+                    Show-Line "Удалены все записи RBCD ($ACECount) на: $TargetSAMAccountName" -Class Hint
                 }
 
             } else {
@@ -440,10 +440,10 @@
                 } else {
                     Write-Warning "[!] Multiple RBCD principals ($ACECount) found on: $TargetSAMAccountName"
                     Show-EmptyLine
-                    Show-Line "To remove a specific principal, use: -Principal <name>" -Class Note
-                    Show-Line "To remove ALL principals, use: -Force" -Class Note
+                    Show-Line "Для удаления отдельного субъекта используйте: -Principal <name>" -Class Note
+                    Show-Line "Для удаления ВСЕХ субъектов используйте: -Force" -Class Note
                     Show-EmptyLine
-                    Show-Line "Existing RBCD principals:" -Class Hint
+                    Show-Line "Существующие субъекты RBCD:" -Class Hint
 
                     $index = 1
                     foreach ($configuredPrincipal in $ConfiguredPrincipals) {

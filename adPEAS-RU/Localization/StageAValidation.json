@@ -1,0 +1,37 @@
+﻿{
+    "Schema":  "adPEAS-RU.StageA.VisibleMessages.1",
+    "PlannedRules":  142,
+    "AppliedOccurrences":  147,
+    "ModifiedSourceFiles":  14,
+    "InterpolationsAndNonStringTokensPreserved":  true,
+    "PowerShellParserPassed":  true,
+    "ModifiedScopes":  [
+                           "Reporting",
+                           "Helpers",
+                           "Collector"
+                       ],
+    "ExplicitlyExcluded":  [
+                               "machine identifiers",
+                               "commands",
+                               "parameters",
+                               "dynamic-only output",
+                               "non-UI data"
+                           ],
+    "Files":  {
+                  "src/modules/Helpers/Invoke-RBCDOperation.ps1":  9,
+                  "src/modules/Reporting/Compare-adPEASReport.ps1":  8,
+                  "src/modules/Helpers/Get-CertificateInfo.ps1":  10,
+                  "src/modules/Helpers/Invoke-PortScan.ps1":  14,
+                  "src/modules/Helpers/Request-ADCSCertificate.ps1":  35,
+                  "src/modules/Helpers/Get-OUPermissions.ps1":  3,
+                  "src/modules/Helpers/Invoke-SMBAccess.ps1":  8,
+                  "src/modules/Helpers/Get-GPOEffectiveness.ps1":  1,
+                  "src/modules/Collector/Invoke-adPEASCollector.ps1":  4,
+                  "src/modules/Helpers/Get-adPEASSession.ps1":  8,
+                  "src/modules/Helpers/Invoke-DCSync.ps1":  22,
+                  "src/modules/Helpers/Ensure-LDAPConnection.ps1":  1,
+                  "src/modules/Helpers/Invoke-ShadowCredentialOperation.ps1":  10,
+                  "src/modules/Reporting/Convert-adPEASReport.ps1":  9
+              },
+    "ADContacted":  false
+}

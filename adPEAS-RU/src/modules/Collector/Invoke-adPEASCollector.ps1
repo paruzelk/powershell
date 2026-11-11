@@ -117,7 +117,7 @@
             $domainDN = $Script:LDAPContext.DomainDN
             $domainSID = $null
 
-            Show-SubHeader "Collecting BloodHound CE data..." -ObjectType "BloodHoundCollector"
+            Show-SubHeader "Сбор данных BloodHound CE..." -ObjectType "BloodHoundCollector"
 
             # Get Domain SID
             $domainObj = @(Get-DomainObject -LDAPFilter "(distinguishedName=$domainDN)" @connectionParams)[0]
@@ -479,17 +479,17 @@
 
             $summaryString = $Script:CollectedParts -join ", "
 
-            Show-Line "Collected $totalObjects objects from $domainName`: $summaryString" -Class Hint -FindingId 'BLOODHOUND_COLLECTION_COMPLETE'
+            Show-Line "Собрано объектов: $totalObjects; домен: $domainName`: $summaryString" -Class Hint -FindingId 'BLOODHOUND_COLLECTION_COMPLETE'
 
             # The full path, as the scan summary reports the text, HTML and JSON files.
             # A bare file name leaves the reader looking for it in the wrong directory,
             # which is exactly where it is not: with -Outputfile the archive is written
             # beside the reports, not into the current one.
             if ($NoZip) {
-                Show-Line "Output: $outputDir (JSON files)" -Class Note
+                Show-Line "Результат: $outputDir (файлы JSON)" -Class Note
             }
             else {
-                Show-Line "Output: $OutputPath" -Class Note
+                Show-Line "Результат: $OutputPath" -Class Note
             }
         }
         catch {
