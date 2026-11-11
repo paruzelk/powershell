@@ -80,7 +80,7 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
                 try {[IO.File]::Delete($tempPath)}
                 catch {throw 'ARCH2b temp attachment copy cleanup failed; stop.'}
             }
-            if($null -ne $attachment -and
+            if($null -ne $attachment -and [Runtime.InteropServices.Marshal]::IsComObject($attachment) -and
                (Get-Command -Name Release-OPAComObject -ErrorAction SilentlyContinue)){
                 Release-OPAComObject -Object $attachment
             }
