@@ -1,5 +1,17 @@
 # SEM-001 — Semantic integrity of Outlook POP3 archiving (normative)
 
+## ARCH1 operational clarification (2026-11-11, binding on future development)
+
+**Read first:** [ADR on COM provider boundary and a binding investigation stop-rule](ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md), [handoff](PROJECT-HANDOFF-ARCH1.md), [delivery roadmap](DELIVERY-ROADMAP.md). This clarification **does not relax** any content/attachment requirement, nor retroactively approve the unexplained historic `0x00010000` or the newer `MSGFLAG_HASATTACH` drift.
+
+**Three levels:** (A) user-visible content/attachment binary hash/state/identity/recovery **critical and must be verified**; (B) provider-derived `MailItem.Size`, `PR_MESSAGE_SIZE` and expected cross-store object identity differences **diagnostic, never universal byte-equality blockers**; (C) unknown significant bits, contradictions with actual attachment objects or missing required evidence **unresolved, not silently waived**. A single system bit drift is not by itself proof of corruption, but neither is it always harmless. Unknown `HASATTACH` requires attachment inventory; no invented pre-Move attachment inventory.
+
+**STOP-RULE:** after a provider-only difference, record evidence and return to the delivery roadmap unless a *new, demonstrable user-data defect or unsafe recovery state* exists. Allow only a bounded targeted investigation with an actionable pass/fail decision: change COM sequence, add a semantic check, preserve original and block the type, or document a provider limitation. No new `BW4k7v2a9`-style branch solely to reverse-engineer `Size` or flags. Prior one-shot Move/Save claims cannot be retried. No 90GB production authorization.
+
+**Critical existing integration gap:** legacy `MailMover.ps1` has a `MoveFailed` catch/continue; legacy `ArchiveVerifier.ps1` does not implement the complete BW4k Body/HTML/attachment-byte SHA witness. Current normal CLI `Archive` is **not automatically disabled** by the diagnostic worker integration flags. First repair/integrate these in ARCH2 before considering an RC.
+
+
+
 **Approved 2026-11-02.** This policy supplements `TECHNICAL_SPECIFICATION.md`, `ARCHITECTURE.md`, `OPERATION-JOURNAL.md`, `RECOVERY.md` and `TESTING.md`. Applies to all future OutlookPOP3Archive Archive / Resume / Auto workers. **Not a production enablement or authorization to move any specific mail.**
 
 ## Purpose
