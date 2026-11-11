@@ -1,0 +1,56 @@
+{
+  "schema": "adPEAS-RU.StageB.Checks.02",
+  "locale": "ru-RU",
+  "files": {
+    "src/modules/Checks/Computer/Get-ComputerPasswordAge.ps1": {
+      "Show-Line \"$($domainControllers.Count) Domain Controller(s) have not changed their machine account password in $PasswordAgeDays days or more:\"": "Show-Line \"$($domainControllers.Count) контроллеров домена не меняли пароль машинной записи в течение $PasswordAgeDays дней или дольше:\"",
+      "Show-Line \"$($members.Count) active computer(s) have not changed their machine account password in $PasswordAgeDays days or more:\"": "Show-Line \"$($members.Count) активных компьютеров не меняли пароль машинной записи в течение $PasswordAgeDays дней или дольше:\""
+    },
+    "src/modules/Checks/Computer/Get-InfrastructureServers.ps1": {
+      "Show-Line \"$ServiceName service accounts could not be read - result unknown, not empty\"": "Show-Line \"Учётные записи службы $ServiceName прочитать не удалось — результат неизвестен, а не пуст\"",
+      "Show-Line \"$ServiceName also runs under $(@($described).Count) domain account(s), host from the SPN: $(@($described) -join '; ')\"": "Show-Line \"Служба $ServiceName также работает под $(@($described).Count) доменными записями; узел определён по SPN: $(@($described) -join '; ')\"",
+      "Show-Line \"$(@($privileged).Count) of them hold privileged rights in the domain, and whoever controls the service or its host holds them too: $(@($privileged) -join '; ')\"": "Show-Line \"Из них $(@($privileged).Count) имеют привилегии в домене; управляющий службой или её узлом также получает эти полномочия: $(@($privileged) -join '; ')\"",
+      "Show-Line \"The privileges of $(@($unevaluated).Count) of them could not be evaluated - result unknown, not unprivileged: $(@($unevaluated) -join '; ')\"": "Show-Line \"Для $(@($unevaluated).Count) записей не удалось оценить полномочия — результат неизвестен, а не отсутствие привилегий: $(@($unevaluated) -join '; ')\"",
+      "Show-Line \"$(@($idle).Count) of the $ServiceName computer account(s) show no recent logon - possibly decommissioned: $(@($names) -join ', ')\"": "Show-Line \"У $(@($idle).Count) компьютерных записей службы $ServiceName нет недавних входов — возможно, узлы выведены из эксплуатации: $(@($names) -join ', ')\"",
+      "Show-Line \"$($unregisteredDCs.Count) computer account(s) carry the Domain Controller role without being registered as Domain Controllers:\"": "Show-Line \"$($unregisteredDCs.Count) компьютерных записей имеют роль контроллера домена, но не зарегистрированы как контроллеры домена:\"",
+      "Show-Line \"The configuration partition could not be read - Domain Controllers were not checked against their NTDS Settings\"": "Show-Line \"Раздел конфигурации прочитать не удалось — записи контроллеров домена не сверялись с NTDS Settings\"",
+      "Show-Line \"SCCM Server enumeration failed - result unknown, not empty\"": "Show-Line \"Не удалось перечислить серверы SCCM — результат неизвестен, а не пуст\"",
+      "Show-Line \"SCOM Server enumeration failed - result unknown, not empty\"": "Show-Line \"Не удалось перечислить серверы SCOM — результат неизвестен, а не пуст\""
+    },
+    "src/modules/Checks/Computer/Get-LAPSConfiguration.ps1": {
+      "Show-Line \"Found $total computer(s) $what, by OU:\"": "Show-Line \"Обнаружено $total компьютеров $what, по OU:\"",
+      "Show-Line \"OPSEC mode: Skipping LAPS configuration check (would query every computer and walk SYSVOL)\"": "Show-Line \"Режим OPSEC: проверка конфигурации LAPS пропущена (потребовался бы опрос всех компьютеров и обход SYSVOL)\"",
+      "Show-Line \"Windows LAPS Native schema present\"": "Show-Line \"Схема Windows LAPS Native присутствует\"",
+      "Show-Line \"Error during check - the LAPS configuration could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить конфигурацию LAPS: $_\""
+    },
+    "src/modules/Checks/Computer/Get-NetworkMap.ps1": {
+      "Show-Line \"No enabled computer logged on within the last $ActiveDays days\"": "Show-Line \"Нет включённых компьютеров со входом за последние $ActiveDays дней\"",
+      "Show-Line \"$outsideDomain active computer(s) with a DNS name outside $domainFQDN - not resolved\"": "Show-Line \"$outsideDomain активных компьютеров с DNS-именем вне $domainFQDN — адреса не определялись\"",
+      "Show-Line \"$withoutName active computer(s) without a DNS name (dNSHostName) - not mapped\"": "Show-Line \"$withoutName активных компьютеров без DNS-имени (dNSHostName) — не отображены на карте\"",
+      "Show-Line \"OPSEC mode: $notInZones active computer(s) not found in the AD-integrated DNS zones - not resolved by DNS query\"": "Show-Line \"Режим OPSEC: $notInZones активных компьютеров не найдены в DNS-зонах, интегрированных с AD — запрос DNS не выполнялся\"",
+      "Show-Line \"No AD-integrated DNS zone of these names could be read - addresses by DNS query to $askedServer\"": "Show-Line \"Не удалось прочитать DNS-зоны этих имён, интегрированные с AD — запрос DNS выполняется к $askedServer\"",
+      "Show-Line \"$withoutAddress active computer(s) without a usable IPv4 address in DNS - not mapped\"": "Show-Line \"$withoutAddress активных компьютеров без пригодного IPv4-адреса в DNS — не отображены на карте\"",
+      "Show-Line \"$ipv6Only active computer(s) with IPv6 addresses only - IPv6 is not mapped\"": "Show-Line \"$ipv6Only активных компьютеров только с IPv6-адресами — IPv6 не отображается на карте\"",
+      "Show-Line \"The domain controllers could not be determined - no subnet counts them\"": "Show-Line \"Контроллеры домена определить не удалось — ни одна подсеть их не учитывает\"",
+      "Show-Line \"$($emptySubnets.Count) subnet(s) defined in Sites and Services without an active computer:\"": "Show-Line \"$($emptySubnets.Count) подсетей в Active Directory Sites and Services не содержат активных компьютеров:\"",
+      "Show-Line \"No subnet to write to $ExportTargets\"": "Show-Line \"Нет подсетей для записи в $ExportTargets\"",
+      "Show-Line \"Wrote $($targets.Count) subnet(s) to $($export.Path)\"": "Show-Line \"Записано $($targets.Count) подсетей в $($export.Path)\"",
+      "Show-Line \"The subnet list could not be written to ${ExportTargets}: $($export.Message)\"": "Show-Line \"Список подсетей не удалось записать в ${ExportTargets}: $($export.Message)\"",
+      "Show-Line \"Error during check - the network map could not be built: $_\"": "Show-Line \"Ошибка проверки: не удалось построить карту сети: $_\""
+    },
+    "src/modules/Checks/Computer/Get-NonDefaultComputerOwners.ps1": {
+      "Show-Line \"$clusterOwned of them are owned by a computer account, which is how a cluster owns the objects it creates\"": "Show-Line \"$clusterOwned из них принадлежат компьютерной записи — так кластер владеет создаваемыми объектами\"",
+      "Show-Line \"The computers whose owner could be read all have default owners ($unreadableOwners of $totalComputers carried no owner in their security descriptor)\"": "Show-Line \"Среди компьютеров, для которых владелец прочитан, все имеют стандартного владельца ($unreadableOwners из $totalComputers без владельца в дескрипторе безопасности)\"",
+      "Show-Line \"$unreadableOwners of $totalComputers computer object(s) carried no owner in their security descriptor and were not evaluated\"": "Show-Line \"$unreadableOwners из $totalComputers объектов компьютеров не имеют владельца в дескрипторе безопасности и не оценивались\"",
+      "Show-Line \"Error during check - computer ownership could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить владельцев компьютерных объектов: $_\""
+    },
+    "src/modules/Checks/Computer/Get-OutdatedComputers.ps1": {
+      "Show-Line \"OPSEC mode: Skipping outdated computer check (would check all enabled computers)\"": "Show-Line \"Режим OPSEC: проверка устаревших компьютеров пропущена (потребовалась бы проверка всех включённых компьютеров)\"",
+      "Show-Line \"$(@($esuOnlyComputerDNs).Count) computer(s) are past general support and inside the paid ESU window:\"": "Show-Line \"$(@($esuOnlyComputerDNs).Count) компьютеров вышли из общей поддержки, но находятся в периоде платной расширенной поддержки ESU:\"",
+      "Show-Line \"$notAssessableCount active computer(s) run a Microsoft operating system this lifecycle table cannot place:\"": "Show-Line \"$notAssessableCount активных компьютеров используют Microsoft ОС, которую невозможно классифицировать по данной таблице жизненного цикла:\"",
+      "Show-Line \"  $osLabel - $($notAssessableOS[$osLabel]) computer(s)\"": "Show-Line \"  $osLabel — $($notAssessableOS[$osLabel]) компьютеров\"",
+      "Show-Line \"No active computers with an outdated Microsoft operating system ($inactiveFilteredCount inactive accounts filtered)\"": "Show-Line \"Активных компьютеров с устаревшей Microsoft ОС не обнаружено (отфильтровано неактивных записей: $inactiveFilteredCount)\"",
+      "Show-Line \"Error during check - outdated operating systems could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить устаревшие операционные системы: $_\""
+    }
+  }
+}
