@@ -1,5 +1,9 @@
 ﻿# Recovery and ambiguous worker outcomes — 2.6.3-PREVIEW1
 
+## ARCH2b source witness is required for verified archival (2026-11-11)
+
+[ARCH2b readme](2.6.5-arch2b-semantic-verifier.md): `Move Started` journal now optionally includes original pre-Move semantic witness (Body/HTML/recipients/state + SHA256 of actual attachment bytes). The main verifier invokes `-RequireSemanticWitness` so older recovered transactions with no original witness **cannot be silently promoted to Verified/Completed**, nor can DuplicateIndex stand in for a missing source snapshot. When this new optional schema is absent, historic one-shot claims remain immutable and manual reconciliation is required. `MailItem.Size` alone is not critical. ARCH2a no-blind-retry fence remains unchanged. Runtime writers remain blocked pending ARCH2c.
+
 ## ARCH2a runtime no-blind-retry fence (2026-11-11)
 
 The previous legacy `MoveFailed` catch/continue has been replaced with `Move Indeterminate` + immediate throw after durable `Move Started`. Before actual COM the step journal and checkpoint are saved and explicitly flushed to disk. A future Resume must scan the **full original step journal** and reject missing/unterminated journal, a missing original plan, repeated `Move Started` or any attempt without a closing `Move Completed`. A visible source message is **not** sufficient to retry. This is a safety improvement, not a finished autonomous reconciliation protocol. Current DEV CLI Archive/Resume/Auto are blocked at entrypoint. See [ARCH2a runbook](2.6.5-arch2a-move-outcome-fence.md).
