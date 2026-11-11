@@ -168,7 +168,7 @@ Describe 'ARCH2b original source semantic witness derived from BW4j verified by-
         $w=Get-OPA265ARCH2bMailSemanticWitness -Mail $mail -MaxAttachmentBytes 4096
         $w.AttachmentCount | Should -Be 1
         $w.Attachments[0].PayloadByteCount | Should -Be 4
-        $w.Attachments[0].PayloadSha256 | Should -BeExactly 'dcaec26fbb59f174925e92bc0c2f0e743a9a3f333a74f944a3d3db58d6e7e6'
+        $w.Attachments[0].PayloadSha256 | Should -BeExactly '3d1f57c984978ef98a18378c8166c1cb8ede02c03eeb6aee7e2f121dfeee3e56'
     }
     It 'never stores original attachment filename in journal witness' {
         $attachment=New-ARCH2bFakeAttachment -FileName 'private-note.txt'
