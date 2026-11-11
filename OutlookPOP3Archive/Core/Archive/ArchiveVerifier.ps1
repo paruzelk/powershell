@@ -50,8 +50,24 @@ function Get-OPAExpectedMovesFromTransaction {
         $planned[$id] = $p
     }
     $completed = @{}
+    # ARCH2b: a separate pre-Move semantic witness is paired with each
+    # completion. Never derive content integrity from DuplicateIndex alone.
+    $sourceWitnessById = @{}
     $txStub = [pscustomobject]@{ Path = $Transaction.Path }
     foreach ($step in @(Read-OPAStepJournal -Transaction $txStub)) {
+        if ($null -ne $step -and [string]$step.Step -ceq 'Move Started') {
+            $sourceId = [string]$step.EntryId
+            if ($planned.ContainsKey($sourceId)) {
+                if ($sourceWitnessById.ContainsKey($sourceId)) {
+                    throw ("ARCH2b multiple original Move Started claims for '{0}'." -f $sourceId)
+                }
+                if ($null -ne $step.SourceSemanticWitness -and
+                    -not (Test-OPA265ARCH2bWitnessSchema -Witness $step.SourceSemanticWitness)) {
+                    throw ("ARCH2b invalid original semantic witness for '{0}'." -f $sourceId)
+                }
+                $sourceWitnessById[$sourceId] = $step.SourceSemanticWitness
+            }
+        }
         if ($null -eq $step -or -not (Test-OPAMoveCompletionStep -Step $step)) { continue }
         $id = [string]$step.EntryId
         if (-not $planned.ContainsKey($id)) { continue }
@@ -103,6 +119,7 @@ function Get-OPAExpectedMovesFromTransaction {
             Subject = [string]$p.Subject
             Sender = [string]$p.Sender
             Size = $p.Size
+            SourceSemanticWitness = if($sourceWitnessById.ContainsKey($id)){$sourceWitnessById[$id]}else{$null}
         }) | Out-Null
     }
     return $rows.ToArray()
@@ -163,7 +180,19 @@ function Test-OPAArchiveItemFingerprint {
         [Parameter(Mandatory=$true)][object]$Expected
     )
     if ([int]$Item.Class -ne 43) { return $false }
-    if ($null -ne $Expected.Size -and [int64]$Item.Size -ne [int64]$Expected.Size) { return $false }
+    # Legacy Size fingerprints remain supported for older read-only tests.
+    # For ARCH2b the ORIGINAL source semantic witness is authoritative:
+    # provider-controlled MailItem.Size is diagnostic, NOT a data hash.
+    if ($null -ne $Expected.SourceSemanticWitness) {
+        if (-not (Test-OPA265ARCH2bWitnessSchema -Witness $Expected.SourceSemanticWitness)) { return $false }
+        try {
+            $destinationWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $Item
+            $semanticComparison = Compare-OPA265ARCH2bMailSemanticWitness -Source $Expected.SourceSemanticWitness -Destination $destinationWitness
+            if (-not $semanticComparison.CriticalContentMatches) { return $false }
+        }
+        catch { return $false }
+    }
+    elseif ($null -ne $Expected.Size -and [int64]$Item.Size -ne [int64]$Expected.Size) { return $false }
     if ([string]$Item.Subject -cne [string]$Expected.Subject) { return $false }
     if (-not [string]::IsNullOrWhiteSpace([string]$Expected.Sender) -and
         [string]$Item.SenderEmailAddress -ine [string]$Expected.Sender) { return $false }
@@ -184,6 +213,7 @@ function Test-OPAArchiveMoves {
         [Parameter(Mandatory=$true)][int]$ExpectedMoved,
         [int]$SourceItemsBefore = -1,
         [object[]]$ExpectedMoves=@(),
+        [switch]$RequireSemanticWitness,
         # Kept as optional legacy parameters; FIX9 callers must pass ExpectedMoves.
         [string[]]$ExpectedEntryIds=@(),
         [string[]]$ExpectedArchiveEntryIds=@(),
@@ -203,6 +233,11 @@ function Test-OPAArchiveMoves {
     $seenSource = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
     $seenArchive = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
     foreach ($m in $expectedRows) {
+        if ($RequireSemanticWitness -and
+            ($null -eq $m -or $null -eq $m.SourceSemanticWitness -or
+             -not (Test-OPA265ARCH2bWitnessSchema -Witness $m.SourceSemanticWitness))) {
+            $missing.Add('ARCH2b_PREMOVE_SEMANTIC_WITNESS_MISSING_OR_INVALID')
+        }
         if (-not $m -or [string]::IsNullOrWhiteSpace([string]$m.SourceEntryId) -or -not $seenSource.Add([string]$m.SourceEntryId)) {
             $missing.Add('DUPLICATE_OR_EMPTY_SOURCE_ID')
         }
@@ -260,6 +295,13 @@ function Test-OPAArchiveMoves {
     $targetRoots = New-Object System.Collections.Generic.List[object]
     try {
         foreach ($m in $expectedRows) {
+            # An existing archive without a durable ORIGINAL pre-Move witness
+            # must NEVER be promoted to verified by subject/Size/index alone.
+            if ($RequireSemanticWitness -and
+                ($null -eq $m.SourceSemanticWitness -or
+                 -not (Test-OPA265ARCH2bWitnessSchema -Witness $m.SourceSemanticWitness))) {
+                continue
+            }
             $archivePst = [string]$m.ArchivePst
             $targetPath = [string]$m.TargetFolderPath
             $id = [string]$m.SourceEntryId
@@ -355,5 +397,7 @@ function Test-OPAArchiveMoves {
         WarningEntryIds = $warnings.ToArray()
         EntryIdsVerified = ($missing.Count -eq 0)
         Verified = ($missing.Count -eq 0)
+        SemanticWitnessRequired = [bool]$RequireSemanticWitness
+        AllRequiredOriginalSemanticWitnessesPresent = ($missing.ToArray() -notmatch 'ARCH2b_PREMOVE_SEMANTIC_WITNESS_MISSING_OR_INVALID').Count -eq 0
     }
 }
