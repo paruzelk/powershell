@@ -1,0 +1,3795 @@
+﻿{
+    "Schema":  "adPEAS-RU.SourceFieldParity392.1",
+    "FindingCount":  392,
+    "SourceNonempty":  {
+                           "attack":  304,
+                           "remediation":  377,
+                           "impact":  377
+                       },
+    "RussianNonempty":  {
+                            "attack":  115,
+                            "remediation":  392,
+                            "impact":  392
+                        },
+    "MissingRussianAttackCount":  189,
+    "MissingRussianAttackIds":  [
+                                    "ACCOUNT_NOT_DELEGATED",
+                                    "ADFS_DKM_CONTAINER",
+                                    "ANONYMOUS_SAM_ENUMERATION_ALLOWED",
+                                    "AUTHN_POLICY_OBJECT_WRITABLE",
+                                    "AZURE_AD_CONNECT_EXPOSED",
+                                    "BITLOCKER_RECOVERY_DELEGATED",
+                                    "BLOODHOUND_COLLECTION_COMPLETE",
+                                    "COMPUTER_CONTAINER_CREATE_BROAD",
+                                    "COMPUTER_OBJECT_EXPLICIT_RIGHT",
+                                    "COMPUTER_OWNERSHIP_REASSIGNED",
+                                    "COMPUTER_PASSWORD_NOT_ROTATED",
+                                    "CONSTRAINED_DELEGATION_TO_DC",
+                                    "CONSTRAINED_DELEGATION_TRANSITION_NO_TARGET",
+                                    "CREDENTIAL_AUTOADMINLOGON",
+                                    "CREDENTIAL_CONNECTION_STRING",
+                                    "CREDENTIAL_IN_DESCRIPTION",
+                                    "CREDENTIAL_MENTION_REVIEW",
+                                    "CREDENTIAL_NET_USE",
+                                    "CREDENTIAL_ROAMING_DELEGATED",
+                                    "CREDENTIAL_ROAMING_PRESENT",
+                                    "CREDENTIAL_ROAMING_READABLE",
+                                    "CREDENTIAL_SCRIPT_PASSWORD",
+                                    "CREDENTIAL_UNATTEND_PASSWORD",
+                                    "CREDENTIAL_VNC_PASSWORD",
+                                    "CRITICAL_OBJECT_CONTROL",
+                                    "DANGEROUS_ACL_BROAD_GROUP",
+                                    "DANGEROUS_ACL_DCSYNC_BROAD",
+                                    "DANGEROUS_ACL_GPO_EXTENDED",
+                                    "DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED",
+                                    "DANGEROUS_RIGHTS_CONTEXT",
+                                    "DC_PASSWORD_NOT_ROTATED",
+                                    "DELETED_OBJECTS_READ_BROAD",
+                                    "DELETED_OBJECTS_READ_DELEGATED",
+                                    "DELETED_OBJECT_CREDENTIAL",
+                                    "DMSA_LINK_IRREGULAR",
+                                    "DMSA_LINK_ONE_SIDED",
+                                    "DMSA_MEMBERSHIP_OWNER",
+                                    "DMSA_PRIVILEGED_PREDECESSOR",
+                                    "DMSA_USABLE_BY_NONPRIVILEGED",
+                                    "DOMAIN_ROOT_FSMO_TRANSFER",
+                                    "DOMAIN_ROOT_MAQ_WRITE",
+                                    "DOMAIN_ROOT_REANIMATE_TOMBSTONES",
+                                    "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION",
+                                    "DSHEURISTICS_ANONYMOUS_NSPI",
+                                    "DSHEURISTICS_UNIQUENESS_DISABLED",
+                                    "ENCRYPTION_DES_ENABLED",
+                                    "ENCRYPTION_NOT_CONFIGURED",
+                                    "ENCRYPTION_RC4_ONLY",
+                                    "ENROLLMENT_REQUIRES_APPROVAL",
+                                    "ESC3_TARGET_TEMPLATE",
+                                    "ESC_ENROLLMENT_RIGHTS_UNREAD",
+                                    "ESX_ADMINS_MEMBER",
+                                    "EXCHANGE_GROUP_LOW_PRIV_MEMBER",
+                                    "EXCHANGE_GROUP_PERMISSIONS",
+                                    "EXCHANGE_HYBRID_DEPLOYMENT",
+                                    "EXCHANGE_RBAC_AD_PERMISSIONS",
+                                    "EXCHANGE_RBAC_APPLICATION_IMPERSONATION",
+                                    "EXCHANGE_RBAC_MAILBOX_IMPORT_EXPORT",
+                                    "EXCHANGE_RBAC_MAILBOX_SEARCH",
+                                    "EXCHANGE_RBAC_ROLE_MANAGEMENT",
+                                    "EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT",
+                                    "EXCHANGE_SHARED_PERMISSIONS_MODEL",
+                                    "EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED",
+                                    "EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM",
+                                    "EXCHANGE_SMTP_ANONYMOUS_SPOOFING",
+                                    "EXCHANGE_SMTP_BROAD_SPOOFING",
+                                    "EXCHANGE_VULNERABLE_VERSION",
+                                    "EXCHANGE_WEB_ENDPOINTS",
+                                    "GMSA_MEMBERSHIP_OWNER",
+                                    "GMSA_PASSWORD_READABLE",
+                                    "GMSA_ROTATION_INTERVAL_LONG",
+                                    "GPO_LOCAL_GROUP_MEMBER",
+                                    "GPO_LOCAL_GROUP_RISKY_MEMBER",
+                                    "GPO_NON_DEFAULT_OWNER",
+                                    "GPO_NOT_CURRENTLY_EFFECTIVE",
+                                    "GPO_POINTANDPRINT_DRIVER_SOURCE",
+                                    "GPO_POINTANDPRINT_EXPLOITABLE",
+                                    "GPO_POINTANDPRINT_LATENT",
+                                    "GPO_POINTANDPRINT_NONADMIN_INSTALL",
+                                    "GPO_POINTANDPRINT_USER_SCOPE",
+                                    "GPO_PRINT_DRIVER_HARDENING",
+                                    "GPO_PRINT_QUEUE_SPECIFIC_FILES",
+                                    "GPO_PRINT_SPOOLER_RPC",
+                                    "GPO_REGISTRY_PASSWORD",
+                                    "GPO_SCRIPT_OUTSIDE_POLICY_STORE",
+                                    "GPO_TASK_CMD_UNQUOTED_PATH",
+                                    "GPO_TASK_SYSTEM_UNC_PATH",
+                                    "GPO_TASK_UNQUOTED_PATH",
+                                    "GPO_USERRIGHT_DEFAULT_REMOVED",
+                                    "GUEST_ACCOUNT_ENABLED",
+                                    "INTERDOMAIN_TRUST_ACCOUNT",
+                                    "KERBEROS_TICKET_LIFETIME_EXTENDED",
+                                    "LAPS_COVERAGE_NOT_IN_AD",
+                                    "LAPS_ENCRYPTED_PASSWORD",
+                                    "LAPS_ENCRYPTED_READ_NO_DECRYPTOR",
+                                    "LAPS_GPO_DISABLED",
+                                    "LAPS_GPO_ENCRYPTION_DISABLED",
+                                    "LAPS_GPO_EXPIRATION_PROTECTION_DISABLED",
+                                    "LAPS_GPO_NOT_LINKED",
+                                    "LAPS_GPO_NO_AD_BACKUP",
+                                    "LAPS_GPO_PASSWORD_AGE",
+                                    "LAPS_GPO_PASSWORD_LENGTH",
+                                    "LAPS_GPO_WEAK_PASSWORD_COMPLEXITY",
+                                    "LAPS_NOT_DEPLOYED",
+                                    "LAPS_PASSWORD_NOT_ROTATED",
+                                    "LAPS_PASSWORD_READ_ACCESS",
+                                    "LAPS_READ_BLOCKED_BY_CONFIDENTIAL",
+                                    "LDAP_ANONYMOUS_BINDING_ALLOWED",
+                                    "LDAP_CHANNEL_BINDING_ALWAYS",
+                                    "LDAP_SIGNING_REQUIRED",
+                                    "LOCKOUT_DURATION_FOREVER",
+                                    "LOGON_SCRIPT_WRITABLE",
+                                    "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
+                                    "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
+                                    "NON_DEFAULT_COMPUTER_OWNERS",
+                                    "NON_DEFAULT_USER_OWNERS",
+                                    "NO_MAX_PASSWORD_AGE",
+                                    "NO_MIN_PASSWORD_AGE",
+                                    "NTAUTH_FOREIGN_ISSUER",
+                                    "ORPHANED_ADMIN_ACCOUNT",
+                                    "OS_EXTENDED_SECURITY_UPDATES_ONLY",
+                                    "OUTDATED_OS",
+                                    "OU_NON_DEFAULT_OWNER",
+                                    "OU_PERM_CONSTRAINED_DELEGATION",
+                                    "OU_PERM_CREATE_DMSA",
+                                    "OU_PERM_DNSHOSTNAME_WRITE",
+                                    "OU_PERM_DNS_HOST_NAME_ATTRIBUTES",
+                                    "OU_PERM_GENERICWRITE",
+                                    "OU_PERM_SCRIPTPATH",
+                                    "OU_PERM_SELF_ALL_VALIDATED",
+                                    "OU_PERM_SELF_MEMBERSHIP",
+                                    "OU_PERM_USERACCOUNTCONTROL",
+                                    "OU_PERM_USER_ACCOUNT_RESTRICTIONS",
+                                    "OU_PERM_VALIDATED_DNS",
+                                    "OU_PERM_VALIDATED_SPN",
+                                    "OU_PERM_WRITEPROPERTY_ALL",
+                                    "PASSWORD_HISTORY_DISABLED",
+                                    "PKI_STRONG_KEY_LENGTH",
+                                    "PKI_STRONG_SIGNATURE_ALGORITHM",
+                                    "PRECREATED_COMPUTER_ACCOUNT",
+                                    "PREWIN2000_ANONYMOUS_MEMBER",
+                                    "PREWIN2000_BROAD_MEMBER",
+                                    "PRIMARY_GROUP_IS_DC_GROUP",
+                                    "PRIVILEGED_ACCOUNT_ACL",
+                                    "PRIVILEGED_ACCOUNT_AFFECTED",
+                                    "READABLE_UNIX_PASSWORD_ATTRIBUTES",
+                                    "REGISTRY_AUTOLOGON",
+                                    "REGISTRY_CREDGUARD",
+                                    "REGISTRY_FILTERADMINTOKEN",
+                                    "REGISTRY_FIREWALL_DISABLED",
+                                    "REGISTRY_INSECURE_GUEST_AUTH",
+                                    "REGISTRY_MACHINE_PASSWORD_STATIC",
+                                    "REGISTRY_NOLMHASH",
+                                    "REGISTRY_NULL_SESSION",
+                                    "REGISTRY_ONELOGON",
+                                    "REGISTRY_RDP_ENCRYPTION",
+                                    "REGISTRY_RDP_NLA",
+                                    "REGISTRY_RDP_SECURITYLAYER",
+                                    "REGISTRY_REMOTEUAC",
+                                    "REGISTRY_RESTRICTEDADMIN",
+                                    "REGISTRY_SMB1_SERVER",
+                                    "REGISTRY_WDIGEST",
+                                    "ROASTABLE_PRIVILEGED_ACCOUNT",
+                                    "RODC_DENIED_GROUP_MISSING",
+                                    "RODC_PRIVILEGED_PASSWORD_ALLOWED",
+                                    "RODC_PRIVILEGED_PASSWORD_REVEALED",
+                                    "SCCM_GROUP_BROAD_MEMBER",
+                                    "SCCM_PXE_EXPOSURE",
+                                    "SCCM_SERVICE_ACCOUNT",
+                                    "SCCM_SITE_HIERARCHY",
+                                    "SCCM_SYSTEM_MANAGEMENT_ACL",
+                                    "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
+                                    "SCRIPTPATH_HARDCODED",
+                                    "SHADOW_CREDENTIALS",
+                                    "SID_HISTORY_FOREIGN_PRIVILEGED",
+                                    "SID_HISTORY_INJECTION",
+                                    "SID_HISTORY_OWN_DOMAIN",
+                                    "SMARTCARD_REQUIRED",
+                                    "STANDALONE_MSA_LEGACY",
+                                    "TRUST_BIDIRECTIONAL",
+                                    "TRUST_PASSWORD_STALE",
+                                    "TRUST_TRANSITIVE",
+                                    "TRUST_TREAT_AS_EXTERNAL",
+                                    "TRUST_USES_RC4",
+                                    "UNCONSTRAINED_DELEGATION_DC",
+                                    "UNREGISTERED_DOMAIN_CONTROLLER",
+                                    "WEAK_FGPP",
+                                    "WEAK_LOCKOUT_DURATION",
+                                    "WEB_ENDPOINT_EPA_ENABLED"
+                                ],
+    "OriginalAttackAbsentCount":  88,
+    "AttackStepCountDifferences":  [
+                                       "ACCOUNT_DISABLED",
+                                       "ADMINSDHOLDER_PROPAGATED_RIGHT",
+                                       "AD_RECYCLE_BIN_DISABLED",
+                                       "ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED",
+                                       "COMPUTER_CONTAINER_CREATE_PERMISSIONS",
+                                       "DANGEROUS_ACL_DCSYNC",
+                                       "DANGEROUS_ACL_GENERICWRITE",
+                                       "DANGEROUS_ACL_GPO_DELETE",
+                                       "DANGEROUS_ACL_GPO_WRITEPROPERTY",
+                                       "DANGEROUS_ACL_REPLICATION_INERT_HALF",
+                                       "DANGEROUS_ACL_REPLICATION_NO_SECRETS",
+                                       "DANGEROUS_ACL_WRITEDACL",
+                                       "DANGEROUS_ACL_WRITEOWNER",
+                                       "DOMAIN_ROOT_GPLINK_WRITE",
+                                       "DOMAIN_ROOT_NON_DEFAULT_OWNER",
+                                       "GPO_SCOPE_DOMAIN_WIDE",
+                                       "GPO_SEMACHINEACCOUNTPRIVILEGE_BROAD",
+                                       "GPO_SYSVOL_WRITABLE",
+                                       "GPO_USERRIGHT_SEASSIGNPRIMARYTOKEN",
+                                       "GPO_USERRIGHT_SEAUDIT",
+                                       "GPO_USERRIGHT_SEBATCHLOGON",
+                                       "GPO_USERRIGHT_SEDEBUG",
+                                       "GPO_USERRIGHT_SEENABLEDELEGATION",
+                                       "GPO_USERRIGHT_SELOADDRIVER",
+                                       "GPO_USERRIGHT_SEREMOTESHUTDOWN",
+                                       "GPO_USERRIGHT_SESECURITY",
+                                       "GPO_USERRIGHT_SESHUTDOWN",
+                                       "GPO_USERRIGHT_SESYSTEMENVIRONMENT",
+                                       "GPO_USERRIGHT_SETAKEOWNERSHIP",
+                                       "INACTIVE_PRIVILEGED_ACCOUNT",
+                                       "KRBTGT_PASSWORD_OLD",
+                                       "LDAP_ANONYMOUS_BINDING_RESTRICTED",
+                                       "MACHINE_QUOTA_UNRESTRICTED",
+                                       "NO_ACCOUNT_LOCKOUT",
+                                       "OU_PERM_CREATE_CHILD",
+                                       "OU_PERM_GPLINK",
+                                       "OU_PERM_GPOPTIONS",
+                                       "OU_PERM_GROUP_MEMBERSHIP",
+                                       "OU_PERM_KEYCREDENTIALLINK_WRITE",
+                                       "OU_PERM_PASSWORD_RESET",
+                                       "PASSWORD_COMPLEXITY_ENABLED",
+                                       "PASSWORD_NEVER_EXPIRES",
+                                       "PASSWORD_NOT_REQUIRED",
+                                       "PREWIN2000_DEFAULT_MEMBER",
+                                       "PRIVILEGED_GROUP_ACL",
+                                       "PRIVILEGED_GROUP_MEMBERSHIP",
+                                       "SMB_SIGNING_DISABLED",
+                                       "SMB_SIGNING_REQUIRED",
+                                       "STALE_PASSWORD",
+                                       "STALE_PASSWORD_MEDIUM",
+                                       "TIER0_NOT_IN_PROTECTED_USERS",
+                                       "WEAK_PASSWORD_POLICY"
+                                   ],
+    "RussianImpactWithNoSource":  15,
+    "RussianRemediationWithNoSource":  15,
+    "Note":  "Совпадение количества пунктов не доказывает их смысловую эквивалентность. 10 Impact/Remediation сверены предметно; остальные требуют последовательной проверки.",
+    "UserReportDataIncluded":  false,
+    "Fields":  [
+                   {
+                       "FindingId":  "ACCOUNT_DISABLED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  1,
+                       "RemediationEN":  4,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "ACCOUNT_NOT_DELEGATED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ACL_INHERITED_FROM",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADCS_CA_CERT_EXPIRED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADCS_CA_CROSS_DOMAIN",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADCS_CA_SHORT_KEY",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADCS_CA_WEAK_SIGNATURE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADCS_CLIENT_AUTH_EKU",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADCS_CLIENT_AUTH_SEVERITY",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADCS_HTTP_AVAILABLE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADCS_MANAGER_APPROVAL",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADCS_NONPRIV_ENROLLMENT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADCS_SMARTCARD_LOGON_EKU",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADFS_DKM_CONTAINER",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ADMINSDHOLDER_PROPAGATED_RIGHT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "ADMIN_COUNT_INDICATOR",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "AD_RECYCLE_BIN_DISABLED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  2,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "AGING_OS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "ANONYMOUS_SAM_ENUMERATION_ALLOWED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "ANON_LDAP_READABLE_ATTRS",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ASREP_ROASTABLE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  4,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  4,
+                       "RemediationRU":  4
+                   },
+                   {
+                       "FindingId":  "AUTHN_KDC_ARMORING_NOT_SUPPORTED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "AUTHN_POLICY_BROAD_CONDITION",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "AUTHN_POLICY_EXEMPT_ADMINISTRATOR",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "AUTHN_POLICY_NOT_EFFECTIVE",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "AUTHN_POLICY_OBJECT_WRITABLE",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "AUTHN_SILO_INCOMPLETE_ENROLLMENT",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "AUTHN_SILO_NOT_EFFECTIVE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "AZURE_AD_CONNECT_EXPOSED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "BITLOCKER_KEY_READABLE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "BITLOCKER_RECOVERY_DELEGATED",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "BLOODHOUND_COLLECTION_COMPLETE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CERT_FLAG_SEVERITY",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "COMPUTER_CONTAINER_CREATE_BROAD",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "COMPUTER_CONTAINER_CREATE_PERMISSIONS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "COMPUTER_OBJECT_EXPLICIT_RIGHT",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "COMPUTER_OWNERSHIP_REASSIGNED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "COMPUTER_PASSWORD_NOT_ROTATED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CONSTRAINED_DELEGATION",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CONSTRAINED_DELEGATION_PROTOCOL_TRANSITION",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CONSTRAINED_DELEGATION_TO_DC",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CONSTRAINED_DELEGATION_TRANSITION_NO_TARGET",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_AUTOADMINLOGON",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_CONNECTION_STRING",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_GPP_PASSWORD",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_IN_DESCRIPTION",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  6,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_MATCHED_LINE",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_MENTION_REVIEW",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_NET_USE",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_PASSWORD_EXPOSED",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_ROAMING_DELEGATED",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_ROAMING_PRESENT",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  6,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_ROAMING_READABLE",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_SCRIPT_PASSWORD",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_TYPE_INFO",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_UNATTEND_PASSWORD",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_USERNAME_EXPOSED",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CREDENTIAL_VNC_PASSWORD",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "CRITICAL_OBJECT_CONTROL",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_BROAD_GROUP",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_DCSYNC",
+                       "ImpactEN":  4,
+                       "ImpactRU":  4,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  4,
+                       "RemediationRU":  4
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_DCSYNC_BROAD",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_GENERICALL",
+                       "ImpactEN":  5,
+                       "ImpactRU":  5,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  4,
+                       "RemediationRU":  4
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_GENERICWRITE",
+                       "ImpactEN":  5,
+                       "ImpactRU":  3,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_GPO_DELETE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  4
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_GPO_EXTENDED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  1,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_GPO_WRITEPROPERTY",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  5,
+                       "RemediationRU":  4
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_REPLICATION_INERT_HALF",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  3,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_REPLICATION_NO_SECRETS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  3,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  3,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_WRITEDACL",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  1,
+                       "RemediationEN":  3,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_ACL_WRITEOWNER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  1,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_RIGHTS_AFFECTED_OUS",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_RIGHTS_CONTEXT",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  7,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DANGEROUS_RIGHTS_SEVERITY",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DC_PASSWORD_NOT_ROTATED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DELETED_OBJECTS_READ_BROAD",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DELETED_OBJECTS_READ_DELEGATED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DELETED_OBJECT_CREDENTIAL",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DMSA_LINK_IRREGULAR",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DMSA_LINK_ONE_SIDED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DMSA_MEMBERSHIP_OWNER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DMSA_PRIVILEGED_PREDECESSOR",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DMSA_USABLE_BY_NONPRIVILEGED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DOMAIN_ROOT_FSMO_TRANSFER",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DOMAIN_ROOT_GPLINK_WRITE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  3,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "DOMAIN_ROOT_MAQ_WRITE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DOMAIN_ROOT_NON_DEFAULT_OWNER",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  3,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "DOMAIN_ROOT_REANIMATE_TOMBSTONES",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DOMAIN_ROOT_REPLICA_INSTALL",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DOMAIN_ROOT_SID_HISTORY_WRITE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DSHEURISTICS_ANONYMOUS_NSPI",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DSHEURISTICS_UNIQUENESS_DISABLED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "DSRM_PASSWORD_UNMANAGED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ENCRYPTION_AES_ONLY",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ENCRYPTION_DES_ENABLED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ENCRYPTION_NOT_CONFIGURED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ENCRYPTION_RC4_ONLY",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ENROLLMENT_REQUIRES_APPROVAL",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ESC13_ISSUANCE_POLICY_GROUP_LINK",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ESC14_WEAK_EXPLICIT_MAPPING",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ESC14_WRITABLE_MAPPING",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ESC15_SCHEMA_V1_ENROLLEE_SUBJECT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  6,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ESC1_TEMPLATE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  4,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  5,
+                       "RemediationRU":  5
+                   },
+                   {
+                       "FindingId":  "ESC2_TEMPLATE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ESC3_TARGET_TEMPLATE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ESC3_TEMPLATE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ESC4_TEMPLATE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ESC5_PKI_CONTAINER_ACL",
+                       "ImpactEN":  5,
+                       "ImpactRU":  5,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  10,
+                       "RemediationRU":  10
+                   },
+                   {
+                       "FindingId":  "ESC8_WEB_ENROLLMENT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  4,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  5,
+                       "RemediationRU":  5
+                   },
+                   {
+                       "FindingId":  "ESC9_CT_NO_SECURITY_EXTENSION",
+                       "ImpactEN":  4,
+                       "ImpactRU":  4,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  3,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "ESC_ENROLLMENT_RIGHTS_UNREAD",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ESX_ADMINS_MEMBER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_AD_SPLIT_PERMISSIONS",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_GROUP_LOW_PRIV_MEMBER",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_GROUP_PERMISSIONS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  6,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_HYBRID_DEPLOYMENT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_PERMISSIONS_MODEL_CLEAN",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_RBAC_AD_PERMISSIONS",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_RBAC_APPLICATION_IMPERSONATION",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_RBAC_DEFAULT_ASSIGNMENT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_RBAC_MAILBOX_IMPORT_EXPORT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_RBAC_MAILBOX_SEARCH",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_RBAC_ROLE_MANAGEMENT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_SHARED_PERMISSIONS_MODEL",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_SMTP_ANONYMOUS_SPOOFING",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_SMTP_BROAD_RELAY",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_SMTP_BROAD_SPOOFING",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_SMTP_CONNECTOR_AUTHENTICATED",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_SMTP_CONNECTOR_UNREADABLE",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_SMTP_OPEN_RELAY",
+                       "ImpactEN":  4,
+                       "ImpactRU":  4,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  3,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_VULNERABLE_VERSION",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "EXCHANGE_WEB_ENDPOINTS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GMSA_MEMBERSHIP_INFO",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GMSA_MEMBERSHIP_OWNER",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GMSA_PASSWORD_READABLE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GMSA_ROTATION_INTERVAL_LONG",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_DANGEROUS_PERMISSIONS",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  7,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_LINKED_OUS_SEVERITY",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_LINK_REACHES_DC",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  1,
+                       "AttackRU":  1,
+                       "RemediationEN":  1,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_LOCAL_GROUP_MEMBER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_LOCAL_GROUP_RISKY_MEMBER",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_NON_DEFAULT_OWNER",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_NOT_CURRENTLY_EFFECTIVE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_POINTANDPRINT_DRIVER_SOURCE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_POINTANDPRINT_EXPLOITABLE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_POINTANDPRINT_LATENT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_POINTANDPRINT_NONADMIN_INSTALL",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_POINTANDPRINT_USER_SCOPE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_PRINT_DRIVER_HARDENING",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_PRINT_QUEUE_SPECIFIC_FILES",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_PRINT_SPOOLER_RPC",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_REGISTRY_PASSWORD",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_SCOPE_DOMAIN_WIDE",
+                       "ImpactEN":  5,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  6,
+                       "RemediationRU":  4
+                   },
+                   {
+                       "FindingId":  "GPO_SCOPE_SEVERITY",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_SCRIPT_OUTSIDE_POLICY_STORE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_SEMACHINEACCOUNTPRIVILEGE_BROAD",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "GPO_SYSVOL_FOLDER_ORPHANED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_SYSVOL_GPT_MISSING",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_SYSVOL_WRITABLE",
+                       "ImpactEN":  5,
+                       "ImpactRU":  5,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  5,
+                       "RemediationRU":  5
+                   },
+                   {
+                       "FindingId":  "GPO_TASK_CMD_UNQUOTED_PATH",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_TASK_FIELD_SEVERITY",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_TASK_SYSTEM_UNC_PATH",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_TASK_UNQUOTED_PATH",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_UNLINKED_BROAD_WRITE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_DEFAULT_REMOVED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  1,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEASSIGNPRIMARYTOKEN",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  1,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEAUDIT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEBACKUP",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEBATCHLOGON",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  1,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SECREATEGLOBAL",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SECREATESYMBOLICLINK",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SECREATETOKEN",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEDEBUG",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEDELEGATESESSIONUSERIMPERSONATE",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEENABLEDELEGATION",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEIMPERSONATE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEINTERACTIVELOGON",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SELOADDRIVER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEMANAGEVOLUME",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEPROFILESINGLEPROCESS",
+                       "ImpactEN":  1,
+                       "ImpactRU":  2,
+                       "AttackEN":  2,
+                       "AttackRU":  2,
+                       "RemediationEN":  1,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SERELABEL",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEREMOTEINTERACTIVELOGON",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SEREMOTESHUTDOWN",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  1,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SERESTORE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SESECURITY",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SESERVICELOGON",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SESHUTDOWN",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  1,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SESYNCAGENT",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SESYSTEMENVIRONMENT",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  1,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SESYSTEMPROFILE",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  2,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SESYSTEMTIME",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  1,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SETAKEOWNERSHIP",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  1,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SETCB",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GPO_USERRIGHT_SETRUSTEDCREDMANACCESS",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GPO_WIDE_IMPACT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "GUEST_ACCOUNT_DISABLED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "GUEST_ACCOUNT_ENABLED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "INACTIVE_ACCOUNT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "INACTIVE_PRIVILEGED_ACCOUNT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  5,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "INTERDOMAIN_TRUST_ACCOUNT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "KERBEROASTABLE_SPN",
+                       "ImpactEN":  4,
+                       "ImpactRU":  4,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  5,
+                       "RemediationRU":  5
+                   },
+                   {
+                       "FindingId":  "KERBEROASTABLE_USER_SPN",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "KERBEROAST_WITHOUT_PREAUTH",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "KERBEROS_HASH_CRACKABLE",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "KERBEROS_TICKET_LIFETIME_EXTENDED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "KRBTGT_PASSWORD_OLD",
+                       "ImpactEN":  5,
+                       "ImpactRU":  5,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  4,
+                       "RemediationRU":  4
+                   },
+                   {
+                       "FindingId":  "LAPS_ACCOUNT_INFO",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_COVERAGE_NOT_IN_AD",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  1,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_ENCRYPTED_PASSWORD",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_ENCRYPTED_READ_NO_DECRYPTOR",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_GPO_DISABLED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_GPO_ENCRYPTION_DISABLED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_GPO_EXPIRATION_PROTECTION_DISABLED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_GPO_NOT_LINKED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_GPO_NO_AD_BACKUP",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_GPO_NO_POST_AUTH_RESET",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_GPO_PASSWORD_AGE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_GPO_PASSWORD_LENGTH",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_GPO_WEAK_PASSWORD_COMPLEXITY",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_INSTALLED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_LEGACY",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_NOT_DEPLOYED",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_PASSWORD_NOT_ROTATED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_PASSWORD_READABLE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_PASSWORD_READ_ACCESS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_READ_BLOCKED_BY_CONFIDENTIAL",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LAPS_UNPROTECTED_COMPUTERS",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LDAP_ANONYMOUS_BINDING_ALLOWED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LDAP_ANONYMOUS_BINDING_RESTRICTED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  1,
+                       "RemediationEN":  4,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "LDAP_CHANNEL_BINDING_ALWAYS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LDAP_CHANNEL_BINDING_NOT_REQUIRED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  6,
+                       "RemediationRU":  6
+                   },
+                   {
+                       "FindingId":  "LDAP_SIGNING_NOT_REQUIRED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  4,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  6,
+                       "RemediationRU":  6
+                   },
+                   {
+                       "FindingId":  "LDAP_SIGNING_REQUIRED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LOCKOUT_DURATION_FOREVER",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "LOGON_SCRIPT_WRITABLE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "MACHINE_QUOTA_UNRESTRICTED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "META_SEVERITY_PASSTHROUGH",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "META_STATUS_INDICATOR",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  1,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "NON_DEFAULT_COMPUTER_OWNERS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "NON_DEFAULT_OWNER",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "NON_DEFAULT_USER_OWNERS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "NO_ACCOUNT_LOCKOUT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  1,
+                       "RemediationEN":  5,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "NO_MAX_PASSWORD_AGE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "NO_MIN_PASSWORD_AGE",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "NTAUTH_FOREIGN_ISSUER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OLD_FUNCTIONAL_LEVEL",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OPERATOR_GROUP_MEMBERS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "OPERATOR_GROUP_MEMBERSHIP",
+                       "ImpactEN":  5,
+                       "ImpactRU":  2,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "ORPHANED_ADMIN_ACCOUNT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OS_EXTENDED_SECURITY_UPDATES_ONLY",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  1,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OUTDATED_OS",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_NON_DEFAULT_OWNER",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_CONSTRAINED_DELEGATION",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_CREATE_CHILD",
+                       "ImpactEN":  5,
+                       "ImpactRU":  3,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  5,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "OU_PERM_CREATE_DMSA",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_DNSHOSTNAME_WRITE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_DNS_HOST_NAME_ATTRIBUTES",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_GENERICWRITE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_GPLINK",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  5,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "OU_PERM_GPOPTIONS",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  3,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "OU_PERM_GROUP_MEMBERSHIP",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  3,
+                       "RemediationEN":  5,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "OU_PERM_KEYCREDENTIALLINK_WRITE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  4,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  4
+                   },
+                   {
+                       "FindingId":  "OU_PERM_LAPS_READ",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_PASSWORD_RESET",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  6,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "OU_PERM_RBCD",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_READALL",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_SCRIPTPATH",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_SELF_ALL_VALIDATED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_SELF_MEMBERSHIP",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_SPN_WRITE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_USERACCOUNTCONTROL",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_USER_ACCOUNT_RESTRICTIONS",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_VALIDATED_DNS",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_VALIDATED_SPN",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "OU_PERM_WRITEPROPERTY_ALL",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PASSWORD_COMPLEXITY_ENABLED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  1,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "PASSWORD_HISTORY_DISABLED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PASSWORD_NEVER_EXPIRES",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "PASSWORD_NOT_REQUIRED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "PKI_CERTIFICATE_EXPIRED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PKI_SHORT_KEY_LENGTH",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PKI_STRONG_KEY_LENGTH",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PKI_STRONG_SIGNATURE_ALGORITHM",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PKI_WEAK_SIGNATURE_ALGORITHM",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PRECREATED_COMPUTER_ACCOUNT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PREWIN2000_ANONYMOUS_MEMBER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PREWIN2000_BROAD_MEMBER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PREWIN2000_DEFAULT_MEMBER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  1,
+                       "RemediationEN":  3,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "PRIMARY_GROUP_IS_DC_GROUP",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PRIVILEGED_ACCOUNT_ACL",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PRIVILEGED_ACCOUNT_AFFECTED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "PRIVILEGED_GROUP_ACL",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "PRIVILEGED_GROUP_MEMBERSHIP",
+                       "ImpactEN":  6,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  9,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "RBCD_CONFIGURED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "RBCD_DANGEROUS_PRINCIPALS",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "READABLE_UNIX_PASSWORD_ATTRIBUTES",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_ALWAYSINSTALLELEVATED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_AUTOLOGON",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_CACHED_LOGONS",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_CREDGUARD",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_CREDSSP_DELEGATE_ANY",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "REGISTRY_CREDSSP_ORACLE",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  2,
+                       "AttackRU":  2,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_DEFENDER_DISABLED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  2,
+                       "AttackRU":  2,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_DSRM_ADMIN_LOGON",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  3,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "REGISTRY_ENABLELUA",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_ESC10_KDC_BINDING",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  3,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "REGISTRY_ESC10_KDC_BINDING_COMPAT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  4,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  4,
+                       "RemediationRU":  4
+                   },
+                   {
+                       "FindingId":  "REGISTRY_ESC10_SCHANNEL_UPN",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "REGISTRY_FILTERADMINTOKEN",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_FIREWALL_DISABLED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_INSECURE_GUEST_AUTH",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_KERBEROS_WEAK_ETYPES",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_LDAP_CLIENT_SIGNING_OFF",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_LEGACY_TLS",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_LLMNR_ON",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_LMCOMPAT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "REGISTRY_MACHINE_PASSWORD_AGE",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_MACHINE_PASSWORD_STATIC",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_NOLMHASH",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_NULL_SESSION",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_OFFICE_MACROS_ON",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_ONELOGON",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_PRINT_RPC_PRIVACY",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_RDP_ENCRYPTION",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_RDP_NLA",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_RDP_SECURITYLAYER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_REMOTEUAC",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_REMOTE_ASSISTANCE_OFFER",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_RESTRICTEDADMIN",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_RUNASPPL",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  2,
+                       "AttackRU":  2,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_SCRIPTBLOCK_LOGGING_OFF",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_SMB1_CLIENT",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "REGISTRY_SMB1_SERVER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_SMB2_SERVER_DISABLED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_SMB_UNENCRYPTED_ACCESS",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_UAC_NO_PROMPT",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_WDIGEST",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_WINRM_BASIC",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REGISTRY_WINRM_UNENCRYPTED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  2,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "REGISTRY_WSUS_HTTP",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  3,
+                       "AttackRU":  3,
+                       "RemediationEN":  2,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "REGISTRY_WSUS_USER_PROXY",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "REVERSIBLE_ENCRYPTION",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "ROASTABLE_PRIVILEGED_ACCOUNT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "RODC_DENIED_GROUP_MISSING",
+                       "ImpactEN":  1,
+                       "ImpactRU":  1,
+                       "AttackEN":  2,
+                       "AttackRU":  0,
+                       "RemediationEN":  1,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "RODC_PRIVILEGED_PASSWORD_ALLOWED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "RODC_PRIVILEGED_PASSWORD_REVEALED",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SCCM_GROUP_BROAD_MEMBER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SCCM_PXE_EXPOSURE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SCCM_SERVICE_ACCOUNT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SCCM_SITE_HIERARCHY",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SCCM_SYSTEM_MANAGEMENT_ACL",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SCRIPTPATH_HARDCODED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SHADOW_CREDENTIALS",
+                       "ImpactEN":  3,
+                       "ImpactRU":  3,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  3
+                   },
+                   {
+                       "FindingId":  "SID_HISTORY_FOREIGN_PRIVILEGED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SID_HISTORY_INJECTION",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SID_HISTORY_ORPHANED",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SID_HISTORY_OWN_DOMAIN",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SMARTCARD_REQUIRED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SMB_SIGNING_DISABLED",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  1,
+                       "RemediationEN":  7,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "SMB_SIGNING_REQUIRED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  1,
+                       "RemediationEN":  4,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "STALE_PASSWORD",
+                       "ImpactEN":  5,
+                       "ImpactRU":  2,
+                       "AttackEN":  5,
+                       "AttackRU":  2,
+                       "RemediationEN":  7,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "STALE_PASSWORD_MEDIUM",
+                       "ImpactEN":  4,
+                       "ImpactRU":  2,
+                       "AttackEN":  4,
+                       "AttackRU":  1,
+                       "RemediationEN":  5,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "STANDALONE_MSA_LEGACY",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "SYSVOL_FRS_REPLICATION",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "TIER0_NOT_IN_PROTECTED_USERS",
+                       "ImpactEN":  5,
+                       "ImpactRU":  5,
+                       "AttackEN":  4,
+                       "AttackRU":  2,
+                       "RemediationEN":  4,
+                       "RemediationRU":  4
+                   },
+                   {
+                       "FindingId":  "TOMBSTONE_LIFETIME_SHORT",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  2,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "TRUST_BIDIRECTIONAL",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "TRUST_PASSWORD_STALE",
+                       "ImpactEN":  2,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "TRUST_SELECTIVE_AUTH",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "TRUST_SID_FILTERING_DISABLED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "TRUST_TRANSITIVE",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "TRUST_TREAT_AS_EXTERNAL",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "TRUST_USES_RC4",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "UAC_SEVERITY_OVERRIDE",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "UNCONSTRAINED_DELEGATION",
+                       "ImpactEN":  5,
+                       "ImpactRU":  5,
+                       "AttackEN":  5,
+                       "AttackRU":  5,
+                       "RemediationEN":  5,
+                       "RemediationRU":  5
+                   },
+                   {
+                       "FindingId":  "UNCONSTRAINED_DELEGATION_DC",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  5,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  4,
+                       "RemediationEN":  3,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "UNREGISTERED_DOMAIN_CONTROLLER",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "WEAK_FGPP",
+                       "ImpactEN":  5,
+                       "ImpactRU":  1,
+                       "AttackEN":  3,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "WEAK_LOCKOUT_DURATION",
+                       "ImpactEN":  3,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "WEAK_PASSWORD_POLICY",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  4,
+                       "AttackRU":  1,
+                       "RemediationEN":  5,
+                       "RemediationRU":  2
+                   },
+                   {
+                       "FindingId":  "WEB_ENDPOINT_EPA_ENABLED",
+                       "ImpactEN":  4,
+                       "ImpactRU":  1,
+                       "AttackEN":  5,
+                       "AttackRU":  0,
+                       "RemediationEN":  4,
+                       "RemediationRU":  1
+                   },
+                   {
+                       "FindingId":  "WEB_ENDPOINT_SECURITY",
+                       "ImpactEN":  0,
+                       "ImpactRU":  1,
+                       "AttackEN":  0,
+                       "AttackRU":  0,
+                       "RemediationEN":  0,
+                       "RemediationRU":  1
+                   }
+               ]
+}

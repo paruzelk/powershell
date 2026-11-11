@@ -120,7 +120,7 @@
                     # A group that does not exist is not an error - below Domain Functional
                     # Level 2012 R2 there is none, and then no account can be a member.
                     Write-Log "[Get-ASREPRoastableAccounts] Protected Users membership could not be read: $_" -Level Warning
-                    Show-Line "Protected Users membership could not be read - members are not marked below" -Class "Note"
+                    Show-Line "Не удалось прочитать состав Protected Users; принадлежность учётных записей к группе ниже не отмечена" -Class "Note"
                 }
 
                 # Determine if we should extract hashes (not in OPSEC mode)
@@ -208,11 +208,11 @@
                 if ($totalUsers -gt $Script:ProgressThreshold) { Show-Progress -Activity "Analyzing AS-REP Roastable accounts" -Completed }
 
                 if ($privilegedCount -gt 0) {
-                    Show-Line "$privilegedCount of them is/are privileged - this hash needs no credentials at all to obtain" -Class "Finding"
+                    Show-Line "Из найденных учётных записей привилегированных: $privilegedCount; для получения AS-REP-хеша не требуются учётные данные" -Class "Finding"
                 }
 
                 if ($protectedCount -gt 0) {
-                    Show-Line "$protectedCount of them is/are in Protected Users - AES-only AS-REP, slower to crack" -Class "Hint"
+                    Show-Line "Из найденных записей в Protected Users: $protectedCount; AS-REP только с AES, автономный подбор сложнее" -Class "Hint"
                 }
 
                 # Kerberoasting without pre-authentication: an account that needs none lets
@@ -229,7 +229,7 @@
                 }
                 $spnAccounts = @(Get-DomainUser -SPN -Enabled -LDAPFilter $krbtgtExclusion -Properties 'sAMAccountName' @connectionParams)
                 if (@($spnAccounts).Count -gt 0) {
-                    Show-Line "Through these accounts, $(@($spnAccounts).Count) kerberoastable account(s) can be roasted without any credentials" -Class "Finding" -FindingId 'KERBEROAST_WITHOUT_PREAUTH'
+                    Show-Line "Через эти записи доступен Kerberoasting без учётных данных для записей со SPN: $(@($spnAccounts).Count)" -Class "Finding" -FindingId 'KERBEROAST_WITHOUT_PREAUTH'
                 }
             } else {
                 Show-Line "Учётных записей, допускающих AS-REP Roasting, не найдено" -Class "Secure"
@@ -237,7 +237,7 @@
 
         } catch {
             Write-Log "[Get-ASREPRoastableAccounts] Error: $_" -Level Error
-            Show-Line "Error during check - AS-REP roastable accounts could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: учётные записи, уязвимые к AS-REP Roasting, оценить не удалось: $_" -Class Finding
         }
     }
 

@@ -97,7 +97,7 @@
                 }
 
                 if ($privilegedCount -gt 0) {
-                    Show-Line "$privilegedCount of them is/are privileged - the cleartext password of an administrator is recoverable from the DC" -Class Finding
+                    Show-Line "Из обнаруженных записей привилегированных: $privilegedCount; пароль администратора можно восстановить из данных контроллера домена в открытом виде" -Class Finding
                 }
             } else {
                 Show-Line "Учётных записей с обратимым шифрованием пароля не найдено" -Class Secure
@@ -107,7 +107,7 @@
             Write-Log "[Get-AdminReversibleEncryption] Error: $_" -Level Error
             # Said on the console, as the other checks do: a failed query used to end the
             # section without a word, which read like a domain with nothing to report.
-            Show-Line "Error during check - accounts with reversible encryption could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: оценить записи с обратимым шифрованием пароля не удалось: $_" -Class Finding
         }
     }
 

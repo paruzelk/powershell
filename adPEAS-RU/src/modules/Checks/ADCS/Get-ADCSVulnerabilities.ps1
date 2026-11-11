@@ -223,7 +223,7 @@
                     }
 
                     if (@($certList).Count -gt 0) {
-                        Show-Line "NTAuth Store contains $(@($certList).Count) certificate(s) trusted for domain authentication (PKINIT)" -Class Note
+                        Show-Line "В хранилище NTAuth находится сертификатов, доверенных для доменной аутентификации PKINIT: $(@($certList).Count)" -Class Note
 
                         # Every issuer in this store may issue a certificate that logs on as
                         # any account, and the store used to be listed without a word on any
@@ -290,10 +290,10 @@
                                        "verify each was added on purpose, and who holds its key") -Class Hint -FindingId 'NTAUTH_FOREIGN_ISSUER'
                         }
                         if ($expiredCount -gt 0) {
-                            Show-Line "$expiredCount NTAuth certificate(s) have expired and can be removed from the store" -Class Hint -FindingId 'PKI_CERTIFICATE_EXPIRED'
+                            Show-Line "Сертификатов NTAuth с истёкшим сроком действия, которые можно удалить после проверки зависимостей: $expiredCount" -Class Hint -FindingId 'PKI_CERTIFICATE_EXPIRED'
                         }
                         if ($weakCount -gt 0) {
-                            Show-Line "$weakCount NTAuth certificate(s) are signed with a weak hash algorithm" -Class Hint -FindingId 'PKI_WEAK_SIGNATURE_ALGORITHM'
+                            Show-Line "Сертификатов NTAuth со слабым алгоритмом хеширования подписи: $weakCount" -Class Hint -FindingId 'PKI_WEAK_SIGNATURE_ALGORITHM'
                         }
 
                         foreach ($ntAuthRow in $ntAuthRows) {
@@ -1153,7 +1153,7 @@
                         }
                     }
                 } else {
-                    Show-Line "PKI container permissions are properly restricted" -Class Secure
+                    Show-Line "Разрешения на контейнерах PKI ограничены ожидающимся образом" -Class Secure
                 }
             }
             catch {
@@ -1177,7 +1177,7 @@
             $templates = @($templateResults | Where-Object { $_._QueryError -ne $true })
 
             if (@($templates).Count -eq 0) {
-                Show-Line "No enabled certificate templates found" -Class Note
+                Show-Line "Включённые шаблоны сертификатов не обнаружены" -Class Note
                 return
             }
 
@@ -1226,7 +1226,7 @@
             # Without it the only trace is an empty PublishedOn row per template, which reads
             # as "published nowhere" rather than "not determined".
             if (@($templates | Where-Object { $_.PublicationUnknown }).Count -gt 0) {
-                Show-Line "Which templates are published to a CA could not be determined - disabled templates may appear below" -Class "Note"
+                Show-Line "Не удалось определить, какие шаблоны опубликованы на ЦС; ниже могут отображаться отключённые шаблоны" -Class "Note"
             }
 
             # Pre-pass: resolve enrollment privilege for every template once, and record which
@@ -1819,14 +1819,14 @@
                 # No interesting templates found
                 $totalFindings = $totalVulnerabilities + $caVulnerabilityCount
                 if ($totalFindings -eq 0) {
-                    Show-Line "No findings in $($templates.Count) analyzed template(s) - all enrollment restricted to privileged users" -Class Secure
+                    Show-Line "Нарушений не обнаружено в $($templates.Count) проверенных шаблонах; регистрация сертификатов ограничена привилегированными пользователями" -Class Secure
                 }
             }
 
         }
         catch {
             Write-Log "[Get-ADCSVulnerabilities] Error: $_" -Level Error
-            Show-Line "Error during check - certificate services vulnerabilities could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: уязвимости служб сертификатов оценить не удалось: $_" -Class Finding
         }
     }
 

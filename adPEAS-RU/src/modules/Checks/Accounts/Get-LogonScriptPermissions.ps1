@@ -91,7 +91,7 @@
             # Internal: the attributes are used here, the accounts are not shown.
             $accounts = @(Get-DomainUser -Enabled -LDAPFilter '(scriptPath=*)' -Properties 'sAMAccountName', 'scriptPath', 'objectSid' @connectionParams)
             if ($accounts.Count -eq 0) {
-                Show-Line "No enabled account runs a logon script" -Class Note
+                Show-Line "Включённых учётных записей со сценарием входа не обнаружено" -Class Note
                 return
             }
 
@@ -183,22 +183,22 @@
                 $distinctReasons = @($unchecked | Select-Object -Unique)
                 $reasonText = (@($distinctReasons | Select-Object -First 10) -join '; ')
                 if ($distinctReasons.Count -gt 10) { $reasonText += "; and $($distinctReasons.Count - 10) more" }
-                Show-Line "$($distinctReasons.Count) logon script(s) could not be checked - who may change them was not evaluated: $reasonText" -Class Note
+                Show-Line "Сценариев входа, для которых не удалось проверить права изменения: $($distinctReasons.Count). Причины: $reasonText" -Class Note
             }
 
             if ($localAccounts -gt 0) {
-                Show-Line "$localAccounts account(s) run a logon script from a local path, which exists on each computer and is not read over the network" -Class Note
+                Show-Line "Учётных записей со сценарием входа по локальному пути: $localAccounts; файл находится на каждом компьютере и не считывается по сети" -Class Note
             }
 
             if ($writable.Count -eq 0 -and $readClean -gt 0) {
                 $cleanClass = 'Secure'
                 if ($unchecked.Count -gt 0) { $cleanClass = 'Note' }
-                Show-Line "Only administrators and privileged accounts may change the $readClean logon script(s) read" -Class $cleanClass
+                Show-Line "Прочитано сценариев входа: $readClean; изменять их могут только администраторы и привилегированные записи" -Class $cleanClass
             }
 
         } catch {
             Write-Log "[Get-LogonScriptPermissions] Error: $_" -Level Error
-            Show-Line "Error during check - the logon scripts of accounts could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: сценарии входа учётных записей оценить не удалось: $_" -Class Finding
         } finally {
             $Script:_uncWriteAccess = $null
         }

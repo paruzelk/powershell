@@ -8,112 +8,12 @@
                                "report-scripts.js",
                                "report-styles.css"
                            ],
-    "UntranslatedCandidateCount":  564,
+    "UntranslatedCandidateCount":  524,
     "UntranslatedCandidates":  [
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-AdminPasswordNeverExpires.ps1",
-                                       "Line":  104,
-                                       "Text":  "No privileged account has \u0027password never expires\u0027 set"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-AdminPasswordNeverExpires.ps1",
-                                       "Line":  205,
-                                       "Text":  "No privileged account has \u0027password never expires\u0027 set (filtered $(@($candidates).Count) candidate(s) with orphaned adminCount)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-AdminPasswordNeverExpires.ps1",
-                                       "Line":  210,
-                                       "Text":  "Error during check - privileged accounts whose password never expires could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-AdminReversibleEncryption.ps1",
-                                       "Line":  110,
-                                       "Text":  "Error during check - accounts with reversible encryption could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                                       "Line":  83,
-                                       "Text":  "The configuration naming context is not known - authentication policy silos were not checked"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                                       "Line":  95,
-                                       "Text":  "The authentication policy configuration could not be read - not checked"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                                       "Line":  267,
-                                       "Text":  "The DCs support claims and Kerberos armoring ($($kdc.Detail)) - client support is not checked"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                                       "Line":  271,
-                                       "Text":  "The DCs do not support claims and Kerberos armoring ($($kdc.Detail)) - the KDC cannot evaluate the conditions"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                                       "Line":  274,
-                                       "Text":  "Whether the DCs support claims and Kerberos armoring could not be read ($($kdc.Detail)) - not checked"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                                       "Line":  285,
-                                       "Text":  "Error during check - authentication policy silos could not be evaluated: $_"
-                                   },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-InactiveAdminAccounts.ps1",
                                        "Line":  211,
                                        "Text":  "Error during check - inactive privileged accounts could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-LogonScriptPermissions.ps1",
-                                       "Line":  94,
-                                       "Text":  "No enabled account runs a logon script"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-LogonScriptPermissions.ps1",
-                                       "Line":  196,
-                                       "Text":  "Only administrators and privileged accounts may change the $readClean logon script(s) read"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-LogonScriptPermissions.ps1",
-                                       "Line":  201,
-                                       "Text":  "Error during check - the logon scripts of accounts could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  260,
-                                       "Text":  "Non-privileged password readers: $readerList"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  263,
-                                       "Text":  "gMSA password access could not be analyzed - no membership descriptor could be read"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  267,
-                                       "Text":  "gMSA password access is restricted to privileged accounts and service hosts ($unanalyzedCount of $totalGMSAs not analyzed)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  278,
-                                       "Text":  "msDS-GroupMSAMembership could not be parsed on $(@($unparsedGMSAs).Count) gMSA(s) - their password access is unknown: $(@($unparsedGMSAs) -join \u0027, \u0027)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  293,
-                                       "Text":  "msDS-GroupMSAMembership is owned by a principal that is not privileged: $ownerList"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  341,
-                                       "Text":  "gMSA(s) rotating their password less often than every 90 days: $(@($longIntervals) -join \u0027, \u0027)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  344,
-                                       "Text":  "gMSA(s) with an expiry date - the account stops authenticating when it passes: $(@($expiringGMSAs) -join \u0027, \u0027)"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
@@ -124,26 +24,6 @@
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
                                        "Line":  425,
                                        "Text":  "Use NT hash with: Pass-the-Hash, Overpass-the-Hash, or DCSync impersonation"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  468,
-                                       "Text":  "gMSA password retrieval cannot be tested over an unencrypted connection - rerun with -UseLDAPS"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  470,
-                                       "Text":  "gMSA password access could not be tested - every read failed"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  472,
-                                       "Text":  "Current user cannot retrieve any gMSA passwords ($readFailures of $totalGMSAs could not be tested)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  477,
-                                       "Text":  "Retrieved $passwordsRetrieved of $($gmsaAccounts.Count) gMSA password(s)"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
@@ -206,11 +86,6 @@
                                        "Text":  "dMSA use is restricted to privileged accounts and service hosts ($unanalyzedDMSAs of $($dmsaAccounts.Count) not analyzed)"
                                    },
                                    {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  815,
-                                       "Text":  "Error during check - managed service accounts could not be evaluated: $_"
-                                   },
-                                   {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-NonDefaultUserOwners.ps1",
                                        "Line":  213,
                                        "Text":  "All users have default owners (filtered $filteredHealthMailboxes Exchange Health Mailboxes)"
@@ -219,21 +94,6 @@
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-NonDefaultUserOwners.ps1",
                                        "Line":  221,
                                        "Text":  "Error during check - the owners of user accounts could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-PasswordNotRequired.ps1",
-                                       "Line":  150,
-                                       "Text":  "Trust account(s) carrying the flag by design, not assessed: $(($trustAccounts | ForEach-Object { $_.sAMAccountName }) -join \u0027, \u0027)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-PasswordNotRequired.ps1",
-                                       "Line":  192,
-                                       "Text":  "Error during check - accounts without a password requirement could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-RODCPasswordReplication.ps1",
-                                       "Line":  166,
-                                       "Text":  "Error during check - the password replication policy of the read-only Domain Controllers could not be evaluated: $_"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Accounts\\Get-SIDHistoryInjection.ps1",
@@ -246,54 +106,9 @@
                                        "Text":  "Error during check - certificate templates could not be evaluated: $_"
                                    },
                                    {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                                       "Line":  226,
-                                       "Text":  "NTAuth Store contains $(@($certList).Count) certificate(s) trusted for domain authentication (PKINIT)"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                                       "Line":  1156,
-                                       "Text":  "PKI container permissions are properly restricted"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                                       "Line":  1180,
-                                       "Text":  "No enabled certificate templates found"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                                       "Line":  1229,
-                                       "Text":  "Which templates are published to a CA could not be determined - disabled templates may appear below"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                                       "Line":  1822,
-                                       "Text":  "No findings in $($templates.Count) analyzed template(s) - all enrollment restricted to privileged users"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                                       "Line":  1829,
-                                       "Text":  "Error during check - certificate services vulnerabilities could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                                       "Line":  133,
-                                       "Text":  "Could not read explicit certificate mappings: $($_.Exception.Message)"
-                                   },
-                                   {
                                        "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
                                        "Line":  226,
                                        "Text":  "Found $countText"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                                       "Line":  285,
-                                       "Text":  "The property set containing altSecurityIdentities could not be read - a delegation naming the set is not examined"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                                       "Line":  458,
-                                       "Text":  "Error during check - who may write altSecurityIdentities could not be evaluated: $_"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
@@ -544,21 +359,6 @@
                                        "File":  "src\\modules\\Checks\\Computer\\Get-OutdatedComputers.ps1",
                                        "Line":  256,
                                        "Text":  "Error during check - outdated operating systems could not be evaluated: $_"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-ASREPRoastableAccounts.ps1",
-                                       "Line":  123,
-                                       "Text":  "Protected Users membership could not be read - members are not marked below"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-ASREPRoastableAccounts.ps1",
-                                       "Line":  232,
-                                       "Text":  "Through these accounts, $(@($spnAccounts).Count) kerberoastable account(s) can be roasted without any credentials"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-ASREPRoastableAccounts.ps1",
-                                       "Line":  240,
-                                       "Text":  "Error during check - AS-REP roastable accounts could not be evaluated: $_"
                                    },
                                    {
                                        "File":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",

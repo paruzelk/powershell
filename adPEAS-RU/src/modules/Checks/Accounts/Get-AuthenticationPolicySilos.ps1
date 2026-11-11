@@ -80,7 +80,7 @@
 
             $configNC = [string]$Script:LDAPContext.ConfigurationNamingContext
             if (-not $configNC) {
-                Show-Line "The configuration naming context is not known - authentication policy silos were not checked" -Class Note
+                Show-Line "Раздел конфигурации AD неизвестен — хранилища политик проверки подлинности не проверялись" -Class Note
                 return
             }
             $authNBase = "CN=AuthN Policy Configuration,CN=Services,$configNC"
@@ -92,7 +92,7 @@
                 $policies = @(Get-DomainObject -LDAPFilter '(objectClass=msDS-AuthNPolicy)' -SearchBase $authNBase @connectionParams)
             } catch {
                 Write-Log "[Get-AuthenticationPolicySilos] The authentication policy configuration could not be read: $_" -Level Warning
-                Show-Line "The authentication policy configuration could not be read - not checked" -Class Note
+                Show-Line "Не удалось прочитать конфигурацию политик проверки подлинности — проверка не выполнена" -Class Note
                 return
             }
 
@@ -264,14 +264,14 @@
                 $kdc = Get-KdcClaimsSupport -ConnectionParams $connectionParams
                 switch ($kdc.State) {
                     'Supported' {
-                        Show-Line "The DCs support claims and Kerberos armoring ($($kdc.Detail)) - client support is not checked" -Class Note
+                        Show-Line "Контроллеры домена поддерживают claims и защищённый Kerberos (Armoring) ($($kdc.Detail)); поддержка клиентами не проверялась" -Class Note
                     }
                     'NotSupported' {
                         $kdcSupportMissing = $true
-                        Show-Line "The DCs do not support claims and Kerberos armoring ($($kdc.Detail)) - the KDC cannot evaluate the conditions" -Class Hint -FindingId 'AUTHN_KDC_ARMORING_NOT_SUPPORTED'
+                        Show-Line "Контроллеры домена не поддерживают claims и Kerberos Armoring ($($kdc.Detail)); KDC не может оценить условия политики" -Class Hint -FindingId 'AUTHN_KDC_ARMORING_NOT_SUPPORTED'
                     }
                     default {
-                        Show-Line "Whether the DCs support claims and Kerberos armoring could not be read ($($kdc.Detail)) - not checked" -Class Note
+                        Show-Line "Сведения о поддержке claims и Kerberos Armoring контроллерами домена недоступны ($($kdc.Detail)); проверка не выполнена" -Class Note
                     }
                 }
             }
@@ -282,7 +282,7 @@
 
         } catch {
             Write-Log "[Get-AuthenticationPolicySilos] Error: $_" -Level Error
-            Show-Line "Error during check - authentication policy silos could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: хранилища политик проверки подлинности оценить не удалось: $_" -Class Finding
         }
     }
 

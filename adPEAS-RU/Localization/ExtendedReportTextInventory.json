@@ -1,164 +1,20 @@
 ﻿{
     "schema":  "adPEAS-RU.ReportTextCoverage.1",
     "locale":  "ru-RU",
-    "translatedNewRules":  41,
+    "translatedNewRules":  97,
     "sources":  200,
     "htmlTemplates":  [
                           "src/modules/Reporting/templates/report-template.html",
                           "src/modules/Reporting/templates/report-scripts.js",
                           "src/modules/Reporting/templates/diff-template.html"
                       ],
-    "candidateCount":  851,
+    "candidateCount":  795,
     "candidates":  [
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AdminPasswordNeverExpires.ps1",
-                           "line":  104,
-                           "snippet":  "Show-Line \"No privileged account has \u0027password never expires\u0027 set\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AdminPasswordNeverExpires.ps1",
-                           "line":  196,
-                           "snippet":  "Show-Line \"$(@($smartcardAccounts).Count) privileged account(s) carry the flag but require a smart card to log on:\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AdminPasswordNeverExpires.ps1",
-                           "line":  205,
-                           "snippet":  "Show-Line \"No privileged account has \u0027password never expires\u0027 set (filtered $(@($candidates).Count) candidate(s) with orphaned adminCount)\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AdminPasswordNeverExpires.ps1",
-                           "line":  210,
-                           "snippet":  "Show-Line \"Error during check - privileged accounts whose password never expires could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AdminReversibleEncryption.ps1",
-                           "line":  100,
-                           "snippet":  "Show-Line \"$privilegedCount of them is/are privileged - the cleartext password of an administrator is recoverable from the DC\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AdminReversibleEncryption.ps1",
-                           "line":  110,
-                           "snippet":  "Show-Line \"Error during check - accounts with reversible encryption could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                           "line":  83,
-                           "snippet":  "Show-Line \"The configuration naming context is not known - authentication policy silos were not checked\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                           "line":  95,
-                           "snippet":  "Show-Line \"The authentication policy configuration could not be read - not checked\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                           "line":  267,
-                           "snippet":  "Show-Line \"The DCs support claims and Kerberos armoring ($($kdc.Detail)) - client support is not checked\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                           "line":  271,
-                           "snippet":  "Show-Line \"The DCs do not support claims and Kerberos armoring ($($kdc.Detail)) - the KDC cannot evaluate the conditions\" -Class Hint -FindingId \u0027AUTHN_KDC_ARMORING_NOT_SUPPORTED\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                           "line":  274,
-                           "snippet":  "Show-Line \"Whether the DCs support claims and Kerberos armoring could not be read ($($kdc.Detail)) - not checked\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-AuthenticationPolicySilos.ps1",
-                           "line":  285,
-                           "snippet":  "Show-Line \"Error during check - authentication policy silos could not be evaluated: $_\" -Class Finding"
-                       },
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-InactiveAdminAccounts.ps1",
                            "line":  211,
                            "snippet":  "Show-Line \"Error during check - inactive privileged accounts could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-LogonScriptPermissions.ps1",
-                           "line":  94,
-                           "snippet":  "Show-Line \"No enabled account runs a logon script\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-LogonScriptPermissions.ps1",
-                           "line":  186,
-                           "snippet":  "Show-Line \"$($distinctReasons.Count) logon script(s) could not be checked - who may change them was not evaluated: $reasonText\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-LogonScriptPermissions.ps1",
-                           "line":  190,
-                           "snippet":  "Show-Line \"$localAccounts account(s) run a logon script from a local path, which exists on each computer and is not read over the network\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-LogonScriptPermissions.ps1",
-                           "line":  196,
-                           "snippet":  "Show-Line \"Only administrators and privileged accounts may change the $readClean logon script(s) read\" -Class $cleanClass"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-LogonScriptPermissions.ps1",
-                           "line":  201,
-                           "snippet":  "Show-Line \"Error during check - the logon scripts of accounts could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  260,
-                           "snippet":  "Show-Line \"Non-privileged password readers: $readerList\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  263,
-                           "snippet":  "Show-Line \"gMSA password access could not be analyzed - no membership descriptor could be read\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  267,
-                           "snippet":  "Show-Line \"gMSA password access is restricted to privileged accounts and service hosts ($unanalyzedCount of $totalGMSAs not analyzed)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  278,
-                           "snippet":  "Show-Line \"msDS-GroupMSAMembership could not be parsed on $(@($unparsedGMSAs).Count) gMSA(s) - their password access is unknown: $(@($unparsedGMSAs) -join \u0027, \u0027)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  293,
-                           "snippet":  "Show-Line \"msDS-GroupMSAMembership is owned by a principal that is not privileged: $ownerList\" -Class Finding -FindingId \u0027GMSA_MEMBERSHIP_OWNER\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  341,
-                           "snippet":  "Show-Line \"gMSA(s) rotating their password less often than every 90 days: $(@($longIntervals) -join \u0027, \u0027)\" -Class Hint -FindingId \u0027GMSA_ROTATION_INTERVAL_LONG\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  344,
-                           "snippet":  "Show-Line \"gMSA(s) with an expiry date - the account stops authenticating when it passes: $(@($expiringGMSAs) -join \u0027, \u0027)\" -Class Note"
                        },
                        {
                            "kind":  "DirectShow",
@@ -171,30 +27,6 @@
                            "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
                            "line":  425,
                            "snippet":  "Show-Line \"Use NT hash with: Pass-the-Hash, Overpass-the-Hash, or DCSync impersonation\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  468,
-                           "snippet":  "Show-Line \"gMSA password retrieval cannot be tested over an unencrypted connection - rerun with -UseLDAPS\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  470,
-                           "snippet":  "Show-Line \"gMSA password access could not be tested - every read failed\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  472,
-                           "snippet":  "Show-Line \"Current user cannot retrieve any gMSA passwords ($readFailures of $totalGMSAs could not be tested)\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  477,
-                           "snippet":  "Show-Line \"Retrieved $passwordsRetrieved of $($gmsaAccounts.Count) gMSA password(s)\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",
@@ -270,12 +102,6 @@
                        },
                        {
                            "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  815,
-                           "snippet":  "Show-Line \"Error during check - managed service accounts could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-NonDefaultUserOwners.ps1",
                            "line":  213,
                            "snippet":  "Show-Line \"All users have default owners (filtered $filteredHealthMailboxes Exchange Health Mailboxes)\" -Class Secure"
@@ -285,36 +111,6 @@
                            "source":  "src\\modules\\Checks\\Accounts\\Get-NonDefaultUserOwners.ps1",
                            "line":  221,
                            "snippet":  "Show-Line \"Error during check - the owners of user accounts could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PasswordNotRequired.ps1",
-                           "line":  135,
-                           "snippet":  "Show-Line \"$(@($emptyPassword).Count) account(s) carry the flag and have never had a password set\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PasswordNotRequired.ps1",
-                           "line":  140,
-                           "snippet":  "Show-Line \"$(@($privilegedAccounts).Count) privileged account(s) are exempt from the password policy\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PasswordNotRequired.ps1",
-                           "line":  150,
-                           "snippet":  "Show-Line \"Trust account(s) carrying the flag by design, not assessed: $(($trustAccounts | ForEach-Object { $_.sAMAccountName }) -join \u0027, \u0027)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PasswordNotRequired.ps1",
-                           "line":  180,
-                           "snippet":  "Show-Line \"$($unusedComputers.Count) computer account(s) carry the flag and have never logged on - the password may be empty or the computer name\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PasswordNotRequired.ps1",
-                           "line":  192,
-                           "snippet":  "Show-Line \"Error during check - accounts without a password requirement could not be evaluated: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DynamicSummary",
@@ -426,42 +222,6 @@
                        },
                        {
                            "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-RODCPasswordReplication.ps1",
-                           "line":  145,
-                           "snippet":  "Show-Line \"$rodcName - $($exposedNames.Count) privileged account(s) may have their password cached, allowed and not denied by its password replication policy: $(Format-RODCAccountList $exposedNames)\" -Class Finding -FindingId \u0027RODC_PRIVILEGED_PASSWORD_ALLOWED\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-RODCPasswordReplication.ps1",
-                           "line":  149,
-                           "snippet":  "Show-Line \"$rodcName - the secrets of $($revealedNames.Count) privileged account(s) are cached on it already: $(Format-RODCAccountList $revealedNames)\" -Class Finding -FindingId \u0027RODC_PRIVILEGED_PASSWORD_REVEALED\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-RODCPasswordReplication.ps1",
-                           "line":  153,
-                           "snippet":  "Show-Line \"$rodcName - the Denied RODC Password Replication Group is not on its deny list\" -Class Hint -FindingId \u0027RODC_DENIED_GROUP_MISSING\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-RODCPasswordReplication.ps1",
-                           "line":  157,
-                           "snippet":  "Show-Line \"$rodcName - $unresolvedDenied member(s) of its deny list could not be resolved and were not counted\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-RODCPasswordReplication.ps1",
-                           "line":  160,
-                           "snippet":  "Show-Line \"$rodcName - no privileged account may have its password cached, and none has\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-RODCPasswordReplication.ps1",
-                           "line":  166,
-                           "snippet":  "Show-Line \"Error during check - the password replication policy of the read-only Domain Controllers could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-SIDHistoryInjection.ps1",
                            "line":  358,
                            "snippet":  "Show-Line (\"$(@($orphanedAccounts).Count) account(s) carry sIDHistory from $(@($orphanedDomainSIDs).Count) domain(s) this domain \" +"
@@ -481,12 +241,6 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                           "line":  226,
-                           "snippet":  "Show-Line \"NTAuth Store contains $(@($certList).Count) certificate(s) trusted for domain authentication (PKINIT)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
                            "line":  285,
                            "snippet":  "Show-Line (\"$($ntAuthIssuers.Count) different CAs are trusted to issue a certificate that logs \" +"
                        },
@@ -497,58 +251,10 @@
                            "snippet":  "Show-Line (\"$foreignCount NTAuth certificate(s) belong to no Enterprise CA of this forest - \" +"
                        },
                        {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                           "line":  293,
-                           "snippet":  "Show-Line \"$expiredCount NTAuth certificate(s) have expired and can be removed from the store\" -Class Hint -FindingId \u0027PKI_CERTIFICATE_EXPIRED\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                           "line":  296,
-                           "snippet":  "Show-Line \"$weakCount NTAuth certificate(s) are signed with a weak hash algorithm\" -Class Hint -FindingId \u0027PKI_WEAK_SIGNATURE_ALGORITHM\u0027"
-                       },
-                       {
                            "kind":  "DynamicSummary",
                            "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
                            "line":  1106,
                            "snippet":  "$countText = if ($IncludePrivileged) { \"$(@($allFindings).Count) finding(s)\" } else { \"$(@($allFindings).Count) non-privileged finding(s)\" }"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                           "line":  1156,
-                           "snippet":  "Show-Line \"PKI container permissions are properly restricted\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                           "line":  1180,
-                           "snippet":  "Show-Line \"No enabled certificate templates found\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                           "line":  1229,
-                           "snippet":  "Show-Line \"Which templates are published to a CA could not be determined - disabled templates may appear below\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                           "line":  1822,
-                           "snippet":  "Show-Line \"No findings in $($templates.Count) analyzed template(s) - all enrollment restricted to privileged users\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                           "line":  1829,
-                           "snippet":  "Show-Line \"Error during check - certificate services vulnerabilities could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                           "line":  133,
-                           "snippet":  "Show-Line \"Could not read explicit certificate mappings: $($_.Exception.Message)\" -Class Note"
                        },
                        {
                            "kind":  "DynamicSummary",
@@ -561,18 +267,6 @@
                            "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
                            "line":  226,
                            "snippet":  "Show-Line \"Found $countText\" -Class $mappingClass -FindingId \u0027ESC14_WEAK_EXPLICIT_MAPPING\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                           "line":  285,
-                           "snippet":  "Show-Line \"The property set containing altSecurityIdentities could not be read - a delegation naming the set is not examined\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                           "line":  458,
-                           "snippet":  "Show-Line \"Error during check - who may write altSecurityIdentities could not be evaluated: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",
@@ -1035,36 +729,6 @@
                            "source":  "src\\modules\\Checks\\Computer\\Get-OutdatedComputers.ps1",
                            "line":  256,
                            "snippet":  "Show-Line \"Error during check - outdated operating systems could not be evaluated: $_\" -Class Finding"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-ASREPRoastableAccounts.ps1",
-                           "line":  123,
-                           "snippet":  "Show-Line \"Protected Users membership could not be read - members are not marked below\" -Class \"Note\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-ASREPRoastableAccounts.ps1",
-                           "line":  211,
-                           "snippet":  "Show-Line \"$privilegedCount of them is/are privileged - this hash needs no credentials at all to obtain\" -Class \"Finding\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-ASREPRoastableAccounts.ps1",
-                           "line":  215,
-                           "snippet":  "Show-Line \"$protectedCount of them is/are in Protected Users - AES-only AS-REP, slower to crack\" -Class \"Hint\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-ASREPRoastableAccounts.ps1",
-                           "line":  232,
-                           "snippet":  "Show-Line \"Through these accounts, $(@($spnAccounts).Count) kerberoastable account(s) can be roasted without any credentials\" -Class \"Finding\" -FindingId \u0027KERBEROAST_WITHOUT_PREAUTH\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-ASREPRoastableAccounts.ps1",
-                           "line":  240,
-                           "snippet":  "Show-Line \"Error during check - AS-REP roastable accounts could not be evaluated: $_\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",

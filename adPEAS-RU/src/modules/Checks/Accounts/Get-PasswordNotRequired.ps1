@@ -132,12 +132,12 @@
                 if ($totalAccounts -gt $Script:ProgressThreshold) { Show-Progress -Activity "Processing accounts without password requirement" -Completed }
 
                 if (@($emptyPassword).Count -gt 0) {
-                    Show-Line "$(@($emptyPassword).Count) account(s) carry the flag and have never had a password set" -Class Finding
+                    Show-Line "Учётных записей с флагом «пароль не требуется», для которых пароль никогда не задавался: $(@($emptyPassword).Count)" -Class Finding
                     foreach ($user in $emptyPassword) { Show-Object $user -Class Finding }
                 }
 
                 if (@($privilegedAccounts).Count -gt 0) {
-                    Show-Line "$(@($privilegedAccounts).Count) privileged account(s) are exempt from the password policy" -Class Finding
+                    Show-Line "Привилегированных записей, на которые не распространяется требование пароля: $(@($privilegedAccounts).Count)" -Class Finding
                     foreach ($user in $privilegedAccounts) { Show-Object $user -Class Finding }
                 }
 
@@ -147,7 +147,7 @@
                 }
 
                 if (@($trustAccounts).Count -gt 0) {
-                    Show-Line "Trust account(s) carrying the flag by design, not assessed: $(($trustAccounts | ForEach-Object { $_.sAMAccountName }) -join ', ')" -Class Note
+                    Show-Line "Учётные записи доверительных отношений с этим флагом по назначению не оценивались: $(($trustAccounts | ForEach-Object { $_.sAMAccountName }) -join ', ')" -Class Note
                 }
             } elseif ($computerAccounts.Count -eq 0) {
                 Show-Line "Включённых учётных записей с флагом PASSWD_NOTREQD («пароль не требуется») не обнаружено" -Class Secure
@@ -177,7 +177,7 @@
                 }
 
                 if ($unusedComputers.Count -gt 0) {
-                    Show-Line "$($unusedComputers.Count) computer account(s) carry the flag and have never logged on - the password may be empty or the computer name" -Class Finding
+                    Show-Line "Учётных записей компьютеров с флагом, которые ни разу не входили: $($unusedComputers.Count); пароль может быть пустым или совпадать с именем компьютера" -Class Finding
                     foreach ($computer in $unusedComputers) { Show-Object $computer -Class Finding }
                 }
 
@@ -189,7 +189,7 @@
 
         } catch {
             Write-Log "[Get-PasswordNotRequired] Error: $_" -Level Error
-            Show-Line "Error during check - accounts without a password requirement could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: записи с отключённым требованием пароля оценить не удалось: $_" -Class Finding
         }
     }
 

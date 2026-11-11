@@ -130,7 +130,7 @@
         }
         catch {
             Write-Log "[Get-WeakCertificateMapping] Query for altSecurityIdentities failed: $_" -Level Warning
-            Show-Line "Could not read explicit certificate mappings: $($_.Exception.Message)" -Class Note
+            Show-Line "Не удалось прочитать явные сопоставления сертификатов: $($_.Exception.Message)" -Class Note
             return
         }
 
@@ -282,7 +282,7 @@
             if ($altSecPropertySet) {
                 Write-Log "[Get-WeakCertificateMapping] altSecurityIdentities belongs to property set $altSecPropertySet"
             } elseif (@($privilegedTargets).Count -gt 0) {
-                Show-Line "The property set containing altSecurityIdentities could not be read - a delegation naming the set is not examined" -Class Note
+                Show-Line "Не удалось прочитать набор свойств с altSecurityIdentities; делегирование на этот набор не проверено" -Class Note
             }
             Write-Log "[Get-WeakCertificateMapping] Checking altSecurityIdentities write access on $(@($privilegedTargets).Count) privileged principal(s)"
 
@@ -455,7 +455,7 @@
             # A failed analysis found nothing, which is not the same as nothing to find:
             # the green line below used to close this section after an exception.
             $writeAnalysisFailed = $true
-            Show-Line "Error during check - who may write altSecurityIdentities could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось определить субъектов с правом изменять altSecurityIdentities: $_" -Class Finding
         }
 
         if (@($writableFindings).Count -gt 0) {

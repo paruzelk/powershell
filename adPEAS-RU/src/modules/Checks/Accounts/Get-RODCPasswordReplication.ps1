@@ -142,28 +142,28 @@
                 $issues = 0
                 if ($exposedNames.Count -gt 0) {
                     $issues++
-                    Show-Line "$rodcName - $($exposedNames.Count) privileged account(s) may have their password cached, allowed and not denied by its password replication policy: $(Format-RODCAccountList $exposedNames)" -Class Finding -FindingId 'RODC_PRIVILEGED_PASSWORD_ALLOWED'
+                    Show-Line "$rodcName — привилегированных записей, чьи пароли МОГУТ кэшироваться по политике репликации RODC: $($exposedNames.Count); перечень: $(Format-RODCAccountList $exposedNames)" -Class Finding -FindingId 'RODC_PRIVILEGED_PASSWORD_ALLOWED'
                 }
                 if ($revealedNames.Count -gt 0) {
                     $issues++
-                    Show-Line "$rodcName - the secrets of $($revealedNames.Count) privileged account(s) are cached on it already: $(Format-RODCAccountList $revealedNames)" -Class Finding -FindingId 'RODC_PRIVILEGED_PASSWORD_REVEALED'
+                    Show-Line "$rodcName — секреты привилегированных записей УЖЕ кэшированы: $($revealedNames.Count); перечень: $(Format-RODCAccountList $revealedNames)" -Class Finding -FindingId 'RODC_PRIVILEGED_PASSWORD_REVEALED'
                 }
                 if (-not $denied.ContainsKey($deniedGroupSID)) {
                     $issues++
-                    Show-Line "$rodcName - the Denied RODC Password Replication Group is not on its deny list" -Class Hint -FindingId 'RODC_DENIED_GROUP_MISSING'
+                    Show-Line "$rodcName — группа Denied RODC Password Replication Group отсутствует в списке запрета репликации паролей" -Class Hint -FindingId 'RODC_DENIED_GROUP_MISSING'
                 }
                 if ($unresolvedDenied -gt 0) {
                     $issues++
-                    Show-Line "$rodcName - $unresolvedDenied member(s) of its deny list could not be resolved and were not counted" -Class Note
+                    Show-Line "$rodcName — не удалось разрешить субъектов в списке запрета RODC: $unresolvedDenied; они не учитывались" -Class Note
                 }
                 if ($issues -eq 0) {
-                    Show-Line "$rodcName - no privileged account may have its password cached, and none has" -Class Secure
+                    Show-Line "$rodcName — политика запрещает кэширование паролей привилегированных записей; кэшированных секретов таких записей не обнаружено" -Class Secure
                 }
             }
 
         } catch {
             Write-Log "[Get-RODCPasswordReplication] Error: $_" -Level Error
-            Show-Line "Error during check - the password replication policy of the read-only Domain Controllers could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: политику репликации паролей контроллеров RODC оценить не удалось: $_" -Class Finding
         }
     }
 

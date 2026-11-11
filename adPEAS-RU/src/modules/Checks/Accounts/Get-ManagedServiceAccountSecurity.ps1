@@ -257,14 +257,14 @@
                             $prefix = if ($_.IsBroadGroup) { "[CRITICAL] " } else { "" }
                             "$prefix$($_.Principal) ($($_.SID))"
                         }) -join ", "
-                        Show-Line "Non-privileged password readers: $readerList" -Class Hint
+                        Show-Line "Непривилегированные субъекты с правом чтения управляемого пароля: $readerList" -Class Hint
                     }
                 } elseif ($analyzedGMSAs -eq 0) {
-                    Show-Line "gMSA password access could not be analyzed - no membership descriptor could be read" -Class Note
+                    Show-Line "Доступ к паролям gMSA оценить не удалось: не прочитан ни один дескриптор разрешений" -Class Note
                 } else {
                     $unanalyzedCount = $totalGMSAs - $analyzedGMSAs
                     if ($unanalyzedCount -gt 0) {
-                        Show-Line "gMSA password access is restricted to privileged accounts and service hosts ($unanalyzedCount of $totalGMSAs not analyzed)" -Class Note
+                        Show-Line "Чтение паролей gMSA ограничено привилегированными субъектами и служебными узлами; не проверено $unanalyzedCount из $totalGMSAs gMSA" -Class Note
                     } else {
                         Show-Line "Чтение паролей gMSA ограничено привилегированными записями и узлами служб" -Class Secure
                     }
@@ -275,7 +275,7 @@
                     Show-Line "Для $(@($undelegatedGMSAs).Count) gMSA не делегирован доступ к паролю либо атрибут msDS-GroupMSAMembership недоступен для чтения: $(@($undelegatedGMSAs) -join ', ')" -Class Note
                 }
                 if (@($unparsedGMSAs).Count -gt 0) {
-                    Show-Line "msDS-GroupMSAMembership could not be parsed on $(@($unparsedGMSAs).Count) gMSA(s) - their password access is unknown: $(@($unparsedGMSAs) -join ', ')" -Class Note
+                    Show-Line "Не удалось разобрать msDS-GroupMSAMembership у $(@($unparsedGMSAs).Count) gMSA; право чтения их паролей неизвестно: $(@($unparsedGMSAs) -join ', ')" -Class Note
                 }
                 # ----- What the gMSA objects themselves say -----
                 #
@@ -290,7 +290,7 @@
                     # the owner row on it, instead of twice.
                     $ownerList = @($descriptorOwnerFindings | ForEach-Object { "$($_.gMSA) ($($_.Owner))" }) -join ', '
 
-                    Show-Line "msDS-GroupMSAMembership is owned by a principal that is not privileged: $ownerList" -Class Finding -FindingId 'GMSA_MEMBERSHIP_OWNER'
+                    Show-Line "Владелец msDS-GroupMSAMembership — непривилегированный субъект: $ownerList" -Class Finding -FindingId 'GMSA_MEMBERSHIP_OWNER'
                     foreach ($ownerFinding in $descriptorOwnerFindings) {
                         if ($reportedGMSANames -contains $ownerFinding.gMSA) { continue }
                         # Printed as the finding the line above announces, not at
@@ -338,10 +338,10 @@
                 }
 
                 if (@($longIntervals).Count -gt 0) {
-                    Show-Line "gMSA(s) rotating their password less often than every 90 days: $(@($longIntervals) -join ', ')" -Class Hint -FindingId 'GMSA_ROTATION_INTERVAL_LONG'
+                    Show-Line "gMSA со сменой пароля реже одного раза в 90 дней: $(@($longIntervals) -join ', ')" -Class Hint -FindingId 'GMSA_ROTATION_INTERVAL_LONG'
                 }
                 if (@($expiringGMSAs).Count -gt 0) {
-                    Show-Line "gMSA(s) with an expiry date - the account stops authenticating when it passes: $(@($expiringGMSAs) -join ', ')" -Class Note
+                    Show-Line "gMSA с датой окончания действия: после её наступления запись перестанет проходить аутентификацию: $(@($expiringGMSAs) -join ', ')" -Class Note
                 }
 
                 # ===== Check 2: Attempt to read gMSA passwords =====
@@ -465,16 +465,16 @@
                     # back: a tested result, and the same kind of answer as the two lines
                     # above it, so it is rendered the same way.
                     if (-not $encryptedSession) {
-                        Show-Line "gMSA password retrieval cannot be tested over an unencrypted connection - rerun with -UseLDAPS" -Class Note
+                        Show-Line "Проверять получение пароля gMSA по нешифрованному соединению нельзя — повторите запуск с -UseLDAPS" -Class Note
                     } elseif ($readFailures -eq $totalGMSAs) {
-                        Show-Line "gMSA password access could not be tested - every read failed" -Class Note
+                        Show-Line "Проверить доступ к паролям gMSA не удалось: все запросы чтения завершились ошибкой" -Class Note
                     } elseif ($readFailures -gt 0) {
-                        Show-Line "Current user cannot retrieve any gMSA passwords ($readFailures of $totalGMSAs could not be tested)" -Class Secure
+                        Show-Line "Текущий пользователь не смог получить ни один пароль gMSA; не проверено $readFailures из $totalGMSAs" -Class Secure
                     } else {
                         Show-Line "Текущий пользователь не может получить пароли gMSA" -Class Secure
                     }
                 } else {
-                    Show-Line "Retrieved $passwordsRetrieved of $($gmsaAccounts.Count) gMSA password(s)" -Class Finding
+                    Show-Line "Получено управляемых паролей gMSA: $passwordsRetrieved из $($gmsaAccounts.Count)" -Class Finding
                 }
 
                 # Output all gMSAs for visibility (they will show adminCount, delegation, SPNs via Show-Object)
@@ -812,7 +812,7 @@
 
         } catch {
             Write-Log "[Get-ManagedServiceAccountSecurity] Error: $_" -Level Error
-            Show-Line "Error during check - managed service accounts could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: управляемые учётные записи служб оценить не удалось: $_" -Class Finding
         }
     }
 

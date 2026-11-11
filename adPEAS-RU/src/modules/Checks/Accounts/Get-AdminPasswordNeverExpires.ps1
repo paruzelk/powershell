@@ -101,7 +101,7 @@
             $candidates = Get-DomainUser -PasswordNeverExpires -LDAPFilter "(&$privilegedFilter$passwordSetFilter)" -ShowOwner @connectionParams
 
             if (-not $candidates -or @($candidates).Count -eq 0) {
-                Show-Line "No privileged account has 'password never expires' set" -Class Secure
+                Show-Line "Привилегированных учётных записей с бессрочным паролем не обнаружено" -Class Secure
                 return
             }
 
@@ -193,7 +193,7 @@
             }
 
             if (@($smartcardAccounts).Count -gt 0) {
-                Show-Line "$(@($smartcardAccounts).Count) privileged account(s) carry the flag but require a smart card to log on:" -Class Hint
+                Show-Line "Привилегированных записей с бессрочным паролем, для входа в которые требуется смарт-карта: $(@($smartcardAccounts).Count)" -Class Hint
 
                 foreach ($user in $smartcardAccounts) {
                     $user | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'PasswordNeverExpires' -Force
@@ -202,12 +202,12 @@
             }
 
             if (@($vulnerableAccounts).Count -eq 0 -and @($recentAccounts).Count -eq 0 -and @($smartcardAccounts).Count -eq 0) {
-                Show-Line "No privileged account has 'password never expires' set (filtered $(@($candidates).Count) candidate(s) with orphaned adminCount)" -Class Secure
+                Show-Line "Привилегированных записей с бессрочным паролем не обнаружено; исключено кандидатов с устаревшим adminCount: $(@($candidates).Count)" -Class Secure
             }
 
         } catch {
             Write-Log "[Get-AdminPasswordNeverExpires] Error: $_" -Level Error
-            Show-Line "Error during check - privileged accounts whose password never expires could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: оценить привилегированные записи с бессрочным паролем не удалось: $_" -Class Finding
         }
     }
 
