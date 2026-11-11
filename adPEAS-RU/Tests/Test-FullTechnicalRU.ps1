@@ -35,6 +35,14 @@ foreach($entry in $entries.GetEnumerator()){
  Check ([string]$d.description -match '[А-Яа-яЁё]') ("Русский текст: "+$entry.Key)
 }
 $js=[IO.File]::ReadAllText((Join-Path $ProjectRoot 'src/modules/Reporting/templates/report-scripts.js'),[Text.Encoding]::UTF8)
+$mergeMarker='const ruFullFindingTechnical = '
+$mergeStart=$js.IndexOf($mergeMarker,[StringComparison]::Ordinal)
+if($mergeStart -lt 0){throw 'Не найден итоговый встроенный русский словарь'}
+$mergeStart+=$mergeMarker.Length
+$mergeEnd=$js.IndexOf([char]10,$mergeStart)
+if($mergeEnd -lt 0){throw 'Нет границы JSON русского словаря'}
+$mergeJson=$js.Substring($mergeStart,$mergeEnd-$mergeStart).Trim().TrimEnd([char]';')
+$merged=ConvertFrom-Json -InputObject $mergeJson
 $compiled=[IO.File]::ReadAllText((Join-Path $ProjectRoot 'adPEAS.ps1'),[Text.Encoding]::UTF8)
 Check ($js.Contains('const ruFullFindingTechnical = ')) 'Полные переводы внедрены в JavaScript'
 Check ($js.Contains('Подробное техническое описание')) 'Русский заголовок полного описания'
@@ -54,18 +62,18 @@ Check (@($attackChecked.PSObject.Properties).Count -eq 38) '38 сверенны�
 Check (@($coreChecked.PSObject.Properties).Count -eq 10) '10 приоритетных сверок Impact и Remediation'
 foreach($e in $attackChecked.PSObject.Properties){
  $id=$e.Name
- $a=@($entries[$id].attack)
+ $a=@($merged.PSObject.Properties[$id].Value.attack)
  Check ($a.Count -eq [int]$e.Value.sourceEnglishAttackStepCount) ("Сохранено число шагов Attack: "+$id)
 }
 foreach($id in @('GPO_WIDE_IMPACT','GPO_UNLINKED_BROAD_WRITE')){
- Check (@($entries[$id].attack).Count -eq 0) ("Нет вымышленного Attack там, где он отсутствует в оригинале: "+$id)
+ Check (@($merged.PSObject.Properties[$id].Value.attack).Count -eq 0) ("Нет вымышленного Attack там, где он отсутствует в оригинале: "+$id)
 }
-Check ($entries['ESC8_WEB_ENROLLMENT'].description -match 'tokenChecking') 'Сохранена оговорка о неопределённом состоянии EPA'
-Check (($entries['ESC1_TEMPLATE'].remediation -join ' ') -match '0x10000') 'Сохранён второй флаг SAN и предупреждение о совместимости'
-Check (($entries['GPO_SYSVOL_WRITABLE'].remediation -join ' ') -match 'dcgpofix') 'Сохранено предупреждение против неосторожного dcgpofix'
-Check (($entries['OU_PERM_KEYCREDENTIALLINK_WRITE'].remediation -join ' ') -match 'SetAccessRuleProtection') 'Указаны последствия разрыва наследования ACL'
+Check ($merged.PSObject.Properties['ESC8_WEB_ENROLLMENT'].Value.description -match 'tokenChecking') 'Сохранена оговорка о неопределённом состоянии EPA'
+Check (($merged.PSObject.Properties['ESC1_TEMPLATE'].Value.remediation -join ' ') -match '0x10000') 'Сохранён второй флаг SAN и предупреждение о совместимости'
+Check (($merged.PSObject.Properties['GPO_SYSVOL_WRITABLE'].Value.remediation -join ' ') -match 'dcgpofix') 'Сохранено предупреждение против неосторожного dcgpofix'
+Check (($merged.PSObject.Properties['OU_PERM_KEYCREDENTIALLINK_WRITE'].Value.remediation -join ' ') -match 'SetAccessRuleProtection') 'Указаны последствия разрыва наследования ACL'
 
-Check (@($entries.GetEnumerator() | Where-Object { @($_.Value.attack).Count -gt 0 }).Count -eq 115) '115 русских сценариев Attack (только там, где они есть в оригинале)'
-Check (@($entries['GPO_WIDE_IMPACT'].attack).Count -eq 0) 'Пустой Attack у GPO_WIDE_IMPACT согласован с оригиналом'
-Check (@($entries['GPO_UNLINKED_BROAD_WRITE'].attack).Count -eq 0) 'Пустой Attack у GPO_UNLINKED_BROAD_WRITE согласован с оригиналом'
+Check (@($merged.PSObject.Properties | Where-Object { @($_.Value.attack).Count -gt 0 }).Count -eq 115) '115 русских сценариев Attack (только там, где они есть в оригинале)'
+Check (@($merged.PSObject.Properties['GPO_WIDE_IMPACT'].Value.attack).Count -eq 0) 'Пустой Attack у GPO_WIDE_IMPACT согласован с оригиналом'
+Check (@($merged.PSObject.Properties['GPO_UNLINKED_BROAD_WRITE'].Value.attack).Count -eq 0) 'Пустой Attack у GPO_UNLINKED_BROAD_WRITE согласован с оригиналом'
 Write-Host "PASS: $n проверок технического перевода; AD не затронут" -ForegroundColor Green
