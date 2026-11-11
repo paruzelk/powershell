@@ -70,7 +70,7 @@ for($catalogIndex=0; $catalogIndex -lt $catalogNames.Count; $catalogIndex++){
         }
     }
     if($seenThis -ne $expectedRules[$catalogIndex]){
-        throw "Каталог $name: ожидалось $($expectedRules[$catalogIndex]) правил, найдено $seenThis"
+        throw "Каталог ${name}: ожидалось $($expectedRules[$catalogIndex]) правил, найдено $seenThis"
     }
 }
 if($ruleCount -ne 142 -or $translations.Count -ne 14){
@@ -84,7 +84,7 @@ foreach($relative in ($translations.Keys | Sort-Object)){
     foreach($pair in $translations[$relative].GetEnumerator()){
         $found=[regex]::Matches($after,[regex]::Escape($pair.Key)).Count
         if($found -lt 1 -or $found -gt 2){
-            throw "Ожидалось 1–2 точных совпадения в $relative, найдено $found: $($pair.Key)"
+            throw "Ожидалось 1–2 точных совпадения в $relative, найдено ${found}: $($pair.Key)"
         }
         $after=$after.Replace($pair.Key,$pair.Value)
         $occurrenceCount+=$found
