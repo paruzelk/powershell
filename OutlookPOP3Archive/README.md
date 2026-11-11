@@ -1,5 +1,13 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
+## ARCH2b — встроенная в основной архиватор проверка содержимого (DEV)
+
+**Текущая линия 2.6.5-ARCH2b:** [полный runbook](docs/2.6.5-arch2b-semantic-verifier.md). Теперь оригинальный `MailItem` получает pre-Move свидетельство (Subject, адреса/Recipients, Body/HTMLBody, даты, UnRead и SHA256 байтов вложений), которое записывается в `Move Started` до COM. `ArchiveVerifier.ps1` независимо сверяет целевой PST с исходным witness, а `MailItem.Size` хранится только диагностически. Это **встраивание ранее проверенного BW4j/BW4k подхода**, не новая MAPI-форензика. Неподдерживаемые вложения и отсутствие оригинальных хешей блокируют проверку.
+
+**ВНИМАНИЕ:** `Archive`, `Resume`, `Auto` в этом DEV-билде всё ещё **заблокированы** защитой ARCH2a; не отключать guard и не запускать на 90 ГБ до живого disposable PST acceptance. `Attachment.SaveAsFile` использует временный файл для чтения бинарных байтов; авария может оставить временную копию вложения. Следующий шаг ARCH2c — контролируемый полный интеграционный тест, cleanup и recovery.
+
+
+
 ## ARCH2a — защита основного Move/Resume от неоднозначного COM-исхода
 
 **Новый DEV-билд 2.6.5-ARCH2a:** [описание и ограничения](docs/2.6.5-arch2a-move-outcome-fence.md). Это реальное изменение основного `MailMover.ps1`: завершение batch при исключении `MailItem.Move()`, надёжная запись `Move Started` до COM, `Move Indeterminate` вместо `Skipped`, отказ от `Resume` по неполному/неоднозначному original journal. До интеграции полного семантического verifier в ARCH2b режимы **`-Mode Archive`, `-Mode Resume`, `-Mode Auto` заблокированы на входе**, включая `-WhatIf`. Existing `Analyze` / `Plan` остаются доступны. Это **не production RC** и **не разрешение архивировать 90 ГБ**. Не удалять этот guard ради обхода.
