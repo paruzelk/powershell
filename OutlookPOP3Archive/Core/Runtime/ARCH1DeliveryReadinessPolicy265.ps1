@@ -42,9 +42,19 @@ function Test-OPA265ARCH1DeliveryReadiness {
     $hasCopy=$mover.Contains('$item.Copy(')
     $skipOnMoveError=($mover.Contains("Reason='MoveFailed'") -and
         $mover.Contains('continue'))
-    $fullSemantic=(($verifier.Contains('HTMLBody')) -and
-        ($verifier.Contains('Attachments')) -and
-        ($verifier.Contains('Body')))
+    # ARCH2b: this older ARCH1 audit is a SOURCE MARKER inventory, not
+    # Outlook runtime certification. Recognize the actual verifier/writer
+    # integration rather than requiring literal HTMLBody names in the
+    # thin verifier that delegates hashing to ARCH2bSemanticWitness.ps1.
+    $arch2bSemanticMarkers=(
+        $verifier.Contains('Compare-OPA265ARCH2bMailSemanticWitness') -and
+        $verifier.Contains('Get-OPA265ARCH2bMailSemanticWitness -Mail $Item') -and
+        $mover.Contains('Get-OPA265ARCH2bMailSemanticWitness -Mail $item') -and
+        $entry.Contains('-RequireSemanticWitness'))
+    $fullSemantic=($arch2bSemanticMarkers -or
+        (($verifier.Contains('HTMLBody')) -and
+         ($verifier.Contains('Attachments')) -and
+         ($verifier.Contains('Body'))))
     $integrated=([bool]$release.Integration.ArchiveWorkerEnabled -and
         [bool]$release.Integration.ResumeWorkerEnabled)
     if($entryMove){Add-OPA265ARCH1Row 'DirectArchiveEntrypoint' 'PresentNotCertified' 'Existing Archive mode calls Move-OPAItemsWithLimit' 'Do not run on 90GB source until guarded end-to-end validation.'}
@@ -54,7 +64,7 @@ function Test-OPA265ARCH1DeliveryReadiness {
     else{Add-OPA265ARCH1Row 'LegacyMover' 'RequiresManualAudit' 'Mover patterns changed' 'Re-audit actual mutation and reconciliation sequence.'}
     if($skipOnMoveError){Add-OPA265ARCH1Row 'AmbiguousMoveFailure' 'CriticalGap' 'Legacy mover catches MoveFailed and continues' 'Prove ambiguous COM outcome is fenced and reconciled before any retry/resume.'}
     else{Add-OPA265ARCH1Row 'AmbiguousMoveFailure' 'NeedsProof' 'No legacy skip pattern found' 'Prove crash/timeout/COM-unknown handling using a controlled test.'}
-    if($fullSemantic){Add-OPA265ARCH1Row 'ArchiveVerifier' 'MarkersPresentNotVerified' 'Body, HTMLBody, Attachments marker strings present' 'Validate byte SHA and all mandatory fields in end-to-end tests.'}
+    if($fullSemantic){Add-OPA265ARCH1Row 'ArchiveVerifier' 'MarkersPresentNotVerified' 'Semantic-integrity integration or legacy content markers present (static only)' 'Validate byte SHA and all mandatory fields in end-to-end tests.'}
     else{Add-OPA265ARCH1Row 'ArchiveVerifier' 'CriticalGap' 'Legacy ArchiveVerifier has no complete Body/HTMLBody/Attachments checks' 'Integrate existing BW4k semantic witness and byte-SHA attachment comparison.'}
     if($year){Add-OPA265ARCH1Row 'YearGrouping' 'ImplementedInSourceNotIntegrated' 'Year grouping exists in ArchiveGrouping' 'Verify -ArchiveGrouping Year at CLI and year/part PST names.'}
     else{Add-OPA265ARCH1Row 'YearGrouping' 'MissingOrUnknown' 'Year grouping marker absent' 'Implement/test archive grouping by year.'}
