@@ -220,6 +220,8 @@ Describe 'ARCH2a DEV writer closure and real legacy Move sequence guards' {
     It 'Resume loads full original journal rather than 200-entry in-memory tail' {
         $script:mover | Should -Match 'Read-OPAStepJournal -Transaction \$Transaction'
         $script:mover | Should -Match 'Assert-OPA265ARCH2aNoUnresolvedMove'
+        $script:main | Should -Match 'Read-OPAStepJournal -Transaction \$tx'
+        $script:main | Should -Match 'Assert-OPA265ARCH2aNoUnresolvedMove'
     }
     It 'Resume fails closed when original journal is missing' {
         $script:mover | Should -Match 'original step journal missing'
@@ -227,6 +229,8 @@ Describe 'ARCH2a DEV writer closure and real legacy Move sequence guards' {
     It 'Resume rejects unterminated potentially truncated journal tail' {
         $script:mover | Should -Match 'unterminated step journal'
         $script:mover | Should -Match '\$fs.ReadByte\(\) -ne 10'
+        $script:mover | Should -Match 'last original journal record malformed'
+        $script:main | Should -Match 'malformed last journal record'
     }
     It 'no new custom MAPI Size or flags waiver' {
         $script:policy | Should -Not -Match '0x0E070003|0x0E080003'
