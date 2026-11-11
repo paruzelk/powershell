@@ -203,7 +203,7 @@
 
         } catch {
             Write-Log "[Get-ResourceBasedConstrainedDelegation] Error: $_" -Level Error
-            Show-Line "Error during check - resource-based constrained delegation could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки RBCD — делегирования на основе ресурса: $_" -Class Finding
         }
     }
 

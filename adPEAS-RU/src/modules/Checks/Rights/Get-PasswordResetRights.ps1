@@ -292,7 +292,7 @@ function Get-PasswordResetRights {
                     Show-Line "$protectedTargets privileged account(s) have inheritance disabled - a delegation on their OU does not reach them" -Class Secure
                     # Not "no OUs with privileged users": those accounts are in an OU, it is
                     # just not one a delegation could reach them through.
-                    Show-Line "No other privileged account was found, so no OU or container was analyzed" -Class Note
+                    Show-Line "Других привилегированных учётных записей не найдено, поэтому OU и контейнеры не анализировались" -Class Note
                 } else {
                     Show-Line "OU с привилегированными пользователями для анализа не найдены" -Class Note
                 }
@@ -381,9 +381,9 @@ function Get-PasswordResetRights {
 
             if (@($allFindings).Count -eq 0) {
                 if ($totalOUs -gt 0 -and $readOUs -le 0) {
-                    Show-Line "Password reset rights were not evaluated - no security descriptor could be read" -Class Note
+                    Show-Line "Права сброса паролей не проверены: дескрипторы безопасности недоступны" -Class Note
                 } else {
-                    Show-Line "No dangerous password reset rights detected in the $readScope analyzed" -Class $conclusionClass
+                    Show-Line "В проверенной области $readScope опасные права сброса паролей не обнаружены" -Class $conclusionClass
                 }
                 return
             }
@@ -526,14 +526,14 @@ function Get-PasswordResetRights {
 
             # If no non-Exchange findings were displayed (and Exchange is hidden without -IncludePrivileged)
             if (@($nonExchangeFindings).Count -eq 0 -and (-not $IncludePrivileged -or @($exchangeFindings).Count -eq 0)) {
-                Show-Line "No dangerous password reset rights detected in the $readScope analyzed" -Class $conclusionClass
+                Show-Line "В проверенной области $readScope опасные права сброса паролей не обнаружены" -Class $conclusionClass
             }
 
         } catch {
             # Say so on the console, not only in the log - an aborted check is otherwise
             # indistinguishable from a domain with nothing to report.
             Write-Log "[Get-PasswordResetRights] Error: $_" -Level Error
-            Show-Line "Error during check - password reset rights could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки разрешений на сброс паролей: $_" -Class Finding
         }
     }
 

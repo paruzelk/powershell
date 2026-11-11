@@ -187,25 +187,25 @@
             }
 
             foreach ($label in $unread) {
-                Show-Line "The ACL of the $label could not be read - not checked" -Class Note
+                Show-Line "ACL объекта $label прочитать не удалось: проверка не выполнена" -Class Note
             }
             if ($sitesUnread) {
-                Show-Line "The sites could not be enumerated - their ACLs were not checked" -Class Note
+                Show-Line "Сайты AD не удалось перечислить: их ACL не проверены" -Class Note
             }
 
             if ($findings.Count -gt 0) {
-                Show-Line "Found $($findings.Count) non-Tier-0 principal(s) with control over an object the forest or the domain runs on" -Class Finding
+                Show-Line "Найдены субъекты вне Tier 0 с правами управления критически важными объектами леса или домена: $($findings.Count)" -Class Finding
                 foreach ($finding in $findings) {
                     $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'CriticalObjectACL' -Force
                     Show-Object $finding -Class Finding
                 }
             } elseif ($unread.Count -eq 0 -and -not $sitesUnread) {
-                Show-Line "No principal outside Tier-0 controls the schema, the configuration, the partitions, a role object or a site" -Class Secure
+                Show-Line "У субъектов вне Tier 0 нет прав управления схемой, конфигурацией, разделами, объектами ролей или сайтами" -Class Secure
             }
 
         } catch {
             Write-Log "[Get-CriticalObjectACLs] Error: $_" -Level Error
-            Show-Line "Error during check - the ACLs of the schema, partitions, role objects and sites could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки ACL схемы, разделов, объектов ролей и сайтов: $_" -Class Finding
         }
     }
 

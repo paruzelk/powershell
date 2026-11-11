@@ -394,7 +394,7 @@ function Get-LDAPConfiguration {
                     Show-Line "The Directory Service object could not be read - dsHeuristics, which decides $unreadHeuristics, is unknown" -Class Note
                 }
             } else {
-                Show-Line "The configuration partition is unknown - dsHeuristics, which decides $unreadHeuristics, could not be read" -Class Note
+                Show-Line "Раздел конфигурации недоступен: не удалось прочитать dsHeuristics для параметров $unreadHeuristics" -Class Note
             }
 
             Show-SubHeader "Анализ настроек подписи LDAP и привязки канала через GPO (SYSVOL)..." -ObjectType "LDAPConfigGPO"
@@ -796,7 +796,7 @@ function Get-LDAPConfiguration {
                 if ((Test-SysvolAccessible) -eq $false) {
                     Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
-                    Show-Line "SYSVOL access failed - the GPO configuration for LDAP Security was not analyzed" -Class Finding
+                    Show-Line "Доступ к SYSVOL отсутствует: настройки безопасности LDAP в GPO не анализировались" -Class Finding
                 }
                 return
             }
@@ -849,7 +849,7 @@ function Get-LDAPConfiguration {
 
         } catch {
             Write-Log "[Get-LDAPConfiguration] Error: $_" -Level Error
-            Show-Line "Error during check - the LDAP signing and channel binding configuration could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки подписи LDAP и LDAP Channel Binding: $_" -Class Finding
         }
     }
 

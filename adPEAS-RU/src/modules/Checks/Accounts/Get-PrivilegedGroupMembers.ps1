@@ -1088,7 +1088,7 @@
 
             # Show group summary if no members found
             if ($TotalMembers -eq 0) {
-                Show-Line "No members found in privileged groups" -Class Note
+                Show-Line "Участники привилегированных групп не найдены" -Class Note
             }
 
             # ===== Accounts that are not computers but hold a DC group as primary =====
@@ -1529,7 +1529,7 @@
                     -AdminSDExcludedGroups $adminSDExcludedGroups
             } catch {
                 Write-Log "[Get-PrivilegedGroupMembers] Group ACL analysis failed: $_" -Level Error
-                Show-Line "Error during the group ACL analysis - the privileged groups AdminSDHolder does not protect could not be evaluated: $_" -Class Finding
+                Show-Line "Ошибка анализа ACL групп: не удалось оценить привилегированные группы вне защиты AdminSDHolder: $_" -Class Finding
             }
 
             # ===== STEP 5c: The DACL of the privileged accounts =====
@@ -1571,7 +1571,7 @@
                     -ConnectionParams $connectionParams -AccountOperatorMembers $accountOperatorMembers
             } catch {
                 Write-Log "[Get-PrivilegedGroupMembers] Account ACL analysis failed: $_" -Level Error
-                Show-Line "Error during the account ACL analysis - the privileged accounts could not be evaluated: $_" -Class Finding
+                Show-Line "Ошибка анализа ACL привилегированных учётных записей: $_" -Class Finding
             }
 
             # ===== STEP 6: Check Pre-Windows 2000 Compatible Access =====
@@ -1702,7 +1702,7 @@
                     Show-Line "Не удалось прочитать состав Pre-Windows 2000 Compatible Access; членство не оценивалось" -Class Finding
                 }
                 elseif (@($PreWin2000Findings).Count -eq 0 -and @($PreWin2000Unresolved).Count -eq 0) {
-                    Show-Line "No dangerous members in Pre-Windows 2000 Compatible Access group" -Class Secure
+                    Show-Line "В группе Pre-Windows 2000 Compatible Access опасные участники не обнаружены" -Class Secure
                 }
 
                 if (@($PreWin2000Unresolved).Count -gt 0) {
@@ -1715,7 +1715,7 @@
 
         } catch {
             Write-Log "[Get-PrivilegedGroupMembers] Error: $_" -Level Error
-            Show-Line "Error during check - privileged group memberships could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить членство в привилегированных группах: $_" -Class Finding
         }
     }
 
@@ -2063,23 +2063,23 @@ function Show-UnprotectedGroupACL {
             $scope | Add-Member -NotePropertyName 'groupsNotRead' -NotePropertyValue @($unreadGroups) -Force
         }
         $scope | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'UnprotectedPrivilegedGroups' -Force
-        Show-Line "Privileged groups outside AdminSDHolder's protection:" -Class Note
+        Show-Line "Привилегированные группы вне защиты AdminSDHolder:" -Class Note
         Show-Object $scope -Class Note
     }
 
     # Account Operators: the default, said once - see the description. Short: what a member
     # of Account Operators can do with it is the card's.
     if ($accountOperatorGroups.Count -gt 0) {
-        $aoReach = if ($accountOperatorGroups.Count -eq $examinedGroups.Count) { "all $($examinedGroups.Count)" } else { "$($accountOperatorGroups.Count) of them" }
+        $aoReach = if ($accountOperatorGroups.Count -eq $examinedGroups.Count) { "$($examinedGroups.Count) из $($examinedGroups.Count)" } else { "$($accountOperatorGroups.Count) из $($examinedGroups.Count)" }
         $aoMembers = ''
         $aoClass = 'Note'
         if ($null -ne $AccountOperatorMembers -and [int]$AccountOperatorMembers -gt 0) {
-            $aoMembers = " ($AccountOperatorMembers member(s))"
+            $aoMembers = " (участников: $AccountOperatorMembers)"
             $aoClass = 'Hint'
         } elseif ($null -ne $AccountOperatorMembers) {
-            $aoMembers = ' (no members)'
+            $aoMembers = ' (нет участников)'
         }
-        Show-Line "Account Operators$aoMembers control $aoReach - the default of every new group" -Class $aoClass -FindingId 'PRIVILEGED_GROUP_ACL'
+        Show-Line "Группа Account Operators$aoMembers по умолчанию имеет права управления: $aoReach группами, не защищёнными AdminSDHolder" -Class $aoClass -FindingId 'PRIVILEGED_GROUP_ACL'
     }
 
     $findingRows = @()
@@ -2112,13 +2112,13 @@ function Show-UnprotectedGroupACL {
     }
 
     if ($findingRows.Count -gt 0) {
-        Show-Line ("Found $($findingRows.Count) principal(s) that can take over a privileged group AdminSDHolder " +
-                   "does not protect") -Class Finding -FindingId 'PRIVILEGED_GROUP_ACL'
+        Show-Line ("Обнаружены субъекты, способные получить контроль над привилегированной группой вне защиты AdminSDHolder: $($findingRows.Count). " +
+                   "Проверьте их фактические права.") -Class Finding -FindingId 'PRIVILEGED_GROUP_ACL'
         foreach ($row in $findingRows) { Show-Object $row -Class Finding }
     }
     if ($operatorRows.Count -gt 0) {
-        Show-Line ("Found $($operatorRows.Count) principal(s) that can take over an operator-level group AdminSDHolder " +
-                   "does not protect") -Class Hint -FindingId 'PRIVILEGED_GROUP_ACL'
+        Show-Line ("Обнаружены субъекты, способные получить контроль над операторской группой вне защиты AdminSDHolder: $($operatorRows.Count). " +
+                   "Проверьте разрешения этих субъектов.") -Class Hint -FindingId 'PRIVILEGED_GROUP_ACL'
         foreach ($row in $operatorRows) { Show-Object $row -Class Hint }
     }
     if ($hintRows.Count -gt 0) {
@@ -2476,23 +2476,23 @@ function Show-PrivilegedAccountACL {
             $scope | Add-Member -NotePropertyName 'accountsNotRead' -NotePropertyValue @($unreadAccounts) -Force
         }
         $scope | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'PrivilegedAccountsRead' -Force
-        Show-Line "Privileged accounts read:" -Class Note
+        Show-Line "Прочитанные привилегированные учётные записи:" -Class Note
         Show-Object $scope -Class Note
     }
 
     # Account Operators: the default, said once - see the description. Short: what a member
     # of Account Operators can do with it is the card's.
     if ($accountOperatorAccounts.Count -gt 0) {
-        $aoReach = if ($accountOperatorAccounts.Count -eq $examinedAccounts) { "all $examinedAccounts" } else { "$($accountOperatorAccounts.Count) of them" }
+        $aoReach = if ($accountOperatorAccounts.Count -eq $examinedAccounts) { "$examinedAccounts из $examinedAccounts" } else { "$($accountOperatorAccounts.Count) из $examinedAccounts" }
         $aoMembers = ''
         $aoClass = 'Note'
         if ($null -ne $AccountOperatorMembers -and [int]$AccountOperatorMembers -gt 0) {
-            $aoMembers = " ($AccountOperatorMembers member(s))"
+            $aoMembers = " (участников: $AccountOperatorMembers)"
             $aoClass = 'Hint'
         } elseif ($null -ne $AccountOperatorMembers) {
-            $aoMembers = ' (no members)'
+            $aoMembers = ' (нет участников)'
         }
-        Show-Line "Account Operators$aoMembers control $aoReach - the default of every new user" -Class $aoClass -FindingId 'PRIVILEGED_ACCOUNT_ACL'
+        Show-Line "Группа Account Operators$aoMembers по умолчанию имеет права управления: $aoReach учётными записями, не защищёнными AdminSDHolder" -Class $aoClass -FindingId 'PRIVILEGED_ACCOUNT_ACL'
     }
 
     $accountFindingRows = @()
@@ -2540,7 +2540,7 @@ function Show-PrivilegedAccountACL {
     if ($accountFindingRows.Count -eq 0 -and $accountOperatorRows.Count -eq 0 -and $accountHintRows.Count -eq 0) {
         if ($examinedAccounts -eq 0) {
             if ($unreadAccounts.Count -eq 0) {
-                Show-Line "No privileged user or service account of this domain was found to read" -Class Note
+                Show-Line "Не найдено привилегированных пользовательских или служебных учётных записей домена" -Class Note
             }
             return
         }

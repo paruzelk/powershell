@@ -962,16 +962,16 @@
             if (-not $Script:_gpoSysvolScanned) {
                 # What write access in SYSVOL buys an attacker is on the card. The console
                 # says what was not examined.
-                Show-Line "SYSVOL was not reachable - the NTFS permissions of the policy folders were not examined" -Class Finding
+                Show-Line "SYSVOL недоступен: права NTFS на папки групповых политик не проверялись" -Class Finding
                 $sysvolCoverageIncomplete = $true
             }
             elseif (@($Script:_gpoSysvolUnread).Count -gt 0) {
-                Show-Line "The NTFS permissions of $(@($Script:_gpoSysvolUnread).Count) of $(@($allGPOs).Count) policy folder(s) in SYSVOL could not be read - who may rewrite their content is unknown" -Class Finding
+                Show-Line "Не удалось прочитать разрешения NTFS для $(@($Script:_gpoSysvolUnread).Count) из $(@($allGPOs).Count) папок политик в SYSVOL; субъекты, способные изменять их содержимое, неизвестны" -Class Finding
                 foreach ($unreadFolder in (@($Script:_gpoSysvolUnread) | Select-Object -First 10)) {
-                    Show-Line "  not read: $unreadFolder" -Class Hint
+                    Show-Line "  не прочитано: $unreadFolder" -Class Hint
                 }
                 if (@($Script:_gpoSysvolUnread).Count -gt 10) {
-                    Show-Line "  ... and $(@($Script:_gpoSysvolUnread).Count - 10) more" -Class Hint
+                    Show-Line "  ... и ещё $(@($Script:_gpoSysvolUnread).Count - 10)" -Class Hint
                 }
                 $sysvolCoverageIncomplete = $true
             }
@@ -998,32 +998,32 @@
                 }
                 $missingClass = 'Note'
                 if ($missingReachesAnybody) { $missingClass = 'Hint' }
-                Show-Line "$(@($missingLines).Count) GPO(s) have no folder or no gpt.ini in SYSVOL on $($Script:LDAPContext.Server) - Group Policy processing aborts where they are linked" -Class $missingClass -FindingId 'GPO_SYSVOL_GPT_MISSING'
+                Show-Line "Для $(@($missingLines).Count) GPO нет папки или gpt.ini в SYSVOL на $($Script:LDAPContext.Server); обработка привязанных политик будет прервана" -Class $missingClass -FindingId 'GPO_SYSVOL_GPT_MISSING'
                 foreach ($missingLine in (@($missingLines) | Select-Object -First 10)) {
                     Show-Line $missingLine -Class $missingClass
                 }
                 if (@($missingLines).Count -gt 10) {
-                    Show-Line "  ... and $(@($missingLines).Count - 10) more" -Class $missingClass
+                    Show-Line "  ... и ещё $(@($missingLines).Count - 10)" -Class $missingClass
                 }
             }
 
             if (@($Script:_gpoSysvolOrphans).Count -gt 0) {
-                Show-Line "$(@($Script:_gpoSysvolOrphans).Count) folder(s) in SYSVOL\Policies on $($Script:LDAPContext.Server) belong to no GPO this account can read - deleted, or hidden from it" -Class Note -FindingId 'GPO_SYSVOL_FOLDER_ORPHANED'
+                Show-Line "Папки без доступного для чтения объекта GPO в SYSVOL\Policies на $($Script:LDAPContext.Server): $(@($Script:_gpoSysvolOrphans).Count). Объект мог быть удалён или скрыт правами" -Class Note -FindingId 'GPO_SYSVOL_FOLDER_ORPHANED'
                 foreach ($orphanFolder in (@($Script:_gpoSysvolOrphans) | Select-Object -First 10)) {
                     Show-Line "  $orphanFolder" -Class Note
                 }
                 if (@($Script:_gpoSysvolOrphans).Count -gt 10) {
-                    Show-Line "  ... and $(@($Script:_gpoSysvolOrphans).Count - 10) more" -Class Note
+                    Show-Line "  ... и ещё $(@($Script:_gpoSysvolOrphans).Count - 10)" -Class Note
                 }
             }
 
             if (@($vulnerableGPOs).Count -gt 0) {
                 $ownerOnlyCount = @($ownerOnlyGPOs.Keys).Count
                 $sysvolCount = @($Script:_gpoSysvolRows.Keys).Count
-                $summary = "Found $(@($vulnerableGPOs).Count) GPO(s) with dangerous permissions, a writable SYSVOL folder or a non-default owner"
+                $summary = "Обнаружено GPO с опасными разрешениями, доступной для записи папкой SYSVOL или нестандартным владельцем: $(@($vulnerableGPOs).Count)"
                 $summaryDetail = @()
-                if ($ownerOnlyCount -gt 0) { $summaryDetail += "$ownerOnlyCount of them by ownership alone" }
-                if ($sysvolCount -gt 0) { $summaryDetail += "$sysvolCount with a writable policy folder" }
+                if ($ownerOnlyCount -gt 0) { $summaryDetail += "только из-за владельца: $ownerOnlyCount" }
+                if ($sysvolCount -gt 0) { $summaryDetail += "папки политики доступны для записи: $sysvolCount" }
                 if (@($summaryDetail).Count -gt 0) {
                     $summary = "$summary (" + ($summaryDetail -join ', ') + ")"
                 }
@@ -1055,12 +1055,12 @@
                 $readCount = @($allGPOs).Count - @($unreadGPOs).Count
                 $conclusionClass = 'Secure'
                 if ($coverageIncomplete -or $sysvolCoverageIncomplete) { $conclusionClass = 'Note' }
-                Show-Line "No dangerous permissions, no non-default owner and no unexpected SYSVOL write access on $readCount of $(@($allGPOs).Count) GPO(s)" -Class $conclusionClass
+                Show-Line "У $readCount из $(@($allGPOs).Count) GPO не обнаружены опасные разрешения, нестандартные владельцы или неожиданные права записи в SYSVOL" -Class $conclusionClass
             }
 
         } catch {
             Write-Log "[Get-GPOPermissions] Error: $_" -Level Error
-            Show-Line "Error during check - GPO permissions could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки: не удалось оценить разрешения GPO: $_" -Class Finding
         }
     }
 

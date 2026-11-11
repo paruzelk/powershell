@@ -347,7 +347,7 @@
                 if ((Test-SysvolAccessible) -eq $false) {
                     Show-Line "Пропущено: SYSVOL недоступен" -Class Hint
                 } else {
-                    Show-Line "SYSVOL access failed - the GPO configuration for SMB Signing was not analyzed" -Class Finding
+                    Show-Line "Доступ к SYSVOL отсутствует: настройки подписи SMB в GPO не анализировались" -Class Finding
                 }
                 return
             }
@@ -555,7 +555,7 @@
                 })
 
                 if ($weakeningGPOs.Count -gt 0) {
-                    Show-Line "SMB signing is weakened by:" -Class Finding
+                    Show-Line "Подпись SMB ослабляется следующими настройками:" -Class Finding
                     foreach ($gpoFinding in $weakeningGPOs) {
                         $weakening = [PSCustomObject]@{
                             displayName   = $gpoFinding.DisplayName
@@ -575,7 +575,7 @@
 
         } catch {
             Write-Log "[Get-SMBSigningStatus] Error: $_" -Level Error
-            Show-Line "Error during check - the SMB signing configuration could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки настроек подписи SMB: $_" -Class Finding
         }
     }
 

@@ -93,7 +93,7 @@
 
             # Protected Users requires Windows Server 2012 R2 (Level 6) or higher
             if ($functionalLevelValue -lt 6) {
-                Show-Line "Protected Users feature not available (requires Domain Functional Level 2012 R2+)" -Class Note
+                Show-Line "Механизм Protected Users недоступен (требуется функциональный уровень домена Windows Server 2012 R2 или выше)" -Class Note
                 return
             }
 
@@ -103,7 +103,7 @@
             $protectedUsersGroup = @(Get-DomainGroup -Identity $protectedUsersSID @PSBoundParameters)[0]
 
             if (-not $protectedUsersGroup) {
-                Show-Line "Protected Users group not found (should exist at this functional level)" -Class Hint
+                Show-Line "Группа Protected Users не найдена, хотя должна существовать на текущем функциональном уровне домена" -Class Hint
                 return
             }
 
@@ -403,7 +403,7 @@
 
             # Show protected accounts (good)
             if (@($protectedTier0).Count -gt 0) {
-                Show-Line "Protected Tier-0 accounts:" -Class Secure
+                Show-Line "Защищённые учётные записи Tier 0:" -Class Secure
 
                 foreach ($item in $protectedTier0) {
                     $account = $item.Account
@@ -482,7 +482,7 @@
 
             # Only show if there are operator groups with members
             if (@($operatorFindings).Count -gt 0) {
-                Show-Line "Operator groups with members (consider for Protected Users):" -Class Hint
+                Show-Line "Операторские группы с участниками (проверьте возможность включения пользователей в Protected Users):" -Class Hint
 
                 foreach ($finding in $operatorFindings) {
                     $finding | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'OperatorGroup' -Force
@@ -492,7 +492,7 @@
 
         } catch {
             Write-Log "[Get-ProtectedUsersStatus] Error: $_" -Level Error
-            Show-Line "Error during check - the Protected Users coverage could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки охвата группы Protected Users: $_" -Class Finding
         }
     }
 

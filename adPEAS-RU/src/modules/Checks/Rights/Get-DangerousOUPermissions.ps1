@@ -126,7 +126,7 @@ function Get-DangerousOUPermissions {
                 Write-Log "[Get-DangerousOUPermissions] No organizational units or containers found"
                 # Say what actually happened. "No dangerous OU permissions detected" here
                 # claimed a result for a scan that never examined a single object.
-                Show-Line "No organizational units or containers returned - permissions were not evaluated" -Class Note
+                Show-Line "Организационные единицы и контейнеры не получены: разрешения не проверялись" -Class Note
                 return
             }
 
@@ -292,9 +292,9 @@ function Get-DangerousOUPermissions {
             # Display findings
             if (@($allFindings).Count -eq 0) {
                 if ($totalOUs -gt 0 -and $readOUs -le 0) {
-                    Show-Line "OU permissions were not evaluated - no security descriptor could be read" -Class Note
+                    Show-Line "Разрешения OU не проверены: дескрипторы безопасности не удалось прочитать" -Class Note
                 } else {
-                    Show-Line "No dangerous OU permissions detected in the $readScope analyzed" -Class $conclusionClass
+                    Show-Line "В проверенной области $readScope опасные разрешения OU не обнаружены" -Class $conclusionClass
                 }
                 return
             }
@@ -454,7 +454,7 @@ function Get-DangerousOUPermissions {
 
             # If no non-Exchange findings were displayed (and Exchange is hidden without -IncludePrivileged)
             if (@($nonExchangeFindings).Count -eq 0 -and (-not $IncludePrivileged -or @($exchangeFindings).Count -eq 0)) {
-                Show-Line "No dangerous OU permissions detected in the $readScope analyzed" -Class $conclusionClass
+                Show-Line "В проверенной области $readScope опасные разрешения OU не обнаружены" -Class $conclusionClass
             }
 
         } catch {
@@ -463,7 +463,7 @@ function Get-DangerousOUPermissions {
             # simply ended, and an empty section reads as a clean one. Same wording as
             # the catch in Get-DangerousACLs.
             Write-Log "[Get-DangerousOUPermissions] Error: $_" -Level Error
-            Show-Line "Error during check - OU permissions could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки разрешений OU: $_" -Class Finding
         }
     }
 

@@ -204,16 +204,16 @@ function Get-UnconstrainedDelegation {
                     Show-Line "Все привилегированные записи защищены от делегирования либо состоят в Protected Users; однако контроллер домена при определённых воздействиях всё равно может передать собственный TGT" -Class Note
                 }
                 if ($exposure.ProtectedUsersCounted -eq $false) {
-                    Show-Line "Protected Users was not counted - it stops delegation only at domain functional level Windows Server 2012 R2 or higher" -Class Note
+                    Show-Line "Защита Protected Users не учитывалась: она запрещает делегирование только на функциональном уровне домена Windows Server 2012 R2 или выше" -Class Note
                 }
             } catch {
                 Write-Log "[Get-UnconstrainedDelegation] Privileged account exposure could not be evaluated: $_" -Level Warning
-                Show-Line "Privileged accounts could not be checked against these hosts - the sensitive flag and Protected Users were not evaluated" -Class Note
+                Show-Line "Не удалось проверить привилегированные записи на этих узлах: флаг запрета делегирования и Protected Users не оценены" -Class Note
             }
 
         } catch {
             Write-Log "[Get-UnconstrainedDelegation] Error: $_" -Level Error
-            Show-Line "Error during check - unconstrained delegation could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки неограниченного делегирования Kerberos: $_" -Class Finding
         }
     }
 

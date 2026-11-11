@@ -448,7 +448,7 @@
 
                 # Display non-privileged, non-Exchange findings as Finding (red)
                 if ($allReaderSIDs.Keys.Count -gt 0) {
-                    Show-Line "Found $($allReaderSIDs.Keys.Count) non-privileged account(s) with LAPS read access" -Class Finding
+                    Show-Line "Непривилегированные учётные записи с доступом на чтение паролей LAPS: $($allReaderSIDs.Keys.Count)" -Class Finding
 
                     foreach ($sid in $allReaderSIDs.Keys) {
                         $readerInfo = $allReaderSIDs[$sid]
@@ -489,7 +489,7 @@
 
                 # Display privileged findings as Hint (yellow) when -IncludePrivileged
                 if ($IncludePrivileged -and $privilegedReaderSIDs.Keys.Count -gt 0) {
-                    Show-Line "Found $($privilegedReaderSIDs.Keys.Count) privileged account(s) with LAPS read access (expected)" -Class Hint
+                    Show-Line "Привилегированные учётные записи с ожидаемым доступом на чтение LAPS: $($privilegedReaderSIDs.Keys.Count)" -Class Hint
 
                     foreach ($sid in $privilegedReaderSIDs.Keys) {
                         $readerInfo = $privilegedReaderSIDs[$sid]
@@ -520,7 +520,7 @@
                 # Display Exchange service group findings as Hint (yellow) - by-design permissions
                 # Only shown with -IncludePrivileged (Exchange groups are privileged by design)
                 if ($IncludePrivileged -and $exchangeReaderSIDs.Keys.Count -gt 0) {
-                    Show-Line "Found $($exchangeReaderSIDs.Keys.Count) Exchange service group(s) with LAPS read access (by-design, cannot be removed)" -Class Hint
+                    Show-Line "Служебные группы Exchange со штатным доступом на чтение LAPS: $($exchangeReaderSIDs.Keys.Count). Удаление прав без проверки Exchange недопустимо" -Class Hint
 
                     foreach ($sid in $exchangeReaderSIDs.Keys) {
                         $readerInfo = $exchangeReaderSIDs[$sid]
@@ -552,20 +552,20 @@
 
                 # If no non-Exchange findings were displayed (and Exchange is hidden without -IncludePrivileged)
                 if ($allReaderSIDs.Keys.Count -eq 0 -and $privilegedReaderSIDs.Keys.Count -eq 0 -and (-not $IncludePrivileged -or $exchangeReaderSIDs.Keys.Count -eq 0)) {
-                    Show-Line "No non-privileged accounts with LAPS read access found in the $readScope analyzed" -Class $conclusionClass
+                    Show-Line "В проверенной области $readScope непривилегированных субъектов с доступом на чтение LAPS не обнаружено" -Class $conclusionClass
                 }
 
             } elseif ($totalOUs -gt 0 -and $readOUs -le 0) {
                 Show-Line "Права чтения LAPS не проверены: не удалось прочитать ни одного дескриптора безопасности" -Class Note
             } else {
-                Show-Line "No non-privileged accounts with LAPS read access found in the $readScope analyzed" -Class $conclusionClass
+                Show-Line "В проверенной области $readScope непривилегированных субъектов с доступом на чтение LAPS не обнаружено" -Class $conclusionClass
             }
 
         } catch {
             # Say so on the console, not only in the log - an aborted check is otherwise
             # indistinguishable from a domain with nothing to report.
             Write-Log "[Get-LAPSPermissions] Error: $_" -Level Error
-            Show-Line "Error during check - LAPS read permissions could not be evaluated: $_" -Class Finding
+            Show-Line "Ошибка проверки разрешений на чтение LAPS: $_" -Class Finding
         }
     }
 

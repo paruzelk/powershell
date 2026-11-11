@@ -1159,7 +1159,7 @@ function Build-FindingCardHtml {
     $cardIndexAttr = if ($CardIndex -ge 0) { " data-card-index=`"$CardIndex`"" } else { "" }
     [void]$card.AppendLine("        <div class=`"finding-card`" id=`"$findingCardId`" data-card-id=`"$findingCardId`" data-severity=`"$cardSeverity`" data-category=`"$categoryEncoded`"$cardIndexAttr>")
     [void]$card.AppendLine("            <div class=`"finding-header`" onclick=`"toggleFinding(this)`">")
-    [void]$card.AppendLine("                <input type=`"checkbox`" class=`"finding-checkbox`" onclick=`"event.stopPropagation(); toggleCompleted('$findingCardId', this.checked)`" aria-label=`"Mark as completed`">")
+    [void]$card.AppendLine("                <input type=`"checkbox`" class=`"finding-checkbox`" onclick=`"event.stopPropagation(); toggleCompleted('$findingCardId', this.checked)`" aria-label=`"Отметить как выполненное`">")
     [void]$card.AppendLine("                <div class=`"finding-severity-bar $cardSeverity`"></div>")
     [void]$card.AppendLine("                <div class=`"finding-content`">")
     [void]$card.AppendLine("                    <div class=`"finding-title-wrapper`"><span class=`"finding-title`">$titleEscaped</span>$helpButtonHtml</div>")
