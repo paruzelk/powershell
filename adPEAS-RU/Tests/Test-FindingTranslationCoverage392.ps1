@@ -54,17 +54,34 @@ if($titles.Count -ne 392 -or $items.Count -ne 392){
 }
 $js=[IO.File]::ReadAllText((Join-Path $ProjectRoot 'src/modules/Reporting/templates/report-scripts.js'),[Text.Encoding]::UTF8)
 if(-not $js.Contains('const ruFullFindingTechnical = ')){throw 'Нет полного справочника в HTML-шаблоне'}
+# Отчёт должен отражать не только исходные JSON, но и уточняющие наложения
+# SourceVerifiedAttack-07 и SourceVerifiedAttack-09a…09c.
+$marker='const ruFullFindingTechnical = '
+$start=$js.IndexOf($marker,[StringComparison]::Ordinal)
+$start+=$marker.Length
+$finish=$js.IndexOf([char]10,$start)
+if($finish -lt 0){throw 'Не найдена граница встроенного русского справочника'}
+$actual=ConvertFrom-Json -InputObject ($js.Substring($start,$finish-$start).Trim().TrimEnd([char]';'))
+$effectiveCount=@($actual.PSObject.Properties).Count
+$effectiveAttacks=@($actual.PSObject.Properties | Where-Object { @($_.Value.attack).Count -gt 0 }).Count
+if($effectiveCount -ne 392){throw "В итоговом JS отсутствуют FindingId: $effectiveCount/392"}
+if($effectiveAttacks -ne 115){throw "Неверное покрытие итоговых Attack: $effectiveAttacks, ожидается 115"}
+
 if($js.Contains('Исходное подробное описание EN (перевод пока не завершён)')){throw 'Устаревшая пометка EN'}
 $result=[ordered]@{
  Schema='adPEAS-RU.FindingTranslationCoverage.392.1'
  CanonicalTitleCount=$titles.Count
  RussianDescriptionImpactRemediationCount=$items.Count
- RussianAttackCount=$translatedAttacks
- AttackNotTranslatedOrNotApplicable=($items.Count-$translatedAttacks)
+ CatalogAttackCount=$translatedAttacks
+ RussianAttackCount=$effectiveAttacks
+ OriginalAttackCount=304
+ MissingRussianAttackCount=(304-$effectiveAttacks)
+ SourceHasNoAttackCount=88
+ AttackNotTranslatedOrNotApplicable=($items.Count-$effectiveAttacks)
  Ids=@($titles.Keys | Sort-Object)
  UserReportDataIncluded=$false
  Note='Непереведённые сценарии атак не обозначаются как завершённые.'
 }
 $out=Join-Path $ProjectRoot 'Localization/FindingTranslationCoverage392.json'
 [IO.File]::WriteAllText($out,(ConvertTo-Json -InputObject $result -Depth 8),(New-Object Text.UTF8Encoding($true)))
-Write-Host "PASS: 392/392 переводов описаний, последствий и рекомендаций; сценариев: $translatedAttacks; AD не затронут" -ForegroundColor Green
+Write-Host "PASS: 392/392 переводов описаний, последствий и рекомендаций; сценариев в исходных каталогах: $translatedAttacks; в итоговом скрипте: $effectiveAttacks; AD не затронут" -ForegroundColor Green

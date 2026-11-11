@@ -21,7 +21,7 @@ foreach($entry in $cat.files.PSObject.Properties){
         $checks++
     }
 }
-if($checks -lt 97){throw "Проверено только $checks переводов; ожидается не менее 97"}
+if($checks -ne 143){throw "Ожидалось ровно 143 точечных перевода, проверено $checks"}
 $names=@('src/modules/Checks','src/modules/Helpers','src/modules/Core','src/modules/Collector','src/modules/Reporting')
 $sources=@()
 foreach($relative in $names){

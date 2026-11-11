@@ -194,7 +194,7 @@
       "Show-Line \"Error during check - the SCCM infrastructure could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось оценить инфраструктуру SCCM: $_\""
     },
     "src/modules/Checks/Computer/Get-ComputerPasswordAge.ps1": {
-      "Show-Line \"Every computer that logged on in the last $ActiveDays days has changed its machine account password within $PasswordAgeDays days\"": "Show-Line \"Все компьютеры, входившие в домен за последние $ActiveDays дней, сменили пароль машинной записи в течение $PasswordAgeDays дней\"",
+      "Show-Line \"Every computer that logged on in the last $ActiveDays days has changed its machine account password within $PasswordAgeDays days\"": "Show-Line \"Все компьютеры с отметкой доменного входа за последние $ActiveDays дней обновили пароль своей машинной учётной записи в пределах $PasswordAgeDays дней\"",
       "Show-Line \"Error during check - the machine account password age could not be evaluated: $_\"": "Show-Line \"Ошибка проверки: не удалось определить возраст паролей машинных учётных записей: $_\""
     },
     "src/modules/Checks/Creds/Get-BitLockerRecoveryKeyAccess.ps1": {
