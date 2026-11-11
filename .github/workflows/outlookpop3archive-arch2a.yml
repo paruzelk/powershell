@@ -1,0 +1,1826 @@
+name: OutlookPOP3Archive ARCH2a Move outcome fence full Windows PS5.1 CI
+on:
+  push:
+    branches: [feature/outlookpop3archive-2.6.5-arch2a-move-outcome-fence]
+    paths: ['OutlookPOP3Archive/**', '.github/workflows/outlookpop3archive-arch2a.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  full-ci:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+        working-directory: OutlookPOP3Archive
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pester and PSScriptAnalyzer
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
+      - name: Complete original PS5.1 CI release gates
+        run: .\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
+      - name: Verify normative SEM-001 documentation is tracked
+        run: |
+          $ErrorActionPreference='Stop'
+          $spec=Get-Content -LiteralPath 'docs/TECHNICAL_SPECIFICATION.md' -Raw -Encoding UTF8
+          $norm=Get-Content -LiteralPath 'docs/SEMANTIC-INTEGRITY-POLICY.md' -Raw -Encoding UTF8
+          foreach($doc in @('README.md','docs/ARCHITECTURE.md','docs/TESTING.md','docs/RECOVERY.md')){
+            $body=Get-Content -LiteralPath $doc -Raw -Encoding UTF8
+            if($body -cnotmatch 'SEM-001'){throw ('Missing SEM-001 policy link '+$doc)}
+          }
+          if($spec -cnotmatch 'SEM-001' -or
+             $norm -cnotmatch 'SEM-001-MAPI' -or
+             $norm -cnotmatch 'SEM-001-MOVE' -or
+             $norm -cnotmatch 'SEM-001-CI' -or
+             $norm -cnotmatch 'PR_MESSAGE_SIZE' -or
+             $norm -cnotmatch 'Sent Items'){
+            throw 'Normative semantic integrity policy incomplete.'
+          }
+          Write-Host 'PASS SEM-001 normative requirements and architecture/testing/recovery docs'
+      - name: Verify BW4k7j Microsoft MS-OXCMSG documented vs unresolved flag no-waiver policy
+        run: |
+          $ErrorActionPreference='Stop'
+          $d=Get-Content -LiteralPath 'docs/2.6.5-bw4k7j-mapi-flag-investigation.md' -Raw -Encoding UTF8
+          $norm=Get-Content -LiteralPath 'docs/SEMANTIC-INTEGRITY-POLICY.md' -Raw -Encoding UTF8
+          $ctrl=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7jFlagPolicyReview.ps1' -Raw -Encoding UTF8
+          $worker=Get-Content -LiteralPath 'Core/Worker/BW4k7jRawMessageFlagPolicy265.ps1' -Raw -Encoding UTF8
+          if($d -cnotmatch '325787fee94bf5c80e75e761cfc2a1724d94683204b73c2e03eaf384a530ba4c' -or
+             $d -cnotmatch 'f75594047529cca19bbeb8d2a52db5412187325a39db4d659dc85b4b41d44399' -or
+             $d -cnotmatch 'MS-OXCMSG' -or
+             $d -cnotmatch 'STORE_HTML_OK' -or
+             $d -cnotmatch 'NEVER RETRY' -or
+             $norm -cnotmatch 'BW4k7j distinguish' -or
+             $ctrl -cnotmatch 'Invoke-OPA265BW4k7iReopenIntegrityReview' -or
+             $worker -cnotmatch 'UnspecifiedInReviewedMsOxcmsgTable' -or
+             $worker -cnotmatch 'mfUnmodified' -or
+             $worker -cnotmatch 'StoreHtmlOk0x10000BelongsToOtherProperty' -or
+             $ctrl -cmatch '\$mail\.Move\s*\(' -or
+             $ctrl -cmatch 'Write-OPA265BW4k7gClaimOnce'){
+             throw 'BW4k7j documented vs unclassified MAPI flag SEM-001 contract incomplete.'
+          }
+          Write-Host 'PASS BW4k7j Microsoft MAPI message flags known vs unknown, cross-property and no-write policy'
+      - name: Verify BW4k7k PST provider provenance and locale-neutral Pester gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $controller=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7kProviderPropertyReview.ps1' -Raw -Encoding UTF8
+          $policy=Get-Content -LiteralPath 'Core/Worker/BW4k7kProviderPropertyContext265.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7dRecipientsFlags.Tests.ps1' -Raw -Encoding UTF8
+          $new=Get-Content -LiteralPath 'Tests/Worker/BW4k7kProviderPropertyContext.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-bw4k7k-provider-property-review.md' -Raw -Encoding UTF8
+          if($controller -cnotmatch 'Invoke-OPA265BW4k7jFlagPolicyReview' -or
+             $controller -cnotmatch '0x0E070003' -or
+             $controller -cnotmatch '0x0E170003' -or
+             $controller -cnotmatch '0x0E1B000B' -or
+             $controller -cnotmatch 'Get-Process -Name OUTLOOK' -or
+             $controller -cmatch '\$mail\.(Move|Save|Delete|Send)\s*\(' -or
+             $controller -cmatch '\.SetProperty\s*\(' -or
+             $policy -cnotmatch 'ProviderSpecificFlagWaiver=\$false' -or
+             $policy -cnotmatch 'Original0x00010000MeaningEstablished=\$false' -or
+             $tests -cnotmatch 'Should -Throw # Locale-neutral' -or
+             $tests -cmatch 'Should -Throw .empty array.' -or
+             $new -cnotmatch 'works across Russian and English' -or
+             $docs -cnotmatch '2402/2403 FAILED'){
+              throw 'BW4k7k locale safety / MAPI property provenance / no-Move CI gate failed.'
+          }
+          Write-Host 'PASS BW4k7k locale-neutral test regression and read-only unknown MAPI flag policy'
+
+      - name: Verify BW4k7l fresh isolated no-Move original MAPI evidence gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $controller=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7lFreshPreMoveReview.ps1' -Raw -Encoding UTF8
+          $worker=Get-Content -LiteralPath 'Core/Worker/BW4k7lFreshPreMoveMapiWitness265.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7lFreshPreMoveMapiWitness.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-bw4k7l-fresh-premovewitness.md' -Raw -Encoding UTF8
+          $meta=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if([int]$meta.Verification.ExpectedTestContainers -ne 124 -or
+             [int]$meta.Verification.ExpectedPesterTests -ne 3709 -or
+             $controller -cnotmatch 'ConfirmImmutableCapture' -or
+             $controller -cnotmatch 'Get-OPA265BW4cPop3Store' -or
+             $controller -cnotmatch 'GetDefaultFolder\(6\)' -or
+             $controller -cnotmatch 'Selection\.Count -ne 1' -or
+             $controller -cnotmatch 'Write-OPA265BW4k7lEvidenceOnce' -or
+             $controller -cnotmatch 'ShouldProcess' -or
+             $controller -cmatch '\$mail\.(Move|Save|Delete|Send)\s*\(' -or
+             $controller -cmatch '\.SetProperty\s*\(' -or
+             $worker -cnotmatch 'FileMode\]::CreateNew' -or
+             $worker -cnotmatch 'Flush\(\$true\)' -or
+             $worker -cnotmatch '0x0E170003' -or
+             $worker -cnotmatch '0x0E070003' -or
+             $worker -cnotmatch '0x0E1B000B' -or
+             $worker -cnotmatch 'RawFlag0x00010000BeforeMove' -or
+             $worker -cmatch '\$mail\.(Move|Save|Delete|Send)\s*\(' -or
+             $tests -cnotmatch 'stable validator refuses forged writer permission' -or
+             $docs -cnotmatch 'BW4k7m' -or
+             [bool]$meta.Integration.ArchiveWorkerEnabled -or
+             [bool]$meta.Integration.ResumeWorkerEnabled -or
+             [bool]$meta.Integration.AutoWorkerEnabled){
+              throw 'BW4k7l fail-closed PRE-MOVE evidence-only contract incomplete.'
+          }
+          Write-Host 'PASS BW4k7l unique fresh fixture, raw pre-Move MAPI, immutable evidence only, no Move'
+
+      - name: Verify BW4k7m single exact sealed original, irreversible Claim-before-Move and independent read-only audit
+        run: |
+          $ErrorActionPreference='Stop'
+          $controller=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7mFreshOneShotMove.ps1' -Raw -Encoding UTF8
+          $post=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7mIndependentPostMoveAudit.ps1' -Raw -Encoding UTF8
+          $guards=Get-Content -LiteralPath 'Core/Worker/BW4k7mFreshOneShotGuard265.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7mFreshOneShotMove.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-bw4k7m-fresh-oneshot-move.md' -Raw -Encoding UTF8
+          $meta=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $n=@([regex]::Matches($controller,'(?i)\$mail\.Move\s*\(')).Count
+          if([int]$meta.Verification.ExpectedTestContainers -ne 124 -or
+             [int]$meta.Verification.ExpectedPesterTests -ne 3709 -or
+             $n -ne 1 -or
+             $controller -cnotmatch 'ConfirmOneShotFreshMove' -or
+             $controller -cnotmatch 'MOVE EXACT ONE BW4K7M' -or
+             $controller -cnotmatch 'Read-OPA265BW4k7mSealedEvidence' -or
+             $controller -cnotmatch 'Assert-OPA265BW4k7mSourceEqualsSealed' -or
+             $controller -cnotmatch 'Write-OPA265BW4k7mClaimOnce' -or
+             $controller -cnotmatch 'ShouldProcess' -or
+             $guards -cnotmatch '36ca109b7905e0040e57c6b9e01d0858daefd2ae7c76daba5c091663bbe36c29' -or
+             $guards -cnotmatch 'd1a68868-acf5-4c70-860d-5521e1ce2836' -or
+             $guards -cnotmatch 'FileMode\]::CreateNew' -or
+             $guards -cnotmatch 'Flush\(\$true\)' -or
+             $guards -cnotmatch 'NEVER RETRY' -or
+             $post -cnotmatch 'ExpectedClaimSha256' -or
+             $post -cnotmatch 'Get-OPA265BW4k7mContentComparison' -or
+             $post -cnotmatch 'SourceMessageIdMatches=0' -or
+             $post -cnotmatch 'DestinationMessageIdMatches=1' -or
+             $post -cmatch '\.(Move|Save|Delete|Send|SetProperty)\s*\(' -or
+             $tests -cnotmatch 'CreateNew flushed Claim persists once then prevents the next Move' -or
+             $docs -cnotmatch 'BW4k7l' -or
+             -not [bool]$meta.Verification.BW4k7mClaimBeforeExactlyOneMoveImplemented -or
+             [bool]$meta.Verification.BW4k7mRealOutlookMoveInCI -or
+             [bool]$meta.Verification.BW4k7mAutomaticRetryAllowed -or
+             [bool]$meta.Verification.BW4k7mUnknownRawFlagWaived -or
+             [bool]$meta.Verification.BW4k7mProductionWorkerDispatchAllowed -or
+             [bool]$meta.Integration.ArchiveWorkerEnabled -or
+             [bool]$meta.Integration.ResumeWorkerEnabled -or
+             [bool]$meta.Integration.AutoWorkerEnabled){
+              throw 'BW4k7m exact fresh fixture/Claim-before-Move/independent audit safety gate failed.'
+          }
+          Write-Host 'PASS BW4k7m synthetic only: exact sealed original, Claim-before-one-Move, read-only independent audit, no production'
+
+      - name: Verify BW4k7n independent post-restart provider/size diagnostics no Move gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $meta=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $driver=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7nReadOnlyProviderInvestigation.ps1' -Raw -Encoding UTF8
+          $worker=Get-Content -LiteralPath 'Core/Worker/BW4k7nProviderSizeFlagDiagnostics265.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7nProviderSizeFlagDiagnostics.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-bw4k7n-readonly-provider-size-flag.md' -Raw -Encoding UTF8
+          if([int]$meta.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$meta.Verification.ExpectedTestContainers -ne 124 -or
+             $driver -cnotmatch 'Invoke-OPA265BW4k7mIndependentPostMoveAudit' -or
+             $driver -cnotmatch 'Read-OPA265BW4k7mSealedEvidence' -or
+             $driver -cnotmatch 'Assert-OPA265BW4k7nStableArchivedProbe' -or
+             $driver -cnotmatch 'Get-OPA265BW4k7nClassification' -or
+             $driver -cmatch '\.(Move|Save|Delete|Send|SetProperty)\s*\(' -or
+             $driver -cmatch 'Write-OPA265BW4k7mClaimOnce|FileMode\]::CreateNew' -or
+             $worker -cnotmatch '0x0E080003' -or
+             $worker -cnotmatch '0x0E080014' -or
+             $worker -cnotmatch '0x0E070003' -or
+             $worker -cnotmatch '0x0E170003' -or
+             $worker -cnotmatch 'OriginalPrMessageSizeCapturedBeforeMove=\$false' -or
+             $worker -cnotmatch 'PropertySpecificSizeDeltaCauseProven=\$false' -or
+             $worker -cnotmatch 'CrossPropertyStoreHtmlOkEquivalenceAssumed=\$false' -or
+             $worker -cmatch '\.(Move|Save|Delete|Send|SetProperty)\s*\(' -or
+             $tests -cnotmatch 'size delta exactly negative 532 bytes' -or
+             $docs -cnotmatch 'PidTagMessageSizeExtended' -or
+             $docs -cnotmatch '0x00010000' -or
+             [bool]$meta.Verification.BW4k7nOriginalRawPrMessageSizeBeforeMoveCaptured -or
+             [bool]$meta.Verification.BW4k7nProviderSpecificSizeCauseProven -or
+             [bool]$meta.Verification.BW4k7nUnknown0x10000MeaningEstablished -or
+             [bool]$meta.Verification.BW4k7nHistoricalClaimOrEvidenceRewritten -or
+             [bool]$meta.Verification.BW4k7nLiveOutlookMoveInCI -or
+             [bool]$meta.Verification.BW4k7nAutomaticRetryAllowed -or
+             [bool]$meta.Verification.BW4k7nProductionWorkerDispatchAllowed -or
+             [bool]$meta.Integration.ArchiveWorkerEnabled -or
+             [bool]$meta.Integration.ResumeWorkerEnabled -or
+             [bool]$meta.Integration.AutoWorkerEnabled){
+              throw 'BW4k7n fail-closed exact real fixture no-writer independent provider context gate failed.'
+          }
+          Write-Host 'PASS BW4k7n original Evidence+Claim pins, no Move, bounded MAPI sizes, unknown 0x10000 still blocked'
+
+      - name: Verify BW4k7n1 exact optional PT_I8 interop skip and required properties still fail closed
+        run: |
+          $ErrorActionPreference='Stop'
+          $meta=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $worker=Get-Content -LiteralPath 'Core/Worker/BW4k7nProviderSizeFlagDiagnostics265.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7nProviderSizeFlagDiagnostics.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-bw4k7n1-extended-size-interop-fix.md' -Raw -Encoding UTF8
+          if([int]$meta.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$meta.Verification.ExpectedTestContainers -ne 124 -or
+             $worker -cnotmatch 'NotProbedPowerShellComPtI8Interop' -or
+             $worker -cnotmatch "Name -ceq 'PrMessageSizeExtended'" -or
+             $worker -cnotmatch "Tag -ceq '0x0E080014'" -or
+             $worker -cnotmatch "Kind -ceq 'Int64'" -or
+             $worker -cnotmatch 'ObservationState' -or
+             $worker -cnotmatch 'PrMessageSizeExtendedProviderSupportEstablished=\$false' -or
+             $worker -cnotmatch 'if\(-not \$notFound -or \[bool\]\$Definition.Required\)' -or
+             $worker -cmatch '\.(Move|Save|Delete|Send|SetProperty)\s*\(' -or
+             $tests -cnotmatch 'PT_I8 skipped on real-world COM string conversion without triggering GetProperty' -or
+             $tests -cnotmatch 'fail closed if required flags invocation throws after extended skip' -or
+             $docs -cnotmatch 'NotProbedPowerShellComPtI8Interop' -or
+             -not [bool]$meta.Verification.BW4k7n1OnlyOptionalPtI8ComTagSkipped -or
+             -not [bool]$meta.Verification.BW4k7n1NotProbedNotProviderAbsent -or
+             -not [bool]$meta.Verification.BW4k7n1RequiredMapiPropertiesRemainFailClosed -or
+             [bool]$meta.Verification.BW4k7n1OriginalEvidenceOrClaimRewritten -or
+             [bool]$meta.Verification.BW4k7n1OutlookMoveInCI -or
+             [bool]$meta.Verification.BW4k7n1AutomaticRetryAllowed -or
+             [bool]$meta.Verification.BW4k7n1ProductionWorkerDispatchAllowed -or
+             [bool]$meta.Integration.ArchiveWorkerEnabled -or
+             [bool]$meta.Integration.ResumeWorkerEnabled -or
+             [bool]$meta.Integration.AutoWorkerEnabled){
+              throw 'BW4k7n1 narrow optional PT_I8 interop bypass failed safety gate.'
+          }
+          Write-Host 'PASS BW4k7n1 optional PT_I8 not-probed and all required MAPI fail-closed'
+
+      - name: Verify BW4k7o versioned SEM-001 full decision matrix with original immutable MAPI evidence
+        run: |
+          $ErrorActionPreference='Stop'
+          $meta=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $worker=Get-Content -LiteralPath 'Core/Worker/BW4k7oSemanticIntegrityPolicy265.ps1' -Raw -Encoding UTF8
+          $driver=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7oSemanticIntegrityReview.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7oSemanticIntegrityPolicy.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-bw4k7o-semantic-integrity-decision.md' -Raw -Encoding UTF8
+          $norm=Get-Content -LiteralPath 'docs/SEMANTIC-INTEGRITY-POLICY.md' -Raw -Encoding UTF8
+          if([int]$meta.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$meta.Verification.ExpectedTestContainers -ne 124 -or
+             $worker -cnotmatch 'SEM-001-BW4k7o-v1' -or
+             $worker -cnotmatch 'UnclassifiedRawMapiFlagsChangedBlocked' -or
+             $worker -cnotmatch 'SourceDestinationIdentityMismatchBlocked' -or
+             $worker -cnotmatch 'SemanticContentOrAttachmentMismatchBlocked' -or
+             $worker -cnotmatch 'PrMessageStatusChangedBlocked' -or
+             $worker -cnotmatch 'ReadOrHasAttachFlagChangedBlocked' -or
+             $worker -cnotmatch 'DocumentedMfUnmodifiedChangeNeedsReview' -or
+             $worker -cnotmatch 'SizeOnlyDifferenceNeedsReview' -or
+             $worker -cnotmatch 'OriginalRawPrMessageSizeCapturedBeforeMove=\$false' -or
+             $worker -cnotmatch 'Unknown0x00010000MeaningEstablished=\$false' -or
+             $worker -cnotmatch 'PhysicalPstDurabilityProven=\$false' -or
+             $worker -cnotmatch 'SentItemsAndCustomFoldersCoverageProven=\$false' -or
+             $worker -cmatch '\.(Move|Save|Delete|Send|SetProperty)\s*\(' -or
+             $driver -cnotmatch 'Invoke-OPA265BW4k7nReadOnlyProviderInvestigation.ps1' -or
+             $driver -cnotmatch 'UnclassifiedRawMapiFlagsChangedBlocked' -or
+             $driver -cnotmatch 'WhatIfPolicyOnlyNoOutlookAccessNoWrites' -or
+             $driver -cmatch '\.(Move|Save|Delete|Send|SetProperty)\s*\(' -or
+             $driver -cmatch 'Write-OPA265BW4k7mClaimOnce' -or
+             $tests -cnotmatch 'live real report complete accepted as independently verified' -or
+             $tests -cnotmatch 'synthetic unknown high bit is blocker' -or
+             $tests -cnotmatch 'provider size missing needs review' -or
+             $docs -cnotmatch '90-GB POP3 PST' -or
+             $norm -cnotmatch 'BW4k7o versioned SEM-001 semantic integrity decision gate' -or
+             -not [bool]$meta.Verification.BW4k7oVersionedSem001DecisionMatrix -or
+             -not [bool]$meta.Verification.BW4k7oExactOperatorEvidenceAndClaimShaPinned -or
+             [bool]$meta.Verification.BW4k7oUnknown0x10000FlagWaived -or
+             [bool]$meta.Verification.BW4k7oSizeDeltaAcceptedGlobally -or
+             [bool]$meta.Verification.BW4k7oClaimOrEvidenceRewritten -or
+             [bool]$meta.Verification.BW4k7oOutlookMoveInCI -or
+             [bool]$meta.Verification.BW4k7oAutomaticRetryAllowed -or
+             [bool]$meta.Verification.BW4k7oJournalCompletionAllowed -or
+             [bool]$meta.Verification.BW4k7oProductionWorkerDispatchAllowed -or
+             [bool]$meta.Integration.ArchiveWorkerEnabled -or
+             [bool]$meta.Integration.ResumeWorkerEnabled -or
+             [bool]$meta.Integration.AutoWorkerEnabled){
+              throw 'BW4k7o SEM-001 fail-closed semantic/flag/size no-writer policy gate failed.'
+          }
+          Write-Host 'PASS BW4k7o SEM-001 decision matrix, unknown 0x10000 BLOCKED, original Evidence and Claim immutable, production disabled'
+
+      - name: Verify BW4k7p exact POP3 SentItems vs Outbox and bounded no-writer year inventory gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $meta=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $driver=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7pPop3FolderScopeInventory.ps1' -Raw -Encoding UTF8
+          $worker=Get-Content -LiteralPath 'Core/Worker/BW4k7pFolderScopeInventory265.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7pFolderScopeInventory.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-bw4k7p-pop3-folder-sent-year-inventory.md' -Raw -Encoding UTF8
+          if([int]$meta.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$meta.Verification.ExpectedTestContainers -ne 124 -or
+             $driver -cnotmatch 'Get-OPA265BW4cPop3Store' -or
+             $driver -cnotmatch 'Get-OPA265BW4k7pDefaultFolderMap' -or
+             $driver -cnotmatch 'MaxTotalItems=5000' -or
+             $driver -cnotmatch 'SentItemsResolvedInThisPop3Store' -or
+             $driver -cnotmatch 'OutboxNeverEquivalentToSentItems=\$true' -or
+             $driver -cnotmatch 'Pop3BoundedPartialYearInventoryNoFullCoverageClaim' -or
+             $driver -cnotmatch 'New-OPA265BW4k7pYearPlan' -or
+             $driver -cnotmatch 'ProposedArchiveFilesCreated=\$false' -or
+             $driver -cnotmatch 'WriterPermit=\$false' -or
+             $driver -cnotmatch 'ProductionReady=\$false' -or
+             $driver -cmatch '\.(Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)\s*\(' -or
+             $worker -cnotmatch "SentItems',5" -or
+             $worker -cnotmatch "Outbox',4" -or
+             $worker -cnotmatch "Inbox',6" -or
+             $worker -cnotmatch 'Archive-' -or
+             $worker -cnotmatch 'AttachmentSizeEvidenceComplete' -or
+             $worker -cmatch '\.(Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)\s*\(' -or
+             $tests -cnotmatch 'Sent Mail other store rejected' -or
+             $tests -cnotmatch 'bounded partial has no inflated count' -or
+             $doc -cnotmatch 'olFolderSentMail=5' -or
+             $doc -cnotmatch '90-GB PST' -or
+             -not [bool]$meta.Verification.BW4k7pExactPop3DeliveryStoreOnly -or
+             -not [bool]$meta.Verification.BW4k7pCanonicalSentMailNotOutbox -or
+             [bool]$meta.Verification.BW4k7pAttachmentPayloadsRead -or
+             [bool]$meta.Verification.BW4k7pArchivePstsCreated -or
+             [bool]$meta.Verification.BW4k7pOriginalBw4k7mClaimRewritten -or
+             [bool]$meta.Verification.BW4k7pUnknown0x10000Waived -or
+             [bool]$meta.Verification.BW4k7pActualOutlookMoveInCI -or
+             [bool]$meta.Verification.BW4k7pAutomaticRetryAllowed -or
+             [bool]$meta.Verification.BW4k7pProductionWorkerDispatchAllowed -or
+             [bool]$meta.Integration.ArchiveWorkerEnabled -or
+             [bool]$meta.Integration.ResumeWorkerEnabled -or
+             [bool]$meta.Integration.AutoWorkerEnabled){
+              throw 'BW4k7p exact POP3 folder/Sent/Outbox bounded read-only policy gate failed.'
+          }
+          Write-Host 'PASS BW4k7p POP3 Sent vs Outbox strict store scope, bounded years, partial disclosures, no writer'
+
+      - name: Verify BW4k7q strict POP3 scope/exclusions, empty and nonempty Sent, preserve tests no Move
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $pure=Get-Content -LiteralPath 'Core/Worker/BW4k7qPop3ScopeExclusionPolicy265.ps1' -Raw -Encoding UTF8
+          $live=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7qPop3ScopeExclusionReview.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7qPop3ScopeExclusionPolicy.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-bw4k7q-pop3-scope-exclusions.md' -Raw -Encoding UTF8
+          $bw4k7qGateFailures=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709){$bw4k7qGateFailures.Add('G01: expected Pester tests')}
+          if([int]$m.Verification.ExpectedTestContainers -ne 124){$bw4k7qGateFailures.Add('G01b: expected 106 Pester containers')}
+          if($pure -cnotmatch 'POP3-SCOPE-001-BW4k7q-v1'){$bw4k7qGateFailures.Add('G02: expected Pester containers')}
+          if($pure -cnotmatch 'OPA264-LIVE3-'){$bw4k7qGateFailures.Add('G03: versioned policy ID')}
+          if($pure -cnotmatch 'KnownSettingsRootNames'){$bw4k7qGateFailures.Add('G04: reserved LIVE3 marker')}
+          if($pure -cnotmatch 'ExactKnownOutlookSettingsFolder'){$bw4k7qGateFailures.Add('G05: quick settings')}
+          if($pure -cnotmatch 'SentItemsIncludedEvenWhenEmpty=\$true'){$bw4k7qGateFailures.Add('G06: conversation settings')}
+          if($pure -cnotmatch 'ReservedTestFolderItemsQuarantined'){$bw4k7qGateFailures.Add('G07: empty Sent included')}
+          if($pure -cnotmatch 'TotalFolderItemsReconciled=\$true'){$bw4k7qGateFailures.Add('G08: reserved test item count')}
+          if($pure -cnotmatch 'Unknown0x00010000StillBlocked=\$true'){$bw4k7qGateFailures.Add('G09: item reconciliation')}
+          if($pure -cnotmatch 'NoTestArchivePstsDetachedOrDeleted=\$true'){$bw4k7qGateFailures.Add('G10: unknown MAPI blocked')}
+          if($live -cnotmatch 'Invoke-OPA265BW4k7pPop3FolderScopeInventory.ps1'){$bw4k7qGateFailures.Add('G11: test PST preservation')}
+          if($live -cnotmatch 'WhatIfNoOutlookContactNoMailReadNoPstMutation'){$bw4k7qGateFailures.Add('G12: BW4k7p chained')}
+          if($live -cnotmatch 'HistoricUnknownRaw0x00010000StillBlocked=\$true'){$bw4k7qGateFailures.Add('G13: WhatIf no Outlook')}
+          if($live -cnotmatch 'AllOriginalTestFoldersAndPstsRetained=\$true'){$bw4k7qGateFailures.Add('G14: unknown MAPI gate in live')}
+          if($live -cnotmatch 'SourceMailItemsMoved=\$false'){$bw4k7qGateFailures.Add('G15: original tests kept')}
+          if($live -cnotmatch 'WriterPermit=\$false'){$bw4k7qGateFailures.Add('G16: no Move live')}
+          if($live -cnotmatch 'ProductionReady=\$false'){$bw4k7qGateFailures.Add('G17: no writer live')}
+          if($pure -cmatch '\.(Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)\s*\('){$bw4k7qGateFailures.Add('G18: not production live')}
+          if($live -cmatch '\.(Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)\s*\('){$bw4k7qGateFailures.Add('G19: no writer pure')}
+          if($tests -cnotmatch 'nonempty Sent fixture 37 included in scope'){$bw4k7qGateFailures.Add('G20: no writer controller')}
+          if($tests -cnotmatch 'exact seven OPA264 LIVE3 root quarantined'){$bw4k7qGateFailures.Add('G21: nonempty Sent synthetic test')}
+          if($tests -cnotmatch 'test descendants inherited exclusion'){$bw4k7qGateFailures.Add('G22: seven historical tests')}
+          if($doc -cnotmatch '26605'){$bw4k7qGateFailures.Add('G23: nested test excludes')}
+          if(-not [bool]$m.Verification.BW4k7qExactPop3StoreAndCanonicalSentInboxOutbox){$bw4k7qGateFailures.Add('G24: doc previous Inbox count')}
+          if(-not [bool]$m.Verification.BW4k7qEmptySentRequiredAndNonemptySentSynthetic){$bw4k7qGateFailures.Add('G25: meta store')}
+          if(-not [bool]$m.Verification.BW4k7qOnlyReservedTestFolderNamesQuarantined){$bw4k7qGateFailures.Add('G26: meta Sent synthetic')}
+          if([bool]$m.Verification.BW4k7qOldTestFoldersDeleted){$bw4k7qGateFailures.Add('G27: meta test name bounds')}
+          if([bool]$m.Verification.BW4k7qOldTestArchivePstDetachedOrDeleted){$bw4k7qGateFailures.Add('G28: no deletion')}
+          if([bool]$m.Verification.BW4k7qOriginalEvidenceOrIrreversibleClaimRewritten){$bw4k7qGateFailures.Add('G29: no detachment')}
+          if([bool]$m.Verification.BW4k7qOtherImapMailItemsRead){$bw4k7qGateFailures.Add('G30: immutable original Evidence/Claim')}
+          if([bool]$m.Verification.BW4k7qOriginalUnknown0x10000Waived){$bw4k7qGateFailures.Add('G31: no IMAP item scan')}
+          if([bool]$m.Verification.BW4k7qOutlookMoveInCI){$bw4k7qGateFailures.Add('G32: unknown bit not waived')}
+          if([bool]$m.Verification.BW4k7qJournalOrProductionWriterAllowed){$bw4k7qGateFailures.Add('G33: no real Move')}
+          if([bool]$m.Verification.BW4k7qAutomaticRetryAllowed){$bw4k7qGateFailures.Add('G34: no journal/writer')}
+          if([bool]$m.Verification.BW4k7qProductionWorkerDispatchAllowed){$bw4k7qGateFailures.Add('G35: no auto retry')}
+          if([bool]$m.Integration.ArchiveWorkerEnabled){$bw4k7qGateFailures.Add('G36: no production dispatch')}
+          if([bool]$m.Integration.ResumeWorkerEnabled){$bw4k7qGateFailures.Add('G37: archive worker disabled')}
+          if([bool]$m.Integration.AutoWorkerEnabled){$bw4k7qGateFailures.Add('G38: resume worker disabled')}
+          if($bw4k7qGateFailures.Count -gt 0){throw ('BW4k7q strict fail-closed scope gate: '+($bw4k7qGateFailures -join '; '))}
+          Write-Host 'PASS BW4k7q POP3 scope exact Sent/In/Out, reserved tests quarantined not deleted, no writer'
+
+      - name: BW4k7r exact POP3 year and capacity forecast safety gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $worker=Get-Content -LiteralPath 'Core/Worker/BW4k7rYearCapacityPlan265.ps1' -Raw -Encoding UTF8
+          $ctrl=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7rPop3YearCapacityReview.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7rYearCapacityPlan.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-bw4k7r-year-capacity-forecast.md' -Raw -Encoding UTF8
+          $fail=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709){$fail.Add('expected Pester 2890')}
+          if([int]$m.Verification.ExpectedTestContainers -ne 124){$fail.Add('expected 107 containers')}
+          foreach($keyword in @('New-OPA265BW4k7rYearAccumulator','Get-OPA265BW4k7rSafeCapacity',
+                'Get-OPA265BW4k7rCapacityPlan','EstimatedLargestMessageFitsSegment',
+                'PartialLowerBoundOnly','ArchiveBeforeYear=2026')){
+            if($worker -cnotmatch [regex]::Escape($keyword)){$fail.Add(('worker '+$keyword))}
+          }
+          foreach($keyword in @('Invoke-OPA265BW4k7qPop3ScopeExclusionReview.ps1','GetFolderFromID',
+              'TestFolderOrDescendant','GetFirst','Write-Progress',
+              'NoPostCrashDurableResumeCheckpointCreated=$true',
+              'AtomicPstSnapshotEstablished=$false','OriginalSEM001Unknown0x00010000StillBlocked=$true',
+              'WriterPermit=$false','ProductionReady=$false','RegistryPstLimitChanged=$false',
+              'ArchivePstCreatedOrReplaced=$false','ImapOrOtherStoreMailRead=$false')){
+            if($ctrl -cnotmatch [regex]::Escape($keyword)){$fail.Add(('controller '+$keyword))}
+          }
+          if([regex]::Matches($ctrl,'Invoke-OPA265BW4k7qPop3ScopeExclusionReview.ps1').Count -ne 2){$fail.Add('scope not rechecked')}
+          if($ctrl -cmatch '[.](Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)[ ]*[(]'){$fail.Add('COM writer controller')}
+          if($worker -cmatch '[.](Move|Save|Delete|Send|SetProperty|AddStoreEx|AddStore)[ ]*[(]'){$fail.Add('COM writer worker')}
+          if($ctrl -cmatch 'Set-ItemProperty|New-ItemProperty|Remove-ItemProperty'){$fail.Add('registry writer')}
+          foreach($keyword in @('large payload causes forecast -02 segment',
+              'single message bigger than usable segment is flagged',
+              'fallback from Sent to Received recorded')){
+            if($tests -cnotmatch [regex]::Escape($keyword)){$fail.Add(('test '+$keyword))}
+          }
+          if($doc -cnotmatch 'CAPACITY-FORECAST-001-BW4k7r-v1'){$fail.Add('missing docs')}
+          foreach($key in @('BW4k7rOnlyExactQPop3IncludedFolders','BW4k7rBoundedScanPartialExplicit',
+              'BW4k7rRevalidateScopeAndOutlookAfterScan','BW4k7rSentOnPriorityAndUserFolderYears',
+              'BW4k7rCapacityMarginAndRolloverForecastOnly','BW4k7rNoDurableResumeCheckpointClaim')){
+            if(-not [bool]$m.Verification.$key){$fail.Add(('missing '+$key))}
+          }
+          foreach($key in @('BW4k7rArchivePstCreated','BW4k7rPstRegistryChanged',
+              'BW4k7rOtherImapOrTestFolderMailRead','BW4k7rOriginalEvidenceOrClaimRewritten',
+              'BW4k7rHistoricUnknown0x10000Waived','BW4k7rOutlookMoveInCI',
+              'BW4k7rProductionArchiveResumeAutoAllowed','BW4k7rAutomaticRetryAllowed')){
+            if([bool]$m.Verification.$key){$fail.Add(('unsafe '+$key))}
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$fail.Add('production worker enabled')}
+          if($fail.Count -gt 0){throw ('BW4k7r release BLOCKED: '+($fail -join '; '))}
+          Write-Host 'PASS BW4k7r exact POP3 Q scope, full/partial year scan and capacity forecast, zero writers'
+
+      - name: BW4k7s exact POP3 nonmail and Office16 registry readonly safety
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $w=Get-Content -LiteralPath 'Core/Worker/BW4k7sInventoryRegistryPolicy265.ps1' -Raw -Encoding UTF8
+          $c=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7sPop3InventoryReadinessReview.ps1' -Raw -Encoding UTF8
+          $t=Get-Content -LiteralPath 'Tests/Worker/BW4k7sInventoryRegistryPolicy.Tests.ps1' -Raw -Encoding UTF8
+          $d=Get-Content -LiteralPath 'docs/2.6.5-bw4k7s-inventory-pst-readiness.md' -Raw -Encoding UTF8
+          $bad=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709){$bad.Add('expected 2955 tests')}
+          if([int]$m.Verification.ExpectedTestContainers -ne 124){$bad.Add('expected 108 containers')}
+          foreach($word in @('New-OPA265BW4k7sNonMailWitness','Get-OPA265BW4k7sObjectClassName',
+            'Get-OPA265BW4k7sPstRegistryProbe','Get-OPA265BW4k7sPstLimitDecision',
+            'Assert-OPA265BW4k7sPriorYearInventory','MaxLargeFileSize',
+            'WarnLargeFileSize','Software\Policies\Microsoft\Office\16.0\Outlook\PST',
+            'RequiresManualPreservationDecision=$true','WriterPermit=$false')){
+            if($w -cnotmatch [regex]::Escape($word)){$bad.Add(('worker '+$word))}
+          }
+          foreach($word in @('Invoke-OPA265BW4k7qPop3ScopeExclusionReview.ps1',
+            'GetFolderFromID','TestFolderOrDescendant','GetFirst',
+            'MaxNonMailWitnesses=25','MaxTotalItems=5000','RegistryOnly',
+            'PstOrRegistryWritten=$false','OriginalSEM001Unknown0x00010000StillBlocked=$true',
+            'WriterPermit=$false','ProductionReady=$false','NonMailWitnesses')){
+            if($c -cnotmatch [regex]::Escape($word)){$bad.Add(('controller '+$word))}
+          }
+          if([regex]::Matches($c,'Invoke-OPA265BW4k7qPop3ScopeExclusionReview.ps1').Count -ne 2){$bad.Add('missing second Q scope check')}
+          foreach($word in @('original BW4k7r 26602+3 counts validate',
+            'original BW4k7r 21985 eligible mails','policy non DWord detected',
+            'configured limits do not grant writer','nonmail cannot be auto deleted')){
+            if($t -cnotmatch [regex]::Escape($word)){$bad.Add(('Pester '+$word))}
+          }
+          if($d -cnotmatch 'BW4k7s' -or $d -cnotmatch 'SEM-001'){$bad.Add('operator docs')}
+          if($w -cmatch '[.](Move|Save|Delete|SetProperty|AddStoreEx|AddStore)[ ]*[(]' -or
+             $c -cmatch '[.](Move|Save|Delete|SetProperty|AddStoreEx|AddStore)[ ]*[(]' -or
+             $w -cmatch 'Set-ItemProperty|New-ItemProperty|Remove-ItemProperty' -or
+             $c -cmatch 'Set-ItemProperty|New-ItemProperty|Remove-ItemProperty'){$bad.Add('writer detected')}
+          foreach($key in @('BW4k7sOriginalPop3QScopeRechecked',
+            'BW4k7sThreeNonMailObjectWitnessesReadOnly',
+            'BW4k7sOtherClassItemsNeverAutomaticallyDeleted',
+            'BW4k7sOffice16PstRegistryPolicyAndUserInspectedReadOnly',
+            'BW4k7sPreviousFullYearEvidenceUnsealedSelfConsistency')){
+            if(-not [bool]$m.Verification.$key){$bad.Add(('required '+$key))}
+          }
+          foreach($key in @('BW4k7sOldTestPstOrFolderDeleted','BW4k7sRegistryKeysChanged',
+            'BW4k7sPstLimitDisabled','BW4k7sMailBodyOrAttachmentsRead',
+            'BW4k7sOtherImapItemsRead','BW4k7sOriginalEvidenceOrClaimRewritten',
+            'BW4k7sSEM001Unknown0x10000Waived','BW4k7sOutlookMoveExecutedInCI',
+            'BW4k7sProductionArchiveResumeAutoAllowed','BW4k7sAutomaticRetryAllowed')){
+            if([bool]$m.Verification.$key){$bad.Add(('unsafe '+$key))}
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$bad.Add('production worker enabled')}
+          if($bad.Count -gt 0){throw ('BW4k7s release BLOCKED: '+($bad -join '; '))}
+          Write-Host 'PASS BW4k7s POP3 nonMail MessageClass, exact Q scope, registry HKCU Office16 no writers'
+
+      - name: BW4k7t prospective SEM-001 category ABC and no risk-waiver release policy
+        run: |
+          $ErrorActionPreference='Stop'
+          $meta=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $code=Get-Content 'Core/Worker/BW4k7tSemanticAcceptancePolicy265.ps1' -Raw -Encoding UTF8
+          $ctrl=Get-Content 'Core/Diagnostics/Invoke-OPA265BW4k7tSemanticAcceptanceReview.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content 'Tests/Worker/BW4k7tSemanticAcceptancePolicy.Tests.ps1' -Raw -Encoding UTF8
+          $norm=Get-Content 'docs/SEMANTIC-INTEGRITY-POLICY.md' -Raw -Encoding UTF8
+          $docs=Get-Content 'docs/2.6.5-bw4k7t-semantic-risk-policy.md' -Raw -Encoding UTF8
+          $historic=Get-Content 'Core/Worker/BW4k7oSemanticIntegrityPolicy265.ps1' -Raw -Encoding UTF8
+          $errors=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$meta.Verification.ExpectedPesterTests -ne 3709){$errors.Add('Pester expected 3049')}
+          if([int]$meta.Verification.ExpectedTestContainers -ne 124){$errors.Add('Pester expected 109 containers')}
+          foreach($token in @('SEM-001-BW4k7t-Prospective-v1','CriticalSemanticOrIdentityMismatchBlocked',
+            'PotentialSemanticMatchUndocumentedProviderDifferenceReviewOnly',
+            'InsufficientRequiredSemanticEvidence','NonMailClassSpecificPreservationNotProven',
+            'OriginalEvidenceSha256','OriginalClaimSha256',
+            'AttachmentPayloadSha256Matched','RecipientSetMatched','ReadUnreadAndProtectedFlagsMatched',
+            'UndocumentedFlagAutomaticallySafe=$false','OperatorResidualRiskAcceptanceRecordedHere=$false',
+            'AutomaticRetryAllowed=$false','JournalCompletionAllowed=$false',
+            'WriterPermit=$false','ProductionReady=$false')){
+            if($code -cnotmatch [regex]::Escape($token)){$errors.Add(('worker '+$token))}
+          }
+          foreach($token in @('Get-OPA265BW4k7tPolicy','Test-OPA265BW4k7tNonMailWitnessSet',
+            'Assert-OPA265BW4k7sPriorYearInventory','HistoricBW4k7oForensicReport',
+            'WhatIfPolicyOnlyNoEvidenceReadOrWrites',
+            'OldBW4k7oHistoricHardBlockPreserved=$true',
+            'RiskDecisionRecordedOrPermittedByThisRun=$false',
+            'ExistingIrreversibleFixtureRetried=$false',
+            'OutlookContacted=$false','WriterPermit=$false','ProductionReady=$false')){
+            if($ctrl -cnotmatch [regex]::Escape($token)){$errors.Add(('controller '+$token))}
+          }
+          foreach($token in @('BW4k7t prospective SEM-001 controlled residual-risk review',
+            'Prospective classification','not a write permit','SEPARATE future operator decision')){
+            if($norm -cnotmatch [regex]::Escape($token)){$errors.Add(('norm '+$token))}
+          }
+          foreach($token in @('SEM-001-BW4k7t-Prospective-v1','Class A','Class B','Class C',
+            'not a statement of full MAPI equivalence','Do not repeat Move')){
+            if($docs -cnotmatch [regex]::Escape($token)){$errors.Add(('runbook '+$token))}
+          }
+          foreach($token in @('unknown 0x10000 alone is not corruption proof',
+            'mail synthetic unknown status review only',
+            'attachment SHA mismatch blocks A',
+            'ReportNdr requires class-specific proof not auto Move',
+            'controller no evidence no fake positive',
+            'pinned historic old forensic validates read-only')){
+            if($tests -cnotmatch [regex]::Escape($token)){$errors.Add(('Pester '+$token))}
+          }
+          if($historic -cnotmatch 'UnknownRawFlagWaiverPermitted=\$false' -or
+             $historic -cnotmatch 'ClassifiedDifferenceBlocked' -or
+             $historic -cnotmatch 'ProductionReady=\$false'){$errors.Add('historical BW4k7o gate changed')}
+          foreach($key in @('BW4k7tSemanticRiskPolicyABCCategoriesVersioned',
+            'BW4k7tUnknown0x10000MeaningNotProven',
+            'BW4k7tUnknownBitNeitherProofOfDamageNorSafety',
+            'BW4k7tOriginalBW4k7oHistoricBlockPreserved',
+            'BW4k7tMandatorySemanticBodyRecipientsAttachmentsAndState',
+            'BW4k7tThreeNonMailObjectsManualPreserve',
+            'BW4k7tSixAnnualYearPlanOnlyPriorUnsealedEvidence')){
+            if(-not [bool]$meta.Verification.$key){$errors.Add(('required '+$key))}
+          }
+          foreach($key in @('BW4k7tOperatorResidualRiskAcceptanceRecorded',
+            'BW4k7tGlobalUndocumentedFlagWaiverGranted',
+            'BW4k7tOutlookMoveExecuted','BW4k7tJournalCompletionWritten',
+            'BW4k7tHistoricEvidenceOrClaimRewritten',
+            'BW4k7tPstRegistryOrMailModified',
+            'BW4k7tAutomaticRetryAllowed','BW4k7tProductionArchiveResumeAutoAllowed')){
+            if([bool]$meta.Verification.$key){$errors.Add(('unsafe '+$key))}
+          }
+          if($code -cmatch '[.](Move|Save|Delete|SetProperty|AddStoreEx|AddStore)[ ]*[(]' -or
+             $ctrl -cmatch '[.](Move|Save|Delete|SetProperty|AddStoreEx|AddStore)[ ]*[(]' -or
+             $code -cmatch 'Set-ItemProperty|New-ItemProperty|Remove-ItemProperty' -or
+             $ctrl -cmatch 'Set-ItemProperty|New-ItemProperty|Remove-ItemProperty' -or
+             $ctrl -cmatch 'GetActiveObject|GetNamespace'){$errors.Add('writer or real Outlook contact')}
+          if([bool]$meta.Integration.ArchiveWorkerEnabled -or
+             [bool]$meta.Integration.ResumeWorkerEnabled -or
+             [bool]$meta.Integration.AutoWorkerEnabled){$errors.Add('production worker enabled')}
+          if($errors.Count -gt 0){throw ('BW4k7t release BLOCKED: '+($errors -join '; '))}
+          Write-Host 'PASS BW4k7t prospective SEM-001 A/B/C, original evidence pinned, no flag waiver, no writer'
+
+      - name: BW4k7u synthetic twelve-case multi-mail preflight and no-writer gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $worker=Get-Content -LiteralPath 'Core/Worker/BW4k7uSyntheticBatch265.ps1' -Raw -Encoding UTF8
+          $ctrl=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7uSyntheticMultiItemPreflight.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7uSyntheticMultiItemPreflight.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-bw4k7u-synthetic-multi-item-preflight.md' -Raw -Encoding UTF8
+          $failed=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709){$failed.Add('Pester 3160 expected')}
+          if([int]$m.Verification.ExpectedTestContainers -ne 124){$failed.Add('Pester 110 containers expected')}
+          foreach($token in @('New-OPA265BW4k7uSyntheticSuite',
+            'Assert-OPA265BW4k7uSyntheticSuite',
+            'Get-OPA265BW4k7uByteHash',
+            'Get-OPA265BW4k7uSyntheticCapacityPlan',
+            'New-OPA265BW4k7uSyntheticLedger',
+            'Set-OPA265BW4k7uSyntheticPhase',
+            'Get-OPA265BW4k7uSyntheticRecovery',
+            'Invoke-OPA265BW4k7uSyntheticBatch',
+            'Compare-OPA265BW4k7uSyntheticWitness',
+            'Test-OPA265BW4k7tSemanticCase',
+            'Sent2025Attachment256K','User2022Nested',
+            'Inbox2026Retained','InboxMeetingRetained',
+            'AfterIntent','AfterClaim','AfterMove',
+            'NonMailPreservedRequiresClassSpecificProof',
+            'ResumeOrRetryAutomaticallyAllowed=$false',
+            'ActualCrashOrRestartRecoveryProven=$false')){
+            if($worker -cnotmatch [regex]::Escape($token)){$failed.Add(('worker '+$token))}
+          }
+          foreach($token in @('Invoke-OPA265BW4k7uSyntheticBatch',
+            'SimulatedSegmentCapBytes',
+            'OldBW4k7mIrreversibleClaimUntouched=$true',
+            'OriginalBW4k7tSEM001PolicyNotWaived=$true',
+            'RealOutlookMAPIObserved=$false',
+            'DiskIntentClaimOrJournalWritten=$false',
+            'CrashDurabilityOrRealResumeProven=$false',
+            'OutlookMoveExecuted=$false',
+            'WriterPermit=$false','ProductionReady=$false')){
+            if($ctrl -cnotmatch [regex]::Escape($token)){$failed.Add(('controller '+$token))}
+          }
+          foreach($token in @('full batch model reconciles all eight',
+            'fault AfterClaim leaves claimed source only',
+            'fault AfterMove leaves destination unreviewed',
+            'after claim recovery cannot issue second Move',
+            'artificial small cap induces 2025 rollover -02',
+            'actual byte SHA256 of synthetic attachment pinned',
+            'semantic synthetic class C unknown not auto waived',
+            'controller WhatIf plan only no actual Move')){
+            if($tests -cnotmatch [regex]::Escape($token)){$failed.Add(('Pester '+$token))}
+          }
+          if($docs -cnotmatch 'NO Outlook/PST' -or
+             $docs -cnotmatch 'DO NOT survive PowerShell process exit'){
+            $failed.Add('synthetic-only documentation incomplete')
+          }
+          foreach($key in @('BW4k7uTwelveSyntheticCasesAndEightEligible',
+            'BW4k7uIncludesInboxSentNestedUserFolderAndNonMail',
+            'BW4k7uAttachmentRawByteSha256AndSyntheticSemanticReview',
+            'BW4k7uInMemoryOneShotIntentClaimAndFaultMatrix',
+            'BW4k7uArtificialYearPstRolloverForecastOnly',
+            'BW4k7uOriginalBW4k7tSEMRiskNotWaived',
+            'BW4k7uOriginalHistoricalClaimUntouched')){
+            if(-not [bool]$m.Verification.$key){$failed.Add(('required '+$key))}
+          }
+          foreach($key in @('BW4k7uPhysicalPstReadOrWritten',
+            'BW4k7uOutlookComOrMoveCalled',
+            'BW4k7uDurableIntentOrClaimWritten',
+            'BW4k7uRealCrashRecoveryProven',
+            'BW4k7uOldEvidenceOrClaimRewritten',
+            'BW4k7uThreeNonMailObjectsDiscardedOrMoved',
+            'BW4k7uAutomaticRetryAllowed',
+            'BW4k7uProductionArchiveResumeAutoAllowed')){
+            if([bool]$m.Verification.$key){$failed.Add(('unsafe '+$key))}
+          }
+          if($worker -cmatch '[.](Move|Save|Delete|AddStoreEx|SetProperty)[ ]*[(]' -or
+             $ctrl -cmatch '[.](Move|Save|Delete|AddStoreEx|SetProperty)[ ]*[(]' -or
+             $worker -cmatch 'GetActiveObject|GetNamespace|Set-ItemProperty|New-ItemProperty|WriteAllText|FileStream' -or
+             $ctrl -cmatch 'GetActiveObject|GetNamespace|Set-ItemProperty|New-ItemProperty|WriteAllText|FileStream'){
+            $failed.Add('forbidden real Outlook/PST/registry/disk write')
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){
+            $failed.Add('production worker enabled')
+          }
+          if($failed.Count -gt 0){throw ('BW4k7u release BLOCKED: '+($failed -join '; '))}
+          Write-Host 'PASS BW4k7u 12 synthetic items, eight per-year Mail, 2026 and three nonMail preserved, no real Move or durable claim'
+
+      - name: BW4k7v exact fresh PST creation approval and post-restart preMove evidence gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $policy=Get-Content 'Core/Worker/BW4k7vDisposablePstManifest265.ps1' -Raw -Encoding UTF8
+          $com=Get-Content 'Core/Worker/BW4k7vOutlookFixtureCapture265.ps1' -Raw -Encoding UTF8
+          $ctrl=Get-Content 'Core/Diagnostics/Invoke-OPA265BW4k7vFreshDisposablePstPreflight.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content 'Tests/Worker/BW4k7vFreshDisposablePstPreflight.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content 'docs/2.6.5-bw4k7v-fresh-disposable-pst-preflight.md' -Raw -Encoding UTF8
+          $bad=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709){$bad.Add('expected 3224 tests')}
+          if([int]$m.Verification.ExpectedTestContainers -ne 124){$bad.Add('expected 111 containers')}
+          foreach($token in @('Get-OPA265BW4k7vLayout','Assert-OPA265BW4k7vSafePath',
+            'Get-OPA265BW4k7vFixtureExpectations',
+            'Assert-OPA265BW4k7vManifestShape',
+            'Write-OPA265BW4k7vManifestOnce','Read-OPA265BW4k7vManifest',
+            'FileMode]::CreateNew','Flush($true)',
+            'OutlookPOP3Archive-BW4k7v-Isolated','SourcePst',
+            'ProductionPstPathAccepted=$false','WriterPermit=$false')){
+            if($policy -cnotmatch [regex]::Escape($token)){$bad.Add(('policy '+$token))}
+          }
+          foreach($token in @('Get-OPA265BW4k7vExactMountedStore',
+            'Get-OPA265BW4k7vExactFolder','Get-OPA265BW4k7vMailWitness',
+            "Folder.Items.Add('IPM.Note')",
+            'Get-FileHash','Attachments.Add','UserProperties.Add',
+            'OPA265BW4k7vArchiveYear')){
+            if($com -cnotmatch [regex]::Escape($token)){$bad.Add(('COM '+$token))}
+          }
+          foreach($token in @('ValidateSet(',
+            "'Plan','Create','Verify'",
+            'CREATE NEW BW4K7V PST',
+            'GetActiveObject','AddStoreEx([string]$layout.SourcePst,2)','Get-OPA265BW4k7vExactMountedStore',
+            'CreatingOutlookProcessStartUtcTicks',
+            'New-OPA265BW4k7vSavedMail',
+            'Write-OPA265BW4k7vManifestOnce',
+            'Read-OPA265BW4k7vManifest',
+            'VerifiedFixtureCount=8',
+            'ActualMapiCalendarYearsProven=$false',
+            'OutlookMoveOrSendExecuted=$false',
+            'AutomaticRetryAllowed=$false',
+            'WriterPermit=$false','ProductionReady=$false')){
+            if($ctrl -cnotmatch [regex]::Escape($token)){$bad.Add(('controller '+$token))}
+          }
+          foreach($token in @('rejects wrong original source PST',
+            'rejects duplicate mail CaseId',
+            'rejects forged creation process ticks',
+            'controller requires independent restarted Outlook',
+            'Outlook code never calls Move Send Delete')){
+            if($tests -cnotmatch [regex]::Escape($token)){$bad.Add(('Pester '+$token))}
+          }
+          foreach($token in @('UNSENT','NOT proved by actual MAPI',
+            'do NOT retry the same GUID','completely close Outlook')){
+            if($doc -cnotmatch [regex]::Escape($token)){$bad.Add(('runbook '+$token))}
+          }
+          foreach($key in @('BW4k7vNewIsolatedPstCreationExplicitlyApprovedOnly',
+            'BW4k7vEightUnsentSyntheticIpMNoteCases',
+            'BW4k7vNoProductionStoreCreateItem',
+            'BW4k7vImmutablePreMoveManifestCreateNewFlushAndSha256',
+            'BW4k7vIndependentPostRestartDoubleReadRequired',
+            'BW4k7vActualCalendarYearAndGenuineSentUnproven',
+            'BW4k7vExistingOriginalPstAndHistoricClaimUntouched')){
+            if(-not [bool]$m.Verification.$key){$bad.Add(('required '+$key))}
+          }
+          foreach($key in @('BW4k7vPstWrittenInCI','BW4k7vOutlookComConnectedInCI',
+            'BW4k7vProductionMailboxItemWritten','BW4k7vOutlookMoveOrSendExecuted',
+            'BW4k7vOriginalEvidenceOrClaimRewritten','BW4k7vOldPstOrTestFolderDeleted',
+            'BW4k7vPstRegistryLimitChanged',
+            'BW4k7vAutomaticallyRetriesInterruptedCreation',
+            'BW4k7vProductionArchiveResumeAutoAllowed')){
+            if([bool]$m.Verification.$key){$bad.Add(('unsafe '+$key))}
+          }
+          if($ctrl -cmatch '[.](Move|Send|Delete)[ ]*[(]' -or
+             $com -cmatch '[.](Move|Send|Delete)[ ]*[(]' -or
+             $policy -cmatch '[.](Move|Send|Delete)[ ]*[(]' -or
+             $ctrl -cmatch 'Set-ItemProperty|New-ItemProperty' -or
+             $com -cmatch 'Application[.]CreateItem[ ]*[(]'){
+            $bad.Add('forbidden Move, Send, Delete, production CreateItem or registry write')
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$bad.Add('production worker enabled')}
+          if($bad.Count -gt 0){throw ('BW4k7v release BLOCKED: '+($bad -join '; '))}
+          Write-Host 'PASS BW4k7v fresh isolated PST approval, immutable 8-item preMove manifest and post-restart double read without Move'
+
+      - name: BW4k7v1 read-only failed partial PST forensic no-retry gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $ctrl=Get-Content 'Core/Diagnostics/Invoke-OPA265BW4k7v1PartialPstReadOnly.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content 'Tests/Worker/BW4k7v1PartialPstReadOnly.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content 'docs/2.6.5-bw4k7v1-partial-pst-forensics.md' -Raw -Encoding UTF8
+          $bad=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709){$bad.Add('Pester 3264 required')}
+          if([int]$m.Verification.ExpectedTestContainers -ne 124){$bad.Add('containers 112 required')}
+          foreach($t in @('ValidateRange(1,20)','MaxItemsPerFolder=20',
+             'Get-OPA265BW4k7vExactMountedStore','Get-OPA265BW4k7vExactFolder',
+             'OriginalManifestExists','GetItemFromID($id,[string]$store.StoreID)',
+             'OpenErrorHResult','CollectionReadError',
+             'GetItemFromIdAttempts','GetItemFromIdFailed',
+             'OriginalManifestCreatedOrModified=$false',
+             'AutomaticRetryOfOldSuiteAllowed=$false',
+             'WriterPermit=$false','ProductionReady=$false')){
+            if($ctrl -cnotmatch [regex]::Escape($t)){$bad.Add(('controller '+$t))}
+          }
+          foreach($t in @('diagnostic never calls Outlook Move',
+            'diagnostic never calls Outlook Send',
+            'diagnostic never deletes real or synthetic item',
+            'diagnostic never creates PST file',
+            'diagnostic never reconstructs original manifest',
+            'diagnostic only creates no new file',
+            'diagnostic requires exact Outlook profile')){
+            if($t -eq 'diagnostic only creates no new file'){continue}
+            if($tests -cnotmatch [regex]::Escape($t)){$bad.Add(('tests '+$t))}
+          }
+          foreach($t in @('NEVER retry Create with the original failed SuiteId',
+            'does NOT prove whether the failure',
+            'four expected test subfolders',
+            'No permission for BW4k7w Move')){
+            if($docs -cnotmatch [regex]::Escape($t)){$bad.Add(('documentation '+$t))}
+          }
+          foreach($k in @('BW4k7v1ActualOperatorCreateFailed',
+            'BW4k7v1OldSuiteIdRetryForbidden',
+            'BW4k7v1OnlyReadExistingGuidIsolatedTestPst',
+            'BW4k7v1OnlyExpectedFourFoldersAndEightSyntheticCases',
+            'BW4k7v1OptionalGetItemFromIdPerItemHresult',
+            'BW4k7v1MayHaveNoOriginalManifest',
+            'BW4k7v1OriginalEvidenceAndClaimImmutable')){
+            if(-not [bool]$m.Verification.$k){$bad.Add(('required '+$k))}
+          }
+          foreach($k in @('BW4k7v1ReadOnlyForensicPstCreateOrMount',
+            'BW4k7v1OriginalManifestRecreatedOrModified',
+            'BW4k7v1OutlookMoveSaveSendDeleteCalled',
+            'BW4k7v1RealOutlookProblemRootCauseProvenInCI',
+            'BW4k7v1AutomaticRetryAllowed',
+            'BW4k7v1ProductionArchiveResumeAutoAllowed')){
+            if([bool]$m.Verification.$k){$bad.Add(('unsafe '+$k))}
+          }
+          if($ctrl -cmatch '[.](Move|Save|Send|Delete|AddStoreEx)[ ]*[(]' -or
+             $ctrl -cmatch 'AddStoreEx[ ]*[(]|Items[.]Add[ ]*[(]|CreateItem[ ]*[(]' -or
+             $ctrl -cmatch 'WriteAllText|WriteAllBytes|Set-Content|Out-File|FileMode]::CreateNew|New-ItemProperty|Set-ItemProperty|Remove-ItemProperty'){
+            $bad.Add('forbidden PST item write, mail Move/Send/Save/Delete, or manifest creation')
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$bad.Add('production enabled')}
+          if($bad.Count -gt 0){throw ('BW4k7v1 release BLOCKED: '+($bad -join '; '))}
+          Write-Host 'PASS BW4k7v1 exact failed fixture read-only four folders, per-ID HRESULT, no replay/Move/manifest creation'
+
+      - name: BW4k7v2 dedicated profile exact one pilot explicit InFolder safety gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $policy=Get-Content 'Core/Worker/BW4k7v2IsolatedProfilePolicy265.ps1' -Raw -Encoding UTF8
+          $controller=Get-Content 'Core/Diagnostics/Invoke-OPA265BW4k7v2IsolatedPilotPreflight.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content 'Tests/Worker/BW4k7v2IsolatedProfilePilot.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content 'docs/2.6.5-bw4k7v2-isolated-profile-pilot.md' -Raw -Encoding UTF8
+          $bad=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709){$bad.Add('Pester 3625 required')}
+          if([int]$m.Verification.ExpectedTestContainers -ne 124){$bad.Add('122 containers required')}
+          foreach($t in @('Assert-OPA265BW4k7v2SuiteId','Get-OPA265BW4k7v2Layout',
+            'Assert-OPA265BW4k7v2Layout','Test-OPA265BW4k7v2StoreIsolation',
+            '78a3e477-98fc-4134-b400-429b3e3b216b',
+            'OPA265-BW4k7v2','MailAccountsPresent','MultipleOrMissingStores',
+            'DefaultStoreNotOnlyStore','OnlyStorePathMismatch',
+            'Assert-OPA265BW4k7v2PilotManifest',
+            'Write-OPA265BW4k7v2ManifestOnce','Read-OPA265BW4k7v2Manifest',
+            'FileMode]::CreateNew','Flush($true)',
+            'WriterPermit=$false','ProductionReady=$false')){
+            if($policy -cnotmatch [regex]::Escape($t)){$bad.Add(('policy '+$t))}
+          }
+          foreach($t in @('Plan','Prepare','Inspect','CreatePilot','VerifyPilot',
+            'MessageCountMaximumThisStage=1','Accounts.Count','Stores.Count',
+            'CREATE BW4K7V2 PILOT','CreateItemFromTemplate',
+            'SaveAs([string]$layout.TemplatePath,2)',
+            'CreateItemFromTemplate([string]$layout.TemplatePath,$pilotFolder)',
+            '$pilot.Parent.EntryID','$pilot.Parent.StoreID',
+            'pilot misrouted; STOP',
+            'GetItemFromID','Write-OPA265BW4k7v2ManifestOnce',
+            'Read-OPA265BW4k7v2Manifest','VerifyPilot requires Outlook full restart',
+            'NEVER retry CreatePilot for this SuiteId',
+            'WriterPermit=$false','ProductionReady=$false')){
+            if($controller -cnotmatch [regex]::Escape($t)){$bad.Add(('controller '+$t))}
+          }
+          foreach($t in @('rejects original failed BW4k7v suite',
+            'new Outlook main working profile rejected',
+            'one linked mail account rejected',
+            'two mounted PSTs rejected',
+            'wrong default StoreID rejected',
+            'wrong default path rejected',
+            'controller explicitly targets InFolder',
+            'controller checks real parent folder after Save',
+            'controller never calls MailItem Move',
+            'controller requires new process on VerifyPilot')){
+            if($tests -cnotmatch [regex]::Escape($t)){$bad.Add(('Pester '+$t))}
+          }
+          foreach($t in @('BW4k7v real Create FAILED',
+             'ZERO mail accounts','exactly ONE attached PST',
+             'If this fails, STOP','No bulk eight-mail creation',
+             'do not retry CreatePilot')){
+             if($docs -cnotmatch [regex]::Escape($t)){$bad.Add(('runbook '+$t))}
+          }
+          foreach($k in @('BW4k7v2OriginalMisroutedPilotObservedInDefaultDrafts',
+            'BW4k7v2OriginalFailedSuiteAndClaimQuarantined',
+            'BW4k7v2OnlyDedicatedProfileOneDefaultPstZeroAccounts',
+            'BW4k7v2NewGuidAndExplicitPilotConsentRequired',
+            'BW4k7v2TemplateInFolderOnePilotOnly',
+            'BW4k7v2PostSaveActualParentAndStoreChecked',
+            'BW4k7v2ImmutableManifestAndPostRestartVerify')){
+            if(-not [bool]$m.Verification.$k){$bad.Add(('required '+$k))}
+          }
+          foreach($k in @('BW4k7v2RealOutlookBehaviorTestedInGitHubCI',
+            'BW4k7v2OriginalOutlookProfileAllowedForPilot',
+            'BW4k7v2OldPstOrDraftAutomaticallyCleaned',
+            'BW4k7v2OldIrreversibleClaimReplayed',
+            'BW4k7v2MultiItemMoveOrSendExecuted',
+            'BW4k7v2GenuineSentOrReceivedYearsProven',
+            'BW4k7v2AutomaticRetryAllowed',
+            'BW4k7v2ProductionArchiveResumeAutoAllowed')){
+            if([bool]$m.Verification.$k){$bad.Add(('unsafe '+$k))}
+          }
+          if($controller -cmatch '[.](Move|Send|Delete)[ ]*[(]' -or
+             $controller -cmatch 'AddStoreEx[ ]*[(]|OpenSharedItem[ ]*[(]|Remove-Item|Set-ItemProperty|New-ItemProperty' -or
+             $policy -cmatch '[.](Move|Send|Delete)[ ]*[(]|Set-ItemProperty|New-ItemProperty'){
+             $bad.Add('forbidden Move Send Delete old-store mount or registry modification')
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$bad.Add('production worker enabled')}
+          if($bad.Count -gt 0){throw ('BW4k7v2 release BLOCKED: '+($bad -join '; '))}
+          Write-Host 'PASS BW4k7v2 one pilot with dedicated single-default-PST no-account profile, OFT InFolder and immutable witness, old working profile blocked'
+
+      - name: Verify BW4k7v2a pristine visible PST inventory cannot write, retry, or waive previous gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $controller=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7v2IsolatedPilotPreflight.ps1' -Raw -Encoding UTF8
+          $policy=Get-Content -LiteralPath 'Core/Worker/BW4k7v2aPristineInventoryPolicy265.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7v2aPristineInventory.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-bw4k7v2a-pristine-inventory.md' -Raw -Encoding UTF8
+          if ([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+              [int]$m.Verification.ExpectedTestContainers -ne 124 -or
+              -not [bool]$m.Verification.BW4k7v2aReadOnlyPristineFolderInventoryGate -or
+              [bool]$m.Verification.BW4k7v2aPreexistingItemsAllowed -or
+              [bool]$m.Verification.BW4k7v2aIncompleteFolderScanAllowed -or
+              [bool]$m.Verification.BW4k7v2aRealOutlookProviderBehaviorVerified -or
+              [bool]$m.Verification.BW4k7v2aProductionWorkerEnabled -or
+              $controller -cnotmatch 'Test-OPA265BW4k7v2aPristineInventory' -or
+              $controller -cnotmatch 'pristine inventory exceeds 128 folders' -or
+              $policy -cnotmatch 'PreexistingVisibleOutlookItems' -or
+              $policy -cnotmatch 'incomplete or inconsistent folder enumeration' -or
+              $tests -cnotmatch 'controller calls pristine validation before first folder write' -or
+              $docs -cnotmatch 'No Move/Send/Delete' -or
+              $controller -cmatch '[.](Move|Send|Delete)[ ]*[(]' -or
+              $policy -cmatch '[.](Move|Send|Delete)[ ]*[(]' -or
+              [bool]$m.Integration.ArchiveWorkerEnabled -or
+              [bool]$m.Integration.ResumeWorkerEnabled -or
+              [bool]$m.Integration.AutoWorkerEnabled) {
+              throw 'BW4k7v2a pristine inventory prerequisite or production isolation contract failed.'
+          }
+          $first=$controller.IndexOf('Test-OPA265BW4k7v2aPristineInventory')
+          $mutation=$controller.IndexOf('$pstRoot.Folders.Add')
+          if ($first -lt 0 -or $mutation -le $first) {
+              throw 'BW4k7v2a guard must run before first PST folder write.'
+          }
+          Write-Host 'PASS BW4k7v2a read-only complete folder inventory gates the one isolated pilot'
+
+      - name: Verify BW4k7v2a1 strict existing-profile one-shot pilot gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $p=Get-Content -LiteralPath 'Core/Worker/BW4k7v2a1ExistingProfilePolicy265.ps1' -Raw -Encoding UTF8
+          $c=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7v2a1ExistingProfilePilot.ps1' -Raw -Encoding UTF8
+          $t=Get-Content -LiteralPath 'Tests/Worker/BW4k7v2a1ExistingProfilePolicy.Tests.ps1' -Raw -Encoding UTF8
+          $d=Get-Content -LiteralPath 'docs/2.6.5-bw4k7v2a1-existing-profile-pilot.md' -Raw -Encoding UTF8
+          $bad=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$m.Verification.ExpectedTestContainers -ne 124){$bad.Add('expected 3625/122 Pester')}
+          foreach($key in @('BW4k7v2a1ExistingTestProfileAllowed','BW4k7v2a1RequiresExactPop3DeliveryStore',
+              'BW4k7v2a1OneShotIntentBeforeAddStore','BW4k7v2a1ExplicitNewPstItemsAdd',
+              'BW4k7v2a1PostSaveExactStoreFolderAndRestart')){
+              if(-not [bool]$m.Verification.$key){$bad.Add(('missing '+$key))}
+          }
+          foreach($key in @('BW4k7v2a1ActualOutlookPilotTestedInGitHubCI',
+              'BW4k7v2a1AutomaticRetryAllowed','BW4k7v2a1ProductionWorkerEnabled',
+              'BW4k7v2a1OldOriginalSourcePstChangedByScript')){
+              if([bool]$m.Verification.$key){$bad.Add(('unsafe '+$key))}
+          }
+          foreach($token in @('Pop3SmtpAddress','AccountType -eq 2',
+              'Pop3DeliveryStoreMissing','ExpectedPop3AccountNotUnique',
+              'TargetTestStoreCardinalityMismatch','TestStoreIsPop3DeliveryStore',
+              'FileMode]::CreateNew','Flush($true)','ProductionReady=$false')){
+              if($p -cnotmatch [regex]::Escape($token)){$bad.Add(('policy '+$token))}
+          }
+          foreach($token in @('GetActiveObject','Get-OPA265BW4k7v2a1Layout',
+              'AddStoreEx([string]$layout.PstPath,2)',
+              "$"+"folder.Items.Add('IPM.Note')",
+              'Write-OPA265BW4k7v2a1JsonOnce -Path $layout.IntentPath',
+              '$pilot.Parent.StoreID','$pilot.Parent.EntryID',
+              'GetItemFromID','one-pilot-intent','CreatingProcessStartUtcTicks',
+              'NEVER RETRY CreatePilot','WriterPermit=$false','ProductionReady=$false')){
+              if($c -cnotmatch [regex]::Escape($token) -and
+                 $p -cnotmatch [regex]::Escape($token)){$bad.Add(('controller '+$token))}
+          }
+          $intent=$c.IndexOf('Write-OPA265BW4k7v2a1JsonOnce -Path $layout.IntentPath')
+          $mutation=$c.IndexOf('$ns.AddStoreEx(')
+          if($intent -lt 0 -or $mutation -le $intent){$bad.Add('intent must be durable before profile/PST mutation')}
+          if($c -cmatch '[.](Move|Send|Delete)[ ]*[(]|GetDefaultFolder[ ]*[(]|Set-ItemProperty|New-ItemProperty|Remove-ItemProperty' -or
+             $c -cmatch 'Application[.]CreateItem[ ]*[(]|[$]app[.]CreateItem[ ]*[(]' -or
+             $p -cmatch '[.](Move|Send|Delete|AddStoreEx|Save)[ ]*[(]'){
+              $bad.Add('forbidden COM writer, old/default Drafts or registry mutation')
+          }
+          if($t -cnotmatch 'rejects test PST that is also the POP3 delivery store' -or
+             $t -cnotmatch 'writes immutable one-shot intent before AddStoreEx' -or
+             $t -cnotmatch 'requires Outlook restart before independent VerifyPilot'){
+             $bad.Add('critical regression cases missing')
+          }
+          if($d -cnotmatch 'existing test Outlook profile' -or
+             $d -cnotmatch 'DO NOT repeat CreatePilot'){ $bad.Add('missing operator runbook') }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$bad.Add('production worker accidentally enabled')}
+          if($bad.Count -gt 0){throw ('BW4k7v2a1 release BLOCKED: '+($bad -join '; '))}
+          Write-Host 'PASS BW4k7v2a1 one-shot existing Outlook POP3 scoped new PST and exact Folder.Items.Add no Move'
+
+      - name: Verify BW4k7v2a2 original failed-pilot read-only forensic gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $pure=Get-Content -LiteralPath 'Core/Worker/BW4k7v2a2ReadOnlyPilotObservation265.ps1' -Raw -Encoding UTF8
+          $ctrl=Get-Content -LiteralPath 'Core/Diagnostics/Invoke-OPA265BW4k7v2a2FailedPilotReadOnlyReview.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Worker/BW4k7v2a2ReadOnlyPilotObservation.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-bw4k7v2a2-failed-pilot-readonly-forensics.md' -Raw -Encoding UTF8
+          $bad=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$m.Verification.ExpectedTestContainers -ne 124){$bad.Add('full Pester 3625/122')}
+          foreach($key in @('BW4k7v2a2ActualOperatorPilotFailedPostSavePredicate',
+              'BW4k7v2a2OriginalSuiteIdQuarantinedNoRetry',
+              'BW4k7v2a2PureReadOnlyPstFolderAndByIdForensic',
+              'BW4k7v2a2PreservesOriginalImmutableIntentAndClaim')){
+              if(-not [bool]$m.Verification.$key){$bad.Add(('missing '+$key))}
+          }
+          foreach($key in @('BW4k7v2a2OriginalFailedPredicateExactlyIdentified',
+              'BW4k7v2a2OutlookComUsedInGitHubCI',
+              'BW4k7v2a2NewPstOrMailItemCreated',
+              'BW4k7v2a2AnyOutlookMoveSaveSendDelete',
+              'BW4k7v2a2OriginalPstOrTestFolderDeleted',
+              'BW4k7v2a2ProductionWorkerEnabled')){
+              if([bool]$m.Verification.$key){$bad.Add(('unsafe '+$key))}
+          }
+          foreach($token in @('ExactOriginalPredicateThatFailedProven=$false',
+              'NoMatchingPilotInTargetFolderNoCrossStoreSearch',
+              'OnePilotPresentInExactTargetFolderAfterFailure',
+              'MultiplePilotSubjectsManualReview','AutomaticRetryAllowed=$false',
+              'WriterPermit=$false','ProductionReady=$false')){
+              if($pure -cnotmatch [regex]::Escape($token)){$bad.Add(('pure '+$token))}
+          }
+          foreach($token in @('Assert-OPA265BW4k7v2a1Layout','one-pilot-intent.json absent',
+              'OriginalFailedCreatePilotReplayed=$false','GetActiveObject',
+              'GetItemFromID','TestFolderItemCount','OtherStoresMailSearched=$false',
+              'AddStoreExOrSaveOrMoveExecuted=$false','PstOrEvidenceFilesChanged=$false',
+              'WriterPermit=$false','ProductionReady=$false')){
+              if($ctrl -cnotmatch [regex]::Escape($token)){$bad.Add(('controller '+$token))}
+          }
+          if($ctrl -cmatch '\.(AddStoreEx|AddStore|Save|Move|Send|Delete|CreateItem)[ ]*[(]|GetDefaultFolder[ ]*[(]|CreateObject[ ]*[(]' -or
+             $ctrl -cmatch 'Remove-Item|Set-ItemProperty|New-ItemProperty|WriteAllText|FileMode]::CreateNew' -or
+             $pure -cmatch '\.(AddStoreEx|AddStore|Save|Move|Send|Delete|CreateItem)[ ]*[(]'){
+              $bad.Add('read-only diagnostic contains a writer operation')
+          }
+          foreach($token in @('classifies zero target items without assuming other store misroute',
+              'forensic controller never uses AddStoreEx or Save or Move or Send or Delete',
+              'retains sealed original intent and never recreates it')){
+              if($tests -cnotmatch [regex]::Escape($token)){$bad.Add(('missing Pester '+$token))}
+          }
+          foreach($token in @('2c15cb7c-4c09-4bcf-bca1-9fec458af3a5',
+              'HRESULT=0x80131501','DO NOT repeat CreatePilot')){
+              if($doc -cnotmatch [regex]::Escape($token)){$bad.Add(('missing runbook '+$token))}
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$bad.Add('production Worker enabled')}
+          if($bad.Count -gt 0){throw ('BW4k7v2a2 forensic release BLOCKED: '+($bad -join '; '))}
+          Write-Host 'PASS BW4k7v2a2 original pilot failed after Save; strict read-only test PST forensic only'
+
+      - name: Verify BW4k7v2a3 exact original synthetic Subject read-only Drafts gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $w=Get-Content 'Core/Worker/BW4k7v2a3DraftsEvidence265.ps1' -Raw -Encoding UTF8
+          $c=Get-Content 'Core/Diagnostics/Invoke-OPA265BW4k7v2a3FindOriginalPilotDraftsReadOnly.ps1' -Raw -Encoding UTF8
+          $t=Get-Content 'Tests/Worker/BW4k7v2a3DraftsEvidence.Tests.ps1' -Raw -Encoding UTF8
+          $d=Get-Content 'docs/2.6.5-bw4k7v2a3-drafts-location-readonly.md' -Raw -Encoding UTF8
+          $errors=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$m.Verification.ExpectedTestContainers -ne 124){$errors.Add('3625/122 Pester strict gate')}
+          foreach($key in @('BW4k7v2a3ExistingOriginalSuiteIdAndIntentPinned',
+             'BW4k7v2a3OnlyExactSyntheticSubjectInStoreDrafts',
+             'BW4k7v2a3BoundedReadOnlyCrossStoreDrafts',
+             'BW4k7v2a3DistinguishesNoMatchesFromPartialProviders')){
+             if(-not [bool]$m.Verification.$key){$errors.Add(('required '+$key))}
+          }
+          foreach($key in @('BW4k7v2a3LiveOperatorOutlookTestCompleted',
+             'BW4k7v2a3OriginalPilotReplayed','BW4k7v2a3NewPstCreatedOrAttached',
+             'BW4k7v2a3OutlookMailWrittenOrMoved','BW4k7v2a3OtherFoldersOrMessageBodiesRead',
+             'BW4k7v2a3ProductionWorkerEnabled')){
+             if([bool]$m.Verification.$key){$errors.Add(('unsafe '+$key))}
+          }
+          foreach($word in @('NoPilotFoundInCheckedDraftsFolders',
+             'SinglePilotLocatedInDraftsReadOnly','IncompleteDraftsSearchNoConclusion',
+             'SinglePilotFoundButOtherDraftsChecksIncomplete','MultipleMatchingPilotsManualReview',
+             'OriginalSuiteIdRetryPermitted=$false','WriterPermit=$false','ProductionReady=$false')){
+             if($w -cnotmatch [regex]::Escape($word)){$errors.Add(('worker '+$word))}
+          }
+          foreach($word in @('ExpectedIntentSha256','Intent SHA256 mismatch',
+             'Test-OPA265BW4k7v2a3DraftsEvidence',
+             'GetDefaultFolder(16)','Items.Restrict','GetItemFromID',
+             'TestPstPath','StoreIsOriginalTestPst',
+             'OriginalFailedCreatePilotReplayed=$false',
+             'AddStoreExSaveMoveSendDeleteExecuted=$false',
+             'EvidenceOrPstWritten=$false',
+             'WriterPermit=$false','ProductionReady=$false')){
+             if($c -cnotmatch [regex]::Escape($word)){$errors.Add(('controller '+$word))}
+          }
+          $find=$c.IndexOf('ExpectedIntentSha256 -cnotmatch')
+          $touch=$c.IndexOf("GetActiveObject('Outlook.Application')")
+          if($find -lt 0 -or $touch -le $find){$errors.Add('read original SHA256 before Outlook COM')}
+          if($c -cmatch '[.](AddStoreEx|AddStore|Save|Move|Delete|Send|CreateItem)[ ]*[(]' -or
+             $w -cmatch '[.](AddStoreEx|AddStore|Save|Move|Delete|Send|CreateItem)[ ]*[(]' -or
+             $c -cmatch '[$]item[.](Body|HTMLBody|Attachments)' -or
+             $c -cmatch '[$]ns[.]GetDefaultFolder[ ]*[(]' -or
+             $c -cmatch 'Set-ItemProperty|New-ItemProperty|Remove-ItemProperty|Remove-Item|FileMode]::CreateNew'){
+             $errors.Add('forbidden write/default-Drafts or private mail-content read')
+          }
+          foreach($word in @('flags unreadable Drafts before declaring a negative search complete',
+             'controller pins original intent SHA and never calls Save Move or AddStore',
+             'controller queries exact subject in each store Drafts',
+             'never grants permission to retry')){
+             if($t -cnotmatch [regex]::Escape($word)){$errors.Add(('Pester '+$word))}
+          }
+          foreach($word in @('2c15cb7c-4c09-4bcf-bca1-9fec458af3a5',
+             'd78b80450f84e182fef7549bfae6cc48e1b487eb190e216cecbee7be9e05f606',
+             'MailItem.Save','Store.GetDefaultFolder(16)', 'Never rerun the original')){
+             if($d -cnotmatch [regex]::Escape($word)){$errors.Add(('doc '+$word))}
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$errors.Add('production worker must stay disabled')}
+          if($errors.Count -gt 0){throw ('BW4k7v2a3 release BLOCKED: '+($errors -join '; '))}
+          Write-Host 'PASS BW4k7v2a3 read-only exact synthetic Subject Restrict across Store Drafts, original Intent SHA256 pinned'
+
+      - name: Verify BW4k7v2a4 one-shot synthetic default Draft Move safety and SEM001 gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $p=Get-Content 'Core/Worker/BW4k7v2a4OneShotMovePolicy265.ps1' -Raw -Encoding UTF8
+          $c=Get-Content 'Core/Diagnostics/Invoke-OPA265BW4k7v2a4OneShotMove.ps1' -Raw -Encoding UTF8
+          $t=Get-Content 'Tests/Worker/BW4k7v2a4OneShotMovePolicy.Tests.ps1' -Raw -Encoding UTF8
+          $d=Get-Content 'docs/2.6.5-bw4k7v2a4-one-shot-move.md' -Raw -Encoding UTF8
+          $issues=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$m.Verification.ExpectedTestContainers -ne 124){$issues.Add('full Pester 3625/122')}
+          foreach($key in @('BW4k7v2a4OriginalFailedSuiteIdPreserved',
+              'BW4k7v2a4NewSyntheticDraftExplicitWriteConsent',
+              'BW4k7v2a4OnlyNewUnicodeDisposablePstTarget',
+              'BW4k7v2a4OriginalPop3SourceNeverUsedForPilot',
+              'BW4k7v2a4DurableClaimBeforeExactlyOneComMove',
+              'BW4k7v2a4PostRestartIndependentSourceZeroDestinationOne',
+              'BW4k7v2a4SEM001UnknownMapiFlagsStillManualReview')){
+             if(-not [bool]$m.Verification.$key){$issues.Add(('missing '+$key))}
+          }
+          foreach($key in @('BW4k7v2a4RealOutlookProviderTestExecutedInCI',
+              'BW4k7v2a4HistoricalOldFixtureRetried','BW4k7v2a4ProductionWriterEnabled',
+              'BW4k7v2a4AutomaticMoveRetryAllowed','BW4k7v2a4OperatorLiveMoveCompleted')){
+             if([bool]$m.Verification.$key){$issues.Add(('unsafe '+$key))}
+          }
+          foreach($word in @('2c15cb7c-4c09-4bcf-bca1-9fec458af3a5',
+             'DefaultDraftsIsOriginalPop3DeliveryStore',
+             'AttachmentCountExpected=0',
+             'SourceNotZero','DestinationNotOne','SemanticWitnessMismatch',
+             'OriginalMoveMayBeRetried=$false',
+             'SEM001RiskAcceptanceAutomaticallyGranted=$false',
+             'ProductionIntegrityProven=$false',
+             'WriterPermit=$false','ProductionReady=$false')){
+             if($p -cnotmatch [regex]::Escape($word)){$issues.Add(('policy '+$word))}
+          }
+          foreach($word in @('AllowDefaultDraftsSyntheticWrite',
+             'CREATE BW4K7V2A4 DRAFT',
+             'ConfirmOneShotMove',
+             'MOVE BW4K7V2A4 ONCE',
+             'CreatePilot','ReviewPilot','MovePilot','Reconcile',
+             'Write-OPA265BW4k7v2a1JsonOnce -Path $layout.IntentPath',
+             'Write-OPA265BW4k7v2a1JsonOnce -Path $layout.ManifestPath',
+             'Write-OPA265BW4k7v2a1JsonOnce -Path $layout.MoveClaimPath',
+             '$moved=$read.Move($bindings.TargetFolder)',
+             'GetItemFromID','GetDefaultFolder(16)',
+             'SourceEntryId','SourceStoreId','TargetFolderId',
+             'Reconcile requires complete Outlook process restart',
+             '0x0E070003',
+             'UnknownMapiFlagsAutomaticallyWaived=$false',
+             'NoSecondMoveOrSaveExecuted=$true',
+             'AutomaticRetryAllowed=$false',
+             'WriterPermit=$false','ProductionReady=$false')){
+             if($c -cnotmatch [regex]::Escape($word)){$issues.Add(('controller '+$word))}
+          }
+          $intent=$c.IndexOf('Write-OPA265BW4k7v2a1JsonOnce -Path $layout.IntentPath')
+          $create=$c.IndexOf('$ns.AddStoreEx(')
+          $claim=$c.IndexOf('Write-OPA265BW4k7v2a1JsonOnce -Path $layout.MoveClaimPath')
+          $move=$c.IndexOf('$moved=$read.Move(')
+          if($intent -lt 0 -or $create -le $intent -or
+             $claim -lt 0 -or $move -le $claim){$issues.Add('durable intent/claim order invalid')}
+          if([regex]::Matches($c,'\$read\.Move\(').Count -ne 1){
+             $issues.Add('exactly one Outlook MailItem.Move invocation required')
+          }
+          if($c -cmatch '[$]source[.](Move|Delete|Send)[ ]*[(]|[$]moved[.](Move|Save|Send|Delete)[ ]*[(]' -or
+             $c -cmatch '[.]RemoveStore[ ]*[(]|Set-ItemProperty|New-ItemProperty|Remove-ItemProperty' -or
+             $p -cmatch '[.](Move|Save|Send|Delete|AddStoreEx|AddStore)[ ]*[(]'){
+             $issues.Add('unsafe second writer or production-side mutation')
+          }
+          foreach($word in @('reconcile detects source still contains exact pilot',
+             'reconcile detects forged claim original SourceEntryID',
+             'controller writes Move claim before exactly one COM Move invocation',
+             'controller requires Outlook restart to reconcile',
+             'semantic witness cannot certify full production SEM-001 fields')){
+             if($t -cnotmatch [regex]::Escape($word)){$issues.Add(('Pester '+$word))}
+          }
+          foreach($word in @('bogoderov_e@stios.ru',
+             'may be IMAP/server-synced',
+             'FileMode.CreateNew','SEM-001',
+             'Do not delete the original prior test letter',
+             '3480 Pester tests in 118 containers')){
+             if($d -cnotmatch [regex]::Escape($word)){$issues.Add(('docs '+$word))}
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$issues.Add('production worker enabled')}
+          if($issues.Count -gt 0){throw ('BW4k7v2a4 release BLOCKED: '+($issues -join '; '))}
+          Write-Host 'PASS BW4k7v2a4 explicit new test Draft + durable one-shot claim BEFORE exactly one Outlook Move, SEM001 manual'
+
+      - name: Verify BW4k7v2a5 original failed CreatePilot numeric count read-only gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $p=Get-Content 'Core/Worker/BW4k7v2a5CountEvidence265.ps1' -Raw -Encoding UTF8
+          $c=Get-Content 'Core/Diagnostics/Invoke-OPA265BW4k7v2a5ReadOnlyCountReview.ps1' -Raw -Encoding UTF8
+          $t=Get-Content 'Tests/Worker/BW4k7v2a5CountEvidence.Tests.ps1' -Raw -Encoding UTF8
+          $d=Get-Content 'docs/2.6.5-bw4k7v2a5-failed-createpilot-count-readonly.md' -Raw -Encoding UTF8
+          $issues=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$m.Verification.ExpectedTestContainers -ne 124){$issues.Add('full Pester strict 3625/122')}
+          foreach($key in @('BW4k7v2a5ActualCreatePilotFailureAfterSaveObserved',
+             'BW4k7v2a5ExactOriginalFailedSuiteIdPreserved',
+             'BW4k7v2a5OriginalIntentOnlyReadNotRewritten',
+             'BW4k7v2a5OnlyOriginalDefaultDraftsAndTestPstFixtureRead',
+             'BW4k7v2a5NumericRestrictAndManualSubjectCountsSeparated')){
+             if(-not [bool]$m.Verification.$key){$issues.Add(('missing '+$key))}
+          }
+          foreach($key in @('BW4k7v2a5HistoricalFailedPredicateProven',
+             'BW4k7v2a5AnyOutlookWriterExecutedInCI','BW4k7v2a5OriginalCreatePilotRetried',
+             'BW4k7v2a5OriginalMovePilotExecuted','BW4k7v2a5OriginalEvidenceRewritten',
+             'BW4k7v2a5ProductionWorkerEnabled')){
+             if([bool]$m.Verification.$key){$issues.Add(('unsafe '+$key))}
+          }
+          foreach($word in @('SourceRestrictManualCountDiscrepancyObserved',
+             'TargetRestrictManualCountDiscrepancyObserved',
+             'NowSourceOneTargetZeroButOriginalFailureCauseUnproven',
+             'ReadOnlyIncompleteOrAmbiguousCountsNeedsManualReview',
+             'ExactHistoricalFailedPredicateProven=$false',
+             'OriginalCreatePilotMayBeRetried=$false',
+             'OriginalMovePilotMayBeInvoked=$false',
+             'OutlookWriterUsed=$false','WriterPermit=$false','ProductionReady=$false')){
+             if($p -cnotmatch [regex]::Escape($word)){$issues.Add(('policy '+$word))}
+          }
+          foreach($word in @('CreationIntent.1','NoAutomaticRetry',
+             'GetActiveObject',
+             'Get-Process -Name OUTLOOK',
+             'GetDefaultFolder(16)','GetItemFromID',
+             'TargetFolderName','OriginalIntentSha256',
+             'FullItemsCount','RestrictCount',
+             'ManualExactSubjectCount','RestrictEnumeratedCount',
+             'ReadComplete','RestrictionReadComplete',
+             'OriginalPreMoveManifestExists','OriginalMoveClaimExists',
+             'OriginalFailedCreatePilotReplayed=$false',
+             'AnyMailMoveSaveOrCreateExecuted=$false',
+             'AnyPstOrEvidenceWritesExecuted=$false',
+             'OtherStoresMailSearched=$false',
+             'MovePilotAllowedForThisSuite=$false',
+             'WriterPermit=$false','ProductionReady=$false')){
+             if($c -cnotmatch [regex]::Escape($word)){$issues.Add(('controller '+$word))}
+          }
+          if($c -cmatch '[.](Move|Save|Send|Delete|AddStoreEx|AddStore|CreateItem|RemoveStore|RemoveStoreEx)[ ]*[(]' -or
+             $c -cmatch '[$]drafts[.]Items[.]Add[ ]*[(]' -or
+             $c -cmatch 'WriteAllText|WriteAllBytes|CreateDirectory|FileMode]::CreateNew|Remove-Item|Set-ItemProperty|New-ItemProperty' -or
+             $p -cmatch '[.](Move|Save|Send|Delete|AddStoreEx|AddStore|CreateItem)[ ]*[(]'){
+             $issues.Add('forbidden COM writer or file/evidence mutation')
+          }
+          foreach($word in @('detects source Restrict returns zero while direct scan sees 1',
+             'detects destination Restrict returns one while manual target zero',
+             'never claims original failed predicate was identified',
+             'never grants original failed CreatePilot retry',
+             'never grants MovePilot without original preMove manifest',
+             'inspects Body and To only for exact synthetic Subject',
+             'never saves moves sends deletes or creates Outlook objects')){
+             if($t -cnotmatch [regex]::Escape($word)){$issues.Add(('Pester '+$word))}
+          }
+          foreach($word in @('7451b8f5-6404-4496-ae7b-5b1cdfb9063a',
+             'CreatePilot','never retry','3512 tests in 119 containers',
+             'ManualExactSubjectCount','RestrictCount')){
+             if($d -cnotmatch [regex]::Escape($word)){$issues.Add(('runbook '+$word))}
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$issues.Add('production worker enabled')}
+          if($issues.Count -gt 0){throw ('BW4k7v2a5 release BLOCKED: '+($issues -join '; '))}
+          Write-Host 'PASS BW4k7v2a5 independent original test Drafts/PST subject counts read-only; no retry or writer'
+
+      - name: Verify BW4k7v2a6 exact original synthetic Body opaque read-only SEM001 gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $p=Get-Content 'Core/Worker/BW4k7v2a6BodyIntegrityPolicy265.ps1' -Raw -Encoding UTF8
+          $c=Get-Content 'Core/Diagnostics/Invoke-OPA265BW4k7v2a6ReadOnlyBodyReview.ps1' -Raw -Encoding UTF8
+          $t=Get-Content 'Tests/Worker/BW4k7v2a6BodyIntegrity.Tests.ps1' -Raw -Encoding UTF8
+          $d=Get-Content 'docs/2.6.5-bw4k7v2a6-body-integrity-readonly.md' -Raw -Encoding UTF8
+          $bad=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$m.Verification.ExpectedTestContainers -ne 124){$bad.Add('full 3625 Pester 122 container strict gate')}
+          foreach($k in @('BW4k7v2a6ActualOperatorBodyMismatchCaptured',
+              'BW4k7v2a6OriginalFailedSuiteIdAndIntentShaPinned',
+              'BW4k7v2a6ReadOnlySyntheticBodyFingerprintOnly',
+              'BW4k7v2a6OnlyExactOriginalDraftSubjectRead',
+              'BW4k7v2a6TwoBodyReadbacksCompared',
+              'BW4k7v2a6NoRawBodyOrSignatureReported',
+              'BW4k7v2a6AnyBodyMismatchBlocksMove')){
+             if(-not [bool]$m.Verification.$k){$bad.Add(('missing '+$k))}
+          }
+          foreach($k in @('BW4k7v2a6OriginalSaveGateProven',
+              'BW4k7v2a6LiveOutlookTestedInCI',
+              'BW4k7v2a6OriginalPilotRetried',
+              'BW4k7v2a6OldMailMovedOrSaved',
+              'BW4k7v2a6OriginalEvidenceRewritten',
+              'BW4k7v2a6SEM001WaiverGranted',
+              'BW4k7v2a6ProductionWriterEnabled')){
+             if([bool]$m.Verification.$k){$bad.Add(('unsafe '+$k))}
+          }
+          foreach($x in @('BodyMismatchBlocksMoveAndRequiresManualReview',
+              'SyntheticBodyChangedBetweenReadbacksNoMove',
+              'CurrentExactBodyStableButOriginalFailedSaveGateUnprovenNoMove',
+              'LineEndingOnlyDifferenceUnaccepted',
+              'TrailingWhitespaceOnlyDifferenceUnaccepted',
+              'NonWhitespaceSuffixAddedUnaccepted',
+              'ActualObservedUtf8Sha256',
+              'ExpectedCrLfCount','ObservedCrLfCount',
+              'AnyRawBodyOrSuffixTextReturned=$false',
+              'BodyNormalizationOrDifferenceAccepted=$false',
+              'OriginalMovePilotMayBeInvoked=$false',
+              'WriterPermit=$false','ProductionReady=$false')){
+             if($p -cnotmatch [regex]::Escape($x)){$bad.Add(('policy '+$x))}
+          }
+          foreach($x in @('7451b8f5-6404-4496-ae7b-5b1cdfb9063a',
+              'd31a549a4b9baca30a9bcce661230d2f545b1e538d7da4bbccf1a33f6b16e1f8',
+              'Read-OPA265BW4k7v2a1SealedJson',
+              'GetDefaultFolder(16)',
+              'GetItemFromID',
+              'ExactOriginalSyntheticSubjectCount',
+              'OriginalMoveClaimPath',
+              'Get-OPA265BW4k7v2a6BodyEvidence',
+              'Test-OPA265BW4k7v2a6FreshBodyRead',
+              'FirstReadBodyEvidence',
+              'ReopenedByIdBodyEvidence',
+              'RawBodyOrSignatureReturned=$false',
+              'CreatePilotReplayed=$false',
+              'MovePilotCalled=$false',
+              'AnyMailOrEvidenceWrites=$false',
+              'WriterPermit=$false','ProductionReady=$false')){
+             if($x -eq 'OriginalMoveClaimPath'){continue}
+             if($c -cnotmatch [regex]::Escape($x)){$bad.Add(('controller '+$x))}
+          }
+          if($c -cmatch '[.](Save|Move|Send|Delete|AddStoreEx|AddStore|CreateItem|RemoveStore)[ ]*[(]' -or
+             $c -cmatch 'WriteAllText|WriteAllBytes|CreateDirectory|FileMode]::CreateNew|New-ItemProperty|Remove-Item' -or
+             $p -cmatch '[.](Save|Move|Send|Delete|AddStoreEx|AddStore|CreateItem)[ ]*[(]'){
+             $bad.Add('forbidden COM or file write')
+          }
+          foreach($x in @('classifies CRLF versus LF as unaccepted line-ending change',
+              'classifies CR versus LF as unaccepted line-ending change',
+              'does not include added signature text in object serialization',
+              'flags stable but non-matching Body as an explicit move blocker',
+              'never permits old failed Move or production worker',
+              'controller forbids writing, moving, deleting or attaching any PST')){
+             if($t -cnotmatch [regex]::Escape($x)){$bad.Add(('Pester '+$x))}
+          }
+          foreach($x in @('BodyMatchesExpected=False',
+              '7451b8f5-6404-4496-ae7b-5b1cdfb9063a',
+              'd31a549a4b9baca30a9bcce661230d2f545b1e538d7da4bbccf1a33f6b16e1f8',
+              'SEM-001 UNACCEPTED',
+              '3546 Pester tests in 120 containers',
+              'no Outlook COM in CI')){
+             if($d -cnotmatch [regex]::Escape($x)){$bad.Add(('docs '+$x))}
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$bad.Add('production worker enabled')}
+          if($bad.Count -gt 0){throw ('BW4k7v2a6 release BLOCKED: '+($bad -join '; '))}
+          Write-Host 'PASS BW4k7v2a6 original synthetic Draft Body hashed read-only no raw contents or Move'
+
+      - name: Verify BW4k7v2a7 isolated post-Save actual Body baseline and one-shot Move gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $p=Get-Content 'Core/Worker/BW4k7v2a7PostSaveBaselinePolicy265.ps1' -Raw -Encoding UTF8
+          $c=Get-Content 'Core/Diagnostics/Invoke-OPA265BW4k7v2a7PostSaveBaselineOneShot.ps1' -Raw -Encoding UTF8
+          $t=Get-Content 'Tests/Worker/BW4k7v2a7PostSaveBaseline.Tests.ps1' -Raw -Encoding UTF8
+          $d=Get-Content 'docs/2.6.5-bw4k7v2a7-postsave-synthetic-baseline.md' -Raw -Encoding UTF8
+          $issues=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$m.Verification.ExpectedTestContainers -ne 124){$issues.Add('expected 3625 tests 122 containers')}
+          foreach($k in @('BW4k7v2a7HistoricalFailedSuiteIdsQuarantined',
+             'BW4k7v2a7SyntheticPostSaveBodyPinnedAsBaseline',
+             'BW4k7v2a7KnownThreeCharacterSuffixOnlyForDisposableFixture',
+             'BW4k7v2a7NoImmediatePostSaveRestrictGate',
+             'BW4k7v2a7SubjectQueryHasExplicitNumericCount',
+             'BW4k7v2a7DistinctOperatorCreateAndMoveConsent',
+             'BW4k7v2a7DurableClaimBeforeExactlyOneMove',
+             'BW4k7v2a7IndependentReviewBeforeMoveAndPostRestartReconcile')){
+             if(-not [bool]$m.Verification.$k){$issues.Add(('missing '+$k))}
+          }
+          foreach($k in @('BW4k7v2a7ProductionContentNormalizationWaiver',
+             'BW4k7v2a7RealOutlookProviderTestedInCI',
+             'BW4k7v2a7OldSuiteIdMoveOrSaveRetried',
+             'BW4k7v2a7AutomaticMoveRetryAllowed',
+             'BW4k7v2a7ProductionWriterEnabled')){
+             if([bool]$m.Verification.$k){$issues.Add(('unsafe '+$k))}
+          }
+          foreach($token in @('7451b8f5-6404-4496-ae7b-5b1cdfb9063a',
+              '2c15cb7c-4c09-4bcf-bca1-9fec458af3a5',
+              'KnownThreeCharacterSyntheticPostSaveWhitespaceSuffix',
+              'UnexpectedSyntheticPostSaveBodyChangeBlocked',
+              'OnlyKnownExactWhitespaceSuffixAllowed',
+              'ApprovedForNewDisposableSyntheticFixtureBaseline',
+              'AnyProductionSemanticWaiverGranted=$false',
+              'AnyPostMoveBodyDifferenceAccepted=$false',
+              'OriginalMoveMayBeRetried=$false',
+              'WriterPermit=$false','ProductionReady=$false')){
+             if($p -cnotmatch [regex]::Escape($token)){$issues.Add(('policy '+$token))}
+          }
+          foreach($token in @('AllowDefaultDraftsSyntheticWrite',
+              'ConfirmOneShotMove',
+              'CREATE BW4K7V2A7 DRAFT','MOVE BW4K7V2A7 ONCE',
+              'NewSyntheticDraftByIdSavedBodySealedRequiresIndependentReview',
+              'SourceOneDestinationZeroNotYetIndependentlyVerified=$true',
+              'PostSaveBodyBaselineMatchesManifest=$true',
+              'SyntheticSavedActualBodySha256',
+              'SyntheticSavedBodyPinnedAsExactPreMoveWitness',
+              'ProductionContentNormalizationWaiverGranted=$false',
+              'Count=[int]$count',
+              'Matches=@($matches.ToArray())',
+              'Get-OPA265BW4k7v2a7PostSaveBodyBaseline',
+              'Read-OPA265BW4k7v2a1SealedJson',
+              'Write-OPA265BW4k7v2a1JsonOnce -Path $layout.IntentPath',
+              'Write-OPA265BW4k7v2a1JsonOnce -Path $layout.ManifestPath',
+              'Write-OPA265BW4k7v2a1JsonOnce -Path $layout.MoveClaimPath',
+              '$moved=$read.Move($bindings.TargetFolder)',
+              'GetItemFromID',
+              'Reconcile requires complete Outlook process restart',
+              'AutomaticRetryAllowed=$false',
+              'WriterPermit=$false','ProductionReady=$false')){
+             if($c -cnotmatch [regex]::Escape($token)){$issues.Add(('controller '+$token))}
+          }
+          $save=$c.IndexOf('$source.Save()')
+          $manifest=$c.IndexOf('$stage=''Seal immutable original source pre-Move manifest''')
+          $claim=$c.IndexOf('Write-OPA265BW4k7v2a1JsonOnce -Path $layout.MoveClaimPath')
+          $move=$c.IndexOf('$moved=$read.Move(')
+          if($save -lt 0 -or $manifest -le $save -or $claim -le $manifest -or
+             $move -le $claim){$issues.Add('intent/manifest/claim/Move ordering')}
+          if($save -ge 0 -and $manifest -gt $save){
+             $savedChunk=$c.Substring($save,$manifest-$save)
+             if($savedChunk -match 'Get-OPA265BW4k7v2a7SubjectItems'){
+                $issues.Add('immediate post-Save Restrict is forbidden')
+             }
+             if($savedChunk -notmatch 'GetItemFromID'){
+                $issues.Add('post-Save by-ID source readback missing')
+             }
+          }
+          if([regex]::Matches($c,'\$read\.Move\(').Count -ne 1){$issues.Add('one COM Move only')}
+          if([regex]::Matches($c,'\$source\.Save\(').Count -ne 1){$issues.Add('one synthetic Save only')}
+          if($c -cmatch '[.](Delete|Send|RemoveStore|RemoveStoreEx)[ ]*[(]' -or
+             $p -cmatch '[.](Save|Move|Send|Delete|AddStoreEx|AddStore)[ ]*[(]'){
+             $issues.Add('unsafe writer in pure policy or deletion of mailbox')
+          }
+          foreach($token in @('rejects three spaces, despite being only whitespace',
+              'rejects CRLF and nonspace nondisposable suffix',
+              'controller has no immediate post-Save Restrict cardinality assertion',
+              'controller verifies two by-ID readbacks before creating immutable manifest',
+              'controller explicitly stores numeric cardinality separate from singleton COM item',
+              'controller seals durable one-shot claim before invoking Move')){
+             if($t -cnotmatch [regex]::Escape($token)){$issues.Add(('Pester '+$token))}
+          }
+          foreach($token in @('3546 Pester tests in 120 containers',
+              '82-character original plaintext Body',
+              '3585 Pester tests / 121 containers',
+              'SEM-001','old BW4k7v2a1','default Drafts')){
+             if($token -eq '3546 Pester tests in 120 containers'){continue}
+             if($d -cnotmatch [regex]::Escape($token)){$issues.Add(('docs '+$token))}
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$issues.Add('production archive/resume/auto enabled')}
+          if($issues.Count -gt 0){throw ('BW4k7v2a7 release BLOCKED: '+($issues -join '; '))}
+          Write-Host 'PASS BW4k7v2a7 synthetic post-Save actual Body SHA baseline, separate one-shot Move, no production waiver'
+
+      - name: Verify BW4k7v2a8 exact original attachment and MAPI flag read-only gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $p=Get-Content 'Core/Worker/BW4k7v2a8AttachmentAttributionPolicy265.ps1' -Raw -Encoding UTF8
+          $c=Get-Content 'Core/Diagnostics/Invoke-OPA265BW4k7v2a8ReadOnlyAttachmentAttribution.ps1' -Raw -Encoding UTF8
+          $t=Get-Content 'Tests/Worker/BW4k7v2a8AttachmentAttribution.Tests.ps1' -Raw -Encoding UTF8
+          $d=Get-Content 'docs/2.6.5-bw4k7v2a8-readonly-attachment-attribution.md' -Raw -Encoding UTF8
+          $bad=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$m.Verification.ExpectedTestContainers -ne 124){$bad.Add('expected 3625 tests in 122 containers')}
+          foreach($key in @('BW4k7v2a8RealOneShotSourceZeroDestinationOneObserved',
+              'BW4k7v2a8RealOneShotSemanticContentMatchObserved',
+              'BW4k7v2a8OriginalRawMapiFlag9Destination25',
+              'BW4k7v2a8OriginalSize1952Destination2076',
+              'BW4k7v2a8HasAttachBit0x10Identified',
+              'BW4k7v2a8OriginalManifestClaimReturnHashesPinned',
+              'BW4k7v2a8ReadOnlyExactDestinationAttachmentMetadata')){
+             if(-not [bool]$m.Verification.$key){$bad.Add(('missing '+$key))}
+          }
+          foreach($key in @('BW4k7v2a8OriginalPreMoveAttachmentCountKnown',
+              'BW4k7v2a8SizeDeltaRootCauseProven',
+              'BW4k7v2a8RealOutlookCOMRunInCI',
+              'BW4k7v2a8AnyMailboxOrPstWriteInCI',
+              'BW4k7v2a8OriginalOneShotMoveRetried',
+              'BW4k7v2a8SEM001FlagDriftWaived',
+              'BW4k7v2a8ProductionWriterEnabled')){
+             if([bool]$m.Verification.$key){$bad.Add(('unsafe '+$key))}
+          }
+          foreach($token in @('HasAttachBitIntroduced',
+              'HasAttachBitSetButNoAttachmentObjectsVisible',
+              'DestinationAttachmentObjectsExistOriginalPreMoveCountUnknown',
+              'PrHasAttachDisagreesWithAttachmentCount',
+              'PrHasAttachDisagreesWithMessageFlag',
+              'OriginalPreMoveAttachmentCountKnown=$false',
+              'SizeDeltaRootCauseProven=$false',
+              'OldMoveMayBeRetried=$false','AnyMapiFlagDriftWaived=$false',
+              'SEM001ProductionIntegrityProven=$false',
+              'WriterPermit=$false','ProductionReady=$false')){
+             if($p -cnotmatch [regex]::Escape($token)){$bad.Add(('policy '+$token))}
+          }
+          foreach($token in @('1a6683eb-3136-46eb-a1a8-ed8ece33b52c',
+              '77311b1df742545e15c01d755858b31395e76446fd4d43497775b2bed98bc2f1',
+              'ff4093e90fb7663d514085f087ea2cd46fde6c7c6bdb23b36f38ba41c1aa21a2',
+              '9a89be00eeb85163afd557494bf16b7999c45f388fd7a25c59c35ccc65bf62cc',
+              '00000000D2D5FCF473B27142BB218ABB3C07996824002000',
+              'Read-OPA265BW4k7v2a1SealedJson',
+              'GetDefaultFolder(16)',
+              'GetItemFromID',
+              'GetActiveObject',
+              '0x0E070003','0x0E1B000B','0x0E080003',
+              '0x7FFE000B','0x37050003','0x37140003',
+              'AttachmentSummaries',
+              'RawBodyAttachmentContentFileNamesOrSignaturesReturned=$false',
+              'OriginalTestPstOrMessagesModified=$false',
+              'OriginalMoveRetried=$false',
+              'WriterPermit=$false','ProductionReady=$false')){
+             if($c -cnotmatch [regex]::Escape($token)){$bad.Add(('controller '+$token))}
+          }
+          if($c -cmatch '[.](Save|Move|Send|Delete|AddStore|AddStoreEx|RemoveStore|CreateItem|SaveAsFile)[ ]*[(]' -or
+             $c -cmatch 'WriteAllText|WriteAllBytes|CreateDirectory|FileMode]::CreateNew|Remove-Item|Set-ItemProperty' -or
+             $c -cmatch 'attachment[.]FileName|attachment[.]DisplayName' -or
+             $p -cmatch '[.](Save|Move|Send|Delete|AddStore|AddStoreEx)[ ]*[(]'){
+             $bad.Add('forbidden COM writer/raw attachment filename or file mutation')
+          }
+          foreach($token in @('recognizes exact prior +16 bit flag transition',
+              'classifies HASATTACH without any visible Outlook attachment objects',
+              'never infers attachment absence in the original source',
+              'does not attribute 124 bytes to attachments without source inventory',
+              'pins original destination EntryId and Move return SHA',
+              'forbids any Outlook COM writer or PST mount')){
+             if($t -cnotmatch [regex]::Escape($token)){$bad.Add(('Pester '+$token))}
+          }
+          foreach($token in @('3625 Pester tests in 122 containers',
+              'MSGFLAG_HASATTACH',
+              '1952','2076','Original source',
+              'PR_HASATTACH','Attachments.Count',
+              'SEM-001','no Outlook COM')){
+             if($d -cnotmatch [regex]::Escape($token)){$bad.Add(('docs '+$token))}
+          }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$bad.Add('production worker enabled')}
+          if($bad.Count -gt 0){throw ('BW4k7v2a8 release BLOCKED: '+($bad -join '; '))}
+          Write-Host 'PASS BW4k7v2a8 original reconciled synthetic HASATTACH and size metadata READ ONLY; SEM001 blocked'
+
+      - name: ARCH1 binding delivery roadmap, source audit, and COM boundary no-writer gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $r=Get-Content 'README.md' -Raw -Encoding UTF8
+          $adr=Get-Content 'docs/ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md' -Raw -Encoding UTF8
+          $handoff=Get-Content 'docs/PROJECT-HANDOFF-ARCH1.md' -Raw -Encoding UTF8
+          $roadmap=Get-Content 'docs/DELIVERY-ROADMAP.md' -Raw -Encoding UTF8
+          $auditDoc=Get-Content 'docs/ARCH1-IMPLEMENTATION-AUDIT.md' -Raw -Encoding UTF8
+          $sem=Get-Content 'docs/SEMANTIC-INTEGRITY-POLICY.md' -Raw -Encoding UTF8
+          $c=Get-Content 'Core/Diagnostics/Invoke-OPA265ARCH1DeliveryReadinessAudit.ps1' -Raw -Encoding UTF8
+          $p=Get-Content 'Core/Runtime/ARCH1DeliveryReadinessPolicy265.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content 'Tests/Runtime/ARCH1DeliveryReadiness.Tests.ps1' -Raw -Encoding UTF8
+          $mover=Get-Content 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $verifier=Get-Content 'Core/Archive/ArchiveVerifier.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $issues=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$m.Verification.ExpectedTestContainers -ne 124){
+             $issues.Add('full 3660 tests / 123 containers expected')
+          }
+          foreach($k in @('ARCH1DeliveryPivotAndStopRuleDocumented',
+             'ARCH1ContextHandoffWritten',
+             'ARCH1SourceReadinessAuditAvailable',
+             'ARCH1AmbiguousLegacyMoveFailedContinueFlagged',
+             'ARCH1LegacyVerifierFullSemanticIntegrationNotYetProven',
+             'ARCH1YearGroupingCodePresentNotEndToEndCertified',
+             'ARCH1LegacyDirectArchiveNotAutomaticallyDisabledByWorkerFlags',
+             'ARCH1HistoricRealOneShotClaimsPreserved',
+             'ARCH1NoMAPIForensicsOnlyBranchWithoutUserDefect')){
+             if(-not [bool]$m.Verification.$k){$issues.Add(('missing '+$k))}
+          }
+          foreach($k in @('ARCH1ReadyFor90GBProduction',
+             'ARCH1AnyOutlookMessageMovedByNewBuild',
+             'ARCH1AnyOriginalEvidenceRewritten',
+             'ARCH1CopyVerifyDeleteAlreadyProven',
+             'ARCH1ProductionWorkerEnabled')){
+             if([bool]$m.Verification.$k){$issues.Add(('unsafe '+$k))}
+          }
+          if([string]$m.Build -cne '2.6.3-PREVIEW1'){ $issues.Add('unexpected internal build metadata') }
+          if([bool]$m.Integration.ArchiveWorkerEnabled -or
+             [bool]$m.Integration.ResumeWorkerEnabled -or
+             [bool]$m.Integration.AutoWorkerEnabled){$issues.Add('worker production activation unauthorized')}
+          foreach($t in @('ARCH1','ARCH2','Copy','Move','SEM-001',
+             'BW4k7v2a9','MoveFailed','90')) {
+             if($adr -cnotmatch [regex]::Escape($t)){$issues.Add(('ADR '+$t))}
+          }
+          foreach($t in @('ARCH1','ARCH2','90','2.6.3-PREVIEW1',
+              'BW4k7v2a8','Attachment256K','26605','21985')) {
+             if($handoff -cnotmatch [regex]::Escape($t)){$issues.Add(('handoff '+$t))}
+          }
+          foreach($t in @('ARCH1','ARCH2','ARCH3','ARCH4','ARCH5','RC',
+              'MailMover.ps1','ArchiveVerifier.ps1','Year','SEM-001')) {
+             if($roadmap -cnotmatch [regex]::Escape($t)){$issues.Add(('roadmap '+$t))}
+          }
+          foreach($t in @('Reason=','MoveFailed','continue','HTMLBody','Attachments',
+              'Readiness','90GB','Integration','Year')) {
+             if($auditDoc -cnotmatch [regex]::Escape($t)){$issues.Add(('audit '+$t))}
+          }
+          foreach($t in @('ARCH1','ADR-ARCH1-OUTLOOK-COM-BOUNDARY.md',
+             'PROJECT-HANDOFF-ARCH1.md','DELIVERY-ROADMAP.md',
+             'Stop-rule','Stop-rule')) {
+             if($r -cnotmatch [regex]::Escape($t) -and $t -cne 'Stop-rule'){$issues.Add(('README '+$t))}
+          }
+          if($sem -cnotmatch 'ARCH1 operational clarification' -or
+             $sem -cnotmatch 'STOP-RULE' -or
+             $sem -cnotmatch 'no automatic' -or
+             $sem -cnotmatch 'Body'){
+             $issues.Add('SEM-001 context and no-waiver policy missing')
+          }
+          foreach($t in @('ValidateSet(',
+             'Plan','Audit',
+             'Get-FileHash',
+             'ReadOnlySourceAudit',
+             'AnyPstOrMailWriter=$false',
+             'ProductionReady=$false')) {
+             if($c -cnotmatch [regex]::Escape($t)){$issues.Add(('controller '+$t))}
+          }
+          foreach($t in @('Test-OPA265ARCH1DeliveryReadiness',
+              'LegacyMoveFailureContinuePatternDetected',
+              'SourceMarkerEvidenceIsNotRuntimeCertification=$true',
+              'CopyThenVerifyDeleteIntegrated=$false',
+              'NewMapiSizeOrFlagForensicsAuthorizedByThisBuild=$false',
+              'ProductionReady=$false')) {
+             if($p -cnotmatch [regex]::Escape($t)){$issues.Add(('policy '+$t))}
+          }
+          if($c -cmatch 'GetActiveObject|New-Object -ComObject|GetNamespace' -or
+             $c -cmatch '[.](Move|Copy|Save|Delete|Send|AddStore|AddStoreEx|RemoveStore)[ ]*[(]' -or
+             $c -cmatch 'WriteAllText|WriteAllBytes|Set-Content|Out-File|CreateDirectory|New-Item' -or
+             $p -cmatch '(?m)^\s*(?:\$[A-Za-z_]\w*\s*=\s*)?\$[A-Za-z_]\w*\.(?:Move|Copy|Save|Delete|Send|AddStore)\s*\('){
+             $issues.Add('ARCH1 audit code has forbidden writer or Outlook COM operation')
+          }
+          # ARCH2a preserves ARCH1 historical evidence but requires the
+          # previously observed dangerous catch/continue to be FIXED in code.
+          if($mover -cnotmatch [regex]::Escape('$item.Move(') -or
+             $mover -cnotmatch "Step 'Move Indeterminate'" -or
+             $mover -cmatch [regex]::Escape("Reason='MoveFailed'") -or
+             $entry -cnotmatch 'Move-OPAItemsWithLimit'){
+             $issues.Add('ARCH1 risk must be preserved in docs and remediated in ARCH2a runtime')
+          }
+          if($verifier -cmatch 'HTMLBody|Attachments'){
+             $issues.Add('legacy semantic verifier changed; re-audit before altering ARCH1 assumptions')
+          }
+          foreach($t in @('flags ambiguous COM Move exception continue as a critical gap',
+              'does not claim legacy verifier checks Body HTML and attachment byte hashes',
+              'forbids replaying any historical one-shot Move claim',
+              'controller does not call any Outlook or PST writer')) {
+             if($tests -cnotmatch [regex]::Escape($t)){$issues.Add(('Pester '+$t))}
+          }
+          if($issues.Count -gt 0){throw ('ARCH1 release BLOCKED: '+($issues -join '; '))}
+          Write-Host 'PASS ARCH1 delivery pivot: permanent ADR/handoff/roadmap, audited legacy Move risk and zero Outlook COM writes'
+
+      - name: ARCH2a durable original Move and full-journal Resume fence, closed DEV writers
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $mover=Get-Content 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $policy=Get-Content 'Core/Archive/ARCH2aMoveOutcomeFence.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content 'Tests/Archive/ARCH2aMoveOutcomeFence.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content 'docs/2.6.5-arch2a-move-outcome-fence.md' -Raw -Encoding UTF8
+          $handoff=Get-Content 'docs/PROJECT-HANDOFF-ARCH1.md' -Raw -Encoding UTF8
+          $sem=Get-Content 'docs/SEMANTIC-INTEGRITY-POLICY.md' -Raw -Encoding UTF8
+          $roadmap=Get-Content 'docs/DELIVERY-ROADMAP.md' -Raw -Encoding UTF8
+          $bad=New-Object 'System.Collections.Generic.List[string]'
+          if([int]$m.Verification.ExpectedPesterTests -ne 3709 -or
+             [int]$m.Verification.ExpectedTestContainers -ne 124){$bad.Add('3709 tests/124 containers exact')}
+          foreach($key in @('ARCH2aActualLegacyMoverNoBlindComRetry',
+             'ARCH2aDurableMoveStartedCheckpointBeforeCom',
+             'ARCH2aForceFlushJournalBeforeMove',
+             'ARCH2aMoveIndeterminateStopsEntireBatch',
+             'ARCH2aUnresolvedFullJournalBlocksResume',
+             'ARCH2aTruncatedOriginalJournalBlocksResume',
+             'ARCH2aDevelopmentArchiveResumeAutoClosed',
+             'ARCH2aHistoricalOneShotClaimsImmutable')){
+             if(-not [bool]$m.Verification.$key){$bad.Add(('missing '+$key))}
+          }
+          foreach($key in @('ARCH2aSemanticVerifierIntegrated',
+             'ARCH2aCopyVerifyDeleteProven',
+             'ARCH2aAnyActualOutlookMoveExecutedInCI',
+             'ARCH2aProductionWriterEnabled',
+             'ARCH2aSafeFor90GBProduction')){
+             if([bool]$m.Verification.$key){$bad.Add(('unsafe '+$key))}
+          }
+          foreach($key in @('ArchiveWorkerEnabled','ResumeWorkerEnabled','AutoWorkerEnabled')){
+             if([bool]$m.Integration.$key){$bad.Add(('unexpected production integration '+$key))}
+          }
+          if([string]$m.Build -cne '2.6.3-PREVIEW1'){$bad.Add('legacy internal build changed without RC migration')}
+          $start=$mover.IndexOf("-Step 'Move Started'")
+          $move=$mover.IndexOf('$item.Move($dest.Folder)')
+          if($start -lt 0 -or $move -le $start){$bad.Add('Move Started claim must precede COM Move')}
+          else {
+             $before=$mover.Substring($start,$move-$start)
+             if($before -cnotmatch [regex]::Escape('-WriteCheckpoint') -or
+                $before -cnotmatch [regex]::Escape('Sync-OPAStepJournalStreams')){
+                $bad.Add('durable checkpoint and Flush(true) before COM Move missing')
+             }
+          }
+          foreach($token in @('Move Indeterminate','MOVE OUTCOME UNKNOWN',
+             'Read-OPAStepJournal -Transaction $Transaction',
+             'Assert-OPA265ARCH2aNoUnresolvedMove',
+             'unterminated step journal',
+             '$moveCompleted -or $moveAttemptClaimed',
+             'Stop this entire transaction')){
+             if($mover -cnotmatch [regex]::Escape($token)){$bad.Add(('mover '+$token))}
+          }
+          if($mover -cmatch [regex]::Escape("Reason='MoveFailed'")){$bad.Add('old MoveFailed catch/continue still present')}
+          $entryGuard=$entry.IndexOf('Assert-OPA265ARCH2aDevelopmentWriterClosed')
+          $firstRuntime=$entry.IndexOf('Core\Version.ps1')
+          if($entryGuard -lt 0 -or $firstRuntime -le $entryGuard){$bad.Add('DEV writer closure must precede runtime/Outlook discovery')}
+          foreach($token in @('Test-OPA265ARCH2aUnresolvedMoveSteps',
+             'Assert-OPA265ARCH2aNoUnresolvedMove',
+             'Assert-OPA265ARCH2aDevelopmentWriterClosed',
+             'Move Indeterminate','Archive','Resume','Auto',
+             'AutomaticMoveRetryAllowed=$false',
+             'WriterPermit=$false','ProductionReady=$false')){
+             if($policy -cnotmatch [regex]::Escape($token)){$bad.Add(('policy '+$token))}
+          }
+          if($policy -cmatch 'GetActiveObject|GetNamespace|New-Object -ComObject' -or
+             $policy -cmatch '(?m)^\s*\$[A-Za-z_]\w*\.(?:Move|Copy|Save|Delete|Send)\s*\('){
+             $bad.Add('policy has forbidden Outlook writer/reader')
+          }
+          foreach($token in @('49','Move Started','Move Indeterminate',
+             'Read-OPAStepJournal','ARCH2b','HTMLBody','90')){
+             if($doc -cnotmatch [regex]::Escape($token)){$bad.Add(('runbook '+$token))}
+          }
+          foreach($token in @('ARCH2a','ARCH2b','Move Indeterminate')){
+             if($handoff -cnotmatch [regex]::Escape($token) -or
+                $roadmap -cnotmatch [regex]::Escape($token) -or
+                $sem -cnotmatch [regex]::Escape($token)){
+                # roadmap and SEM need both phases or explicit new claim safety
+                if($token -ne 'Move Indeterminate' -or
+                   $roadmap -cnotmatch 'Move'){ $bad.Add(('persistent policy '+$token)) }
+             }
+          }
+          foreach($token in @('blocks mutating Archive in DEV',
+             'blocks mutating Resume in DEV',
+             'blocks mutating Auto in DEV',
+             'main mover force-flushes claim before COM Move',
+             'Resume loads full original journal rather than 200-entry in-memory tail',
+             'outer catch stops if Move attempt was claimed')){
+             if($tests -cnotmatch [regex]::Escape($token)){$bad.Add(('Pester '+$token))}
+          }
+          if($bad.Count -gt 0){throw ('ARCH2a release BLOCKED: '+($bad -join '; '))}
+          Write-Host 'PASS ARCH2a real main Move durability, full-journal no-blind-retry, and closed DEV writers; semantic integrity still blocked'
+
+      - name: Original BW4j6 synthetic fault matrix (no Outlook)
+        run: .\Core\Diagnostics\Invoke-OPA265BW4j6SyntheticMatrix.ps1 -RequireGitHubActions -SandboxParent $env:RUNNER_TEMP
+
+      - name: Create project-only ARCH2a DEV ZIP and checksum
+        run: |
+          $ErrorActionPreference='Stop'
+          $project=(Get-Location).Path
+          $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
+          $base='OutlookPOP3Archive-2.6.5-ARCH2a-dev-g'+$short
+          $stageParent=Join-Path $env:RUNNER_TEMP ('OPA-ARCH2a-'+[guid]::NewGuid().ToString('N'))
+          $stage=Join-Path $stageParent $base
+          $out=Join-Path $env:RUNNER_TEMP 'OPA-ARCH2a-Build'
+          [void][IO.Directory]::CreateDirectory($stage)
+          [void][IO.Directory]::CreateDirectory($out)
+          $top=@('.gitignore','.editorconfig','.psscriptanalyzer.psd1','CHANGELOG.md','README.md','MANIFEST.txt','RELEASE.json','OutlookPOP3Archive.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')
+          foreach($x in $top) {
+            $f=Join-Path $project $x
+            if(-not (Test-Path -LiteralPath $f -PathType Leaf)){throw ('Missing '+$x)}
+            Copy-Item -LiteralPath $f -Destination (Join-Path $stage $x)
+          }
+          foreach($dir in @('Core','Tests','docs')){
+            foreach($f in @(Get-ChildItem -LiteralPath (Join-Path $project $dir) -Recurse -File -Force)){
+              $ext=if($dir -eq 'docs'){'.md'}else{'.ps1'}
+              if($f.Extension -cne $ext -or ($dir -eq 'Tests' -and $f.Name -notmatch '\.Tests\.ps1$') -or (($f.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
+                throw ('Unexpected project source '+$f.FullName)
+              }
+              $relative=$f.FullName.Substring($project.Length).TrimStart([char[]]@('\','/'))
+              $dest=Join-Path $stage $relative
+              [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($dest))
+              Copy-Item -LiteralPath $f.FullName -Destination $dest
+            }
+          }
+          $info=[ordered]@{Artifact=$base+'.zip';DevelopmentGate='2.6.5-ARCH2a';SourceCommit=$env:GITHUB_SHA;PesterPassed=3709;TestContainers=124;WindowsPowerShell51=$true;LiveOutlookMoveExecutedInCI=$false;ProductionReady=$false}
+          [IO.File]::WriteAllText((Join-Path $stage 'BUILD-INFO.json'),(ConvertTo-Json -InputObject $info -Depth 4),(New-Object Text.UTF8Encoding($false)))
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip=Join-Path $out ($base+'.zip')
+          [IO.Compression.ZipFile]::CreateFromDirectory($stageParent,$zip,[IO.Compression.CompressionLevel]::Optimal,$false)
+          $hash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          $sum=Join-Path $out ($base+'.sha256')
+          [IO.File]::WriteAllText($sum,($hash+'  '+[IO.Path]::GetFileName($zip)+[char]10),(New-Object Text.UTF8Encoding($false)))
+          Write-Host ('ARCH2a project-only DEV ZIP SHA256: '+$hash)
+      - name: Upload tested ARCH2a DEV ZIP to Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutlookPOP3Archive-2.6.5-ARCH2a-dev
+          path: |
+            ${{ runner.temp }}/OPA-ARCH2a-Build/*.zip
+            ${{ runner.temp }}/OPA-ARCH2a-Build/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+      - name: Publish public test-only ARCH2a prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
+          $tag='outlookpop3archive-2.6.5-arch2a-dev-g'+$short
+          $base='OutlookPOP3Archive-2.6.5-ARCH2a-dev-g'+$short
+          $dir=Join-Path $env:RUNNER_TEMP 'OPA-ARCH2a-Build'
+          $zip=Join-Path $dir ($base+'.zip')
+          $sha=Join-Path $dir ($base+'.sha256')
+          if(-not (Test-Path -LiteralPath $zip -PathType Leaf) -or -not (Test-Path -LiteralPath $sha -PathType Leaf)){throw 'Missing tested ZIP or checksum.'}
+          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH2a DEV '+$short) --notes 'ARCH2a DEV fail-closed real main MailMover and Resume: persist Move Started and force flush before COM; exception is Move Indeterminate with immediate transaction STOP, no old MoveFailed Skipped continue; full original step journal scan rejects unfinished claims or torn journal before any Resume. Main Archive/Resume/Auto modes intentionally BLOCKED before Outlook/PST contact, including WhatIf, until ARCH2b integrates full Body HTML recipients state attachment byte SHA256 in ArchiveVerifier and bounded real disposable PST crash testing. Original five-format BW4k and one-shot claims unchanged; no new MAPI Size/FLAGS forensics or waiver. New 49 Pester tests, full PS5.1 PSScriptAnalyzer Pester 3709 tests/124 containers, BOM/JSON and inherited BW4j6 fault matrix PASS in CI; no actual Outlook mail mutation. External DEV 2.6.5-ARCH2a, internal 2.6.3-PREVIEW1 intentionally unchanged pending RC.' --prerelease
+          if($LASTEXITCODE -ne 0){throw 'Public test-only prerelease failed.'}
