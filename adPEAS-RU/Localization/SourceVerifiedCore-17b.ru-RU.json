@@ -1,0 +1,300 @@
+{
+  "schema": "adPEAS-RU.StageD8.CoreFields.17b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "GPO_LOCAL_GROUP_MEMBER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Whoever controls the principal - its password, a session where it is logged on, a delegated right to reset it or to change the group's members - controls every computer in scope",
+        "Local administrator on many machines makes credential theft from LSASS and lateral movement across them routine",
+        "Removing the member on a machine changes nothing - the next policy refresh puts it back"
+      ],
+      "impact": [
+        "Кто контролирует указанный субъект — его пароль, активный сеанс или делегированное право сброса пароля либо изменения состава группы, — тот контролирует каждый компьютер в области действия политики.",
+        "Локальные административные права на множестве компьютеров облегчают хищение учётных данных из LSASS и горизонтальное перемещение.",
+        "Ручное удаление участника из локальной группы ничего не меняет: следующее обновление GPO добавит его снова."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Check that the principal is meant to hold these rights on every computer the policy reaches",
+        "Prefer a dedicated group per tier and scope over individual accounts, and LAPS over a standing membership for workstation administration",
+        "Protect the principal as well as the computers in scope are protected: whoever may reset its password or change its members controls them"
+      ],
+      "remediation": [
+        "Проверьте, действительно ли субъект должен иметь такие права на каждом компьютере, где действует политика.",
+        "Предпочитайте отдельную группу для каждого уровня администрирования и области действия вместо отдельных записей, а для рабочих станций — LAPS вместо постоянного членства.",
+        "Защищайте субъект не слабее компьютеров, на которые распространяется право: возможность сбросить его пароль или изменить состав группы даёт контроль над этими компьютерами."
+      ]
+    },
+    "GPO_REGISTRY_PASSWORD": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Readable by whoever can read the share the file sits on - in SYSVOL or NETLOGON, every authenticated user",
+        "The password often belongs to a service, a proxy or a management agent that runs with more rights than the user reading it",
+        "Every computer the GPO applies to receives it in its registry as well"
+      ],
+      "impact": [
+        "Пароль может прочитать любой, кому доступен сетевой ресурс с файлом; в SYSVOL или NETLOGON это каждый аутентифицированный пользователь.",
+        "Пароль часто принадлежит службе, прокси или агенту управления с более высокими правами, чем у читающего его пользователя.",
+        "Каждый компьютер, к которому применяется GPO, также получает пароль в собственный реестр."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the value from the GPO - in GPMC, the Administrative Template setting or the preference item that writes it",
+        "Change the password, since it has been readable for as long as the GPO existed",
+        "Hand the credential to the application another way - a managed service account, or a secret store"
+      ],
+      "remediation": [
+        "Удалите значение из GPO через GPMC, найдя соответствующую настройку Administrative Templates или элемент предпочтений, который его записывает.",
+        "Смените пароль: он был доступен для чтения всё время существования GPO.",
+        "Передавайте приложению учётные данные другим способом — через управляемую служебную запись или защищённое хранилище секретов."
+      ]
+    },
+    "GPO_SCOPE_DOMAIN_WIDE": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Every computer in the domain processes this GPO during Group Policy refresh",
+        "Every user logging on to any domain computer is affected",
+        "Malicious modifications impact the entire domain simultaneously",
+        "Domain Controllers are also affected (highest security impact)",
+        "Scope amplifies any other finding on this GPO to critical severity"
+      ],
+      "impact": [
+        "Каждый компьютер домена обрабатывает эту GPO при обновлении групповой политики.",
+        "Настройки затрагивают каждого пользователя, входящего на любой доменный компьютер.",
+        "Вредоносные изменения одновременно действуют на весь домен.",
+        "Контроллеры домена тоже затронуты, что создаёт максимальные последствия для безопасности.",
+        "Широкая область действия усиливает любую другую находку этой GPO до критической значимости."
+      ],
+      "sourceEnglishRemediationCount": 6,
+      "sourceEnglishRemediation": [
+        "Minimize the number of GPOs linked at domain root",
+        "Ensure strict permissions on domain-wide GPOs (only Domain Admins)",
+        "Use OU-level GPO linking for more granular control",
+        "Narrow the scope with security filtering - and leave Domain Computers a read, which MS16-072 made a precondition for user policies",
+        "A WMI filter is a different mechanism from security filtering: it is evaluated on the client at every refresh and costs time there, and it does not take the read away from anybody",
+        "Monitor GPO link changes at domain level (Event ID 5136)"
+      ],
+      "remediation": [
+        "Сведите к минимуму число GPO, привязанных непосредственно к корню домена.",
+        "Обеспечьте строгие права доступа к общедоменным GPO: только Domain Admins.",
+        "Для более точного разграничения используйте привязку GPO на уровне OU.",
+        "Сузьте область фильтрацией безопасности, сохранив право чтения для Domain Computers: после MS16-072 это условие применения пользовательских политик.",
+        "WMI-фильтр — другой механизм, чем фильтрация безопасности: он проверяется клиентом при каждом обновлении, требует времени и никого не лишает права чтения.",
+        "Отслеживайте изменения привязок GPO на уровне домена (Event ID 5136)."
+      ]
+    },
+    "GPO_SCRIPT_OUTSIDE_POLICY_STORE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Write access to the script file is code execution in the script's context - SYSTEM for startup and shutdown scripts",
+        "The scope is every machine or every user the GPO applies to, at every boot or every logon",
+        "A UNC path also makes each machine authenticate to that host, which is an NTLM coercion surface",
+        "A local path has to exist on every target, so one machine where it does not is a place to plant it"
+      ],
+      "impact": [
+        "Право записи файла сценария означает выполнение кода в его контексте, в том числе от имени SYSTEM для сценариев запуска и завершения работы.",
+        "Риск распространяется на все компьютеры или пользователей, к которым применяется GPO, при каждом запуске компьютера или входе.",
+        "UNC-путь дополнительно заставляет компьютер аутентифицироваться на этом узле, создавая поверхность для принудительной NTLM-аутентификации.",
+        "Локальный путь должен существовать на каждой целевой машине: если на какой-то файл отсутствует, это может стать точкой для размещения подменённого сценария."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Keep GPO scripts in the policy's own Scripts folder, where the GPO's permissions decide who may change them - that is what the Group Policy editor does by default",
+        "Where a share must be used, confirm that only administrators may write the file and the folder above it, and prefer a path that is not reachable by the machines' own accounts",
+        "Check whether the script exists at all on every target: a missing file on one machine is a place to plant one",
+        "Review the script's content too - it is readable by every authenticated user in SYSVOL, so credentials in it are already exposed"
+      ],
+      "remediation": [
+        "Храните сценарии GPO в собственной папке Scripts политики, где разрешения GPO определяют, кому можно менять файлы; так по умолчанию работает редактор групповых политик.",
+        "Если общий ресурс неизбежен, проверьте, что писать файл и родительскую папку могут только администраторы; предпочтителен путь, недоступный для записи учётным записям самих компьютеров.",
+        "Убедитесь, что файл сценария существует на каждой целевой системе: отсутствующий файл может быть подменён.",
+        "Проверяйте содержимое сценария: в SYSVOL его видит каждый аутентифицированный пользователь, поэтому учётные данные внутри него уже раскрыты."
+      ]
+    },
+    "GPO_SEMACHINEACCOUNTPRIVILEGE_BROAD": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Listed accounts can add computers to domain",
+        "Works in addition to ms-DS-MachineAccountQuota",
+        "May allow broader access than intended"
+      ],
+      "impact": [
+        "Перечисленные учётные записи могут добавлять компьютеры в домен.",
+        "Это право действует в дополнение к ms-DS-MachineAccountQuota.",
+        "Объём предоставленного доступа может быть шире предполагаемого."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Restrict SeMachineAccountPrivilege to specific admin groups",
+        "Avoid assigning to Authenticated Users or Everyone",
+        "Implement controlled computer provisioning",
+        "Monitor for unexpected computer account creation"
+      ],
+      "remediation": [
+        "Ограничьте SeMachineAccountPrivilege конкретными административными группами.",
+        "Не назначайте это право группам Authenticated Users или Everyone.",
+        "Внедрите контролируемую процедуру создания компьютерных учётных записей.",
+        "Отслеживайте неожиданное создание компьютерных учётных записей."
+      ]
+    },
+    "GPO_SYSVOL_FOLDER_ORPHANED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Nothing applies an orphaned folder, but its content - scripts, Registry.pol, Groups.xml - stays where every domain user may read it, and may still carry credentials or internal paths",
+        "If the policy object is restored - from the Active Directory Recycle Bin, for example - it uses this folder again, with whatever the folder holds by then"
+      ],
+      "impact": [
+        "Ни одна политика не применяет осиротевшую папку, но её содержимое — scripts, Registry.pol, Groups.xml — остаётся доступным для чтения пользователям домена и может раскрывать пароли или внутренние пути.",
+        "Если объект политики восстановят, например из AD Recycle Bin, он снова будет использовать эту папку с тем содержимым, которое останется там к моменту восстановления."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Confirm with an account that can read every policy that no policy object has this GUID",
+        "Look through the folder for credentials and scripts before removing it",
+        "Delete the folder on one domain controller and let SYSVOL replication remove it from the others"
+      ],
+      "remediation": [
+        "Подтвердите учётной записью, имеющей доступ ко всем политикам, что объекта GPO с этим GUID действительно нет.",
+        "До удаления проверьте папку на наличие паролей и сценариев.",
+        "Удалите папку на одном контроллере домена и позвольте репликации SYSVOL удалить её на остальных."
+      ]
+    },
+    "GPO_SYSVOL_GPT_MISSING": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Computers and users in the scope of a linked policy apply no Group Policy at all - security baselines, audit and firewall settings stay as they were or never arrive",
+        "Where only some domain controllers lack the folder, the outcome depends on which one a computer reads SYSVOL from, and can change from one start to the next",
+        "Group Policy Management shows the policy as usual, because its directory half is intact"
+      ],
+      "impact": [
+        "Пользователи и компьютеры в области привязанной политики вообще не получают её настройки: базовые меры защиты, аудит и брандмауэр остаются прежними или не применяются.",
+        "Если папка отсутствует только на части DC, результат зависит от контроллера, с которого компьютер читает SYSVOL, и может меняться при перезагрузках.",
+        "Group Policy Management по-прежнему отображает объект политики, поскольку его часть в каталоге существует."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Look at the policy on every domain controller - the Status tab of the domain in Group Policy Management (Group Policy Infrastructure Status) compares the directory and SYSVOL halves across them",
+        "Where the folder exists on other domain controllers, repair SYSVOL replication rather than copying files by hand",
+        "Where it is gone on every domain controller, restore the policy from a Group Policy Management backup, or delete the policy object and recreate it; for the two default policies Microsoft provides dcgpofix"
+      ],
+      "remediation": [
+        "Проверьте политику на всех DC: вкладка Status домена в Group Policy Management (Group Policy Infrastructure Status) сравнивает части AD и SYSVOL.",
+        "Если папка сохранилась на других DC, восстановите репликацию SYSVOL вместо ручного копирования файлов.",
+        "Если папка утрачена на всех DC, восстановите политику из резервной копии Group Policy Management либо удалите объект и создайте его заново; для двух стандартных политик Microsoft предоставляет dcgpofix."
+      ]
+    },
+    "GPO_TASK_CMD_UNQUOTED_PATH": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Whoever can create the truncated program runs code in the task's account on every computer the policy reaches",
+        "As SYSTEM, that is a local privilege escalation on each of them",
+        "Until such a file exists, the task fails at every run - which usually goes unnoticed"
+      ],
+      "impact": [
+        "Субъект, способный создать файл по усечённому пути программы, может выполнять код от имени учётной записи задания на всех компьютерах в области GPO.",
+        "При запуске от SYSTEM это локальное повышение привилегий на каждом таком компьютере.",
+        "Пока подходящий подменённый файл не существует, задание не запускается успешно, что часто остаётся незамеченным."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Quote the program path inside the cmd.exe line, or make the program itself the task's program instead of starting it through cmd.exe",
+        "Do not run scheduled tasks from a folder created in the root of a drive without hardening its permissions"
+      ],
+      "remediation": [
+        "Заключите путь к программе в кавычки внутри строки cmd.exe либо укажите саму программу как исполняемый файл задания, отказавшись от запуска через cmd.exe.",
+        "Не запускайте задания из папки в корне диска, не ограничив права записи в неё."
+      ]
+    },
+    "GPO_TASK_UNQUOTED_PATH": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "No hijack through the task itself: the Task Scheduler quotes the program path when it starts it",
+        "It becomes one where the string reaches a shell - cmd.exe /c, a batch file, or a service ImagePath built from the same value",
+        "Planting C:\\Program.exe needs the right to create files in the root of the system drive, which ordinary users do not have by default"
+      ],
+      "impact": [
+        "Само задание через этот путь перехватить нельзя: Task Scheduler заключает путь программы в кавычки при запуске.",
+        "Уязвимость появляется, если строка передаётся оболочке — cmd.exe /c, пакетному файлу или создаваемому из неё ImagePath службы.",
+        "Размещение C:\\Program.exe требует права создавать файлы в корне системного диска, которого у обычных пользователей по умолчанию нет."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Quote program paths that contain spaces, as hygiene - the task itself is not exploitable through this",
+        "Keep the root of the system drive free of create-file rights for ordinary users"
+      ],
+      "remediation": [
+        "Заключайте содержащие пробелы пути в кавычки для единообразия и безопасности, но само задание через такой путь не эксплуатируется.",
+        "Не предоставляйте обычным пользователям право создавать файлы в корне системного диска."
+      ]
+    },
+    "GPO_POINTANDPRINT_DRIVER_SOURCE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A driver may be pulled from an attacker-controlled print server",
+        "An approved-server list without package enforcement is bypassed by falling back",
+        "Package enforcement without a server list still allows any server to supply the driver"
+      ],
+      "impact": [
+        "Драйвер может быть загружен с принт-сервера, контролируемого атакующим.",
+        "Список разрешённых серверов без требования пакетов драйвера можно обойти посредством запасного способа установки.",
+        "Требование пакетной установки без списка серверов по-прежнему позволяет получать драйвер с произвольного сервера."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Enable 'Only use Package Point and print' (PackagePointAndPrintOnly=1)",
+        "Enable 'Package Point and print - Approved servers' and list the print servers explicitly",
+        "Set both policies together - the approved-server list alone is bypassable"
+      ],
+      "remediation": [
+        "Включите «Only use Package Point and print» (PackagePointAndPrintOnly=1).",
+        "Включите «Package Point and print - Approved servers» и явно перечислите доверенные принт-серверы.",
+        "Применяйте оба ограничения одновременно: один лишь список разрешённых серверов можно обойти."
+      ]
+    },
+    "GPO_POINTANDPRINT_LATENT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "No exploitation today on machines carrying the August 2021 update",
+        "One unrelated registry change turns this into domain-wide privilege escalation",
+        "Machines missing the 2021 update are exploitable right now"
+      ],
+      "impact": [
+        "На компьютерах с обновлением августа 2021 года эксплуатация в текущем состоянии невозможна.",
+        "Одно постороннее изменение реестра может превратить ситуацию в возможность повышения привилегий во всём домене.",
+        "Компьютеры без обновления 2021 года уязвимы уже сейчас."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the prompt suppression - set the Point and Print Restrictions policy to Enabled with warning and elevation prompt",
+        "Explicitly set RestrictDriverInstallationToAdministrators=1 so the block does not depend on a default"
+      ],
+      "remediation": [
+        "Отмените подавление предупреждений: включите политику Point and Print Restrictions с предупреждением и запросом повышения привилегий.",
+        "Явно установите RestrictDriverInstallationToAdministrators=1, чтобы защита не зависела от значения по умолчанию."
+      ]
+    },
+    "GPO_POINTANDPRINT_NONADMIN_INSTALL": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The post-2021 default that blocks PrintNightmare is explicitly turned off",
+        "Users can be socially engineered through the remaining elevation prompt",
+        "Adding NoWarningNoElevationOnInstall=1 makes the attack silent"
+      ],
+      "impact": [
+        "Защита по умолчанию после 2021 года, препятствующая PrintNightmare, явно отключена.",
+        "Пользователей можно обманом склонить к действиям через оставшийся запрос повышения прав.",
+        "Установка NoWarningNoElevationOnInstall=1 делает атаку незаметной для пользователя."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set RestrictDriverInstallationToAdministrators=1, or remove the value entirely",
+        "Deploy printers centrally so that users never need to install a driver themselves"
+      ],
+      "remediation": [
+        "Установите RestrictDriverInstallationToAdministrators=1 либо полностью удалите это значение, восстановив защищённое значение по умолчанию.",
+        "Разворачивайте принтеры централизованно, чтобы пользователи не устанавливали драйверы самостоятельно."
+      ]
+    }
+  }
+}
