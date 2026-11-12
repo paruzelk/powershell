@@ -1,5 +1,12 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH2d5 DEV — 2026-11-12
+- Introduced `Invoke-ARCH2d5.ps1`, `Core/Archive/ARCH2d5Batch100Policy.ps1`, `ARCH2d5Batch100Core.ps1`: exactly 100 new real POP3 Inbox original EntryIDs, isolated new output archive PST, never historical ARCH2c4a/ARCH2d evidence.
+- Original full by-value ARCH2b Body/HTML/recipients/state/attachment-byte SHA256 for all 100 before any target PST, second full manifest preflight, per-item source semantic checks, immutable global once-claim and per-item CreateNew/Flush(true) claims before one and only COM Move per item.
+- Chained receipts: each next claim references previous return SHA256; after 10,20,...100 returns a checkpoint seal anchors previous checkpoint and most recent receipt; final seal binds ten checkpoints and 100th return. Externally operator-pinned final SHA256 required for clean full Evidence/Reconcile PASS. Partial failures never authorize automatic retry/resume.
+- Read-only Evidence and post-Outlook-restart Reconcile validate exact anchored manifest/global/final original hashes, full 100-item archive semantics and absence of original EntryIDs. Attachment hashing uses protected ephemeral TEMP copies. Old Archive/Resume/Auto blocked.
+- 36 new Pester regressions with hundred-item disk JSON fixture, tampered receipt/claim/checkpoint/final seal, 5/50/99 interrupted runs, approval and no-WhatIf side effects; full Windows PS5.1 expected 4059 tests / 134 containers. Actual hundred real Outlook acceptance pending.
+
 ## 2.6.5-ARCH2d4 DEV — 2026-11-12
 - Add independent forensic operator entrypoint `Invoke-ARCH2d4.ps1` with Plan (no files), Evidence (anchored immutable JSON only) and LiveAudit (existing attached Outlook/PST read-only).
 - Verify original externally pinned manifest/global-claim SHA256 and immutable original prepare intent, ten per-item claims/returns with full strict linkage and ordinal prefix, SHA self-consistency and duplicate returned IDs. Explicitly disclose that per-item SHA has no independent historic pin and cannot prove historical immutability.
