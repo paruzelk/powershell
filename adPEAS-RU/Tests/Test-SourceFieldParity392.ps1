@@ -73,8 +73,8 @@ for($i=0;$i -lt $ids.Count;$i++){
 if($original.attack -ne 304 -or $original.impact -ne 377 -or $original.remediation -ne 377){
  throw 'Исходный справочник не соответствует закреплённым количествам'
 }
-if($russian.attack -ne 192){throw "Ожидалось 192 русских Attack, найдено $($russian.attack)"}
-if($missing.Count -ne 112){throw "Ожидалось 112 ещё не переведённых Attack, найдено $($missing.Count)"}
+if($russian.attack -ne 304){throw "Ожидалось 304 русских Attack, найдено $($russian.attack)"}
+if($missing.Count -ne 0){throw "Ожидалось 0 непереведённых Attack, найдено $($missing.Count)"}
 if($unexpected.Count -ne 0){throw "Обнаружен вымышленный Attack: $($unexpected -join ', ')"}
 if($drift.Count -ne 0){throw "Переведённые Attack имеют расхождения числа пунктов: $($drift -join ', ')"}
 $result=[ordered]@{
@@ -90,7 +90,7 @@ $result=[ordered]@{
  RemediationStepCountDifferences=@($remediationStepDrifts)
  RussianImpactWithNoSource=$sourceMissingImpact
  RussianRemediationWithNoSource=$sourceMissingRemediation
- Note='77 новых Attack имеют точный EN-свидетель, сопоставленный пункт за пунктом. Количество пунктов Impact и Remediation не доказывает смысловую эквивалентность; их проверка продолжается.'
+ Note='Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 20 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.'
  UserReportDataIncluded=$false
  Fields=@($rows)
 }
