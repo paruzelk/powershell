@@ -204,6 +204,38 @@ jobs:
             throw 'ARCH3a exact original-code reuse/explicit open gaps/writer-closed safety contract missing.'
           }
           Write-Host 'PASS ARCH3a single existing archiver, original Year/POP3/SentOn/PST routing, semantic verifier preserved; no duplicate writer, production closed.'
+      - name: ARCH3b original candidate SHA operation identity and synthetic fail closed sequence
+        run: |
+          $ErrorActionPreference='Stop'
+          $bridge=Get-Content -LiteralPath 'Core/Archive/ARCH3bOriginalMoverContract.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3b.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3bOriginalMoverContract.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3b-original-mover-contract.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($bridge -cnotmatch 'function New-OPA265ARCH3bOperationContract' -or
+             $bridge -cnotmatch 'function Test-OPA265ARCH3bPhaseEvidence' -or
+             $bridge -cnotmatch 'function New-OPA265ARCH3bBatchPreview' -or
+             $bridge -cnotmatch 'Get-OPAArchivePartPath -SourcePst' -or
+             $bridge -cnotmatch 'Get-OPAArchiveTargetPath -ReceivedTime' -or
+             $bridge -cnotmatch 'Get-OPA265ARCH3bDigest -Parts' -or
+             $bridge -cnotmatch 'MoveIndeterminate' -or
+             $bridge -cnotmatch 'PrepareIntent' -or
+             $bridge -cnotmatch 'IndependentContentVerified' -or
+             $bridge -cnotmatch 'IndexCommitted' -or
+             $bridge -cnotmatch 'DurablyFlushedBeforeMove' -or
+             $bridge -cnotmatch 'OutlookRestartConfirmed' -or
+             $bridge -cmatch '\.(Move|AddStoreEx|Save|Delete|Copy)\s*\(' -or
+             $bridge -cmatch 'Write-OPA265ARCH2c4JsonOnce' -or
+             $entry -cnotmatch "ValidateSet\('Plan','SyntheticPreview','SyntheticCrashReview'\)" -or
+             $tests -cnotmatch 'durable Prepare intent MUST precede destination PST creation' -or
+             $docs -cnotmatch 'ARCH3c' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4145 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 136){
+            throw 'ARCH3b original MailMover source-backed identity and fail-closed no-write gate missing.'
+          }
+          Write-Host 'PASS ARCH3b original Year/part/folder functions and SHA operation identity, PrepareIntent-before-PST phase order, no live writer.'
       - name: Package only OutlookPOP3Archive from tested commit and calculate SHA-256
         run: |
           $ErrorActionPreference='Stop'
