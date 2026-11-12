@@ -1,5 +1,10 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
+## ARCH2c3 — реальный Outlook COM: одноразовый PST, только чтение
+
+Подготовлен [операторский протокол ARCH2c3](docs/2.6.5-arch2c3-disposable-com-probe.md): `Plan` без Outlook, `Inventory` уже смонтированного изолированного PST, `Probe` одного синтетического by-value вложения через реальный `Attachment.SaveAsFile` в приватном TEMP (ARCH2c2) с независимой SHA-256 проверкой, и `PostRestartProbe` после реального перезапуска Outlook. Нет подключения/создания PST, MailItem.Copy/Move/Delete/Save и удаления источника. **CI не имеет Outlook и не выполняет реальный COM**: DEV, целевые 3804 теста/128 контейнеров. `Archive`, `Resume`, `Auto` запрещены ARCH2a до отдельной приёмки.
+
+
 ## ARCH2c2 — защищённые временные файлы и эксклюзивная lease (DEV)
 
 [ARCH2c2 runbook](docs/2.6.5-arch2c2-private-acl-lease.md). Основной witness вложений использует каталог с приватным Windows DACL, созданным атомарно, и временную `.opa-lease` с `FileShare.None`. При обычном завершении каталог очищается **без рекурсии**; для аварийных остатков существует только read-only инвентаризация с `LeaseState`, не автоматическое удаление. Это подэтап ARCH2c с синтетическими проверками (цель: 3778 тестов/127 контейнеров). Нет реального Outlook/PST CI, нет разрешения на production. `Archive`, `Resume`, `Auto` остаются заблокированы защитой ARCH2a.
