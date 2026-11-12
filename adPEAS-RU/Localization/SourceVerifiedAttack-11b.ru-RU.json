@@ -1,0 +1,436 @@
+{
+  "schema": "adPEAS-RU.StageD2.Attack.11b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "LDAP_ANONYMOUS_BINDING_ALLOWED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker reaches a domain controller on port 389 without credentials",
+        "2. Binds anonymously and searches the domain partition",
+        "3. Collects users, groups and descriptions as far as the ACLs let ANONYMOUS LOGON read",
+        "4. Uses the account list for password spraying or targeted attacks"
+      ],
+      "attack": [
+        "1. Без учётных данных подключиться к контроллеру домена по порту 389.",
+        "2. Выполнить анонимную привязку LDAP и поиск в разделе домена.",
+        "3. Собрать сведения о пользователях, группах и описаниях в пределах чтения, разрешённого ACL субъекту ANONYMOUS LOGON.",
+        "4. Использовать список записей для распыления паролей либо целевых атак."
+      ]
+    },
+    "LDAP_CHANNEL_BINDING_ALWAYS": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "With channel binding enforced, attackers cannot:",
+        "- Relay LDAP authentication over TLS",
+        "- Bypass LDAP signing via LDAPS relay",
+        "- Perform man-in-the-middle on encrypted LDAP"
+      ],
+      "attack": [
+        "При обязательной привязке к каналу нарушитель не может:",
+        "— ретранслировать LDAP-аутентификацию поверх TLS;",
+        "— обходить требование подписи LDAP ретрансляцией к LDAPS;",
+        "— выполнять атаку посредника на зашифрованный LDAP."
+      ]
+    },
+    "LDAP_SIGNING_REQUIRED": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "With LDAP signing required, attackers cannot:",
+        "- Relay NTLM authentication to LDAP for privilege escalation",
+        "- Intercept or modify LDAP traffic in transit",
+        "- Perform RBCD attacks via LDAP relay",
+        "- Add users to groups via unsigned LDAP operations"
+      ],
+      "attack": [
+        "При обязательной подписи LDAP нарушитель не может:",
+        "— ретранслировать NTLM-аутентификацию к LDAP для повышения привилегий;",
+        "— перехватывать или изменять LDAP-трафик в пути;",
+        "— проводить атаки RBCD через LDAP relay;",
+        "— добавлять пользователей в группы неподписанными LDAP-операциями."
+      ]
+    },
+    "LOCKOUT_DURATION_FOREVER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "With permanent lockout enabled, attackers cannot:",
+        "- Wait for accounts to auto-unlock and continue attacks",
+        "- Perform slow-rate password spraying undetected",
+        "- Bypass lockout by timing attacks across lockout windows"
+      ],
+      "attack": [
+        "При постоянной блокировке учётных записей нарушитель не может:",
+        "— дождаться автоматического снятия блокировки и продолжить попытки;",
+        "— незаметно подбирать пароли с малой частотой (password spraying);",
+        "— обходить блокировку, рассчитывая интервалы между окнами блокировки."
+      ]
+    },
+    "LOGON_SCRIPT_WRITABLE": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker reads the scriptPath of the accounts and lists who may write the scripts in NETLOGON",
+        "2. As a principal with write access, adds a command to the script or replaces it",
+        "3. Waits for an account that runs it to log on, and the command runs as that account"
+      ],
+      "attack": [
+        "1. Прочитать scriptPath учётных записей и проверить, кто вправе изменять сценарии NETLOGON.",
+        "2. От имени субъекта с правом записи добавить команду в сценарий либо заменить его.",
+        "3. Дождаться входа пользователя, запускающего сценарий: команда выполнится от его имени."
+      ]
+    },
+    "MSSQL_SERVICE_ACCOUNT_PRIVILEGED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker obtains a sysadmin login on the instance - a weak sa password, a linked server, an over-privileged application login - or local administrator rights on the SQL host",
+        "2. xp_cmdshell is enabled with sp_configure, or the service password is read from the LSA secrets of the host",
+        "3. Commands run as the service account, or the recovered credential is used directly",
+        "4. The account's domain privileges are used - no further escalation is needed"
+      ],
+      "attack": [
+        "1. Получить права sysadmin на экземпляре SQL (слабый пароль sa, связанный сервер, избыточные права прикладной записи) либо стать локальным администратором узла SQL.",
+        "2. Включить xp_cmdshell через sp_configure либо прочитать пароль службы из секретов LSA узла.",
+        "3. Выполнять команды под служебной записью либо напрямую использовать восстановленные учётные данные.",
+        "4. Использовать доменные привилегии службы без дополнительного повышения прав."
+      ]
+    },
+    "NETWORK_SUBNET_DOMAIN_CONTROLLERS": {
+      "sourceEnglishAttackStepCount": 1,
+      "sourceEnglishAttack": [
+        "Not an attack path - reported so the assessment knows where the Tier-0 systems are, and which other systems share their network"
+      ],
+      "attack": [
+        "Это не путь атаки: запись сообщает, где расположены системы Tier 0 и какие другие устройства используют их сеть."
+      ]
+    },
+    "NON_DEFAULT_COMPUTER_OWNERS": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker identifies computer where they are owner",
+        "2. Uses owner rights to grant themselves GenericAll",
+        "3. Configures RBCD to impersonate any user",
+        "4. Gains local admin access on target computer"
+      ],
+      "attack": [
+        "1. Найти компьютер, объект которого принадлежит нарушителю.",
+        "2. Использовать права владельца, чтобы назначить себе GenericAll.",
+        "3. Настроить RBCD для олицетворения любого пользователя.",
+        "4. Получить права локального администратора целевого компьютера."
+      ]
+    },
+    "NON_DEFAULT_USER_OWNERS": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker identifies user where they are owner",
+        "2. Uses owner rights to grant themselves GenericAll",
+        "3. Resets target user's password",
+        "4. Authenticates as target user to gain their privileges"
+      ],
+      "attack": [
+        "1. Найти пользовательский объект, владельцем которого является нарушитель.",
+        "2. Через права владельца назначить себе GenericAll.",
+        "3. Сбросить пароль целевого пользователя.",
+        "4. Аутентифицироваться от его имени и получить его полномочия."
+      ]
+    },
+    "NO_MAX_PASSWORD_AGE": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker obtains password through phishing or breach",
+        "2. Password never expires - access persists indefinitely",
+        "3. Even after detection, no automatic expiration",
+        "4. Long-term persistent access maintained"
+      ],
+      "attack": [
+        "1. Получить пароль через фишинг либо утечку.",
+        "2. Пароль не имеет срока действия, поэтому доступ сохраняется неограниченно долго.",
+        "3. Даже после обнаружения не произойдёт автоматического истечения срока.",
+        "4. Сохраняется долговременный несанкционированный доступ."
+      ]
+    },
+    "NO_MIN_PASSWORD_AGE": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. User is forced to change password",
+        "2. Changes password N times in quick succession (N = history count)",
+        "3. Sets password back to original",
+        "4. Password history effectively circumvented"
+      ],
+      "attack": [
+        "1. Принудить пользователя сменить пароль.",
+        "2. Быстро сменить пароль N раз, где N равно количеству сохраняемых предыдущих паролей.",
+        "3. Вернуть первоначальный пароль.",
+        "4. Тем самым обойти политику истории паролей."
+      ]
+    },
+    "NTAUTH_FOREIGN_ISSUER": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Obtain the issuer's private key - from a retired CA server, a backup, or a CA the attacker set up and published",
+        "2. Issue a certificate for the target account, signed with that key",
+        "3. Authenticate with it through PKINIT and receive a TGT for the target account"
+      ],
+      "attack": [
+        "1. Получить закрытый ключ издателя из выведенного из эксплуатации ЦС, резервной копии либо ЦС, созданного и опубликованного самим нарушителем.",
+        "2. Выдать сертификат на имя целевой записи с подписью этим ключом.",
+        "3. Аутентифицироваться с сертификатом через PKINIT и получить TGT целевой записи."
+      ]
+    },
+    "ORPHANED_ADMIN_ACCOUNT": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker identifies orphaned admin accounts",
+        "2. These accounts may have residual permissions in AD",
+        "3. May be overlooked in access reviews",
+        "4. Can be used for stealthy privilege maintenance"
+      ],
+      "attack": [
+        "1. Найти оставшиеся без владельца административные учётные записи.",
+        "2. Такие записи могут сохранять ранее выданные разрешения в AD.",
+        "3. При ревизии доступа их могут не заметить.",
+        "4. Они могут использоваться для скрытого сохранения привилегий."
+      ]
+    },
+    "OS_EXTENDED_SECURITY_UPDATES_ONLY": {
+      "sourceEnglishAttackStepCount": 1,
+      "sourceEnglishAttack": [
+        "The attacks are those of the underlying platform. For Windows Server 2012 R2 that includes every vulnerability patched since October 2023 on systems without ESU."
+      ],
+      "attack": [
+        "Возможные атаки определяются базовой платформой. Для Windows Server 2012 R2 без ESU они включают все уязвимости, исправленные после октября 2023 года."
+      ]
+    },
+    "OUTDATED_OS": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker identifies EOL systems in the environment",
+        "2. Uses known exploits (EternalBlue, BlueKeep, etc.)",
+        "3. Gains remote code execution",
+        "4. Uses system as pivot point for further attacks"
+      ],
+      "attack": [
+        "1. Найти в инфраструктуре системы с завершённым сроком поддержки (EOL).",
+        "2. Применить известные эксплойты, например EternalBlue или BlueKeep.",
+        "3. Добиться удалённого выполнения кода.",
+        "4. Использовать систему как промежуточную точку дальнейших атак."
+      ]
+    },
+    "OU_NON_DEFAULT_OWNER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker controls the principal that owns the OU",
+        "2. Grants itself GenericAll on the OU, inherited to child objects",
+        "3. Resets the password of a privileged account below, or writes RBCD on a computer there",
+        "4. This is the BloodHound Owns edge, and it is usually the shortest path left in a hardened domain"
+      ],
+      "attack": [
+        "1. Получить контроль над субъектом — владельцем OU.",
+        "2. Назначить себе GenericAll на OU с наследованием дочерними объектами.",
+        "3. Сбросить пароль привилегированной записи внутри OU либо записать RBCD на её компьютер.",
+        "4. В BloodHound это связь Owns; часто она оказывается кратчайшим оставшимся путём в защищённом домене."
+      ]
+    },
+    "OU_PERM_CONSTRAINED_DELEGATION": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker modifies msDS-AllowedToDelegateTo on a controlled account",
+        "2. Configures delegation to sensitive service (e.g., ldap/dc.domain.com)",
+        "3. Uses S4U2Self and S4U2Proxy to obtain service ticket as admin",
+        "4. Authenticates to the service as the impersonated admin"
+      ],
+      "attack": [
+        "1. Изменить msDS-AllowedToDelegateTo контролируемой записи.",
+        "2. Настроить делегирование к чувствительной службе, например ldap/dc.domain.com.",
+        "3. Через S4U2Self и S4U2Proxy получить служебный билет от имени администратора.",
+        "4. Аутентифицироваться в службе от имени этого администратора."
+      ]
+    },
+    "OU_PERM_CREATE_DMSA": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Create a dMSA in the OU; the creator becomes its owner",
+        "2. As the owner, allow yourself to use it (msDS-GroupMSAMembership)",
+        "3. Pair it with an account you can write to: msDS-ManagedAccountPrecededByLink on the dMSA, msDS-SupersededManagedAccountLink on the account, msDS-DelegatedMSAState 2",
+        "4. Request a ticket for the dMSA from a Windows Server 2025 KDC: it carries the account's group memberships, and its key package holds the account's keys"
+      ],
+      "attack": [
+        "1. Создать dMSA в OU: создатель становится её владельцем.",
+        "2. Как владелец разрешить себе использование dMSA через msDS-GroupMSAMembership.",
+        "3. Связать dMSA с записью, доступной для изменения: msDS-ManagedAccountPrecededByLink на dMSA, msDS-SupersededManagedAccountLink на записи, msDS-DelegatedMSAState = 2.",
+        "4. Запросить билет dMSA у KDC Windows Server 2025: билет содержит членства заменённой записи в группах, а пакет ключей — её ключи."
+      ]
+    },
+    "OU_PERM_DNSHOSTNAME_WRITE": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker modifies dNSHostName of a computer account",
+        "2. Sets it to match a target server (e.g., DC)",
+        "3. Performs Kerberos relay to authenticate as the computer",
+        "4. Obtains tickets for services trusting the DNS name"
+      ],
+      "attack": [
+        "1. Изменить dNSHostName компьютерной учётной записи.",
+        "2. Установить имя целевого сервера, например DC.",
+        "3. Выполнить ретрансляцию Kerberos-аутентификации от имени компьютера.",
+        "4. Получить билеты служб, доверяющих этому DNS-имени."
+      ]
+    },
+    "OU_PERM_DNS_HOST_NAME_ATTRIBUTES": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker uses DNS-Host-Name-Attributes write access",
+        "2. Modifies dNSHostName or adds additional DNS names",
+        "3. Performs Kerberos relay attacks using modified identity",
+        "4. May evade detection that only monitors dNSHostName directly"
+      ],
+      "attack": [
+        "1. Использовать право записи DNS-Host-Name-Attributes.",
+        "2. Изменить dNSHostName либо добавить дополнительные DNS-имена.",
+        "3. Проводить Kerberos relay с изменённой идентичностью.",
+        "4. Потенциально обойти мониторинг, отслеживающий только прямые изменения dNSHostName."
+      ]
+    },
+    "OU_PERM_GENERICWRITE": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "Same attacks as WriteProperty (All Properties)",
+        "Add SPN for Kerberoasting",
+        "Modify scriptPath for code execution",
+        "Configure delegation attributes"
+      ],
+      "attack": [
+        "Те же атаки, что при WriteProperty (All Properties).",
+        "Добавление SPN для Kerberoasting.",
+        "Изменение scriptPath для выполнения кода.",
+        "Настройка атрибутов делегирования."
+      ]
+    },
+    "OU_PERM_SCRIPTPATH": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker creates malicious script on accessible share",
+        "2. Modifies scriptPath of target user to point to malicious script",
+        "3. User logs in and script executes",
+        "4. Attacker gains code execution as the user"
+      ],
+      "attack": [
+        "1. Разместить вредоносный сценарий на доступном общем ресурсе.",
+        "2. Изменить scriptPath целевого пользователя, указав этот сценарий.",
+        "3. Пользователь входит в систему, и сценарий выполняется.",
+        "4. Нарушитель получает выполнение кода от имени пользователя."
+      ]
+    },
+    "OU_PERM_SELF_ALL_VALIDATED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker controls a principal holding Self with no ObjectType on the OU",
+        "2. Adds itself to a privileged group in the OU through the Self-Membership write",
+        "3. Obtains a new Kerberos ticket to pick up the group SID",
+        "4. Or, where no privileged group is in reach, sets an SPN on an account in the OU and Kerberoasts it"
+      ],
+      "attack": [
+        "1. Получить контроль над субъектом с правом Self без ObjectType на OU.",
+        "2. Добавить себя в привилегированную группу OU через запись Self-Membership.",
+        "3. Получить новый билет Kerberos, чтобы в нём появился SID группы.",
+        "4. Если подходящей привилегированной группы нет, установить SPN записи в OU и применить Kerberoasting."
+      ]
+    },
+    "OU_PERM_SELF_MEMBERSHIP": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker enumerates groups in the target OU and their privileges",
+        "2. Adds its own account to the privileged group using the Self-Membership write",
+        "3. Obtains a new Kerberos ticket to pick up the added group SID",
+        "4. Gains all privileges of the group, then removes itself again"
+      ],
+      "attack": [
+        "1. Перечислить группы целевой OU и их полномочия.",
+        "2. Добавить собственную запись в привилегированную группу через право Self-Membership.",
+        "3. Получить новый билет Kerberos с SID добавленной группы.",
+        "4. Использовать полномочия группы, после чего снова удалить себя из её состава."
+      ]
+    },
+    "OU_PERM_USERACCOUNTCONTROL": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker modifies userAccountControl on target account",
+        "2. Sets DONT_REQUIRE_PREAUTH flag",
+        "3. Performs AS-REP Roasting to obtain crackable hash",
+        "Or: Enables TRUSTED_FOR_DELEGATION for Kerberos attacks"
+      ],
+      "attack": [
+        "1. Изменить userAccountControl целевой записи.",
+        "2. Установить флаг DONT_REQUIRE_PREAUTH.",
+        "3. Применить AS-REP Roasting для получения хеша, допускающего подбор.",
+        "Либо включить TRUSTED_FOR_DELEGATION для атак на Kerberos."
+      ]
+    },
+    "OU_PERM_USER_ACCOUNT_RESTRICTIONS": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker uses User-Account-Restrictions write access",
+        "2. Modifies userAccountControl for delegation or AS-REP Roasting",
+        "3. Or modifies accountExpires to deny legitimate access",
+        "4. Changes are harder to detect than direct attribute writes"
+      ],
+      "attack": [
+        "1. Использовать право записи User-Account-Restrictions.",
+        "2. Изменить userAccountControl для делегирования либо AS-REP Roasting.",
+        "3. Либо изменить accountExpires, чтобы лишить законного пользователя доступа.",
+        "4. Такие изменения заметить сложнее, чем прямую запись отдельных атрибутов."
+      ]
+    },
+    "OU_PERM_VALIDATED_DNS": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "Attack surface is limited by validation rules",
+        "Computer accounts using Self rights is legitimate",
+        "Non-SELF rights may still enable some relay scenarios"
+      ],
+      "attack": [
+        "Поверхность атаки ограничена правилами валидации.",
+        "Использование прав Self компьютерными записями является штатным.",
+        "Права, предоставленные не субъекту SELF, могут сохранять возможность некоторых сценариев ретрансляции."
+      ]
+    },
+    "OU_PERM_VALIDATED_SPN": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. If target is a user account, same Kerberoasting attack applies",
+        "2. Validation may prevent some attack scenarios",
+        "3. Still allows adding SPNs within validation rules"
+      ],
+      "attack": [
+        "1. Если цель — пользовательская запись, применима та же атака Kerberoasting.",
+        "2. Валидация может блокировать часть сценариев.",
+        "3. При этом добавление SPN в рамках правил валидации остаётся допустимым."
+      ]
+    },
+    "OU_PERM_WRITEPROPERTY_ALL": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker identifies principal with WriteProperty (All Properties)",
+        "2. Modifies userAccountControl to enable delegation or disable protections",
+        "3. Adds SPN to enable Kerberoasting of privileged accounts",
+        "4. Configures RBCD for lateral movement"
+      ],
+      "attack": [
+        "1. Найти субъект с правом WriteProperty (All Properties).",
+        "2. Изменить userAccountControl для включения делегирования либо отключения защиты.",
+        "3. Добавить SPN, позволяющий выполнять Kerberoasting привилегированной записи.",
+        "4. Настроить RBCD для бокового перемещения."
+      ]
+    },
+    "PASSWORD_HISTORY_DISABLED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker obtains a user's password",
+        "2. The password is reset or expires, and the user sets the old one again",
+        "3. The attacker's password works again"
+      ],
+      "attack": [
+        "1. Получить пароль пользователя.",
+        "2. После сброса пароля или истечения его срока пользователь вновь устанавливает старый пароль.",
+        "3. Ранее полученный нарушителем пароль снова действует."
+      ]
+    }
+  }
+}
