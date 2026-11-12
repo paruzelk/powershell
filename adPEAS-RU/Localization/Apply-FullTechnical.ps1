@@ -535,6 +535,61 @@ if($d8Seen.Count -ne 24 -or $d8Impact -ne 79 -or $d8Remediation -ne 75){
 }
 Write-Host '[RU] PASS D8: 24 находки, Impact 79 и Remediation 75 проверены по EN'
 
+
+# Этап D9: точный перевод Impact/Remediation 24 Registry и GPO User Rights.
+# Сверка исходных EN-свидетелей, запрет перекрытия ранее проверенных полей.
+$d9New=@('SourceVerifiedCore-18a.ru-RU.json','SourceVerifiedCore-18b.ru-RU.json')
+$d9Earlier=@(
+ 'SourceVerifiedCore-07.ru-RU.json','SourceVerifiedCore-11.ru-RU.json',
+ 'SourceVerifiedCore-12.ru-RU.json','SourceVerifiedCore-13.ru-RU.json',
+ 'SourceVerifiedCore-14a.ru-RU.json','SourceVerifiedCore-14b.ru-RU.json',
+ 'SourceVerifiedCore-15a.ru-RU.json','SourceVerifiedCore-15b.ru-RU.json',
+ 'SourceVerifiedCore-16a.ru-RU.json','SourceVerifiedCore-16b.ru-RU.json',
+ 'SourceVerifiedCore-17a.ru-RU.json','SourceVerifiedCore-17b.ru-RU.json'
+)
+$d9Protected=@{}
+foreach($name in $d9Earlier){
+ $old=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($r in $old.translations.PSObject.Properties){$d9Protected[[string]$r.Name]=$true}
+}
+$d9Seen=@{}
+$d9Impact=0
+$d9Remediation=0
+foreach($name in $d9New){
+ $cat=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ if(@($cat.translations.PSObject.Properties).Count -ne 12){throw "D9: неполный каталог $name"}
+ foreach($row in $cat.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if(-not $entries.Contains($id)){throw "D9: неизвестный FindingId $id"}
+  if($d9Protected.ContainsKey($id) -or $d9Seen.ContainsKey($id)){throw "D9: повтор ранее сверенного ID $id"}
+  $d9Seen[$id]=$true
+  foreach($field in @('Impact','Remediation')){
+   $lower=$field.ToLowerInvariant()
+   $prop='sourceEnglish'+$field
+   $countProp=$prop+'Count'
+   $original=@(Get-PinnedFindingText $id $field)
+   $witness=@($row.Value.$prop)
+   $russian=@($row.Value.$lower)
+   $count=[int]$row.Value.$countProp
+   if($count -le 0 -or $original.Count -ne $count -or
+      $witness.Count -ne $count -or $russian.Count -ne $count){
+    throw "D9: неполный перевод $id / $field"
+   }
+   for($i=0;$i -lt $count;$i++){
+    if([string]$original[$i] -cne [string]$witness[$i]){throw "D9: изменён EN $id / $field / пункт $($i+1)"}
+    if([string]::IsNullOrWhiteSpace([string]$russian[$i]) -or
+       [string]$russian[$i] -notmatch '[А-Яа-яЁё]'){throw "D9: отсутствует RU $id / $field / пункт $($i+1)"}
+   }
+   $entries[$id].$lower=@($russian)
+   if($field -eq 'Impact'){$d9Impact+=$count}else{$d9Remediation+=$count}
+  }
+ }
+}
+if($d9Seen.Count -ne 24 -or $d9Impact -ne 61 -or $d9Remediation -ne 45){
+ throw "D9: неверный набор $($d9Seen.Count) / $d9Impact / $d9Remediation"
+}
+Write-Host '[RU] PASS D9: 24 находки, Impact 61 и Remediation 45 проверены по EN'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
