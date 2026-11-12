@@ -22,13 +22,7 @@
     "ImpactStepCountDifferences":  [
                                        "DANGEROUS_RIGHTS_AFFECTED_OUS",
                                        "DANGEROUS_RIGHTS_SEVERITY",
-                                       "ENROLLMENT_REQUIRES_APPROVAL",
-                                       "ESX_ADMINS_MEMBER",
-                                       "EXCHANGE_AD_SPLIT_PERMISSIONS",
-                                       "EXCHANGE_GROUP_LOW_PRIV_MEMBER",
-                                       "EXCHANGE_GROUP_PERMISSIONS",
                                        "EXCHANGE_HYBRID_DEPLOYMENT",
-                                       "EXCHANGE_PERMISSIONS_MODEL_CLEAN",
                                        "EXCHANGE_RBAC_AD_PERMISSIONS",
                                        "EXCHANGE_RBAC_APPLICATION_IMPERSONATION",
                                        "EXCHANGE_RBAC_DEFAULT_ASSIGNMENT",
@@ -43,34 +37,10 @@
                                        "EXCHANGE_SMTP_BROAD_SPOOFING",
                                        "EXCHANGE_VULNERABLE_VERSION",
                                        "EXCHANGE_WEB_ENDPOINTS",
-                                       "LAPS_INSTALLED",
-                                       "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
-                                       "NTAUTH_FOREIGN_ISSUER",
-                                       "PKI_CERTIFICATE_EXPIRED",
-                                       "PKI_SHORT_KEY_LENGTH",
-                                       "PKI_STRONG_KEY_LENGTH",
-                                       "PKI_STRONG_SIGNATURE_ALGORITHM",
-                                       "PKI_WEAK_SIGNATURE_ALGORITHM",
-                                       "SCCM_GROUP_BROAD_MEMBER",
-                                       "SCCM_PXE_EXPOSURE",
-                                       "SCCM_SERVICE_ACCOUNT",
-                                       "SCCM_SITE_HIERARCHY",
-                                       "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
-                                       "TRUST_BIDIRECTIONAL",
-                                       "TRUST_PASSWORD_STALE",
-                                       "TRUST_SELECTIVE_AUTH",
-                                       "TRUST_TRANSITIVE",
-                                       "TRUST_TREAT_AS_EXTERNAL",
-                                       "WEB_ENDPOINT_EPA_ENABLED"
+                                       "LAPS_INSTALLED"
                                    ],
     "RemediationStepCountDifferences":  [
-                                            "ENROLLMENT_REQUIRES_APPROVAL",
-                                            "ESX_ADMINS_MEMBER",
-                                            "EXCHANGE_AD_SPLIT_PERMISSIONS",
-                                            "EXCHANGE_GROUP_LOW_PRIV_MEMBER",
-                                            "EXCHANGE_GROUP_PERMISSIONS",
                                             "EXCHANGE_HYBRID_DEPLOYMENT",
-                                            "EXCHANGE_PERMISSIONS_MODEL_CLEAN",
                                             "EXCHANGE_RBAC_AD_PERMISSIONS",
                                             "EXCHANGE_RBAC_APPLICATION_IMPERSONATION",
                                             "EXCHANGE_RBAC_DEFAULT_ASSIGNMENT",
@@ -86,25 +56,7 @@
                                             "EXCHANGE_SMTP_CONNECTOR_UNREADABLE",
                                             "EXCHANGE_VULNERABLE_VERSION",
                                             "EXCHANGE_WEB_ENDPOINTS",
-                                            "GPO_LINK_REACHES_DC",
-                                            "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
-                                            "NTAUTH_FOREIGN_ISSUER",
-                                            "PKI_CERTIFICATE_EXPIRED",
-                                            "PKI_SHORT_KEY_LENGTH",
-                                            "PKI_STRONG_KEY_LENGTH",
-                                            "PKI_STRONG_SIGNATURE_ALGORITHM",
-                                            "PKI_WEAK_SIGNATURE_ALGORITHM",
-                                            "SCCM_GROUP_BROAD_MEMBER",
-                                            "SCCM_PXE_EXPOSURE",
-                                            "SCCM_SERVICE_ACCOUNT",
-                                            "SCCM_SITE_HIERARCHY",
-                                            "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
-                                            "TRUST_BIDIRECTIONAL",
-                                            "TRUST_PASSWORD_STALE",
-                                            "TRUST_SELECTIVE_AUTH",
-                                            "TRUST_TRANSITIVE",
-                                            "TRUST_TREAT_AS_EXTERNAL",
-                                            "WEB_ENDPOINT_EPA_ENABLED"
+                                            "GPO_LINK_REACHES_DC"
                                         ],
     "RussianImpactWithNoSource":  15,
     "RussianRemediationWithNoSource":  15,
@@ -1014,11 +966,11 @@
                    {
                        "FindingId":  "ENROLLMENT_REQUIRES_APPROVAL",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "ESC13_ISSUANCE_POLICY_GROUP_LINK",
@@ -1140,38 +1092,38 @@
                    {
                        "FindingId":  "ESX_ADMINS_MEMBER",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "EXCHANGE_AD_SPLIT_PERMISSIONS",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "EXCHANGE_GROUP_LOW_PRIV_MEMBER",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "EXCHANGE_GROUP_PERMISSIONS",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  6,
-                       "RemediationRU":  1
+                       "RemediationRU":  6
                    },
                    {
                        "FindingId":  "EXCHANGE_HYBRID_DEPLOYMENT",
@@ -1185,11 +1137,11 @@
                    {
                        "FindingId":  "EXCHANGE_PERMISSIONS_MODEL_CLEAN",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "EXCHANGE_RBAC_AD_PERMISSIONS",
@@ -2310,11 +2262,11 @@
                    {
                        "FindingId":  "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
@@ -2382,11 +2334,11 @@
                    {
                        "FindingId":  "NTAUTH_FOREIGN_ISSUER",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "OLD_FUNCTIONAL_LEVEL",
@@ -2697,47 +2649,47 @@
                    {
                        "FindingId":  "PKI_CERTIFICATE_EXPIRED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "PKI_SHORT_KEY_LENGTH",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "PKI_STRONG_KEY_LENGTH",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "PKI_STRONG_SIGNATURE_ALGORITHM",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "PKI_WEAK_SIGNATURE_ALGORITHM",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "PRECREATED_COMPUTER_ACCOUNT",
@@ -3300,38 +3252,38 @@
                    {
                        "FindingId":  "SCCM_GROUP_BROAD_MEMBER",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "SCCM_PXE_EXPOSURE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "SCCM_SERVICE_ACCOUNT",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "SCCM_SITE_HIERARCHY",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "SCCM_SYSTEM_MANAGEMENT_ACL",
@@ -3345,11 +3297,11 @@
                    {
                        "FindingId":  "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "SCRIPTPATH_HARDCODED",
@@ -3489,29 +3441,29 @@
                    {
                        "FindingId":  "TRUST_BIDIRECTIONAL",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "TRUST_PASSWORD_STALE",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "TRUST_SELECTIVE_AUTH",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "TRUST_SID_FILTERING_DISABLED",
@@ -3525,20 +3477,20 @@
                    {
                        "FindingId":  "TRUST_TRANSITIVE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "TRUST_TREAT_AS_EXTERNAL",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "TRUST_USES_RC4",
@@ -3624,11 +3576,11 @@
                    {
                        "FindingId":  "WEB_ENDPOINT_EPA_ENABLED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "WEB_ENDPOINT_SECURITY",
