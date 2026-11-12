@@ -104,8 +104,8 @@ jobs:
              $realCore -cnotmatch 'GlobalClaimPath' -or
              $realEntry -cnotmatch 'Invoke-OPA265ARCH2dBatch' -or
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 3976 -or
-             [int]$rel.Verification.ExpectedTestContainers -ne 132){
+             [int]$rel.Verification.ExpectedPesterTests -ne 4023 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 133){
              throw 'ARCH2d3 synthetic fault matrix/no Outlook/real writer compatibility gate failed.'
           }
           Write-Host 'PASS ARCH2d3 57-case 1/5/10 no-retry, actual force-flushed JSON writer, no COM/PST, original ARCH2d untouched.'
