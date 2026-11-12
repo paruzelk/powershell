@@ -92,20 +92,10 @@
                                        "GPO_USERRIGHT_DEFAULT_REMOVED",
                                        "GPO_USERRIGHT_SECREATEGLOBAL",
                                        "GPO_USERRIGHT_SECREATESYMBOLICLINK",
-                                       "GPO_USERRIGHT_SECREATETOKEN",
-                                       "GPO_USERRIGHT_SEDEBUG",
-                                       "GPO_USERRIGHT_SEENABLEDELEGATION",
-                                       "GPO_USERRIGHT_SEIMPERSONATE",
-                                       "GPO_USERRIGHT_SELOADDRIVER",
                                        "GPO_USERRIGHT_SEMANAGEVOLUME",
                                        "GPO_USERRIGHT_SEPROFILESINGLEPROCESS",
                                        "GPO_USERRIGHT_SERELABEL",
-                                       "GPO_USERRIGHT_SEREMOTEINTERACTIVELOGON",
-                                       "GPO_USERRIGHT_SERESTORE",
-                                       "GPO_USERRIGHT_SESECURITY",
-                                       "GPO_USERRIGHT_SESERVICELOGON",
                                        "GPO_USERRIGHT_SESYNCAGENT",
-                                       "GPO_USERRIGHT_SETAKEOWNERSHIP",
                                        "GPO_USERRIGHT_SETRUSTEDCREDMANACCESS",
                                        "GUEST_ACCOUNT_DISABLED",
                                        "INACTIVE_ACCOUNT",
@@ -145,29 +135,17 @@
                                        "PRIMARY_GROUP_IS_DC_GROUP",
                                        "RBCD_CONFIGURED",
                                        "READABLE_UNIX_PASSWORD_ATTRIBUTES",
-                                       "REGISTRY_AUTOLOGON",
-                                       "REGISTRY_CREDGUARD",
                                        "REGISTRY_FILTERADMINTOKEN",
-                                       "REGISTRY_FIREWALL_DISABLED",
-                                       "REGISTRY_INSECURE_GUEST_AUTH",
-                                       "REGISTRY_LEGACY_TLS",
-                                       "REGISTRY_LLMNR_ON",
-                                       "REGISTRY_MACHINE_PASSWORD_AGE",
                                        "REGISTRY_MACHINE_PASSWORD_STATIC",
-                                       "REGISTRY_NOLMHASH",
-                                       "REGISTRY_NULL_SESSION",
                                        "REGISTRY_ONELOGON",
                                        "REGISTRY_PRINT_RPC_PRIVACY",
                                        "REGISTRY_RDP_ENCRYPTION",
-                                       "REGISTRY_RDP_NLA",
                                        "REGISTRY_RDP_SECURITYLAYER",
                                        "REGISTRY_REMOTEUAC",
-                                       "REGISTRY_RESTRICTEDADMIN",
                                        "REGISTRY_SCRIPTBLOCK_LOGGING_OFF",
                                        "REGISTRY_SMB1_SERVER",
                                        "REGISTRY_SMB2_SERVER_DISABLED",
                                        "REGISTRY_SMB_UNENCRYPTED_ACCESS",
-                                       "REGISTRY_WDIGEST",
                                        "REGISTRY_WSUS_USER_PROXY",
                                        "REVERSIBLE_ENCRYPTION",
                                        "SCCM_GROUP_BROAD_MEMBER",
@@ -270,19 +248,13 @@
                                             "GPO_PRINT_QUEUE_SPECIFIC_FILES",
                                             "GPO_PRINT_SPOOLER_RPC",
                                             "GPO_USERRIGHT_DEFAULT_REMOVED",
-                                            "GPO_USERRIGHT_SEASSIGNPRIMARYTOKEN",
-                                            "GPO_USERRIGHT_SEBATCHLOGON",
                                             "GPO_USERRIGHT_SECREATESYMBOLICLINK",
-                                            "GPO_USERRIGHT_SEIMPERSONATE",
                                             "GPO_USERRIGHT_SEPROFILESINGLEPROCESS",
-                                            "GPO_USERRIGHT_SEREMOTEINTERACTIVELOGON",
                                             "GPO_USERRIGHT_SEREMOTESHUTDOWN",
-                                            "GPO_USERRIGHT_SESERVICELOGON",
                                             "GPO_USERRIGHT_SESHUTDOWN",
                                             "GPO_USERRIGHT_SESYNCAGENT",
                                             "GPO_USERRIGHT_SESYSTEMENVIRONMENT",
                                             "GPO_USERRIGHT_SESYSTEMTIME",
-                                            "GPO_USERRIGHT_SETAKEOWNERSHIP",
                                             "GUEST_ACCOUNT_DISABLED",
                                             "INACTIVE_ACCOUNT",
                                             "INACTIVE_PRIVILEGED_ACCOUNT",
@@ -318,22 +290,13 @@
                                             "PRIMARY_GROUP_IS_DC_GROUP",
                                             "RBCD_CONFIGURED",
                                             "READABLE_UNIX_PASSWORD_ATTRIBUTES",
-                                            "REGISTRY_AUTOLOGON",
-                                            "REGISTRY_CREDGUARD",
-                                            "REGISTRY_FIREWALL_DISABLED",
-                                            "REGISTRY_LEGACY_TLS",
-                                            "REGISTRY_MACHINE_PASSWORD_AGE",
-                                            "REGISTRY_NULL_SESSION",
                                             "REGISTRY_OFFICE_MACROS_ON",
                                             "REGISTRY_ONELOGON",
                                             "REGISTRY_PRINT_RPC_PRIVACY",
-                                            "REGISTRY_RDP_NLA",
                                             "REGISTRY_REMOTEUAC",
-                                            "REGISTRY_RESTRICTEDADMIN",
                                             "REGISTRY_SCRIPTBLOCK_LOGGING_OFF",
                                             "REGISTRY_SMB1_SERVER",
                                             "REGISTRY_SMB_UNENCRYPTED_ACCESS",
-                                            "REGISTRY_WDIGEST",
                                             "REGISTRY_WSUS_USER_PROXY",
                                             "REVERSIBLE_ENCRYPTION",
                                             "SCCM_GROUP_BROAD_MEMBER",
@@ -368,7 +331,7 @@
                                         ],
     "RussianImpactWithNoSource":  15,
     "RussianRemediationWithNoSource":  15,
-    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 150 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
+    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 174 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
     "UserReportDataIncluded":  false,
     "Fields":  [
                    {
@@ -1917,7 +1880,7 @@
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
-                       "RemediationRU":  2
+                       "RemediationRU":  1
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SEAUDIT",
@@ -1944,7 +1907,7 @@
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
-                       "RemediationRU":  2
+                       "RemediationRU":  1
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SECREATEGLOBAL",
@@ -1967,7 +1930,7 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SECREATETOKEN",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
@@ -1976,7 +1939,7 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SEDEBUG",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  2,
@@ -1994,7 +1957,7 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SEENABLEDELEGATION",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  2,
@@ -2003,11 +1966,11 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SEIMPERSONATE",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SEINTERACTIVELOGON",
@@ -2021,7 +1984,7 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SELOADDRIVER",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
@@ -2057,11 +2020,11 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SEREMOTEINTERACTIVELOGON",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SEREMOTESHUTDOWN",
@@ -2075,7 +2038,7 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SERESTORE",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
@@ -2084,7 +2047,7 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SESECURITY",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
@@ -2093,11 +2056,11 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SESERVICELOGON",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SESHUTDOWN",
@@ -2147,11 +2110,11 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SETAKEOWNERSHIP",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  1,
-                       "RemediationRU":  2
+                       "RemediationRU":  1
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SETCB",
@@ -3119,11 +3082,11 @@
                    {
                        "FindingId":  "REGISTRY_AUTOLOGON",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "REGISTRY_CACHED_LOGONS",
@@ -3137,11 +3100,11 @@
                    {
                        "FindingId":  "REGISTRY_CREDGUARD",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  2,
                        "AttackRU":  2,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "REGISTRY_CREDSSP_DELEGATE_ANY",
@@ -3227,16 +3190,16 @@
                    {
                        "FindingId":  "REGISTRY_FIREWALL_DISABLED",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  2,
                        "AttackRU":  2,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "REGISTRY_INSECURE_GUEST_AUTH",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
@@ -3263,16 +3226,16 @@
                    {
                        "FindingId":  "REGISTRY_LEGACY_TLS",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "REGISTRY_LLMNR_ON",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  1,
@@ -3290,11 +3253,11 @@
                    {
                        "FindingId":  "REGISTRY_MACHINE_PASSWORD_AGE",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "REGISTRY_MACHINE_PASSWORD_STATIC",
@@ -3308,7 +3271,7 @@
                    {
                        "FindingId":  "REGISTRY_NOLMHASH",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
@@ -3317,11 +3280,11 @@
                    {
                        "FindingId":  "REGISTRY_NULL_SESSION",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  2,
                        "AttackRU":  2,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "REGISTRY_OFFICE_MACROS_ON",
@@ -3362,11 +3325,11 @@
                    {
                        "FindingId":  "REGISTRY_RDP_NLA",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "REGISTRY_RDP_SECURITYLAYER",
@@ -3398,11 +3361,11 @@
                    {
                        "FindingId":  "REGISTRY_RESTRICTEDADMIN",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "REGISTRY_RUNASPPL",
@@ -3470,11 +3433,11 @@
                    {
                        "FindingId":  "REGISTRY_WDIGEST",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "REGISTRY_WINRM_BASIC",
