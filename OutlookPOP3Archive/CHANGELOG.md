@@ -1,5 +1,12 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH2d3 DEV — 2026-11-12
+- Recorded actual operator evidence: ARCH2d RunId 23ee0a5b-4780-45a2-9ef6-e12992b418f4 independently verified ten real saved POP3 mails after Outlook restart, including two with supported attachments, exact archive 10 and source original IDs 0. Original JSON and PST not modified by this build.
+- New Core/Diagnostics/ARCH2d3FaultSimulator.ps1: 57 isolated synthetic fault cases (19 types × 1st/5th/10th), using the original durable ARCH2c4 Write-JsonOnce CreateNew+Flush(true) and ARCH2d semantic reconciliation policy, no Outlook COM or PST.
+- Simulated preclaim/torn global, per-item claim faults, COM before/after apply ambiguity, missing/torn returns, crash after return, source/destination SHA mismatch, unexpected provider, duplicate target, missing restart. All never issue retry/replay permission.
+- Added Invoke-ARCH2d3.ps1 with no-side-effect Plan and opt-in scratch-only Simulate; original Archive/Resume/Auto closed, original ARCH2d MoveBatch unchanged.
+- 87 new regression tests, expected full Windows PS5.1 3976 in 132 containers; ZIP only OutlookPOP3Archive with SHA256, CI no production readiness.
+
 ## 2.6.5-ARCH2d DEV — 2026-11-12
 - Core/Archive ARCH2dBatchCore + ARCH2dBatchPolicy and operator `Invoke-ARCH2d.ps1` — one explicit ten-mail batch from existing real POP3 Inbox, never the previous ARCH2c4a RunId or target PST.
 - Batch source immutable manifest: ten unique original EntryIDs, original saved Body/HTML/recipients/user-state and protected by-value attachment SHA256 fingerprints, exact source/destination store/folder identity.
