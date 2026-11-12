@@ -1,0 +1,394 @@
+{
+  "schema": "adPEAS-RU.StageD2.Attack.11c",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "PKI_STRONG_KEY_LENGTH": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "With strong key lengths, attackers cannot:",
+        "- Factor the private key using known mathematical methods",
+        "- Compromise the CA through key recovery attacks",
+        "- Forge certificates by deriving the private key"
+      ],
+      "attack": [
+        "При достаточной длине ключей нарушитель не может:",
+        "— факторизовать закрытый ключ известными математическими методами;",
+        "— скомпрометировать ЦС посредством восстановления ключа;",
+        "— подделать сертификаты, вычислив закрытый ключ."
+      ]
+    },
+    "PKI_STRONG_SIGNATURE_ALGORITHM": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "With strong signature algorithms, attackers cannot:",
+        "- Forge certificates using hash collision attacks",
+        "- Create fraudulent certificates that chain to the trusted root",
+        "- Exploit weaknesses in deprecated hash algorithms"
+      ],
+      "attack": [
+        "При использовании стойких алгоритмов подписи нарушитель не может:",
+        "— подделать сертификаты через коллизии хеш-функции;",
+        "— создать поддельные сертификаты, выстраивающие цепочку к доверенному корневому центру;",
+        "— использовать слабости устаревших алгоритмов хеширования."
+      ]
+    },
+    "PRECREATED_COMPUTER_ACCOUNT": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker collects computer names - from DNS, from NetBIOS, or from the directory",
+        "2. Requests a TGT for each account with its name in lowercase as password - tools cut the name to 14 characters",
+        "3. Uses the machine account to enumerate the domain, roast service accounts or stage a resource-based constrained delegation attack"
+      ],
+      "attack": [
+        "1. Собрать имена компьютеров из DNS, NetBIOS либо каталога.",
+        "2. Запросить TGT для каждой записи, используя её имя в нижнем регистре как пароль; инструменты обрезают имя до 14 символов.",
+        "3. Использовать машинную запись для перечисления домена, Kerberoasting служебных записей либо подготовки атаки RBCD."
+      ]
+    },
+    "PREWIN2000_ANONYMOUS_MEMBER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker reaches a domain controller on the network with no credentials",
+        "2. Binds to LDAP anonymously, or opens a null SMB session",
+        "3. Enumerates users, groups and computers including descriptions and SPNs",
+        "4. Picks targets for AS-REP roasting, Kerberoasting or spraying from what the directory volunteered"
+      ],
+      "attack": [
+        "1. Без учётных данных достичь контроллера домена по сети.",
+        "2. Выполнить анонимную LDAP-привязку либо открыть анонимный SMB-сеанс.",
+        "3. Перечислить пользователей, группы и компьютеры, включая описания и SPN.",
+        "4. Выбрать цели AS-REP Roasting, Kerberoasting либо распыления паролей по раскрытым каталогом данным."
+      ]
+    },
+    "PREWIN2000_BROAD_MEMBER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker obtains any domain account, however unprivileged",
+        "2. Reads every user and group object through the permissions this group grants",
+        "3. Harvests SPNs, descriptions and group memberships",
+        "4. Picks the shortest path to a privileged account from what the directory volunteered"
+      ],
+      "attack": [
+        "1. Получить любую, даже непривилегированную, доменную запись.",
+        "2. Читать все объекты пользователей и групп благодаря разрешениям этой группы.",
+        "3. Собрать SPN, описания и членства в группах.",
+        "4. Найти кратчайший путь к привилегированной записи по раскрытым каталогом данным."
+      ]
+    },
+    "PRIMARY_GROUP_IS_DC_GROUP": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. An attacker obtains write access to primaryGroupID on an account it controls",
+        "2. Sets it to 516, 521 or 498 - the group's own membership does not change",
+        "3. The next logon issues a token holding the domain controller group SID",
+        "4. Everything that trusts that group now trusts this account"
+      ],
+      "attack": [
+        "1. Получить право изменения primaryGroupID на контролируемой записи.",
+        "2. Установить значение 516, 521 либо 498; фактическое членство самой группы при этом не меняется.",
+        "3. При следующем входе выдать токен с SID группы контроллеров домена.",
+        "4. Все системы, доверяющие такой группе, начинают доверять и этой записи."
+      ]
+    },
+    "PRIVILEGED_ACCOUNT_ACL": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. As the holder, add a key credential to the account (Whisker, pyWhisker) or reset its password",
+        "2. Request a TGT for the account with the key (PKINIT) or the new password",
+        "3. Use the account's group rights - Domain Admin, DnsAdmins code execution on the DNS servers, or policy creation"
+      ],
+      "attack": [
+        "1. Обладая соответствующим правом, добавить в запись ключевые учётные данные (Whisker, pyWhisker) либо сбросить пароль.",
+        "2. Запросить TGT записи через ключ (PKINIT) либо новый пароль.",
+        "3. Использовать права её групп: Domain Admin, выполнение кода на DNS-серверах через DnsAdmins либо создание политик."
+      ]
+    },
+    "PRIVILEGED_ACCOUNT_AFFECTED": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. Attacker exploits the weakness reported on the account",
+        "2. The rights that come with it are the account's own, so no further escalation is needed"
+      ],
+      "attack": [
+        "1. Использовать слабость, обнаруженную у учётной записи.",
+        "2. Получить её собственные права; дополнительное повышение привилегий уже не требуется."
+      ]
+    },
+    "READABLE_UNIX_PASSWORD_ATTRIBUTES": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker queries AD for Unix password attributes",
+        "2. Extracts password hashes from readable attributes",
+        "3. Cracks hashes offline or uses Pass-the-Hash",
+        "4. Gains access to accounts with populated attributes"
+      ],
+      "attack": [
+        "1. Запросить в AD парольные атрибуты Unix.",
+        "2. Извлечь хеши паролей из доступных для чтения атрибутов.",
+        "3. Подобрать пароли по хешам автономно либо применить Pass-the-Hash.",
+        "4. Получить доступ к записям с заполненными атрибутами."
+      ]
+    },
+    "REGISTRY_AUTOLOGON": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Read Registry.xml from SYSVOL",
+        "2. Extract DefaultUserName/DefaultPassword if present",
+        "3. Use the credentials directly"
+      ],
+      "attack": [
+        "1. Прочитать Registry.xml из SYSVOL.",
+        "2. Извлечь DefaultUserName/DefaultPassword, если они присутствуют.",
+        "3. Использовать полученные учётные данные напрямую."
+      ]
+    },
+    "REGISTRY_CREDGUARD": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. Dump LSASS on an affected host",
+        "2. Recover usable credential material"
+      ],
+      "attack": [
+        "1. Извлечь содержимое LSASS на затронутом узле.",
+        "2. Восстановить пригодный для аутентификации материал учётных данных."
+      ]
+    },
+    "REGISTRY_FILTERADMINTOKEN": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. Recover the RID-500 hash (often shared via imaging)",
+        "2. Pass-the-hash remotely to affected hosts"
+      ],
+      "attack": [
+        "1. Получить хеш встроенного администратора RID-500, часто одинаковый после тиражирования образа.",
+        "2. Выполнить удалённый Pass-the-Hash на затронутых узлах."
+      ]
+    },
+    "REGISTRY_FIREWALL_DISABLED": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. Reach a host that would otherwise have been firewalled off",
+        "2. Enumerate and connect to services the firewall would have blocked"
+      ],
+      "attack": [
+        "1. Подключиться к узлу, доступ к которому иначе блокировал бы брандмауэр.",
+        "2. Перечислить службы и установить соединения, ранее блокируемые брандмауэром."
+      ]
+    },
+    "REGISTRY_INSECURE_GUEST_AUTH": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Stand up a rogue SMB server, or coerce a client toward one (NTLM relay tooling, Responder-style)",
+        "2. Refuse the client's real credentials so it falls back to guest",
+        "3. Read or tamper with whatever the client sends over that session"
+      ],
+      "attack": [
+        "1. Создать поддельный SMB-сервер либо принудить клиента обратиться к нему (инструменты NTLM relay, подход Responder).",
+        "2. Отклонить реальные учётные данные клиента, чтобы он перешёл к гостевому доступу.",
+        "3. Прочитать или изменить передаваемые клиентом данные в этом сеансе."
+      ]
+    },
+    "REGISTRY_MACHINE_PASSWORD_STATIC": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. Recover the machine account key once",
+        "2. Forge silver tickets that stay valid indefinitely"
+      ],
+      "attack": [
+        "1. Однократно получить ключ машинной учётной записи.",
+        "2. Подделывать Silver Ticket, сохраняющие действительность неограниченно долго."
+      ]
+    },
+    "REGISTRY_NOLMHASH": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Dump the local SAM",
+        "2. Crack the LM hashes offline",
+        "3. Reuse recovered passwords"
+      ],
+      "attack": [
+        "1. Извлечь локальную базу SAM.",
+        "2. Подобрать пароли по LM-хешам автономно.",
+        "3. Повторно использовать восстановленные пароли."
+      ]
+    },
+    "REGISTRY_NULL_SESSION": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. Connect with a null session",
+        "2. Enumerate users, groups, shares, password policy"
+      ],
+      "attack": [
+        "1. Подключиться через анонимный сеанс (null session).",
+        "2. Перечислить пользователей, группы, общие ресурсы и парольную политику."
+      ]
+    },
+    "REGISTRY_ONELOGON": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Identify accounts in the allow-list",
+        "2. Run the OneLogon attack against the insecure Netlogon channel",
+        "3. Compromise the targeted account / escalate"
+      ],
+      "attack": [
+        "1. Выявить учётные записи в списке разрешённых.",
+        "2. Выполнить атаку OneLogon через небезопасный канал Netlogon.",
+        "3. Скомпрометировать целевую учётную запись либо повысить привилегии."
+      ]
+    },
+    "REGISTRY_RDP_ENCRYPTION": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. Capture RDP traffic on the path",
+        "2. Read the unencrypted server-to-client half directly, or break the weak client-to-server encryption"
+      ],
+      "attack": [
+        "1. Перехватить трафик RDP по пути передачи.",
+        "2. Прочитать незашифрованную часть сервер–клиент напрямую либо вскрыть слабое шифрование клиент–сервер."
+      ]
+    },
+    "REGISTRY_RDP_NLA": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Connect to the RDP port without any credential",
+        "2. Reach the pre-auth protocol surface or the logon screen directly",
+        "3. Exploit an unpatched RDP stack vulnerability, or guess credentials unthrottled"
+      ],
+      "attack": [
+        "1. Подключиться к порту RDP без учётных данных.",
+        "2. Получить доступ к протоколу до аутентификации либо непосредственно к экрану входа.",
+        "3. Использовать неисправленную уязвимость стека RDP либо неограниченно подбирать учётные данные."
+      ]
+    },
+    "REGISTRY_RDP_SECURITYLAYER": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Position between client and server (ARP/DNS spoofing, rogue AP)",
+        "2. Present a forged RDP server - the client has no certificate to check against",
+        "3. Capture the session, including any hash or credential exchanged"
+      ],
+      "attack": [
+        "1. Занять промежуточную позицию между клиентом и сервером (подмена ARP/DNS, поддельная точка Wi-Fi).",
+        "2. Представить поддельный RDP-сервер: у клиента нет сертификата для проверки.",
+        "3. Перехватить сеанс, включая передаваемые хеши или учётные данные."
+      ]
+    },
+    "REGISTRY_REMOTEUAC": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Obtain a local admin hash (e.g. from SAM)",
+        "2. Pass-the-hash to ADMIN$/WMI on other affected hosts",
+        "3. Move laterally"
+      ],
+      "attack": [
+        "1. Получить хеш локального администратора, например из SAM.",
+        "2. Использовать Pass-the-Hash к ADMIN$/WMI на других затронутых узлах.",
+        "3. Перемещаться между компьютерами сети."
+      ]
+    },
+    "REGISTRY_RESTRICTEDADMIN": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Obtain a local/domain admin NT hash",
+        "2. RDP with Restricted Admin using the hash (e.g. mstsc /restrictedadmin via Mimikatz)",
+        "3. Interactive admin session without the password"
+      ],
+      "attack": [
+        "1. Получить NT-хеш локального или доменного администратора.",
+        "2. Подключиться по RDP в режиме Restricted Admin, используя хеш (например, mstsc /restrictedadmin через Mimikatz).",
+        "3. Получить интерактивный сеанс администратора без знания пароля."
+      ]
+    },
+    "REGISTRY_SMB1_SERVER": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker places itself between a client and a server in the GPO's scope",
+        "2. Strips the newer dialects from the negotiation so both sides fall back to SMBv1",
+        "3. Reads or tampers with the traffic, or exploits an unpatched SMBv1 flaw"
+      ],
+      "attack": [
+        "1. Встать между клиентом и сервером в области действия GPO.",
+        "2. Исключить современные диалекты при согласовании, заставив обе стороны перейти на SMBv1.",
+        "3. Прочитать либо изменить трафик или использовать неисправленную уязвимость SMBv1."
+      ]
+    },
+    "REGISTRY_WDIGEST": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Land on a host where the GPO applies",
+        "2. Dump LSASS (e.g. mimikatz sekurlsa::wdigest)",
+        "3. Read plaintext credentials of logged-on users"
+      ],
+      "attack": [
+        "1. Получить доступ к узлу, на который распространяется GPO.",
+        "2. Извлечь данные LSASS, например через mimikatz sekurlsa::wdigest.",
+        "3. Прочитать пароли пользователей, вошедших в систему, в открытом виде."
+      ]
+    },
+    "ROASTABLE_PRIVILEGED_ACCOUNT": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker requests a service ticket for the SPN, or an AS-REP for the account",
+        "2. The reply is encrypted with a key derived from the account's password",
+        "3. The hash is cracked offline against a wordlist, with no interaction with the domain",
+        "4. The recovered password is used directly with the account's privileges"
+      ],
+      "attack": [
+        "1. Запросить служебный билет для SPN либо AS-REP для учётной записи.",
+        "2. Ответ зашифрован ключом, производным от пароля этой записи.",
+        "3. Подобрать пароль по хешу автономно с использованием словаря, не взаимодействуя с доменом.",
+        "4. Использовать восстановленный пароль непосредственно с полномочиями записи."
+      ]
+    },
+    "RODC_DENIED_GROUP_MISSING": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. An administrator adds a broad group to the allow list, or a privileged account to an allowed group",
+        "2. The read-only Domain Controller caches the privileged password at the next logon through it"
+      ],
+      "attack": [
+        "1. Администратор добавляет широкую группу в список разрешённых либо привилегированную запись — в разрешённую группу.",
+        "2. При следующем входе через контроллер домена только для чтения (RODC) он кэширует пароль привилегированной записи."
+      ]
+    },
+    "RODC_PRIVILEGED_PASSWORD_ALLOWED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker gains administrative access to the read-only Domain Controller or its disks",
+        "2. Extracts the cached secrets (secretsdump against the NTDS.dit, or the RODC's own krbtgt to forge tickets for cached accounts)",
+        "3. Uses the privileged account's hash anywhere in the domain"
+      ],
+      "attack": [
+        "1. Получить административный доступ к RODC либо его дискам.",
+        "2. Извлечь кэшированные секреты (secretsdump из NTDS.dit либо собственный krbtgt RODC для подделки билетов кэшированных записей).",
+        "3. Использовать хеш привилегированной записи в любой точке домена."
+      ]
+    },
+    "RODC_PRIVILEGED_PASSWORD_REVEALED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker gains administrative access to the read-only Domain Controller or its disks",
+        "2. Extracts the cached hashes of the privileged accounts",
+        "3. Uses them anywhere in the domain"
+      ],
+      "attack": [
+        "1. Получить административный доступ к RODC либо его дискам.",
+        "2. Извлечь кэшированные хеши привилегированных записей.",
+        "3. Использовать их где угодно в домене."
+      ]
+    },
+    "SCCM_GROUP_BROAD_MEMBER": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker with any domain account is, through the broad group, a member of the SCCM group",
+        "2. Uses the access the group grants - in the console, on a site server share, or on the site database",
+        "3. With an administrative role, deploys a script or an application to the clients"
+      ],
+      "attack": [
+        "1. Нарушитель с любой доменной записью через широкую группу становится участником группы SCCM.",
+        "2. Использует разрешения этой группы: в консоли, на общем ресурсе сервера сайта либо в базе данных сайта.",
+        "3. При наличии административной роли разворачивает сценарий либо приложение на клиентских компьютерах."
+      ]
+    }
+  }
+}
