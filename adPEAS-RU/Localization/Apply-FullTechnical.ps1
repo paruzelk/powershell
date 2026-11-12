@@ -646,6 +646,63 @@ if($d10Seen.Count -ne 24 -or $d10Impact -ne 54 -or $d10Remediation -ne 43){
 }
 Write-Host '[RU] PASS D10: 24 находки, Impact 54 и Remediation 43 по закреплённому оригиналу'
 
+
+# Этап D11: полный перевод Impact и Remediation для 24 прав GPO, паролей,
+# доверий, делегирования и SMB. Только русский каталог, код сканера не изменяется.
+$d11CatalogNames=@('SourceVerifiedCore-20a.ru-RU.json','SourceVerifiedCore-20b.ru-RU.json')
+$d11ProtectedNames=@(
+ 'SourceVerifiedCore-07.ru-RU.json','SourceVerifiedCore-11.ru-RU.json',
+ 'SourceVerifiedCore-12.ru-RU.json','SourceVerifiedCore-13.ru-RU.json',
+ 'SourceVerifiedCore-14a.ru-RU.json','SourceVerifiedCore-14b.ru-RU.json',
+ 'SourceVerifiedCore-15a.ru-RU.json','SourceVerifiedCore-15b.ru-RU.json',
+ 'SourceVerifiedCore-16a.ru-RU.json','SourceVerifiedCore-16b.ru-RU.json',
+ 'SourceVerifiedCore-17a.ru-RU.json','SourceVerifiedCore-17b.ru-RU.json',
+ 'SourceVerifiedCore-18a.ru-RU.json','SourceVerifiedCore-18b.ru-RU.json',
+ 'SourceVerifiedCore-19a.ru-RU.json','SourceVerifiedCore-19b.ru-RU.json'
+)
+$d11Protected=@{}
+foreach($name in $d11ProtectedNames){
+ $oldCatalog=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($p in $oldCatalog.translations.PSObject.Properties){$d11Protected[[string]$p.Name]=$true}
+}
+$d11Seen=@{}
+$d11Impact=0
+$d11Remediation=0
+foreach($name in $d11CatalogNames){
+ $cat=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ if(@($cat.translations.PSObject.Properties).Count -ne 12){throw "D11: каталог $name должен иметь 12 записей"}
+ foreach($row in $cat.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if(-not $entries.Contains($id)){throw "D11: неизвестный FindingId $id"}
+  if($d11Protected.ContainsKey($id) -or $d11Seen.ContainsKey($id)){throw "D11: перекрытие уже сверенной находки $id"}
+  $d11Seen[$id]=$true
+  foreach($field in @('Impact','Remediation')){
+   $lower=$field.ToLowerInvariant()
+   $sourceName='sourceEnglish'+$field
+   $countName=$sourceName+'Count'
+   $original=@(Get-PinnedFindingText $id $field)
+   $english=@($row.Value.$sourceName)
+   $russian=@($row.Value.$lower)
+   $expected=[int]$row.Value.$countName
+   if($expected -le 0 -or $original.Count -ne $expected -or
+      $english.Count -ne $expected -or $russian.Count -ne $expected){
+    throw "D11: неверное число пунктов $id / $field"
+   }
+   for($i=0;$i -lt $expected;$i++){
+    if([string]$original[$i] -cne [string]$english[$i]){throw "D11: изменён закреплённый EN $id / $field / $($i+1)"}
+    if([string]::IsNullOrWhiteSpace([string]$russian[$i]) -or
+       [string]$russian[$i] -notmatch '[А-Яа-яЁё]'){throw "D11: отсутствует русский пункт $id / $field / $($i+1)"}
+   }
+   $entries[$id].$lower=@($russian)
+   if($field -eq 'Impact'){$d11Impact+=$expected}else{$d11Remediation+=$expected}
+  }
+ }
+}
+if($d11Seen.Count -ne 24 -or $d11Impact -ne 77 -or $d11Remediation -ne 77){
+ throw "D11: неполный набор $($d11Seen.Count) / $d11Impact / $d11Remediation"
+}
+Write-Host '[RU] PASS D11: 24 находки, Impact 77 и Remediation 77 сверены с EN'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
