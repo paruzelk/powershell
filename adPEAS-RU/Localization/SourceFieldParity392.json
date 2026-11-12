@@ -20,26 +20,8 @@
 
                                    ],
     "ImpactStepCountDifferences":  [
-                                       "ADMINSDHOLDER_PROPAGATED_RIGHT",
-                                       "BLOODHOUND_COLLECTION_COMPLETE",
-                                       "COMPUTER_CONTAINER_CREATE_BROAD",
-                                       "COMPUTER_CONTAINER_CREATE_PERMISSIONS",
-                                       "COMPUTER_OBJECT_EXPLICIT_RIGHT",
-                                       "COMPUTER_OWNERSHIP_REASSIGNED",
-                                       "COMPUTER_PASSWORD_NOT_ROTATED",
-                                       "CONSTRAINED_DELEGATION",
-                                       "CRITICAL_OBJECT_CONTROL",
                                        "DANGEROUS_RIGHTS_AFFECTED_OUS",
-                                       "DANGEROUS_RIGHTS_CONTEXT",
                                        "DANGEROUS_RIGHTS_SEVERITY",
-                                       "DMSA_LINK_ONE_SIDED",
-                                       "DMSA_MEMBERSHIP_OWNER",
-                                       "DMSA_PRIVILEGED_PREDECESSOR",
-                                       "DMSA_USABLE_BY_NONPRIVILEGED",
-                                       "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION",
-                                       "DSHEURISTICS_ANONYMOUS_NSPI",
-                                       "DSHEURISTICS_UNIQUENESS_DISABLED",
-                                       "ENCRYPTION_DES_ENABLED",
                                        "ENROLLMENT_REQUIRES_APPROVAL",
                                        "ESX_ADMINS_MEMBER",
                                        "EXCHANGE_AD_SPLIT_PERMISSIONS",
@@ -64,22 +46,16 @@
                                        "LAPS_INSTALLED",
                                        "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
                                        "NTAUTH_FOREIGN_ISSUER",
-                                       "OU_NON_DEFAULT_OWNER",
                                        "PKI_CERTIFICATE_EXPIRED",
                                        "PKI_SHORT_KEY_LENGTH",
                                        "PKI_STRONG_KEY_LENGTH",
                                        "PKI_STRONG_SIGNATURE_ALGORITHM",
                                        "PKI_WEAK_SIGNATURE_ALGORITHM",
-                                       "RBCD_CONFIGURED",
                                        "SCCM_GROUP_BROAD_MEMBER",
                                        "SCCM_PXE_EXPOSURE",
                                        "SCCM_SERVICE_ACCOUNT",
                                        "SCCM_SITE_HIERARCHY",
                                        "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
-                                       "SID_HISTORY_FOREIGN_PRIVILEGED",
-                                       "SID_HISTORY_ORPHANED",
-                                       "SID_HISTORY_OWN_DOMAIN",
-                                       "STANDALONE_MSA_LEGACY",
                                        "TRUST_BIDIRECTIONAL",
                                        "TRUST_PASSWORD_STALE",
                                        "TRUST_SELECTIVE_AUTH",
@@ -88,24 +64,6 @@
                                        "WEB_ENDPOINT_EPA_ENABLED"
                                    ],
     "RemediationStepCountDifferences":  [
-                                            "ADMINSDHOLDER_PROPAGATED_RIGHT",
-                                            "BLOODHOUND_COLLECTION_COMPLETE",
-                                            "COMPUTER_CONTAINER_CREATE_BROAD",
-                                            "COMPUTER_CONTAINER_CREATE_PERMISSIONS",
-                                            "COMPUTER_OBJECT_EXPLICIT_RIGHT",
-                                            "COMPUTER_OWNERSHIP_REASSIGNED",
-                                            "COMPUTER_PASSWORD_NOT_ROTATED",
-                                            "CONSTRAINED_DELEGATION",
-                                            "CRITICAL_OBJECT_CONTROL",
-                                            "DANGEROUS_RIGHTS_CONTEXT",
-                                            "DMSA_LINK_ONE_SIDED",
-                                            "DMSA_MEMBERSHIP_OWNER",
-                                            "DMSA_PRIVILEGED_PREDECESSOR",
-                                            "DMSA_USABLE_BY_NONPRIVILEGED",
-                                            "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION",
-                                            "DSHEURISTICS_ANONYMOUS_NSPI",
-                                            "DSHEURISTICS_UNIQUENESS_DISABLED",
-                                            "ENCRYPTION_DES_ENABLED",
                                             "ENROLLMENT_REQUIRES_APPROVAL",
                                             "ESX_ADMINS_MEMBER",
                                             "EXCHANGE_AD_SPLIT_PERMISSIONS",
@@ -131,22 +89,16 @@
                                             "GPO_LINK_REACHES_DC",
                                             "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
                                             "NTAUTH_FOREIGN_ISSUER",
-                                            "OU_NON_DEFAULT_OWNER",
                                             "PKI_CERTIFICATE_EXPIRED",
                                             "PKI_SHORT_KEY_LENGTH",
                                             "PKI_STRONG_KEY_LENGTH",
                                             "PKI_STRONG_SIGNATURE_ALGORITHM",
                                             "PKI_WEAK_SIGNATURE_ALGORITHM",
-                                            "RBCD_CONFIGURED",
                                             "SCCM_GROUP_BROAD_MEMBER",
                                             "SCCM_PXE_EXPOSURE",
                                             "SCCM_SERVICE_ACCOUNT",
                                             "SCCM_SITE_HIERARCHY",
                                             "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
-                                            "SID_HISTORY_FOREIGN_PRIVILEGED",
-                                            "SID_HISTORY_ORPHANED",
-                                            "SID_HISTORY_OWN_DOMAIN",
-                                            "STANDALONE_MSA_LEGACY",
                                             "TRUST_BIDIRECTIONAL",
                                             "TRUST_PASSWORD_STALE",
                                             "TRUST_SELECTIVE_AUTH",
@@ -288,11 +240,11 @@
                    {
                        "FindingId":  "ADMINSDHOLDER_PROPAGATED_RIGHT",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  3
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "ADMIN_COUNT_INDICATOR",
@@ -450,11 +402,11 @@
                    {
                        "FindingId":  "BLOODHOUND_COLLECTION_COMPLETE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "CERT_FLAG_SEVERITY",
@@ -468,56 +420,56 @@
                    {
                        "FindingId":  "COMPUTER_CONTAINER_CREATE_BROAD",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "COMPUTER_CONTAINER_CREATE_PERMISSIONS",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  2
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "COMPUTER_OBJECT_EXPLICIT_RIGHT",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "COMPUTER_OWNERSHIP_REASSIGNED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "COMPUTER_PASSWORD_NOT_ROTATED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "CONSTRAINED_DELEGATION",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "CONSTRAINED_DELEGATION_PROTOCOL_TRANSITION",
@@ -693,11 +645,11 @@
                    {
                        "FindingId":  "CRITICAL_OBJECT_CONTROL",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "DANGEROUS_ACL_BROAD_GROUP",
@@ -828,11 +780,11 @@
                    {
                        "FindingId":  "DANGEROUS_RIGHTS_CONTEXT",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  7,
-                       "RemediationRU":  1
+                       "RemediationRU":  7
                    },
                    {
                        "FindingId":  "DANGEROUS_RIGHTS_SEVERITY",
@@ -891,38 +843,38 @@
                    {
                        "FindingId":  "DMSA_LINK_ONE_SIDED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DMSA_MEMBERSHIP_OWNER",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "DMSA_PRIVILEGED_PREDECESSOR",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  2,
                        "AttackRU":  2,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DMSA_USABLE_BY_NONPRIVILEGED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "DOMAIN_ROOT_FSMO_TRANSFER",
@@ -990,29 +942,29 @@
                    {
                        "FindingId":  "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DSHEURISTICS_ANONYMOUS_NSPI",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "DSHEURISTICS_UNIQUENESS_DISABLED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DSRM_PASSWORD_UNMANAGED",
@@ -1035,11 +987,11 @@
                    {
                        "FindingId":  "ENCRYPTION_DES_ENABLED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "ENCRYPTION_NOT_CONFIGURED",
@@ -2493,11 +2445,11 @@
                    {
                        "FindingId":  "OU_NON_DEFAULT_OWNER",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "OU_PERM_CONSTRAINED_DELEGATION",
@@ -2871,11 +2823,11 @@
                    {
                        "FindingId":  "RBCD_CONFIGURED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "RBCD_DANGEROUS_PRINCIPALS",
@@ -3420,11 +3372,11 @@
                    {
                        "FindingId":  "SID_HISTORY_FOREIGN_PRIVILEGED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "SID_HISTORY_INJECTION",
@@ -3438,20 +3390,20 @@
                    {
                        "FindingId":  "SID_HISTORY_ORPHANED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "SID_HISTORY_OWN_DOMAIN",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "SMARTCARD_REQUIRED",
@@ -3501,11 +3453,11 @@
                    {
                        "FindingId":  "STANDALONE_MSA_LEGACY",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "SYSVOL_FRS_REPLICATION",
