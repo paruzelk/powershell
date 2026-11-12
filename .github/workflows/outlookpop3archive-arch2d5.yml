@@ -1,4 +1,4 @@
-name: OutlookPOP3Archive ARCH2d5 hundred original letters SHA256 chain Windows PS5.1 CI
+name: OutlookPOP3Archive ARCH2d5 hundred real POP3 letters SHA-chain Windows PS5.1 CI
 on:
   push:
     branches: [feature/outlookpop3archive-2.6.5-arch2d5-real-batch100]
@@ -30,7 +30,7 @@ jobs:
             'Tests/Archive/ARCH2c4aRuntimeDependencies.Tests.ps1',
             'Tests/Archive/ARCH2dBoundedRealBatch10.Tests.ps1',
             'Tests/Archive/ARCH2d3FaultMatrix.Tests.ps1',
-            'Tests/Archive/ARCH2d5ReadOnlyForensics.Tests.ps1',
+            'Tests/Archive/ARCH2d4ReadOnlyForensics.Tests.ps1',
             'Tests/Archive/ARCH2d5RealBatch100.Tests.ps1',
             'Tests/Archive/ARCH2bSemanticWitness.Tests.ps1',
             'Tests/Archive/ARCH2c1TempIsolation.Tests.ps1',
@@ -110,24 +110,24 @@ jobs:
              throw 'ARCH2d3 synthetic fault matrix/no Outlook/real writer compatibility gate failed.'
           }
           Write-Host 'PASS ARCH2d3 57-case 1/5/10 no-retry, actual force-flushed JSON writer, no COM/PST, original ARCH2d untouched.'
-      - name: ARCH2d5 exact historical pinned evidence and read-only semantic forensic gates
+      - name: ARCH2d4 exact historical pinned evidence and read-only semantic forensic gates
         run: |
           $ErrorActionPreference='Stop'
-          $evidence=Get-Content -LiteralPath 'Core/Diagnostics/ARCH2d5EvidencePolicy.ps1' -Raw -Encoding UTF8
-          $audit=Get-Content -LiteralPath 'Core/Diagnostics/ARCH2d5LiveAudit.ps1' -Raw -Encoding UTF8
-          $entry=Get-Content -LiteralPath 'Invoke-ARCH2d5.ps1' -Raw -Encoding UTF8
-          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch2d5-readonly-forensics.md' -Raw -Encoding UTF8
+          $evidence=Get-Content -LiteralPath 'Core/Diagnostics/ARCH2d4EvidencePolicy.ps1' -Raw -Encoding UTF8
+          $audit=Get-Content -LiteralPath 'Core/Diagnostics/ARCH2d4LiveAudit.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH2d4.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch2d4-readonly-forensics.md' -Raw -Encoding UTF8
           $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
           $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
           if($evidence -cnotmatch 'Read-OPA265ARCH2c4JsonSealed -Path \(\[string\]\$Layout.ManifestPath\)' -or
              $evidence -cnotmatch 'Read-OPA265ARCH2c4JsonSealed -Path \(\[string\]\$Layout.GlobalClaimPath\)' -or
-             $evidence -cnotmatch 'Read-OPA265ARCH2d5UnanchoredJson' -or
+             $evidence -cnotmatch 'Read-OPA265ARCH2d4UnanchoredJson' -or
              $evidence -cnotmatch 'MovedContentMatchedReceiptMissingManualReview' -or
              $evidence -cnotmatch 'PartialBatchReadOnlyClassifiedNoResumePermit' -or
              $audit -cnotmatch 'Open-OPA265ARCH2dSession' -or
              $audit -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness' -or
              $audit -cnotmatch 'Get-OPA265ARCH2dSourcePresence' -or
-             $audit -cnotmatch 'Get-OPA265ARCH2d5BatchDecision' -or
+             $audit -cnotmatch 'Get-OPA265ARCH2d4BatchDecision' -or
              $audit -cmatch '\.(Move|Copy|Save|Delete|AddStoreEx|RemoveStore)\s*\(' -or
              $audit -cmatch 'Write-OPA265ARCH2c4JsonOnce' -or
              $evidence -cmatch 'Write-OPA265ARCH2c4JsonOnce' -or
@@ -137,9 +137,9 @@ jobs:
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed' -or
              [int]$rel.Verification.ExpectedPesterTests -ne 4059 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 134){
-             throw 'ARCH2d5 forensic pinned claims/return check and zero real write permissions gate failed.'
+             throw 'ARCH2d4 forensic pinned claims/return check and zero real write permissions gate failed.'
           }
-          Write-Host 'PASS ARCH2d5 operator hashes anchored, 10 receipts validated, no journal/PST writes or any COM Move.'
+          Write-Host 'PASS ARCH2d4 operator hashes anchored, 10 receipts validated, no journal/PST writes or any COM Move.'
       - name: Package only OutlookPOP3Archive from tested commit and calculate SHA-256
         run: |
           $ErrorActionPreference='Stop'
@@ -151,7 +151,7 @@ jobs:
           $staged=Join-Path $stageParent $base
           [void][IO.Directory]::CreateDirectory($out)
           [void][IO.Directory]::CreateDirectory($staged)
-          foreach($f in @('.editorconfig','.gitignore','.psscriptanalyzer.psd1','RELEASE.json','MANIFEST.txt','README.md','CHANGELOG.md','OutlookPOP3Archive.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-ARCH2c4.ps1','Invoke-ARCH2d.ps1','Invoke-ARCH2d3.ps1','Invoke-ARCH2d5.ps1','Invoke-ARCH2d5.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')){
+          foreach($f in @('.editorconfig','.gitignore','.psscriptanalyzer.psd1','RELEASE.json','MANIFEST.txt','README.md','CHANGELOG.md','OutlookPOP3Archive.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-ARCH2c4.ps1','Invoke-ARCH2d.ps1','Invoke-ARCH2d3.ps1','Invoke-ARCH2d5.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')){
             $src=Join-Path $project $f
             if(-not (Test-Path -LiteralPath $src -PathType Leaf)){throw ('Required project file absent: '+$f)}
             Copy-Item -LiteralPath $src -Destination (Join-Path $staged $f)
@@ -198,5 +198,5 @@ jobs:
           $sha=Join-Path $dir ($base+'.sha256')
           if(-not (Test-Path -LiteralPath $zip -PathType Leaf) -or -not (Test-Path -LiteralPath $sha -PathType Leaf)){throw 'ZIP/checksum absent'}
           $tag='outlookpop3archive-2.6.5-arch2d5-dev-g'+$short
-          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH2d5 DEV '+$short) --notes 'ARCH2d5 DEV: independent read-only forensics of historical ARCH2d ten REAL POP3 mails after 10/10 semantic matches. Plan, Evidence (original operator-pinned manifest/global claim SHA256, original intent and 10 claim/return linkage) and LiveAudit (existing Outlook and attached source/target PST, Body HTML recipients flags attachment SHA256 from transient protected temp). Torn/missing receipts, unknown MAPI, duplicate and changed content fail closed with NO retry. Per-item receipts have only current self-computed hashes, NOT independently historically pinned. No mail Move/Save/Delete, no PST mounting or old journal writes, no Outlook used in CI; main Archive/Resume/Auto blocked. 4023 Windows PS5.1 Pester tests in 133 containers, PSSA BOM JSON gates and project-only SHA256 ZIP.' --prerelease
+          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH2d5 DEV '+$short) --notes 'ARCH2d5 DEV: exactly 100 existing original POP3 Inbox mails and fresh separate output PST. Before any Move store 100 full semantic SHA256 original fingerprints. One global durable claim, one durable claim before each of exactly 100 COM Moves, SHA256 receipt included in next claim, checkpoint seal every 10, final operator-pinned SHA256 seal after the 100th. Read-only Evidence and after-Outlook-restart Reconcile verify complete chain and all 100 original semantic fingerprints. Any failure halts without retry or resume. Older real ARCH2c4a and ARCH2d4 archive evidence never touched. Archive/Resume/Auto stay blocked; not certified for 90GB. Full Windows PowerShell 5.1 4059 tests in 134 containers, PSSA BOM JSON gates and project-only SHA256 ZIP.' --prerelease
           if($LASTEXITCODE -ne 0){throw 'GitHub prerelease publication failed'}
