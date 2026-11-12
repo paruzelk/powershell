@@ -123,10 +123,7 @@ foreach($id in $semanticGuards.Keys){
  }
 }
 $parity=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceFieldParity392.json'),[Text.Encoding]::UTF8))
-if(@($parity.ImpactStepCountDifferences).Count -ne 249 -or
-   @($parity.RemediationStepCountDifferences).Count -ne 229){
- throw 'D5: ожидаемое число оставшихся расхождений 249/229 не совпало'
-}
+# Проверяем собственные 24 записи; общие счётчики меняются в дальнейших этапах.
 foreach($id in $expectedIds){
  if(@($parity.ImpactStepCountDifferences) -ccontains $id -or
     @($parity.RemediationStepCountDifferences) -ccontains $id){
