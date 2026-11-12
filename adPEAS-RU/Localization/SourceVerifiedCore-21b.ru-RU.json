@@ -1,0 +1,306 @@
+{
+  "schema": "adPEAS-RU.StageD12.CoreFields.21b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "CREDENTIAL_ROAMING_READABLE": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Any authenticated user harvests the roamed material of every user in the domain, with no special rights and nothing to exploit",
+        "The harvest is a read, so it leaves no trace beyond LDAP query logging",
+        "Combined with the domain backup key, or the target's password or hash, it yields their private keys and every DPAPI secret of their profile",
+        "A roamed client-authentication certificate then authenticates as that user without their password",
+        "Collected material stays usable after a password change, because decryption through the domain backup key does not depend on it"
+      ],
+      "impact": [
+        "Любой аутентифицированный пользователь может собрать перемещаемые данные всех пользователей домена без специальных прав и эксплуатации уязвимости.",
+        "Сбор выполняется чтением и не оставляет следов, кроме возможных записей LDAP-запросов.",
+        "Вместе с резервным ключом домена либо паролем или хешем цели это даёт её закрытые ключи и все DPAPI-секреты профиля.",
+        "Перемещаемый сертификат клиентской аутентификации позволяет после этого войти от имени пользователя без его пароля.",
+        "Собранные данные работают и после смены пароля, поскольку расшифрование резервным ключом домена от пароля не зависит."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Mark msPKIAccountCredentials and msPKIDPAPIMasterKeys confidential in the schema - this is the one change that stops ordinary users reading them",
+        "Verify afterwards as a low-privileged user that the attributes no longer come back",
+        "Turn Credential Roaming off where it is not needed, and clear the attributes that already synchronised",
+        "Treat the domain backup key as a Tier 0 secret, since it is the other half of this",
+        "Monitor for unusual read or replication activity against these attributes"
+      ],
+      "remediation": [
+        "Отметьте msPKIAccountCredentials и msPKIDPAPIMasterKeys как confidential в схеме: это изменение прекращает чтение атрибутов обычными пользователями.",
+        "После настройки убедитесь от имени пользователя с минимальными правами, что атрибуты больше не возвращаются.",
+        "Отключите Credential Roaming там, где оно не нужно, и очистите ранее синхронизированные атрибуты.",
+        "Считайте резервный ключ домена секретом Tier 0: это вторая часть механизма раскрытия.",
+        "Отслеживайте необычные операции чтения и репликации этих атрибутов."
+      ]
+    },
+    "CREDENTIAL_SCRIPT_PASSWORD": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Readable by whoever can read the share the file sits on - in SYSVOL or NETLOGON, every authenticated user",
+        "May be used for service accounts, database connections, or administrative access",
+        "Scripts often contain credentials for automation purposes",
+        "Could expose access to critical systems or databases"
+      ],
+      "impact": [
+        "Учётные данные может прочитать любой, кому доступен файловый ресурс; в SYSVOL или NETLOGON — каждый аутентифицированный пользователь.",
+        "Пароли могут относиться к службам, подключениям баз данных или административному доступу.",
+        "Сценарии часто хранят пароли для автоматизации.",
+        "Возможно раскрытие доступа к критическим системам или базам данных."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove all hardcoded credentials from scripts",
+        "Use Windows Credential Manager or secure vaults",
+        "Implement service accounts with Kerberos delegation",
+        "Use gMSA accounts for services where possible",
+        "Change all exposed passwords immediately"
+      ],
+      "remediation": [
+        "Удалите все жёстко прописанные пароли и другие учётные данные из сценариев.",
+        "Используйте Windows Credential Manager или защищённые хранилища секретов.",
+        "Для служебных записей применяйте делегирование Kerberos.",
+        "Где возможно, используйте gMSA для служб.",
+        "Немедленно смените все раскрытые пароли."
+      ]
+    },
+    "CREDENTIAL_UNATTEND_PASSWORD": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The local administrator password of every machine built from the file - often the same on all of them",
+        "The domain join account's password, a domain credential, in clear text",
+        "Readable by whoever can read the share the file sits on - in SYSVOL or NETLOGON, every authenticated user"
+      ],
+      "impact": [
+        "Раскрывается пароль локального администратора каждого компьютера, развёрнутого по файлу, зачастую одинаковый на всех.",
+        "Пароль учётной записи присоединения к домену либо другие доменные учётные данные находятся в открытом виде.",
+        "Файл может читать любой с доступом к ресурсу; в SYSVOL или NETLOGON — каждый аутентифицированный пользователь."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Change the exposed passwords first - every machine built from the file, and the domain join account",
+        "Remove the answer file from the share; keep deployment files where only the deployment service reads them",
+        "Use Windows LAPS for the local administrator, and a join account that may only join computers, ideally with a pre-staged computer object"
+      ],
+      "remediation": [
+        "Сначала смените раскрытые пароли на каждом компьютере, установленном из файла, а также пароль учётной записи присоединения к домену.",
+        "Удалите файл ответов из общего ресурса; храните установочные файлы там, где их читает только служба развёртывания.",
+        "Для локального администратора используйте Windows LAPS, а для присоединения к домену — запись с минимальными правами присоединения, предпочтительно с заранее созданным объектом компьютера."
+      ]
+    },
+    "CREDENTIAL_VNC_PASSWORD": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Screen and keyboard of every VNC server the password opens - with a full-access password, the session of whoever is signed in there",
+        "Readable by whoever can read the share the file or policy sits on - in SYSVOL or NETLOGON, every authenticated user",
+        "A connection file names the host as well"
+      ],
+      "impact": [
+        "Пароль открывает доступ к экрану и клавиатуре VNC-сервера; при полном доступе — к сеансу вошедшего пользователя.",
+        "Файл или политику может читать любой с доступом к ресурсу; в SYSVOL и NETLOGON — каждый аутентифицированный пользователь.",
+        "Файл подключения также раскрывает адрес целевого компьютера."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Change the VNC password on every server that uses it",
+        "Remove connection files with saved passwords from shares; do not distribute VNC passwords by Group Policy",
+        "Prefer VNC authentication against the Windows account (RealVNC system authentication, UltraVNC MS-Logon) over a shared VNC password"
+      ],
+      "remediation": [
+        "Смените пароль VNC на каждом сервере, который его использует.",
+        "Удалите из общих ресурсов файлы подключения с сохранёнными паролями; не распространяйте пароли VNC через GPO.",
+        "Предпочитайте аутентификацию VNC через учётную запись Windows (RealVNC system authentication, UltraVNC MS-Logon) общему паролю VNC."
+      ]
+    },
+    "DELETED_OBJECT_CREDENTIAL": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The password stays readable for everyone who may list deleted objects, for as long as the object is kept",
+        "Service account and administrator passwords are often reused, on other accounts and outside the directory",
+        "Restoring the object brings the account back with this password, its SID and its group memberships"
+      ],
+      "impact": [
+        "Пароль остаётся доступным всем субъектам, имеющим право перечислять удалённые объекты, пока объект хранится.",
+        "Пароли служебных и административных учётных записей нередко повторно используются в других записях и вне каталога.",
+        "Восстановление объекта возвращает учётную запись с тем же паролем, SID и членством в группах."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Change the password wherever it is still in use - it was readable while it was in the attribute, before the deletion and after it",
+        "Recycle the deleted object, which removes its attributes for good: deleting a deleted object again does that, and it can no longer be restored afterwards",
+        "Keep credentials out of directory attributes; a deleted object keeps them as long as a live one"
+      ],
+      "remediation": [
+        "Смените пароль везде, где он ещё используется: его можно было читать в атрибуте до удаления объекта и после него.",
+        "Окончательно удалите удалённый объект (recycle), что безвозвратно уничтожит его атрибуты и сделает восстановление невозможным.",
+        "Не храните учётные данные в атрибутах каталога: удалённые объекты сохраняют их не хуже действующих."
+      ]
+    },
+    "LOGON_SCRIPT_WRITABLE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Code execution as every account that runs the script, at its next logon",
+        "An administrator who has the script set hands the writer administrative rights",
+        "The change leaves the accounts untouched, so it is easily missed"
+      ],
+      "impact": [
+        "При следующем входе каждого пользователя, выполняющего сценарий, возможно выполнение кода с правами этого пользователя.",
+        "Если сценарий назначен администратору, субъект с правом записи может получить административные привилегии.",
+        "Изменение не затрагивает сами учётные записи, поэтому его легко не заметить."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove the write access from the script and its folder; NETLOGON should be writable by the domain's administrators only",
+        "An inherited entry has to be changed at the folder it comes from",
+        "Prefer logon scripts deployed by Group Policy, in the policy's own folder, where the GPO permissions decide who may change them",
+        "Do not give administrative accounts a logon script at all"
+      ],
+      "remediation": [
+        "Удалите право записи сценария и родительской папки; NETLOGON должны изменять только администраторы домена.",
+        "Унаследованную ACE исправляйте на родительской папке, где она задана.",
+        "Предпочитайте сценарии входа, распространяемые GPO и хранящиеся в её собственной папке, где право изменения контролируется ACL политики.",
+        "Не назначайте сценарии входа административным учётным записям."
+      ]
+    },
+    "READABLE_UNIX_PASSWORD_ATTRIBUTES": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Password hashes readable by any authenticated user",
+        "May contain NTLM hashes in LM/NT format",
+        "Legacy Unix integration often stores weak hashes",
+        "Cleartext passwords possible in some configurations"
+      ],
+      "impact": [
+        "Хеши паролей доступны на чтение любому аутентифицированному пользователю.",
+        "Могут содержаться NTLM-хеши в формате LM/NT.",
+        "Устаревшая интеграция Unix часто хранит слабые хеши.",
+        "В некоторых конфигурациях возможны открытые пароли."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Change the passwords first - clearing the attribute does not revoke them. Every authenticated user in the domain could read them, sambaNTPassword is a directly usable NT hash, and the values are in every AD backup",
+        "Remove unused Unix password attributes",
+        "Mark the attributes confidential (searchFlags bit 7) so they are no longer readable by every authenticated user",
+        "Migrate to modern authentication (Kerberos) for Unix systems",
+        "Treat a populated userPassword as an active logon credential, not only as a leak: with the domain's plaintext policy enabled it authenticates"
+      ],
+      "remediation": [
+        "Сначала смените пароли: очистка атрибута не отзывает их. Каждый аутентифицированный пользователь мог прочитать эти значения, sambaNTPassword — непосредственно пригодный NT-хеш, а прежние значения сохраняются в резервных копиях AD.",
+        "Удалите неиспользуемые атрибуты паролей Unix.",
+        "Пометьте атрибуты как confidential (searchFlags bit 7), чтобы они перестали читаться всеми аутентифицированными пользователями.",
+        "Переведите системы Unix на современные механизмы аутентификации, например Kerberos.",
+        "Рассматривайте заполненный userPassword как действующие учётные данные для входа, а не только как утечку: при включённой в домене политике открытых паролей он позволяет аутентифицироваться."
+      ]
+    },
+    "ANONYMOUS_SAM_ENUMERATION_ALLOWED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "An unauthenticated SMB client can list local accounts and shares",
+        "Useful for reconnaissance before an authenticated attack",
+        "0 is also the operating system default, so an explicit 0 is often a baseline stating the default rather than a decision"
+      ],
+      "impact": [
+        "SMB-клиент без аутентификации может перечислять локальные учётные записи и общие ресурсы.",
+        "Это помогает разведке перед атакой с аутентификацией.",
+        "Значение 0 также является значением ОС по умолчанию, поэтому явный 0 может отражать стандартную настройку, а не отдельное административное решение."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set 'Network access: Do not allow anonymous enumeration of SAM accounts and shares' to Enabled",
+        "Expect legacy clients and some NAS and print devices to depend on null sessions - check before enforcing"
+      ],
+      "remediation": [
+        "Установите «Network access: Do not allow anonymous enumeration of SAM accounts and shares» в Enabled.",
+        "Некоторые устаревшие клиенты, NAS и устройства печати зависят от нулевых сеансов (null sessions); проверьте это до применения запрета."
+      ]
+    },
+    "ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The renamed built-in administrator can be found by its RID",
+        "Group and account names can be resolved without credentials",
+        "Supports targeted password spraying"
+      ],
+      "impact": [
+        "По RID можно обнаружить переименованного встроенного администратора.",
+        "Имена групп и учётных записей разрешаются без учётных данных.",
+        "Это облегчает целенаправленный password spraying."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set 'Network access: Allow anonymous SID/Name translation' to Disabled",
+        "The setting exists for pre-Windows 2000 compatibility; anything still needing it should be inventoried first"
+      ],
+      "remediation": [
+        "Установите «Network access: Allow anonymous SID/Name translation» в Disabled.",
+        "Настройка существует ради совместимости с системами до Windows 2000; сначала инвентаризируйте оставшиеся зависимости."
+      ]
+    },
+    "ANON_LDAP_READABLE_ATTRS": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Unauthenticated enumeration of specific directory attributes",
+        "Information gathering for targeted attacks"
+      ],
+      "impact": [
+        "Возможно анонимное перечисление отдельных атрибутов каталога.",
+        "Собранные сведения помогают выбирать цели для атак."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Disable anonymous LDAP access entirely",
+        "Restrict dsHeuristics to remove ANONYMOUS LOGON access"
+      ],
+      "remediation": [
+        "Полностью отключите анонимный доступ по LDAP.",
+        "Ограничьте dsHeuristics, убрав доступ ANONYMOUS LOGON."
+      ]
+    },
+    "DELETED_OBJECTS_READ_BROAD": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Every account in the domain reads deleted accounts, groups and organizational units",
+        "A credential in a free-text attribute of a deleted account is readable by every member until the object is recycled",
+        "Deleted accounts worth restoring are visible to anyone looking for a way back in"
+      ],
+      "impact": [
+        "Каждая учётная запись домена может читать удалённые учётные записи, группы и OU.",
+        "Учётные данные в свободном текстовом атрибуте удалённой записи остаются доступны всем участникам широкой группы до окончательного удаления объекта.",
+        "Удалённые записи, которые целесообразно восстановить, видны любому, кто ищет способ вернуть прежний доступ."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the broad group's ACE from CN=Deleted Objects; grant the right to the team that needs it, if any",
+        "Recycle deleted objects that hold credentials, and change those passwords"
+      ],
+      "remediation": [
+        "Удалите ACE широкой группы из CN=Deleted Objects; при необходимости выдайте право только ответственным за восстановление.",
+        "Окончательно удалите объекты, содержащие пароли, и смените эти пароли."
+      ]
+    },
+    "DELETED_OBJECTS_READ_DELEGATED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The holder reads deleted accounts, groups and organizational units that administrators consider gone",
+        "A credential typed into a free-text attribute of a deleted account stays readable until the object is recycled",
+        "Together with Reanimate-Tombstones on the domain and write access to a deleted object, the holder can restore it with its SID and its group memberships"
+      ],
+      "impact": [
+        "Обладатель разрешения читает удалённые учётные записи, группы и OU, которые администраторы считают исчезнувшими.",
+        "Пароль, записанный в текстовом атрибуте удалённой записи, остаётся доступен, пока объект окончательно не удалён.",
+        "В сочетании с Reanimate-Tombstones на домене и правом записи удалённого объекта субъект может восстановить его с SID и членством в группах."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Confirm the principal is the team the delegation was meant for; remove its ACE from CN=Deleted Objects otherwise",
+        "Grant the right to a dedicated group rather than to an account",
+        "Recycle deleted objects that hold credentials, and change those passwords"
+      ],
+      "remediation": [
+        "Убедитесь, что субъект — именно команда, которой предназначалось делегирование; иначе удалите его ACE из CN=Deleted Objects.",
+        "Предоставляйте право выделенной группе, а не отдельной учётной записи.",
+        "Окончательно удалите содержащие пароли объекты и смените эти пароли."
+      ]
+    }
+  }
+}
