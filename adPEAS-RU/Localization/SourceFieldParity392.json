@@ -8,8 +8,8 @@
                        },
     "RussianNonempty":  {
                             "attack":  304,
-                            "remediation":  391,
-                            "impact":  392
+                            "remediation":  377,
+                            "impact":  377
                         },
     "MissingRussianAttackCount":  0,
     "MissingRussianAttackIds":  [
@@ -25,8 +25,8 @@
     "RemediationStepCountDifferences":  [
 
                                         ],
-    "RussianImpactWithNoSource":  15,
-    "RussianRemediationWithNoSource":  14,
+    "RussianImpactWithNoSource":  0,
+    "RussianRemediationWithNoSource":  0,
     "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 246 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
     "UserReportDataIncluded":  false,
     "Fields":  [
@@ -69,11 +69,11 @@
                    {
                        "FindingId":  "ADCS_CA_CROSS_DOMAIN",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "ADCS_CA_SHORT_KEY",
@@ -456,11 +456,11 @@
                    {
                        "FindingId":  "CREDENTIAL_MATCHED_LINE",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "CREDENTIAL_MENTION_REVIEW",
@@ -483,11 +483,11 @@
                    {
                        "FindingId":  "CREDENTIAL_PASSWORD_EXPOSED",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "CREDENTIAL_ROAMING_DELEGATED",
@@ -528,11 +528,11 @@
                    {
                        "FindingId":  "CREDENTIAL_TYPE_INFO",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "CREDENTIAL_UNATTEND_PASSWORD",
@@ -546,11 +546,11 @@
                    {
                        "FindingId":  "CREDENTIAL_USERNAME_EXPOSED",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "CREDENTIAL_VNC_PASSWORD",
@@ -897,7 +897,7 @@
                    {
                        "FindingId":  "ENCRYPTION_AES_ONLY",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  1,
@@ -1320,11 +1320,11 @@
                    {
                        "FindingId":  "GPO_LINKED_OUS_SEVERITY",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "GPO_LINK_REACHES_DC",
@@ -1464,11 +1464,11 @@
                    {
                        "FindingId":  "GPO_SCOPE_SEVERITY",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "GPO_SCRIPT_OUTSIDE_POLICY_STORE",
@@ -1527,11 +1527,11 @@
                    {
                        "FindingId":  "GPO_TASK_FIELD_SEVERITY",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "GPO_TASK_SYSTEM_UNC_PATH",
@@ -1896,11 +1896,11 @@
                    {
                        "FindingId":  "KERBEROASTABLE_USER_SPN",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "KERBEROAST_WITHOUT_PREAUTH",
@@ -2211,20 +2211,20 @@
                    {
                        "FindingId":  "META_SEVERITY_PASSTHROUGH",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "META_STATUS_INDICATOR",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
@@ -2256,11 +2256,11 @@
                    {
                        "FindingId":  "NON_DEFAULT_OWNER",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "NON_DEFAULT_USER_OWNERS",
@@ -3471,11 +3471,11 @@
                    {
                        "FindingId":  "UAC_SEVERITY_OVERRIDE",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "UNCONSTRAINED_DELEGATION",
@@ -3552,11 +3552,11 @@
                    {
                        "FindingId":  "WEB_ENDPOINT_SECURITY",
                        "ImpactEN":  0,
-                       "ImpactRU":  1,
+                       "ImpactRU":  0,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    }
                ]
 }
