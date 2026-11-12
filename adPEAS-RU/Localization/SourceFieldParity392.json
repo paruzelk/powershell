@@ -20,17 +20,12 @@
 
                                    ],
     "ImpactStepCountDifferences":  [
-                                       "ADCS_MANAGER_APPROVAL",
                                        "ADFS_DKM_CONTAINER",
                                        "ADMINSDHOLDER_PROPAGATED_RIGHT",
                                        "AGING_OS",
                                        "ANONYMOUS_SAM_ENUMERATION_ALLOWED",
                                        "ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED",
                                        "ANON_LDAP_READABLE_ATTRS",
-                                       "AUTHN_KDC_ARMORING_NOT_SUPPORTED",
-                                       "AUTHN_POLICY_OBJECT_WRITABLE",
-                                       "AUTHN_SILO_INCOMPLETE_ENROLLMENT",
-                                       "AUTHN_SILO_NOT_EFFECTIVE",
                                        "AZURE_AD_CONNECT_EXPOSED",
                                        "BITLOCKER_KEY_READABLE",
                                        "BITLOCKER_RECOVERY_DELEGATED",
@@ -71,7 +66,6 @@
                                        "DMSA_PRIVILEGED_PREDECESSOR",
                                        "DMSA_USABLE_BY_NONPRIVILEGED",
                                        "DOMAIN_ROOT_FSMO_TRANSFER",
-                                       "DOMAIN_ROOT_MAQ_WRITE",
                                        "DOMAIN_ROOT_NON_DEFAULT_OWNER",
                                        "DOMAIN_ROOT_REANIMATE_TOMBSTONES",
                                        "DOMAIN_ROOT_REPLICA_INSTALL",
@@ -143,9 +137,6 @@
                                        "KERBEROAST_WITHOUT_PREAUTH",
                                        "LAPS_INSTALLED",
                                        "LAPS_LEGACY",
-                                       "LDAP_ANONYMOUS_BINDING_RESTRICTED",
-                                       "LDAP_CHANNEL_BINDING_ALWAYS",
-                                       "LDAP_SIGNING_REQUIRED",
                                        "LOGON_SCRIPT_WRITABLE",
                                        "MACHINE_QUOTA_UNRESTRICTED",
                                        "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
@@ -162,20 +153,6 @@
                                        "OS_EXTENDED_SECURITY_UPDATES_ONLY",
                                        "OUTDATED_OS",
                                        "OU_NON_DEFAULT_OWNER",
-                                       "OU_PERM_CREATE_CHILD",
-                                       "OU_PERM_CREATE_DMSA",
-                                       "OU_PERM_DNSHOSTNAME_WRITE",
-                                       "OU_PERM_DNS_HOST_NAME_ATTRIBUTES",
-                                       "OU_PERM_GPOPTIONS",
-                                       "OU_PERM_GROUP_MEMBERSHIP",
-                                       "OU_PERM_SCRIPTPATH",
-                                       "OU_PERM_SELF_ALL_VALIDATED",
-                                       "OU_PERM_SELF_MEMBERSHIP",
-                                       "OU_PERM_SPN_WRITE",
-                                       "OU_PERM_USERACCOUNTCONTROL",
-                                       "OU_PERM_VALIDATED_DNS",
-                                       "OU_PERM_VALIDATED_SPN",
-                                       "OU_PERM_WRITEPROPERTY_ALL",
                                        "PASSWORD_COMPLEXITY_ENABLED",
                                        "PASSWORD_NEVER_EXPIRES",
                                        "PASSWORD_NOT_REQUIRED",
@@ -252,10 +229,6 @@
                                             "AGING_OS",
                                             "ANONYMOUS_SAM_ENUMERATION_ALLOWED",
                                             "ANON_LDAP_READABLE_ATTRS",
-                                            "AUTHN_KDC_ARMORING_NOT_SUPPORTED",
-                                            "AUTHN_POLICY_EXEMPT_ADMINISTRATOR",
-                                            "AUTHN_SILO_INCOMPLETE_ENROLLMENT",
-                                            "AUTHN_SILO_NOT_EFFECTIVE",
                                             "AZURE_AD_CONNECT_EXPOSED",
                                             "BITLOCKER_KEY_READABLE",
                                             "BITLOCKER_RECOVERY_DELEGATED",
@@ -292,7 +265,6 @@
                                             "DMSA_PRIVILEGED_PREDECESSOR",
                                             "DMSA_USABLE_BY_NONPRIVILEGED",
                                             "DOMAIN_ROOT_FSMO_TRANSFER",
-                                            "DOMAIN_ROOT_MAQ_WRITE",
                                             "DOMAIN_ROOT_NON_DEFAULT_OWNER",
                                             "DOMAIN_ROOT_REANIMATE_TOMBSTONES",
                                             "DOMAIN_ROOT_REPLICA_INSTALL",
@@ -360,9 +332,6 @@
                                             "INACTIVE_PRIVILEGED_ACCOUNT",
                                             "INTERDOMAIN_TRUST_ACCOUNT",
                                             "KERBEROAST_WITHOUT_PREAUTH",
-                                            "LDAP_ANONYMOUS_BINDING_RESTRICTED",
-                                            "LDAP_CHANNEL_BINDING_ALWAYS",
-                                            "LDAP_SIGNING_REQUIRED",
                                             "LOGON_SCRIPT_WRITABLE",
                                             "MACHINE_QUOTA_UNRESTRICTED",
                                             "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
@@ -379,19 +348,6 @@
                                             "OS_EXTENDED_SECURITY_UPDATES_ONLY",
                                             "OUTDATED_OS",
                                             "OU_NON_DEFAULT_OWNER",
-                                            "OU_PERM_CREATE_CHILD",
-                                            "OU_PERM_CREATE_DMSA",
-                                            "OU_PERM_DNSHOSTNAME_WRITE",
-                                            "OU_PERM_DNS_HOST_NAME_ATTRIBUTES",
-                                            "OU_PERM_GROUP_MEMBERSHIP",
-                                            "OU_PERM_SCRIPTPATH",
-                                            "OU_PERM_SELF_ALL_VALIDATED",
-                                            "OU_PERM_SELF_MEMBERSHIP",
-                                            "OU_PERM_SPN_WRITE",
-                                            "OU_PERM_USERACCOUNTCONTROL",
-                                            "OU_PERM_VALIDATED_DNS",
-                                            "OU_PERM_VALIDATED_SPN",
-                                            "OU_PERM_WRITEPROPERTY_ALL",
                                             "PASSWORD_NEVER_EXPIRES",
                                             "PASSWORD_NOT_REQUIRED",
                                             "PKI_CERTIFICATE_EXPIRED",
@@ -456,7 +412,7 @@
                                         ],
     "RussianImpactWithNoSource":  15,
     "RussianRemediationWithNoSource":  15,
-    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 102 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
+    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 126 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
     "UserReportDataIncluded":  false,
     "Fields":  [
                    {
@@ -552,7 +508,7 @@
                    {
                        "FindingId":  "ADCS_MANAGER_APPROVAL",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  1,
@@ -660,11 +616,11 @@
                    {
                        "FindingId":  "AUTHN_KDC_ARMORING_NOT_SUPPORTED",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "AUTHN_POLICY_BROAD_CONDITION",
@@ -682,7 +638,7 @@
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "AUTHN_POLICY_NOT_EFFECTIVE",
@@ -696,7 +652,7 @@
                    {
                        "FindingId":  "AUTHN_POLICY_OBJECT_WRITABLE",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
@@ -705,20 +661,20 @@
                    {
                        "FindingId":  "AUTHN_SILO_INCOMPLETE_ENROLLMENT",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "AUTHN_SILO_NOT_EFFECTIVE",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "AZURE_AD_CONNECT_EXPOSED",
@@ -1245,11 +1201,11 @@
                    {
                        "FindingId":  "DOMAIN_ROOT_MAQ_WRITE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DOMAIN_ROOT_NON_DEFAULT_OWNER",
@@ -2568,20 +2524,20 @@
                    {
                        "FindingId":  "LDAP_ANONYMOUS_BINDING_RESTRICTED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  4,
-                       "RemediationRU":  2
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "LDAP_CHANNEL_BINDING_ALWAYS",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "LDAP_CHANNEL_BINDING_NOT_REQUIRED",
@@ -2604,11 +2560,11 @@
                    {
                        "FindingId":  "LDAP_SIGNING_REQUIRED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "LOCKOUT_DURATION_FOREVER",
@@ -2811,38 +2767,38 @@
                    {
                        "FindingId":  "OU_PERM_CREATE_CHILD",
                        "ImpactEN":  5,
-                       "ImpactRU":  3,
+                       "ImpactRU":  5,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  5,
-                       "RemediationRU":  3
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_CREATE_DMSA",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "OU_PERM_DNSHOSTNAME_WRITE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_DNS_HOST_NAME_ATTRIBUTES",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_GENERICWRITE",
@@ -2865,7 +2821,7 @@
                    {
                        "FindingId":  "OU_PERM_GPOPTIONS",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
@@ -2874,11 +2830,11 @@
                    {
                        "FindingId":  "OU_PERM_GROUP_MEMBERSHIP",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  3
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_KEYCREDENTIALLINK_WRITE",
@@ -2928,47 +2884,47 @@
                    {
                        "FindingId":  "OU_PERM_SCRIPTPATH",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_SELF_ALL_VALIDATED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_SELF_MEMBERSHIP",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_SPN_WRITE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_USERACCOUNTCONTROL",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_USER_ACCOUNT_RESTRICTIONS",
@@ -2982,29 +2938,29 @@
                    {
                        "FindingId":  "OU_PERM_VALIDATED_DNS",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_VALIDATED_SPN",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_PERM_WRITEPROPERTY_ALL",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "PASSWORD_COMPLEXITY_ENABLED",
