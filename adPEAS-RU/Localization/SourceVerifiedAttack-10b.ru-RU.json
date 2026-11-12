@@ -1,0 +1,550 @@
+{
+  "schema": "adPEAS-RU.StageD.SourceVerifiedAttack.02",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "note": "One-to-one original EN Attack witnesses, including cautionary and condition-only sections; no code/risk modifications.",
+  "translations": {
+    "DMSA_USABLE_BY_NONPRIVILEGED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Authenticate as a principal named in msDS-GroupMSAMembership",
+        "2. Request a ticket for the dMSA with that principal's own ticket",
+        "3. Use it - with the group memberships of the account the dMSA replaced"
+      ],
+      "attack": [
+        "1. Аутентифицируется как субъект, указанный в msDS-GroupMSAMembership.",
+        "2. Используя собственный билет этого субъекта, запрашивает билет для dMSA.",
+        "3. Использует его с членствами в группах той записи, которую заменила dMSA."
+      ]
+    },
+    "DOMAIN_ROOT_FSMO_TRANSFER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker holds Change-PDC on the domain object",
+        "2. Transfers the PDC emulator role to a domain controller of its choosing",
+        "3. Time synchronisation and password-change replication degrade domain-wide",
+        "4. The cause looks like a replication fault rather than an action"
+      ],
+      "attack": [
+        "1. Нарушитель обладает правом Change-PDC на объекте домена.",
+        "2. Передаёт роль эмулятора PDC выбранному контроллеру домена.",
+        "3. Синхронизация времени и репликация изменений паролей ухудшаются в масштабе домена.",
+        "4. Причина может выглядеть как сбой репликации, а не умышленное действие."
+      ]
+    },
+    "DOMAIN_ROOT_MAQ_WRITE": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker can write ms-DS-MachineAccountQuota on the domain object",
+        "2. Raises it from 0 to a non-zero value",
+        "3. Creates a computer account and holds its credentials",
+        "4. Uses it as the delegation source for RBCD against a target it has write access to"
+      ],
+      "attack": [
+        "1. Нарушитель имеет право изменять ms-DS-MachineAccountQuota в объекте домена.",
+        "2. Увеличивает значение с 0 до ненулевого.",
+        "3. Создаёт учётную запись компьютера и контролирует её учётные данные.",
+        "4. Использует её как источник делегирования для RBCD против цели, на которую у него есть право записи."
+      ]
+    },
+    "DOMAIN_ROOT_REANIMATE_TOMBSTONES": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker holds Reanimate-Tombstones on the domain object",
+        "2. Lists the deleted objects and picks one it may write whose SID, memberships or password are worth having",
+        "3. Restores it into a container where it may create objects of that class - isDeleted removed and a new DN set in one modification",
+        "4. Uses the account, with its old password or after resetting it where its ACL allows"
+      ],
+      "attack": [
+        "1. Нарушитель обладает правом Reanimate-Tombstones на объекте домена.",
+        "2. Перечисляет удалённые объекты и выбирает доступный ему для записи объект с ценными SID, членствами или паролем.",
+        "3. Восстанавливает его в контейнер, где разрешено создавать объекты этого класса: одним изменением снимает isDeleted и задаёт новый DN.",
+        "4. Использует запись со старым паролем либо сбрасывает пароль, если это допускает её ACL."
+      ]
+    },
+    "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker controls an account with a delegated right over a member of an excluded group - the helpdesk delegation the exclusion is usually set for",
+        "2. Resets the member's password or adds an account to the group; SDProp no longer removes the right that allowed it",
+        "3. Uses the group's rights on a domain controller, e.g. backs up the directory database as a member of Backup Operators"
+      ],
+      "attack": [
+        "1. Нарушитель контролирует запись с делегированным правом на участника исключённой группы — обычно это делегирование службе поддержки.",
+        "2. Сбрасывает пароль участника либо добавляет запись в группу; SDProp больше не удаляет позволившее это право.",
+        "3. Использует полномочия группы на контроллере домена, например создаёт резервную копию базы каталога как участник Backup Operators."
+      ]
+    },
+    "DSHEURISTICS_ANONYMOUS_NSPI": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker reaches the RPC endpoint of a domain controller without credentials",
+        "2. Binds to the NSPI interface anonymously",
+        "3. Reads the address book entries the directory shows an anonymous caller",
+        "4. Uses the names and addresses for password spraying or phishing"
+      ],
+      "attack": [
+        "1. Нарушитель без учётных данных достигает RPC-интерфейса контроллера домена.",
+        "2. Выполняет анонимную привязку к интерфейсу NSPI.",
+        "3. Читает записи адресной книги, которые каталог показывает анонимному клиенту.",
+        "4. Использует имена и адреса для распыления паролей либо фишинга."
+      ]
+    },
+    "DSHEURISTICS_UNIQUENESS_DISABLED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker controls an account that may write the UPN or the SPNs of some account - through a delegation, or GenericWrite on a computer",
+        "2. Writes a name another account already holds, or an alias such as cifs/server beside that server's HOST/server; the domain controller accepts it",
+        "3. With an alias, clients of the service get tickets for the attacker's account, whose machine then poses as the server; with a duplicate, logons and tickets for the name fail"
+      ],
+      "attack": [
+        "1. Нарушитель контролирует учётную запись с правом изменить UPN или SPN другой записи — через делегирование либо GenericWrite на компьютере.",
+        "2. Записывает имя, уже назначенное другой записи, или псевдоним вроде cifs/server рядом с HOST/server этого сервера; контроллер домена принимает изменение.",
+        "3. При псевдониме клиенты получают билеты службы для записи нарушителя, компьютер которой выдаёт себя за сервер; при дубликате входы и выдача билетов по этому имени нарушаются."
+      ]
+    },
+    "ENCRYPTION_DES_ENABLED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Request a ticket for the account and capture it",
+        "2. Brute-force the 56-bit DES key - a known-plaintext attack on the encrypted part, not a password guess",
+        "3. Decrypt the ticket, or forge one with the recovered key"
+      ],
+      "attack": [
+        "1. Запрашивает и перехватывает билет для учётной записи.",
+        "2. Перебирает 56-битный ключ DES — это атака с известным открытым текстом на зашифрованную часть, а не подбор пароля.",
+        "3. Расшифровывает билет либо подделывает новый с восстановленным ключом."
+      ]
+    },
+    "ENCRYPTION_NOT_CONFIGURED": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. Request a service ticket for the account and ask for RC4 (Rubeus does this by default with /rc4opsec)",
+        "2. If the KDC issues it, crack the ticket at RC4 speed"
+      ],
+      "attack": [
+        "1. Запрашивает служебный билет для записи с предпочтением RC4 (Rubeus по умолчанию делает это при /rc4opsec).",
+        "2. Если KDC выдаёт такой билет, подбирает пароль автономно со скоростью, характерной для RC4."
+      ]
+    },
+    "ENCRYPTION_RC4_ONLY": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Request a service ticket for the account (Kerberoasting) - the encryption type of the ticket follows this attribute",
+        "2. Extract the RC4 hash ($krb5tgs$23$...) and crack it offline at RC4 speed",
+        "3. The recovered password is the account's, with whatever the account may reach"
+      ],
+      "attack": [
+        "1. Запрашивает служебный билет для записи (Kerberoasting); тип шифрования билета определяется этим атрибутом.",
+        "2. Извлекает RC4-хеш ($krb5tgs$23$...) и подбирает пароль автономно со скоростью RC4.",
+        "3. Получает пароль этой записи и доступ ко всем ресурсам в пределах её полномочий."
+      ]
+    },
+    "ENROLLMENT_REQUIRES_APPROVAL": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "With PEND_ALL_REQUESTS enabled, attackers cannot:",
+        "- Automatically obtain certificates",
+        "- Exploit enrollment-based vulnerabilities silently",
+        "- Request certificates without administrator awareness"
+      ],
+      "attack": [
+        "Когда включён PEND_ALL_REQUESTS, нарушители не могут:",
+        "— автоматически получать сертификаты;",
+        "— незаметно использовать уязвимости, связанные с регистрацией сертификатов;",
+        "— запрашивать сертификаты без ведома администратора."
+      ]
+    },
+    "ESC3_TARGET_TEMPLATE": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "1. Attacker obtains an enrollment agent certificate (ESC3 condition 1 template, stolen key, or a legitimately issued agent certificate)",
+        "2. Builds a request against this template naming a privileged principal as the subject",
+        "3. Co-signs the request with the enrollment agent certificate (CMC full PKI request)",
+        "4. CA issues a client-authentication certificate for the named principal",
+        "5. Attacker authenticates as that principal via PKINIT"
+      ],
+      "attack": [
+        "1. Нарушитель получает сертификат агента регистрации (шаблон с условием ESC3 №1, украденный ключ либо законно выданный агентский сертификат).",
+        "2. Формирует запрос по этому шаблону, указывая привилегированную запись как субъект сертификата.",
+        "3. Дополнительно подписывает запрос сертификатом агента регистрации (полный запрос CMC PKI).",
+        "4. Центр сертификации выдаёт сертификат клиентской аутентификации для указанной записи.",
+        "5. Нарушитель аутентифицируется как эта запись через PKINIT."
+      ]
+    },
+    "ESC_ENROLLMENT_RIGHTS_UNREAD": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Nothing here is an attack by itself - this is a gap in what the scan could see",
+        "2. The value of knowing it: an attacker who already owns the template can produce exactly this state by writing a GENERIC_ALL ACE",
+        "3. A hardened template produces it too, which is why it is a hint rather than a finding"
+      ],
+      "attack": [
+        "1. Само по себе это не атака: находка указывает на пробел в данных сканирования.",
+        "2. Это важно учитывать: нарушитель, уже контролирующий шаблон, может создать именно такое состояние, записав ACE с GENERIC_ALL.",
+        "3. Но и защищённый шаблон может дать такой результат — поэтому это подсказка (Hint), а не подтверждённая уязвимость."
+      ]
+    },
+    "ESX_ADMINS_MEMBER": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker becomes a member of ESX Admins - or creates or renames a group to that name if none exists",
+        "2. Logs on to a domain-joined ESXi host with domain credentials and is its administrator",
+        "3. Copies a domain controller's virtual disk, or encrypts the virtual machines"
+      ],
+      "attack": [
+        "1. Нарушитель становится участником ESX Admins либо, если группы нет, создаёт группу с таким именем или переименовывает существующую.",
+        "2. Входит на присоединённый к домену узел ESXi с доменными учётными данными и становится его администратором.",
+        "3. Копирует виртуальный диск контроллера домена либо шифрует виртуальные машины."
+      ]
+    },
+    "EXCHANGE_GROUP_LOW_PRIV_MEMBER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker compromises the low-privileged account",
+        "2. Account is already member of Exchange service group (misconfiguration)",
+        "3. Attacker leverages Exchange group permissions for privilege escalation",
+        "4. Can potentially reset admin passwords or modify sensitive attributes"
+      ],
+      "attack": [
+        "1. Нарушитель компрометирует низкопривилегированную учётную запись.",
+        "2. Эта запись уже входит в служебную группу Exchange — ошибочная конфигурация.",
+        "3. Нарушитель использует разрешения группы Exchange для повышения привилегий.",
+        "4. Потенциально может сбрасывать пароли администраторов или изменять чувствительные атрибуты."
+      ]
+    },
+    "EXCHANGE_GROUP_PERMISSIONS": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "Attackers may target Exchange servers to gain access to these privileged groups",
+        "Exchange vulnerabilities (e.g., ProxyLogon, ProxyShell) could provide access",
+        "Once Exchange is compromised, attackers can leverage these permissions"
+      ],
+      "attack": [
+        "Нарушители могут атаковать серверы Exchange, чтобы получить доступ к этим привилегированным группам.",
+        "Уязвимости Exchange, например ProxyLogon и ProxyShell, могут предоставить такой доступ.",
+        "После компрометации Exchange нарушитель может использовать соответствующие разрешения."
+      ]
+    },
+    "EXCHANGE_HYBRID_DEPLOYMENT": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Gain administrative access to an on-premises Exchange server through any of the paths in this report",
+        "2. Use the shared service principal's credentials to obtain tokens against Exchange Online",
+        "3. Act in the tenant as a trusted first-party application"
+      ],
+      "attack": [
+        "1. Получает административный доступ к локальному серверу Exchange одним из способов, описанных в отчёте.",
+        "2. Использует учётные данные общего субъекта-службы (service principal), чтобы получить токены доступа к Exchange Online.",
+        "3. Действует в облачном арендаторе как доверенное приложение первой стороны."
+      ]
+    },
+    "EXCHANGE_RBAC_AD_PERMISSIONS": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Obtain the principal holding the role",
+        "2. Add-ADPermission granting the attacker Send-As on a target mailbox, or an escalation ACE on a directory object",
+        "3. Use the granted right directly"
+      ],
+      "attack": [
+        "1. Получает контроль над субъектом, которому назначена роль.",
+        "2. Через Add-ADPermission предоставляет себе Send-As на целевой почтовый ящик либо ACE повышения привилегий на объекте каталога.",
+        "3. Непосредственно использует предоставленное право."
+      ]
+    },
+    "EXCHANGE_RBAC_APPLICATION_IMPERSONATION": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Compromise the account or service that holds the role, often a low-privilege integration account with a static password",
+        "2. Connect to EWS with an impersonation header naming the target mailbox",
+        "3. Enumerate and search mailboxes at will (MailSniper automates this)"
+      ],
+      "attack": [
+        "1. Компрометирует учётную запись или службу с этой ролью — часто интеграционную запись с небольшими правами и постоянным паролем.",
+        "2. Подключается к EWS, передавая в заголовке олицетворения целевой почтовый ящик.",
+        "3. Произвольно перечисляет и ищет содержимое почтовых ящиков (это автоматизирует MailSniper)."
+      ]
+    },
+    "EXCHANGE_RBAC_MAILBOX_IMPORT_EXPORT": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Obtain the account holding the role",
+        "2. New-MailboxExportRequest against the target mailbox, writing to a UNC path the attacker controls",
+        "3. Collect the PST and read it offline"
+      ],
+      "attack": [
+        "1. Получает контроль над записью, которой назначена роль.",
+        "2. Выполняет New-MailboxExportRequest для целевого почтового ящика с сохранением по UNC-пути под контролем нарушителя.",
+        "3. Получает PST и читает его автономно."
+      ]
+    },
+    "EXCHANGE_RBAC_MAILBOX_SEARCH": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Obtain the principal holding the role",
+        "2. New-MailboxSearch with a keyword list across all mailboxes",
+        "3. Open the target discovery mailbox and read the copied items"
+      ],
+      "attack": [
+        "1. Получает контроль над субъектом, которому назначена роль.",
+        "2. Через New-MailboxSearch выполняет поиск по списку ключевых слов во всех почтовых ящиках.",
+        "3. Открывает целевой почтовый ящик обнаружения (discovery mailbox) и читает скопированные элементы."
+      ]
+    },
+    "EXCHANGE_RBAC_ROLE_MANAGEMENT": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Obtain the principal holding Role Management",
+        "2. New-ManagementRoleAssignment granting itself ApplicationImpersonation",
+        "3. Read every mailbox over EWS"
+      ],
+      "attack": [
+        "1. Получает контроль над субъектом с ролью Role Management.",
+        "2. Через New-ManagementRoleAssignment назначает себе ApplicationImpersonation.",
+        "3. Читает все почтовые ящики через EWS."
+      ]
+    },
+    "EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Obtain the principal holding the role",
+        "2. New-ManagementRole -UnScopedTopLevel wrapping an attacker-supplied script",
+        "3. Assign the new role and invoke it"
+      ],
+      "attack": [
+        "1. Получает контроль над субъектом с соответствующей ролью.",
+        "2. Через New-ManagementRole -UnScopedTopLevel создаёт роль, оборачивающую предоставленный нарушителем сценарий.",
+        "3. Назначает новую роль и вызывает её."
+      ]
+    },
+    "EXCHANGE_SHARED_PERMISSIONS_MODEL": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Obtain any principal in Exchange Windows Permissions, or relay an Exchange server's machine authentication",
+        "2. Write an ACE on the domain object granting the controlled principal the replication rights",
+        "3. Run DCSync against a domain controller",
+        "4. Forge a golden ticket from the krbtgt hash, or authenticate as any user"
+      ],
+      "attack": [
+        "1. Получает контроль над любым субъектом в Exchange Windows Permissions либо ретранслирует машинную аутентификацию сервера Exchange.",
+        "2. Добавляет в объект домена ACE, предоставляющий контролируемому субъекту права репликации.",
+        "3. Выполняет DCSync против контроллера домена.",
+        "4. Подделывает Golden Ticket с хешем krbtgt либо аутентифицируется как любой пользователь."
+      ]
+    },
+    "EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker finds the connector that accepts anonymous sessions",
+        "2. Submits a message to a distribution group that accepts internal senders only",
+        "3. The message is treated as authenticated and delivered without an external marking"
+      ],
+      "attack": [
+        "1. Нарушитель находит соединитель, принимающий анонимные сеансы.",
+        "2. Отправляет сообщение в группу рассылки, допускающую только внутренних отправителей.",
+        "3. Сообщение считается аутентифицированным и доставляется без внешней маркировки."
+      ]
+    },
+    "EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker finds the connector that accepts anonymous sessions - port 25 on a published host",
+        "2. Submits a message with a malicious attachment or a credential phishing link",
+        "3. The bypass grant means no filtering is applied to it",
+        "4. The message is delivered and looks like mail that passed inspection"
+      ],
+      "attack": [
+        "1. Находит соединитель, принимающий анонимные сеансы, — порт 25 опубликованного узла.",
+        "2. Отправляет сообщение с вредоносным вложением либо фишинговой ссылкой для кражи учётных данных.",
+        "3. Из-за права обхода фильтрации сообщение не проверяется.",
+        "4. Оно доставляется и выглядит как почта, прошедшая проверку."
+      ]
+    },
+    "EXCHANGE_SMTP_ANONYMOUS_SPOOFING": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Reach the connector from an address inside its remote IP range",
+        "2. Open an SMTP session without authenticating",
+        "3. Set MAIL FROM to an executive's internal address and RCPT TO to a target employee",
+        "4. The message is delivered as internal mail from that executive"
+      ],
+      "attack": [
+        "1. Подключается к соединителю с адреса в разрешённом диапазоне удалённых IP.",
+        "2. Открывает SMTP-сеанс без аутентификации.",
+        "3. Задаёт MAIL FROM равным внутреннему адресу руководителя, а RCPT TO — адресу целевого сотрудника.",
+        "4. Сообщение доставляется как внутренняя почта от этого руководителя."
+      ]
+    },
+    "EXCHANGE_SMTP_BROAD_SPOOFING": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker authenticates to the connector with any domain account",
+        "2. Submits a message with MAIL FROM and the From header set to an internal address",
+        "3. Exchange accepts it as authoritative because the connector grants the sender right",
+        "4. The recipient sees an ordinary internal mail from a colleague"
+      ],
+      "attack": [
+        "1. Аутентифицируется на соединителе под любой доменной учётной записью.",
+        "2. Отправляет сообщение, указав внутренний адрес в MAIL FROM и заголовке From.",
+        "3. Exchange принимает сообщение как авторитетное, потому что соединитель предоставляет право отправителя.",
+        "4. Получатель видит обычное внутреннее письмо от коллеги."
+      ]
+    },
+    "EXCHANGE_VULNERABLE_VERSION": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker fingerprints the Exchange version from the outside - the build number is in the OWA response",
+        "2. Picks the published exploit chain for that version, or waits for the next one",
+        "3. Gains code execution as SYSTEM on the Exchange server",
+        "4. Uses the server's own directory permissions, or the credentials on it, to move into Active Directory"
+      ],
+      "attack": [
+        "1. Определяет версию Exchange извне: номер сборки содержится в ответе OWA.",
+        "2. Выбирает опубликованную цепочку эксплуатации для этой версии либо ожидает следующую.",
+        "3. Получает выполнение кода от SYSTEM на сервере Exchange.",
+        "4. Использует собственные права сервера в каталоге или хранящиеся на нём учётные данные для продвижения в Active Directory."
+      ]
+    },
+    "EXCHANGE_WEB_ENDPOINTS": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Coerce or capture an authentication from a domain account or machine account",
+        "2. Relay it to an Exchange endpoint that offers NTLM without binding it to the TLS channel",
+        "3. Act as the relayed identity against that endpoint - mailbox access through EWS, or the service methods of an endpoint such as MRSProxy",
+        "4. An Exchange server compromised this way reaches every mailbox, and through Exchange's directory permissions often the domain"
+      ],
+      "attack": [
+        "1. Принуждает доменную или машинную запись к аутентификации либо перехватывает такую аутентификацию.",
+        "2. Ретранслирует её на конечную точку Exchange, предоставляющую NTLM без привязки к каналу TLS.",
+        "3. Действует от имени ретранслированной записи: читает почту через EWS либо вызывает методы другой конечной точки, например MRSProxy.",
+        "4. Компрометированный таким образом Exchange даёт доступ ко всем почтовым ящикам, а через права Exchange в каталоге часто и к домену."
+      ]
+    },
+    "GMSA_MEMBERSHIP_OWNER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker controls the owner of msDS-GroupMSAMembership",
+        "2. Rewrites the descriptor to grant itself ReadProperty",
+        "3. Reads msDS-ManagedPassword and derives the account's Kerberos keys",
+        "4. Authenticates as the gMSA, then restores the descriptor"
+      ],
+      "attack": [
+        "1. Получает контроль над владельцем msDS-GroupMSAMembership.",
+        "2. Изменяет дескриптор, предоставляя себе ReadProperty.",
+        "3. Читает msDS-ManagedPassword и выводит ключи Kerberos учётной записи.",
+        "4. Аутентифицируется как gMSA, после чего восстанавливает дескриптор."
+      ]
+    },
+    "GMSA_PASSWORD_READABLE": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker identifies gMSA accounts they can read",
+        "2. Retrieves msDS-ManagedPassword attribute",
+        "3. Decodes the BLOB to obtain NT hash",
+        "4. Uses hash for Pass-the-Hash or Kerberos ticket requests"
+      ],
+      "attack": [
+        "1. Выявляет записи gMSA, пароли которых ему разрешено читать.",
+        "2. Получает атрибут msDS-ManagedPassword.",
+        "3. Разбирает BLOB и получает NT-хеш.",
+        "4. Использует хеш для Pass-the-Hash либо запросов билетов Kerberos."
+      ]
+    },
+    "GMSA_ROTATION_INTERVAL_LONG": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker retrieves msDS-ManagedPassword for the gMSA (see the password access findings)",
+        "2. Derives the Kerberos keys from the blob and authenticates as the service",
+        "3. Keeps doing so until the interval expires - with 365 days, for up to a year"
+      ],
+      "attack": [
+        "1. Получает msDS-ManagedPassword записи gMSA (см. находки о доступе к управляемому паролю).",
+        "2. Выводит ключи Kerberos из BLOB и аутентифицируется как служба.",
+        "3. Продолжает это до истечения интервала ротации; при 365 днях — до года."
+      ]
+    },
+    "GPO_LOCAL_GROUP_MEMBER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Read the assignment from SYSVOL as any domain user - GptTmpl.inf and Groups.xml are readable by all",
+        "2. Determine which computers the GPO is linked to",
+        "3. Take over the principal - spray or phish the account, reset its password with a delegated right, or add a member to the group",
+        "4. Log on to the computers in scope with the group's rights"
+      ],
+      "attack": [
+        "1. Как обычный пользователь домена читает назначение в SYSVOL: GptTmpl.inf и Groups.xml доступны всем для чтения.",
+        "2. Определяет компьютеры, к которым привязана GPO.",
+        "3. Захватывает указанный субъект: подбирает или выманивает пароль, сбрасывает пароль делегированным правом либо добавляет участника в группу.",
+        "4. Входит на компьютеры в области действия с правами этой группы."
+      ]
+    },
+    "GPO_LOCAL_GROUP_RISKY_MEMBER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Read the assignment from SYSVOL as any domain user - GptTmpl.inf or Groups.xml are world-readable",
+        "2. Determine which computers the GPO is linked to",
+        "3. Authenticate to one of them with any domain account, which is already a member through the broad principal",
+        "4. Use the granted privileges - dump credentials as local administrator, read the SAM as a backup operator, or log on interactively"
+      ],
+      "attack": [
+        "1. Как обычный пользователь домена читает назначение из SYSVOL: GptTmpl.inf либо Groups.xml доступны широкому кругу субъектов.",
+        "2. Определяет компьютеры, к которым привязана GPO.",
+        "3. Аутентифицируется на одном из них любой доменной записью, которая уже является участником через широкую группу.",
+        "4. Использует полученные права: извлекает учётные данные как локальный администратор, читает SAM как оператор резервного копирования либо входит интерактивно."
+      ]
+    },
+    "GPO_NON_DEFAULT_OWNER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Identify a GPO whose owner is an account the attacker already controls or can compromise",
+        "2. As the owner, write a new ACE granting full control - no existing permission is needed for this",
+        "3. Edit the policy content (scripts, scheduled tasks, Group Policy Preferences, registry settings)",
+        "4. The payload runs on every machine within the GPO's scope at the next refresh"
+      ],
+      "attack": [
+        "1. Выявляет GPO, владелец которой уже контролируется нарушителем или может быть им скомпрометирован.",
+        "2. Как владелец добавляет ACE с полным доступом; отдельное уже существующее разрешение для этого не требуется.",
+        "3. Изменяет содержимое политики: сценарии, запланированные задания, Group Policy Preferences или реестр.",
+        "4. При следующем обновлении полезная нагрузка выполняется на всех компьютерах в области GPO."
+      ]
+    },
+    "GPO_NOT_CURRENTLY_EFFECTIVE": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. The setting sits dormant and out of mind",
+        "2. Someone links the GPO or re-enables the disabled half, for an unrelated reason",
+        "3. The setting takes effect on every machine in scope, with nobody having reviewed it"
+      ],
+      "attack": [
+        "1. Настройка остаётся неактивной и о ней забывают.",
+        "2. Кто-то по другой причине привязывает GPO либо повторно включает отключённую часть.",
+        "3. Настройка начинает действовать на всех компьютерах в области политики, хотя никто не проверял её последствия."
+      ]
+    },
+    "GPO_POINTANDPRINT_DRIVER_SOURCE": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Stand up a print server anywhere the client can reach",
+        "2. Offer a malicious driver from it, or fall back to non-package Point and Print",
+        "3. Combine with a suppressed prompt for silent SYSTEM execution"
+      ],
+      "attack": [
+        "1. Поднимает сервер печати в любой точке сети, доступной клиенту.",
+        "2. Предлагает с него вредоносный драйвер либо использует вариант Point and Print без пакета драйвера.",
+        "3. В сочетании с отключёнными запросами подтверждения получает незаметное выполнение кода от SYSTEM."
+      ]
+    },
+    "GPO_POINTANDPRINT_EXPLOITABLE": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Stand up a print server exposing a malicious printer driver",
+        "2. Have a machine in scope connect to that shared printer (Point and Print)",
+        "3. The driver is installed with no prompt and its payload runs as SYSTEM"
+      ],
+      "attack": [
+        "1. Разворачивает сервер печати с вредоносным драйвером принтера.",
+        "2. Добивается подключения компьютера из области действия политики к общему принтеру (Point and Print).",
+        "3. Драйвер устанавливается без запроса, а его код выполняется от SYSTEM."
+      ]
+    }
+  }
+}
