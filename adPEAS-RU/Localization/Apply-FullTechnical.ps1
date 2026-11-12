@@ -963,6 +963,58 @@ if($d16Seen.Count -ne 20 -or $d16Impact -ne 59 -or $d16Remediation -ne 56){
 }
 Write-Host '[RU] PASS D16: 20 находок, Impact 59 и Remediation 56 сверены с EN'
 
+
+# D17: source-verified technical translations (Kerberos, LDAP, ACL, GPO and Windows).
+# Before adding 24 new ID, forbid changes to the 338 previously verified ID.
+$d17Catalogs=@('SourceVerifiedCore-26a.ru-RU.json','SourceVerifiedCore-26b.ru-RU.json')
+$d17Protected=@{}
+foreach($name in (@($d12Older)+@($d12Catalogs)+@($d13Catalogs)+@($d14Catalogs)+@($d15Catalogs)+@($d16Catalogs))){
+ $prior=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($item in $prior.translations.PSObject.Properties){
+  $id=[string]$item.Name
+  if($d17Protected.ContainsKey($id)){throw "D17: повторный ID в старых каталогах $id"}
+  $d17Protected[$id]=$true
+ }
+}
+if($d17Protected.Count -ne 338){throw "D17: ожидается 338 ранее проверенных FindingId, найдено $($d17Protected.Count)"}
+$d17Seen=@{}
+$d17Impact=0
+$d17Remediation=0
+foreach($name in $d17Catalogs){
+ $catalog=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ if(@($catalog.translations.PSObject.Properties).Count -ne 12){throw "D17: в каталоге $name должно быть 12 находок"}
+ foreach($row in $catalog.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if(-not $entries.Contains($id)){throw "D17: неизвестный FindingId $id"}
+  if($d17Protected.ContainsKey($id) -or $d17Seen.ContainsKey($id)){throw "D17: перезапись проверенного либо повторённого FindingId $id"}
+  $d17Seen[$id]=$true
+  foreach($field in @('Impact','Remediation')){
+   $lower=$field.ToLowerInvariant()
+   $enProperty='sourceEnglish'+$field
+   $countProperty=$enProperty+'Count'
+   $original=@(Get-PinnedFindingText $id $field)
+   $witness=@($row.Value.$enProperty)
+   $russian=@($row.Value.$lower)
+   $expected=[int]$row.Value.$countProperty
+   if($expected -le 0 -or $original.Count -ne $expected -or $witness.Count -ne $expected -or $russian.Count -ne $expected){
+    throw "D17: число пунктов не совпало $id / $field"
+   }
+   for($i=0;$i -lt $expected;$i++){
+    if([string]$original[$i] -cne [string]$witness[$i]){throw "D17: изменён оригинальный EN $id / $field / $($i+1)"}
+    if([string]::IsNullOrWhiteSpace([string]$russian[$i]) -or [string]$russian[$i] -notmatch '[А-Яа-яЁё]'){
+     throw "D17: не переведён пункт $id / $field / $($i+1)"
+    }
+   }
+   $entries[$id].$lower=@($russian)
+   if($field -eq 'Impact'){$d17Impact+=$expected}else{$d17Remediation+=$expected}
+  }
+ }
+}
+if($d17Seen.Count -ne 24 -or $d17Impact -ne 67 -or $d17Remediation -ne 60){
+ throw "D17: ожидалось 24 находки / 67 Impact / 60 Remediation, найдено $($d17Seen.Count) / $d17Impact / $d17Remediation"
+}
+Write-Host '[RU] PASS D17: 24 находки, Impact 67 и Remediation 60 сверены с EN'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')

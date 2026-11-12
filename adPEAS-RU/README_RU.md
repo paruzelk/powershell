@@ -867,3 +867,90 @@ Impact/Remediation, осталось **54 типа**. Ожидаемый стр�
 
 Пакет публикуется только после успешной CI:
 `adPEAS-RU-2.9.0-STAGE-D16-20261112.zip`.
+
+
+## Этап D17 — Kerberos, LDAP, GPO, ACL и параметры защиты Windows (12 ноября 2026)
+
+Предметно сверены ещё **24 типа находок** из закреплённого
+`61106960/adPEAS` v2.9.0 (`ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`).
+Каталоги `Localization/SourceVerifiedCore-26a.ru-RU.json` и
+`Localization/SourceVerifiedCore-26b.ru-RU.json` содержат **67 пунктов
+Impact и 60 пунктов Remediation**. Для каждого перевода сохранены
+английский оригинал, его порядок и число пунктов, а также собственный
+русский текст. Исполняемый код находок и команды исправления не изменены.
+
+Состав этапа:
+
+- **Kerberos, сертификаты и опасные ACL:** `ASREP_ROASTABLE`,
+  `KERBEROASTABLE_SPN`, `DANGEROUS_ACL_GENERICALL`,
+  `ESC9_CT_NO_SECURITY_EXTENSION`.
+- **LDAP и SMTP:** `LDAP_CHANNEL_BINDING_NOT_REQUIRED`,
+  `LDAP_SIGNING_NOT_REQUIRED`, `EXCHANGE_SMTP_OPEN_RELAY`.
+- **Права пользователей через GPO:** `GPO_USERRIGHT_SEAUDIT`,
+  `GPO_USERRIGHT_SEBACKUP`,
+  `GPO_USERRIGHT_SEDELEGATESESSIONUSERIMPERSONATE`,
+  `GPO_USERRIGHT_SEINTERACTIVELOGON`,
+  `GPO_USERRIGHT_SESYSTEMPROFILE`.
+- **Настройки реестра и защиты Windows:**
+  `REGISTRY_ALWAYSINSTALLELEVATED`, `REGISTRY_CACHED_LOGONS`,
+  `REGISTRY_CREDSSP_DELEGATE_ANY`, `REGISTRY_CREDSSP_ORACLE`,
+  `REGISTRY_DEFENDER_DISABLED`, `REGISTRY_DSRM_ADMIN_LOGON`,
+  `REGISTRY_ENABLELUA`, `REGISTRY_ESC10_KDC_BINDING`,
+  `REGISTRY_ESC10_KDC_BINDING_COMPAT`,
+  `REGISTRY_ESC10_SCHANNEL_UPN`,
+  `REGISTRY_KERBEROS_WEAK_ETYPES`,
+  `REGISTRY_LDAP_CLIENT_SIGNING_OFF`.
+
+### Оговорки, которые нельзя потерять при переводе
+
+- **AS-REP Roasting / Kerberoasting**: для офлайн-подбора получают
+  материал Kerberos (AS-REP либо сервисный билет), а не читают
+  непосредственно исходный пароль. Факт выдачи билета сам по себе
+  ещё не означает компрометации учётной записи.
+- **GenericAll** означает широкие полномочия на объекте, но реальная
+  цепочка повышения привилегий зависит от типа целевого объекта и
+  дополнительных условий.
+- **ESC9 / ESC10**: важно наличие расширения безопасности SID,
+  параметры `StrongCertificateBindingEnforcement` и
+  `CertificateMappingMethods`, а также права изменения
+  `userPrincipalName`. Изменение настроек должно учитывать
+  легитимные сертификаты, зависящие от прежнего сопоставления.
+- **LDAP signing / channel binding**: перед обязательным включением
+  используйте диагностический журнал `Directory Service`; для
+  неподписанных bind важны события 2886/2887/2889, для CBT — 3039
+  и сводные 3040/3041. `LdapEnforceChannelBinding=1` — переходный
+  режим; `2` требует полного соответствия поддерживающих клиентов.
+  Простой LDAPS bind и SASL по TLS не следует смешивать.
+- **Права GPO на контроллерах домена**: `SeBackupPrivilege`
+  распространяется на чтение `ntds.dit` в контексте резервирования,
+  поэтому назначение стороннему субъекту требует отдельного
+  расследования. Риск зависит от области применения GPO.
+- **SMTP relay**: сначала установите нужные узлы и
+  `RemoteIPRanges`; снятие `ms-Exch-SMTP-Accept-Any-Recipient`
+  с коннектора, обслуживающего производственные службы, требует
+  проверки зависимостей.
+- **CredSSP / DSRM / UAC**: `AllowEncryptionOracle=0`,
+  `DsrmAdminLogonBehavior`, `BackupDsrmPassword`, `EnableLUA=1`
+  и `AlwaysInstallElevated` оставлены в технических фрагментах
+  без перевода идентификаторов. Применять изменения нужно
+  с учётом действующих систем и возможного перезапуска.
+
+### Статус
+
+- Всего проверено **362 из 392** типов Impact и Remediation.
+- Не прошло предметную сверку **30** типов. Они сохраняются в
+  отдельной очереди D18–D19.
+- Структурные расхождения по числу пунктов: **0 Impact / 0
+  Remediation** (проверяется повторно в CI). Это не доказывает
+  точность ещё не проверенных текстов.
+- 304 исходно непустых сценария Attack ранее переведены; 88
+  исходно пустых не дополнены.
+- `Apply-FullTechnical.ps1` запрещает перезапись **338** ранее
+  проверенных ID; `Tests/Test-StageD17VerifiedCoreRU.ps1`
+  отдельно проверяет EN ↔ RU ↔ HTML и 24 смысловые оговорки.
+- Все исходные `.ps1/.psm1/.psd1` — UTF-8 с BOM,
+  оригинальные определения и поведение adPEAS сохраняются.
+
+Сборка после успешной GitHub Actions публикуется в архиве
+`adPEAS-RU-2.9.0-STAGE-D17-20261112.zip`.
+

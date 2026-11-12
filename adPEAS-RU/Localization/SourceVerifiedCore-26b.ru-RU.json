@@ -1,0 +1,250 @@
+{
+  "schema": "adPEAS-RU.StageD17.CoreFields.26b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "REGISTRY_ALWAYSINSTALLELEVATED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Any user installs MSI packages as SYSTEM",
+        "Direct local privilege escalation to SYSTEM",
+        "Applies to every computer in the GPO scope"
+      ],
+      "impact": [
+        "Любой пользователь может устанавливать пакеты MSI с правами SYSTEM при выполнении условий действия этой политики.",
+        "Это создаёт прямой путь локального повышения привилегий до SYSTEM.",
+        "Настройка применяется ко всем компьютерам в области действия соответствующей GPO."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set AlwaysInstallElevated=0 in both HKLM and HKCU (or remove the policy)"
+      ],
+      "remediation": [
+        "Установите AlwaysInstallElevated=0 одновременно в HKLM и HKCU либо удалите данную политику."
+      ]
+    },
+    "REGISTRY_CACHED_LOGONS": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "More accounts' password verifiers on every computer in scope, crackable offline (DCC2)"
+      ],
+      "impact": [
+        "На каждом компьютере, охваченном политикой, сохраняются проверочные значения паролей большего числа учётных записей, которые могут подвергаться офлайн-подбору (DCC2)."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Keep the setting at 10 or below; computers that never leave the network need fewer"
+      ],
+      "remediation": [
+        "Оставьте значение не выше 10; для компьютеров, постоянно подключённых к сети, может быть достаточно меньшего числа кэшируемых входов."
+      ]
+    },
+    "REGISTRY_CREDSSP_DELEGATE_ANY": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "The logon credentials of every user of these computers reach any host they connect to with CredSSP - Remote Desktop, PowerShell remoting with CredSSP",
+        "A single attacker host collects reusable credentials, domain administrators among them"
+      ],
+      "impact": [
+        "Учётные данные пользователей таких компьютеров передаются любому узлу, к которому они подключаются с CredSSP, в том числе при RDP и удалённом PowerShell через CredSSP.",
+        "Один контролируемый злоумышленником узел может собирать повторно используемые учётные данные, включая учётные данные администраторов домена."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Replace the wildcard entry with the servers that need delegation, by name",
+        "Prefer Remote Credential Guard or Restricted Admin mode for Remote Desktop over delegating credentials"
+      ],
+      "remediation": [
+        "Замените универсальный шаблон (*) точными именами серверов, которым действительно требуется делегирование.",
+        "Для удалённого рабочего стола предпочитайте Remote Credential Guard или Restricted Admin вместо передачи учётных данных."
+      ]
+    },
+    "REGISTRY_CREDSSP_ORACLE": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "CredSSP accepts unpatched peers",
+        "MITM can achieve remote code execution over RDP"
+      ],
+      "impact": [
+        "CredSSP допускает соединения с узлами, на которых не установлены необходимые исправления.",
+        "Атака посредника (MITM) может привести к удалённому выполнению кода при RDP-соединении."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set AllowEncryptionOracle to 0 (Force Updated Clients)"
+      ],
+      "remediation": [
+        "Установите AllowEncryptionOracle=0 (Force Updated Clients), предварительно проверив обновление всех участвующих узлов."
+      ]
+    },
+    "REGISTRY_DEFENDER_DISABLED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Endpoint AV/real-time protection disabled centrally",
+        "Malware and credential theft tools run undetected"
+      ],
+      "impact": [
+        "Антивирусная защита конечных узлов, включая защиту в реальном времени, централизованно отключена.",
+        "Вредоносные программы и инструменты кражи учётных данных могут работать без обнаружения этим механизмом защиты."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the Defender disable policy; enable Tamper Protection"
+      ],
+      "remediation": [
+        "Удалите политику отключения Microsoft Defender и включите Tamper Protection."
+      ]
+    },
+    "REGISTRY_DSRM_ADMIN_LOGON": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The DSRM account logs on to the running domain controller as its local administrator, over the network with the NT hash alone",
+        "A DSRM password captured once - or set at promotion and never changed since - stays a way into every domain controller in scope",
+        "Resetting domain passwords, krbtgt included, does not touch it: the account lives in the domain controller's local SAM"
+      ],
+      "impact": [
+        "Учётная запись DSRM может входить на работающий контроллер домена как локальный администратор, в том числе по сети при наличии её NT-хеша.",
+        "Пароль DSRM, однажды полученный злоумышленником или не менявшийся с момента повышения сервера до DC, остаётся способом доступа ко всем затронутым контроллерам домена.",
+        "Сброс паролей домена, в том числе krbtgt, не меняет пароль DSRM: эта запись находится в локальной SAM контроллера домена."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the value from the policy and from the registry of the domain controllers, or set it to 0 - restore mode then needs a restart into it, as by default",
+        "Reset the DSRM password on every domain controller in scope, or let Windows LAPS manage it (BackupDsrmPassword)",
+        "Monitor for event 4794, an attempt to set the DSRM administrator password, and for changes to DsrmAdminLogonBehavior"
+      ],
+      "remediation": [
+        "Удалите DsrmAdminLogonBehavior из политики и реестра контроллеров домена либо установите 0: по умолчанию режим восстановления требует соответствующей перезагрузки.",
+        "Сбросьте пароль DSRM на каждом затронутом контроллере домена либо настройте управление через Windows LAPS (BackupDsrmPassword).",
+        "Отслеживайте событие 4794 (попытка установить пароль администратора DSRM) и изменения DsrmAdminLogonBehavior."
+      ]
+    },
+    "REGISTRY_ENABLELUA": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "No UAC token filtering on affected hosts",
+        "All local admins usable for remote pass-the-hash",
+        "Malware runs elevated without prompts"
+      ],
+      "impact": [
+        "На затронутых компьютерах отключается фильтрация токенов UAC.",
+        "Возрастает риск удалённого использования прав локальных администраторов посредством pass-the-hash.",
+        "Вредоносные программы могут запускаться с повышенными правами без привычных запросов подтверждения UAC."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set EnableLUA=1 and keep UAC enabled"
+      ],
+      "remediation": [
+        "Установите EnableLUA=1 и оставьте UAC включённым."
+      ]
+    },
+    "REGISTRY_ESC10_KDC_BINDING": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A certificate authenticates as whichever account holds the UPN in its SAN",
+        "An attacker who can write userPrincipalName on an account they control sets it to a target's UPN, enrols, and authenticates as the target",
+        "The certificate template needs no misconfiguration at all - the binding is broken domain-wide"
+      ],
+      "impact": [
+        "Сертификат может использоваться для аутентификации от имени любой учётной записи, чей UPN указан в SAN этого сертификата, при слабом сопоставлении.",
+        "Злоумышленник с правом изменить userPrincipalName контролируемой им записи может установить UPN цели, запросить сертификат и аутентифицироваться как целевая запись.",
+        "Для такого сценария не требуется неправильная настройка шаблона сертификата: нарушена привязка сертификатов в масштабе домена."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set StrongCertificateBindingEnforcement=2 (full enforcement) on every domain controller",
+        "Re-issue certificates that predate the SID extension before switching to 2",
+        "Restrict who may write userPrincipalName"
+      ],
+      "remediation": [
+        "Установите StrongCertificateBindingEnforcement=2 (полное принудительное сопоставление) на каждом контроллере домена.",
+        "Перед переходом на 2 перевыпустите сертификаты, выпущенные до добавления расширения SID.",
+        "Ограничьте круг субъектов, имеющих право изменять userPrincipalName."
+      ]
+    },
+    "REGISTRY_ESC10_KDC_BINDING_COMPAT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "A certificate issued without a SID extension maps by UPN alone",
+        "An ESC9 template hands out exactly such certificates to anyone who may enrol",
+        "An attacker who can write userPrincipalName on a controlled account sets it to a target's UPN, enrols on the ESC9 template and authenticates as the target",
+        "Certificates that predate the May 2022 update also carry no extension and are accepted the same way"
+      ],
+      "impact": [
+        "Сертификат, выпущенный без расширения SID, может сопоставляться с учётной записью только по UPN.",
+        "Шаблон ESC9 выдаёт именно такие сертификаты пользователям, которым разрешён выпуск.",
+        "Злоумышленник с правом изменить userPrincipalName контролируемой записи может присвоить ей UPN цели, выпустить сертификат по шаблону ESC9 и войти как целевая запись.",
+        "Сертификаты, выпущенные до обновления мая 2022 года, также могут не содержать расширение SID и приниматься по этому механизму."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Set StrongCertificateBindingEnforcement=2 on every domain controller - compatibility mode was a migration state, not a setting",
+        "Before switching, re-issue or retire certificates that predate the SID extension, which is what the value was lowered for",
+        "Clear CT_FLAG_NO_SECURITY_EXTENSION on any template that carries it, so no new certificate is issued without the extension",
+        "Restrict who may write userPrincipalName"
+      ],
+      "remediation": [
+        "Установите StrongCertificateBindingEnforcement=2 на всех контроллерах домена: режим совместимости был переходным состоянием, а не рекомендуемой постоянной настройкой.",
+        "До перехода перевыпустите либо выведите из эксплуатации сертификаты, созданные до появления расширения SID.",
+        "Снимите CT_FLAG_NO_SECURITY_EXTENSION у шаблонов, где он установлен, чтобы новые сертификаты содержали необходимое расширение.",
+        "Ограничьте возможность изменения userPrincipalName."
+      ]
+    },
+    "REGISTRY_ESC10_SCHANNEL_UPN": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A certificate authenticates over LDAPS as whichever account carries the UPN in its SAN",
+        "Reachable without Kerberos, so hardening the KDC alone does not close it",
+        "The other bits (0x1 subject/issuer, 0x2 issuer, 0x8 subject) are not this finding - only 0x4 is"
+      ],
+      "impact": [
+        "Сертификат может проходить аутентификацию по LDAPS как учётная запись, чей UPN содержится в SAN.",
+        "Эта цепочка не требует Kerberos, поэтому одно лишь усиление проверки KDC не устраняет проблему.",
+        "Другие биты настройки (0x1 — subject/issuer, 0x2 — issuer, 0x8 — subject) не относятся к этой находке: оценивается только 0x4."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Clear bit 0x4 from CertificateMappingMethods on every domain controller",
+        "Leave certificate mapping to Kerberos with the SID extension enforced"
+      ],
+      "remediation": [
+        "Очистите бит 0x4 в CertificateMappingMethods на каждом контроллере домена.",
+        "Используйте сопоставление сертификатов через Kerberos с принудительной проверкой расширения SID."
+      ]
+    },
+    "REGISTRY_KERBEROS_WEAK_ETYPES": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Service tickets requested in RC4, cracked offline much faster than AES",
+        "DES, where accounts are configured for it, breakable outright"
+      ],
+      "impact": [
+        "Сервисные билеты с RC4 могут подвергаться офлайн-подбору существенно быстрее, чем билеты AES.",
+        "DES, если он разрешён в настройках учётных записей, допускает прямой взлом из-за криптографической слабости."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Allow AES128_HMAC_SHA1, AES256_HMAC_SHA1 and future encryption types only, after checking that every account has AES keys"
+      ],
+      "remediation": [
+        "После проверки наличия AES-ключей у всех необходимых учётных записей разрешайте только AES128_HMAC_SHA1, AES256_HMAC_SHA1 и поддерживаемые будущие алгоритмы шифрования."
+      ]
+    },
+    "REGISTRY_LDAP_CLIENT_SIGNING_OFF": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "LDAP traffic of the computers in scope readable and alterable in transit"
+      ],
+      "impact": [
+        "LDAP-трафик компьютеров в области действия политики может быть прочитан и изменён при передаче по сети."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set the setting to 'Negotiate signing' or 'Require signing'"
+      ],
+      "remediation": [
+        "Установите для клиентской подписи LDAP значение Negotiate signing или Require signing."
+      ]
+    }
+  }
+}

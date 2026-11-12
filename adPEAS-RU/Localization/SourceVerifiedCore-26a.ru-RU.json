@@ -1,0 +1,304 @@
+{
+  "schema": "adPEAS-RU.StageD17.CoreFields.26a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "ASREP_ROASTABLE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Attackers can obtain the account's password hash without ANY authentication",
+        "No failed login attempts are logged during the attack",
+        "Offline password cracking can be performed indefinitely",
+        "Compromised accounts can be used for initial access or privilege escalation"
+      ],
+      "impact": [
+        "Злоумышленник может запросить материал AS-REP для автономного подбора пароля учётной записи БЕЗ предварительной аутентификации.",
+        "При таком запросе не возникают неудачные попытки входа в систему.",
+        "Подбор пароля по полученному материалу может выполняться офлайн сколь угодно долго.",
+        "Компрометированная запись может использоваться для первоначального доступа или повышения привилегий."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Enable Kerberos pre-authentication for all accounts",
+        "Review why pre-authentication was disabled and find alternatives",
+        "Use strong passwords for accounts that must have pre-auth disabled",
+        "Monitor for AS-REQ requests without pre-authentication"
+      ],
+      "remediation": [
+        "Включите предварительную аутентификацию Kerberos для всех учётных записей, где это возможно.",
+        "Установите, почему предварительная аутентификация была отключена, и найдите альтернативу.",
+        "Если отключение обязательно, используйте стойкий, достаточно длинный пароль учётной записи.",
+        "Отслеживайте запросы AS-REQ без предварительной аутентификации."
+      ]
+    },
+    "DANGEROUS_ACL_GENERICALL": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Can reset passwords of target accounts without knowing current password",
+        "Can add members to groups (including Domain Admins)",
+        "Can modify any attribute including servicePrincipalName for Kerberoasting",
+        "Can enable Resource-Based Constrained Delegation",
+        "Complete control over the target object"
+      ],
+      "impact": [
+        "Разрешение GenericAll позволяет сбрасывать пароль целевой учётной записи без знания текущего.",
+        "Позволяет изменять членство в группах, включая потенциальное добавление в Domain Admins.",
+        "Позволяет изменять атрибуты, в том числе servicePrincipalName для организации атаки Kerberoasting.",
+        "Позволяет настроить ресурсное ограниченное делегирование (RBCD) при выполнении условий атаки.",
+        "Обеспечивает практически полный контроль над целевым объектом AD."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review and remove unnecessary GenericAll permissions",
+        "Follow principle of least privilege",
+        "Use role-based access control (RBAC)",
+        "Monitor ACL changes on sensitive objects"
+      ],
+      "remediation": [
+        "Проверьте и удалите ненужные разрешения GenericAll.",
+        "Следуйте принципу минимально необходимых привилегий.",
+        "Используйте ролевое разграничение доступа (RBAC).",
+        "Контролируйте изменения ACL чувствительных объектов."
+      ]
+    },
+    "ESC9_CT_NO_SECURITY_EXTENSION": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Certificates not cryptographically bound to requestor",
+        "Stolen certificates can be used by anyone",
+        "No SID validation during authentication",
+        "Enables certificate theft attacks"
+      ],
+      "impact": [
+        "Выпущенные сертификаты не имеют криптографически подтверждённой привязки к первоначальному заявителю.",
+        "Украденные сертификаты могут использоваться другим субъектом при наличии требуемых ключей и условий сопоставления.",
+        "При таком выпуске отсутствует проверка SID через расширение безопасности сертификата.",
+        "Это создаёт условия для атак с использованием похищенных сертификатов и слабого сопоставления."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Enable StrongCertificateBindingEnforcement on DCs",
+        "Include szOID_NTDS_CA_SECURITY_EXT in certificate templates",
+        "Monitor for certificate-based authentication anomalies"
+      ],
+      "remediation": [
+        "Включите StrongCertificateBindingEnforcement на контроллерах домена с учётом готовности клиентов и сертификатов.",
+        "Обеспечьте включение расширения szOID_NTDS_CA_SECURITY_EXT в выдаваемые сертификаты соответствующих шаблонов.",
+        "Отслеживайте аномалии аутентификации по сертификатам."
+      ]
+    },
+    "EXCHANGE_SMTP_OPEN_RELAY": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The server sends mail on behalf of anyone who can reach the listening port",
+        "The organization's own IP reputation and mail domains carry the traffic",
+        "Blocklisting of the sending address affects all legitimate mail from the organization",
+        "Combined with an internal sender address it becomes internal phishing that passes every trust indicator"
+      ],
+      "impact": [
+        "Почтовый сервер отправляет письма от имени любого субъекта, способного подключиться к прослушиваемому SMTP-порту.",
+        "Для такого трафика используется репутация IP-адреса и почтовых доменов организации.",
+        "Попадание исходящего IP-адреса в блок-листы затрагивает всю легитимную почту организации.",
+        "При подмене внутреннего адреса отправителя открытый relay превращается в канал внутреннего фишинга, обходящий привычные признаки доверия."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Narrow the connector's remote IP ranges to the hosts that actually need to relay",
+        "Remove ms-Exch-SMTP-Accept-Any-Recipient from Anonymous Logon where relay is not required",
+        "Prefer an authenticated relay connector over an anonymous one"
+      ],
+      "remediation": [
+        "Ограничьте RemoteIPRanges коннектора конкретными узлами, которым действительно требуется SMTP relay.",
+        "Удалите ms-Exch-SMTP-Accept-Any-Recipient у Anonymous Logon, если анонимная пересылка не требуется.",
+        "Вместо анонимного relay по возможности используйте коннектор с аутентификацией."
+      ]
+    },
+    "GPO_USERRIGHT_SEAUDIT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Real events are rolled out of a Security log that overwrites as needed",
+        "Where 'Audit: Shut down system immediately if unable to log security audits' is on, a full log stops the machine",
+        "Forged records send an investigation the wrong way"
+      ],
+      "impact": [
+        "Настоящие события вытесняются из журнала Security при его циклической перезаписи.",
+        "Если включена политика «Audit: Shut down system immediately if unable to log security audits», переполненный журнал может остановить компьютер.",
+        "Поддельные записи журнала могут направить расследование по ложному следу."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the principal and leave the right with LOCAL SERVICE and NETWORK SERVICE, as by default",
+        "Forward the Security log to a collector, so overwriting it locally removes nothing"
+      ],
+      "remediation": [
+        "Удалите избыточного субъекта из этого права и оставьте его LOCAL SERVICE и NETWORK SERVICE, как предусмотрено настройкой по умолчанию.",
+        "Перенаправляйте события Security в централизованный коллектор, чтобы локальная перезапись не уничтожала единственную копию журналов."
+      ]
+    },
+    "GPO_USERRIGHT_SEBACKUP": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Reads the SAM and SYSTEM registry hives offline, yielding every local account's NT hash",
+        "On a domain controller, reads ntds.dit directly - every domain account's password hash, extractable without touching LSASS or triggering DCSync detections",
+        "Bypasses NTFS ACLs entirely; file permissions are not a defense against this right"
+      ],
+      "impact": [
+        "Разрешает читать автономные копии кустов реестра SAM и SYSTEM и извлекать NT-хеши локальных учётных записей.",
+        "На контроллере домена позволяет напрямую прочитать ntds.dit и извлечь хеши паролей доменных записей без обращения к LSASS или характерных событий обнаружения DCSync.",
+        "Обходит ограничения NTFS ACL при резервном копировании: сами файловые разрешения не защищают от такого права."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the principal from this right unless it operates an actual, monitored backup solution",
+        "Treat any account holding it as Tier-0 on a domain controller and Tier-1 elsewhere"
+      ],
+      "remediation": [
+        "Удалите это право у субъекта, если он не работает в реально используемой и контролируемой системе резервного копирования.",
+        "Считайте любую запись с этим правом субъектом уровня Tier 0 на контроллере домена и Tier 1 на остальных серверах."
+      ]
+    },
+    "GPO_USERRIGHT_SEDELEGATESESSIONUSERIMPERSONATE": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "The holder acts as another user signed in to the same session, with that user's access"
+      ],
+      "impact": [
+        "Обладатель права может действовать от имени другого пользователя, вошедшего в тот же сеанс, с его полномочиями доступа."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Grant the right only where a product documents that it needs it, and to a dedicated account"
+      ],
+      "remediation": [
+        "Предоставляйте право только выделенной учётной записи и только если производитель соответствующего продукта документирует необходимость этого права."
+      ]
+    },
+    "GPO_USERRIGHT_SEINTERACTIVELOGON": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A console/local session on every targeted machine",
+        "On a domain controller, local logon capability is functionally domain-admin-adjacent access to the machine's own security context"
+      ],
+      "impact": [
+        "Субъект получает возможность локального интерактивного входа через консоль на все компьютеры, на которые распространяется политика.",
+        "На контроллере домена локальный вход открывает доступ к критичному контексту безопасности самого DC и должен рассматриваться как особенно привилегированный."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "On domain controllers, restrict local logon strictly to domain administrators",
+        "On member computers, restrict it to the intended local users/support staff"
+      ],
+      "remediation": [
+        "На контроллерах домена строго ограничьте право локального входа администраторами домена.",
+        "На обычных компьютерах оставьте право только целевым локальным пользователям и сотрудникам поддержки."
+      ]
+    },
+    "GPO_USERRIGHT_SESYSTEMPROFILE": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "Reconnaissance on the machine: active system processes, security software among them"
+      ],
+      "impact": [
+        "Позволяет собирать сведения о системных процессах компьютера, включая запущенное защитное ПО."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the principal and leave the right with Administrators and NT SERVICE\\WdiServiceHost, as by default"
+      ],
+      "remediation": [
+        "Удалите лишнего субъекта, оставив право Administrators и NT SERVICE\\WdiServiceHost, как в конфигурации по умолчанию."
+      ]
+    },
+    "KERBEROASTABLE_SPN": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Attackers can obtain the account's password hash without triggering account lockout",
+        "Offline password cracking can be performed indefinitely",
+        "If the password is weak, the account can be compromised within hours or days",
+        "Service accounts often have elevated privileges, enabling lateral movement or privilege escalation"
+      ],
+      "impact": [
+        "Злоумышленник может получить сервисный билет, содержащий материал для офлайн-подбора пароля учётной записи, без срабатывания блокировки самой записи.",
+        "Офлайн-подбор пароля по материалу билета может продолжаться неограниченное время.",
+        "Если пароль слабый, компрометация возможна в течение часов или дней.",
+        "Служебные учётные записи часто имеют повышенные права, что создаёт путь к горизонтальному перемещению или повышению привилегий."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Use Group Managed Service Accounts (gMSA) instead of regular user accounts for services",
+        "Set strong, randomly generated passwords (25+ characters) for service accounts",
+        "Enable AES encryption for service accounts (reduces cracking speed significantly)",
+        "Regularly rotate service account passwords",
+        "Monitor for TGS requests to service accounts from unusual sources"
+      ],
+      "remediation": [
+        "Используйте Group Managed Service Accounts (gMSA) вместо обычных пользовательских учётных записей для служб.",
+        "Задавайте служебным учётным записям длинные случайные пароли, например не менее 25 символов.",
+        "Включите AES для Kerberos у служебных записей: это существенно затрудняет офлайн-подбор по сравнению с RC4 при наличии ключей AES.",
+        "Регулярно выполняйте ротацию паролей служебных записей.",
+        "Отслеживайте запросы TGS к служебным учётным записям из необычных источников."
+      ]
+    },
+    "LDAP_CHANNEL_BINDING_NOT_REQUIRED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "LDAPS connections can be relayed",
+        "Provides additional attack surface for NTLM relay",
+        "Weakens overall LDAP security posture"
+      ],
+      "impact": [
+        "Подключения LDAPS с SASL-аутентификацией могут быть подвержены ретрансляции без проверки привязки к TLS-каналу.",
+        "Создаётся дополнительная поверхность для атак NTLM relay.",
+        "Снижается общий уровень защиты LDAP."
+      ],
+      "sourceEnglishRemediationCount": 6,
+      "sourceEnglishRemediation": [
+        "Enable LDAP channel binding on Domain Controllers",
+        "Set registry: HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\NTDS\\Parameters\\LdapEnforceChannelBinding = 2",
+        "Best practice: Deploy via GPO Preferences for consistent configuration",
+        "Go through 1 (When supported) first: it demands the token only from clients that announce they can supply one, which leaves the rest working while they are found. 2 (Always) once the audit is quiet",
+        "The audit in between: with 16 LDAP Interface Events at 2, the Directory Service log writes 3039 per client, and 3040 and 3041 as the 24-hour summary. The clients named there are the ones that stop working at 2",
+        "What this setting does not touch: a simple bind over LDAPS carries no channel binding token at all and is unaffected - it is the SASL binds (Negotiate, Kerberos, NTLM) over TLS that have to supply one. Windows clients do once the March 2020 updates are in, so what is usually left is non-Windows LDAP libraries and appliance firmware that never implemented CBT"
+      ],
+      "remediation": [
+        "Включите привязку LDAP к TLS-каналу (LDAP channel binding) на контроллерах домена.",
+        "Установите параметр реестра HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\NTDS\\Parameters\\LdapEnforceChannelBinding = 2.",
+        "Для согласованной настройки предпочтительно использовать GPO Preferences.",
+        "Сначала используйте значение 1 (When supported): токен требуется от клиентов, заявляющих его поддержку; затем, после устранения несовместимостей, переходите на 2 (Always).",
+        "Для промежуточного аудита установите диагностическую категорию 16 LDAP Interface Events в 2: в журнале Directory Service событие 3039 указывает клиента, а 3040 и 3041 дают сводку за 24 часа. Названные клиенты могут перестать работать при значении 2.",
+        "Простой bind через LDAPS не передаёт токен channel binding и не затрагивается этой настройкой; токен требуется для SASL-bind (Negotiate, Kerberos, NTLM) поверх TLS. Клиенты Windows поддерживают его после обновлений марта 2020 года, а отдельные библиотеки LDAP для Linux и прошивки устройств могут не поддерживать CBT."
+      ]
+    },
+    "LDAP_SIGNING_NOT_REQUIRED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "LDAP traffic can be intercepted and modified",
+        "NTLM relay attacks can target LDAP services",
+        "Credentials can be captured or modified in transit",
+        "Enables attacks like NTLM relay to LDAP for adding users to groups"
+      ],
+      "impact": [
+        "Трафик LDAP может быть перехвачен и изменён в пути.",
+        "Атаки NTLM relay могут быть направлены на LDAP-службы.",
+        "Учётные данные могут быть перехвачены либо изменены при передаче в зависимости от типа соединения и аутентификации.",
+        "Возможны атаки NTLM relay к LDAP, в том числе с изменением членства в группах при наличии нужных полномочий."
+      ],
+      "sourceEnglishRemediationCount": 6,
+      "sourceEnglishRemediation": [
+        "Enable 'Domain controller: LDAP server signing requirements' = Require signing",
+        "Configure via GPO: Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > Security Options",
+        "Best practice: Always configure security settings via GPO rather than local policy",
+        "Measure before enforcing, do not survey: set the diagnostic 16 LDAP Interface Events to 2 on the DCs and read the Directory Service log. 2886 and 2887 are the standing reminder and the 24-hour count; 2889 names the client address and the account for each unsigned or cleartext bind. That list is what enforcing breaks, by name",
+        "What is usually on it: printers, scanners and multifunction devices doing a simple bind on port 389, appliances with an LDAP user directory behind them (VPN gateways, load balancers, NAS), older monitoring and backup agents, Linux hosts whose nss/pam/sssd configuration points at ldap:// without TLS, and in-house tools that bind with no authentication type set",
+        "Every one of those is fixed on the client - LDAPS or StartTLS, or a SASL bind that requests signing - and not by leaving the domain controller as it is"
+      ],
+      "remediation": [
+        "Включите параметр «Domain controller: LDAP server signing requirements» = Require signing.",
+        "Настройте его через GPO: Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > Security Options.",
+        "Предпочитайте применение параметров безопасности через GPO, а не локальную политику.",
+        "Перед принудительным включением измерьте несовместимости: установите 16 LDAP Interface Events = 2 на DC и проверьте Directory Service. События 2886 и 2887 — напоминание и суточная статистика; 2889 показывает IP клиента и учётную запись для каждого неподписанного или незашифрованного bind. Именно эти клиенты требуют исправления.",
+        "Чаще всего встречаются принтеры и сканеры с простым bind на 389, VPN-шлюзы, балансировщики, NAS, устаревшие средства мониторинга и резервирования, Linux с nss/pam/sssd через ldap:// без TLS и собственные программы без заданного типа аутентификации.",
+        "Исправляйте каждый такой клиент: переводите на LDAPS или StartTLS либо используйте SASL bind с подписью, а не оставляйте контроллер домена с ослабленной политикой."
+      ]
+    }
+  }
+}
