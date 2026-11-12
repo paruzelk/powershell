@@ -1,0 +1,308 @@
+{
+  "schema": "adPEAS-RU.StageD8.CoreFields.17a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "DANGEROUS_ACL_GPO_DELETE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Delete / DeleteTree removes the GPO outright - every setting it enforced (including security hardening) stops applying the moment replication catches up",
+        "A deleted GPO is also how a defender's remediation gets undone: recreating it does not restore its original GUID, so links, WMI filters and delegated permissions tied to the old GUID have to be redone by hand",
+        "CreateChild / DeleteChild matter on the Group Policy Objects container itself rather than on an individual policy - held there, they control who may create or remove GPOs domain-wide"
+      ],
+      "impact": [
+        "Права Delete/DeleteTree позволяют полностью удалить GPO; после репликации перестают применяться все её настройки, включая усиление безопасности.",
+        "Удаление GPO также отменяет результаты прежних исправлений: создание новой политики не восстанавливает её GUID, поэтому привязки, WMI-фильтры и делегированные права, связанные со старым GUID, приходится настраивать заново.",
+        "CreateChild/DeleteChild действуют на контейнере объектов групповых политик, а не на отдельной GPO; там они позволяют управлять созданием и удалением GPO во всём домене."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove unnecessary Delete/DeleteTree/DeleteChild/CreateChild permissions on GPO objects and on the Group Policy Objects container",
+        "An inherited entry has to be removed on the container it is written on, and the owner of the object can restore any of this - both are outside what Set-GPPermission reaches",
+        "Monitor GPO deletion (Event ID 5141) and GPO creation, not only content changes",
+        "Back up GPOs (Get-GPOReport / Backup-GPO) so a deleted policy can be restored with its original settings intact"
+      ],
+      "remediation": [
+        "Удалите ненужные Delete/DeleteTree/DeleteChild/CreateChild на объектах GPO и контейнере Group Policy Objects.",
+        "Унаследованную ACE нужно удалять с контейнера, на котором она задана; владелец объекта тоже может вернуть удалённые разрешения. Ни то ни другое не исправляется через Set-GPPermission.",
+        "Отслеживайте удаление GPO (Event ID 5141) и её создание, а не только изменения содержимого.",
+        "Создавайте резервные копии GPO (Get-GPOReport / Backup-GPO), чтобы восстановить содержимое удалённой политики."
+      ]
+    },
+    "DANGEROUS_ACL_GPO_EXTENDED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "The specific permission this grants depends on which validated write or extended right is behind it - information the ACE's right type alone does not carry",
+        "Its mere presence on an object class that does not normally carry one is itself worth a second look"
+      ],
+      "impact": [
+        "Реальный эффект разрешения зависит от конкретной проверяемой записи (validated write) или расширенного права, заданного за ACE; одного типа права недостаточно для вывода.",
+        "Само наличие такого права на классе объектов, где его обычно не бывает, требует дополнительной проверки."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Identify the specific right behind the ACE (its ObjectType GUID) and evaluate whether it belongs on this GPO",
+        "Remove it if it was inherited from a container-level delegation that was never meant to reach GPOs"
+      ],
+      "remediation": [
+        "Определите конкретное разрешение по ObjectType GUID записи ACE и оцените его применимость к этой GPO.",
+        "Удалите право, если оно унаследовано от делегирования на контейнере, не предназначенного для объектов GPO."
+      ]
+    },
+    "DANGEROUS_ACL_GPO_WRITEPROPERTY": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "gPCFileSysPath can be redirected to an attacker-controlled UNC path - every machine that applies the GPO then reads GPT.ini and the policy content from that path instead of the real one",
+        "gPCMachineExtensionNames / gPCUserExtensionNames decide which client-side extensions process the policy at all - broadening them can activate a CSE (e.g. Scripts, Group Policy Preferences) the GPO did not previously use",
+        "versionNumber can be set to force every client to consider the policy changed and reapply it immediately, rather than waiting for the next refresh cycle"
+      ],
+      "impact": [
+        "gPCFileSysPath можно перенаправить на контролируемый атакующим UNC-путь: компьютеры, применяющие GPO, будут читать GPT.ini и содержимое политики оттуда, а не из исходного места.",
+        "gPCMachineExtensionNames и gPCUserExtensionNames определяют, какие клиентские расширения (CSE) обрабатывают политику; их изменение может включить ранее неиспользовавшееся расширение, например Scripts или Group Policy Preferences.",
+        "Изменение versionNumber заставляет клиентов считать политику изменённой и применять её повторно, не дожидаясь очередного обычного обновления."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove unnecessary WriteProperty permissions on GPO objects",
+        "Where the row says the ACE is inherited, removing it on the GPO is not possible: it is written on the parent container - CN=Policies,CN=System - and either has to go there or inheritance has to be broken on this object",
+        "Check the owner as well: an owner may rewrite the ACL and put the permission back, and neither Set-GPPermission nor the delegation tab changes ownership",
+        "Delegate GPO editing through the Group Policy Management Console's built-in delegation model rather than raw ACL grants",
+        "Monitor changes to gPCFileSysPath, gPCMachineExtensionNames and gPCUserExtensionNames (Event ID 5136)"
+      ],
+      "remediation": [
+        "Удалите ненужные WriteProperty у объектов GPO.",
+        "Если ACE унаследована, убрать её непосредственно на GPO нельзя: она задана на родительском CN=Policies,CN=System. Удалите её там либо осознанно измените наследование объекта.",
+        "Проверьте владельца: он может переписать ACL и восстановить права; Set-GPPermission и вкладка делегирования GPMC владельца не изменяют.",
+        "Делегируйте редактирование GPO через стандартную модель Group Policy Management Console, а не вручную через широкие ACE.",
+        "Отслеживайте изменения gPCFileSysPath, gPCMachineExtensionNames и gPCUserExtensionNames (Event ID 5136)."
+      ]
+    },
+    "DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Whatever the named attribute itself controls - for gPCWQLFilter, which WMI filter decides whether the policy applies to a machine at all",
+        "A WMI filter swap is a scoping change, not code execution: it can stop a hardening policy from applying to chosen machines, which is worth noticing but is not the same exposure",
+        "The attribute is named on the finding so it can be assessed on its own terms rather than against the worst case"
+      ],
+      "impact": [
+        "Воздействие зависит от указанного атрибута; например, gPCWQLFilter задаёт WMI-фильтр, определяющий применимость GPO к компьютеру.",
+        "Замена WMI-фильтра меняет область применения, а не сама по себе запускает код: она может отключить защитную политику для выбранных машин, но не равна выполнению кода.",
+        "В находке явно назван атрибут, чтобы оценивать его реальную функцию, а не максимальный возможный риск."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Decide whether the delegation is intentional - an attribute-scoped ACE is often the result of a deliberately narrow delegation and correct as it stands",
+        "Remove it if it was inherited from a container-level delegation that was never meant to reach GPOs",
+        "Monitor changes to the attribute (Event ID 5136) if the policy it scopes is a hardening one"
+      ],
+      "remediation": [
+        "Установите, является ли делегирование намеренным: ACE с правом записи отдельного атрибута часто отражает корректное узкое делегирование.",
+        "Удалите его, если оно унаследовано от делегирования на контейнере, которое не должно распространяться на GPO.",
+        "Для защитных GPO отслеживайте изменение этого атрибута (Event ID 5136)."
+      ]
+    },
+    "DANGEROUS_ACL_REPLICATION_INERT_HALF": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "No access on its own - the right cannot be exercised without DS-Replication-Get-Changes",
+        "Adding the missing right is a single ACE on the domain object, and it turns this into full DCSync",
+        "A partial grant is usually the remains of a migration or a monitoring tool, so nobody is watching it",
+        "It will not appear in a DCSync audit, because the pair is what such an audit looks for"
+      ],
+      "impact": [
+        "Само по себе право не даёт доступа к репликации без DS-Replication-Get-Changes.",
+        "Добавление одного недостающего права ACE на объекте домена превращает это в возможность полноценного DCSync.",
+        "Частичное делегирование часто осталось после миграции или настройки мониторинга и потому может не привлекать внимания.",
+        "Обычный аудит DCSync может его не показать, поскольку ищет пару необходимых прав."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the right - a principal that cannot use it does not need it",
+        "Establish where it came from, because the same process may have granted the other half elsewhere",
+        "Do not treat it as harmless on the grounds that it is inert today"
+      ],
+      "remediation": [
+        "Удалите неиспользуемое право: субъект, которому оно не помогает, не нуждается в нём.",
+        "Выясните источник права: тот же процесс мог выдать вторую часть разрешений в другом месте.",
+        "Не считайте его безвредным только потому, что сейчас оно не позволяет выполнять DCSync."
+      ]
+    },
+    "DANGEROUS_ACL_REPLICATION_NO_SECRETS": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Replicates every non-secret attribute of every object in the domain, in one legitimate-looking operation",
+        "That includes every security descriptor, which is the whole delegation model handed over for offline analysis",
+        "Also the attributes that carry credentials without being secrets - descriptions holding passwords, userPassword, unixUserPassword, LAPS attributes where the confidential flag is not set",
+        "The second half is one ACE away: a principal that can write the DACL of the domain object, or that is trusted to manage replication, completes it"
+      ],
+      "impact": [
+        "Позволяет одним штатно выглядящим действием реплицировать все несекретные атрибуты всех объектов домена.",
+        "Среди них все дескрипторы безопасности, раскрывающие модель делегирования для дальнейшего автономного анализа.",
+        "Также доступны поля с учётными данными, не классифицированные как секреты: пароли в description, userPassword, unixUserPassword и атрибуты LAPS без признака confidential.",
+        "Для получения недостающей части полномочий достаточно одной ACE: субъект с правом менять DACL объекта домена или управлять репликацией может дополнить разрешение."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the right unless the principal is a domain controller or a replication service that genuinely needs it",
+        "Treat a partial grant as the same class of exposure as the pair - the difference is one ACE, not one tier",
+        "Audit who can write the DACL of the domain object, since that is the shortest route to the missing half"
+      ],
+      "remediation": [
+        "Удалите право, если субъект не является контроллером домена или службой репликации, которой оно действительно требуется.",
+        "Рассматривайте частично выданные права как риск того же класса, что и полную пару: различие составляет одну ACE, а не уровень доверия.",
+        "Проверьте, кто может изменять DACL объекта домена: это кратчайший путь к недостающему праву."
+      ]
+    },
+    "DOMAIN_ROOT_FSMO_TRANSFER": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Transferring the PDC emulator moves the authoritative time source and the urgent-replication target for password changes",
+        "A role moved onto an attacker-controlled or soon-to-be-decommissioned DC is a denial of service that is slow to diagnose"
+      ],
+      "impact": [
+        "Перенос роли PDC emulator меняет авторитетный источник времени и узел срочной репликации изменений паролей.",
+        "Перенос роли на контролируемый атакующим или выводимый из эксплуатации DC создаёт труднодиагностируемый отказ в обслуживании."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove Change-PDC from every principal that is not a Tier-0 administrator",
+        "Record which domain controller holds the PDC emulator role and alert on a change",
+        "Transfer the role through the documented process rather than by granting the right"
+      ],
+      "remediation": [
+        "Удалите Change-PDC у всех субъектов, не являющихся администраторами Tier 0.",
+        "Зафиксируйте, какой контроллер домена выполняет роль PDC emulator, и настройте оповещение о её переносе.",
+        "Переносите роль установленной процедурой, а не путём предоставления лишних разрешений."
+      ]
+    },
+    "DOMAIN_ROOT_NON_DEFAULT_OWNER": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The owner can write itself DS-Replication-Get-Changes and DS-Replication-Get-Changes-All and run a DCSync",
+        "It can grant itself GenericAll on the domain object and inherit that down to every object in the domain",
+        "No entry in the DACL has to exist for any of this, so an audit that reads only the DACL sees nothing",
+        "Ownership survives a DACL reset, which is what most hardening scripts do"
+      ],
+      "impact": [
+        "Владелец может выдать себе DS-Replication-Get-Changes и DS-Replication-Get-Changes-All, затем выполнить DCSync.",
+        "Он может назначить себе GenericAll на объекте домена и распространить такие права ниже по иерархии.",
+        "Для этого в DACL не обязана заранее существовать разрешающая ACE, поэтому аудит только DACL не выявит риск.",
+        "Владение сохраняется после сброса DACL, которым обычно ограничиваются скрипты усиления безопасности."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set the owner of the domain object back to Domain Admins or Administrators",
+        "Establish how it changed: taking ownership requires WriteOwner or SeTakeOwnershipPrivilege, and both are worth auditing",
+        "Check the owner of the other Tier-0 objects at the same time - AdminSDHolder, the Domain Controllers OU, the GPOs linked to it"
+      ],
+      "remediation": [
+        "Верните владельца объекта домена к Domain Admins либо Administrators.",
+        "Установите причину смены владельца: для захвата нужны WriteOwner или SeTakeOwnershipPrivilege, и оба следует проверить.",
+        "Одновременно проверьте владельцев других объектов Tier 0: AdminSDHolder, OU Domain Controllers и привязанных к нему GPO."
+      ]
+    },
+    "DOMAIN_ROOT_REANIMATE_TOMBSTONES": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "A restored account comes back with its original SID, and every ACE naming that SID applies again",
+        "With the AD Recycle Bin enabled it also comes back with its password and its group memberships",
+        "Restoring keeps the SID, so it also restores access granted on other systems that trust that SID",
+        "The holder needs write access to the deleted object as well - an account it administered before the deletion, one it created, or one whose ACL grants it - so the right is as wide as those objects"
+      ],
+      "impact": [
+        "Восстановленная учётная запись сохраняет исходный SID, поэтому ранее предоставленные этому SID разрешения начинают действовать снова.",
+        "При включённой AD Recycle Bin запись восстанавливается также со своим паролем и членством в группах.",
+        "Сохранение SID возвращает доступ и на других системах, где права выдавались этому SID.",
+        "Обладателю права дополнительно нужен доступ на запись к удалённому объекту — например, к ранее управляемому или созданному им объекту либо объекту с подходящей ACL; масштаб риска зависит от таких объектов."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the right from every principal that is not a Tier-0 administrator",
+        "Review the deleted objects for formerly privileged accounts, and recycle those that will not be restored",
+        "Audit restores - a restore is a modification of a deleted object, logged as event 5138 (a directory service object was undeleted)"
+      ],
+      "remediation": [
+        "Удалите право у всех субъектов, кроме администраторов Tier 0.",
+        "Проверьте удалённые объекты на наличие ранее привилегированных учётных записей и обработайте те, которые не планируется восстанавливать.",
+        "Отслеживайте восстановление объектов: операция фиксируется как Event ID 5138 (объект службы каталогов восстановлен после удаления)."
+      ]
+    },
+    "DOMAIN_ROOT_REPLICA_INSTALL": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "A machine the attacker controls can be brought up as a replica and receive the entire directory",
+        "That includes the credential material a DCSync would otherwise have to be granted separately",
+        "The replication traffic is legitimate, so it does not look like an export",
+        "Removing a rogue replica afterwards does not undo what it already received"
+      ],
+      "impact": [
+        "Атакующий может развернуть на контролируемом компьютере реплику и получить весь каталог.",
+        "В том числе поступят учётные данные, для извлечения которых иначе потребовалось бы отдельное право DCSync.",
+        "Трафик репликации выглядит штатным и не похож на отдельный экспорт данных.",
+        "Позднейшее удаление посторонней реплики не отменяет передачу уже полученных сведений."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the right from every principal that is not a domain controller or a Tier-0 administrator",
+        "Compare the list of domain controllers against the expected one",
+        "Alert on new objects in the Domain Controllers OU and on new nTDSDSA objects in the configuration partition"
+      ],
+      "remediation": [
+        "Удалите право у всех субъектов, кроме контроллеров домена и администраторов Tier 0.",
+        "Сверьте фактический список контроллеров домена с ожидаемым.",
+        "Настройте уведомления о новых объектах в OU Domain Controllers и новых nTDSDSA в разделе Configuration."
+      ]
+    },
+    "DOMAIN_ROOT_SID_HISTORY_WRITE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "A SID written into sIDHistory is added to the logon token, so the account holds the privilege of a group it is not a member of",
+        "Group membership reports and most audits read member and memberOf, neither of which shows this",
+        "The target account can be an ordinary user the attacker already controls",
+        "Removing the account from privileged groups does not remove the privilege"
+      ],
+      "impact": [
+        "SID, внесённый в sIDHistory, попадает в токен входа, благодаря чему учётная запись получает привилегии группы, в которой формально не состоит.",
+        "Отчёты о членстве обычно анализируют member и memberOf, не показывающие такие SID.",
+        "Целевой записью может быть обычный пользователь, которого атакующий уже контролирует.",
+        "Исключение записи из привилегированных групп не устраняет привилегии, полученные через sIDHistory."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the Migrate-SID-History right from every principal that is not an active migration service account",
+        "Audit sIDHistory across the domain for privileged SIDs of this domain - a local privileged SID there is never a migration artefact",
+        "Remove the right again once a migration has finished, rather than leaving it in place"
+      ],
+      "remediation": [
+        "Удалите право Migrate-SID-History у всех, кроме действующей служебной учётной записи миграции.",
+        "Проверьте sIDHistory в домене на привилегированные SID того же домена: локальный привилегированный SID здесь не является нормальным результатом миграции.",
+        "После завершения миграции обязательно отзовите право, не оставляя его постоянно."
+      ]
+    },
+    "GPO_NON_DEFAULT_OWNER": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The owner can add itself to the DACL with full control at any time, so removing its ACEs changes nothing",
+        "Ownership is not visible in the permission list a GPMC delegation tab shows - it needs the Advanced view or a DACL read",
+        "A GPO created by a delegated account keeps that account as its owner unless the creator's group is a default owner, which is how this state usually arises",
+        "An account that owns a GPO linked to the Domain Controllers OU can execute code on domain controllers"
+      ],
+      "impact": [
+        "Владелец может в любое время добавить в DACL собственную ACE с полным контролем, поэтому удаление его текущих ACE само по себе бесполезно.",
+        "Владение не отображается в обычном списке вкладки делегирования GPMC: нужна расширенная вкладка или чтение дескриптора безопасности.",
+        "GPO, созданная делегированной учётной записью, сохраняет её как владельца, если группа создателя не назначается владельцем по умолчанию; это распространённый источник проблемы.",
+        "Учётная запись — владелец GPO, привязанной к OU Domain Controllers, может добиться выполнения кода на контроллерах домена."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set the owner of every GPO to Domain Admins: in GPMC, Delegation -> Advanced -> Owner, or Set-Acl on the AD: provider path of the GPO object",
+        "Review why the current owner holds it - a delegated GPO creator keeps ownership of what it creates, so the Group Policy Creator Owners membership is the place to look",
+        "Audit ownership together with the DACL from then on, since an owner needs no ACE to regain control"
+      ],
+      "remediation": [
+        "Назначьте владельцем GPO Domain Admins: GPMC → Delegation → Advanced → Owner или Set-Acl на AD:-пути объекта GPO.",
+        "Проверьте причину владения: делегированный создатель GPO сохраняет право собственности, поэтому отдельно проверьте членство в Group Policy Creator Owners.",
+        "В дальнейшем проверяйте владельца вместе с DACL: владелец не нуждается в отдельной ACE для восстановления контроля."
+      ]
+    }
+  }
+}
