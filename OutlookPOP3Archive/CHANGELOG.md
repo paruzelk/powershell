@@ -1,5 +1,10 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH3b DEV — 2026-11-12
+- Added `Core/Archive/ARCH3bOriginalMoverContract.ps1` as a non-writing bridge to **existing** `ArchiveSelector` rows, original `Get-OPAArchivePartPath` and `Get-OPAArchiveTargetPath` functions, not a duplicate archiver or new COM mover. Canonical length-tagged source Transaction/Store/EntryID/date/folder/year/part/target sha256 identity and validation against changed originals; bounded duplicate-safe multi-year batch previews.
+- Pure stage-order policy requires PrepareIntent BEFORE any existing destination-PST creation, source semantic SHA witness before durable claimed COM Move, independent Outlook restart verification before committing DuplicateIndex; fails closed on unknown COM result, duplicate/out-of-order or forged evidence. No step writes, no PST/COM touches, no writer/retry permits from this bridge; existing Archive/Resume/Auto closed.
+- Read-only operator `Invoke-ARCH3b.ps1` with Plan/SyntheticPreview/SyntheticCrashReview; 48 Pester cases, expected full Windows PowerShell 5.1 CI 4145 tests / 136 containers, PSSA/BOM/JSON gates. Next ARCH3c is actual safe integration of a persisted receipt protocol with the original MailMover; not yet production-ready.
+
 ## 2.6.5-ARCH3a DEV — 2026-11-12
 - Adopt [ADR ARCH3-001](docs/ADR-ARCH3-001-reuse-existing-archiver.md): use **original** OutlookPOP3Archive and legacy Year/PST routing, recursive POP3 Inbox/Sent/custom folder traversal, original transaction, index and verifier. Integrate ARCH2d5 safety constraints without building a parallel archiver.
 - Correct prior inventory overstatement: original `ArchiveVerifier` already performs full semantic Body/HTML/recipients/by-value attachment SHA256 comparison under `-RequireSemanticWitness`, also passed by current main Archive/Resume callers. Remaining gap is cross-process independently anchored claims/receipts, multi-folder/year and crash-safe resume, not absent Year routing or absent hash verifier.
