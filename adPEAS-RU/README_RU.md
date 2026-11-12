@@ -416,3 +416,31 @@ Workflow GitHub Actions теперь создаёт после проверок 
 **Состояние после D7:** построчно сверены **126 из 392** наборов Impact/Remediation (осталось **266**); неполных по количеству пунктов осталось **202 Impact**, **185 Remediation**. Из **304/304** исходно непустых Attack все переведены; 88 отсутствующих в оригинале не добавлялись.
 
 Архив этапа: `adPEAS-RU-2.9.0-STAGE-D7-20261112.zip`.
+
+
+## Этап D8 — права GPO, репликация, объект домена и SYSVOL (12 ноября 2026)
+
+Два новых каталога `Localization/SourceVerifiedCore-17a.ru-RU.json` и `Localization/SourceVerifiedCore-17b.ru-RU.json` содержат переводы **24 находок: 79 пунктов Impact и 75 пунктов Remediation**. Каждая русская строка сопоставлена с одним точным английским пунктом закреплённого adPEAS 2.9.0 (`ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`); не изменены условия проверки, исходные английские определения, риск, машинные идентификаторы или исполняемые команды.
+
+**ACL и репликация (6):** `DANGEROUS_ACL_GPO_DELETE`, `DANGEROUS_ACL_GPO_EXTENDED`, `DANGEROUS_ACL_GPO_WRITEPROPERTY`, `DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED`, `DANGEROUS_ACL_REPLICATION_INERT_HALF`, `DANGEROUS_ACL_REPLICATION_NO_SECRETS`.
+
+**Права и владение объектом домена (5):** `DOMAIN_ROOT_FSMO_TRANSFER`, `DOMAIN_ROOT_NON_DEFAULT_OWNER`, `DOMAIN_ROOT_REANIMATE_TOMBSTONES`, `DOMAIN_ROOT_REPLICA_INSTALL`, `DOMAIN_ROOT_SID_HISTORY_WRITE`.
+
+**GPO (13):** `GPO_NON_DEFAULT_OWNER`, `GPO_LOCAL_GROUP_MEMBER`, `GPO_REGISTRY_PASSWORD`, `GPO_SCOPE_DOMAIN_WIDE`, `GPO_SCRIPT_OUTSIDE_POLICY_STORE`, `GPO_SEMACHINEACCOUNTPRIVILEGE_BROAD`, `GPO_SYSVOL_FOLDER_ORPHANED`, `GPO_SYSVOL_GPT_MISSING`, `GPO_TASK_CMD_UNQUOTED_PATH`, `GPO_TASK_UNQUOTED_PATH`, `GPO_POINTANDPRINT_DRIVER_SOURCE`, `GPO_POINTANDPRINT_LATENT`, `GPO_POINTANDPRINT_NONADMIN_INSTALL`.
+
+### Критичные различия
+
+- **Неполные репликационные права:** `DANGEROUS_ACL_REPLICATION_INERT_HALF` само по себе не выполняет DCSync без `DS-Replication-Get-Changes`, но добавление одной ACE может сделать атаку возможной; `DANGEROUS_ACL_REPLICATION_NO_SECRETS` уже раскрывает несекретные атрибуты и дескрипторы безопасности, но не должно автоматически называться полным DCSync.
+- **Владелец:** `DOMAIN_ROOT_NON_DEFAULT_OWNER` и `GPO_NON_DEFAULT_OWNER` дают владельцу путь к изменению DACL; удаление отдельных ACE не устраняет риск. `Set-GPPermission` не изменяет владельца или унаследованные ACE.
+- **Точное право GPO:** `DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED` зависит от *конкретного* атрибута и не равнозначно произвольному исполнению кода. Смена WMI-фильтра влияет на область действия.
+- **Возврат SID:** восстановление объекта с тем же SID может вернуть ранее выданные разрешения; при AD Recycle Bin сохраняются дополнительные атрибуты. `DOMAIN_ROOT_SID_HISTORY_WRITE` позволяет добавить SID в токен без членства в группе.
+- **SYSVOL:** осиротевшая папка GPO сейчас не применяется, но файлы внутри могут оставаться доступны для чтения; при отсутствующей GPT-папке политике нечего применять, а поведение различается по DC, если репликация SYSVOL повреждена.
+- **Пути задания:** `GPO_TASK_UNQUOTED_PATH` в обычном Task Scheduler *не* означает эксплуатацию пути без кавычек: планировщик сам обрабатывает путь. `GPO_TASK_CMD_UNQUOTED_PATH` имеет другой риск, поскольку исполнение проходит через `cmd.exe`.
+- **Point and Print:** сохранено различие между скрытой и уже действующей уязвимостью в зависимости от обновления августа 2021 года, а также требования к одновременному применению Package Point and Print и Approved servers.
+- **Масштаб GPO:** фильтрация безопасности должна сохранять чтение GPO для `Domain Computers` с учётом MS16-072; WMI-фильтрация не заменяет её.
+
+Тест `Tests/Test-StageD8VerifiedCoreRU.ps1` проверяет исходные пункты EN, строки русского каталога, встроенный HTML-словарь, 24 ID и 24 критичные смысловые оговорки. `Localization/Apply-FullTechnical.ps1` запрещает перезапись ранее проверенных находок; тест D7 теперь не зависит от меняющейся общей статистики.
+
+**Состояние D8:** полная предметная сверка Impact/Remediation выполнена для **150/392** типов, остаётся **242**. Несовпадений количества пунктов осталось **179 Impact и 164 Remediation**. Разделы Attack, непустые в оригинале, переведены **304/304**; 88 пустых не заполнялись.
+
+Архив: `adPEAS-RU-2.9.0-STAGE-D8-20261112.zip`.
