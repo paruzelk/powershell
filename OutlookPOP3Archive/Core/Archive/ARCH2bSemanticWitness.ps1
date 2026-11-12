@@ -277,7 +277,7 @@ function Compare-OPA265ARCH2bMailSemanticWitness {
         if(([IO.File]::GetAttributes($path) -band [IO.FileAttributes]::ReparsePoint) -ne 0){
             throw 'ARCH2c1 workspace inventory includes a reparse point; manual review required.'
         }
-        $folder=New-Object IO.DirectoryInfo($path)
+        $folder=Get-Item -LiteralPath $path -Force
         $rows.Add([pscustomobject][ordered]@{
             WorkspacePath=[string]$folder.FullName
             LastWriteTimeUtc=[datetime]$folder.LastWriteTimeUtc
