@@ -1,0 +1,244 @@
+{
+  "schema": "adPEAS-RU.StageD10.CoreFields.19a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "REGISTRY_FILTERADMINTOKEN": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "RID-500 admin usable for remote pass-the-hash",
+        "Lateral movement via the built-in admin hash"
+      ],
+      "impact": [
+        "Встроенная учётная запись Administrator с RID 500 может использоваться для удалённой атаки Pass-the-Hash.",
+        "Хеш встроенного администратора позволяет горизонтально перемещаться между компьютерами."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set FilterAdministratorToken=1; use LAPS for unique passwords"
+      ],
+      "remediation": [
+        "Установите FilterAdministratorToken=1; используйте LAPS, чтобы локальные пароли были уникальными."
+      ]
+    },
+    "REGISTRY_MACHINE_PASSWORD_STATIC": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Machine account password never rotates",
+        "Long-lived silver tickets remain valid"
+      ],
+      "impact": [
+        "Пароль компьютерной учётной записи никогда не меняется автоматически.",
+        "Длительное время остаются действительными поддельные билеты служб (silver tickets)."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Re-enable machine password rotation (remove the value / set to 0)"
+      ],
+      "remediation": [
+        "Вновь включите ротацию пароля компьютерной учётной записи: удалите параметр либо установите значение 0."
+      ]
+    },
+    "REGISTRY_OFFICE_MACROS_ON": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "Code execution as the user from any document that reaches them - mail, download, share"
+      ],
+      "impact": [
+        "Любой документ, доставленный пользователю по почте, через загрузку или общий ресурс, может выполнять код с его полномочиями."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set the setting to 'Disable all except digitally signed macros' (3) or stricter",
+        "Block macros in files from the internet"
+      ],
+      "remediation": [
+        "Установите «Disable all except digitally signed macros» (значение 3) либо более строгую настройку.",
+        "Заблокируйте макросы в файлах, полученных из Интернета."
+      ]
+    },
+    "REGISTRY_ONELOGON": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Listed machine/trust accounts can be attacked via insecure Netlogon",
+        "Enables meet-in-the-middle and brute-force secure-channel compromise",
+        "Can lead to domain controller / account takeover"
+      ],
+      "impact": [
+        "Перечисленные учётные записи компьютеров и доверительных отношений уязвимы при использовании небезопасного канала Netlogon.",
+        "Возможны атаки «человек посередине» и перебор для компрометации защищённого канала.",
+        "Последствия могут включать захват контроллера домена либо учётной записи."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove all entries from the allow-list and delete the policy",
+        "Ensure all clients support secure Netlogon (RPC signing/sealing)"
+      ],
+      "remediation": [
+        "Удалите все записи из списка исключений и удалите соответствующую политику.",
+        "Убедитесь, что все клиенты поддерживают защищённый Netlogon (подпись и запечатывание RPC, signing/sealing)."
+      ]
+    },
+    "REGISTRY_PRINT_RPC_PRIVACY": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "The print spooler accepts IRemoteWinspool calls at the lower authentication level again, which reopens the relay CVE-2021-1678 describes",
+        "The value is usually set to keep old print clients working, and stays after they are gone"
+      ],
+      "impact": [
+        "Диспетчер печати вновь принимает вызовы IRemoteWinspool с пониженным уровнем аутентификации, открывая путь для relay-атаки CVE-2021-1678.",
+        "Значение часто устанавливают ради совместимости со старыми клиентами печати, но не удаляют после их замены."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the value from the policy, or set it to 1",
+        "Update the print clients that needed it - Microsoft requires the January 12, 2021 update or later on them"
+      ],
+      "remediation": [
+        "Удалите параметр из политики либо установите его равным 1.",
+        "Обновите зависевшие от него клиенты печати: Microsoft требует обновление от 12 января 2021 года или более позднее."
+      ]
+    },
+    "REGISTRY_RDP_ENCRYPTION": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Server-to-client RDP traffic sent unencrypted",
+        "Client-to-server traffic uses breakable legacy RC4"
+      ],
+      "impact": [
+        "Трафик RDP от сервера к клиенту передаётся без шифрования.",
+        "Трафик от клиента к серверу использует устаревшее RC4, поддающееся взлому."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set MinEncryptionLevel=3 (High) or enforce TLS via SecurityLayer=2, which makes this setting moot"
+      ],
+      "remediation": [
+        "Установите MinEncryptionLevel=3 (High) либо принудительно используйте TLS через SecurityLayer=2; при TLS эта настройка теряет значение."
+      ]
+    },
+    "REGISTRY_RDP_SECURITYLAYER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "No certificate validation - a MITM server is indistinguishable from the real one",
+        "Weak native RDP encryption protects the session, not TLS",
+        "Credentials and session content are interceptable in transit"
+      ],
+      "impact": [
+        "Сертификат сервера не проверяется: атакующий сервер «человек посередине» неотличим от настоящего.",
+        "Сеанс защищён слабым встроенным шифрованием RDP вместо TLS.",
+        "Учётные данные и содержимое сеанса могут быть перехвачены при передаче."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set SecurityLayer=2 (TLS) via GPO; 1 (Negotiate) still allows fallback to the insecure layer"
+      ],
+      "remediation": [
+        "Через GPO установите SecurityLayer=2 (TLS); значение 1 (Negotiate) по-прежнему допускает переход к небезопасному механизму."
+      ]
+    },
+    "REGISTRY_REMOTEUAC": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Local admin accounts usable for remote pass-the-hash",
+        "Greatly eases lateral movement across the scope"
+      ],
+      "impact": [
+        "Локальные администраторы могут использоваться для удалённой атаки Pass-the-Hash.",
+        "Значительно упрощается горизонтальное перемещение в области применения настройки."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove LocalAccountTokenFilterPolicy or set it to 0",
+        "The value is often set deliberately by a product: RMM, backup and monitoring agents that work remotely with a local account lose their elevated token when it goes. Find out which agent needs it and give that one a domain account or a documented exception, rather than removing the value and waiting for the outage",
+        "Use LAPS to ensure unique local admin passwords"
+      ],
+      "remediation": [
+        "Удалите LocalAccountTokenFilterPolicy либо установите его равным 0.",
+        "Значение нередко намеренно используют RMM, резервное копирование и системы мониторинга с локальной учётной записью: после удаления параметра их агент потеряет повышенный токен. Сначала выясните зависимость, затем выделите агенту доменную учётную запись или документированное исключение, а не дожидайтесь отказа работы.",
+        "Применяйте LAPS, обеспечивая уникальные пароли локальных администраторов."
+      ]
+    },
+    "REGISTRY_SCRIPTBLOCK_LOGGING_OFF": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "PowerShell attack tooling - download cradles, AMSI bypasses, offensive modules - leaves no 4104 event on the computers in scope",
+        "Detection rules and incident response that rely on the PowerShell Operational log find nothing there"
+      ],
+      "impact": [
+        "Атакующие сценарии PowerShell — загрузчики, обходы AMSI, наступательные модули — не оставляют события 4104 на затронутых компьютерах.",
+        "Правила обнаружения и расследования, опирающиеся на журнал PowerShell Operational, не находят в нём записей об этих блоках."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set the policy to Enabled - or at least to Not configured, which keeps the automatic logging of suspicious script blocks",
+        "Enable Protected Event Logging along with it, so that logged script content stays encrypted"
+      ],
+      "remediation": [
+        "Установите политику в Enabled или как минимум Not configured: тогда сохраняется автоматическое журналирование подозрительных блоков сценариев.",
+        "Также включите Protected Event Logging, чтобы записанное содержимое сценариев хранилось в зашифрованном виде."
+      ]
+    },
+    "REGISTRY_SMB1_SERVER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "An attacker in the path can downgrade a connection to SMBv1, which has no pre-authentication integrity",
+        "SMBv1 carries no encryption, so an encrypted share is read in the clear over it unless unencrypted access is refused",
+        "Old remote code execution flaws in SMBv1 (EternalBlue, MS17-010) reach every unpatched machine in scope"
+      ],
+      "impact": [
+        "Атакующий на пути сетевого обмена может понизить протокол до SMBv1, где нет проверки целостности до аутентификации.",
+        "SMBv1 не шифрует данные: содержимое ресурса, требующего шифрования, передаётся открыто, если не запрещён незашифрованный доступ.",
+        "Старые уязвимости удалённого выполнения кода в SMBv1 (EternalBlue, MS17-010) затрагивают все необновлённые компьютеры в области политики."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set SMB1=0 - or remove the setting and uninstall the SMB 1.0/CIFS File Sharing Support feature",
+        "Audit SMBv1 use first: Set-SmbServerConfiguration -AuditSmb1Access `$true, then event 3000 in Microsoft-Windows-SMBServer/Audit",
+        "Update or replace the device that still needs SMBv1 (Microsoft's SMB1 Product Clearinghouse)"
+      ],
+      "remediation": [
+        "Установите SMB1=0 либо удалите настройку и компонент SMB 1.0/CIFS File Sharing Support.",
+        "Сначала проверьте использование SMBv1: Set-SmbServerConfiguration -AuditSmb1Access `$true; затем событие 3000 в Microsoft-Windows-SMBServer/Audit.",
+        "Обновите или замените устройства, которым ещё требуется SMBv1 (Microsoft SMB1 Product Clearinghouse)."
+      ]
+    },
+    "REGISTRY_SMB2_SERVER_DISABLED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "No SMB encryption and no pre-authentication integrity on the machines in scope",
+        "Clients fall back to SMBv1 where the server still offers it"
+      ],
+      "impact": [
+        "На затронутых компьютерах отсутствуют шифрование SMB и проверка целостности до аутентификации.",
+        "Клиенты переходят к SMBv1, если сервер всё ещё поддерживает его."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the setting or set SMB2=1; the default is enabled"
+      ],
+      "remediation": [
+        "Удалите этот параметр либо установите SMB2=1; по умолчанию он включён."
+      ]
+    },
+    "REGISTRY_SMB_UNENCRYPTED_ACCESS": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Data on shares that require encryption crosses the network unencrypted to clients that do not encrypt",
+        "An attacker in the path can downgrade a client to SMB 1.0 and read an encrypted share in the clear"
+      ],
+      "impact": [
+        "Данные на общих ресурсах с требованием шифрования передаются без шифрования клиентам, которые его не поддерживают.",
+        "Атакующий на сетевом пути может понизить клиент до SMB 1.0 и прочитать открытым текстом содержимое ресурса, рассчитанного на шифрование."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the setting; the default rejects unencrypted access",
+        "Update the clients that cannot encrypt, and disable the SMB 1.0 server"
+      ],
+      "remediation": [
+        "Удалите настройку; по умолчанию незашифрованный доступ отклоняется.",
+        "Обновите клиентов без поддержки шифрования и отключите сервер SMB 1.0."
+      ]
+    }
+  }
+}
