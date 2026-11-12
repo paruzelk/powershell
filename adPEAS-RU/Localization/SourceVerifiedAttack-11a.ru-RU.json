@@ -1,0 +1,409 @@
+{
+  "schema": "adPEAS-RU.StageD2.Attack.11a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "note": "Every English step pinned; protective explanations preserved",
+  "translations": {
+    "GPO_POINTANDPRINT_LATENT": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Wait for or provoke RestrictDriverInstallationToAdministrators=0 (a common printer troubleshooting step)",
+        "2. Serve a malicious driver from a print server",
+        "3. The driver installs with no prompt and runs as SYSTEM"
+      ],
+      "attack": [
+        "1. Дождаться установки RestrictDriverInstallationToAdministrators=0 либо спровоцировать её (частый шаг при устранении неполадок печати).",
+        "2. Разместить вредоносный драйвер на сервере печати.",
+        "3. Драйвер установится без запроса и выполнится от имени SYSTEM."
+      ]
+    },
+    "GPO_POINTANDPRINT_NONADMIN_INSTALL": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Serve a malicious printer driver from a print server",
+        "2. Get a user in scope to connect to the printer and accept the prompt",
+        "3. The driver payload runs as SYSTEM"
+      ],
+      "attack": [
+        "1. Разместить вредоносный драйвер принтера на сервере печати.",
+        "2. Побудить пользователя, на которого действует политика, подключиться к принтеру и принять запрос подтверждения.",
+        "3. Полезная нагрузка драйвера выполнится от имени SYSTEM."
+      ]
+    },
+    "GPO_POINTANDPRINT_USER_SCOPE": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. Read the effective machine-scope configuration instead of this policy",
+        "2. Attack according to the Computer Configuration or the Windows default"
+      ],
+      "attack": [
+        "1. Вместо этой пользовательской политики проверить действующие настройки уровня компьютера.",
+        "2. Оценивать возможность атаки по разделу «Конфигурация компьютера» либо по умолчаниям Windows."
+      ]
+    },
+    "GPO_PRINT_DRIVER_HARDENING": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Intercept the cleartext HTTP driver download and substitute a malicious package",
+        "2. Or have a user install an attacker-supplied driver via the local add-printer flow",
+        "3. The driver code runs in a privileged context"
+      ],
+      "attack": [
+        "1. Перехватить незашифрованную загрузку драйвера по HTTP и подменить пакет вредоносным.",
+        "2. Либо побудить пользователя установить предоставленный нарушителем драйвер через локальное добавление принтера.",
+        "3. Код драйвера выполняется в привилегированном контексте."
+      ]
+    },
+    "GPO_PRINT_QUEUE_SPECIFIC_FILES": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Stand up a print server offering a queue with attacker-chosen queue-specific files",
+        "2. Have a client in scope connect to that queue",
+        "3. The spooler copies the files locally, enabling SYSTEM-level code execution"
+      ],
+      "attack": [
+        "1. Развернуть сервер печати с очередью, предлагающей выбранные нарушителем файлы, специфичные для очереди.",
+        "2. Побудить клиентский компьютер в области политики подключиться к этой очереди.",
+        "3. Диспетчер печати скопирует файлы локально, что позволяет выполнить код с правами SYSTEM."
+      ]
+    },
+    "GPO_PRINT_SPOOLER_RPC": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Locate machines with a reachable spooler RPC endpoint",
+        "2. Coerce authentication via MS-RPRN RpcRemoteFindFirstPrinterChangeNotification",
+        "3. Relay the coerced authentication, for example to AD CS or LDAP"
+      ],
+      "attack": [
+        "1. Найти компьютеры с доступным RPC-интерфейсом диспетчера печати.",
+        "2. Принудить их к аутентификации через MS-RPRN RpcRemoteFindFirstPrinterChangeNotification.",
+        "3. Ретранслировать вызванную аутентификацию, например к AD CS либо LDAP."
+      ]
+    },
+    "GPO_REGISTRY_PASSWORD": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker reads Registry.pol and Registry.xml from SYSVOL - any domain account can - or from a copy of the policy on a share",
+        "2. Picks the values named like a password",
+        "3. Uses the password against the service or account it belongs to"
+      ],
+      "attack": [
+        "1. Прочитать Registry.pol и Registry.xml из SYSVOL (это доступно любой доменной записи) либо копию политики на общем ресурсе.",
+        "2. Найти значения с именами, похожими на пароль.",
+        "3. Использовать найденный пароль против связанной с ним службы или учётной записи."
+      ]
+    },
+    "GPO_SCRIPT_OUTSIDE_POLICY_STORE": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker reads the policy's scripts.ini or psscripts.ini out of SYSVOL, which any authenticated user may do",
+        "2. Checks who may write the path it names - a share with loose permissions, or a local directory users can write",
+        "3. Replaces the script, or creates it where it is missing",
+        "4. Waits for the next boot or logon, and the code runs in the script's context"
+      ],
+      "attack": [
+        "1. Прочитать scripts.ini или psscripts.ini политики из SYSVOL, что разрешено любому аутентифицированному пользователю.",
+        "2. Проверить права записи на указанный там путь: общий ресурс со слабыми ACL либо локальный каталог, доступный для записи пользователям.",
+        "3. Заменить сценарий либо создать файл, если его нет.",
+        "4. Дождаться следующего запуска компьютера или входа пользователя: код выполнится в контексте сценария."
+      ]
+    },
+    "GPO_TASK_CMD_UNQUOTED_PATH": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Read the task out of ScheduledTasks.xml in SYSVOL as any domain user",
+        "2. Check whether the directory of the truncated path is writable on a target - for C:\\Tools\\My App\\run.bat that is C:\\Tools",
+        "3. Create C:\\Tools\\My.exe there",
+        "4. The next run of the task starts it in the task's account"
+      ],
+      "attack": [
+        "1. Как любой пользователь домена прочитать задание из ScheduledTasks.xml в SYSVOL.",
+        "2. Проверить доступность записи в каталог, полученный усечением пути: для C:\\Tools\\My App\\run.bat это C:\\Tools.",
+        "3. Создать там C:\\Tools\\My.exe.",
+        "4. При следующем запуске задание выполнит его от имени своей учётной записи."
+      ]
+    },
+    "GPO_TASK_SYSTEM_UNC_PATH": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker reads the UNC path out of ScheduledTasks.xml in SYSVOL and checks the share's permissions",
+        "2. Replaces the executable or script there with a malicious payload",
+        "3. Task executes the payload as SYSTEM, or as the privileged account, on all affected hosts",
+        "4. Gains SYSTEM access on multiple computers - or the privileges of that account, which for a domain administrator is the domain"
+      ],
+      "attack": [
+        "1. Прочитать UNC-путь из ScheduledTasks.xml в SYSVOL и проверить разрешения общего ресурса.",
+        "2. Заменить исполняемый файл или сценарий по этому пути вредоносным.",
+        "3. Задание запустит его от имени SYSTEM либо привилегированной записи на всех затронутых узлах.",
+        "4. Получить права SYSTEM на нескольких компьютерах либо полномочия этой записи; для Domain Admin это может означать контроль над доменом."
+      ]
+    },
+    "GPO_TASK_UNQUOTED_PATH": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. The same unquoted path is copied into a command line that gets split, such as cmd.exe /c or a service ImagePath",
+        "2. There Windows tries each truncation in turn - C:\\Program.exe before C:\\Program Files\\App Folder\\task.exe",
+        "3. An attacker who can create a file at the truncated location runs code in that context"
+      ],
+      "attack": [
+        "1. Такой же путь без кавычек попадает в разбираемую на части командную строку, например cmd.exe /c или ImagePath службы.",
+        "2. Windows последовательно пробует усечения: C:\\Program.exe раньше C:\\Program Files\\App Folder\\task.exe.",
+        "3. Нарушитель, способный создать файл по усечённому пути, выполняет код в соответствующем контексте."
+      ]
+    },
+    "GPO_USERRIGHT_DEFAULT_REMOVED": {
+      "sourceEnglishAttackStepCount": 1,
+      "sourceEnglishAttack": [
+        "Not an attack path - reported so the reader can tell a deliberate removal from an accidental one, and confirm nothing that still needs the right lost it"
+      ],
+      "attack": [
+        "Это не путь атаки: находка нужна, чтобы отличить намеренное удаление права от случайного и убедиться, что его не потеряли объекты, которым оно по-прежнему необходимо."
+      ]
+    },
+    "GUEST_ACCOUNT_ENABLED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker identifies enabled Guest account",
+        "2. Attempts authentication with blank or common passwords",
+        "3. Enumerates accessible resources and permissions",
+        "4. Uses Guest access for lateral movement or privilege escalation"
+      ],
+      "attack": [
+        "1. Выявить включённую учётную запись Guest.",
+        "2. Попробовать аутентификацию с пустым или распространённым паролем.",
+        "3. Перечислить доступные ресурсы и разрешения.",
+        "4. Использовать гостевой доступ для бокового перемещения либо повышения привилегий."
+      ]
+    },
+    "INTERDOMAIN_TRUST_ACCOUNT": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Extract the trust key from the trust account (DCSync or NTDS.dit)",
+        "2. Forge an inter-realm TGT with SIDHistory of Enterprise Admins",
+        "3. Present the forged ticket to the trusted domain's KDC",
+        "4. Gain administrative access across the trust boundary"
+      ],
+      "attack": [
+        "1. Извлечь ключ доверия из учётной записи доверительного отношения (через DCSync либо NTDS.dit).",
+        "2. Подделать междоменный TGT с SIDHistory группы Enterprise Admins.",
+        "3. Предъявить поддельный билет KDC доверенного домена.",
+        "4. Получить административный доступ через границу доверия."
+      ]
+    },
+    "KERBEROS_TICKET_LIFETIME_EXTENDED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker obtains a TGT - from LSASS on a machine the user logged on to, or forged with the krbtgt key",
+        "2. Uses it for the remainder of its lifetime, with no further contact with the password",
+        "3. Renews it inside the renewal window, which costs one request and extends the hold"
+      ],
+      "attack": [
+        "1. Получить TGT из LSASS компьютера, где входил пользователь, либо подделать его при наличии ключа krbtgt.",
+        "2. Пользоваться билетом до конца срока его действия без повторного обращения к паролю.",
+        "3. Продлевать билет в разрешённом интервале обновления: для этого достаточно одного запроса, а время доступа увеличивается."
+      ]
+    },
+    "LAPS_COVERAGE_NOT_IN_AD": {
+      "sourceEnglishAttackStepCount": 1,
+      "sourceEnglishAttack": [
+        "Nothing follows from this state by itself. It is reported so the coverage figure above is not read as evidence of unmanaged passwords when it is not."
+      ],
+      "attack": [
+        "Из самого этого состояния ничего не следует. Оно показано, чтобы приведённый выше показатель охвата LAPS не приняли за доказательство отсутствия управляемых паролей, если это не так."
+      ]
+    },
+    "LAPS_ENCRYPTED_PASSWORD": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker reads msLAPS-EncryptedPassword, which the ACL allows, and keeps the blobs",
+        "2. Parses the target SID out of them to learn which principal can decrypt",
+        "3. Looks for a path into that principal, by default Domain Admins",
+        "4. Opens every blob collected earlier, offline, as soon as that path exists"
+      ],
+      "attack": [
+        "1. Прочитать разрешённый ACL атрибут msLAPS-EncryptedPassword и сохранить зашифрованные блоки данных.",
+        "2. Извлечь из блоков SID целевого субъекта, способного выполнять расшифровку.",
+        "3. Найти путь к получению его полномочий (по умолчанию это Domain Admins).",
+        "4. После получения такого доступа автономно расшифровать все ранее собранные блоки."
+      ]
+    },
+    "LAPS_ENCRYPTED_READ_NO_DECRYPTOR": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker controls a principal that can read msLAPS-EncryptedPassword",
+        "2. Collects the blobs, which is quiet and needs no further right",
+        "3. Looks for a path into the group named in ADPasswordEncryptionPrincipal, by default Domain Admins",
+        "4. Opens every blob collected earlier as soon as that path exists"
+      ],
+      "attack": [
+        "1. Получить контроль над субъектом, имеющим право чтения msLAPS-EncryptedPassword.",
+        "2. Незаметно собрать зашифрованные блоки, не требуя дополнительных прав.",
+        "3. Найти путь к группе из ADPasswordEncryptionPrincipal, по умолчанию Domain Admins.",
+        "4. Сразу после получения доступа расшифровать все собранные ранее блоки."
+      ]
+    },
+    "LAPS_GPO_DISABLED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker reads ms-Mcs-AdmPwdExpirationTime and sees a date that never moves",
+        "2. Obtains the password of one machine - from the directory or from the machine itself",
+        "3. It keeps working, because nothing is going to change it"
+      ],
+      "attack": [
+        "1. Прочитать ms-Mcs-AdmPwdExpirationTime и увидеть дату, которая не меняется.",
+        "2. Получить пароль одного компьютера из каталога либо с самого компьютера.",
+        "3. Продолжать использовать его, поскольку механизм не выполняет смену."
+      ]
+    },
+    "LAPS_GPO_ENCRYPTION_DISABLED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Authenticate to LDAP as any account with read access to the attribute",
+        "2. Query computers with (msLAPS-Password=*)",
+        "3. Read the cleartext local administrator password",
+        "4. Authenticate to the affected hosts as local administrator"
+      ],
+      "attack": [
+        "1. Аутентифицироваться в LDAP записью с правом чтения соответствующего атрибута.",
+        "2. Найти компьютеры с помощью фильтра (msLAPS-Password=*).",
+        "3. Прочитать открытый пароль локального администратора.",
+        "4. Войти на затронутые узлы от имени локального администратора."
+      ]
+    },
+    "LAPS_GPO_EXPIRATION_PROTECTION_DISABLED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Obtain write access to the LAPS password expiration attribute on a computer object",
+        "2. Set the expiration time far into the future",
+        "3. A previously captured local administrator password remains valid"
+      ],
+      "attack": [
+        "1. Получить право записи атрибута истечения срока пароля LAPS в объекте компьютера.",
+        "2. Установить срок истечения далеко в будущем.",
+        "3. Ранее полученный пароль локального администратора останется действительным."
+      ]
+    },
+    "LAPS_GPO_NOT_LINKED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Identify computers that were expected to be covered by this GPO",
+        "2. Confirm they carry no LAPS attribute in Active Directory",
+        "3. Target their local administrator accounts, which are likely static or shared"
+      ],
+      "attack": [
+        "1. Определить компьютеры, которые предполагалось охватить этой GPO.",
+        "2. Убедиться, что у них в Active Directory не заполнен атрибут LAPS.",
+        "3. Атаковать учётные записи локального администратора, пароли которых, вероятно, статичны или совпадают на разных компьютерах."
+      ]
+    },
+    "LAPS_GPO_NO_AD_BACKUP": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Identify hosts in scope of this GPO",
+        "2. Note that no LAPS attribute is populated for them in AD",
+        "3. Local administrator passwords on these hosts are unmanaged from an AD perspective, and may be static or shared"
+      ],
+      "attack": [
+        "1. Определить узлы в области действия этой GPO.",
+        "2. Установить, что их атрибуты LAPS не заполняются в AD.",
+        "3. Пароли локальных администраторов с точки зрения AD не управляются и могут быть статическими или общими."
+      ]
+    },
+    "LAPS_GPO_PASSWORD_AGE": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker reads or cracks the local administrator password of one machine",
+        "2. Uses it until LAPS rotates it - which the policy decides",
+        "3. Where the same interval applies domain-wide, that window is domain-wide too"
+      ],
+      "attack": [
+        "1. Прочитать или подобрать пароль локального администратора одного компьютера.",
+        "2. Использовать его до очередной смены LAPS, срок которой задаёт политика.",
+        "3. Если одинаковый интервал установлен во всём домене, такое окно риска распространяется на весь домен."
+      ]
+    },
+    "LAPS_GPO_PASSWORD_LENGTH": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker dumps the local SAM or captures the NTLM hash of the local administrator",
+        "2. Cracks it offline - the shorter the password, the sooner that finishes",
+        "3. Uses the password or its hash on every machine where the policy produced the same length"
+      ],
+      "attack": [
+        "1. Извлечь локальную базу SAM либо перехватить NTLM-хеш локального администратора.",
+        "2. Подобрать пароль автономно: чем он короче, тем быстрее подбор.",
+        "3. Использовать пароль или хеш на компьютерах, где политика создаёт пароли той же длины."
+      ]
+    },
+    "LAPS_GPO_WEAK_PASSWORD_COMPLEXITY": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Recover a local administrator hash from an affected host",
+        "2. Crack it against the reduced keyspace implied by the complexity setting",
+        "3. Reuse the recovered password where LAPS has not yet rotated it"
+      ],
+      "attack": [
+        "1. Извлечь хеш локального администратора затронутого узла.",
+        "2. Подобрать пароль в уменьшенном пространстве вариантов, заданном параметром сложности.",
+        "3. Повторно применить найденный пароль там, где LAPS ещё не выполнил смену."
+      ]
+    },
+    "LAPS_NOT_DEPLOYED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker compromises one workstation and extracts local admin hash",
+        "2. Uses hash to authenticate to other workstations (Pass-the-Hash)",
+        "3. Moves laterally across the network",
+        "4. Eventually reaches high-value targets"
+      ],
+      "attack": [
+        "1. Компрометировать рабочую станцию и извлечь хеш локального администратора.",
+        "2. Использовать хеш для входа на другие рабочие станции (Pass-the-Hash).",
+        "3. Перемещаться между компьютерами сети.",
+        "4. В конечном счёте достичь ценных целевых систем."
+      ]
+    },
+    "LAPS_PASSWORD_NOT_ROTATED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker reads the LAPS password of a machine, or finds an old one from any source",
+        "2. The password has not rotated, so it is still valid",
+        "3. Local administrator on the machine yields its cached credentials and its machine account",
+        "4. Machines that stopped rotating together often share one password, and the same credential opens the next host"
+      ],
+      "attack": [
+        "1. Прочитать пароль LAPS компьютера либо найти ранее полученный пароль из другого источника.",
+        "2. Поскольку пароль не менялся, он по-прежнему действителен.",
+        "3. Права локального администратора позволяют получить кэшированные учётные данные и машинную учётную запись.",
+        "4. Компьютеры, одновременно переставшие менять пароль, часто используют общий пароль, и те же данные открывают следующий узел."
+      ]
+    },
+    "LAPS_PASSWORD_READ_ACCESS": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker compromises account with LAPS read permissions",
+        "2. Enumerates computers where the account can read passwords",
+        "3. Retrieves LAPS passwords via LDAP (ms-Mcs-AdmPwd or msLAPS-Password)",
+        "4. Uses credentials for local admin access and credential harvesting"
+      ],
+      "attack": [
+        "1. Скомпрометировать запись с правом чтения паролей LAPS.",
+        "2. Перечислить компьютеры, чьи пароли может читать эта запись.",
+        "3. Получить пароли LAPS через LDAP (ms-Mcs-AdmPwd либо msLAPS-Password).",
+        "4. Использовать данные для доступа локального администратора и извлечения других учётных данных."
+      ]
+    },
+    "LAPS_READ_BLOCKED_BY_CONFIDENTIAL": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker holds, or takes over, the delegated principal",
+        "2. Reads the computer objects of the OU - every attribute except the confidential ones",
+        "3. Waits for, or brings about, the removal of the confidential flag, then reads the passwords"
+      ],
+      "attack": [
+        "1. Иметь либо получить контроль над субъектом с делегированным правом.",
+        "2. Прочитать объекты компьютеров OU — все атрибуты, кроме конфиденциальных.",
+        "3. Дождаться снятия флага конфиденциальности либо добиться этого, затем прочитать пароли."
+      ]
+    }
+  }
+}
