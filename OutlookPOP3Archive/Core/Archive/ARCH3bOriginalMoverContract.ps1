@@ -133,13 +133,14 @@ function New-OPA265ARCH3bBatchPreview {
 function Test-OPA265ARCH3bPhaseEvidence {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Contract,
-          [Parameter(Mandatory=$true)][AllowEmptyCollection()][object[]]$Events)
+          [Parameter(Mandatory=$true)][AllowNull()][AllowEmptyCollection()][object[]]$Events)
     # Hypothetical policy simulation only. Never enables a live Move.
     $allowed=@('PrepareIntent','DestinationReady','SourceWitnessAnchored','MoveClaimed','MoveReturned','IndependentContentVerified','IndexCommitted')
     $next=0
     $issues=New-Object 'System.Collections.Generic.List[string]'
     $unknown=$false
-    foreach($event in $Events){
+    # Classify null as invalid evidence instead of failing parameter binding.
+    foreach($event in @($Events)){
         if($null -eq $event){[void]$issues.Add('NullEvidence');continue}
         if([string]$event.OperationId -cne [string]$Contract.OperationId -or [string]$event.TransactionId -cne [string]$Contract.TransactionId){
             [void]$issues.Add('IdentityMismatch');continue
