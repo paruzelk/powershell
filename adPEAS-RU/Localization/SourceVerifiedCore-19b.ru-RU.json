@@ -1,0 +1,250 @@
+{
+  "schema": "adPEAS-RU.StageD10.CoreFields.19b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "REGISTRY_WSUS_USER_PROXY": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A standard user who sets a proxy of their own can intercept the update scan of the computer and offer it updates of their choosing, which the update service installs as SYSTEM",
+        "It matters only where the update server is reached over http:// - the finding 'WSUS configured over HTTP' says whether it is"
+      ],
+      "impact": [
+        "Обычный пользователь, задавший собственный прокси, может перехватить поиск обновлений компьютера и предложить выбранные им обновления, которые служба установки обновлений запускает от имени SYSTEM.",
+        "Риск существует только при обращении к серверу обновлений по http://; находка «WSUS configured over HTTP» показывает, используется ли такой адрес."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set 'Select the proxy behavior for Windows Update client for detecting updates' back to 'Only use system proxy for detecting updates' (0), or remove it",
+        "Reach the update server over https, which takes the question away"
+      ],
+      "remediation": [
+        "Верните параметр «Select the proxy behavior for Windows Update client for detecting updates» в «Only use system proxy for detecting updates» (значение 0) либо удалите его.",
+        "Используйте для сервера обновлений https, устраняя эту зависимость."
+      ]
+    },
+    "SYSVOL_FRS_REPLICATION": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "No domain controller from Windows Server 1709 on can be added until SYSVOL is migrated",
+        "The domain is held to old domain controllers, with their missing security features and patches",
+        "FRS replicates less reliably than DFSR: a policy or a script can differ between domain controllers"
+      ],
+      "impact": [
+        "Контроллеры домена с Windows Server 1709 и более новыми версиями не удастся добавить, пока SYSVOL не переведён на DFSR.",
+        "Домен остаётся привязанным к старым контроллерам домена, которым могут недоставать исправления и новые возможности защиты.",
+        "FRS реплицирует менее надёжно, чем DFSR: содержимое GPO и сценариев может отличаться между контроллерами домена."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Migrate SYSVOL to DFS Replication with dfsrmig on the PDC emulator: Prepared, Redirected, Eliminated",
+        "The domain functional level must be Windows Server 2008 or higher",
+        "Finish a migration that stopped halfway - FRS keeps replicating until the state is Eliminated"
+      ],
+      "remediation": [
+        "Перенесите репликацию SYSVOL на DFS Replication с помощью dfsrmig на эмуляторе PDC через стадии Prepared, Redirected и Eliminated.",
+        "Функциональный уровень домена должен быть не ниже Windows Server 2008.",
+        "Завершите миграцию, остановившуюся на промежуточной стадии: FRS продолжает репликацию до состояния Eliminated."
+      ]
+    },
+    "DC_PASSWORD_NOT_ROTATED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A once-extracted Domain Controller key replicates every password hash of the domain (DCSync) for as long as it stays",
+        "Service tickets to the Domain Controller's own services - LDAP, CIFS, HOST - can be forged with it"
+      ],
+      "impact": [
+        "Однажды извлечённый ключ контроллера домена позволяет реплицировать все хеши паролей домена (DCSync), пока ключ остаётся действующим.",
+        "С его помощью можно подделывать билеты к собственным службам контроллера домена — LDAP, CIFS и HOST."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Find out why the Domain Controller does not change its password: 'Domain member: Disable machine account password changes' or a long maximum age applied to the Domain Controllers, or a restored or cloned Domain Controller",
+        "Turn the change back on, so the Domain Controller changes its password at its next check"
+      ],
+      "remediation": [
+        "Выясните, почему контроллер домена не меняет пароль: настройка «Domain member: Disable machine account password changes», увеличенный максимальный срок, действующий для Domain Controllers, либо восстановленный или клонированный DC.",
+        "Вновь включите смену пароля, чтобы контроллер домена выполнил её при следующей плановой проверке."
+      ]
+    },
+    "GPO_POINTANDPRINT_USER_SCOPE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The setting has no effect at all on any machine",
+        "Hardening believed to be deployed is not deployed",
+        "Audits and change reviews that read the GPO see a control that does not exist"
+      ],
+      "impact": [
+        "Настройка вообще не действует ни на одном компьютере.",
+        "Предполагаемое усиление безопасности на самом деле не развёрнуто.",
+        "Аудит или согласование изменений GPO видит меру защиты, которой фактически нет."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Move the settings to Computer Configuration > Administrative Templates > Printers",
+        "Remove the User Configuration policy so it cannot be mistaken for a control"
+      ],
+      "remediation": [
+        "Перенесите параметры в Computer Configuration → Administrative Templates → Printers.",
+        "Удалите политику в User Configuration, чтобы её не принимали за действующую защиту."
+      ]
+    },
+    "GPO_PRINT_DRIVER_HARDENING": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Driver packages may be fetched over unauthenticated HTTP and tampered with in transit",
+        "Non-administrators may install printer drivers through the local add-printer flow",
+        "Widens the set of paths by which attacker-supplied driver code reaches a machine"
+      ],
+      "impact": [
+        "Пакеты драйверов могут загружаться по HTTP без аутентификации, что допускает их подмену при передаче.",
+        "Пользователи без административных прав могут устанавливать драйверы принтера обычным локальным способом добавления принтера.",
+        "Увеличивается число путей, по которым драйвер, предоставленный атакующим, попадает на компьютер."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Enable 'Turn off downloading of print drivers over HTTP' (DisableWebPnPDownload=1)",
+        "Enable 'Devices: Prevent users from installing printer drivers' (AddPrinterDrivers=1)"
+      ],
+      "remediation": [
+        "Включите «Turn off downloading of print drivers over HTTP» (DisableWebPnPDownload=1).",
+        "Включите «Devices: Prevent users from installing printer drivers» (AddPrinterDrivers=1)."
+      ]
+    },
+    "GPO_PRINT_QUEUE_SPECIFIC_FILES": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A print server can place arbitrary files on the client via the spooler",
+        "File write in a SYSTEM context leads to local code execution",
+        "Applies to every machine in the GPO scope"
+      ],
+      "impact": [
+        "Принт-сервер может разместить на клиенте произвольные файлы через диспетчер печати.",
+        "Запись файлов в контексте SYSTEM позволяет добиться локального выполнения кода.",
+        "Риск распространяется на каждый компьютер в области действия GPO."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set 'Manage processing of Queue-specific files' to 'Limit Queue-specific files to Color profiles' (value 1)",
+        "Or set it to 'Do not allow Queue-specific files' (value 0) where colour profiles are not needed"
+      ],
+      "remediation": [
+        "Установите «Manage processing of Queue-specific files» в «Limit Queue-specific files to Color profiles» (значение 1).",
+        "Либо выберите «Do not allow Queue-specific files» (значение 0), если цветовые профили не нужны."
+      ]
+    },
+    "GPO_PRINT_SPOOLER_RPC": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Remote MS-RPRN/MS-PAR attack surface is reachable on every machine in scope",
+        "Enables PrinterBug coercion for NTLM relay, critical on Domain Controllers",
+        "Remote driver installation attacks become reachable over the network"
+      ],
+      "impact": [
+        "На каждом компьютере в области GPO доступна удалённая поверхность атак MS-RPRN/MS-PAR.",
+        "Возможна принудительная аутентификация PrinterBug для NTLM relay, особенно опасная на контроллерах домена.",
+        "Удалённые атаки с установкой драйверов становятся доступны по сети."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set 'Allow Print Spooler to accept client connections' to Disabled (writes the value 2)",
+        "Disable the Print Spooler service entirely on Domain Controllers and servers that do not print"
+      ],
+      "remediation": [
+        "Установите «Allow Print Spooler to accept client connections» в Disabled (записывается значение 2).",
+        "Полностью отключите службу Print Spooler на контроллерах домена и серверах, где печать не используется."
+      ]
+    },
+    "GPO_USERRIGHT_DEFAULT_REMOVED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Usually intended: a documented default holder (e.g. Backup Operators, Server Operators) is deliberately excluded on a hardened build",
+        "Occasionally an operational foot-gun: if the removed holder actually needed the right for something running today, that functionality breaks the moment the policy applies"
+      ],
+      "impact": [
+        "Обычно это намеренное усиление защиты: документированный стандартный обладатель права, например Backup Operators или Server Operators, исключён на защищённой системе.",
+        "Иногда это приводит к неожиданному отказу функции: если исключённому субъекту право было необходимо для действующей задачи, она перестанет работать сразу после применения политики."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Confirm the removal was deliberate hardening rather than an accident",
+        "If something on the affected machines relied on the removed holder having this right, restore it explicitly rather than leaving the policy to guess"
+      ],
+      "remediation": [
+        "Подтвердите, что удаление было осознанным усилением защиты, а не ошибкой.",
+        "Если на затронутых компьютерах определённой функции нужен прежний обладатель права, явно восстановите его, не рассчитывая на значения по умолчанию."
+      ]
+    },
+    "GPO_USERRIGHT_SECREATEGLOBAL": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A named object a service expects to create in the global namespace can be created first by the holder, from any session",
+        "Shared memory a privileged process reads can be supplied by the holder"
+      ],
+      "impact": [
+        "Субъект из любого сеанса может раньше службы создать именованный объект в глобальном пространстве имён, который ожидает эта служба.",
+        "Он может подменить данные общей памяти, которые затем читает привилегированный процесс."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the principal; for Remote Desktop access use the Remote Desktop Users group, as Microsoft recommends"
+      ],
+      "remediation": [
+        "Удалите субъект: для доступа по Remote Desktop используйте группу Remote Desktop Users, как рекомендует Microsoft."
+      ]
+    },
+    "GPO_USERRIGHT_SECREATESYMBOLICLINK": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A link planted where a more privileged process writes or deletes redirects that operation to a file of the holder's choosing",
+        "Symbolic link redirection is a known route from a standard account to a privileged file operation"
+      ],
+      "impact": [
+        "Символическая ссылка, размещённая там, где привилегированный процесс записывает или удаляет файлы, перенаправляет операцию на файл, выбранный обладателем права.",
+        "Перенаправление через символическую ссылку — известный путь от обычной учётной записи к привилегированной файловой операции."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the principal and leave the right with Administrators, as by default",
+        "Restrict which symbolic links are followed with fsutil behavior set symlinkevaluation"
+      ],
+      "remediation": [
+        "Удалите субъект, оставив право у Administrators, как установлено по умолчанию.",
+        "Ограничьте виды разрешённых символических ссылок командой fsutil behavior set symlinkevaluation."
+      ]
+    },
+    "GPO_USERRIGHT_SEMANAGEVOLUME": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Reads and writes the raw disk, including files a running process has locked open (the SAM/SYSTEM hives, ntds.dit)",
+        "File system permissions provide no protection once the volume itself is addressable directly"
+      ],
+      "impact": [
+        "Обладатель права может читать и записывать диск напрямую, включая файлы, заблокированные работающими процессами, например кусты SAM/SYSTEM и ntds.dit.",
+        "Разрешения файловой системы перестают защищать данные, если доступ к самому тому возможен напрямую."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the principal; only built-in Administrators should hold this right"
+      ],
+      "remediation": [
+        "Удалите субъект: право должно оставаться только у встроенной группы Administrators."
+      ]
+    },
+    "GPO_USERRIGHT_SEPROFILESINGLEPROCESS": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "Reconnaissance on the machine: running processes, security software among them, and signed-in users"
+      ],
+      "impact": [
+        "Позволяет собирать сведения на компьютере: видеть работающие процессы, включая программы защиты, и вошедших пользователей."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the principal; grant the right only to trusted monitoring applications, as Microsoft recommends"
+      ],
+      "remediation": [
+        "Удалите лишний субъект; выдавайте право только доверенным приложениям мониторинга, как рекомендует Microsoft."
+      ]
+    }
+  }
+}
