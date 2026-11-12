@@ -130,4 +130,4 @@ foreach($id in $expectedIds){
   throw "D5: структурное расхождение у переведённой находки $id"
  }
 }
-Write-Host 'PASS D5: 24 находки; Impact 94, Remediation 101; EN/RU/HTML паритет; остатки 249/229' -ForegroundColor Green
+Write-Host 'PASS D5: 24 находки; Impact 94, Remediation 101; EN/RU/HTML паритет и стабильность 24 ID' -ForegroundColor Green
