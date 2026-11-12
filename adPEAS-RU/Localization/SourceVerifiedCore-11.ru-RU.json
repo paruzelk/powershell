@@ -1,0 +1,284 @@
+{
+  "schema": "adPEAS-RU.StageD2.CoreFields.11",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "DANGEROUS_ACL_DCSYNC_BROAD": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Any account that can authenticate can run a DCSync and take every password hash in the domain",
+        "That includes krbtgt, so it also means a Golden Ticket and persistence that survives every password reset but one",
+        "No account has to be compromised first - a single ordinary user is enough",
+        "The group's membership cannot be audited down: these groups are populated by the directory itself"
+      ],
+      "impact": [
+        "Любая учётная запись, способная пройти аутентификацию, может выполнить DCSync и получить все хеши паролей домена.",
+        "Включая krbtgt: это также позволяет создать Golden Ticket и сохранять доступ после всех смен паролей, кроме надлежащей смены krbtgt.",
+        "Предварительно компрометировать какую-либо запись не требуется — достаточно обычного доменного пользователя.",
+        "Невозможно сузить состав участников такой группы обычной ревизией: эти группы наполняются самим каталогом."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove the ACE naming the broad group from the domain object - this is not a delegation to narrow, it is one to delete",
+        "Establish how it was added: a replication right granted to Authenticated Users is not a default and not an accident of inheritance",
+        "Assume the domain's credentials are compromised and plan accordingly, including krbtgt twice",
+        "Audit for the same pattern on the other naming contexts, since whatever granted it there may have granted it elsewhere"
+      ],
+      "remediation": [
+        "Удалите ACE, назначающую права широкой группе, из объекта домена: такое делегирование нужно удалить, а не просто сузить.",
+        "Выясните происхождение ACE: права репликации для Authenticated Users не являются значением по умолчанию и не возникают случайно из наследования.",
+        "Исходите из возможной компрометации доменных учётных данных и планируйте реагирование, включая две смены пароля krbtgt.",
+        "Проверьте тот же шаблон на других контекстах именования: механизм, добавивший право сюда, мог затронуть и их."
+      ]
+    },
+    "ESC3_TARGET_TEMPLATE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Holder of an enrollment agent certificate can request certificates for arbitrary principals",
+        "Resulting certificate authenticates via PKINIT/Schannel as the impersonated user",
+        "Without CA-side enrollment agent restrictions, one agent certificate covers all such templates",
+        "Broad enrollment scope (Domain Users, Authenticated Users) widens the set of impersonatable targets"
+      ],
+      "impact": [
+        "Обладатель сертификата агента регистрации может запрашивать сертификаты на произвольных субъектов.",
+        "Полученный сертификат позволяет аутентифицироваться через PKINIT/Schannel как выбранный пользователь.",
+        "Без ограничений агента регистрации на стороне ЦС один агентский сертификат применим ко всем подобным шаблонам.",
+        "Широкий круг с правом регистрации (Domain Users, Authenticated Users) увеличивает число субъектов, за которых можно себя выдать."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Enable enrollment agent restrictions on the CA and scope each agent to specific templates and target principals",
+        "Restrict enrollment on this template to the principals that actually need it",
+        "Require CA manager approval (CT_FLAG_PEND_ALL_REQUESTS) for this template",
+        "Audit which certificates carrying the Certificate Request Agent EKU have been issued and revoke unneeded ones",
+        "Unpublish the template from the CA if on-behalf-of enrollment is no longer used"
+      ],
+      "remediation": [
+        "Включите ограничения агента регистрации на ЦС, ограничив каждого агента конкретными шаблонами и целевыми субъектами.",
+        "Ограничьте регистрацию по этому шаблону только субъектами, которым она действительно нужна.",
+        "Для этого шаблона включите одобрение администратором ЦС (CT_FLAG_PEND_ALL_REQUESTS).",
+        "Проверьте выданные сертификаты с EKU Certificate Request Agent и отзовите ненужные.",
+        "Снимите публикацию шаблона на ЦС, если выпуск сертификатов от чужого имени более не используется."
+      ]
+    },
+    "DMSA_LINK_IRREGULAR": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Whoever may use the dMSA acts with this account's group memberships",
+        "The dMSA's key package holds this account's keys - a credential dump without DCSync",
+        "The account keeps working on its own beside the dMSA"
+      ],
+      "impact": [
+        "Любой субъект, которому разрешено использовать dMSA, действует с членствами этой исходной записи в группах.",
+        "Пакет ключей dMSA содержит ключи исходной записи — секреты доступны без DCSync.",
+        "При этом сама исходная учётная запись продолжает действовать наряду с dMSA."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Establish whether a migration to this dMSA was intended",
+        "If it was not: clear both links, find out who wrote them (event 5136) and treat the account's keys as known",
+        "If it was: complete it with Complete-ADServiceAccountMigration, which also disables the account",
+        "Restrict who may create dMSAs and who may write to accounts that could be paired with one"
+      ],
+      "remediation": [
+        "Установите, планировалась ли миграция этой записи на dMSA.",
+        "Если нет — очистите обе связи, выясните автора изменений (событие 5136) и считайте ключи исходной записи потенциально раскрытыми.",
+        "Если миграция была запланирована — завершите её командой Complete-ADServiceAccountMigration, которая также отключает исходную запись.",
+        "Ограничьте субъектов, которым разрешено создавать dMSA и изменять записи, пригодные для связывания с ней."
+      ]
+    },
+    "EXCHANGE_SHARED_PERMISSIONS_MODEL": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "A member of the group can grant itself DS-Replication-Get-Changes and -All",
+        "That is DCSync: every password hash in the domain, including krbtgt",
+        "Exchange Trusted Subsystem is nested in Exchange Windows Permissions, so every Exchange server computer account reaches this too",
+        "An NTLM relay from an Exchange server is therefore a relay to domain compromise"
+      ],
+      "impact": [
+        "Участник группы способен назначить себе права DS-Replication-Get-Changes и DS-Replication-Get-Changes-All.",
+        "Это предоставляет DCSync — доступ ко всем хешам паролей домена, включая krbtgt.",
+        "Exchange Trusted Subsystem входит в Exchange Windows Permissions, поэтому машинные записи серверов Exchange тоже получают этот путь.",
+        "Таким образом, NTLM relay от сервера Exchange может привести к компрометации домена."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Apply the inherit-only flag to the WriteDACL ACE so it no longer applies to the domain object (Microsoft documents this for the shared permissions model)",
+        "Or move the organization to Active Directory split permissions, which removes the model entirely",
+        "Keep Exchange Windows Permissions and Exchange Trusted Subsystem free of anything that is not an Exchange server",
+        "Enable LDAP signing and channel binding so an Exchange server's authentication cannot be relayed to a domain controller"
+      ],
+      "remediation": [
+        "Установите для ACE WriteDACL флаг inherit-only: тогда запись перестанет действовать на сам объект домена (Microsoft описывает это для модели shared permissions).",
+        "Либо перейдите на модель разделённых разрешений Active Directory (AD split permissions), полностью устраняющую эту модель доступа.",
+        "Не включайте в Exchange Windows Permissions и Exchange Trusted Subsystem никого, кроме необходимых компьютерных записей серверов Exchange.",
+        "Включите подпись LDAP и Channel Binding, чтобы аутентификацию сервера Exchange нельзя было ретранслировать на контроллер домена."
+      ]
+    },
+    "SID_HISTORY_INJECTION": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Account may have hidden privileged access through historical SIDs",
+        "Access is granted based on SID History without group membership visibility",
+        "Attackers can inject Domain Admin SIDs for persistent access",
+        "Very difficult to detect without specifically checking SID History",
+        "Survives password resets and most remediation attempts"
+      ],
+      "impact": [
+        "Учётная запись может скрытно получать привилегии через исторические SID.",
+        "Права выдаются по SID History без видимого членства в группе.",
+        "Нарушитель может добавить SID Domain Admins и сохранить привилегии.",
+        "Без специальной проверки SID History такой доступ трудно обнаружить.",
+        "Он сохраняется после смены пароля и многих обычных действий по устранению последствий."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Audit all accounts with SID History entries",
+        "Remove SID History after migration is complete",
+        "Use 'Get-ADUser -Properties SIDHistory' to identify affected accounts",
+        "Enable SID Filtering on trusts to block SID History injection",
+        "Monitor for SID History modifications (Event ID 4765, 4766)"
+      ],
+      "remediation": [
+        "Проверьте все записи с заполненным SID History.",
+        "Удалите SID History после завершения миграции, когда он больше не нужен.",
+        "Найдите затронутые записи через Get-ADUser -Properties SIDHistory.",
+        "Включите SID Filtering на довериях, чтобы блокировать внедрение SID History через границу доверия.",
+        "Отслеживайте изменения SID History по событиям 4765 и 4766."
+      ]
+    },
+    "UNREGISTERED_DOMAIN_CONTROLLER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The account replicates the directory as a Domain Controller would, every password hash included (DCSync)",
+        "It does not appear where Domain Controllers are expected - no server object, no replication partner - so it is easy to miss",
+        "adPEAS and other tools that recognise Domain Controllers by the role flag treat it as one, which hides it from the checks that skip Domain Controllers"
+      ],
+      "impact": [
+        "Запись может реплицировать каталог подобно контроллеру домена, включая все хеши паролей (DCSync).",
+        "Она отсутствует там, где ожидают увидеть контроллеры домена: нет серверного объекта и партнёра репликации, поэтому её легко пропустить.",
+        "adPEAS и другие средства, распознающие DC по флагу роли, считают её контроллером домена и могут исключать из проверок, пропускающих DC."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Find out how the account got the role: a failed promotion or demotion, or a change of userAccountControl outside a promotion (event 4742 with 0x2000)",
+        "Remove the role from an account that is not a Domain Controller: set userAccountControl back to WORKSTATION_TRUST_ACCOUNT, and check afterwards that primaryGroupID is 515 (Domain Computers) again",
+        "Reset the account's password and treat the domain's secrets as exposed if the account was used",
+        "Review who holds DS-Install-Replica on the domain object"
+      ],
+      "remediation": [
+        "Выясните источник признака роли: неудачное повышение/понижение DC либо изменение userAccountControl вне этой процедуры (событие 4742 с 0x2000).",
+        "Снимите роль с записи, не являющейся DC: верните userAccountControl к WORKSTATION_TRUST_ACCOUNT и затем убедитесь, что primaryGroupID снова равно 515 (Domain Computers).",
+        "Смените пароль записи и считайте секреты домена потенциально раскрытыми, если она использовалась.",
+        "Проверьте обладателей права DS-Install-Replica на объекте домена."
+      ]
+    },
+    "TRUST_USES_RC4": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Referral tickets across the trust are RC4, so RC4 cannot be switched off on either side without breaking the trust",
+        "Clients with RC4 disabled fall back to NTLM across the trust, or fail",
+        "On a realm trust to MIT Kerberos with an administrator-chosen password: offline cracking of the trust key from a referral ticket any user can request where the realm trusts this domain"
+      ],
+      "impact": [
+        "Междоменные билеты по доверию используют RC4, поэтому отключение RC4 с любой стороны без подготовки нарушит доверие.",
+        "Клиенты с отключённым RC4 перейдут на NTLM при пересечении доверия либо не смогут аутентифицироваться.",
+        "Для realm-доверия с MIT Kerberos и паролем, заданным администратором, возможен автономный подбор ключа доверия по referral ticket, который вправе запросить любой пользователь, если realm доверяет домену."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Select 'The other domain supports Kerberos AES Encryption' in the properties of the trust, on both sides and for both directions - the trust stays, nothing is re-created",
+        "Or keep RC4 for older clients and add AES with ksetup /setenctypeattr, run on a domain controller of the trusted domain",
+        "On a realm trust to MIT Kerberos, give the trust a long random password and AES keys on both sides",
+        "Monitor for RC4 across trusts: Event ID 4769 with ticket encryption type 0x17"
+      ],
+      "remediation": [
+        "Включите «The other domain supports Kerberos AES Encryption» в свойствах доверия с обеих сторон и в обоих направлениях; пересоздавать доверие не требуется.",
+        "Либо временно сохраните RC4 для старых клиентов и добавьте AES командой ksetup /setenctypeattr на контроллере доверенного домена.",
+        "В realm-доверии с MIT Kerberos используйте длинный случайный пароль доверия и AES-ключи с обеих сторон.",
+        "Отслеживайте RC4 при переходе доверий: событие 4769 с типом шифрования билета 0x17."
+      ]
+    },
+    "SCCM_SYSTEM_MANAGEMENT_ACL": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "A management point published here is accepted by every client configured for Active Directory site discovery",
+        "The client takes its policy, and the software that policy deploys, from that management point",
+        "Policies carry the network access account credentials, which the client requests from the management point it trusts",
+        "The blast radius is every managed client in the site, which in most domains is every workstation"
+      ],
+      "impact": [
+        "Каждый клиент, настроенный на обнаружение сайта в Active Directory, доверяет опубликованной здесь точке управления.",
+        "Клиент получает от неё политику и программное обеспечение, развёртываемое этой политикой.",
+        "Политики включают учётные данные сетевой учётной записи доступа (NAA), которые клиент запрашивает у доверенной точки управления.",
+        "Масштаб поражения — все управляемые клиенты сайта, обычно большинство рабочих станций домена."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Reduce the ACL to what Configuration Manager documents: Full Control for the site server computer accounts, and nothing else beyond the domain administrators",
+        "Establish who granted the entry and when, from the directory service audit log (event 5136 on nTSecurityDescriptor)",
+        "Where extension of the schema and this container were done years ago by a departed admin, treat the whole ACL as unreviewed rather than the one entry",
+        "Clients can be moved off AD site discovery, but that changes the exposure rather than the permission - fix the ACL either way"
+      ],
+      "remediation": [
+        "Ограничьте ACL в соответствии с документацией Configuration Manager: Full Control — компьютерным записям серверов сайта, остальные разрешения — только необходимые администраторам домена.",
+        "Установите, кто и когда выдал право, по журналу аудита службы каталогов (событие 5136 для nTSecurityDescriptor).",
+        "Если схема и контейнер были расширены много лет назад уволившимся администратором, считайте непроверенным весь ACL, а не только конкретную ACE.",
+        "Можно отказаться от обнаружения сайта через AD, но это лишь меняет поверхность риска, а не разрешения: в любом случае исправьте ACL."
+      ]
+    },
+    "LAPS_ENCRYPTED_PASSWORD": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Not a password read today - without the configured decryptor the blob stays a blob",
+        "The read right is granted though, so it becomes a password read the moment the account reaches the decryptor principal, which is a group membership rather than an ACL change",
+        "The blob names its decryptor: the target SID parses out of it without any right, which tells an attacker precisely which group to go after",
+        "Reported as a hint rather than a finding on purpose - calling it a password read teaches the reader that the encryption buys nothing"
+      ],
+      "impact": [
+        "Это ещё не чтение пароля: без настроенного субъекта расшифровки зашифрованный блок останется нечитаемым.",
+        "Однако право чтения уже предоставлено: при получении полномочий субъекта расшифровки оно превращается в доступ к паролю без изменения ACL.",
+        "Блок указывает SID субъекта расшифровки: его можно извлечь без отдельного права и узнать, какую группу атаковать.",
+        "Это намеренно справочная находка (Hint), а не подтверждённая уязвимость: называть её чтением пароля означало бы отрицать пользу шифрования."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Review the read right rather than the encryption: an account that cannot decrypt has no use for the attribute",
+        "Confirm who ADPasswordEncryptionPrincipal names and treat that group as Tier 0 - it decrypts every LAPS password in its scope",
+        "Keep this generation rather than the legacy attribute: a read right on ms-Mcs-AdmPwd or msLAPS-Password is the password itself"
+      ],
+      "remediation": [
+        "Проверьте именно право чтения, а не только наличие шифрования: записи без права расшифровки этот атрибут не нужен.",
+        "Установите, на кого указывает ADPasswordEncryptionPrincipal; считайте эту группу Tier 0, поскольку она расшифровывает пароли LAPS в области действия.",
+        "Сохраняйте шифруемое поколение LAPS вместо устаревших атрибутов: право чтения ms-Mcs-AdmPwd либо msLAPS-Password само по себе даёт пароль."
+      ]
+    },
+    "GPO_POINTANDPRINT_EXPLOITABLE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Any authenticated user gains SYSTEM on every machine in the GPO scope",
+        "The driver payload runs before any user interaction, with no prompt shown",
+        "Approved-server restrictions do not help - a suppressed prompt overrides them",
+        "Works against fully patched machines, because the policy re-enables the behaviour"
+      ],
+      "impact": [
+        "Любой аутентифицированный пользователь способен получить SYSTEM на всех компьютерах в области действия GPO.",
+        "Полезная нагрузка драйвера выполняется до взаимодействия с пользователем и без запроса.",
+        "Ограничение доверенных серверов не помогает: подавление запроса подтверждения обходит его.",
+        "Уязвимость действует даже на полностью обновлённых компьютерах, поскольку политика вновь разрешает небезопасное поведение."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Set RestrictDriverInstallationToAdministrators=1 (or remove the value to keep the secure default)",
+        "Remove NoWarningNoElevationOnInstall=1 and set UpdatePromptSettings=0",
+        "Keep 'Point and Print Restrictions' Enabled with warning and elevation prompt for install and update",
+        "Non-administrators can then no longer connect a printer whose driver is not already on the machine or deployed as a package - which is why this value is set to 0 in the first place. Deploy the printers centrally, or package the drivers, before enforcing it; otherwise the change comes back out after the first help desk call"
+      ],
+      "remediation": [
+        "Установите RestrictDriverInstallationToAdministrators=1 либо удалите параметр, оставив защищённое значение по умолчанию.",
+        "Удалите NoWarningNoElevationOnInstall=1 и задайте UpdatePromptSettings=0.",
+        "Оставьте «Point and Print Restrictions» включённой с предупреждением и запросом повышения при установке и обновлении.",
+        "После этого непривилегированные пользователи не смогут подключать принтер с отсутствующим на компьютере или не развёрнутым пакетом драйвера — поэтому параметр нередко и ставят равным 0. До включения защиты централизованно разверните принтеры либо пакеты драйверов; иначе служба поддержки может потребовать отменить изменение."
+      ]
+    }
+  }
+}
