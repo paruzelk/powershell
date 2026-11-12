@@ -1,0 +1,316 @@
+{
+  "schema": "adPEAS-RU.StageD15.CoreFields.24a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "TRUST_BIDIRECTIONAL": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Compromise of either domain can affect the other",
+        "Attack paths exist in both directions",
+        "Lateral movement possible across trust boundary",
+        "Increases blast radius of security incidents"
+      ],
+      "impact": [
+        "Компрометация любого из двух доменов может повлиять на безопасность другого.",
+        "Пути атаки могут существовать в обоих направлениях доверительного отношения.",
+        "Возможно горизонтальное перемещение между доменами через границу доверия.",
+        "Двустороннее доверие увеличивает масштаб возможных последствий инцидента."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review if bidirectional trust is required",
+        "Consider one-way trust where possible",
+        "Implement Selective Authentication to limit scope",
+        "Enable SID Filtering to prevent SID History attacks"
+      ],
+      "remediation": [
+        "Проверьте, действительно ли требуется двустороннее доверие.",
+        "Если это соответствует задачам, рассмотрите одностороннее доверие.",
+        "Для ограничения области доступа используйте Selective Authentication (выборочную аутентификацию).",
+        "Включите SID Filtering для предотвращения атак с подменой SIDHistory."
+      ]
+    },
+    "TRUST_PASSWORD_STALE": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A trust key extracted once keeps working: inter-realm tickets forged with it stay valid",
+        "A trust to a domain that no longer answers is left in place"
+      ],
+      "impact": [
+        "Однажды извлечённый ключ доверия продолжает работать: поддельные межобластные билеты, созданные с его помощью, сохраняют действительность до смены ключа.",
+        "Доверительное отношение с доменом, который больше не отвечает, может оставаться настроенным."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Verify the trust - netdom trust /verify, or Validate in Active Directory Domains and Trusts - and find out why the trusting domain stopped changing the password",
+        "Remove trusts to domains that no longer exist",
+        "Reset the trust password on both sides with netdom trust /resetOneSide and the same password; twice, if the key may have been extracted"
+      ],
+      "remediation": [
+        "Проверьте доверие командой netdom trust /verify либо функцией Validate в Active Directory Domains and Trusts и установите, почему доверяющий домен перестал менять пароль доверия.",
+        "Удалите доверительные отношения с доменами, которых больше не существует.",
+        "Сбросьте пароль доверия на обеих сторонах с помощью netdom trust /resetOneSide и одинакового пароля; если ключ мог быть извлечён, повторите ротацию дважды согласно исходной рекомендации."
+      ]
+    },
+    "TRUST_SELECTIVE_AUTH": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Restricts cross-trust authentication to explicitly permitted resources",
+        "Prevents automatic forest-wide authentication for trusted users",
+        "Requires explicit access grants on each resource server",
+        "Significantly reduces the attack surface of the trust"
+      ],
+      "impact": [
+        "Выборочная аутентификация ограничивает вход через доверие только явно разрешёнными ресурсами.",
+        "Пользователи доверенного леса не получают автоматическую возможность аутентификации на всех ресурсах леса.",
+        "На каждом сервере ресурсов требуется явно назначенное разрешение доступа для аутентификации.",
+        "Это существенно сокращает поверхность атаки через доверительное отношение."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "No action required - this is a recommended security configuration",
+        "Ensure resource-side permissions are granted correctly",
+        "Document which servers have Allowed-To-Authenticate configured"
+      ],
+      "remediation": [
+        "Исправление не требуется: это рекомендуемая защитная настройка.",
+        "Проверьте корректность разрешений на стороне ресурсов.",
+        "Документируйте серверы, на которых настроено право Allowed-To-Authenticate."
+      ]
+    },
+    "TRUST_TRANSITIVE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Trust extends beyond directly connected domains",
+        "May create unintended authentication paths",
+        "Increases complexity of trust relationships",
+        "Harder to audit all possible access paths"
+      ],
+      "impact": [
+        "Транзитивное доверие распространяет отношения доверия за пределы непосредственно связанных доменов.",
+        "Это может создавать непредусмотренные пути аутентификации.",
+        "Повышается сложность конфигурации доверительных отношений.",
+        "Становится труднее проверить все возможные пути доступа."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Document all transitive trust paths",
+        "Consider non-transitive trusts for external partners",
+        "Use Selective Authentication where possible",
+        "Regularly audit trust relationships"
+      ],
+      "remediation": [
+        "Документируйте все транзитивные пути доверия.",
+        "Для внешних партнёров рассмотрите нетранзитивные доверительные отношения.",
+        "По возможности применяйте Selective Authentication.",
+        "Регулярно проверяйте конфигурацию доверительных отношений."
+      ]
+    },
+    "TRUST_TREAT_AS_EXTERNAL": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "SID history from the trusted forest is accepted for domains it does not own",
+        "A Domain Admin SID of this domain, injected on the other side, is honoured on this one",
+        "Whoever controls any domain of the trusted forest can reach this domain",
+        "The flag is set deliberately, so it is a configuration decision rather than an oversight"
+      ],
+      "impact": [
+        "При этой настройке SIDHistory из доверенного леса может приниматься для доменов, которым этот лес не принадлежит.",
+        "SID группы Domain Admins вашего домена, внедрённый на другой стороне доверия, может учитываться в вашем домене.",
+        "Субъект, контролирующий любой домен доверенного леса, может получить путь к вашему домену.",
+        "Флаг устанавливается намеренно: это осознанное конфигурационное решение, а не обязательно случайная ошибка."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the flag unless the cross-forest SID history it allows is genuinely needed - and find out what needs it before removing it, because somebody set it for a migration",
+        "Where a migration does need it, bound it in time: turn it off again once the SID history is no longer used",
+        "Keep quarantine and SID filtering in place on every external and realm trust"
+      ],
+      "remediation": [
+        "Удалите флаг, если межлесной SIDHistory действительно не требуется; прежде выясните зависимости, поскольку его могли включить на время миграции.",
+        "Если миграция требует флага, ограничьте срок его действия и отключите после прекращения использования SIDHistory.",
+        "Сохраняйте режим quarantine и SID Filtering на всех внешних довериях и довериях с областями Kerberos (realm trusts)."
+      ]
+    },
+    "PKI_CERTIFICATE_EXPIRED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Certificates chaining to an expired root will fail validation",
+        "Certificate-based authentication (PKINIT, smart card) may stop working",
+        "New certificate enrollment may be affected",
+        "Trust relationships depending on this certificate break"
+      ],
+      "impact": [
+        "Сертификаты с цепочкой доверия до просроченного корневого сертификата перестанут проходить проверку.",
+        "Аутентификация по сертификатам (PKINIT, смарт-карты) может перестать работать.",
+        "Может нарушиться выпуск новых сертификатов.",
+        "Доверительные механизмы, зависящие от этого сертификата, могут перестать работать."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Renew the expired CA certificate",
+        "If the CA is no longer needed, remove it from the trust store",
+        "Verify all dependent services after certificate renewal"
+      ],
+      "remediation": [
+        "Обновите просроченный сертификат удостоверяющего центра (CA).",
+        "Если удостоверяющий центр больше не используется, удалите его сертификат из соответствующего доверенного хранилища после проверки зависимостей.",
+        "После обновления сертификата проверьте все зависимые службы."
+      ]
+    },
+    "PKI_SHORT_KEY_LENGTH": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Keys shorter than 2048 bits can potentially be factored",
+        "All certificates in the trust chain are affected",
+        "Non-compliant with NIST SP 800-57 and industry standards"
+      ],
+      "impact": [
+        "RSA-ключи длиной менее 2048 бит потенциально допускают факторизацию при достаточных ресурсах.",
+        "Слабый ключ удостоверяющего центра влияет на доверие ко всей цепочке сертификатов.",
+        "Такая длина ключа не соответствует рекомендациям NIST SP 800-57 и принятым отраслевым требованиям."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Renew the CA certificate with at least 2048-bit RSA key (4096-bit recommended)",
+        "For ECC keys, use P-256 or stronger curves",
+        "Plan CA migration if the current key cannot be upgraded"
+      ],
+      "remediation": [
+        "Обновите сертификат CA, используя RSA-ключ не короче 2048 бит; исходная рекомендация — 4096 бит.",
+        "Для ECC используйте кривые P-256 или более стойкие.",
+        "Если ключ действующего CA нельзя заменить без миграции, спланируйте переход на другой удостоверяющий центр."
+      ]
+    },
+    "PKI_STRONG_KEY_LENGTH": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Key is computationally infeasible to factor with current technology",
+        "Exceeds NIST minimum requirements for RSA keys",
+        "Provides long-term security appropriate for CA certificates",
+        "Future-proof against advances in computing power"
+      ],
+      "impact": [
+        "Факторизация такого ключа вычислительно недостижима доступными современными методами.",
+        "Длина RSA-ключа превышает минимальные требования NIST.",
+        "Обеспечивается запас криптографической стойкости, подходящий для сертификатов CA.",
+        "Настройка даёт дополнительный запас устойчивости к развитию вычислительной техники."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Continue using 4096-bit or stronger keys for CA certificates",
+        "Consider ECC P-384 or P-521 as a modern alternative"
+      ],
+      "remediation": [
+        "Это безопасная конфигурация: исправление не требуется.",
+        "Для сертификатов CA продолжайте использовать RSA-ключи длиной 4096 бит или более, если это соответствует политике совместимости.",
+        "В качестве современной альтернативы рассмотрите ECC P-384 или P-521."
+      ]
+    },
+    "PKI_STRONG_SIGNATURE_ALGORITHM": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Certificate signatures provide extra security margin beyond baseline",
+        "Stronger collision resistance than SHA-256",
+        "Future-proof against potential advances in hash attacks",
+        "Exceeds current industry baseline requirements"
+      ],
+      "impact": [
+        "Подписи сертификатов обеспечивают дополнительный запас безопасности относительно базового уровня.",
+        "Обеспечивается более высокая стойкость к коллизиям, чем у SHA-256.",
+        "Создаётся запас устойчивости к потенциальному развитию атак на хеш-функции.",
+        "Алгоритм превосходит текущие минимальные отраслевые требования."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Continue using SHA-384 or SHA-512 for CA certificate operations",
+        "Monitor for algorithm deprecation announcements"
+      ],
+      "remediation": [
+        "Это безопасная конфигурация: исправление не требуется.",
+        "Продолжайте использовать SHA-384 или SHA-512 при операциях подписи сертификатов CA, если их поддерживают зависимые системы.",
+        "Следите за объявлениями об устаревании криптографических алгоритмов."
+      ]
+    },
+    "PKI_WEAK_SIGNATURE_ALGORITHM": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Weak hash algorithms are susceptible to collision attacks",
+        "Forged certificates could be created that appear to chain to the trusted root",
+        "Modern security policies and browsers reject SHA-1 signed certificates",
+        "All certificates in the chain inherit the weakness of the root signature"
+      ],
+      "impact": [
+        "Слабые хеш-алгоритмы уязвимы к атакам на поиск коллизий.",
+        "Это может позволить выпускать поддельные сертификаты, выглядящие как часть цепочки к доверенному корню, при выполнении соответствующих условий атаки.",
+        "Современные политики безопасности и браузеры отклоняют сертификаты с подписью SHA-1.",
+        "Слабая подпись корневого сертификата влияет на оценку доверия ко всей цепочке."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Renew the CA certificate with SHA-256 or stronger signature algorithm",
+        "Plan CA migration if the current CA does not support modern algorithms",
+        "Update all dependent certificates in the chain"
+      ],
+      "remediation": [
+        "Перевыпустите сертификат CA с SHA-256 или более стойким алгоритмом подписи.",
+        "Если действующий CA не поддерживает современные алгоритмы, спланируйте миграцию удостоверяющего центра.",
+        "Обновите все зависимые сертификаты в цепочке доверия."
+      ]
+    },
+    "NTAUTH_FOREIGN_ISSUER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Whoever holds the issuer's private key can issue a certificate that logs on as any account, domain admins included",
+        "The key of a removed CA often survives on a decommissioned server or in a backup that nobody watches any more",
+        "Publishing an issuer to the store is a known way to keep access to a forest after it was compromised"
+      ],
+      "impact": [
+        "Владелец закрытого ключа такого издателя может выпускать сертификаты, позволяющие аутентифицироваться как любая учётная запись, включая администраторов домена, если сертификат удовлетворяет требованиям сопоставления.",
+        "Закрытый ключ удалённого CA может сохраниться на выведенном из эксплуатации сервере либо в давно не контролируемой резервной копии.",
+        "Публикация издателя в хранилище NTAuthCertificates — известный способ сохранить доступ к лесу после его компрометации."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Establish what the issuer is, whether it is meant to issue logon certificates, and who controls its key",
+        "Remove the entries of CAs that no longer exist or are not meant to be trusted: Enterprise PKI (pkiview.msc) > Manage AD Containers > NTAuthCertificates",
+        "Audit changes to CN=NTAuthCertificates in the Configuration partition (event 5136)"
+      ],
+      "remediation": [
+        "Установите, какому издателю принадлежит сертификат, должен ли он выпускать сертификаты входа и кто контролирует его закрытый ключ.",
+        "Удалите записи несуществующих или более не доверенных CA через Enterprise PKI (pkiview.msc) → Manage AD Containers → NTAuthCertificates после проверки зависимостей.",
+        "Проводите аудит изменений CN=NTAuthCertificates в разделе Configuration (событие 5136)."
+      ]
+    },
+    "ENROLLMENT_REQUIRES_APPROVAL": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "All certificate requests require explicit approval",
+        "No certificates are automatically issued",
+        "Provides complete control over certificate issuance",
+        "Significantly reduces ADCS attack surface"
+      ],
+      "impact": [
+        "Для каждого запроса сертификата требуется явное одобрение.",
+        "Автоматический выпуск сертификатов не выполняется.",
+        "Обеспечивается полный контроль над выдачей сертификатов в рамках данного процесса одобрения.",
+        "Это существенно сокращает поверхность атак на AD CS."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Document the approval process and responsible personnel",
+        "Ensure timely processing of legitimate requests",
+        "Audit approval actions for compliance"
+      ],
+      "remediation": [
+        "Это безопасная конфигурация: исправление не требуется.",
+        "Документируйте процесс одобрения заявок и ответственных сотрудников.",
+        "Обеспечьте своевременную обработку легитимных запросов.",
+        "Проверяйте действия по одобрению для соблюдения требований аудита."
+      ]
+    }
+  }
+}

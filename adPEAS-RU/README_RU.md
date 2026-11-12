@@ -701,3 +701,79 @@ PowerShell-код проверок, оригинальные находки, о�
 
 После успешного GitHub Actions архив публикуется как
 `adPEAS-RU-2.9.0-STAGE-D14-20261112.zip`.
+
+## Этап D15 — доверительные отношения, PKI, инфраструктура управления и права Exchange (12 ноября 2026)
+
+Добавлены `Localization/SourceVerifiedCore-24a.ru-RU.json` и
+`Localization/SourceVerifiedCore-24b.ru-RU.json`: **24 дополнительных
+находки**, **86 пунктов Impact** и **85 пунктов Remediation**, предметно
+сверенных по закреплённому оригиналу adPEAS 2.9.0
+(`ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`). Для каждого пункта
+сохранена отдельная неизменная английская строка-свидетель. Изменяются
+только отображаемые русские технические пояснения отчёта.
+
+- **Доверительные отношения (5):** `TRUST_BIDIRECTIONAL`,
+  `TRUST_PASSWORD_STALE`, `TRUST_SELECTIVE_AUTH`,
+  `TRUST_TRANSITIVE`, `TRUST_TREAT_AS_EXTERNAL`.
+- **Сертификаты, NTAuth и выпуск (7):** `PKI_CERTIFICATE_EXPIRED`,
+  `PKI_SHORT_KEY_LENGTH`, `PKI_STRONG_KEY_LENGTH`,
+  `PKI_STRONG_SIGNATURE_ALGORITHM`, `PKI_WEAK_SIGNATURE_ALGORITHM`,
+  `NTAUTH_FOREIGN_ISSUER`, `ENROLLMENT_REQUIRES_APPROVAL`.
+- **Службы, SCCM/SCOM, виртуализация, SQL и веб-аутентификация (8):**
+  `WEB_ENDPOINT_EPA_ENABLED`, `SCCM_GROUP_BROAD_MEMBER`,
+  `SCCM_PXE_EXPOSURE`, `SCCM_SERVICE_ACCOUNT`,
+  `SCCM_SITE_HIERARCHY`, `SCOM_PRIVILEGED_SERVICE_ACCOUNT`,
+  `ESX_ADMINS_MEMBER`, `MSSQL_SERVICE_ACCOUNT_PRIVILEGED`.
+- **Модель разрешений Exchange (4):** `EXCHANGE_AD_SPLIT_PERMISSIONS`,
+  `EXCHANGE_GROUP_LOW_PRIV_MEMBER`, `EXCHANGE_GROUP_PERMISSIONS`,
+  `EXCHANGE_PERMISSIONS_MODEL_CLEAN`.
+
+### Важные технические оговорки
+
+- **Выборочная аутентификация (Selective Authentication), сильные ключи
+  и подписи CA, обязательное одобрение заявок, EPA и разделённые права
+  Exchange** в соответствующих FindingId — защитные настройки.
+  Русский перевод не должен рекомендовать их «устранение».
+- Для `TRUST_TREAT_AS_EXTERNAL` сохранено различие с карантином
+  внешнего доверия: удаление флага допустимо лишь после выяснения,
+  нужен ли межлесной `SIDHistory` на время миграции. Для
+  `TRUST_PASSWORD_STALE` сброс ключа доверия выполняется с двух
+  сторон и требует учёта текущих зависимостей.
+- `PKI_CERTIFICATE_EXPIRED` описывает возможные отказы PKINIT,
+  смарт-карт и построения цепочек; при `NTAUTH_FOREIGN_ISSUER`
+  дополнительно важен контроль закрытого ключа издателя и публикации
+  в `NTAuthCertificates`. Утверждения об атаке должны оцениваться
+  с учётом настроек сопоставления сертификатов и роли CA.
+- **SCCM:** исходная рекомендация добавлять служебные учётные записи
+  в `Protected Users` может нарушить работу NTLM/RC4/делегирования;
+  после проверки совместимости это применимо только к подходящим
+  пользовательским записям, но **не к gMSA или компьютерам**.
+  `Enhanced HTTP` не доказывает устранение NAA, пока NAA реально
+  используется; необходимо проверить прекращение его применения.
+- **Exchange:** штатные сервисные ACE в модели Exchange нельзя
+  удалять механически; если обнаружено членство непривилегированной
+  записи в сервисной группе — требуется независимая проверка.
+  `EXCHANGE_AD_SPLIT_PERMISSIONS` оценивает только определённый
+  объект/набор ACE, а не весь состав `Exchange Trusted Subsystem`.
+- **ESXi:** для `ESX_ADMINS_MEMBER` сохранено имя параметра
+  `Config.HostAgent.plugins.hostsvc.esxAdminsGroup` и ссылка на
+  `CVE-2024-37085`; аудит следует проводить на реально используемой
+  версии и её политике исправлений.
+- **Tier 0:** SCCM CAS, привилегированные SCOM/SQL учётные записи и
+  управляющие серверы требуют соразмерной изоляции. Использование
+  `gMSA` уменьшает риск паролей, но не делает компрометацию
+  административных полномочий невозможной.
+
+`Apply-FullTechnical.ps1` защищает от повторной записи все **294
+ранее сверенные находки**. Новый автономный
+`Tests/Test-StageD15VerifiedCoreRU.ps1` проверяет точные английские
+строки, количество, порядок, значения русского HTML и 24 смысловых
+условия; предыдущие тесты D1–D14 сохранены.
+
+**Итог после D15: 318 из 392** находок с полными предметными сверками
+Impact/Remediation; осталось **74** типа. Структурный остаток после
+успешной пересборки ожидается **18 Impact и 17 Remediation**.
+Attack: 304/304 непустых оригиналов переведены, ещё 88 оригинально
+пустых разделов не дополнялись.
+
+Архив после успешной CI: `adPEAS-RU-2.9.0-STAGE-D15-20261112.zip`.

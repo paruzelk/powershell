@@ -1,0 +1,326 @@
+{
+  "schema": "adPEAS-RU.StageD15.CoreFields.24b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "WEB_ENDPOINT_EPA_ENABLED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "NTLM relay attacks over HTTPS are blocked",
+        "Authentication is cryptographically bound to TLS channel",
+        "Provides defense in depth for legacy NTLM authentication",
+        "Significantly reduces attack surface for web services"
+      ],
+      "impact": [
+        "Для защищённого HTTPS-подключения механизмы EPA препятствуют NTLM relay.",
+        "Аутентификация криптографически привязывается к TLS-каналу.",
+        "EPA обеспечивает дополнительный уровень защиты при использовании устаревшего NTLM.",
+        "Это значительно сокращает поверхность атак на веб-службы."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Ensure EPA is consistently enabled across all web services",
+        "Consider migrating to Kerberos or certificate authentication",
+        "Document EPA configuration in security baseline"
+      ],
+      "remediation": [
+        "Это безопасная конфигурация: исправление не требуется.",
+        "Проверьте, что EPA согласованно включён во всех соответствующих веб-службах.",
+        "Рассмотрите переход на Kerberos или аутентификацию по сертификатам.",
+        "Зафиксируйте настройку EPA в базовом профиле безопасности."
+      ]
+    },
+    "SCCM_GROUP_BROAD_MEMBER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Every account in the broad group inherits the SCCM group's access",
+        "Where the group carries an SCCM administrative role, that is software deployment and script execution on every managed client",
+        "Where it is a site system connection group, it is the site server's own access to the other site systems"
+      ],
+      "impact": [
+        "Все участники широкой группы наследуют доступ, предоставленный связанной с SCCM группе.",
+        "Если этой группе назначена административная роль SCCM, она может позволять развёртывать ПО и выполнять сценарии на всех управляемых клиентах.",
+        "Если это группа подключения систем сайта, она предоставляет учётной записи сервера сайта доступ к другим системам сайта."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the broad group from the SCCM-related group",
+        "Grant SCCM roles to named administrative groups only, and review the role assignments in the console"
+      ],
+      "remediation": [
+        "Удалите широкую группу из SCCM-связанной группы после проверки зависимостей.",
+        "Назначайте роли SCCM только определённым административным группам и проверяйте их роли в консоли управления."
+      ]
+    },
+    "SCCM_PXE_EXPOSURE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "NAA credentials or task sequence secrets can be extracted from PXE boot images",
+        "Captured credentials often grant network-wide access to SCCM distribution points",
+        "Rogue PXE responses via DHCP spoofing enable OS deployment manipulation",
+        "Boot images may contain additional embedded credentials or domain join accounts"
+      ],
+      "impact": [
+        "Из образов загрузки PXE могут быть извлечены учётные данные Network Access Account (NAA) или секреты последовательностей задач.",
+        "Перехваченные учётные данные могут давать сетевой доступ к точкам распространения SCCM.",
+        "Поддельные ответы PXE при DHCP spoofing позволяют вмешиваться в развёртывание операционных систем.",
+        "Загрузочные образы могут содержать и другие встроенные учётные данные, в том числе записи присоединения к домену."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Enable PXE password protection on all distribution points",
+        "Use Enhanced HTTP or HTTPS instead of NAA for client communication",
+        "Implement DHCP snooping and IP Source Guard to prevent PXE spoofing",
+        "Restrict PXE boot to dedicated VLANs with network access control",
+        "Migrate from NAA to Enhanced HTTP (removes credential exposure entirely)"
+      ],
+      "remediation": [
+        "Включите защиту паролем PXE на всех соответствующих точках распространения.",
+        "По возможности используйте Enhanced HTTP или HTTPS вместо устаревшей зависимости от NAA при обмене с клиентами.",
+        "Для предотвращения подмены PXE используйте DHCP snooping и IP Source Guard.",
+        "Ограничьте PXE-загрузку отдельными VLAN с контролем сетевого доступа.",
+        "Запланируйте отказ от NAA в пользу Enhanced HTTP; это устраняет данный источник раскрытия учётных данных только при фактическом прекращении использования NAA."
+      ]
+    },
+    "SCCM_SERVICE_ACCOUNT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Service account is kerberoastable - ticket can be requested and cracked offline",
+        "SCCM service accounts often have local admin rights on SCCM servers",
+        "Compromised service account may enable SCCM admin access and software deployment to all clients",
+        "Account may have elevated AD permissions (adminCount, delegation rights)"
+      ],
+      "impact": [
+        "Учётная запись службы может быть подвержена Kerberoasting: сервисный билет можно запросить и пытаться подобрать ключ офлайн.",
+        "Служебные записи SCCM часто имеют права локального администратора на серверах SCCM.",
+        "Компрометация служебной записи может дать административный доступ SCCM и возможность развёртывать ПО на управляемые клиенты.",
+        "У записи могут быть повышенные разрешения AD: adminCount или права делегирования."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Use Group Managed Service Accounts (gMSA) instead of regular user accounts",
+        "Enforce long, complex passwords (25+ characters) on service accounts",
+        "Add SCCM service accounts to the Protected Users group (prevents RC4)",
+        "Enable AES-only Kerberos encryption for the service account",
+        "Monitor for Kerberoasting activity (Event ID 4769 with RC4 encryption)"
+      ],
+      "remediation": [
+        "По возможности используйте Group Managed Service Accounts (gMSA) вместо обычных пользовательских записей служб.",
+        "Для остающихся обычных служебных записей задавайте длинные сложные пароли, например не менее 25 символов, после проверки требований совместимости.",
+        "Рассмотрите Protected Users только для подходящих пользовательских записей, после проверки совместимости: ограничения NTLM, RC4 и делегирования могут нарушить работу служб; не добавляйте в группу gMSA или компьютерные записи.",
+        "Разрешайте для служебной записи AES в Kerberos без RC4 после проверки всех зависимых служб.",
+        "Отслеживайте признаки Kerberoasting: событие 4769 с использованием RC4."
+      ]
+    },
+    "SCCM_SITE_HIERARCHY": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "CAS controls all Primary and Secondary sites in the hierarchy",
+        "Compromise of CAS enables code execution across ALL sites",
+        "CAS is the single point of control for the entire SCCM infrastructure"
+      ],
+      "impact": [
+        "Central Administration Site (CAS) управляет всеми Primary и Secondary Sites в иерархии.",
+        "Компрометация CAS может позволить выполнение кода на системах всех сайтов.",
+        "CAS является центральной точкой управления всей инфраструктурой SCCM."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Treat CAS as Tier 0 infrastructure",
+        "Restrict CAS admin access to dedicated admin accounts",
+        "Enable SCCM audit logging on CAS",
+        "Implement network segmentation for SCCM infrastructure"
+      ],
+      "remediation": [
+        "Рассматривайте CAS как инфраструктуру уровня Tier 0 по критичности воздействия.",
+        "Ограничьте административный доступ к CAS специально выделенными учётными записями.",
+        "Включите аудит операций SCCM на CAS.",
+        "Сегментируйте сеть инфраструктуры SCCM."
+      ]
+    },
+    "SCOM_PRIVILEGED_SERVICE_ACCOUNT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The account is local administrator on every monitored server by design, so its credential is present in memory across the estate",
+        "A SCOM operator can run a script or task on any agent, which is remote code execution wherever SCOM monitors",
+        "With domain privileges attached, the same access reaches the domain rather than stopping at the monitored servers",
+        "Management servers are rarely administered as Tier 0, so the account is usually easier to reach than what it can do"
+      ],
+      "impact": [
+        "По описываемой конфигурации учётная запись имеет права локального администратора на отслеживаемых серверах, поэтому её учётные данные могут находиться в памяти многих систем.",
+        "Оператор SCOM может запускать сценарии или задачи на агенте, что даёт удалённое выполнение кода на управляемых узлах при соответствующих полномочиях.",
+        "При добавленных доменных привилегиях тот же путь воздействия распространяется на домен, а не ограничивается мониторируемыми серверами.",
+        "Серверы управления часто администрируются не как Tier 0, поэтому к такой учётной записи может быть легче получить доступ, чем к ресурсам, которыми она управляет."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Take the domain privilege away: a SCOM action account needs rights on the monitored servers, not in Active Directory",
+        "Use separate accounts for the action account, the SDK account and the data warehouse rather than one account for all of them",
+        "Where the account must stay privileged, administer the management servers as Tier 0 - the account is only as protected as the weakest host it logs on to",
+        "Consider a group Managed Service Account, whose password cannot be cracked and rotates on its own"
+      ],
+      "remediation": [
+        "Удалите избыточные доменные привилегии: для Action Account SCOM нужны права на наблюдаемых серверах, а не административное членство в AD.",
+        "Используйте раздельные учётные записи для Action Account, SDK и хранилища данных вместо одной записи на все задачи.",
+        "Если запись должна оставаться привилегированной, администрируйте управляющие серверы как Tier 0: защищённость учётной записи ограничена защищённостью слабейшего узла, где она применяется.",
+        "Рассмотрите Group Managed Service Account (gMSA) с автоматической ротацией случайного пароля, уменьшающей риск его подбора."
+      ]
+    },
+    "ESX_ADMINS_MEMBER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Full administrative control of every ESXi host joined to the domain that still uses the default group",
+        "Access to the disks of the virtual machines on those hosts - a domain controller's disk holds the directory database",
+        "Mass encryption of the virtual machines, as in the ransomware cases Microsoft reported"
+      ],
+      "impact": [
+        "Возникает полный административный контроль над всеми присоединёнными к домену ESXi-хостами, которые по-прежнему используют группу по умолчанию.",
+        "Появляется доступ к дискам виртуальных машин таких хостов; на диске контроллера домена хранится база каталога.",
+        "Это позволяет массово шифровать виртуальные машины, как в описанных Microsoft инцидентах с вымогательским ПО."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Treat the group as Tier 0: keep its membership minimal and let only the domain's administrators change it",
+        "On every ESXi host joined to the domain, point Config.HostAgent.plugins.hostsvc.esxAdminsGroup to a dedicated group, or leave the domain where the join is not needed",
+        "Update ESXi to a version with the fix for CVE-2024-37085 - Broadcom fixed 8.0 and VMware Cloud Foundation 5.x"
+      ],
+      "remediation": [
+        "Рассматривайте группу как Tier 0, минимизируйте состав и разрешайте менять его только уполномоченным администраторам домена.",
+        "На каждом присоединённом к домену ESXi-хосте настройте Config.HostAgent.plugins.hostsvc.esxAdminsGroup на отдельную группу либо исключите хост из домена, если присоединение не требуется.",
+        "Установите версию ESXi с исправлением CVE-2024-37085; по исходным сведениям Broadcom исправила VMware ESXi 8.0 и VMware Cloud Foundation 5.x."
+      ]
+    },
+    "MSSQL_SERVICE_ACCOUNT_PRIVILEGED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "A login in the sysadmin role enables xp_cmdshell and runs commands as the service account - the process it spawns has the same security rights as the SQL Server service account",
+        "Where SQL Server Agent runs under the same account, a CmdExec job step does the same",
+        "Windows keeps the password of every account a service is configured to run as in the LSA secrets of the host, so local administrator rights on a SQL host recover it",
+        "SQL hosts are rarely administered as Tier 0, and sysadmin is routinely held by database administrators and application owners who are not domain administrators"
+      ],
+      "impact": [
+        "Участник роли sysadmin может запускать xp_cmdshell и выполнять команды от имени сервисной учётной записи SQL Server; порождённый процесс получает её полномочия безопасности.",
+        "Если SQL Server Agent использует ту же запись, аналогичное выполнение может быть доступно через шаг задания CmdExec.",
+        "Windows хранит пароли служебных учётных записей в LSA secrets хоста, поэтому локальный администратор SQL-сервера может получить такие секреты.",
+        "Серверы SQL редко администрируются как Tier 0, а роль sysadmin часто выдана администраторам баз данных и владельцам приложений, которые не являются администраторами домена."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Take the domain privilege away: SQL Server needs no privileged group membership to run",
+        "Run the instance under a group Managed Service Account or a virtual account with the lowest rights that work, as Microsoft recommends for SQL Server services",
+        "Use separate accounts for the Database Engine and SQL Server Agent, and for each instance",
+        "Where the account must stay privileged, administer the SQL hosts as Tier 0 and grant sysadmin to Tier 0 administrators only"
+      ],
+      "remediation": [
+        "Удалите доменные привилегии: для работы SQL Server не требуется членство в привилегированных группах AD.",
+        "Запускайте экземпляр от Group Managed Service Account (gMSA) или виртуальной учётной записи с минимально необходимыми правами, согласно рекомендациям Microsoft для служб SQL Server.",
+        "Используйте разные записи для Database Engine и SQL Server Agent, а также для разных экземпляров.",
+        "Если служебная запись неизбежно привилегированная, защищайте SQL-хосты как Tier 0 и предоставляйте sysadmin только администраторам Tier 0."
+      ]
+    },
+    "EXCHANGE_AD_SPLIT_PERMISSIONS": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Exchange Windows Permissions holds no access control entries on the domain object - that is what was read",
+        "Creating users and groups, and changing distribution group membership, requires Active Directory tools and Active Directory permissions",
+        "Not read here: whether Exchange Trusted Subsystem is a member of Exchange Windows Permissions. Setup does not nest them in this model, but the group membership itself is not part of this verdict - the privileged-groups section is where that is listed"
+      ],
+      "impact": [
+        "Exchange Windows Permissions не имеет ACE на объекте домена — именно это было проверено.",
+        "Создание пользователей и групп, изменение состава групп рассылки требуют инструментов и разрешений Active Directory.",
+        "Эта проверка не определяет, входит ли Exchange Trusted Subsystem в Exchange Windows Permissions. Штатная установка не вкладывает эти группы при такой модели, но фактическое членство проверяется отдельно в разделе привилегированных групп."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "No action required - this is the hardened model",
+        "Check the Exchange Trusted Subsystem entries separately: Microsoft's setup removes the Exchange Windows Permissions entries from the domain object, and names no others"
+      ],
+      "remediation": [
+        "Исправление не требуется: используется усиленная модель разделённых разрешений.",
+        "Отдельно проверьте состав Exchange Trusted Subsystem: при этой модели настройка Microsoft удаляет записи Exchange Windows Permissions из ACL доменного объекта и не предполагает иных подобных записей."
+      ]
+    },
+    "EXCHANGE_GROUP_LOW_PRIV_MEMBER": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Low-privileged user gains Exchange-level permissions in Active Directory",
+        "Can potentially reset passwords for users in affected OUs",
+        "May be able to modify Exchange-related attributes",
+        "Significant privilege escalation pathway"
+      ],
+      "impact": [
+        "Непривилегированный пользователь получает права уровня Exchange в Active Directory.",
+        "В затронутых OU он потенциально может сбрасывать пароли других пользователей.",
+        "Он может получить возможность изменять связанные с Exchange атрибуты.",
+        "Это создаёт существенный путь повышения привилегий."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "IMMEDIATELY remove the low-privileged account from the Exchange service group",
+        "Audit all Exchange service group memberships",
+        "Investigate how the account was added (intentional or compromise)",
+        "Review group membership change logs in Security Event Log",
+        "Implement alerting for changes to Exchange security groups"
+      ],
+      "remediation": [
+        "НЕМЕДЛЕННО удалите непривилегированную запись из служебной группы Exchange после проверки назначения.",
+        "Проверьте состав всех служебных групп Exchange.",
+        "Выясните обстоятельства добавления записи: штатное действие или компрометация.",
+        "Проанализируйте журнал Security Event Log на предмет изменений членства.",
+        "Настройте оповещения об изменениях групп безопасности Exchange."
+      ]
+    },
+    "EXCHANGE_GROUP_PERMISSIONS": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Exchange groups have broad permissions including password reset rights on certain OUs",
+        "These permissions are by-design and necessary for Exchange operations",
+        "Compromise of these groups would grant significant AD access",
+        "However, these groups are managed by Exchange and not directly user-controlled"
+      ],
+      "impact": [
+        "Группы Exchange имеют широкие разрешения, включая право сброса паролей на некоторых OU.",
+        "Описанные разрешения предусмотрены штатной моделью Exchange и необходимы для его работы.",
+        "Компрометация этих групп дала бы значительный доступ к Active Directory.",
+        "Однако штатно эти группы управляются Exchange и не должны непосредственно контролироваться обычными пользователями."
+      ],
+      "sourceEnglishRemediationCount": 6,
+      "sourceEnglishRemediation": [
+        "NOTE: These permissions CANNOT and SHOULD NOT be removed",
+        "Keep Exchange servers fully patched and updated",
+        "Monitor Exchange service group membership for unexpected changes",
+        "Implement network segmentation for Exchange servers",
+        "Use dedicated admin accounts for Exchange administration",
+        "Consider implementing Extended Protection for Authentication (EPA)"
+      ],
+      "remediation": [
+        "ВАЖНО: предусмотренные Exchange разрешения нельзя и не следует удалять без анализа архитектуры; исходная рекомендация прямо запрещает их удаление как универсальное «исправление».",
+        "Поддерживайте серверы Exchange в актуальном состоянии и устанавливайте исправления.",
+        "Отслеживайте неожиданные изменения членства в служебных группах Exchange.",
+        "Реализуйте сетевую сегментацию серверов Exchange.",
+        "Используйте отдельные административные учётные записи для управления Exchange.",
+        "Рассмотрите Extended Protection for Authentication (EPA) после проверки совместимости и развёртывания."
+      ]
+    },
+    "EXCHANGE_PERMISSIONS_MODEL_CLEAN": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Membership of Exchange Windows Permissions does not by itself lead to DCSync",
+        "Relaying an Exchange server's authentication does not reach the domain DACL through this path"
+      ],
+      "impact": [
+        "Членство в Exchange Windows Permissions само по себе не предоставляет путь к DCSync.",
+        "Ретрансляция аутентификации сервера Exchange не даёт доступ к DACL объекта домена именно через этот путь."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "No action required for this check",
+        "Keep LDAP signing and channel binding enforced - they close the relay path itself, not only its payoff"
+      ],
+      "remediation": [
+        "Для данной проверки исправление не требуется.",
+        "Сохраняйте принудительное LDAP signing и LDAP channel binding: они закрывают сам путь relay, а не только его возможный результат."
+      ]
+    }
+  }
+}
