@@ -57,10 +57,18 @@ foreach($name in @('SourceVerifiedAttack-10a.ru-RU.json','SourceVerifiedAttack-1
  }
 }
 if($count -ne 77 -or $steps -ne 272){throw "Ожидалось 77 разделов и 272 пункта, получено $count/$steps"}
-foreach($id in @('ACCOUNT_NOT_DELEGATED','BLOODHOUND_COLLECTION_COMPLETE','ESC_ENROLLMENT_RIGHTS_UNREAD','ENROLLMENT_REQUIRES_APPROVAL')){
+# У ESC_ENROLLMENT_RIGHTS_UNREAD исходное диагностическое пояснение
+# пронумеровано как три шага — нумерацию оригинала нельзя удалять.
+$meaningChecks=@{
+ ACCOUNT_NOT_DELEGATED='нарушитель не может'
+ BLOODHOUND_COLLECTION_COMPLETE='защитный инструмент'
+ ESC_ENROLLMENT_RIGHTS_UNREAD='Само по себе это не атака'
+ ENROLLMENT_REQUIRES_APPROVAL='нарушители не могут'
+}
+foreach($id in $meaningChecks.Keys){
  $x=($compiled.PSObject.Properties[$id].Value.attack -join ' ')
- if($x -match '^1\.[ \t]' -or $x -notmatch '[А-Яа-яЁё]'){
-  throw "Защитное или справочное пояснение ошибочно названо сценарием атаки: $id"
+ if($x -notmatch [regex]::Escape([string]$meaningChecks[$id])){
+  throw "Утерян смысл защитного или диагностического пояснения: $id"
  }
 }
 Write-Host 'PASS Stage D1: 77 новых разделов Attack и 272 пункта точно связаны с EN-оригиналом' -ForegroundColor Green
