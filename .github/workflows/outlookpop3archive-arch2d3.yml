@@ -1,0 +1,170 @@
+name: OutlookPOP3Archive ARCH2d3 fault injection 57-case full Windows PS5.1 CI
+on:
+  push:
+    branches: [feature/outlookpop3archive-2.6.5-arch2d3-failure-matrix]
+    paths: ['OutlookPOP3Archive/**', '.github/workflows/outlookpop3archive-arch2d3.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  full-ci:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+        working-directory: OutlookPOP3Archive
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pester and PSScriptAnalyzer
+        run: |
+          $ErrorActionPreference='Stop'
+          [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
+      - name: Focused ARCH2d3 fault scenarios and original semantic witnesses
+        run: |
+          $ErrorActionPreference='Stop'
+          $paths=@(
+            'Tests/Archive/ARCH2c4RealPop3OneShot.Tests.ps1',
+            'Tests/Archive/ARCH2c4aRuntimeDependencies.Tests.ps1',
+            'Tests/Archive/ARCH2dBoundedRealBatch10.Tests.ps1',
+            'Tests/Archive/ARCH2d3FaultMatrix.Tests.ps1',
+            'Tests/Archive/ARCH2bSemanticWitness.Tests.ps1',
+            'Tests/Archive/ARCH2c1TempIsolation.Tests.ps1',
+            'Tests/Archive/ARCH2c2TempSafety.Tests.ps1'
+          )
+          $result=Invoke-Pester -Path $paths -Output Detailed -PassThru
+          if($result.Result -ne 'Passed' -or $result.FailedCount -ne 0 -or $result.SkippedCount -ne 0){
+            throw ('ARCH2d3 focused Pester gate failed: '+$result.Result)
+          }
+          Write-Host ('PASS ARCH2d3 focused Pester '+$result.PassedCount+' tests.')
+      - name: Mandatory original Windows PowerShell 5.1 CI gates
+        run: |
+          $ErrorActionPreference='Stop'
+          .\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
+          if($LASTEXITCODE -ne 0){throw 'Original CI gates failed.'}
+      - name: ARCH2d exactly ten immutable semantic claims before real COM Move and independent restart fence
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH2dBatchCore.ps1' -Raw -Encoding UTF8
+          $policy=Get-Content -LiteralPath 'Core/Archive/ARCH2dBatchPolicy.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH2d.ps1' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch2d-bounded-real-batch10.md' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH2dBoundedRealBatch10.Tests.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $globalIdx=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path $layout.GlobalClaimPath')
+          $itemIdx=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path (Get-OPA265ARCH2dItemClaimPath')
+          $moveIdx=$core.IndexOf('$item.Move($target)')
+          if(([regex]::Matches($core,'\$item\.Move\(\$target\)')).Count -ne 1 -or
+             $globalIdx -lt 0 -or $itemIdx -le $globalIdx -or $moveIdx -le $itemIdx -or
+             $core -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness' -or
+             $core -cnotmatch 'Compare-OPA265ARCH2bMailSemanticWitness' -or
+             $core -cnotmatch 'Get-OPA265ARCH2dTargetFolder' -or
+             $core -cmatch '\.(Delete|Copy|Send)\s*\(' -or
+             $policy -cnotmatch 'Get-OPA265ARCH2dReconcileDecision' -or
+             $policy -cnotmatch 'ARCH2c4OneShotCore\.ps1' -or
+             $policy -cnotmatch 'AutomaticRetryAllowed=\$false' -or
+             $entry -cnotmatch 'Invoke-OPA265ARCH2dBatch' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed' -or
+             $docs -cnotmatch 'ARCH2d' -or
+             $tests -cnotmatch 'independently approves exact ten semantic matches' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 3976 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 132){
+              throw 'ARCH2d real batch10 fail-closed, SHA witness, claim order or inventory gate incomplete.'
+          }
+          Write-Host 'PASS ARCH2d batch10 SHA256-original, global then per-item claim before Move, no retry, original CLI closed.'
+      - name: ARCH2d3 bounded synthetic-only failpoint model and no historical PST access gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $sim=Get-Content -LiteralPath 'Core/Diagnostics/ARCH2d3FaultSimulator.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH2d3.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH2d3FaultMatrix.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch2d3-fault-injection.md' -Raw -Encoding UTF8
+          $realCore=Get-Content -LiteralPath 'Core/Archive/ARCH2dBatchCore.ps1' -Raw -Encoding UTF8
+          $realEntry=Get-Content -LiteralPath 'Invoke-ARCH2d.ps1' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($sim -cnotmatch 'Write-OPA265ARCH2c4JsonOnce -Path \$globalPath' -or
+             $sim -cnotmatch 'Write-OPA265ARCH2c4JsonOnce -Path \$row\.ClaimPath' -or
+             $sim -cnotmatch 'Get-OPA265ARCH2dReconcileDecision -ItemResults' -or
+             $sim -cnotmatch 'foreach\(\$ord in @\(1,5,10\)\)' -or
+             $sim -cnotmatch 'Cases=\$all.Count' -or
+             $sim -cmatch 'GetActiveObject\s*\(' -or
+             $sim -cmatch '\.Move\s*\(' -or
+             $sim -cmatch '\.AddStoreEx\s*\(' -or
+             $sim -cmatch '\.SaveAsFile\s*\(' -or
+             $entry -cnotmatch 'Invoke-OPA265ARCH2d3SyntheticMatrix' -or
+             $entry -cmatch 'GetActiveObject\s*\(' -or
+             $tests -cnotmatch '57-case 1/5/10 failure injection' -or
+             $tests -cnotmatch 'ComAppliesThenThrows' -or
+             $doc -cnotmatch '57' -or
+             $realCore -cnotmatch 'GlobalClaimPath' -or
+             $realEntry -cnotmatch 'Invoke-OPA265ARCH2dBatch' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 3976 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 132){
+             throw 'ARCH2d3 synthetic fault matrix/no Outlook/real writer compatibility gate failed.'
+          }
+          Write-Host 'PASS ARCH2d3 57-case 1/5/10 no-retry, actual force-flushed JSON writer, no COM/PST, original ARCH2d untouched.'
+      - name: Package only OutlookPOP3Archive from tested commit and calculate SHA-256
+        run: |
+          $ErrorActionPreference='Stop'
+          $project=(Get-Location).Path
+          $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
+          $base='OutlookPOP3Archive-2.6.5-ARCH2d3-dev-g'+$short
+          $out=Join-Path $env:RUNNER_TEMP 'OPA-ARCH2d3-Package'
+          $stageParent=Join-Path $env:RUNNER_TEMP 'OPA-ARCH2d3-Stage'
+          $staged=Join-Path $stageParent $base
+          [void][IO.Directory]::CreateDirectory($out)
+          [void][IO.Directory]::CreateDirectory($staged)
+          foreach($f in @('.editorconfig','.gitignore','.psscriptanalyzer.psd1','RELEASE.json','MANIFEST.txt','README.md','CHANGELOG.md','OutlookPOP3Archive.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-ARCH2c4.ps1','Invoke-ARCH2d.ps1','Invoke-ARCH2d3.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')){
+            $src=Join-Path $project $f
+            if(-not (Test-Path -LiteralPath $src -PathType Leaf)){throw ('Required project file absent: '+$f)}
+            Copy-Item -LiteralPath $src -Destination (Join-Path $staged $f)
+          }
+          foreach($dir in @('Core','Tests','docs')){
+            $dirPath=Join-Path $project $dir
+            foreach($f in @(Get-ChildItem -LiteralPath $dirPath -Recurse -File -Force)){
+              $extension=if($dir -eq 'docs'){'.md'}else{'.ps1'}
+              if($f.Extension -cne $extension -or
+                 ($dir -eq 'Tests' -and $f.Name -notmatch '\.Tests\.ps1$') -or
+                 (($f.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)){throw ('Unallowlisted file: '+$f.FullName)}
+              $relative=$f.FullName.Substring($project.Length).TrimStart([char[]]@('\','/'))
+              $dst=Join-Path $staged $relative
+              [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($dst))
+              Copy-Item -LiteralPath $f.FullName -Destination $dst
+            }
+          }
+          $info=[ordered]@{Schema='OPA265.ARCH2d3.BuildInfo.1';DevelopmentGate='2.6.5-ARCH2d3';SourceCommit=$env:GITHUB_SHA;WindowsPowerShell51CiPassed=$true;PesterAndPSScriptAnalyzerRequired=$true;LiveOutlookTestInCi=$false;ArchiveResumeAutoClosed=$true;ProductionReady=$false}
+          [IO.File]::WriteAllText((Join-Path $staged 'BUILD-INFO.json'),(ConvertTo-Json -InputObject $info -Depth 4),(New-Object Text.UTF8Encoding($false)))
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip=Join-Path $out ($base+'.zip')
+          [IO.Compression.ZipFile]::CreateFromDirectory($stageParent,$zip,[IO.Compression.CompressionLevel]::Optimal,$false)
+          $hash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          [IO.File]::WriteAllText((Join-Path $out ($base+'.sha256')),($hash+'  '+[IO.Path]::GetFileName($zip)+[char]10),(New-Object Text.UTF8Encoding($false)))
+          Write-Host ('ARCH2d3 ZIP SHA256: '+$hash)
+      - name: Upload tested project-only ARCH2d3 DEV ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutlookPOP3Archive-2.6.5-ARCH2d3-dev
+          path: |
+            ${{ runner.temp }}/OPA-ARCH2d3-Package/*.zip
+            ${{ runner.temp }}/OPA-ARCH2d3-Package/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+      - name: Publish public test-only ARCH2d3 prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
+          $base='OutlookPOP3Archive-2.6.5-ARCH2d3-dev-g'+$short
+          $dir=Join-Path $env:RUNNER_TEMP 'OPA-ARCH2d3-Package'
+          $zip=Join-Path $dir ($base+'.zip')
+          $sha=Join-Path $dir ($base+'.sha256')
+          if(-not (Test-Path -LiteralPath $zip -PathType Leaf) -or -not (Test-Path -LiteralPath $sha -PathType Leaf)){throw 'ZIP/checksum absent'}
+          $tag='outlookpop3archive-2.6.5-arch2d3-dev-g'+$short
+          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH2d3 DEV '+$short) --notes 'ARCH2d3 DEV: synthetic only, 19 failure kinds x 1st 5th 10th item = 57 fault variants, uses original production immutable CreateNew/Flush(true) evidence writer and ARCH2d ten-original semantic reconciliation. No Outlook COM and NO physical PST read/write in CI; previous completed real ARCH2d batch RunId 23ee0a5b-4780-45a2-9ef6-e12992b418f4 verified 10/10, preserved immutable. COM applied-before-throw, post-claim crash, torn journals, return failures and SHA mismatch all no retry; no automatic resume. Main Archive/Resume/Auto remain blocked, not 90GB production ready. Full Windows PowerShell 5.1 3976 Pester tests in 132 containers, PSScriptAnalyzer, BOM, JSON release gates and project-only SHA256 ZIP.' --prerelease
+          if($LASTEXITCODE -ne 0){throw 'GitHub prerelease publication failed'}
