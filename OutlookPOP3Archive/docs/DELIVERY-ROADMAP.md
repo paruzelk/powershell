@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH2c4a (2026-11-12): после первого реального `Prepare` найден пропущенный bootstrap зависимостей `Get-OPAInternetMessageId`. Исправлено в `Core/Archive/ARCH2c4OneShotCore.ps1`, добавлены 10 интеграционных Pester тестов с вызовом настоящего ARCH2b witness. Текущий operator RunId сохраняется; реальный Move не начинался. CI по-прежнему не заменяет фактическое Outlook acceptance.
+
 > ARCH2c4 (2026-11-12): ограниченный **один реальный перенос** из существующего POP3 Inbox через новый `Core/Archive/ARCH2c4OneShotCore.ps1`, глобальный durable claim/принцип never-retry и независимая read-only проверка SHA-256 после перезапуска. Новые синтетические PST-источники не нужны; отдельный архив PST — результат операции. `Archive/Resume/Auto` по-прежнему закрыты. См. [операторскую инструкцию](2.6.5-arch2c4-real-pop3-one-shot.md).
 
 > ARCH2c3 (2026-11-12): read-only план/инвентаризация/проба в существующем disposable PST с оригинальным payload SHA-256 и повторной проверкой после restart. `Archive/Resume/Auto` закрыты; тесты (целевое значение 3804/128) синтетические. Следующим ограниченным этапом после реального operator output будет ARCH2c4 и отдельно Copy→Verify→Delete. См. [операторский runbook](2.6.5-arch2c3-disposable-com-probe.md).
