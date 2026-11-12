@@ -1,0 +1,326 @@
+{
+  "schema": "adPEAS-RU.StageD5.CoreFields.14a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "ADCS_CA_CERT_EXPIRED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "CA cannot issue new valid certificates",
+        "Existing certificates signed by this CA may fail chain validation",
+        "Certificate-based authentication (PKINIT, smart card) may stop working",
+        "Services relying on auto-enrollment will fail"
+      ],
+      "impact": [
+        "ЦС больше не может выпускать новые действительные сертификаты.",
+        "Уже выданные этим ЦС сертификаты могут не проходить проверку цепочки доверия.",
+        "Аутентификация по сертификатам (PKINIT, смарт-карты) может перестать работать.",
+        "Службы, использующие автоматическую регистрацию сертификатов (auto-enrollment), столкнутся с ошибками."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Renew the CA certificate immediately",
+        "If the CA is no longer needed, decommission it properly",
+        "Verify all dependent services after certificate renewal"
+      ],
+      "remediation": [
+        "Незамедлительно обновите сертификат центра сертификации.",
+        "Если ЦС больше не нужен, корректно выведите его из эксплуатации.",
+        "После обновления сертификата проверьте все зависимые службы."
+      ]
+    },
+    "ADCS_CA_SHORT_KEY": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Keys shorter than 2048 bits can potentially be factored",
+        "All certificates issued by this CA inherit the weak security",
+        "Non-compliant with NIST SP 800-57 and industry standards"
+      ],
+      "impact": [
+        "Ключи длиной менее 2048 бит потенциально могут быть раскрыты факторизацией.",
+        "Слабая криптографическая стойкость ЦС затрагивает доверие ко всем выпущенным им сертификатам.",
+        "Конфигурация не соответствует рекомендациям NIST SP 800-57 и отраслевым стандартам."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Renew the CA certificate with at least 2048-bit RSA key (4096-bit recommended)",
+        "For ECC keys, use P-256 or stronger curves",
+        "Plan CA migration if the current key cannot be upgraded"
+      ],
+      "remediation": [
+        "Обновите сертификат ЦС с ключом RSA длиной не менее 2048 бит (рекомендуется 4096 бит).",
+        "Для ключей ECC применяйте кривые P-256 или более стойкие.",
+        "Если действующий ключ нельзя заменить, запланируйте миграцию ЦС."
+      ]
+    },
+    "ADCS_CA_WEAK_SIGNATURE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Weak hash algorithms are susceptible to collision attacks",
+        "Forged certificates could be created that appear valid",
+        "Modern security policies and browsers reject SHA-1 signed certificates"
+      ],
+      "impact": [
+        "Слабые алгоритмы хеширования подвержены атакам на коллизии.",
+        "Возможно создание поддельных сертификатов, которые выглядят действительными.",
+        "Современные политики безопасности и браузеры отклоняют сертификаты с подписью SHA-1."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Renew the CA certificate with SHA-256 or stronger signature algorithm",
+        "Plan CA migration if the current CA does not support modern algorithms",
+        "Verify all issued certificates also use strong signature algorithms"
+      ],
+      "remediation": [
+        "Обновите сертификат ЦС, используя алгоритм подписи SHA-256 или более стойкий.",
+        "Если текущий ЦС не поддерживает современные алгоритмы, запланируйте миграцию.",
+        "Убедитесь, что все выданные сертификаты также используют стойкие алгоритмы подписи."
+      ]
+    },
+    "ESC13_ISSUANCE_POLICY_GROUP_LINK": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Attacker enrolls in the template and gains membership in the linked AD group",
+        "If the linked group is privileged, this directly escalates privileges",
+        "Certificate-based group membership bypasses traditional group management controls",
+        "The group membership is granted automatically upon certificate issuance"
+      ],
+      "impact": [
+        "Атакующий регистрирует сертификат по этому шаблону и получает членство в связанной группе AD через политику выдачи сертификатов.",
+        "Если связанная группа привилегированная, это непосредственно повышает привилегии.",
+        "Членство в группе на основании сертификата обходит привычные механизмы управления участниками групп.",
+        "Такое членство предоставляется автоматически при выпуске соответствующего сертификата."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove the msDS-OIDToGroupLink attribute from the issuance policy OID object",
+        "Remove the issuance policy from the template's msPKI-Certificate-Policy attribute",
+        "Restrict enrollment permissions to privileged users only",
+        "Review which groups are linked to issuance policies and assess the security impact"
+      ],
+      "remediation": [
+        "Удалите атрибут msDS-OIDToGroupLink у объекта OID политики выдачи.",
+        "Удалите эту политику выдачи из атрибута msPKI-Certificate-Policy шаблона.",
+        "Ограничьте права регистрации сертификатов только привилегированными пользователями, которым они необходимы.",
+        "Проверьте группы, связанные с политиками выдачи сертификатов, и оцените последствия для безопасности."
+      ]
+    },
+    "ESC14_WRITABLE_MAPPING": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The trustee adds a mapping for a certificate they control and authenticates as this account",
+        "No password is changed and no group membership is touched, so the account looks untouched",
+        "The mapping persists until somebody reads the attribute"
+      ],
+      "impact": [
+        "Обладатель разрешения добавляет сопоставление с контролируемым им сертификатом и аутентифицируется как эта привилегированная учётная запись.",
+        "Пароль не меняется и членство в группах не затрагивается, поэтому учётная запись внешне остаётся неизменной.",
+        "Сопоставление сохраняется, пока кто-нибудь не проверит атрибут."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove WriteProperty on altSecurityIdentities, and the blanket rights that include it, from non-administrative principals",
+        "Check the property-set delegations too: WriteProperty on the set that contains the attribute - usually Public-Information - grants it without naming it",
+        "Check the owner of the account: an owner may rewrite the DACL and grant itself the write, so an owner outside the administrative tier is the same exposure",
+        "Audit the attribute on privileged accounts: a mapping that is already there may have been added this way",
+        "Monitor changes to altSecurityIdentities on privileged accounts"
+      ],
+      "remediation": [
+        "Удалите у непривилегированных субъектов WriteProperty для altSecurityIdentities и общие права, включающие запись этого атрибута.",
+        "Проверьте делегирование на наборы свойств: WriteProperty для набора, содержащего атрибут (обычно Public-Information), позволяет менять его без явного перечисления имени.",
+        "Проверьте владельца учётной записи: владелец может переписать DACL и выдать себе право записи, поэтому владелец вне административного уровня создаёт ту же угрозу.",
+        "Проведите аудит altSecurityIdentities у привилегированных учётных записей: существующее сопоставление могло быть добавлено таким способом.",
+        "Отслеживайте изменения altSecurityIdentities у привилегированных учётных записей."
+      ]
+    },
+    "KERBEROS_HASH_CRACKABLE": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Offline cracking can run indefinitely without triggering account lockout",
+        "Weak passwords can be cracked within minutes using modern GPUs",
+        "Even complex passwords may fall to dictionary attacks with rules",
+        "Once cracked, the attacker has valid credentials for the target account",
+        "No logs are generated during offline cracking - the attack is undetectable"
+      ],
+      "impact": [
+        "Автономный подбор может продолжаться неограниченно долго, не вызывая блокировки учётной записи.",
+        "Слабые пароли могут быть подобраны современными GPU за считанные минуты.",
+        "Даже сложные пароли могут оказаться уязвимыми для словарных атак с правилами преобразования.",
+        "После успешного подбора атакующий получает действительные учётные данные целевой записи.",
+        "Во время самого автономного подбора события в домене не создаются, поэтому этот этап атаки не виден по доменным журналам."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Set strong, randomly generated passwords (25+ characters) for service accounts",
+        "Use Group Managed Service Accounts (gMSA) which have 240-character auto-rotating passwords",
+        "Enable AES encryption to slow down cracking (still crackable, but significantly slower)",
+        "Implement a password policy that prevents dictionary words",
+        "Regularly rotate service account passwords"
+      ],
+      "remediation": [
+        "Для служебных учётных записей установите стойкие случайно сгенерированные пароли длиной от 25 символов.",
+        "Используйте групповые управляемые служебные учётные записи (gMSA) с автоматически меняющимися паролями длиной 240 символов.",
+        "Включите AES, чтобы замедлить подбор: билет по-прежнему можно атаковать, но подбор существенно усложняется.",
+        "Применяйте политику паролей, препятствующую использованию словарных слов.",
+        "Регулярно меняйте пароли служебных учётных записей."
+      ]
+    },
+    "KERBEROS_TICKET_LIFETIME_EXTENDED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "A stolen or forged TGT is accepted for as long as the lifetime allows",
+        "Disabling the account or resetting its password does not invalidate a ticket already issued",
+        "The renewal window is the outer bound: a ticket renewed in time never has to be re-requested",
+        "A longer lifetime widens every pass-the-ticket and Golden Ticket window by the same amount"
+      ],
+      "impact": [
+        "Похищенный или поддельный TGT будет приниматься до истечения установленного срока действия.",
+        "Отключение учётной записи или сброс её пароля не аннулирует уже выданный билет.",
+        "Окно продления задаёт внешнюю границу: вовремя продлеваемый билет не требуется запрашивать заново.",
+        "Увеличенный срок действия настолько же расширяет окно для Pass-the-Ticket и Golden Ticket."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set the maximum lifetime for user tickets back to 10 hours, the renewal lifetime to 7 days, the service ticket lifetime to 600 minutes and the clock tolerance to 5 minutes",
+        "They live in Default Domain Policy under Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies -> Kerberos Policy; the row names the GPO that actually sets each value",
+        "A longer lifetime is sometimes set for an application that cannot re-authenticate; the fix there belongs in the application, not in the domain policy"
+      ],
+      "remediation": [
+        "Верните предельный срок действия пользовательского билета к 10 часам, срок продления — к 7 дням, срок действия билета службы — к 600 минутам, допустимое расхождение времени — к 5 минутам.",
+        "Параметры находятся в Default Domain Policy: Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies → Kerberos Policy; строка находки указывает фактическую GPO, задающую соответствующее значение.",
+        "Иногда срок увеличивают для приложения, которое не умеет повторно аутентифицироваться; исправлять такую проблему следует в приложении, а не ослаблять доменную политику."
+      ]
+    },
+    "ROASTABLE_PRIVILEGED_ACCOUNT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The hash of a privileged account is obtainable by any authenticated user, and for AS-REP roasting by anyone at all",
+        "Cracking happens offline, so no lockout policy, no failed logon, nothing to alert on",
+        "Success grants the account's rights directly - no further escalation needed",
+        "Service account passwords are set once and rarely rotated, which is what makes the offline attack worth running"
+      ],
+      "impact": [
+        "Хеш привилегированной записи может получить любой аутентифицированный пользователь, а при AS-REP Roasting — даже без аутентификации.",
+        "Подбор происходит вне домена: не срабатывает блокировка, не появляются неудачные попытки входа и связанные с ними оповещения.",
+        "Успешный подбор непосредственно даёт права этой записи — дополнительное повышение привилегий не требуется.",
+        "Пароли служебных записей часто задают один раз и редко меняют, что делает автономный подбор привлекательным."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "A privileged account should not be roastable at all: remove the SPN, or move the service to a group Managed Service Account whose 240-byte password cannot be cracked",
+        "If the account carries DONT_REQ_PREAUTH, clear it - pre-authentication is what makes AS-REP roasting impossible",
+        "Take the privilege away rather than the exposure where the service does not need it",
+        "Add the account to 'Protected Users', which forbids RC4 and shortens the ticket lifetime",
+        "Where the account must stay as it is, give it a password long enough that offline cracking is not worth the electricity - 25 characters or more"
+      ],
+      "remediation": [
+        "Привилегированная запись вообще не должна допускать Roasting: удалите SPN или перенесите службу на gMSA, чей 240-байтовый пароль практически не поддаётся подбору.",
+        "Если установлен флаг DONT_REQ_PREAUTH, снимите его: предварительная аутентификация предотвращает AS-REP Roasting.",
+        "Если службе не нужны привилегии, удалите их, а не ограничивайтесь устранением способа получения хеша.",
+        "Добавьте подходящую пользовательскую учётную запись в Protected Users после проверки совместимости: это запрещает RC4 и сокращает срок действия билетов.",
+        "Если запись необходимо сохранить в нынешнем виде, задайте пароль длиной не менее 25 символов, чтобы автономный подбор был экономически нецелесообразен."
+      ]
+    },
+    "LAPS_COVERAGE_NOT_IN_AD": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The computers listed here have no LAPS attribute in Active Directory, which is the expected state for an Entra-escrowed policy and not a finding in itself",
+        "What cannot be confirmed from Active Directory is whether each of them is really in that policy's scope - a computer outside it has no managed password at all, and looks identical from here",
+        "With BackupDirectory = 0 the password is not escrowed anywhere, which means nobody can retrieve it: the account is effectively locked out rather than managed"
+      ],
+      "impact": [
+        "У перечисленных компьютеров нет атрибутов LAPS в Active Directory — это ожидаемо при хранении паролей в Entra ID и само по себе не является нарушением.",
+        "По одним данным AD нельзя определить, действительно ли каждый компьютер входит в область действия такой политики: компьютер вне её также не имеет управляемого пароля и выглядит здесь так же.",
+        "При BackupDirectory = 0 пароль нигде не сохраняется для восстановления: он меняется, но получить его нельзя, фактически оставляя администратора без аварийного доступа."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Confirm in Microsoft Entra ID (Devices -> Local administrator password recovery) that the computers listed here really do have an escrowed password",
+        "For an on-premises fleet, set BackupDirectory = 2 so the password is escrowed to Active Directory and this check can assess it",
+        "BackupDirectory = 0 is worth correcting on its own terms: the password rotates and nobody can read it",
+        "Where both are in use, scope the two policies so it is documented which computers are escrowed where"
+      ],
+      "remediation": [
+        "Проверьте в Microsoft Entra ID (Devices → Local administrator password recovery), что для перечисленных компьютеров действительно сохранены пароли.",
+        "Для локальной инфраструктуры установите BackupDirectory = 2, чтобы пароли сохранялись в Active Directory и эта проверка могла оценивать покрытие.",
+        "BackupDirectory = 0 требует отдельного исправления: пароль меняется, но ни один администратор не может его прочитать из хранилища.",
+        "Если используются оба механизма, разграничьте области применения политик и задокументируйте, где сохраняются пароли каждого компьютера."
+      ]
+    },
+    "LAPS_GPO_ENCRYPTION_DISABLED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Local administrator passwords are stored in cleartext in Active Directory",
+        "Every identity with read access to msLAPS-Password obtains the password directly",
+        "The ADPasswordEncryptionPrincipal restriction does not apply at all",
+        "Affects every computer where the GPO is applied"
+      ],
+      "impact": [
+        "Пароли локальных администраторов сохраняются в Active Directory в открытом виде.",
+        "Любой субъект с правом чтения msLAPS-Password получает пароль непосредственно.",
+        "Ограничение ADPasswordEncryptionPrincipal в таком режиме вообще не применяется.",
+        "Проблема затрагивает каждый компьютер, на который распространяется GPO."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Set ADPasswordEncryptionEnabled=1 in the Windows LAPS policy",
+        "Requires Domain Functional Level 2016 or later",
+        "Configure ADPasswordEncryptionPrincipal to the group allowed to decrypt",
+        "Review the ACLs on msLAPS-Password and rotate all affected passwords afterwards"
+      ],
+      "remediation": [
+        "Установите ADPasswordEncryptionEnabled = 1 в политике Windows LAPS.",
+        "Для шифрования необходим функциональный уровень домена Windows Server 2016 или выше.",
+        "Настройте ADPasswordEncryptionPrincipal на группу, которой разрешена расшифровка.",
+        "Проверьте ACL для msLAPS-Password, затем смените все затронутые пароли."
+      ]
+    },
+    "LAPS_GPO_NO_AD_BACKUP": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "No local administrator password is escrowed to this Active Directory",
+        "Recovery of the managed account password from AD is impossible",
+        "LAPS coverage reporting based on AD attributes is misleading for these hosts",
+        "With BackupDirectory=0 the password is not backed up anywhere at all"
+      ],
+      "impact": [
+        "Пароль локального администратора не сохраняется в данной Active Directory.",
+        "Восстановить пароль управляемой учётной записи из AD невозможно.",
+        "Отчёт о покрытии LAPS по атрибутам AD может создавать неверное представление о защищённости таких компьютеров.",
+        "При BackupDirectory = 0 резервного сохранения пароля вообще нет."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set BackupDirectory=2 (Active Directory) for on-premises domain-joined devices",
+        "Use BackupDirectory=1 only for Microsoft Entra joined devices",
+        "Verify the LAPS schema is extended and the device OUs allow the computer to write its own password"
+      ],
+      "remediation": [
+        "Для локальных компьютеров, присоединённых к домену, установите BackupDirectory = 2 (Active Directory).",
+        "Используйте BackupDirectory = 1 только для устройств, присоединённых к Microsoft Entra ID.",
+        "Убедитесь, что схема LAPS расширена, а OU компьютеров позволяет им записывать собственный пароль."
+      ]
+    },
+    "LAPS_GPO_NO_POST_AUTH_RESET": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A password that was retrieved once keeps working until the next scheduled rotation",
+        "The rotation interval, not the use of the password, decides the exposure window",
+        "Nothing in the directory records that the password was used"
+      ],
+      "impact": [
+        "Однажды полученный пароль продолжает действовать до следующей плановой ротации.",
+        "Длительность риска определяется интервалом ротации, а не фактом использования пароля.",
+        "Сам каталог не фиксирует факт использования этого пароля."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set the post-authentication action to reset the password, which is the Windows LAPS default behaviour",
+        "Where a reset alone is not enough, the logoff and reboot variants end the session that used it"
+      ],
+      "remediation": [
+        "Настройте действие после аутентификации на сброс пароля — это стандартное поведение Windows LAPS.",
+        "Если одного сброса недостаточно, варианты с выходом из сеанса или перезагрузкой завершат сеанс, в котором применялся пароль."
+      ]
+    }
+  }
+}
