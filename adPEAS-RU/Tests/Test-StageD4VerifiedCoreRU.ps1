@@ -21,7 +21,7 @@ $end=$javascript.IndexOf([char]10,$start)
 if($end -lt 0){throw 'D4: неверная граница HTML-словаря'}
 $ru=ConvertFrom-Json -InputObject ($javascript.Substring($start,$end-$start).Trim().TrimEnd([char]';'))
 if(@($ru.PSObject.Properties).Count -ne 392){throw 'D4: ожидалось 392 находки в HTML'}
-if(@($catalog.translations.PSObject.Properties).Count -ne 20){throw 'D4: ожидалось 14 переводов'}
+if(@($catalog.translations.PSObject.Properties).Count -ne 20){throw 'D4: ожидалось 20 переводов'}
 $expectedIds=@(
  'CONSTRAINED_DELEGATION_PROTOCOL_TRANSITION','CONSTRAINED_DELEGATION_TO_DC',
  'CONSTRAINED_DELEGATION_TRANSITION_NO_TARGET','RBCD_DANGEROUS_PRINCIPALS',
