@@ -1,5 +1,10 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
+### ARCH3c — синтетические защищённые файловые квитанции с оригинальным OperationJournal (DEV)
+
+[ARCH3c: durable SHA-цепочка и исходный журнал](docs/2.6.5-arch3c-durable-original-operation-journal.md). В отдельной папке `ARCH3C-SYNTHETIC-...` внутри OS TEMP создаются семь одноразовых JSON-фаз (`FileMode.CreateNew`, `Flush(true)`) и финальная внешне закрепляемая SHA256 печать, которая также включает SHA256 **оригинального** `OperationJournal.ps1`. Используются оригинальные `Write-OPAOperationJournalEvent`/`Read-OPAOperationJournal`/`Resolve-OPAOperationRecovery`. Проверяются обрыв после заявки Move, подмена квитанций и повреждение хвоста журнала, всегда без replay и production-разрешения. `Invoke-ARCH3c.ps1` Plan/SyntheticWrite/Evidence. **Только синтетика: реальные PST, legacy `MailMover`, транзакция и `DuplicateIndex` не изменяются; WriterPermit=False, Archive/Resume/Auto блокированы.** Следующий этап — реальная интеграция проверяемых связей в исходный двигательный путь с изолированными тестами.
+
+
 ### ARCH3b — контракт операции поверх существующего MailMover (read-only DEV)
 
 [ARCH3b: контракт исходного кандидата, года/PST и безопасной операции](docs/2.6.5-arch3b-original-mover-contract.md). Новый `Core/Archive/ARCH3bOriginalMoverContract.ps1` не заменяет архиватор и не открывает PST. Он формирует устойчивый SHA256 `OperationId` из исходного `ArchiveSelector`, исходного StoreID/EntryID, года/part и путей, вычисляемых **уже существующими** `Get-OPAArchivePartPath` и `Get-OPAArchiveTargetPath`. Чистая модель фаз требует durable `PrepareIntent` **до** создания PST, source witness до `MoveClaimed`, независимую пострестартовую семантическую проверку до записи индекса; неопределённый COM результат не разрешает retry. `Invoke-ARCH3b.ps1 -Mode Plan|SyntheticPreview|SyntheticCrashReview` — только чтение и синтетика. Основной `MailMover` и `Archive/Resume/Auto` пока не включены.
