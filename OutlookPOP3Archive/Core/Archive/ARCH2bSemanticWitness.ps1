@@ -1,6 +1,8 @@
 ﻿#requires -Version 5.1
 # ARCH2b: general semantic witness based on the proven BW4j by-value
 # attachment SaveAsFile->SHA256 approach. DEV Archive/Resume/Auto remain closed.
+# ARCH2c2 private NTFS ACL and exclusive lease are mandatory for each witness.
+. (Join-Path $PSScriptRoot 'ARCH2c2TempSafety.ps1')
 function Get-OPA265ARCH2bTextSha256 {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][AllowEmptyString()][string]$Text)
@@ -31,22 +33,12 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
         [ValidateRange(1,256)][int]$MaxAttachmentCount=128,
         [string]$TemporaryDirectory=[IO.Path]::GetTempPath()
     )
-    $root=[IO.Path]::GetFullPath($TemporaryDirectory)
-    if(-not [IO.Directory]::Exists($root) -or
-       (([IO.File]::GetAttributes($root) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
-        throw 'ARCH2b attachment temp root missing or reparse point; no Move authorized.'
-    }
-    # A unique child workspace isolates sensitive copies from unrelated temp data.
-    # A hard crash can leave this GUID-only workspace behind; see ARCH2c1 inventory.
-    $workspace=Join-Path $root ('OPA-ARCH2c1-'+[guid]::NewGuid().ToString('N'))
-    if([IO.Directory]::Exists($workspace) -or [IO.File]::Exists($workspace)){
-        throw 'ARCH2c1 attachment workspace collision; no Move authorized.'
-    }
-    [void][IO.Directory]::CreateDirectory($workspace)
+    # Private ACL must be applied atomically at creation. The exclusive lease
+    # stays open throughout SaveAsFile / SHA256 / per-file cleanup.
+    $workspaceLease=$null
     try {
-        if(([IO.File]::GetAttributes($workspace) -band [IO.FileAttributes]::ReparsePoint) -ne 0){
-            throw 'ARCH2c1 attachment workspace is a reparse point; no Move authorized.'
-        }
+        $workspaceLease=New-OPA265ARCH2c2PrivateWorkspace -TemporaryDirectory $TemporaryDirectory
+        $workspace=[string]$workspaceLease.WorkspacePath
         $collection=$Mail.Attachments
         $count=[int]$collection.Count
         if($count -lt 0 -or $count -gt $MaxAttachmentCount){
@@ -100,14 +92,10 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
         return $result.ToArray()
     }
     finally {
-        # Non-recursive delete only: unexpected files, directory reparse points, or
-        # failed per-attachment cleanup must STOP rather than erase other content.
-        if([IO.Directory]::Exists($workspace)){
-            if(([IO.File]::GetAttributes($workspace) -band [IO.FileAttributes]::ReparsePoint) -ne 0){
-                throw 'ARCH2c1 attachment workspace changed to reparse point; stop.'
-            }
-            try {[IO.Directory]::Delete($workspace,$false)}
-            catch {throw 'ARCH2c1 attachment workspace not empty or cleanup failed; stop.'}
+        # Close releases the exclusive lease only after all payload copies have
+        # been handled. Unknown residue is never recursively deleted.
+        if($null -ne $workspaceLease){
+            Close-OPA265ARCH2c2PrivateWorkspace -Workspace $workspaceLease
         }
     }
 }
@@ -131,6 +119,7 @@ function Get-OPA265ARCH2c1AttachmentWorkspaceInventory {
             WorkspacePath=[string]$folder.FullName
             LastWriteTimeUtc=[datetime]$folder.LastWriteTimeUtc
             RequiresManualReview=$true
+            LeaseState=(Get-OPA265ARCH2c2ObservedLeaseState -WorkspacePath $path)
             AutomaticallyDeleted=$false
         }) | Out-Null
     }
