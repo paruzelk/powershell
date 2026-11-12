@@ -1,0 +1,80 @@
+{
+  "schema": "adPEAS-RU.StageD19.CoreFields.28b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "KERBEROASTABLE_USER_SPN": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "META_SEVERITY_PASSTHROUGH": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "META_STATUS_INDICATOR": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "NON_DEFAULT_OWNER": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "UAC_SEVERITY_OVERRIDE": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "WEB_ENDPOINT_SECURITY": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "ENCRYPTION_AES_ONLY": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": true,
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Nothing to do. Keep it this way when the account's password is reset or the service is rebuilt."
+      ],
+      "remediation": [
+        "Исправление не требуется: сохраните режим только AES при следующем сбросе пароля учётной записи или повторном развёртывании службы."
+      ]
+    }
+  }
+}

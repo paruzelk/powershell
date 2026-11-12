@@ -1067,6 +1067,75 @@ if($d18Seen.Count -ne 15 -or $d18Impact -ne 28 -or $d18Remediation -ne 23){
 }
 Write-Host '[RU] PASS D18: 15 находок, Impact 28 и Remediation 23 сверены с EN'
 
+
+# D19: verify exact absence of optional original fields and one genuine AES remediation.
+# All 377 previously source-verified IDs must remain untouched.
+$d19Catalogs=@('SourceVerifiedCore-28a.ru-RU.json','SourceVerifiedCore-28b.ru-RU.json')
+$d19Protected=@{}
+foreach($name in (@($d12Older)+@($d12Catalogs)+@($d13Catalogs)+@($d14Catalogs)+@($d15Catalogs)+@($d16Catalogs)+@($d17Catalogs)+@($d18Catalogs))){
+ $earlier=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($row in $earlier.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if($d19Protected.ContainsKey($id)){throw "D19: повтор FindingId в проверенных каталогах $id"}
+  $d19Protected[$id]=$true
+ }
+}
+if($d19Protected.Count -ne 377){throw "D19: ожидалось 377 защищённых FindingId, найдено $($d19Protected.Count)"}
+$d19Seen=@{}
+$d19NonemptyImpact=0
+$d19NonemptyRemediation=0
+$d19AbsentFields=0
+$d19Sizes=@{'SourceVerifiedCore-28a.ru-RU.json'=8;'SourceVerifiedCore-28b.ru-RU.json'=7}
+foreach($name in $d19Catalogs){
+ $cat=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ if(@($cat.translations.PSObject.Properties).Count -ne $d19Sizes[$name]){throw "D19: неверное число FindingId в $name"}
+ foreach($row in $cat.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if(-not $entries.Contains($id)){throw "D19: неизвестный FindingId $id"}
+  if($d19Protected.ContainsKey($id) -or $d19Seen.ContainsKey($id)){throw "D19: перезапись защищённого или повторённого ID $id"}
+  $d19Seen[$id]=$true
+  $needle="    '$id' = @{"
+  $start=$originalFindingText.IndexOf($needle,[StringComparison]::Ordinal)
+  if($start -lt 0){throw "D19: нет оригинала $id"}
+  $stop=$originalFindingText.IndexOf(([string][char]10+'    }'),$start,[StringComparison]::Ordinal)
+  if($stop -lt 0){throw "D19: нет конца оригинала $id"}
+  $block=$originalFindingText.Substring($start,$stop-$start)
+  foreach($field in @('Impact','Remediation')){
+   $lower=$field.ToLowerInvariant()
+   $enField='sourceEnglish'+$field
+   $countField=$enField+'Count'
+   $declaredField=$enField+'Declared'
+   $actualDeclared=[regex]::IsMatch($block,'(?m)^[ \t]{8}'+$field+'[ \t]*=')
+   $expectedDeclared=[bool]$row.Value.$declaredField
+   if($actualDeclared -ne $expectedDeclared){throw "D19: не совпало наличие оригинального поля $id / $field"}
+   $original=@()
+   if($actualDeclared){$original=@(Get-PinnedFindingText $id $field)}else{$d19AbsentFields++}
+   $witness=@($row.Value.$enField)
+   $translated=@($row.Value.$lower)
+   $n=[int]$row.Value.$countField
+   if($n -ne $original.Count -or $n -ne $witness.Count -or $n -ne $translated.Count){
+    throw "D19: несовпадение пустого либо заполненного раздела $id / $field"
+   }
+   if($n -gt 0 -and ($id -cne 'ENCRYPTION_AES_ONLY' -or $field -cne 'Remediation' -or $n -ne 1)){
+    throw "D19: неожиданное содержимое в исходно пустом разделе $id / $field"
+   }
+   for($i=0;$i -lt $n;$i++){
+    if([string]$original[$i] -cne [string]$witness[$i]){throw "D19: изменён оригинальный EN $id / $field / $($i+1)"}
+    if([string]::IsNullOrWhiteSpace([string]$translated[$i]) -or [string]$translated[$i] -notmatch '[А-Яа-яЁё]'){
+     throw "D19: отсутствует русский перевод $id / $field / $($i+1)"
+    }
+   }
+   if($n -eq 0 -and ($actualDeclared -or $expectedDeclared)){throw "D19: неожиданный объявленный пустой раздел $id / $field"}
+   $entries[$id].$lower=@($translated)
+   if($field -eq 'Impact'){$d19NonemptyImpact+=$n}else{$d19NonemptyRemediation+=$n}
+  }
+ }
+}
+if($d19Seen.Count -ne 15 -or $d19AbsentFields -ne 29 -or $d19NonemptyImpact -ne 0 -or $d19NonemptyRemediation -ne 1){
+ throw "D19: ожидалось 15 находок, 29 отсутствующих полей, 0 Impact, 1 Remediation; получено $($d19Seen.Count), $d19AbsentFields, $d19NonemptyImpact, $d19NonemptyRemediation"
+}
+Write-Host '[RU] PASS D19: 15 находок, 29 отсутствующих полей оригинала, 0 Impact и 1 Remediation сверены с EN'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')

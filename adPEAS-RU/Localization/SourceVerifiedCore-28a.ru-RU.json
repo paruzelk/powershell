@@ -1,0 +1,86 @@
+{
+  "schema": "adPEAS-RU.StageD19.CoreFields.28a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "ADCS_CA_CROSS_DOMAIN": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "CREDENTIAL_MATCHED_LINE": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "CREDENTIAL_PASSWORD_EXPOSED": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "CREDENTIAL_TYPE_INFO": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "CREDENTIAL_USERNAME_EXPOSED": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "GPO_LINKED_OUS_SEVERITY": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "GPO_SCOPE_SEVERITY": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "GPO_TASK_FIELD_SEVERITY": {
+      "sourceEnglishImpactDeclared": false,
+      "sourceEnglishImpactCount": 0,
+      "sourceEnglishImpact": [],
+      "impact": [],
+      "sourceEnglishRemediationDeclared": false,
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    }
+  }
+}
