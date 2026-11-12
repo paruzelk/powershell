@@ -12,6 +12,8 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH2d5 DEV: exactly 100 real POP3 Inbox letters in NEW isolated archive PST; 100 immutable source SHA256 semantic witnesses and second preflight, global one-shot claim, 100 durable per-item claims before COM Move, SHA256-linked receipt to next claim, ten immutable checkpoints each after 10 receipts and an operator-externally pinned final seal SHA256 binding all 100. Read-only Evidence and independent after-restart Reconcile require exact original manifest/global/final SHA256 to certify clean full batch. Partial/indeterminate claims prohibit retry, no production Archive/Resume/Auto. Expected Windows PS5.1 4059 Pester tests in 134 containers; real hundred-message acceptance pending.",
+
     "ARCH2d4 DEV: read-only original evidence/attached Outlook forensic audit of exact completed ARCH2d ten-mail batch. Operator-pinned manifest/global SHA256, original intent identity, rigorous per-item claim+return linkage and prefix, independent post-Outlook-restart semantic Body/HTML/recipients/state/attachment SHA256 and source EntryID absence. Missing/torn return, duplicate, unknown MAPI, changed Body and interrupted batch require manual review; never retries/moves or writes original PST/journals. Explicit warning: individual receipts only internally hashed, not independently historically anchored. Windows PS5.1 4023 tests in 133 containers; real LiveAudit pending.",
     "ARCH2d3 DEV: synthetic 57-case (19 faults x ordinals 1/5/10) crash/fault matrix grounded in original ARCH2d ten-item policy and actual immutable ARCH2c4 CreateNew+Flush(true) evidence writer. Distinguishes COM-before-apply vs applied-then-throws, torn journals, return receipt failures, source drift and SHA256/duplicate mismatches; fail-closed no automatic replay. Prior successful real ten-mail ARCH2d case and global claim remain untouched. Does not execute Outlook/PST, production Archive/Resume/Auto blocked. Expected full Windows PS5.1 CI 3976 tests in 132 containers.",
 
@@ -73,8 +75,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 133,
-    "ExpectedPesterTests": 4023,
+    "ExpectedTestContainers": 134,
+    "ExpectedPesterTests": 4059,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
