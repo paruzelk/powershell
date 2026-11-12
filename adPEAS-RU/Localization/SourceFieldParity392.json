@@ -48,9 +48,6 @@
                                        "COMPUTER_OWNERSHIP_REASSIGNED",
                                        "COMPUTER_PASSWORD_NOT_ROTATED",
                                        "CONSTRAINED_DELEGATION",
-                                       "CONSTRAINED_DELEGATION_PROTOCOL_TRANSITION",
-                                       "CONSTRAINED_DELEGATION_TO_DC",
-                                       "CONSTRAINED_DELEGATION_TRANSITION_NO_TARGET",
                                        "CREDENTIAL_AUTOADMINLOGON",
                                        "CREDENTIAL_CONNECTION_STRING",
                                        "CREDENTIAL_GPP_PASSWORD",
@@ -64,15 +61,11 @@
                                        "CREDENTIAL_UNATTEND_PASSWORD",
                                        "CREDENTIAL_VNC_PASSWORD",
                                        "CRITICAL_OBJECT_CONTROL",
-                                       "DANGEROUS_ACL_BROAD_GROUP",
-                                       "DANGEROUS_ACL_GENERICWRITE",
                                        "DANGEROUS_ACL_GPO_DELETE",
                                        "DANGEROUS_ACL_GPO_EXTENDED",
                                        "DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED",
                                        "DANGEROUS_ACL_REPLICATION_INERT_HALF",
                                        "DANGEROUS_ACL_REPLICATION_NO_SECRETS",
-                                       "DANGEROUS_ACL_WRITEDACL",
-                                       "DANGEROUS_ACL_WRITEOWNER",
                                        "DANGEROUS_RIGHTS_AFFECTED_OUS",
                                        "DANGEROUS_RIGHTS_CONTEXT",
                                        "DANGEROUS_RIGHTS_SEVERITY",
@@ -96,13 +89,7 @@
                                        "ENCRYPTION_DES_ENABLED",
                                        "ENROLLMENT_REQUIRES_APPROVAL",
                                        "ESC13_ISSUANCE_POLICY_GROUP_LINK",
-                                       "ESC14_WEAK_EXPLICIT_MAPPING",
                                        "ESC14_WRITABLE_MAPPING",
-                                       "ESC15_SCHEMA_V1_ENROLLEE_SUBJECT",
-                                       "ESC2_TEMPLATE",
-                                       "ESC3_TEMPLATE",
-                                       "ESC4_TEMPLATE",
-                                       "ESC_ENROLLMENT_RIGHTS_UNREAD",
                                        "ESX_ADMINS_MEMBER",
                                        "EXCHANGE_AD_SPLIT_PERMISSIONS",
                                        "EXCHANGE_GROUP_LOW_PRIV_MEMBER",
@@ -127,11 +114,8 @@
                                        "GMSA_MEMBERSHIP_OWNER",
                                        "GMSA_PASSWORD_READABLE",
                                        "GMSA_ROTATION_INTERVAL_LONG",
-                                       "GPO_DANGEROUS_PERMISSIONS",
                                        "GPO_LOCAL_GROUP_MEMBER",
-                                       "GPO_LOCAL_GROUP_RISKY_MEMBER",
                                        "GPO_NON_DEFAULT_OWNER",
-                                       "GPO_NOT_CURRENTLY_EFFECTIVE",
                                        "GPO_POINTANDPRINT_DRIVER_SOURCE",
                                        "GPO_POINTANDPRINT_LATENT",
                                        "GPO_POINTANDPRINT_NONADMIN_INSTALL",
@@ -146,9 +130,7 @@
                                        "GPO_SYSVOL_FOLDER_ORPHANED",
                                        "GPO_SYSVOL_GPT_MISSING",
                                        "GPO_TASK_CMD_UNQUOTED_PATH",
-                                       "GPO_TASK_SYSTEM_UNC_PATH",
                                        "GPO_TASK_UNQUOTED_PATH",
-                                       "GPO_UNLINKED_BROAD_WRITE",
                                        "GPO_USERRIGHT_DEFAULT_REMOVED",
                                        "GPO_USERRIGHT_SECREATEGLOBAL",
                                        "GPO_USERRIGHT_SECREATESYMBOLICLINK",
@@ -167,7 +149,6 @@
                                        "GPO_USERRIGHT_SESYNCAGENT",
                                        "GPO_USERRIGHT_SETAKEOWNERSHIP",
                                        "GPO_USERRIGHT_SETRUSTEDCREDMANACCESS",
-                                       "GPO_WIDE_IMPACT",
                                        "GUEST_ACCOUNT_DISABLED",
                                        "INACTIVE_ACCOUNT",
                                        "INACTIVE_PRIVILEGED_ACCOUNT",
@@ -254,7 +235,6 @@
                                        "PRIVILEGED_GROUP_ACL",
                                        "PRIVILEGED_GROUP_MEMBERSHIP",
                                        "RBCD_CONFIGURED",
-                                       "RBCD_DANGEROUS_PRINCIPALS",
                                        "READABLE_UNIX_PASSWORD_ATTRIBUTES",
                                        "REGISTRY_AUTOLOGON",
                                        "REGISTRY_CREDGUARD",
@@ -341,9 +321,6 @@
                                             "COMPUTER_OWNERSHIP_REASSIGNED",
                                             "COMPUTER_PASSWORD_NOT_ROTATED",
                                             "CONSTRAINED_DELEGATION",
-                                            "CONSTRAINED_DELEGATION_PROTOCOL_TRANSITION",
-                                            "CONSTRAINED_DELEGATION_TO_DC",
-                                            "CONSTRAINED_DELEGATION_TRANSITION_NO_TARGET",
                                             "CREDENTIAL_AUTOADMINLOGON",
                                             "CREDENTIAL_CONNECTION_STRING",
                                             "CREDENTIAL_GPP_PASSWORD",
@@ -357,13 +334,9 @@
                                             "CREDENTIAL_UNATTEND_PASSWORD",
                                             "CREDENTIAL_VNC_PASSWORD",
                                             "CRITICAL_OBJECT_CONTROL",
-                                            "DANGEROUS_ACL_BROAD_GROUP",
-                                            "DANGEROUS_ACL_GENERICWRITE",
                                             "DANGEROUS_ACL_GPO_EXTENDED",
                                             "DANGEROUS_ACL_GPO_WRITEPROPERTY",
                                             "DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED",
-                                            "DANGEROUS_ACL_WRITEDACL",
-                                            "DANGEROUS_ACL_WRITEOWNER",
                                             "DANGEROUS_RIGHTS_CONTEXT",
                                             "DC_PASSWORD_NOT_ROTATED",
                                             "DELETED_OBJECTS_READ_BROAD",
@@ -385,13 +358,7 @@
                                             "ENCRYPTION_DES_ENABLED",
                                             "ENROLLMENT_REQUIRES_APPROVAL",
                                             "ESC13_ISSUANCE_POLICY_GROUP_LINK",
-                                            "ESC14_WEAK_EXPLICIT_MAPPING",
                                             "ESC14_WRITABLE_MAPPING",
-                                            "ESC15_SCHEMA_V1_ENROLLEE_SUBJECT",
-                                            "ESC2_TEMPLATE",
-                                            "ESC3_TEMPLATE",
-                                            "ESC4_TEMPLATE",
-                                            "ESC_ENROLLMENT_RIGHTS_UNREAD",
                                             "ESX_ADMINS_MEMBER",
                                             "EXCHANGE_AD_SPLIT_PERMISSIONS",
                                             "EXCHANGE_GROUP_LOW_PRIV_MEMBER",
@@ -417,12 +384,9 @@
                                             "GMSA_MEMBERSHIP_OWNER",
                                             "GMSA_PASSWORD_READABLE",
                                             "GMSA_ROTATION_INTERVAL_LONG",
-                                            "GPO_DANGEROUS_PERMISSIONS",
                                             "GPO_LINK_REACHES_DC",
                                             "GPO_LOCAL_GROUP_MEMBER",
-                                            "GPO_LOCAL_GROUP_RISKY_MEMBER",
                                             "GPO_NON_DEFAULT_OWNER",
-                                            "GPO_NOT_CURRENTLY_EFFECTIVE",
                                             "GPO_POINTANDPRINT_DRIVER_SOURCE",
                                             "GPO_POINTANDPRINT_LATENT",
                                             "GPO_POINTANDPRINT_NONADMIN_INSTALL",
@@ -437,9 +401,7 @@
                                             "GPO_SYSVOL_FOLDER_ORPHANED",
                                             "GPO_SYSVOL_GPT_MISSING",
                                             "GPO_TASK_CMD_UNQUOTED_PATH",
-                                            "GPO_TASK_SYSTEM_UNC_PATH",
                                             "GPO_TASK_UNQUOTED_PATH",
-                                            "GPO_UNLINKED_BROAD_WRITE",
                                             "GPO_USERRIGHT_DEFAULT_REMOVED",
                                             "GPO_USERRIGHT_SEASSIGNPRIMARYTOKEN",
                                             "GPO_USERRIGHT_SEBATCHLOGON",
@@ -454,7 +416,6 @@
                                             "GPO_USERRIGHT_SESYSTEMENVIRONMENT",
                                             "GPO_USERRIGHT_SESYSTEMTIME",
                                             "GPO_USERRIGHT_SETAKEOWNERSHIP",
-                                            "GPO_WIDE_IMPACT",
                                             "GUEST_ACCOUNT_DISABLED",
                                             "INACTIVE_ACCOUNT",
                                             "INACTIVE_PRIVILEGED_ACCOUNT",
@@ -536,7 +497,6 @@
                                             "PRIVILEGED_GROUP_ACL",
                                             "PRIVILEGED_GROUP_MEMBERSHIP",
                                             "RBCD_CONFIGURED",
-                                            "RBCD_DANGEROUS_PRINCIPALS",
                                             "READABLE_UNIX_PASSWORD_ATTRIBUTES",
                                             "REGISTRY_AUTOLOGON",
                                             "REGISTRY_CREDGUARD",
@@ -591,7 +551,7 @@
                                         ],
     "RussianImpactWithNoSource":  15,
     "RussianRemediationWithNoSource":  15,
-    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 34 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
+    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 54 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
     "UserReportDataIncluded":  false,
     "Fields":  [
                    {
@@ -957,29 +917,29 @@
                    {
                        "FindingId":  "CONSTRAINED_DELEGATION_PROTOCOL_TRANSITION",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "CONSTRAINED_DELEGATION_TO_DC",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "CONSTRAINED_DELEGATION_TRANSITION_NO_TARGET",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "CREDENTIAL_AUTOADMINLOGON",
@@ -1137,11 +1097,11 @@
                    {
                        "FindingId":  "DANGEROUS_ACL_BROAD_GROUP",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DANGEROUS_ACL_DCSYNC",
@@ -1173,11 +1133,11 @@
                    {
                        "FindingId":  "DANGEROUS_ACL_GENERICWRITE",
                        "ImpactEN":  5,
-                       "ImpactRU":  3,
+                       "ImpactRU":  5,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  2
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "DANGEROUS_ACL_GPO_DELETE",
@@ -1236,20 +1196,20 @@
                    {
                        "FindingId":  "DANGEROUS_ACL_WRITEDACL",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  2,
                        "AttackRU":  2,
                        "RemediationEN":  3,
-                       "RemediationRU":  2
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DANGEROUS_ACL_WRITEOWNER",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DANGEROUS_RIGHTS_AFFECTED_OUS",
@@ -1515,11 +1475,11 @@
                    {
                        "FindingId":  "ESC14_WEAK_EXPLICIT_MAPPING",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "ESC14_WRITABLE_MAPPING",
@@ -1533,11 +1493,11 @@
                    {
                        "FindingId":  "ESC15_SCHEMA_V1_ENROLLEE_SUBJECT",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  6,
-                       "RemediationRU":  1
+                       "RemediationRU":  6
                    },
                    {
                        "FindingId":  "ESC1_TEMPLATE",
@@ -1551,11 +1511,11 @@
                    {
                        "FindingId":  "ESC2_TEMPLATE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "ESC3_TARGET_TEMPLATE",
@@ -1569,20 +1529,20 @@
                    {
                        "FindingId":  "ESC3_TEMPLATE",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "ESC4_TEMPLATE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "ESC5_PKI_CONTAINER_ACL",
@@ -1614,11 +1574,11 @@
                    {
                        "FindingId":  "ESC_ENROLLMENT_RIGHTS_UNREAD",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "ESX_ADMINS_MEMBER",
@@ -1875,11 +1835,11 @@
                    {
                        "FindingId":  "GPO_DANGEROUS_PERMISSIONS",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  7,
-                       "RemediationRU":  1
+                       "RemediationRU":  7
                    },
                    {
                        "FindingId":  "GPO_LINKED_OUS_SEVERITY",
@@ -1911,11 +1871,11 @@
                    {
                        "FindingId":  "GPO_LOCAL_GROUP_RISKY_MEMBER",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "GPO_NON_DEFAULT_OWNER",
@@ -1929,11 +1889,11 @@
                    {
                        "FindingId":  "GPO_NOT_CURRENTLY_EFFECTIVE",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "GPO_POINTANDPRINT_DRIVER_SOURCE",
@@ -2100,11 +2060,11 @@
                    {
                        "FindingId":  "GPO_TASK_SYSTEM_UNC_PATH",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "GPO_TASK_UNQUOTED_PATH",
@@ -2118,11 +2078,11 @@
                    {
                        "FindingId":  "GPO_UNLINKED_BROAD_WRITE",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  2
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_DEFAULT_REMOVED",
@@ -2397,11 +2357,11 @@
                    {
                        "FindingId":  "GPO_WIDE_IMPACT",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  2
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "GUEST_ACCOUNT_DISABLED",
@@ -3315,11 +3275,11 @@
                    {
                        "FindingId":  "RBCD_DANGEROUS_PRINCIPALS",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "READABLE_UNIX_PASSWORD_ATTRIBUTES",
