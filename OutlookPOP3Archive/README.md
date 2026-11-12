@@ -1,5 +1,12 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
+### ARCH3a — продолжаем существующий архиватор, а не создаём новый (DEV)
+
+**[ADR ARCH3-001](docs/ADR-ARCH3-001-reuse-existing-archiver.md)** фиксирует обязательное архитектурное решение: сохранить существующий `OutlookPOP3Archive.ps1` и уже написанные `ArchiveGrouping` (Year/YearQuarter/YearMonth), `ArchivePlanner` (рекурсивные POP3 Inbox/Sent/пользовательские папки), `SystemFolders` (Outbox исключён), `MailMover` (годовые PST/лимиты/rollover), `ArchiveTransaction`, `OperationJournal`, `DuplicateIndex`, `ArchiveVerifier`. Проверенные ARCH2d5 claims, SHA-квитанции и независимую сверку **интегрировать в один исходный движок**, не писать третий архиватор. Уже реализованное семантическое сравнение в legacy `ArchiveVerifier` при `-RequireSemanticWitness` сохраняется; необходимо усилить сквозной приёмкой после перезапуска и безопасной работой с прерываниями.
+
+[ARCH3a read-only аудит и пример маршрутизации](docs/2.6.5-arch3a-existing-pipeline-audit.md): `Invoke-ARCH3a.ps1 -Mode Plan`, `-Mode Audit`, `-Mode RoutingExamples -SourcePst <path>`. Ни один режим не открывает PST, не вызывает COM Move и не изменяет журналы. Массовый Archive/Resume/Auto и production permit по-прежнему закрыты.
+
+
 ### ARCH2d5 — проверяемая реальная партия из 100 писем, SHA-256 цепочка (DEV)
 
 После успешного реального ARCH2d4 `10/10` — [операторский протокол ARCH2d5](docs/2.6.5-arch2d5-real-batch100.md). `Invoke-ARCH2d5.ps1` поддерживает Plan/Inventory/Prepare/MoveBatch/Evidence/Reconcile для **ровно 100 настоящих** писем существующего POP3 Inbox в **новый** PST назначения. Для каждого исходного письма заранее сохраняются SHA256 Body/HTML/получателей/состояния/байтов вложений, затем второй полный read-only preflight; перед каждым реальным COM Move — immutable force-flushed claim. SHA256 квитанции включается в следующую заявку; каждые десять писем завершаются checkpoint, затем создаётся финальная печать, чей **SHA256 оператор сохраняет независимо от PST** и передаёт для Reconcile. При любом сбое — STOP без повторного Move/Resume. `Evidence` читает лишь журналы; `Reconcile` проверяет архив после реального перезапуска Outlook. Старые ARCH2c4a/ARCH2d PST/заявки не изменяются. Массовый Archive/Resume/Auto остаётся заблокированным.
