@@ -208,6 +208,9 @@ if(-not $?){throw 'Ошибка безопасного перевода Reportin
 & (Join-Path $PSScriptRoot 'Localization/Apply-StageBVisibleMessages.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка проверки точечных переводов Checks на этапе B'}
 
+& (Join-Path $PSScriptRoot 'Localization/Apply-StageCVisibleMessages.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка безопасного перевода пользовательских сообщений Core'}
+
 & (Join-Path $PSScriptRoot 'Localization/Apply-ReportDisplay.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка перевода отображаемых значений отчёта'}
 
