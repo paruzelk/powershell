@@ -36,13 +36,24 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
        (([IO.File]::GetAttributes($root) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
         throw 'ARCH2b attachment temp root missing or reparse point; no Move authorized.'
     }
-    $collection=$Mail.Attachments
-    $count=[int]$collection.Count
-    if($count -lt 0 -or $count -gt $MaxAttachmentCount){
-        throw 'ARCH2b attachment count exceeds bounded witness limit; no Move authorized.'
+    # A unique child workspace isolates sensitive copies from unrelated temp data.
+    # A hard crash can leave this GUID-only workspace behind; see ARCH2c1 inventory.
+    $workspace=Join-Path $root ('OPA-ARCH2c1-'+[guid]::NewGuid().ToString('N'))
+    if([IO.Directory]::Exists($workspace) -or [IO.File]::Exists($workspace)){
+        throw 'ARCH2c1 attachment workspace collision; no Move authorized.'
     }
-    $result=New-Object 'System.Collections.Generic.List[object]'
-    for($i=1;$i -le $count;$i++){
+    [void][IO.Directory]::CreateDirectory($workspace)
+    try {
+        if(([IO.File]::GetAttributes($workspace) -band [IO.FileAttributes]::ReparsePoint) -ne 0){
+            throw 'ARCH2c1 attachment workspace is a reparse point; no Move authorized.'
+        }
+        $collection=$Mail.Attachments
+        $count=[int]$collection.Count
+        if($count -lt 0 -or $count -gt $MaxAttachmentCount){
+            throw 'ARCH2b attachment count exceeds bounded witness limit; no Move authorized.'
+        }
+        $result=New-Object 'System.Collections.Generic.List[object]'
+        for($i=1;$i -le $count;$i++){
         $attachment=$null;$tempPath=$null
         try{
             $attachment=$collection.Item($i)
@@ -56,7 +67,7 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
             $filename=[string]$attachment.FileName
             if($filename.Length -gt 1024){throw 'ARCH2b attachment name exceeds bound.'}
             # No original attachment filename in temp path or journal.
-            $tempPath=Join-Path $root ('OPA-ARCH2b-'+[guid]::NewGuid().ToString('N')+'.bin')
+            $tempPath=Join-Path $workspace ('OPA-ARCH2b-'+[guid]::NewGuid().ToString('N')+'.bin')
             if([IO.File]::Exists($tempPath)){throw 'ARCH2b temp collision; stop.'}
             # SaveAsFile writes only an ephemeral attachment COPY, not a PST.
             # A process crash can leave sensitive temp data (documented risk).
@@ -86,7 +97,195 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
             }
         }
     }
-    return $result.ToArray()
+        return $result.ToArray()
+    }
+    finally {
+        # Non-recursive delete only: unexpected files, directory reparse points, or
+        # failed per-attachment cleanup must STOP rather than erase other content.
+        if([IO.Directory]::Exists($workspace)){
+            if(([IO.File]::GetAttributes($workspace) -band [IO.FileAttributes]::ReparsePoint) -ne 0){
+                throw 'ARCH2c1 attachment workspace changed to reparse point; stop.'
+            }
+            try {[IO.Directory]::Delete($workspace,$false)}
+            catch {throw 'ARCH2c1 attachment workspace not empty or cleanup failed; stop.'}
+        }
+    }
+}
+function Get-OPA265ARCH2c1AttachmentWorkspaceInventory {
+    [CmdletBinding()]
+    param([string]$TemporaryDirectory=[IO.Path]::GetTempPath())
+    $root=[IO.Path]::GetFullPath($TemporaryDirectory)
+    if(-not [IO.Directory]::Exists($root) -or
+       (([IO.File]::GetAttributes($root) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
+        throw 'ARCH2c1 inventory temp root missing or reparse point.'
+    }
+    $rows=New-Object 'System.Collections.Generic.List[object]'
+    foreach($path in [IO.Directory]::GetDirectories($root,'OPA-ARCH2c1-*',[IO.SearchOption]::TopDirectoryOnly)){
+        $name=[IO.Path]::GetFileName($path)
+        if($name -cnotmatch '^OPA-ARCH2c1-[0-9a-f]{32}
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][object]$Mail,
+        [int64]$MaxAttachmentBytes=268435456,
+        [int]$MaxAttachmentCount=128,
+        [string]$TemporaryDirectory=[IO.Path]::GetTempPath()
+    )
+    if([int]$Mail.Class -ne 43){throw 'ARCH2b only Outlook MailItem class 43 supported.'}
+    # The already-saved item is the source baseline, never a pre-Save template.
+    $subject=[string]$Mail.Subject
+    $sender=[string]$Mail.SenderEmailAddress
+    $to=[string]$Mail.To;$cc=[string]$Mail.CC;$bcc=[string]$Mail.BCC
+    $body=[string]$Mail.Body;$html=[string]$Mail.HTMLBody
+    $messageId=[string](Get-OPAInternetMessageId -Item $Mail)
+    $received=[datetime]$Mail.ReceivedTime
+    $sent=[datetime]$Mail.SentOn
+    $unread=[bool]$Mail.UnRead
+    $importance=[int]$Mail.Importance
+    $sensitivity=[int]$Mail.Sensitivity
+    $categories=[string]$Mail.Categories
+    $recipients=$Mail.Recipients
+    $recCount=[int]$recipients.Count
+    if($recCount -lt 0 -or $recCount -gt 2048){throw 'ARCH2b recipient count exceeds witness bound.'}
+    $recParts=New-Object 'System.Collections.Generic.List[string]'
+    for($i=1;$i -le $recCount;$i++){
+        $r=$null
+        try{
+            $r=$recipients.Item($i)
+            if($null -eq $r){throw 'ARCH2b missing recipient record.'}
+            $recParts.Add(('{0}|{1}|{2}' -f [int]$r.Type,
+                (Get-OPA265ARCH2bTextSha256 -Text ([string]$r.Name)),
+                (Get-OPA265ARCH2bTextSha256 -Text ([string]$r.Address)))) | Out-Null
+        }
+        finally {
+            if($null -ne $r -and [Runtime.InteropServices.Marshal]::IsComObject($r) -and
+               (Get-Command -Name Release-OPAComObject -ErrorAction SilentlyContinue)){
+                Release-OPAComObject -Object $r
+            }
+        }
+    }
+    $attachmentArgs=@{
+        Mail=$Mail
+        MaxAttachmentBytes=$MaxAttachmentBytes
+        MaxAttachmentCount=$MaxAttachmentCount
+        TemporaryDirectory=$TemporaryDirectory
+    }
+    $att=@(Get-OPA265ARCH2bAttachmentWitnesses @attachmentArgs)
+    $witness=[pscustomobject][ordered]@{
+        Schema='2.6.5-ARCH2b.MailSemanticWitness.1'
+        ItemClass=43
+        InternetMessageIdSha256=(Get-OPA265ARCH2bTextSha256 -Text $messageId)
+        SubjectSha256=(Get-OPA265ARCH2bTextSha256 -Text $subject)
+        SenderSha256=(Get-OPA265ARCH2bTextSha256 -Text $sender)
+        ToSha256=(Get-OPA265ARCH2bTextSha256 -Text $to)
+        CcSha256=(Get-OPA265ARCH2bTextSha256 -Text $cc)
+        BccSha256=(Get-OPA265ARCH2bTextSha256 -Text $bcc)
+        RecipientCount=$recCount
+        OrderedRecipientDigestSha256=(Get-OPA265ARCH2bTextSha256 -Text ($recParts.ToArray() -join [char]10))
+        BodySha256=(Get-OPA265ARCH2bTextSha256 -Text $body)
+        BodyUtf16Length=[int]$body.Length
+        HtmlBodySha256=(Get-OPA265ARCH2bTextSha256 -Text $html)
+        HtmlBodyUtf16Length=[int]$html.Length
+        ReceivedUtcTicks=[int64]$received.ToUniversalTime().Ticks
+        SentUtcTicks=[int64]$sent.ToUniversalTime().Ticks
+        UnRead=$unread
+        Importance=$importance
+        Sensitivity=$sensitivity
+        CategoriesSha256=(Get-OPA265ARCH2bTextSha256 -Text $categories)
+        AttachmentCount=$att.Count
+        Attachments=@($att)
+        MailItemSizeDiagnosticBytes=[int64]$Mail.Size
+    }
+    if(-not (Test-OPA265ARCH2bWitnessSchema -Witness $witness)){
+        throw 'ARCH2b incomplete source semantic witness; no Move authorized.'
+    }
+    return $witness
+}
+function Test-OPA265ARCH2bWitnessSchema {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Witness)
+    if($null -eq $Witness -or
+       [string]$Witness.Schema -cne '2.6.5-ARCH2b.MailSemanticWitness.1' -or
+       [int]$Witness.ItemClass -ne 43){return $false}
+    foreach($name in @('InternetMessageIdSha256','SubjectSha256','SenderSha256',
+        'ToSha256','CcSha256','BccSha256','OrderedRecipientDigestSha256',
+        'BodySha256','HtmlBodySha256','CategoriesSha256')){
+        if([string]$Witness.$name -cnotmatch '^[a-f0-9]{64}$'){return $false}
+    }
+    foreach($name in @('BodyUtf16Length','HtmlBodyUtf16Length','RecipientCount',
+        'AttachmentCount','ReceivedUtcTicks','SentUtcTicks','MailItemSizeDiagnosticBytes')){
+        if($null -eq $Witness.$name){return $false}
+        try{if([int64]$Witness.$name -lt 0){return $false}}catch{return $false}
+    }
+    if($Witness.UnRead -isnot [bool]){return $false}
+    $att=@($Witness.Attachments)
+    if($att.Count -ne [int]$Witness.AttachmentCount){return $false}
+    for($i=0;$i -lt $att.Count;$i++){
+        $a=$att[$i]
+        if($null -eq $a -or [int]$a.Index -ne ($i+1) -or
+           [int]$a.Type -ne 1 -or
+           [string]$a.NameUtf8Sha256 -cnotmatch '^[a-f0-9]{64}$' -or
+           [string]$a.PayloadSha256 -cnotmatch '^[a-f0-9]{64}$' -or
+           $null -eq $a.PayloadByteCount){return $false}
+        try{if([int64]$a.PayloadByteCount -lt 0){return $false}}catch{return $false}
+    }
+    return $true
+}
+function Compare-OPA265ARCH2bMailSemanticWitness {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Source,
+          [Parameter(Mandatory=$true)][object]$Destination)
+    $issues=New-Object 'System.Collections.Generic.List[string]'
+    if(-not (Test-OPA265ARCH2bWitnessSchema -Witness $Source) -or
+       -not (Test-OPA265ARCH2bWitnessSchema -Witness $Destination)){
+        $issues.Add('SourceOrDestinationWitnessIncomplete') | Out-Null
+    } else {
+        foreach($name in @('InternetMessageIdSha256','SubjectSha256','SenderSha256',
+            'ToSha256','CcSha256','BccSha256','RecipientCount','OrderedRecipientDigestSha256',
+            'BodySha256','BodyUtf16Length','HtmlBodySha256','HtmlBodyUtf16Length',
+            'ReceivedUtcTicks','SentUtcTicks','UnRead','Importance','Sensitivity',
+            'CategoriesSha256','AttachmentCount')){
+            if([string]$Source.$name -cne [string]$Destination.$name){
+                $issues.Add(('Different'+$name)) | Out-Null
+            }
+        }
+        if([int]$Source.AttachmentCount -eq [int]$Destination.AttachmentCount){
+            $left=@($Source.Attachments);$right=@($Destination.Attachments)
+            for($i=0;$i -lt $left.Count;$i++){
+                foreach($name in @('Index','Type','NameUtf8Sha256','PayloadByteCount','PayloadSha256')){
+                    if([string]$left[$i].$name -cne [string]$right[$i].$name){
+                        $issues.Add(('Attachment'+($i+1)+'Different'+$name)) | Out-Null
+                    }
+                }
+            }
+        }
+    }
+    $ok=$issues.Count -eq 0
+    return [pscustomobject][ordered]@{
+        Schema='2.6.5-ARCH2b.SemanticComparison.1'
+        Status=if($ok){'CapturedUserContentMatchedDiagnosticProviderSizeOnly'}else{'CriticalMailContentOrAttachmentDifferenceBlocked'}
+        CriticalContentMatches=$ok
+        IssueCodes=@($issues.ToArray())
+        SourceSizeDiagnosticBytes=[int64]$Source.MailItemSizeDiagnosticBytes
+        DestinationSizeDiagnosticBytes=[int64]$Destination.MailItemSizeDiagnosticBytes
+        ProviderSizeDifferenceIsNotAutomaticCorruption=$true
+        OriginalMoveMayBeRetried=$false
+        WriterPermit=$false
+        ProductionReady=$false
+    }
+}
+){continue}
+        if(([IO.File]::GetAttributes($path) -band [IO.FileAttributes]::ReparsePoint) -ne 0){
+            throw 'ARCH2c1 workspace inventory includes a reparse point; manual review required.'
+        }
+        $folder=New-Object IO.DirectoryInfo($path)
+        $rows.Add([pscustomobject][ordered]@{
+            WorkspacePath=[string]$folder.FullName
+            LastWriteTimeUtc=[datetime]$folder.LastWriteTimeUtc
+            RequiresManualReview=$true
+            AutomaticallyDeleted=$false
+        }) | Out-Null
+    }
+    return $rows.ToArray()
 }
 function Get-OPA265ARCH2bMailSemanticWitness {
     [CmdletBinding()]
