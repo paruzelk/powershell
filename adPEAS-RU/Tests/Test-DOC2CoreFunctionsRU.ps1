@@ -68,7 +68,7 @@ $ruLinks=@([regex]::Matches($ru,$linksPattern) | ForEach-Object {$_.Groups[1].Va
 if(($enLinks -join "`n") -cne ($ruLinks -join "`n")){
  throw 'DOC2a: изменились ссылки или якоря в документации'
 }
-foreach($marker in @('memberOfNested','не обнаруживаются локальные группы','флаг NOT_DELEGATED',
+foreach($marker in @('memberOfNested' ,'Не обнаруживаются локальные группы','флаг NOT_DELEGATED',
  'глобального каталога','Primary group','-IncludeDeleted','flags=3',
  'szOID_NTDS_CA_SECURITY_EXT','ESC9/ESC10','GenericAll','WriteDacl','WriteOwner')){
  if(-not $ru.Contains($marker)){throw "DOC2a: утеряно существенное условие: $marker"}
