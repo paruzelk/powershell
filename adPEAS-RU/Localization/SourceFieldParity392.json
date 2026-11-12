@@ -20,9 +20,6 @@
 
                                    ],
     "ImpactStepCountDifferences":  [
-                                       "ACCOUNT_DISABLED",
-                                       "ACCOUNT_NOT_DELEGATED",
-                                       "ACL_INHERITED_FROM",
                                        "ADCS_CA_CERT_EXPIRED",
                                        "ADCS_CA_SHORT_KEY",
                                        "ADCS_CA_WEAK_SIGNATURE",
@@ -33,8 +30,6 @@
                                        "ADCS_SMARTCARD_LOGON_EKU",
                                        "ADFS_DKM_CONTAINER",
                                        "ADMINSDHOLDER_PROPAGATED_RIGHT",
-                                       "ADMIN_COUNT_INDICATOR",
-                                       "AD_RECYCLE_BIN_DISABLED",
                                        "AGING_OS",
                                        "ANONYMOUS_SAM_ENUMERATION_ALLOWED",
                                        "ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED",
@@ -90,7 +85,6 @@
                                        "DMSA_PRIVILEGED_PREDECESSOR",
                                        "DMSA_USABLE_BY_NONPRIVILEGED",
                                        "DOMAIN_ROOT_FSMO_TRANSFER",
-                                       "DOMAIN_ROOT_GPLINK_WRITE",
                                        "DOMAIN_ROOT_MAQ_WRITE",
                                        "DOMAIN_ROOT_NON_DEFAULT_OWNER",
                                        "DOMAIN_ROOT_REANIMATE_TOMBSTONES",
@@ -99,10 +93,7 @@
                                        "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION",
                                        "DSHEURISTICS_ANONYMOUS_NSPI",
                                        "DSHEURISTICS_UNIQUENESS_DISABLED",
-                                       "DSRM_PASSWORD_UNMANAGED",
                                        "ENCRYPTION_DES_ENABLED",
-                                       "ENCRYPTION_NOT_CONFIGURED",
-                                       "ENCRYPTION_RC4_ONLY",
                                        "ENROLLMENT_REQUIRES_APPROVAL",
                                        "ESC13_ISSUANCE_POLICY_GROUP_LINK",
                                        "ESC14_WEAK_EXPLICIT_MAPPING",
@@ -178,7 +169,6 @@
                                        "GPO_USERRIGHT_SETRUSTEDCREDMANACCESS",
                                        "GPO_WIDE_IMPACT",
                                        "GUEST_ACCOUNT_DISABLED",
-                                       "GUEST_ACCOUNT_ENABLED",
                                        "INACTIVE_ACCOUNT",
                                        "INACTIVE_PRIVILEGED_ACCOUNT",
                                        "INTERDOMAIN_TRUST_ACCOUNT",
@@ -205,11 +195,9 @@
                                        "LAPS_PASSWORD_READ_ACCESS",
                                        "LAPS_READ_BLOCKED_BY_CONFIDENTIAL",
                                        "LAPS_UNPROTECTED_COMPUTERS",
-                                       "LDAP_ANONYMOUS_BINDING_ALLOWED",
                                        "LDAP_ANONYMOUS_BINDING_RESTRICTED",
                                        "LDAP_CHANNEL_BINDING_ALWAYS",
                                        "LDAP_SIGNING_REQUIRED",
-                                       "LOCKOUT_DURATION_FOREVER",
                                        "LOGON_SCRIPT_WRITABLE",
                                        "MACHINE_QUOTA_UNRESTRICTED",
                                        "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
@@ -217,7 +205,6 @@
                                        "NON_DEFAULT_COMPUTER_OWNERS",
                                        "NON_DEFAULT_USER_OWNERS",
                                        "NO_ACCOUNT_LOCKOUT",
-                                       "NO_MAX_PASSWORD_AGE",
                                        "NO_MIN_PASSWORD_AGE",
                                        "NTAUTH_FOREIGN_ISSUER",
                                        "OLD_FUNCTIONAL_LEVEL",
@@ -250,7 +237,6 @@
                                        "OU_PERM_VALIDATED_SPN",
                                        "OU_PERM_WRITEPROPERTY_ALL",
                                        "PASSWORD_COMPLEXITY_ENABLED",
-                                       "PASSWORD_HISTORY_DISABLED",
                                        "PASSWORD_NEVER_EXPIRES",
                                        "PASSWORD_NOT_REQUIRED",
                                        "PKI_CERTIFICATE_EXPIRED",
@@ -329,9 +315,6 @@
                                        "WEB_ENDPOINT_EPA_ENABLED"
                                    ],
     "RemediationStepCountDifferences":  [
-                                            "ACCOUNT_DISABLED",
-                                            "ACCOUNT_NOT_DELEGATED",
-                                            "ACL_INHERITED_FROM",
                                             "ADCS_CA_CERT_EXPIRED",
                                             "ADCS_CA_SHORT_KEY",
                                             "ADCS_CA_WEAK_SIGNATURE",
@@ -341,7 +324,6 @@
                                             "ADCS_SMARTCARD_LOGON_EKU",
                                             "ADFS_DKM_CONTAINER",
                                             "ADMINSDHOLDER_PROPAGATED_RIGHT",
-                                            "AD_RECYCLE_BIN_DISABLED",
                                             "AGING_OS",
                                             "ANONYMOUS_SAM_ENUMERATION_ALLOWED",
                                             "ANON_LDAP_READABLE_ATTRS",
@@ -400,10 +382,7 @@
                                             "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION",
                                             "DSHEURISTICS_ANONYMOUS_NSPI",
                                             "DSHEURISTICS_UNIQUENESS_DISABLED",
-                                            "DSRM_PASSWORD_UNMANAGED",
                                             "ENCRYPTION_DES_ENABLED",
-                                            "ENCRYPTION_NOT_CONFIGURED",
-                                            "ENCRYPTION_RC4_ONLY",
                                             "ENROLLMENT_REQUIRES_APPROVAL",
                                             "ESC13_ISSUANCE_POLICY_GROUP_LINK",
                                             "ESC14_WEAK_EXPLICIT_MAPPING",
@@ -477,7 +456,6 @@
                                             "GPO_USERRIGHT_SETAKEOWNERSHIP",
                                             "GPO_WIDE_IMPACT",
                                             "GUEST_ACCOUNT_DISABLED",
-                                            "GUEST_ACCOUNT_ENABLED",
                                             "INACTIVE_ACCOUNT",
                                             "INACTIVE_PRIVILEGED_ACCOUNT",
                                             "INTERDOMAIN_TRUST_ACCOUNT",
@@ -501,11 +479,9 @@
                                             "LAPS_PASSWORD_READ_ACCESS",
                                             "LAPS_READ_BLOCKED_BY_CONFIDENTIAL",
                                             "LAPS_UNPROTECTED_COMPUTERS",
-                                            "LDAP_ANONYMOUS_BINDING_ALLOWED",
                                             "LDAP_ANONYMOUS_BINDING_RESTRICTED",
                                             "LDAP_CHANNEL_BINDING_ALWAYS",
                                             "LDAP_SIGNING_REQUIRED",
-                                            "LOCKOUT_DURATION_FOREVER",
                                             "LOGON_SCRIPT_WRITABLE",
                                             "MACHINE_QUOTA_UNRESTRICTED",
                                             "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
@@ -513,7 +489,6 @@
                                             "NON_DEFAULT_COMPUTER_OWNERS",
                                             "NON_DEFAULT_USER_OWNERS",
                                             "NO_ACCOUNT_LOCKOUT",
-                                            "NO_MAX_PASSWORD_AGE",
                                             "NO_MIN_PASSWORD_AGE",
                                             "NTAUTH_FOREIGN_ISSUER",
                                             "OLD_FUNCTIONAL_LEVEL",
@@ -544,7 +519,6 @@
                                             "OU_PERM_VALIDATED_DNS",
                                             "OU_PERM_VALIDATED_SPN",
                                             "OU_PERM_WRITEPROPERTY_ALL",
-                                            "PASSWORD_HISTORY_DISABLED",
                                             "PASSWORD_NEVER_EXPIRES",
                                             "PASSWORD_NOT_REQUIRED",
                                             "PKI_CERTIFICATE_EXPIRED",
@@ -617,35 +591,35 @@
                                         ],
     "RussianImpactWithNoSource":  15,
     "RussianRemediationWithNoSource":  15,
-    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 20 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
+    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 34 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
     "UserReportDataIncluded":  false,
     "Fields":  [
                    {
                        "FindingId":  "ACCOUNT_DISABLED",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  2
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "ACCOUNT_NOT_DELEGATED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "ACL_INHERITED_FROM",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "ADCS_CA_CERT_EXPIRED",
@@ -758,7 +732,7 @@
                    {
                        "FindingId":  "ADMIN_COUNT_INDICATOR",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  1,
@@ -767,11 +741,11 @@
                    {
                        "FindingId":  "AD_RECYCLE_BIN_DISABLED",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  3
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "AGING_OS",
@@ -1397,7 +1371,7 @@
                    {
                        "FindingId":  "DOMAIN_ROOT_GPLINK_WRITE",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
@@ -1478,11 +1452,11 @@
                    {
                        "FindingId":  "DSRM_PASSWORD_UNMANAGED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "ENCRYPTION_AES_ONLY",
@@ -1505,20 +1479,20 @@
                    {
                        "FindingId":  "ENCRYPTION_NOT_CONFIGURED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  2,
                        "AttackRU":  2,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "ENCRYPTION_RC4_ONLY",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "ENROLLMENT_REQUIRES_APPROVAL",
@@ -2441,11 +2415,11 @@
                    {
                        "FindingId":  "GUEST_ACCOUNT_ENABLED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "INACTIVE_ACCOUNT",
@@ -2720,11 +2694,11 @@
                    {
                        "FindingId":  "LDAP_ANONYMOUS_BINDING_ALLOWED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "LDAP_ANONYMOUS_BINDING_RESTRICTED",
@@ -2774,11 +2748,11 @@
                    {
                        "FindingId":  "LOCKOUT_DURATION_FOREVER",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "LOGON_SCRIPT_WRITABLE",
@@ -2873,11 +2847,11 @@
                    {
                        "FindingId":  "NO_MAX_PASSWORD_AGE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "NO_MIN_PASSWORD_AGE",
@@ -3179,11 +3153,11 @@
                    {
                        "FindingId":  "PASSWORD_HISTORY_DISABLED",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "PASSWORD_NEVER_EXPIRES",
