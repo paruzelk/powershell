@@ -1,0 +1,254 @@
+{
+  "schema": "adPEAS-RU.StageD9.CoreFields.18b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "GPO_USERRIGHT_SEDEBUG": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Direct read access to LSASS memory: NT hashes, Kerberos tickets and cached cleartext credentials of every signed-in user",
+        "Every process on the machine is exposed, not only the holder's own - service accounts and other users' sessions included",
+        "The privilege bypasses the process ACL check itself, so hardening the target process does not help"
+      ],
+      "impact": [
+        "Право прямого чтения памяти LSASS позволяет получить NT-хеши, билеты Kerberos и кэшированные пароли в открытом виде всех пользователей, вошедших в систему.",
+        "Открыты все процессы компьютера, не только собственные процессы субъекта: в том числе процессы служебных учётных записей и сеансы других пользователей.",
+        "Привилегия обходит саму проверку ACL процесса, поэтому усиление ACL целевого процесса не устраняет этот путь доступа."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the principal; only built-in Administrators should hold this right",
+        "If a monitoring or EDR agent genuinely needs it, scope the GPO to the specific hosts that agent runs on"
+      ],
+      "remediation": [
+        "Удалите субъект из обладателей права: оно должно оставаться только у встроенной группы Administrators.",
+        "Если агент мониторинга или EDR действительно нуждается в таком праве, ограничьте область GPO конкретными компьютерами, на которых работает агент."
+      ]
+    },
+    "GPO_USERRIGHT_SEIMPERSONATE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A service account with this right and a named pipe or RPC endpoint can trick a SYSTEM-level client into connecting, then impersonate it",
+        "The Potato family (JuicyPotato, PrintSpoofer, RoguePotato, GodPotato) automates this into SYSTEM in seconds",
+        "Service accounts routinely carry this right for their normal operation, which is exactly what makes an extra holder dangerous - it hides among the expected ones"
+      ],
+      "impact": [
+        "Служебная учётная запись с таким правом и именованным каналом либо RPC-точкой может вынудить клиент, работающий от имени SYSTEM, подключиться и затем выдать себя за него.",
+        "Семейство атак Potato (JuicyPotato, PrintSpoofer, RoguePotato, GodPotato) автоматизирует получение SYSTEM за считанные секунды.",
+        "Обычно служебным учётным записям право нужно для работы, поэтому лишний обладатель особенно опасен: он скрывается среди ожидаемых."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the principal unless it is a genuine service account that needs to impersonate its own clients (IIS, MSSQL, etc.)",
+        "Where the account is a service account, confirm it cannot also be used interactively"
+      ],
+      "remediation": [
+        "Удалите субъект, если это не настоящая служебная учётная запись, которой нужно выдавать себя за собственных клиентов (IIS, MSSQL и т. д.).",
+        "Если учётная запись служебная, убедитесь, что она не допускает также интерактивного входа."
+      ]
+    },
+    "GPO_USERRIGHT_SEENABLEDELEGATION": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Configures unconstrained or constrained delegation on any account, without needing that account's own credentials",
+        "Unconstrained delegation on a service captures the TGT of every user that authenticates to it - a coerced domain controller authentication yields a DC's own TGT",
+        "Every account that is neither marked 'Account is sensitive and cannot be delegated' nor in Protected Users can be impersonated through the delegation the holder configures - the flag still holds against it, on domain controllers with the CVE-2020-17049 fix"
+      ],
+      "impact": [
+        "Субъект может настраивать неограниченное или ограниченное делегирование для любой учётной записи без знания её собственных учётных данных.",
+        "Неограниченное делегирование на службе позволяет получить TGT каждого пользователя, который к ней аутентифицируется; принудительная аутентификация DC может передать TGT самого контроллера домена.",
+        "Любая учётная запись без флага «Account is sensitive and cannot be delegated» и не входящая в Protected Users может быть подменена через настроенное делегирование; запрет остаётся действующим на DC с исправлением CVE-2020-17049."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the principal from this right; only built-in Administrators should hold it on a domain controller",
+        "Enable 'Account is sensitive and cannot be delegated' on Tier-0 accounts as a second layer"
+      ],
+      "remediation": [
+        "Удалите у субъекта это право: на контроллере домена оно должно быть только у встроенной группы Administrators.",
+        "Для учётных записей Tier 0 дополнительно включите «Account is sensitive and cannot be delegated»."
+      ]
+    },
+    "GPO_USERRIGHT_SELOADDRIVER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A legitimately signed but vulnerable driver (Bring Your Own Vulnerable Driver) gives the holder a kernel read/write primitive",
+        "Kernel code execution defeats every user-mode protection on the machine, EDR included",
+        "On a domain controller this is full compromise of the directory, not just the host"
+      ],
+      "impact": [
+        "Правомерно подписанный, но уязвимый драйвер (Bring Your Own Vulnerable Driver, BYOVD) может дать субъекту возможность чтения и записи памяти ядра.",
+        "Выполнение кода в ядре обходит пользовательские защитные механизмы компьютера, включая EDR.",
+        "На контроллере домена это означает компрометацию каталога целиком, а не только отдельного компьютера."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the principal from this right; only Administrators (and Print Operators on a DC, for print driver installation) should hold it",
+        "Enable Microsoft's vulnerable driver blocklist (HVCI/WDAC) as a second layer regardless of who holds this right"
+      ],
+      "remediation": [
+        "Удалите субъект из обладателей права: оно должно оставаться у Administrators (а на DC — у Print Operators для установки драйверов печати).",
+        "Включите список блокирования уязвимых драйверов Microsoft (HVCI/WDAC) как дополнительную защиту независимо от назначенных прав."
+      ]
+    },
+    "GPO_USERRIGHT_SERESTORE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Overwrites a service binary or DLL a privileged process loads, turning the next service start or reboot into code execution as that service's identity",
+        "Rewrites the SAM/SYSTEM hives, or replaces a logon-screen accessibility binary (utilman.exe, sethc.exe) for a SYSTEM shell with no credentials",
+        "Sets ownership on any object, which then allows re-ACLing it freely"
+      ],
+      "impact": [
+        "Можно заменить двоичный файл службы либо DLL, загружаемую привилегированным процессом: следующий запуск службы или перезагрузка приведёт к выполнению кода с её полномочиями.",
+        "Возможна замена кустов SAM/SYSTEM либо исполняемого файла специальных возможностей экрана входа (utilman.exe, sethc.exe), чтобы получить оболочку SYSTEM без учётных данных.",
+        "Право позволяет назначить владельца любого объекта и затем свободно изменить его ACL."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the principal from this right unless it operates an actual, monitored backup/restore solution",
+        "Treat any account holding it as Tier-0 on a domain controller and Tier-1 elsewhere"
+      ],
+      "remediation": [
+        "Удалите право, если субъект не обслуживает реальное контролируемое решение резервного копирования и восстановления.",
+        "На DC считайте любую учётную запись с этим правом субъектом Tier 0, на других серверах — соответствующего Tier 1."
+      ]
+    },
+    "GPO_USERRIGHT_SETAKEOWNERSHIP": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Any file, registry key or AD object on the machine can be taken over, regardless of its current ACL",
+        "Ownership implies the right to re-ACL the object afterwards - the original access restriction becomes irrelevant",
+        "Escalation path: take ownership of a privileged service's binary or config, re-ACL it, replace it"
+      ],
+      "impact": [
+        "Субъект может стать владельцем любого файла, раздела реестра или объекта AD на компьютере независимо от действующей ACL.",
+        "Владение подразумевает возможность последующего изменения ACL, поэтому прежнее ограничение доступа перестаёт защищать объект.",
+        "Путь повышения привилегий: стать владельцем двоичного файла или конфигурации привилегированной службы, изменить ACL, затем заменить файл."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the principal; only built-in Administrators should hold this right"
+      ],
+      "remediation": [
+        "Удалите субъект: право должно оставаться только у встроенной группы Administrators."
+      ]
+    },
+    "GPO_USERRIGHT_SESECURITY": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Clearing the Security log after an intrusion is how it stops being reconstructable - the compromise leaves no trace on the host",
+        "The holder can also weaken the audit policy beforehand so sensitive actions were never logged in the first place",
+        "Reads SACLs and the audit configuration itself, useful reconnaissance for what is and is not being watched"
+      ],
+      "impact": [
+        "Очистка журнала Security после вторжения мешает восстановлению событий: на самом компьютере следы компрометации исчезают.",
+        "Субъект также может заранее ослабить политику аудита, чтобы чувствительные действия изначально не протоколировались.",
+        "Чтение SACL и конфигурации аудита позволяет выяснить, что находится под наблюдением, а что нет."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the principal; only built-in Administrators should hold this right",
+        "Forward Security logs to a SIEM the holder cannot reach, so a local clear does not erase the copy of record"
+      ],
+      "remediation": [
+        "Удалите субъект: право должно оставаться только у встроенной группы Administrators.",
+        "Пересылайте события Security во внешнюю SIEM, недоступную субъекту, чтобы локальная очистка не уничтожала авторитетную копию журнала."
+      ]
+    },
+    "GPO_USERRIGHT_SESERVICELOGON": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Service execution as the holder, starting automatically at boot with no interactive session",
+        "A classic persistence mechanism, and a way to run code under a service account's specific privileges, which are sometimes broader than an ordinary user's"
+      ],
+      "impact": [
+        "Служба может автоматически запускаться от имени обладателя права при загрузке без интерактивного сеанса.",
+        "Это распространённый механизм закрепления доступа и выполнения кода с полномочиями конкретной служебной учётной записи, иногда более широкими, чем у обычного пользователя."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Confirm every holder is an actual, currently-installed service account - remove any that is not",
+        "Scope service accounts to the minimum machines and privileges they need"
+      ],
+      "remediation": [
+        "Проверьте, что каждый субъект с правом действительно используется установленной действующей службой; удалите ненужных.",
+        "Ограничьте служебные учётные записи минимальным набором компьютеров и прав."
+      ]
+    },
+    "GPO_USERRIGHT_SEREMOTEINTERACTIVELOGON": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "An interactive session on every targeted machine - a foothold for further action, not merely a login",
+        "Combines with whatever local or domain rights the holder already has once inside the session",
+        "Broadens the RDP attack surface (credential capture, RDP-based relay) to a wider population of accounts"
+      ],
+      "impact": [
+        "Разрешает интерактивный сеанс на каждом целевом компьютере — основу для дальнейших действий, а не только факт успешного входа.",
+        "После входа доступны все уже имеющиеся локальные и доменные права субъекта.",
+        "Увеличивается поверхность атак через RDP — перехват учётных данных и ретрансляция по RDP — для большего круга учётных записей."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Restrict RDP logon to a dedicated admin/support group, not a broad or unexpected principal",
+        "Combine with Restricted Admin / NLA hardening and RDP session monitoring"
+      ],
+      "remediation": [
+        "Ограничьте RDP-вход выделенной группой администраторов или поддержки, а не широкой либо неожиданной учётной записью.",
+        "Сочетайте ограничение с усилением Restricted Admin/NLA и мониторингом RDP-сеансов."
+      ]
+    },
+    "GPO_USERRIGHT_SEBATCHLOGON": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Scheduled Task execution as the holder, unattended and persistent",
+        "A common persistence and lateral-movement mechanism once an account is compromised"
+      ],
+      "impact": [
+        "Позволяет запускать задания Task Scheduler от имени обладателя права без присутствия пользователя, постоянно и автоматически.",
+        "После компрометации учётной записи это распространённый способ закрепления доступа и горизонтального перемещения."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Restrict batch-logon to the specific service/automation accounts that genuinely need it"
+      ],
+      "remediation": [
+        "Предоставляйте право пакетного входа только конкретным служебным учётным записям и записям автоматизации, которым оно действительно необходимо."
+      ]
+    },
+    "GPO_USERRIGHT_SEASSIGNPRIMARYTOKEN": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Combined with an impersonation token (from SeImpersonatePrivilege, or one already captured), starts an arbitrary process as that identity",
+        "Turns a captured token into a running, interactive process rather than only an in-process impersonation"
+      ],
+      "impact": [
+        "В сочетании с токеном подмены (полученным через SeImpersonatePrivilege или ранее захваченным) право позволяет запустить произвольный процесс от имени соответствующего пользователя.",
+        "Захваченный токен превращается в работающий интерактивный процесс, а не ограничивается подменой пользователя внутри текущего процесса."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the principal unless it is a genuine service identity that legitimately launches processes under another account"
+      ],
+      "remediation": [
+        "Удалите субъект, если это не действительная служебная учётная запись, которая законно запускает процессы от имени других пользователей."
+      ]
+    },
+    "GPO_USERRIGHT_SECREATETOKEN": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A token can be built claiming membership of Domain Admins or any other group, with no authentication against that account",
+        "The forged token is indistinguishable from a real one to anything that trusts the kernel's token store"
+      ],
+      "impact": [
+        "Можно сформировать токен с заявленным членством в Domain Admins или любой другой группе без аутентификации от имени соответствующей записи.",
+        "Система, доверяющая хранилищу токенов ядра, не может отличить поддельный токен от настоящего."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the principal - Windows ships this to nobody, and there is essentially never a legitimate operational reason to hold it outside the kernel itself"
+      ],
+      "remediation": [
+        "Удалите субъект: Windows по умолчанию не назначает это право никому, и вне ядра практически нет оправданных эксплуатационных причин его предоставлять."
+      ]
+    }
+  }
+}
