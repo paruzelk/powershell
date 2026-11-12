@@ -219,6 +219,54 @@ if(@($entries.Values | Where-Object { @($_.attack).Count -gt 0 }).Count -ne 304)
 }
 Write-Host '[RU] PASS D2: Attack 304/304, новых 112 разделов/380 пунктов; Impact 38, Remediation 41 для 10 критичных находок'
 
+
+# Этап D3: полные Impact/Remediation для 14 дополнительных находок.
+# Каждый пункт исходника и перевода связан с точным полем закреплённого adPEAS 2.9.0.
+# Изменение источника, неполная структура или совпадение с ранее проверенным ID блокирует сборку.
+$d3=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceVerifiedCore-12.ru-RU.json'),[Text.Encoding]::UTF8))
+if(@($d3.translations.PSObject.Properties).Count -ne 14){throw 'Ожидалось 14 находок D3'}
+$d3Count=0
+$d3Impact=0
+$d3Remediation=0
+$previouslyVerified=@{}
+foreach($name in @('SourceVerifiedCore-07.ru-RU.json','SourceVerifiedCore-11.ru-RU.json')){
+ $prior=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($p in $prior.translations.PSObject.Properties){$previouslyVerified[[string]$p.Name]=$true}
+}
+foreach($row in $d3.translations.PSObject.Properties){
+ $id=[string]$row.Name
+ if(-not $entries.Contains($id)){throw "Неизвестный FindingId D3: $id"}
+ if($previouslyVerified.ContainsKey($id)){throw "D3 запрещает перезапись уже проверенного перевода: $id"}
+ foreach($field in @('Impact','Remediation')){
+  $lower=$field.ToLowerInvariant()
+  $enProperty='sourceEnglish'+$field
+  $countProperty=$enProperty+'Count'
+  $original=@(Get-PinnedFindingText $id $field)
+  $witness=@($row.Value.$enProperty)
+  $translated=@($row.Value.$lower)
+  $expected=[int]$row.Value.$countProperty
+  if($expected -le 0 -or $original.Count -ne $expected -or
+     $witness.Count -ne $expected -or $translated.Count -ne $expected){
+   throw "D3: неполный перевод $id / $field"
+  }
+  for($i=0;$i -lt $expected;$i++){
+   if([string]$original[$i] -cne [string]$witness[$i]){
+    throw "D3: английский оригинал изменился: $id / $field / пункт $($i+1)"
+   }
+   if([string]::IsNullOrWhiteSpace([string]$translated[$i]) -or [string]$translated[$i] -notmatch '[А-Яа-яЁё]'){
+    throw "D3: русский пункт отсутствует: $id / $field / пункт $($i+1)"
+   }
+  }
+  $entries[$id].$lower=@($translated)
+  if($field -eq 'Impact'){$d3Impact+=$expected}else{$d3Remediation+=$expected}
+ }
+ $d3Count++
+}
+if($d3Count -ne 14 -or $d3Impact -ne 46 -or $d3Remediation -ne 43){
+ throw "D3: неполный набор $d3Count / $d3Impact / $d3Remediation"
+}
+Write-Host "[RU] PASS D3: 14 находок, Impact 46 и Remediation 43 сверены с EN-источником"
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
