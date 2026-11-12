@@ -1,5 +1,11 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH2c1 DEV — 2026-11-12
+- Isolated per-witness GUID temporary directories for Outlook attachment SaveAsFile bytes; non-recursive normal/exception cleanup and fail-closed residue handling.
+- Read-only crash residual workspace inventory. Ten synthetic Windows PowerShell 5.1 Pester cases; no real Outlook COM in CI.
+- Writer Archive/Resume/Auto remain blocked by ARCH2a. Internal runtime 2.6.3-PREVIEW1 remains unchanged pending RC; no production certification.
+- License review: independent implementation, no third-party code copied; see docs/2.6.5-arch2c1-temp-isolation.md.
+
 - Based on operator confirmation ARCH2a **3709 Pester tests in 124 containers PASS**, `LegacyMoveFailureContinuePatternDetected=False`, `LegacyVerifierIncludesFullBodyHtmlAttachmentWitness=False`. **No more standalone Size/Flags MAPI investigation.**
 - Reuses the real BW4j attachment-CRC approach: `Core/Archive/ARCH2bSemanticWitness.ps1` hashes exact already-saved MailItem Subject/Sender/To/Cc/Bcc/ordered recipients, Body, HTMLBody, message dates, UnRead, Importance/Sensitivity/Categories and each supported by-value attachment filename + actual saved payload bytes SHA256. Uses temporary SaveAsFile copies (sensitive crash residue risk) and fails closed for unsupported embedded/OLE or >128 attachments or >256MiB per attachment.
 - The **real existing `Core/Archive/MailMover.ps1`**, not a separate diagnostic, now captures original source witness BEFORE durable `Move Started` / any COM Move; capture failure stops the batch before any claimed Move. `Save-OPAArchiveTransaction -SemanticWitness` writes only hash/length metadata into the append-only journal.
