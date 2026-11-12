@@ -351,3 +351,36 @@ Workflow GitHub Actions теперь создаёт после проверок 
 Тест `Tests/Test-StageD5VerifiedCoreRU.ps1` проверяет 24 закреплённых FindingId, дословные английские строки, количество и последовательность пунктов, точность интеграции в итоговый HTML-словарь и критические технические оговорки. Предыдущий тест D4 переведён на независимую проверку собственных 20 находок, чтобы новые переводы не нарушали регрессионные тесты. Сборка блокируется при изменении закреплённого оригинала или попытке перезаписать проверенные ранее поля. Доступ к AD для тестов не требуется.
 
 Архив: `adPEAS-RU-2.9.0-STAGE-D5-20261112.zip`.
+
+
+## Этап D6 — ещё 24 полных Impact и Remediation (12 ноября 2026)
+
+Добавлены `Localization/SourceVerifiedCore-15a.ru-RU.json` и `Localization/SourceVerifiedCore-15b.ru-RU.json`: **79 точных по структуре пунктов Impact и 74 пункта Remediation**, для **24 новых FindingId**. Для каждого сохранён полный английский свидетель из закреплённого `adPEAS 2.9.0`, SHA `ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`; строки перевода совпадают с ним по количеству и порядку. Изменены только русские пояснения в HTML, но не определения находок, их статус/оценка риска, запросы к AD или команды исправления.
+
+**AD CS (4):** `ADCS_CLIENT_AUTH_EKU`, `ADCS_HTTP_AVAILABLE`, `ADCS_NONPRIV_ENROLLMENT`, `ADCS_SMARTCARD_LOGON_EKU`.
+
+**gMSA (2):** `GMSA_MEMBERSHIP_INFO`, `GMSA_ROTATION_INTERVAL_LONG`.
+
+**LAPS (10):** `LAPS_ACCOUNT_INFO`, `LAPS_GPO_DISABLED`, `LAPS_GPO_EXPIRATION_PROTECTION_DISABLED`, `LAPS_GPO_NOT_LINKED`, `LAPS_GPO_PASSWORD_AGE`, `LAPS_GPO_PASSWORD_LENGTH`, `LAPS_GPO_WEAK_PASSWORD_COMPLEXITY`, `LAPS_PASSWORD_READABLE`, `LAPS_READ_BLOCKED_BY_CONFIDENTIAL`, `LAPS_UNPROTECTED_COMPUTERS`.
+
+**Привилегии (2):** `PRIVILEGED_ACCOUNT_AFFECTED`, `PRIVILEGED_GROUP_ACL`.
+
+**RODC (2):** `RODC_PRIVILEGED_PASSWORD_ALLOWED`, `RODC_PRIVILEGED_PASSWORD_REVEALED`.
+
+**Делегирование OU (4):** `OU_PERM_LAPS_READ`, `OU_PERM_READALL`, `OU_PERM_GENERICWRITE`, `OU_PERM_USER_ACCOUNT_RESTRICTIONS`.
+
+### Сохранённые технические оговорки
+
+- `ADCS_CLIENT_AUTH_EKU` и `ADCS_NONPRIV_ENROLLMENT`: наличие EKU или широкого права enrollment **само по себе не доказывает ESC1**; оно становится опасным в сочетании с `ENROLLEE_SUPPLIES_SUBJECT` и другими условиями. Для HTTP-регистрации отдельно указаны HTTPS и EPA как разные меры защиты.
+- `GMSA_ROTATION_INTERVAL_LONG`: `msDS-ManagedPasswordInterval` задаётся при создании gMSA и не изменяется на существующей записи; исправление требует создания новой gMSA.
+- `LAPS_GPO_DISABLED`: отключённая ротация не удаляет ранее сохранённые в AD пароли. `LAPS_GPO_NOT_LINKED`: непривязанная GPO не применяется ни к одному компьютеру.
+- `LAPS_READ_BLOCKED_BY_CONFIDENTIAL`: широкое `ReadProperty` не равно доступу к паролям LAPS с установленным `searchFlags` bit 7; для конфиденциальных атрибутов дополнительно нужен `CONTROL_ACCESS`. В `OU_PERM_READALL` это условие также явно пояснено во избежание неверного вывода.
+- `PRIVILEGED_ACCOUNT_AFFECTED`: привилегии определяются членством в группах, а не устаревшим `adminCount`; членство в `Protected Users` допускается только для поддерживаемых типов записей с проверкой совместимости.
+- `RODC_PRIVILEGED_PASSWORD_ALLOWED`: политика **разрешает** последующее кэширование. `RODC_PRIVILEGED_PASSWORD_REVEALED`: хеши привилегированных записей **уже закэшированы**, и одно лишь изменение политики не делает их недействительными — требуется смена пароля.
+- `OU_PERM_GENERICWRITE` и `OU_PERM_USER_ACCOUNT_RESTRICTIONS`: изменение наследования через `SetAccessRuleProtection` может затронуть все наследуемые права OU.
+
+Тест `Tests/Test-StageD6VerifiedCoreRU.ps1` сравнивает полный перечень 24 ID, все EN-свидетели, русские строки в исходном каталоге и встроенный HTML-словарь; отдельно проверяет сохранение ключевых технических нюансов. Тест D5 теперь ограничен собственными 24 находками, а не глобальными счётчиками. Блок `Localization/Apply-FullTechnical.ps1` откажется перезаписывать любую из ранее проверенных записей.
+
+**Итого после D6:** **102/392** находок со сверенными полными Impact и Remediation; **290/392** требуют продолжения предметной проверки. Неполных по количеству пунктов: **Impact — 225**, **Remediation — 205**. Все **304/304** исходно непустых Attack переведены; для 88 пустых Attack ничего не добавлено.
+
+Архив: `adPEAS-RU-2.9.0-STAGE-D6-20261112.zip`.
