@@ -1,15 +1,278 @@
 # adPEAS-RU 2.9.0
 
+## Быстрый старт и полный синтаксис параметров
+
+**Раздел составлен по реальным `param()` и `ValidateSet` adPEAS-RU 2.9.0.**
+Прежний README описывал только базовые примеры, а не все ключи.
+Русская обёртка и исходные функции имеют разные параметры и умолчания.
+
+### Быстрый запуск в Windows PowerShell 5.1
+
+~~~powershell
+# OPSEC и LDAPS у обёртки включены без явных флагов
+.\Run-AD-Audit-RU.ps1 -Domain 'example.local'
+
+# Выбор DC, модулей и папки результата
+.\Run-AD-Audit-RU.ps1 -Domain 'example.local' -Server 'dc01.example.local' `
+    -Module Domain,Accounts,GPO,Rights -Format All `
+    -OutputDirectory 'D:\AD-Audit\Reports'
+
+# Запрос учётных данных и исключение разделов
+.\Run-AD-Audit-RU.ps1 -Domain 'example.local' -Credential (Get-Credential) `
+    -ExcludeModule Bloodhound,Shares -IncludePrivileged
+
+Get-Help .\Run-AD-Audit-RU.ps1 -Full
+~~~
+
+По умолчанию создаются `Reports\AD-Audit-ГГГГММДД_ЧЧММСС.txt`,
+`.html` и `.json`. OPSEC уменьшает активность, но не
+гарантирует абсолютно пассивного сканирования.
+Команды исправления в HTML автоматически не выполняются.
+
+### Все ключи `Run-AD-Audit-RU.ps1`
+
+~~~powershell
+.\Run-AD-Audit-RU.ps1 -Domain <String> [-Server <String>] `
+    [-OutputDirectory <String>] [-Format <Text|HTML|JSON|All>] `
+    [-Module <String[]>] [-ExcludeModule <String[]>] `
+    [-OPSEC[:$true|:$false]] [-IncludePrivileged] `
+    [-UseLDAPS[:$true|:$false]] [-AllowUntrustedCertificate] `
+    [-Credential <PSCredential>]
+~~~
+
+| Параметр | Тип / по умолчанию | Назначение |
+|---|---|---|
+| `-Domain` | `String`, **обязателен** | DNS-имя домена AD. |
+| `-Server` | `String`, не задан | FQDN/IP контроллера домена. |
+| `-OutputDirectory` | `String`, `Reports` | Папка отчётов, создаётся при отсутствии. |
+| `-Format` | `Text`/`HTML`/`JSON`/`All`, **`All`** | Форматы файлов результата. |
+| `-Module` | `String[]`, не задан | Выполнить только выбранные модули. |
+| `-ExcludeModule` | `String[]`, не задан | Исключить выбранные модули. |
+| `-OPSEC` | `Switch`, **включён** | Пропуск ряда активных проверок; `-OPSEC:$false` отключает. |
+| `-IncludePrivileged` | `Switch`, выключен | Дополнительно показать привилегированные назначения. |
+| `-UseLDAPS` | `Switch`, **включён** | Принудительный LDAPS; `-UseLDAPS:$false` отменяет. |
+| `-AllowUntrustedCertificate` | `Switch`, выключен | Игнорировать TLS-ошибки DC: небезопасно. |
+| `-Credential` | `PSCredential`, не задан | Другая запись: `(Get-Credential)`. |
+
+Для `-Module` и `-ExcludeModule` доступны **11 значений**:
+`Domain`, `Creds`, `Rights`, `Delegation`, `ADCS`,
+`Accounts`, `GPO`, `Computer`, `Application`,
+`Shares`, `Bloodhound`.
+
+В обёртке **нет** ключей `-OutputAppend`, `-Statistics`,
+`-TimeoutSeconds`, `-InactiveDays`, `-NoColor`,
+`-VerboseLogging` и `-License`. Для них используйте
+исходные `Connect-adPEAS` / `Invoke-adPEAS`.
+
+
+### Все ключи `Invoke-adPEAS`
+
+Это основная функция исходного инструмента. После вызова
+соединение остаётся открытым до `Disconnect-adPEAS`.
+Для безопасной проверки LDAPS сначала создайте сессию
+с явным `-IgnoreSSLErrors:$false`:
+
+~~~powershell
+Import-Module .\adPEAS.ps1 -Force
+Connect-adPEAS -Domain 'example.local' -UseWindowsAuth -UseLDAPS `
+    -IgnoreSSLErrors:$false -Server 'dc01.example.local'
+Invoke-adPEAS -Module Domain,Accounts,GPO -Format All -OPSEC `
+    -Outputfile 'D:\AD-Audit\audit' -Statistics -InactiveDays 90
+Get-adPEASSession -TestConnection
+Disconnect-adPEAS
+~~~
+
+| Параметр `Invoke-adPEAS` | Тип и назначение |
+|---|---|
+| `-Domain` | `String`, необязателен при открытой сессии; для прямого подключения укажите домен. |
+| `-Server` | `String`, FQDN/IP DC. |
+| `-UseLDAPS` | `Switch`, принудительный LDAPS. |
+| `-UseWindowsAuth` | `Switch`, контекст текущего пользователя Windows. |
+| `-Credential` | `PSCredential`, альтернативная учётная запись. |
+| `-Username` | `String`, имя учётной записи при пароле. |
+| `-Password` | `String`/`SecureString`, пароль, набор UsernamePassword. |
+| `-Certificate` | `String`, PKCS#12/PFX либо Base64 для PKINIT. |
+| `-CertificatePassword` | `String`/`SecureString`, необязательный пароль PFX. |
+| `-Outputfile` | `String`, базовый путь **без расширения**; суффиксы `.txt`/`.html`/`.json` добавляются автоматически. |
+| `-Module` | `String[]`, выполнять выбранные модули из 11 перечисленных выше. |
+| `-ExcludeModule` | `String[]`, исключить модули из списка/всего аудита. |
+| `-OPSEC` | `Switch`, в **исходном Invoke-adPEAS выключен** по умолчанию. |
+| `-NoColor` | `Switch`, отключить ANSI-цвета. |
+| `-VerboseLogging` | `Switch`, подробный журнал и `-Verbose`; для файла нужен `-Outputfile`. |
+| `-InactiveDays` | `Int32`, **90**, диапазон **1–3650** дней. |
+| `-IncludePrivileged` | `Switch`, показать также ожидаемые привилегированные назначения. |
+| `-TimeoutSeconds` | `Int32`, **30**, диапазон **5–600** секунд. |
+| `-Format` | `Text`, `HTML`, `JSON`, `All`; по умолчанию **`All`**. |
+| `-OutputAppend` | `Switch`, объединить с предыдущим JSON при повторных проходах; необходим `-Outputfile`. |
+| `-License` | `String`, путь к лицензии автора. |
+| `-Statistics` | `Switch`, подсчёт LDAP-запросов и их результатов. |
+
+~~~powershell
+# Сканировать разные группы модулей в общий файл
+Connect-adPEAS -Domain 'example.local' -UseWindowsAuth `
+    -UseLDAPS -IgnoreSSLErrors:$false
+Invoke-adPEAS -Module Domain -Outputfile '.\Reports\combined' -OPSEC
+Invoke-adPEAS -Module Accounts,Rights -Outputfile '.\Reports\combined' `
+    -OutputAppend -OPSEC
+
+# VPN с высокой задержкой; возраст и время ожидания
+Invoke-adPEAS -Module GPO -InactiveDays 180 -TimeoutSeconds 120 `
+    -Outputfile '.\Reports\gpo' -VerboseLogging -NoColor -Statistics -OPSEC
+
+# Всё, кроме BloodHound и Shares
+Invoke-adPEAS -ExcludeModule Bloodhound,Shares -OPSEC
+Disconnect-adPEAS
+~~~
+
+**Не переносите параметры между командами без проверки.**
+`Invoke-adPEAS` не принимает `-IgnoreSSLErrors` или `-ForceKerberos`:
+они принадлежат `Connect-adPEAS`. При самостоятельном
+`Invoke-adPEAS -Domain ...` нельзя считать проверку TLS
+эквивалентной защищённой русской обёртке.
+
+
+### Все ключи `Connect-adPEAS`
+
+Это отдельная функция создания LDAP-сессии. В отличие от русской
+обёртки, оригинальный `Connect-adPEAS` имеет
+`-IgnoreSSLErrors` = **TRUE по умолчанию**, поэтому для
+проверки сертификата LDAPS передавайте
+`-IgnoreSSLErrors:$false` явно.
+
+| Параметр | Тип / действие |
+|---|---|
+| `-Domain` | `String`, имя домена; обязателен для штатного подключения. |
+| `-Server` | `String`, FQDN/IP контроллера домена. |
+| `-UseLDAPS` | `Switch`, TLS/LDAPS. |
+| `-IgnoreSSLErrors` | `Switch`, **TRUE** в оригинале; `-IgnoreSSLErrors:$false` включает проверку сертификата. |
+| `-DnsServer` | `String`, пользовательский DNS-сервер. |
+| `-PatchHostsFile` | `Switch`, изменяет системный файл `hosts` (нужны повышенные права), не для обычного аудита. |
+| `-Quiet` | `Switch`, меньше сообщений при соединении. |
+| `-UseWindowsAuth` | `Switch`, контекст Windows, стандартный набор аутентификации. |
+| `-Credential` | `PSCredential`, другой набор аутентификации. |
+| `-Username` | `String`, обязателен с паролем, NT-хешем и AES-ключом. |
+| `-Password` | `String`/`SecureString`, пароль. |
+| `-Certificate` | `String`, PFX или Base64, набор Certificate. |
+| `-CertificatePassword` | `String`/`SecureString`, пароль PFX (необязателен). |
+| `-ForcePassTheCert` | `Switch`, Schannel/LDAPS вместо PKINIT. |
+| `-NTHash` | `String`, NT-хеш **32 hex**, отдельный набор. |
+| `-AES256Key` | `String`, ключ **64 hex**, отдельный набор. |
+| `-AES128Key` | `String`, ключ **32 hex**, отдельный набор. |
+| `-Kirbi` | `String`, путь или Base64 билета Kerberos. |
+| `-Ccache` | `String`, путь или Base64 файла кэша билетов. |
+| `-ForceNTLM` | `Switch`, NTLM вместо Kerberos, только для Credential либо UsernamePassword. |
+| `-ForceSimpleBind` | `Switch`, пропустить Kerberos/NTLM ради простого LDAP bind. |
+| `-ForceKerberos` | `Switch`, требовать Kerberos без fallback. |
+| `-License` | `String`, путь к лицензии. |
+| `-BuildCompletionCache` | `Switch`, дополнительный LDAP-поиск имён для Tab-дополнения. |
+| `-TimeoutSeconds` | `Int32`, **30**, диапазон **5–600** секунд. |
+
+~~~powershell
+# Рекомендуемая интегрированная Windows-аутентификация
+Connect-adPEAS -Domain 'example.local' -UseWindowsAuth `
+    -UseLDAPS -IgnoreSSLErrors:$false
+
+# Альтернативные учётные данные, введённые интерактивно
+$cred = Get-Credential
+Connect-adPEAS -Domain 'example.local' -Credential $cred `
+    -UseLDAPS -IgnoreSSLErrors:$false -TimeoutSeconds 60
+
+# Законно выданный сертификат аудиторской учётной записи
+Connect-adPEAS -Domain 'example.local' -Certificate 'C:\Certs\audit.pfx' `
+    -CertificatePassword (Read-Host 'Пароль PFX' -AsSecureString) `
+    -UseLDAPS -IgnoreSSLErrors:$false
+~~~
+
+**Наборы по хешу, AES-ключу и билету** предназначены только
+для уполномоченных специализированных проверок и не требуются
+для обычной инвентаризации AD. Не помещайте пароли и ключи
+в историю команд. Подробности и ограничения:
+[Методы аутентификации](docs/03-Authentication-Methods.md).
+
+
+### Остальные команды: полный список их ключей
+
+| Команда | Все собственные параметры | Описание |
+|---|---|---|
+| `Invoke-adPEASCollector` | `-Domain`, `-Server`, `-Credential`, `-OutputPath`, `-CollectionMethod`, `-NoZip`, `-PrettyPrint` | Сбор для BloodHound CE, отдельно от OPSEC-скана. |
+| `Convert-adPEASReport` | `-InputJson`, `-OutputPath`, `-Format`, `-License`, `-NoColor` | Пересоздание отчётов из JSON без LDAP-соединения. |
+| `Compare-adPEASReport` | `-Baseline`, `-Current`, `-OutputPath`, `-NoColor` | Сравнение двух JSON-снимков. |
+| `Get-adPEASSession` | `-TestConnection`, `-Quiet` | Проверить состояние сессии. |
+| `Disconnect-adPEAS` | `-Force` | Завершить сессию. |
+| `Import-adPEAS-RU.ps1` | `-SkipBuild` | Повторно импортировать закреплённый оригинал и применить русификацию. |
+| `Build-Release.ps1` | `-License`, `-Stable`, `-CodeSigningCert`, `-CertPassword`, `-TimestampServer`, `-ConfigPath` | Собрать четыре автономных варианта. |
+
+`Invoke-adPEASCollector -CollectionMethod` допускает
+`DCOnly` (по умолчанию), `ACL`, `ObjectProps`, `Trusts`,
+`Container` и `CertServices`. Параметр `-NoZip` выводит
+отдельные JSON, `-PrettyPrint` добавляет отступы.
+`Convert-adPEASReport -Format` принимает `Text`,
+`HTML`, `JSON` и `All`. У конвертера обязательны
+`-InputJson` и `-OutputPath`, у сравнения —
+`-Baseline` и `-Current`.
+
+~~~powershell
+# BloodHound CE: только при разрешении владельца AD
+Connect-adPEAS -Domain 'example.local' -UseWindowsAuth `
+    -UseLDAPS -IgnoreSSLErrors:$false
+Invoke-adPEASCollector -CollectionMethod DCOnly `
+    -OutputPath '.\Reports\bloodhound.zip'
+Disconnect-adPEAS
+
+# Пересоздать HTML/TXT/JSON без подключения к AD
+Import-Module .\adPEAS.ps1 -Force
+Convert-adPEASReport -InputJson '.\Reports\audit.json' `
+    -OutputPath '.\Reports\audit-rebuilt' -Format All -NoColor
+
+# Сравнить два отчёта
+Compare-adPEASReport -Baseline '.\Reports\old.json' `
+    -Current '.\Reports\new.json' -OutputPath '.\Reports\comparison'
+
+# Уточнить синтаксис из загруженного модуля
+Get-Command Invoke-adPEAS,Connect-adPEAS,Invoke-adPEASCollector -Syntax
+Get-Command Compare-adPEASReport,Convert-adPEASReport -Syntax
+~~~
+
+**Граница полноты:** перечислены все собственные параметры
+**10 основных точек входа** (русская обёртка, Invoke,
+Connect, Collector, Convert, Compare, GetSession,
+Disconnect, Import и Build). Общие параметры PowerShell,
+например `-Verbose` и `-ErrorAction`, добавляются
+`CmdletBinding` и не являются отдельными ключами adPEAS.
+У отдельных `Get-*`, `Set-*`, `New-*` и Check-функций
+свои параметры — их нельзя свести к одному универсальному
+синтаксису. Проверка: `Get-Command <имя> -Syntax`;
+справочники: [Core Functions](docs/06-Core-Functions.md),
+[Set & New Modules](docs/07-Set-Modules.md).
+
+### Актуальное состояние перевода
+
+Каталог находок **392/392** прошёл предметную сверку
+Impact и Remediation; **304/304** исходно непустых Attack
+переведены, **88** исходно пустых не дополнялись.
+После обновления сборки нужен **новый HTML-отчёт**.
+
+**Документация и все динамические строки ещё не переведены
+полностью.** Страницы `docs/00–12` содержат гораздо
+больше исходных материалов, чем прежние
+`docs/ru-RU/00–12`. Перевод этих страниц ведётся
+отдельными документированными этапами. Исторические
+промежуточные показатели ниже не заменяют текущие
+392/392 и не означают полной русификации всего проекта.
+
+---
+
+
 Русскоязычная адаптация [adPEAS v2](https://github.com/61106960/adPEAS)
 для аудита безопасности Active Directory.
 
 **Исходник:** `61106960/adPEAS`, версия 2.9.0, commit
 `ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`.
 
-**Статус:** перевод основных элементов HTML, сравнения отчётов, части интерактивных
-подсказок и сообщений консоли. Полный перевод всех технических описаний находок,
-английской документации и каждого модуля **ещё не завершён**. Функциональность
-исходного проекта сохранена, имена команд и структурированные ключи не переводились.
+**Текущий статус:** каталог находок сверён 392/392, переведены все непустые
+Attack (304/304). Подробные справочные страницы и оставшиеся динамические
+сообщения переводятся поэтапно; **полной русификации всего проекта пока нет**.
+Команды, FindingId и машинные ключи не менялись.
 
 ## Локализация содержимого отчётов (редакция 2026-11-10)
 
@@ -21,10 +284,10 @@
 - Перевод названий находок применяется также в основном HTML-представлении, без замены машинных идентификаторов.
 - Для частей, пока не прошедших построчную сверку, доступно русское техническое изложение; исходный английский текст остаётся в отдельном свёрнутом блоке для сверки.
 
-**Важно:** это существенно расширенная русификация отчётов, но не полный
-построчный перевод всех 392 наборов технических объяснений и всей динамической
-консольной выдачи. Содержание исходного JSON, идентификаторы FindingId,
-названия прав и протоколов сохраняются.
+**Историческая пометка на 10.11.2026:** приведённые выше показатели
+относились к раннему этапу перевода. После D19 все 392 набора Impact и
+Remediation предметно сверены; динамическая консольная выдача всё ещё
+не полностью русифицирована. Структура JSON и FindingId не менялись.
 
 Чтобы увидеть обновления, необходимо **создать новый HTML-отчёт**:
 уже сохранённые отчёты от предыдущей сборки автоматически не изменяются.
