@@ -22,6 +22,19 @@ jobs:
           Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
           Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
           Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
+      - name: Focused ARCH2c2 Windows ACL, orphan and legacy witness tests
+        run: |
+          $ErrorActionPreference='Stop'
+          $paths=@(
+            'Tests/Archive/ARCH2bSemanticWitness.Tests.ps1',
+            'Tests/Archive/ARCH2c1TempIsolation.Tests.ps1',
+            'Tests/Archive/ARCH2c2TempSafety.Tests.ps1'
+          )
+          $result=Invoke-Pester -Path $paths -Output Detailed -PassThru
+          if($result.Result -ne 'Passed' -or $result.FailedCount -ne 0 -or $result.SkippedCount -ne 0){
+            throw ('Focused ARCH2c2/ARCH2b/ARCH2c1 tests not passed: '+$result.Result)
+          }
+          Write-Host ('PASS ARCH2c2 focused Pester '+$result.PassedCount+' tests.')
       - name: Mandatory original Windows PowerShell 5.1 CI gates
         run: |
           $ErrorActionPreference='Stop'
