@@ -1,0 +1,258 @@
+{
+  "schema": "adPEAS-RU.StageD9.CoreFields.18a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "REGISTRY_AUTOLOGON": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Automatic logon as a (often privileged) account",
+        "DefaultPassword commonly exposed in SYSVOL",
+        "Physical/console access yields an authenticated session"
+      ],
+      "impact": [
+        "Автоматический вход под учётной записью, нередко привилегированной.",
+        "Значение DefaultPassword часто оказывается раскрытым в SYSVOL.",
+        "Физический доступ к консоли позволяет получить уже аутентифицированный сеанс."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Disable AutoAdminLogon via GPO; rotate any exposed password",
+        "Use Autopilot/MDT for unattended setups instead"
+      ],
+      "remediation": [
+        "Отключите AutoAdminLogon через GPO и смените любой пароль, который мог быть раскрыт.",
+        "Для автоматизированной подготовки систем вместо этого используйте Autopilot или MDT."
+      ]
+    },
+    "REGISTRY_CREDGUARD": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Credential Guard isolation turned off",
+        "NTLM hashes / Kerberos TGTs exposed in LSASS"
+      ],
+      "impact": [
+        "Изоляция учётных данных посредством Credential Guard отключена.",
+        "NTLM-хеши и билеты Kerberos TGT становятся доступнее для извлечения из LSASS."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Enable Credential Guard (LsaCfgFlags=1)",
+        "1 means 'Enabled with UEFI lock': after that it cannot be switched off by Group Policy again, only per machine with the Device Guard readiness tool and physical access. Use 2 for a pilot that has to stay reversible",
+        "It needs virtualization-based security to be on as well (EnableVirtualizationBasedSecurity=1 plus a platform security level); LsaCfgFlags alone has no effect"
+      ],
+      "remediation": [
+        "Включите Credential Guard (LsaCfgFlags=1).",
+        "Значение 1 означает «Enabled with UEFI lock»: после этого отключить защиту обратно через GPO нельзя; для отключения на отдельной машине требуются Device Guard readiness tool и физический доступ. Для пилотного развёртывания с возможностью отмены используйте значение 2.",
+        "Дополнительно требуется включённая безопасность на основе виртуализации (EnableVirtualizationBasedSecurity=1 и соответствующий уровень безопасности платформы): одного LsaCfgFlags недостаточно."
+      ]
+    },
+    "REGISTRY_FIREWALL_DISABLED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "No host firewall filtering on the affected profile",
+        "Every service listening on the host becomes network-reachable, not only the ones meant to be"
+      ],
+      "impact": [
+        "Для затронутого профиля отсутствует фильтрация трафика брандмауэром компьютера.",
+        "По сети становятся доступны все службы, прослушивающие подключения на узле, а не только те, доступ к которым планировалось разрешить."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set EnableFirewall=1 for every profile the policy configures",
+        "Investigate why the policy turns the firewall off - a documented exception should scope narrower than a whole profile"
+      ],
+      "remediation": [
+        "Установите EnableFirewall=1 для каждого профиля, настраиваемого политикой.",
+        "Выясните причину отключения брандмауэра: документированное исключение должно быть уже, чем целый профиль."
+      ]
+    },
+    "REGISTRY_INSECURE_GUEST_AUTH": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A rogue or coerced SMB server captures whatever the client sends over the guest session",
+        "No signing or encryption enforced on a guest fallback session"
+      ],
+      "impact": [
+        "Поддельный SMB-сервер или сервер, к которому принудительно направили подключение, может перехватить данные гостевого сеанса.",
+        "При гостевом резервном подключении не обеспечивается обязательное использование подписи и шифрования."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set AllowInsecureGuestAuth=0 (the Windows default since 1709)"
+      ],
+      "remediation": [
+        "Установите AllowInsecureGuestAuth=0 (значение по умолчанию в Windows начиная с версии 1709)."
+      ]
+    },
+    "REGISTRY_LEGACY_TLS": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Where both ends still offer the old version, a man in the middle can push the connection down to it and attack it there",
+        "Compliance baselines such as PCI DSS forbid both versions"
+      ],
+      "impact": [
+        "Если обе стороны по-прежнему поддерживают устаревший протокол, атакующий «человек посередине» может добиться понижения версии соединения и атаковать его.",
+        "Стандарты соответствия, например PCI DSS, запрещают обе устаревшие версии протокола."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the values from the policy, or set Enabled to 0 under Protocols\\SSL 3.0 and Protocols\\TLS 1.0, for the server and the client role",
+        "Before switching TLS 1.0 off, find the peers that still need it - Schannel event logging records the negotiated versions"
+      ],
+      "remediation": [
+        "Удалите соответствующие значения из политики либо установите Enabled=0 в разделах Protocols\\SSL 3.0 и Protocols\\TLS 1.0 как для серверной, так и для клиентской роли.",
+        "Прежде чем отключить TLS 1.0, найдите системы, которым он ещё требуется: журналирование Schannel позволяет установить согласованные версии протокола."
+      ]
+    },
+    "REGISTRY_LLMNR_ON": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Mistyped and stale names are answered by whoever responds first on the local network",
+        "NTLM authentication of users and computers captured for cracking or relayed"
+      ],
+      "impact": [
+        "На ошибочные или устаревшие имена может ответить любой узел локальной сети, который успеет первым.",
+        "NTLM-аутентификация пользователей и компьютеров может быть перехвачена для подбора пароля или ретрансляции (relay)."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set 'Turn off multicast name resolution' to Enabled"
+      ],
+      "remediation": [
+        "Установите политику «Turn off multicast name resolution» в состояние Enabled."
+      ]
+    },
+    "REGISTRY_MACHINE_PASSWORD_AGE": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A captured machine account hash keeps forging service tickets to the computer, and keeps authenticating as the computer, for months instead of weeks",
+        "On a domain controller the machine account can replicate the directory, krbtgt included, for as long as its hash stays valid"
+      ],
+      "impact": [
+        "Похищенный хеш учётной записи компьютера позволяет месяцами вместо недель подделывать билеты служб этого компьютера и аутентифицироваться от его имени.",
+        "Если речь о контроллере домена, учётная запись компьютера позволяет реплицировать каталог, включая krbtgt, пока похищенный хеш остаётся действующим."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set 'Domain member: Maximum machine account password age' back to 30 days, or remove it from the policy",
+        "Where a captured machine hash is suspected, change the computer's password at once rather than waiting for the interval"
+      ],
+      "remediation": [
+        "Верните «Domain member: Maximum machine account password age» к 30 дням либо удалите переопределение из политики.",
+        "При подозрении на хищение хеша компьютера немедленно смените пароль его учётной записи, не дожидаясь планового интервала."
+      ]
+    },
+    "REGISTRY_NOLMHASH": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "LM hashes stored locally are easily cracked to plaintext",
+        "Compromise of one host's SAM exposes reusable passwords"
+      ],
+      "impact": [
+        "Сохранённые локально LM-хеши легко подобрать до открытых паролей.",
+        "Компрометация SAM одного компьютера раскрывает пароли, которые могут повторно использоваться."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set NoLmHash=1 (do not store LM hash on next password change)"
+      ],
+      "remediation": [
+        "Установите NoLmHash=1: LM-хеш не будет сохраняться после следующей смены пароля."
+      ]
+    },
+    "REGISTRY_NULL_SESSION": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Unauthenticated enumeration of accounts/shares",
+        "Aids password spraying and target selection",
+        "With RestrictNullSessAccess=0, unauthenticated access to every share and named pipe whose permissions admit anonymous users"
+      ],
+      "impact": [
+        "Возможно анонимное перечисление учётных записей и общих ресурсов.",
+        "Это помогает выбирать цели для password spraying и других атак.",
+        "При RestrictNullSessAccess=0 анонимный доступ возможен ко всем общим папкам и именованным каналам, разрешения которых допускают анонимных пользователей."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Restore anonymous restrictions (RestrictAnonymous/SAM=1, EveryoneIncludesAnonymous=0)",
+        "Set 'Network access: Restrict anonymous access to Named Pipes and Shares' back to Enabled (RestrictNullSessAccess=1), the Windows default"
+      ],
+      "remediation": [
+        "Восстановите ограничения анонимного доступа (RestrictAnonymous/SAM=1, EveryoneIncludesAnonymous=0).",
+        "Верните политику «Network access: Restrict anonymous access to Named Pipes and Shares» в Enabled (RestrictNullSessAccess=1), значение Windows по умолчанию."
+      ]
+    },
+    "REGISTRY_RDP_NLA": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Unauthenticated exposure to RDP protocol vulnerabilities (the BlueKeep class)",
+        "No pre-authentication throttling of credential guessing",
+        "Removes the one hardening RDP Restricted Admin mode assumes is already in place"
+      ],
+      "impact": [
+        "RDP-сервер становится доступным для атак на уязвимости протокола до аутентификации, включая класс BlueKeep.",
+        "Отсутствует ограничение попыток подбора учётных данных на этапе предварительной аутентификации.",
+        "Удаляется одна из защитных предпосылок, на которые рассчитан режим RDP Restricted Admin."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set UserAuthentication=1 (Require NLA) via GPO",
+        "Clients without CredSSP cannot connect afterwards - thin clients, some Linux RDP clients, and anything connecting through an old gateway. Check what connects to the affected hosts before enforcing it",
+        "Combine with SecurityLayer=2 (TLS) rather than relying on NLA alone"
+      ],
+      "remediation": [
+        "Установите UserAuthentication=1 (Require NLA) через GPO.",
+        "Клиенты без CredSSP после этого не смогут подключаться: это могут быть тонкие клиенты, некоторые Linux-клиенты RDP и соединения через старые шлюзы. Перед применением проверьте реальные подключения к затронутым узлам.",
+        "Сочетайте NLA с SecurityLayer=2 (TLS), а не полагайтесь на NLA как единственную меру."
+      ]
+    },
+    "REGISTRY_RESTRICTEDADMIN": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "RDP accepts NT hash without plaintext password",
+        "Pass-the-Hash over RDP becomes possible",
+        "Can bypass RDP-layer MFA"
+      ],
+      "impact": [
+        "RDP принимает NT-хеш без необходимости передавать пароль в открытом виде.",
+        "Становится возможна атака Pass-the-Hash через RDP.",
+        "Возможен обход MFA, реализованной на уровне RDP."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Set DisableRestrictedAdmin=1 unless a documented need exists",
+        "Where Restricted Admin is wanted, DisableRestrictedAdminOutboundCreds=1 is the hardening that keeps it: the session can no longer use the target host's credentials outbound, which is the part an attacker on that host would relay",
+        "That also turns off mstsc /restrictedadmin and Remote Credential Guard, which exist so an administrator's credentials never reach the remote host. Where those are in use the trade is one credential protection for another, so decide per host class rather than domain-wide",
+        "Monitor changes to this value as a compromise indicator"
+      ],
+      "remediation": [
+        "Установите DisableRestrictedAdmin=1, если нет документированной необходимости в этом режиме.",
+        "Если Restricted Admin необходим, настройка DisableRestrictedAdminOutboundCreds=1 ограничивает исходящее использование учётных данных целевого узла из сеанса, которые иначе мог бы ретранслировать атакующий на нём.",
+        "Это также отключает mstsc /restrictedadmin и Remote Credential Guard, предназначенные для предотвращения передачи учётных данных администратора удалённому узлу. Здесь одна мера защиты учётных данных заменяет другую, поэтому решение принимайте отдельно для классов компьютеров, а не для всего домена.",
+        "Отслеживайте изменения этого параметра как возможный индикатор компрометации."
+      ]
+    },
+    "REGISTRY_WDIGEST": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "LSASS caches cleartext passwords for interactive/RDP sessions",
+        "Any local admin or SYSTEM can recover plaintext credentials from memory",
+        "Affects every computer where the GPO is applied"
+      ],
+      "impact": [
+        "LSASS кэширует открытые пароли для интерактивных сеансов и сеансов RDP.",
+        "Любой локальный администратор либо SYSTEM может извлечь из памяти учётные данные в открытом виде.",
+        "Риск распространяется на все компьютеры, где применяется GPO."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set UseLogonCredential=0 (or remove the value) via GPO",
+        "Enable LSA Protection (RunAsPPL) and Credential Guard"
+      ],
+      "remediation": [
+        "Установите UseLogonCredential=0 (или удалите значение) через GPO.",
+        "Включите LSA Protection (RunAsPPL) и Credential Guard."
+      ]
+    }
+  }
+}
