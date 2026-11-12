@@ -481,6 +481,60 @@ if($d7Seen.Count -ne 24 -or $d7Impact -ne 85 -or $d7Remediation -ne 93){
 }
 Write-Host '[RU] PASS D7: 24 находки, Impact 85 и Remediation 93 сверены с исходником'
 
+
+# Этап D8: точный перевод Impact и Remediation 24 находок ACL/GPO/domain root.
+# Привязка к строкам adPEAS 2.9.0, без изменения логики проверок и команд.
+$d8New=@('SourceVerifiedCore-17a.ru-RU.json','SourceVerifiedCore-17b.ru-RU.json')
+$d8Earlier=@(
+ 'SourceVerifiedCore-07.ru-RU.json','SourceVerifiedCore-11.ru-RU.json',
+ 'SourceVerifiedCore-12.ru-RU.json','SourceVerifiedCore-13.ru-RU.json',
+ 'SourceVerifiedCore-14a.ru-RU.json','SourceVerifiedCore-14b.ru-RU.json',
+ 'SourceVerifiedCore-15a.ru-RU.json','SourceVerifiedCore-15b.ru-RU.json',
+ 'SourceVerifiedCore-16a.ru-RU.json','SourceVerifiedCore-16b.ru-RU.json'
+)
+$d8Protected=@{}
+foreach($name in $d8Earlier){
+ $old=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($r in $old.translations.PSObject.Properties){$d8Protected[[string]$r.Name]=$true}
+}
+$d8Seen=@{}
+$d8Impact=0
+$d8Remediation=0
+foreach($name in $d8New){
+ $cat=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ if(@($cat.translations.PSObject.Properties).Count -ne 12){throw "D8: неполный каталог $name"}
+ foreach($row in $cat.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if(-not $entries.Contains($id)){throw "D8: неизвестный FindingId $id"}
+  if($d8Protected.ContainsKey($id) -or $d8Seen.ContainsKey($id)){throw "D8: найден повтор ранее сверенного ID $id"}
+  $d8Seen[$id]=$true
+  foreach($field in @('Impact','Remediation')){
+   $lower=$field.ToLowerInvariant()
+   $prop='sourceEnglish'+$field
+   $countProp=$prop+'Count'
+   $original=@(Get-PinnedFindingText $id $field)
+   $witness=@($row.Value.$prop)
+   $russian=@($row.Value.$lower)
+   $count=[int]$row.Value.$countProp
+   if($count -le 0 -or $original.Count -ne $count -or
+      $witness.Count -ne $count -or $russian.Count -ne $count){
+    throw "D8: неполный перевод $id / $field"
+   }
+   for($i=0;$i -lt $count;$i++){
+    if([string]$original[$i] -cne [string]$witness[$i]){throw "D8: изменён EN $id / $field / пункт $($i+1)"}
+    if([string]::IsNullOrWhiteSpace([string]$russian[$i]) -or
+       [string]$russian[$i] -notmatch '[А-Яа-яЁё]'){throw "D8: отсутствует RU $id / $field / пункт $($i+1)"}
+   }
+   $entries[$id].$lower=@($russian)
+   if($field -eq 'Impact'){$d8Impact+=$count}else{$d8Remediation+=$count}
+  }
+ }
+}
+if($d8Seen.Count -ne 24 -or $d8Impact -ne 79 -or $d8Remediation -ne 75){
+ throw "D8: неверный набор $($d8Seen.Count) / $d8Impact / $d8Remediation"
+}
+Write-Host '[RU] PASS D8: 24 находки, Impact 79 и Remediation 75 проверены по EN'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
