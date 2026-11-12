@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH2d (2026-11-12): разработан `Invoke-ARCH2d.ps1` / `Core/Archive/ARCH2dBatchCore.ps1`: **один явный пакет из 10 реальных писем** существующего POP3 Inbox. Ten immutable pre-Move semantic witnesses, global + per-item force-flushed claims, no-retry fail-closed COM, read-only postrestart reconciliation. Исходная завершённая ARCH2c4a проверка остаётся нетронутой. CI синтетический; production Archive/Resume/Auto остаются закрыты. [Операторские шаги](2.6.5-arch2d-bounded-real-batch10.md).
+
 > ARCH2c4a (2026-11-12): после первого реального `Prepare` найден пропущенный bootstrap зависимостей `Get-OPAInternetMessageId`. Исправлено в `Core/Archive/ARCH2c4OneShotCore.ps1`, добавлены 10 интеграционных Pester тестов с вызовом настоящего ARCH2b witness. Текущий operator RunId сохраняется; реальный Move не начинался. CI по-прежнему не заменяет фактическое Outlook acceptance.
 
 > ARCH2c4 (2026-11-12): ограниченный **один реальный перенос** из существующего POP3 Inbox через новый `Core/Archive/ARCH2c4OneShotCore.ps1`, глобальный durable claim/принцип never-retry и независимая read-only проверка SHA-256 после перезапуска. Новые синтетические PST-источники не нужны; отдельный архив PST — результат операции. `Archive/Resume/Auto` по-прежнему закрыты. См. [операторскую инструкцию](2.6.5-arch2c4-real-pop3-one-shot.md).
