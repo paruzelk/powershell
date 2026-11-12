@@ -12,7 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
-    "ARCH3b DEV: original ArchiveSelector candidate rows get stable canonical SHA256 OperationId bound to existing Year grouping, Get-OPAArchivePartPath, original folder paths, TransactionId and StoreId; no new destination algorithm. Pure bounded batch preview and 48 fault-injection policy tests enforce PrepareIntent before PST creation, original witness hash, durable one-shot MoveClaim before COM, independent post-Outlook-restart semantic verify before DuplicateIndex commit and no retry on unknown Move. This is an UNCONNECTED source-backed design contract, not a live writer or production resume. Archive/Resume/Auto remain closed. Expected full Windows PS5.1 CI 4145 Pester tests in 138 containers.",
+    "ARCH3b DEV: original ArchiveSelector candidate rows get stable canonical SHA256 OperationId bound to existing Year grouping, Get-OPAArchivePartPath, original folder paths, TransactionId and StoreId; no new destination algorithm. Pure bounded batch preview and 48 fault-injection policy tests enforce PrepareIntent before PST creation, original witness hash, durable one-shot MoveClaim before COM, independent post-Outlook-restart semantic verify before DuplicateIndex commit and no retry on unknown Move. This is an UNCONNECTED source-backed design contract, not a live writer or production resume. Archive/Resume/Auto remain closed. Expected full Windows PS5.1 CI 4145 Pester tests in 136 containers.",
     "ARCH3a DEV: ADR ARCH3-001 commits to reusing original OutlookPOP3Archive archive planner, Year/YearQuarter grouping, recursive POP3 Sent and custom-folder traversal, original PST part naming/capacity/rollover, transaction and duplicate index rather than building a third archiver. New read-only source-backed integration audit and pure original-functions routing examples, 38 Pester tests for reuse and six remaining safety integration gaps. Legacy verifier already checks full original Body/HTML/recipients/attachment-byte SHA256 with RequireSemanticWitness; missing independent after-restart cross-year/folder receipt proof is a separate integration risk. Archive/Resume/Auto remain explicitly blocked. Windows PS5.1 full CI 4097 tests in 135 containers; no real Outlook/PST in CI.",
     "ARCH2d5 DEV: exactly 100 real POP3 Inbox letters in NEW isolated archive PST; 100 immutable source SHA256 semantic witnesses and second preflight, global one-shot claim, 100 durable per-item claims before COM Move, SHA256-linked receipt to next claim, ten immutable checkpoints each after 10 receipts and an operator-externally pinned final seal SHA256 binding all 100. Read-only Evidence and independent after-restart Reconcile require exact original manifest/global/final SHA256 to certify clean full batch. Partial/indeterminate claims prohibit retry, no production Archive/Resume/Auto. Expected Windows PS5.1 4059 Pester tests in 134 containers; real hundred-message acceptance pending.",
 
@@ -77,7 +77,7 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 138,
+    "ExpectedTestContainers": 136,
     "ExpectedPesterTests": 4145,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
