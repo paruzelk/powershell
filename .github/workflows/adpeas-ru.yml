@@ -56,6 +56,7 @@ jobs:
           .\adPEAS-RU\Tests\Test-StageD8VerifiedCoreRU.ps1
           .\adPEAS-RU\Tests\Test-StageD9VerifiedCoreRU.ps1
           .\adPEAS-RU\Tests\Test-StageD10VerifiedCoreRU.ps1
+          .\adPEAS-RU\Tests\Test-StageD11VerifiedCoreRU.ps1
           .\adPEAS-RU\Tests\Test-CheckSecureMessagesRU.ps1
           .\adPEAS-RU\Tests\Test-StageAVisibleMessages.ps1
           .\adPEAS-RU\Tests\Test-StageBVisibleMessages.ps1
@@ -79,11 +80,11 @@ jobs:
         shell: powershell
         run: |
           $ErrorActionPreference = "Stop"
-          $archive = "adPEAS-RU-2.9.0-STAGE-D10-20261112.zip"
+          $archive = "adPEAS-RU-2.9.0-STAGE-D11-20261112.zip"
           if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force }
           Compress-Archive -Path "adPEAS-RU" -DestinationPath $archive -CompressionLevel Optimal
           $hash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
-          [IO.File]::WriteAllText("adPEAS-RU-2.9.0-STAGE-D10-20261112.sha256", "$hash  $archive"+[Environment]::NewLine, (New-Object Text.UTF8Encoding($false)))
+          [IO.File]::WriteAllText("adPEAS-RU-2.9.0-STAGE-D11-20261112.sha256", "$hash  $archive"+[Environment]::NewLine, (New-Object Text.UTF8Encoding($false)))
           Write-Host "RU BUILD ZIP SHA-256: $hash"
       - name: Upload full source and build artifacts
         uses: actions/upload-artifact@v4
@@ -91,8 +92,8 @@ jobs:
           name: adPEAS-RU-2.9.0-full-source
           path: |
             adPEAS-RU
-            adPEAS-RU-2.9.0-STAGE-D10-20261112.zip
-            adPEAS-RU-2.9.0-STAGE-D10-20261112.sha256
+            adPEAS-RU-2.9.0-STAGE-D11-20261112.zip
+            adPEAS-RU-2.9.0-STAGE-D11-20261112.sha256
           retention-days: 7
       - name: Commit complete project to dedicated branch
         shell: powershell
@@ -100,7 +101,7 @@ jobs:
           $ErrorActionPreference = "Stop"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- adPEAS-RU adPEAS-RU-2.9.0-STAGE-D10-20261112.zip adPEAS-RU-2.9.0-STAGE-D10-20261112.sha256
+          git add -A -- adPEAS-RU adPEAS-RU-2.9.0-STAGE-D11-20261112.zip adPEAS-RU-2.9.0-STAGE-D11-20261112.sha256
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -m "adPEAS-RU: full pinned v2.9.0 sources, localized build and verified tests"
