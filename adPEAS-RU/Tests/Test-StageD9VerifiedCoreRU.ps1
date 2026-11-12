@@ -147,14 +147,10 @@ foreach($id in $semanticGuards.Keys){
 }
 $parity=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceFieldParity392.json'),[Text.Encoding]::UTF8))
 # Глобальные показатели могут изменяться в следующих этапах; D9 сверяет собственные ID.
-if(@($parity.ImpactStepCountDifferences).Count -ne 157 -or
-   @($parity.RemediationStepCountDifferences).Count -ne 149){
- throw 'D9: итоговая статистика Impact/Remediation не совпадает с 157/149'
-}
 foreach($id in $expectedIds){
  if(@($parity.ImpactStepCountDifferences) -ccontains $id -or
     @($parity.RemediationStepCountDifferences) -ccontains $id){
   throw "D9: структурное расхождение у переведённой находки $id"
  }
 }
-Write-Host 'PASS D9: 24 находки; Impact 61, Remediation 45; EN/RU/HTML паритет; остатки 157/149' -ForegroundColor Green
+Write-Host 'PASS D9: 24 находки; Impact 61, Remediation 45; EN/RU/HTML паритет и стабильность 24 ID' -ForegroundColor Green
