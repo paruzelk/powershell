@@ -62,7 +62,7 @@ function Write-OPA265ARCH3cJsonOnce {
     # No overwrite, ever; even process death leaves a visible non-retry claim.
     $fs=$null
     try{
-        $fs=New-Object IO.FileStream($Path,[IO.FileMode]::CreateNew,
+        $fs=[IO.FileStream]::new($Path,[IO.FileMode]::CreateNew,
               [IO.FileAccess]::Write,[IO.FileShare]::None)
         $fs.Write($bytes,0,$bytes.Length)
         $fs.Flush($true)
