@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH2c3 (2026-11-12): read-only план/инвентаризация/проба в существующем disposable PST с оригинальным payload SHA-256 и повторной проверкой после restart. `Archive/Resume/Auto` закрыты; тесты (целевое значение 3804/128) синтетические. Следующим ограниченным этапом после реального operator output будет ARCH2c4 и отдельно Copy→Verify→Delete. См. [операторский runbook](2.6.5-arch2c3-disposable-com-probe.md).
+
 > ARCH2c2 (2026-11-12): новый private NTFS DACL + FileShare.None lease в основном witness. Синтетические проверки (3778/127 target), только read-only остатки, writer disabled. См. [runbook](2.6.5-arch2c2-private-acl-lease.md). Следующий ARCH2c3: реальный disposable Outlook и аварийная проверка, без исторических Move повторов.
 
 > ARCH2c1 (12.11.2026): реализована изоляция временных вложений с синтетическими PS5.1 тестами. После CI требуется ARCH2c2 — ACL/lease/crash review и отдельно реальная Outlook disposable-PST приёмка. Никакого разрешения на Archive/Resume/Auto или 90 ГБ.
@@ -15,6 +17,7 @@
 | ARCH1 — аудит и архитектурный поворот | Реальный source inventory, фиксированные ADR/handoff/SEM stop-rule, автоматический read-only audit | Нет новых Move; DEV CI/ZIP PASS; список блокеров подтверждён исходным кодом | Выполняется в этом билде |
 | ARCH2a — durable Move claim / no-blind-retry | Исправить COM catch/continue и блокировать неразрешённый Resume, закрыть mutating DEV CLI | Source & synthetic CI PASS, никаких Outlook/PST изменений; writer не активирован | Выполняется |
 | ARCH2b — semantic verifier integration | BW4k-style source→destination hashes Body/HTML/recipients/attachment payload integrated into real MailMover/journal/ArchiveVerifier | Pure/Pester CI PASS, DEV Archive/Resume/Auto remain closed; live Outlook not yet certified | Текущая реализация DEV |
+| ARCH2c3 — disposable live COM attachment probe | Только существующий изолированный PST; независимый hash фактических bytes; Outlook restart proof | CI synthetic, реальные результаты оператора pending | DEV |
 | ARCH2c2 — private NTFS ACL and exclusive lease | DACL только текущему SID и SYSTEM, FileShare.None на время SaveAsFile/SHA-256, read-only lease inventory | Full PS5.1 CI PASS; без реального Outlook | DEV, CI pending |
 | ARCH2c1 — temp isolation + failure cleanup | GUID workspace, non-recursive cleanup, orphan inventory, 10 synthetic tests; DEV writers remain closed | Full PS5.1 CI PASS; no Outlook in CI | Implementation / CI pending |
 | ARCH2c — controlled Outlook acceptance | Temp-attachment cleanup, unsupported types and fail-closed recovery; bounded disposable PST test | Original witness vs target SHA, source0/target1, failure windows; separate explicit operator consent | Следующий |
