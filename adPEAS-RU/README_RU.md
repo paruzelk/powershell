@@ -328,3 +328,26 @@ Workflow GitHub Actions теперь создаёт после проверок 
 `Localization/Apply-FullTechnical.ps1` прекращает сборку при несовпадении исходного EN, длины полей или попытке затронуть ранее проверенные D2/D3 записи. Автономный `Tests/Test-StageD4VerifiedCoreRU.ps1` сравнивает исходник, русский каталог и встроенный HTML-словарь и отдельно фиксирует смысловые оговорки. Предыдущий тест D3 теперь проверяет закреплённые 14 ID независимо от развития общего покрытия.
 
 Пакет: `adPEAS-RU-2.9.0-STAGE-D4-20261112.zip`. Реальное подключение к AD, запуск исправляющих команд, изменение FinderId, проверок LDAP, риска и исходного технического английского текста не выполняются в рамках локализации.
+
+
+## Этап D5 — предметная сверка ещё 24 находок (12 ноября 2026)
+
+В двух новых каталогах `Localization/SourceVerifiedCore-14a.ru-RU.json` и `SourceVerifiedCore-14b.ru-RU.json` переведены **94 исходных пункта Impact и 101 пункт Remediation**, строго один к одному с закреплёнными английскими списками adPEAS 2.9.0 (`ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`).
+
+**AD CS:** `ADCS_CA_CERT_EXPIRED`, `ADCS_CA_SHORT_KEY`, `ADCS_CA_WEAK_SIGNATURE`, `ESC13_ISSUANCE_POLICY_GROUP_LINK`, `ESC14_WRITABLE_MAPPING`.
+
+**Kerberos:** `KERBEROS_HASH_CRACKABLE`, `KERBEROS_TICKET_LIFETIME_EXTENDED`, `ROASTABLE_PRIVILEGED_ACCOUNT`.
+
+**Windows LAPS:** `LAPS_COVERAGE_NOT_IN_AD`, `LAPS_GPO_ENCRYPTION_DISABLED`, `LAPS_GPO_NO_AD_BACKUP`, `LAPS_GPO_NO_POST_AUTH_RESET`, `LAPS_NOT_DEPLOYED`, `LAPS_PASSWORD_NOT_ROTATED`, `LAPS_PASSWORD_READ_ACCESS`, `LAPS_ENCRYPTED_READ_NO_DECRYPTOR`.
+
+**Привилегии и делегирование:** `GMSA_PASSWORD_READABLE`, `GMSA_MEMBERSHIP_OWNER`, `PRIVILEGED_GROUP_MEMBERSHIP`, `PRIVILEGED_ACCOUNT_ACL`, `OU_PERM_CONSTRAINED_DELEGATION`, `OU_PERM_PASSWORD_RESET`, `OU_PERM_RBCD`, `OU_PERM_GPLINK`.
+
+Важные разграничения: LAPS с BackupDirectory=1 сохраняет пароль в Entra ID, а не в AD; отсутствие атрибутов LAPS в AD само по себе не означает отсутствие защиты. При BackupDirectory=0 пароль нигде не сохраняется для извлечения. Чтение `msLAPS-EncryptedPassword` без полномочий `ADPasswordEncryptionPrincipal` не раскрывает пароль: результат остаётся предупреждением (Hint), а не доказанной компрометацией. Для `msDS-GroupMSAMembership` отдельно отмечено право владельца изменять DACL, даже если владелец не указан среди получателей пароля.
+
+В разделе `PRIVILEGED_GROUP_MEMBERSHIP` сохранено предостережение: Protected Users относится к пользовательским записям после проверки совместимости; **компьютеры и gMSA в эту группу не добавляют**. Для `OU_PERM_*` не предлагается бездумно разрывать наследование: `SetAccessRuleProtection` затрагивает все наследуемые разрешения, а не только опасную ACE. При увеличенном времени действия билета Kerberos сброс пароля не аннулирует уже выданный билет. Исходные параметры и команды исправления остаются неизменными.
+
+Итого построчно сверено **78 из 392** находок по полям Impact и Remediation (10 + 10 + 14 + 20 + 24); **314** ещё требуют предметной проверки. По числу пунктов после D5 остаётся **249** расхождений Impact и **229** расхождений Remediation; это структурные индикаторы, не автоматический признак ошибки. **Attack: 304/304**, без вымышленных сценариев для 88 пустых исходных полей.
+
+Тест `Tests/Test-StageD5VerifiedCoreRU.ps1` проверяет 24 закреплённых FindingId, дословные английские строки, количество и последовательность пунктов, точность интеграции в итоговый HTML-словарь и критические технические оговорки. Предыдущий тест D4 переведён на независимую проверку собственных 20 находок, чтобы новые переводы не нарушали регрессионные тесты. Сборка блокируется при изменении закреплённого оригинала или попытке перезаписать проверенные ранее поля. Доступ к AD для тестов не требуется.
+
+Архив: `adPEAS-RU-2.9.0-STAGE-D5-20261112.zip`.
