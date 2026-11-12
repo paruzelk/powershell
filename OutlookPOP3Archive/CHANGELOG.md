@@ -1,5 +1,12 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH2c4 DEV — 2026-11-12
+- New operator-authorized core-only one-shot pilot for a real `info@stios.ru.pst` POP3 Inbox item; no deleted historical BW4k PST fixtures required.
+- New unique archive PST created only as output after explicit Prepare; independent Body/HTML/recipient/attachment-byte semantic witness before one irreversible MailItem.Move.
+- Immutable original intent, manifest, global once-only claim, per-run Move claim and return observation using FileStream.Flush(true); never auto retry after claimed COM outcome.
+- Separate read-only post-restart reconciliation of exactly one destination mail against original witnessed content. Main Archive, Resume and Auto remain blocked. Actual Outlook test pending.
+- 33 new synthetic Windows PowerShell 5.1 Pester tests; expected full CI 3837 tests / 129 containers, zero skipped or failed.
+
 ## 2.6.5-ARCH2c3 DEV — 2026-11-12
 - New read-only Outlook COM diagnostic for an existing mounted disposable BW4k7v/BW4k7v2a1 PST; exact SuiteId/path/store/subject/EntryId guards, never creates/mounts a PST or moves/deletes mail.
 - By-value attachment SaveAsFile uses ARCH2c2 protected NTFS ACL/lease; independent original-file SHA256 + byte-length comparison, plus PostRestartProbe with changed Outlook process identity.
