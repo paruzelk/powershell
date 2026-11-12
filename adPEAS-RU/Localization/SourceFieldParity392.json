@@ -8,7 +8,7 @@
                        },
     "RussianNonempty":  {
                             "attack":  304,
-                            "remediation":  392,
+                            "remediation":  391,
                             "impact":  392
                         },
     "MissingRussianAttackCount":  0,
@@ -20,46 +20,13 @@
 
                                    ],
     "ImpactStepCountDifferences":  [
-                                       "DANGEROUS_RIGHTS_AFFECTED_OUS",
-                                       "DANGEROUS_RIGHTS_SEVERITY",
-                                       "EXCHANGE_HYBRID_DEPLOYMENT",
-                                       "EXCHANGE_RBAC_AD_PERMISSIONS",
-                                       "EXCHANGE_RBAC_APPLICATION_IMPERSONATION",
-                                       "EXCHANGE_RBAC_DEFAULT_ASSIGNMENT",
-                                       "EXCHANGE_RBAC_MAILBOX_IMPORT_EXPORT",
-                                       "EXCHANGE_RBAC_MAILBOX_SEARCH",
-                                       "EXCHANGE_RBAC_ROLE_MANAGEMENT",
-                                       "EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT",
-                                       "EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED",
-                                       "EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM",
-                                       "EXCHANGE_SMTP_ANONYMOUS_SPOOFING",
-                                       "EXCHANGE_SMTP_BROAD_RELAY",
-                                       "EXCHANGE_SMTP_BROAD_SPOOFING",
-                                       "EXCHANGE_VULNERABLE_VERSION",
-                                       "EXCHANGE_WEB_ENDPOINTS",
-                                       "LAPS_INSTALLED"
+
                                    ],
     "RemediationStepCountDifferences":  [
-                                            "EXCHANGE_HYBRID_DEPLOYMENT",
-                                            "EXCHANGE_RBAC_AD_PERMISSIONS",
-                                            "EXCHANGE_RBAC_APPLICATION_IMPERSONATION",
-                                            "EXCHANGE_RBAC_DEFAULT_ASSIGNMENT",
-                                            "EXCHANGE_RBAC_MAILBOX_IMPORT_EXPORT",
-                                            "EXCHANGE_RBAC_MAILBOX_SEARCH",
-                                            "EXCHANGE_RBAC_ROLE_MANAGEMENT",
-                                            "EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT",
-                                            "EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED",
-                                            "EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM",
-                                            "EXCHANGE_SMTP_ANONYMOUS_SPOOFING",
-                                            "EXCHANGE_SMTP_BROAD_RELAY",
-                                            "EXCHANGE_SMTP_BROAD_SPOOFING",
-                                            "EXCHANGE_SMTP_CONNECTOR_UNREADABLE",
-                                            "EXCHANGE_VULNERABLE_VERSION",
-                                            "EXCHANGE_WEB_ENDPOINTS",
-                                            "GPO_LINK_REACHES_DC"
+
                                         ],
     "RussianImpactWithNoSource":  15,
-    "RussianRemediationWithNoSource":  15,
+    "RussianRemediationWithNoSource":  14,
     "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 246 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
     "UserReportDataIncluded":  false,
     "Fields":  [
@@ -723,7 +690,7 @@
                    {
                        "FindingId":  "DANGEROUS_RIGHTS_AFFECTED_OUS",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  1,
@@ -741,7 +708,7 @@
                    {
                        "FindingId":  "DANGEROUS_RIGHTS_SEVERITY",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  1,
@@ -1128,11 +1095,11 @@
                    {
                        "FindingId":  "EXCHANGE_HYBRID_DEPLOYMENT",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "EXCHANGE_PERMISSIONS_MODEL_CLEAN",
@@ -1146,65 +1113,65 @@
                    {
                        "FindingId":  "EXCHANGE_RBAC_AD_PERMISSIONS",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "EXCHANGE_RBAC_APPLICATION_IMPERSONATION",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "EXCHANGE_RBAC_DEFAULT_ASSIGNMENT",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "EXCHANGE_RBAC_MAILBOX_IMPORT_EXPORT",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "EXCHANGE_RBAC_MAILBOX_SEARCH",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "EXCHANGE_RBAC_ROLE_MANAGEMENT",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "EXCHANGE_SHARED_PERMISSIONS_MODEL",
@@ -1218,47 +1185,47 @@
                    {
                        "FindingId":  "EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "EXCHANGE_SMTP_ANONYMOUS_SPOOFING",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "EXCHANGE_SMTP_BROAD_RELAY",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "EXCHANGE_SMTP_BROAD_SPOOFING",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "EXCHANGE_SMTP_CONNECTOR_AUTHENTICATED",
@@ -1276,7 +1243,7 @@
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "EXCHANGE_SMTP_OPEN_RELAY",
@@ -1290,20 +1257,20 @@
                    {
                        "FindingId":  "EXCHANGE_VULNERABLE_VERSION",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "EXCHANGE_WEB_ENDPOINTS",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "GMSA_MEMBERSHIP_INFO",
@@ -1366,7 +1333,7 @@
                        "AttackEN":  1,
                        "AttackRU":  1,
                        "RemediationEN":  1,
-                       "RemediationRU":  2
+                       "RemediationRU":  1
                    },
                    {
                        "FindingId":  "GPO_LOCAL_GROUP_MEMBER",
@@ -2091,11 +2058,11 @@
                    {
                        "FindingId":  "LAPS_INSTALLED",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  0,
-                       "RemediationRU":  1
+                       "RemediationRU":  0
                    },
                    {
                        "FindingId":  "LAPS_LEGACY",
