@@ -1,5 +1,11 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH2c3 DEV — 2026-11-12
+- New read-only Outlook COM diagnostic for an existing mounted disposable BW4k7v/BW4k7v2a1 PST; exact SuiteId/path/store/subject/EntryId guards, never creates/mounts a PST or moves/deletes mail.
+- By-value attachment SaveAsFile uses ARCH2c2 protected NTFS ACL/lease; independent original-file SHA256 + byte-length comparison, plus PostRestartProbe with changed Outlook process identity.
+- 26 new PS5.1 synthetic Pester tests, target full CI 3804 tests / 128 containers. Actual Outlook operator acceptance pending, no production claims.
+- Main Archive, Resume, Auto remain fail-closed by ARCH2a. No third-party code copied.
+
 ## 2.6.5-ARCH2c2 DEV — 2026-11-12
 - Standard .NET Framework NTFS DACL creation at workspace creation (current SID and SYSTEM only), check owner/protected rules and fail-closed verification.
 - Exclusive FileShare.None lease during attachment SaveAsFile/hash/cleanup; no automatic crash-orphan deletion; read-only LeaseState classification.
