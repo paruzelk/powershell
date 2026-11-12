@@ -216,32 +216,37 @@ Describe 'ARCH2d3 isolated 57-case 1/5/10 failure injection (no Outlook)' {
     }
 }
 Describe 'ARCH2d3 every indexed failure case is durably fenced' {
-    foreach($f in @('None','GlobalClaimCollision','GlobalClaimTornWrite','AfterGlobalClaimBeforeFirstItem',
+    $all=@(
+        'None','GlobalClaimCollision','GlobalClaimTornWrite','AfterGlobalClaimBeforeFirstItem',
         'ItemClaimCollision','ItemClaimTornWrite','AfterItemClaimBeforeCom',
         'ComThrowsWithoutApply','ComAppliesThenThrows','ComReturnsBeforeReceipt',
         'ReturnReceiptCollision','ReturnReceiptTornWrite','AfterReturnCrash',
         'ChangedOriginalBeforeGlobalClaim','ChangedOriginalBeforeItemClaim',
-        'ChangedDestinationBody','UnknownSourceProvider','DuplicateDestination','NoRestart')){
-        foreach($n in @(1,5,10)){
-            It ("never grants replay after {0} @ {1}" -f $f,$n) {
-                $case=@($script:matrix.ResultRows|Where-Object {
-                    $_.Fault -ceq $f -and $_.FaultAt -eq $n
-                })[0]
-                $case | Should -Not -BeNullOrEmpty
-                $case.ReplayBlocked | Should -BeTrue
-                $case.AutomaticRetryAllowed | Should -BeFalse
-                $case.ActualOutlookContacted | Should -BeFalse
-                $case.ActualPstReadOrWritten | Should -BeFalse
-                if($f -eq 'None'){
-                    $case.IndependentlyVerifiedAllTen | Should -BeTrue
-                }elseif($f -in @('GlobalClaimCollision','GlobalClaimTornWrite',
-                    'ChangedOriginalBeforeGlobalClaim')){
-                    $case.FakeComMoveCalls | Should -Be 0
-                }elseif($f -in @('ItemClaimCollision','ItemClaimTornWrite',
-                    'AfterItemClaimBeforeCom','ChangedOriginalBeforeItemClaim')){
-                    $case.FakeComMoveCalls | Should -Be ($n-1)
-                }
-            }
+        'ChangedDestinationBody','UnknownSourceProvider','DuplicateDestination','NoRestart'
+    )
+    $cases=@(foreach($caseName in $all){
+        foreach($index in @(1,5,10)){
+            @{ Fault=$caseName; FaultAt=$index }
+        }
+    })
+    It 'never grants replay after <Fault> @ <FaultAt>' -TestCases $cases {
+        param([string]$Fault,[int]$FaultAt)
+        $case=@($script:matrix.ResultRows|Where-Object {
+            $_.Fault -ceq $Fault -and $_.FaultAt -eq $FaultAt
+        })[0]
+        $case | Should -Not -BeNullOrEmpty
+        $case.ReplayBlocked | Should -BeTrue
+        $case.AutomaticRetryAllowed | Should -BeFalse
+        $case.ActualOutlookContacted | Should -BeFalse
+        $case.ActualPstReadOrWritten | Should -BeFalse
+        if($Fault -eq 'None'){
+            $case.IndependentlyVerifiedAllTen | Should -BeTrue
+        }elseif($Fault -in @('GlobalClaimCollision','GlobalClaimTornWrite',
+            'ChangedOriginalBeforeGlobalClaim')){
+            $case.FakeComMoveCalls | Should -Be 0
+        }elseif($Fault -in @('ItemClaimCollision','ItemClaimTornWrite',
+            'AfterItemClaimBeforeCom','ChangedOriginalBeforeItemClaim')){
+            $case.FakeComMoveCalls | Should -Be ($FaultAt-1)
         }
     }
 }
