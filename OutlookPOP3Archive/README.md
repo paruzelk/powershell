@@ -1,5 +1,10 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
+## ARCH2c1 — временные копии вложений изолированы (DEV / NO WRITER)
+
+Новый подэтап ARCH2c1: [runbook](docs/2.6.5-arch2c1-temp-isolation.md). Изменён реальный `Core/Archive/ARCH2bSemanticWitness.ps1`: каждая проверка содержимого вложений использует собственный GUID workspace в TEMP, при обычных исключениях удаляет копии и **нерекурсивно** удаляет пустой workspace. Добавлена read-only инвентаризация workspace, которые могли остаться после аварии; автоматического удаления чужих/активных/непроверенных каталогов нет. Реальный Outlook COM и crash/restart еще не сертифицированы. `Archive`, `Resume`, `Auto` остаются закрыты защитой ARCH2a, включая `-WhatIf`.
+
+
 ## ARCH2b — встроенная в основной архиватор проверка содержимого (DEV)
 
 **Текущая линия 2.6.5-ARCH2b:** [полный runbook](docs/2.6.5-arch2b-semantic-verifier.md). Теперь оригинальный `MailItem` получает pre-Move свидетельство (Subject, адреса/Recipients, Body/HTMLBody, даты, UnRead и SHA256 байтов вложений), которое записывается в `Move Started` до COM. `ArchiveVerifier.ps1` независимо сверяет целевой PST с исходным witness, а `MailItem.Size` хранится только диагностически. Это **встраивание ранее проверенного BW4j/BW4k подхода**, не новая MAPI-форензика. Неподдерживаемые вложения и отсутствие оригинальных хешей блокируют проверку.
