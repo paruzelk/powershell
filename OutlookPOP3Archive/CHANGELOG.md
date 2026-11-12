@@ -1,5 +1,11 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH3a DEV — 2026-11-12
+- Adopt [ADR ARCH3-001](docs/ADR-ARCH3-001-reuse-existing-archiver.md): use **original** OutlookPOP3Archive and legacy Year/PST routing, recursive POP3 Inbox/Sent/custom folder traversal, original transaction, index and verifier. Integrate ARCH2d5 safety constraints without building a parallel archiver.
+- Correct prior inventory overstatement: original `ArchiveVerifier` already performs full semantic Body/HTML/recipients/by-value attachment SHA256 comparison under `-RequireSemanticWitness`, also passed by current main Archive/Resume callers. Remaining gap is cross-process independently anchored claims/receipts, multi-folder/year and crash-safe resume, not absent Year routing or absent hash verifier.
+- Add read-only `Invoke-ARCH3a.ps1` and `Core/Diagnostics/ARCH3aLegacyIntegrationAudit.ps1`: 15 original-module fingerprints, 18 source capability contracts, six explicit outstanding integration gaps and real execution of **existing** pure Year/PST name/SentOn/Outbox and nested folder rules with synthetic path only. No PST/Outlook/writer, no change to legacy modules.
+- 38 focused Pester regressions for existing-code reuse, immutable original safety gates and source policy; full Windows PS5.1 expected 4097 tests in 135 containers. `Archive/Resume/Auto` remain blocked, 90GB production not certified.
+
 ## 2.6.5-ARCH2d5 DEV — 2026-11-12
 - Introduced `Invoke-ARCH2d5.ps1`, `Core/Archive/ARCH2d5Batch100Policy.ps1`, `ARCH2d5Batch100Core.ps1`: exactly 100 new real POP3 Inbox original EntryIDs, isolated new output archive PST, never historical ARCH2c4a/ARCH2d evidence.
 - Original full by-value ARCH2b Body/HTML/recipients/state/attachment-byte SHA256 for all 100 before any target PST, second full manifest preflight, per-item source semantic checks, immutable global once-claim and per-item CreateNew/Flush(true) claims before one and only COM Move per item.
