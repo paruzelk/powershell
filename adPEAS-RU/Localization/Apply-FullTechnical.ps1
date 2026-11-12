@@ -141,6 +141,84 @@ if($stageDCount -ne 77 -or $stageDSteps -ne 272){
 }
 Write-Host "[RU] PASS: 77 новых разделов Attack (272 пункта) сверены с закреплённым английским источником"
 
+
+# D2: точная сверка каждого пункта Attack/Impact/Remediation с оригиналом EN.
+$attackD2Count=0
+$attackD2Steps=0
+$seenD2=@{}
+$coreD2Count=0
+$impactD2Steps=0
+$remediationD2Steps=0
+function Get-PinnedFindingText([string]$id,[string]$field){
+ $needle="    '$id' = @{"
+ $start=$originalFindingText.IndexOf($needle,[StringComparison]::Ordinal)
+ if($start -lt 0){throw "Найден несуществующий FindingId: $id"}
+ $stop=$originalFindingText.IndexOf(([string][char]10+'    }'),$start,[StringComparison]::Ordinal)
+ if($stop -lt 0){throw "Не найден конец блока оригинала: $id"}
+ $block=$originalFindingText.Substring($start,$stop-$start)
+ $fieldRe='(?ms)^[ \t]{8}'+$field+'[ \t]*=[ \t]*@\([ \t]*\n(?<items>.*?)^[ \t]{8}\)'
+ $match=[regex]::Match($block,$fieldRe)
+ if(-not $match.Success){throw "Отсутствует $field у $id"}
+ return @([regex]::Matches($match.Groups['items'].Value,'(?m)^[ \t]{12}"(?<value>(?:\x60.|[^"])*)"') | ForEach-Object { $_.Groups['value'].Value })
+}
+foreach($name in @('SourceVerifiedAttack-11a.ru-RU.json','SourceVerifiedAttack-11b.ru-RU.json',
+                   'SourceVerifiedAttack-11c.ru-RU.json','SourceVerifiedAttack-11d.ru-RU.json')){
+ $cat=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($row in $cat.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if($seenD2.ContainsKey($id)){throw "Повтор FindingId D2: $id"}
+  $seenD2[$id]=$true
+  if(-not $entries.Contains($id)){throw "Неизвестный FindingId: $id"}
+  if(@($entries[$id].attack).Count -gt 0){throw "Существующий Attack запрещено перезаписывать: $id"}
+  $original=@(Get-PinnedFindingText $id 'Attack')
+  $witness=@($row.Value.sourceEnglishAttack)
+  $translated=@($row.Value.attack)
+  $n=[int]$row.Value.sourceEnglishAttackStepCount
+  if($n -ne $original.Count -or $n -ne $witness.Count -or $n -ne $translated.Count){
+   throw "Разная длина Attack: $id, $n / $($original.Count) / $($witness.Count) / $($translated.Count)"
+  }
+  for($i=0;$i -lt $n;$i++){
+   if([string]$original[$i] -cne [string]$witness[$i]){throw "Изменён EN-источник: $id, шаг $($i+1)"}
+   if([string]$translated[$i] -notmatch '[А-Яа-яЁё]'){throw "Нет русского шага: $id, шаг $($i+1)"}
+  }
+  $entries[$id].attack=@($translated)
+  $attackD2Count++
+  $attackD2Steps+=$n
+ }
+}
+if($attackD2Count -ne 112 -or $attackD2Steps -ne 380){throw "Неполный набор D2 Attack: $attackD2Count / $attackD2Steps"}
+$core=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceVerifiedCore-11.ru-RU.json'),[Text.Encoding]::UTF8))
+foreach($row in $core.translations.PSObject.Properties){
+ $id=[string]$row.Name
+ if(-not $entries.Contains($id)){throw "Неизвестная находка Core D2: $id"}
+ foreach($field in @('Impact','Remediation')){
+  $name=$field.ToLowerInvariant()
+  $enProp='sourceEnglish'+$field
+  $countProp='sourceEnglish'+$field+'Count'
+  $original=@(Get-PinnedFindingText $id $field)
+  $witness=@($row.Value.$enProp)
+  $translated=@($row.Value.$name)
+  $n=[int]$row.Value.$countProp
+  if($n -ne $original.Count -or $n -ne $witness.Count -or $n -ne $translated.Count){
+   throw "Разная длина $field у $id"
+  }
+  for($i=0;$i -lt $n;$i++){
+   if([string]$original[$i] -cne [string]$witness[$i]){throw "Изменён EN-источник $id, поле $field, пункт $($i+1)"}
+   if([string]$translated[$i] -notmatch '[А-Яа-яЁё]'){throw "Нет русского пункта $id, поле $field, пункт $($i+1)"}
+  }
+  $entries[$id].$name=@($translated)
+  if($field -eq 'Impact'){$impactD2Steps+=$n}else{$remediationD2Steps+=$n}
+ }
+ $coreD2Count++
+}
+if($coreD2Count -ne 10 -or $impactD2Steps -ne 38 -or $remediationD2Steps -ne 41){
+ throw "Неполный набор D2 Core: $coreD2Count / $impactD2Steps / $remediationD2Steps"
+}
+if(@($entries.Values | Where-Object { @($_.attack).Count -gt 0 }).Count -ne 304){
+ throw 'Ожидалось 304/304 русских Attack, не считая 88 пустых оригиналов'
+}
+Write-Host '[RU] PASS D2: Attack 304/304, новых 112 разделов/380 пунктов; Impact 38, Remediation 41 для 10 критичных находок'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
