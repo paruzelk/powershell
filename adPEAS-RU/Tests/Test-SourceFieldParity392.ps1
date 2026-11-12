@@ -90,7 +90,7 @@ $result=[ordered]@{
  RemediationStepCountDifferences=@($remediationStepDrifts)
  RussianImpactWithNoSource=$sourceMissingImpact
  RussianRemediationWithNoSource=$sourceMissingRemediation
- Note='Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 102 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.'
+ Note='Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 126 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.'
  UserReportDataIncluded=$false
  Fields=@($rows)
 }
