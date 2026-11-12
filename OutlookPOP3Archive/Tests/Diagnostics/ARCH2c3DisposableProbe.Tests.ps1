@@ -2,7 +2,7 @@
 # ARCH2c3: standalone synthetic policy tests; does NOT launch Outlook or mount PST.
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../Core/Diagnostics/ARCH2c3DisposableProbePolicy.ps1')
-    $script:guid='11111111-2222-4333-8444-555555555555'
+    $script:guid='11111111-2222-4a33-8b44-5555555555aa'
     $script:root=$env:LOCALAPPDATA
     $script:sha='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     function New-ARCH2c3Layout {
