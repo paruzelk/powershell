@@ -713,7 +713,7 @@
                             $Script:LDAPContext['EarlyHostsPatched'] = $true
 
                             if ($hostsPatched.Count -gt 0) {
-                                Show-Line "Patched hosts file with $($hostsPatched.Count) entries (cleanup on Disconnect-adPEAS)" -Class Info
+                                Show-Line "Добавлено записей в hosts: $($hostsPatched.Count) (очистка при Disconnect-adPEAS)" -Class Info
                             }
                         }
                         else {
@@ -959,7 +959,7 @@
                     }
                     elseif (-not $ForceSimpleBind -and $UserRealm -and $UserRealm -notmatch '\.') {
                         Write-Log "[Connect-adPEAS] Cross-domain with NetBIOS prefix '$UserRealm' - skipping Kerberos (cannot discover KDC)"
-                        Show-Line "Cross-domain authentication (NetBIOS): using NTLM/SimpleBind" -Class Hint
+                        Show-Line "Междоменная аутентификация (NetBIOS): используется NTLM/SimpleBind" -Class Hint
                         # Fall through to NTLM Impersonation / SimpleBind below
                     }
                     elseif (-not $ForceSimpleBind) {
@@ -972,7 +972,7 @@
                             $UserRealmDC = Resolve-adPEASName -Domain $UserRealm
                             if (-not $UserRealmDC -or -not $UserRealmDC.IP) {
                                 Write-Log "[Connect-adPEAS] Cross-domain: could not discover KDC for '$UserRealm' - falling back to NTLM/SimpleBind"
-                                Show-Line "Cross-domain: could not find KDC for '$UserRealm' - using NTLM/SimpleBind" -Class Hint
+                                Show-Line "Междоменная аутентификация: KDC для '$UserRealm' не найден — используется NTLM/SimpleBind" -Class Hint
                                 # Set flag to skip Kerberos and fall through to NTLM/SimpleBind
                                 $UserRealmDC = $null
                                 $UserRealm = $null  # Clear to prevent cross-domain Kerberos attempt
@@ -1035,14 +1035,14 @@
                             }
                             if ($IsCrossDomain) {
                                 Write-Log "[Connect-adPEAS] Cross-domain: Kerberos failed, allowing NTLM/SimpleBind fallback"
-                                Show-Line "Cross-domain authentication: falling back to NTLM/SimpleBind" -Class Hint
+                                Show-Line "Междоменная аутентификация: переход на NTLM/SimpleBind" -Class Hint
                             }
 
                             # Check if this is a DNS resolution issue (custom DNS without hosts patching)
                             $IsDnsResolutionIssue = $ErrorMessage -match "Kerberos tickets obtained successfully.*LDAP connection failed"
                             if ($IsDnsResolutionIssue) {
-                                Show-Line "Kerberos TGT/TGS acquired successfully, but LDAP requires hostname resolution" -Class Note
-                                Show-Line "Use -PatchHostsFile for full Kerberos authentication" -Class Note
+                                Show-Line "Билеты Kerberos TGT/TGS получены, но для LDAP требуется разрешение имени узла" -Class Note
+                                Show-Line "Для полноценной аутентификации Kerberos используйте -PatchHostsFile" -Class Note
                                 Write-Log "[Connect-adPEAS] Custom DNS active without hosts patching - SimpleBind fallback"
                             }
 
@@ -1094,7 +1094,7 @@
                             }
 
                             Write-Log "[Connect-adPEAS] Kerberos PTT failed - trying NTLM impersonation fallback..."
-                            Show-Line "Kerberos failed - trying NTLM impersonation" -Class Info
+                            Show-Line "Аутентификация Kerberos не удалась — попытка олицетворения через NTLM" -Class Info
                         }
                     }
                     else {
@@ -1137,7 +1137,7 @@
                                 }
 
                                 Write-Log "[Connect-adPEAS] LDAP connection failed with explicit NTLM - trying SimpleBind..."
-                                Show-Line "NTLM failed - falling back to SimpleBind" -Class Hint
+                                Show-Line "Аутентификация NTLM не удалась — переход на SimpleBind" -Class Hint
                                 # Fall through to SimpleBind below
                             }
                             else {
@@ -1146,7 +1146,7 @@
                                 $Script:AuthInfo.NTLMImpersonation = $false
                                 $Script:LDAPContext['Credential'] = $CredObject
 
-                                Show-Line "Connected via NTLM (supports LDAP signing)" -Class Hint
+                                Show-Line "Подключено через NTLM (поддерживается подпись LDAP)" -Class Hint
                             }
                         }
 
@@ -1199,7 +1199,7 @@
                                 # Port 389 without TLS: there is no channel to bind, so the
                                 # refusal can only be the signing requirement - a simple bind
                                 # cannot be signed. The line used to name channel binding too.
-                                Show-Line "LDAP signing required - the simple bind was refused on port 389, auto-upgrading to LDAPS" -Class Hint
+                                Show-Line "Требуется подпись LDAP — простая привязка на порту 389 отклонена, автоматический переход на LDAPS" -Class Hint
 
                                 $ConnParams['UseLDAPS'] = $true
                                 $Connection = Connect-LDAP @ConnParams
@@ -1446,7 +1446,7 @@
 
                         # Display all identities + selected override
                         if ($certIdentities.Count -gt 1) {
-                            Show-Line "Certificate contains multiple identities" -Class Note
+                            Show-Line "Сертификат содержит несколько идентичностей" -Class Note
                             $idx = 1
                             foreach ($id in $certIdentities) {
                                 Show-KeyValue "    [$idx] $($id.Type):" $id.Value
@@ -1463,7 +1463,7 @@
 
                     } else {
                         # Multiple identities - show all, auto-select first, hint about -Username
-                        Show-Line "Certificate contains multiple identities" -Class Note
+                        Show-Line "Сертификат содержит несколько идентичностей" -Class Note
                         $idx = 1
                         foreach ($id in $certIdentities) {
                             Show-KeyValue "    [$idx] $($id.Type):" $id.Value
@@ -1473,7 +1473,7 @@
                         # Auto-select first identity (UPNs come before DNS in the list)
                         $CertUserName = $certIdentities[0].CName
                         Show-KeyValue "Using identity [1]:" $CertUserName -Class Note
-                        Show-Line "To select a different identity, use: -Username <name>" -Class Note
+                        Show-Line "Чтобы выбрать другую идентичность, используйте: -Username <name>" -Class Note
 
                         Write-Log "[Connect-adPEAS] Multiple identities found ($($certIdentities.Count)), auto-selected first: $($certIdentities[0].Type)=$($certIdentities[0].Value) -> cname: $CertUserName"
                     }
@@ -2087,7 +2087,7 @@
                 $Script:LDAPContext['HostsEntries'] = $hostsPatched
 
                 if ($hostsPatched.Count -gt 0) {
-                    Show-Line "Patched hosts file with $($hostsPatched.Count) entries (cleanup on Disconnect-adPEAS)" -Class Info
+                    Show-Line "Добавлено записей в hosts: $($hostsPatched.Count) (очистка при Disconnect-adPEAS)" -Class Info
                 }
             }
             elseif ($Script:LDAPContext['EarlyHostsPatched'] -and $Connection.Server) {
@@ -2220,10 +2220,10 @@
             # Build tab-completion cache if requested
             if ($BuildCompletionCache) {
                 Show-EmptyLine
-                Show-Line "Building tab-completion cache..." -Class Info
+                Show-Line "Создание кэша автодополнения..." -Class Info
                 Build-CompletionCache
                 $stats = Get-CompletionCacheStats
-                Show-Line "Cached: $($stats.Users) users, $($stats.Computers) computers, $($stats.Groups) groups, $($stats.GPOs) GPOs" -Class Hint
+                Show-Line "Кэшировано пользователей: $($stats.Users), компьютеров: $($stats.Computers), групп: $($stats.Groups), GPO: $($stats.GPOs)" -Class Hint
             }
 
             if (-not $Quiet) {

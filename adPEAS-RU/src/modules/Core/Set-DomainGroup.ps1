@@ -300,7 +300,7 @@
                     } elseif ($SkippedMembers.Count -gt 0 -and $FailedMembers.Count -eq 0) {
                         # All members already existed
                         if (-not $PassThru) {
-                            Show-Line "All $($SkippedMembers.Count) member(s) already exist in: $($TargetGroup.sAMAccountName)" -Class Note
+                            Show-Line "Все $($SkippedMembers.Count) участников уже состоят в: $($TargetGroup.sAMAccountName)" -Class Note
                         }
                     }
 
@@ -386,7 +386,7 @@
                     } elseif ($SkippedMembers.Count -gt 0 -and $FailedMembers.Count -eq 0) {
                         # None of the specified members were in the group
                         if (-not $PassThru) {
-                            Show-Line "None of the $($SkippedMembers.Count) specified member(s) were in: $($TargetGroup.sAMAccountName)" -Class Note
+                            Show-Line "Ни один из $($SkippedMembers.Count) указанных участников не состоял в: $($TargetGroup.sAMAccountName)" -Class Note
                         }
                     }
 
@@ -429,7 +429,7 @@
                                 Message = "Group has no members (no change)"
                             }
                         } else {
-                            Show-Line "Group has no members: $($TargetGroup.sAMAccountName)" -Class Note
+                            Show-Line "Группа не содержит участников: $($TargetGroup.sAMAccountName)" -Class Note
                         }
                     }
                     elseif (-not $Force) {
@@ -443,8 +443,8 @@
                                 Message = "Group has $($CurrentMembers.Count) members. Use -Force to confirm removal of all members."
                             }
                         } else {
-                            Show-Line "Group '$($TargetGroup.sAMAccountName)' has $($CurrentMembers.Count) members" -Class Note
-                            Show-Line "Use -Force to confirm removal of all members" -Class Note
+                            Show-Line "Группа '$($TargetGroup.sAMAccountName)' содержит $($CurrentMembers.Count) участников" -Class Note
+                            Show-Line "Для подтверждения удаления всех участников используйте -Force" -Class Note
                         }
                     }
                     else {
@@ -474,7 +474,7 @@
                                     Message = "Removed all $($CurrentMembers.Count) member(s)"
                                 }
                             } else {
-                                Show-Line "Successfully removed all $($CurrentMembers.Count) member(s) from: $($TargetGroup.sAMAccountName)" -Class Hint
+                                Show-Line "Все $($CurrentMembers.Count) участников успешно удалены из: $($TargetGroup.sAMAccountName)" -Class Hint
                             }
                         } catch {
                             throw "Failed to clear members: $_"
@@ -500,7 +500,7 @@
                                     Message = "Description already set to this value (no change)"
                                 }
                             } else {
-                                Show-Line "Description already set to this value: $($TargetGroup.sAMAccountName)" -Class Note
+                                Show-Line "Описание уже имеет указанное значение у: $($TargetGroup.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -531,7 +531,7 @@
                                     Message = "Description updated"
                                 }
                             } else {
-                                Show-Line "Successfully set description for: $($TargetGroup.sAMAccountName)" -Class Hint
+                                Show-Line "Описание успешно задано для: $($TargetGroup.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -555,7 +555,7 @@
                                     Message = "Description already empty (no change)"
                                 }
                             } else {
-                                Show-Line "Description already empty: $($TargetGroup.sAMAccountName)" -Class Note
+                                Show-Line "Описание уже пустое у: $($TargetGroup.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -584,7 +584,7 @@
                                     Message = "Description cleared"
                                 }
                             } else {
-                                Show-Line "Successfully cleared description for: $($TargetGroup.sAMAccountName)" -Class Hint
+                                Show-Line "Описание успешно очищено у: $($TargetGroup.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -624,7 +624,7 @@
                                     Message = "Group is already a Security group (no change)"
                                 }
                             } else {
-                                Show-Line "Group is already a Security group: $($TargetGroup.sAMAccountName)" -Class Note
+                                Show-Line "Группа уже имеет тип Security: $($TargetGroup.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -659,8 +659,8 @@
                                     Message = "Converted to Security group - can now be used for permissions"
                                 }
                             } else {
-                                Show-Line "Successfully converted to Security group: $($TargetGroup.sAMAccountName)" -Class Hint
-                                Show-Line "Group can now be used for permission assignments!" -Class Finding
+                                Show-Line "Группа успешно преобразована в тип Security: $($TargetGroup.sAMAccountName)" -Class Hint
+                                Show-Line "Теперь группу можно использовать при назначении разрешений!" -Class Finding
                             }
                         }
                     } catch {
@@ -691,7 +691,7 @@
                                     Message = "Group is already a Distribution group (no change)"
                                 }
                             } else {
-                                Show-Line "Group is already a Distribution group: $($TargetGroup.sAMAccountName)" -Class Note
+                                Show-Line "Группа уже имеет тип Distribution: $($TargetGroup.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -726,8 +726,8 @@
                                     Message = "Converted to Distribution group - can no longer be used for permissions"
                                 }
                             } else {
-                                Show-Line "Successfully converted to Distribution group: $($TargetGroup.sAMAccountName)" -Class Hint
-                                Show-Line "Group can no longer be used for permissions (effectively disarmed)!" -Class Finding
+                                Show-Line "Группа успешно преобразована в тип Distribution: $($TargetGroup.sAMAccountName)" -Class Hint
+                                Show-Line "Группу больше нельзя использовать для назначения разрешений (права через членство прекращают действовать)!" -Class Finding
                             }
                         }
                     } catch {
@@ -762,7 +762,7 @@
                                 Message = "Owner successfully changed"
                             }
                         } else {
-                            Show-Line "Successfully changed owner of $($TargetGroup.sAMAccountName) to: $Owner" -Class Hint
+                            Show-Line "Владелец объекта $($TargetGroup.sAMAccountName) успешно изменён на: $Owner" -Class Hint
                         }
                     } catch {
                         throw "Failed to set owner: $_"
@@ -804,7 +804,7 @@
                                 Message = "Rights successfully granted"
                             }
                         } else {
-                            Show-Line "Successfully granted $GrantRights to $Principal on: $($TargetGroup.sAMAccountName)" -Class Hint
+                            Show-Line "Успешно предоставлены права $GrantRights субъекту $Principal на объект: $($TargetGroup.sAMAccountName)" -Class Hint
                         }
                     } catch {
                         throw "Failed to grant rights: $_"

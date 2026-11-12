@@ -380,18 +380,18 @@
                 return $Result
             } else {
                 # Console output (default behavior)
-                Show-Line "Successfully created GPO AD object: $DisplayName" -Class Hint
+                Show-Line "Успешно создан объект GPO в AD: $DisplayName" -Class Hint
                 Show-KeyValue "Distinguished Name:" $GPODN
                 Show-KeyValue "GUID:" $GPOGUIDWithBraces
                 Show-KeyValue "SYSVOL Path:" $gPCFileSysPath
 
                 if ($SYSVOLCreated -and $SYSVOLResult) {
-                    Show-Line "SYSVOL folder structure created successfully" -Class Hint
+                    Show-Line "Структура папок SYSVOL успешно создана" -Class Hint
                     Show-KeyValue "Machine folder:" $SYSVOLResult.MachinePath
                     Show-KeyValue "User folder:" $SYSVOLResult.UserPath
                     Show-KeyValue "GPT.INI:" $SYSVOLResult.GptIniPath
                 } elseif ($NoSYSVOL) {
-                    Show-Line "SYSVOL creation skipped (-NoSYSVOL)" -Class Note
+                    Show-Line "Создание структуры SYSVOL пропущено (-NoSYSVOL)" -Class Note
                 }
             }
         }

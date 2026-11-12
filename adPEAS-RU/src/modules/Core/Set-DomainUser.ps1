@@ -548,7 +548,7 @@
                             Message = "Password successfully reset"
                         }
                     } else {
-                        Show-Line "Successfully reset password for user: $($TargetUser.sAMAccountName)" -Class Hint
+                        Show-Line "Пароль пользователя успешно сброшен: $($TargetUser.sAMAccountName)" -Class Hint
                     }
                 }
 
@@ -626,7 +626,7 @@
                             Message = "Password successfully changed"
                         }
                     } else {
-                        Show-Line "Successfully changed password for user: $($TargetUser.sAMAccountName)" -Class Hint
+                        Show-Line "Пароль пользователя успешно изменён: $($TargetUser.sAMAccountName)" -Class Hint
                     }
                 }
 
@@ -647,7 +647,7 @@
                                     Message = "Owner successfully changed"
                                 }
                             } else {
-                                Show-Line "Successfully changed owner of $($TargetUser.sAMAccountName) to: $Owner" -Class Hint
+                                Show-Line "Владелец объекта $($TargetUser.sAMAccountName) успешно изменён на: $Owner" -Class Hint
                             }
                         } else {
                             throw "Set-DomainObject returned false"
@@ -682,7 +682,7 @@
                                     Message = "Rights successfully granted"
                                 }
                             } else {
-                                Show-Line "Successfully granted $GrantRights to $Principal on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Успешно предоставлены права $GrantRights субъекту $Principal на объект: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         } else {
                             throw "Set-DomainObject returned false"
@@ -762,7 +762,7 @@
                                     Message = "SPN already present (no change)"
                                 }
                             } else {
-                                Show-Line "SPN '$SetSPN' already present on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "SPN '$SetSPN' уже присутствует у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -798,8 +798,8 @@
                                     Message = "SPN added - user is now Kerberoastable"
                                 }
                             } else {
-                                Show-Line "Successfully added SPN '$SetSPN' to: $($TargetUser.sAMAccountName)" -Class Hint
-                                Show-Line "User is now Kerberoastable!" -Class Finding
+                                Show-Line "SPN '$SetSPN' успешно добавлен для: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Теперь пользовательская учётная запись уязвима к Kerberoasting!" -Class Finding
                             }
                         }
                     } catch {
@@ -835,7 +835,7 @@
                                     Message = "No SPNs present (no change)"
                                 }
                             } else {
-                                Show-Line "No SPNs present on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "У учётной записи отсутствуют SPN: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         }
                         elseif ($Force) {
@@ -864,7 +864,7 @@
                                     Message = "All $($CurrentSPNs.Count) SPN(s) removed"
                                 }
                             } else {
-                                Show-Line "Successfully removed all $($CurrentSPNs.Count) SPN(s) from: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Успешно удалены все $($CurrentSPNs.Count) SPN у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                         elseif ($CurrentSPNs -contains $ClearSPN) {
@@ -908,7 +908,7 @@
                                     Message = "SPN removed"
                                 }
                             } else {
-                                Show-Line "Successfully removed SPN '$ClearSPN' from: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "SPN '$ClearSPN' успешно удалён у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                         else {
@@ -921,9 +921,9 @@
                                     Message = "SPN '$ClearSPN' not found on user. Use -Force to remove all SPNs."
                                 }
                             } else {
-                                Show-Line "SPN '$ClearSPN' not found on: $($TargetUser.sAMAccountName)" -Class Note
-                                Show-Line "Current SPNs: $($CurrentSPNs -join ', ')" -Class Note
-                                Show-Line "Use -Force to remove all SPNs" -Class Note
+                                Show-Line "SPN '$ClearSPN' не найден у: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Текущие SPN: $($CurrentSPNs -join ', ')" -Class Note
+                                Show-Line "Для удаления всех SPN используйте -Force" -Class Note
                             }
                         }
                     } catch {
@@ -956,7 +956,7 @@
                                     Message = "DONT_REQ_PREAUTH already set (no change)"
                                 }
                             } else {
-                                Show-Line "DONT_REQ_PREAUTH already set on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг DONT_REQ_PREAUTH уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -989,8 +989,8 @@
                                     Message = "DONT_REQ_PREAUTH flag set - user is now AS-REP roastable!"
                                 }
                             } else {
-                                Show-Line "Successfully set DONT_REQ_PREAUTH on: $($TargetUser.sAMAccountName)" -Class Hint
-                                Show-Line "User is now ASREPRoastable!" -Class Finding
+                                Show-Line "Флаг DONT_REQ_PREAUTH успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Теперь пользовательская учётная запись уязвима к AS-REP Roasting!" -Class Finding
                             }
                         }
                     } catch {
@@ -1022,7 +1022,7 @@
                                     Message = "DONT_REQ_PREAUTH already cleared (no change)"
                                 }
                             } else {
-                                Show-Line "DONT_REQ_PREAUTH already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг DONT_REQ_PREAUTH уже снят у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1055,7 +1055,7 @@
                                     Message = "DONT_REQ_PREAUTH flag cleared - pre-authentication is required again"
                                 }
                             } else {
-                                Show-Line "Successfully cleared DONT_REQ_PREAUTH on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг DONT_REQ_PREAUTH успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1088,7 +1088,7 @@
                                     Message = "Account already enabled (no change)"
                                 }
                             } else {
-                                Show-Line "Account already enabled: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Учётная запись уже включена: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1121,7 +1121,7 @@
                                     Message = "Account enabled"
                                 }
                             } else {
-                                Show-Line "Successfully enabled account: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Учётная запись успешно включена: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1153,7 +1153,7 @@
                                     Message = "Account already disabled (no change)"
                                 }
                             } else {
-                                Show-Line "Account already disabled: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Учётная запись уже отключена: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1186,7 +1186,7 @@
                                     Message = "Account disabled"
                                 }
                             } else {
-                                Show-Line "Successfully disabled account: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Учётная запись успешно отключена: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1212,7 +1212,7 @@
                                     Message = "Account not locked (no change)"
                                 }
                             } else {
-                                Show-Line "Account not locked: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Учётная запись не заблокирована: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1244,7 +1244,7 @@
                                     Message = "Account unlocked"
                                 }
                             } else {
-                                Show-Line "Successfully unlocked account: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Учётная запись успешно разблокирована: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1270,7 +1270,7 @@
                                     Message = "PASSWD_NOTREQD already set (no change)"
                                 }
                             } else {
-                                Show-Line "PASSWD_NOTREQD already set on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг PASSWD_NOTREQD уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $NewUAC = $CurrentUAC -bor $PASSWD_NOTREQD
@@ -1297,7 +1297,7 @@
                                     Message = "PASSWD_NOTREQD flag set"
                                 }
                             } else {
-                                Show-Line "Successfully set PASSWD_NOTREQD on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг PASSWD_NOTREQD успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1323,7 +1323,7 @@
                                     Message = "PASSWD_NOTREQD already cleared (no change)"
                                 }
                             } else {
-                                Show-Line "PASSWD_NOTREQD already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг PASSWD_NOTREQD уже снят у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $NewUAC = $CurrentUAC -band (-bnot $PASSWD_NOTREQD)
@@ -1350,7 +1350,7 @@
                                     Message = "PASSWD_NOTREQD flag cleared - password is required again"
                                 }
                             } else {
-                                Show-Line "Successfully cleared PASSWD_NOTREQD on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг PASSWD_NOTREQD успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1376,7 +1376,7 @@
                                     Message = "ENCRYPTED_TEXT_PWD_ALLOWED already set (no change)"
                                 }
                             } else {
-                                Show-Line "ENCRYPTED_TEXT_PWD_ALLOWED already set on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг ENCRYPTED_TEXT_PWD_ALLOWED уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $NewUAC = $CurrentUAC -bor $ENCRYPTED_TEXT_PWD_ALLOWED
@@ -1403,7 +1403,7 @@
                                     Message = "ENCRYPTED_TEXT_PWD_ALLOWED flag set"
                                 }
                             } else {
-                                Show-Line "Successfully set ENCRYPTED_TEXT_PWD_ALLOWED on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг ENCRYPTED_TEXT_PWD_ALLOWED успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1429,7 +1429,7 @@
                                     Message = "ENCRYPTED_TEXT_PWD_ALLOWED already cleared (no change)"
                                 }
                             } else {
-                                Show-Line "ENCRYPTED_TEXT_PWD_ALLOWED already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг ENCRYPTED_TEXT_PWD_ALLOWED уже снят у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $NewUAC = $CurrentUAC -band (-bnot $ENCRYPTED_TEXT_PWD_ALLOWED)
@@ -1456,7 +1456,7 @@
                                     Message = "ENCRYPTED_TEXT_PWD_ALLOWED flag cleared - reversible encryption disabled"
                                 }
                             } else {
-                                Show-Line "Successfully cleared ENCRYPTED_TEXT_PWD_ALLOWED on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг ENCRYPTED_TEXT_PWD_ALLOWED успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1482,7 +1482,7 @@
                                     Message = "DONT_EXPIRE_PASSWORD already set (no change)"
                                 }
                             } else {
-                                Show-Line "DONT_EXPIRE_PASSWORD already set on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг DONT_EXPIRE_PASSWORD уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $NewUAC = $CurrentUAC -bor $DONT_EXPIRE_PASSWORD
@@ -1509,7 +1509,7 @@
                                     Message = "DONT_EXPIRE_PASSWORD flag set"
                                 }
                             } else {
-                                Show-Line "Successfully set DONT_EXPIRE_PASSWORD on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг DONT_EXPIRE_PASSWORD успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1535,7 +1535,7 @@
                                     Message = "DONT_EXPIRE_PASSWORD already cleared (no change)"
                                 }
                             } else {
-                                Show-Line "DONT_EXPIRE_PASSWORD already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг DONT_EXPIRE_PASSWORD уже снят у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $NewUAC = $CurrentUAC -band (-bnot $DONT_EXPIRE_PASSWORD)
@@ -1562,7 +1562,7 @@
                                     Message = "DONT_EXPIRE_PASSWORD flag cleared - password expiry follows domain policy"
                                 }
                             } else {
-                                Show-Line "Successfully cleared DONT_EXPIRE_PASSWORD on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг DONT_EXPIRE_PASSWORD успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1588,7 +1588,7 @@
                                     Message = "SMARTCARD_REQUIRED already set (no change)"
                                 }
                             } else {
-                                Show-Line "SMARTCARD_REQUIRED already set on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг SMARTCARD_REQUIRED уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $NewUAC = $CurrentUAC -bor $SMARTCARD_REQUIRED
@@ -1615,7 +1615,7 @@
                                     Message = "SMARTCARD_REQUIRED flag set"
                                 }
                             } else {
-                                Show-Line "Successfully set SMARTCARD_REQUIRED on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг SMARTCARD_REQUIRED успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1641,7 +1641,7 @@
                                     Message = "SMARTCARD_REQUIRED already cleared (no change)"
                                 }
                             } else {
-                                Show-Line "SMARTCARD_REQUIRED already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг SMARTCARD_REQUIRED уже снят у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $NewUAC = $CurrentUAC -band (-bnot $SMARTCARD_REQUIRED)
@@ -1668,7 +1668,7 @@
                                     Message = "SMARTCARD_REQUIRED flag cleared - smartcard no longer required"
                                 }
                             } else {
-                                Show-Line "Successfully cleared SMARTCARD_REQUIRED on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг SMARTCARD_REQUIRED успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1694,7 +1694,7 @@
                                     Message = "NOT_DELEGATED already set (no change)"
                                 }
                             } else {
-                                Show-Line "NOT_DELEGATED already set on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг NOT_DELEGATED уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $NewUAC = $CurrentUAC -bor $NOT_DELEGATED
@@ -1721,7 +1721,7 @@
                                     Message = "NOT_DELEGATED flag set - account marked as sensitive"
                                 }
                             } else {
-                                Show-Line "Successfully set NOT_DELEGATED on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг NOT_DELEGATED успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1747,7 +1747,7 @@
                                     Message = "NOT_DELEGATED already cleared (no change)"
                                 }
                             } else {
-                                Show-Line "NOT_DELEGATED already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Флаг NOT_DELEGATED уже снят у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $NewUAC = $CurrentUAC -band (-bnot $NOT_DELEGATED)
@@ -1774,7 +1774,7 @@
                                     Message = "NOT_DELEGATED flag cleared - account can be delegated again"
                                 }
                             } else {
-                                Show-Line "Successfully cleared NOT_DELEGATED on: $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг NOT_DELEGATED успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1806,7 +1806,7 @@
                                     Message = "pwdLastSet already 0 (no change)"
                                 }
                             } else {
-                                Show-Line "Password already expired (pwdLastSet 0) on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Срок действия пароля уже истёк (pwdLastSet = 0) у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             $ModifyRequest = New-Object System.DirectoryServices.Protocols.ModifyRequest
@@ -1873,7 +1873,7 @@
                                     Message = "Password not expired (no change)"
                                 }
                             } else {
-                                Show-Line "Password not expired on: $($TargetUser.sAMAccountName)" -Class Note
+                                Show-Line "Срок действия пароля не истёк у: $($TargetUser.sAMAccountName)" -Class Note
                             }
                         } else {
                             # -1 takes effect only on a pwdLastSet of 0. Measured in the lab on
@@ -1908,7 +1908,7 @@
                                     Message = "pwdLastSet set to the current time - the password age starts anew"
                                 }
                             } else {
-                                Show-Line "Password no longer expired (pwdLastSet set to the current time): $($TargetUser.sAMAccountName)" -Class Hint
+                                Show-Line "Признак истечения пароля снят (pwdLastSet установлен в текущее время) у: $($TargetUser.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {

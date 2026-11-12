@@ -24813,7 +24813,7 @@ function Show-WebEndpointUnreachable {
 	    [string]$CheckLabel = 'Web endpoint check'
 	)
 	if ($ProbeResult -and $ProbeResult.Success) { return }
-	Show-Line "$CheckLabel could not reach $Hostname (HTTP/HTTPS unreachable)" -Class Note
+	Show-Line "$CheckLabel не удалось подключиться к $Hostname (HTTP/HTTPS недоступен)" -Class Note
 }
 function Show-Object {
 	[CmdletBinding()]
@@ -24931,13 +24931,13 @@ function Show-NoSessionError {
 	    [string]$Context
 	)
 	if ($Context) {
-	    Show-SubHeader "No active session for $Context..." -NoCollect
+	    Show-SubHeader "Нет активного сеанса для $Context..." -NoCollect
 	} else {
-	    Show-SubHeader "No active session..." -NoCollect
+	    Show-SubHeader "Активный сеанс отсутствует..." -NoCollect
 	}
 	Show-KeyValue "Session:" "Not connected" -Class Finding -NoCollect
 	Show-EmptyLine
-	Show-Line "Help:" -Class Hint -NoCollect
+	Show-Line "Справка:" -Class Hint -NoCollect
 	Show-Line "Connect-adPEAS -Domain 'contoso.com' -Credential (Get-Credential)" -NoCollect
 	Show-Line "Get-Help Connect-adPEAS -Examples" -NoCollect
 	Show-EmptyLine
@@ -25030,29 +25030,29 @@ function Get-adPEASHelp {
 	$showChecks = $showAll -or ($Section -contains 'Checks')
 	$showCommands = $showAll -or ($Section -contains 'Commands')
 	if ($showQuickStart) {
-	    Show-SubHeader "Quick Start"
-	    Show-Line "Simple scan (Windows Auth):" -Class Hint
+	    Show-SubHeader "Быстрый старт"
+	    Show-Line "Простое сканирование (аутентификация Windows):" -Class Hint
 	    Show-Line "Invoke-adPEAS -Domain 'contoso.com'"
 	    Show-EmptyLine
-	    Show-Line "Session-based with credentials:" -Class Hint
+	    Show-Line "Сеанс с явными учётными данными:" -Class Hint
 	    Show-Line "Connect-adPEAS -Domain 'contoso.com' -Credential (Get-Credential)"
 	    Show-Line "Invoke-adPEAS"
 	    Show-EmptyLine
-	    Show-Line "On domain-joined machines, -Password/-NTHash/-AES*Key/-Certificate replace your Kerberos tickets." -Class Note
-	    Show-Line "Use Connect-adPEAS with -ForceNTLM or -ForceSimpleBind to avoid this."
+	    Show-Line "На компьютерах в домене параметры -Password/-NTHash/-AES*Key/-Certificate заменяют билеты Kerberos текущего сеанса." -Class Note
+	    Show-Line "Для предотвращения этого используйте Connect-adPEAS с -ForceNTLM или -ForceSimpleBind."
 	    Show-EmptyLine
-	    Show-Line "More help:" -Class Hint
+	    Show-Line "Дополнительная справка:" -Class Hint
 	    Show-Line "Get-adPEASHelp"
 	    Show-Line "Get-Help Connect-adPEAS -Examples"
 	    Show-Line "Get-Help <Command> -Detailed"
 	    Show-EmptyLine
 	}
 	if ($showChecks) {
-	    Show-SubHeader "Security Check Modules"
-	    Show-Line "Run all modules:" -Class Hint
+	    Show-SubHeader "Модули проверок безопасности"
+	    Show-Line "Запустить все модули:" -Class Hint
 	    Show-Line "Invoke-adPEAS (without -Module)"
 	    Show-EmptyLine
-	    Show-Line "Run specific modules only:" -Class Hint
+	    Show-Line "Запустить только выбранные модули:" -Class Hint
 	    Show-Line "Invoke-adPEAS -Module 'Domain','Creds','ADCS'"
 	    Show-EmptyLine
 	    $moduleOrder = [ordered]@{
@@ -25095,13 +25095,13 @@ function Get-adPEASHelp {
 	    }
 	}
 	if ($showCommands) {
-	    Show-SubHeader "Additional Core and Helper Modules"
-	    Show-Line "Connection:" -Class Hint
+	    Show-SubHeader "Дополнительные основные и вспомогательные модули"
+	    Show-Line "Подключение:" -Class Hint
 	    Show-KeyValue "Connect-adPEAS" "Establish LDAP session"
 	    Show-KeyValue "Disconnect-adPEAS" "Close LDAP session"
 	    Show-KeyValue "Get-adPEASSession" "Show session status"
 	    Show-EmptyLine
-	    Show-Line "AD Queries:" -Class Hint
+	    Show-Line "Запросы AD:" -Class Hint
 	    Show-KeyValue "Get-DomainUser" "Query AD users"
 	    Show-KeyValue "Get-DomainComputer" "Query AD computers"
 	    Show-KeyValue "Get-DomainGroup" "Query AD groups"
@@ -25111,7 +25111,7 @@ function Get-adPEASHelp {
 	    Show-KeyValue "Get-CertificateTemplate" "Query certificate templates"
 	    Show-KeyValue "Get-CertificateAuthority" "Query certificate authorities"
 	    Show-EmptyLine
-	    Show-Line "AD Modifications:" -Class Hint
+	    Show-Line "Изменения AD:" -Class Hint
 	    Show-KeyValue "Set-DomainUser" "Modify user attributes"
 	    Show-KeyValue "Set-DomainComputer" "Modify computer attributes"
 	    Show-KeyValue "Set-DomainGroup" "Modify group attributes"
@@ -25123,18 +25123,18 @@ function Get-adPEASHelp {
 	    Show-KeyValue "New-DomainGroup" "Create AD group"
 	    Show-KeyValue "New-DomainGPO" "Create Group Policy Object"
 	    Show-EmptyLine
-	    Show-Line "Kerberos Authentication:" -Class Hint
+	    Show-Line "Аутентификация Kerberos:" -Class Hint
 	    Show-KeyValue "Invoke-KerberosAuth" "Request TGT (Password/Hash/Key/Cert)"
 	    Show-KeyValue "Request-ServiceTicket" "Request TGS for a service"
 	    Show-KeyValue "Import-KerberosTicket" "Pass-the-Ticket (inject into session)"
 	    Show-EmptyLine
-	    Show-Line "Credential Attacks:" -Class Hint
+	    Show-Line "Атаки на учётные данные:" -Class Hint
 	    Show-KeyValue "Invoke-Kerberoast" "Kerberoasting (request service tickets)"
 	    Show-KeyValue "Invoke-ASREPRoast" "AS-REP Roasting (no preauth)"
 	    Show-KeyValue "Invoke-DCSync" "DCSync (directory replication)"
 	    Show-KeyValue "Invoke-PasswordSpray" "Password spraying"
 	    Show-EmptyLine
-	    Show-Line "Offensive Actions:" -Class Hint
+	    Show-Line "Активные операции:" -Class Hint
 	    Show-KeyValue "Invoke-TicketForge" "Golden/Silver/Diamond Tickets"
 	    Show-KeyValue "Invoke-S4U" "S4U delegation attacks"
 	    Show-KeyValue "Invoke-RBCDOperation" "Resource-Based Constrained Delegation"
@@ -26805,7 +26805,7 @@ function Connect-adPEAS {
 	                        $Script:LDAPContext['HostsEntries'] = $hostsPatched
 	                        $Script:LDAPContext['EarlyHostsPatched'] = $true
 	                        if ($hostsPatched.Count -gt 0) {
-	                            Show-Line "Patched hosts file with $($hostsPatched.Count) entries (cleanup on Disconnect-adPEAS)" -Class Info
+	                            Show-Line "Добавлено записей в hosts: $($hostsPatched.Count) (очистка при Disconnect-adPEAS)" -Class Info
 	                        }
 	                    }
 	                    else {
@@ -26965,14 +26965,14 @@ function Connect-adPEAS {
 	                    return $null
 	                }
 	                elseif (-not $ForceSimpleBind -and $UserRealm -and $UserRealm -notmatch '\.') {
-	                    Show-Line "Cross-domain authentication (NetBIOS): using NTLM/SimpleBind" -Class Hint
+	                    Show-Line "Междоменная аутентификация (NetBIOS): используется NTLM/SimpleBind" -Class Hint
 	                }
 	                elseif (-not $ForceSimpleBind) {
 	                    $UserRealmDC = $null
 	                    if ($UserRealm -and $UserRealm -match '\.') {
 	                        $UserRealmDC = Resolve-adPEASName -Domain $UserRealm
 	                        if (-not $UserRealmDC -or -not $UserRealmDC.IP) {
-	                            Show-Line "Cross-domain: could not find KDC for '$UserRealm' - using NTLM/SimpleBind" -Class Hint
+	                            Show-Line "Междоменная аутентификация: KDC для '$UserRealm' не найден — используется NTLM/SimpleBind" -Class Hint
 	                            $UserRealmDC = $null
 	                            $UserRealm = $null
 	                        } else {
@@ -27019,12 +27019,12 @@ function Connect-adPEAS {
 	                            return $null
 	                        }
 	                        if ($IsCrossDomain) {
-	                            Show-Line "Cross-domain authentication: falling back to NTLM/SimpleBind" -Class Hint
+	                            Show-Line "Междоменная аутентификация: переход на NTLM/SimpleBind" -Class Hint
 	                        }
 	                        $IsDnsResolutionIssue = $ErrorMessage -match "Kerberos tickets obtained successfully.*LDAP connection failed"
 	                        if ($IsDnsResolutionIssue) {
-	                            Show-Line "Kerberos TGT/TGS acquired successfully, but LDAP requires hostname resolution" -Class Note
-	                            Show-Line "Use -PatchHostsFile for full Kerberos authentication" -Class Note
+	                            Show-Line "Билеты Kerberos TGT/TGS получены, но для LDAP требуется разрешение имени узла" -Class Note
+	                            Show-Line "Для полноценной аутентификации Kerberos используйте -PatchHostsFile" -Class Note
 	                        }
 	                        $IsPTTError = $ErrorMessage -match "non-domain-joined|Remote Credential Guard|Ticket import failed|ticket not used|ticket not usable"
 	                        if ($IsPTTError) {
@@ -27048,7 +27048,7 @@ function Connect-adPEAS {
 	                                       'SimpleBind are not attempted') -Class Note
 	                            return $null
 	                        }
-	                        Show-Line "Kerberos failed - trying NTLM impersonation" -Class Info
+	                        Show-Line "Аутентификация Kerberos не удалась — попытка олицетворения через NTLM" -Class Info
 	                    }
 	                }
 	                else {
@@ -27074,14 +27074,14 @@ function Connect-adPEAS {
 	                                           'is not attempted') -Class Note
 	                                return $null
 	                            }
-	                            Show-Line "NTLM failed - falling back to SimpleBind" -Class Hint
+	                            Show-Line "Аутентификация NTLM не удалась — переход на SimpleBind" -Class Hint
 	                        }
 	                        else {
 	                            $Script:AuthInfo.Method = 'NTLM'
 	                            $Script:AuthInfo.KerberosUsed = $false
 	                            $Script:AuthInfo.NTLMImpersonation = $false
 	                            $Script:LDAPContext['Credential'] = $CredObject
-	                            Show-Line "Connected via NTLM (supports LDAP signing)" -Class Hint
+	                            Show-Line "Подключено через NTLM (поддерживается подпись LDAP)" -Class Hint
 	                        }
 	                    }
 	                    if (-not $Connection) {
@@ -27114,7 +27114,7 @@ function Connect-adPEAS {
 	                            }
 	                        }
 	                        if (-not $Connection -and -not $UseLDAPS -and $Script:LastLDAPErrorCode -eq 8) {
-	                            Show-Line "LDAP signing required - the simple bind was refused on port 389, auto-upgrading to LDAPS" -Class Hint
+	                            Show-Line "Требуется подпись LDAP — простая привязка на порту 389 отклонена, автоматический переход на LDAPS" -Class Hint
 	                            $ConnParams['UseLDAPS'] = $true
 	                            $Connection = Connect-LDAP @ConnParams
 	                        }
@@ -27270,7 +27270,7 @@ function Connect-adPEAS {
 	                        }
 	                    }
 	                    if ($certIdentities.Count -gt 1) {
-	                        Show-Line "Certificate contains multiple identities" -Class Note
+	                        Show-Line "Сертификат содержит несколько идентичностей" -Class Note
 	                        $idx = 1
 	                        foreach ($id in $certIdentities) {
 	                            Show-KeyValue "    [$idx] $($id.Type):" $id.Value
@@ -27281,7 +27281,7 @@ function Connect-adPEAS {
 	                } elseif ($certIdentities.Count -eq 1) {
 	                    $CertUserName = $certIdentities[0].CName
 	                } else {
-	                    Show-Line "Certificate contains multiple identities" -Class Note
+	                    Show-Line "Сертификат содержит несколько идентичностей" -Class Note
 	                    $idx = 1
 	                    foreach ($id in $certIdentities) {
 	                        Show-KeyValue "    [$idx] $($id.Type):" $id.Value
@@ -27289,7 +27289,7 @@ function Connect-adPEAS {
 	                    }
 	                    $CertUserName = $certIdentities[0].CName
 	                    Show-KeyValue "Using identity [1]:" $CertUserName -Class Note
-	                    Show-Line "To select a different identity, use: -Username <name>" -Class Note
+	                    Show-Line "Чтобы выбрать другую идентичность, используйте: -Username <name>" -Class Note
 	                }
 	                if ($Server) {
 	                    $ResolvedIP = Resolve-adPEASName -Name $Server
@@ -27674,7 +27674,7 @@ function Connect-adPEAS {
 	            }
 	            $Script:LDAPContext['HostsEntries'] = $hostsPatched
 	            if ($hostsPatched.Count -gt 0) {
-	                Show-Line "Patched hosts file with $($hostsPatched.Count) entries (cleanup on Disconnect-adPEAS)" -Class Info
+	                Show-Line "Добавлено записей в hosts: $($hostsPatched.Count) (очистка при Disconnect-adPEAS)" -Class Info
 	            }
 	        }
 	        elseif ($Script:LDAPContext['EarlyHostsPatched'] -and $Connection.Server) {
@@ -27760,10 +27760,10 @@ function Connect-adPEAS {
 	        $DomainFL = $FLMapping[[int]$Connection.DomainFunctionality]
 	        if ($BuildCompletionCache) {
 	            Show-EmptyLine
-	            Show-Line "Building tab-completion cache..." -Class Info
+	            Show-Line "Создание кэша автодополнения..." -Class Info
 	            Build-CompletionCache
 	            $stats = Get-CompletionCacheStats
-	            Show-Line "Cached: $($stats.Users) users, $($stats.Computers) computers, $($stats.Groups) groups, $($stats.GPOs) GPOs" -Class Hint
+	            Show-Line "Кэшировано пользователей: $($stats.Users), компьютеров: $($stats.Computers), групп: $($stats.Groups), GPO: $($stats.GPOs)" -Class Hint
 	        }
 	        if (-not $Quiet) {
 	            Get-adPEASSession
@@ -27824,9 +27824,9 @@ function Disconnect-adPEAS {
 	            if ($Script:LDAPContext) { Clear-SessionState }
 	            return
 	        }
-	        Show-SubHeader "Disconnecting session..."
+	        Show-SubHeader "Отключение сеанса..."
 	        if ($Script:LDAPContext -and $Script:LDAPContext['Domain']) {
-	            Show-Line "Current Session:" -Class Hint
+	            Show-Line "Текущий сеанс:" -Class Hint
 	            Show-KeyValue "Domain:" $Script:LDAPContext.Domain
 	            if ($Script:LDAPContext.AuthenticatedUser) {
 	                Show-KeyValue "Authenticated as:" $Script:LDAPContext.AuthenticatedUser
@@ -27879,12 +27879,12 @@ function Disconnect-adPEAS {
 	        }
 	        Clear-SessionState
 	        Show-EmptyLine
-	        Show-Line "Cleanup:" -Class Hint
+	        Show-Line "Очистка:" -Class Hint
 	        Show-KeyValue "Connection:" "Closed" -Class Note
 	        Show-KeyValue "Variables:" "Cleared" -Class Note
 	        Show-EmptyLine
 	        if ($cleanupErrors.Count -gt 0 -and $Force) {
-	            Show-Line "Cleanup errors (forced disconnect):" -Class Hint
+	            Show-Line "Ошибки очистки (принудительное отключение):" -Class Hint
 	            foreach ($err in $cleanupErrors) {
 	                Show-Line "- $err"
 	            }
@@ -27893,7 +27893,7 @@ function Disconnect-adPEAS {
 	    catch {
 	        Show-DisconnectError -ErrorMessage $_.Exception.Message
 	        if ($Force) {
-	            Show-Line "Force mode enabled - clearing variables anyway..." -Class Hint
+	            Show-Line "Принудительный режим включён — переменные будут очищены несмотря на ошибки..." -Class Hint
 	            if ($Script:NTLMTokenHandle -and $Script:NTLMTokenHandle -ne [IntPtr]::Zero) {
 	                try { Invoke-RevertToSelf -TokenHandle $Script:NTLMTokenHandle } catch {}
 	                $Script:NTLMTokenHandle = [IntPtr]::Zero
@@ -27901,7 +27901,7 @@ function Disconnect-adPEAS {
 	            try { if ($Script:LdapConnection) { $Script:LdapConnection.Dispose() } } catch {}
 	            try { if ($Script:GCConnection) { $Script:GCConnection.Dispose() } } catch {}
 	            Clear-SessionState
-	            Show-Line "Session variables and caches force-cleared" -Class Note
+	            Show-Line "Переменные сеанса и кэши принудительно очищены" -Class Note
 	        }
 	    }
 	}
@@ -30642,7 +30642,7 @@ function Set-DomainObject {
 	                    Message = "No modifications specified"
 	                }
 	            }
-	            Show-Line "No modifications specified for object: $ObjectDN" -Class Note
+	            Show-Line "Изменения для объекта не заданы: $ObjectDN" -Class Note
 	            return $true
 	        }
 	    } catch {
@@ -32449,14 +32449,14 @@ function Set-CertificateTemplate {
 	                        }
 	                    }
 	                    if ($RestoreAttributes.Count -eq 0) {
-	                        Show-Line "Template '$TemplateName' already matches backup - no changes needed" -Class Note
+	                        Show-Line "Шаблон '$TemplateName' уже соответствует резервной копии — изменения не требуются" -Class Note
 	                        continue
 	                    }
 	                    if ($PSCmdlet.ShouldProcess($TemplateName, "Restore template from backup")) {
 	                        try {
 	                            $null = Set-DomainObject -Identity $TemplateDN -Set $RestoreAttributes -SearchBase $TemplatesBase -ErrorAction Stop
 	                            $RestoredCount++
-	                            Show-Line "Successfully restored template: $TemplateName ($($RestoreAttributes.Count) attributes)" -Class Hint
+	                            Show-Line "Шаблон успешно восстановлен: $TemplateName ($($RestoreAttributes.Count) атрибутов)" -Class Hint
 	                        }
 	                        catch {
 	                            Write-Warning "[!] Failed to restore template '$TemplateName': $($_.Exception.Message)"
@@ -32489,7 +32489,7 @@ function Set-CertificateTemplate {
 	            }
 	            try {
 	                $ExportData | ConvertTo-Json -Depth 10 | Set-Content -Path $Export -Encoding UTF8 -ErrorAction Stop
-	                Show-Line "Successfully exported template '$TemplateName' to: $Export" -Class Hint
+	                Show-Line "Шаблон '$TemplateName' успешно экспортирован в: $Export" -Class Hint
 	            }
 	            catch {
 	                throw "Failed to write export file: $_"
@@ -32870,8 +32870,8 @@ function Set-CertificateTemplate {
 	            $NewRevision = $CurrentRevision + 1
 	            $null = Set-DomainObject -Identity $TemplateDN -Set @{'revision' = $NewRevision} -SearchBase $TemplatesBase
 	        }
-	        Show-Line "Template modified successfully: $TemplateName" -Class Hint
-	        Show-Line "Modifications applied: $($Modifications -join ', ')"
+	        Show-Line "Шаблон успешно изменён: $TemplateName" -Class Hint
+	        Show-Line "Применённые изменения: $($Modifications -join ', ')"
 	        Get-CertificateTemplate -Identity $Identity -ShowAll
 	    } catch {
 	        $ErrorMessage = $_.Exception.Message
@@ -33078,7 +33078,7 @@ function Set-DomainUser {
 	                        Message = "Password successfully reset"
 	                    }
 	                } else {
-	                    Show-Line "Successfully reset password for user: $($TargetUser.sAMAccountName)" -Class Hint
+	                    Show-Line "Пароль пользователя успешно сброшен: $($TargetUser.sAMAccountName)" -Class Hint
 	                }
 	            }
 	            'ChangePassword' {
@@ -33138,7 +33138,7 @@ function Set-DomainUser {
 	                        Message = "Password successfully changed"
 	                    }
 	                } else {
-	                    Show-Line "Successfully changed password for user: $($TargetUser.sAMAccountName)" -Class Hint
+	                    Show-Line "Пароль пользователя успешно изменён: $($TargetUser.sAMAccountName)" -Class Hint
 	                }
 	            }
 	            'SetOwner' {
@@ -33155,7 +33155,7 @@ function Set-DomainUser {
 	                                Message = "Owner successfully changed"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully changed owner of $($TargetUser.sAMAccountName) to: $Owner" -Class Hint
+	                            Show-Line "Владелец объекта $($TargetUser.sAMAccountName) успешно изменён на: $Owner" -Class Hint
 	                        }
 	                    } else {
 	                        throw "Set-DomainObject returned false"
@@ -33185,7 +33185,7 @@ function Set-DomainUser {
 	                                Message = "Rights successfully granted"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully granted $GrantRights to $Principal on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Успешно предоставлены права $GrantRights субъекту $Principal на объект: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    } else {
 	                        throw "Set-DomainObject returned false"
@@ -33246,7 +33246,7 @@ function Set-DomainUser {
 	                                Message = "SPN already present (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "SPN '$SetSPN' already present on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "SPN '$SetSPN' уже присутствует у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -33275,8 +33275,8 @@ function Set-DomainUser {
 	                                Message = "SPN added - user is now Kerberoastable"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully added SPN '$SetSPN' to: $($TargetUser.sAMAccountName)" -Class Hint
-	                            Show-Line "User is now Kerberoastable!" -Class Finding
+	                            Show-Line "SPN '$SetSPN' успешно добавлен для: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Теперь пользовательская учётная запись уязвима к Kerberoasting!" -Class Finding
 	                        }
 	                    }
 	                } catch {
@@ -33305,7 +33305,7 @@ function Set-DomainUser {
 	                                Message = "No SPNs present (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "No SPNs present on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "У учётной записи отсутствуют SPN: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    elseif ($Force) {
@@ -33329,7 +33329,7 @@ function Set-DomainUser {
 	                                Message = "All $($CurrentSPNs.Count) SPN(s) removed"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully removed all $($CurrentSPNs.Count) SPN(s) from: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Успешно удалены все $($CurrentSPNs.Count) SPN у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                    elseif ($CurrentSPNs -contains $ClearSPN) {
@@ -33364,7 +33364,7 @@ function Set-DomainUser {
 	                                Message = "SPN removed"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully removed SPN '$ClearSPN' from: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "SPN '$ClearSPN' успешно удалён у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                    else {
@@ -33377,9 +33377,9 @@ function Set-DomainUser {
 	                                Message = "SPN '$ClearSPN' not found on user. Use -Force to remove all SPNs."
 	                            }
 	                        } else {
-	                            Show-Line "SPN '$ClearSPN' not found on: $($TargetUser.sAMAccountName)" -Class Note
-	                            Show-Line "Current SPNs: $($CurrentSPNs -join ', ')" -Class Note
-	                            Show-Line "Use -Force to remove all SPNs" -Class Note
+	                            Show-Line "SPN '$ClearSPN' не найден у: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Текущие SPN: $($CurrentSPNs -join ', ')" -Class Note
+	                            Show-Line "Для удаления всех SPN используйте -Force" -Class Note
 	                        }
 	                    }
 	                } catch {
@@ -33400,7 +33400,7 @@ function Set-DomainUser {
 	                                Message = "DONT_REQ_PREAUTH already set (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "DONT_REQ_PREAUTH already set on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг DONT_REQ_PREAUTH уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -33427,8 +33427,8 @@ function Set-DomainUser {
 	                                Message = "DONT_REQ_PREAUTH flag set - user is now AS-REP roastable!"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set DONT_REQ_PREAUTH on: $($TargetUser.sAMAccountName)" -Class Hint
-	                            Show-Line "User is now ASREPRoastable!" -Class Finding
+	                            Show-Line "Флаг DONT_REQ_PREAUTH успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Теперь пользовательская учётная запись уязвима к AS-REP Roasting!" -Class Finding
 	                        }
 	                    }
 	                } catch {
@@ -33449,7 +33449,7 @@ function Set-DomainUser {
 	                                Message = "DONT_REQ_PREAUTH already cleared (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "DONT_REQ_PREAUTH already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг DONT_REQ_PREAUTH уже снят у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -33476,7 +33476,7 @@ function Set-DomainUser {
 	                                Message = "DONT_REQ_PREAUTH flag cleared - pre-authentication is required again"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared DONT_REQ_PREAUTH on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг DONT_REQ_PREAUTH успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33497,7 +33497,7 @@ function Set-DomainUser {
 	                                Message = "Account already enabled (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Account already enabled: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Учётная запись уже включена: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -33524,7 +33524,7 @@ function Set-DomainUser {
 	                                Message = "Account enabled"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully enabled account: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Учётная запись успешно включена: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33545,7 +33545,7 @@ function Set-DomainUser {
 	                                Message = "Account already disabled (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Account already disabled: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Учётная запись уже отключена: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -33572,7 +33572,7 @@ function Set-DomainUser {
 	                                Message = "Account disabled"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully disabled account: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Учётная запись успешно отключена: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33593,7 +33593,7 @@ function Set-DomainUser {
 	                                Message = "Account not locked (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Account not locked: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Учётная запись не заблокирована: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -33618,7 +33618,7 @@ function Set-DomainUser {
 	                                Message = "Account unlocked"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully unlocked account: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Учётная запись успешно разблокирована: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33639,7 +33639,7 @@ function Set-DomainUser {
 	                                Message = "PASSWD_NOTREQD already set (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "PASSWD_NOTREQD already set on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг PASSWD_NOTREQD уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $NewUAC = $CurrentUAC -bor $PASSWD_NOTREQD
@@ -33665,7 +33665,7 @@ function Set-DomainUser {
 	                                Message = "PASSWD_NOTREQD flag set"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set PASSWD_NOTREQD on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг PASSWD_NOTREQD успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33686,7 +33686,7 @@ function Set-DomainUser {
 	                                Message = "PASSWD_NOTREQD already cleared (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "PASSWD_NOTREQD already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг PASSWD_NOTREQD уже снят у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $NewUAC = $CurrentUAC -band (-bnot $PASSWD_NOTREQD)
@@ -33712,7 +33712,7 @@ function Set-DomainUser {
 	                                Message = "PASSWD_NOTREQD flag cleared - password is required again"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared PASSWD_NOTREQD on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг PASSWD_NOTREQD успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33733,7 +33733,7 @@ function Set-DomainUser {
 	                                Message = "ENCRYPTED_TEXT_PWD_ALLOWED already set (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "ENCRYPTED_TEXT_PWD_ALLOWED already set on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг ENCRYPTED_TEXT_PWD_ALLOWED уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $NewUAC = $CurrentUAC -bor $ENCRYPTED_TEXT_PWD_ALLOWED
@@ -33759,7 +33759,7 @@ function Set-DomainUser {
 	                                Message = "ENCRYPTED_TEXT_PWD_ALLOWED flag set"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set ENCRYPTED_TEXT_PWD_ALLOWED on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг ENCRYPTED_TEXT_PWD_ALLOWED успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33780,7 +33780,7 @@ function Set-DomainUser {
 	                                Message = "ENCRYPTED_TEXT_PWD_ALLOWED already cleared (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "ENCRYPTED_TEXT_PWD_ALLOWED already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг ENCRYPTED_TEXT_PWD_ALLOWED уже снят у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $NewUAC = $CurrentUAC -band (-bnot $ENCRYPTED_TEXT_PWD_ALLOWED)
@@ -33806,7 +33806,7 @@ function Set-DomainUser {
 	                                Message = "ENCRYPTED_TEXT_PWD_ALLOWED flag cleared - reversible encryption disabled"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared ENCRYPTED_TEXT_PWD_ALLOWED on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг ENCRYPTED_TEXT_PWD_ALLOWED успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33827,7 +33827,7 @@ function Set-DomainUser {
 	                                Message = "DONT_EXPIRE_PASSWORD already set (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "DONT_EXPIRE_PASSWORD already set on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг DONT_EXPIRE_PASSWORD уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $NewUAC = $CurrentUAC -bor $DONT_EXPIRE_PASSWORD
@@ -33853,7 +33853,7 @@ function Set-DomainUser {
 	                                Message = "DONT_EXPIRE_PASSWORD flag set"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set DONT_EXPIRE_PASSWORD on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг DONT_EXPIRE_PASSWORD успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33874,7 +33874,7 @@ function Set-DomainUser {
 	                                Message = "DONT_EXPIRE_PASSWORD already cleared (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "DONT_EXPIRE_PASSWORD already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг DONT_EXPIRE_PASSWORD уже снят у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $NewUAC = $CurrentUAC -band (-bnot $DONT_EXPIRE_PASSWORD)
@@ -33900,7 +33900,7 @@ function Set-DomainUser {
 	                                Message = "DONT_EXPIRE_PASSWORD flag cleared - password expiry follows domain policy"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared DONT_EXPIRE_PASSWORD on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг DONT_EXPIRE_PASSWORD успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33921,7 +33921,7 @@ function Set-DomainUser {
 	                                Message = "SMARTCARD_REQUIRED already set (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "SMARTCARD_REQUIRED already set on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг SMARTCARD_REQUIRED уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $NewUAC = $CurrentUAC -bor $SMARTCARD_REQUIRED
@@ -33947,7 +33947,7 @@ function Set-DomainUser {
 	                                Message = "SMARTCARD_REQUIRED flag set"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set SMARTCARD_REQUIRED on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг SMARTCARD_REQUIRED успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -33968,7 +33968,7 @@ function Set-DomainUser {
 	                                Message = "SMARTCARD_REQUIRED already cleared (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "SMARTCARD_REQUIRED already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг SMARTCARD_REQUIRED уже снят у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $NewUAC = $CurrentUAC -band (-bnot $SMARTCARD_REQUIRED)
@@ -33994,7 +33994,7 @@ function Set-DomainUser {
 	                                Message = "SMARTCARD_REQUIRED flag cleared - smartcard no longer required"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared SMARTCARD_REQUIRED on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг SMARTCARD_REQUIRED успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -34015,7 +34015,7 @@ function Set-DomainUser {
 	                                Message = "NOT_DELEGATED already set (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "NOT_DELEGATED already set on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг NOT_DELEGATED уже установлен у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $NewUAC = $CurrentUAC -bor $NOT_DELEGATED
@@ -34041,7 +34041,7 @@ function Set-DomainUser {
 	                                Message = "NOT_DELEGATED flag set - account marked as sensitive"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set NOT_DELEGATED on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг NOT_DELEGATED успешно установлен у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -34062,7 +34062,7 @@ function Set-DomainUser {
 	                                Message = "NOT_DELEGATED already cleared (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "NOT_DELEGATED already cleared on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг NOT_DELEGATED уже снят у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $NewUAC = $CurrentUAC -band (-bnot $NOT_DELEGATED)
@@ -34088,7 +34088,7 @@ function Set-DomainUser {
 	                                Message = "NOT_DELEGATED flag cleared - account can be delegated again"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared NOT_DELEGATED on: $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг NOT_DELEGATED успешно снят у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -34108,7 +34108,7 @@ function Set-DomainUser {
 	                                Message = "pwdLastSet already 0 (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Password already expired (pwdLastSet 0) on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Срок действия пароля уже истёк (pwdLastSet = 0) у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $ModifyRequest = New-Object System.DirectoryServices.Protocols.ModifyRequest
@@ -34166,7 +34166,7 @@ function Set-DomainUser {
 	                                Message = "Password not expired (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Password not expired on: $($TargetUser.sAMAccountName)" -Class Note
+	                            Show-Line "Срок действия пароля не истёк у: $($TargetUser.sAMAccountName)" -Class Note
 	                        }
 	                    } else {
 	                        $Values = @('-1')
@@ -34196,7 +34196,7 @@ function Set-DomainUser {
 	                                Message = "pwdLastSet set to the current time - the password age starts anew"
 	                            }
 	                        } else {
-	                            Show-Line "Password no longer expired (pwdLastSet set to the current time): $($TargetUser.sAMAccountName)" -Class Hint
+	                            Show-Line "Признак истечения пароля снят (pwdLastSet установлен в текущее время) у: $($TargetUser.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -34357,7 +34357,7 @@ function Set-DomainGroup {
 	                    }
 	                } elseif ($SkippedMembers.Count -gt 0 -and $FailedMembers.Count -eq 0) {
 	                    if (-not $PassThru) {
-	                        Show-Line "All $($SkippedMembers.Count) member(s) already exist in: $($TargetGroup.sAMAccountName)" -Class Note
+	                        Show-Line "Все $($SkippedMembers.Count) участников уже состоят в: $($TargetGroup.sAMAccountName)" -Class Note
 	                    }
 	                }
 	                if ($PassThru) {
@@ -34423,7 +34423,7 @@ function Set-DomainGroup {
 	                    }
 	                } elseif ($SkippedMembers.Count -gt 0 -and $FailedMembers.Count -eq 0) {
 	                    if (-not $PassThru) {
-	                        Show-Line "None of the $($SkippedMembers.Count) specified member(s) were in: $($TargetGroup.sAMAccountName)" -Class Note
+	                        Show-Line "Ни один из $($SkippedMembers.Count) указанных участников не состоял в: $($TargetGroup.sAMAccountName)" -Class Note
 	                    }
 	                }
 	                if ($PassThru) {
@@ -34459,7 +34459,7 @@ function Set-DomainGroup {
 	                            Message = "Group has no members (no change)"
 	                        }
 	                    } else {
-	                        Show-Line "Group has no members: $($TargetGroup.sAMAccountName)" -Class Note
+	                        Show-Line "Группа не содержит участников: $($TargetGroup.sAMAccountName)" -Class Note
 	                    }
 	                }
 	                elseif (-not $Force) {
@@ -34473,8 +34473,8 @@ function Set-DomainGroup {
 	                            Message = "Group has $($CurrentMembers.Count) members. Use -Force to confirm removal of all members."
 	                        }
 	                    } else {
-	                        Show-Line "Group '$($TargetGroup.sAMAccountName)' has $($CurrentMembers.Count) members" -Class Note
-	                        Show-Line "Use -Force to confirm removal of all members" -Class Note
+	                        Show-Line "Группа '$($TargetGroup.sAMAccountName)' содержит $($CurrentMembers.Count) участников" -Class Note
+	                        Show-Line "Для подтверждения удаления всех участников используйте -Force" -Class Note
 	                    }
 	                }
 	                else {
@@ -34499,7 +34499,7 @@ function Set-DomainGroup {
 	                                Message = "Removed all $($CurrentMembers.Count) member(s)"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully removed all $($CurrentMembers.Count) member(s) from: $($TargetGroup.sAMAccountName)" -Class Hint
+	                            Show-Line "Все $($CurrentMembers.Count) участников успешно удалены из: $($TargetGroup.sAMAccountName)" -Class Hint
 	                        }
 	                    } catch {
 	                        throw "Failed to clear members: $_"
@@ -34519,7 +34519,7 @@ function Set-DomainGroup {
 	                                Message = "Description already set to this value (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Description already set to this value: $($TargetGroup.sAMAccountName)" -Class Note
+	                            Show-Line "Описание уже имеет указанное значение у: $($TargetGroup.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -34545,7 +34545,7 @@ function Set-DomainGroup {
 	                                Message = "Description updated"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set description for: $($TargetGroup.sAMAccountName)" -Class Hint
+	                            Show-Line "Описание успешно задано для: $($TargetGroup.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -34565,7 +34565,7 @@ function Set-DomainGroup {
 	                                Message = "Description already empty (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Description already empty: $($TargetGroup.sAMAccountName)" -Class Note
+	                            Show-Line "Описание уже пустое у: $($TargetGroup.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -34589,7 +34589,7 @@ function Set-DomainGroup {
 	                                Message = "Description cleared"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared description for: $($TargetGroup.sAMAccountName)" -Class Hint
+	                            Show-Line "Описание успешно очищено у: $($TargetGroup.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -34610,7 +34610,7 @@ function Set-DomainGroup {
 	                                Message = "Group is already a Security group (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Group is already a Security group: $($TargetGroup.sAMAccountName)" -Class Note
+	                            Show-Line "Группа уже имеет тип Security: $($TargetGroup.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -34637,8 +34637,8 @@ function Set-DomainGroup {
 	                                Message = "Converted to Security group - can now be used for permissions"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully converted to Security group: $($TargetGroup.sAMAccountName)" -Class Hint
-	                            Show-Line "Group can now be used for permission assignments!" -Class Finding
+	                            Show-Line "Группа успешно преобразована в тип Security: $($TargetGroup.sAMAccountName)" -Class Hint
+	                            Show-Line "Теперь группу можно использовать при назначении разрешений!" -Class Finding
 	                        }
 	                    }
 	                } catch {
@@ -34659,7 +34659,7 @@ function Set-DomainGroup {
 	                                Message = "Group is already a Distribution group (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Group is already a Distribution group: $($TargetGroup.sAMAccountName)" -Class Note
+	                            Show-Line "Группа уже имеет тип Distribution: $($TargetGroup.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -34686,8 +34686,8 @@ function Set-DomainGroup {
 	                                Message = "Converted to Distribution group - can no longer be used for permissions"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully converted to Distribution group: $($TargetGroup.sAMAccountName)" -Class Hint
-	                            Show-Line "Group can no longer be used for permissions (effectively disarmed)!" -Class Finding
+	                            Show-Line "Группа успешно преобразована в тип Distribution: $($TargetGroup.sAMAccountName)" -Class Hint
+	                            Show-Line "Группу больше нельзя использовать для назначения разрешений (права через членство прекращают действовать)!" -Class Finding
 	                        }
 	                    }
 	                } catch {
@@ -34716,7 +34716,7 @@ function Set-DomainGroup {
 	                            Message = "Owner successfully changed"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully changed owner of $($TargetGroup.sAMAccountName) to: $Owner" -Class Hint
+	                        Show-Line "Владелец объекта $($TargetGroup.sAMAccountName) успешно изменён на: $Owner" -Class Hint
 	                    }
 	                } catch {
 	                    throw "Failed to set owner: $_"
@@ -34751,7 +34751,7 @@ function Set-DomainGroup {
 	                            Message = "Rights successfully granted"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully granted $GrantRights to $Principal on: $($TargetGroup.sAMAccountName)" -Class Hint
+	                        Show-Line "Успешно предоставлены права $GrantRights субъекту $Principal на объект: $($TargetGroup.sAMAccountName)" -Class Hint
 	                    }
 	                } catch {
 	                    throw "Failed to grant rights: $_"
@@ -34920,7 +34920,7 @@ function Set-DomainComputer {
 	                                Message = "Owner successfully changed"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully changed owner of $($TargetComputer.sAMAccountName) to: $Owner" -Class Hint
+	                            Show-Line "Владелец объекта $($TargetComputer.sAMAccountName) успешно изменён на: $Owner" -Class Hint
 	                        }
 	                    } else {
 	                        throw "Set-DomainObject returned false"
@@ -34944,7 +34944,7 @@ function Set-DomainComputer {
 	                                Message = "Rights successfully granted"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully granted $GrantRights to $Principal on: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Успешно предоставлены права $GrantRights субъекту $Principal на объект: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    } else {
 	                        throw "Set-DomainObject returned false"
@@ -34980,7 +34980,7 @@ function Set-DomainComputer {
 	                                Message = "Account already enabled (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Account already enabled: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Учётная запись уже включена: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35007,7 +35007,7 @@ function Set-DomainComputer {
 	                                Message = "Account enabled"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully enabled account: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Учётная запись успешно включена: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -35028,7 +35028,7 @@ function Set-DomainComputer {
 	                                Message = "Account already disabled (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Account already disabled: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Учётная запись уже отключена: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35055,7 +35055,7 @@ function Set-DomainComputer {
 	                                Message = "Account disabled"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully disabled account: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Учётная запись успешно отключена: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -35076,7 +35076,7 @@ function Set-DomainComputer {
 	                                Message = "Unconstrained Delegation already enabled (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Unconstrained Delegation already enabled on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Неограниченное делегирование уже включено для: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35103,8 +35103,8 @@ function Set-DomainComputer {
 	                                Message = "Unconstrained Delegation enabled - computer can now impersonate ANY user to ANY service!"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully enabled Unconstrained Delegation for: $($TargetComputer.sAMAccountName)" -Class Hint
-	                            Show-Line "Computer can now impersonate ANY user to ANY service!" -Class Finding
+	                            Show-Line "Неограниченное делегирование успешно включено для: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Теперь компьютер может выдавать себя за ЛЮБОГО пользователя при обращении к ЛЮБОЙ службе!" -Class Finding
 	                        }
 	                    }
 	                } catch {
@@ -35125,7 +35125,7 @@ function Set-DomainComputer {
 	                                Message = "Unconstrained Delegation already disabled (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Unconstrained Delegation already disabled on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Неограниченное делегирование уже отключено для: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35152,7 +35152,7 @@ function Set-DomainComputer {
 	                                Message = "Unconstrained Delegation disabled"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully disabled Unconstrained Delegation for: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Неограниченное делегирование успешно отключено для: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -35190,7 +35190,7 @@ function Set-DomainComputer {
 	                                CurrentSPNs = $CurrentSPNs
 	                            }
 	                        } else {
-	                            Show-Line "All specified SPNs already present on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Все указанные SPN уже присутствуют у: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35218,11 +35218,11 @@ function Set-DomainComputer {
 	                                Message = "Constrained Delegation configured - computer can now delegate to $($AddedSPNs.Count) new SPN(s)"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully configured Constrained Delegation for: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Ограниченное делегирование успешно настроено для: $($TargetComputer.sAMAccountName)" -Class Hint
 	                            foreach ($spn in $AddedSPNs) {
-	                                Show-Line "  Added: $spn" -Class Note
+	                                Show-Line "  Добавлено: $spn" -Class Note
 	                            }
-	                            Show-Line "Computer can now delegate to these services!" -Class Finding
+	                            Show-Line "Теперь компьютер может делегировать доступ к этим службам!" -Class Finding
 	                        }
 	                    }
 	                } catch {
@@ -35251,7 +35251,7 @@ function Set-DomainComputer {
 	                                Message = "No Constrained Delegation SPNs present (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "No Constrained Delegation SPNs present on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "SPN ограниченного делегирования отсутствуют у: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    elseif ($Force) {
@@ -35275,7 +35275,7 @@ function Set-DomainComputer {
 	                                Message = "All $($CurrentSPNs.Count) Constrained Delegation SPN(s) removed"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully removed all $($CurrentSPNs.Count) Constrained Delegation SPN(s) from: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Удалены все $($CurrentSPNs.Count) SPN ограниченного делегирования у: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                    elseif ($Principal) {
@@ -35314,7 +35314,7 @@ function Set-DomainComputer {
 	                                    Message = "Constrained Delegation SPN removed"
 	                                }
 	                            } else {
-	                                Show-Line "Successfully removed SPN '$Principal' from: $($TargetComputer.sAMAccountName)" -Class Hint
+	                                Show-Line "SPN '$Principal' успешно удалён у: $($TargetComputer.sAMAccountName)" -Class Hint
 	                            }
 	                        }
 	                        else {
@@ -35327,9 +35327,9 @@ function Set-DomainComputer {
 	                                    Message = "SPN '$Principal' not found. Use -Force to remove all SPNs."
 	                                }
 	                            } else {
-	                                Show-Line "SPN '$Principal' not found on: $($TargetComputer.sAMAccountName)" -Class Note
-	                                Show-Line "Current SPNs: $($CurrentSPNs -join ', ')" -Class Note
-	                                Show-Line "Use -Force to remove all SPNs" -Class Note
+	                                Show-Line "SPN '$Principal' не найден у: $($TargetComputer.sAMAccountName)" -Class Note
+	                                Show-Line "Текущие SPN: $($CurrentSPNs -join ', ')" -Class Note
+	                                Show-Line "Для удаления всех SPN используйте -Force" -Class Note
 	                            }
 	                        }
 	                    }
@@ -35344,11 +35344,11 @@ function Set-DomainComputer {
 	                                CurrentSPNs = $CurrentSPNs
 	                            }
 	                        } else {
-	                            Show-Line "Current Constrained Delegation SPNs on $($TargetComputer.sAMAccountName):" -Class Note
+	                            Show-Line "Текущие SPN ограниченного делегирования у $($TargetComputer.sAMAccountName):" -Class Note
 	                            foreach ($spn in $CurrentSPNs) {
 	                                Show-Line "  - $spn" -Class Note
 	                            }
-	                            Show-Line "Use -Principal <SPN> to remove specific SPN or -Force to remove all" -Class Note
+	                            Show-Line "Для удаления конкретного SPN используйте -Principal <SPN>, для удаления всех — -Force" -Class Note
 	                        }
 	                    }
 	                } catch {
@@ -35369,7 +35369,7 @@ function Set-DomainComputer {
 	                                Message = "Protocol Transition (S4U2Self) already enabled (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Protocol Transition already enabled on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Переход протокола уже включён для: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35396,8 +35396,8 @@ function Set-DomainComputer {
 	                                Message = "Protocol Transition enabled - computer can obtain service tickets for users without their credentials!"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully enabled Protocol Transition (S4U2Self) for: $($TargetComputer.sAMAccountName)" -Class Hint
-	                            Show-Line "Computer can now obtain service tickets for users without their credentials!" -Class Finding
+	                            Show-Line "Переход протокола (S4U2Self) успешно включён для: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Теперь компьютер может получать служебные билеты от имени пользователей без знания их учётных данных!" -Class Finding
 	                        }
 	                    }
 	                } catch {
@@ -35418,7 +35418,7 @@ function Set-DomainComputer {
 	                                Message = "Protocol Transition (S4U2Self) already disabled (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "Protocol Transition already disabled on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Переход протокола уже отключён для: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35445,7 +35445,7 @@ function Set-DomainComputer {
 	                                Message = "Protocol Transition disabled"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully disabled Protocol Transition for: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Переход протокола успешно отключён для: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -35466,7 +35466,7 @@ function Set-DomainComputer {
 	                                Message = "PASSWD_NOTREQD already set (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "PASSWD_NOTREQD already set on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг PASSWD_NOTREQD уже установлен у: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35493,8 +35493,8 @@ function Set-DomainComputer {
 	                                Message = "PASSWD_NOTREQD flag set - computer account can have an empty password!"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set PASSWD_NOTREQD on: $($TargetComputer.sAMAccountName)" -Class Hint
-	                            Show-Line "Computer account can now have an empty password!" -Class Finding
+	                            Show-Line "Флаг PASSWD_NOTREQD успешно установлен у: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Теперь у компьютерной учётной записи может быть пустой пароль!" -Class Finding
 	                        }
 	                    }
 	                } catch {
@@ -35515,7 +35515,7 @@ function Set-DomainComputer {
 	                                Message = "PASSWD_NOTREQD already cleared (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "PASSWD_NOTREQD already cleared on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг PASSWD_NOTREQD уже снят у: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35542,7 +35542,7 @@ function Set-DomainComputer {
 	                                Message = "PASSWD_NOTREQD flag cleared - password is required again"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared PASSWD_NOTREQD on: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг PASSWD_NOTREQD успешно снят у: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -35563,7 +35563,7 @@ function Set-DomainComputer {
 	                                Message = "DONT_EXPIRE_PASSWORD already set (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "DONT_EXPIRE_PASSWORD already set on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг DONT_EXPIRE_PASSWORD уже установлен у: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35590,7 +35590,7 @@ function Set-DomainComputer {
 	                                Message = "DONT_EXPIRE_PASSWORD flag set - password will never expire"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set DONT_EXPIRE_PASSWORD on: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг DONT_EXPIRE_PASSWORD успешно установлен у: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -35611,7 +35611,7 @@ function Set-DomainComputer {
 	                                Message = "DONT_EXPIRE_PASSWORD already cleared (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "DONT_EXPIRE_PASSWORD already cleared on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг DONT_EXPIRE_PASSWORD уже снят у: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35638,7 +35638,7 @@ function Set-DomainComputer {
 	                                Message = "DONT_EXPIRE_PASSWORD flag cleared - password expiry follows domain policy"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared DONT_EXPIRE_PASSWORD on: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг DONT_EXPIRE_PASSWORD успешно снят у: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -35659,7 +35659,7 @@ function Set-DomainComputer {
 	                                Message = "NOT_DELEGATED already set (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "NOT_DELEGATED already set on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг NOT_DELEGATED уже установлен у: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35686,8 +35686,8 @@ function Set-DomainComputer {
 	                                Message = "NOT_DELEGATED flag set - account marked as sensitive, cannot be delegated"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set NOT_DELEGATED on: $($TargetComputer.sAMAccountName)" -Class Hint
-	                            Show-Line "Account is now marked as sensitive and cannot be delegated" -Class Note
+	                            Show-Line "Флаг NOT_DELEGATED успешно установлен у: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Учётная запись теперь помечена как чувствительная; делегирование от её имени запрещено" -Class Note
 	                        }
 	                    }
 	                } catch {
@@ -35708,7 +35708,7 @@ function Set-DomainComputer {
 	                                Message = "NOT_DELEGATED already cleared (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "NOT_DELEGATED already cleared on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг NOT_DELEGATED уже снят у: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35735,7 +35735,7 @@ function Set-DomainComputer {
 	                                Message = "NOT_DELEGATED flag cleared - account can be delegated again"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared NOT_DELEGATED on: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг NOT_DELEGATED успешно снят у: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -35756,7 +35756,7 @@ function Set-DomainComputer {
 	                                Message = "DONT_REQ_PREAUTH already set (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "DONT_REQ_PREAUTH already set on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг DONT_REQ_PREAUTH уже установлен у: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35783,8 +35783,8 @@ function Set-DomainComputer {
 	                                Message = "DONT_REQ_PREAUTH flag set - computer account is now AS-REP roastable!"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully set DONT_REQ_PREAUTH on: $($TargetComputer.sAMAccountName)" -Class Hint
-	                            Show-Line "Computer account is now AS-REP roastable!" -Class Finding
+	                            Show-Line "Флаг DONT_REQ_PREAUTH успешно установлен у: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Теперь компьютерная учётная запись допускает AS-REP Roasting!" -Class Finding
 	                        }
 	                    }
 	                } catch {
@@ -35805,7 +35805,7 @@ function Set-DomainComputer {
 	                                Message = "DONT_REQ_PREAUTH already cleared (no change)"
 	                            }
 	                        } else {
-	                            Show-Line "DONT_REQ_PREAUTH already cleared on: $($TargetComputer.sAMAccountName)" -Class Note
+	                            Show-Line "Флаг DONT_REQ_PREAUTH уже снят у: $($TargetComputer.sAMAccountName)" -Class Note
 	                        }
 	                    }
 	                    else {
@@ -35832,7 +35832,7 @@ function Set-DomainComputer {
 	                                Message = "DONT_REQ_PREAUTH flag cleared - pre-authentication is required again"
 	                            }
 	                        } else {
-	                            Show-Line "Successfully cleared DONT_REQ_PREAUTH on: $($TargetComputer.sAMAccountName)" -Class Hint
+	                            Show-Line "Флаг DONT_REQ_PREAUTH успешно снят у: $($TargetComputer.sAMAccountName)" -Class Hint
 	                        }
 	                    }
 	                } catch {
@@ -36035,12 +36035,12 @@ function Set-DomainGPO {
 	                    if ($PassThru) {
 	                        return [PSCustomObject]@{ Operation="Export"; GPO=$GPOName; Path=$Result.Path; FileCount=$Result.FileCount; Success=$true; Message="GPO exported" }
 	                    } else {
-	                        Show-Line "Exported GPO '$GPOName' to: $($Result.Path)" -Class Hint
+	                        Show-Line "GPO '$GPOName' экспортирована в: $($Result.Path)" -Class Hint
 	                        Show-KeyValue "SYSVOL files:" $Result.FileCount
 	                    }
 	                } catch {
 	                    if ($PassThru) { return [PSCustomObject]@{ Operation="Export"; GPO=$GPOName; Success=$false; Message=$_.Exception.Message } }
-	                    Show-Line "Failed to export GPO '$GPOName': $($_.Exception.Message)" -Class Finding
+	                    Show-Line "Не удалось экспортировать GPO '$GPOName': $($_.Exception.Message)" -Class Finding
 	                }
 	                break
 	            }
@@ -36048,12 +36048,12 @@ function Set-DomainGPO {
 	                try {
 	                    $Result = Import-GPOState -GPODN $GPODN -GPOName $GPOName -GPOGUID $GPOGUIDResolved -Path $Import -Credential $Credential
 	                    if ($PassThru) { return $Result }
-	                    Show-Line "Restored GPO '$GPOName' from backup: $Import" -Class Hint
+	                    Show-Line "GPO '$GPOName' восстановлена из резервной копии: $Import" -Class Hint
 	                    Show-KeyValue "SYSVOL files restored:" $Result.FilesRestored
 	                    Show-KeyValue "Injected files deleted:" $Result.FilesDeleted
 	                } catch {
 	                    if ($PassThru) { return [PSCustomObject]@{ Operation="Import"; GPO=$GPOName; Success=$false; Message=$_.Exception.Message } }
-	                    Show-Line "Failed to import GPO '$GPOName': $($_.Exception.Message)" -Class Finding
+	                    Show-Line "Не удалось импортировать GPO '$GPOName': $($_.Exception.Message)" -Class Finding
 	                }
 	                break
 	            }
@@ -36080,11 +36080,11 @@ function Set-DomainGPO {
 	                    }
 	                    $Result = Remove-GPOPayloadItem -GPODN $GPODN -GPOName $GPOName -GPOGUID $GPOGUIDResolved -Type $removeType -ItemName $itemId -MemberSID $memberSidVal -Credential $Credential
 	                    if ($PassThru) { return $Result }
-	                    Show-Line "Removed $removeType '$itemId' from GPO '$GPOName' ($($Result.ItemsRemoved) item(s))" -Class Hint
-	                    Show-Line "Server-side only: effects already applied on clients are NOT undone." -Class Note
+	                    Show-Line "Удалён элемент типа $removeType '$itemId' из GPO '$GPOName' (элементов удалено: $($Result.ItemsRemoved))" -Class Hint
+	                    Show-Line "Только на стороне сервера: последствия уже применённых на клиентах настроек НЕ отменяются." -Class Note
 	                } catch {
 	                    if ($PassThru) { return [PSCustomObject]@{ Operation="Remove$removeType"; GPO=$GPOName; Success=$false; Message=$_.Exception.Message } }
-	                    Show-Line "Failed to remove $removeType from GPO '$GPOName': $($_.Exception.Message)" -Class Finding
+	                    Show-Line "Не удалось удалить элемент типа $removeType из GPO '$GPOName': $($_.Exception.Message)" -Class Finding
 	                }
 	                break
 	            }
@@ -36094,11 +36094,11 @@ function Set-DomainGPO {
 	                try {
 	                    $Result = Remove-GPOScriptEntry -GPODN $GPODN -GPOName $GPOName -GPOGUID $GPOGUIDResolved -Kind $kind -ScriptName $ScriptName -Credential $Credential
 	                    if ($PassThru) { return $Result }
-	                    Show-Line "Removed $kind script '$ScriptName' from GPO '$GPOName'" -Class Hint
-	                    Show-Line "Server-side only: effects already applied on clients are NOT undone." -Class Note
+	                    Show-Line "Удалён сценарий типа $kind '$ScriptName' из GPO '$GPOName'" -Class Hint
+	                    Show-Line "Только на стороне сервера: последствия уже применённых на клиентах настроек НЕ отменяются." -Class Note
 	                } catch {
 	                    if ($PassThru) { return [PSCustomObject]@{ Operation="Remove${kind}Script"; GPO=$GPOName; Success=$false; Message=$_.Exception.Message } }
-	                    Show-Line "Failed to remove $kind script from GPO '$GPOName': $($_.Exception.Message)" -Class Finding
+	                    Show-Line "Не удалось удалить сценарий типа $kind из GPO '$GPOName': $($_.Exception.Message)" -Class Finding
 	                }
 	                break
 	            }
@@ -36124,7 +36124,7 @@ function Set-DomainGPO {
 	                        SYSVOLSynced = $null
 	                    }
 	                    if (-not $PassThru) {
-	                        Show-Line "Successfully changed owner of GPO '$GPOName' to: $Owner" -Class Hint
+	                        Show-Line "Владелец GPO '$GPOName' успешно изменён на: $Owner" -Class Hint
 	                    }
 	                } catch {
 	                    throw "Failed to set owner: $_"
@@ -36153,7 +36153,7 @@ function Set-DomainGPO {
 	                        SYSVOLSynced = $null
 	                    }
 	                    if (-not $PassThru) {
-	                        Show-Line "Successfully granted $GrantRights to $Principal on GPO: $GPOName" -Class Hint
+	                        Show-Line "Успешно предоставлены права $GrantRights субъекту $Principal на GPO: $GPOName" -Class Hint
 	                    }
 	                } catch {
 	                    throw "Failed to grant rights: $_"
@@ -36213,7 +36213,7 @@ function Set-DomainGPO {
 	                            Message = "GPO successfully linked"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully linked GPO '$GPOName' to '$TargetDN' (Status: $linkStatusText)" -Class Hint
+	                        Show-Line "GPO '$GPOName' успешно привязана к '$TargetDN' (состояние: $linkStatusText)" -Class Hint
 	                    }
 	                } catch {
 	                    throw "Failed to link GPO: $_"
@@ -36265,7 +36265,7 @@ function Set-DomainGPO {
 	                            Message = "GPO successfully unlinked"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully unlinked GPO '$GPOName' from '$TargetDN'" -Class Hint
+	                        Show-Line "GPO '$GPOName' успешно отвязана от '$TargetDN'" -Class Hint
 	                    }
 	                } catch {
 	                    throw "Failed to unlink GPO: $_"
@@ -36276,7 +36276,7 @@ function Set-DomainGPO {
 	                if ($PassThru) {
 	                    return $syncResult
 	                } elseif ($syncResult.Success) {
-	                    Show-Line "Successfully synchronized SYSVOL permissions for GPO '$GPOName'" -Class Hint
+	                    Show-Line "Разрешения SYSVOL для GPO '$GPOName' успешно синхронизированы" -Class Hint
 	                } else {
 	                    throw $syncResult.Message
 	                }
@@ -36459,7 +36459,7 @@ $taskEntryXml
 	                            Message = "Scheduled Task added successfully"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully added Immediate Scheduled Task to GPO '$GPOName'" -Class Hint
+	                        Show-Line "Немедленное запланированное задание успешно добавлено в GPO '$GPOName'" -Class Hint
 	                        Show-KeyValue "Task Name:" $TaskName
 	                        Show-KeyValue "Command:" $TaskCommand
 	                        Show-KeyValue "Arguments:" $TaskArguments
@@ -36589,7 +36589,7 @@ $groupEntryXml
 	                            Message = "Local Group Member added successfully"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully added member to local group via GPO '$GPOName'" -Class Hint
+	                        Show-Line "Участник успешно добавлен в локальную группу через GPO '$GPOName'" -Class Hint
 	                        Show-KeyValue "Local Group:" "$LocalGroup ($localGroupSID)"
 	                        Show-KeyValue "Member Added:" "$MemberToAdd ($memberSID)"
 	                        Show-KeyValue "GPO Version:" $versionResult.NewVersion
@@ -36717,7 +36717,7 @@ ${nextIndex}Parameters=$scriptParamsVal
 	                            Message = "Startup Script added successfully"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully added Startup Script to GPO '$GPOName'" -Class Hint
+	                        Show-Line "Сценарий запуска компьютера успешно добавлен в GPO '$GPOName'" -Class Hint
 	                        Show-KeyValue "Script Name:" $scriptFileName
 	                        Show-KeyValue "Script Path:" $smbResult.ScriptPath
 	                        Show-KeyValue "Parameters:" $ScriptParameters
@@ -36846,7 +36846,7 @@ ${nextIndex}Parameters=$scriptParamsVal
 	                            Message = "Logon Script added successfully"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully added Logon Script to GPO '$GPOName'" -Class Hint
+	                        Show-Line "Сценарий входа пользователя успешно добавлен в GPO '$GPOName'" -Class Hint
 	                        Show-KeyValue "Script Name:" $scriptFileName
 	                        Show-KeyValue "Script Path:" $smbResult.ScriptPath
 	                        Show-KeyValue "Parameters:" $ScriptParameters
@@ -36964,7 +36964,7 @@ $serviceEntryXml
 	                            Message = "Service added successfully"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully added Service to GPO '$GPOName'" -Class Hint
+	                        Show-Line "Служба успешно добавлена в GPO '$GPOName'" -Class Hint
 	                        Show-KeyValue "Service Name:" $ServiceName
 	                        Show-KeyValue "Display Name:" $svcDisplayName
 	                        Show-KeyValue "Binary Path:" $BinaryPath
@@ -37084,7 +37084,7 @@ $fileEntryXml
 	                            Message = "File deployment added successfully"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully added File Deployment to GPO '$GPOName'" -Class Hint
+	                        Show-Line "Развёртывание файла успешно добавлено в GPO '$GPOName'" -Class Hint
 	                        Show-KeyValue "Source:" $SourceFile
 	                        Show-KeyValue "Destination:" $DestinationPath
 	                        Show-KeyValue "Action:" $FileAction
@@ -37203,7 +37203,7 @@ $ruleEntryXml
 	                            Message = "Firewall rule added successfully"
 	                        }
 	                    } else {
-	                        Show-Line "Successfully added Firewall Rule to GPO '$GPOName'" -Class Hint
+	                        Show-Line "Правило брандмауэра успешно добавлено в GPO '$GPOName'" -Class Hint
 	                        Show-KeyValue "Rule Name:" $RuleName
 	                        Show-KeyValue "Direction:" $RuleDirection
 	                        Show-KeyValue "Action:" $RuleAction
@@ -37234,7 +37234,7 @@ $ruleEntryXml
 	            }
 	            if ($syncResult.Success) {
 	                if (-not $PassThru) {
-	                    Show-Line "SYSVOL permissions synchronized automatically" -Class Hint
+	                    Show-Line "Разрешения SYSVOL синхронизированы автоматически" -Class Hint
 	                }
 	            } else {
 	                if (-not $PassThru) {
@@ -37985,7 +37985,7 @@ function Move-DomainObject {
 	                    Message = "Object is already at the requested location and name"
 	                }
 	            }
-	            Show-Line "Object is already at the requested location and name: $SourceDN" -Class Note
+	            Show-Line "Объект уже находится в запрошенном расположении и имеет указанное имя: $SourceDN" -Class Note
 	            return $true
 	        }
 	        $DomainDN = [string]$Script:LDAPContext.DomainDN
@@ -38051,10 +38051,10 @@ function Move-DomainObject {
 	                        Message = "Object successfully moved"
 	                    }
 	                }
-	                Show-Line "Successfully moved $ObjectClass object" -Class Hint
+	                Show-Line "Успешно перемещён объект класса $ObjectClass" -Class Hint
 	                Show-KeyValue "From:" $SourceDN
 	                Show-KeyValue "To:" $TargetDN
-	                Show-Line "objectGUID and objectSID are unchanged, but applied GPOs and inherited ACLs now come from the new location" -Class Note
+	                Show-Line "objectGUID и objectSID не изменились, но применяемые GPO и наследуемые ACL теперь определяются новым расположением" -Class Note
 	                return $true
 	            } else {
 	                $Message = "ModifyDNRequest failed: $($Response.ResultCode) - $($Response.ErrorMessage)"
@@ -38247,7 +38247,7 @@ function New-DomainUser {
 	            }
 	            return $Result
 	        } else {
-	            Show-Line "Successfully created user: $Name" -Class Hint
+	            Show-Line "Успешно создан пользователь: $Name" -Class Hint
 	            Show-KeyValue "Distinguished Name:" $UserDN
 	            Show-KeyValue "Enabled:" $Enabled
 	            if ($PasswordGenerated) {
@@ -38443,7 +38443,7 @@ function New-DomainComputer {
 	            }
 	            return $Result
 	        } else {
-	            Show-Line "Successfully created computer: $Name" -Class Hint
+	            Show-Line "Успешно создан компьютер: $Name" -Class Hint
 	            Show-KeyValue "Distinguished Name:" $ComputerDN
 	            Show-KeyValue "DNS Hostname:" "$ComputerNameWithoutDollar.$($Script:LDAPContext.Domain)"
 	            Show-KeyValue "Enabled:" $Enabled
@@ -38550,7 +38550,7 @@ function New-DomainGroup {
 	                Message = "Group successfully created"
 	            }
 	        } else {
-	            Show-Line "Successfully created group: $Name" -Class Hint
+	            Show-Line "Успешно создана группа: $Name" -Class Hint
 	            Show-KeyValue "Distinguished Name:" $GroupDN
 	            Show-KeyValue "Type:" $GroupType
 	            Show-KeyValue "Scope:" $GroupScope
@@ -38767,17 +38767,17 @@ function New-DomainGPO {
 	            }
 	            return $Result
 	        } else {
-	            Show-Line "Successfully created GPO AD object: $DisplayName" -Class Hint
+	            Show-Line "Успешно создан объект GPO в AD: $DisplayName" -Class Hint
 	            Show-KeyValue "Distinguished Name:" $GPODN
 	            Show-KeyValue "GUID:" $GPOGUIDWithBraces
 	            Show-KeyValue "SYSVOL Path:" $gPCFileSysPath
 	            if ($SYSVOLCreated -and $SYSVOLResult) {
-	                Show-Line "SYSVOL folder structure created successfully" -Class Hint
+	                Show-Line "Структура папок SYSVOL успешно создана" -Class Hint
 	                Show-KeyValue "Machine folder:" $SYSVOLResult.MachinePath
 	                Show-KeyValue "User folder:" $SYSVOLResult.UserPath
 	                Show-KeyValue "GPT.INI:" $SYSVOLResult.GptIniPath
 	            } elseif ($NoSYSVOL) {
-	                Show-Line "SYSVOL creation skipped (-NoSYSVOL)" -Class Note
+	                Show-Line "Создание структуры SYSVOL пропущено (-NoSYSVOL)" -Class Note
 	            }
 	        }
 	    }
@@ -97716,7 +97716,7 @@ function Collect-BHIssuancePolicies {
 	}
 	return $bhPolicies
 }
-$Script:adPEASVersion = "2.9.0+20261111-1944"
+$Script:adPEASVersion = "2.9.0+20261112-0811"
 if ($MyInvocation.MyCommand.Path) {
 	$Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {

@@ -1168,7 +1168,7 @@ function Show-WebEndpointUnreachable {
     # Probe reached the target - nothing to report here.
     if ($ProbeResult -and $ProbeResult.Success) { return }
 
-    Show-Line "$CheckLabel could not reach $Hostname (HTTP/HTTPS unreachable)" -Class Note
+    Show-Line "$CheckLabel не удалось подключиться к $Hostname (HTTP/HTTPS недоступен)" -Class Note
 }
 
 <#
@@ -1521,9 +1521,9 @@ function Show-NoSessionError {
 
     # SubHeader with context (NoCollect: session errors are not security findings)
     if ($Context) {
-        Show-SubHeader "No active session for $Context..." -NoCollect
+        Show-SubHeader "Нет активного сеанса для $Context..." -NoCollect
     } else {
-        Show-SubHeader "No active session..." -NoCollect
+        Show-SubHeader "Активный сеанс отсутствует..." -NoCollect
     }
 
     # Error details (NoCollect: session errors are not security findings)
@@ -1531,7 +1531,7 @@ function Show-NoSessionError {
 
     # Help section
     Show-EmptyLine
-    Show-Line "Help:" -Class Hint -NoCollect
+    Show-Line "Справка:" -Class Hint -NoCollect
     Show-Line "Connect-adPEAS -Domain 'contoso.com' -Credential (Get-Credential)" -NoCollect
     Show-Line "Get-Help Connect-adPEAS -Examples" -NoCollect
     Show-EmptyLine
@@ -1783,23 +1783,23 @@ function Get-adPEASHelp {
 
     # --- Quick Start ---
     if ($showQuickStart) {
-        Show-SubHeader "Quick Start"
+        Show-SubHeader "Быстрый старт"
 
-        Show-Line "Simple scan (Windows Auth):" -Class Hint
+        Show-Line "Простое сканирование (аутентификация Windows):" -Class Hint
         Show-Line "Invoke-adPEAS -Domain 'contoso.com'"
         Show-EmptyLine
 
-        Show-Line "Session-based with credentials:" -Class Hint
+        Show-Line "Сеанс с явными учётными данными:" -Class Hint
         Show-Line "Connect-adPEAS -Domain 'contoso.com' -Credential (Get-Credential)"
         Show-Line "Invoke-adPEAS"
         Show-EmptyLine
 
         # PTT Note (for domain-joined machines with alternate credentials)
-        Show-Line "On domain-joined machines, -Password/-NTHash/-AES*Key/-Certificate replace your Kerberos tickets." -Class Note
-        Show-Line "Use Connect-adPEAS with -ForceNTLM or -ForceSimpleBind to avoid this."
+        Show-Line "На компьютерах в домене параметры -Password/-NTHash/-AES*Key/-Certificate заменяют билеты Kerberos текущего сеанса." -Class Note
+        Show-Line "Для предотвращения этого используйте Connect-adPEAS с -ForceNTLM или -ForceSimpleBind."
         Show-EmptyLine
 
-        Show-Line "More help:" -Class Hint
+        Show-Line "Дополнительная справка:" -Class Hint
         Show-Line "Get-adPEASHelp"
         Show-Line "Get-Help Connect-adPEAS -Examples"
         Show-Line "Get-Help <Command> -Detailed"
@@ -1809,12 +1809,12 @@ function Get-adPEASHelp {
 
     # --- Check Modules (dynamic from ObjectTypeDefinitions) ---
     if ($showChecks) {
-        Show-SubHeader "Security Check Modules"
+        Show-SubHeader "Модули проверок безопасности"
 
-        Show-Line "Run all modules:" -Class Hint
+        Show-Line "Запустить все модули:" -Class Hint
         Show-Line "Invoke-adPEAS (without -Module)"
         Show-EmptyLine
-        Show-Line "Run specific modules only:" -Class Hint
+        Show-Line "Запустить только выбранные модули:" -Class Hint
         Show-Line "Invoke-adPEAS -Module 'Domain','Creds','ADCS'"
         Show-EmptyLine
 
@@ -1864,17 +1864,17 @@ function Get-adPEASHelp {
 
     # --- Commands ---
     if ($showCommands) {
-        Show-SubHeader "Additional Core and Helper Modules"
+        Show-SubHeader "Дополнительные основные и вспомогательные модули"
 
         # --- Connection ---
-        Show-Line "Connection:" -Class Hint
+        Show-Line "Подключение:" -Class Hint
         Show-KeyValue "Connect-adPEAS" "Establish LDAP session"
         Show-KeyValue "Disconnect-adPEAS" "Close LDAP session"
         Show-KeyValue "Get-adPEASSession" "Show session status"
         Show-EmptyLine
 
         # --- AD Queries ---
-        Show-Line "AD Queries:" -Class Hint
+        Show-Line "Запросы AD:" -Class Hint
         Show-KeyValue "Get-DomainUser" "Query AD users"
         Show-KeyValue "Get-DomainComputer" "Query AD computers"
         Show-KeyValue "Get-DomainGroup" "Query AD groups"
@@ -1886,7 +1886,7 @@ function Get-adPEASHelp {
         Show-EmptyLine
 
         # --- AD Modifications ---
-        Show-Line "AD Modifications:" -Class Hint
+        Show-Line "Изменения AD:" -Class Hint
         Show-KeyValue "Set-DomainUser" "Modify user attributes"
         Show-KeyValue "Set-DomainComputer" "Modify computer attributes"
         Show-KeyValue "Set-DomainGroup" "Modify group attributes"
@@ -1900,14 +1900,14 @@ function Get-adPEASHelp {
         Show-EmptyLine
 
         # --- Kerberos Authentication ---
-        Show-Line "Kerberos Authentication:" -Class Hint
+        Show-Line "Аутентификация Kerberos:" -Class Hint
         Show-KeyValue "Invoke-KerberosAuth" "Request TGT (Password/Hash/Key/Cert)"
         Show-KeyValue "Request-ServiceTicket" "Request TGS for a service"
         Show-KeyValue "Import-KerberosTicket" "Pass-the-Ticket (inject into session)"
         Show-EmptyLine
 
         # --- Credential Attacks ---
-        Show-Line "Credential Attacks:" -Class Hint
+        Show-Line "Атаки на учётные данные:" -Class Hint
         Show-KeyValue "Invoke-Kerberoast" "Kerberoasting (request service tickets)"
         Show-KeyValue "Invoke-ASREPRoast" "AS-REP Roasting (no preauth)"
         Show-KeyValue "Invoke-DCSync" "DCSync (directory replication)"
@@ -1915,7 +1915,7 @@ function Get-adPEASHelp {
         Show-EmptyLine
 
         # --- Offensive Actions ---
-        Show-Line "Offensive Actions:" -Class Hint
+        Show-Line "Активные операции:" -Class Hint
         Show-KeyValue "Invoke-TicketForge" "Golden/Silver/Diamond Tickets"
         Show-KeyValue "Invoke-S4U" "S4U delegation attacks"
         Show-KeyValue "Invoke-RBCDOperation" "Resource-Based Constrained Delegation"

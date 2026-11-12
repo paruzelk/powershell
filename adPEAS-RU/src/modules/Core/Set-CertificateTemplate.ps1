@@ -391,7 +391,7 @@
                         }
 
                         if ($RestoreAttributes.Count -eq 0) {
-                            Show-Line "Template '$TemplateName' already matches backup - no changes needed" -Class Note
+                            Show-Line "Шаблон '$TemplateName' уже соответствует резервной копии — изменения не требуются" -Class Note
                             continue
                         }
 
@@ -403,7 +403,7 @@
                                 $null = Set-DomainObject -Identity $TemplateDN -Set $RestoreAttributes -SearchBase $TemplatesBase -ErrorAction Stop
                                 # Success - increment counter and show message
                                 $RestoredCount++
-                                Show-Line "Successfully restored template: $TemplateName ($($RestoreAttributes.Count) attributes)" -Class Hint
+                                Show-Line "Шаблон успешно восстановлен: $TemplateName ($($RestoreAttributes.Count) атрибутов)" -Class Hint
                             }
                             catch {
                                 Write-Warning "[!] Failed to restore template '$TemplateName': $($_.Exception.Message)"
@@ -449,7 +449,7 @@
 
                 try {
                     $ExportData | ConvertTo-Json -Depth 10 | Set-Content -Path $Export -Encoding UTF8 -ErrorAction Stop
-                    Show-Line "Successfully exported template '$TemplateName' to: $Export" -Class Hint
+                    Show-Line "Шаблон '$TemplateName' успешно экспортирован в: $Export" -Class Hint
                 }
                 catch {
                     throw "Failed to write export file: $_"
@@ -1027,8 +1027,8 @@
             }
 
             # Success - Show modification summary and call Get-CertificateTemplate for output
-            Show-Line "Template modified successfully: $TemplateName" -Class Hint
-            Show-Line "Modifications applied: $($Modifications -join ', ')"
+            Show-Line "Шаблон успешно изменён: $TemplateName" -Class Hint
+            Show-Line "Применённые изменения: $($Modifications -join ', ')"
 
             # Use Get-CertificateTemplate to display the updated template
             Get-CertificateTemplate -Identity $Identity -ShowAll

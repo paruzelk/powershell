@@ -189,7 +189,7 @@
                 }
             } else {
                 # Console output (default behavior)
-                Show-Line "Successfully created group: $Name" -Class Hint
+                Show-Line "Успешно создана группа: $Name" -Class Hint
                 Show-KeyValue "Distinguished Name:" $GroupDN
                 Show-KeyValue "Type:" $GroupType
                 Show-KeyValue "Scope:" $GroupScope

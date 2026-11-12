@@ -271,7 +271,7 @@
                 return $Result
             } else {
                 # Console output (default behavior)
-                Show-Line "Successfully created user: $Name" -Class Hint
+                Show-Line "Успешно создан пользователь: $Name" -Class Hint
                 Show-KeyValue "Distinguished Name:" $UserDN
                 Show-KeyValue "Enabled:" $Enabled
 

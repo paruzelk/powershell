@@ -659,12 +659,12 @@
                         if ($PassThru) {
                             return [PSCustomObject]@{ Operation="Export"; GPO=$GPOName; Path=$Result.Path; FileCount=$Result.FileCount; Success=$true; Message="GPO exported" }
                         } else {
-                            Show-Line "Exported GPO '$GPOName' to: $($Result.Path)" -Class Hint
+                            Show-Line "GPO '$GPOName' экспортирована в: $($Result.Path)" -Class Hint
                             Show-KeyValue "SYSVOL files:" $Result.FileCount
                         }
                     } catch {
                         if ($PassThru) { return [PSCustomObject]@{ Operation="Export"; GPO=$GPOName; Success=$false; Message=$_.Exception.Message } }
-                        Show-Line "Failed to export GPO '$GPOName': $($_.Exception.Message)" -Class Finding
+                        Show-Line "Не удалось экспортировать GPO '$GPOName': $($_.Exception.Message)" -Class Finding
                     }
                     break
                 }
@@ -673,12 +673,12 @@
                     try {
                         $Result = Import-GPOState -GPODN $GPODN -GPOName $GPOName -GPOGUID $GPOGUIDResolved -Path $Import -Credential $Credential
                         if ($PassThru) { return $Result }
-                        Show-Line "Restored GPO '$GPOName' from backup: $Import" -Class Hint
+                        Show-Line "GPO '$GPOName' восстановлена из резервной копии: $Import" -Class Hint
                         Show-KeyValue "SYSVOL files restored:" $Result.FilesRestored
                         Show-KeyValue "Injected files deleted:" $Result.FilesDeleted
                     } catch {
                         if ($PassThru) { return [PSCustomObject]@{ Operation="Import"; GPO=$GPOName; Success=$false; Message=$_.Exception.Message } }
-                        Show-Line "Failed to import GPO '$GPOName': $($_.Exception.Message)" -Class Finding
+                        Show-Line "Не удалось импортировать GPO '$GPOName': $($_.Exception.Message)" -Class Finding
                     }
                     break
                 }
@@ -708,11 +708,11 @@
                         }
                         $Result = Remove-GPOPayloadItem -GPODN $GPODN -GPOName $GPOName -GPOGUID $GPOGUIDResolved -Type $removeType -ItemName $itemId -MemberSID $memberSidVal -Credential $Credential
                         if ($PassThru) { return $Result }
-                        Show-Line "Removed $removeType '$itemId' from GPO '$GPOName' ($($Result.ItemsRemoved) item(s))" -Class Hint
-                        Show-Line "Server-side only: effects already applied on clients are NOT undone." -Class Note
+                        Show-Line "Удалён элемент типа $removeType '$itemId' из GPO '$GPOName' (элементов удалено: $($Result.ItemsRemoved))" -Class Hint
+                        Show-Line "Только на стороне сервера: последствия уже применённых на клиентах настроек НЕ отменяются." -Class Note
                     } catch {
                         if ($PassThru) { return [PSCustomObject]@{ Operation="Remove$removeType"; GPO=$GPOName; Success=$false; Message=$_.Exception.Message } }
-                        Show-Line "Failed to remove $removeType from GPO '$GPOName': $($_.Exception.Message)" -Class Finding
+                        Show-Line "Не удалось удалить элемент типа $removeType из GPO '$GPOName': $($_.Exception.Message)" -Class Finding
                     }
                     break
                 }
@@ -723,11 +723,11 @@
                     try {
                         $Result = Remove-GPOScriptEntry -GPODN $GPODN -GPOName $GPOName -GPOGUID $GPOGUIDResolved -Kind $kind -ScriptName $ScriptName -Credential $Credential
                         if ($PassThru) { return $Result }
-                        Show-Line "Removed $kind script '$ScriptName' from GPO '$GPOName'" -Class Hint
-                        Show-Line "Server-side only: effects already applied on clients are NOT undone." -Class Note
+                        Show-Line "Удалён сценарий типа $kind '$ScriptName' из GPO '$GPOName'" -Class Hint
+                        Show-Line "Только на стороне сервера: последствия уже применённых на клиентах настроек НЕ отменяются." -Class Note
                     } catch {
                         if ($PassThru) { return [PSCustomObject]@{ Operation="Remove${kind}Script"; GPO=$GPOName; Success=$false; Message=$_.Exception.Message } }
-                        Show-Line "Failed to remove $kind script from GPO '$GPOName': $($_.Exception.Message)" -Class Finding
+                        Show-Line "Не удалось удалить сценарий типа $kind из GPO '$GPOName': $($_.Exception.Message)" -Class Finding
                     }
                     break
                 }
@@ -760,7 +760,7 @@
                         }
 
                         if (-not $PassThru) {
-                            Show-Line "Successfully changed owner of GPO '$GPOName' to: $Owner" -Class Hint
+                            Show-Line "Владелец GPO '$GPOName' успешно изменён на: $Owner" -Class Hint
                         }
                     } catch {
                         throw "Failed to set owner: $_"
@@ -797,7 +797,7 @@
                         }
 
                         if (-not $PassThru) {
-                            Show-Line "Successfully granted $GrantRights to $Principal on GPO: $GPOName" -Class Hint
+                            Show-Line "Успешно предоставлены права $GrantRights субъекту $Principal на GPO: $GPOName" -Class Hint
                         }
                     } catch {
                         throw "Failed to grant rights: $_"
@@ -887,7 +887,7 @@
                                 Message = "GPO successfully linked"
                             }
                         } else {
-                            Show-Line "Successfully linked GPO '$GPOName' to '$TargetDN' (Status: $linkStatusText)" -Class Hint
+                            Show-Line "GPO '$GPOName' успешно привязана к '$TargetDN' (состояние: $linkStatusText)" -Class Hint
                         }
 
                     } catch {
@@ -963,7 +963,7 @@
                                 Message = "GPO successfully unlinked"
                             }
                         } else {
-                            Show-Line "Successfully unlinked GPO '$GPOName' from '$TargetDN'" -Class Hint
+                            Show-Line "GPO '$GPOName' успешно отвязана от '$TargetDN'" -Class Hint
                         }
 
                     } catch {
@@ -980,7 +980,7 @@
                     if ($PassThru) {
                         return $syncResult
                     } elseif ($syncResult.Success) {
-                        Show-Line "Successfully synchronized SYSVOL permissions for GPO '$GPOName'" -Class Hint
+                        Show-Line "Разрешения SYSVOL для GPO '$GPOName' успешно синхронизированы" -Class Hint
                     } else {
                         throw $syncResult.Message
                     }
@@ -1209,7 +1209,7 @@ $taskEntryXml
                                 Message = "Scheduled Task added successfully"
                             }
                         } else {
-                            Show-Line "Successfully added Immediate Scheduled Task to GPO '$GPOName'" -Class Hint
+                            Show-Line "Немедленное запланированное задание успешно добавлено в GPO '$GPOName'" -Class Hint
                             Show-KeyValue "Task Name:" $TaskName
                             Show-KeyValue "Command:" $TaskCommand
                             Show-KeyValue "Arguments:" $TaskArguments
@@ -1384,7 +1384,7 @@ $groupEntryXml
                                 Message = "Local Group Member added successfully"
                             }
                         } else {
-                            Show-Line "Successfully added member to local group via GPO '$GPOName'" -Class Hint
+                            Show-Line "Участник успешно добавлен в локальную группу через GPO '$GPOName'" -Class Hint
                             Show-KeyValue "Local Group:" "$LocalGroup ($localGroupSID)"
                             Show-KeyValue "Member Added:" "$MemberToAdd ($memberSID)"
                             Show-KeyValue "GPO Version:" $versionResult.NewVersion
@@ -1559,7 +1559,7 @@ ${nextIndex}Parameters=$scriptParamsVal
                                 Message = "Startup Script added successfully"
                             }
                         } else {
-                            Show-Line "Successfully added Startup Script to GPO '$GPOName'" -Class Hint
+                            Show-Line "Сценарий запуска компьютера успешно добавлен в GPO '$GPOName'" -Class Hint
                             Show-KeyValue "Script Name:" $scriptFileName
                             Show-KeyValue "Script Path:" $smbResult.ScriptPath
                             Show-KeyValue "Parameters:" $ScriptParameters
@@ -1735,7 +1735,7 @@ ${nextIndex}Parameters=$scriptParamsVal
                                 Message = "Logon Script added successfully"
                             }
                         } else {
-                            Show-Line "Successfully added Logon Script to GPO '$GPOName'" -Class Hint
+                            Show-Line "Сценарий входа пользователя успешно добавлен в GPO '$GPOName'" -Class Hint
                             Show-KeyValue "Script Name:" $scriptFileName
                             Show-KeyValue "Script Path:" $smbResult.ScriptPath
                             Show-KeyValue "Parameters:" $ScriptParameters
@@ -1895,7 +1895,7 @@ $serviceEntryXml
                                 Message = "Service added successfully"
                             }
                         } else {
-                            Show-Line "Successfully added Service to GPO '$GPOName'" -Class Hint
+                            Show-Line "Служба успешно добавлена в GPO '$GPOName'" -Class Hint
                             Show-KeyValue "Service Name:" $ServiceName
                             Show-KeyValue "Display Name:" $svcDisplayName
                             Show-KeyValue "Binary Path:" $BinaryPath
@@ -2062,7 +2062,7 @@ $fileEntryXml
                                 Message = "File deployment added successfully"
                             }
                         } else {
-                            Show-Line "Successfully added File Deployment to GPO '$GPOName'" -Class Hint
+                            Show-Line "Развёртывание файла успешно добавлено в GPO '$GPOName'" -Class Hint
                             Show-KeyValue "Source:" $SourceFile
                             Show-KeyValue "Destination:" $DestinationPath
                             Show-KeyValue "Action:" $FileAction
@@ -2230,7 +2230,7 @@ $ruleEntryXml
                                 Message = "Firewall rule added successfully"
                             }
                         } else {
-                            Show-Line "Successfully added Firewall Rule to GPO '$GPOName'" -Class Hint
+                            Show-Line "Правило брандмауэра успешно добавлено в GPO '$GPOName'" -Class Hint
                             Show-KeyValue "Rule Name:" $RuleName
                             Show-KeyValue "Direction:" $RuleDirection
                             Show-KeyValue "Action:" $RuleAction
@@ -2269,7 +2269,7 @@ $ruleEntryXml
 
                 if ($syncResult.Success) {
                     if (-not $PassThru) {
-                        Show-Line "SYSVOL permissions synchronized automatically" -Class Hint
+                        Show-Line "Разрешения SYSVOL синхронизированы автоматически" -Class Hint
                     }
                 } else {
                     if (-not $PassThru) {

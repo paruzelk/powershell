@@ -1,0 +1,36 @@
+﻿{
+    "Schema":  "adPEAS-RU.StageC.VisibleMessages.1",
+    "PlannedRules":  189,
+    "AppliedOccurrences":  192,
+    "ModifiedSourceFiles":  14,
+    "InterpolationsAndNonStringTokensPreserved":  true,
+    "PowerShellParserPassed":  true,
+    "ModifiedScopes":  [
+                           "Core"
+                       ],
+    "ExplicitlyExcluded":  [
+                               "FindingId",
+                               "risk classes",
+                               "commands and examples",
+                               "LDAP/ACL/API identifiers",
+                               "metadata definitions",
+                               "dynamic/composite expressions"
+                           ],
+    "Files":  {
+                  "src/modules/Core/Set-DomainGroup.ps1":  18,
+                  "src/modules/Core/Connect-adPEAS.ps1":  14,
+                  "src/modules/Core/New-DomainUser.ps1":  1,
+                  "src/modules/Core/Set-DomainGPO.ps1":  22,
+                  "src/modules/Core/New-DomainGroup.ps1":  1,
+                  "src/modules/Core/Set-DomainObject.ps1":  1,
+                  "src/modules/Core/Set-CertificateTemplate.ps1":  5,
+                  "src/modules/Core/Set-DomainUser.ps1":  47,
+                  "src/modules/Core/Disconnect-adPEAS.ps1":  6,
+                  "src/modules/Core/Set-DomainComputer.ps1":  47,
+                  "src/modules/Core/Move-DomainObject.ps1":  3,
+                  "src/modules/Core/adPEAS-Messages.ps1":  20,
+                  "src/modules/Core/New-DomainComputer.ps1":  1,
+                  "src/modules/Core/New-DomainGPO.ps1":  3
+              },
+    "ADContacted":  false
+}

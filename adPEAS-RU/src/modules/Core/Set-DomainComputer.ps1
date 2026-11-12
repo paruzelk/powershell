@@ -437,7 +437,7 @@
                                     Message = "Owner successfully changed"
                                 }
                             } else {
-                                Show-Line "Successfully changed owner of $($TargetComputer.sAMAccountName) to: $Owner" -Class Hint
+                                Show-Line "Владелец объекта $($TargetComputer.sAMAccountName) успешно изменён на: $Owner" -Class Hint
                             }
                         } else {
                             throw "Set-DomainObject returned false"
@@ -465,7 +465,7 @@
                                     Message = "Rights successfully granted"
                                 }
                             } else {
-                                Show-Line "Successfully granted $GrantRights to $Principal on: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Успешно предоставлены права $GrantRights субъекту $Principal на объект: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         } else {
                             throw "Set-DomainObject returned false"
@@ -519,7 +519,7 @@
                                     Message = "Account already enabled (no change)"
                                 }
                             } else {
-                                Show-Line "Account already enabled: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Учётная запись уже включена: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -552,7 +552,7 @@
                                     Message = "Account enabled"
                                 }
                             } else {
-                                Show-Line "Successfully enabled account: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Учётная запись успешно включена: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -584,7 +584,7 @@
                                     Message = "Account already disabled (no change)"
                                 }
                             } else {
-                                Show-Line "Account already disabled: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Учётная запись уже отключена: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -617,7 +617,7 @@
                                     Message = "Account disabled"
                                 }
                             } else {
-                                Show-Line "Successfully disabled account: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Учётная запись успешно отключена: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -650,7 +650,7 @@
                                     Message = "Unconstrained Delegation already enabled (no change)"
                                 }
                             } else {
-                                Show-Line "Unconstrained Delegation already enabled on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Неограниченное делегирование уже включено для: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -683,8 +683,8 @@
                                     Message = "Unconstrained Delegation enabled - computer can now impersonate ANY user to ANY service!"
                                 }
                             } else {
-                                Show-Line "Successfully enabled Unconstrained Delegation for: $($TargetComputer.sAMAccountName)" -Class Hint
-                                Show-Line "Computer can now impersonate ANY user to ANY service!" -Class Finding
+                                Show-Line "Неограниченное делегирование успешно включено для: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Теперь компьютер может выдавать себя за ЛЮБОГО пользователя при обращении к ЛЮБОЙ службе!" -Class Finding
                             }
                         }
                     } catch {
@@ -716,7 +716,7 @@
                                     Message = "Unconstrained Delegation already disabled (no change)"
                                 }
                             } else {
-                                Show-Line "Unconstrained Delegation already disabled on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Неограниченное делегирование уже отключено для: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -749,7 +749,7 @@
                                     Message = "Unconstrained Delegation disabled"
                                 }
                             } else {
-                                Show-Line "Successfully disabled Unconstrained Delegation for: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Неограниченное делегирование успешно отключено для: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -797,7 +797,7 @@
                                     CurrentSPNs = $CurrentSPNs
                                 }
                             } else {
-                                Show-Line "All specified SPNs already present on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Все указанные SPN уже присутствуют у: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -831,11 +831,11 @@
                                     Message = "Constrained Delegation configured - computer can now delegate to $($AddedSPNs.Count) new SPN(s)"
                                 }
                             } else {
-                                Show-Line "Successfully configured Constrained Delegation for: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Ограниченное делегирование успешно настроено для: $($TargetComputer.sAMAccountName)" -Class Hint
                                 foreach ($spn in $AddedSPNs) {
-                                    Show-Line "  Added: $spn" -Class Note
+                                    Show-Line "  Добавлено: $spn" -Class Note
                                 }
-                                Show-Line "Computer can now delegate to these services!" -Class Finding
+                                Show-Line "Теперь компьютер может делегировать доступ к этим службам!" -Class Finding
                             }
                         }
                     } catch {
@@ -871,7 +871,7 @@
                                     Message = "No Constrained Delegation SPNs present (no change)"
                                 }
                             } else {
-                                Show-Line "No Constrained Delegation SPNs present on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "SPN ограниченного делегирования отсутствуют у: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         elseif ($Force) {
@@ -900,7 +900,7 @@
                                     Message = "All $($CurrentSPNs.Count) Constrained Delegation SPN(s) removed"
                                 }
                             } else {
-                                Show-Line "Successfully removed all $($CurrentSPNs.Count) Constrained Delegation SPN(s) from: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Удалены все $($CurrentSPNs.Count) SPN ограниченного делегирования у: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         }
                         elseif ($Principal) {
@@ -950,7 +950,7 @@
                                         Message = "Constrained Delegation SPN removed"
                                     }
                                 } else {
-                                    Show-Line "Successfully removed SPN '$Principal' from: $($TargetComputer.sAMAccountName)" -Class Hint
+                                    Show-Line "SPN '$Principal' успешно удалён у: $($TargetComputer.sAMAccountName)" -Class Hint
                                 }
                             }
                             else {
@@ -963,9 +963,9 @@
                                         Message = "SPN '$Principal' not found. Use -Force to remove all SPNs."
                                     }
                                 } else {
-                                    Show-Line "SPN '$Principal' not found on: $($TargetComputer.sAMAccountName)" -Class Note
-                                    Show-Line "Current SPNs: $($CurrentSPNs -join ', ')" -Class Note
-                                    Show-Line "Use -Force to remove all SPNs" -Class Note
+                                    Show-Line "SPN '$Principal' не найден у: $($TargetComputer.sAMAccountName)" -Class Note
+                                    Show-Line "Текущие SPN: $($CurrentSPNs -join ', ')" -Class Note
+                                    Show-Line "Для удаления всех SPN используйте -Force" -Class Note
                                 }
                             }
                         }
@@ -981,11 +981,11 @@
                                     CurrentSPNs = $CurrentSPNs
                                 }
                             } else {
-                                Show-Line "Current Constrained Delegation SPNs on $($TargetComputer.sAMAccountName):" -Class Note
+                                Show-Line "Текущие SPN ограниченного делегирования у $($TargetComputer.sAMAccountName):" -Class Note
                                 foreach ($spn in $CurrentSPNs) {
                                     Show-Line "  - $spn" -Class Note
                                 }
-                                Show-Line "Use -Principal <SPN> to remove specific SPN or -Force to remove all" -Class Note
+                                Show-Line "Для удаления конкретного SPN используйте -Principal <SPN>, для удаления всех — -Force" -Class Note
                             }
                         }
                     } catch {
@@ -1018,7 +1018,7 @@
                                     Message = "Protocol Transition (S4U2Self) already enabled (no change)"
                                 }
                             } else {
-                                Show-Line "Protocol Transition already enabled on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Переход протокола уже включён для: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1051,8 +1051,8 @@
                                     Message = "Protocol Transition enabled - computer can obtain service tickets for users without their credentials!"
                                 }
                             } else {
-                                Show-Line "Successfully enabled Protocol Transition (S4U2Self) for: $($TargetComputer.sAMAccountName)" -Class Hint
-                                Show-Line "Computer can now obtain service tickets for users without their credentials!" -Class Finding
+                                Show-Line "Переход протокола (S4U2Self) успешно включён для: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Теперь компьютер может получать служебные билеты от имени пользователей без знания их учётных данных!" -Class Finding
                             }
                         }
                     } catch {
@@ -1084,7 +1084,7 @@
                                     Message = "Protocol Transition (S4U2Self) already disabled (no change)"
                                 }
                             } else {
-                                Show-Line "Protocol Transition already disabled on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Переход протокола уже отключён для: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1117,7 +1117,7 @@
                                     Message = "Protocol Transition disabled"
                                 }
                             } else {
-                                Show-Line "Successfully disabled Protocol Transition for: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Переход протокола успешно отключён для: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1150,7 +1150,7 @@
                                     Message = "PASSWD_NOTREQD already set (no change)"
                                 }
                             } else {
-                                Show-Line "PASSWD_NOTREQD already set on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Флаг PASSWD_NOTREQD уже установлен у: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1183,8 +1183,8 @@
                                     Message = "PASSWD_NOTREQD flag set - computer account can have an empty password!"
                                 }
                             } else {
-                                Show-Line "Successfully set PASSWD_NOTREQD on: $($TargetComputer.sAMAccountName)" -Class Hint
-                                Show-Line "Computer account can now have an empty password!" -Class Finding
+                                Show-Line "Флаг PASSWD_NOTREQD успешно установлен у: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Теперь у компьютерной учётной записи может быть пустой пароль!" -Class Finding
                             }
                         }
                     } catch {
@@ -1214,7 +1214,7 @@
                                     Message = "PASSWD_NOTREQD already cleared (no change)"
                                 }
                             } else {
-                                Show-Line "PASSWD_NOTREQD already cleared on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Флаг PASSWD_NOTREQD уже снят у: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1247,7 +1247,7 @@
                                     Message = "PASSWD_NOTREQD flag cleared - password is required again"
                                 }
                             } else {
-                                Show-Line "Successfully cleared PASSWD_NOTREQD on: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг PASSWD_NOTREQD успешно снят у: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1280,7 +1280,7 @@
                                     Message = "DONT_EXPIRE_PASSWORD already set (no change)"
                                 }
                             } else {
-                                Show-Line "DONT_EXPIRE_PASSWORD already set on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Флаг DONT_EXPIRE_PASSWORD уже установлен у: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1313,7 +1313,7 @@
                                     Message = "DONT_EXPIRE_PASSWORD flag set - password will never expire"
                                 }
                             } else {
-                                Show-Line "Successfully set DONT_EXPIRE_PASSWORD on: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг DONT_EXPIRE_PASSWORD успешно установлен у: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1343,7 +1343,7 @@
                                     Message = "DONT_EXPIRE_PASSWORD already cleared (no change)"
                                 }
                             } else {
-                                Show-Line "DONT_EXPIRE_PASSWORD already cleared on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Флаг DONT_EXPIRE_PASSWORD уже снят у: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1376,7 +1376,7 @@
                                     Message = "DONT_EXPIRE_PASSWORD flag cleared - password expiry follows domain policy"
                                 }
                             } else {
-                                Show-Line "Successfully cleared DONT_EXPIRE_PASSWORD on: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг DONT_EXPIRE_PASSWORD успешно снят у: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1409,7 +1409,7 @@
                                     Message = "NOT_DELEGATED already set (no change)"
                                 }
                             } else {
-                                Show-Line "NOT_DELEGATED already set on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Флаг NOT_DELEGATED уже установлен у: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1442,8 +1442,8 @@
                                     Message = "NOT_DELEGATED flag set - account marked as sensitive, cannot be delegated"
                                 }
                             } else {
-                                Show-Line "Successfully set NOT_DELEGATED on: $($TargetComputer.sAMAccountName)" -Class Hint
-                                Show-Line "Account is now marked as sensitive and cannot be delegated" -Class Note
+                                Show-Line "Флаг NOT_DELEGATED успешно установлен у: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Учётная запись теперь помечена как чувствительная; делегирование от её имени запрещено" -Class Note
                             }
                         }
                     } catch {
@@ -1475,7 +1475,7 @@
                                     Message = "NOT_DELEGATED already cleared (no change)"
                                 }
                             } else {
-                                Show-Line "NOT_DELEGATED already cleared on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Флаг NOT_DELEGATED уже снят у: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1508,7 +1508,7 @@
                                     Message = "NOT_DELEGATED flag cleared - account can be delegated again"
                                 }
                             } else {
-                                Show-Line "Successfully cleared NOT_DELEGATED on: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг NOT_DELEGATED успешно снят у: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {
@@ -1541,7 +1541,7 @@
                                     Message = "DONT_REQ_PREAUTH already set (no change)"
                                 }
                             } else {
-                                Show-Line "DONT_REQ_PREAUTH already set on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Флаг DONT_REQ_PREAUTH уже установлен у: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1574,8 +1574,8 @@
                                     Message = "DONT_REQ_PREAUTH flag set - computer account is now AS-REP roastable!"
                                 }
                             } else {
-                                Show-Line "Successfully set DONT_REQ_PREAUTH on: $($TargetComputer.sAMAccountName)" -Class Hint
-                                Show-Line "Computer account is now AS-REP roastable!" -Class Finding
+                                Show-Line "Флаг DONT_REQ_PREAUTH успешно установлен у: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Теперь компьютерная учётная запись допускает AS-REP Roasting!" -Class Finding
                             }
                         }
                     } catch {
@@ -1607,7 +1607,7 @@
                                     Message = "DONT_REQ_PREAUTH already cleared (no change)"
                                 }
                             } else {
-                                Show-Line "DONT_REQ_PREAUTH already cleared on: $($TargetComputer.sAMAccountName)" -Class Note
+                                Show-Line "Флаг DONT_REQ_PREAUTH уже снят у: $($TargetComputer.sAMAccountName)" -Class Note
                             }
                         }
                         else {
@@ -1640,7 +1640,7 @@
                                     Message = "DONT_REQ_PREAUTH flag cleared - pre-authentication is required again"
                                 }
                             } else {
-                                Show-Line "Successfully cleared DONT_REQ_PREAUTH on: $($TargetComputer.sAMAccountName)" -Class Hint
+                                Show-Line "Флаг DONT_REQ_PREAUTH успешно снят у: $($TargetComputer.sAMAccountName)" -Class Hint
                             }
                         }
                     } catch {

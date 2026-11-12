@@ -75,10 +75,10 @@
             }
 
             # Display current session before disconnect
-            Show-SubHeader "Disconnecting session..."
+            Show-SubHeader "Отключение сеанса..."
 
             if ($Script:LDAPContext -and $Script:LDAPContext['Domain']) {
-                Show-Line "Current Session:" -Class Hint
+                Show-Line "Текущий сеанс:" -Class Hint
                 Show-KeyValue "Domain:" $Script:LDAPContext.Domain
                 # Display authenticated user
                 if ($Script:LDAPContext.AuthenticatedUser) {
@@ -153,13 +153,13 @@
 
             # Success output
             Show-EmptyLine
-            Show-Line "Cleanup:" -Class Hint
+            Show-Line "Очистка:" -Class Hint
             Show-KeyValue "Connection:" "Closed" -Class Note
             Show-KeyValue "Variables:" "Cleared" -Class Note
             Show-EmptyLine
 
             if ($cleanupErrors.Count -gt 0 -and $Force) {
-                Show-Line "Cleanup errors (forced disconnect):" -Class Hint
+                Show-Line "Ошибки очистки (принудительное отключение):" -Class Hint
                 foreach ($err in $cleanupErrors) {
                     Show-Line "- $err"
                 }
@@ -171,7 +171,7 @@
 
             # If Force is specified, clear variables anyway
             if ($Force) {
-                Show-Line "Force mode enabled - clearing variables anyway..." -Class Hint
+                Show-Line "Принудительный режим включён — переменные будут очищены несмотря на ошибки..." -Class Hint
                 # Revert NTLM impersonation even in force mode
                 if ($Script:NTLMTokenHandle -and $Script:NTLMTokenHandle -ne [IntPtr]::Zero) {
                     try { Invoke-RevertToSelf -TokenHandle $Script:NTLMTokenHandle } catch {}
@@ -182,7 +182,7 @@
                 try { if ($Script:GCConnection) { $Script:GCConnection.Dispose() } } catch {}
                 # Clear all state
                 Clear-SessionState
-                Show-Line "Session variables and caches force-cleared" -Class Note
+                Show-Line "Переменные сеанса и кэши принудительно очищены" -Class Note
             }
         }
     }

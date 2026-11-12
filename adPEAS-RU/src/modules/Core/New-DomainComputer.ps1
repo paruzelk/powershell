@@ -314,7 +314,7 @@
                 return $Result
             } else {
                 # Console output (default behavior)
-                Show-Line "Successfully created computer: $Name" -Class Hint
+                Show-Line "Успешно создан компьютер: $Name" -Class Hint
                 Show-KeyValue "Distinguished Name:" $ComputerDN
                 Show-KeyValue "DNS Hostname:" "$ComputerNameWithoutDollar.$($Script:LDAPContext.Domain)"
                 Show-KeyValue "Enabled:" $Enabled

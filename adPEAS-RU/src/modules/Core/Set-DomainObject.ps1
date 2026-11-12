@@ -779,7 +779,7 @@
                         Message = "No modifications specified"
                     }
                 }
-                Show-Line "No modifications specified for object: $ObjectDN" -Class Note
+                Show-Line "Изменения для объекта не заданы: $ObjectDN" -Class Note
                 return $true
             }
 

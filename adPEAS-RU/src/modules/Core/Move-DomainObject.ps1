@@ -268,7 +268,7 @@
                         Message = "Object is already at the requested location and name"
                     }
                 }
-                Show-Line "Object is already at the requested location and name: $SourceDN" -Class Note
+                Show-Line "Объект уже находится в запрошенном расположении и имеет указанное имя: $SourceDN" -Class Note
                 return $true
             }
 
@@ -364,12 +364,12 @@
                             Message = "Object successfully moved"
                         }
                     }
-                    Show-Line "Successfully moved $ObjectClass object" -Class Hint
+                    Show-Line "Успешно перемещён объект класса $ObjectClass" -Class Hint
                     Show-KeyValue "From:" $SourceDN
                     Show-KeyValue "To:" $TargetDN
                     # The object is the same principal, but its policy and delegation context
                     # is not - worth stating, because that is usually the point of the move.
-                    Show-Line "objectGUID and objectSID are unchanged, but applied GPOs and inherited ACLs now come from the new location" -Class Note
+                    Show-Line "objectGUID и objectSID не изменились, но применяемые GPO и наследуемые ACL теперь определяются новым расположением" -Class Note
                     return $true
                 } else {
                     $Message = "ModifyDNRequest failed: $($Response.ResultCode) - $($Response.ErrorMessage)"
