@@ -61,6 +61,9 @@ function New-OPA265ARCH2c2PrivateWorkspace {
     $systemSid=New-Object Security.Principal.SecurityIdentifier 'S-1-5-18'
     $dacl=New-Object Security.AccessControl.DirectorySecurity
     $dacl.SetAccessRuleProtection($true,$false)
+    # Elevated Windows users may otherwise inherit Administrators as the owner.
+    # The only acceptable owner is the exact user SID that runs Outlook COM.
+    $dacl.SetOwner($currentSid)
     $inherit=[Security.AccessControl.InheritanceFlags]::ContainerInherit -bor
         [Security.AccessControl.InheritanceFlags]::ObjectInherit
     foreach($sid in @($currentSid,$systemSid)){
