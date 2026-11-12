@@ -88,6 +88,59 @@ if($secondAttackCount -ne 52 -or $secondAttackSteps -ne 189){
 }
 Write-Host "[RU] PASS: 52 сценария Attack приведены к структуре оригинала, проверено 189 пунктов"
 
+
+# Этап D: русские разделы Attack с точным английским свидетельством.
+# Запрещено молча переопределять более ранний перевод или изменять источник.
+$originalFindingText=[IO.File]::ReadAllText($coreDefinitions,[Text.Encoding]::UTF8)
+$originalFindingText=$originalFindingText.Replace(([string][char]13+[string][char]10),[string][char]10)
+$stageDCount=0
+$stageDSteps=0
+$stageDSeen=@{}
+foreach($name in @('SourceVerifiedAttack-10a.ru-RU.json','SourceVerifiedAttack-10b.ru-RU.json')){
+ $source=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($p in $source.translations.PSObject.Properties){
+  $id=[string]$p.Name
+  if($stageDSeen.ContainsKey($id)){throw "Повторный перевод Stage D: $id"}
+  $stageDSeen[$id]=$true
+  if(-not $entries.Contains($id)){throw "Неизвестный FindingId Stage D: $id"}
+  if(@($entries[$id].attack).Count -ne 0){throw "Попытка перезаписать существующий Attack: $id"}
+  $marker="    '$id' = @{"
+  $begin=$originalFindingText.IndexOf($marker,[StringComparison]::Ordinal)
+  if($begin -lt 0){throw "Отсутствует FindingId в каноническом EN: $id"}
+  $finish=$originalFindingText.IndexOf(([string][char]10+'    }'),$begin,[StringComparison]::Ordinal)
+  if($finish -lt 0){throw "Не завершён блок оригинала: $id"}
+  $block=$originalFindingText.Substring($begin,$finish-$begin)
+  $attackMatch=[regex]::Match($block,'(?ms)^[ \t]{8}Attack[ \t]*=[ \t]*@\([ \t]*\n(?<items>.*?)^[ \t]{8}\)')
+  if(-not $attackMatch.Success){throw "У оригинала нет раздела Attack: $id"}
+  $originalSteps=@([regex]::Matches($attackMatch.Groups['items'].Value,'(?m)^[ \t]{12}"(?<value>(?:\x60.|[^"])*)"') | ForEach-Object { $_.Groups['value'].Value })
+  $sourceSteps=@($p.Value.sourceEnglishAttack)
+  $translatedSteps=@($p.Value.attack)
+  $expected=[int]$p.Value.sourceEnglishAttackStepCount
+  if($originalSteps.Count -ne $expected -or $sourceSteps.Count -ne $expected -or $translatedSteps.Count -ne $expected){
+   throw "Различается число пунктов Attack $($id): EN=$($originalSteps.Count), свидетельство=$($sourceSteps.Count), RU=$($translatedSteps.Count), ожидается=$expected"
+  }
+  for($i=0;$i -lt $expected;$i++){
+   if([string]$originalSteps[$i] -cne [string]$sourceSteps[$i]){
+    throw "Английский оригинал Attack изменён: $id, пункт $($i+1)"
+   }
+   if([string]::IsNullOrWhiteSpace([string]$translatedSteps[$i]) -or [string]$translatedSteps[$i] -notmatch '[А-Яа-яЁё]'){
+    throw "Отсутствует русский перевод Attack: $id, пункт $($i+1)"
+   }
+   if($originalSteps[$i] -match '^(?:With |When |Nothing here|BloodHound is|Attackers also use|Understanding your)' -and
+      $translatedSteps[$i] -match '^1\.[ \t]'){
+    throw "Защитное или справочное пояснение ошибочно превращено в шаг атаки: $id"
+   }
+  }
+  $entries[$id].attack=@($translatedSteps)
+  $stageDCount++
+  $stageDSteps+=$expected
+ }
+}
+if($stageDCount -ne 77 -or $stageDSteps -ne 272){
+ throw "Неполный этап D: типов=$stageDCount, пунктов=$stageDSteps (ожидалось 77/272)"
+}
+Write-Host "[RU] PASS: 77 новых разделов Attack (272 пункта) сверены с закреплённым английским источником"
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
