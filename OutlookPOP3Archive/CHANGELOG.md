@@ -1,5 +1,12 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH2c2 DEV — 2026-11-12
+- Standard .NET Framework NTFS DACL creation at workspace creation (current SID and SYSTEM only), check owner/protected rules and fail-closed verification.
+- Exclusive FileShare.None lease during attachment SaveAsFile/hash/cleanup; no automatic crash-orphan deletion; read-only LeaseState classification.
+- Fourteen new synthetic Pester tests; expected 3778 tests in 127 containers after full PS5.1 gate. No live Outlook or production writer.
+- Outbound Archive/Resume/Auto remain closed, historical Move claims immutable. Copy/Verify/Delete remains design stage.
+- Source written independently in pure Windows PowerShell 5.1, no external code copied.
+
 ## 2.6.5-ARCH2c1 DEV — 2026-11-12
 - Isolated per-witness GUID temporary directories for Outlook attachment SaveAsFile bytes; non-recursive normal/exception cleanup and fail-closed residue handling.
 - Read-only crash residual workspace inventory. Ten synthetic Windows PowerShell 5.1 Pester cases; no real Outlook COM in CI.
