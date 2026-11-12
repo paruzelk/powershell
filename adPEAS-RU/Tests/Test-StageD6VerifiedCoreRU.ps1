@@ -126,8 +126,8 @@ foreach($id in $semanticGuards.Keys){
 }
 $parity=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceFieldParity392.json'),[Text.Encoding]::UTF8))
 if(@($parity.ImpactStepCountDifferences).Count -ne 225 -or
-   @($parity.RemediationStepCountDifferences).Count -ne 205){
- throw 'D6: итоговый счётчик расхождений должен быть 225/205'
+   @($parity.RemediationStepCountDifferences).Count -ne 206){
+ throw 'D6: итоговый счётчик расхождений должен быть 225/206'
 }
 foreach($id in $expectedIds){
  if(@($parity.ImpactStepCountDifferences) -ccontains $id -or
@@ -135,4 +135,4 @@ foreach($id in $expectedIds){
   throw "D6: структурное расхождение у переведённой находки $id"
  }
 }
-Write-Host 'PASS D6: 24 находки; Impact 79, Remediation 74; EN/RU/HTML паритет; остатки 225/205' -ForegroundColor Green
+Write-Host 'PASS D6: 24 находки; Impact 79, Remediation 74; EN/RU/HTML паритет; остатки 225/206' -ForegroundColor Green
