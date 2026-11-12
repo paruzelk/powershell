@@ -1,5 +1,11 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH2c4a DEV hotfix — 2026-11-12
+- Fix actual operator `Prepare` failure: `Get-OPAInternetMessageId` unavailable in one-shot core because `ArchiveSelector.ps1` and `ComManager.ps1` were omitted from standalone bootstrap.
+- Restore original core dependency load order; test complete real ARCH2b semantic witness on fake Unicode, MAPI InternetMessageId, original by-value attachment content and protected TEMP; fail-closed on changed body/payload.
+- Add 10 PowerShell 5.1 integration regression tests. Expected full CI: 3847 tests / 130 containers, zero failures/skips.
+- Keep original ARCH2c4 one-shot scope, run layout, operator approvals, global claim and main Archive/Resume/Auto lockdown unchanged. No COM Move executed by Actions.
+
 ## 2.6.5-ARCH2c4 DEV — 2026-11-12
 - New operator-authorized core-only one-shot pilot for a real `info@stios.ru.pst` POP3 Inbox item; no deleted historical BW4k PST fixtures required.
 - New unique archive PST created only as output after explicit Prepare; independent Body/HTML/recipient/attachment-byte semantic witness before one irreversible MailItem.Move.
