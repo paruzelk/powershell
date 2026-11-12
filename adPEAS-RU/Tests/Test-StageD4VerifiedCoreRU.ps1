@@ -112,8 +112,12 @@ foreach($id in $checks.Keys){
   throw "D4: потерян существенный технический нюанс у $id"
  }
 }
-if(@($parity.ImpactStepCountDifferences).Count -ne 273 -or
-   @($parity.RemediationStepCountDifferences).Count -ne 253){
- throw 'D4: итоговая статистика полей не соответствует 273/253'
+# В последующих этапах общий счётчик дрейфа меняется.
+# Здесь контролируется только закреплённый набор D4 из 20 ID.
+foreach($id in $expectedIds){
+ if(@($parity.ImpactStepCountDifferences) -ccontains $id -or
+    @($parity.RemediationStepCountDifferences) -ccontains $id){
+  throw "D4: найдено структурное расхождение у ранее сверенного $id"
+ }
 }
 Write-Host "PASS D4: 20 находок, 75 Impact + 77 Remediation; EN-свидетели и HTML совпадают" -ForegroundColor Green
