@@ -140,6 +140,36 @@ jobs:
              throw 'ARCH2d4 forensic pinned claims/return check and zero real write permissions gate failed.'
           }
           Write-Host 'PASS ARCH2d4 operator hashes anchored, 10 receipts validated, no journal/PST writes or any COM Move.'
+      - name: ARCH2d5 exact 100 originals and externally anchored SHA256 receipt chain safety
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH2d5Batch100Core.ps1' -Raw -Encoding UTF8
+          $policy=Get-Content -LiteralPath 'Core/Archive/ARCH2d5Batch100Policy.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH2d5.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch2d5-real-batch100.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $global=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path $layout.GlobalClaimPath')
+          $item=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path (Get-OPA265ARCH2d5ItemPath -Layout $layout -Ordinal $ordinal)')
+          $move=$core.IndexOf('$moved=$mail.Move($target)')
+          $return=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path (Get-OPA265ARCH2d5ItemPath -Layout $layout -Ordinal $ordinal -Kind Return)')
+          $checkpoint=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path (Get-OPA265ARCH2d5CheckpointPath')
+          $final=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path $layout.FinalSealPath')
+          if(([regex]::Matches($core,'\$moved=\$mail\.Move\(\$target\)')).Count -ne 1 -or
+             $global -lt 0 -or $item -le $global -or $move -le $item -or
+             $return -le $move -or $checkpoint -le $return -or $final -le $checkpoint -or
+             $core -cmatch '\.(Copy|Delete|Save|Send)\s*\(' -or
+             $core -cnotmatch 'for\(\$i=0;\$i -lt 100;\$i\+\+\)' -or
+             $core -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness' -or
+             $core -cnotmatch 'PreviousReceiptSha256=\$lastReturnSha' -or
+             $policy -cnotmatch 'AllHundredChainVerified' -or
+             $policy -cnotmatch 'FinalSealExternallyPinned' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Inventory','Prepare','MoveBatch','Evidence','Reconcile'\)" -or
+             $docs -cnotmatch 'FinalSealSha256' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4059 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 134){
+              throw 'ARCH2d5 batch100 sealed receipt chain static safety gate failed.'
+          }
+          Write-Host 'PASS ARCH2d5 100 originals, per-item claim before COM Move, ten receipt checkpoints and final operator-pinned SHA.'
       - name: Package only OutlookPOP3Archive from tested commit and calculate SHA-256
         run: |
           $ErrorActionPreference='Stop'
