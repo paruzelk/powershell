@@ -1,0 +1,547 @@
+{
+  "schema": "adPEAS-RU.StageD.SourceVerifiedAttack.01",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "note": "English Attack list is preserved verbatim for strict pinned-source verification; Russian steps correspond one-to-one, including non-exploitable conditions.",
+  "translations": {
+    "ACCOUNT_NOT_DELEGATED": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "With NOT_DELEGATED set, attackers cannot:",
+        "- Impersonate this account via delegation servers",
+        "- Use captured TGTs for S4U2Self/S4U2Proxy attacks",
+        "- Leverage RBCD to access resources as this account",
+        "- Abuse unconstrained delegation to steal this account's TGT"
+      ],
+      "attack": [
+        "Если установлен флаг NOT_DELEGATED, нарушитель не может:",
+        "— выдавать себя за эту учётную запись через серверы с настроенным делегированием;",
+        "— применять перехваченные TGT для атак S4U2Self/S4U2Proxy;",
+        "— использовать RBCD для доступа к ресурсам от имени этой записи;",
+        "— злоупотреблять неограниченным делегированием для кражи TGT этой записи."
+      ]
+    },
+    "ADFS_DKM_CONTAINER": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker gains administrative access to an AD FS server or to the AD FS service account",
+        "2. The DKM key is read from the container in AD and the encrypted configuration is read from the AD FS database",
+        "3. The token-signing certificate is decrypted with the DKM key",
+        "4. SAML tokens are forged for arbitrary users and accepted by every relying party, including Microsoft 365"
+      ],
+      "attack": [
+        "1. Нарушитель получает административный доступ к серверу AD FS либо к служебной учётной записи AD FS.",
+        "2. Считывает ключ DKM из контейнера AD, а зашифрованную конфигурацию — из базы данных AD FS.",
+        "3. Расшифровывает сертификат подписи токенов с помощью ключа DKM.",
+        "4. Подделывает SAML-токены произвольных пользователей; их принимают доверяющие стороны, в том числе Microsoft 365."
+      ]
+    },
+    "ANONYMOUS_SAM_ENUMERATION_ALLOWED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker opens a null session to a machine in scope",
+        "2. Enumerates local accounts and shares",
+        "3. Uses the names for password spraying or share hunting"
+      ],
+      "attack": [
+        "1. Нарушитель открывает анонимный сеанс (null session) с компьютером в области действия политики.",
+        "2. Перечисляет локальные учётные записи и общие ресурсы.",
+        "3. Использует найденные имена для распыления паролей (password spraying) или поиска доступных общих ресурсов."
+      ]
+    },
+    "AUTHN_POLICY_OBJECT_WRITABLE": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Use the write access to set msDS-AuthNPolicySiloEnforced (or msDS-AuthNPolicyEnforced) to FALSE, or to widen a condition",
+        "2. Wait for a Tier 0 account to sign on from a machine the attacker controls",
+        "3. Take its credentials there"
+      ],
+      "attack": [
+        "1. Использует право записи, чтобы установить msDS-AuthNPolicySiloEnforced (либо msDS-AuthNPolicyEnforced) в FALSE или ослабить условие политики.",
+        "2. Дожидается входа учётной записи Tier 0 с компьютера под контролем нарушителя.",
+        "3. Похищает её учётные данные на этом компьютере."
+      ]
+    },
+    "AZURE_AD_CONNECT_EXPOSED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker compromises Azure AD Connect server",
+        "2. Extracts MSOL account credentials",
+        "3. Uses DCSync rights to dump all domain hashes",
+        "4. Or forges tokens for Azure AD access"
+      ],
+      "attack": [
+        "1. Нарушитель компрометирует сервер Azure AD Connect.",
+        "2. Извлекает учётные данные записи MSOL.",
+        "3. Использует права DCSync для извлечения всех хешей паролей домена.",
+        "4. Либо подделывает токены для доступа к Azure AD."
+      ]
+    },
+    "BITLOCKER_RECOVERY_DELEGATED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. As the delegated principal, read msFVE-RecoveryPassword from the msFVE-RecoveryInformation objects below the computers in scope",
+        "2. Obtain the disk of one of those computers, or an image of it",
+        "3. Unlock the volume with the 48-digit recovery password (manage-bde -unlock -RecoveryPassword, or dislocker)",
+        "4. Read the volume offline: SAM and LSA secrets, DPAPI material, and on a domain controller ntds.dit"
+      ],
+      "attack": [
+        "1. От имени субъекта с делегированным правом считывает msFVE-RecoveryPassword из объектов msFVE-RecoveryInformation под соответствующими компьютерами.",
+        "2. Получает диск одного из этих компьютеров либо образ диска.",
+        "3. Разблокирует том 48-значным паролем восстановления (manage-bde -unlock -RecoveryPassword либо dislocker).",
+        "4. Читает том автономно: секреты SAM и LSA, материал DPAPI, а на контроллере домена — ntds.dit."
+      ]
+    },
+    "BLOODHOUND_COLLECTION_COMPLETE": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "BloodHound is a defensive tool for identifying attack paths",
+        "Attackers also use BloodHound for reconnaissance",
+        "Understanding your attack surface helps prioritize remediation"
+      ],
+      "attack": [
+        "BloodHound — защитный инструмент для выявления путей атаки.",
+        "Нарушители также используют BloodHound для разведки.",
+        "Понимание собственной поверхности атаки помогает определять приоритеты устранения рисков."
+      ]
+    },
+    "COMPUTER_CONTAINER_CREATE_BROAD": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Any member of the group creates a computer account in the container",
+        "2. Sets its password, so it owns a machine identity",
+        "3. Writes msDS-AllowedToActOnBehalfOfOtherIdentity on a target computer",
+        "4. Requests a service ticket for a privileged user on that target"
+      ],
+      "attack": [
+        "1. Любой участник группы создаёт учётную запись компьютера в контейнере.",
+        "2. Задаёт её пароль и получает контролируемую машинную идентичность.",
+        "3. Записывает msDS-AllowedToActOnBehalfOfOtherIdentity на целевом компьютере.",
+        "4. Запрашивает служебный билет от имени привилегированного пользователя для этого компьютера."
+      ]
+    },
+    "COMPUTER_OBJECT_EXPLICIT_RIGHT": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker controls the listed principal",
+        "2. Writes RBCD or a key credential on the computer, resets its password, or reads its LAPS password",
+        "3. Obtains a service ticket to the computer as an administrator, or logs on with the local administrator password"
+      ],
+      "attack": [
+        "1. Нарушитель получает контроль над указанным субъектом.",
+        "2. Записывает RBCD или ключевые учётные данные на объект компьютера, сбрасывает его пароль либо читает пароль LAPS.",
+        "3. Получает служебный билет к компьютеру от имени администратора либо входит с паролем локального администратора."
+      ]
+    },
+    "COMPUTER_OWNERSHIP_REASSIGNED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker gains control of the principal that owns the computer object",
+        "2. Owner rights are used to write a DACL entry granting GenericAll",
+        "3. msDS-AllowedToActOnBehalfOfOtherIdentity is set to an account the attacker controls",
+        "4. S4U2Self plus S4U2Proxy yields a service ticket as any user, including a Domain Admin, against the machine"
+      ],
+      "attack": [
+        "1. Нарушитель получает контроль над субъектом — владельцем объекта компьютера.",
+        "2. Использует права владельца, чтобы добавить ACE в DACL с разрешением GenericAll.",
+        "3. Устанавливает msDS-AllowedToActOnBehalfOfOtherIdentity на контролируемую запись.",
+        "4. Через S4U2Self и S4U2Proxy получает служебный билет к этому компьютеру от имени любого пользователя, включая Domain Admin."
+      ]
+    },
+    "COMPUTER_PASSWORD_NOT_ROTATED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker extracts the machine account key of the host once",
+        "2. Forges service tickets to its services, or authenticates as the computer",
+        "3. Keeps that access for as long as the password does not change"
+      ],
+      "attack": [
+        "1. Нарушитель однократно извлекает ключ машинной учётной записи узла.",
+        "2. Подделывает служебные билеты для служб узла либо аутентифицируется как компьютер.",
+        "3. Сохраняет этот доступ, пока пароль компьютера не изменится."
+      ]
+    },
+    "CONSTRAINED_DELEGATION_TO_DC": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "1. Attacker compromises the account or its password hash",
+        "2. S4U2Self obtains a ticket for a privileged user - forwardable if protocol transition is set",
+        "3. S4U2Proxy exchanges it for a service ticket to the configured SPN on the Domain Controller",
+        "4. The service class in that ticket is rewritten to the one wanted, for example ldap or cifs",
+        "5. The rewritten ticket is used against the Domain Controller, for example for DCSync"
+      ],
+      "attack": [
+        "1. Нарушитель компрометирует учётную запись либо получает хеш её пароля.",
+        "2. Через S4U2Self получает билет для привилегированного пользователя; при разрешённом переходе протокола билет может быть перенаправляемым.",
+        "3. Через S4U2Proxy обменивает его на служебный билет к настроенному SPN контроллера домена.",
+        "4. Переписывает класс службы в билете на необходимый, например ldap или cifs.",
+        "5. Использует изменённый билет против контроллера домена, например для DCSync."
+      ]
+    },
+    "CONSTRAINED_DELEGATION_TRANSITION_NO_TARGET": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker compromises the account",
+        "2. S4U2Self obtains a forwardable ticket impersonating a privileged user",
+        "3. The ticket is presented to a service the account itself hosts",
+        "4. If the attacker can write msDS-AllowedToDelegateTo, any target of choice is added"
+      ],
+      "attack": [
+        "1. Нарушитель компрометирует учётную запись.",
+        "2. Через S4U2Self получает перенаправляемый билет, выдавая себя за привилегированного пользователя.",
+        "3. Предъявляет билет службе, которую размещает сама эта учётная запись.",
+        "4. При наличии права записи msDS-AllowedToDelegateTo добавляет любую выбранную целевую службу."
+      ]
+    },
+    "CREDENTIAL_AUTOADMINLOGON": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "1. Attacker reads SYSVOL - any domain user can - or a share holding a copy of a policy, such as a GPO backup",
+        "2. Searches for Registry.xml files containing the Winlogon DefaultPassword value",
+        "3. Extracts DefaultUserName, DefaultPassword, and DefaultDomainName",
+        "4. Uses credentials directly (no decryption needed!)",
+        "5. Logs into systems where AutoAdminLogon is configured"
+      ],
+      "attack": [
+        "1. Нарушитель читает SYSVOL (доступен любому пользователю домена) либо ресурс с копией политики, например резервной копией GPO.",
+        "2. Ищет Registry.xml со значением Winlogon DefaultPassword.",
+        "3. Извлекает DefaultUserName, DefaultPassword и DefaultDomainName.",
+        "4. Использует учётные данные напрямую — расшифровка не требуется.",
+        "5. Входит на системы, где настроен AutoAdminLogon."
+      ]
+    },
+    "CREDENTIAL_CONNECTION_STRING": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker finds connection string in config file or script",
+        "2. Extracts server, database, username, and password",
+        "3. Connects to database server using exposed credentials",
+        "4. Extracts data or escalates privileges (xp_cmdshell, etc.)"
+      ],
+      "attack": [
+        "1. Нарушитель находит строку подключения в конфигурационном файле или сценарии.",
+        "2. Извлекает адрес сервера, базу данных, имя пользователя и пароль.",
+        "3. Подключается к серверу БД с раскрытыми учётными данными.",
+        "4. Извлекает данные либо повышает привилегии (например, через xp_cmdshell)."
+      ]
+    },
+    "CREDENTIAL_IN_DESCRIPTION": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker queries AD for all objects with non-empty description/info",
+        "2. Parses for password patterns (pass=, pwd:, password, etc.)",
+        "3. Tests discovered credentials against accounts",
+        "4. Uses valid credentials for access or privilege escalation"
+      ],
+      "attack": [
+        "1. Нарушитель запрашивает в AD объекты с непустыми атрибутами description/info.",
+        "2. Ищет в них шаблоны указания пароля (pass=, pwd:, password и подобные).",
+        "3. Проверяет обнаруженные учётные данные на учётных записях.",
+        "4. Применяет действительные данные для доступа либо повышения привилегий."
+      ]
+    },
+    "CREDENTIAL_MENTION_REVIEW": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker searches scripts for credential keywords",
+        "2. Reviews context to determine if actual credentials are present",
+        "3. If credentials found, extracts and uses them for access"
+      ],
+      "attack": [
+        "1. Нарушитель ищет в сценариях ключевые слова, связанные с учётными данными.",
+        "2. Анализирует контекст, чтобы понять, действительно ли они присутствуют.",
+        "3. Если данные обнаружены, извлекает их и использует для доступа."
+      ]
+    },
+    "CREDENTIAL_NET_USE": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "1. Attacker reads the scripts on SYSVOL, NETLOGON or a file share",
+        "2. Searches login scripts for 'net use' with /user: parameter",
+        "3. Extracts username and password from the command",
+        "4. Uses credentials to access the target resource",
+        "5. Potentially pivots to other systems using same credentials"
+      ],
+      "attack": [
+        "1. Нарушитель читает сценарии из SYSVOL, NETLOGON или общего файлового ресурса.",
+        "2. Ищет в сценариях входа команды net use с параметром /user:.",
+        "3. Извлекает имя пользователя и пароль из команды.",
+        "4. Использует их для доступа к целевому ресурсу.",
+        "5. Возможно, переходит к другим системам, где используются те же учётные данные."
+      ]
+    },
+    "CREDENTIAL_ROAMING_DELEGATED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. As the delegated principal, read msPKIDPAPIMasterKeys and msPKIAccountCredentials from the users in scope",
+        "2. Obtain the domain backup key, or the target's password or hash",
+        "3. Decrypt the master keys offline, then the private keys they protect",
+        "4. Authenticate as the target with a recovered certificate, or decrypt their stored DPAPI secrets"
+      ],
+      "attack": [
+        "1. От имени субъекта с делегированным доступом читает msPKIDPAPIMasterKeys и msPKIAccountCredentials пользователей в области действия.",
+        "2. Получает доменный резервный ключ либо пароль или хеш целевого пользователя.",
+        "3. Автономно расшифровывает мастер-ключи, затем защищённые ими закрытые ключи.",
+        "4. Аутентифицируется как целевой пользователь с восстановленным сертификатом либо расшифровывает сохранённые секреты DPAPI."
+      ]
+    },
+    "CREDENTIAL_ROAMING_PRESENT": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "1. Read msPKIDPAPIMasterKeys and msPKIAccountCredentials from the target user object",
+        "2. Export the domain backup key from a domain controller (lsadump::backupkeys /export) or use the user's password or hash",
+        "3. Decrypt the master keys offline (dpapi::masterkey /in:<blob> /pvk:<backupkey>.pvk)",
+        "4. Decrypt the private key out of msPKIAccountCredentials with the recovered master key",
+        "5. Authenticate as the user with the recovered certificate, or decrypt their stored DPAPI secrets"
+      ],
+      "attack": [
+        "1. Читает msPKIDPAPIMasterKeys и msPKIAccountCredentials в объекте целевого пользователя.",
+        "2. Экспортирует доменный резервный ключ с контроллера домена (lsadump::backupkeys /export) либо использует пароль или хеш пользователя.",
+        "3. Автономно расшифровывает мастер-ключи (dpapi::masterkey /in:<blob> /pvk:<backupkey>.pvk).",
+        "4. Полученным мастер-ключом расшифровывает закрытый ключ из msPKIAccountCredentials.",
+        "5. Аутентифицируется как пользователь с восстановленным сертификатом либо расшифровывает его сохранённые секреты DPAPI."
+      ]
+    },
+    "CREDENTIAL_ROAMING_READABLE": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "1. As any domain user, query every user object for msPKIDPAPIMasterKeys and msPKIAccountCredentials",
+        "2. Store the blobs - no privileges were needed to read them and none are needed to keep them",
+        "3. Wait for, or work towards, either the target's hash or the domain backup key",
+        "4. Decrypt the master keys offline, then the private keys they protect",
+        "5. Impersonate the user with a roamed authentication certificate"
+      ],
+      "attack": [
+        "1. Как обычный пользователь домена запрашивает msPKIDPAPIMasterKeys и msPKIAccountCredentials всех пользовательских объектов.",
+        "2. Сохраняет двоичные данные — для их чтения не требовалось привилегий, и для последующего хранения они также не нужны.",
+        "3. Ожидает либо пытается получить хеш целевого пользователя или доменный резервный ключ.",
+        "4. Автономно расшифровывает мастер-ключи, затем защищённые ими закрытые ключи.",
+        "5. Выдаёт себя за пользователя с помощью перенесённого сертификата аутентификации."
+      ]
+    },
+    "CREDENTIAL_SCRIPT_PASSWORD": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker searches SYSVOL, NETLOGON and readable file shares for common password patterns",
+        "2. Reviews scripts for hardcoded credentials",
+        "3. Identifies context of the credential (database, service, admin)",
+        "4. Uses credential to access the target resource or system"
+      ],
+      "attack": [
+        "1. Нарушитель ищет типовые шаблоны паролей в SYSVOL, NETLOGON и доступных для чтения общих ресурсах.",
+        "2. Анализирует сценарии на наличие встроенных учётных данных.",
+        "3. Выясняет их назначение: база данных, служба или администратор.",
+        "4. Использует найденные данные для доступа к ресурсу либо системе."
+      ]
+    },
+    "CREDENTIAL_UNATTEND_PASSWORD": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Read the answer file from the share",
+        "2. Decode a hidden value: Base64, then UTF-16LE, then cut AdministratorPassword or Password off the end",
+        "3. Log on with the local administrator password to every machine built from the file, or with the domain join account to the domain"
+      ],
+      "attack": [
+        "1. Читает файл автоматической установки (answer file) из общего ресурса.",
+        "2. Декодирует скрытое значение: Base64, затем UTF-16LE, после чего удаляет суффикс AdministratorPassword или Password.",
+        "3. Входит как локальный администратор на компьютеры, установленные с этого файла, либо использует доменную запись присоединения к домену."
+      ]
+    },
+    "CREDENTIAL_VNC_PASSWORD": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Read the .vnc file, the .ini or the policy from the share",
+        "2. Decrypt the 16 hex digits with the fixed VNC DES key",
+        "3. Connect to the host the file names, or to any VNC server that shares the password"
+      ],
+      "attack": [
+        "1. Читает из общего ресурса файл .vnc, файл .ini либо политику.",
+        "2. Расшифровывает 16 шестнадцатеричных символов фиксированным ключом DES для VNC.",
+        "3. Подключается к указанному в файле узлу или другому VNC-серверу с тем же паролем."
+      ]
+    },
+    "CRITICAL_OBJECT_CONTROL": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker controls the listed principal",
+        "2. Uses the right on the object - writes the DACL, the schema, or fSMORoleOwner with the role's transfer right",
+        "3. Holds the change for as long as nobody compares the object with its default"
+      ],
+      "attack": [
+        "1. Нарушитель получает контроль над указанным субъектом.",
+        "2. Использует его право на объект: изменяет DACL, схему либо fSMORoleOwner с соответствующим правом передачи роли.",
+        "3. Сохраняет изменение, пока кто-либо не сравнит объект с его исходным состоянием."
+      ]
+    },
+    "DANGEROUS_ACL_BROAD_GROUP": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker authenticates as any domain user",
+        "2. Exercises the right directly, since the group granting it already includes that account",
+        "3. Where the right is WriteDacl or WriteOwner, writes itself whatever else it needs",
+        "4. Takes the domain from there"
+      ],
+      "attack": [
+        "1. Нарушитель проходит аутентификацию как любой пользователь домена.",
+        "2. Прямо использует предоставленное право, поскольку группа, которой оно назначено, уже включает эту учётную запись.",
+        "3. Если право — WriteDacl или WriteOwner, добавляет себе необходимые разрешения.",
+        "4. Затем может захватить домен."
+      ]
+    },
+    "DANGEROUS_ACL_DCSYNC_BROAD": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker authenticates as any domain user, however unprivileged",
+        "2. Finds the replication rights granted to a group that account is already in",
+        "3. Runs DCSync against a domain controller and collects every hash, krbtgt included",
+        "4. Forges a Golden Ticket, which no password reset short of krbtgt twice will remove"
+      ],
+      "attack": [
+        "1. Нарушитель аутентифицируется как любой, даже непривилегированный пользователь домена.",
+        "2. Обнаруживает права репликации, предоставленные группе, в которую его запись уже входит.",
+        "3. Выполняет DCSync на контроллере домена и получает все хеши, включая krbtgt.",
+        "4. Подделывает Golden Ticket; простой сброс остальных паролей не отменит его без двух смен пароля krbtgt."
+      ]
+    },
+    "DANGEROUS_ACL_GPO_EXTENDED": {
+      "sourceEnglishAttackStepCount": 1,
+      "sourceEnglishAttack": [
+        "Read the ACE's ObjectType GUID directly to identify which validated write or extended right is actually granted, then assess it on its own terms"
+      ],
+      "attack": [
+        "Непосредственно прочитать GUID ObjectType у ACE, определить, какое конкретно право проверенной записи или расширенное право предоставлено, и отдельно оценить последствия именно этого разрешения."
+      ]
+    },
+    "DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Read which attribute the ACE is scoped to - it is named in the finding",
+        "2. Assess what that single attribute controls on a groupPolicyContainer",
+        "3. For gPCWQLFilter: point the GPO at a WMI filter that evaluates false on the machines the attacker wants exempted from the policy"
+      ],
+      "attack": [
+        "1. Прочитать, на какой атрибут распространяется ACE: его имя указано в находке.",
+        "2. Оценить, чем управляет этот отдельный атрибут объекта groupPolicyContainer.",
+        "3. Если это gPCWQLFilter, привязать GPO к WMI-фильтру, возвращающему FALSE на компьютерах, которые нарушитель хочет исключить из области политики."
+      ]
+    },
+    "DANGEROUS_RIGHTS_CONTEXT": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "1. Attacker compromises low-privileged user with GenericAll on Domain Admins group",
+        "2. Uses Add-DomainGroupMember to add attacker account to Domain Admins",
+        "3. Alternatively, WriteDACL allows adding new ACE granting attacker Full Control",
+        "4. WriteOwner enables taking ownership of sensitive objects (AdminSDHolder, GPOs)",
+        "5. ForceChangePassword allows resetting passwords of privileged accounts"
+      ],
+      "attack": [
+        "1. Нарушитель компрометирует низкопривилегированного пользователя с GenericAll на группе Domain Admins.",
+        "2. Через Add-DomainGroupMember добавляет контролируемую запись в Domain Admins.",
+        "3. Альтернативно WriteDACL позволяет добавить ACE с полным доступом нарушителя.",
+        "4. WriteOwner позволяет завладеть чувствительными объектами, например AdminSDHolder и GPO.",
+        "5. ForceChangePassword позволяет сбросить пароль привилегированной учётной записи."
+      ]
+    },
+    "DC_PASSWORD_NOT_ROTATED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker obtains the Domain Controller's machine account key once - from a backup, a VM snapshot or memory",
+        "2. Replicates the domain's secrets with it (DCSync), or forges service tickets to the Domain Controller",
+        "3. Keeps that access until the Domain Controller changes its password"
+      ],
+      "attack": [
+        "1. Нарушитель однажды получает ключ машинной учётной записи контроллера домена из резервной копии, снимка виртуальной машины либо памяти.",
+        "2. Использует его для репликации секретов домена через DCSync или подделки служебных билетов контроллера.",
+        "3. Сохраняет доступ до смены пароля контроллера домена."
+      ]
+    },
+    "DELETED_OBJECTS_READ_BROAD": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. As any domain user, search the Deleted Objects container with the show-deleted control",
+        "2. Read the attributes of the deleted objects",
+        "3. Use what they hold"
+      ],
+      "attack": [
+        "1. Как любой пользователь домена ищет в контейнере Deleted Objects с управляющим элементом show-deleted.",
+        "2. Читает атрибуты удалённых объектов.",
+        "3. Использует содержащиеся в них сведения."
+      ]
+    },
+    "DELETED_OBJECTS_READ_DELEGATED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. As the delegated principal, search the Deleted Objects container with the show-deleted control",
+        "2. Read the deleted objects - descriptions, info, extension attributes, Unix password attributes",
+        "3. Use what they hold, or pick a deleted account worth restoring"
+      ],
+      "attack": [
+        "1. От имени субъекта с делегированным правом ищет в контейнере Deleted Objects с управляющим элементом show-deleted.",
+        "2. Читает удалённые объекты: описания, info, расширенные атрибуты и парольные атрибуты Unix.",
+        "3. Использует эти сведения либо выбирает удалённую запись, восстановление которой представляет интерес."
+      ]
+    },
+    "DELETED_OBJECT_CREDENTIAL": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. List the Deleted Objects container with the show-deleted control (Get-ADObject -IncludeDeletedObjects)",
+        "2. Read the free-text and password attributes of the deleted accounts",
+        "3. Try the password on the accounts it may have been reused for, or on the account itself once it is restored"
+      ],
+      "attack": [
+        "1. Перечисляет контейнер Deleted Objects с управляющим элементом show-deleted (Get-ADObject -IncludeDeletedObjects).",
+        "2. Читает свободные текстовые и парольные атрибуты удалённых записей.",
+        "3. Пробует пароль на других записях, где он мог повторно использоваться, либо на самой записи после восстановления."
+      ]
+    },
+    "DMSA_LINK_IRREGULAR": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Control a dMSA - create one, or hold write access to an existing one",
+        "2. With write access to the target account, write both halves of the pairing: msDS-ManagedAccountPrecededByLink on the dMSA, msDS-SupersededManagedAccountLink on the account",
+        "3. Request a ticket for the dMSA: it carries the account's group memberships, and its key package holds the account's keys"
+      ],
+      "attack": [
+        "1. Получает контроль над dMSA: создаёт новую либо имеет право записи на существующую.",
+        "2. При наличии права записи целевой записи задаёт обе стороны связи: msDS-ManagedAccountPrecededByLink у dMSA и msDS-SupersededManagedAccountLink у целевой записи.",
+        "3. Запрашивает билет для dMSA: он содержит членства замещённой записи в группах, а пакет ключей dMSA содержит её ключи."
+      ]
+    },
+    "DMSA_LINK_ONE_SIDED": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Control a dMSA and point its msDS-ManagedAccountPrecededByLink at the target - the half already written here",
+        "2. Gain write access to the target and set its msDS-SupersededManagedAccountLink to the dMSA",
+        "3. Request a ticket for the dMSA: it carries the target's group memberships, and its key package holds the target's keys"
+      ],
+      "attack": [
+        "1. Управляет dMSA и направляет её msDS-ManagedAccountPrecededByLink на цель — это уже установленная сторона связи.",
+        "2. Получает право записи целевой записи и задаёт msDS-SupersededManagedAccountLink на dMSA.",
+        "3. Запрашивает билет dMSA: он содержит членства целевой записи в группах, а пакет ключей — её ключи."
+      ]
+    },
+    "DMSA_MEMBERSHIP_OWNER": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Control the owner of msDS-GroupMSAMembership",
+        "2. Rewrite the descriptor to name itself",
+        "3. Request a ticket for the dMSA, then restore the descriptor"
+      ],
+      "attack": [
+        "1. Получает контроль над владельцем дескриптора msDS-GroupMSAMembership.",
+        "2. Изменяет дескриптор, добавляя собственный субъект.",
+        "3. Запрашивает билет для dMSA, после чего восстанавливает дескриптор."
+      ]
+    },
+    "DMSA_PRIVILEGED_PREDECESSOR": {
+      "sourceEnglishAttackStepCount": 2,
+      "sourceEnglishAttack": [
+        "1. Take over a host allowed to use the dMSA, or gain write access to its msDS-GroupMSAMembership",
+        "2. Obtain a ticket for the dMSA: it carries this account's group memberships"
+      ],
+      "attack": [
+        "1. Захватывает узел, которому разрешено использовать dMSA, либо получает право записи её msDS-GroupMSAMembership.",
+        "2. Получает билет для dMSA с членствами предшествующей записи в группах."
+      ]
+    }
+  }
+}
