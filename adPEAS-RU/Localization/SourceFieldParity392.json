@@ -7,124 +7,13 @@
                            "impact":  377
                        },
     "RussianNonempty":  {
-                            "attack":  192,
+                            "attack":  304,
                             "remediation":  392,
                             "impact":  392
                         },
-    "MissingRussianAttackCount":  112,
+    "MissingRussianAttackCount":  0,
     "MissingRussianAttackIds":  [
-                                    "GPO_POINTANDPRINT_LATENT",
-                                    "GPO_POINTANDPRINT_NONADMIN_INSTALL",
-                                    "GPO_POINTANDPRINT_USER_SCOPE",
-                                    "GPO_PRINT_DRIVER_HARDENING",
-                                    "GPO_PRINT_QUEUE_SPECIFIC_FILES",
-                                    "GPO_PRINT_SPOOLER_RPC",
-                                    "GPO_REGISTRY_PASSWORD",
-                                    "GPO_SCRIPT_OUTSIDE_POLICY_STORE",
-                                    "GPO_TASK_CMD_UNQUOTED_PATH",
-                                    "GPO_TASK_SYSTEM_UNC_PATH",
-                                    "GPO_TASK_UNQUOTED_PATH",
-                                    "GPO_USERRIGHT_DEFAULT_REMOVED",
-                                    "GUEST_ACCOUNT_ENABLED",
-                                    "INTERDOMAIN_TRUST_ACCOUNT",
-                                    "KERBEROS_TICKET_LIFETIME_EXTENDED",
-                                    "LAPS_COVERAGE_NOT_IN_AD",
-                                    "LAPS_ENCRYPTED_PASSWORD",
-                                    "LAPS_ENCRYPTED_READ_NO_DECRYPTOR",
-                                    "LAPS_GPO_DISABLED",
-                                    "LAPS_GPO_ENCRYPTION_DISABLED",
-                                    "LAPS_GPO_EXPIRATION_PROTECTION_DISABLED",
-                                    "LAPS_GPO_NOT_LINKED",
-                                    "LAPS_GPO_NO_AD_BACKUP",
-                                    "LAPS_GPO_PASSWORD_AGE",
-                                    "LAPS_GPO_PASSWORD_LENGTH",
-                                    "LAPS_GPO_WEAK_PASSWORD_COMPLEXITY",
-                                    "LAPS_NOT_DEPLOYED",
-                                    "LAPS_PASSWORD_NOT_ROTATED",
-                                    "LAPS_PASSWORD_READ_ACCESS",
-                                    "LAPS_READ_BLOCKED_BY_CONFIDENTIAL",
-                                    "LDAP_ANONYMOUS_BINDING_ALLOWED",
-                                    "LDAP_CHANNEL_BINDING_ALWAYS",
-                                    "LDAP_SIGNING_REQUIRED",
-                                    "LOCKOUT_DURATION_FOREVER",
-                                    "LOGON_SCRIPT_WRITABLE",
-                                    "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
-                                    "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
-                                    "NON_DEFAULT_COMPUTER_OWNERS",
-                                    "NON_DEFAULT_USER_OWNERS",
-                                    "NO_MAX_PASSWORD_AGE",
-                                    "NO_MIN_PASSWORD_AGE",
-                                    "NTAUTH_FOREIGN_ISSUER",
-                                    "ORPHANED_ADMIN_ACCOUNT",
-                                    "OS_EXTENDED_SECURITY_UPDATES_ONLY",
-                                    "OUTDATED_OS",
-                                    "OU_NON_DEFAULT_OWNER",
-                                    "OU_PERM_CONSTRAINED_DELEGATION",
-                                    "OU_PERM_CREATE_DMSA",
-                                    "OU_PERM_DNSHOSTNAME_WRITE",
-                                    "OU_PERM_DNS_HOST_NAME_ATTRIBUTES",
-                                    "OU_PERM_GENERICWRITE",
-                                    "OU_PERM_SCRIPTPATH",
-                                    "OU_PERM_SELF_ALL_VALIDATED",
-                                    "OU_PERM_SELF_MEMBERSHIP",
-                                    "OU_PERM_USERACCOUNTCONTROL",
-                                    "OU_PERM_USER_ACCOUNT_RESTRICTIONS",
-                                    "OU_PERM_VALIDATED_DNS",
-                                    "OU_PERM_VALIDATED_SPN",
-                                    "OU_PERM_WRITEPROPERTY_ALL",
-                                    "PASSWORD_HISTORY_DISABLED",
-                                    "PKI_STRONG_KEY_LENGTH",
-                                    "PKI_STRONG_SIGNATURE_ALGORITHM",
-                                    "PRECREATED_COMPUTER_ACCOUNT",
-                                    "PREWIN2000_ANONYMOUS_MEMBER",
-                                    "PREWIN2000_BROAD_MEMBER",
-                                    "PRIMARY_GROUP_IS_DC_GROUP",
-                                    "PRIVILEGED_ACCOUNT_ACL",
-                                    "PRIVILEGED_ACCOUNT_AFFECTED",
-                                    "READABLE_UNIX_PASSWORD_ATTRIBUTES",
-                                    "REGISTRY_AUTOLOGON",
-                                    "REGISTRY_CREDGUARD",
-                                    "REGISTRY_FILTERADMINTOKEN",
-                                    "REGISTRY_FIREWALL_DISABLED",
-                                    "REGISTRY_INSECURE_GUEST_AUTH",
-                                    "REGISTRY_MACHINE_PASSWORD_STATIC",
-                                    "REGISTRY_NOLMHASH",
-                                    "REGISTRY_NULL_SESSION",
-                                    "REGISTRY_ONELOGON",
-                                    "REGISTRY_RDP_ENCRYPTION",
-                                    "REGISTRY_RDP_NLA",
-                                    "REGISTRY_RDP_SECURITYLAYER",
-                                    "REGISTRY_REMOTEUAC",
-                                    "REGISTRY_RESTRICTEDADMIN",
-                                    "REGISTRY_SMB1_SERVER",
-                                    "REGISTRY_WDIGEST",
-                                    "ROASTABLE_PRIVILEGED_ACCOUNT",
-                                    "RODC_DENIED_GROUP_MISSING",
-                                    "RODC_PRIVILEGED_PASSWORD_ALLOWED",
-                                    "RODC_PRIVILEGED_PASSWORD_REVEALED",
-                                    "SCCM_GROUP_BROAD_MEMBER",
-                                    "SCCM_PXE_EXPOSURE",
-                                    "SCCM_SERVICE_ACCOUNT",
-                                    "SCCM_SITE_HIERARCHY",
-                                    "SCCM_SYSTEM_MANAGEMENT_ACL",
-                                    "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
-                                    "SCRIPTPATH_HARDCODED",
-                                    "SHADOW_CREDENTIALS",
-                                    "SID_HISTORY_FOREIGN_PRIVILEGED",
-                                    "SID_HISTORY_INJECTION",
-                                    "SID_HISTORY_OWN_DOMAIN",
-                                    "SMARTCARD_REQUIRED",
-                                    "STANDALONE_MSA_LEGACY",
-                                    "TRUST_BIDIRECTIONAL",
-                                    "TRUST_PASSWORD_STALE",
-                                    "TRUST_TRANSITIVE",
-                                    "TRUST_TREAT_AS_EXTERNAL",
-                                    "TRUST_USES_RC4",
-                                    "UNCONSTRAINED_DELEGATION_DC",
-                                    "UNREGISTERED_DOMAIN_CONTROLLER",
-                                    "WEAK_FGPP",
-                                    "WEAK_LOCKOUT_DURATION",
-                                    "WEB_ENDPOINT_EPA_ENABLED"
+
                                 ],
     "OriginalAttackAbsentCount":  88,
     "AttackStepCountDifferences":  [
@@ -181,7 +70,6 @@
                                        "CREDENTIAL_VNC_PASSWORD",
                                        "CRITICAL_OBJECT_CONTROL",
                                        "DANGEROUS_ACL_BROAD_GROUP",
-                                       "DANGEROUS_ACL_DCSYNC_BROAD",
                                        "DANGEROUS_ACL_GENERICWRITE",
                                        "DANGEROUS_ACL_GPO_DELETE",
                                        "DANGEROUS_ACL_GPO_EXTENDED",
@@ -197,7 +85,6 @@
                                        "DELETED_OBJECTS_READ_BROAD",
                                        "DELETED_OBJECTS_READ_DELEGATED",
                                        "DELETED_OBJECT_CREDENTIAL",
-                                       "DMSA_LINK_IRREGULAR",
                                        "DMSA_LINK_ONE_SIDED",
                                        "DMSA_MEMBERSHIP_OWNER",
                                        "DMSA_PRIVILEGED_PREDECESSOR",
@@ -222,7 +109,6 @@
                                        "ESC14_WRITABLE_MAPPING",
                                        "ESC15_SCHEMA_V1_ENROLLEE_SUBJECT",
                                        "ESC2_TEMPLATE",
-                                       "ESC3_TARGET_TEMPLATE",
                                        "ESC3_TEMPLATE",
                                        "ESC4_TEMPLATE",
                                        "ESC_ENROLLMENT_RIGHTS_UNREAD",
@@ -239,7 +125,6 @@
                                        "EXCHANGE_RBAC_MAILBOX_SEARCH",
                                        "EXCHANGE_RBAC_ROLE_MANAGEMENT",
                                        "EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT",
-                                       "EXCHANGE_SHARED_PERMISSIONS_MODEL",
                                        "EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED",
                                        "EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM",
                                        "EXCHANGE_SMTP_ANONYMOUS_SPOOFING",
@@ -257,7 +142,6 @@
                                        "GPO_NON_DEFAULT_OWNER",
                                        "GPO_NOT_CURRENTLY_EFFECTIVE",
                                        "GPO_POINTANDPRINT_DRIVER_SOURCE",
-                                       "GPO_POINTANDPRINT_EXPLOITABLE",
                                        "GPO_POINTANDPRINT_LATENT",
                                        "GPO_POINTANDPRINT_NONADMIN_INSTALL",
                                        "GPO_POINTANDPRINT_USER_SCOPE",
@@ -303,7 +187,6 @@
                                        "KERBEROS_TICKET_LIFETIME_EXTENDED",
                                        "LAPS_ACCOUNT_INFO",
                                        "LAPS_COVERAGE_NOT_IN_AD",
-                                       "LAPS_ENCRYPTED_PASSWORD",
                                        "LAPS_ENCRYPTED_READ_NO_DECRYPTOR",
                                        "LAPS_GPO_DISABLED",
                                        "LAPS_GPO_ENCRYPTION_DISABLED",
@@ -419,11 +302,9 @@
                                        "SCCM_PXE_EXPOSURE",
                                        "SCCM_SERVICE_ACCOUNT",
                                        "SCCM_SITE_HIERARCHY",
-                                       "SCCM_SYSTEM_MANAGEMENT_ACL",
                                        "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
                                        "SCRIPTPATH_HARDCODED",
                                        "SID_HISTORY_FOREIGN_PRIVILEGED",
-                                       "SID_HISTORY_INJECTION",
                                        "SID_HISTORY_ORPHANED",
                                        "SID_HISTORY_OWN_DOMAIN",
                                        "SMARTCARD_REQUIRED",
@@ -440,10 +321,8 @@
                                        "TRUST_SID_FILTERING_DISABLED",
                                        "TRUST_TRANSITIVE",
                                        "TRUST_TREAT_AS_EXTERNAL",
-                                       "TRUST_USES_RC4",
                                        "UNCONSTRAINED_DELEGATION_DC",
                                        "UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS",
-                                       "UNREGISTERED_DOMAIN_CONTROLLER",
                                        "WEAK_FGPP",
                                        "WEAK_LOCKOUT_DURATION",
                                        "WEAK_PASSWORD_POLICY",
@@ -497,7 +376,6 @@
                                             "CREDENTIAL_VNC_PASSWORD",
                                             "CRITICAL_OBJECT_CONTROL",
                                             "DANGEROUS_ACL_BROAD_GROUP",
-                                            "DANGEROUS_ACL_DCSYNC_BROAD",
                                             "DANGEROUS_ACL_GENERICWRITE",
                                             "DANGEROUS_ACL_GPO_EXTENDED",
                                             "DANGEROUS_ACL_GPO_WRITEPROPERTY",
@@ -509,7 +387,6 @@
                                             "DELETED_OBJECTS_READ_BROAD",
                                             "DELETED_OBJECTS_READ_DELEGATED",
                                             "DELETED_OBJECT_CREDENTIAL",
-                                            "DMSA_LINK_IRREGULAR",
                                             "DMSA_LINK_ONE_SIDED",
                                             "DMSA_MEMBERSHIP_OWNER",
                                             "DMSA_PRIVILEGED_PREDECESSOR",
@@ -533,7 +410,6 @@
                                             "ESC14_WRITABLE_MAPPING",
                                             "ESC15_SCHEMA_V1_ENROLLEE_SUBJECT",
                                             "ESC2_TEMPLATE",
-                                            "ESC3_TARGET_TEMPLATE",
                                             "ESC3_TEMPLATE",
                                             "ESC4_TEMPLATE",
                                             "ESC_ENROLLMENT_RIGHTS_UNREAD",
@@ -550,7 +426,6 @@
                                             "EXCHANGE_RBAC_MAILBOX_SEARCH",
                                             "EXCHANGE_RBAC_ROLE_MANAGEMENT",
                                             "EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT",
-                                            "EXCHANGE_SHARED_PERMISSIONS_MODEL",
                                             "EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED",
                                             "EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM",
                                             "EXCHANGE_SMTP_ANONYMOUS_SPOOFING",
@@ -570,7 +445,6 @@
                                             "GPO_NON_DEFAULT_OWNER",
                                             "GPO_NOT_CURRENTLY_EFFECTIVE",
                                             "GPO_POINTANDPRINT_DRIVER_SOURCE",
-                                            "GPO_POINTANDPRINT_EXPLOITABLE",
                                             "GPO_POINTANDPRINT_LATENT",
                                             "GPO_POINTANDPRINT_NONADMIN_INSTALL",
                                             "GPO_POINTANDPRINT_USER_SCOPE",
@@ -611,7 +485,6 @@
                                             "KERBEROS_HASH_CRACKABLE",
                                             "KERBEROS_TICKET_LIFETIME_EXTENDED",
                                             "LAPS_COVERAGE_NOT_IN_AD",
-                                            "LAPS_ENCRYPTED_PASSWORD",
                                             "LAPS_ENCRYPTED_READ_NO_DECRYPTOR",
                                             "LAPS_GPO_DISABLED",
                                             "LAPS_GPO_ENCRYPTION_DISABLED",
@@ -716,11 +589,9 @@
                                             "SCCM_PXE_EXPOSURE",
                                             "SCCM_SERVICE_ACCOUNT",
                                             "SCCM_SITE_HIERARCHY",
-                                            "SCCM_SYSTEM_MANAGEMENT_ACL",
                                             "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
                                             "SCRIPTPATH_HARDCODED",
                                             "SID_HISTORY_FOREIGN_PRIVILEGED",
-                                            "SID_HISTORY_INJECTION",
                                             "SID_HISTORY_ORPHANED",
                                             "SID_HISTORY_OWN_DOMAIN",
                                             "SMARTCARD_REQUIRED",
@@ -737,10 +608,8 @@
                                             "TRUST_SID_FILTERING_DISABLED",
                                             "TRUST_TRANSITIVE",
                                             "TRUST_TREAT_AS_EXTERNAL",
-                                            "TRUST_USES_RC4",
                                             "UNCONSTRAINED_DELEGATION_DC",
                                             "UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS",
-                                            "UNREGISTERED_DOMAIN_CONTROLLER",
                                             "WEAK_FGPP",
                                             "WEAK_LOCKOUT_DURATION",
                                             "WEAK_PASSWORD_POLICY",
@@ -748,7 +617,7 @@
                                         ],
     "RussianImpactWithNoSource":  15,
     "RussianRemediationWithNoSource":  15,
-    "Note":  "77 новых Attack имеют точный EN-свидетель, сопоставленный пункт за пунктом. Количество пунктов Impact и Remediation не доказывает смысловую эквивалентность; их проверка продолжается.",
+    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 20 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
     "UserReportDataIncluded":  false,
     "Fields":  [
                    {
@@ -1312,11 +1181,11 @@
                    {
                        "FindingId":  "DANGEROUS_ACL_DCSYNC_BROAD",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "DANGEROUS_ACL_GENERICALL",
@@ -1474,11 +1343,11 @@
                    {
                        "FindingId":  "DMSA_LINK_IRREGULAR",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "DMSA_LINK_ONE_SIDED",
@@ -1717,11 +1586,11 @@
                    {
                        "FindingId":  "ESC3_TARGET_TEMPLATE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "ESC3_TEMPLATE",
@@ -1897,11 +1766,11 @@
                    {
                        "FindingId":  "EXCHANGE_SHARED_PERMISSIONS_MODEL",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED",
@@ -2104,18 +1973,18 @@
                    {
                        "FindingId":  "GPO_POINTANDPRINT_EXPLOITABLE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "GPO_POINTANDPRINT_LATENT",
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2124,7 +1993,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2133,7 +2002,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  2,
-                       "AttackRU":  0,
+                       "AttackRU":  2,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2142,7 +2011,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2151,7 +2020,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2160,7 +2029,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2169,7 +2038,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -2196,7 +2065,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -2241,7 +2110,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2259,7 +2128,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -2268,7 +2137,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2286,7 +2155,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  1,
-                       "AttackRU":  0,
+                       "AttackRU":  1,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2574,7 +2443,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -2601,7 +2470,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -2646,7 +2515,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -2673,25 +2542,25 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  1,
-                       "AttackRU":  0,
+                       "AttackRU":  1,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
                    {
                        "FindingId":  "LAPS_ENCRYPTED_PASSWORD",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "LAPS_ENCRYPTED_READ_NO_DECRYPTOR",
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -2700,7 +2569,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -2709,7 +2578,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -2718,7 +2587,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2727,7 +2596,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2736,7 +2605,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -2754,7 +2623,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2763,7 +2632,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2772,7 +2641,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2799,7 +2668,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -2808,7 +2677,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -2826,7 +2695,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -2835,7 +2704,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -2853,7 +2722,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -2871,7 +2740,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -2898,7 +2767,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  5,
-                       "AttackRU":  0,
+                       "AttackRU":  5,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -2907,7 +2776,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -2916,7 +2785,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -2952,7 +2821,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -2961,7 +2830,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  1,
-                       "AttackRU":  0,
+                       "AttackRU":  1,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -2970,7 +2839,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -2988,7 +2857,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -3006,7 +2875,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -3015,7 +2884,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3024,7 +2893,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3060,7 +2929,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -3069,7 +2938,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  1,
-                       "AttackRU":  0,
+                       "AttackRU":  1,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3078,7 +2947,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3087,7 +2956,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3096,7 +2965,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3114,7 +2983,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -3123,7 +2992,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3132,7 +3001,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3141,7 +3010,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3222,7 +3091,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3231,7 +3100,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3240,7 +3109,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3258,7 +3127,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3267,7 +3136,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3276,7 +3145,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3285,7 +3154,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3294,7 +3163,7 @@
                        "ImpactEN":  5,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3312,7 +3181,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -3357,7 +3226,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3366,7 +3235,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3384,7 +3253,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3393,7 +3262,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3402,7 +3271,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3420,7 +3289,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3429,7 +3298,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3438,7 +3307,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  2,
-                       "AttackRU":  0,
+                       "AttackRU":  2,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3483,7 +3352,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3501,7 +3370,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -3519,7 +3388,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  2,
-                       "AttackRU":  0,
+                       "AttackRU":  2,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3600,7 +3469,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  2,
-                       "AttackRU":  0,
+                       "AttackRU":  2,
                        "RemediationEN":  1,
                        "RemediationRU":  1
                    },
@@ -3609,7 +3478,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  2,
-                       "AttackRU":  0,
+                       "AttackRU":  2,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -3618,7 +3487,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  1,
                        "RemediationRU":  1
                    },
@@ -3681,7 +3550,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  2,
-                       "AttackRU":  0,
+                       "AttackRU":  2,
                        "RemediationEN":  1,
                        "RemediationRU":  1
                    },
@@ -3690,7 +3559,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  1,
                        "RemediationRU":  1
                    },
@@ -3699,7 +3568,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  2,
-                       "AttackRU":  0,
+                       "AttackRU":  2,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -3717,7 +3586,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -3735,7 +3604,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  2,
-                       "AttackRU":  0,
+                       "AttackRU":  2,
                        "RemediationEN":  1,
                        "RemediationRU":  1
                    },
@@ -3744,7 +3613,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3753,7 +3622,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  1,
                        "RemediationRU":  1
                    },
@@ -3762,7 +3631,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3780,7 +3649,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -3816,7 +3685,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3852,7 +3721,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -3906,7 +3775,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3915,7 +3784,7 @@
                        "ImpactEN":  1,
                        "ImpactRU":  1,
                        "AttackEN":  2,
-                       "AttackRU":  0,
+                       "AttackRU":  2,
                        "RemediationEN":  1,
                        "RemediationRU":  1
                    },
@@ -3924,7 +3793,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -3933,7 +3802,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -3942,7 +3811,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  2,
                        "RemediationRU":  1
                    },
@@ -3951,7 +3820,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3960,7 +3829,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -3969,25 +3838,25 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
                    {
                        "FindingId":  "SCCM_SYSTEM_MANAGEMENT_ACL",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -3996,7 +3865,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -4005,7 +3874,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  3,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  3,
                        "RemediationRU":  3
                    },
@@ -4014,18 +3883,18 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
                    {
                        "FindingId":  "SID_HISTORY_INJECTION",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  5,
-                       "AttackRU":  0,
+                       "AttackRU":  5,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "SID_HISTORY_ORPHANED",
@@ -4041,7 +3910,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -4050,7 +3919,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  5,
-                       "AttackRU":  0,
+                       "AttackRU":  5,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -4095,7 +3964,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -4131,7 +4000,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -4140,7 +4009,7 @@
                        "ImpactEN":  2,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
@@ -4167,7 +4036,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -4176,18 +4045,18 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  3,
                        "RemediationRU":  1
                    },
                    {
                        "FindingId":  "TRUST_USES_RC4",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "UAC_SEVERITY_OVERRIDE",
@@ -4212,7 +4081,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  5,
                        "RemediationRU":  1
                    },
@@ -4228,18 +4097,18 @@
                    {
                        "FindingId":  "UNREGISTERED_DOMAIN_CONTROLLER",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "WEAK_FGPP",
                        "ImpactEN":  5,
                        "ImpactRU":  1,
                        "AttackEN":  3,
-                       "AttackRU":  0,
+                       "AttackRU":  3,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -4248,7 +4117,7 @@
                        "ImpactEN":  3,
                        "ImpactRU":  1,
                        "AttackEN":  4,
-                       "AttackRU":  0,
+                       "AttackRU":  4,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
@@ -4266,7 +4135,7 @@
                        "ImpactEN":  4,
                        "ImpactRU":  1,
                        "AttackEN":  5,
-                       "AttackRU":  0,
+                       "AttackRU":  5,
                        "RemediationEN":  4,
                        "RemediationRU":  1
                    },
