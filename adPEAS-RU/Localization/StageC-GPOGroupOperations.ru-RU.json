@@ -1,0 +1,49 @@
+{
+  "schema": "adPEAS-RU.StageC.GPOGroupOperations.1",
+  "files": {
+    "src/modules/Core/Set-DomainGPO.ps1": {
+      "Show-Line \"Exported GPO '$GPOName' to: $($Result.Path)\"": "Show-Line \"GPO '$GPOName' экспортирована в: $($Result.Path)\"",
+      "Show-Line \"Failed to export GPO '$GPOName': $($_.Exception.Message)\"": "Show-Line \"Не удалось экспортировать GPO '$GPOName': $($_.Exception.Message)\"",
+      "Show-Line \"Restored GPO '$GPOName' from backup: $Import\"": "Show-Line \"GPO '$GPOName' восстановлена из резервной копии: $Import\"",
+      "Show-Line \"Failed to import GPO '$GPOName': $($_.Exception.Message)\"": "Show-Line \"Не удалось импортировать GPO '$GPOName': $($_.Exception.Message)\"",
+      "Show-Line \"Removed $removeType '$itemId' from GPO '$GPOName' ($($Result.ItemsRemoved) item(s))\"": "Show-Line \"Удалён элемент типа $removeType '$itemId' из GPO '$GPOName' (элементов удалено: $($Result.ItemsRemoved))\"",
+      "Show-Line \"Server-side only: effects already applied on clients are NOT undone.\"": "Show-Line \"Только на стороне сервера: последствия уже применённых на клиентах настроек НЕ отменяются.\"",
+      "Show-Line \"Failed to remove $removeType from GPO '$GPOName': $($_.Exception.Message)\"": "Show-Line \"Не удалось удалить элемент типа $removeType из GPO '$GPOName': $($_.Exception.Message)\"",
+      "Show-Line \"Removed $kind script '$ScriptName' from GPO '$GPOName'\"": "Show-Line \"Удалён сценарий типа $kind '$ScriptName' из GPO '$GPOName'\"",
+      "Show-Line \"Failed to remove $kind script from GPO '$GPOName': $($_.Exception.Message)\"": "Show-Line \"Не удалось удалить сценарий типа $kind из GPO '$GPOName': $($_.Exception.Message)\"",
+      "Show-Line \"Successfully changed owner of GPO '$GPOName' to: $Owner\"": "Show-Line \"Владелец GPO '$GPOName' успешно изменён на: $Owner\"",
+      "Show-Line \"Successfully granted $GrantRights to $Principal on GPO: $GPOName\"": "Show-Line \"Успешно предоставлены права $GrantRights субъекту $Principal на GPO: $GPOName\"",
+      "Show-Line \"Successfully linked GPO '$GPOName' to '$TargetDN' (Status: $linkStatusText)\"": "Show-Line \"GPO '$GPOName' успешно привязана к '$TargetDN' (состояние: $linkStatusText)\"",
+      "Show-Line \"Successfully unlinked GPO '$GPOName' from '$TargetDN'\"": "Show-Line \"GPO '$GPOName' успешно отвязана от '$TargetDN'\"",
+      "Show-Line \"Successfully synchronized SYSVOL permissions for GPO '$GPOName'\"": "Show-Line \"Разрешения SYSVOL для GPO '$GPOName' успешно синхронизированы\"",
+      "Show-Line \"Successfully added Immediate Scheduled Task to GPO '$GPOName'\"": "Show-Line \"Немедленное запланированное задание успешно добавлено в GPO '$GPOName'\"",
+      "Show-Line \"Successfully added member to local group via GPO '$GPOName'\"": "Show-Line \"Участник успешно добавлен в локальную группу через GPO '$GPOName'\"",
+      "Show-Line \"Successfully added Startup Script to GPO '$GPOName'\"": "Show-Line \"Сценарий запуска компьютера успешно добавлен в GPO '$GPOName'\"",
+      "Show-Line \"Successfully added Logon Script to GPO '$GPOName'\"": "Show-Line \"Сценарий входа пользователя успешно добавлен в GPO '$GPOName'\"",
+      "Show-Line \"Successfully added Service to GPO '$GPOName'\"": "Show-Line \"Служба успешно добавлена в GPO '$GPOName'\"",
+      "Show-Line \"Successfully added File Deployment to GPO '$GPOName'\"": "Show-Line \"Развёртывание файла успешно добавлено в GPO '$GPOName'\"",
+      "Show-Line \"Successfully added Firewall Rule to GPO '$GPOName'\"": "Show-Line \"Правило брандмауэра успешно добавлено в GPO '$GPOName'\"",
+      "Show-Line \"SYSVOL permissions synchronized automatically\"": "Show-Line \"Разрешения SYSVOL синхронизированы автоматически\""
+    },
+    "src/modules/Core/Set-DomainGroup.ps1": {
+      "Show-Line \"All $($SkippedMembers.Count) member(s) already exist in: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Все $($SkippedMembers.Count) участников уже состоят в: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"None of the $($SkippedMembers.Count) specified member(s) were in: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Ни один из $($SkippedMembers.Count) указанных участников не состоял в: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Group has no members: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Группа не содержит участников: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Group '$($TargetGroup.sAMAccountName)' has $($CurrentMembers.Count) members\"": "Show-Line \"Группа '$($TargetGroup.sAMAccountName)' содержит $($CurrentMembers.Count) участников\"",
+      "Show-Line \"Use -Force to confirm removal of all members\"": "Show-Line \"Для подтверждения удаления всех участников используйте -Force\"",
+      "Show-Line \"Successfully removed all $($CurrentMembers.Count) member(s) from: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Все $($CurrentMembers.Count) участников успешно удалены из: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Description already set to this value: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Описание уже имеет указанное значение у: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Successfully set description for: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Описание успешно задано для: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Description already empty: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Описание уже пустое у: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Successfully cleared description for: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Описание успешно очищено у: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Group is already a Security group: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Группа уже имеет тип Security: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Successfully converted to Security group: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Группа успешно преобразована в тип Security: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Group can now be used for permission assignments!\"": "Show-Line \"Теперь группу можно использовать при назначении разрешений!\"",
+      "Show-Line \"Group is already a Distribution group: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Группа уже имеет тип Distribution: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Successfully converted to Distribution group: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Группа успешно преобразована в тип Distribution: $($TargetGroup.sAMAccountName)\"",
+      "Show-Line \"Group can no longer be used for permissions (effectively disarmed)!\"": "Show-Line \"Группу больше нельзя использовать для назначения разрешений (права через членство прекращают действовать)!\"",
+      "Show-Line \"Successfully changed owner of $($TargetGroup.sAMAccountName) to: $Owner\"": "Show-Line \"Владелец объекта $($TargetGroup.sAMAccountName) успешно изменён на: $Owner\"",
+      "Show-Line \"Successfully granted $GrantRights to $Principal on: $($TargetGroup.sAMAccountName)\"": "Show-Line \"Успешно предоставлены права $GrantRights субъекту $Principal на объект: $($TargetGroup.sAMAccountName)\""
+    }
+  }
+}
