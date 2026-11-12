@@ -107,7 +107,7 @@
       ],
       "remediation": [
         "Включите «Turn off downloading of print drivers over HTTP» (DisableWebPnPDownload=1).",
-        "Включите «Devices: Prevent users from installing printer drivers» (AddPrinterDrivers=1)."
+        "Включите «Devices: Prevent users from installing printer drivers» (AddPrinterDrivers=1). Это дополнительная мера, не заменяющая RestrictDriverInstallationToAdministrators для защиты от PrintNightmare."
       ]
     },
     "GPO_PRINT_QUEUE_SPECIFIC_FILES": {
