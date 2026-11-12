@@ -171,6 +171,38 @@ jobs:
               throw 'ARCH2d5 batch100 sealed receipt chain static safety gate failed.'
           }
           Write-Host 'PASS ARCH2d5 100 originals, per-item claim before COM Move, ten receipt checkpoints and final operator-pinned SHA.'
+      - name: ARCH3a reuse-only original Year/PST/Sent/POP3 contracts, no new writer gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $audit=Get-Content -LiteralPath 'Core/Diagnostics/ARCH3aLegacyIntegrationAudit.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3a.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3aReuseExistingArchiver.Tests.ps1' -Raw -Encoding UTF8
+          $adr=Get-Content -LiteralPath 'docs/ADR-ARCH3-001-reuse-existing-archiver.md' -Raw -Encoding UTF8
+          $map=Get-Content -LiteralPath 'docs/2.6.5-arch3a-existing-pipeline-audit.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($audit -cnotmatch 'function Get-OPA265ARCH3aIntegrationAudit' -or
+             $audit -cnotmatch 'function Get-OPA265ARCH3aExistingRoutingExamples' -or
+             $audit -cnotmatch 'Get-OPAArchivePartPath -SourcePst' -or
+             $audit -cnotmatch 'Get-OPAArchiveTargetPath -ReceivedTime' -or
+             $audit -cnotmatch 'Get-OPAArchiveItemDate -Item' -or
+             $audit -cnotmatch 'Test-OPAExcludedSystemFolder' -or
+             $audit -cnotmatch 'SourceMarkerEvidenceIsNotRuntimeCertification' -or
+             $audit -cmatch 'GetActiveObject\s*\(' -or
+             $audit -cmatch '\.(Move|AddStoreEx|Save|Copy|Delete)\s*\(' -or
+             $audit -cmatch 'Write-OPA265ARCH2c4JsonOnce' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Audit','RoutingExamples'\)" -or
+             $entry -cmatch "ValidateSet\('Prepare','MoveBatch'" -or
+             $tests -cnotmatch 'the original archive verifier already contains full semantic comparison' -or
+             $adr -cnotmatch 'ARCH3b' -or
+             $adr -cnotmatch 'ArchiveVerifier.ps1' -or
+             $map -cnotmatch 'ARCH3a' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4097 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 135){
+            throw 'ARCH3a exact original-code reuse/explicit open gaps/writer-closed safety contract missing.'
+          }
+          Write-Host 'PASS ARCH3a single existing archiver, original Year/POP3/SentOn/PST routing, semantic verifier preserved; no duplicate writer, production closed.'
       - name: Package only OutlookPOP3Archive from tested commit and calculate SHA-256
         run: |
           $ErrorActionPreference='Stop'
