@@ -1,0 +1,334 @@
+{
+  "schema": "adPEAS-RU.StageD11.CoreFields.20b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "SMB_SIGNING_DISABLED": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "SMB connections can be intercepted and relayed",
+        "NTLM relay attacks can target SMB services",
+        "Attackers can authenticate to other systems using relayed credentials",
+        "Can lead to remote code execution on target systems",
+        "Enables lateral movement without knowing passwords"
+      ],
+      "impact": [
+        "SMB-соединения могут перехватываться и использоваться для ретрансляции аутентификации.",
+        "Атаки NTLM relay могут быть направлены на службы SMB.",
+        "Ретранслированные учётные данные позволяют атакующему аутентифицироваться на других компьютерах.",
+        "На целевых системах возможно удалённое выполнение кода.",
+        "Становится возможным горизонтальное перемещение без знания паролей."
+      ],
+      "sourceEnglishRemediationCount": 7,
+      "sourceEnglishRemediation": [
+        "Enable SMB signing on all systems: RequireSecuritySignature = True",
+        "Deploy via GPO: Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > Security Options",
+        "Microsoft network server: Digitally sign communications (always) = Enabled",
+        "Best practice: Always configure security settings via GPO rather than relying on local policy or OS defaults",
+        "Domain controllers already require it through the Default Domain Controllers Policy, so the work is member servers and clients - per OU, not domain-wide in one step",
+        "What breaks: devices that cannot sign at all. Multifunction printers and scanners writing to a share, embedded NAS and SAN firmware, imaging and backup appliances, anything still speaking SMB1. Such a device cannot be exempted from a server that requires signing - either its firmware is updated, or its share moves to a server deliberately kept outside the enforcing OU and documented as the exception it is",
+        "What it costs: signing is computed per packet. With SMB 3 and AES-based signing on current CPUs that is cheap, but it is still measurable on sequential file-server loads over fast links - worth measuring throughput on the busiest file server before the change rather than after"
+      ],
+      "remediation": [
+        "Включите обязательную подпись SMB на всех системах: RequireSecuritySignature = True.",
+        "Разверните настройку через GPO: Computer Configuration → Policies → Windows Settings → Security Settings → Local Policies → Security Options.",
+        "Установите «Microsoft network server: Digitally sign communications (always)» в Enabled.",
+        "Предпочитайте централизованную настройку защиты через GPO локальным политикам и значениям ОС по умолчанию.",
+        "Контроллеры домена уже требуют подпись через Default Domain Controllers Policy, поэтому основная работа касается рядовых серверов и клиентов; применяйте изменения по OU, а не сразу ко всему домену.",
+        "Учитывайте несовместимость устройств без поддержки подписи: МФУ и сканеров, записывающих на SMB-ресурс, встроенных NAS/SAN, устройств резервного копирования и систем на SMB1. Для сервера с обязательной подписью исключения для клиента нет: обновите устройство либо перенесите его ресурс на отдельно защищённый и документированный сервер вне OU с обязательной политикой.",
+        "Подпись рассчитывается для каждого пакета. При SMB 3 с подписью на основе AES нагрузка современных CPU обычно невелика, но на скоростных файловых серверах заметна: измерьте производительность самых нагруженных серверов до изменения."
+      ]
+    },
+    "SMB_SIGNING_REQUIRED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "SMB traffic is protected against interception and relay",
+        "NTLM relay attacks targeting SMB are blocked",
+        "Remote code execution via relay is prevented",
+        "Lateral movement via unsigned SMB is blocked"
+      ],
+      "impact": [
+        "SMB-трафик защищён от перехвата и ретрансляции.",
+        "Атаки NTLM relay на SMB блокируются.",
+        "Предотвращается удалённое выполнение кода через такую ретрансляцию.",
+        "Горизонтальное перемещение через неподписанный SMB блокируется."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Ensure SMB signing is required on both server and client sides",
+        "Document this control in your security hardening baseline",
+        "Monitor for any attempts to disable SMB signing"
+      ],
+      "remediation": [
+        "Это безопасная конфигурация: исправление не требуется.",
+        "Убедитесь, что подпись SMB обязательна на серверной и клиентской стороне.",
+        "Задокументируйте меру в базовой конфигурации усиления безопасности.",
+        "Отслеживайте попытки отключить подпись SMB."
+      ]
+    },
+    "PREWIN2000_ANONYMOUS_MEMBER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The complete user, group and computer inventory can be read without an account",
+        "Service accounts, descriptions, group memberships and account flags are all exposed, which is the input for password spraying and for picking a target",
+        "Pre-authentication reconnaissance leaves no failed logon behind"
+      ],
+      "impact": [
+        "Полный перечень пользователей, групп и компьютеров можно получить без учётной записи.",
+        "Раскрываются служебные записи, описания, членство в группах и флаги записей, что помогает выбирать цели и проводить password spraying.",
+        "Предварительная разведка без аутентификации не создаёт событий неудачного входа."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove Anonymous Logon from Pre-Windows 2000 Compatible Access",
+        "The group exists for Windows NT 4.0 era clients and RAS servers; on a domain without them it should be empty",
+        "Check what depends on it first - some legacy appliances and older NAS devices bind anonymously"
+      ],
+      "remediation": [
+        "Удалите Anonymous Logon из Pre-Windows 2000 Compatible Access.",
+        "Группа нужна для клиентов эпохи Windows NT 4.0 и RAS; если их нет, группа должна быть пустой.",
+        "Сначала проверьте зависимости: некоторые устаревшие устройства и NAS используют анонимное подключение."
+      ]
+    },
+    "PREWIN2000_BROAD_MEMBER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Any single compromised account or machine account reads the full user, group and computer inventory",
+        "Account descriptions, SPNs, group memberships and account flags are all exposed, which is the input for Kerberoasting and for choosing a target",
+        "Read access this broad defeats the point of removing read permissions elsewhere in the directory"
+      ],
+      "impact": [
+        "Любая одна скомпрометированная пользовательская или компьютерная учётная запись позволяет читать полный перечень пользователей, групп и компьютеров.",
+        "Раскрываются описания учётных записей, SPN, членство и флаги, что помогает Kerberoasting и выбору целей.",
+        "Столь широкое право чтения сводит на нет ограничения чтения, настроенные в других частях каталога."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the broad principal from Pre-Windows 2000 Compatible Access",
+        "The group exists for Windows NT 4.0 era clients and RAS servers; on a domain without them it should be empty",
+        "A domain installed with 'pre-Windows 2000 compatible permissions' gets this membership by default, so finding it says nothing about a mistake - it still has to be removed"
+      ],
+      "remediation": [
+        "Удалите широко охватывающий субъект из Pre-Windows 2000 Compatible Access.",
+        "Группа создана для клиентов эпохи Windows NT 4.0 и RAS; при их отсутствии она должна быть пустой.",
+        "В домене, установленном с «pre-Windows 2000 compatible permissions», такое членство могло появиться по умолчанию: его наличие само по себе не доказывает ошибку администратора, но право всё равно следует убрать."
+      ]
+    },
+    "REVERSIBLE_ENCRYPTION": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Password can be recovered in clear text from AD database",
+        "Anyone with DCSync rights can extract the actual password",
+        "NTDS.dit extraction reveals the password",
+        "Required for some legacy protocols but severe security risk"
+      ],
+      "impact": [
+        "Пароль можно восстановить из базы AD в открытом виде.",
+        "Субъект с правами DCSync может получить исходный пароль.",
+        "Извлечение NTDS.dit раскрывает пароль.",
+        "Режим требуется некоторым старым протоколам, но создаёт серьёзный риск безопасности."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Disable 'Store password using reversible encryption' for all accounts",
+        "Force password change after disabling the setting",
+        "Review applications requiring this setting - find alternatives",
+        "Use modern authentication protocols that don't require reversible encryption"
+      ],
+      "remediation": [
+        "Отключите «Store password using reversible encryption» для всех учётных записей.",
+        "После отключения принудительно смените затронутые пароли.",
+        "Проверьте приложения, которым требовался такой режим, и подберите альтернативы.",
+        "Используйте современные механизмы аутентификации без обратимого шифрования паролей."
+      ]
+    },
+    "KERBEROAST_WITHOUT_PREAUTH": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Kerberoasting no longer needs a domain account - network access to a domain controller is enough",
+        "Every service account with an SPN is exposed, whatever its own pre-authentication setting",
+        "The requests carry no pre-authentication and show up only as AS-REQs for the one account without it"
+      ],
+      "impact": [
+        "Для Kerberoasting больше не нужна доменная учётная запись: достаточно сетевого доступа к контроллеру домена.",
+        "Затронута каждая служебная запись с SPN независимо от её собственного флага предварительной аутентификации.",
+        "Запросы выполняются без предварительной аутентификации и отражаются только как AS-REQ для одной записи, у которой она отключена."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Require pre-authentication on every account - removing the last account without it closes this path for all SPN accounts at once",
+        "Give the accounts with an SPN long random passwords, or move them to gMSAs, which closes it for each of them whatever else happens"
+      ],
+      "remediation": [
+        "Требуйте предварительную аутентификацию для каждой учётной записи: устранение последней записи без неё закрывает этот путь ко всем SPN сразу.",
+        "Установите служебным записям с SPN длинные случайные пароли либо переведите их на gMSA, устраняя практическую возможность подбора отдельно для каждой записи."
+      ]
+    },
+    "UNCONSTRAINED_DELEGATION_DC": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "TGTs of authenticating users are cached on the domain controller",
+        "A coercion primitive (PrinterBug, PetitPotam, DFSCoerce) can direct a privileged account's authentication here",
+        "The flag itself is not a misconfiguration and cannot be removed without breaking the DC"
+      ],
+      "impact": [
+        "На контроллере домена кэшируются TGT пользователей, проходящих аутентификацию.",
+        "Принудительная аутентификация (PrinterBug, PetitPotam, DFSCoerce) может направить сюда вход привилегированной учётной записи.",
+        "Сам флаг не является ошибкой конфигурации и не может быть снят без нарушения работы контроллера домена."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Do not clear the flag - a domain controller needs it. The controls are elsewhere",
+        "Put Tier 0 accounts in Protected Users, or set 'Account is sensitive and cannot be delegated', so their TGTs are never forwarded here",
+        "Disable the Print Spooler service on domain controllers, which removes the PrinterBug coercion primitive",
+        "Enable LDAP signing and channel binding, and EPA on the certificate enrollment endpoints, so a coerced authentication cannot be relayed",
+        "Patch and monitor the coercion primitives (PetitPotam, DFSCoerce, ShadowCoerce)"
+      ],
+      "remediation": [
+        "Не снимайте флаг: он требуется контроллеру домена. Защитные меры должны применяться в других местах.",
+        "Добавьте пользовательские учётные записи Tier 0 в Protected Users либо установите «Account is sensitive and cannot be delegated», чтобы их TGT не перенаправлялись сюда.",
+        "Отключите службу Print Spooler на контроллерах домена, устраняя механизм принудительной аутентификации PrinterBug.",
+        "Включите подпись LDAP, channel binding и EPA на точках регистрации сертификатов, чтобы принудительную аутентификацию нельзя было ретранслировать.",
+        "Устанавливайте обновления и отслеживайте механизмы принудительной аутентификации PetitPotam, DFSCoerce и ShadowCoerce."
+      ]
+    },
+    "UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A routine logon to the host - a remote desktop session, a mapped drive, a management console - leaves a reusable TGT of a privileged account behind",
+        "With the TGT of a Domain Admin the host's controller can replicate the directory (DCSync)",
+        "A Domain Controller's own machine account is not covered by either control, so a coerced Domain Controller still hands its TGT to these hosts whatever is done here"
+      ],
+      "impact": [
+        "Обычный вход на сервер — RDP, подключение диска или административной консоли — оставляет доступный для повторного использования TGT привилегированной записи.",
+        "Получив TGT Domain Admin, атакующий на таком сервере может реплицировать каталог через DCSync.",
+        "Учётная запись компьютера-контроллера домена не защищается ни одной из двух мер, поэтому принудительная аутентификация DC всё равно передаст TGT на такие серверы."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Mark every privileged account 'Account is sensitive and cannot be delegated'",
+        "Put privileged user accounts in Protected Users once the domain functional level is Windows Server 2012 R2 or higher - not service or computer accounts",
+        "Replace unconstrained delegation on the hosts with constrained delegation or resource-based constrained delegation"
+      ],
+      "remediation": [
+        "Для всех привилегированных записей включите «Account is sensitive and cannot be delegated».",
+        "После проверки совместимости и функционального уровня домена Windows Server 2012 R2+ включите *пользовательские* привилегированные записи в Protected Users — не служебные и не компьютерные записи.",
+        "Замените неограниченное делегирование на серверах ограниченным делегированием либо resource-based constrained delegation (RBCD)."
+      ]
+    },
+    "TRUST_SID_FILTERING_DISABLED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Attackers in trusted domain can inject privileged SIDs",
+        "SID History injection enables Domain Admin access across trusts",
+        "Compromising trusted domain can lead to trusting domain compromise",
+        "Bypasses normal forest trust boundaries"
+      ],
+      "impact": [
+        "Атакующие в доверенном домене могут внедрить привилегированные SID.",
+        "Добавление SID через SID History позволяет получить доступ уровня Domain Admin через отношения доверия.",
+        "Компрометация доверенного домена может привести к компрометации доверяющего домена.",
+        "Обходятся обычные границы доверия между лесами."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "This is the external or realm trust case, and quarantine is the lever: netdom trust THIS.DOMAIN /domain:TRUSTED.DOMAIN /quarantine:yes. It is also the default for such a trust, so somebody cleared it. A forest trust is relaxed by a different flag and has its own write-up - TRUST_TREAT_AS_EXTERNAL",
+        "Find out what it was cleared for before setting it back. Quarantine stops this domain honouring sIDHistory from the other side, so accounts migrated out of the trusted domain that still reach resources here through an old SID of theirs lose that access the moment it is on - after a domain consolidation that is a working arrangement rather than an oversight, and it is the usual reason the flag is gone",
+        "Where migrated accounts still depend on it: re-permission the resources onto the current SIDs first, then enable quarantine",
+        "Selective Authentication limits which principals may authenticate across the trust at all - worth having in addition, not instead",
+        "Until it is on, treat the trusted domain as part of this domain's attack surface and watch cross-trust authentication for SID history abuse"
+      ],
+      "remediation": [
+        "Для внешнего доверия или доверия с realm используется карантин: netdom trust THIS.DOMAIN /domain:TRUSTED.DOMAIN /quarantine:yes. По умолчанию он включён, значит настройку кто-то снял. Для доверия между лесами действует другой флаг и отдельная находка TRUST_TREAT_AS_EXTERNAL.",
+        "До повторного включения выясните причину отключения: карантин запрещает принимать sIDHistory с другой стороны, и перенесённые учётные записи, которым для ресурсов здесь ещё нужен старый SID, немедленно потеряют доступ. После консолидации доменов это может быть намеренной рабочей конфигурацией.",
+        "Если перенесённые записи ещё зависят от старых SID, сначала переназначьте разрешения ресурсов на актуальные SID, затем включайте карантин.",
+        "Selective Authentication дополнительно ограничивает субъектов, которые могут аутентифицироваться через доверие; это дополнительная мера, а не замена фильтрации SID.",
+        "Пока карантин отключён, считайте доверенный домен частью поверхности атаки и отслеживайте злоупотребление SID History при междоменной аутентификации."
+      ]
+    },
+    "WEAK_LOCKOUT_DURATION": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Attackers can resume password spraying after short wait",
+        "Lockout provides minimal protection against persistent attacks",
+        "Automated tools can pace attacks to avoid permanent lockout"
+      ],
+      "impact": [
+        "Атакующий может возобновить password spraying после короткого ожидания.",
+        "Блокировка обеспечивает минимальную защиту от настойчивого подбора.",
+        "Автоматизированные средства могут подбирать темп атак, не вызывая длительной блокировки."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Set lockout duration to 30 minutes or more",
+        "Consider permanent lockout (manual unlock required) for sensitive accounts",
+        "Monitor for repeated lockout events",
+        "Implement additional controls (MFA, conditional access)"
+      ],
+      "remediation": [
+        "Установите продолжительность блокировки не менее 30 минут.",
+        "Рассмотрите постоянную блокировку с ручной разблокировкой для чувствительных учётных записей.",
+        "Отслеживайте повторяющиеся события блокировки.",
+        "Используйте дополнительные меры защиты: MFA и условный доступ."
+      ]
+    },
+    "WEAK_FGPP": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "The accounts a PSO is assigned to are exempt from the domain password policy",
+        "A short or complexity-free minimum makes guessing and cracking cheaper for those accounts",
+        "Reversible encryption stores the password in a form that can be decrypted, not hashed",
+        "No lockout threshold on the PSO removes the limit on guessing against its targets",
+        "A PSO assigned to a privileged group is an exception carved out for the accounts that matter most"
+      ],
+      "impact": [
+        "Для записей, охваченных объектом PSO, действует исключение из доменной парольной политики.",
+        "Короткий минимальный пароль или отсутствие требований сложности делают подбор дешевле.",
+        "Обратимое шифрование хранит пароль в форме, пригодной для расшифровки, а не только в виде хеша.",
+        "Отсутствие порога блокировки PSO снимает ограничение попыток подбора для целевых записей.",
+        "PSO, применённый к привилегированной группе, ослабляет политику именно для наиболее важных учётных записей."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Raise the PSO to at least the domain default: minimum length 14, complexity on, reversible encryption off, a lockout threshold set",
+        "Where the PSO exists for a service account that cannot meet the policy, prefer a gMSA - the password is then 240 random characters and nobody has to type it",
+        "Remove a PSO that is assigned to nobody rather than leaving it in the container",
+        "Check msDS-PasswordSettingsPrecedence: the lowest value wins, so a weak PSO with precedence 1 beats a strong one with 10"
+      ],
+      "remediation": [
+        "Усилите PSO не слабее доменной политики: минимальная длина 14 символов, включённая сложность, отключённое обратимое шифрование и установленный порог блокировки.",
+        "Если PSO создан ради служебной записи, не способной соответствовать политике, предпочтите gMSA с автоматически управляемым случайным паролем длиной 240 символов.",
+        "Удалите неиспользуемый PSO, не оставляя его в контейнере.",
+        "Проверьте msDS-PasswordSettingsPrecedence: побеждает меньшее значение, поэтому слабый PSO с приоритетом 1 перекрывает сильный с приоритетом 10."
+      ]
+    },
+    "OLD_FUNCTIONAL_LEVEL": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Cannot use Protected Users group (requires 2012 R2+)",
+        "Cannot use Authentication Policies/Silos (requires 2012 R2+)",
+        "Missing modern Kerberos improvements",
+        "May indicate presence of legacy Domain Controllers"
+      ],
+      "impact": [
+        "Недоступна группа Protected Users (требуется 2012 R2 или новее).",
+        "Недоступны Authentication Policies и Silos (требуется 2012 R2 или новее).",
+        "Отсутствуют современные усовершенствования Kerberos.",
+        "В домене могут оставаться устаревшие контроллеры домена."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Plan upgrade of all Domain Controllers to current OS version",
+        "Raise domain/forest functional level after all DCs are upgraded",
+        "Remove any remaining legacy Domain Controllers",
+        "Test application compatibility before raising functional level"
+      ],
+      "remediation": [
+        "Запланируйте обновление всех контроллеров домена до поддерживаемой версии ОС.",
+        "После обновления всех DC повысьте функциональный уровень домена и леса.",
+        "Удалите оставшиеся устаревшие контроллеры домена.",
+        "Перед повышением функционального уровня проверьте совместимость приложений."
+      ]
+    }
+  }
+}
