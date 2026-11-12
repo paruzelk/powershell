@@ -73,7 +73,7 @@ Check (($merged.PSObject.Properties['ESC1_TEMPLATE'].Value.remediation -join ' '
 Check (($merged.PSObject.Properties['GPO_SYSVOL_WRITABLE'].Value.remediation -join ' ') -match 'dcgpofix') 'Сохранено предупреждение против неосторожного dcgpofix'
 Check (($merged.PSObject.Properties['OU_PERM_KEYCREDENTIALLINK_WRITE'].Value.remediation -join ' ') -match 'SetAccessRuleProtection') 'Указаны последствия разрыва наследования ACL'
 
-Check (@($merged.PSObject.Properties | Where-Object { @($_.Value.attack).Count -gt 0 }).Count -eq 115) '115 русских сценариев Attack (только там, где они есть в оригинале)'
+Check (@($merged.PSObject.Properties | Where-Object { @($_.Value.attack).Count -gt 0 }).Count -eq 192) '192 русских раздела Attack (только там, где они есть в оригинале)'
 Check (@($merged.PSObject.Properties['GPO_WIDE_IMPACT'].Value.attack).Count -eq 0) 'Пустой Attack у GPO_WIDE_IMPACT согласован с оригиналом'
 Check (@($merged.PSObject.Properties['GPO_UNLINKED_BROAD_WRITE'].Value.attack).Count -eq 0) 'Пустой Attack у GPO_UNLINKED_BROAD_WRITE согласован с оригиналом'
 

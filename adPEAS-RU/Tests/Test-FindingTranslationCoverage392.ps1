@@ -55,7 +55,7 @@ if($titles.Count -ne 392 -or $items.Count -ne 392){
 $js=[IO.File]::ReadAllText((Join-Path $ProjectRoot 'src/modules/Reporting/templates/report-scripts.js'),[Text.Encoding]::UTF8)
 if(-not $js.Contains('const ruFullFindingTechnical = ')){throw 'Нет полного справочника в HTML-шаблоне'}
 # Отчёт должен отражать не только исходные JSON, но и уточняющие наложения
-# SourceVerifiedAttack-07 и SourceVerifiedAttack-09a…09c.
+# SourceVerifiedAttack-07, 09a…09c и 10a…10b; учитывается итоговая структура.
 $marker='const ruFullFindingTechnical = '
 $start=$js.IndexOf($marker,[StringComparison]::Ordinal)
 $start+=$marker.Length
@@ -65,7 +65,7 @@ $actual=ConvertFrom-Json -InputObject ($js.Substring($start,$finish-$start).Trim
 $effectiveCount=@($actual.PSObject.Properties).Count
 $effectiveAttacks=@($actual.PSObject.Properties | Where-Object { @($_.Value.attack).Count -gt 0 }).Count
 if($effectiveCount -ne 392){throw "В итоговом JS отсутствуют FindingId: $effectiveCount/392"}
-if($effectiveAttacks -ne 115){throw "Неверное покрытие итоговых Attack: $effectiveAttacks, ожидается 115"}
+if($effectiveAttacks -ne 192){throw "Неверное покрытие итоговых Attack: $effectiveAttacks, ожидается 192"}
 
 if($js.Contains('Исходное подробное описание EN (перевод пока не завершён)')){throw 'Устаревшая пометка EN'}
 $result=[ordered]@{

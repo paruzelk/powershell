@@ -41,6 +41,8 @@ $unexpected=@()
 $drift=@()
 $sourceMissingImpact=0
 $sourceMissingRemediation=0
+$impactStepDrifts=@()
+$remediationStepDrifts=@()
 $rows=@()
 for($i=0;$i -lt $ids.Count;$i++){
  $id=$ids[$i]
@@ -58,6 +60,8 @@ for($i=0;$i -lt $ids.Count;$i++){
  if($en.attack -gt 0 -and $translated.attack -eq 0){$missing+=($id)}
  if($en.attack -eq 0 -and $translated.attack -gt 0){$unexpected+=($id)}
  if($en.attack -gt 0 -and $translated.attack -gt 0 -and $en.attack -ne $translated.attack){$drift+=($id)}
+ if($en.impact -gt 0 -and $translated.impact -ne $en.impact){$impactStepDrifts+=($id)}
+ if($en.remediation -gt 0 -and $translated.remediation -ne $en.remediation){$remediationStepDrifts+=($id)}
  if($en.impact -eq 0 -and $translated.impact -gt 0){$sourceMissingImpact++}
  if($en.remediation -eq 0 -and $translated.remediation -gt 0){$sourceMissingRemediation++}
  $rows+=([pscustomobject]@{
@@ -69,8 +73,8 @@ for($i=0;$i -lt $ids.Count;$i++){
 if($original.attack -ne 304 -or $original.impact -ne 377 -or $original.remediation -ne 377){
  throw 'Исходный справочник не соответствует закреплённым количествам'
 }
-if($russian.attack -ne 115){throw "Ожидалось 115 русских Attack, найдено $($russian.attack)"}
-if($missing.Count -ne 189){throw "Ожидалось 189 ещё не переведённых Attack, найдено $($missing.Count)"}
+if($russian.attack -ne 192){throw "Ожидалось 192 русских Attack, найдено $($russian.attack)"}
+if($missing.Count -ne 112){throw "Ожидалось 112 ещё не переведённых Attack, найдено $($missing.Count)"}
 if($unexpected.Count -ne 0){throw "Обнаружен вымышленный Attack: $($unexpected -join ', ')"}
 if($drift.Count -ne 0){throw "Переведённые Attack имеют расхождения числа пунктов: $($drift -join ', ')"}
 $result=[ordered]@{
@@ -82,9 +86,11 @@ $result=[ordered]@{
  MissingRussianAttackIds=@($missing)
  OriginalAttackAbsentCount=88
  AttackStepCountDifferences=@($drift)
+ ImpactStepCountDifferences=@($impactStepDrifts)
+ RemediationStepCountDifferences=@($remediationStepDrifts)
  RussianImpactWithNoSource=$sourceMissingImpact
  RussianRemediationWithNoSource=$sourceMissingRemediation
- Note='Совпадение количества пунктов не доказывает их смысловую эквивалентность. 10 Impact/Remediation сверены предметно; остальные требуют последовательной проверки.'
+ Note='77 новых Attack имеют точный EN-свидетель, сопоставленный пункт за пунктом. Количество пунктов Impact и Remediation не доказывает смысловую эквивалентность; их проверка продолжается.'
  UserReportDataIncluded=$false
  Fields=@($rows)
 }
