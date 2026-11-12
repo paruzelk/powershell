@@ -703,6 +703,64 @@ if($d11Seen.Count -ne 24 -or $d11Impact -ne 77 -or $d11Remediation -ne 77){
 }
 Write-Host '[RU] PASS D11: 24 находки, Impact 77 и Remediation 77 сверены с EN'
 
+
+# Этап D12: source-verified Impact и Remediation для 24 credential/BitLocker/ADFS находок.
+# Структурный и дословный контроль закреплённого EN, запрет повторного изменения старых ID.
+$d12Catalogs=@('SourceVerifiedCore-21a.ru-RU.json','SourceVerifiedCore-21b.ru-RU.json')
+$d12Older=@(
+ 'SourceVerifiedCore-07.ru-RU.json','SourceVerifiedCore-11.ru-RU.json',
+ 'SourceVerifiedCore-12.ru-RU.json','SourceVerifiedCore-13.ru-RU.json',
+ 'SourceVerifiedCore-14a.ru-RU.json','SourceVerifiedCore-14b.ru-RU.json',
+ 'SourceVerifiedCore-15a.ru-RU.json','SourceVerifiedCore-15b.ru-RU.json',
+ 'SourceVerifiedCore-16a.ru-RU.json','SourceVerifiedCore-16b.ru-RU.json',
+ 'SourceVerifiedCore-17a.ru-RU.json','SourceVerifiedCore-17b.ru-RU.json',
+ 'SourceVerifiedCore-18a.ru-RU.json','SourceVerifiedCore-18b.ru-RU.json',
+ 'SourceVerifiedCore-19a.ru-RU.json','SourceVerifiedCore-19b.ru-RU.json',
+ 'SourceVerifiedCore-20a.ru-RU.json','SourceVerifiedCore-20b.ru-RU.json'
+)
+$d12Protected=@{}
+foreach($name in $d12Older){
+ $prior=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($entry in $prior.translations.PSObject.Properties){$d12Protected[[string]$entry.Name]=$true}
+}
+$d12Seen=@{}
+$d12Impact=0
+$d12Remediation=0
+foreach($name in $d12Catalogs){
+ $cat=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ if(@($cat.translations.PSObject.Properties).Count -ne 12){throw "D12: неполный каталог $name"}
+ foreach($row in $cat.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if(-not $entries.Contains($id)){throw "D12: неизвестный FindingId $id"}
+  if($d12Protected.ContainsKey($id) -or $d12Seen.ContainsKey($id)){throw "D12: перезапись уже проверенного ID $id"}
+  $d12Seen[$id]=$true
+  foreach($field in @('Impact','Remediation')){
+   $lower=$field.ToLowerInvariant()
+   $originalProperty='sourceEnglish'+$field
+   $nProperty=$originalProperty+'Count'
+   $original=@(Get-PinnedFindingText $id $field)
+   $witness=@($row.Value.$originalProperty)
+   $russian=@($row.Value.$lower)
+   $n=[int]$row.Value.$nProperty
+   if($n -le 0 -or $n -ne $original.Count -or
+      $n -ne $witness.Count -or $n -ne $russian.Count){
+    throw "D12: число строк не совпало $id / $field"
+   }
+   for($i=0;$i -lt $n;$i++){
+    if([string]$original[$i] -cne [string]$witness[$i]){throw "D12: изменился оригинальный EN $id / $field / $($i+1)"}
+    if([string]::IsNullOrWhiteSpace([string]$russian[$i]) -or
+       [string]$russian[$i] -notmatch '[А-Яа-яЁё]'){throw "D12: отсутствует русский перевод $id / $field / $($i+1)"}
+   }
+   $entries[$id].$lower=@($russian)
+   if($field -eq 'Impact'){$d12Impact+=$n}else{$d12Remediation+=$n}
+  }
+ }
+}
+if($d12Seen.Count -ne 24 -or $d12Impact -ne 94 -or $d12Remediation -ne 97){
+ throw "D12: неполный набор $($d12Seen.Count) / $d12Impact / $d12Remediation"
+}
+Write-Host '[RU] PASS D12: 24 находки, Impact 94 и Remediation 97 сверены с закреплённым EN'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
