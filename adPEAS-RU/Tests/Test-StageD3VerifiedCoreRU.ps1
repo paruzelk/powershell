@@ -35,9 +35,11 @@ if(($actualIds -join [char]10) -cne ($sortedExpected -join [char]10)){
  throw 'D3: изменён закреплённый набор из 14 FindingId'
 }
 $parity=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceFieldParity392.json'),[Text.Encoding]::UTF8))
-if(@($parity.ImpactStepCountDifferences).Count -ne 293 -or
-   @($parity.RemediationStepCountDifferences).Count -ne 273){
- throw 'D3: сводная статистика полей не отражает новые полные переводы'
+foreach($id in $expectedIds){
+ if(@($parity.ImpactStepCountDifferences) -ccontains $id -or
+    @($parity.RemediationStepCountDifferences) -ccontains $id){
+  throw "D3: полные переводы не отражены в сводной статистике: $id"
+ }
 }
 function Get-OriginalItems([string]$id,[string]$field){
  $begin=$source.IndexOf(("    '"+$id+"' = @{"),[StringComparison]::Ordinal)
