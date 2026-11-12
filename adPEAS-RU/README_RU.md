@@ -954,3 +954,90 @@ Impact и 60 пунктов Remediation**. Для каждого перевод�
 Сборка после успешной GitHub Actions публикуется в архиве
 `adPEAS-RU-2.9.0-STAGE-D17-20261112.zip`.
 
+
+
+## Этап D18 — безопасность Windows, политики аутентификации и защищённые индикаторы (12 ноября 2026)
+
+Предметно сверены ещё **15 типов находок** по закреплённому
+оригиналу `61106960/adPEAS` v2.9.0
+(`ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`):
+**28 пунктов Impact и 23 пункта Remediation**.
+Каталоги:
+`Localization/SourceVerifiedCore-27a.ru-RU.json` (8 типов)
+и `Localization/SourceVerifiedCore-27b.ru-RU.json` (7 типов).
+Каждая русская строка связана с точным английским свидетельством
+из исходного скрипта, в том же порядке.
+
+Состав:
+
+- **Шаблоны сертификатов и политика аутентификации:**
+  `ADCS_CLIENT_AUTH_SEVERITY`,
+  `AUTHN_POLICY_BROAD_CONDITION`,
+  `AUTHN_POLICY_NOT_EFFECTIVE`,
+  `CERT_FLAG_SEVERITY`.
+- **Защищённая SMTP-конфигурация:**
+  `EXCHANGE_SMTP_CONNECTOR_AUTHENTICATED`.
+- **Реестр и средства управления Windows:**
+  `REGISTRY_LMCOMPAT`,
+  `REGISTRY_REMOTE_ASSISTANCE_OFFER`,
+  `REGISTRY_RUNASPPL`, `REGISTRY_SMB1_CLIENT`,
+  `REGISTRY_UAC_NO_PROMPT`,
+  `REGISTRY_WINRM_BASIC`,
+  `REGISTRY_WINRM_UNENCRYPTED`,
+  `REGISTRY_WSUS_HTTP`.
+- **Контроллеры домена:**
+  `RODC_DENIED_GROUP_MISSING`,
+  `UNCONSTRAINED_DELEGATION`.
+
+### Технические и смысловые ограничения
+
+- `EXCHANGE_SMTP_CONNECTOR_AUTHENTICATED` — **положительный результат**:
+  коннектор не предоставляет проверяемые анонимные возможности
+  relay и подмены отправителя. Исходная рекомендация — не менять
+  его конфигурацию только из-за данной проверки.
+- Для `AUTHN_POLICY_BROAD_CONDITION` оставлены буквальный путь
+  `@USER.ad://ext/AuthenticationSilo`, условие `SILO` и
+  ограничение компьютерами `Tier 0`. Для
+  `AUTHN_POLICY_NOT_EFFECTIVE` сохранены события 305/306 и
+  `Set-ADAuthenticationPolicy -Enforce`; не переводить
+  имена параметров команд.
+- Для `REGISTRY_LMCOMPAT` сохранено существенное предупреждение:
+  переход на `LmCompatibilityLevel=5` без инвентаризации
+  устройств без NTLMv2 может вывести из строя их
+  аутентификацию. Рекомендуется поэтапная проверка.
+- `REGISTRY_RUNASPPL` — `RunAsPPL=1`, защита LSASS.
+  `REGISTRY_SMB1_CLIENT` — `mrxsmb10` и
+  `DependOnService` у `LanmanWorkstation`.
+  `REGISTRY_UAC_NO_PROMPT` — точные значения политики UAC
+  5 и 2, без подмены их смысла.
+- Для WinRM раздельно проверяются запрет `Basic authentication`,
+  запрет незашифрованного трафика и необходимость HTTPS,
+  если Kerberos недоступен. Для WSUS исходная рекомендация
+  требует HTTPS, TLS и проверки сертификата.
+- `RODC_DENIED_GROUP_MISSING` проверяет именно отсутствие
+  стандартной `Denied RODC Password Replication Group`
+  в списке запретов кэширования паролей; наличие иных запретов
+  не следует путать с этой конкретной проверкой.
+- `UNCONSTRAINED_DELEGATION` сохраняет предупреждение
+  о краже TGT, механизме `PrinterBug` и возможности
+  компрометации домена. `Protected Users` применяется только
+  к подходящим пользовательским учётным записям после проверки
+  совместимости; **не** к компьютерам или gMSA.
+
+### Статус и проверки D18
+
+- После этапа подтверждены **377/392** полных переводов
+  Impact/Remediation; **15** ещё не прошли предметную сверку.
+- Структурное совпадение числа пунктов Impact/Remediation — **0/0**
+  расхождений, но само по себе оно не подтверждает точность смысла.
+- У оставшихся 15 типов большинство исходных Impact/Remediation
+  отсутствует, и их нельзя заполнять выдуманными советами.
+  Этот контроль относится к D19.
+- `Apply-FullTechnical.ps1` защищает от перезаписи **362 ранее
+  сверенных FindingId**; `Tests/Test-StageD18VerifiedCoreRU.ps1`
+  проверяет EN ↔ RU ↔ HTML и 15 смысловых условий.
+- Команды исправления, `FindingId`, SID, GUID, LDAP-атрибуты,
+  оценки риска и исходный скрипт adPEAS не меняются.
+
+После успешной GitHub Actions архив:
+`adPEAS-RU-2.9.0-STAGE-D18-20261112.zip`.

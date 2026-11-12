@@ -1,0 +1,142 @@
+{
+  "schema": "adPEAS-RU.StageD18.CoreFields.27a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "ADCS_CLIENT_AUTH_SEVERITY": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "Certificates can authenticate as the enrolled user"
+      ],
+      "impact": [
+        "Сертификат с назначением Client Authentication позволяет аутентифицироваться от имени пользователя, для которого он выдан, при соблюдении требований сопоставления сертификатов."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Only enable Client Authentication EKU where required"
+      ],
+      "remediation": [
+        "Разрешайте назначение Client Authentication EKU только там, где оно действительно необходимо."
+      ]
+    },
+    "AUTHN_POLICY_BROAD_CONDITION": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "The accounts the policy covers can sign on from any domain-joined machine, or be authenticated to by anybody"
+      ],
+      "impact": [
+        "Учётные записи, охватываемые политикой, могут входить с любого компьютера домена либо проходить аутентификацию со стороны любого субъекта из-за слишком широких условий."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Name the devices the accounts may sign on from - a silo claim (@USER.ad://ext/AuthenticationSilo == `\"SILO`\") or a group holding only the Tier 0 machines"
+      ],
+      "remediation": [
+        "Явно задайте устройства, с которых учётным записям разрешён вход: например, условием silo claim `@USER.ad://ext/AuthenticationSilo == `\"SILO`\"` или группой, содержащей только компьютеры Tier 0."
+      ]
+    },
+    "AUTHN_POLICY_NOT_EFFECTIVE": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "The assigned accounts can sign on from any machine and keep ordinary ticket lifetimes"
+      ],
+      "impact": [
+        "Для назначенных учётных записей сохраняется возможность входа с любого компьютера и стандартные сроки действия билетов, поскольку ограничения политики ещё не применяются."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Review the audit events (events 305 and 306 in AuthenticationPolicyFailures-DomainController), then enforce the policy: Set-ADAuthenticationPolicy -Identity 'POLICY' -Enforce `$true"
+      ],
+      "remediation": [
+        "Проверьте события аудита 305 и 306 в AuthenticationPolicyFailures-DomainController, затем включите принудительное применение: Set-ADAuthenticationPolicy -Identity 'POLICY' -Enforce $true."
+      ]
+    },
+    "CERT_FLAG_SEVERITY": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "Security-relevant certificate template flags affect enrollment behavior"
+      ],
+      "impact": [
+        "Флаги шаблона сертификата, значимые для безопасности, влияют на условия и порядок выдачи сертификатов."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Review and secure certificate template flag configuration"
+      ],
+      "remediation": [
+        "Проверьте конфигурацию флагов шаблонов сертификатов и ограничьте небезопасные возможности выдачи."
+      ]
+    },
+    "EXCHANGE_SMTP_CONNECTOR_AUTHENTICATED": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "No anonymous relay and no anonymous sender spoofing through this connector"
+      ],
+      "impact": [
+        "Через этот коннектор не допускаются анонимный SMTP relay и анонимная подмена адреса отправителя."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "No action required for this connector"
+      ],
+      "remediation": [
+        "Для этого коннектора исправление не требуется: проверка отмечает защищённую конфигурацию."
+      ]
+    },
+    "REGISTRY_LMCOMPAT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "LM/NTLMv1 responses can be cracked to recover NT hashes",
+        "Facilitates NTLM relay and offline cracking",
+        "Weakens authentication across all affected hosts"
+      ],
+      "impact": [
+        "Ответы LM/NTLMv1 допускают подбор, способный раскрыть NT-хеши.",
+        "Облегчаются атаки NTLM relay и офлайн-подбор учётных данных.",
+        "Ослабляется аутентификация на всех компьютерах, охваченных этой настройкой."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set LmCompatibilityLevel to 5 (NTLMv2 only, refuse LM and NTLM)",
+        "Level 5 refuses LM and NTLM outright, so any device that cannot do NTLMv2 stops authenticating - multifunction printers, NAS boxes, embedded systems and old Samba builds. Inventory those first and raise the level in stages, or the change is rolled back after the first ticket"
+      ],
+      "remediation": [
+        "Установите LmCompatibilityLevel равным 5: использовать только NTLMv2 и отказывать в LM/NTLM.",
+        "Уровень 5 полностью запрещает LM и NTLMv1, поэтому устройства без поддержки NTLMv2 перестанут проходить аутентификацию: это могут быть МФУ, NAS, встроенные системы и старые версии Samba. Сначала проведите инвентаризацию, затем повышайте уровень поэтапно, иначе настройку могут откатить после первых сбоев."
+      ]
+    },
+    "REGISTRY_REMOTE_ASSISTANCE_OFFER": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "Screen access - and with control allowed, interactive control - on every computer in scope for the listed helpers"
+      ],
+      "impact": [
+        "Перечисленные помощники получают доступ к экрану каждого компьютера из области действия политики, а если разрешено управление — возможность интерактивно управлять им."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set 'Configure Offer Remote Assistance' to Disabled, or keep the helper list to a dedicated support group"
+      ],
+      "remediation": [
+        "Отключите политику Configure Offer Remote Assistance либо ограничьте список помощников отдельной группой технической поддержки."
+      ]
+    },
+    "REGISTRY_RUNASPPL": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "LSASS not protected against memory access/injection",
+        "Eases credential dumping (Mimikatz, comsvcs.dll)"
+      ],
+      "impact": [
+        "Процесс LSASS не защищён от чтения памяти и внедрения кода средствами LSA Protection.",
+        "Это облегчает извлечение учётных данных инструментами вроде Mimikatz и comsvcs.dll."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set RunAsPPL=1 to enable LSA Protection"
+      ],
+      "remediation": [
+        "Установите RunAsPPL=1 для включения LSA Protection, предварительно проверив совместимость компонентов, использующих LSASS."
+      ]
+    }
+  }
+}

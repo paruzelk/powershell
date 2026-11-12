@@ -1,0 +1,152 @@
+{
+  "schema": "adPEAS-RU.StageD18.CoreFields.27b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "REGISTRY_SMB1_CLIENT": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A rogue server can keep the client on SMBv1, without the protections of SMB 2 and 3",
+        "Keeps alive the old SMBv1 client paths that SMB 2 and 3 replaced"
+      ],
+      "impact": [
+        "Поддельный SMB-сервер может удерживать клиента на SMBv1 без механизмов защиты, появившихся в SMB 2 и SMB 3.",
+        "Остаются доступны старые клиентские механизмы SMBv1, заменённые более современными версиями протокола."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set mrxsmb10 Start to 4 and remove MRxSmb10 from the DependOnService value of LanmanWorkstation, as Microsoft documents it",
+        "Update or replace the server that still needs SMBv1"
+      ],
+      "remediation": [
+        "Установите для службы mrxsmb10 параметр Start=4 и удалите MRxSmb10 из значения DependOnService службы LanmanWorkstation в соответствии с рекомендацией Microsoft.",
+        "Обновите или замените сервер, которому для работы всё ещё необходим SMBv1."
+      ]
+    },
+    "REGISTRY_UAC_NO_PROMPT": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Malware an administrator starts - from a document, a download or a link - elevates silently, without the prompt that would show it",
+        "UAC bypass techniques become unnecessary on the computers in scope"
+      ],
+      "impact": [
+        "Вредоносная программа, запущенная администратором из документа, загрузки или ссылки, может повысить привилегии незаметно, без запроса подтверждения UAC.",
+        "На компьютерах в области действия настройки становятся ненужными дополнительные методы обхода UAC."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set the setting back to 'Prompt for consent for non-Windows binaries' (5), or to something stricter such as 'Prompt for consent on the secure desktop' (2)"
+      ],
+      "remediation": [
+        "Верните значение Prompt for consent for non-Windows binaries (5) или более строгое, например Prompt for consent on the secure desktop (2)."
+      ]
+    },
+    "REGISTRY_WINRM_BASIC": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Passwords of the accounts that manage these computers readable on the network over HTTP",
+        "The service side accepts local accounts by password, outside Kerberos and its protections"
+      ],
+      "impact": [
+        "При WinRM Basic через HTTP пароли учётных записей администрирования компьютеров могут быть прочитаны в сети.",
+        "Серверная сторона принимает парольную аутентификацию локальных записей вне Kerberos и обеспечиваемых им механизмов защиты."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Set 'Allow Basic authentication' to Disabled for the WinRM service and the WinRM client"
+      ],
+      "remediation": [
+        "Отключите Allow Basic authentication одновременно для WinRM service и WinRM client."
+      ]
+    },
+    "REGISTRY_WINRM_UNENCRYPTED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Commands and output of remote management sessions readable on the network",
+        "Together with Basic authentication: user names and passwords in clear text"
+      ],
+      "impact": [
+        "Команды и результаты удалённых сеансов администрирования могут передаваться по сети в читаемом виде.",
+        "В сочетании с Basic authentication имена пользователей и пароли передаются открытым текстом."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set 'Allow unencrypted traffic' to Disabled for the WinRM service and the WinRM client",
+        "Use WinRM over HTTPS where Kerberos is not available"
+      ],
+      "remediation": [
+        "Отключите Allow unencrypted traffic для WinRM service и WinRM client.",
+        "Используйте WinRM через HTTPS там, где Kerberos недоступен."
+      ]
+    },
+    "REGISTRY_WSUS_HTTP": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "WSUS traffic is unauthenticated/cleartext",
+        "MITM can inject updates executed as SYSTEM",
+        "Mass compromise of all WSUS clients in scope"
+      ],
+      "impact": [
+        "Трафик WSUS передаётся без надлежащей аутентификации и шифрования транспортного соединения.",
+        "Атака посредника (MITM) может способствовать подмене обновлений, выполняемых с полномочиями SYSTEM, при выполнении остальных условий атаки.",
+        "При успешной эксплуатации возможно массовое воздействие на все клиенты WSUS в области действия настройки."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Reconfigure WSUS to use HTTPS (WUServer=https://...)",
+        "Enable TLS and proper certificate validation"
+      ],
+      "remediation": [
+        "Перенастройте WSUS на HTTPS, например WUServer=https://... .",
+        "Включите TLS и корректную проверку сертификата сервера."
+      ]
+    },
+    "RODC_DENIED_GROUP_MISSING": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "A privileged account brought into the allow list - directly or through a broad group - is no longer stopped by the domain-wide deny group"
+      ],
+      "impact": [
+        "Если привилегированная запись включена в список разрешённого кэширования паролей RODC напрямую или через широкую группу, её больше не защищает стандартная доменная группа запрета."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Put the Denied RODC Password Replication Group back on the deny list of the read-only Domain Controller"
+      ],
+      "remediation": [
+        "Верните Denied RODC Password Replication Group в список запрета репликации паролей для соответствующего контроллера домена только для чтения (RODC)."
+      ]
+    },
+    "UNCONSTRAINED_DELEGATION": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "TGTs of all authenticating users are cached on the system",
+        "Attackers who compromise this system can steal TGTs of privileged users",
+        "Enables impersonation attacks against any domain service",
+        "Domain Controllers authenticate to computers via print spooler (PrinterBug)",
+        "Can lead to complete domain compromise within minutes"
+      ],
+      "impact": [
+        "TGT пользователей, проходящих аутентификацию на системе с неограниченным делегированием, могут кэшироваться на ней, если для этих записей делегирование разрешено.",
+        "Злоумышленник, скомпрометировавший такую систему, может похитить TGT привилегированных пользователей.",
+        "Это позволяет представляться пользователями перед произвольными доменными службами при наличии соответствующего билета.",
+        "Контроллеры домена могут аутентифицироваться на других компьютерах посредством службы печати Print Spooler (PrinterBug).",
+        "Такая цепочка при благоприятных условиях может привести к полной компрометации домена за считаные минуты."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Replace unconstrained delegation with constrained delegation or RBCD",
+        "Add high-value accounts to 'Protected Users' group",
+        "Enable 'Account is sensitive and cannot be delegated' for privileged accounts",
+        "Disable the Print Spooler service on Domain Controllers",
+        "Monitor for TGT requests from unconstrained delegation systems"
+      ],
+      "remediation": [
+        "Замените неограниченное делегирование ограниченным делегированием либо RBCD.",
+        "Включайте подходящие высокопривилегированные пользовательские записи в группу Protected Users после проверки совместимости; компьютерные записи и gMSA в неё включать не следует.",
+        "Для привилегированных учётных записей установите Account is sensitive and cannot be delegated.",
+        "Отключите службу Print Spooler на контроллерах домена, где она не требуется.",
+        "Контролируйте запросы TGT, поступающие от систем с неограниченным делегированием."
+      ]
+    }
+  }
+}
