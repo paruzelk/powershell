@@ -1,0 +1,222 @@
+{
+  "schema": "adPEAS-RU.StageD16.CoreFields.25b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "EXCHANGE_SMTP_ANONYMOUS_SPOOFING": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Mail arrives in employee mailboxes from an internal address that nobody sent",
+        "SPF, DKIM and DMARC do not apply - the message never leaves the organization's own perimeter",
+        "Outlook shows the sender as a known internal contact, photo and display name included",
+        "It is the highest-fidelity phishing primitive an internal network offers"
+      ],
+      "impact": [
+        "Во входящих ящиках сотрудников могут появляться письма с внутреннего адреса, которые никто из его владельцев не отправлял.",
+        "SPF, DKIM и DMARC при таком сценарии не срабатывают: сообщение не покидает периметр организации.",
+        "Outlook может отображать отправителя как знакомый внутренний контакт, включая имя и фотографию.",
+        "Это один из наиболее убедительных способов фишинга, доступных злоумышленнику во внутренней сети."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the accept-sender extended rights from Anonymous Logon on this connector",
+        "Where an application must send as an internal address, give it an authenticated connector instead",
+        "Restrict the connector's remote IP ranges to the sending hosts"
+      ],
+      "remediation": [
+        "Удалите расширенные права Accept-Sender у Anonymous Logon на этом коннекторе.",
+        "Для приложения, которому необходимо отправлять от имени внутреннего адреса, создайте отдельный аутентифицируемый коннектор.",
+        "Ограничьте диапазоны удалённых IP коннектора только требуемыми узлами-отправителями."
+      ]
+    },
+    "EXCHANGE_SMTP_BROAD_RELAY": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Any domain account, including a service account with a weak password, can relay through this connector",
+        "Outbound mail carries the organization's reputation"
+      ],
+      "impact": [
+        "Любая доменная учётная запись, включая службу со слабым паролем, может использовать этот коннектор для пересылки почты.",
+        "Исходящие письма при этом отправляются с использованием репутации организации."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Grant the relay rights to a dedicated group holding the accounts that actually relay",
+        "Review the connector's remote IP ranges alongside the permission"
+      ],
+      "remediation": [
+        "Выдавайте право relay выделенной группе, содержащей только действительно использующие пересылку учётные записи.",
+        "Проверяйте RemoteIPRanges коннектора совместно с его разрешениями."
+      ]
+    },
+    "EXCHANGE_SMTP_BROAD_SPOOFING": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Any domain account can send mail as any internal address through this connector",
+        "The message is internal, so it passes the checks that exist for external mail and lands without a banner",
+        "That is the opening move of most internal phishing: a password reset, an invoice change, an instruction from a manager",
+        "It also defeats approval workflows that trust the sender address of an internal message"
+      ],
+      "impact": [
+        "Любая доменная учётная запись может отправлять через коннектор письма от имени любого внутреннего адреса.",
+        "Такое сообщение считается внутренним, поэтому может обходить проверки и предупреждения для внешней почты.",
+        "Это позволяет начинать внутренний фишинг: поддельные запросы смены пароля, корректировки счета или распоряжения руководителя.",
+        "Такая подмена также нарушает процессы согласования, полагающиеся только на адрес внутреннего отправителя."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove ms-Exch-SMTP-Accept-Authoritative-Domain-Sender and ms-Exch-SMTP-Accept-Any-Sender from the broad principal: Remove-ADPermission -Identity 'CONNECTOR' -User 'DOMAIN\\Domain Users' -ExtendedRights ms-Exch-SMTP-Accept-Authoritative-Domain-Sender",
+        "Where an application needs to send as an internal address, give that application its own account and grant the right to it alone, on a connector that only it can reach",
+        "Restrict the connector's RemoteIPRanges to the hosts that are meant to use it",
+        "Check the other connectors too: the grant is often copied from one to the next"
+      ],
+      "remediation": [
+        "Удалите у широкой группы ms-Exch-SMTP-Accept-Authoritative-Domain-Sender и ms-Exch-SMTP-Accept-Any-Sender: Remove-ADPermission -Identity 'CONNECTOR' -User 'DOMAIN\\Domain Users' -ExtendedRights ms-Exch-SMTP-Accept-Authoritative-Domain-Sender. Исходная команда показывает снятие первого права; второе необходимо проверить и снять отдельно.",
+        "Если приложению требуется отправка с внутреннего адреса, используйте его собственную запись и предоставьте право только ей на коннекторе, доступном только этому приложению.",
+        "Ограничьте RemoteIPRanges коннектора только предназначенными для него отправляющими узлами.",
+        "Проверьте и другие коннекторы: такое разрешение часто копируют между ними."
+      ]
+    },
+    "EXCHANGE_VULNERABLE_VERSION": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "No security updates: the next critical vulnerability in this version stays open",
+        "Exchange historically carries pre-authentication remote code execution bugs - ProxyLogon, ProxyShell and ProxyNotShell were all of that class",
+        "The server reaches Active Directory through its own service account, so compromising it is rarely the last step",
+        "Unsupported versions are the ones ransomware operators scan for, because the install base stays exploitable"
+      ],
+      "impact": [
+        "При отсутствии обновлений безопасности следующая критическая уязвимость используемой версии остаётся неустранённой.",
+        "Ранее в Exchange неоднократно встречались ошибки удалённого выполнения кода до аутентификации, включая ProxyLogon, ProxyShell и ProxyNotShell.",
+        "Сервер имеет доступ к Active Directory с полномочиями своих служб, поэтому его компрометация редко ограничивается самим сервером.",
+        "Злоумышленники-вымогатели активно ищут неподдерживаемые версии Exchange, поскольку они продолжают оставаться уязвимыми."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Move to a supported version - Exchange Subscription Edition is the only line still receiving updates, and the upgrade path from 2016 and 2019 is in place",
+        "Until then, run the Exchange Health Checker on the server to see which cumulative and security updates are missing: that is the question this finding cannot answer from the directory",
+        "Enable Extended Protection for Authentication, which is what closes the relay half of these chains",
+        "Keep the server off the internet where the role does not require it, and in front of a reverse proxy where it does",
+        "Consider migration to Exchange Online"
+      ],
+      "remediation": [
+        "Перейдите на поддерживаемую версию: в закреплённом оригинале единственной поддерживаемой линией указана Exchange Subscription Edition с доступным путём обновления с Exchange 2016 и 2019.",
+        "До обновления запустите Exchange Health Checker для проверки отсутствующих накопительных и защитных обновлений: текущая проверка AD сама по себе не определяет их полный перечень.",
+        "Включите Extended Protection for Authentication (EPA) для закрытия составляющей атак, связанной с ретрансляцией аутентификации, после проверки совместимости.",
+        "Если роль сервера не требует внешнего доступа, изолируйте его от интернета; при необходимости внешнего доступа используйте обратный прокси.",
+        "Рассмотрите миграцию на Exchange Online."
+      ]
+    },
+    "EXCHANGE_WEB_ENDPOINTS": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "HTTP + NTLM endpoints are vulnerable to NTLM relay",
+        "HTTPS + NTLM without EPA is also vulnerable",
+        "Relay attacks can compromise Exchange mailboxes",
+        "A relayed machine account can reach service endpoints that write files, which has yielded web shells running as SYSTEM"
+      ],
+      "impact": [
+        "Веб-эндпоинты HTTP с NTLM могут быть подвержены атакам NTLM relay.",
+        "HTTPS с NTLM без EPA также может быть подвержен NTLM relay.",
+        "Ретрансляция аутентификации может привести к компрометации почтовых ящиков Exchange.",
+        "Ретранслированная учётная запись компьютера может получить доступ к сервисным эндпоинтам, записывающим файлы; в известных цепочках это приводило к запуску веб-оболочек с правами SYSTEM."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Enable EPA on all Exchange endpoints, and verify it per virtual directory rather than per server",
+        "Disable HTTP access and require HTTPS",
+        "Keep the servers on a current cumulative and security update - several relay paths were closed by update rather than by configuration",
+        "Turn MRSProxy off on servers that perform no cross-forest or hybrid mailbox moves"
+      ],
+      "remediation": [
+        "Включите EPA для всех соответствующих эндпоинтов Exchange и проверьте его настройки по каждой виртуальной директории, а не только на уровне сервера.",
+        "Отключите доступ по HTTP и требуйте HTTPS.",
+        "Поддерживайте серверы на актуальных накопительных и защитных обновлениях: часть путей relay была закрыта исправлениями, а не конфигурацией.",
+        "Отключите MRSProxy на серверах, которые не участвуют в межлесном или гибридном переносе почтовых ящиков."
+      ]
+    },
+    "EXCHANGE_SMTP_CONNECTOR_UNREADABLE": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "The connector's relay and sender-spoofing exposure is unknown"
+      ],
+      "impact": [
+        "Неизвестно, открыт ли у данного коннектора путь к relay и подмене отправителя: его разрешения недоступны для чтения."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Re-run with an account that can read nTSecurityDescriptor on the Configuration partition",
+        "Or review the connector directly with Get-ADPermission"
+      ],
+      "remediation": [
+        "Повторите проверку от имени учётной записи, имеющей право читать nTSecurityDescriptor в разделе Configuration.",
+        "Либо проверьте разрешения коннектора непосредственно через Get-ADPermission."
+      ]
+    },
+    "DANGEROUS_RIGHTS_AFFECTED_OUS": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "All objects in listed OUs are affected",
+        "Scope of impact depends on OU contents"
+      ],
+      "impact": [
+        "Все объекты в перечисленных организационных единицах (OU) находятся под действием указанного опасного разрешения.",
+        "Масштаб последствий зависит от состава объектов в затронутых OU."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Review and restrict permissions on affected OUs"
+      ],
+      "remediation": [
+        "Проверьте и ограничьте разрешения на затронутых OU с учётом необходимых задач делегирования."
+      ]
+    },
+    "DANGEROUS_RIGHTS_SEVERITY": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Expected/Attention: Permissions are by-design for privileged groups",
+        "Finding: Permissions are unexpected and potentially dangerous"
+      ],
+      "impact": [
+        "Состояния Expected/Attention означают, что для привилегированных групп эти разрешения считаются предусмотренными архитектурой.",
+        "Состояние Finding означает, что обнаружены неожиданные и потенциально опасные разрешения."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Review unexpected permissions and remove if not required"
+      ],
+      "remediation": [
+        "Проверьте неожиданные разрешения и удалите те, которые не нужны."
+      ]
+    },
+    "LAPS_INSTALLED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Local admin passwords are unique per computer and automatically rotated",
+        "Pass-the-Hash lateral movement with local admin is prevented"
+      ],
+      "impact": [
+        "Для каждого компьютера используются уникальные пароли локального администратора с автоматической ротацией.",
+        "Это препятствует горизонтальному перемещению Pass-the-Hash с использованием единого пароля локального администратора."
+      ],
+      "sourceEnglishRemediationCount": 0,
+      "sourceEnglishRemediation": [],
+      "remediation": []
+    },
+    "GPO_LINK_REACHES_DC": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "What the policy sets, grants or runs takes effect on a domain controller"
+      ],
+      "impact": [
+        "Параметры, предоставленные полномочия и запускаемые действия этой политики будут применяться к контроллеру домена."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Link a policy meant for member computers to the OUs those computers are in, not above a domain controller"
+      ],
+      "remediation": [
+        "Привязывайте политику, предназначенную для обычных компьютеров, к OU, в которых расположены эти компьютеры, а не выше OU контроллеров домена."
+      ]
+    }
+  }
+}

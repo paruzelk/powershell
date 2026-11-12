@@ -1,0 +1,258 @@
+{
+  "schema": "adPEAS-RU.StageD16.CoreFields.25a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "EXCHANGE_HYBRID_DEPLOYMENT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Administrative access to an on-premises Exchange server can be turned into privileges in the cloud tenant",
+        "The escalation leaves little in the tenant's own audit trail, because it arrives through a trusted principal",
+        "Every other Exchange finding in this report gains the tenant as additional blast radius"
+      ],
+      "impact": [
+        "Административный доступ к локальному серверу Exchange может быть преобразован в привилегии облачного тенанта.",
+        "Повышение привилегий может оставить мало следов непосредственно в журналах аудита тенанта, поскольку доступ осуществляется через доверенного принципала.",
+        "Для каждой другой находки Exchange в отчёте облачный тенант становится дополнительной областью возможных последствий."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Install the Exchange hotfix (April 2025 or newer) and deploy the dedicated Exchange hybrid application",
+        "Reset the shared service principal's credentials after switching, as Microsoft's guidance instructs",
+        "Verify with Microsoft's Exchange Server Health Checker that the dedicated app is in use",
+        "Treat every on-premises Exchange server as a tier-0 asset for as long as the hybrid trust exists"
+      ],
+      "remediation": [
+        "Установите исправление Exchange (апрель 2025 года или новее) и разверните отдельное приложение Exchange Hybrid.",
+        "После перехода сбросьте учётные данные общего сервисного принципала в соответствии с рекомендацией Microsoft.",
+        "Убедитесь через Microsoft Exchange Server Health Checker, что используется выделенное приложение.",
+        "Пока существует гибридное доверие, относите все локальные серверы Exchange к критичным активам Tier 0."
+      ]
+    },
+    "EXCHANGE_RBAC_AD_PERMISSIONS": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Directory ACLs can be modified with the Exchange Trusted Subsystem's permissions",
+        "Where the shared permissions model is in place, that reaches the domain object",
+        "Send-As and Receive-As can be granted on any mailbox, which is mailbox access without a mailbox permission"
+      ],
+      "impact": [
+        "Разрешения Exchange Trusted Subsystem могут позволять изменять ACL каталога Active Directory.",
+        "В модели общих разрешений (shared permissions) это может распространяться на объект домена.",
+        "Права Send-As и Receive-As могут назначаться на любой почтовый ящик и предоставлять доступ к почте без изменения собственных разрешений ящика."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the assignment; this role belongs with Organization Management",
+        "Verify the Exchange permissions model on the domain object (see the Exchange Permissions Model check)",
+        "Audit Add-ADPermission in the Exchange admin audit log"
+      ],
+      "remediation": [
+        "Удалите это назначение роли у неуполномоченных субъектов: роль должна принадлежать Organization Management.",
+        "Проверьте модель разрешений Exchange на объекте домена (отдельная проверка Exchange Permissions Model).",
+        "Проверьте операции Add-ADPermission в журнале административного аудита Exchange."
+      ]
+    },
+    "EXCHANGE_RBAC_APPLICATION_IMPERSONATION": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Read, send and delete mail as any user in the organization",
+        "Search every mailbox for credentials, contracts or security documentation",
+        "Send mail as an executive from that executive's real mailbox - it appears in their Sent Items",
+        "No mailbox permission is changed and the mailbox owner sees nothing"
+      ],
+      "impact": [
+        "Возможность читать, отправлять и удалять письма от имени любого пользователя организации.",
+        "Возможность искать учётные данные, договоры и документацию по безопасности во всех почтовых ящиках.",
+        "Возможность отправлять сообщения от имени руководителя из его настоящего ящика — такие письма появляются в папке «Отправленные».",
+        "Разрешения самого почтового ящика не меняются, а его владелец может не заметить доступ."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove the assignment where no application needs it",
+        "Where an application does, scope the assignment with a management scope to the mailboxes it actually serves",
+        "Treat every account holding this role as a tier-0 credential: long random password, no interactive logon, monitored",
+        "Prefer modern per-application access over an organization-wide impersonation role"
+      ],
+      "remediation": [
+        "Удалите назначение роли там, где приложению оно не требуется.",
+        "Если назначение необходимо приложению, ограничьте его management scope только обслуживаемыми почтовыми ящиками.",
+        "Защищайте каждую учётную запись с этой ролью как критичные учётные данные Tier 0: длинный случайный пароль, запрет интерактивного входа и мониторинг.",
+        "Предпочитайте современные ограничения доступа отдельных приложений вместо роли олицетворения, распространяющейся на всю организацию."
+      ]
+    },
+    "EXCHANGE_RBAC_DEFAULT_ASSIGNMENT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Every member of the role group holds this capability",
+        "Role groups such as Organization Management are frequently larger than anyone intends",
+        "Discovery Management is meant to be empty between cases and often is not"
+      ],
+      "impact": [
+        "Каждый участник группы ролей получает соответствующую возможность.",
+        "Группы ролей, например Organization Management, часто имеют более широкий состав, чем планировалось.",
+        "Discovery Management должна оставаться пустой между расследованиями, но на практике это соблюдается не всегда."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Review the role group's membership rather than the assignment",
+        "Keep Discovery Management empty outside of active cases",
+        "Require privileged access management for membership in Organization Management"
+      ],
+      "remediation": [
+        "Проверяйте состав группы ролей, а не само назначение.",
+        "Оставляйте Discovery Management пустой вне активных расследований.",
+        "Применяйте управление привилегированным доступом для членства в Organization Management."
+      ]
+    },
+    "EXCHANGE_RBAC_MAILBOX_IMPORT_EXPORT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The complete contents of any mailbox can be written to a file and taken away",
+        "No mailbox owner is notified and no mailbox permission is changed",
+        "The import direction historically served as a web shell delivery path, by exporting a crafted message into a web-served directory"
+      ],
+      "impact": [
+        "Всё содержимое любого почтового ящика может быть записано в файл и выведено из организации.",
+        "Владелец ящика не получает уведомления, а его права доступа не меняются.",
+        "Операции импорта и экспорта исторически использовались для доставки веб-оболочки — например, при экспорте специально подготовленного сообщения в каталог, обслуживаемый веб-сервером."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove the assignment where the export capability is not an ongoing operational need",
+        "Where it is needed, assign it temporarily and remove it again afterwards",
+        "Restrict the export destination to a monitored share",
+        "Audit New-MailboxExportRequest in the Exchange admin audit log"
+      ],
+      "remediation": [
+        "Удалите назначение роли, если возможность экспорта не нужна для постоянной работы.",
+        "При временной необходимости выдавайте роль на ограниченный срок и затем отзывайте.",
+        "Разрешайте экспорт только в контролируемую общую папку.",
+        "Проверяйте операции New-MailboxExportRequest в журнале административного аудита Exchange."
+      ]
+    },
+    "EXCHANGE_RBAC_MAILBOX_SEARCH": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Keyword search across every mailbox, including those of executives and administrators",
+        "Results are copied into a discovery mailbox the holder can then open",
+        "Passwords, contracts and security documentation are found by searching for them",
+        "The activity looks like eDiscovery, which is exactly what it is"
+      ],
+      "impact": [
+        "Возможен поиск по ключевым словам во всех почтовых ящиках, включая ящики руководителей и администраторов.",
+        "Результаты копируются в почтовый ящик обнаружения (discovery mailbox), к которому субъект затем может получить доступ.",
+        "Поиск позволяет находить пароли, договоры и документацию по безопасности.",
+        "Активность выглядит как eDiscovery, поскольку технически является именно таким поиском."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the assignment; discovery belongs to a named, monitored group",
+        "Keep Discovery Management empty and populate it only for the duration of a case",
+        "Audit New-MailboxSearch and access to discovery mailboxes"
+      ],
+      "remediation": [
+        "Удалите избыточное назначение роли: функции обнаружения должны принадлежать конкретной контролируемой группе.",
+        "Оставляйте Discovery Management пустой и добавляйте участников лишь на время дела.",
+        "Проверяйте операции New-MailboxSearch и доступ к почтовым ящикам обнаружения."
+      ]
+    },
+    "EXCHANGE_RBAC_ROLE_MANAGEMENT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Self-escalation to every other Exchange capability in one command",
+        "Access to all mailbox content by way of the roles it can grant",
+        "A quiet persistence mechanism - a new role assignment looks like administration, not intrusion"
+      ],
+      "impact": [
+        "Одной командой субъект может предоставить себе другие возможности Exchange, вплоть до всех доступных ролей.",
+        "Через самостоятельно назначенные роли может открыться доступ ко всему содержимому почтовых ящиков.",
+        "Незаметное закрепление возможно через новое назначение роли, которое выглядит как обычное администрирование."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the assignment; Role Management belongs with Organization Management",
+        "Audit New-ManagementRoleAssignment in the Exchange admin audit log",
+        "Review every existing assignment after removing this one - the holder may already have granted itself others"
+      ],
+      "remediation": [
+        "Удалите избыточное назначение: Role Management должна принадлежать Organization Management.",
+        "Проводите аудит New-ManagementRoleAssignment в административном журнале Exchange.",
+        "После отзыва этой роли проверьте уже существующие назначения: субъект мог заранее выдать себе дополнительные права."
+      ]
+    },
+    "EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Arbitrary script execution in the Exchange management context",
+        "Code runs on the Exchange server, which is a domain member with far-reaching AD permissions",
+        "The role publishes itself - anyone assigned the unscoped role can run its contents"
+      ],
+      "impact": [
+        "Возможно выполнение произвольных сценариев в контексте управления Exchange.",
+        "Код выполняется на сервере Exchange — члене домена с широкими разрешениями Active Directory.",
+        "Роль распространяет выполнение своего содержимого: любой назначенный участник unscoped-роли способен запускать включённый в неё код."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the assignment - very few organizations have a legitimate use for it",
+        "Review every existing unscoped role for content that is not expected",
+        "Audit New-ManagementRole in the Exchange admin audit log"
+      ],
+      "remediation": [
+        "Удалите избыточное назначение: законная необходимость в этой возможности встречается редко.",
+        "Проверьте содержимое всех существующих ролей без области действия (unscoped roles) на неожиданные сценарии.",
+        "Проводите аудит операций New-ManagementRole в журнале административного аудита Exchange."
+      ]
+    },
+    "EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Anonymous senders reach distribution groups restricted to internal senders",
+        "Mail from outside is not marked as external, so recipients and transport rules take it for internal mail",
+        "Combined with a spoofed internal sender address, phishing that looks entirely internal"
+      ],
+      "impact": [
+        "Анонимные отправители могут доставлять сообщения группам рассылки, принимающим только письма от внутренних отправителей.",
+        "Письма извне не помечаются как внешние, поэтому получатели и транспортные правила могут считать их внутренними.",
+        "В сочетании с подменой внутреннего адреса отправителя это позволяет создавать фишинговые письма, полностью выглядящие внутренними."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove ms-Exch-SMTP-Accept-Authentication-Flag from the anonymous principal: Remove-ADPermission -Identity 'CONNECTOR' -User 'NT AUTHORITY\\ANONYMOUS LOGON' -ExtendedRights ms-Exch-SMTP-Accept-Authentication-Flag",
+        "Where a trusted relay host needs it, give that host its own connector restricted by RemoteIPRanges and authenticate it",
+        "Check whether the connector uses 'Externally secured' authentication on a network that is not actually secured"
+      ],
+      "remediation": [
+        "Удалите у Anonymous Logon расширенное право ms-Exch-SMTP-Accept-Authentication-Flag: Remove-ADPermission -Identity 'CONNECTOR' -User 'NT AUTHORITY\\ANONYMOUS LOGON' -ExtendedRights ms-Exch-SMTP-Accept-Authentication-Flag.",
+        "Если доверенному relay-серверу необходимо такое право, создайте для него отдельный коннектор, ограниченный RemoteIPRanges, и настройте аутентификацию.",
+        "Проверьте, не использует ли коннектор режим «Externally secured» в сети, которая фактически не защищена."
+      ]
+    },
+    "EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Unauthenticated mail reaches mailboxes without spam or malware filtering",
+        "Exchange marks it as having passed inspection, so downstream rules that trust that marking also let it through",
+        "Phishing and malware delivery become a question of reaching the connector, which is the easy part",
+        "The same grant usually carries headers-routing, which lets the sender dictate how the message appears to have travelled"
+      ],
+      "impact": [
+        "Неаутентифицированные сообщения могут попадать в почтовые ящики в обход фильтрации спама и вредоносного содержимого.",
+        "Exchange помечает такие письма как проверенные, и дальнейшие правила, доверяющие этому признаку, тоже пропускают их.",
+        "Для доставки фишинга и вредоносного ПО злоумышленнику остаётся лишь достигнуть коннектора, что зачастую несложно.",
+        "То же разрешение обычно сочетается с правами на заголовки маршрутизации, позволяя отправителю влиять на сведения о пройденном письмом пути."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove ms-Exch-Bypass-Anti-Spam from the anonymous principal: Remove-ADPermission -Identity 'CONNECTOR' -User 'NT AUTHORITY\\ANONYMOUS LOGON' -ExtendedRights ms-Exch-Bypass-Anti-Spam",
+        "Where an upstream appliance really does the filtering, give that host its own connector restricted by RemoteIPRanges, and grant the bypass only there",
+        "Confirm which hosts actually deliver to this connector before changing it - a shared internet-facing connector may carry both kinds of traffic"
+      ],
+      "remediation": [
+        "Удалите у Anonymous Logon право ms-Exch-Bypass-Anti-Spam: Remove-ADPermission -Identity 'CONNECTOR' -User 'NT AUTHORITY\\ANONYMOUS LOGON' -ExtendedRights ms-Exch-Bypass-Anti-Spam.",
+        "Если фильтрация действительно выполняется внешним шлюзом, выделите ему отдельный коннектор с ограниченными RemoteIPRanges и предоставьте обход только на нём.",
+        "Перед изменением выясните, какие узлы доставляют почту через коннектор: общий интернет-доступный коннектор может одновременно обслуживать оба типа трафика."
+      ]
+    }
+  }
+}

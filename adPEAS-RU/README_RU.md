@@ -777,3 +777,93 @@ Attack: 304/304 непустых оригиналов переведены, ещ
 пустых разделов не дополнялись.
 
 Архив после успешной CI: `adPEAS-RU-2.9.0-STAGE-D15-20261112.zip`.
+
+
+## Этап D16 — Exchange RBAC, SMTP и закрытие структурных расхождений (12 ноября 2026)
+
+Новые каталоги `Localization/SourceVerifiedCore-25a.ru-RU.json` и
+`Localization/SourceVerifiedCore-25b.ru-RU.json` содержат **20 новых
+предметно сверенных типов находок**, **59 пунктов Impact** и
+**56 пунктов Remediation**. У каждого пункта хранится соответствующая
+английская строка из закреплённого оригинала
+`61106960/adPEAS` commit `ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`.
+Проверка выполняется по точному порядку и количеству пунктов, а не
+только по наличию русских фраз.
+
+**16 находок Exchange:**
+
+- `EXCHANGE_HYBRID_DEPLOYMENT`.
+- `EXCHANGE_RBAC_AD_PERMISSIONS`,
+  `EXCHANGE_RBAC_APPLICATION_IMPERSONATION`,
+  `EXCHANGE_RBAC_DEFAULT_ASSIGNMENT`,
+  `EXCHANGE_RBAC_MAILBOX_IMPORT_EXPORT`,
+  `EXCHANGE_RBAC_MAILBOX_SEARCH`,
+  `EXCHANGE_RBAC_ROLE_MANAGEMENT`,
+  `EXCHANGE_RBAC_UNSCOPED_ROLE_MANAGEMENT`.
+- `EXCHANGE_SMTP_ANONYMOUS_AUTHENTICATED`,
+  `EXCHANGE_SMTP_ANONYMOUS_BYPASS_ANTISPAM`,
+  `EXCHANGE_SMTP_ANONYMOUS_SPOOFING`,
+  `EXCHANGE_SMTP_BROAD_RELAY`,
+  `EXCHANGE_SMTP_BROAD_SPOOFING`,
+  `EXCHANGE_SMTP_CONNECTOR_UNREADABLE`.
+- `EXCHANGE_VULNERABLE_VERSION`,
+  `EXCHANGE_WEB_ENDPOINTS`.
+
+**Четыре остальных структурных исключения:**
+`DANGEROUS_RIGHTS_AFFECTED_OUS`,
+`DANGEROUS_RIGHTS_SEVERITY`,
+`LAPS_INSTALLED`, `GPO_LINK_REACHES_DC`.
+
+### Смысловые и эксплуатационные ограничения
+
+- **RBAC**: наличие роли не означает её злонамеренное использование;
+  необходимы проверка обладателей роли, реальной области действия
+  (`management scope`) и журналов административных операций. Роли
+  `Role Management` и `Unscoped Role Management` могут создавать
+  устойчивые пути повышения привилегий.
+- **SMTP**: опасные разрешения зависят от того, кто может подключиться
+  к коннектору, его `RemoteIPRanges`, способа аутентификации,
+  фактического разграничения сетей и назначенных `ExtendedRights`.
+  Не удаляйте разрешения со штатных relay-коннекторов без оценки
+  зависимости служб и потока почты.
+- **Команды исправления** в технических пояснениях лишь отображаются,
+  но не исполняются. Исходная команда для
+  `EXCHANGE_SMTP_BROAD_SPOOFING` снимает только один из двух
+  перечисленных ExtendedRights; перевод сохранил эту команду и
+  явно поясняет, что второе право проверяют и снимают отдельно.
+- `EXCHANGE_SMTP_CONNECTOR_UNREADABLE` — **отсутствие данных**:
+  пока ACL коннектора не прочитан, нельзя утверждать ни наличие,
+  ни отсутствие relay / spoofing. Для проверки нужен доступ
+  к `nTSecurityDescriptor` или `Get-ADPermission`.
+- **Hybrid и веб-эндпоинты**: учтены выделенное гибридное приложение,
+  `Exchange Server Health Checker`, `EPA`, `MRSProxy`,
+  обновления безопасности и ограничения внешнего доступа. Настройки
+  нужно проверять на реальных версиях Exchange и по виртуальным
+  каталогам, а не только по заголовку находки.
+- `DANGEROUS_RIGHTS_SEVERITY` сохраняет отличие ожидаемых прав
+  `Expected/Attention` от действительно подозрительных `Finding`.
+  `GPO_LINK_REACHES_DC` требует проверять область действия GPO
+  перед изменением ссылок.
+- `LAPS_INSTALLED` — **защитная настройка**. В закреплённом исходнике
+  для неё `Remediation = @()`; русский каталог и HTML оставляют этот
+  массив строго пустым. Никакие выдуманные рекомендации не добавлены.
+
+### Контроль качества
+
+`Apply-FullTechnical.ps1` теперь запрещает перекрытие
+**318 прежних FindingId** и проверяет все 20 новых записей.
+`Tests/Test-StageD16VerifiedCoreRU.ps1` дополнительно сверяет
+EN ↔ каталог RU ↔ встроенный HTML по каждому пункту, контролирует
+20 смысловых оговорок и пустой раздел LAPS.
+Действующие проверки D1–D15 и исходные определения находок сохранены.
+
+После D16 предметно проверены **338 из 392** типов
+Impact/Remediation, осталось **54 типа**. Ожидаемый структурный
+остаток после пересборки — **0 Impact / 0 Remediation**.
+Это **не означает**, что оставшиеся 54 типа уже прошли предметную
+сверку: равное количество пунктов не гарантирует точный смысл.
+304 исходно непустых раздела Attack ранее переведены; 88
+исходно пустых оставлены пустыми.
+
+Пакет публикуется только после успешной CI:
+`adPEAS-RU-2.9.0-STAGE-D16-20261112.zip`.

@@ -158,6 +158,9 @@ function Get-PinnedFindingText([string]$id,[string]$field){
  $block=$originalFindingText.Substring($start,$stop-$start)
  $fieldRe='(?ms)^[ \t]{8}'+$field+'[ \t]*=[ \t]*@\([ \t]*\n(?<items>.*?)^[ \t]{8}\)'
  $match=[regex]::Match($block,$fieldRe)
+ # Поддержка исходного пустого @(): поле намеренно не имеет рекомендаций.
+ $emptyRe='(?m)^[ \t]{8}'+$field+'[ \t]*=[ \t]*@\(\)[ \t]*$'
+ if([regex]::IsMatch($block,$emptyRe)){return @()}
  if(-not $match.Success){throw "Отсутствует $field у $id"}
  return @([regex]::Matches($match.Groups['items'].Value,'(?m)^[ \t]{12}"(?<value>(?:\x60.|[^"])*)"') | ForEach-Object { $_.Groups['value'].Value })
 }
@@ -904,6 +907,61 @@ if($d15Seen.Count -ne 24 -or $d15Impact -ne 86 -or $d15Remediation -ne 85){
  throw "D15: ожидалось 24 находки / 86 Impact / 85 Remediation, найдено $($d15Seen.Count) / $d15Impact / $d15Remediation"
 }
 Write-Host '[RU] PASS D15: 24 находки, Impact 86 и Remediation 85 сверены с EN'
+
+
+# D16: Exchange RBAC, SMTP и четыре оставшихся структурных исключения.
+# Сверка закреплённого английского текста и защита 318 проверенных находок.
+$d16Catalogs=@('SourceVerifiedCore-25a.ru-RU.json','SourceVerifiedCore-25b.ru-RU.json')
+$d16Protected=@{}
+foreach($name in (@($d12Older)+@($d12Catalogs)+@($d13Catalogs)+@($d14Catalogs)+@($d15Catalogs))){
+ $oldCat=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($item in $oldCat.translations.PSObject.Properties){
+  $id=[string]$item.Name
+  if($d16Protected.ContainsKey($id)){throw "D16: повтор ID в предыдущих каталогах $id"}
+  $d16Protected[$id]=$true
+ }
+}
+if($d16Protected.Count -ne 318){throw "D16: должно быть 318 защищённых FindingId, найдено $($d16Protected.Count)"}
+$d16Seen=@{}
+$d16Impact=0
+$d16Remediation=0
+foreach($name in $d16Catalogs){
+ $cat=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ if(@($cat.translations.PSObject.Properties).Count -ne 10){throw "D16: в каталоге $name ожидаются 10 находок"}
+ foreach($row in $cat.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if(-not $entries.Contains($id)){throw "D16: неизвестный FindingId $id"}
+  if($d16Protected.ContainsKey($id) -or $d16Seen.ContainsKey($id)){throw "D16: прежняя или повторная находка $id"}
+  $d16Seen[$id]=$true
+  foreach($field in @('Impact','Remediation')){
+   $lower=$field.ToLowerInvariant()
+   $enField='sourceEnglish'+$field
+   $countField=$enField+'Count'
+   $original=@(Get-PinnedFindingText $id $field)
+   $witness=@($row.Value.$enField)
+   $translated=@($row.Value.$lower)
+   $expected=[int]$row.Value.$countField
+   if($expected -lt 0 -or $original.Count -ne $expected -or $witness.Count -ne $expected -or $translated.Count -ne $expected){
+    throw "D16: неверное число пунктов $id / $field"
+   }
+   if($expected -eq 0 -and ($id -cne 'LAPS_INSTALLED' -or $field -cne 'Remediation')){
+    throw "D16: неожиданный пустой раздел $id / $field"
+   }
+   for($i=0;$i -lt $expected;$i++){
+    if([string]$original[$i] -cne [string]$witness[$i]){throw "D16: отличается источник EN $id / $field / $($i+1)"}
+    if([string]::IsNullOrWhiteSpace([string]$translated[$i]) -or [string]$translated[$i] -notmatch '[А-Яа-яЁё]'){
+     throw "D16: не переведён пункт $id / $field / $($i+1)"
+    }
+   }
+   $entries[$id].$lower=@($translated)
+   if($field -eq 'Impact'){$d16Impact+=$expected}else{$d16Remediation+=$expected}
+  }
+ }
+}
+if($d16Seen.Count -ne 20 -or $d16Impact -ne 59 -or $d16Remediation -ne 56){
+ throw "D16: ожидаются 20 находок / 59 Impact / 56 Remediation; найдено $($d16Seen.Count) / $d16Impact / $d16Remediation"
+}
+Write-Host '[RU] PASS D16: 20 находок, Impact 59 и Remediation 56 сверены с EN'
 
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
