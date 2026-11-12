@@ -1,5 +1,10 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
+### ARCH3b — контракт операции поверх существующего MailMover (read-only DEV)
+
+[ARCH3b: контракт исходного кандидата, года/PST и безопасной операции](docs/2.6.5-arch3b-original-mover-contract.md). Новый `Core/Archive/ARCH3bOriginalMoverContract.ps1` не заменяет архиватор и не открывает PST. Он формирует устойчивый SHA256 `OperationId` из исходного `ArchiveSelector`, исходного StoreID/EntryID, года/part и путей, вычисляемых **уже существующими** `Get-OPAArchivePartPath` и `Get-OPAArchiveTargetPath`. Чистая модель фаз требует durable `PrepareIntent` **до** создания PST, source witness до `MoveClaimed`, независимую пострестартовую семантическую проверку до записи индекса; неопределённый COM результат не разрешает retry. `Invoke-ARCH3b.ps1 -Mode Plan|SyntheticPreview|SyntheticCrashReview` — только чтение и синтетика. Основной `MailMover` и `Archive/Resume/Auto` пока не включены.
+
+
 ### ARCH3a — продолжаем существующий архиватор, а не создаём новый (DEV)
 
 **[ADR ARCH3-001](docs/ADR-ARCH3-001-reuse-existing-archiver.md)** фиксирует обязательное архитектурное решение: сохранить существующий `OutlookPOP3Archive.ps1` и уже написанные `ArchiveGrouping` (Year/YearQuarter/YearMonth), `ArchivePlanner` (рекурсивные POP3 Inbox/Sent/пользовательские папки), `SystemFolders` (Outbox исключён), `MailMover` (годовые PST/лимиты/rollover), `ArchiveTransaction`, `OperationJournal`, `DuplicateIndex`, `ArchiveVerifier`. Проверенные ARCH2d5 claims, SHA-квитанции и независимую сверку **интегрировать в один исходный движок**, не писать третий архиватор. Уже реализованное семантическое сравнение в legacy `ArchiveVerifier` при `-RequireSemanticWitness` сохраняется; необходимо усилить сквозной приёмкой после перезапуска и безопасной работой с прерываниями.
