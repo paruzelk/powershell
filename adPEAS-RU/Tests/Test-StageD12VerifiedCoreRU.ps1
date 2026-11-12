@@ -147,14 +147,11 @@ foreach($id in $semanticGuards.Keys){
 }
 $parity=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceFieldParity392.json'),[Text.Encoding]::UTF8))
 # Глобальные показатели могут изменяться в следующих этапах; D12 сверяет собственные ID.
-if(@($parity.ImpactStepCountDifferences).Count -ne 90 -or
-   @($parity.RemediationStepCountDifferences).Count -ne 87){
- throw 'D12: контрольный остаток структурных расхождений должен быть 90/87'
-}
+# D12 фиксирует свой набор ID; последующие этапы вправе уменьшать глобальный остаток.
 foreach($id in $expectedIds){
  if(@($parity.ImpactStepCountDifferences) -ccontains $id -or
     @($parity.RemediationStepCountDifferences) -ccontains $id){
   throw "D12: структурное расхождение у переведённой находки $id"
  }
 }
-Write-Host 'PASS D12: 24 находки; Impact 94, Remediation 97; EN/RU/HTML паритет; остатки 90/87' -ForegroundColor Green
+Write-Host 'PASS D12: 24 находки; Impact 94, Remediation 97; EN/RU/HTML паритет; стабильность 24 ID' -ForegroundColor Green

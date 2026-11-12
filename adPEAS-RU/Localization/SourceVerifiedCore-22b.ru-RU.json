@@ -1,0 +1,314 @@
+{
+  "schema": "adPEAS-RU.StageD13.CoreFields.22b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "LAPS_LEGACY": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Local admin passwords are managed but stored unencrypted in AD",
+        "Any principal with read access to the LAPS attribute can see passwords"
+      ],
+      "impact": [
+        "Пароли локальных администраторов управляются, но в классической Microsoft LAPS хранятся в Active Directory без дополнительного шифрования самого атрибута.",
+        "Любой субъект с правом чтения атрибута LAPS может увидеть соответствующий пароль."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Plan migration to Windows LAPS for enhanced security features"
+      ],
+      "remediation": [
+        "Запланируйте переход на Windows LAPS, который предоставляет дополнительные средства защиты."
+      ]
+    },
+    "NETWORK_SUBNET_DOMAIN_CONTROLLERS": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Every other system in this subnet shares a network segment with the domain controllers",
+        "A compromised client or server here reaches the domain controllers without crossing a firewall, unless the segment is filtered inside"
+      ],
+      "impact": [
+        "Все остальные устройства данной подсети находятся в одном сетевом сегменте с контроллерами домена.",
+        "При компрометации клиента или сервера в этом сегменте доступ к контроллерам домена возможен без прохождения межсетевого экрана, если внутри сегмента нет дополнительной фильтрации."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Keep the domain controllers in a segment of their own, with only Tier-0 systems and the administrative workstations of Tier 0 in it",
+        "Allow the client and server networks only what a domain controller has to answer - DNS, Kerberos, LDAP, SMB for SYSVOL and NETLOGON, RPC - and administration only from the Tier-0 administrative network"
+      ],
+      "remediation": [
+        "Разместите контроллеры домена в отдельном сегменте вместе только с системами Tier 0 и предназначенными для их администрирования рабочими станциями Tier 0.",
+        "Разрешайте клиентским и серверным сетям лишь необходимые обращения к контроллерам домена: DNS, Kerberos, LDAP, SMB для SYSVOL и NETLOGON, RPC; административный доступ ограничьте административной сетью Tier 0."
+      ]
+    },
+    "PRECREATED_COMPUTER_ACCOUNT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Trying computer names as passwords yields a domain account without any credentials",
+        "A machine account under the attacker's control is what resource-based constrained delegation attacks need, even where the machine account quota is 0",
+        "Over NTLM the right password returns STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT instead of a logon, which still confirms it; Kerberos accepts it outright"
+      ],
+      "impact": [
+        "Попытка использовать имя компьютера как пароль может дать доступ к доменной учётной записи без знания секретных учётных данных.",
+        "Контролируемая злоумышленником учётная запись компьютера позволяет проводить атаки с ресурсным ограниченным делегированием (RBCD), даже если квота создания компьютеров равна нулю.",
+        "При NTLM верный пароль может возвращать STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT вместо полноценного входа, но всё равно подтверждать догадку; Kerberos принимает такие данные напрямую."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Delete pre-created computer accounts that no computer is going to join with",
+        "Set a random password on the ones still needed, or join the computer, which also clears the flag",
+        "Remove the 'Password Not Required' flag"
+      ],
+      "remediation": [
+        "Удалите заранее созданные учётные записи компьютеров, которые не будут присоединены к домену.",
+        "Для необходимых записей задайте случайный пароль либо завершите присоединение компьютера к домену, что также сбрасывает соответствующий флаг.",
+        "Снимите флаг `Password Not Required` у затронутых записей."
+      ]
+    },
+    "PREWIN2000_DEFAULT_MEMBER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Any account that can authenticate may enumerate every user and group in the domain",
+        "That includes the group memberships an attacker needs to choose a target",
+        "The group also reads tokenGroupsGlobalAndUniversal, which Authenticated Users alone cannot"
+      ],
+      "impact": [
+        "Любая успешно аутентифицированная учётная запись может перечислять пользователей и группы домена.",
+        "Это раскрывает и состав групп, необходимый злоумышленнику для выбора цели.",
+        "Группа также предоставляет чтение tokenGroupsGlobalAndUniversal, которого у одних лишь Authenticated Users нет."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Check what depends on it first: ADFS 3.0 WebForms authentication and Cisco ISE are documented to require this membership and break without it",
+        "Remove Authenticated Users from the group once nothing needs it",
+        "Grant the read explicitly to the accounts that turn out to need it instead"
+      ],
+      "remediation": [
+        "Сначала проверьте зависимости: для AD FS 3.0 WebForms и Cisco ISE документированы сценарии, в которых такое членство требуется и его удаление нарушает работу.",
+        "Удаляйте Authenticated Users из группы только после подтверждения отсутствия зависимостей.",
+        "Если отдельным сервисам требуется чтение, назначьте его явно конкретным учётным записям вместо широкого членства."
+      ]
+    },
+    "PRIMARY_GROUP_IS_DC_GROUP": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The account's token carries the Domain Controllers SID, so every ACE granted to that group applies to it",
+        "The membership is invisible to anything that reads the group's member attribute, including most review scripts",
+        "A user account in this state is not covered by the protections that apply to machine accounts"
+      ],
+      "impact": [
+        "Токен безопасности такой учётной записи содержит SID группы Domain Controllers; к ней применяются все ACE, назначенные этой группе.",
+        "Членство не видно инструментам, которые читают только атрибут member самой группы, включая многие сценарии проверки.",
+        "На пользовательскую учётную запись в таком состоянии не распространяются средства защиты, предусмотренные для учётных записей компьютеров."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set primaryGroupID back to 513 (Domain Users) for a user account, or 515 (Domain Computers) for a machine that is not a domain controller",
+        "Find out who could write the attribute: the change needs no group membership, so the path is an ACE on the object",
+        "Audit directory changes to primaryGroupID - it is written rarely enough that every change is worth a look"
+      ],
+      "remediation": [
+        "Верните primaryGroupID к 513 (Domain Users) для обычного пользователя или 515 (Domain Computers) для компьютера, который не является контроллером домена, после проверки типа объекта.",
+        "Выясните, кто мог изменить атрибут: такое действие не требует изменения членства в группе, а определяется разрешающей ACE на объекте.",
+        "Контролируйте изменения primaryGroupID в каталоге: этот атрибут меняют достаточно редко, чтобы исследовать каждый случай."
+      ]
+    },
+    "SCRIPTPATH_HARDCODED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "UNC paths can point to attacker-controlled SMB servers, enabling code execution on user logon",
+        "Absolute local paths bypass NETLOGON share protections and GPO-based script management",
+        "Logon scripts execute with the user's privileges - privileged accounts amplify the risk",
+        "An attacker who can modify scriptPath can achieve persistence without touching NETLOGON"
+      ],
+      "impact": [
+        "UNC-путь может указывать на SMB-сервер злоумышленника и приводить к выполнению кода при входе пользователя.",
+        "Абсолютные локальные пути обходят защиту общего ресурса NETLOGON и штатное управление сценариями через GPO.",
+        "Сценарии входа выполняются с полномочиями пользователя, поэтому для привилегированных записей риск выше.",
+        "Имея право изменения scriptPath, злоумышленник может закрепиться, не изменяя NETLOGON."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Use only relative paths in scriptPath that resolve via the NETLOGON share",
+        "Prefer Group Policy-based logon scripts over per-user scriptPath settings",
+        "Monitor scriptPath changes, especially to UNC or absolute paths",
+        "Audit who has WriteProperty permissions on scriptPath in affected OUs"
+      ],
+      "remediation": [
+        "Используйте в scriptPath только относительные пути, разрешаемые через общий ресурс NETLOGON.",
+        "Предпочитайте сценарии входа, управляемые групповой политикой, индивидуальным атрибутам scriptPath пользователей.",
+        "Отслеживайте изменения scriptPath, особенно появление UNC и абсолютных путей.",
+        "Проверьте, кто имеет разрешение WriteProperty для scriptPath в затронутых OU."
+      ]
+    },
+    "OPERATOR_GROUP_MEMBERS": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Account Operators can create and modify non-admin accounts",
+        "Backup Operators can back up and restore files on DCs including NTDS.dit",
+        "Print Operators can load drivers on DCs (kernel-mode code execution)",
+        "Server Operators can log on to DCs and manage services"
+      ],
+      "impact": [
+        "Account Operators могут создавать и изменять непривилегированные учётные записи.",
+        "Backup Operators могут создавать и восстанавливать резервные копии файлов контроллеров домена, включая NTDS.dit.",
+        "Print Operators могут загружать драйверы на контроллерах домена, что в определённых конфигурациях создаёт риск выполнения кода в режиме ядра.",
+        "Server Operators могут входить на контроллеры домена и управлять службами."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review if members actually need membership in this operator group",
+        "Follow least-privilege principle for group assignments",
+        "Monitor membership changes in these groups",
+        "Consider using delegated permissions instead of broad group membership"
+      ],
+      "remediation": [
+        "Проверьте, действительно ли каждому участнику требуется членство в соответствующей операторской группе.",
+        "Применяйте принцип минимальных привилегий при назначении членства.",
+        "Отслеживайте изменения состава этих групп.",
+        "Рассмотрите точечное делегирование разрешений вместо широкого членства в операторских группах."
+      ]
+    },
+    "OPERATOR_GROUP_MEMBERSHIP": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Account Operators: Can create accounts and modify non-admin accounts",
+        "Backup Operators: Can back up and restore files on DCs, including NTDS.dit",
+        "Print Operators: Can load drivers on DCs (potential kernel-mode code execution)",
+        "Cert Publishers: Can modify certificate templates and CA configuration",
+        "Server Operators: Can log on to DCs and manage services"
+      ],
+      "impact": [
+        "Account Operators могут создавать учётные записи и изменять непривилегированные учётные записи.",
+        "Backup Operators могут выполнять резервное копирование и восстановление файлов контроллеров домена, включая NTDS.dit.",
+        "Print Operators могут загружать драйверы на контроллерах домена, потенциально открывая путь к выполнению кода в режиме ядра.",
+        "Cert Publishers в описываемой исходником конфигурации могут влиять на шаблоны сертификатов и настройки удостоверяющего центра; фактические права необходимо проверить по ACL.",
+        "Server Operators могут входить на контроллеры домена и управлять службами."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review if membership in this group is necessary",
+        "Follow least-privilege principle for group assignments",
+        "Monitor membership changes in these groups",
+        "Consider using delegated permissions instead of broad group membership"
+      ],
+      "remediation": [
+        "Проверьте необходимость членства каждого пользователя в данной группе.",
+        "Используйте принцип минимальных привилегий при назначении членства.",
+        "Контролируйте изменение состава операторских групп.",
+        "По возможности заменяйте широкое членство точечным делегированием разрешений."
+      ]
+    },
+    "ORPHANED_ADMIN_ACCOUNT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Account may retain historical privileges not visible in group membership",
+        "SDProp protection prevents normal ACL inheritance",
+        "May have delegated permissions that persist after group removal",
+        "Account management (password reset delegation) may be broken"
+      ],
+      "impact": [
+        "Учётная запись может сохранять исторические привилегии, не отражённые в текущем членстве в группах.",
+        "Ранее применённая защита SDProp может препятствовать обычному наследованию ACL.",
+        "После удаления из привилегированной группы у учётной записи могут оставаться делегированные разрешения.",
+        "Механизмы администрирования, включая делегированный сброс пароля, могут работать некорректно."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Clear AdminCount attribute on orphaned accounts",
+        "Review and remove any residual permissions",
+        "Run SDProp to reset ACLs to inherited defaults",
+        "Implement regular audit of AdminCount vs group membership"
+      ],
+      "remediation": [
+        "После проверки реального привилегированного статуса очистите атрибут adminCount у осиротевшей учётной записи.",
+        "Проверьте и удалите остаточные избыточные разрешения.",
+        "Восстановите требуемое наследование ACL на объекте и проверьте влияние SDProp; один запуск SDProp сам по себе не возвращает наследуемые разрешения.",
+        "Регулярно сопоставляйте adminCount с фактическим членством в привилегированных группах."
+      ]
+    },
+    "NON_DEFAULT_COMPUTER_OWNERS": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Object owner has implicit WriteDACL permission",
+        "Owner can grant themselves any permission on the object",
+        "May enable RBCD attacks if attacker owns the computer",
+        "Non-standard ownership can indicate misconfiguration or compromise"
+      ],
+      "impact": [
+        "Владелец объекта обычно имеет неявную возможность изменять его DACL (WriteDACL), если это не ограничено специальными правилами.",
+        "Владелец может назначить себе дополнительные разрешения на объект.",
+        "Контроль над объектом компьютера через владение может открыть путь к атакам RBCD.",
+        "Нестандартный владелец может указывать на ошибочное делегирование или компрометацию."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review computer object owners across the domain",
+        "Reset ownership to Domain Admins for critical systems",
+        "Implement process to set correct owner during provisioning",
+        "Monitor for ownership changes on computer objects"
+      ],
+      "remediation": [
+        "Проверьте владельцев объектов компьютеров во всём домене.",
+        "Для критичных систем восстановите ожидаемого владельца, например Domain Admins, после проверки существующей модели управления.",
+        "Включите контроль корректного владельца в процесс создания объектов компьютеров.",
+        "Отслеживайте изменения владельцев объектов компьютеров."
+      ]
+    },
+    "NON_DEFAULT_USER_OWNERS": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Object owner has implicit WriteDACL permission",
+        "Owner can grant themselves any permission on the object",
+        "Owner can reset the user's password without knowing the current one",
+        "May enable privilege escalation if attacker owns a privileged user"
+      ],
+      "impact": [
+        "Владелец объекта обычно имеет неявную возможность менять его DACL (WriteDACL), если специальные правила не ограничивают это право.",
+        "Владелец может назначить себе дополнительные разрешения на объект пользователя.",
+        "Получив необходимые права через управление DACL, владелец может сбросить пароль пользователя, не зная прежний.",
+        "Владение объектом привилегированного пользователя может привести к повышению полномочий."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review user object owners across the domain",
+        "Reset ownership to Domain Admins for privileged accounts",
+        "Implement process to set correct owner during provisioning",
+        "Monitor for ownership changes on user objects"
+      ],
+      "remediation": [
+        "Проверьте владельцев объектов пользователей в домене.",
+        "Для привилегированных записей восстановите ожидаемого владельца, например Domain Admins, после проверки схемы делегирования.",
+        "Внедрите правила назначения владельца при подготовке новых учётных записей.",
+        "Отслеживайте изменения владельцев объектов пользователей."
+      ]
+    },
+    "MACHINE_QUOTA_UNRESTRICTED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Any user can create machine accounts in the domain",
+        "Machine accounts can be used for RBCD attacks",
+        "Enables relay attacks requiring computer accounts",
+        "Created accounts persist even if creator loses access"
+      ],
+      "impact": [
+        "Обычный пользователь может создавать учётные записи компьютеров в домене.",
+        "Созданные записи компьютеров могут использоваться в атаках с ресурсным ограниченным делегированием (RBCD).",
+        "Это также создаёт условия для relay-атак, которым требуется контролируемая учётная запись компьютера.",
+        "Созданные учётные записи продолжают существовать, даже если создатель утратил доступ."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Set ms-DS-MachineAccountQuota to 0",
+        "Use dedicated groups for computer account creation",
+        "Pre-stage computer accounts in AD",
+        "Monitor for unexpected computer account creation"
+      ],
+      "remediation": [
+        "Установите ms-DS-MachineAccountQuota равным 0 после проверки штатных процессов присоединения компьютеров.",
+        "Предоставляйте создание учётных записей компьютеров специально выделенным группам.",
+        "Заранее создавайте (pre-stage) необходимые учётные записи компьютеров в AD.",
+        "Отслеживайте неожиданное появление новых учётных записей компьютеров."
+      ]
+    }
+  }
+}

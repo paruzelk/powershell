@@ -558,3 +558,71 @@ Workflow GitHub Actions теперь создаёт после проверок 
 **Итог D12:** **246 из 392** находок имеют полностью сверенные Impact и Remediation. Осталось **146 находок**, что при том же темпе означает ещё примерно 7 этапов (D13–D19). Число структурных расхождений по сравнению с английским источником: **90 Impact, 87 Remediation**. Из 304 исходно непустых Attack все переведены; 88 исходно пустых не дополнялись.
 
 Архив: `adPEAS-RU-2.9.0-STAGE-D12-20261112.zip`.
+
+## Этап D13 — жизненный цикл учётных записей, операционные системы и права владельцев (12 ноября 2026)
+
+В каталогах `Localization/SourceVerifiedCore-22a.ru-RU.json` и
+`Localization/SourceVerifiedCore-22b.ru-RU.json` предметно переведены
+**24 дополнительных типа находок**: **88 пунктов Impact и 89 пунктов
+Remediation**. У каждого пункта сохранён дословный английский оригинал
+из adPEAS 2.9.0 (`ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`).
+Определения находок, идентификаторы, риск, проверки и исполняемые
+команды исправления не изменялись.
+
+- **Учётные записи, пароли и доверие (9):** `GUEST_ACCOUNT_DISABLED`,
+  `INACTIVE_ACCOUNT`, `INACTIVE_PRIVILEGED_ACCOUNT`,
+  `INTERDOMAIN_TRUST_ACCOUNT`, `SMARTCARD_REQUIRED`,
+  `STALE_PASSWORD`, `STALE_PASSWORD_MEDIUM`,
+  `PASSWORD_COMPLEXITY_ENABLED`, `ORPHANED_ADMIN_ACCOUNT`.
+- **ОС, обновления, LAPS и восстановление (5):** `AGING_OS`,
+  `OUTDATED_OS`, `OS_EXTENDED_SECURITY_UPDATES_ONLY`,
+  `LAPS_LEGACY`, `TOMBSTONE_LIFETIME_SHORT`.
+- **Объекты компьютеров, сети и делегирование (6):**
+  `NETWORK_SUBNET_DOMAIN_CONTROLLERS`, `PRECREATED_COMPUTER_ACCOUNT`,
+  `PREWIN2000_DEFAULT_MEMBER`, `PRIMARY_GROUP_IS_DC_GROUP`,
+  `SCRIPTPATH_HARDCODED`, `MACHINE_QUOTA_UNRESTRICTED`.
+- **Операторские группы и владельцы объектов (4):**
+  `OPERATOR_GROUP_MEMBERS`, `OPERATOR_GROUP_MEMBERSHIP`,
+  `NON_DEFAULT_COMPUTER_OWNERS`, `NON_DEFAULT_USER_OWNERS`.
+
+### Технические ограничения
+
+- `GUEST_ACCOUNT_DISABLED`, `SMARTCARD_REQUIRED` и
+  `PASSWORD_COMPLEXITY_ENABLED` описывают **защитные настройки**:
+  перевод не должен ошибочно превращать их в рекомендации «исправить».
+- `INTERDOMAIN_TRUST_ACCOUNT`: `PASSWD_NOTREQD` у учётной записи
+  доверия штатен. Нельзя бездумно снимать его или сбрасывать пароль
+  доверия без расследования.
+- `ORPHANED_ADMIN_ACCOUNT`: один запуск **SDProp не восстанавливает**
+  наследуемые ACL — это ручная операция после проверки фактической
+  защиты объекта и `adminCount`.
+- `PREWIN2000_DEFAULT_MEMBER`: проверены оговорки о возможных
+  зависимостях AD FS 3.0 WebForms и Cisco ISE.
+- `STALE_PASSWORD`: интервалы принудительной смены из исходника
+  переданы как пример политики автора, а не как универсальное
+  требование для каждого пользовательского пароля. Для служб
+  предпочтительны gMSA и ротация с контролем зависимостей.
+- `OS_EXTENDED_SECURITY_UPDATES_ONLY`: ESU не фиксируется в AD.
+  **По состоянию на 12 ноября 2026 года ESU Windows Server 2012/2012 R2
+  уже закончились 13 октября 2026 года.** Не считайте наличие старой
+  подписки свидетельством продолжающегося получения обновлений.
+  Актуальную дату поддержки конкретной ОС необходимо проверять отдельно.
+- `NON_DEFAULT_USER_OWNERS` и `NON_DEFAULT_COMPUTER_OWNERS`:
+  владение объектом и возможность изменения DACL — существенный риск,
+  но фактические ограничения `OWNER RIGHTS` также учитывайте вручную.
+
+`Localization/Apply-FullTechnical.ps1` запрещает повторно изменять
+**246 ранее сверенных типов**. Тест `Tests/Test-StageD13VerifiedCoreRU.ps1`
+проверяет 24 ID, порядок пунктов, равенство EN-свидетелей закреплённому
+исходнику, совпадение русских значений в HTML и технические условия.
+D12 изменён только в части проверки глобальных счётчиков: последующие
+этапы вправе уменьшать остаток, а D12 обязан сохранять собственные 24 ID.
+
+**Покрытие после подключения D13:** **270/392** типов; **122** ещё
+требуют предметной сверки. Структурные расхождения Impact/Remediation
+должны уменьшиться до **66/65**; это проверяется обновляемой
+инвентаризацией, а не считается заменой интеграционного теста на AD.
+Все **304/304** исходно непустых Attack сохраняются.
+
+Архив после успешного CI: `adPEAS-RU-2.9.0-STAGE-D13-20261112.zip`.
+Дальнейший план: [ROADMAP_RU.md](ROADMAP_RU.md).

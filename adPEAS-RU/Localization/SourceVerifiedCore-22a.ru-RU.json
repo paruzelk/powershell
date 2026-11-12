@@ -1,0 +1,340 @@
+{
+  "schema": "adPEAS-RU.StageD13.CoreFields.22a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "GUEST_ACCOUNT_DISABLED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Blocks anonymous or minimally authenticated access via Guest account",
+        "Prevents attackers from using Guest account as initial foothold",
+        "Reduces attack surface by disabling unnecessary account"
+      ],
+      "impact": [
+        "Отключение учётной записи Guest блокирует доступ через эту гостевую учётную запись с анонимными или минимальными учётными данными.",
+        "Злоумышленник не может использовать отключённую учётную запись Guest как первоначальную точку входа.",
+        "Отключение ненужной гостевой учётной записи уменьшает поверхность атаки."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "No action required - Guest account is already disabled",
+        "Ensure the account remains disabled through Group Policy",
+        "Regularly audit that the account has not been re-enabled"
+      ],
+      "remediation": [
+        "Исправление не требуется: учётная запись Guest уже отключена.",
+        "Обеспечьте сохранение отключённого состояния Guest через групповую политику.",
+        "Регулярно проверяйте, что учётная запись Guest не была включена повторно."
+      ]
+    },
+    "INACTIVE_ACCOUNT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Inactive accounts with old passwords are prime targets for credential stuffing",
+        "Compromise of inactive accounts may go unnoticed for extended periods",
+        "Accounts inactive for over 365 days likely represent orphaned or unnecessary accounts"
+      ],
+      "impact": [
+        "Давно не используемые учётные записи со старыми паролями становятся целями атак с подбором ранее скомпрометированных учётных данных (credential stuffing).",
+        "Компрометация неактивной учётной записи может долго оставаться незамеченной.",
+        "Записи без активности более 365 дней, вероятно, являются оставшимися после увольнения или более не нужными учётными записями."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Disable or delete accounts that are no longer in use",
+        "Implement an automated account lifecycle management process",
+        "Regularly audit inactive accounts and require justification for active status",
+        "Monitor for logon events from previously inactive accounts"
+      ],
+      "remediation": [
+        "Отключите или удалите учётные записи, которые больше не используются, после проверки владельца и зависимостей.",
+        "Внедрите автоматизированный процесс управления жизненным циклом учётных записей.",
+        "Регулярно проверяйте неактивные записи и требуйте обоснования сохранения активного состояния.",
+        "Отслеживайте события входа для ранее неактивных учётных записей."
+      ]
+    },
+    "INACTIVE_PRIVILEGED_ACCOUNT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Unused credentials may be targeted for compromise",
+        "Password may be weak or unchanged for long periods",
+        "Account may have been abandoned after personnel change",
+        "Provides unnecessary attack surface for privilege escalation"
+      ],
+      "impact": [
+        "Неиспользуемые привилегированные учётные данные могут стать целью компрометации.",
+        "Пароль мог быть слабым или не меняться длительное время.",
+        "Учётная запись могла остаться без ответственного после кадровых изменений.",
+        "Сохранение неиспользуемых привилегий создаёт дополнительную поверхность для повышения полномочий."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Disable or remove accounts inactive for more than 90 days",
+        "Remove privileged group memberships from inactive accounts",
+        "Implement automated account lifecycle management",
+        "Require periodic re-certification of privileged access",
+        "Enable account activity monitoring and alerting"
+      ],
+      "remediation": [
+        "После проверки назначения отключайте или удаляйте привилегированные записи без активности более 90 дней.",
+        "Удаляйте неиспользуемые учётные записи из привилегированных групп.",
+        "Автоматизируйте управление жизненным циклом учётных записей.",
+        "Проводите периодическую повторную аттестацию необходимости привилегированного доступа.",
+        "Включите мониторинг активности таких записей и оповещения."
+      ]
+    },
+    "INTERDOMAIN_TRUST_ACCOUNT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Trust accounts hold the shared secret for the entire trust relationship",
+        "Compromising the trust key allows forging inter-realm TGTs",
+        "An attacker with the trust key can create cross-domain Golden Tickets",
+        "Trust keys are equivalent to krbtgt keys for cross-domain access"
+      ],
+      "impact": [
+        "Учётные записи доверия хранят общий секрет всего доверительного отношения между доменами.",
+        "Компрометация ключа доверия позволяет подделывать межобластные Kerberos TGT.",
+        "Имея ключ доверия, злоумышленник может создавать междоменные Golden Ticket.",
+        "Для междоменного доступа ключи доверия сопоставимы по значимости с ключами krbtgt."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Leave PASSWD_NOTREQD on the trust account alone - Windows sets it on every trust account, and it is not a weakness there",
+        "Reset the trust password after a suspected compromise of either domain (netdom trust ... /reset); Windows changes it every 30 days on its own",
+        "Monitor trust account modifications with Event ID 4738",
+        "Consider Selective Authentication to limit trust scope",
+        "Use SID Filtering to prevent SIDHistory-based escalation across trusts"
+      ],
+      "remediation": [
+        "Не снимайте PASSWD_NOTREQD с учётной записи доверия: Windows устанавливает этот флаг для каждой такой записи, и здесь он не является слабостью.",
+        "При подозрении на компрометацию любого из доменов сбросьте пароль доверия (`netdom trust ... /reset`); штатно Windows меняет его автоматически примерно каждые 30 дней.",
+        "Контролируйте изменения учётной записи доверия по событию 4738.",
+        "Рассмотрите выборочную аутентификацию (Selective Authentication) для ограничения области доверия.",
+        "Используйте SID Filtering для предотвращения повышения полномочий через SIDHistory между доверенными доменами."
+      ]
+    },
+    "AGING_OS": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Windows Server 2016: Extended support ends Jan 2027 - approaching EOL",
+        "Windows 10: Standard support ended Oct 2025, ESU available until Oct 2028",
+        "May not support latest security features (Credential Guard enhancements, etc.)",
+        "Reduced vendor support and slower security response"
+      ],
+      "impact": [
+        "Для Windows Server 2016 расширенная поддержка заканчивается в январе 2027 года: срок приближается к завершению.",
+        "Стандартная поддержка Windows 10 завершилась в октябре 2025 года; при соответствующих условиях ESU может предоставляться до октября 2028 года.",
+        "Система может не поддерживать новейшие средства защиты, включая улучшения Credential Guard.",
+        "Снижаются доступность поддержки производителя и скорость реагирования на новые угрозы."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Plan migration to current OS version (Server 2022/2025, Windows 11)",
+        "Ensure Extended Security Updates (ESU) are active if available",
+        "Monitor for security advisories specific to this OS version",
+        "Prioritize these systems in your upgrade roadmap"
+      ],
+      "remediation": [
+        "Запланируйте переход на поддерживаемую версию ОС, например Windows Server 2022/2025 или Windows 11.",
+        "Если программа Extended Security Updates (ESU) доступна для данной редакции и приобретена, проверьте фактическое получение обновлений.",
+        "Отслеживайте рекомендации по безопасности именно для этой версии ОС.",
+        "Приоритизируйте обновление этих систем в плане модернизации."
+      ]
+    },
+    "OUTDATED_OS": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "No security patches available for new vulnerabilities",
+        "Known exploits exist with no fixes available",
+        "Often targeted first in attacks due to guaranteed vulnerabilities",
+        "May not support modern security features (Credential Guard, etc.)",
+        "Compliance violations in regulated environments"
+      ],
+      "impact": [
+        "Для новых уязвимостей больше не выпускаются обычные исправления безопасности.",
+        "Для известных уязвимостей могут существовать эксплойты без доступного исправления.",
+        "Устаревшие системы часто выбираются первыми целями атак из-за известных уязвимостей.",
+        "Могут отсутствовать современные механизмы защиты, например Credential Guard.",
+        "В регулируемых средах использование такой ОС может нарушать требования соответствия."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Upgrade to supported operating system version",
+        "If upgrade not possible, isolate system from network",
+        "Implement compensating controls (strict firewall, monitoring)",
+        "Plan migration path for legacy applications",
+        "Document and accept risk if system must remain"
+      ],
+      "remediation": [
+        "Обновите систему до поддерживаемой версии операционной системы.",
+        "Если обновление невозможно, изолируйте систему от остальных сегментов сети.",
+        "Внедрите компенсирующие меры: строгие правила межсетевого экрана и мониторинг.",
+        "Подготовьте путь миграции для устаревших приложений.",
+        "Если система должна оставаться в эксплуатации, документируйте риск и оформите его принятие ответственным лицом."
+      ]
+    },
+    "OS_EXTENDED_SECURITY_UPDATES_ONLY": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Without the extension the machine has the same exposure as any end-of-life system - known, unpatched vulnerabilities, and no fix coming",
+        "With the extension it receives critical and important security updates only: no feature updates, no non-security fixes, and no new functionality",
+        "ESU is not a state the directory records, so this is the one finding in the report that needs an answer from whoever administers the machine",
+        "The window closes on the date named on the row, after which no extension is available at any price"
+      ],
+      "impact": [
+        "Без оплаченного продления обновлений система подвергается тем же рискам, что и ОС после завершения поддержки: известные неисправленные уязвимости без ожидаемых исправлений.",
+        "При действующем ESU предоставляются только критические и важные обновления безопасности; новые функции, обычные несвязанные с безопасностью исправления и функциональные обновления не включены.",
+        "Состояние ESU не фиксируется в Active Directory, поэтому этот результат требует подтверждения администратора конкретного компьютера.",
+        "В дату окончания ESU, указанную в строке находки, срок продления завершается; дальнейшее продление не предусмотрено."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Establish whether Extended Security Updates were actually purchased and are being delivered - for Server 2012/2012 R2 that means an Azure Arc connection and an active subscription, for Windows 7 and Server 2008/2008 R2 a volume licensing agreement",
+        "Plan the migration regardless: the ESU window has a hard end, named on the row, and there is nothing after it",
+        "Where ESU is not in place, treat the machine as end-of-life today and isolate it accordingly - it has been unpatched since the general support end"
+      ],
+      "remediation": [
+        "Установите, действительно ли ESU приобретён и поступают ли обновления: для Windows Server 2012/2012 R2 проверьте применимую модель подписки, в том числе через Azure Arc; для Windows 7 и Server 2008/2008 R2 — соответствующее корпоративное лицензирование.",
+        "В любом случае планируйте миграцию: период ESU имеет окончательную дату завершения, указанную в строке находки.",
+        "Если ESU отсутствует, рассматривайте систему как неподдерживаемую с даты прекращения обычных обновлений и изолируйте её соответствующим образом."
+      ]
+    },
+    "SMARTCARD_REQUIRED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Password-based attacks are ineffective",
+        "Phishing for passwords becomes useless",
+        "Strong cryptographic authentication required",
+        "Significantly increases account security"
+      ],
+      "impact": [
+        "Для интерактивного входа с обязательной смарт-картой атаки на обычный пароль становятся неэффективными.",
+        "Фишинг, рассчитанный только на получение пароля для такого входа, не позволяет обойти требование смарт-карты.",
+        "Требуется стойкая криптографическая аутентификация.",
+        "Для соответствующего способа входа существенно повышается защищённость учётной записи."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Ensure smart card infrastructure is properly maintained",
+        "Document smart card enrollment and revocation procedures",
+        "Consider extending smart card requirement to more privileged accounts"
+      ],
+      "remediation": [
+        "Это защитная конфигурация: исправление не требуется.",
+        "Обеспечьте надлежащее обслуживание инфраструктуры смарт-карт.",
+        "Документируйте выдачу и отзыв сертификатов смарт-карт.",
+        "Рассмотрите введение обязательной смарт-карты и для других привилегированных учётных записей после проверки совместимости."
+      ]
+    },
+    "STALE_PASSWORD": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Extremely high exposure window for brute-force or dictionary attacks",
+        "Password very likely compromised or exposed over such a long period",
+        "Old passwords may use severely outdated complexity requirements",
+        "Service accounts with static passwords are prime targets for Kerberoasting",
+        "Credentials almost certainly exist in old backups, password dumps, or breach databases"
+      ],
+      "impact": [
+        "Длительное использование одного пароля увеличивает окно для атак перебором и словарного подбора.",
+        "За столь продолжительный срок пароль с высокой вероятностью мог быть скомпрометирован или раскрыт.",
+        "Старый пароль мог создаваться по давно устаревшим требованиям сложности.",
+        "Служебные учётные записи со статическими паролями являются приоритетными целями Kerberoasting.",
+        "Существуют значительные риски присутствия этих учётных данных в старых резервных копиях, дампах паролей или базах утечек."
+      ],
+      "sourceEnglishRemediationCount": 7,
+      "sourceEnglishRemediation": [
+        "IMMEDIATE: Force password change for this account",
+        "Implement regular password rotation policy (90-180 days for users, 30-60 days for service accounts)",
+        "Use Group Managed Service Accounts (gMSA) for automatic password rotation",
+        "Monitor pwdLastSet for accounts exceeding policy thresholds",
+        "Enforce strong password complexity and minimum length",
+        "Check compromised password lists (Have I Been Pwned, Azure AD Password Protection)",
+        "Consider passwordless authentication methods (Windows Hello, FIDO2)"
+      ],
+      "remediation": [
+        "СРОЧНО: обеспечьте смену пароля этой учётной записи после оценки её назначения и зависимостей.",
+        "Применяйте политику ротации, соответствующую риску и требованиям организации (в оригинале: 90–180 дней для пользователей и 30–60 дней для служебных записей).",
+        "Для автоматической ротации паролей служб используйте Group Managed Service Accounts (gMSA).",
+        "Контролируйте pwdLastSet для записей, превышающих установленные пороги.",
+        "Требуйте достаточную длину и стойкость паролей.",
+        "Проверяйте пароли по базам известных компрометаций, используя Have I Been Pwned или Azure AD Password Protection.",
+        "Рассмотрите беспарольные способы аутентификации, например Windows Hello и FIDO2."
+      ]
+    },
+    "STALE_PASSWORD_MEDIUM": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Increased exposure window for brute-force or dictionary attacks",
+        "Password may have been compromised without detection over time",
+        "Old passwords may use weaker historical complexity requirements",
+        "Service accounts with static passwords are targets for Kerberoasting"
+      ],
+      "impact": [
+        "Увеличивается период, в течение которого возможны атаки перебором или словарного подбора.",
+        "Пароль мог быть скомпрометирован с течением времени без обнаружения.",
+        "Старые пароли могут соответствовать более слабым историческим требованиям сложности.",
+        "Служебные учётные записи со статическими паролями могут подвергаться Kerberoasting."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Implement regular password rotation policy (90-180 days for users, 30-60 days for service accounts)",
+        "Use Group Managed Service Accounts (gMSA) for automatic password rotation",
+        "Monitor pwdLastSet for accounts exceeding policy thresholds",
+        "Enforce strong password complexity and minimum length",
+        "Consider passwordless authentication methods (Windows Hello, FIDO2)"
+      ],
+      "remediation": [
+        "Применяйте принятую политику ротации паролей (в оригинале: 90–180 дней для пользователей, 30–60 дней для служебных записей) с учётом риска и зависимостей.",
+        "Используйте Group Managed Service Accounts (gMSA) для автоматического обновления паролей.",
+        "Отслеживайте pwdLastSet для учётных записей, выходящих за заданные сроки.",
+        "Обеспечьте достаточную длину и сложность паролей.",
+        "Рассмотрите беспарольную аутентификацию Windows Hello или FIDO2."
+      ]
+    },
+    "TOMBSTONE_LIFETIME_SHORT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Backups older than the tombstone lifetime cannot be restored",
+        "A compromise noticed late leaves fewer clean backups to recover from",
+        "A domain controller offline longer than the tombstone lifetime has to be rebuilt"
+      ],
+      "impact": [
+        "Резервные копии старше срока хранения tombstone нельзя корректно использовать для восстановления Active Directory.",
+        "При позднем обнаружении компрометации остаётся меньше подходящих чистых резервных копий.",
+        "Контроллер домена, находившийся вне сети дольше tombstone lifetime, необходимо пересоздать, а не просто вернуть в репликацию."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set tombstoneLifetime on CN=Directory Service,CN=Windows NT,CN=Services in the configuration partition to 180",
+        "Keep backups of at least two domain controllers per domain, younger than the tombstone lifetime"
+      ],
+      "remediation": [
+        "Установите tombstoneLifetime равным 180 в `CN=Directory Service,CN=Windows NT,CN=Services` раздела конфигурации после проверки действующей политики восстановления.",
+        "Храните актуальные резервные копии как минимум двух контроллеров каждого домена; каждая используемая для восстановления копия должна быть моложе tombstone lifetime."
+      ]
+    },
+    "PASSWORD_COMPLEXITY_ENABLED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Passwords must meet minimum complexity standards",
+        "Brute force attacks require significantly more time",
+        "Simple dictionary passwords are prevented"
+      ],
+      "impact": [
+        "Пароли должны соответствовать минимальным требованиям сложности.",
+        "Перебор паролей становится заметно более трудоёмким.",
+        "Простейшие словарные пароли не проходят заданные критерии сложности."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Consider supplementing with Azure AD Password Protection for banned passwords"
+      ],
+      "remediation": [
+        "Это безопасная настройка: исправление не требуется.",
+        "Рассмотрите дополнение политики средствами Azure AD Password Protection для блокировки запрещённых и известных слабых паролей."
+      ]
+    }
+  }
+}

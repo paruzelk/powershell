@@ -761,6 +761,54 @@ if($d12Seen.Count -ne 24 -or $d12Impact -ne 94 -or $d12Remediation -ne 97){
 }
 Write-Host '[RU] PASS D12: 24 находки, Impact 94 и Remediation 97 сверены с закреплённым EN'
 
+
+# Этап D13: предметная сверка 24 дополнительных Impact/Remediation.
+# Защищаем все 246 предыдущих находок от повторной записи; EN, риск и команды неизменны.
+$d13Catalogs=@('SourceVerifiedCore-22a.ru-RU.json','SourceVerifiedCore-22b.ru-RU.json')
+$d13Protected=@{}
+foreach($name in (@($d12Older)+@($d12Catalogs))){
+ $prior=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ foreach($entry in $prior.translations.PSObject.Properties){$d13Protected[[string]$entry.Name]=$true}
+}
+if($d13Protected.Count -ne 246){throw "D13: защищённых FindingId должно быть 246, найдено $($d13Protected.Count)"}
+$d13Seen=@{}
+$d13Impact=0
+$d13Remediation=0
+foreach($name in $d13Catalogs){
+ $cat=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$name)),[Text.Encoding]::UTF8))
+ if(@($cat.translations.PSObject.Properties).Count -ne 12){throw "D13: в каталоге $name ожидаются 12 находок"}
+ foreach($row in $cat.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if(-not $entries.Contains($id)){throw "D13: неизвестный FindingId $id"}
+  if($d13Protected.ContainsKey($id) -or $d13Seen.ContainsKey($id)){throw "D13: перекрытие ранее проверенного FindingId $id"}
+  $d13Seen[$id]=$true
+  foreach($field in @('Impact','Remediation')){
+   $lower=$field.ToLowerInvariant()
+   $englishProperty='sourceEnglish'+$field
+   $countProperty=$englishProperty+'Count'
+   $original=@(Get-PinnedFindingText $id $field)
+   $english=@($row.Value.$englishProperty)
+   $russian=@($row.Value.$lower)
+   $expected=[int]$row.Value.$countProperty
+   if($expected -le 0 -or $original.Count -ne $expected -or $english.Count -ne $expected -or $russian.Count -ne $expected){
+    throw "D13: неверное количество пунктов $id / $field"
+   }
+   for($i=0;$i -lt $expected;$i++){
+    if([string]$original[$i] -cne [string]$english[$i]){throw "D13: изменена закреплённая строка EN $id / $field / $($i+1)"}
+    if([string]::IsNullOrWhiteSpace([string]$russian[$i]) -or [string]$russian[$i] -notmatch '[А-Яа-яЁё]'){
+     throw "D13: отсутствует русская строка $id / $field / $($i+1)"
+    }
+   }
+   $entries[$id].$lower=@($russian)
+   if($field -eq 'Impact'){$d13Impact+=$expected}else{$d13Remediation+=$expected}
+  }
+ }
+}
+if($d13Seen.Count -ne 24 -or $d13Impact -ne 88 -or $d13Remediation -ne 89){
+ throw "D13: ожидалось 24 находки / 88 Impact / 89 Remediation, найдено $($d13Seen.Count) / $d13Impact / $d13Remediation"
+}
+Write-Host '[RU] PASS D13: 24 находки, Impact 88 и Remediation 89 сверены с EN'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
