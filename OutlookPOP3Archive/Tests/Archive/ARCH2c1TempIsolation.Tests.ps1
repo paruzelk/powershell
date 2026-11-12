@@ -51,7 +51,7 @@ Describe 'ARCH2c1 isolated temporary attachment workspace — synthetic fail-clo
         $attachment=New-ARCH2c1Attachment -ThrowAfterWrite
         {Get-OPA265ARCH2bAttachmentWitnesses -Mail (New-ARCH2c1Mail -Attachments @($attachment)) -TemporaryDirectory $root -MaxAttachmentBytes 4096} | Should -Throw
         @([IO.Directory]::GetDirectories($root)).Count | Should -Be 0
-        @([IO.File]::GetFiles($root)).Count | Should -Be 0
+        @([IO.Directory]::GetFiles($root)).Count | Should -Be 0
     }
     It 'cleans multiple attachment copies after a complete witness' {
         $root=New-ARCH2c1TempRoot -Name 'two-attachments'
