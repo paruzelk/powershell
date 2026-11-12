@@ -21,7 +21,6 @@
                                    ],
     "ImpactStepCountDifferences":  [
                                        "ADMINSDHOLDER_PROPAGATED_RIGHT",
-                                       "AGING_OS",
                                        "BLOODHOUND_COLLECTION_COMPLETE",
                                        "COMPUTER_CONTAINER_CREATE_BROAD",
                                        "COMPUTER_CONTAINER_CREATE_PERMISSIONS",
@@ -62,48 +61,25 @@
                                        "EXCHANGE_SMTP_BROAD_SPOOFING",
                                        "EXCHANGE_VULNERABLE_VERSION",
                                        "EXCHANGE_WEB_ENDPOINTS",
-                                       "GUEST_ACCOUNT_DISABLED",
-                                       "INACTIVE_ACCOUNT",
-                                       "INACTIVE_PRIVILEGED_ACCOUNT",
-                                       "INTERDOMAIN_TRUST_ACCOUNT",
                                        "LAPS_INSTALLED",
-                                       "LAPS_LEGACY",
-                                       "MACHINE_QUOTA_UNRESTRICTED",
                                        "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
-                                       "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
-                                       "NON_DEFAULT_COMPUTER_OWNERS",
-                                       "NON_DEFAULT_USER_OWNERS",
                                        "NTAUTH_FOREIGN_ISSUER",
-                                       "OPERATOR_GROUP_MEMBERS",
-                                       "OPERATOR_GROUP_MEMBERSHIP",
-                                       "ORPHANED_ADMIN_ACCOUNT",
-                                       "OS_EXTENDED_SECURITY_UPDATES_ONLY",
-                                       "OUTDATED_OS",
                                        "OU_NON_DEFAULT_OWNER",
-                                       "PASSWORD_COMPLEXITY_ENABLED",
                                        "PKI_CERTIFICATE_EXPIRED",
                                        "PKI_SHORT_KEY_LENGTH",
                                        "PKI_STRONG_KEY_LENGTH",
                                        "PKI_STRONG_SIGNATURE_ALGORITHM",
                                        "PKI_WEAK_SIGNATURE_ALGORITHM",
-                                       "PRECREATED_COMPUTER_ACCOUNT",
-                                       "PREWIN2000_DEFAULT_MEMBER",
-                                       "PRIMARY_GROUP_IS_DC_GROUP",
                                        "RBCD_CONFIGURED",
                                        "SCCM_GROUP_BROAD_MEMBER",
                                        "SCCM_PXE_EXPOSURE",
                                        "SCCM_SERVICE_ACCOUNT",
                                        "SCCM_SITE_HIERARCHY",
                                        "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
-                                       "SCRIPTPATH_HARDCODED",
                                        "SID_HISTORY_FOREIGN_PRIVILEGED",
                                        "SID_HISTORY_ORPHANED",
                                        "SID_HISTORY_OWN_DOMAIN",
-                                       "SMARTCARD_REQUIRED",
-                                       "STALE_PASSWORD",
-                                       "STALE_PASSWORD_MEDIUM",
                                        "STANDALONE_MSA_LEGACY",
-                                       "TOMBSTONE_LIFETIME_SHORT",
                                        "TRUST_BIDIRECTIONAL",
                                        "TRUST_PASSWORD_STALE",
                                        "TRUST_SELECTIVE_AUTH",
@@ -113,7 +89,6 @@
                                    ],
     "RemediationStepCountDifferences":  [
                                             "ADMINSDHOLDER_PROPAGATED_RIGHT",
-                                            "AGING_OS",
                                             "BLOODHOUND_COLLECTION_COMPLETE",
                                             "COMPUTER_CONTAINER_CREATE_BROAD",
                                             "COMPUTER_CONTAINER_CREATE_PERMISSIONS",
@@ -154,45 +129,24 @@
                                             "EXCHANGE_VULNERABLE_VERSION",
                                             "EXCHANGE_WEB_ENDPOINTS",
                                             "GPO_LINK_REACHES_DC",
-                                            "GUEST_ACCOUNT_DISABLED",
-                                            "INACTIVE_ACCOUNT",
-                                            "INACTIVE_PRIVILEGED_ACCOUNT",
-                                            "INTERDOMAIN_TRUST_ACCOUNT",
-                                            "MACHINE_QUOTA_UNRESTRICTED",
                                             "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
-                                            "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
-                                            "NON_DEFAULT_COMPUTER_OWNERS",
-                                            "NON_DEFAULT_USER_OWNERS",
                                             "NTAUTH_FOREIGN_ISSUER",
-                                            "OPERATOR_GROUP_MEMBERS",
-                                            "OPERATOR_GROUP_MEMBERSHIP",
-                                            "ORPHANED_ADMIN_ACCOUNT",
-                                            "OS_EXTENDED_SECURITY_UPDATES_ONLY",
-                                            "OUTDATED_OS",
                                             "OU_NON_DEFAULT_OWNER",
                                             "PKI_CERTIFICATE_EXPIRED",
                                             "PKI_SHORT_KEY_LENGTH",
                                             "PKI_STRONG_KEY_LENGTH",
                                             "PKI_STRONG_SIGNATURE_ALGORITHM",
                                             "PKI_WEAK_SIGNATURE_ALGORITHM",
-                                            "PRECREATED_COMPUTER_ACCOUNT",
-                                            "PREWIN2000_DEFAULT_MEMBER",
-                                            "PRIMARY_GROUP_IS_DC_GROUP",
                                             "RBCD_CONFIGURED",
                                             "SCCM_GROUP_BROAD_MEMBER",
                                             "SCCM_PXE_EXPOSURE",
                                             "SCCM_SERVICE_ACCOUNT",
                                             "SCCM_SITE_HIERARCHY",
                                             "SCOM_PRIVILEGED_SERVICE_ACCOUNT",
-                                            "SCRIPTPATH_HARDCODED",
                                             "SID_HISTORY_FOREIGN_PRIVILEGED",
                                             "SID_HISTORY_ORPHANED",
                                             "SID_HISTORY_OWN_DOMAIN",
-                                            "SMARTCARD_REQUIRED",
-                                            "STALE_PASSWORD",
-                                            "STALE_PASSWORD_MEDIUM",
                                             "STANDALONE_MSA_LEGACY",
-                                            "TOMBSTONE_LIFETIME_SHORT",
                                             "TRUST_BIDIRECTIONAL",
                                             "TRUST_PASSWORD_STALE",
                                             "TRUST_SELECTIVE_AUTH",
@@ -361,11 +315,11 @@
                    {
                        "FindingId":  "AGING_OS",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  4,
-                       "RemediationRU":  2
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "ANONYMOUS_SAM_ENUMERATION_ALLOWED",
@@ -2017,11 +1971,11 @@
                    {
                        "FindingId":  "GUEST_ACCOUNT_DISABLED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "GUEST_ACCOUNT_ENABLED",
@@ -2035,29 +1989,29 @@
                    {
                        "FindingId":  "INACTIVE_ACCOUNT",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  4,
-                       "RemediationRU":  3
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "INACTIVE_PRIVILEGED_ACCOUNT",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  3
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "INTERDOMAIN_TRUST_ACCOUNT",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "KERBEROASTABLE_SPN",
@@ -2242,7 +2196,7 @@
                    {
                        "FindingId":  "LAPS_LEGACY",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  1,
@@ -2377,11 +2331,11 @@
                    {
                        "FindingId":  "MACHINE_QUOTA_UNRESTRICTED",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  2
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "META_SEVERITY_PASSTHROUGH",
@@ -2413,20 +2367,20 @@
                    {
                        "FindingId":  "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  1,
                        "AttackRU":  1,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "NON_DEFAULT_COMPUTER_OWNERS",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "NON_DEFAULT_OWNER",
@@ -2440,11 +2394,11 @@
                    {
                        "FindingId":  "NON_DEFAULT_USER_OWNERS",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "NO_ACCOUNT_LOCKOUT",
@@ -2494,47 +2448,47 @@
                    {
                        "FindingId":  "OPERATOR_GROUP_MEMBERS",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  4,
-                       "RemediationRU":  3
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "OPERATOR_GROUP_MEMBERSHIP",
                        "ImpactEN":  5,
-                       "ImpactRU":  2,
+                       "ImpactRU":  5,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  4,
-                       "RemediationRU":  3
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "ORPHANED_ADMIN_ACCOUNT",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "OS_EXTENDED_SECURITY_UPDATES_ONLY",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  1,
                        "AttackRU":  1,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "OUTDATED_OS",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "OU_NON_DEFAULT_OWNER",
@@ -2755,7 +2709,7 @@
                    {
                        "FindingId":  "PASSWORD_COMPLEXITY_ENABLED",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
@@ -2836,11 +2790,11 @@
                    {
                        "FindingId":  "PRECREATED_COMPUTER_ACCOUNT",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "PREWIN2000_ANONYMOUS_MEMBER",
@@ -2863,20 +2817,20 @@
                    {
                        "FindingId":  "PREWIN2000_DEFAULT_MEMBER",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  2
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "PRIMARY_GROUP_IS_DC_GROUP",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "PRIVILEGED_ACCOUNT_ACL",
@@ -3448,11 +3402,11 @@
                    {
                        "FindingId":  "SCRIPTPATH_HARDCODED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "SHADOW_CREDENTIALS",
@@ -3502,11 +3456,11 @@
                    {
                        "FindingId":  "SMARTCARD_REQUIRED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "SMB_SIGNING_DISABLED",
@@ -3529,20 +3483,20 @@
                    {
                        "FindingId":  "STALE_PASSWORD",
                        "ImpactEN":  5,
-                       "ImpactRU":  2,
+                       "ImpactRU":  5,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  7,
-                       "RemediationRU":  2
+                       "RemediationRU":  7
                    },
                    {
                        "FindingId":  "STALE_PASSWORD_MEDIUM",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  2
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "STANDALONE_MSA_LEGACY",
@@ -3574,11 +3528,11 @@
                    {
                        "FindingId":  "TOMBSTONE_LIFETIME_SHORT",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "TRUST_BIDIRECTIONAL",
