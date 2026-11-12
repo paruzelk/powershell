@@ -237,6 +237,37 @@ jobs:
             throw 'ARCH3b original MailMover source-backed identity and fail-closed no-write gate missing.'
           }
           Write-Host 'PASS ARCH3b original Year/part/folder functions and SHA operation identity, PrepareIntent-before-PST phase order, no live writer.'
+      - name: ARCH3c original OperationJournal durable synthetic seal and production safety gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $a=Get-Content -LiteralPath 'Core/Archive/ARCH3cDurableOperationLedger.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3c.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3cDurableOriginalOperationJournal.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3c-durable-original-operation-journal.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($a -cnotmatch 'function Invoke-OPA265ARCH3cSyntheticWrite' -or
+             $a -cnotmatch 'function Test-OPA265ARCH3cSyntheticEvidence' -or
+             $a -cnotmatch 'FileMode]::CreateNew' -or
+             $a -cnotmatch '\$fs.Flush\(\$true\)' -or
+             $a -cnotmatch 'ARCH3C-SYNTHETIC' -or
+             $a -cnotmatch 'Write-OPAOperationJournalEvent -Path' -or
+             $a -cnotmatch 'Read-OPAOperationJournal -Path' -or
+             $a -cnotmatch 'Resolve-OPAOperationRecovery -Journal' -or
+             $a -cnotmatch 'FinalSealSha256' -or
+             $a -cnotmatch 'PreviousStageSha256' -or
+             $a -cnotmatch 'IndependentLivePstVerified=\$false' -or
+             $a -cmatch '\.(Move|AddStoreEx|Delete|Save|Copy)\s*\(' -or
+             $a -cmatch 'Save-OPAArchiveTransaction|Add-OPADuplicateEntry' -or
+             $entry -cnotmatch "ValidateSet\('Plan','SyntheticWrite','Evidence'\)" -or
+             $tests -cnotmatch 'indeterminate synthetic crash after claim remains permanently unrepeatable' -or
+             $docs -cnotmatch 'ARCH3c' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4174 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 137){
+            throw 'ARCH3c synthetic ONLY original OperationJournal / SHA-anchored immutable evidence contract failed.'
+          }
+          Write-Host 'PASS ARCH3c synthetic immutable SHA-chain, original OperationJournal, no Outlook/PST/Move or production permit.'
       - name: Package only OutlookPOP3Archive from tested commit and calculate SHA-256
         run: |
           $ErrorActionPreference='Stop'
