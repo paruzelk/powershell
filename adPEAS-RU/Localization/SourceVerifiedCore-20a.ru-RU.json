@@ -1,0 +1,274 @@
+{
+  "schema": "adPEAS-RU.StageD11.CoreFields.20a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "GPO_USERRIGHT_SERELABEL": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Raises the integrity level of an object a sandboxed or low-integrity process should not be able to touch",
+        "Undermines Mandatory Integrity Control as a defense layer on the machine"
+      ],
+      "impact": [
+        "Позволяет повысить уровень целостности объекта, к которому изолированный или низкоцелостный процесс не должен иметь доступ.",
+        "Ослабляет обязательный контроль целостности Mandatory Integrity Control (MIC) как уровень защиты компьютера."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the principal; Windows ships this to nobody, and there is essentially never a legitimate reason to hold it"
+      ],
+      "remediation": [
+        "Удалите субъект: Windows по умолчанию не назначает это право никому, и законная необходимость в нём практически отсутствует."
+      ]
+    },
+    "GPO_USERRIGHT_SEREMOTESHUTDOWN": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Denial of service against every machine the policy reaches, triggered from anywhere on the network",
+        "Can be timed to disrupt operations, or to force a reboot that clears volatile forensic evidence after an intrusion"
+      ],
+      "impact": [
+        "Позволяет вызвать отказ в обслуживании на каждом компьютере, охваченном политикой, из любой точки сети.",
+        "Отключение можно приурочить к нарушению работы служб либо принудительной перезагрузке, удаляющей непостоянные данные расследования после вторжения."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Restrict this right to Administrators and dedicated operations accounts"
+      ],
+      "remediation": [
+        "Ограничьте право группой Administrators и выделенными эксплуатационными учётными записями."
+      ]
+    },
+    "GPO_USERRIGHT_SESHUTDOWN": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Denial of service against every targeted machine, from a local session",
+        "On a domain controller, forcing a shutdown pushes clients toward a different DC, which an attacker positioned on the network can exploit"
+      ],
+      "impact": [
+        "Позволяет вызвать отказ в обслуживании любого целевого компьютера из локального сеанса.",
+        "Остановка контроллера домена переводит клиентов на другой DC, чем может воспользоваться атакующий, контролирующий участок сети."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Restrict this right to Administrators and dedicated operations accounts, especially on domain controllers"
+      ],
+      "remediation": [
+        "Ограничьте право группой Administrators и выделенными эксплуатационными учётными записями, особенно на контроллерах домена."
+      ]
+    },
+    "GPO_USERRIGHT_SESYNCAGENT": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Reads the same replicated data a DCSync operation pulls, including NT hashes and Kerberos keys, for every account in the domain",
+        "No interactive logon on a domain controller is required - the privilege operates at the directory-replication layer"
+      ],
+      "impact": [
+        "Позволяет читать реплицируемые сведения, аналогичные получаемым через DCSync, включая NT-хеши и ключи Kerberos каждой учётной записи домена.",
+        "Интерактивный вход на контроллер домена не нужен: привилегия действует на уровне репликации каталога."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the principal; this right has no legitimate holder outside a real directory-synchronization product (Entra Connect, third-party identity sync)",
+        "Where a sync product genuinely needs it, confirm the account cannot be used interactively and is monitored as Tier-0"
+      ],
+      "remediation": [
+        "Удалите субъект, если он не используется настоящим продуктом синхронизации каталогов (Entra Connect или сторонней системой управления идентичностями).",
+        "Если синхронизатору право действительно необходимо, убедитесь, что запись не используется для интерактивного входа, и контролируйте её как субъект Tier 0."
+      ]
+    },
+    "GPO_USERRIGHT_SESYSTEMENVIRONMENT": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "The boot settings held in NVRAM are writable to the holder",
+        "A hardware component can be configured to fail - data corruption or denial of service"
+      ],
+      "impact": [
+        "Обладатель может изменять параметры загрузки, хранящиеся в NVRAM.",
+        "Можно настроить аппаратный компонент так, что это вызовет повреждение данных или отказ в обслуживании."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the principal and leave the right with Administrators - removing Administrators as well can break BitLocker, Microsoft warns"
+      ],
+      "remediation": [
+        "Удалите лишний субъект, сохранив право у Administrators: Microsoft предупреждает, что удаление и Administrators может нарушить работу BitLocker."
+      ]
+    },
+    "GPO_USERRIGHT_SESYSTEMTIME": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Pushing a machine's clock outside the Kerberos skew tolerance breaks authentication for every account using that machine - a denial of service",
+        "Can also be used to extend or shorten the apparent validity window of a captured ticket, or to confuse time-based log correlation during an investigation"
+      ],
+      "impact": [
+        "Перевод часов компьютера за допустимое расхождение времени Kerberos ломает аутентификацию работающих на нём учётных записей, вызывая отказ в обслуживании.",
+        "Можно искусственно увеличить или сократить видимый срок действия захваченного билета либо исказить временную корреляцию журналов при расследовании."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Restrict this right to Administrators and the accounts that genuinely manage time synchronization"
+      ],
+      "remediation": [
+        "Оставьте право только Administrators и учётным записям, которым действительно поручена синхронизация времени."
+      ]
+    },
+    "GPO_USERRIGHT_SETRUSTEDCREDMANACCESS": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Recovers cleartext passwords, certificates and other secrets a user chose to have Windows remember (mapped drives, RDP, some browsers/apps)",
+        "Reads every user's vault on the machine, not only the holder's own"
+      ],
+      "impact": [
+        "Позволяет восстановить открытые пароли, сертификаты и другие секреты, сохранённые пользователями в Windows (подключённые диски, RDP, некоторые браузеры и приложения).",
+        "Доступ предоставляется к хранилищам всех пользователей компьютера, а не только к собственному хранилищу субъекта."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the principal; Windows ships this to nobody, and only genuine backup/restore tooling has a legitimate reason to hold it"
+      ],
+      "remediation": [
+        "Удалите субъект: Windows по умолчанию никому не назначает это право; законная потребность возможна только у настоящего ПО резервного копирования и восстановления."
+      ]
+    },
+    "NO_ACCOUNT_LOCKOUT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Unlimited password guessing attempts possible",
+        "Password spraying can be performed aggressively",
+        "Brute force attacks can run indefinitely",
+        "No automated response to authentication attacks"
+      ],
+      "impact": [
+        "Число попыток подбора пароля не ограничено.",
+        "Атаки password spraying могут выполняться интенсивно.",
+        "Перебор паролей может продолжаться без ограничения по времени.",
+        "Автоматическая реакция на атаки аутентификации отсутствует."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Configure account lockout threshold (10-15 attempts)",
+        "Set lockout duration (30+ minutes)",
+        "Enable lockout counter reset (15-30 minutes)",
+        "Implement additional controls (MFA, conditional access)",
+        "Monitor for authentication failures"
+      ],
+      "remediation": [
+        "Задайте порог блокировки учётной записи (10–15 неудачных попыток).",
+        "Установите длительность блокировки не менее 30 минут.",
+        "Настройте сброс счётчика блокировки через 15–30 минут.",
+        "Используйте дополнительные меры, например MFA и условный доступ.",
+        "Отслеживайте неудачные попытки аутентификации."
+      ]
+    },
+    "NO_MIN_PASSWORD_AGE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Password history policy can be bypassed by rapid cycling",
+        "Users can revert to a previous favorite password",
+        "Reduces effectiveness of password rotation policies"
+      ],
+      "impact": [
+        "Политику истории паролей можно обойти быстрой последовательной сменой паролей.",
+        "Пользователи могут вернуться к ранее предпочитаемому паролю.",
+        "Снижается эффективность политики периодической смены паролей."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set minimum password age to at least 1 day",
+        "Combine with password history (24+ passwords remembered)",
+        "Consider deploying Azure AD Password Protection"
+      ],
+      "remediation": [
+        "Установите минимальный возраст пароля не менее одного дня.",
+        "Сочетайте настройку с историей паролей (запоминать не менее 24 предыдущих).",
+        "Рассмотрите внедрение Azure AD Password Protection."
+      ]
+    },
+    "PASSWORD_NEVER_EXPIRES": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Passwords are not rotated, increasing compromise window",
+        "If password is leaked or cracked, it remains valid indefinitely",
+        "Service accounts with old passwords are high-value targets",
+        "Violates security best practices and compliance requirements"
+      ],
+      "impact": [
+        "Пароли не меняются периодически, что увеличивает окно компрометации.",
+        "Если пароль раскрыт или подобран, он продолжает действовать неограниченно долго.",
+        "Служебные учётные записи со старыми паролями представляют повышенный интерес для атакующих.",
+        "Конфигурация может противоречить применимым требованиям безопасности и соответствия."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Enable password expiration for user accounts",
+        "For service accounts, use Group Managed Service Accounts (gMSA)",
+        "Implement regular password rotation policies",
+        "Monitor for accounts with this flag set"
+      ],
+      "remediation": [
+        "Включите срок действия пароля для пользовательских учётных записей согласно принятой политике.",
+        "Для служб применяйте групповые управляемые служебные учётные записи (gMSA).",
+        "Внедрите политику регулярной ротации паролей в соответствии с требованиями организации.",
+        "Отслеживайте учётные записи с установленным флагом PasswordNeverExpires."
+      ]
+    },
+    "PASSWORD_NOT_REQUIRED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Account may have no password set",
+        "Enables authentication with blank password",
+        "Often indicates legacy or misconfigured accounts",
+        "Easy target for attackers"
+      ],
+      "impact": [
+        "Для учётной записи может вообще не быть установлен пароль.",
+        "Возможно выполнение аутентификации с пустым паролем.",
+        "Это часто признак устаревшей или неверно настроенной учётной записи.",
+        "Такая учётная запись становится удобной целью атакующего."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove the PASSWD_NOTREQD flag from all accounts",
+        "Set strong passwords on these accounts",
+        "Investigate why the flag was set and remediate root cause",
+        "Consider disabling accounts that don't need to be active"
+      ],
+      "remediation": [
+        "Снимите флаг PASSWD_NOTREQD у всех затронутых учётных записей.",
+        "Задайте для них стойкие пароли.",
+        "Выясните причину назначения флага и устраните исходную проблему.",
+        "Рассмотрите отключение записей, которые больше не нужны."
+      ]
+    },
+    "WEAK_PASSWORD_POLICY": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Users can set weak, easily guessable passwords",
+        "Password spraying attacks more likely to succeed",
+        "Brute force attacks complete faster",
+        "Compliance requirements may be violated"
+      ],
+      "impact": [
+        "Пользователи могут устанавливать слабые пароли, которые легко угадать.",
+        "Повышается вероятность успеха password spraying.",
+        "Перебор паролей может завершаться быстрее.",
+        "Возможно нарушение требований соответствия."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Set minimum password length to 14+ characters",
+        "Enable password complexity requirements",
+        "Implement password history (24+ passwords)",
+        "Consider Fine-Grained Password Policies for privileged accounts",
+        "Deploy Azure AD Password Protection for banned password list"
+      ],
+      "remediation": [
+        "Установите минимальную длину пароля не менее 14 символов.",
+        "Включите требования сложности пароля.",
+        "Настройте историю паролей (не менее 24 предыдущих).",
+        "Рассмотрите Fine-Grained Password Policies для привилегированных учётных записей.",
+        "Внедрите Azure AD Password Protection со списком запрещённых паролей."
+      ]
+    }
+  }
+}
