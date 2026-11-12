@@ -424,6 +424,63 @@ if($d6Seen.Count -ne 24 -or $d6Impact -ne 79 -or $d6Remediation -ne 74){
 }
 Write-Host '[RU] PASS D6: 24 находки, Impact 79 и Remediation 74 сверены с EN-источником'
 
+
+# Этап D7: source-pinned Impact/Remediation для 24 групп AUTHN/LDAP/ADCS/OU.
+# Отдельные английские свидетели, запрет перекрытия A-D6, точный порядок пунктов.
+$d7CatalogNames=@('SourceVerifiedCore-16a.ru-RU.json','SourceVerifiedCore-16b.ru-RU.json')
+$d7EarlierNames=@(
+ 'SourceVerifiedCore-07.ru-RU.json','SourceVerifiedCore-11.ru-RU.json',
+ 'SourceVerifiedCore-12.ru-RU.json','SourceVerifiedCore-13.ru-RU.json',
+ 'SourceVerifiedCore-14a.ru-RU.json','SourceVerifiedCore-14b.ru-RU.json',
+ 'SourceVerifiedCore-15a.ru-RU.json','SourceVerifiedCore-15b.ru-RU.json'
+)
+$d7Prior=@{}
+foreach($catalogName in $d7EarlierNames){
+ $prior=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$catalogName)),[Text.Encoding]::UTF8))
+ foreach($p in $prior.translations.PSObject.Properties){$d7Prior[[string]$p.Name]=$true}
+}
+$d7Seen=@{}
+$d7Impact=0
+$d7Remediation=0
+foreach($catalogName in $d7CatalogNames){
+ $d7Catalog=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$catalogName)),[Text.Encoding]::UTF8))
+ if(@($d7Catalog.translations.PSObject.Properties).Count -ne 12){throw "D7: каталог $catalogName должен содержать 12 находок"}
+ foreach($row in $d7Catalog.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if(-not $entries.Contains($id)){throw "D7: неизвестный FindingId $id"}
+  if($d7Prior.ContainsKey($id) -or $d7Seen.ContainsKey($id)){throw "D7: повторный или уже сверенный FindingId $id"}
+  $d7Seen[$id]=$true
+  foreach($field in @('Impact','Remediation')){
+   $lower=$field.ToLowerInvariant()
+   $enProp='sourceEnglish'+$field
+   $countProp=$enProp+'Count'
+   $original=@(Get-PinnedFindingText $id $field)
+   $witness=@($row.Value.$enProp)
+   $russian=@($row.Value.$lower)
+   $expected=[int]$row.Value.$countProp
+   if($expected -le 0 -or $original.Count -ne $expected -or
+      $witness.Count -ne $expected -or $russian.Count -ne $expected){
+    throw "D7: несовпадение числа пунктов $id / $field"
+   }
+   for($i=0;$i -lt $expected;$i++){
+    if([string]$original[$i] -cne [string]$witness[$i]){
+     throw "D7: английский источник изменился $id / $field / пункт $($i+1)"
+    }
+    if([string]::IsNullOrWhiteSpace([string]$russian[$i]) -or
+       [string]$russian[$i] -notmatch '[А-Яа-яЁё]'){
+     throw "D7: нет русского перевода $id / $field / пункт $($i+1)"
+    }
+   }
+   $entries[$id].$lower=@($russian)
+   if($field -eq 'Impact'){$d7Impact+=$expected}else{$d7Remediation+=$expected}
+  }
+ }
+}
+if($d7Seen.Count -ne 24 -or $d7Impact -ne 85 -or $d7Remediation -ne 93){
+ throw "D7: неполный набор $($d7Seen.Count) / $d7Impact / $d7Remediation"
+}
+Write-Host '[RU] PASS D7: 24 находки, Impact 85 и Remediation 93 сверены с исходником'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
