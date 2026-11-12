@@ -1,0 +1,330 @@
+{
+  "schema": "adPEAS-RU.StageD2.Attack.11d",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "SCCM_PXE_EXPOSURE": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Identify PXE servers via AD connectionPoint or intellimirrorSCP objects",
+        "2. Use PXEThief to request PXE boot media from the distribution point",
+        "3. Extract media variables (NAA credentials, task sequence secrets)",
+        "4. Use captured credentials for lateral movement or SCCM admin access"
+      ],
+      "attack": [
+        "1. Обнаружить PXE-серверы через объекты AD connectionPoint либо intellimirrorSCP.",
+        "2. Применить PXEThief для запроса загрузочного PXE-носителя у точки распространения.",
+        "3. Извлечь переменные носителя (данные NAA и секреты последовательности задач).",
+        "4. Использовать полученные учётные данные для бокового перемещения либо административного доступа SCCM."
+      ]
+    },
+    "SCCM_SERVICE_ACCOUNT": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Request Kerberos TGS ticket for the SMS* SPN (Kerberoasting)",
+        "2. Crack the ticket offline to recover the plaintext password",
+        "3. Authenticate as the service account to access SCCM infrastructure",
+        "4. Use SCCM admin access for domain-wide code execution via software deployment"
+      ],
+      "attack": [
+        "1. Запросить билет Kerberos TGS для SPN вида SMS* (Kerberoasting).",
+        "2. Автономно подобрать пароль по билету.",
+        "3. Аутентифицироваться как служебная запись для доступа к инфраструктуре SCCM.",
+        "4. При административном доступе SCCM выполнить код на компьютерах домена через развёртывание ПО."
+      ]
+    },
+    "SCCM_SITE_HIERARCHY": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Identify CAS server via mSSMSManagementPoint site hierarchy analysis",
+        "2. Target CAS admin accounts or CAS server directly",
+        "3. Deploy malicious applications to all sites from CAS",
+        "4. Full control of managed endpoints across entire organization"
+      ],
+      "attack": [
+        "1. Определить сервер CAS по иерархии сайта mSSMSManagementPoint.",
+        "2. Атаковать административные записи CAS либо сам сервер CAS.",
+        "3. Через CAS развернуть вредоносные приложения на всех сайтах.",
+        "4. Получить полный контроль над управляемыми конечными устройствами организации."
+      ]
+    },
+    "SCCM_SYSTEM_MANAGEMENT_ACL": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker gains control of a principal with write access to the container",
+        "2. An mSSMSManagementPoint object naming a host the attacker controls is published",
+        "3. Clients using AD site discovery resolve to it and request policy",
+        "4. The rogue management point serves policy and collects what the clients send it, including credentials the real one would have issued"
+      ],
+      "attack": [
+        "1. Получить контроль над субъектом с правом записи в контейнер.",
+        "2. Опубликовать mSSMSManagementPoint с адресом узла под контролем нарушителя.",
+        "3. Клиенты, использующие обнаружение сайта через AD, находят этот узел и запрашивают политику.",
+        "4. Поддельная точка управления предоставляет политику и собирает отправленные клиентами сведения, включая учётные данные, которые выдала бы настоящая точка."
+      ]
+    },
+    "SCOM_PRIVILEGED_SERVICE_ACCOUNT": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker gains administrative access to a SCOM management server, or to any server the action account logs on to",
+        "2. The service account credential is recovered from memory or from the SCOM configuration",
+        "3. Its domain privileges are used directly - no further escalation is needed",
+        "4. Alternatively a SCOM task is authored and run against every agent at once"
+      ],
+      "attack": [
+        "1. Получить административный доступ к серверу управления SCOM либо к серверу, где входит учётная запись действия (action account).",
+        "2. Восстановить её учётные данные из памяти либо конфигурации SCOM.",
+        "3. Непосредственно использовать доменные привилегии записи без дальнейшего повышения.",
+        "4. Альтернативно создать задачу SCOM и одновременно запустить её на всех агентах."
+      ]
+    },
+    "SCRIPTPATH_HARDCODED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker modifies scriptPath to point to an attacker-controlled UNC share (\\\\evil\\share\\payload.bat)",
+        "2. User logs on and Windows executes the script from the UNC path",
+        "3. Attacker gains code execution in the user's security context",
+        "4. If the user is privileged, the attacker escalates privileges"
+      ],
+      "attack": [
+        "1. Изменить scriptPath, указав контролируемый нарушителем общий UNC-ресурс (\\\\evil\\share\\payload.bat).",
+        "2. При входе пользователя Windows выполняет сценарий по UNC-пути.",
+        "3. Нарушитель получает выполнение кода в контексте безопасности пользователя.",
+        "4. Если пользователь привилегированный, нарушитель повышает свои полномочия."
+      ]
+    },
+    "SHADOW_CREDENTIALS": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Shadow Credentials needs write access to msDS-KeyCredentialLink on the target - reported by the ACL checks, not by this row",
+        "2. With it, an attacker adds a key pair of their own to the attribute",
+        "3. The private key authenticates as the target with PKINIT",
+        "4. The planted key stays valid across password changes until it is removed"
+      ],
+      "attack": [
+        "1. Для атаки Shadow Credentials требуется право записи msDS-KeyCredentialLink на цели; его показывают проверки ACL, а не эта строка.",
+        "2. При наличии права нарушитель добавляет в атрибут собственную пару ключей.",
+        "3. Закрытый ключ позволяет аутентифицироваться как целевая запись через PKINIT.",
+        "4. Добавленный ключ остаётся действительным после смены пароля, пока его не удалят."
+      ]
+    },
+    "SID_HISTORY_FOREIGN_PRIVILEGED": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker controls, or compromises, a domain on the far side of a trust without SID filtering",
+        "2. Writes a privileged SID of the target domain into an account's sIDHistory",
+        "3. Authenticates across the trust; the SID is honoured and lands in the token",
+        "4. The access is indistinguishable from an ordinary migration record"
+      ],
+      "attack": [
+        "1. Получить контроль над доменом по другую сторону доверия без фильтрации SID либо скомпрометировать его.",
+        "2. Записать привилегированный SID целевого домена в sIDHistory учётной записи.",
+        "3. Аутентифицироваться через доверие: SID учитывается и включается в токен.",
+        "4. Такой доступ неотличим от обычной записи, оставшейся после миграции."
+      ]
+    },
+    "SID_HISTORY_INJECTION": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "1. Attacker gains write access to an account's SID History",
+        "2. Injects Domain Admin SID (RID 512) into SID History",
+        "3. Account now has Domain Admin access without visible group membership",
+        "4. Standard 'net group' and 'Get-ADGroupMember' won't show the access",
+        "5. Attacker maintains access even after initial compromise is remediated"
+      ],
+      "attack": [
+        "1. Получить право записи SID History учётной записи.",
+        "2. Внедрить SID группы Domain Admins (RID 512) в SID History.",
+        "3. Запись получит доступ Domain Admin без видимого членства в группе.",
+        "4. Стандартные net group и Get-ADGroupMember не покажут это разрешение.",
+        "5. Нарушитель сохраняет доступ даже после устранения первоначальной компрометации."
+      ]
+    },
+    "SID_HISTORY_OWN_DOMAIN": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker gains write access to an account's sIDHistory",
+        "2. Writes the SID of a local account or group that holds a delegated right",
+        "3. The account now holds that right, with no group membership to audit",
+        "4. The access survives password resets and group clean-ups"
+      ],
+      "attack": [
+        "1. Получить право записи sIDHistory учётной записи.",
+        "2. Добавить SID локальной записи или группы с делегированным правом.",
+        "3. Запись получит такое право без членства в группе, которое можно было бы проверить.",
+        "4. Доступ сохраняется после смены паролей и очистки членств в группах."
+      ]
+    },
+    "SMARTCARD_REQUIRED": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "With smartcard required, attackers cannot:",
+        "- Use password spraying or brute force attacks",
+        "- Leverage credentials from phishing attacks",
+        "- Use stolen password hashes for authentication",
+        "- Perform Kerberoasting (password hash is random)"
+      ],
+      "attack": [
+        "При обязательной смарт-карте нарушитель не может:",
+        "— применять распыление паролей либо грубый перебор;",
+        "— использовать данные, выманенные фишингом;",
+        "— аутентифицироваться с украденными хешами паролей;",
+        "— выполнять Kerberoasting (хеш пароля случайный)."
+      ]
+    },
+    "STANDALONE_MSA_LEGACY": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. sMSA passwords can potentially be extracted from the host",
+        "2. No distributed password management like gMSA",
+        "3. Compromise of host compromises sMSA"
+      ],
+      "attack": [
+        "1. Пароли отдельных sMSA потенциально могут быть извлечены из узла.",
+        "2. Нет распределённого управления паролями, как у gMSA.",
+        "3. Компрометация узла приводит к компрометации sMSA."
+      ]
+    },
+    "TRUST_BIDIRECTIONAL": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker compromises account in one domain",
+        "2. Uses trust to access resources in partner domain",
+        "3. Escalates privileges across trust boundary",
+        "4. Potentially compromises both domains"
+      ],
+      "attack": [
+        "1. Скомпрометировать учётную запись одного домена.",
+        "2. Использовать доверие для доступа к ресурсам партнёрского домена.",
+        "3. Повысить полномочия через границу доверия.",
+        "4. Потенциально скомпрометировать оба домена."
+      ]
+    },
+    "TRUST_PASSWORD_STALE": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker with replication rights or a domain controller backup extracts the key of the trust account (DCSync of <flatName>$)",
+        "2. Forges inter-realm tickets with it",
+        "3. The key keeps working, because the password is no longer changed"
+      ],
+      "attack": [
+        "1. При наличии прав репликации либо резервной копии DC извлечь ключ учётной записи доверия (DCSync для <flatName>$).",
+        "2. Подделать с его помощью междоменные билеты.",
+        "3. Ключ продолжает действовать, поскольку пароль больше не меняется."
+      ]
+    },
+    "TRUST_TRANSITIVE": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker maps transitive trust chains",
+        "2. Identifies indirect trust relationships",
+        "3. Uses transitive trust to reach target domain",
+        "4. Bypasses direct trust restrictions"
+      ],
+      "attack": [
+        "1. Составить карту цепочек транзитивного доверия.",
+        "2. Обнаружить косвенные доверительные отношения.",
+        "3. Использовать транзитивное доверие для достижения целевого домена.",
+        "4. Обойти ограничения прямого доверия."
+      ]
+    },
+    "TRUST_TREAT_AS_EXTERNAL": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker gains control of any domain in the trusted forest",
+        "2. Writes a SID of this domain into sIDHistory of an account there",
+        "3. Authenticates across the trust, and this domain honours the injected SID"
+      ],
+      "attack": [
+        "1. Получить контроль над любым доменом доверенного леса.",
+        "2. Добавить SID этого домена в sIDHistory учётной записи доверенного домена.",
+        "3. Аутентифицироваться через доверие: домен учитывает внедрённый SID."
+      ]
+    },
+    "TRUST_USES_RC4": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker with any domain account requests a referral ticket into the partner realm, which works where the realm trusts this domain",
+        "2. The ticket is encrypted with the RC4 trust key",
+        "3. On a realm trust with a weak password, cracks the key offline like a Kerberoast hash",
+        "4. With the key, forges inter-realm tickets into the partner realm"
+      ],
+      "attack": [
+        "1. От имени любой доменной записи запросить билет направления (referral ticket) в партнёрский realm, если он доверяет этому домену.",
+        "2. Билет будет зашифрован ключом доверия RC4.",
+        "3. Для доверия между realm со слабым паролем подобрать этот ключ автономно, как хеш Kerberoast.",
+        "4. Получив ключ, подделывать междоменные билеты в партнёрский realm."
+      ]
+    },
+    "UNCONSTRAINED_DELEGATION_DC": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker gains code execution on the domain controller, or relays an authentication to it",
+        "2. Extracts cached TGTs from LSASS",
+        "3. Impersonates the accounts whose tickets were cached"
+      ],
+      "attack": [
+        "1. Получить выполнение кода на контроллере домена либо ретранслировать на него аутентификацию.",
+        "2. Извлечь кэшированные TGT из LSASS.",
+        "3. Выдавать себя за записи, чьи билеты находились в кэше."
+      ]
+    },
+    "UNREGISTERED_DOMAIN_CONTROLLER": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker with DS-Install-Replica on the domain sets SERVER_TRUST_ACCOUNT on a computer account it knows the password of",
+        "2. The primary group becomes Domain Controllers (RID 516)",
+        "3. The attacker requests a TGT for the account and replicates the domain's secrets with it (DCSync)"
+      ],
+      "attack": [
+        "1. Имея DS-Install-Replica на домене, установить SERVER_TRUST_ACCOUNT компьютерной записи с известным нарушителю паролем.",
+        "2. Основная группа записи станет Domain Controllers (RID 516).",
+        "3. Запросить TGT этой записи и реплицировать с его помощью секреты домена (DCSync)."
+      ]
+    },
+    "WEAK_FGPP": {
+      "sourceEnglishAttackStepCount": 3,
+      "sourceEnglishAttack": [
+        "1. Attacker learns which accounts a PSO covers from msDS-PSOApplied on its users and groups - readable to far more accounts than the PSO itself, which by default only Domain Admins may read",
+        "2. Learns the weaker settings wherever the PSO is readable - to an account with the rights this report was run with, or through a delegated read permission",
+        "3. Sprays or cracks against exactly those accounts, within whatever lockout the PSO allows"
+      ],
+      "attack": [
+        "1. Узнать, к каким записям применяется PSO, по msDS-PSOApplied у пользователей и групп: доступ к ним имеют гораздо больше записей, чем к самому PSO, который по умолчанию виден только Domain Admins.",
+        "2. Узнать ослабленные параметры там, где PSO доступен для чтения: через права записи, под которой выполнен аудит, либо делегированное чтение.",
+        "3. Подбирать пароли либо распылять их по этим записям с учётом разрешённой PSO политики блокировки."
+      ]
+    },
+    "WEAK_LOCKOUT_DURATION": {
+      "sourceEnglishAttackStepCount": 4,
+      "sourceEnglishAttack": [
+        "1. Attacker triggers account lockout with failed attempts",
+        "2. Waits for short lockout duration to expire",
+        "3. Resumes password spraying",
+        "4. Repeats cycle until password is found"
+      ],
+      "attack": [
+        "1. Вызвать блокировку записи неудачными попытками входа.",
+        "2. Дождаться окончания короткого периода блокировки.",
+        "3. Возобновить распыление паролей.",
+        "4. Повторять цикл до обнаружения пароля."
+      ]
+    },
+    "WEB_ENDPOINT_EPA_ENABLED": {
+      "sourceEnglishAttackStepCount": 5,
+      "sourceEnglishAttack": [
+        "With EPA enabled, attackers cannot:",
+        "- Relay NTLM authentication to this endpoint",
+        "- Exploit coercion attacks (PetitPotam, etc.) via relay",
+        "- Perform ESC8 attacks against ADCS web enrollment",
+        "- Use NTLM relay for privilege escalation"
+      ],
+      "attack": [
+        "При включённой EPA нарушитель не может:",
+        "— ретранслировать NTLM-аутентификацию к этой конечной точке;",
+        "— эксплуатировать принуждение к аутентификации (PetitPotam и др.) через ретрансляцию;",
+        "— выполнять атаки ESC8 против веб-регистрации AD CS;",
+        "— повышать привилегии с помощью NTLM relay."
+      ]
+    }
+  }
+}
