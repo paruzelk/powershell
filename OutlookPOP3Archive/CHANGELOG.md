@@ -1,5 +1,11 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH2d4 DEV — 2026-11-12
+- Add independent forensic operator entrypoint `Invoke-ARCH2d4.ps1` with Plan (no files), Evidence (anchored immutable JSON only) and LiveAudit (existing attached Outlook/PST read-only).
+- Verify original externally pinned manifest/global-claim SHA256 and immutable original prepare intent, ten per-item claims/returns with full strict linkage and ordinal prefix, SHA self-consistency and duplicate returned IDs. Explicitly disclose that per-item SHA has no independent historic pin and cannot prove historical immutability.
+- LiveAudit validates existing POP3 source/destination store/folder identities, Outlook restart, original ten source EntryIDs and full ARCH2b Body/HTML/recipient/state/attachment SHA256 semantics. Missing/torn receipts, indeterminate COM provider, duplicate/unexpected destination, semantic mismatch or claimed-original-still-present fail closed with no retry permit.
+- New Pester tests include complete ten-item audit, missing/torn/forged journals, five-of-ten partial batch, moved content without receipt, unknown source MAPI and changed Body. Expected full Windows PS5.1 4023 tests in 133 containers. No physical PST or Outlook contact in CI; original ARCH2d remains unchanged.
+
 ## 2.6.5-ARCH2d3 DEV — 2026-11-12
 - Recorded actual operator evidence: ARCH2d RunId 23ee0a5b-4780-45a2-9ef6-e12992b418f4 independently verified ten real saved POP3 mails after Outlook restart, including two with supported attachments, exact archive 10 and source original IDs 0. Original JSON and PST not modified by this build.
 - New Core/Diagnostics/ARCH2d3FaultSimulator.ps1: 57 isolated synthetic fault cases (19 types × 1st/5th/10th), using the original durable ARCH2c4 Write-JsonOnce CreateNew+Flush(true) and ARCH2d semantic reconciliation policy, no Outlook COM or PST.
