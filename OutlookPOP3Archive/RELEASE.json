@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH2d4 DEV: read-only original evidence/attached Outlook forensic audit of exact completed ARCH2d ten-mail batch. Operator-pinned manifest/global SHA256, original intent identity, rigorous per-item claim+return linkage and prefix, independent post-Outlook-restart semantic Body/HTML/recipients/state/attachment SHA256 and source EntryID absence. Missing/torn return, duplicate, unknown MAPI, changed Body and interrupted batch require manual review; never retries/moves or writes original PST/journals. Explicit warning: individual receipts only internally hashed, not independently historically anchored. Windows PS5.1 4023 tests in 133 containers; real LiveAudit pending.",
     "ARCH2d3 DEV: synthetic 57-case (19 faults x ordinals 1/5/10) crash/fault matrix grounded in original ARCH2d ten-item policy and actual immutable ARCH2c4 CreateNew+Flush(true) evidence writer. Distinguishes COM-before-apply vs applied-then-throws, torn journals, return receipt failures, source drift and SHA256/duplicate mismatches; fail-closed no automatic replay. Prior successful real ten-mail ARCH2d case and global claim remain untouched. Does not execute Outlook/PST, production Archive/Resume/Auto blocked. Expected full Windows PS5.1 CI 3976 tests in 132 containers.",
 
     "ARCH2d DEV: one explicitly approved real POP3 Inbox batch of exactly 10 original MailItems, independently pinned per-original SHA256 Body/HTML/recipients/state/attachments; immutable global attempt claim and per-item claim force-flushed BEFORE COM Move, immediate STOP on error, zero auto retries; post-Outlook-restart source-original EntryId and each full semantic witness reconciled. Old ARCH2c4a completed pilot never modified. Main Archive/Resume/Auto stay blocked. No Outlook in GitHub Actions. Full PS5.1 3889 tests/131 containers, real operator batch acceptance pending.",
@@ -72,8 +73,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 132,
-    "ExpectedPesterTests": 3976,
+    "ExpectedTestContainers": 133,
+    "ExpectedPesterTests": 4023,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
