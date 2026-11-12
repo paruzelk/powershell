@@ -626,3 +626,78 @@ D12 изменён только в части проверки глобальн�
 
 Архив после успешного CI: `adPEAS-RU-2.9.0-STAGE-D13-20261112.zip`.
 Дальнейший план: [ROADMAP_RU.md](ROADMAP_RU.md).
+
+## Этап D14 — разрешения ACL, AdminSDHolder, dMSA и SIDHistory (12 ноября 2026)
+
+Два новых каталога `Localization/SourceVerifiedCore-23a.ru-RU.json` и
+`Localization/SourceVerifiedCore-23b.ru-RU.json` содержат **24 предметно
+сверенных типа находок**, **82 пункта Impact** и **78 пунктов Remediation**.
+Английские пункты-свидетели дословно извлечены из закреплённого исходника
+adPEAS 2.9.0 (`ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`).
+PowerShell-код проверок, оригинальные находки, оценки риска и выполняемые
+команды исправления не изменены.
+
+Группы находок:
+
+- **AdminSDHolder и разрешения объектов (9):**
+  `ADMINSDHOLDER_PROPAGATED_RIGHT`,
+  `COMPUTER_CONTAINER_CREATE_BROAD`,
+  `COMPUTER_CONTAINER_CREATE_PERMISSIONS`,
+  `COMPUTER_OBJECT_EXPLICIT_RIGHT`,
+  `COMPUTER_OWNERSHIP_REASSIGNED`,
+  `COMPUTER_PASSWORD_NOT_ROTATED`, `CRITICAL_OBJECT_CONTROL`,
+  `DANGEROUS_RIGHTS_CONTEXT`, `OU_NON_DEFAULT_OWNER`.
+- **Управляемые служебные учётные записи (5):**
+  `DMSA_LINK_ONE_SIDED`, `DMSA_MEMBERSHIP_OWNER`,
+  `DMSA_PRIVILEGED_PREDECESSOR`, `DMSA_USABLE_BY_NONPRIVILEGED`,
+  `STANDALONE_MSA_LEGACY`.
+- **Системные механизмы AD и Kerberos (6):**
+  `DSHEURISTICS_ADMINSDHOLDER_EXCLUSION`,
+  `DSHEURISTICS_ANONYMOUS_NSPI`,
+  `DSHEURISTICS_UNIQUENESS_DISABLED`,
+  `ENCRYPTION_DES_ENABLED`, `CONSTRAINED_DELEGATION`,
+  `RBCD_CONFIGURED`.
+- **История SID и аналитика путей атак (4):**
+  `SID_HISTORY_FOREIGN_PRIVILEGED`, `SID_HISTORY_ORPHANED`,
+  `SID_HISTORY_OWN_DOMAIN`, `BLOODHOUND_COLLECTION_COMPLETE`.
+
+### Условия и ограничения безопасности, сохранённые в D14
+
+- Наличие **RBCD** само по себе не доказывает компрометацию: нужно
+  проверить разрешённых принципалов и право записи атрибута
+  `msDS-AllowedToActOnBehalfOfOtherIdentity`. Его очистка удалит все
+  настройки ресурса и может нарушить легитимную работу.
+- **SDProp** распространяет разрешения `AdminSDHolder` на защищённые
+  объекты. Удалять опасную ACE только у дочернего защищённого объекта
+  недостаточно; изменение источника требует оценки последствий.
+- Для **односторонней связи dMSA** сохранено исходное ограничение:
+  пока связь неполная, KDC её игнорирует; риск возникает при её
+  завершении. Список `msDS-GroupMSAMembership` не заменяет проверку
+  владельца этого дескриптора.
+- Для **dsHeuristics** сохранены конкретные позиции 8, 16 и 21.
+  Изменение одного символа не должно стирать остальные параметры;
+  отключение проверки уникальности UPN/SPN не исправляет уже созданные
+  дубликаты.
+- **SIDHistory** не удаляется вслепую: сначала проверяются действующие
+  ACL и зависимости мигрировавших учётных записей, а также SID filtering
+  соответствующих доверий.
+- **OWNER RIGHTS**, наследование ACE и делегирование прав на OU
+  требуют отдельной проверки. Смена владельца без анализа DACL не
+  устраняет уже созданные злоумышленником разрешения.
+- `BLOODHOUND_COLLECTION_COMPLETE` — диагностическое сообщение
+  о готовности собранных данных, не доказательство наличия пути атаки.
+
+`Apply-FullTechnical.ps1` теперь отклоняет перекрытие
+**270 ранее подтверждённых FindingId**. Новый тест
+`Tests/Test-StageD14VerifiedCoreRU.ps1` проверяет 24 ID, порядок,
+полное совпадение свидетельств EN с исходником, итоговые русские
+значения в HTML и смысловые условия. Тесты D1–D13 сохранены.
+
+**Покрытие после D14: 294/392** полных сверок Impact/Remediation.
+Остаётся **98** типов. После пересборки структурный остаток
+должен составить **42 Impact и 41 Remediation**. Все 304 исходно
+непустых раздела Attack ранее переведены; 88 исходно пустых
+не дополняются.
+
+После успешного GitHub Actions архив публикуется как
+`adPEAS-RU-2.9.0-STAGE-D14-20261112.zip`.

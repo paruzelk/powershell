@@ -1,0 +1,312 @@
+{
+  "schema": "adPEAS-RU.StageD14.CoreFields.23a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "ADMINSDHOLDER_PROPAGATED_RIGHT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "A member right makes the trustee a member of Domain Admins whenever it likes",
+        "A key credential, SPN, certificate mapping or reset right takes over any administrator account",
+        "SDProp restores the right every hour, which makes it a persistence mechanism as much as an escalation",
+        "Ownership of AdminSDHolder lets the owner grant itself anything here"
+      ],
+      "impact": [
+        "Право изменения членства, закреплённое в ACL AdminSDHolder, позволяет субъекту по своему усмотрению добавлять себя в Domain Admins.",
+        "Право сброса пароля, изменения SPN, сопоставления сертификата или ключевых учётных данных позволяет захватить защищённую административную учётную запись.",
+        "SDProp примерно каждый час возвращает разрешение на защищённые объекты: это одновременно путь повышения привилегий и механизм закрепления.",
+        "Владелец объекта AdminSDHolder может выдать себе любые необходимые разрешения на этот объект."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove the ACE from CN=AdminSDHolder,CN=System - removing it from a protected object alone does not last",
+        "Wait for SDProp or trigger it (runProtectAdminGroupsTask on the PDC emulator), then confirm the protected objects no longer carry it",
+        "For an owner finding, set the owner of AdminSDHolder back to Domain Admins",
+        "Treat a non-default ACE here as a sign of compromise and review the protected accounts"
+      ],
+      "remediation": [
+        "Удалите опасную ACE именно из CN=AdminSDHolder,CN=System: её удаление только с защищённого объекта не будет постоянным.",
+        "Дождитесь SDProp либо инициируйте его через runProtectAdminGroupsTask на эмуляторе PDC; затем проверьте отсутствие опасного разрешения на защищённых объектах.",
+        "Если находка связана с владельцем AdminSDHolder, восстановите владельца Domain Admins.",
+        "Рассматривайте нестандартную ACE на AdminSDHolder как возможный признак компрометации и проверьте защищённые учётные записи."
+      ]
+    },
+    "COMPUTER_CONTAINER_CREATE_BROAD": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Every member of the group can create a computer account it fully controls",
+        "That account is the delegation source a resource-based constrained delegation attack needs",
+        "It also supplies the machine account an NTLM relay to LDAP requires",
+        "Hardening ms-DS-MachineAccountQuota to 0 does not close this - the permission is granted directly"
+      ],
+      "impact": [
+        "Любой член широко доступной группы может создать учётную запись компьютера и получить над ней полный контроль.",
+        "Такая запись может служить исходным субъектом делегирования для атаки через ресурсное ограниченное делегирование RBCD.",
+        "Она также предоставляет учётную запись компьютера, необходимую для NTLM relay к LDAP.",
+        "Установка ms-DS-MachineAccountQuota в 0 не закрывает этот путь: разрешение создания выдано непосредственно в ACL контейнера."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove CreateChild for the computer class from the broad group on this container",
+        "Grant it to a dedicated provisioning account instead, and only there",
+        "If the finding names an inherited source the entry is not on this container - remove it where it is defined, or break inheritance here with SetAccessRuleProtection, which also cuts every other permission this container inherits",
+        "Pre-stage computer accounts rather than letting users create them"
+      ],
+      "remediation": [
+        "Удалите у широкой группы право CreateChild для класса computer на этом контейнере.",
+        "Предоставьте создание объектов компьютеров отдельной учётной записи подготовки устройств и только в необходимом месте.",
+        "Если ACE наследуется, измените её на объекте-источнике; отключение наследования через SetAccessRuleProtection в текущем контейнере затронет все остальные наследуемые права.",
+        "Предварительно создавайте объекты компьютеров в AD вместо предоставления пользователям возможности создавать их самостоятельно."
+      ]
+    },
+    "COMPUTER_CONTAINER_CREATE_PERMISSIONS": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Users can create computer accounts beyond quota",
+        "Created accounts can be used in RBCD attacks",
+        "Enables relay attacks requiring machine accounts",
+        "May bypass quota restrictions entirely"
+      ],
+      "impact": [
+        "Пользователи могут создавать объекты компьютеров сверх установленной квоты.",
+        "Созданные объекты компьютеров могут использоваться в атаках RBCD.",
+        "Появляется возможность relay-атак, которым необходимы учётные записи компьютеров.",
+        "Прямое разрешение может полностью обходить ограничения квоты создания учётных записей компьютеров."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Audit ACLs on Computers container and OUs",
+        "Remove explicit Create Computer permissions",
+        "Use dedicated provisioning accounts only",
+        "Implement computer account pre-staging"
+      ],
+      "remediation": [
+        "Проверьте ACL стандартного контейнера Computers и всех соответствующих OU.",
+        "Удалите избыточные явные разрешения Create Computer.",
+        "Используйте только специально выделенные учётные записи для подготовки объектов компьютеров.",
+        "Внедрите предварительное создание (pre-staging) учётных записей компьютеров."
+      ]
+    },
+    "COMPUTER_OBJECT_EXPLICIT_RIGHT": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Administrative access to the computer, through its own machine account or through delegation to it",
+        "On a server that holds credentials, or on a domain controller, more than the computer"
+      ],
+      "impact": [
+        "Такое право может дать административный доступ к компьютеру через его учётную запись или через делегирование на неё.",
+        "Для сервера, хранящего учётные данные, и тем более контроллера домена последствия могут выходить за пределы самого компьютера."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the entry from the computer object, or replace it with the narrower right the task needs",
+        "Delegate computer management on the OU to a group, where the OU permission check reports it, rather than per object"
+      ],
+      "remediation": [
+        "Удалите опасную ACE с объекта компьютера либо замените её более узким правом, необходимым для конкретной задачи.",
+        "Предпочитайте делегирование управления компьютерами группе на уровне OU, где это право обнаруживается проверкой разрешений OU, вместо отдельных ACE на каждом объекте."
+      ]
+    },
+    "COMPUTER_OWNERSHIP_REASSIGNED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The owner holds implicit WriteDACL and can grant itself any right on the object",
+        "Writing msDS-AllowedToActOnBehalfOfOtherIdentity gives local SYSTEM on the machine via resource-based constrained delegation",
+        "Writing msDS-KeyCredentialLink gives a certificate that authenticates as the machine, with no password reset and nothing for the user to notice",
+        "Ownership is not shown by the usual permission views, so this survives a review that only reads the DACL"
+      ],
+      "impact": [
+        "Владелец объекта имеет неявное WriteDACL и может предоставить себе дополнительные права на объект с учётом возможных ограничений OWNER RIGHTS.",
+        "Запись msDS-AllowedToActOnBehalfOfOtherIdentity открывает путь к локальным полномочиям SYSTEM на компьютере посредством RBCD при выполнении остальных условий атаки.",
+        "Запись msDS-KeyCredentialLink позволяет использовать сертификат для аутентификации как компьютер, без сброса его пароля и без очевидных изменений для пользователя.",
+        "Владелец обычно не отображается в стандартных представлениях разрешений, поэтому проверка только DACL может не выявить этот путь доступа."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Establish who changed the ownership and when, from the directory service audit log on the domain controllers (event 5136 on nTSecurityDescriptor)",
+        "Reset the owner to Domain Admins, which is what a provisioning process should be setting",
+        "Review the object's DACL as well - an owner that wanted access has usually already granted itself some",
+        "Where computer objects are created by delegated staff, pre-create the accounts and set the owner explicitly instead of relying on the join"
+      ],
+      "remediation": [
+        "Установите, кем и когда изменён владелец, по журналам изменений службы каталогов на контроллерах домена (событие 5136 для nTSecurityDescriptor).",
+        "Восстановите владельца Domain Admins, если он предусмотрен процессом создания объекта.",
+        "Дополнительно проверьте DACL объекта: субъект, получивший владение ради доступа, мог уже выдать себе разрешения.",
+        "Если компьютеры присоединяют делегированные сотрудники, заранее создавайте учётные записи и явно устанавливайте владельца, не полагаясь на автоматически полученного при присоединении."
+      ]
+    },
+    "COMPUTER_PASSWORD_NOT_ROTATED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A once-extracted machine account key stays valid - from the host's LSA secrets, a backup or a disk image",
+        "With it, service tickets to every service of the host can be forged (silver tickets), and the computer's own domain access can be used",
+        "Microsoft names non-persistent VDI and embedded devices as the cases for switching the change off - with a change planned for each maintenance window"
+      ],
+      "impact": [
+        "Однажды извлечённый ключ учётной записи компьютера остаётся действительным, например после компрометации LSA secrets, резервной копии или образа диска.",
+        "С таким ключом возможно создавать поддельные сервисные билеты для служб компьютера (silver tickets) и пользоваться его доменной идентичностью.",
+        "Microsoft указывает непостоянные VDI и встроенные устройства как случаи отключения автоматической смены, но с отдельной плановой сменой пароля при обслуживании."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Find out why the computer does not change its password: DisablePasswordChange or a long MaximumPasswordAge under the Netlogon parameters, a non-Windows join tool, or a clone",
+        "Turn the change back on; on a non-Windows member configure the join tool to renew the machine password",
+        "Where the change has to stay off, change the password in each maintenance window"
+      ],
+      "remediation": [
+        "Выясните причину отсутствия ротации: DisablePasswordChange, слишком большое MaximumPasswordAge в параметрах Netlogon, нестандартное средство присоединения к домену или клонирование.",
+        "Восстановите автоматическую смену пароля; на устройстве не под Windows настройте инструмент присоединения к домену на обновление машинного пароля.",
+        "Если отключить автоматическую смену невозможно, меняйте пароль компьютера при каждом плановом обслуживании."
+      ]
+    },
+    "CONSTRAINED_DELEGATION": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Can impersonate authenticating users to configured target services",
+        "If any target SPN points at a Domain Controller, privilege escalation is possible"
+      ],
+      "impact": [
+        "Ограниченное делегирование позволяет представляться аутентифицирующимися пользователями перед заранее настроенными целевыми службами.",
+        "Если один из целевых SPN указывает на контроллер домена, при дополнительных условиях становится возможным повышение привилегий."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Review if constrained delegation is still required",
+        "Limit target services to minimum necessary"
+      ],
+      "remediation": [
+        "Проверьте, действительно ли ограниченное делегирование ещё необходимо.",
+        "Сведите перечень целевых служб делегирования к минимально необходимому."
+      ]
+    },
+    "CRITICAL_OBJECT_CONTROL": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Schema control is forest-wide persistence: an ACE added to a default security descriptor lands on every object created from then on",
+        "An inheritable ACE on the configuration head reaches the certificate templates and the certification authorities below it",
+        "A role taken over moves an operation of the forest or the domain to a server of the attacker's choosing",
+        "An exhausted RID pool stops the domain from creating any new account, group or computer"
+      ],
+      "impact": [
+        "Контроль схемы может обеспечить закрепление во всём лесу: ACE, добавленная в стандартный дескриптор безопасности класса, наследуется вновь создаваемыми объектами этого класса.",
+        "Наследуемая ACE на корне раздела конфигурации может распространяться на находящиеся ниже шаблоны сертификатов и удостоверяющие центры.",
+        "Захват роли FSMO позволяет перенести соответствующую операцию леса или домена на сервер по выбору злоумышленника.",
+        "Исчерпание пула RID лишает домен возможности создавать новые учётные записи, группы и компьютеры."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Remove the ACE or the ownership from the principal - these objects are administered by Schema Admins, Enterprise Admins and Domain Admins only",
+        "Review who granted it and when; a change on the schema is replicated to every domain controller of the forest"
+      ],
+      "remediation": [
+        "Удалите несанкционированную ACE или владение у субъекта: подобными критичными объектами должны управлять только уполномоченные Schema Admins, Enterprise Admins и Domain Admins.",
+        "Установите, кем и когда предоставлено разрешение: изменение схемы реплицируется на все контроллеры домена леса."
+      ]
+    },
+    "DANGEROUS_RIGHTS_CONTEXT": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Privilege escalation to high-value accounts possible",
+        "Unauthorized modification of group memberships (adding users to Domain Admins)",
+        "Password resets on privileged accounts",
+        "ACL manipulation enabling persistent backdoors",
+        "Ownership changes leading to complete object control"
+      ],
+      "impact": [
+        "Возможно повышение привилегий до контроля над особо значимыми учётными записями.",
+        "Возможно несанкционированное изменение состава групп, например добавление пользователей в Domain Admins.",
+        "Возможен сброс паролей привилегированных учётных записей.",
+        "Изменение ACL позволяет создать устойчивые скрытые пути доступа.",
+        "Изменение владельца объекта может привести к полному контролю над ним."
+      ],
+      "sourceEnglishRemediationCount": 7,
+      "sourceEnglishRemediation": [
+        "Audit all ACLs using BloodHound, PingCastle, or Defender for Identity",
+        "Remove unnecessary GenericAll, WriteDACL, WriteOwner permissions",
+        "Ensure only appropriate groups have dangerous permissions on high-value objects",
+        "Monitor AdminSDHolder ACL for unauthorized modifications",
+        "Implement Protected Users security group for sensitive accounts",
+        "Enable advanced auditing for ACL changes (Event ID 4670, 5136)",
+        "Review and remediate attack paths identified by BloodHound"
+      ],
+      "remediation": [
+        "Проведите аудит ACL средствами BloodHound, PingCastle или Defender for Identity.",
+        "Уберите ненужные разрешения GenericAll, WriteDACL и WriteOwner.",
+        "Убедитесь, что опасные права на критичных объектах имеют только обоснованные группы.",
+        "Контролируйте ACL AdminSDHolder на несанкционированные изменения.",
+        "Для подходящих чувствительных пользовательских записей используйте защитную группу Protected Users после проверки совместимости; не добавляйте туда компьютеры или gMSA.",
+        "Включите расширенный аудит изменений ACL (события 4670 и 5136).",
+        "Проанализируйте и устраните опасные пути атаки, обнаруженные BloodHound."
+      ]
+    },
+    "DMSA_LINK_ONE_SIDED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Nothing yet - the KDC ignores half a pairing",
+        "One write to this account completes it, and the dMSA then acts with this account's group memberships and holds its keys",
+        "Shows that someone controls a dMSA and aimed it at this account"
+      ],
+      "impact": [
+        "Пока эффект отсутствует: KDC игнорирует одностороннюю связь между dMSA и исходной учётной записью.",
+        "Единственное дополнительное изменение этой учётной записи может завершить связывание; после этого dMSA получает членства в группах исходной записи и владеет её ключами.",
+        "Односторонняя связь указывает, что кто-то управляет dMSA и попытался связать её с данной учётной записью."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Find out who created or changed the dMSA (events 5137 and 5136)",
+        "Clear msDS-ManagedAccountPrecededByLink on the dMSA, or delete the dMSA if nobody needs it",
+        "Restrict who may create dMSAs and who may write to this account"
+      ],
+      "remediation": [
+        "Установите, кто создал или изменил dMSA, по событиям 5137 и 5136.",
+        "Очистите msDS-ManagedAccountPrecededByLink у dMSA либо удалите dMSA, если она больше не нужна.",
+        "Ограничьте возможность создавать dMSA и изменять целевую учётную запись."
+      ]
+    },
+    "DMSA_MEMBERSHIP_OWNER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The owner can allow itself to use the dMSA and remove the entry afterwards",
+        "It holds that right without appearing in the list of principals allowed to use it",
+        "After a migration this is a path to the replaced account's privileges"
+      ],
+      "impact": [
+        "Владелец может включить себя в перечень субъектов, которым разрешено использовать dMSA, и затем удалить эту запись.",
+        "Такое право владельца существует, даже если он не перечислен среди субъектов, которым разрешено использовать dMSA.",
+        "После миграции это становится путём к привилегиям заменённой dMSA учётной записи."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set the owner of msDS-GroupMSAMembership back to Domain Admins or SYSTEM - rewriting the list with Set-ADServiceAccount does that",
+        "Review who holds WriteOwner on the dMSA object itself"
+      ],
+      "remediation": [
+        "Верните владельца msDS-GroupMSAMembership к Domain Admins или SYSTEM; переписывание разрешённого списка через Set-ADServiceAccount также выполняет эту операцию согласно оригиналу.",
+        "Проверьте, кто имеет WriteOwner непосредственно на объекте dMSA."
+      ]
+    },
+    "DMSA_PRIVILEGED_PREDECESSOR": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The dMSA's privileges appear in no group membership",
+        "Every host allowed to use the dMSA is a Tier 0 system",
+        "Write access to the dMSA object is a path to this account's privileges"
+      ],
+      "impact": [
+        "Привилегии dMSA не отражаются в обычном членстве в группах самой dMSA.",
+        "Любой узел, которому разрешено использовать dMSA, необходимо рассматривать как систему Tier 0.",
+        "Разрешение записи объекта dMSA может открывать путь к полномочиям прежней привилегированной учётной записи."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Grant the service only the rights it needs instead of a privileged group membership",
+        "Treat every host in the dMSA's msDS-GroupMSAMembership as Tier 0",
+        "Restrict write access to the dMSA object to Tier 0 administrators"
+      ],
+      "remediation": [
+        "Предоставляйте службе только необходимые права вместо членства в привилегированной группе.",
+        "Считайте каждый узел из msDS-GroupMSAMembership этой dMSA инфраструктурой Tier 0.",
+        "Разрешайте запись объекта dMSA только администраторам Tier 0."
+      ]
+    }
+  }
+}

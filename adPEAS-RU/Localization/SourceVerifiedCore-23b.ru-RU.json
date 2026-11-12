@@ -1,0 +1,308 @@
+{
+  "schema": "adPEAS-RU.StageD14.CoreFields.23b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "DMSA_USABLE_BY_NONPRIVILEGED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The listed principals can act as the dMSA",
+        "After a migration they act with the group memberships of the account the dMSA replaced",
+        "A broad group in the list hands this to every account in the domain"
+      ],
+      "impact": [
+        "Перечисленные субъекты могут действовать от имени dMSA.",
+        "После миграции они действуют с членствами в группах учётной записи, которую dMSA заменила.",
+        "Включение широкой группы в список даёт соответствующую возможность каждой учётной записи домена, входящей в эту группу."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Name only the hosts that run the service, ideally through a group that holds only their computer accounts",
+        "Remove user accounts and broad groups from the list"
+      ],
+      "remediation": [
+        "Указывайте только хосты, где работает служба, желательно через группу, содержащую исключительно их компьютерные учётные записи.",
+        "Удалите из списка пользовательские учётные записи и группы с широким членством."
+      ]
+    },
+    "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A right granted on an excluded group or on one of its members is no longer removed within the hour",
+        "Delegated permissions on an OU reach the members once their inheritance is switched back on",
+        "The operator groups lead to the domain controllers: the directory database, drivers, services"
+      ],
+      "impact": [
+        "Разрешение, выданное исключённой операторской группе или одному из её участников, перестаёт автоматически удаляться в течение примерно часа механизмом SDProp.",
+        "Делегированные разрешения на OU могут распространяться на участников группы после восстановления наследования их ACL.",
+        "Операторские группы могут дать доступ к контроллерам домена, включая базу каталога, драйверы и управление службами."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set character 16 of dsHeuristics back to 0 and keep every other character as it is; SDProp protects the groups and their members again at its next run",
+        "Better still, empty the operator groups and delegate through dedicated groups that hold only the rights the task needs",
+        "Review the rights already granted on the groups and their members while they were excluded - SDProp overwrites the DACL of a protected object, but the rights may already have been used"
+      ],
+      "remediation": [
+        "Установите 16-й символ dsHeuristics обратно в 0, сохранив без изменений остальные символы; после следующего запуска SDProp группы и участники снова защищаются.",
+        "Предпочтительнее очистить ненужное членство в операторских группах и делегировать точечные права специализированным группам.",
+        "Проверьте разрешения, выданные группам и их участникам, пока они были исключены: SDProp заменяет DACL защищённых объектов, но опасные права уже могли быть использованы."
+      ]
+    },
+    "DSHEURISTICS_ANONYMOUS_NSPI": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Unauthenticated reading of the address book - with Exchange, the names and mail addresses of the organization",
+        "Account names for password spraying and phishing, without a domain account",
+        "The setting is forest-wide: it applies on every domain controller of every domain"
+      ],
+      "impact": [
+        "Становится возможно неаутентифицированное чтение адресной книги; при наличии Exchange раскрываются имена и почтовые адреса организации.",
+        "Имена учётных записей могут использоваться для password spraying и фишинга без учётной записи домена.",
+        "Параметр действует на весь лес — на контроллерах всех входящих в него доменов."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set character 8 of dsHeuristics back to 0 and keep every other character as it is",
+        "Find the client that needed anonymous NSPI first - the setting is off by default, so somebody turned it on"
+      ],
+      "remediation": [
+        "Установите 8-й символ dsHeuristics обратно в 0, оставив прочие символы неизменными.",
+        "Сначала определите клиент, которому требовался анонимный NSPI: по умолчанию механизм отключён, следовательно, его кто-то включил."
+      ]
+    },
+    "DSHEURISTICS_UNIQUENESS_DISABLED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Two accounts can hold the same UPN or SPN, so the name no longer identifies one account",
+        "With the SPN alias check off, a service of a server can be claimed for another account, which then poses as that server to Kerberos clients",
+        "Logons and service tickets for a duplicated name fail or reach the wrong account",
+        "The setting is forest-wide: it applies on every domain controller of every domain"
+      ],
+      "impact": [
+        "У двух учётных записей могут оказаться одинаковые UPN или SPN, и имя перестаёт однозначно идентифицировать запись.",
+        "При отключённой проверке псевдонимов SPN служба одного сервера может быть заявлена другой учётной записью, которая затем представляется этим сервером клиентам Kerberos.",
+        "Входы в систему и сервисные билеты для дублированного имени могут завершаться ошибкой либо направляться не той учётной записи.",
+        "Параметр действует во всём лесу — на всех контроллерах всех доменов."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set character 21 of dsHeuristics back to 0 and keep every other character as it is",
+        "The switch exists for migration tools - set it back once the migration is done",
+        "The checks apply to new writes only: find the duplicates created while they were off and remove them"
+      ],
+      "remediation": [
+        "Установите 21-й символ dsHeuristics обратно в 0, не меняя остальных символов.",
+        "Этот переключатель предназначен для задач миграции; верните проверку после завершения миграции.",
+        "Проверки применяются только к новым операциям записи: найдите и устраните дубликаты UPN/SPN, созданные при их отключении."
+      ]
+    },
+    "ENCRYPTION_DES_ENABLED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A DES key is recoverable by brute force regardless of how long the password is",
+        "Enabling DES on an account usually means a legacy application dictated it, and that application is as old as the setting",
+        "The account's tickets can be decrypted, which exposes whatever the service protects"
+      ],
+      "impact": [
+        "Ключ DES может быть восстановлен перебором независимо от длины исходного пароля.",
+        "Разрешение DES для учётной записи обычно указывает на зависимость устаревшего приложения от старой криптографии.",
+        "Билеты такой учётной записи могут быть расшифрованы, что угрожает данным и доступу, защищаемым службой."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the DES bits from msDS-SupportedEncryptionTypes and reset the account's password",
+        "Identify the application that required DES - it needs replacing, not accommodating",
+        "Check the domain controllers' own policy ('Network security: Configure encryption types allowed for Kerberos') for DES as well"
+      ],
+      "remediation": [
+        "Уберите биты DES из msDS-SupportedEncryptionTypes и сбросьте пароль соответствующей учётной записи.",
+        "Найдите приложение, которому необходим DES: его следует заменить или модернизировать, а не сохранять слабую криптографию.",
+        "Дополнительно проверьте политику контроллеров домена «Network security: Configure encryption types allowed for Kerberos» на разрешение DES."
+      ]
+    },
+    "OU_NON_DEFAULT_OWNER": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The owner can write itself GenericAll on the OU and inherit it down to every object in it",
+        "That covers resetting the passwords of the users below, writing msDS-AllowedToActOnBehalfOfOtherIdentity on the computers, and changing the group memberships",
+        "It can also link a GPO, which is code execution on every machine below the OU",
+        "None of it requires an entry in the DACL, so reading the DACL alone shows nothing"
+      ],
+      "impact": [
+        "Владелец OU может предоставить себе GenericAll на этом OU и наследовать разрешение на находящиеся ниже объекты с учётом действующих ограничений наследования.",
+        "Это может позволить сбрасывать пароли пользователей ниже OU, записывать msDS-AllowedToActOnBehalfOfOtherIdentity у компьютеров и изменять состав групп.",
+        "Контроль OU также может позволить привязать GPO и тем самым выполнить код на компьютерах, к которым политика применяется, при наличии необходимых прав.",
+        "Для этих действий отдельная ACE в DACL владельцу может быть не нужна, поэтому просмотр только DACL не раскрывает полный риск."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set the owner back to Domain Admins or Administrators",
+        "Establish how it changed - most often the account that created the OU stayed its owner, because CREATOR OWNER is the default",
+        "Review the owners of the other OUs in the same sweep; one non-default owner usually means a delegation practice rather than an incident"
+      ],
+      "remediation": [
+        "Верните ожидаемого владельца OU, например Domain Admins или Administrators, после проверки модели делегирования.",
+        "Установите причину изменения: часто владелец остался учётной записью создателя OU вследствие стандартного поведения CREATOR OWNER.",
+        "Проверьте владельцев других OU в рамках того же аудита: нестандартное владение может быть следствием практики делегирования, а не отдельного инцидента."
+      ]
+    },
+    "RBCD_CONFIGURED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Whoever controls a principal listed here can obtain a service ticket to this resource as any account the resource accepts",
+        "That is the intended behaviour of the feature, so the question is whether the principals are the ones that should hold it",
+        "An attacker who can write this attribute adds themselves to it, which is why write access to the resource object matters as much as the current contents"
+      ],
+      "impact": [
+        "Субъект, контролирующий указанного здесь принципала, может получать сервисные билеты к этому ресурсу от имени учётных записей, принимаемых ресурсом.",
+        "Это штатное поведение RBCD, поэтому сама настройка ещё не означает уязвимость: важно, действительно ли указанные субъекты должны обладать этим правом.",
+        "Злоумышленник с правом записи этого атрибута может добавить себя в него; поэтому разрешения записи объекта ресурса столь же важны, как текущее содержимое атрибута."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Confirm the entries are the ones intended, and remove the rest: Set-ADComputer -Identity RESOURCE -Clear msDS-AllowedToActOnBehalfOfOtherIdentity removes all of them",
+        "Who may write the attribute decides who may add themselves to it - review the ACL of the resource object and its owner, which Get-DangerousACLs and the owner checks report",
+        "Put the accounts that must never be impersonated into Protected Users, or mark them sensitive and not delegated - that is what stops the S4U chain regardless of this attribute"
+      ],
+      "remediation": [
+        "Проверьте ожидаемость записей и удалите лишние; команда Set-ADComputer -Identity RESOURCE -Clear msDS-AllowedToActOnBehalfOfOtherIdentity очищает список целиком и требует предварительной проверки зависимостей.",
+        "Проверьте ACL и владельца объекта ресурса: кто может записать атрибут, тот может добавить себя; соответствующие пути показывает Get-DangerousACLs и проверки владельцев.",
+        "Учётные записи, которые нельзя делегировать, включайте в Protected Users (только подходящих пользователей) или помечайте как sensitive and not delegated: это блокирует цепочку S4U независимо от содержимого атрибута."
+      ]
+    },
+    "SID_HISTORY_FOREIGN_PRIVILEGED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "If SID filtering is not enforced on the trust, the SID is honoured and grants privileged access from the other domain",
+        "If the source domain is gone, the SID still lands in the token at every logon here and is honoured by every ACL that names it - sidHistorySource says whether a trust or the forest still leads to it",
+        "A reader who cannot tell a migration leftover from an injection cannot act on either"
+      ],
+      "impact": [
+        "Если на соответствующем доверительном отношении не применяется SID filtering, чужой привилегированный SID может учитываться и предоставлять права из другого домена.",
+        "Если исходный домен исчез, SID по-прежнему попадает в токен при входе и учитывается ACL, где он указан; sidHistorySource показывает, ведёт ли к нему действующее доверие или лес.",
+        "Без проверки невозможно отличить остаток миграции от намеренной инъекции SID и принять корректное решение."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Check whether SID filtering is enforced on the trust this SID comes from - adPEAS reports that in the Domain Trusts section",
+        "Establish whether the source domain still exists; if it does not, the entry is clutter and can go",
+        "Remove sIDHistory once the migration it belongs to is complete - it is meant to be temporary",
+        "Monitor for sIDHistory modifications (Event ID 4765, 4766)"
+      ],
+      "remediation": [
+        "Проверьте действие SID filtering на доверии, из которого получен SID; adPEAS отражает это в разделе Domain Trusts.",
+        "Установите, существует ли исходный домен: если его нет, значение может быть оставшимся после миграции и подлежать удалению после проверки зависимостей.",
+        "Удаляйте sIDHistory после завершения миграции, для которой он использовался: его назначение временное.",
+        "Отслеживайте изменения sIDHistory по событиям 4765 и 4766."
+      ]
+    },
+    "SID_HISTORY_ORPHANED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Access granted to the old domain's SIDs still works for these accounts wherever an ACL names them",
+        "Nobody can tell from the directory what the SIDs grant, so the access is never reviewed",
+        "Entries that should be gone hide a deliberately written one among them"
+      ],
+      "impact": [
+        "Права, предоставленные SID старого домена, могут продолжать действовать для этих учётных записей везде, где ACL ссылаются на такие SID.",
+        "По одним данным каталога нельзя определить все разрешения, полученные через эти SID, поэтому доступ может оставаться вне регулярной проверки.",
+        "Лишние старые SID затрудняют обнаружение среди них намеренно добавленного злоумышленником значения."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Re-permission the resources that still name the old SIDs with groups of this domain, then remove sIDHistory from the accounts",
+        "Remove sIDHistory once the migration it belongs to is complete - it is meant to be temporary",
+        "Monitor for sIDHistory changes (Event ID 4765, 4766)"
+      ],
+      "remediation": [
+        "Назначьте на ресурсах, где ещё используются старые SID, разрешения группам текущего домена, затем удалите соответствующие значения sIDHistory.",
+        "После завершения миграции удалите sIDHistory: эти значения предполагаются временными.",
+        "Отслеживайте изменения sIDHistory по событиям 4765 и 4766."
+      ]
+    },
+    "SID_HISTORY_OWN_DOMAIN": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The account is granted whatever the referenced local account or group is granted",
+        "Nothing in the group memberships of either object shows the relationship",
+        "An unprivileged target is not a harmless target - delegated ACEs and share permissions do not appear in any group",
+        "No migration produces this, so the entry was written deliberately"
+      ],
+      "impact": [
+        "Учётная запись получает полномочия, назначенные локальной учётной записи или группе, чей SID указан в sIDHistory.",
+        "Эта связь не отображается в обычном членстве в группах ни одного из двух объектов.",
+        "Ссылка на непривилегированный объект не обязательно безопасна: делегированные ACE и права общих ресурсов могут не отражаться в членстве групп.",
+        "Обычная миграция не создаёт такой SID из текущего домена, поэтому его появление следует расследовать как намеренную запись."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Establish what the referenced SID is granted before removing anything - that is the access to review",
+        "Remove the sIDHistory entry; nothing in this domain needs it",
+        "Check who can write sIDHistory on this object",
+        "Monitor for sIDHistory modifications (Event ID 4765, 4766)"
+      ],
+      "remediation": [
+        "До удаления установите все полномочия, предоставленные указанному SID: именно этот доступ требует проверки.",
+        "Удалите значение sIDHistory, относящееся к текущему домену: оно не требуется для миграции между доменами.",
+        "Проверьте, кто имеет право записи sIDHistory на этом объекте.",
+        "Контролируйте изменения sIDHistory по событиям 4765 и 4766."
+      ]
+    },
+    "STANDALONE_MSA_LEGACY": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Password management less robust than gMSA",
+        "Tied to single computer - no failover capability",
+        "Legacy technology with fewer security controls",
+        "Should be migrated to gMSA where possible"
+      ],
+      "impact": [
+        "Управление паролями одиночной MSA менее гибкое, чем у gMSA.",
+        "sMSA привязана к одному компьютеру и не обеспечивает перенос службы на другой узел при отказе.",
+        "Устаревшая технология предоставляет меньше средств управления безопасностью.",
+        "По возможности следует планировать переход на gMSA."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Migrate sMSAs to Group Managed Service Accounts (gMSA)",
+        "Implement gMSA for all new service accounts",
+        "Review if sMSAs are still necessary",
+        "Ensure proper ACLs on sMSA objects"
+      ],
+      "remediation": [
+        "Переведите подходящие отдельные MSA (sMSA) на Group Managed Service Accounts (gMSA).",
+        "Для новых служб по возможности используйте gMSA.",
+        "Проверьте необходимость сохранения существующих sMSA.",
+        "Убедитесь, что ACL объектов sMSA ограничивают управление уполномоченными субъектами."
+      ]
+    },
+    "BLOODHOUND_COLLECTION_COMPLETE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Enables graph-based attack path analysis in BloodHound CE",
+        "Identifies privilege escalation paths across the domain",
+        "Visualizes ACL-based attack chains",
+        "Maps group membership hierarchies and nested delegations"
+      ],
+      "impact": [
+        "Позволяет анализировать графовые пути атак с помощью BloodHound CE.",
+        "Помогает обнаруживать цепочки повышения привилегий между объектами домена.",
+        "Визуализирует цепочки атак через разрешения ACL.",
+        "Отображает иерархии членства в группах и вложенные делегированные полномочия."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Import the ZIP file into BloodHound CE for analysis",
+        "Focus on 'Shortest Paths to Domain Admin' queries",
+        "Identify and remediate high-risk ACL configurations",
+        "Review delegation paths and Kerberoastable accounts"
+      ],
+      "remediation": [
+        "Импортируйте собранный ZIP в BloodHound CE для анализа в разрешённой среде.",
+        "Сосредоточьтесь на запросах Shortest Paths to Domain Admin для поиска коротких цепочек полномочий.",
+        "Выявляйте и исправляйте опасные конфигурации ACL.",
+        "Проверяйте пути делегирования и учётные записи, подверженные Kerberoasting."
+      ]
+    }
+  }
+}
