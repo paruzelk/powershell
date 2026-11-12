@@ -267,6 +267,53 @@ if($d3Count -ne 14 -or $d3Impact -ne 46 -or $d3Remediation -ne 43){
 }
 Write-Host "[RU] PASS D3: 14 находок, Impact 46 и Remediation 43 сверены с EN-источником"
 
+
+# Этап D4: полная предметная сверка Impact/Remediation для 20 типов
+# делегирования, AD CS, ACL и GPO без изменения проверяющих механизмов.
+$d4=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceVerifiedCore-13.ru-RU.json'),[Text.Encoding]::UTF8))
+if(@($d4.translations.PSObject.Properties).Count -ne 20){throw 'D4: ожидалось 20 находок'}
+$d4AlreadyVerified=@{}
+foreach($catalogName in @('SourceVerifiedCore-07.ru-RU.json','SourceVerifiedCore-11.ru-RU.json','SourceVerifiedCore-12.ru-RU.json')){
+ $prior=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$catalogName)),[Text.Encoding]::UTF8))
+ foreach($priorItem in $prior.translations.PSObject.Properties){$d4AlreadyVerified[[string]$priorItem.Name]=$true}
+}
+$d4Count=0
+$d4Impact=0
+$d4Remediation=0
+foreach($row in $d4.translations.PSObject.Properties){
+ $id=[string]$row.Name
+ if(-not $entries.Contains($id)){throw "D4: неизвестный FindingId $id"}
+ if($d4AlreadyVerified.ContainsKey($id)){throw "D4: запрещено перезаписывать уже проверенный FindingId $id"}
+ foreach($field in @('Impact','Remediation')){
+  $lower=$field.ToLowerInvariant()
+  $enProperty='sourceEnglish'+$field
+  $countProperty=$enProperty+'Count'
+  $original=@(Get-PinnedFindingText $id $field)
+  $englishWitness=@($row.Value.$enProperty)
+  $russian=@($row.Value.$lower)
+  $expected=[int]$row.Value.$countProperty
+  if($expected -le 0 -or $original.Count -ne $expected -or
+     $englishWitness.Count -ne $expected -or $russian.Count -ne $expected){
+   throw "D4: число пунктов не совпадает $id / $field"
+  }
+  for($i=0;$i -lt $expected;$i++){
+   if([string]$original[$i] -cne [string]$englishWitness[$i]){
+    throw "D4: английский оригинал изменён $id / $field / пункт $($i+1)"
+   }
+   if([string]::IsNullOrWhiteSpace([string]$russian[$i]) -or [string]$russian[$i] -notmatch '[А-Яа-яЁё]'){
+    throw "D4: отсутствует русский перевод $id / $field / пункт $($i+1)"
+   }
+  }
+  $entries[$id].$lower=@($russian)
+  if($field -eq 'Impact'){$d4Impact+=$expected}else{$d4Remediation+=$expected}
+ }
+ $d4Count++
+}
+if($d4Count -ne 20 -or $d4Impact -ne 75 -or $d4Remediation -ne 77){
+ throw "D4: неполный перевод $d4Count / $d4Impact / $d4Remediation"
+}
+Write-Host '[RU] PASS D4: 20 находок, Impact 75 и Remediation 77 по закреплённому оригиналу'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
