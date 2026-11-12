@@ -1,0 +1,376 @@
+{
+  "schema": "adPEAS-RU.StageD12.CoreFields.21a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "ADFS_DKM_CONTAINER": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Read access to the DKM key plus the AD FS configuration database yields the token-signing certificate",
+        "With that certificate, SAML tokens can be issued for any federated user, including a global administrator - Golden SAML",
+        "The token is signed rather than obtained by authenticating, so MFA at the identity provider does not apply and no sign-in the tenant can see takes place",
+        "Resetting on-premises passwords does not revoke it: the signing certificate has to be rolled, twice, for the old key to stop being trusted"
+      ],
+      "impact": [
+        "Доступ на чтение ключа DKM вместе с базой конфигурации AD FS позволяет получить сертификат подписи токенов.",
+        "С этим сертификатом можно выпускать SAML-токены от имени любого федеративного пользователя, включая глобального администратора, — атака Golden SAML.",
+        "Токен подписывается, а не получается через аутентификацию, поэтому MFA у поставщика удостоверений не применяется и в арендаторе не появляется видимого события входа.",
+        "Сброс локальных паролей не отзывает токен: сертификат подписи необходимо сменить дважды, чтобы прежний ключ перестал считаться доверенным."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Treat AD FS servers as Tier 0: the same administrative isolation as a domain controller, no shared administration with member servers",
+        "Restrict who can read the DKM container - only the AD FS service account needs it",
+        "Roll the token-signing certificate twice after any suspicion of compromise; once is not enough, because the previous certificate stays trusted",
+        "Where the federation exists only for Microsoft 365, consider moving to Entra ID directly, which removes the on-premises signing key altogether"
+      ],
+      "remediation": [
+        "Рассматривайте серверы AD FS как инфраструктуру Tier 0: административная изоляция на уровне контроллера домена, без совместного администрирования с рядовыми серверами.",
+        "Ограничьте чтение контейнера DKM: оно необходимо только служебной учётной записи AD FS.",
+        "При подозрении на компрометацию дважды смените сертификат подписи токенов: одной смены недостаточно, поскольку предыдущий сертификат остаётся доверенным.",
+        "Если федерация нужна только для Microsoft 365, рассмотрите прямое использование Entra ID, исключив локальный ключ подписи."
+      ]
+    },
+    "AZURE_AD_CONNECT_EXPOSED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Azure AD Connect service account has DCSync rights",
+        "Server stores Azure AD credentials in encrypted form",
+        "Compromise enables Silver Ticket to Azure AD",
+        "Can extract cloud credentials and NTLM hashes"
+      ],
+      "impact": [
+        "Служебная учётная запись Azure AD Connect имеет права DCSync.",
+        "На сервере хранятся учётные данные Azure AD в зашифрованном виде.",
+        "Компрометация может позволить атаку Silver Ticket на Azure AD.",
+        "Возможно извлечение облачных учётных данных и NTLM-хешей."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Treat Azure AD Connect as Tier 0 infrastructure",
+        "Limit access to dedicated admin accounts",
+        "Enable PTA (Pass-through Auth) instead of password sync",
+        "Monitor for suspicious AAD Connect activity"
+      ],
+      "remediation": [
+        "Относите Azure AD Connect к инфраструктуре Tier 0.",
+        "Ограничьте доступ выделенными административными учётными записями.",
+        "Рассмотрите PTA (Pass-through Authentication) вместо синхронизации хешей паролей.",
+        "Отслеживайте подозрительную активность Azure AD Connect."
+      ]
+    },
+    "BITLOCKER_KEY_READABLE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The recovery key can unlock the computer's BitLocker-protected volume offline",
+        "Relevant when a disk is lost, stolen, decommissioned, or imaged",
+        "Broad read access may exceed what recovery/helpdesk roles actually require",
+        "Often correlates with over-permissive ACLs on the computer OUs"
+      ],
+      "impact": [
+        "Ключ восстановления позволяет автономно разблокировать том компьютера, защищённый BitLocker.",
+        "Это важно при утрате, краже, списании диска или создании его образа.",
+        "Широкое право чтения может выходить за пределы необходимых полномочий сотрудников восстановления и поддержки.",
+        "Часто связано с чрезмерно разрешающими ACL в OU компьютеров."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Review who can read msFVE-RecoveryPassword on computer OUs",
+        "Restrict recovery key read access to dedicated recovery/helpdesk roles (tiered administration)",
+        "Use security groups for recovery key access, not broad or individual grants",
+        "Audit recovery key reads (Event ID 4662 on msFVE-RecoveryInformation objects)",
+        "Ensure recovery keys are only escrowed where AD ACLs are properly hardened"
+      ],
+      "remediation": [
+        "Проверьте, кто может читать msFVE-RecoveryPassword в OU компьютеров.",
+        "Ограничьте право чтения ключей восстановления выделенными группами поддержки и восстановления с учётом уровней администрирования.",
+        "Выдавайте доступ группам безопасности, а не широким субъектам или отдельным пользователям.",
+        "Настройте аудит чтения ключей восстановления (Event ID 4662 на объектах msFVE-RecoveryInformation).",
+        "Сохраняйте ключи восстановления в AD только там, где ACL надёжно ограничивают доступ."
+      ]
+    },
+    "BITLOCKER_RECOVERY_DELEGATED": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "The holder reads the recovery password of every computer below the container with a plain LDAP query",
+        "With the disk or an image of it - a stolen laptop, a retired drive, a virtual machine's disk file - the volume opens offline",
+        "Disabling the computer account does not change the recovery password; it stays valid for the disk wherever the disk went",
+        "An opened system volume yields the computer's local secrets, and on a domain controller the directory database",
+        "A right the confidential flag currently blocks becomes live the moment somebody clears the flag"
+      ],
+      "impact": [
+        "Обладатель разрешения может простым LDAP-запросом прочитать пароли восстановления всех компьютеров под контейнером.",
+        "Имея диск или его образ — украденный ноутбук, списанный накопитель либо файл диска виртуальной машины, — можно автономно открыть том.",
+        "Отключение компьютерной учётной записи не меняет пароль восстановления: он продолжает действовать для диска независимо от его местонахождения.",
+        "Открытый системный том раскрывает локальные секреты компьютера, а для контроллера домена — базу каталога.",
+        "Право, которое сейчас блокируется признаком конфиденциальности атрибута, начнёт действовать, если кто-либо снимет этот признак."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Confirm the principal is the recovery or helpdesk role the delegation was meant for; remove the ACE otherwise",
+        "Scope the delegation to the containers whose computers that role supports, and keep servers and domain controllers out of it",
+        "Keep the confidential flag on msFVE-RecoveryPassword - it is what makes a plain read of all properties insufficient",
+        "Audit reads of recovery passwords (event 4662 on msFVE-RecoveryInformation objects)"
+      ],
+      "remediation": [
+        "Убедитесь, что субъект — именно группа восстановления или поддержки, которой предназначалось делегирование; в противном случае удалите ACE.",
+        "Ограничьте делегирование контейнерами обслуживаемых компьютеров; исключите серверы и контроллеры домена.",
+        "Сохраните confidential flag на msFVE-RecoveryPassword: благодаря ему одного широкого права чтения свойств недостаточно.",
+        "Отслеживайте чтение паролей восстановления (Event ID 4662 на объектах msFVE-RecoveryInformation)."
+      ]
+    },
+    "CREDENTIAL_AUTOADMINLOGON": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Username and password stored in PLAINTEXT (not even encrypted like GPP)",
+        "Readable by whoever can read the share the file sits on - in SYSVOL or NETLOGON, every authenticated user",
+        "Often contains administrative credentials for unattended deployments",
+        "Credentials apply to workstations/servers where the GPO is linked",
+        "Enables automatic administrative access to target systems"
+      ],
+      "impact": [
+        "Имя пользователя и пароль сохраняются ОТКРЫТЫМ ТЕКСТОМ (даже без шифрования, применяемого в GPP).",
+        "Их может прочитать любой, кому доступен файловый ресурс; для SYSVOL и NETLOGON — каждый аутентифицированный пользователь.",
+        "При автоматическом развёртывании нередко сохраняются административные учётные данные.",
+        "Учётные данные применимы на рабочих станциях и серверах, к которым привязана GPO.",
+        "Возможен автоматизированный административный доступ к целевым системам."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Change the exposed password first - the value stood in clear text in SYSVOL, readable by every authenticated user, and removing the policy does not revoke it",
+        "Remove the Preferences registry item from the GPO (Registry.xml, not Administrative Templates)",
+        "Use Windows Autopilot or MDT for unattended deployments instead",
+        "If AutoAdminLogon is required, configure it locally (not via GPO)",
+        "Consider using autologon.exe from Sysinternals which encrypts credentials"
+      ],
+      "remediation": [
+        "Сначала смените раскрытый пароль: значение было открыто доступно в SYSVOL каждому аутентифицированному пользователю, и удаление политики его не отзывает.",
+        "Удалите элемент настройки реестра из Group Policy Preferences (Registry.xml, а не Administrative Templates).",
+        "Для установки без участия пользователя используйте Windows Autopilot или MDT.",
+        "Если AutoAdminLogon необходим, настройте его локально, а не через GPO.",
+        "Рассмотрите Sysinternals autologon.exe, который шифрует сохранённые учётные данные."
+      ]
+    },
+    "CREDENTIAL_CONNECTION_STRING": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Direct access to database server without further authentication",
+        "May expose SQL Server, Oracle, MySQL, or other database credentials",
+        "Database may contain sensitive business data, PII, or financial records",
+        "SQL Server accounts may have elevated privileges (sysadmin)"
+      ],
+      "impact": [
+        "Возможен прямой доступ к серверу базы данных без дополнительной аутентификации.",
+        "Могут раскрываться учётные данные SQL Server, Oracle, MySQL и других СУБД.",
+        "База данных может содержать конфиденциальную деловую информацию, персональные данные (PII) или финансовые записи.",
+        "Учётные записи SQL Server могут иметь повышенные привилегии, например sysadmin."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove credentials from connection strings",
+        "Use Windows Integrated Authentication where possible",
+        "Store connection strings in encrypted configuration sections",
+        "Use Azure Key Vault or similar secret management",
+        "Rotate all exposed database credentials"
+      ],
+      "remediation": [
+        "Удалите учётные данные из строк подключения.",
+        "По возможности используйте Windows Integrated Authentication.",
+        "Храните строки подключения в зашифрованных разделах конфигурации.",
+        "Используйте Azure Key Vault или аналогичное хранилище секретов.",
+        "Смените все раскрытые пароли баз данных."
+      ]
+    },
+    "CREDENTIAL_GPP_PASSWORD": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Password can be instantly decrypted by anyone who can read the file",
+        "Readable by whoever can read the share the file sits on - in SYSVOL or NETLOGON, every authenticated user",
+        "Often contains local administrator or service account passwords",
+        "Credentials may still be valid and in use",
+        "Common finding in domain compromises"
+      ],
+      "impact": [
+        "Любой, кто может прочитать файл, способен немедленно расшифровать пароль.",
+        "Файл доступен каждому, кто может читать ресурс; в SYSVOL и NETLOGON — всем аутентифицированным пользователям.",
+        "Часто встречаются пароли локальных администраторов или служебных записей.",
+        "Раскрытые учётные данные могут оставаться действующими.",
+        "Это частая находка при компрометации домена."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Change the password first, before the cleanup. Deleting the XML does not revoke it: the file is cached on every client that applied the policy (%ProgramData%\\Microsoft\\Group Policy\\History), it is in every SYSVOL and system-state backup, and anybody who read it keeps it. A retest after the deletion alone shows the finding gone and the risk unchanged",
+        "Delete ALL GPP files containing cpassword attributes immediately",
+        "Install KB2962486 to prevent new GPP passwords from being created",
+        "Use LAPS for local administrator password management",
+        "Use gMSA for service accounts instead of GPP-deployed passwords"
+      ],
+      "remediation": [
+        "Сначала смените пароль до очистки. Удаление XML не отзывает секрет: файл кэшируется у каждого клиента, применявшего политику (%ProgramData%\\Microsoft\\Group Policy\\History), присутствует в копиях SYSVOL и резервных копиях состояния системы, а уже прочитавший его сохраняет пароль. Повторная проверка после одного лишь удаления файла может показать исчезновение находки при неизменном риске.",
+        "Немедленно удалите ВСЕ файлы GPP, содержащие атрибут cpassword.",
+        "Установите KB2962486, предотвращающее создание новых паролей GPP.",
+        "Для паролей локальных администраторов используйте LAPS.",
+        "Для служебных учётных записей вместо паролей, распространяемых GPP, используйте gMSA."
+      ]
+    },
+    "CREDENTIAL_IN_DESCRIPTION": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Passwords visible to any authenticated domain user",
+        "Often contains actual working passwords",
+        "Common for service accounts and shared accounts",
+        "No authentication or special permissions required to read",
+        "Credentials may grant access to critical systems"
+      ],
+      "impact": [
+        "Пароли видны любому аутентифицированному пользователю домена.",
+        "Часто речь идёт о действующих паролях.",
+        "Нередко встречаются пароли служебных и общих учётных записей.",
+        "Для чтения не требуются специальные разрешения сверх обычной аутентификации.",
+        "Пароли могут открывать доступ к критическим системам."
+      ],
+      "sourceEnglishRemediationCount": 6,
+      "sourceEnglishRemediation": [
+        "Change the password first. The attribute was readable by every authenticated user in the domain, usually for years; emptying the field afterwards changes nothing about who already has the value, and the old content is in every AD backup",
+        "Remove the password from the attribute the row names - description, info, comment, adminDescription, the link or the extension attribute",
+        "Use a proper password manager for credential storage",
+        "Educate administrators about this security risk",
+        "Implement regular scans for credentials in AD attributes",
+        "Consider using managed service accounts (gMSA/sMSA) which don't need stored passwords"
+      ],
+      "remediation": [
+        "Сначала смените пароль. Атрибут обычно годами доступен каждому аутентифицированному пользователю: очистка поля не меняет уже полученные кем-либо секреты, а прежнее содержимое остаётся в резервных копиях AD.",
+        "Удалите пароль из указанного находкой атрибута — description, info, comment, adminDescription, ссылки или атрибута расширения.",
+        "Храните учётные данные в подходящем менеджере паролей.",
+        "Обучите администраторов учитывать этот риск.",
+        "Регулярно сканируйте атрибуты AD на наличие учётных данных.",
+        "Рассмотрите управляемые служебные учётные записи (gMSA/sMSA), которым не требуется хранение паролей вручную."
+      ]
+    },
+    "CREDENTIAL_MENTION_REVIEW": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "May indicate hardcoded passwords requiring further investigation",
+        "Could be documentation, comments, or actual credential exposure",
+        "False positives are common with generic password mentions",
+        "Manual review needed to assess actual risk"
+      ],
+      "impact": [
+        "Может указывать на жёстко прописанный пароль, требующий дальнейшей проверки.",
+        "Совпадение может оказаться документацией, комментарием либо реальным раскрытием учётных данных.",
+        "При общих упоминаниях паролей возможны многочисленные ложные срабатывания.",
+        "Для определения фактического риска нужна ручная проверка."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review the matched line to determine if credentials are present",
+        "If credentials exist, remove them and use secure alternatives",
+        "Document password policies rather than embedding examples",
+        "Use secure credential storage mechanisms"
+      ],
+      "remediation": [
+        "Проверьте совпавшую строку и установите, содержит ли она учётные данные.",
+        "Если данные найдены, удалите их из текста и примените безопасную альтернативу.",
+        "Документируйте политику паролей, а не вставляйте примеры реальных секретов.",
+        "Используйте защищённые механизмы хранения учётных данных."
+      ]
+    },
+    "CREDENTIAL_NET_USE": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Password visible in plaintext in script files",
+        "Readable by whoever can read the share the file sits on - in SYSVOL or NETLOGON, every authenticated user",
+        "Often used to map network drives at user logon",
+        "May contain service account or shared account credentials",
+        "Credentials may provide access to file servers or other resources"
+      ],
+      "impact": [
+        "Пароль виден в открытом тексте файлов сценариев.",
+        "Сценарий доступен всем, кто читает файловый ресурс; в SYSVOL или NETLOGON — каждому аутентифицированному пользователю.",
+        "Обычно такие сценарии подключают сетевые диски при входе пользователя.",
+        "Могут содержаться пароли служебных или общих учётных записей.",
+        "Раскрытые данные могут давать доступ к файловым серверам и другим ресурсам."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove passwords from all login scripts immediately",
+        "Use Group Policy Preferences drive mappings (without cpassword)",
+        "Implement Kerberos authentication for network resources",
+        "Use the user's own credentials via SSO for drive mappings",
+        "Change any exposed passwords"
+      ],
+      "remediation": [
+        "Немедленно удалите пароли из всех сценариев входа.",
+        "Используйте сопоставление дисков через Group Policy Preferences без cpassword.",
+        "Для сетевых ресурсов применяйте Kerberos.",
+        "Для подключения дисков используйте собственные учётные данные пользователя через SSO.",
+        "Смените все раскрытые пароли."
+      ]
+    },
+    "CREDENTIAL_ROAMING_DELEGATED": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "The holder reads another user's private keys and DPAPI master keys with a plain LDAP query, no exploit involved",
+        "With the domain backup key, or the target's password or hash, that material decrypts offline",
+        "A roamed client-authentication certificate then authenticates as the target without their password",
+        "The right usually applies to a whole container, so it covers every user below it, not one account",
+        "A right the confidential flag currently blocks becomes live the moment somebody clears the flag"
+      ],
+      "impact": [
+        "Обладатель права читает чужие закрытые ключи и мастер-ключи DPAPI простым LDAP-запросом, без эксплуатации уязвимости.",
+        "При наличии резервного ключа домена либо пароля или хеша целевого пользователя эти данные расшифровываются автономно.",
+        "Перемещаемый сертификат клиентской аутентификации затем позволяет войти от имени пользователя без его пароля.",
+        "Право обычно распространяется на контейнер целиком, охватывая всех пользователей ниже него, а не одну запись.",
+        "Разрешение, сейчас заблокированное конфиденциальностью атрибута, станет действующим, как только кто-то снимет этот признак."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove the ACE unless the principal genuinely needs to read other users' private keys - almost nothing does",
+        "Check what the delegation was meant to grant; a wizard or script that produced this one has probably produced others",
+        "Mark the two attributes confidential in the schema, which at least stops READ_PROPERTY alone from working",
+        "Clear the attributes on accounts that do not need roaming, and turn Credential Roaming off where it is not needed",
+        "Treat the domain backup key as a Tier 0 secret - it is the other half of every one of these findings"
+      ],
+      "remediation": [
+        "Удалите ACE, если субъекту действительно не требуется чтение закрытых ключей других пользователей; такие исключения крайне редки.",
+        "Выясните цель делегирования: мастер или скрипт, выдавший это разрешение, мог выдать и другие чрезмерные права.",
+        "Отметьте оба атрибута как confidential в схеме, чтобы одного READ_PROPERTY было недостаточно.",
+        "Очистите атрибуты записей, которым перемещение данных не нужно, и отключите Credential Roaming там, где оно не используется.",
+        "Защищайте резервный ключ домена как секрет Tier 0: он необходим для расшифрования данных из каждой такой находки."
+      ]
+    },
+    "CREDENTIAL_ROAMING_PRESENT": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Anybody who later obtains the user's password or hash decrypts the master keys and with them every DPAPI secret of that profile",
+        "Anybody who obtains the domain backup key decrypts them without the user's password - and every domain administrator holds it",
+        "A roamed client-authentication or smartcard certificate then impersonates the user through PKINIT or Schannel, with no password involved",
+        "The material survives a password change, because the domain backup key path does not depend on the password",
+        "DCSync, a copy of ntds.dit or an AD backup yields it regardless of any permission on the attributes"
+      ],
+      "impact": [
+        "Тот, кто позднее получит пароль или хеш пользователя, сможет расшифровать мастер-ключи и все DPAPI-секреты его профиля.",
+        "Получивший резервный ключ домена расшифрует их без пароля пользователя; такой ключ есть у администраторов домена.",
+        "Перемещаемый сертификат клиентской аутентификации или смарт-карты позволяет выдавать себя за пользователя через PKINIT либо Schannel без пароля.",
+        "Данные сохраняют пригодность после смены пароля, поскольку путь расшифрования через резервный ключ домена от пароля не зависит.",
+        "DCSync, копия ntds.dit или резервная копия AD позволяют получить материал независимо от ACL атрибутов."
+      ],
+      "sourceEnglishRemediationCount": 6,
+      "sourceEnglishRemediation": [
+        "Turn Credential Roaming off where it is not genuinely needed - every unnecessary deployment puts private keys and master keys into the directory for nothing",
+        "Mark msPKIAccountCredentials and msPKIDPAPIMasterKeys confidential in the schema, which stops ordinary users reading them",
+        "Clear the attributes on accounts that no longer need roaming; disabling the policy does not remove what has already synchronised",
+        "Prefer smartcards or Windows Hello for Business with non-exportable, TPM-bound keys, which never roam",
+        "Treat the domain backup key as a Tier 0 secret and rotate it after a domain controller compromise, or all roamed material stays decryptable",
+        "Keep clients on the September 2022 patch level or later for CVE-2022-30170, a client-side flaw in how roamed data is written back"
+      ],
+      "remediation": [
+        "Отключите Credential Roaming там, где оно не требуется: каждый ненужный случай хранит закрытые ключи и мастер-ключи в каталоге.",
+        "Отметьте msPKIAccountCredentials и msPKIDPAPIMasterKeys как confidential в схеме, запретив чтение обычным пользователям.",
+        "Очистите атрибуты записей, которым перемещение данных больше не нужно: отключение политики не удаляет ранее синхронизированные значения.",
+        "Предпочитайте смарт-карты или Windows Hello for Business с неизвлекаемыми ключами, привязанными к TPM и не перемещаемыми между устройствами.",
+        "Защищайте резервный ключ домена как секрет Tier 0 и меняйте его после компрометации контроллера домена, иначе весь перемещённый материал остаётся расшифровываемым.",
+        "Обновите клиенты до исправлений сентября 2022 года или новее против CVE-2022-30170 — клиентской ошибки записи перемещаемых данных."
+      ]
+    }
+  }
+}
