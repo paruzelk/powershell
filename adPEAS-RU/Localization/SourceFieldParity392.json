@@ -20,15 +20,8 @@
 
                                    ],
     "ImpactStepCountDifferences":  [
-                                       "ADFS_DKM_CONTAINER",
                                        "ADMINSDHOLDER_PROPAGATED_RIGHT",
                                        "AGING_OS",
-                                       "ANONYMOUS_SAM_ENUMERATION_ALLOWED",
-                                       "ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED",
-                                       "ANON_LDAP_READABLE_ATTRS",
-                                       "AZURE_AD_CONNECT_EXPOSED",
-                                       "BITLOCKER_KEY_READABLE",
-                                       "BITLOCKER_RECOVERY_DELEGATED",
                                        "BLOODHOUND_COLLECTION_COMPLETE",
                                        "COMPUTER_CONTAINER_CREATE_BROAD",
                                        "COMPUTER_CONTAINER_CREATE_PERMISSIONS",
@@ -36,25 +29,10 @@
                                        "COMPUTER_OWNERSHIP_REASSIGNED",
                                        "COMPUTER_PASSWORD_NOT_ROTATED",
                                        "CONSTRAINED_DELEGATION",
-                                       "CREDENTIAL_AUTOADMINLOGON",
-                                       "CREDENTIAL_CONNECTION_STRING",
-                                       "CREDENTIAL_GPP_PASSWORD",
-                                       "CREDENTIAL_IN_DESCRIPTION",
-                                       "CREDENTIAL_MENTION_REVIEW",
-                                       "CREDENTIAL_NET_USE",
-                                       "CREDENTIAL_ROAMING_DELEGATED",
-                                       "CREDENTIAL_ROAMING_PRESENT",
-                                       "CREDENTIAL_ROAMING_READABLE",
-                                       "CREDENTIAL_SCRIPT_PASSWORD",
-                                       "CREDENTIAL_UNATTEND_PASSWORD",
-                                       "CREDENTIAL_VNC_PASSWORD",
                                        "CRITICAL_OBJECT_CONTROL",
                                        "DANGEROUS_RIGHTS_AFFECTED_OUS",
                                        "DANGEROUS_RIGHTS_CONTEXT",
                                        "DANGEROUS_RIGHTS_SEVERITY",
-                                       "DELETED_OBJECTS_READ_BROAD",
-                                       "DELETED_OBJECTS_READ_DELEGATED",
-                                       "DELETED_OBJECT_CREDENTIAL",
                                        "DMSA_LINK_ONE_SIDED",
                                        "DMSA_MEMBERSHIP_OWNER",
                                        "DMSA_PRIVILEGED_PREDECESSOR",
@@ -90,7 +68,6 @@
                                        "INTERDOMAIN_TRUST_ACCOUNT",
                                        "LAPS_INSTALLED",
                                        "LAPS_LEGACY",
-                                       "LOGON_SCRIPT_WRITABLE",
                                        "MACHINE_QUOTA_UNRESTRICTED",
                                        "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
                                        "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
@@ -113,7 +90,6 @@
                                        "PREWIN2000_DEFAULT_MEMBER",
                                        "PRIMARY_GROUP_IS_DC_GROUP",
                                        "RBCD_CONFIGURED",
-                                       "READABLE_UNIX_PASSWORD_ATTRIBUTES",
                                        "SCCM_GROUP_BROAD_MEMBER",
                                        "SCCM_PXE_EXPOSURE",
                                        "SCCM_SERVICE_ACCOUNT",
@@ -136,14 +112,8 @@
                                        "WEB_ENDPOINT_EPA_ENABLED"
                                    ],
     "RemediationStepCountDifferences":  [
-                                            "ADFS_DKM_CONTAINER",
                                             "ADMINSDHOLDER_PROPAGATED_RIGHT",
                                             "AGING_OS",
-                                            "ANONYMOUS_SAM_ENUMERATION_ALLOWED",
-                                            "ANON_LDAP_READABLE_ATTRS",
-                                            "AZURE_AD_CONNECT_EXPOSED",
-                                            "BITLOCKER_KEY_READABLE",
-                                            "BITLOCKER_RECOVERY_DELEGATED",
                                             "BLOODHOUND_COLLECTION_COMPLETE",
                                             "COMPUTER_CONTAINER_CREATE_BROAD",
                                             "COMPUTER_CONTAINER_CREATE_PERMISSIONS",
@@ -151,23 +121,8 @@
                                             "COMPUTER_OWNERSHIP_REASSIGNED",
                                             "COMPUTER_PASSWORD_NOT_ROTATED",
                                             "CONSTRAINED_DELEGATION",
-                                            "CREDENTIAL_AUTOADMINLOGON",
-                                            "CREDENTIAL_CONNECTION_STRING",
-                                            "CREDENTIAL_GPP_PASSWORD",
-                                            "CREDENTIAL_IN_DESCRIPTION",
-                                            "CREDENTIAL_MENTION_REVIEW",
-                                            "CREDENTIAL_NET_USE",
-                                            "CREDENTIAL_ROAMING_DELEGATED",
-                                            "CREDENTIAL_ROAMING_PRESENT",
-                                            "CREDENTIAL_ROAMING_READABLE",
-                                            "CREDENTIAL_SCRIPT_PASSWORD",
-                                            "CREDENTIAL_UNATTEND_PASSWORD",
-                                            "CREDENTIAL_VNC_PASSWORD",
                                             "CRITICAL_OBJECT_CONTROL",
                                             "DANGEROUS_RIGHTS_CONTEXT",
-                                            "DELETED_OBJECTS_READ_BROAD",
-                                            "DELETED_OBJECTS_READ_DELEGATED",
-                                            "DELETED_OBJECT_CREDENTIAL",
                                             "DMSA_LINK_ONE_SIDED",
                                             "DMSA_MEMBERSHIP_OWNER",
                                             "DMSA_PRIVILEGED_PREDECESSOR",
@@ -203,7 +158,6 @@
                                             "INACTIVE_ACCOUNT",
                                             "INACTIVE_PRIVILEGED_ACCOUNT",
                                             "INTERDOMAIN_TRUST_ACCOUNT",
-                                            "LOGON_SCRIPT_WRITABLE",
                                             "MACHINE_QUOTA_UNRESTRICTED",
                                             "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
                                             "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
@@ -225,7 +179,6 @@
                                             "PREWIN2000_DEFAULT_MEMBER",
                                             "PRIMARY_GROUP_IS_DC_GROUP",
                                             "RBCD_CONFIGURED",
-                                            "READABLE_UNIX_PASSWORD_ATTRIBUTES",
                                             "SCCM_GROUP_BROAD_MEMBER",
                                             "SCCM_PXE_EXPOSURE",
                                             "SCCM_SERVICE_ACCOUNT",
@@ -249,7 +202,7 @@
                                         ],
     "RussianImpactWithNoSource":  15,
     "RussianRemediationWithNoSource":  15,
-    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 222 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
+    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 246 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
     "UserReportDataIncluded":  false,
     "Fields":  [
                    {
@@ -372,11 +325,11 @@
                    {
                        "FindingId":  "ADFS_DKM_CONTAINER",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "ADMINSDHOLDER_PROPAGATED_RIGHT",
@@ -417,16 +370,16 @@
                    {
                        "FindingId":  "ANONYMOUS_SAM_ENUMERATION_ALLOWED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
@@ -435,11 +388,11 @@
                    {
                        "FindingId":  "ANON_LDAP_READABLE_ATTRS",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "ASREP_ROASTABLE",
@@ -516,29 +469,29 @@
                    {
                        "FindingId":  "AZURE_AD_CONNECT_EXPOSED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "BITLOCKER_KEY_READABLE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "BITLOCKER_RECOVERY_DELEGATED",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "BLOODHOUND_COLLECTION_COMPLETE",
@@ -642,38 +595,38 @@
                    {
                        "FindingId":  "CREDENTIAL_AUTOADMINLOGON",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "CREDENTIAL_CONNECTION_STRING",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "CREDENTIAL_GPP_PASSWORD",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "CREDENTIAL_IN_DESCRIPTION",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  6,
-                       "RemediationRU":  1
+                       "RemediationRU":  6
                    },
                    {
                        "FindingId":  "CREDENTIAL_MATCHED_LINE",
@@ -687,20 +640,20 @@
                    {
                        "FindingId":  "CREDENTIAL_MENTION_REVIEW",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "CREDENTIAL_NET_USE",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "CREDENTIAL_PASSWORD_EXPOSED",
@@ -714,38 +667,38 @@
                    {
                        "FindingId":  "CREDENTIAL_ROAMING_DELEGATED",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "CREDENTIAL_ROAMING_PRESENT",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  6,
-                       "RemediationRU":  1
+                       "RemediationRU":  6
                    },
                    {
                        "FindingId":  "CREDENTIAL_ROAMING_READABLE",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "CREDENTIAL_SCRIPT_PASSWORD",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "CREDENTIAL_TYPE_INFO",
@@ -759,11 +712,11 @@
                    {
                        "FindingId":  "CREDENTIAL_UNATTEND_PASSWORD",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "CREDENTIAL_USERNAME_EXPOSED",
@@ -777,11 +730,11 @@
                    {
                        "FindingId":  "CREDENTIAL_VNC_PASSWORD",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "CRITICAL_OBJECT_CONTROL",
@@ -948,29 +901,29 @@
                    {
                        "FindingId":  "DELETED_OBJECTS_READ_BROAD",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "DELETED_OBJECTS_READ_DELEGATED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DELETED_OBJECT_CREDENTIAL",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DMSA_LINK_IRREGULAR",
@@ -2415,11 +2368,11 @@
                    {
                        "FindingId":  "LOGON_SCRIPT_WRITABLE",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "MACHINE_QUOTA_UNRESTRICTED",
@@ -2982,11 +2935,11 @@
                    {
                        "FindingId":  "READABLE_UNIX_PASSWORD_ATTRIBUTES",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "REGISTRY_ALWAYSINSTALLELEVATED",
