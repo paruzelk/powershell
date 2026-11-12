@@ -1,0 +1,81 @@
+{
+  "schema": "adPEAS-RU.StageC.SessionAndCoreUX.1",
+  "locale": "ru-RU",
+  "files": {
+    "src/modules/Core/Connect-adPEAS.ps1": {
+      "Show-Line \"Patched hosts file with $($hostsPatched.Count) entries (cleanup on Disconnect-adPEAS)\"": "Show-Line \"Добавлено записей в hosts: $($hostsPatched.Count) (очистка при Disconnect-adPEAS)\"",
+      "Show-Line \"Cross-domain authentication (NetBIOS): using NTLM/SimpleBind\"": "Show-Line \"Междоменная аутентификация (NetBIOS): используется NTLM/SimpleBind\"",
+      "Show-Line \"Cross-domain: could not find KDC for '$UserRealm' - using NTLM/SimpleBind\"": "Show-Line \"Междоменная аутентификация: KDC для '$UserRealm' не найден — используется NTLM/SimpleBind\"",
+      "Show-Line \"Cross-domain authentication: falling back to NTLM/SimpleBind\"": "Show-Line \"Междоменная аутентификация: переход на NTLM/SimpleBind\"",
+      "Show-Line \"Kerberos TGT/TGS acquired successfully, but LDAP requires hostname resolution\"": "Show-Line \"Билеты Kerberos TGT/TGS получены, но для LDAP требуется разрешение имени узла\"",
+      "Show-Line \"Use -PatchHostsFile for full Kerberos authentication\"": "Show-Line \"Для полноценной аутентификации Kerberos используйте -PatchHostsFile\"",
+      "Show-Line \"Kerberos failed - trying NTLM impersonation\"": "Show-Line \"Аутентификация Kerberos не удалась — попытка олицетворения через NTLM\"",
+      "Show-Line \"NTLM failed - falling back to SimpleBind\"": "Show-Line \"Аутентификация NTLM не удалась — переход на SimpleBind\"",
+      "Show-Line \"Connected via NTLM (supports LDAP signing)\"": "Show-Line \"Подключено через NTLM (поддерживается подпись LDAP)\"",
+      "Show-Line \"LDAP signing required - the simple bind was refused on port 389, auto-upgrading to LDAPS\"": "Show-Line \"Требуется подпись LDAP — простая привязка на порту 389 отклонена, автоматический переход на LDAPS\"",
+      "Show-Line \"Certificate contains multiple identities\"": "Show-Line \"Сертификат содержит несколько идентичностей\"",
+      "Show-Line \"To select a different identity, use: -Username <name>\"": "Show-Line \"Чтобы выбрать другую идентичность, используйте: -Username <name>\"",
+      "Show-Line \"Building tab-completion cache...\"": "Show-Line \"Создание кэша автодополнения...\"",
+      "Show-Line \"Cached: $($stats.Users) users, $($stats.Computers) computers, $($stats.Groups) groups, $($stats.GPOs) GPOs\"": "Show-Line \"Кэшировано пользователей: $($stats.Users), компьютеров: $($stats.Computers), групп: $($stats.Groups), GPO: $($stats.GPOs)\""
+    },
+    "src/modules/Core/Disconnect-adPEAS.ps1": {
+      "Show-SubHeader \"Disconnecting session...\"": "Show-SubHeader \"Отключение сеанса...\"",
+      "Show-Line \"Current Session:\"": "Show-Line \"Текущий сеанс:\"",
+      "Show-Line \"Cleanup:\"": "Show-Line \"Очистка:\"",
+      "Show-Line \"Cleanup errors (forced disconnect):\"": "Show-Line \"Ошибки очистки (принудительное отключение):\"",
+      "Show-Line \"Force mode enabled - clearing variables anyway...\"": "Show-Line \"Принудительный режим включён — переменные будут очищены несмотря на ошибки...\"",
+      "Show-Line \"Session variables and caches force-cleared\"": "Show-Line \"Переменные сеанса и кэши принудительно очищены\""
+    },
+    "src/modules/Core/Move-DomainObject.ps1": {
+      "Show-Line \"Object is already at the requested location and name: $SourceDN\"": "Show-Line \"Объект уже находится в запрошенном расположении и имеет указанное имя: $SourceDN\"",
+      "Show-Line \"Successfully moved $ObjectClass object\"": "Show-Line \"Успешно перемещён объект класса $ObjectClass\"",
+      "Show-Line \"objectGUID and objectSID are unchanged, but applied GPOs and inherited ACLs now come from the new location\"": "Show-Line \"objectGUID и objectSID не изменились, но применяемые GPO и наследуемые ACL теперь определяются новым расположением\""
+    },
+    "src/modules/Core/New-DomainComputer.ps1": {
+      "Show-Line \"Successfully created computer: $Name\"": "Show-Line \"Успешно создан компьютер: $Name\""
+    },
+    "src/modules/Core/New-DomainGPO.ps1": {
+      "Show-Line \"Successfully created GPO AD object: $DisplayName\"": "Show-Line \"Успешно создан объект GPO в AD: $DisplayName\"",
+      "Show-Line \"SYSVOL folder structure created successfully\"": "Show-Line \"Структура папок SYSVOL успешно создана\"",
+      "Show-Line \"SYSVOL creation skipped (-NoSYSVOL)\"": "Show-Line \"Создание структуры SYSVOL пропущено (-NoSYSVOL)\""
+    },
+    "src/modules/Core/New-DomainGroup.ps1": {
+      "Show-Line \"Successfully created group: $Name\"": "Show-Line \"Успешно создана группа: $Name\""
+    },
+    "src/modules/Core/New-DomainUser.ps1": {
+      "Show-Line \"Successfully created user: $Name\"": "Show-Line \"Успешно создан пользователь: $Name\""
+    },
+    "src/modules/Core/Set-CertificateTemplate.ps1": {
+      "Show-Line \"Template '$TemplateName' already matches backup - no changes needed\"": "Show-Line \"Шаблон '$TemplateName' уже соответствует резервной копии — изменения не требуются\"",
+      "Show-Line \"Successfully restored template: $TemplateName ($($RestoreAttributes.Count) attributes)\"": "Show-Line \"Шаблон успешно восстановлен: $TemplateName ($($RestoreAttributes.Count) атрибутов)\"",
+      "Show-Line \"Successfully exported template '$TemplateName' to: $Export\"": "Show-Line \"Шаблон '$TemplateName' успешно экспортирован в: $Export\"",
+      "Show-Line \"Template modified successfully: $TemplateName\"": "Show-Line \"Шаблон успешно изменён: $TemplateName\"",
+      "Show-Line \"Modifications applied: $($Modifications -join ', ')\"": "Show-Line \"Применённые изменения: $($Modifications -join ', ')\""
+    },
+    "src/modules/Core/Set-DomainObject.ps1": {
+      "Show-Line \"No modifications specified for object: $ObjectDN\"": "Show-Line \"Изменения для объекта не заданы: $ObjectDN\""
+    },
+    "src/modules/Core/adPEAS-Messages.ps1": {
+      "Show-Line \"$CheckLabel could not reach $Hostname (HTTP/HTTPS unreachable)\"": "Show-Line \"$CheckLabel не удалось подключиться к $Hostname (HTTP/HTTPS недоступен)\"",
+      "Show-SubHeader \"No active session for $Context...\"": "Show-SubHeader \"Нет активного сеанса для $Context...\"",
+      "Show-SubHeader \"No active session...\"": "Show-SubHeader \"Активный сеанс отсутствует...\"",
+      "Show-Line \"Help:\"": "Show-Line \"Справка:\"",
+      "Show-SubHeader \"Quick Start\"": "Show-SubHeader \"Быстрый старт\"",
+      "Show-Line \"Simple scan (Windows Auth):\"": "Show-Line \"Простое сканирование (аутентификация Windows):\"",
+      "Show-Line \"Session-based with credentials:\"": "Show-Line \"Сеанс с явными учётными данными:\"",
+      "Show-Line \"On domain-joined machines, -Password/-NTHash/-AES*Key/-Certificate replace your Kerberos tickets.\"": "Show-Line \"На компьютерах в домене параметры -Password/-NTHash/-AES*Key/-Certificate заменяют билеты Kerberos текущего сеанса.\"",
+      "Show-Line \"Use Connect-adPEAS with -ForceNTLM or -ForceSimpleBind to avoid this.\"": "Show-Line \"Для предотвращения этого используйте Connect-adPEAS с -ForceNTLM или -ForceSimpleBind.\"",
+      "Show-Line \"More help:\"": "Show-Line \"Дополнительная справка:\"",
+      "Show-SubHeader \"Security Check Modules\"": "Show-SubHeader \"Модули проверок безопасности\"",
+      "Show-Line \"Run all modules:\"": "Show-Line \"Запустить все модули:\"",
+      "Show-Line \"Run specific modules only:\"": "Show-Line \"Запустить только выбранные модули:\"",
+      "Show-SubHeader \"Additional Core and Helper Modules\"": "Show-SubHeader \"Дополнительные основные и вспомогательные модули\"",
+      "Show-Line \"Connection:\"": "Show-Line \"Подключение:\"",
+      "Show-Line \"AD Queries:\"": "Show-Line \"Запросы AD:\"",
+      "Show-Line \"AD Modifications:\"": "Show-Line \"Изменения AD:\"",
+      "Show-Line \"Kerberos Authentication:\"": "Show-Line \"Аутентификация Kerberos:\"",
+      "Show-Line \"Credential Attacks:\"": "Show-Line \"Атаки на учётные данные:\"",
+      "Show-Line \"Offensive Actions:\"": "Show-Line \"Активные операции:\""
+    }
+  }
+}
