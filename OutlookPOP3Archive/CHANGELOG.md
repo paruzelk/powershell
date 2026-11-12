@@ -1,5 +1,12 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+## 2.6.5-ARCH2d DEV — 2026-11-12
+- Core/Archive ARCH2dBatchCore + ARCH2dBatchPolicy and operator `Invoke-ARCH2d.ps1` — one explicit ten-mail batch from existing real POP3 Inbox, never the previous ARCH2c4a RunId or target PST.
+- Batch source immutable manifest: ten unique original EntryIDs, original saved Body/HTML/recipients/user-state and protected by-value attachment SHA256 fingerprints, exact source/destination store/folder identity.
+- Global one-batch claim and per-message claim force-flushed before every COM MailItem.Move; no continue, retry or unapproved resume on uncertain outcomes, no Copy/Delete/Send operations.
+- Independent post-Outlook-restart read-only ten-item semantic reconciliation, explicit partial/manual-review statuses; all mail fingerprints must be unique.
+- 42 new synthetic regression tests. Expected Windows PS5.1 full CI: 3889 Pester tests / 131 containers, no skips/failures. Real Outlook batch acceptance pending; production writer unchanged and blocked.
+
 ## 2.6.5-ARCH2c4a DEV hotfix — 2026-11-12
 - Fix actual operator `Prepare` failure: `Get-OPAInternetMessageId` unavailable in one-shot core because `ArchiveSelector.ps1` and `ComManager.ps1` were omitted from standalone bootstrap.
 - Restore original core dependency load order; test complete real ARCH2b semantic witness on fake Unicode, MAPI InternetMessageId, original by-value attachment content and protected TEMP; fail-closed on changed body/payload.
