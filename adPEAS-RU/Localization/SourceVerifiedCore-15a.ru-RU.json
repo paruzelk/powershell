@@ -1,0 +1,292 @@
+{
+  "schema": "adPEAS-RU.StageD6.CoreFields.15a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "ADCS_CLIENT_AUTH_EKU": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Certificates can be used to authenticate as the enrolled user",
+        "If combined with ENROLLEE_SUPPLIES_SUBJECT, enables impersonation (ESC1)",
+        "Certificates valid for long periods (often 1-2 years)",
+        "Authentication possible even after password change"
+      ],
+      "impact": [
+        "Сертификат можно использовать для аутентификации от имени пользователя, которому он выдан.",
+        "В сочетании с ENROLLEE_SUPPLIES_SUBJECT появляется возможность выдавать себя за другого пользователя (ESC1).",
+        "Сертификаты могут действовать длительное время (часто 1–2 года).",
+        "Сертификатная аутентификация может оставаться доступной даже после смены пароля учётной записи."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Only enable Client Authentication EKU where required",
+        "Combine with Manager Approval for sensitive templates",
+        "Ensure enrollment restrictions are in place",
+        "Monitor certificate-based authentication events"
+      ],
+      "remediation": [
+        "Разрешайте EKU Client Authentication только там, где он действительно необходим.",
+        "Для чувствительных шаблонов сочетайте эту возможность с одобрением администратором ЦС (Manager Approval).",
+        "Убедитесь, что действуют необходимые ограничения на регистрацию сертификатов (enrollment).",
+        "Отслеживайте события аутентификации с использованием сертификатов."
+      ]
+    },
+    "ADCS_HTTP_AVAILABLE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "NTLM relay attacks against CA enrollment endpoints",
+        "Credential interception through man-in-the-middle attacks",
+        "Combined with coercion (PetitPotam, PrinterBug) enables domain compromise",
+        "Certificates obtained via relay can impersonate the victim"
+      ],
+      "impact": [
+        "Возможны атаки NTLM relay на HTTP-точки регистрации сертификатов ЦС.",
+        "При атаке «человек посередине» возможно перехватывание учётных данных или обмена аутентификацией.",
+        "В сочетании с принудительной аутентификацией (PetitPotam, PrinterBug) возможна компрометация домена.",
+        "Сертификат, полученный через ретрансляцию аутентификации, позволяет выдавать себя за жертву."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Enforce HTTPS-only access for all CA enrollment endpoints",
+        "Disable HTTP bindings on the CA's IIS server",
+        "Enable Extended Protection for Authentication (EPA)",
+        "If web enrollment is not required, disable it entirely"
+      ],
+      "remediation": [
+        "Разрешите доступ ко всем точкам регистрации сертификатов ЦС только по HTTPS.",
+        "Отключите привязки HTTP на IIS-сервере центра сертификации.",
+        "Включите Extended Protection for Authentication (EPA).",
+        "Если веб-регистрация сертификатов не нужна, полностью отключите её."
+      ]
+    },
+    "ADCS_NONPRIV_ENROLLMENT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Non-privileged users can request certificates from this template",
+        "If combined with ENROLLEE_SUPPLIES_SUBJECT flag, enables ESC1",
+        "If combined with Any Purpose EKU, enables ESC2",
+        "Wider enrollment permissions increase exploitation potential"
+      ],
+      "impact": [
+        "Непривилегированные пользователи могут запрашивать сертификаты по этому шаблону.",
+        "Если также установлен ENROLLEE_SUPPLIES_SUBJECT, возникают условия для ESC1.",
+        "В сочетании с EKU Any Purpose возникают условия для ESC2.",
+        "Широкие права регистрации сертификатов повышают вероятность эксплуатации других ошибок шаблона."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review if non-privileged enrollment is required",
+        "Restrict enrollment to specific groups if possible",
+        "Ensure template does not have dangerous flags enabled",
+        "Monitor certificate enrollment activity"
+      ],
+      "remediation": [
+        "Проверьте, действительно ли необходима регистрация сертификатов непривилегированными пользователями.",
+        "По возможности ограничьте право регистрации конкретными группами.",
+        "Убедитесь, что в шаблоне не включены опасные параметры.",
+        "Отслеживайте операции регистрации и выпуска сертификатов."
+      ]
+    },
+    "ADCS_SMARTCARD_LOGON_EKU": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Certificates can be used for Windows interactive logon",
+        "Enables PKINIT-based authentication (Kerberos)",
+        "If combined with ENROLLEE_SUPPLIES_SUBJECT, enables impersonation (ESC1)",
+        "Smartcard certificates often have longer validity periods"
+      ],
+      "impact": [
+        "Сертификаты можно использовать для интерактивного входа в Windows.",
+        "Поддерживается аутентификация Kerberos с применением PKINIT.",
+        "В сочетании с ENROLLEE_SUPPLIES_SUBJECT появляется возможность выдавать себя за другого пользователя (ESC1).",
+        "Сертификаты для входа по смарт-карте нередко имеют увеличенный срок действия."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Only enable Smartcard Logon EKU where required",
+        "Implement strong enrollment approval processes",
+        "Monitor smartcard certificate requests",
+        "Consider hardware-bound certificates for smartcards"
+      ],
+      "remediation": [
+        "Включайте EKU Smartcard Logon только при необходимости.",
+        "Внедрите строгую процедуру одобрения выдачи таких сертификатов.",
+        "Отслеживайте запросы сертификатов для входа по смарт-карте.",
+        "Рассмотрите использование сертификатов, привязанных к аппаратной смарт-карте."
+      ]
+    },
+    "GMSA_MEMBERSHIP_INFO": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Listed principals can obtain the gMSA password",
+        "If broad groups are included, the gMSA password is widely accessible"
+      ],
+      "impact": [
+        "Перечисленные субъекты могут получить управляемый пароль gMSA.",
+        "Если среди них есть широкие группы, доступ к паролю gMSA предоставляется слишком многим субъектам."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Ensure only required principals are in the gMSA membership",
+        "Remove broad groups like Authenticated Users from gMSA access"
+      ],
+      "remediation": [
+        "Убедитесь, что право получения пароля gMSA предоставлено только необходимым субъектам.",
+        "Удалите широкие группы, например Authenticated Users, из списка имеющих доступ к gMSA."
+      ]
+    },
+    "GMSA_ROTATION_INTERVAL_LONG": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A password read from the directory stays valid until the next rotation",
+        "The interval is the upper bound on the useful life of one theft",
+        "An interval far above the default is usually unintentional - it was typed once at creation"
+      ],
+      "impact": [
+        "Пароль, однажды считанный из каталога, действует до следующей ротации.",
+        "Интервал ротации определяет верхнюю границу времени, в течение которого полезен один факт хищения пароля.",
+        "Интервал значительно больше стандартного обычно является непреднамеренной настройкой, заданной один раз при создании записи."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Create the account again with the default interval; msDS-ManagedPasswordInterval cannot be changed on an existing gMSA",
+        "Check who may retrieve the password while the long interval stands - those principals are the exposure"
+      ],
+      "remediation": [
+        "Создайте gMSA заново со стандартным интервалом: msDS-ManagedPasswordInterval невозможно изменить для уже существующей gMSA.",
+        "До исправления проверьте, кому разрешено извлекать пароль: именно эти субъекты определяют область риска."
+      ]
+    },
+    "LAPS_ACCOUNT_INFO": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Reveals the local admin account name managed by LAPS",
+        "If the LAPS password is also readable, provides full local admin access"
+      ],
+      "impact": [
+        "Раскрывается имя локальной административной учётной записи, которой управляет LAPS.",
+        "Если также доступен для чтения пароль LAPS, эти сведения позволяют получить полный локальный административный доступ."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Restrict LAPS attribute read permissions"
+      ],
+      "remediation": [
+        "Ограничьте права чтения атрибутов LAPS."
+      ]
+    },
+    "LAPS_GPO_DISABLED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Local administrator passwords stop rotating and keep the value they last had",
+        "Those values remain readable in the directory for whoever is delegated the attribute",
+        "The expiration attribute keeps its last date, so the machines look managed",
+        "A password captured from one machine stays valid indefinitely"
+      ],
+      "impact": [
+        "Пароли локальных администраторов перестают обновляться и сохраняют последнее установленное значение.",
+        "Сохранённые значения остаются доступными в каталоге субъектам с делегированным правом чтения соответствующего атрибута.",
+        "Атрибут срока действия сохраняет прежнюю дату, поэтому компьютеры могут выглядеть как управляемые.",
+        "Пароль, когда-либо полученный с такого компьютера, продолжает действовать неопределённо долго."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set 'Enable local admin password management' back to Enabled, or remove the policy if LAPS was replaced",
+        "After re-enabling, force a rotation so the passwords that stood still are replaced",
+        "If LAPS was deliberately retired, remove the delegated read permissions on the attributes as well - the stored passwords outlive the policy"
+      ],
+      "remediation": [
+        "Верните настройку «Enable local admin password management» в состояние Enabled либо удалите политику, если LAPS заменён другим решением.",
+        "После повторного включения принудительно смените пароли, которые не ротировались.",
+        "Если LAPS выведен из эксплуатации намеренно, удалите и делегированные права чтения атрибутов: сохранённые пароли остаются в каталоге даже после отключения политики."
+      ]
+    },
+    "LAPS_GPO_EXPIRATION_PROTECTION_DISABLED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The configured maximum password age is not enforced",
+        "A writable expiration timestamp lets an attacker defer rotation indefinitely",
+        "A compromised local administrator password may stay valid far beyond its intended lifetime"
+      ],
+      "impact": [
+        "Заданный максимальный срок действия пароля не обеспечивается принудительно.",
+        "Возможность изменения отметки срока действия позволяет атакующему откладывать ротацию на неопределённое время.",
+        "Скомпрометированный пароль локального администратора может оставаться действительным значительно дольше предусмотренного срока."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set PasswordExpirationProtectionEnabled=1 in the Windows LAPS policy",
+        "Review write permissions on the LAPS expiration attributes of computer objects"
+      ],
+      "remediation": [
+        "Установите PasswordExpirationProtectionEnabled = 1 в политике Windows LAPS.",
+        "Проверьте права записи атрибутов срока действия LAPS у объектов компьютеров."
+      ]
+    },
+    "LAPS_GPO_NOT_LINKED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The LAPS settings in this GPO apply to no computer at all",
+        "An intended LAPS rollout may be silently incomplete",
+        "Hosts expected to be covered may have unmanaged local administrator passwords"
+      ],
+      "impact": [
+        "Параметры LAPS из этой GPO не применяются ни к одному компьютеру.",
+        "Запланированное развёртывание LAPS может незаметно остаться незавершённым.",
+        "На компьютерах, которые предполагалось защитить, пароли локальных администраторов могут остаться неуправляемыми."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Link the GPO to the OUs holding the computers it is meant to cover, or delete it",
+        "Verify LAPS coverage against the actual computer objects afterwards"
+      ],
+      "remediation": [
+        "Привяжите GPO к OU с компьютерами, на которые она должна распространяться, либо удалите ненужную GPO.",
+        "После этого проверьте фактическое покрытие LAPS по объектам компьютеров."
+      ]
+    },
+    "LAPS_GPO_PASSWORD_AGE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A captured local administrator password stays valid until the next rotation",
+        "The interval is the upper bound on the useful life of one capture",
+        "Lateral movement with a cracked or dumped password has that long to run"
+      ],
+      "impact": [
+        "Однажды полученный пароль локального администратора остаётся действительным до очередной ротации.",
+        "Интервал ротации определяет максимальное время полезности одного факта получения пароля.",
+        "В течение всего этого периода возможно горизонтальное перемещение с подобранным или извлечённым паролем."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set the rotation interval back to 30 days or fewer",
+        "Windows LAPS can reset the password after each use (PostAuthenticationActions), which makes the interval nearly irrelevant"
+      ],
+      "remediation": [
+        "Верните интервал ротации к 30 дням или меньшему значению.",
+        "Windows LAPS умеет сбрасывать пароль после каждого использования (PostAuthenticationActions), что почти устраняет зависимость риска от длительности интервала."
+      ]
+    },
+    "LAPS_GPO_PASSWORD_LENGTH": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A shorter random password is proportionally cheaper to crack offline",
+        "The local administrator hash is what gets captured, and it is what gets cracked",
+        "Nobody types a LAPS password, so the shorter value buys nothing"
+      ],
+      "impact": [
+        "Более короткий случайный пароль пропорционально дешевле подбирать автономно.",
+        "С компьютера извлекается хеш локального администратора, и именно этот хеш затем подвергается подбору.",
+        "Пользователю не требуется вручную вводить пароль LAPS, поэтому его сокращение не даёт практического преимущества."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set the password length back to 14 or higher in the LAPS policy",
+        "Windows LAPS supports passphrases, which are longer again for the same operational cost"
+      ],
+      "remediation": [
+        "Установите длину пароля LAPS не менее 14 символов.",
+        "Windows LAPS поддерживает парольные фразы (passphrases), которые могут быть ещё длиннее без дополнительных эксплуатационных затрат."
+      ]
+    }
+  }
+}
