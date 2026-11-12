@@ -384,3 +384,35 @@ Workflow GitHub Actions теперь создаёт после проверок 
 **Итого после D6:** **102/392** находок со сверенными полными Impact и Remediation; **290/392** требуют продолжения предметной проверки. Неполных по количеству пунктов: **Impact — 225**, **Remediation — 206**. Все **304/304** исходно непустых Attack переведены; для 88 пустых Attack ничего не добавлено.
 
 Архив: `adPEAS-RU-2.9.0-STAGE-D6-20261112.zip`.
+
+
+## Этап D7 — сверка AUTHN, LDAP, AD CS, domain root и прав OU (12 ноября 2026)
+
+Добавлены `Localization/SourceVerifiedCore-16a.ru-RU.json` и `Localization/SourceVerifiedCore-16b.ru-RU.json`: **24 находки, 85 пунктов Impact и 93 пункта Remediation**. Каждый пункт привязан к дословному английскому оригиналу закреплённой версии adPEAS 2.9.0 (`ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`). Данные каталогов применяются только к русским техническим описаниям отчёта; сканирующие функции, расчёт риска, `FindingId`, команды исправления и исходный EN-код не изменяются.
+
+**Аутентификация (5):** `AUTHN_KDC_ARMORING_NOT_SUPPORTED`, `AUTHN_POLICY_EXEMPT_ADMINISTRATOR`, `AUTHN_POLICY_OBJECT_WRITABLE`, `AUTHN_SILO_INCOMPLETE_ENROLLMENT`, `AUTHN_SILO_NOT_EFFECTIVE`.
+
+**LDAP (3):** `LDAP_ANONYMOUS_BINDING_RESTRICTED`, `LDAP_CHANNEL_BINDING_ALWAYS`, `LDAP_SIGNING_REQUIRED`.
+
+**AD CS (1):** `ADCS_MANAGER_APPROVAL`.
+
+**Объект домена (1):** `DOMAIN_ROOT_MAQ_WRITE`.
+
+**Делегирование OU (14):** `OU_PERM_CREATE_CHILD`, `OU_PERM_CREATE_DMSA`, `OU_PERM_DNSHOSTNAME_WRITE`, `OU_PERM_DNS_HOST_NAME_ATTRIBUTES`, `OU_PERM_GPOPTIONS`, `OU_PERM_GROUP_MEMBERSHIP`, `OU_PERM_SCRIPTPATH`, `OU_PERM_SELF_ALL_VALIDATED`, `OU_PERM_SELF_MEMBERSHIP`, `OU_PERM_SPN_WRITE`, `OU_PERM_USERACCOUNTCONTROL`, `OU_PERM_VALIDATED_DNS`, `OU_PERM_VALIDATED_SPN`, `OU_PERM_WRITEPROPERTY_ALL`.
+
+### Предметные ограничения, которые сохранены в переводе
+
+- **Kerberos armoring:** включение `Fail unarmored authentication requests` до модернизации всех клиентов может заблокировать их аутентификацию. Встроенный Administrator домена (`RID 500`) освобождён от authentication policy silo: внесение его в silo не создаёт реальной защиты. Для применения silo требуется и назначение записи, и членство в списке silo; режим аудита не блокирует вход.
+- **LDAP:** перечисленные настройки `Restricted`, `Always`, `Required` являются *защитными* конфигурациями. В соответствующих Remediation прямо указано, что исправление не требуется.
+- **AD CS:** параметр `Manager Approval` различает автоматически выдаваемые сертификаты и заявки с ручным одобрением. Наличие записи само по себе не означает эксплуатацию уязвимости.
+- **Domain root:** право изменения `ms-DS-MachineAccountQuota` позволяет ослабить установленное значение 0, способствуя созданию контролируемых компьютерных учётных записей, RBCD и другим атакам.
+- **dMSA:** создание dMSA может стать критичным при наличии контроллера домена Windows Server 2025 и возможности связать dMSA с учётной записью, которую атакующий может изменять. Сохранены названия атрибутов `msDS-ManagedAccountPrecededByLink`, `msDS-SupersededManagedAccountLink` и событий 5137/5136.
+- **OU / Self:** `Self-Membership` позволяет добавить в группу **себя**, но не произвольных участников; `Self` без ObjectType даёт совокупность validated writes. `Validated-SPN` и `Validated-DNS-Host-Name` более ограничены, чем прямое `WriteProperty`; обычные права Self компьютерных записей не объявляются автоматически уязвимостью.
+- **GPO:** право изменения `gPOptions` может заблокировать наследование GPO, но не отменяет принудительно применяемые привязки (Enforced).
+- **Наследование ACL:** для каждой находки OU сохранено предупреждение: `SetAccessRuleProtection` отключает наследование всех разрешений на OU, не только выбранной ACE; предпочтительно устранять унаследованную ACE в её исходном контейнере.
+
+Новый автономный тест `Tests/Test-StageD7VerifiedCoreRU.ps1` сравнивает исходник, английские свидетельства, русский каталог и итоговый HTML, проверяет порядок всех пунктов, ключевые технические условия и статистику. `Tests/Test-StageD6VerifiedCoreRU.ps1` переведён на независимую проверку своих 24 ID, чтобы развитие покрытия не ломало предыдущие гарантии.
+
+**Состояние после D7:** построчно сверены **126 из 392** наборов Impact/Remediation (осталось **266**); неполных по количеству пунктов осталось **202 Impact**, **185 Remediation**. Из **304/304** исходно непустых Attack все переведены; 88 отсутствующих в оригинале не добавлялись.
+
+Архив этапа: `adPEAS-RU-2.9.0-STAGE-D7-20261112.zip`.
