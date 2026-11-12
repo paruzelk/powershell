@@ -471,3 +471,33 @@ Workflow GitHub Actions теперь создаёт после проверок 
 **Итог D9:** полная предметная сверка Impact/Remediation выполнена для **174/392** типов, осталось **218**. Структурные расхождения количества пунктов: **157 Impact и 149 Remediation**. Все **304/304** исходно непустых Attack переведены; 88 исходных пустых разделов не дополнялись.
 
 Архив: `adPEAS-RU-2.9.0-STAGE-D9-20261112.zip`.
+
+
+## Этап D10 — SMB, RDP, реестр Windows, печать, SYSVOL и права GPO (12 ноября 2026)
+
+Новые каталоги `Localization/SourceVerifiedCore-19a.ru-RU.json` и `Localization/SourceVerifiedCore-19b.ru-RU.json` переводят **24 дополнительных находки, 54 пункта Impact и 43 пункта Remediation**, с точным построчным сопоставлением закреплённому английскому исходнику adPEAS 2.9.0 (`ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`). Русские пункты не изменяют исполняемые команды, исходные определения находок, PowerShell-проверки, права или вычисление риска.
+
+**Реестр Windows (13):** `REGISTRY_FILTERADMINTOKEN`, `REGISTRY_MACHINE_PASSWORD_STATIC`, `REGISTRY_OFFICE_MACROS_ON`, `REGISTRY_ONELOGON`, `REGISTRY_PRINT_RPC_PRIVACY`, `REGISTRY_RDP_ENCRYPTION`, `REGISTRY_RDP_SECURITYLAYER`, `REGISTRY_REMOTEUAC`, `REGISTRY_SCRIPTBLOCK_LOGGING_OFF`, `REGISTRY_SMB1_SERVER`, `REGISTRY_SMB2_SERVER_DISABLED`, `REGISTRY_SMB_UNENCRYPTED_ACCESS`, `REGISTRY_WSUS_USER_PROXY`.
+
+**SYSVOL и контроллеры домена (2):** `SYSVOL_FRS_REPLICATION`, `DC_PASSWORD_NOT_ROTATED`.
+
+**Печать (4):** `GPO_POINTANDPRINT_USER_SCOPE`, `GPO_PRINT_DRIVER_HARDENING`, `GPO_PRINT_QUEUE_SPECIFIC_FILES`, `GPO_PRINT_SPOOLER_RPC`.
+
+**Права GPO (5):** `GPO_USERRIGHT_DEFAULT_REMOVED`, `GPO_USERRIGHT_SECREATEGLOBAL`, `GPO_USERRIGHT_SECREATESYMBOLICLINK`, `GPO_USERRIGHT_SEMANAGEVOLUME`, `GPO_USERRIGHT_SEPROFILESINGLEPROCESS`.
+
+### Технические нюансы, сохранённые при переводе
+
+- **SMB:** `SMB2=0` отключает *и SMBv2, и SMBv3*; при наличии SMBv1 может происходить откат к нему, а при отсутствии SMBv1 — потеря общего доступа. `RejectUnencryptedAccess=0` — отдельная опасная настройка, раскрывающая данные общих ресурсов; изменение её не заменяет отказа от SMB 1.0. Для `REGISTRY_SMB1_SERVER` сохранены MS17-010 и инструкция по аудиту события 3000.
+- **RDP:** `MinEncryptionLevel=1` применяется к встроенному механизму RDP и теряет значение при обязательном TLS (`SecurityLayer=2`); `SecurityLayer=1` (Negotiate) всё ещё допускает использование менее защищённого механизма.
+- **Remote UAC:** удаление `LocalAccountTokenFilterPolicy` может нарушить работу RMM, резервного копирования и систем мониторинга; до применения исправления нужно оценить зависимости.
+- **PowerShell:** явное отключение Script Block Logging подавляет даже автоматические события 4104 о подозрительных сценариях, которые сохраняются без такой политики. Рекомендовано Enabled, либо хотя бы Not configured, вместе с Protected Event Logging.
+- **Windows Update:** пользовательский прокси при поиске обновлений опасен при WSUS по `http://`; при `https://` соответствующий путь атаки отсутствует. Перевод не приписывает уязвимость каждому WSUS.
+- **Печать:** `RegisterSpoolerRemoteRpcEndPoint=2` — защитное значение для запрета удалённых соединений, а не 0. Ограничения `DisableWebPnPDownload` и `AddPrinterDrivers` дополняют, но не заменяют `RestrictDriverInstallationToAdministrators`. User Configuration для Point and Print Restrictions не применяется Windows 7+; её нельзя считать действующей защитой. `CopyFilesPolicy` различает 0/1/2.
+- **SYSVOL:** для перехода с FRS на DFSR требуется `dfsrmig` через Prepared, Redirected, Eliminated и функциональный уровень Windows Server 2008+. Промежуточное состояние не означает завершённой миграции.
+- **Права:** удаление стандартного субъекта из `[Privilege Rights]` чаще является намеренным усилением защиты, но иногда приводит к отказу функции; `SeCreateGlobalPrivilege`, `SeCreateSymbolicLinkPrivilege`, `SeManageVolumePrivilege` и `SeProfileSingleProcessPrivilege` оценены отдельно с их реальными механизмами.
+
+`Localization/Apply-FullTechnical.ps1` сверяет дословные английские пункты и запрещает повторное изменение 174 ранее проверенных находок. Тест `Tests/Test-StageD10VerifiedCoreRU.ps1` сверяет 24 ID, порядок и число Impact/Remediation, русский каталог с финальным HTML и 24 существенных смысловых условия; предыдущие тесты D1–D9 остаются регрессионными.
+
+**Итог D10:** **198/392** типов находок с полной сверкой Impact/Remediation; **194** типов ещё требуют предметной проверки. Структурный остаток: **134 Impact**, **132 Remediation**. Раздел Attack полностью переведён для **304/304** исходно непустых находок, 88 исходных пустых не заполнялись.
+
+Архив: `adPEAS-RU-2.9.0-STAGE-D10-20261112.zip`.
