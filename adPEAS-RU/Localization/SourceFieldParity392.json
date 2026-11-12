@@ -49,11 +49,6 @@
                                        "CREDENTIAL_UNATTEND_PASSWORD",
                                        "CREDENTIAL_VNC_PASSWORD",
                                        "CRITICAL_OBJECT_CONTROL",
-                                       "DANGEROUS_ACL_GPO_DELETE",
-                                       "DANGEROUS_ACL_GPO_EXTENDED",
-                                       "DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED",
-                                       "DANGEROUS_ACL_REPLICATION_INERT_HALF",
-                                       "DANGEROUS_ACL_REPLICATION_NO_SECRETS",
                                        "DANGEROUS_RIGHTS_AFFECTED_OUS",
                                        "DANGEROUS_RIGHTS_CONTEXT",
                                        "DANGEROUS_RIGHTS_SEVERITY",
@@ -65,11 +60,6 @@
                                        "DMSA_MEMBERSHIP_OWNER",
                                        "DMSA_PRIVILEGED_PREDECESSOR",
                                        "DMSA_USABLE_BY_NONPRIVILEGED",
-                                       "DOMAIN_ROOT_FSMO_TRANSFER",
-                                       "DOMAIN_ROOT_NON_DEFAULT_OWNER",
-                                       "DOMAIN_ROOT_REANIMATE_TOMBSTONES",
-                                       "DOMAIN_ROOT_REPLICA_INSTALL",
-                                       "DOMAIN_ROOT_SID_HISTORY_WRITE",
                                        "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION",
                                        "DSHEURISTICS_ANONYMOUS_NSPI",
                                        "DSHEURISTICS_UNIQUENESS_DISABLED",
@@ -95,23 +85,10 @@
                                        "EXCHANGE_SMTP_BROAD_SPOOFING",
                                        "EXCHANGE_VULNERABLE_VERSION",
                                        "EXCHANGE_WEB_ENDPOINTS",
-                                       "GPO_LOCAL_GROUP_MEMBER",
-                                       "GPO_NON_DEFAULT_OWNER",
-                                       "GPO_POINTANDPRINT_DRIVER_SOURCE",
-                                       "GPO_POINTANDPRINT_LATENT",
-                                       "GPO_POINTANDPRINT_NONADMIN_INSTALL",
                                        "GPO_POINTANDPRINT_USER_SCOPE",
                                        "GPO_PRINT_DRIVER_HARDENING",
                                        "GPO_PRINT_QUEUE_SPECIFIC_FILES",
                                        "GPO_PRINT_SPOOLER_RPC",
-                                       "GPO_REGISTRY_PASSWORD",
-                                       "GPO_SCOPE_DOMAIN_WIDE",
-                                       "GPO_SCRIPT_OUTSIDE_POLICY_STORE",
-                                       "GPO_SEMACHINEACCOUNTPRIVILEGE_BROAD",
-                                       "GPO_SYSVOL_FOLDER_ORPHANED",
-                                       "GPO_SYSVOL_GPT_MISSING",
-                                       "GPO_TASK_CMD_UNQUOTED_PATH",
-                                       "GPO_TASK_UNQUOTED_PATH",
                                        "GPO_USERRIGHT_DEFAULT_REMOVED",
                                        "GPO_USERRIGHT_SECREATEGLOBAL",
                                        "GPO_USERRIGHT_SECREATESYMBOLICLINK",
@@ -252,9 +229,6 @@
                                             "CREDENTIAL_UNATTEND_PASSWORD",
                                             "CREDENTIAL_VNC_PASSWORD",
                                             "CRITICAL_OBJECT_CONTROL",
-                                            "DANGEROUS_ACL_GPO_EXTENDED",
-                                            "DANGEROUS_ACL_GPO_WRITEPROPERTY",
-                                            "DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED",
                                             "DANGEROUS_RIGHTS_CONTEXT",
                                             "DC_PASSWORD_NOT_ROTATED",
                                             "DELETED_OBJECTS_READ_BROAD",
@@ -264,11 +238,6 @@
                                             "DMSA_MEMBERSHIP_OWNER",
                                             "DMSA_PRIVILEGED_PREDECESSOR",
                                             "DMSA_USABLE_BY_NONPRIVILEGED",
-                                            "DOMAIN_ROOT_FSMO_TRANSFER",
-                                            "DOMAIN_ROOT_NON_DEFAULT_OWNER",
-                                            "DOMAIN_ROOT_REANIMATE_TOMBSTONES",
-                                            "DOMAIN_ROOT_REPLICA_INSTALL",
-                                            "DOMAIN_ROOT_SID_HISTORY_WRITE",
                                             "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION",
                                             "DSHEURISTICS_ANONYMOUS_NSPI",
                                             "DSHEURISTICS_UNIQUENESS_DISABLED",
@@ -296,23 +265,10 @@
                                             "EXCHANGE_VULNERABLE_VERSION",
                                             "EXCHANGE_WEB_ENDPOINTS",
                                             "GPO_LINK_REACHES_DC",
-                                            "GPO_LOCAL_GROUP_MEMBER",
-                                            "GPO_NON_DEFAULT_OWNER",
-                                            "GPO_POINTANDPRINT_DRIVER_SOURCE",
-                                            "GPO_POINTANDPRINT_LATENT",
-                                            "GPO_POINTANDPRINT_NONADMIN_INSTALL",
                                             "GPO_POINTANDPRINT_USER_SCOPE",
                                             "GPO_PRINT_DRIVER_HARDENING",
                                             "GPO_PRINT_QUEUE_SPECIFIC_FILES",
                                             "GPO_PRINT_SPOOLER_RPC",
-                                            "GPO_REGISTRY_PASSWORD",
-                                            "GPO_SCOPE_DOMAIN_WIDE",
-                                            "GPO_SCRIPT_OUTSIDE_POLICY_STORE",
-                                            "GPO_SEMACHINEACCOUNTPRIVILEGE_BROAD",
-                                            "GPO_SYSVOL_FOLDER_ORPHANED",
-                                            "GPO_SYSVOL_GPT_MISSING",
-                                            "GPO_TASK_CMD_UNQUOTED_PATH",
-                                            "GPO_TASK_UNQUOTED_PATH",
                                             "GPO_USERRIGHT_DEFAULT_REMOVED",
                                             "GPO_USERRIGHT_SEASSIGNPRIMARYTOKEN",
                                             "GPO_USERRIGHT_SEBATCHLOGON",
@@ -412,7 +368,7 @@
                                         ],
     "RussianImpactWithNoSource":  15,
     "RussianRemediationWithNoSource":  15,
-    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 126 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
+    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 150 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
     "UserReportDataIncluded":  false,
     "Fields":  [
                    {
@@ -1003,7 +959,7 @@
                    {
                        "FindingId":  "DANGEROUS_ACL_GPO_DELETE",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
@@ -1012,11 +968,11 @@
                    {
                        "FindingId":  "DANGEROUS_ACL_GPO_EXTENDED",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  1,
                        "AttackRU":  1,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "DANGEROUS_ACL_GPO_WRITEPROPERTY",
@@ -1025,21 +981,21 @@
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  4
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "DANGEROUS_ACL_GPO_WRITEPROPERTY_SCOPED",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DANGEROUS_ACL_REPLICATION_INERT_HALF",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
@@ -1048,7 +1004,7 @@
                    {
                        "FindingId":  "DANGEROUS_ACL_REPLICATION_NO_SECRETS",
                        "ImpactEN":  4,
-                       "ImpactRU":  3,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
@@ -1183,11 +1139,11 @@
                    {
                        "FindingId":  "DOMAIN_ROOT_FSMO_TRANSFER",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DOMAIN_ROOT_GPLINK_WRITE",
@@ -1210,38 +1166,38 @@
                    {
                        "FindingId":  "DOMAIN_ROOT_NON_DEFAULT_OWNER",
                        "ImpactEN":  4,
-                       "ImpactRU":  2,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  2
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DOMAIN_ROOT_REANIMATE_TOMBSTONES",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DOMAIN_ROOT_REPLICA_INSTALL",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DOMAIN_ROOT_SID_HISTORY_WRITE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "DSHEURISTICS_ADMINSDHOLDER_EXCLUSION",
@@ -1723,11 +1679,11 @@
                    {
                        "FindingId":  "GPO_LOCAL_GROUP_MEMBER",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "GPO_LOCAL_GROUP_RISKY_MEMBER",
@@ -1741,11 +1697,11 @@
                    {
                        "FindingId":  "GPO_NON_DEFAULT_OWNER",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "GPO_NOT_CURRENTLY_EFFECTIVE",
@@ -1759,11 +1715,11 @@
                    {
                        "FindingId":  "GPO_POINTANDPRINT_DRIVER_SOURCE",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "GPO_POINTANDPRINT_EXPLOITABLE",
@@ -1777,20 +1733,20 @@
                    {
                        "FindingId":  "GPO_POINTANDPRINT_LATENT",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "GPO_POINTANDPRINT_NONADMIN_INSTALL",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "GPO_POINTANDPRINT_USER_SCOPE",
@@ -1831,20 +1787,20 @@
                    {
                        "FindingId":  "GPO_REGISTRY_PASSWORD",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "GPO_SCOPE_DOMAIN_WIDE",
                        "ImpactEN":  5,
-                       "ImpactRU":  2,
+                       "ImpactRU":  5,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  6,
-                       "RemediationRU":  4
+                       "RemediationRU":  6
                    },
                    {
                        "FindingId":  "GPO_SCOPE_SEVERITY",
@@ -1858,38 +1814,38 @@
                    {
                        "FindingId":  "GPO_SCRIPT_OUTSIDE_POLICY_STORE",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "GPO_SEMACHINEACCOUNTPRIVILEGE_BROAD",
                        "ImpactEN":  3,
-                       "ImpactRU":  2,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  3
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "GPO_SYSVOL_FOLDER_ORPHANED",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "GPO_SYSVOL_GPT_MISSING",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "GPO_SYSVOL_WRITABLE",
@@ -1903,11 +1859,11 @@
                    {
                        "FindingId":  "GPO_TASK_CMD_UNQUOTED_PATH",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "GPO_TASK_FIELD_SEVERITY",
@@ -1930,11 +1886,11 @@
                    {
                        "FindingId":  "GPO_TASK_UNQUOTED_PATH",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "GPO_UNLINKED_BROAD_WRITE",
