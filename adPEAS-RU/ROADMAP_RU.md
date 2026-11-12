@@ -250,3 +250,33 @@ Remediation. Новые файлы `SourceVerifiedCore-26a.ru-RU.json`
 Статус DOC1 подтверждён только после успешной
 Windows PowerShell 5.1 CI и создания архива
 `adPEAS-RU-2.9.0-DOC1-20261112.zip`.
+
+## DOC2a — полный перевод справочника Core Functions (12 ноября 2026)
+
+Переведён `docs/ru-RU/06-Core-Functions.md` по закреплённому
+`docs/06-Core-Functions.md`: 859 строк в каждом справочнике,
+7 функций (`Get-DomainUser`, `Get-DomainComputer`, `Get-DomainGroup`,
+`Get-DomainGPO`, `Get-DomainObject`, `Get-ObjectACL`,
+`Get-CertificateTemplate`), 146 параметров, 74 комментария
+к примерам и 15 блоков PowerShell.
+
+Сохранены исходные имена команд, синтаксис параметров, LDAP-фильтры,
+значения `KnownSPN`, флаги `UserAccountControl`, ссылки и якоря.
+Уточнены смысловые ограничения: `memberOfNested` и GC,
+расширение состава групп при `-Recurse`, область видимости
+`-IncludeDeleted`, `NOT_DELEGATED`, `flags=3`,
+`ESC9/ESC10` и разрешения ACL.
+
+Тест `Tests/Test-DOC2CoreFunctionsRU.ps1` сравнивает русскую
+страницу с оригиналом без выполнения примеров: состав и типы
+параметров, все исполняемые строки PowerShell, комментарии, ссылки,
+полноту описаний и критические ограничения. Встроен в CI
+Windows PowerShell 5.1. Архив этапа получает имя
+`adPEAS-RU-2.9.0-DOC2a-20261112.zip` только после CI.
+
+**DOC2 выполняется по частям; это не завершение всего DOC2.**
+Следующий этап — DOC2b: полный перевод
+`08-Helper-Functions.md`, затем справочников
+`07-Set-Modules.md` и `04-Security-Checks.md`.
+После этого DOC3 (архитектура/риски/диагностика), DOC4
+(динамические сообщения и тесты отчётов в AD).
