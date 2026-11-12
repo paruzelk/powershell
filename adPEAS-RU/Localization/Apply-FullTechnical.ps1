@@ -314,6 +314,60 @@ if($d4Count -ne 20 -or $d4Impact -ne 75 -or $d4Remediation -ne 77){
 }
 Write-Host '[RU] PASS D4: 20 находок, Impact 75 и Remediation 77 по закреплённому оригиналу'
 
+
+# Этап D5: source-pinned поля Impact/Remediation для LAPS, Kerberos, AD CS,
+# привилегированных учётных записей, gMSA и делегированных прав OU.
+# Только UI-словарь: определения FindingId, триггеры, риск и команды не меняются.
+$d5Names=@('SourceVerifiedCore-14a.ru-RU.json','SourceVerifiedCore-14b.ru-RU.json')
+$d5Previous=@{}
+foreach($catalogName in @('SourceVerifiedCore-07.ru-RU.json','SourceVerifiedCore-11.ru-RU.json',
+                         'SourceVerifiedCore-12.ru-RU.json','SourceVerifiedCore-13.ru-RU.json')){
+ $previousCatalog=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$catalogName)),[Text.Encoding]::UTF8))
+ foreach($p in $previousCatalog.translations.PSObject.Properties){$d5Previous[[string]$p.Name]=$true}
+}
+$d5Seen=@{}
+$d5Impact=0
+$d5Remediation=0
+foreach($catalogName in $d5Names){
+ $d5Catalog=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot ('Localization/'+$catalogName)),[Text.Encoding]::UTF8))
+ if(@($d5Catalog.translations.PSObject.Properties).Count -ne 12){throw "D5: неполный каталог $catalogName"}
+ foreach($row in $d5Catalog.translations.PSObject.Properties){
+  $id=[string]$row.Name
+  if(-not $entries.Contains($id)){throw "D5: неизвестный FindingId $id"}
+  if($d5Previous.ContainsKey($id) -or $d5Seen.ContainsKey($id)){
+   throw "D5: запрещена перезапись или повторная запись $id"
+  }
+  $d5Seen[$id]=$true
+  foreach($field in @('Impact','Remediation')){
+   $lower=$field.ToLowerInvariant()
+   $enProp='sourceEnglish'+$field
+   $countProp=$enProp+'Count'
+   $original=@(Get-PinnedFindingText $id $field)
+   $witness=@($row.Value.$enProp)
+   $translated=@($row.Value.$lower)
+   $count=[int]$row.Value.$countProp
+   if($count -le 0 -or $count -ne $original.Count -or
+      $count -ne $witness.Count -or $count -ne $translated.Count){
+    throw "D5: не совпадает число пунктов $id / $field"
+   }
+   for($i=0;$i -lt $count;$i++){
+    if([string]$witness[$i] -cne [string]$original[$i]){
+     throw "D5: изменён английский источник $id / $field / пункт $($i+1)"
+    }
+    if([string]::IsNullOrWhiteSpace([string]$translated[$i]) -or [string]$translated[$i] -notmatch '[А-Яа-яЁё]'){
+     throw "D5: отсутствует русская строка $id / $field / пункт $($i+1)"
+    }
+   }
+   $entries[$id].$lower=@($translated)
+   if($field -eq 'Impact'){$d5Impact+=$count}else{$d5Remediation+=$count}
+  }
+ }
+}
+if($d5Seen.Count -ne 24 -or $d5Impact -ne 94 -or $d5Remediation -ne 101){
+ throw "D5: набор неполон $($d5Seen.Count) / $d5Impact / $d5Remediation"
+}
+Write-Host '[RU] PASS D5: 24 находки, Impact 94 и Remediation 101 по закреплённому источнику'
+
 $entryCount=$entries.Count
 if($entryCount -ne 392){throw "Ожидалось 392 русских технических описания, найдено $entryCount"}
 $required=@('LDAP_CHANNEL_BINDING_NOT_REQUIRED','LDAP_SIGNING_NOT_REQUIRED','UNCONSTRAINED_DELEGATION','DANGEROUS_ACL_GENERICALL')
