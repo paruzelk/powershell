@@ -444,3 +444,30 @@ Workflow GitHub Actions теперь создаёт после проверок 
 **Состояние D8:** полная предметная сверка Impact/Remediation выполнена для **150/392** типов, остаётся **242**. Несовпадений количества пунктов осталось **179 Impact и 164 Remediation**. Разделы Attack, непустые в оригинале, переведены **304/304**; 88 пустых не заполнялись.
 
 Архив: `adPEAS-RU-2.9.0-STAGE-D8-20261112.zip`.
+
+
+## Этап D9 — реестр Windows и пользовательские права GPO (12 ноября 2026)
+
+Два каталога `Localization/SourceVerifiedCore-18a.ru-RU.json` и `Localization/SourceVerifiedCore-18b.ru-RU.json` содержат **24 находки, 61 пункт Impact и 45 пунктов Remediation**. Каждый пункт сопоставлен с точной английской строкой закреплённого adPEAS 2.9.0 (`ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082`). Перевод затрагивает исключительно текст технических разделов, не меняя логику детектирования, PowerShell-команды исправления, машинные ID и расчёт риска.
+
+**Настройки реестра Windows (12):** `REGISTRY_AUTOLOGON`, `REGISTRY_CREDGUARD`, `REGISTRY_FIREWALL_DISABLED`, `REGISTRY_INSECURE_GUEST_AUTH`, `REGISTRY_LEGACY_TLS`, `REGISTRY_LLMNR_ON`, `REGISTRY_MACHINE_PASSWORD_AGE`, `REGISTRY_NOLMHASH`, `REGISTRY_NULL_SESSION`, `REGISTRY_RDP_NLA`, `REGISTRY_RESTRICTEDADMIN`, `REGISTRY_WDIGEST`.
+
+**Пользовательские права GPO (12):** `GPO_USERRIGHT_SEDEBUG`, `GPO_USERRIGHT_SEIMPERSONATE`, `GPO_USERRIGHT_SEENABLEDELEGATION`, `GPO_USERRIGHT_SELOADDRIVER`, `GPO_USERRIGHT_SERESTORE`, `GPO_USERRIGHT_SETAKEOWNERSHIP`, `GPO_USERRIGHT_SESECURITY`, `GPO_USERRIGHT_SESERVICELOGON`, `GPO_USERRIGHT_SEREMOTEINTERACTIVELOGON`, `GPO_USERRIGHT_SEBATCHLOGON`, `GPO_USERRIGHT_SEASSIGNPRIMARYTOKEN`, `GPO_USERRIGHT_SECREATETOKEN`.
+
+### Технические оговорки, сохранённые в переводе
+
+- **Credential Guard:** `LsaCfgFlags=1` включает режим с UEFI lock, который не отключается обычной GPO; для пилотного развёртывания с возможностью отката оригинал рекомендует `LsaCfgFlags=2`. Отдельно необходима работающая виртуализационная защита `EnableVirtualizationBasedSecurity=1`.
+- **RDP и Restricted Admin:** обязательный NLA может нарушить совместимость клиентов без CredSSP. Включение/отключение Restricted Admin и Remote Credential Guard имеет разные последствия для передачи учётных данных, поэтому универсальная настройка для всего домена не предлагается.
+- **WDigest, LLMNR и SMB:** не смешиваются открытые пароли в LSASS, перехват NTLM при разрешении имён и гостевые SMB-сеансы без обязательной подписи или шифрования.
+- **Пароль компьютера:** увеличенный срок смены пароля компьютерной записи продлевает пригодность похищенного хеша; особенно опасно для учётной записи контроллера домена.
+- **`SeImpersonatePrivilege`:** штатные служебные записи могут нуждаться в подмене собственных клиентов; удалять право у всех служб без проверки нельзя. Для необоснованно назначенных субъектов сохраняется риск атак семейства Potato.
+- **`SeEnableDelegationPrivilege`:** отдельно отражено неограниченное делегирование, TGT контроллера домена, защита Protected Users и зависимость от исправления CVE-2020-17049.
+- **`SeDebugPrivilege`, `SeLoadDriverPrivilege`, `SeRestorePrivilege`, `SeTakeOwnershipPrivilege`:** различаются чтение LSASS, запуск уязвимого подписанного драйвера, замена файлов службы и получение владения с последующей сменой ACL.
+- **`SeCreateTokenPrivilege` и `SeAssignPrimaryTokenPrivilege`:** изготовление произвольного токена не равнозначно использованию уже захваченного токена подмены.
+- **Логи Security:** для `SeSecurityPrivilege` необходима отправка событий на удалённую SIEM, недоступную субъекту, чтобы локальная очистка не уничтожала доказательства.
+
+Автономный тест `Tests/Test-StageD9VerifiedCoreRU.ps1` проверяет 24 ID, оригинальные EN-свидетели, все русские пункты и их включение в HTML, 24 технических условия и показатели сверки. Тест D8 теперь сравнивает только собственные 24 находки и остаётся стабильным при дальнейшем расширении каталога.
+
+**Итог D9:** полная предметная сверка Impact/Remediation выполнена для **174/392** типов, осталось **218**. Структурные расхождения количества пунктов: **157 Impact и 149 Remediation**. Все **304/304** исходно непустых Attack переведены; 88 исходных пустых разделов не дополнялись.
+
+Архив: `adPEAS-RU-2.9.0-STAGE-D9-20261112.zip`.
