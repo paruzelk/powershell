@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3a DEV: ADR ARCH3-001 commits to reusing original OutlookPOP3Archive archive planner, Year/YearQuarter grouping, recursive POP3 Sent and custom-folder traversal, original PST part naming/capacity/rollover, transaction and duplicate index rather than building a third archiver. New read-only source-backed integration audit and pure original-functions routing examples, 38 Pester tests for reuse and six remaining safety integration gaps. Legacy verifier already checks full original Body/HTML/recipients/attachment-byte SHA256 with RequireSemanticWitness; missing independent after-restart cross-year/folder receipt proof is a separate integration risk. Archive/Resume/Auto remain explicitly blocked. Windows PS5.1 full CI 4097 tests in 135 containers; no real Outlook/PST in CI.",
     "ARCH2d5 DEV: exactly 100 real POP3 Inbox letters in NEW isolated archive PST; 100 immutable source SHA256 semantic witnesses and second preflight, global one-shot claim, 100 durable per-item claims before COM Move, SHA256-linked receipt to next claim, ten immutable checkpoints each after 10 receipts and an operator-externally pinned final seal SHA256 binding all 100. Read-only Evidence and independent after-restart Reconcile require exact original manifest/global/final SHA256 to certify clean full batch. Partial/indeterminate claims prohibit retry, no production Archive/Resume/Auto. Expected Windows PS5.1 4059 Pester tests in 134 containers; real hundred-message acceptance pending.",
 
     "ARCH2d4 DEV: read-only original evidence/attached Outlook forensic audit of exact completed ARCH2d ten-mail batch. Operator-pinned manifest/global SHA256, original intent identity, rigorous per-item claim+return linkage and prefix, independent post-Outlook-restart semantic Body/HTML/recipients/state/attachment SHA256 and source EntryID absence. Missing/torn return, duplicate, unknown MAPI, changed Body and interrupted batch require manual review; never retries/moves or writes original PST/journals. Explicit warning: individual receipts only internally hashed, not independently historically anchored. Windows PS5.1 4023 tests in 133 containers; real LiveAudit pending.",
@@ -75,8 +76,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 134,
-    "ExpectedPesterTests": 4059,
+    "ExpectedTestContainers": 135,
+    "ExpectedPesterTests": 4097,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
