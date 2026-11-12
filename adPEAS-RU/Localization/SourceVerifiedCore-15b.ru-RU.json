@@ -1,0 +1,314 @@
+{
+  "schema": "adPEAS-RU.StageD6.CoreFields.15b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "LAPS_GPO_WEAK_PASSWORD_COMPLEXITY": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Generated passwords use a reduced character set",
+        "Offline cracking of a recovered hash becomes substantially cheaper",
+        "Applies to every computer in scope of the GPO"
+      ],
+      "impact": [
+        "Генерируемые пароли используют сокращённый набор символов.",
+        "Автономный подбор ранее извлечённого хеша становится существенно дешевле.",
+        "Настройка затрагивает все компьютеры в области действия GPO."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set PasswordComplexity to 4 or higher",
+        "Ensure the configured PasswordLength is compatible with the local password policy"
+      ],
+      "remediation": [
+        "Установите PasswordComplexity не ниже 4.",
+        "Убедитесь, что выбранная PasswordLength совместима с локальной политикой паролей."
+      ]
+    },
+    "LAPS_PASSWORD_READABLE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "LAPS password provides local administrator access to the computer",
+        "If attacker can read password, they can fully compromise the system",
+        "Local admin access enables credential harvesting (Mimikatz)",
+        "Can be used as stepping stone for lateral movement"
+      ],
+      "impact": [
+        "Пароль LAPS предоставляет права локального администратора на этом компьютере.",
+        "Если атакующий может прочитать пароль, он способен полностью скомпрометировать систему.",
+        "Локальный административный доступ позволяет извлекать другие учётные данные (например, с помощью Mimikatz).",
+        "Полученный доступ может стать отправной точкой горизонтального перемещения."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Review LAPS password read permissions",
+        "Use tiered administration - only Tier 0 admins read DC LAPS passwords",
+        "Enable LAPS password encryption (Windows LAPS)",
+        "Audit LAPS password reads (Event ID 4662)",
+        "Use Just-In-Time access for LAPS password retrieval"
+      ],
+      "remediation": [
+        "Проверьте права чтения паролей LAPS.",
+        "Применяйте многоуровневое администрирование: пароли LAPS контроллеров домена должны читать только соответствующие администраторы Tier 0.",
+        "Включите шифрование паролей Windows LAPS.",
+        "Проводите аудит операций чтения паролей LAPS (Event ID 4662).",
+        "Предоставляйте доступ к извлечению пароля LAPS по необходимости и на ограниченное время (Just-In-Time)."
+      ]
+    },
+    "LAPS_READ_BLOCKED_BY_CONFIDENTIAL": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Every other attribute of the computer objects is readable, which is reconnaissance rather than credential access",
+        "Clearing the confidential flag on a LAPS password attribute turns this into a read of every local administrator password in the OU",
+        "A later ACE granting CONTROL_ACCESS to the same principal does the same thing"
+      ],
+      "impact": [
+        "Остальные атрибуты объектов компьютеров доступны для чтения: это позволяет собирать сведения, но само по себе не раскрывает учётные данные.",
+        "Если снять признак конфиденциальности с атрибута пароля LAPS, делегированное право начнёт позволять чтение всех паролей локальных администраторов в OU.",
+        "Позднее добавленная для того же субъекта ACE с правом CONTROL_ACCESS приводит к такому же результату."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Leave the confidential flag in place - it is what makes this harmless, and it is set by the LAPS schema extension",
+        "Remove the all-properties delegation anyway if nothing needs it: it is wider than it looks and it is one schema change away from a password read",
+        "Verify the flag rather than assuming it: searchFlags on ms-Mcs-AdmPwd, msLAPS-Password and msLAPS-EncryptedPassword must have bit 7 set"
+      ],
+      "remediation": [
+        "Сохраните признак конфиденциальности: именно он делает такое чтение безопасным для пароля; признак устанавливается расширением схемы LAPS.",
+        "Если чтение всех свойств не требуется, всё равно удалите чрезмерно широкое делегирование: после одного изменения схемы оно может превратиться в доступ к паролям.",
+        "Проверьте признак явно, не предполагая его наличие: в searchFlags атрибутов ms-Mcs-AdmPwd, msLAPS-Password и msLAPS-EncryptedPassword должен быть установлен бит 7."
+      ]
+    },
+    "LAPS_UNPROTECTED_COMPUTERS": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Local admin passwords may be identical across systems",
+        "Compromising one system enables lateral movement via Pass-the-Hash",
+        "No automatic password rotation for local accounts"
+      ],
+      "impact": [
+        "Пароли локальных администраторов могут быть одинаковыми на нескольких компьютерах.",
+        "Компрометация одной системы позволяет горизонтальное перемещение с помощью Pass-the-Hash.",
+        "Автоматическая ротация паролей локальных учётных записей отсутствует."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Deploy Windows LAPS to all computers in the OU",
+        "Configure LAPS via GPO for password complexity and rotation"
+      ],
+      "remediation": [
+        "Разверните Windows LAPS на всех компьютерах этой OU.",
+        "Настройте через GPO сложность паролей LAPS и их ротацию."
+      ]
+    },
+    "PRIVILEGED_ACCOUNT_AFFECTED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "The account's credential is worth the domain rather than one service",
+        "Privilege is established from group membership resolved through the chain, not from adminCount - that attribute is set by AdminSDHolder and never cleared, and it never appears on some privileged groups at all"
+      ],
+      "impact": [
+        "Учётные данные этой записи представляют риск для всего домена, а не только для отдельной службы.",
+        "Привилегии устанавливаются по цепочке членства в группах, а не по adminCount: AdminSDHolder устанавливает этот атрибут, но не сбрасывает его, а у некоторых привилегированных групп он вообще отсутствует."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Treat this account ahead of the others in the same finding",
+        "Question whether the account needs the privilege, the exposure, or either",
+        "Add it to 'Protected Users' where the account type allows it"
+      ],
+      "remediation": [
+        "Исправляйте эту учётную запись раньше остальных, отмеченных той же находкой.",
+        "Проверьте, необходимы ли учётной записи привилегии, обнаруженная опасная конфигурация или вообще оба условия.",
+        "Добавьте запись в Protected Users, если это допускается её типом и проверена совместимость."
+      ]
+    },
+    "PRIVILEGED_GROUP_ACL": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The holder adds an account of its choosing to the group, and that account receives the group's rights at its next logon",
+        "DnsAdmins membership leads to code execution as SYSTEM on the domain controllers that run DNS",
+        "A right on a nested group is a right on every group it is nested into",
+        "Nothing resets the ACE: unlike a protected group, this one keeps it until somebody removes it"
+      ],
+      "impact": [
+        "Обладатель разрешения может добавить выбранную учётную запись в группу; при следующем входе она получит права группы.",
+        "Членство в DnsAdmins позволяет выполнять код от имени SYSTEM на контроллерах домена, где работает служба DNS.",
+        "Право на вложенную группу даёт влияние на все группы, в которые она входит.",
+        "Эта ACE не сбрасывается автоматически: в отличие от защищённой группы, здесь разрешение сохраняется до явного удаления."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove the ACE unless the principal is meant to manage this group; an inherited one has to go at the container it comes from",
+        "Move privileged groups into an OU that only Tier 0 administrators control, so no delegation on an ordinary OU reaches them",
+        "Keep Account Operators empty - the group class gives them full control over every group AdminSDHolder does not protect",
+        "Audit changes to the member attribute of these groups (event 4728/4732/4756, or 5136 on the object)"
+      ],
+      "remediation": [
+        "Удалите ACE, если субъект не должен управлять группой; унаследованную запись удаляйте на исходном контейнере.",
+        "Перенесите привилегированные группы в OU, доступную для управления только администраторам Tier 0, чтобы делегирование обычной OU их не затрагивало.",
+        "Не допускайте участников в Account Operators: особенности объектов group дают этой группе полный контроль над группами, не защищёнными AdminSDHolder.",
+        "Проверяйте изменения атрибута member этих групп: события 4728/4732/4756 либо 5136 для объекта каталога."
+      ]
+    },
+    "RODC_PRIVILEGED_PASSWORD_ALLOWED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Once such an account logs on through the read-only Domain Controller, its password hash is stored there",
+        "Whoever takes the server - a branch office machine, a stolen disk, a backup - takes those hashes with it",
+        "For a Domain Admin or an operator that is the domain"
+      ],
+      "impact": [
+        "После входа такой учётной записи через контроллер домена только для чтения её хеш пароля может быть сохранён на этом RODC.",
+        "Захвативший сервер, например в филиале, похищенный диск или резервную копию, может получить находящиеся на нём хеши.",
+        "Если это Domain Admin или привилегированный оператор, последствия могут затронуть весь домен."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the privileged accounts or the groups that bring them in from the allow list, or the Allowed RODC Password Replication Group",
+        "Add the privileged groups to the Denied RODC Password Replication Group - deny wins over allow",
+        "Prepopulate only the accounts of the branch office the read-only Domain Controller serves"
+      ],
+      "remediation": [
+        "Удалите привилегированные записи и включающие их группы из разрешающего списка либо из Allowed RODC Password Replication Group.",
+        "Добавьте привилегированные группы в Denied RODC Password Replication Group: запрет имеет приоритет над разрешением.",
+        "Предварительно кэшируйте только учётные записи пользователей филиала, которые обслуживает данный RODC."
+      ]
+    },
+    "RODC_PRIVILEGED_PASSWORD_REVEALED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "The password hashes of privileged accounts are on a server outside the protected Tier-0 boundary",
+        "Whoever takes the server takes them, with no further action by the accounts"
+      ],
+      "impact": [
+        "Хеши паролей привилегированных учётных записей уже находятся на сервере вне защищённой границы Tier 0.",
+        "Захват сервера позволяет получить эти хеши без каких-либо дополнительных действий со стороны соответствующих учётных записей."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Reset the passwords of the listed accounts - that invalidates the cached copies",
+        "Deny the groups that brought them in, so the secrets are not cached again"
+      ],
+      "remediation": [
+        "Сбросьте пароли перечисленных учётных записей, чтобы сделать закэшированные копии паролей непригодными для аутентификации.",
+        "Добавьте группы, приведшие к кэшированию, в список запрета, чтобы секреты не сохранялись повторно."
+      ]
+    },
+    "OU_PERM_LAPS_READ": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Can retrieve local administrator passwords for computers in the OU",
+        "Enables local admin access to all affected computers",
+        "Can be used for lateral movement",
+        "May expose service accounts or backup admin passwords"
+      ],
+      "impact": [
+        "Субъект может получать пароли локальных администраторов компьютеров в этой OU.",
+        "Это даёт локальный административный доступ ко всем затронутым компьютерам.",
+        "Такие права могут использоваться для горизонтального перемещения.",
+        "Возможно раскрытие паролей служебных учётных записей либо резервных административных паролей."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review LAPS read permissions - should be limited to designated admins",
+        "Use tiered administration - only Tier 0/1 admins should read DC passwords",
+        "Audit LAPS password access (Windows LAPS supports auditing)",
+        "Consider shorter password rotation intervals"
+      ],
+      "remediation": [
+        "Проверьте права чтения LAPS: они должны быть только у назначенных администраторов.",
+        "Соблюдайте многоуровневое администрирование: пароли контроллеров домена должны читаться лишь администраторами соответствующего уровня Tier 0/1.",
+        "Настройте аудит чтения паролей LAPS (Windows LAPS поддерживает такой аудит).",
+        "Рассмотрите сокращение интервала ротации паролей."
+      ]
+    },
+    "OU_PERM_READALL": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Can read LAPS passwords if stored on computer objects in this OU",
+        "Can enumerate all user attributes including confidential ones",
+        "Can read security descriptors to map further attack paths"
+      ],
+      "impact": [
+        "Может читать пароли LAPS на объектах компьютеров этой OU, если дополнительные требования доступа к конфиденциальным атрибутам выполнены.",
+        "Может перечислять атрибуты пользователей, включая конфиденциальные при наличии отдельных необходимых разрешений.",
+        "Может читать доступные дескрипторы безопасности и выявлять последующие пути атаки."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review if broad read access is necessary for this principal",
+        "Consider using more granular read permissions per attribute",
+        "Ensure LAPS password read is restricted via separate ACLs",
+        "If the finding names an inherited source the entry is not on this OU - remove it where it is defined, or break inheritance here with SetAccessRuleProtection, which also cuts every other permission this OU inherits"
+      ],
+      "remediation": [
+        "Проверьте, необходимо ли этому субъекту широкое право чтения.",
+        "Вместо него рассмотрите конкретные разрешения чтения отдельных атрибутов.",
+        "Убедитесь, что чтение паролей LAPS ограничено отдельными ACL и требованиями к конфиденциальным атрибутам.",
+        "Если находка указывает на унаследованный источник, ACE задана не на этой OU: удалите её там, где назначена, либо отключите наследование через SetAccessRuleProtection, что также прекратит наследование всех остальных разрешений OU."
+      ]
+    },
+    "OU_PERM_GENERICWRITE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Can write to most attributes on affected objects",
+        "Includes ability to modify SPN, scriptPath, and delegation settings",
+        "Less than GenericAll but still very powerful",
+        "Enables targeted Kerberoasting and other attacks"
+      ],
+      "impact": [
+        "Субъект может изменять большинство атрибутов затронутых объектов.",
+        "Среди доступных действий — изменение SPN, scriptPath и параметров делегирования.",
+        "GenericWrite менее широкое право, чем GenericAll, но всё равно предоставляет значительный контроль.",
+        "Возможны целевой Kerberoasting и другие атаки."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Replace GenericWrite with specific attribute permissions",
+        "GenericWrite is overly broad for most delegation needs",
+        "Review all principals with GenericWrite",
+        "Use delegation wizards for specific tasks",
+        "If the finding names an inherited source the entry is not on this OU - remove it where it is defined, or break inheritance here with SetAccessRuleProtection, which also cuts every other permission this OU inherits"
+      ],
+      "remediation": [
+        "Замените GenericWrite отдельными необходимыми правами на конкретные атрибуты.",
+        "Для большинства задач делегирования GenericWrite чрезмерно широко.",
+        "Проверьте всех субъектов, которым предоставлено GenericWrite.",
+        "Для конкретных административных задач используйте мастера делегирования прав.",
+        "Если указан унаследованный источник, ACE задана не на этой OU: удалите её на исходном контейнере или отключите наследование через SetAccessRuleProtection, понимая, что это затронет все остальные наследуемые разрешения."
+      ]
+    },
+    "OU_PERM_USER_ACCOUNT_RESTRICTIONS": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Includes all userAccountControl impacts (delegation, pre-auth, etc.)",
+        "Can modify pwdLastSet to reset password age",
+        "Can change accountExpires to lock out accounts",
+        "Can modify logon hours restrictions",
+        "Property set grants access to multiple security attributes at once"
+      ],
+      "impact": [
+        "Право включает все риски изменения userAccountControl, в том числе делегирование и предварительную аутентификацию.",
+        "Позволяет изменять pwdLastSet и тем самым изменять возраст пароля.",
+        "Позволяет изменять accountExpires, включая создание условий для блокирования доступа к учётной записи.",
+        "Позволяет изменять ограничения по часам входа.",
+        "Набор свойств предоставляет право записи сразу нескольких чувствительных атрибутов безопасности."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove User-Account-Restrictions property set permissions from non-admin principals",
+        "Grant specific attribute permissions instead of property sets",
+        "Property sets were designed for convenience, not security",
+        "Review all principals with property set permissions",
+        "If the finding names an inherited source the entry is not on this OU - remove it where it is defined, or break inheritance here with SetAccessRuleProtection, which also cuts every other permission this OU inherits"
+      ],
+      "remediation": [
+        "Удалите у неадминистративных субъектов право записи набора свойств User-Account-Restrictions.",
+        "Вместо наборов свойств выдавайте конкретные разрешения на необходимые атрибуты.",
+        "Наборы свойств создавались для удобства администрирования, а не для минимизации привилегий.",
+        "Проверьте всех субъектов, имеющих права на наборы свойств.",
+        "Если указан унаследованный источник, ACE задана выше по иерархии: удалите её в месте назначения либо отключите наследование через SetAccessRuleProtection, учитывая потерю остальных наследуемых разрешений."
+      ]
+    }
+  }
+}
