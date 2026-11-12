@@ -1,0 +1,364 @@
+{
+  "schema": "adPEAS-RU.StageD5.CoreFields.14b",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "LAPS_NOT_DEPLOYED": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Local admin passwords may be identical across systems",
+        "Compromising one system's local admin enables lateral movement",
+        "No automatic password rotation for local accounts",
+        "Pass-the-Hash attacks are highly effective",
+        "Violates security best practices and compliance requirements"
+      ],
+      "impact": [
+        "Пароли локальных администраторов могут совпадать на разных системах.",
+        "Компрометация локального администратора одного компьютера открывает путь для горизонтального перемещения.",
+        "Автоматическая ротация паролей локальных учётных записей отсутствует.",
+        "Атаки Pass-the-Hash оказываются особенно эффективными.",
+        "Это противоречит практикам обеспечения безопасности и может нарушать применимые требования соответствия."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Deploy Windows LAPS (built into Windows 11 22H2+ and Server 2019+)",
+        "Or deploy legacy Microsoft LAPS for older systems",
+        "Configure LAPS via GPO for password complexity and rotation",
+        "Restrict LAPS password read access to appropriate administrators",
+        "Enable LAPS password encryption for enhanced security"
+      ],
+      "remediation": [
+        "Разверните Windows LAPS (встроен в Windows 11 22H2+ и Windows Server 2019+ с необходимыми обновлениями).",
+        "Для более старых систем используйте прежний Microsoft LAPS.",
+        "Настройте через GPO сложность паролей LAPS и интервалы их смены.",
+        "Ограничьте чтение паролей LAPS уполномоченными администраторами.",
+        "Для дополнительной защиты включите шифрование паролей Windows LAPS."
+      ]
+    },
+    "LAPS_PASSWORD_NOT_ROTATED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The local administrator password has not changed since rotation stopped, so a password captured then still works today",
+        "The machine is counted as protected in every coverage figure, so nobody looks at it",
+        "Anything that could read the password once - an over-permissive OU delegation since corrected, a backup, a screenshot in a ticket - still holds a valid credential",
+        "Where several machines stopped rotating at the same time they may share the password that was set before LAPS took over, which restores exactly the lateral movement LAPS was deployed to stop"
+      ],
+      "impact": [
+        "Пароль локального администратора не менялся с момента прекращения ротации, поэтому ранее полученный пароль может действовать до сих пор.",
+        "Компьютер продолжает учитываться как защищённый в отчётах о покрытии LAPS, из-за чего проблему можно не заметить.",
+        "Любой ранее имевший доступ к паролю источник — слишком широкое делегирование на OU, резервная копия или снимок экрана в заявке — по-прежнему может хранить действующий пароль.",
+        "Если на нескольких компьютерах ротация остановилась одновременно, у них может сохраниться общий пароль, использовавшийся до перехода на LAPS, что вновь создаёт риск горизонтального перемещения."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Find out why the client stopped rotating: the LAPS CSE is not installed or not running, the policy no longer reaches the machine, or the machine has been offline since",
+        "Force a rotation once the client works again - Reset-LapsPassword for Windows LAPS, or clear the expiration attribute for Legacy LAPS",
+        "Where the machine is simply gone, remove the stale computer account instead of leaving a live credential behind",
+        "Turn on PasswordExpirationProtectionEnabled so a client cannot extend its own expiration time past the policy maximum"
+      ],
+      "remediation": [
+        "Определите причину остановки ротации: компонент LAPS CSE не установлен или не работает, политика перестала применяться либо компьютер давно не подключался к сети.",
+        "После восстановления работы клиента принудительно смените пароль: используйте Reset-LapsPassword для Windows LAPS либо очистите атрибут срока действия для Legacy LAPS.",
+        "Если компьютер уже выведен из эксплуатации, удалите устаревшую учётную запись компьютера вместо сохранения действующих учётных данных.",
+        "Включите PasswordExpirationProtectionEnabled, чтобы клиент не мог продлить срок действия своего пароля сверх максимума, заданного политикой."
+      ]
+    },
+    "LAPS_PASSWORD_READ_ACCESS": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Principal can read local admin passwords for affected computers",
+        "Enables lateral movement to any computer where they have read access",
+        "Compromising this principal grants access to all computers in scope",
+        "May violate tiered administration model"
+      ],
+      "impact": [
+        "Субъект может читать пароли локального администратора затронутых компьютеров.",
+        "Это позволяет горизонтально перемещаться на любой компьютер, пароль которого субъект может прочитать.",
+        "Компрометация такого субъекта открывает доступ ко всем компьютерам в области его полномочий.",
+        "Возможно нарушение модели многоуровневого административного доступа."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Review and restrict LAPS password read permissions",
+        "Follow tiered administration - only appropriate tier admins should read passwords",
+        "Use security groups for LAPS access, not individual accounts",
+        "Consider Windows LAPS with encrypted passwords for additional protection",
+        "Audit LAPS password reads (Event ID 4662)"
+      ],
+      "remediation": [
+        "Проверьте и ограничьте права чтения паролей LAPS.",
+        "Соблюдайте многоуровневую модель администрирования: читать пароли должны только администраторы соответствующего уровня.",
+        "Выдавайте доступ LAPS группам безопасности, а не отдельным пользователям.",
+        "Для усиления защиты рассмотрите Windows LAPS с шифрованием паролей.",
+        "Включите аудит чтения паролей LAPS (Event ID 4662)."
+      ]
+    },
+    "LAPS_ENCRYPTED_READ_NO_DECRYPTOR": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The blob cannot be opened without being the configured decryptor, so this is not a password read today",
+        "It becomes one the moment the principal is added to the decryptor group, which is a group membership rather than an ACL change",
+        "The delegation is still wrong: no account needs to read an attribute it cannot use",
+        "Reported as a hint and not as a finding, because telling the reader otherwise teaches them the encryption buys nothing"
+      ],
+      "impact": [
+        "Без прав настроенного расшифровщика получить пароль из зашифрованного объекта (blob) нельзя, поэтому сейчас это не эквивалентно чтению пароля.",
+        "Если субъект станет участником группы расшифровки, чтение превратится в доступ к паролю без изменения ACL.",
+        "Такое делегирование всё равно избыточно: учётной записи не требуется читать атрибут, содержимое которого она не может расшифровать.",
+        "Результат классифицируется как Hint, а не как Finding: нельзя ошибочно утверждать, что шифрование не даёт защиты."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the read right - a principal that cannot decrypt has no use for the attribute",
+        "Confirm who ADPasswordEncryptionPrincipal names, and keep that group as small as the password itself deserves",
+        "Prefer this generation over the legacy plaintext attribute: a read right on ms-Mcs-AdmPwd is the password"
+      ],
+      "remediation": [
+        "Удалите право чтения: субъекту без возможности расшифровки этот атрибут не нужен.",
+        "Установите, какой субъект задан в ADPasswordEncryptionPrincipal, и минимизируйте состав соответствующей группы.",
+        "Предпочитайте шифрованный механизм Windows LAPS прежнему открытому атрибуту: право чтения ms-Mcs-AdmPwd непосредственно раскрывает пароль."
+      ]
+    },
+    "GMSA_PASSWORD_READABLE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "gMSA password allows impersonation of the service account",
+        "Service accounts often have elevated privileges",
+        "Can access all resources the gMSA has permissions to",
+        "May enable lateral movement or privilege escalation"
+      ],
+      "impact": [
+        "Пароль gMSA позволяет выдавать себя за эту служебную учётную запись.",
+        "Служебные учётные записи нередко имеют повышенные привилегии.",
+        "Можно получить доступ ко всем ресурсам, на которые у gMSA есть права.",
+        "Это может обеспечить горизонтальное перемещение или повышение привилегий."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review PrincipalsAllowedToRetrieveManagedPassword",
+        "Restrict password retrieval to only systems that need it",
+        "Use tiered administration for gMSA management",
+        "Audit gMSA password retrievals"
+      ],
+      "remediation": [
+        "Проверьте PrincipalsAllowedToRetrieveManagedPassword.",
+        "Ограничьте извлечение управляемого пароля только системами, которым он действительно необходим.",
+        "Применяйте многоуровневую модель администрирования к управлению gMSA.",
+        "Проводите аудит обращений за управляемыми паролями gMSA."
+      ]
+    },
+    "GMSA_MEMBERSHIP_OWNER": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The owner can grant itself password retrieval and remove the entry afterwards",
+        "It holds that right without appearing in any list of password readers",
+        "The gMSA's Kerberos keys follow from the password blob, so this is full control of the service identity",
+        "Where the gMSA is privileged, this is a path into that privilege"
+      ],
+      "impact": [
+        "Владелец может выдать себе разрешение на получение пароля, а затем удалить эту запись.",
+        "Он имеет такую возможность, даже не присутствуя в списке субъектов с правом чтения пароля.",
+        "Из полученного пароля gMSA можно вывести ключи Kerberos, поэтому это полный контроль над служебной идентичностью.",
+        "Если gMSA привилегирована, этот путь позволяет получить соответствующие привилегии."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set the owner of msDS-GroupMSAMembership back to Domain Admins or SYSTEM",
+        "Review who holds WriteOwner on the gMSA object itself - that right leads back here",
+        "Treat whoever created the account as a holder of its password until the owner is corrected"
+      ],
+      "remediation": [
+        "Верните владельца msDS-GroupMSAMembership к Domain Admins или SYSTEM.",
+        "Проверьте, кто имеет WriteOwner на самом объекте gMSA: это право может снова привести к такой возможности.",
+        "Считайте создателя учётной записи потенциальным обладателем доступа к её паролю, пока владелец не исправлен."
+      ]
+    },
+    "PRIVILEGED_GROUP_MEMBERSHIP": {
+      "sourceEnglishImpactCount": 6,
+      "sourceEnglishImpact": [
+        "Tier 0 - Domain Admins: Full control over all domain objects and Domain Controllers",
+        "Tier 0 - Enterprise Admins: Full control over all domains in the forest",
+        "Tier 0 - Schema Admins: Can modify the AD schema (forest-wide impact)",
+        "Tier 0 - Administrators: Local admin on all Domain Controllers",
+        "Tier 0 - Account/Server/Backup Operators: Can escalate to Domain Admin through various techniques",
+        "Tier violation: If a Tier 0 account is used on Tier 1/2 systems, credentials can be stolen"
+      ],
+      "impact": [
+        "Tier 0 — Domain Admins: полный контроль над объектами домена и контроллерами домена.",
+        "Tier 0 — Enterprise Admins: полный контроль над всеми доменами леса.",
+        "Tier 0 — Schema Admins: право изменения схемы AD с последствиями для всего леса.",
+        "Tier 0 — Administrators: полномочия локального администратора на всех контроллерах домена.",
+        "Tier 0 — Account/Server/Backup Operators: возможность повысить привилегии до Domain Admins различными способами.",
+        "Нарушение границ Tier: если учётная запись Tier 0 используется на системах Tier 1/2, её учётные данные могут быть похищены."
+      ],
+      "sourceEnglishRemediationCount": 9,
+      "sourceEnglishRemediation": [
+        "Implement Microsoft's Enterprise Access Model (Tier Model)",
+        "Tier 0 accounts: Only use on Tier 0 systems (DCs, PAWs)",
+        "Minimize the number of Tier 0 accounts",
+        "Use dedicated admin accounts (not used for daily activities)",
+        "Add Tier 0 USER accounts to 'Protected Users'. It ends NTLM, CredSSP, Digest, RC4 and delegation for those accounts and stops their credentials being cached, so anything that depends on one of those breaks - test before rolling it out broadly",
+        "Do not put a computer account or a gMSA in 'Protected Users' - Microsoft advises against it and it has no effect there. Use 'Account is sensitive and cannot be delegated', msDS-SupportedEncryptionTypes set to AES only, and an authentication policy silo instead",
+        "Implement Privileged Access Workstations (PAWs) for Tier 0 administration",
+        "Enable multi-factor authentication for Tier 0 accounts",
+        "Monitor for Tier violations (Tier 0 credentials on non-Tier 0 systems)"
+      ],
+      "remediation": [
+        "Внедрите Microsoft Enterprise Access Model (Tier Model).",
+        "Используйте учётные записи Tier 0 только на системах Tier 0 — контроллерах домена и защищённых административных рабочих станциях (PAW).",
+        "Сведите число учётных записей Tier 0 к минимуму.",
+        "Используйте отдельные административные учётные записи, не предназначенные для повседневной работы.",
+        "Добавьте пользовательские учётные записи Tier 0 в Protected Users после проверки совместимости: эта группа запрещает NTLM, CredSSP, Digest, RC4 и делегирование, препятствует кэшированию их учётных данных; зависимые от этих механизмов приложения могут перестать работать.",
+        "Не добавляйте учётные записи компьютеров и gMSA в Protected Users: Microsoft не рекомендует это, а защита группы для них не действует. Вместо этого применяйте «Account is sensitive and cannot be delegated», msDS-SupportedEncryptionTypes с разрешённым только AES и изоляцию политиками аутентификации (authentication policy silo).",
+        "Для администрирования Tier 0 используйте привилегированные рабочие станции (PAW).",
+        "Включите многофакторную аутентификацию для учётных записей Tier 0.",
+        "Отслеживайте нарушения границ Tier — использование учётных данных Tier 0 на системах более низких уровней."
+      ]
+    },
+    "PRIVILEGED_ACCOUNT_ACL": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The holder authenticates as the privileged account and holds every right of its groups",
+        "Password reset and certificate mapping work without the account's password; a key credential leaves the password untouched and is easily missed",
+        "An inherited right reaches every account below the OU it was delegated on"
+      ],
+      "impact": [
+        "Обладатель права может аутентифицироваться от имени привилегированной записи и получить все права групп, в которые она входит.",
+        "Сброс пароля и сопоставление сертификата работают без знания её текущего пароля; добавление ключевых учётных данных (key credential) вообще не меняет пароль и может остаться незамеченным.",
+        "Унаследованное право распространяется на все учётные записи ниже OU, в которой оно делегировано."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the entry from the account; an inherited one has to go at the container it comes from",
+        "Keep privileged accounts in an OU that only Tier 0 administrators control, so no delegation on an ordinary OU reaches them",
+        "Keep Account Operators empty - the user class gives them full control over every account AdminSDHolder does not protect"
+      ],
+      "remediation": [
+        "Удалите разрешающую ACE с учётной записи; если она унаследована, удалять её нужно на исходном контейнере.",
+        "Размещайте привилегированные учётные записи в OU под исключительным контролем администраторов Tier 0, чтобы делегирование обычной OU не распространялось на них.",
+        "Не допускайте участников в Account Operators: особенности класса user дают этой группе полный контроль над учётными записями, которые не защищены AdminSDHolder."
+      ]
+    },
+    "OU_PERM_CONSTRAINED_DELEGATION": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Can configure Constrained Delegation on any account in the OU",
+        "Allows impersonation of users to specified services",
+        "If the target SPN points at a Domain Controller, enables privilege escalation whatever its service class",
+        "Constrained Delegation is a powerful impersonation mechanism"
+      ],
+      "impact": [
+        "Субъект может настроить ограниченное делегирование (Constrained Delegation) для любой учётной записи в OU.",
+        "Это позволяет выдавать себя за пользователей при обращении к указанным службам.",
+        "Если целевой SPN указывает на контроллер домена, возможно повышение привилегий независимо от класса службы SPN.",
+        "Ограниченное делегирование — мощный механизм выдачи себя за другого пользователя."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove delegation attribute write permissions from non-admin principals",
+        "Review all accounts with Constrained Delegation configured",
+        "Consider using Resource-Based Constrained Delegation (RBCD) with proper controls",
+        "Monitor for msDS-AllowedToDelegateTo changes",
+        "If the finding names an inherited source the entry is not on this OU - remove it where it is defined, or break inheritance here with SetAccessRuleProtection, which also cuts every other permission this OU inherits"
+      ],
+      "remediation": [
+        "Удалите у неадминистративных субъектов право записи атрибутов делегирования.",
+        "Проверьте все учётные записи с настроенным ограниченным делегированием.",
+        "Рассмотрите RBCD при наличии надлежащих мер контроля.",
+        "Отслеживайте изменения msDS-AllowedToDelegateTo.",
+        "Если находка указывает на унаследованный источник, ACE задана не на этой OU: удалите её там, где она назначена, либо отключите наследование здесь через SetAccessRuleProtection — при этом прекратится наследование и остальных разрешений OU."
+      ]
+    },
+    "OU_PERM_PASSWORD_RESET": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Can reset passwords of all user accounts in the OU",
+        "Enables immediate account takeover without cracking passwords",
+        "If privileged users are in the OU, leads to privilege escalation",
+        "No knowledge of current password required"
+      ],
+      "impact": [
+        "Субъект может сбрасывать пароли всех учётных записей пользователей в OU.",
+        "Это позволяет немедленно захватить учётную запись без подбора пароля.",
+        "Если в OU размещены привилегированные пользователи, возможно повышение привилегий.",
+        "Знать текущий пароль для такого сброса не требуется."
+      ],
+      "sourceEnglishRemediationCount": 6,
+      "sourceEnglishRemediation": [
+        "Remove password reset rights from non-helpdesk principals",
+        "Segregate privileged accounts into protected OUs, and let AdminSDHolder protect the ones that belong to a protected group - that is what keeps a delegated reset away from them",
+        "Use tiered administration model",
+        "Audit the reset itself: event 4724 on a domain controller names who reset whose password",
+        "Monitor for password reset events (Event ID 4724)",
+        "If the finding names an inherited source the entry is not on this OU - remove it where it is defined, or break inheritance here with SetAccessRuleProtection, which also cuts every other permission this OU inherits"
+      ],
+      "remediation": [
+        "Удалите права сброса пароля у субъектов, не являющихся уполномоченной службой поддержки.",
+        "Помещайте привилегированные записи в защищённые OU; для участников защищённых групп используйте защиту AdminSDHolder, предотвращающую действие делегированного сброса на такие записи.",
+        "Применяйте многоуровневую модель администрирования.",
+        "Проводите аудит самого сброса: событие 4724 на контроллере домена показывает, кто и чьё изменение пароля инициировал.",
+        "Отслеживайте события сброса паролей (Event ID 4724).",
+        "Если находка показывает унаследованный источник, ACE отсутствует непосредственно на этой OU: удалите её в месте назначения или отключите наследование через SetAccessRuleProtection с учётом потери остальных наследуемых разрешений."
+      ]
+    },
+    "OU_PERM_RBCD": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Can configure RBCD on any account in the OU",
+        "RBCD allows impersonation of ANY domain user (except Protected Users)",
+        "More powerful than regular Constrained Delegation",
+        "If targeting computer accounts, enables full computer compromise"
+      ],
+      "impact": [
+        "Субъект может настроить RBCD для любой учётной записи в OU.",
+        "RBCD позволяет выдавать себя за любого пользователя домена, кроме защищённых механизмом Protected Users.",
+        "Это более мощный механизм подмены пользователя, чем обычное ограниченное делегирование.",
+        "Если целью является учётная запись компьютера, возможно получение полного контроля над компьютером."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove RBCD attribute write permissions from non-admin principals",
+        "This is one of the most commonly abused ACL misconfigurations",
+        "Lower ms-DS-MachineAccountQuota to prevent machine account creation",
+        "Monitor for msDS-AllowedToActOnBehalfOfOtherIdentity changes",
+        "If the finding names an inherited source the entry is not on this OU - remove it where it is defined, or break inheritance here with SetAccessRuleProtection, which also cuts every other permission this OU inherits"
+      ],
+      "remediation": [
+        "Удалите у неадминистративных субъектов право записи атрибута RBCD.",
+        "Это одна из наиболее распространённых опасных ошибок конфигурации ACL.",
+        "Уменьшите ms-DS-MachineAccountQuota, чтобы ограничить создание новых учётных записей компьютеров.",
+        "Отслеживайте изменения msDS-AllowedToActOnBehalfOfOtherIdentity.",
+        "Если находка указывает на унаследованный источник, удалите ACE там, где она задана, либо отключите наследование для OU через SetAccessRuleProtection, учитывая, что это затронет все остальные наследуемые разрешения."
+      ]
+    },
+    "OU_PERM_GPLINK": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Can link any GPO to the OU",
+        "GPO settings apply to all users and computers in the OU",
+        "Can deploy malicious scripts, scheduled tasks, or software",
+        "Can modify security settings to weaken defenses"
+      ],
+      "impact": [
+        "Субъект может привязать к OU любую GPO.",
+        "Настройки такой GPO распространяются на всех пользователей и компьютеры в OU.",
+        "Можно разворачивать вредоносные сценарии, запланированные задания и программы.",
+        "Можно изменять параметры безопасности, ослабляя защиту."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove gPLink write permissions from non-admin principals",
+        "GPO management should be restricted to Group Policy administrators",
+        "Monitor for gPLink changes on OUs",
+        "Review linked GPOs regularly for unauthorized modifications",
+        "If the finding names an inherited source the entry is not on this OU - remove it where it is defined, or break inheritance here with SetAccessRuleProtection, which also cuts every other permission this OU inherits"
+      ],
+      "remediation": [
+        "Удалите права записи gPLink у неадминистративных субъектов.",
+        "Управление GPO должно быть ограничено администраторами групповых политик.",
+        "Отслеживайте изменения gPLink в OU.",
+        "Регулярно проверяйте привязанные GPO на предмет несанкционированных изменений.",
+        "Если находка указывает на унаследованный источник, ACE установлена выше этой OU: удалите её в месте назначения или отключите наследование через SetAccessRuleProtection, что также прекратит наследование остальных прав."
+      ]
+    }
+  }
+}
