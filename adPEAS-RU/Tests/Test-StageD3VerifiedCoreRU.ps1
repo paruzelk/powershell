@@ -22,6 +22,23 @@ if($end -lt 0){throw 'D3: неверная граница HTML-словаря'}
 $ru=ConvertFrom-Json -InputObject ($javascript.Substring($start,$end-$start).Trim().TrimEnd([char]';'))
 if(@($ru.PSObject.Properties).Count -ne 392){throw 'D3: ожидалось 392 находки в HTML'}
 if(@($catalog.translations.PSObject.Properties).Count -ne 14){throw 'D3: ожидалось 14 переводов'}
+$expectedIds=@(
+ 'ACCOUNT_DISABLED','ACCOUNT_NOT_DELEGATED','ACL_INHERITED_FROM',
+ 'ADMIN_COUNT_INDICATOR','AD_RECYCLE_BIN_DISABLED','DOMAIN_ROOT_GPLINK_WRITE',
+ 'DSRM_PASSWORD_UNMANAGED','ENCRYPTION_NOT_CONFIGURED','ENCRYPTION_RC4_ONLY',
+ 'GUEST_ACCOUNT_ENABLED','LDAP_ANONYMOUS_BINDING_ALLOWED',
+ 'LOCKOUT_DURATION_FOREVER','NO_MAX_PASSWORD_AGE','PASSWORD_HISTORY_DISABLED'
+)
+$actualIds=@($catalog.translations.PSObject.Properties | ForEach-Object {$_.Name} | Sort-Object)
+$sortedExpected=@($expectedIds | Sort-Object)
+if(($actualIds -join [char]10) -cne ($sortedExpected -join [char]10)){
+ throw 'D3: изменён закреплённый набор из 14 FindingId'
+}
+$parity=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/SourceFieldParity392.json'),[Text.Encoding]::UTF8))
+if(@($parity.ImpactStepCountDifferences).Count -ne 293 -or
+   @($parity.RemediationStepCountDifferences).Count -ne 273){
+ throw 'D3: сводная статистика полей не отражает новые полные переводы'
+}
 function Get-OriginalItems([string]$id,[string]$field){
  $begin=$source.IndexOf(("    '"+$id+"' = @{"),[StringComparison]::Ordinal)
  if($begin -lt 0){throw "D3: отсутствует FindingId в оригинале $id"}
