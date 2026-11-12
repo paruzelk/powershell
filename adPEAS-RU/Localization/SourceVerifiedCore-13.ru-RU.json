@@ -1,0 +1,550 @@
+{
+  "schema": "adPEAS-RU.StageD4.CoreFields.13",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "CONSTRAINED_DELEGATION_PROTOCOL_TRANSITION": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Account can impersonate any user (including Domain Admins) to target services",
+        "No authentication from the impersonated user is required",
+        "If any target SPN points at a Domain Controller, this is a direct path to Domain Admin",
+        "Attackers who compromise this account gain significant lateral movement capability"
+      ],
+      "impact": [
+        "Учётная запись может выдавать себя за любого пользователя (включая участников Domain Admins) при обращении к указанным целевым службам.",
+        "Аутентификация пользователя, от имени которого выполняется обращение, не требуется.",
+        "Если какой-либо целевой SPN указывает на контроллер домена, возникает прямой путь к получению привилегий Domain Admin.",
+        "Компрометация этой учётной записи даёт атакующему значительные возможности горизонтального перемещения."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Review if protocol transition is actually required",
+        "Switch to Resource-Based Constrained Delegation (RBCD) where possible",
+        "Do not delegate to a Domain Controller at all - restricting the service class is no protection",
+        "Add privileged accounts to 'Protected Users' group",
+        "Monitor S4U2Self and S4U2Proxy requests"
+      ],
+      "remediation": [
+        "Проверьте, действительно ли приложению необходим переход между протоколами (protocol transition).",
+        "По возможности перейдите на ограниченное делегирование на основе ресурса (RBCD).",
+        "Не разрешайте делегирование к контроллеру домена вообще: ограничение класса службы в SPN не защищает от этого риска.",
+        "Добавьте привилегированные пользовательские учётные записи в группу Protected Users после проверки совместимости.",
+        "Отслеживайте запросы S4U2Self и S4U2Proxy."
+      ]
+    },
+    "CONSTRAINED_DELEGATION_TO_DC": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Compromise of this account is equivalent to compromise of the domain",
+        "The service class named in the SPN is not a restriction - see below",
+        "With protocol transition the account needs no cooperation from the impersonated user",
+        "Reachable by anyone who can take over the account, including through its ACL or its service password"
+      ],
+      "impact": [
+        "Компрометация этой учётной записи по последствиям эквивалентна компрометации домена.",
+        "Класс службы, указанный в SPN, не является надёжным ограничением доступа к контроллеру домена.",
+        "Если разрешён protocol transition, взаимодействие пользователя, за которого выдаётся атакующий, не требуется.",
+        "Риск доступен любому, кто сможет захватить учётную запись, в том числе через её ACL или пароль службы."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove the Domain Controller from msDS-AllowedToDelegateTo - restricting the service class does not help",
+        "If the application needs delegation, move the target service off the Domain Controller",
+        "Prefer Resource-Based Constrained Delegation, which lets the target decide who may delegate to it",
+        "Put privileged accounts in 'Protected Users' or mark them 'Account is sensitive and cannot be delegated'"
+      ],
+      "remediation": [
+        "Удалите контроллер домена из msDS-AllowedToDelegateTo: ограничение класса службы ситуацию не исправляет.",
+        "Если приложению требуется делегирование, перенесите целевую службу с контроллера домена.",
+        "Предпочтите RBCD, при котором целевой ресурс определяет, кому разрешено делегирование.",
+        "Добавьте привилегированные пользовательские учётные записи в Protected Users либо установите флаг «Account is sensitive and cannot be delegated»."
+      ]
+    },
+    "CONSTRAINED_DELEGATION_TRANSITION_NO_TARGET": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "S4U2Self returns a forwardable ticket for any user against this account's own services",
+        "That ticket can be used locally against services this account hosts",
+        "The flag is one write away from being usable: an attacker who can also set msDS-AllowedToDelegateTo gains full constrained delegation",
+        "Set on its own it is more often a leftover or an attacker's groundwork than an intended configuration"
+      ],
+      "impact": [
+        "S4U2Self возвращает пересылаемый билет (forwardable ticket) для любого пользователя к собственным службам этой учётной записи.",
+        "Такой билет можно использовать локально для доступа к службам, размещённым от имени этой учётной записи.",
+        "До полноценного ограниченного делегирования остаётся одно изменение: атакующий, способный также задать msDS-AllowedToDelegateTo, получает соответствующую возможность.",
+        "Сам по себе этот флаг чаще оказывается остатком прежней настройки или подготовкой атаки, чем намеренной рабочей конфигурацией."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Clear the flag if delegation is not in use",
+        "If delegation is intended, configure the target services explicitly and review them",
+        "Check who can write userAccountControl and msDS-AllowedToDelegateTo on this account"
+      ],
+      "remediation": [
+        "Снимите TRUSTED_TO_AUTH_FOR_DELEGATION, если делегирование не используется.",
+        "Если делегирование необходимо, явно укажите целевые службы и проверьте их.",
+        "Проверьте, кто вправе изменять userAccountControl и msDS-AllowedToDelegateTo этой учётной записи."
+      ]
+    },
+    "RBCD_DANGEROUS_PRINCIPALS": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Principals in the RBCD list can impersonate any user to this computer",
+        "If attackers control a listed principal, they can compromise this system",
+        "Enables lateral movement through S4U2Proxy abuse"
+      ],
+      "impact": [
+        "Субъекты из списка RBCD могут выдавать себя за любого пользователя при обращении к этому компьютеру.",
+        "Если атакующий контролирует один из перечисленных субъектов, он может скомпрометировать данную систему.",
+        "Злоупотребление S4U2Proxy открывает путь для горизонтального перемещения."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Audit msDS-AllowedToActOnBehalfOfOtherIdentity on all computers",
+        "Remove unnecessary principals from RBCD configurations",
+        "Ensure only explicitly required accounts are in the delegation list",
+        "Monitor changes to this attribute"
+      ],
+      "remediation": [
+        "Проверьте атрибут msDS-AllowedToActOnBehalfOfOtherIdentity на всех компьютерах.",
+        "Удалите из конфигураций RBCD субъектов, не нуждающихся в таком делегировании.",
+        "Убедитесь, что в списке делегирования остались только явно необходимые учётные записи.",
+        "Отслеживайте изменения этого атрибута."
+      ]
+    },
+    "DANGEROUS_ACL_BROAD_GROUP": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Any authenticated account can exercise the right, so there is no principal to contain",
+        "Write access to the DACL or the owner lets any of them grant themselves the rest, replication rights included",
+        "A GPO linked at the domain root by any user is code execution on every machine, domain controllers included",
+        "The group cannot be emptied: these groups are populated by the directory, so the ACE is the only thing to remove"
+      ],
+      "impact": [
+        "Право доступно любой аутентифицированной учётной записи: отдельного субъекта, которого можно изолировать, нет.",
+        "Право изменения DACL или владельца позволяет любому участнику широкой группы выдать себе остальные разрешения, включая права репликации.",
+        "Возможность любого пользователя привязать GPO к корню домена означает выполнение кода на всех компьютерах, включая контроллеры домена.",
+        "Такую группу нельзя просто очистить: её состав формируется каталогом, поэтому необходимо удалить разрешающую запись ACE."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the ACE naming the broad group - this is not a delegation to narrow but one to delete",
+        "Establish how it was added, and check whether the same hand granted it elsewhere",
+        "Compare the domain object's DACL against a freshly promoted domain's, since none of this is a default"
+      ],
+      "remediation": [
+        "Удалите ACE, предоставляющую право широкой группе: такое делегирование следует удалить, а не только сузить.",
+        "Установите, кто добавил запись, и проверьте, не предоставлены ли аналогичные права в других местах.",
+        "Сравните DACL объекта домена с DACL недавно созданного домена: такие разрешения не являются настройкой по умолчанию."
+      ]
+    },
+    "DANGEROUS_ACL_GENERICWRITE": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "On User objects: Set servicePrincipalName for targeted Kerberoasting, modify scriptPath for logon script execution",
+        "On Computer objects: Configure msDS-AllowedToActOnBehalfOfOtherIdentity for Resource-Based Constrained Delegation (RBCD)",
+        "On Group objects: Modify member attribute to add accounts to the group",
+        "On GPO objects: Modify Group Policy settings to execute code on all linked systems",
+        "Can write msDS-KeyCredentialLink for Shadow Credentials attack"
+      ],
+      "impact": [
+        "На объектах User: изменение servicePrincipalName позволяет выполнить целевой Kerberoasting, а изменение scriptPath — организовать запуск сценария входа.",
+        "На объектах Computer: изменение msDS-AllowedToActOnBehalfOfOtherIdentity позволяет настроить ограниченное делегирование на основе ресурса (RBCD).",
+        "На объектах Group: изменение атрибута member позволяет добавить учётные записи в группу.",
+        "На объектах GPO: изменение параметров групповой политики позволяет выполнять код на системах, к которым эта GPO привязана.",
+        "Изменение msDS-KeyCredentialLink может использоваться для атаки Shadow Credentials."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Review and remove unnecessary GenericWrite permissions",
+        "Follow principle of least privilege - use specific write permissions instead",
+        "Use role-based access control (RBAC)",
+        "Monitor attribute changes on sensitive objects (Event ID 5136)"
+      ],
+      "remediation": [
+        "Проверьте и удалите ненужные разрешения GenericWrite.",
+        "Соблюдайте принцип минимальных привилегий: предоставляйте конкретные права записи вместо GenericWrite.",
+        "Используйте ролевую модель управления доступом (RBAC).",
+        "Отслеживайте изменения атрибутов чувствительных объектов (Event ID 5136)."
+      ]
+    },
+    "DANGEROUS_ACL_WRITEDACL": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Can grant themselves GenericAll or any other permission",
+        "Effectively equals full control over the object",
+        "Can be used to hide permission changes by modifying SACL"
+      ],
+      "impact": [
+        "Субъект может предоставить себе GenericAll или любое другое разрешение.",
+        "На практике это даёт возможность получить полный контроль над объектом.",
+        "В оригинальном описании упоминается сокрытие изменений через SACL; однако право WriteDACL само по себе не разрешает изменять SACL: для этого требуется отдельное право доступа."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove WriteDACL from non-administrative principals",
+        "Only domain/enterprise admins should have WriteDACL on sensitive objects",
+        "Monitor DACL modifications"
+      ],
+      "remediation": [
+        "Удалите WriteDACL у субъектов без административных полномочий.",
+        "На чувствительных объектах предоставляйте WriteDACL только администраторам домена или леса и другим строго уполномоченным субъектам.",
+        "Отслеживайте изменения DACL."
+      ]
+    },
+    "DANGEROUS_ACL_WRITEOWNER": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Can become owner of the object",
+        "Owners have implicit WriteDACL permission",
+        "Leads to full control through permission chaining"
+      ],
+      "impact": [
+        "Субъект может стать владельцем объекта.",
+        "Владелец имеет подразумеваемое право WriteDACL в обычной модели безопасности объекта.",
+        "Последовательное использование владения и изменения DACL может привести к полному контролю над объектом."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove WriteOwner from non-administrative principals",
+        "Ensure proper ownership is set on sensitive objects",
+        "Monitor ownership changes"
+      ],
+      "remediation": [
+        "Удалите WriteOwner у субъектов без административных полномочий.",
+        "Убедитесь, что владельцами чувствительных объектов назначены надлежащие субъекты.",
+        "Отслеживайте изменения владельцев объектов."
+      ]
+    },
+    "ESC2_TEMPLATE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Certificates can be used for authentication as any user",
+        "SubCA certificates can issue other certificates",
+        "Enables code signing for malware",
+        "Complete compromise of PKI trust chain possible"
+      ],
+      "impact": [
+        "Сертификаты могут использоваться для аутентификации от имени любого пользователя при выполнении остальных условий такой атаки.",
+        "Сертификат подчинённого центра сертификации (SubCA) может выпускать другие сертификаты.",
+        "Сертификаты с соответствующими назначениями позволяют подписывать вредоносный код.",
+        "Возможна полная компрометация цепочки доверия PKI."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove 'Any Purpose' EKU - specify only required purposes",
+        "Never allow SubCA certificates to be issued to non-CA systems",
+        "Restrict enrollment permissions",
+        "Require CA Manager approval"
+      ],
+      "remediation": [
+        "Удалите EKU Any Purpose и укажите только действительно необходимые назначения.",
+        "Не разрешайте выпуск сертификатов SubCA системам, которые не являются центрами сертификации.",
+        "Ограничьте права регистрации сертификатов (enrollment).",
+        "Требуйте одобрение запроса администратором ЦС (CA Manager approval)."
+      ]
+    },
+    "ESC3_TEMPLATE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Enrollment Agent can request certificates for any user",
+        "Bypasses per-user enrollment restrictions on other templates",
+        "Enables escalation through certificate impersonation"
+      ],
+      "impact": [
+        "Агент регистрации (Enrollment Agent) может запрашивать сертификаты от имени произвольных пользователей при соответствующих разрешениях ЦС.",
+        "Становится возможен обход ограничений регистрации других шаблонов, рассчитанных на отдельного пользователя.",
+        "Подмена удостоверяемой сертификатом личности создаёт путь повышения привилегий."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Restrict Enrollment Agent certificate issuance to specific users",
+        "Enable 'Restrict enrollment agents' on the CA",
+        "Configure enrollment agent restrictions to limit which templates agents can use",
+        "Monitor enrollment agent certificate requests"
+      ],
+      "remediation": [
+        "Ограничьте выдачу сертификатов Enrollment Agent конкретными пользователями.",
+        "Включите на ЦС параметр Restrict enrollment agents.",
+        "Настройте ограничения агентов регистрации по шаблонам сертификатов, которые им разрешено использовать.",
+        "Отслеживайте запросы на выпуск сертификатов агентов регистрации."
+      ]
+    },
+    "ESC4_TEMPLATE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Attackers can modify template to allow arbitrary SANs",
+        "Can enable Any Purpose or Client Authentication EKUs",
+        "Effectively converts to ESC1/ESC2 vulnerability",
+        "Changes to templates take effect immediately"
+      ],
+      "impact": [
+        "Атакующий может изменить шаблон так, чтобы разрешить произвольные значения SAN.",
+        "Может включить EKU Any Purpose или Client Authentication.",
+        "Это фактически создаёт условия для уязвимостей ESC1 или ESC2.",
+        "Изменения шаблонов начинают действовать немедленно."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Audit template ACLs - remove unnecessary write permissions",
+        "Only Domain Admins and Enterprise Admins should modify templates",
+        "Monitor template modifications via Windows event logs"
+      ],
+      "remediation": [
+        "Проверьте ACL шаблона и удалите ненужные права записи.",
+        "Разрешайте изменение шаблонов только Domain Admins, Enterprise Admins и другим явно уполномоченным администраторам PKI.",
+        "Отслеживайте изменения шаблонов по журналам событий Windows."
+      ]
+    },
+    "ESC14_WEAK_EXPLICIT_MAPPING": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Anyone able to obtain a certificate with a matching subject or e-mail authenticates as this principal",
+        "On a template where the enrollee supplies the subject, that is a single certificate request",
+        "The mapping survives a password change, so it is also a persistence mechanism",
+        "Strong certificate binding enforcement on the domain controllers does not close it: an explicit mapping is honoured by design"
+      ],
+      "impact": [
+        "Любой, кто может получить сертификат с подходящим именем субъекта или адресом электронной почты, способен аутентифицироваться как эта учётная запись.",
+        "Если шаблон разрешает заявителю указывать имя субъекта, для этого достаточно одного запроса сертификата.",
+        "Сопоставление продолжает действовать после смены пароля и поэтому может использоваться для закрепления доступа.",
+        "Принудительное строгое сопоставление сертификатов на контроллерах домена не устраняет проблему: явное сопоставление учитывается по правилам AD."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Replace the mapping with a strong format: X509IssuerSerialNumber, X509SKI or X509SHA1PublicKey",
+        "Remove the mapping entirely where the account no longer needs certificate authentication",
+        "Restrict who may write altSecurityIdentities on privileged accounts"
+      ],
+      "remediation": [
+        "Замените слабое сопоставление на надёжный формат: X509IssuerSerialNumber, X509SKI или X509SHA1PublicKey.",
+        "Если учётной записи больше не требуется сертификатная аутентификация, полностью удалите сопоставление.",
+        "Ограничьте право изменения altSecurityIdentities для привилегированных учётных записей."
+      ]
+    },
+    "ESC15_SCHEMA_V1_ENROLLEE_SUBJECT": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "The enrollee injects the EKU: no client-authentication EKU is needed on the template, which is why no other check in this section flags it",
+        "That makes it the one ESC that reaches exactly the templates everything else passes as harmless - a web server template is a typical case",
+        "The subject comes from the request, so which account the certificate authenticates as is the attacker's choice",
+        "Patched CA: direct exploitation blocked, but a v1 template remains less controllable than v2+ and cannot be confirmed as patched from here"
+      ],
+      "impact": [
+        "Заявитель внедряет назначение сертификата (EKU) в запрос: в шаблоне не обязательно должен быть Client Authentication, поэтому другие проверки могут не обнаружить эту ситуацию.",
+        "Этот вариант ESC затрагивает даже шаблоны, которые остальные проверки считают безопасными; типичный пример — шаблон веб-сервера.",
+        "Имя субъекта берётся из запроса, поэтому атакующий выбирает учётную запись, от имени которой будет использоваться сертификат.",
+        "На обновлённом ЦС непосредственная эксплуатация заблокирована, но шаблон Schema v1 остаётся менее управляемым, чем v2+, а наличие исправления нельзя подтвердить этой LDAP-проверкой."
+      ],
+      "sourceEnglishRemediationCount": 6,
+      "sourceEnglishRemediation": [
+        "Apply CVE-2024-49019 patch (November 2024 Patch Tuesday)",
+        "Replace Schema v1 templates with v2+ duplicates",
+        "Unpublish default v1 templates that are no longer needed",
+        "Remove ENROLLEE_SUPPLIES_SUBJECT if not required",
+        "Require CA Manager approval for subject requests",
+        "Disable Application Policies extension: certutil -setreg policy\\DisableExtensionList +1.3.6.1.4.1.311.21.10"
+      ],
+      "remediation": [
+        "Установите исправление CVE-2024-49019 (обновления ноября 2024 года).",
+        "Замените шаблоны Schema v1 дубликатами с версией схемы v2 или выше.",
+        "Отмените публикацию стандартных шаблонов v1, которые больше не используются.",
+        "Отключите ENROLLEE_SUPPLIES_SUBJECT, если заявителю не нужно самостоятельно задавать имя субъекта.",
+        "Требуйте согласования таких запросов администратором ЦС (CA Manager approval).",
+        "Отключите расширение Application Policies командой: certutil -setreg policy\\DisableExtensionList +1.3.6.1.4.1.311.21.10."
+      ]
+    },
+    "GPO_DANGEROUS_PERMISSIONS": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Attacker can modify GPO to execute code on target computers",
+        "Can deploy scheduled tasks, startup scripts, or registry modifications",
+        "Affects all computers and users in the GPO's scope",
+        "Changes propagate automatically during Group Policy refresh",
+        "Can be used to compromise Domain Controllers if linked at domain level"
+      ],
+      "impact": [
+        "Атакующий может изменить GPO, чтобы выполнять код на целевых компьютерах.",
+        "Может разворачивать запланированные задания, сценарии запуска и изменения реестра.",
+        "Изменения затрагивают всех пользователей и компьютеры в области действия GPO.",
+        "Изменения распространяются автоматически при обновлении групповой политики.",
+        "Если GPO привязана на уровне домена и распространяется на контроллеры домена, возможна их компрометация."
+      ],
+      "sourceEnglishRemediationCount": 7,
+      "sourceEnglishRemediation": [
+        "Remove unnecessary write permissions from GPOs",
+        "An inherited ACE does not go away here: it has to be removed where it is written, usually on CN=Policies,CN=System, or inheritance has to be broken on the GPO. Set-GPPermission and the GPMC delegation tab cannot touch an inherited entry at all, so check the row for whether the grant is inherited before acting on it",
+        "Set-GPPermission does not change the owner either. A trustee that owns the GPO can re-grant itself everything that was just removed, so an owner outside the administrative tier is its own task: Set-Acl on the AD object, or dsacls with /takeownership",
+        "Only Domain Admins and specific GPO management groups should have write access",
+        "Use GPO delegation carefully - prefer read-only access",
+        "Monitor GPO modifications (Event ID 5136) - that event covers the directory object. The attack path here is the policy content in SYSVOL, and a change to those files raises no 5136: it needs file system auditing (4663) on the SYSVOL policy folder",
+        "Implement GPO change management process"
+      ],
+      "remediation": [
+        "Удалите ненужные разрешения записи GPO.",
+        "Унаследованная ACE не исчезнет после изменения разрешений самой GPO: её нужно удалить там, где она назначена (обычно CN=Policies,CN=System), либо отключить наследование для GPO. Set-GPPermission и вкладка «Делегирование» GPMC не позволяют изменить унаследованную ACE; сначала проверьте признак наследования.",
+        "Set-GPPermission не изменяет владельца. Если GPO принадлежит субъекту вне административного уровня доверия, он сможет снова выдать себе удалённые разрешения. Исправляйте владение отдельно через Set-Acl объекта AD или dsacls /takeownership.",
+        "Предоставляйте право записи только Domain Admins и специально назначенным группам управления GPO.",
+        "Делегируйте управление GPO осторожно; когда изменение не требуется, выдавайте доступ только на чтение.",
+        "Отслеживайте изменения GPO (Event ID 5136 относится к объекту каталога). Изменение файлов политики в SYSVOL не создаёт события 5136: для этого необходим аудит файловой системы (Event ID 4663) в папке политики SYSVOL.",
+        "Внедрите процесс согласования и учёта изменений групповых политик."
+      ]
+    },
+    "GPO_LOCAL_GROUP_RISKY_MEMBER": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Every domain user holds the group's privileges on every computer in scope",
+        "In the local Administrators group that is local administrator everywhere the policy is linked, which makes credential theft from LSASS and lateral movement across those machines routine",
+        "In Backup Operators it is read access to every file including the registry hives, which yields the local SAM and cached credentials",
+        "In Remote Desktop Users or Remote Management Users it is an interactive or WinRM logon for the whole domain, turning any single compromised account into a foothold on those machines",
+        "Removing the account from the group on a machine changes nothing - the next policy refresh puts it back"
+      ],
+      "impact": [
+        "Каждый пользователь домена получает привилегии указанной локальной группы на всех компьютерах в области действия политики.",
+        "Для локальной группы Administrators это означает права локального администратора на всех затронутых компьютерах, облегчая извлечение учётных данных из LSASS и горизонтальное перемещение.",
+        "В группе Backup Operators это даёт чтение всех файлов, включая кусты реестра, что может раскрыть локальную SAM и кэшированные учётные данные.",
+        "В группах Remote Desktop Users или Remote Management Users это даёт вход по RDP или WinRM всем пользователям домена, превращая компрометацию одной записи в точку доступа к таким компьютерам.",
+        "Ручное удаление участника из локальной группы не решает проблему: следующее обновление GPO добавит его снова."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Replace the broad principal with a dedicated group holding only the accounts that need the privilege",
+        "Scope the policy to the computers that need it instead of linking it broadly",
+        "Where local administrator rights on a workstation are needed, prefer LAPS over a standing group membership",
+        "Check the policy's Restricted Groups mode: a Members list replaces the group, a Memberof entry only adds to it"
+      ],
+      "remediation": [
+        "Замените широкую группу отдельной группой с минимально необходимым составом участников.",
+        "Ограничьте область применения GPO только компьютерами, которым требуются эти настройки.",
+        "Если на рабочих станциях необходимы локальные административные полномочия, предпочтите управление локальными паролями через LAPS, а не постоянное широкое членство.",
+        "Проверьте режим Restricted Groups: список Members заменяет состав группы, а настройка Member of лишь добавляет членство."
+      ]
+    },
+    "GPO_NOT_CURRENTLY_EFFECTIVE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Nothing today - which is the point of saying so, because an identical entry in an active GPO is a live exposure",
+        "One click away from applying: re-enabling the disabled half, or linking the GPO, makes it effective with no further change",
+        "A forgotten policy is the usual reason a setting like this survives, and a forgotten policy is the one nobody reviews before re-linking it"
+      ],
+      "impact": [
+        "Сейчас непосредственного воздействия нет: в отличие от аналогичного параметра в действующей GPO, эта настройка пока не создаёт активной угрозы.",
+        "Настройка может вступить в силу одним действием — при включении отключённой части GPO либо привязке политики; менять сам параметр для этого не требуется.",
+        "Забытые политики часто сохраняют такие параметры, и именно их могут повторно привязать без предварительной проверки."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Fix or remove the setting rather than relying on the GPO staying switched off",
+        "Delete a GPO that is no longer wanted, instead of unlinking it and leaving it in the directory",
+        "Check who may link GPOs and who may edit this one - see the GPO permission findings"
+      ],
+      "remediation": [
+        "Исправьте или удалите опасный параметр, а не рассчитывайте на то, что GPO всегда останется отключённой.",
+        "Удалите больше не нужную GPO вместо простого удаления её привязки с сохранением в каталоге.",
+        "Проверьте, кто может привязывать GPO и кто вправе изменять эту политику; см. результаты проверки разрешений GPO."
+      ]
+    },
+    "GPO_UNLINKED_BROAD_WRITE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Any member of the group can stage a payload in the policy now and wait for it to be linked",
+        "Whoever may write gPLink on an OU, a site or the domain turns that into code execution on the computers below it, with no right on any policy of their own",
+        "Group Policy Management lists the policy among the unlinked ones, where it draws no attention"
+      ],
+      "impact": [
+        "Любой участник широкой группы может заранее разместить вредоносное содержимое в политике и ожидать её привязки.",
+        "Субъект с правом изменения gPLink на OU, сайте или домене может превратить подготовленную политику в выполнение кода на подчинённых компьютерах, не имея собственных прав изменения GPO.",
+        "В Group Policy Management такая политика находится среди непривязанных объектов и может не привлекать внимания."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove the write permission of the broad group from the policy - on the directory object (the Delegation tab in Group Policy Management) and on its folder in SYSVOL",
+        "Delete policies that are no longer needed rather than leaving them unlinked",
+        "Before linking an old policy again, review its content: every setting, script and preference item it holds applies with the link"
+      ],
+      "remediation": [
+        "Удалите права записи широкой группы как с объекта GPO в каталоге (вкладка Delegation в Group Policy Management), так и с его папки в SYSVOL.",
+        "Удаляйте ненужные политики, а не оставляйте их непривязанными.",
+        "Перед повторной привязкой старой GPO проверьте всё её содержимое: каждую настройку, сценарий и элемент предпочтений, которые начнут применяться после привязки."
+      ]
+    },
+    "GPO_TASK_SYSTEM_UNC_PATH": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Task runs with SYSTEM privileges, or as a privileged domain account",
+        "What it runs is loaded from a network share at every run",
+        "Write access to the share = code execution in that account",
+        "Affects all computers where the GPO is applied"
+      ],
+      "impact": [
+        "Задание выполняется от имени SYSTEM или привилегированной доменной учётной записи.",
+        "При каждом запуске исполняемый файл или данные загружаются из сетевой общей папки.",
+        "Возможность записи в эту общую папку означает возможность выполнения кода с полномочиями учётной записи задания.",
+        "Риск распространяется на все компьютеры, к которым применяется GPO."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Start SYSTEM-context tasks from a local path that only administrators can write",
+        "Do not run GPO-deployed tasks as a privileged domain account; give the task an account with only the rights it needs",
+        "Ensure the share and the files on it are writable by administrators only - NTFS and share permissions both",
+        "Implement code signing for scheduled task executables",
+        "Review all GPO scheduled tasks for security"
+      ],
+      "remediation": [
+        "Запускайте задания с контекстом SYSTEM из локального каталога, запись в который доступна только администраторам.",
+        "Не запускайте задания, развёрнутые через GPO, от имени привилегированной доменной записи; выделите запись только с необходимыми правами.",
+        "Убедитесь, что изменять общую папку и находящиеся в ней файлы могут только администраторы; проверьте и NTFS-разрешения, и разрешения общего доступа.",
+        "Применяйте подписание кода к исполняемым файлам запланированных заданий.",
+        "Проверьте безопасность всех запланированных заданий, развёрнутых через GPO."
+      ]
+    },
+    "ESC_ENROLLMENT_RIGHTS_UNREAD": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The ESC findings reported for this template cannot be confirmed as exploitable, and cannot be ruled out either",
+        "A template that withdraws Read-Control from Authenticated Users arrives without a security descriptor, so the hardening itself produces this state",
+        "An enrollment ACE written as GENERIC_ALL reads the same way, and that is the form impacket and Certipy write"
+      ],
+      "impact": [
+        "Подтвердить эксплуатационную пригодность ESC-находок для этого шаблона нельзя, но и исключить её невозможно.",
+        "Если у Authenticated Users намеренно отозван Read-Control, описание безопасности шаблона может быть недоступно для чтения; таким образом, сама защитная настройка приводит к этому результату.",
+        "ACE с правами GENERIC_ALL может отображаться таким же образом; такую запись создают в том числе impacket и Certipy."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Read the template's security descriptor with an account that holds Read-Control on it, and re-run the scan",
+        "Check the descriptor by hand for an ACE written with the generic access bits rather than named rights",
+        "If Read-Control was withdrawn deliberately, nothing needs doing - but the ESC verdicts for this template stay undecided until somebody can read it"
+      ],
+      "remediation": [
+        "Прочитайте дескриптор безопасности шаблона с учётной записью, у которой есть Read-Control, и повторите аудит.",
+        "Проверьте дескриптор вручную: запись ACE может использовать общие биты доступа вместо именованных прав.",
+        "Если Read-Control был намеренно отозван, исправлять настройку не обязательно; но выводы ESC для шаблона останутся неопределёнными до проверки дескриптора."
+      ]
+    },
+    "GPO_WIDE_IMPACT": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "GPO settings apply to all affected computers",
+        "Malicious modifications impact multiple systems simultaneously",
+        "Larger scope amplifies any security vulnerability"
+      ],
+      "impact": [
+        "Настройки GPO применяются ко всем затронутым компьютерам.",
+        "Вредоносное изменение одновременно воздействует на несколько систем.",
+        "Большая область применения усиливает последствия любой уязвимости безопасности."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Review GPO permissions and ensure strict access control",
+        "Reduce the scope with security filtering, and leave Domain Computers a read: since MS16-072 a user policy is fetched in the computer account's context, so removing Authenticated Users without that read stops the GPO applying to users",
+        "A WMI filter narrows the scope differently - it runs on the client at every refresh rather than taking the read away - so the two are not interchangeable"
+      ],
+      "remediation": [
+        "Проверьте разрешения GPO и обеспечьте строгий контроль доступа.",
+        "Сузьте область применения фильтрацией безопасности, сохранив право чтения для Domain Computers: после MS16-072 пользовательская политика загружается в контексте компьютерной учётной записи, поэтому удаление Authenticated Users без такого права чтения мешает применению GPO к пользователям.",
+        "WMI-фильтр ограничивает область иначе: он выполняется на клиенте при каждом обновлении политики, а не отнимает право чтения; эти механизмы не взаимозаменяемы."
+      ]
+    }
+  }
+}
