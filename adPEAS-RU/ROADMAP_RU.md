@@ -254,7 +254,7 @@ Windows PowerShell 5.1 CI и создания архива
 ## DOC2a — полный перевод справочника Core Functions (12 ноября 2026)
 
 Переведён `docs/ru-RU/06-Core-Functions.md` по закреплённому
-`docs/06-Core-Functions.md`: 859 строк в каждом справочнике,
+`docs/06-Core-Functions.md`: сохранены разделы и примеры,
 7 функций (`Get-DomainUser`, `Get-DomainComputer`, `Get-DomainGroup`,
 `Get-DomainGPO`, `Get-DomainObject`, `Get-ObjectACL`,
 `Get-CertificateTemplate`), 146 параметров, 74 комментария
