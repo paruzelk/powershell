@@ -1,5 +1,10 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
+### ARCH2d — ограниченная партия из 10 реальных POP3 писем (DEV)
+
+[Операторский протокол ARCH2d](docs/2.6.5-arch2d-bounded-real-batch10.md). Новый `Invoke-ARCH2d.ps1` выбирает строго 10 реальных писем `info@stios.ru.pst\Входящие`, сохраняет исходный SHA256 Body/HTML/Recipients/State/байтов вложений, создаёт один новый **целевой архивный** PST, фиксирует глобальный batch claim и отдельный force-flushed claim **до каждого** реального `MailItem.Move()`. `MoveBatch` запускается ровно один раз; при любой ошибке останавливается без retry, весь результат независимо проверяется после перезапуска Outlook. Успешный ARCH2c4a RunId и его файлы не используются и не изменяются. Основные режимы `Archive/Resume/Auto` запрещены. CI не означает готовности к 90 ГБ.
+
+
 ### ARCH2c4a — hotfix загрузки зависимостей
 
 Исправлена обнаруженная при реальном `Prepare` ошибка `Get-OPAInternetMessageId is not recognized`. Операторский `Invoke-ARCH2c4.ps1` теперь загружает исходные `Core/Runtime/ComManager.ps1` и `Core/Archive/ArchiveSelector.ps1` *до* `ARCH2bSemanticWitness.ps1`. Добавлена интеграционная регрессия, вызывающая реальный исходный семантический witness с эмуляцией существующего Unicode-письма и вложения. При ранее наблюдавшемся исключении код завершался **до** создания PST, намерения и Move: RunId `18585296-c1f6-4859-97d1-1f9d272b9e07` можно сохранить после read-only проверки отсутствия артефактов. Основной Archive/Resume/Auto закрыт. См. [runbook ARCH2c4](docs/2.6.5-arch2c4-real-pop3-one-shot.md).
