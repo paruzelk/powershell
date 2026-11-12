@@ -1,0 +1,352 @@
+{
+  "schema": "adPEAS-RU.StageD3.CoreFields.12",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "ACCOUNT_DISABLED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Account cannot be used for authentication",
+        "Prevents misuse of inactive or compromised accounts",
+        "Reduces attack surface by removing unused credentials",
+        "Good security hygiene for terminated employees"
+      ],
+      "impact": [
+        "Эта учётная запись не может использоваться для аутентификации.",
+        "Предотвращается злоупотребление неактивными или скомпрометированными учётными записями.",
+        "Поверхность атаки сокращается благодаря исключению неиспользуемых учётных данных.",
+        "Это соответствует надлежащей практике защиты учётных записей уволенных сотрудников."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration for inactive accounts",
+        "Consider deleting accounts that will never be re-enabled",
+        "Document the reason for keeping disabled accounts",
+        "Review disabled accounts periodically for potential deletion"
+      ],
+      "remediation": [
+        "Для неактивных учётных записей это безопасная конфигурация.",
+        "Рассмотрите удаление записей, которые никогда больше не будут включены.",
+        "Задокументируйте причину сохранения отключённых учётных записей.",
+        "Периодически проверяйте отключённые записи и определяйте, какие из них можно удалить."
+      ]
+    },
+    "ACCOUNT_NOT_DELEGATED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Account is protected from Kerberos delegation attacks - on domain controllers that enforce the CVE-2020-17049 fix",
+        "Cannot be impersonated via unconstrained delegation",
+        "Protected from constrained delegation abuse, unless a domain controller still accepts the Bronze Bit alteration",
+        "RBCD attacks cannot target this account"
+      ],
+      "impact": [
+        "Учётная запись защищена от атак через делегирование Kerberos на контроллерах домена, где применяется исправление CVE-2020-17049.",
+        "Через неограниченное делегирование нельзя выдать себя за эту учётную запись.",
+        "Она защищена от злоупотреблений ограниченным делегированием, если контроллер домена не принимает подмену Bronze Bit.",
+        "Атаки RBCD не могут использовать эту учётную запись в качестве цели."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Keep every domain controller on Windows updates from July 13, 2021 or later: before them, Bronze Bit (CVE-2020-17049) bypasses this flag and Protected Users alike",
+        "Consider adding all privileged accounts to Protected Users group",
+        "Document which accounts have this protection",
+        "Regularly audit that this flag remains set on sensitive accounts"
+      ],
+      "remediation": [
+        "Это безопасная конфигурация; исправление не требуется.",
+        "Устанавливайте обновления Windows от 13 июля 2021 года или новее на всех контроллерах домена: без них Bronze Bit (CVE-2020-17049) позволяет обойти этот флаг и защиту Protected Users.",
+        "Рассмотрите включение всех привилегированных учётных записей пользователей в группу Protected Users после проверки совместимости.",
+        "Задокументируйте, для каких учётных записей включена эта защита.",
+        "Регулярно проверяйте, что флаг остаётся установленным на чувствительных учётных записях."
+      ]
+    },
+    "ACL_INHERITED_FROM": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "Informational - shows permission inheritance path",
+        "Helps trace the source of potentially dangerous permissions"
+      ],
+      "impact": [
+        "Справочная информация: показывает путь наследования разрешений.",
+        "Помогает установить источник потенциально опасных унаследованных разрешений."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Review the source OU/container for overly broad permissions",
+        "Consider breaking inheritance on sensitive OUs if appropriate"
+      ],
+      "remediation": [
+        "Проверьте исходный OU или контейнер на наличие чрезмерно широких разрешений.",
+        "При необходимости рассмотрите отключение наследования для чувствительных OU."
+      ]
+    },
+    "ADMIN_COUNT_INDICATOR": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The account keeps the AdminSDHolder ACL with inheritance disabled, so permissions delegated on its OU do not reach it",
+        "SDProp no longer maintains that ACL once the membership ended, while the mark still makes the account look protected",
+        "Typically a former admin account that was not cleaned up"
+      ],
+      "impact": [
+        "На учётной записи сохраняется ACL от AdminSDHolder с отключённым наследованием, поэтому делегированные на её OU разрешения на эту запись не распространяются.",
+        "После прекращения членства в защищённой группе SDProp перестаёт поддерживать эту ACL, хотя метка по-прежнему создаёт впечатление защищённой учётной записи.",
+        "Обычно это бывшая административная учётная запись, для которой не завершена очистка настроек."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Confirm the account is in no protected group, then clear adminCount and re-enable permission inheritance on it"
+      ],
+      "remediation": [
+        "Убедитесь, что учётная запись больше не входит ни в одну защищённую группу, затем очистите adminCount и снова включите наследование разрешений для неё."
+      ]
+    },
+    "AD_RECYCLE_BIN_DISABLED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A deleted user, group or computer comes back without its group memberships and most attributes",
+        "Recovery from a destructive attack on the directory needs a backup and an authoritative restore",
+        "Deleted objects say little about what they were, which hampers an investigation"
+      ],
+      "impact": [
+        "При восстановлении удалённого пользователя, группы или компьютера не возвращаются членства в группах и большинство атрибутов.",
+        "Восстановление после разрушительной атаки на каталог потребует резервной копии и авторитетного восстановления Active Directory.",
+        "По удалённым объектам остаётся мало сведений, что затрудняет расследование."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Enable the Recycle Bin (forest functional level Windows Server 2008 R2 or higher); it cannot be disabled again",
+        "Objects deleted before it was enabled stay tombstones - it protects deletions from then on"
+      ],
+      "remediation": [
+        "Включите корзину Active Directory (функциональный уровень леса — Windows Server 2008 R2 или выше); после включения отключить её нельзя.",
+        "Объекты, удалённые до включения корзины, останутся в состоянии tombstone: защита действует только для последующих удалений."
+      ]
+    },
+    "DOMAIN_ROOT_GPLINK_WRITE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "A GPO linked at the domain root applies to every computer and user in the domain, domain controllers included",
+        "Startup and logon scripts, scheduled immediate tasks and software installation in such a GPO are code execution everywhere",
+        "The attacker does not need write access to any existing GPO - creating one and linking it here is enough",
+        "The same attribute also removes a link or changes its order and enforcement, which takes a hardening policy off the whole domain"
+      ],
+      "impact": [
+        "GPO, привязанная к корню домена, применяется ко всем пользователям и компьютерам домена, включая контроллеры домена.",
+        "Сценарии запуска и входа, немедленные запланированные задания и установка программ в такой GPO дают возможность выполнять код по всему домену.",
+        "Атакующему не нужны права изменения существующей GPO: достаточно создать новую и привязать её здесь.",
+        "Изменение того же атрибута позволяет удалить привязку GPO, поменять порядок и принудительное применение, тем самым отключив защитную политику для всего домена."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove write access to gPLink on the domain object from every non-Tier-0 principal",
+        "Audit the current links at the domain root - a policy linked there should be deliberate and few",
+        "Watch directory service changes on the domain object for gPLink (Event ID 5136)"
+      ],
+      "remediation": [
+        "Удалите права записи атрибута gPLink объекта домена у всех субъектов, не относящихся к Tier 0.",
+        "Проверьте текущие привязки GPO на корне домена: каждая должна иметь обоснованное назначение, а их число должно быть небольшим.",
+        "Контролируйте изменения атрибута gPLink объекта домена в журнале Directory Service (Event ID 5136)."
+      ]
+    },
+    "DSRM_PASSWORD_UNMANAGED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "With console access - a hypervisor console is enough - the DSRM password logs on to a domain controller started in restore mode as its local administrator, with the directory database offline and open to copying",
+        "Where DsrmAdminLogonBehavior is 2, the DSRM account logs on to the running domain controller at any time, over the network with its hash alone",
+        "A DSRM password set once for every domain controller at promotion, or synchronized from a domain account with ntdsutil, is disclosed for all of them at once"
+      ],
+      "impact": [
+        "При доступе к консоли (достаточно консоли гипервизора) пароль DSRM позволяет войти на контроллер домена, запущенный в режиме восстановления служб каталога, как локальный администратор; база каталога при этом отключена и доступна для копирования.",
+        "Если DsrmAdminLogonBehavior равен 2, учётная запись DSRM позволяет войти на работающий контроллер домена в любое время, в том числе по сети, используя только её хеш.",
+        "Если на всех контроллерах домена используется пароль DSRM, заданный при повышении роли, или он синхронизирован с доменной записью через ntdsutil, раскрытие этого пароля затронет все такие контроллеры."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Let Windows LAPS manage the DSRM password: a policy with BackupDirectory 2, ADPasswordEncryptionEnabled 1 and BackupDsrmPassword 1 that applies to the domain controllers - this needs domain functional level 2016 and Windows Server 2019 or later domain controllers",
+        "Until then, set a unique, long DSRM password on each domain controller and keep it in a vault",
+        "Make sure no domain controller has DsrmAdminLogonBehavior set to 2"
+      ],
+      "remediation": [
+        "Настройте управление паролем DSRM через Windows LAPS: примените к контроллерам домена политику с BackupDirectory = 2, ADPasswordEncryptionEnabled = 1 и BackupDsrmPassword = 1. Для этого нужен функциональный уровень домена Windows Server 2016 и контроллеры домена Windows Server 2019 или новее.",
+        "До этого задайте каждому контроллеру домена отдельный длинный пароль DSRM и храните его в защищённом хранилище.",
+        "Убедитесь, что DsrmAdminLogonBehavior не равен 2 ни на одном контроллере домена."
+      ]
+    },
+    "ENCRYPTION_NOT_CONFIGURED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The account can be roasted for an RC4 ticket even though nothing in the directory says RC4 is allowed for it",
+        "It is the most common state of a service account, which is why it is reported as a hint rather than a finding - but it is not the same as AES-only",
+        "What the KDC actually issues depends on the domain controllers' policy, which this attribute cannot tell you"
+      ],
+      "impact": [
+        "Для этой учётной записи возможно получение билета RC4, пригодного для Kerberoasting, хотя в каталоге явно не указано, что RC4 ей разрешён.",
+        "Это самое распространённое состояние служебных учётных записей, поэтому оно отмечается как подсказка (Hint), а не как нарушение; однако оно не эквивалентно режиму AES-only.",
+        "Фактически выдаваемый KDC тип шифрования зависит от политики контроллеров домена; по одному этому атрибуту его определить нельзя."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set msDS-SupportedEncryptionTypes to 24 (AES128 + AES256) on every account with an SPN, then reset its password so the AES keys exist",
+        "Restrict the encryption types the domain allows as well, through 'Network security: Configure encryption types allowed for Kerberos' - the account attribute only narrows what the domain already permits",
+        "Verify with a captured ticket (klist, or Rubeus kerberoast) that AES is what the KDC now issues"
+      ],
+      "remediation": [
+        "Установите msDS-SupportedEncryptionTypes = 24 (AES128 + AES256) для каждой учётной записи со SPN, затем смените пароль, чтобы появились ключи AES.",
+        "Также ограничьте типы шифрования, разрешённые доменом, через политику «Network security: Configure encryption types allowed for Kerberos»: атрибут записи лишь сужает набор, допускаемый доменом.",
+        "Проверьте по полученному билету (например, с помощью klist или Rubeus kerberoast), что KDC теперь выдаёт билет с AES."
+      ]
+    },
+    "ENCRYPTION_RC4_ONLY": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "A kerberoasted ticket for this account can be cracked far faster than an AES one - the same password resists AES and falls to RC4",
+        "A long random service account password is still the real defence, but RC4 removes the margin it buys",
+        "RC4 also keeps the account usable for an overpass-the-hash with its NT hash alone, without the AES keys"
+      ],
+      "impact": [
+        "Билет этой учётной записи, полученный при Kerberoasting, можно подобрать значительно быстрее, чем билет AES: один и тот же пароль может выдержать подбор AES, но быть раскрыт при RC4.",
+        "Длинный случайный пароль служебной записи остаётся основной защитой, однако RC4 уменьшает обеспечиваемый им запас стойкости.",
+        "RC4 также позволяет выполнять overpass-the-hash для этой записи, имея только её NT-хеш, без ключей AES."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set msDS-SupportedEncryptionTypes to AES128 and AES256 only (decimal 24) on the account, after confirming every service that authenticates to it can negotiate AES",
+        "Reset the account's password afterwards so the AES keys are actually generated - changing the attribute alone leaves the old keys in place",
+        "Where RC4 cannot be removed yet, give the account a long random password and a managed one if possible (gMSA), which is what makes the cracking speed irrelevant"
+      ],
+      "remediation": [
+        "После проверки поддержки AES всеми службами, которые аутентифицируются с этой записью, установите для неё только AES128 и AES256 в msDS-SupportedEncryptionTypes (десятичное значение 24).",
+        "После изменения атрибута смените пароль записи, чтобы действительно создать ключи AES: одно изменение атрибута оставляет прежние ключи.",
+        "Если от RC4 пока нельзя отказаться, используйте длинный случайный пароль и по возможности управляемую учётную запись (gMSA): это снижает практическую значимость скорости подбора."
+      ]
+    },
+    "GUEST_ACCOUNT_ENABLED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Allows unauthenticated or minimally authenticated access",
+        "Can be used for initial foothold in the network",
+        "Often has weak or no password protection",
+        "May have been granted unintended permissions over time"
+      ],
+      "impact": [
+        "Допускается доступ без аутентификации или с минимальной аутентификацией.",
+        "Учётная запись может использоваться для первоначального проникновения в сеть.",
+        "Часто её защищает слабый пароль либо пароль отсутствует.",
+        "Со временем ей могли быть выданы непредусмотренные разрешения."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Disable the Guest account immediately",
+        "Review group memberships and remove from all groups",
+        "Audit any permissions explicitly granted to Guest",
+        "Monitor for attempts to re-enable the account"
+      ],
+      "remediation": [
+        "Немедленно отключите учётную запись Guest.",
+        "Проверьте членство в группах и удалите её из всех групп.",
+        "Проверьте все разрешения, явно выданные Guest.",
+        "Отслеживайте попытки повторного включения этой учётной записи."
+      ]
+    },
+    "LDAP_ANONYMOUS_BINDING_ALLOWED": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "Unauthenticated reading of whatever the ACLs grant ANONYMOUS LOGON - with Pre-Windows 2000 Compatible Access holding it, users, groups and their attributes",
+        "Account names for password spraying and the group structure for choosing targets, without a domain account",
+        "The setting is forest-wide: it applies on every domain controller of every domain"
+      ],
+      "impact": [
+        "Без аутентификации можно читать всё, что ACL разрешают субъекту ANONYMOUS LOGON; если он входит в Pre-Windows 2000 Compatible Access, это могут быть пользователи, группы и их атрибуты.",
+        "Имена учётных записей для password spraying и структура групп для выбора целей доступны без доменной учётной записи.",
+        "Настройка действует на уровне всего леса: на каждом контроллере домена в каждом домене."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Set character 7 of dsHeuristics back to 0 and keep every other character as it is",
+        "Find the application that needed anonymous LDAP first - the setting is off by default, so somebody turned it on",
+        "Remove ANONYMOUS LOGON and Everyone from Pre-Windows 2000 Compatible Access where nothing depends on them"
+      ],
+      "remediation": [
+        "Верните седьмой символ dsHeuristics к значению 0, сохранив все остальные символы без изменений.",
+        "Сначала выясните, какому приложению понадобился анонимный LDAP: по умолчанию он отключён, следовательно, его включали явно.",
+        "Удалите ANONYMOUS LOGON и Everyone из Pre-Windows 2000 Compatible Access там, где от этого не зависят приложения."
+      ]
+    },
+    "LOCKOUT_DURATION_FOREVER": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Brute force attacks are severely limited",
+        "Locked accounts remain locked until admin intervention",
+        "Provides opportunity to investigate lockout causes",
+        "Strong deterrent against password guessing attacks"
+      ],
+      "impact": [
+        "Атаки перебором паролей существенно ограничены.",
+        "Заблокированные учётные записи остаются заблокированными до вмешательства администратора.",
+        "Остаётся возможность расследовать причины блокировки.",
+        "Это серьёзно затрудняет атаки подбора паролей."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Ensure help desk processes exist for legitimate unlock requests",
+        "Implement self-service unlock with strong verification",
+        "Monitor lockout events for attack detection"
+      ],
+      "remediation": [
+        "Это безопасная конфигурация; исправление не требуется.",
+        "Организуйте в службе поддержки обработку законных запросов на разблокировку.",
+        "Внедрите самостоятельную разблокировку с надёжной проверкой личности.",
+        "Отслеживайте события блокировки учётных записей для выявления атак."
+      ]
+    },
+    "NO_MAX_PASSWORD_AGE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Compromised passwords remain valid indefinitely",
+        "No forced rotation after suspected breach",
+        "Stale credentials accumulate over time",
+        "Compliance violations (PCI-DSS, HIPAA require rotation)"
+      ],
+      "impact": [
+        "Скомпрометированные пароли продолжают действовать неограниченно долго.",
+        "При подозрении на компрометацию принудительная ротация пароля не происходит автоматически.",
+        "Со временем накапливаются устаревшие учётные данные.",
+        "В исходном описании это также названо нарушением требований PCI-DSS и HIPAA к смене паролей; применимость конкретных требований необходимо проверять отдельно."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Set maximum password age to 365 days or less",
+        "Implement breach detection and forced reset on compromise",
+        "Deploy Azure AD Password Protection for leaked password detection",
+        "Consider passwordless authentication (FIDO2, Windows Hello)"
+      ],
+      "remediation": [
+        "Установите максимальный срок действия пароля не более 365 дней.",
+        "Внедрите обнаружение компрометации паролей и обязательный сброс при подтверждении компрометации.",
+        "Разверните Azure AD Password Protection для выявления скомпрометированных паролей.",
+        "Рассмотрите аутентификацию без пароля (FIDO2, Windows Hello)."
+      ]
+    },
+    "PASSWORD_HISTORY_DISABLED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "A forced password change can be undone by setting the previous password again",
+        "A leaked password that was reset can return the moment its owner sets it again"
+      ],
+      "impact": [
+        "После принудительной смены пароля пользователь может снова установить предыдущий пароль.",
+        "Пароль, раскрытый и затем сброшенный, может снова использоваться, если владелец задаст его повторно."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Set 'Enforce password history' to 24 in the Default Domain Policy, and msDS-PasswordHistoryLength on fine-grained policies",
+        "Set a minimum password age above 0 as well - without it, a history can be cycled through by changing the password several times in a row"
+      ],
+      "remediation": [
+        "Установите «Enforce password history» = 24 в Default Domain Policy, а для детальных политик задайте msDS-PasswordHistoryLength.",
+        "Также установите минимальный срок действия пароля больше 0: иначе историю можно обойти последовательной многократной сменой пароля."
+      ]
+    }
+  }
+}
