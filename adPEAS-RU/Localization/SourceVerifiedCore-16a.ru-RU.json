@@ -1,0 +1,296 @@
+{
+  "schema": "adPEAS-RU.StageD7.CoreFields.16a",
+  "upstream": "61106960/adPEAS 2.9.0 ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "translations": {
+    "AUTHN_KDC_ARMORING_NOT_SUPPORTED": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "The device restriction of a silo - the reason it exists for Tier 0 - cannot be evaluated by the KDC",
+        "Conditions on the silo claim have no claim to test"
+      ],
+      "impact": [
+        "Ограничение устройств в authentication policy silo — ключевая мера защиты Tier 0 — не может быть проверено контроллером KDC.",
+        "Условия на основе silo claim не имеют утверждения (claim), с которым их можно сопоставить."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Enable 'KDC support for claims, compound authentication and Kerberos armoring' (Computer Configuration > Administrative Templates > System > KDC) in a policy that reaches every domain controller, at Supported or Always provide claims",
+        "Enable 'Kerberos client support for claims, compound authentication and Kerberos armoring' (System > Kerberos) on the devices the accounts sign on from",
+        "Choose 'Fail unarmored authentication requests' only once every client supports armoring - clients that do not can no longer authenticate"
+      ],
+      "remediation": [
+        "Включите «KDC support for claims, compound authentication and Kerberos armoring» (Computer Configuration → Administrative Templates → System → KDC) в политике, действующей на все контроллеры домена, установив Supported или Always provide claims.",
+        "Включите «Kerberos client support for claims, compound authentication and Kerberos armoring» (System → Kerberos) на устройствах, с которых выполняется вход под этими учётными записями.",
+        "Выбирайте «Fail unarmored authentication requests» только после поддержки armoring всеми клиентами: клиенты без такой поддержки перестанут проходить аутентификацию."
+      ]
+    },
+    "AUTHN_POLICY_EXEMPT_ADMINISTRATOR": {
+      "sourceEnglishImpactCount": 1,
+      "sourceEnglishImpact": [
+        "The most privileged account of the domain is not restricted by the silo or policy it appears in"
+      ],
+      "impact": [
+        "Встроенная наиболее привилегированная учётная запись домена не ограничивается silo или политикой, даже если числится в них."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Protect the built-in Administrator by other means: a long random password kept offline, the account disabled where possible, 'Deny log on' user rights on non-Tier 0 machines, and monitoring of its logons",
+        "Remove it from the silo or policy so the configuration does not suggest a protection it does not have"
+      ],
+      "remediation": [
+        "Защитите встроенную учётную запись Administrator другими средствами: длинным случайным паролем с автономным хранением, отключением при возможности, правами «Deny log on» на компьютерах вне Tier 0 и мониторингом входов.",
+        "Удалите её из silo или назначения политики, чтобы конфигурация не создавала ложного впечатления о действующей защите."
+      ]
+    },
+    "AUTHN_POLICY_OBJECT_WRITABLE": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "The protection of every account in the silo or under the policy can be switched off",
+        "An account can be added to a silo so that it passes conditions that require silo membership"
+      ],
+      "impact": [
+        "Защиту всех учётных записей в silo или под действием политики можно отключить.",
+        "Учётную запись можно добавить в silo, чтобы она выполняла условия, требующие членства в нём."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Remove the write access - silos and policies should be writable by Enterprise Admins and Domain Admins of the forest root only"
+      ],
+      "remediation": [
+        "Удалите право записи: изменять authentication policy silos и политики должны только Enterprise Admins и Domain Admins корневого домена леса."
+      ]
+    },
+    "AUTHN_SILO_INCOMPLETE_ENROLLMENT": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "The account is not restricted by the silo, although it appears in it",
+        "A policy assigned directly to the account applies instead, if there is one"
+      ],
+      "impact": [
+        "Учётная запись фактически не ограничивается silo, хотя кажется его участником.",
+        "Вместо silo действует непосредственно назначенная учётной записи authentication policy, если она есть."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Complete the enrollment: Grant-ADAuthenticationPolicySiloAccess for the membership, Set-ADAccountAuthenticationPolicySilo for the assignment",
+        "Or remove the half that is left over, if the account does not belong in the silo"
+      ],
+      "remediation": [
+        "Завершите регистрацию в silo: Grant-ADAuthenticationPolicySiloAccess задаёт членство, а Set-ADAccountAuthenticationPolicySilo — назначение silo учётной записи.",
+        "Либо удалите оставшуюся половину настройки, если учётная запись не должна входить в silo."
+      ]
+    },
+    "AUTHN_SILO_NOT_EFFECTIVE": {
+      "sourceEnglishImpactCount": 3,
+      "sourceEnglishImpact": [
+        "The accounts the silo is meant to confine can sign on from any machine - a Tier 0 credential lands wherever an administrator logs on",
+        "Their tickets keep the domain's lifetime instead of the silo's",
+        "The silo looks like protection in every console that lists it"
+      ],
+      "impact": [
+        "Учётные записи, которые silo должен ограничивать, могут входить с любых компьютеров; учётные данные Tier 0 попадают туда, где администратор выполнил вход.",
+        "Билеты продолжают использовать срок действия из доменной политики, а не из правил silo.",
+        "В консолях управления silo при этом выглядит как действующая защита."
+      ],
+      "sourceEnglishRemediationCount": 2,
+      "sourceEnglishRemediation": [
+        "Review the audit events (Microsoft-Windows-Authentication/AuthenticationPolicyFailures-DomainController, events 305 and 306), then enforce the silo: Set-ADAuthenticationPolicySilo -Identity 'SILO' -Enforce `$true",
+        "Give the silo a user authentication policy, and enroll its accounts - see the enrollment card"
+      ],
+      "remediation": [
+        "Изучите события аудита (Microsoft-Windows-Authentication/AuthenticationPolicyFailures-DomainController, события 305 и 306), затем включите применение ограничений: Set-ADAuthenticationPolicySilo -Identity 'SILO' -Enforce `$true.",
+        "Назначьте silo политику аутентификации пользователей и полностью зарегистрируйте в нём учётные записи; см. карточку о членстве."
+      ]
+    },
+    "LDAP_ANONYMOUS_BINDING_RESTRICTED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Unauthenticated LDAP enumeration is blocked",
+        "Attackers cannot gather AD information without credentials",
+        "Reduces exposure of usernames, groups, and organizational structure",
+        "Compliant with security hardening best practices"
+      ],
+      "impact": [
+        "Анонимное перечисление объектов по LDAP заблокировано.",
+        "Атакующие без учётных данных не могут собирать сведения AD через анонимный LDAP.",
+        "Снижена доступность имён пользователей, групп и организационной структуры для посторонних.",
+        "Настройка соответствует практикам усиления безопасности."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Verify the setting is applied via GPO for consistency",
+        "Audit any exceptions that may require anonymous access",
+        "Monitor for failed anonymous bind attempts"
+      ],
+      "remediation": [
+        "Это безопасная конфигурация: исправление не требуется.",
+        "Проверьте единообразное применение настройки через GPO.",
+        "Проведите аудит исключений, которым может требоваться анонимный доступ.",
+        "Отслеживайте неуспешные попытки анонимного LDAP bind."
+      ]
+    },
+    "LDAP_CHANNEL_BINDING_ALWAYS": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "LDAPS connections are protected against relay attacks",
+        "TLS channel is cryptographically bound to authentication",
+        "Enhanced protection beyond just LDAP signing",
+        "Compliant with Microsoft's 2020 LDAP security recommendations"
+      ],
+      "impact": [
+        "Соединения LDAPS защищены от ретрансляции аутентификации (relay).",
+        "TLS-канал криптографически связан с выполняемой аутентификацией.",
+        "Это дополнительная защита сверх обязательной подписи LDAP.",
+        "Настройка соответствует рекомендациям Microsoft по безопасности LDAP, опубликованным в 2020 году."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Ensure this is consistently configured via GPO across all DCs",
+        "Verify application compatibility has been tested",
+        "Document in security hardening baseline"
+      ],
+      "remediation": [
+        "Это безопасная конфигурация: исправление не требуется.",
+        "Обеспечьте единообразие настройки на всех контроллерах домена через GPO.",
+        "Убедитесь, что совместимость приложений проверена.",
+        "Зафиксируйте настройку в базовом стандарте усиления безопасности."
+      ]
+    },
+    "LDAP_SIGNING_REQUIRED": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "LDAP traffic is protected against interception and modification",
+        "NTLM relay attacks targeting LDAP services are blocked",
+        "Credentials and data are protected during LDAP communications",
+        "Compliant with security best practices and CIS benchmarks"
+      ],
+      "impact": [
+        "Обмен по LDAP защищён от перехвата и изменения трафика средствами подписи.",
+        "Атаки NTLM relay, направленные на LDAP-службы, блокируются.",
+        "Учётные данные и передаваемая информация защищаются при LDAP-обмене.",
+        "Настройка соответствует рекомендуемым практикам безопасности и требованиям CIS Benchmarks."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "This is a secure configuration - no remediation needed",
+        "Ensure this setting is consistently applied across all Domain Controllers",
+        "Document this security control in your hardening baseline",
+        "Monitor for any attempts to weaken this setting"
+      ],
+      "remediation": [
+        "Это безопасная конфигурация: исправление не требуется.",
+        "Убедитесь, что требование подписи одинаково настроено на всех контроллерах домена.",
+        "Задокументируйте защитную настройку в базовом стандарте безопасности.",
+        "Отслеживайте попытки ослабить это требование."
+      ]
+    },
+    "ADCS_MANAGER_APPROVAL": {
+      "sourceEnglishImpactCount": 2,
+      "sourceEnglishImpact": [
+        "If not required: Certificates are issued automatically upon request",
+        "If required: Provides manual review step preventing immediate exploitation"
+      ],
+      "impact": [
+        "Если одобрение не требуется, сертификаты выдаются автоматически при поступлении запросов.",
+        "Если одобрение обязательно, ручная проверка заявок предотвращает немедленную эксплуатацию опасного шаблона."
+      ],
+      "sourceEnglishRemediationCount": 1,
+      "sourceEnglishRemediation": [
+        "Enable Manager Approval for sensitive templates"
+      ],
+      "remediation": [
+        "Включите Manager Approval для чувствительных шаблонов сертификатов."
+      ]
+    },
+    "DOMAIN_ROOT_MAQ_WRITE": {
+      "sourceEnglishImpactCount": 4,
+      "sourceEnglishImpact": [
+        "Raising the quota hands every authenticated user a computer account they fully control",
+        "A controlled computer account is what RBCD needs as the delegation source",
+        "The same account carries a machine certificate and a key credential, which opens the certificate and shadow-credential paths",
+        "A quota of zero is the documented mitigation, and this write access reverses it without touching any other setting"
+      ],
+      "impact": [
+        "Повышение квоты позволяет любому аутентифицированному пользователю создать полностью контролируемую им учётную запись компьютера.",
+        "Такая учётная запись компьютера используется как источник делегирования при атаках RBCD.",
+        "У неё могут быть сертификат компьютера и ключевые учётные данные (key credential), что открывает пути сертификатных атак и Shadow Credentials.",
+        "Квота, установленная в 0, служит документированной защитой; право записи атрибута позволяет отменить её без изменения других настроек."
+      ],
+      "sourceEnglishRemediationCount": 3,
+      "sourceEnglishRemediation": [
+        "Remove write access to the attribute from every non-Tier-0 principal",
+        "Set the quota to 0 and delegate computer creation explicitly where it is needed",
+        "Alert on changes to the attribute (Event ID 5136 on the domain object)"
+      ],
+      "remediation": [
+        "Удалите право изменения ms-DS-MachineAccountQuota у всех субъектов вне Tier 0.",
+        "Установите квоту в 0, а необходимое создание компьютеров делегируйте явно.",
+        "Настройте оповещения об изменении атрибута (Event ID 5136 у объекта домена)."
+      ]
+    },
+    "OU_PERM_CREATE_CHILD": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "Can create new objects (users, computers, groups) in the OU",
+        "Computer object creation enables RBCD attacks",
+        "With a Windows Server 2025 domain controller, All Objects includes delegated Managed Service Accounts: paired with an account the creator can write to, a dMSA receives that account's group memberships and keys",
+        "Created objects may inherit dangerous permissions",
+        "Can be used to establish persistence"
+      ],
+      "impact": [
+        "Субъект может создавать новые объекты (пользователей, компьютеров, групп) в этой OU.",
+        "Создание учётных записей компьютеров позволяет проводить атаки RBCD.",
+        "Если хотя бы один контроллер домена работает под Windows Server 2025, CreateChild для All Objects охватывает delegated Managed Service Accounts: в паре с учётной записью, доступной создателю для изменения, dMSA получает её группы и ключи.",
+        "Создаваемые объекты могут наследовать опасные разрешения.",
+        "Возможна организация закрепления доступа (persistence)."
+      ],
+      "sourceEnglishRemediationCount": 5,
+      "sourceEnglishRemediation": [
+        "Remove CreateChild rights from non-admin principals",
+        "If delegation is needed, limit to specific object types",
+        "Lower ms-DS-MachineAccountQuota domain-wide",
+        "Monitor for new object creation in sensitive OUs",
+        "If the finding names an inherited source the entry is not on this OU - remove it where it is defined, or break inheritance here with SetAccessRuleProtection, which also cuts every other permission this OU inherits"
+      ],
+      "remediation": [
+        "Удалите CreateChild у неадминистративных субъектов.",
+        "Если делегирование необходимо, ограничьте его конкретными классами объектов.",
+        "Снизьте ms-DS-MachineAccountQuota для всего домена.",
+        "Отслеживайте создание объектов в чувствительных OU.",
+        "Если находка указывает на унаследованный источник, ACE задана не на этой OU: удалите её там, где она назначена, или отключите наследование через SetAccessRuleProtection, учитывая прекращение наследования и всех остальных прав OU."
+      ]
+    },
+    "OU_PERM_CREATE_DMSA": {
+      "sourceEnglishImpactCount": 5,
+      "sourceEnglishImpact": [
+        "The creator owns the dMSA and decides who may use it (msDS-GroupMSAMembership)",
+        "Paired with an account the creator can write to, the dMSA acts with that account's group memberships - Domain Admins and domain controllers included",
+        "The dMSA's key package holds the keys of the account it is paired with - a credential dump without DCSync",
+        "On its own: an account under the creator's control, usable like a created computer account",
+        "Relevant only while at least one domain controller runs Windows Server 2025"
+      ],
+      "impact": [
+        "Создатель является владельцем dMSA и определяет, кому разрешено использовать её (msDS-GroupMSAMembership).",
+        "При связывании с учётной записью, которую создатель может изменять, dMSA действует с её членством в группах, включая Domain Admins и контроллеры домена.",
+        "Пакет ключей dMSA включает ключи связанной учётной записи — извлечение учётных данных без DCSync.",
+        "Сама по себе созданная dMSA является контролируемой создателем учётной записью, подобно созданной учётной записи компьютера.",
+        "Это актуально только при наличии хотя бы одного контроллера домена с Windows Server 2025."
+      ],
+      "sourceEnglishRemediationCount": 4,
+      "sourceEnglishRemediation": [
+        "Remove the right to create this class - and every class - from principals that are not Tier 0 administrators",
+        "If a dMSA delegation is needed, grant it on a dedicated OU to a dedicated group",
+        "Audit the creation of dMSAs (event 5137) and changes to msDS-ManagedAccountPrecededByLink and msDS-SupersededManagedAccountLink (event 5136)",
+        "If the finding names an inherited source the entry is not on this OU - remove it where it is defined, or break inheritance here with SetAccessRuleProtection, which also cuts every other permission this OU inherits"
+      ],
+      "remediation": [
+        "Удалите у субъектов, не являющихся администраторами Tier 0, право создавать объекты этого класса и всех классов.",
+        "Если необходимо делегировать создание dMSA, выделите отдельную OU и отдельную группу для такого права.",
+        "Проверяйте создание dMSA (Event ID 5137) и изменения msDS-ManagedAccountPrecededByLink и msDS-SupersededManagedAccountLink (Event ID 5136).",
+        "Если источник разрешения унаследован, ACE задана выше OU: удалите её на исходном контейнере или отключите наследование через SetAccessRuleProtection, что также затронет другие наследуемые разрешения."
+      ]
+    }
+  }
+}
