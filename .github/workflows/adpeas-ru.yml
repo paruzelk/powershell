@@ -9,6 +9,7 @@ on:
       - "adPEAS-RU/Localization/**"
       - "adPEAS-RU/Run-AD-Audit-RU.ps1"
       - "adPEAS-RU/Tests/**"
+      - "adPEAS-RU/README_RU.md"
       - ".github/workflows/adpeas-ru.yml"
   workflow_dispatch:
 concurrency:
