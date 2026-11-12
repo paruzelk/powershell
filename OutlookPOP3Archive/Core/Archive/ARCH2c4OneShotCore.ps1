@@ -1,6 +1,8 @@
 ﻿#requires -Version 5.1
 # ARCH2c4 core integration: one real message from the verified POP3 Inbox to
 # a fresh one-shot archive PST. No production Archive/Resume/Auto activation.
+. (Join-Path $PSScriptRoot '../Runtime/ComManager.ps1')
+. (Join-Path $PSScriptRoot 'ArchiveSelector.ps1')
 . (Join-Path $PSScriptRoot 'ARCH2c4OneShotPolicy.ps1')
 . (Join-Path $PSScriptRoot 'ARCH2bSemanticWitness.ps1')
 function Release-OPA265ARCH2c4Com {
