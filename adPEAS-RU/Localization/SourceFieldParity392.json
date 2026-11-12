@@ -84,14 +84,10 @@
                                        "EXCHANGE_SMTP_BROAD_SPOOFING",
                                        "EXCHANGE_VULNERABLE_VERSION",
                                        "EXCHANGE_WEB_ENDPOINTS",
-                                       "GPO_USERRIGHT_SERELABEL",
-                                       "GPO_USERRIGHT_SESYNCAGENT",
-                                       "GPO_USERRIGHT_SETRUSTEDCREDMANACCESS",
                                        "GUEST_ACCOUNT_DISABLED",
                                        "INACTIVE_ACCOUNT",
                                        "INACTIVE_PRIVILEGED_ACCOUNT",
                                        "INTERDOMAIN_TRUST_ACCOUNT",
-                                       "KERBEROAST_WITHOUT_PREAUTH",
                                        "LAPS_INSTALLED",
                                        "LAPS_LEGACY",
                                        "LOGON_SCRIPT_WRITABLE",
@@ -100,10 +96,7 @@
                                        "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
                                        "NON_DEFAULT_COMPUTER_OWNERS",
                                        "NON_DEFAULT_USER_OWNERS",
-                                       "NO_ACCOUNT_LOCKOUT",
-                                       "NO_MIN_PASSWORD_AGE",
                                        "NTAUTH_FOREIGN_ISSUER",
-                                       "OLD_FUNCTIONAL_LEVEL",
                                        "OPERATOR_GROUP_MEMBERS",
                                        "OPERATOR_GROUP_MEMBERSHIP",
                                        "ORPHANED_ADMIN_ACCOUNT",
@@ -111,21 +104,16 @@
                                        "OUTDATED_OS",
                                        "OU_NON_DEFAULT_OWNER",
                                        "PASSWORD_COMPLEXITY_ENABLED",
-                                       "PASSWORD_NEVER_EXPIRES",
-                                       "PASSWORD_NOT_REQUIRED",
                                        "PKI_CERTIFICATE_EXPIRED",
                                        "PKI_SHORT_KEY_LENGTH",
                                        "PKI_STRONG_KEY_LENGTH",
                                        "PKI_STRONG_SIGNATURE_ALGORITHM",
                                        "PKI_WEAK_SIGNATURE_ALGORITHM",
                                        "PRECREATED_COMPUTER_ACCOUNT",
-                                       "PREWIN2000_ANONYMOUS_MEMBER",
-                                       "PREWIN2000_BROAD_MEMBER",
                                        "PREWIN2000_DEFAULT_MEMBER",
                                        "PRIMARY_GROUP_IS_DC_GROUP",
                                        "RBCD_CONFIGURED",
                                        "READABLE_UNIX_PASSWORD_ATTRIBUTES",
-                                       "REVERSIBLE_ENCRYPTION",
                                        "SCCM_GROUP_BROAD_MEMBER",
                                        "SCCM_PXE_EXPOSURE",
                                        "SCCM_SERVICE_ACCOUNT",
@@ -136,8 +124,6 @@
                                        "SID_HISTORY_ORPHANED",
                                        "SID_HISTORY_OWN_DOMAIN",
                                        "SMARTCARD_REQUIRED",
-                                       "SMB_SIGNING_DISABLED",
-                                       "SMB_SIGNING_REQUIRED",
                                        "STALE_PASSWORD",
                                        "STALE_PASSWORD_MEDIUM",
                                        "STANDALONE_MSA_LEGACY",
@@ -145,14 +131,8 @@
                                        "TRUST_BIDIRECTIONAL",
                                        "TRUST_PASSWORD_STALE",
                                        "TRUST_SELECTIVE_AUTH",
-                                       "TRUST_SID_FILTERING_DISABLED",
                                        "TRUST_TRANSITIVE",
                                        "TRUST_TREAT_AS_EXTERNAL",
-                                       "UNCONSTRAINED_DELEGATION_DC",
-                                       "UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS",
-                                       "WEAK_FGPP",
-                                       "WEAK_LOCKOUT_DURATION",
-                                       "WEAK_PASSWORD_POLICY",
                                        "WEB_ENDPOINT_EPA_ENABLED"
                                    ],
     "RemediationStepCountDifferences":  [
@@ -219,47 +199,33 @@
                                             "EXCHANGE_VULNERABLE_VERSION",
                                             "EXCHANGE_WEB_ENDPOINTS",
                                             "GPO_LINK_REACHES_DC",
-                                            "GPO_USERRIGHT_SEREMOTESHUTDOWN",
-                                            "GPO_USERRIGHT_SESHUTDOWN",
-                                            "GPO_USERRIGHT_SESYNCAGENT",
-                                            "GPO_USERRIGHT_SESYSTEMENVIRONMENT",
-                                            "GPO_USERRIGHT_SESYSTEMTIME",
                                             "GUEST_ACCOUNT_DISABLED",
                                             "INACTIVE_ACCOUNT",
                                             "INACTIVE_PRIVILEGED_ACCOUNT",
                                             "INTERDOMAIN_TRUST_ACCOUNT",
-                                            "KERBEROAST_WITHOUT_PREAUTH",
                                             "LOGON_SCRIPT_WRITABLE",
                                             "MACHINE_QUOTA_UNRESTRICTED",
                                             "MSSQL_SERVICE_ACCOUNT_PRIVILEGED",
                                             "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
                                             "NON_DEFAULT_COMPUTER_OWNERS",
                                             "NON_DEFAULT_USER_OWNERS",
-                                            "NO_ACCOUNT_LOCKOUT",
-                                            "NO_MIN_PASSWORD_AGE",
                                             "NTAUTH_FOREIGN_ISSUER",
-                                            "OLD_FUNCTIONAL_LEVEL",
                                             "OPERATOR_GROUP_MEMBERS",
                                             "OPERATOR_GROUP_MEMBERSHIP",
                                             "ORPHANED_ADMIN_ACCOUNT",
                                             "OS_EXTENDED_SECURITY_UPDATES_ONLY",
                                             "OUTDATED_OS",
                                             "OU_NON_DEFAULT_OWNER",
-                                            "PASSWORD_NEVER_EXPIRES",
-                                            "PASSWORD_NOT_REQUIRED",
                                             "PKI_CERTIFICATE_EXPIRED",
                                             "PKI_SHORT_KEY_LENGTH",
                                             "PKI_STRONG_KEY_LENGTH",
                                             "PKI_STRONG_SIGNATURE_ALGORITHM",
                                             "PKI_WEAK_SIGNATURE_ALGORITHM",
                                             "PRECREATED_COMPUTER_ACCOUNT",
-                                            "PREWIN2000_ANONYMOUS_MEMBER",
-                                            "PREWIN2000_BROAD_MEMBER",
                                             "PREWIN2000_DEFAULT_MEMBER",
                                             "PRIMARY_GROUP_IS_DC_GROUP",
                                             "RBCD_CONFIGURED",
                                             "READABLE_UNIX_PASSWORD_ATTRIBUTES",
-                                            "REVERSIBLE_ENCRYPTION",
                                             "SCCM_GROUP_BROAD_MEMBER",
                                             "SCCM_PXE_EXPOSURE",
                                             "SCCM_SERVICE_ACCOUNT",
@@ -270,8 +236,6 @@
                                             "SID_HISTORY_ORPHANED",
                                             "SID_HISTORY_OWN_DOMAIN",
                                             "SMARTCARD_REQUIRED",
-                                            "SMB_SIGNING_DISABLED",
-                                            "SMB_SIGNING_REQUIRED",
                                             "STALE_PASSWORD",
                                             "STALE_PASSWORD_MEDIUM",
                                             "STANDALONE_MSA_LEGACY",
@@ -279,19 +243,13 @@
                                             "TRUST_BIDIRECTIONAL",
                                             "TRUST_PASSWORD_STALE",
                                             "TRUST_SELECTIVE_AUTH",
-                                            "TRUST_SID_FILTERING_DISABLED",
                                             "TRUST_TRANSITIVE",
                                             "TRUST_TREAT_AS_EXTERNAL",
-                                            "UNCONSTRAINED_DELEGATION_DC",
-                                            "UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS",
-                                            "WEAK_FGPP",
-                                            "WEAK_LOCKOUT_DURATION",
-                                            "WEAK_PASSWORD_POLICY",
                                             "WEB_ENDPOINT_EPA_ENABLED"
                                         ],
     "RussianImpactWithNoSource":  15,
     "RussianRemediationWithNoSource":  15,
-    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 198 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
+    "Note":  "Все 304 Attack имеют русский текст; последние 112 снабжены буквальными EN-свидетелями с проверкой исходника. 222 приоритетных Impact/Remediation сверены построчно; совпадение количества пунктов остальных не доказывает смысловую точность.",
     "UserReportDataIncluded":  false,
     "Fields":  [
                    {
@@ -1971,7 +1929,7 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SERELABEL",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
@@ -1993,7 +1951,7 @@
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
-                       "RemediationRU":  2
+                       "RemediationRU":  1
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SERESTORE",
@@ -2029,16 +1987,16 @@
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
-                       "RemediationRU":  2
+                       "RemediationRU":  1
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SESYNCAGENT",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SESYSTEMENVIRONMENT",
@@ -2047,7 +2005,7 @@
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
-                       "RemediationRU":  2
+                       "RemediationRU":  1
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SESYSTEMPROFILE",
@@ -2065,7 +2023,7 @@
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
-                       "RemediationRU":  2
+                       "RemediationRU":  1
                    },
                    {
                        "FindingId":  "GPO_USERRIGHT_SETAKEOWNERSHIP",
@@ -2088,7 +2046,7 @@
                    {
                        "FindingId":  "GPO_USERRIGHT_SETRUSTEDCREDMANACCESS",
                        "ImpactEN":  2,
-                       "ImpactRU":  1,
+                       "ImpactRU":  2,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  1,
@@ -2169,11 +2127,11 @@
                    {
                        "FindingId":  "KERBEROAST_WITHOUT_PREAUTH",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  2,
-                       "RemediationRU":  1
+                       "RemediationRU":  2
                    },
                    {
                        "FindingId":  "KERBEROS_HASH_CRACKABLE",
@@ -2538,11 +2496,11 @@
                    {
                        "FindingId":  "NO_ACCOUNT_LOCKOUT",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  2
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "NO_MAX_PASSWORD_AGE",
@@ -2556,11 +2514,11 @@
                    {
                        "FindingId":  "NO_MIN_PASSWORD_AGE",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "NTAUTH_FOREIGN_ISSUER",
@@ -2574,11 +2532,11 @@
                    {
                        "FindingId":  "OLD_FUNCTIONAL_LEVEL",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  0,
                        "AttackRU":  0,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "OPERATOR_GROUP_MEMBERS",
@@ -2862,20 +2820,20 @@
                    {
                        "FindingId":  "PASSWORD_NEVER_EXPIRES",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  2
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "PASSWORD_NOT_REQUIRED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  2
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "PKI_CERTIFICATE_EXPIRED",
@@ -2934,20 +2892,20 @@
                    {
                        "FindingId":  "PREWIN2000_ANONYMOUS_MEMBER",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "PREWIN2000_BROAD_MEMBER",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "PREWIN2000_DEFAULT_MEMBER",
@@ -3438,11 +3396,11 @@
                    {
                        "FindingId":  "REVERSIBLE_ENCRYPTION",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "ROASTABLE_PRIVILEGED_ACCOUNT",
@@ -3600,20 +3558,20 @@
                    {
                        "FindingId":  "SMB_SIGNING_DISABLED",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  7,
-                       "RemediationRU":  2
+                       "RemediationRU":  7
                    },
                    {
                        "FindingId":  "SMB_SIGNING_REQUIRED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  5,
                        "AttackRU":  5,
                        "RemediationEN":  4,
-                       "RemediationRU":  2
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "STALE_PASSWORD",
@@ -3699,11 +3657,11 @@
                    {
                        "FindingId":  "TRUST_SID_FILTERING_DISABLED",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "TRUST_TRANSITIVE",
@@ -3753,20 +3711,20 @@
                    {
                        "FindingId":  "UNCONSTRAINED_DELEGATION_DC",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  5,
-                       "RemediationRU":  1
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  3,
-                       "RemediationRU":  1
+                       "RemediationRU":  3
                    },
                    {
                        "FindingId":  "UNREGISTERED_DOMAIN_CONTROLLER",
@@ -3780,29 +3738,29 @@
                    {
                        "FindingId":  "WEAK_FGPP",
                        "ImpactEN":  5,
-                       "ImpactRU":  1,
+                       "ImpactRU":  5,
                        "AttackEN":  3,
                        "AttackRU":  3,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "WEAK_LOCKOUT_DURATION",
                        "ImpactEN":  3,
-                       "ImpactRU":  1,
+                       "ImpactRU":  3,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  4,
-                       "RemediationRU":  1
+                       "RemediationRU":  4
                    },
                    {
                        "FindingId":  "WEAK_PASSWORD_POLICY",
                        "ImpactEN":  4,
-                       "ImpactRU":  1,
+                       "ImpactRU":  4,
                        "AttackEN":  4,
                        "AttackRU":  4,
                        "RemediationEN":  5,
-                       "RemediationRU":  2
+                       "RemediationRU":  5
                    },
                    {
                        "FindingId":  "WEB_ENDPOINT_EPA_ENABLED",
