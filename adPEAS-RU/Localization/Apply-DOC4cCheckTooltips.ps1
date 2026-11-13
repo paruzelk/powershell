@@ -58,7 +58,7 @@ if($translations.Count -ne 125 -or $loadedFiles -ne 9){
 $defs=[IO.File]::ReadAllText(
  (Join-Path $ProjectRoot 'src/modules/Core/adPEAS-ObjectTypes.ps1'),
  [Text.Encoding]::UTF8)
-$originalIds=@([regex]::Matches($defs,"(?m)^    '([^']+)'\\s*=\\s*@\\{") |
+$originalIds=@([regex]::Matches($defs,"(?m)^    '([^']+)'\s*=\s*@\{") |
  ForEach-Object {$_.Groups[1].Value})
 if($originalIds.Count -ne 125){throw "DOC4c: исходный каталог ObjectType изменился ($($originalIds.Count))"}
 foreach($id in $originalIds){
