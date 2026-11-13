@@ -100,6 +100,12 @@ Describe 'ARCH3j original shared DuplicateIndex read-only strict gate' {
         $r.Approved | Should -BeFalse
         $r.Reason | Should -BeExactly 'SourceAlreadyInOriginalSharedDuplicateIndex'
     }
+    It 'rejects malformed final shared JSONL line even when newline is present' {
+        New-ARCH3jEmptySharedIndex
+        $journal=Join-Path (Join-Path $TestDrive 'OutlookPOP3Archive-Transactions') 'DuplicateIndex.jsonl'
+        [IO.File]::WriteAllText($journal,('NOT_VALID_JSON'+[Environment]::NewLine))
+        {Get-OPA265ARCH3jIndexSafety -Part1 $script:part1 -SourceEntryId $script:sourceId} | Should -Throw
+    }
     It 'refuses unterminated shared index JSONL before original importer' {
         New-ARCH3jEmptySharedIndex
         [IO.File]::WriteAllText((Join-Path (Join-Path $TestDrive 'OutlookPOP3Archive-Transactions') 'DuplicateIndex.jsonl'),'{"SourceEntryId":"bad"}')
