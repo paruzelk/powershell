@@ -35,10 +35,9 @@ $functions=@('Connect-adPEAS','Disconnect-adPEAS','Get-adPEASSession',
  'Invoke-Kerberoast','Invoke-ASREPRoast','Request-ADCSCertificate',
  'Get-LAPSGPOConfig','Get-OUPermissions','Get-GPOLinkage','Invoke-PortScan')
 foreach($fn in $functions){
- foreach($lines in @($enLines,$ruLines)){
-  if(@($lines | Where-Object {$_ -ceq ('### '+$fn)}).Count -ne 1){
-   throw "DOC2b: пропущен раздел $fn"
-  }
+ if(@($enLines | Where-Object {$_ -ceq ('### '+$fn)}).Count -ne 1 -or
+    @($ruLines | Where-Object {$_ -ceq ('### '+$fn)}).Count -ne 1){
+  throw "DOC2b: пропущен раздел $fn"
  }
 }
 function Remove-Comment([string]$Line){
@@ -46,7 +45,8 @@ function Remove-Comment([string]$Line){
  return ($Line -creplace '[ `t]+#[^\r\n]*$','')
 }
 $inCode=$false;$codeBlocks=0;$comments=0;$translated=0
-$techPattern=[char]96 + '([^' + [char]96 + ']+)' + [char]96
+$tick=[string][char]96
+$techPattern=$tick+'([^'+$tick+']+)'+$tick
 for($i=0;$i -lt $enLines.Count;$i++){
  $x=$enLines[$i];$y=$ruLines[$i]
  if($x.StartsWith(([string][char]96)*3)){
@@ -78,7 +78,7 @@ $ruLinks=@([regex]::Matches($ru,$linkRegex) | ForEach-Object {$_.Groups[1].Value
 if(($enLinks -join [char]31) -cne ($ruLinks -join [char]31)){
  throw 'DOC2b: изменены ссылки оригинала'
 }
-foreach($term in @('Global Catalog','UnPAC-the-Hash','sIDHistory','CredentialRoaming',
+foreach($term in @('GCConnection','UnPAC-the-Hash','sIDHistory','CredentialRoaming',
  'GrantsControlAccess','READ_PROPERTY','CONTROL_ACCESS','-DomainComputers',
  '-ActiveDays','-ExportOpenPorts','Get-NetworkMap','BatchSize','TimeoutMs','COM/RPC')){
  if(-not $ru.Contains($term)){throw "DOC2b: отсутствует ограничение $term"}
