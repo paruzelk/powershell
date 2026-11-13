@@ -142,6 +142,13 @@ Describe 'ARCH3i private immutable full witness evidence, real Windows filesyste
         $script:testLayout=Get-OPA265ARCH3iEvidenceLayout -RunId $script:testRunId
         $script:params=New-ARCH3iPins -Digest $script:testDigest
         $script:params.RunId=$script:testRunId
+        # The fake Outlook adapter still runs through the real read-only PST
+        # existence/reparse-point guard. Use a tiny disposable TestDrive PST,
+        # never a real user PST or a weaker production preflight.
+        $script:testSource=Join-Path $TestDrive 'info@stios.ru.pst'
+        [IO.File]::WriteAllBytes($script:testSource,[byte[]](1..32))
+        $script:params.SourcePst=$script:testSource
+        $script:source=$script:testSource
         Mock Invoke-OPA265ARCH3hPinnedSemanticWitness {
             return (New-ARCH3iObserved -Witness $script:testWitness)
         }
