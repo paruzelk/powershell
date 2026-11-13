@@ -48,7 +48,8 @@ function Invoke-OPA265ARCH3hPinnedSemanticWitness {
         [Parameter(Mandatory=$true)][ValidateRange(1,9223372036854775807)][long]$ExpectedSourcePstLengthBytes,
         [Parameter(Mandatory=$true)][ValidateRange(1,9223372036854775807)][long]$ExpectedExistingArchiveLengthBytes,
         [Parameter(Mandatory=$true)][ValidateRange(0,256)][int]$ExpectedAttachmentCount,
-        [Parameter(Mandatory=$true)][datetime]$ExpectedArchiveDate
+        [Parameter(Mandatory=$true)][datetime]$ExpectedArchiveDate,
+        [switch]$IncludeFullWitness
     )
     $p=Assert-OPA265ARCH3fRealTestSource -SourcePst $SourcePst -RequireExisting:($Mode -ceq 'Witness')
     $id=Assert-OPA265ARCH3gSourceEntryId -SourceEntryId $SourceEntryId
@@ -129,7 +130,7 @@ function Invoke-OPA265ARCH3hPinnedSemanticWitness {
            [string]$parent.EntryID -cne $ExpectedSourceFolderEntryId){
             throw 'ARCH3h source or existing archive changed while hashing; STOP.'
         }
-        return [pscustomobject][ordered]@{
+        $result=[pscustomobject][ordered]@{
             Schema='2.6.5-ARCH3h.OriginalSemanticWitness.1'
             Status='RealSourceFullOriginalSemanticWitnessComputedNoMove'
             SourcePst=$p;SourceEntryId=$id
@@ -154,6 +155,10 @@ function Invoke-OPA265ARCH3hPinnedSemanticWitness {
             NoPstOrJournalWrites=$true;LiveMovePerformed=$false
             AutomaticRetryAllowed=$false;WriterPermit=$false;ProductionReady=$false
         }
+        # Internal opt-in for ARCH3i immutable evidence. Public ARCH3h entrypoint
+        # does not expose this switch or print the full witness object.
+        if($IncludeFullWitness){$result | Add-Member -NotePropertyName FullWitness -NotePropertyValue $witness}
+        return $result
     } finally{
         Release-OPA265ARCH2c4Com -Object $parent
         Release-OPA265ARCH2c4Com -Object $mail
