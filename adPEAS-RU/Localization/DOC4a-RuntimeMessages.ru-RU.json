@@ -38,6 +38,26 @@
     "src/modules/Helpers/Get-GCConnection.ps1": {
       "    Show-Line (\"Global Catalog (port 3268) is not reachable on $($targets -join ', ') - identities from \" +": "    Show-Line (\"Глобальный каталог (порт 3268) недоступен на $($targets -join ', '): идентификаторы из \" +",
       "               'another domain cannot be resolved and are reported as unresolved') -Class Note": "                          'других доменов не удаётся сопоставить с именами, поэтому они выводятся как неразрешённые') -Class Note"
+    },
+    "src/modules/Checks/Creds/Get-BitLockerRecoveryKeyAccess.ps1": {
+      "        $readableText = 'No - blocked by the confidential flag on msFVE-RecoveryPassword, live the moment it is cleared'": "        $readableText = 'Нет — флаг конфиденциальности msFVE-RecoveryPassword блокирует чтение; после его снятия право начнёт действовать'",
+      "            $readableText = 'Yes - the principal can read these recovery passwords today'": "            $readableText = 'Да — этот субъект может читать пароли восстановления сейчас'",
+      "            $readableText = 'Unknown - the schema could not be read, so whether the confidential flag blocks the read is open'": "            $readableText = 'Неизвестно — схема недоступна, поэтому действие флага конфиденциальности определить не удалось'",
+      "            if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', blocked by the confidential flag' }": "            if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', чтение блокируется флагом конфиденциальности' }",
+      "            if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', not decidable - the schema could not be read' }": "            if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', не удалось проверить: схема недоступна' }",
+      "            $containerTexts.Add(\"$($item.Container) ($($computersByContainer[$item.Container]) computer(s)$suffix)\")": "            $containerTexts.Add(\"$($item.Container) ($($computersByContainer[$item.Container]) компьютеров$suffix)\")",
+      "            Show-Line (\"No non-privileged principal holds a delegated read of the BitLocker recovery passwords, but \" +": "            Show-Line (\"Делегированных прав чтения паролей восстановления BitLocker у непривилегированных субъектов не обнаружено, однако \" +",
+      "                       \"$($suppressedPrivileged.Count) privileged one(s) hold a right on them - use -IncludePrivileged to see them\") -Class Note": "                                  \"$($suppressedPrivileged.Count) привилегированных субъектов имеют такие права; для просмотра используйте -IncludePrivileged\") -Class Note",
+      "            Show-Line (\"The delegations on the $totalContainers container(s) holding computers were not evaluated - \" +": "            Show-Line (\"Делегированные права в $totalContainers контейнерах компьютеров не проверены: \" +",
+      "                       \"no security descriptor could be read\") -Class Note": "                                  \"не удалось прочитать ни одного дескриптора безопасности\") -Class Note",
+      "            Show-Line (\"No principal holds a delegated read of the BitLocker recovery passwords on the $readContainers \" +": "            Show-Line (\"Не обнаружено делегированных прав чтения паролей восстановления BitLocker в $readContainers \" +",
+      "                       \"container(s) holding computers\") -Class $delegationClass": "                                  \"проверенных контейнерах компьютеров\") -Class $delegationClass",
+      "        Show-Line (\"Found $($findingRows.Count) non-privileged principal(s) who can read BitLocker recovery \" +": "        Show-Line (\"Найдено непривилегированных субъектов с правом чтения паролей восстановления BitLocker: $($findingRows.Count); \" +",
+      "                   \"passwords\") -Class Finding -FindingId 'BITLOCKER_RECOVERY_DELEGATED'": "                              \"права действуют сейчас\") -Class Finding -FindingId 'BITLOCKER_RECOVERY_DELEGATED'",
+      "        Show-Line (\"Found $($hintRows.Count) further delegated read(s) of the BitLocker recovery passwords that \" +": "        Show-Line (\"Найдено дополнительных делегированных прав чтения паролей восстановления BitLocker: $($hintRows.Count); \" +",
+      "                   \"do not work today or belong to a privileged principal\") -Class Hint -FindingId 'BITLOCKER_RECOVERY_DELEGATED'": "                              \"они пока не действуют либо принадлежат привилегированным субъектам\") -Class Hint -FindingId 'BITLOCKER_RECOVERY_DELEGATED'",
+      "        Show-Line (\"$($suppressedPrivileged.Count) privileged principal(s) hold a right on the recovery passwords \" +": "        Show-Line (\"Привилегированных субъектов, не перечисленных в результатах, но имеющих доступ к паролям восстановления: $($suppressedPrivileged.Count); \" +",
+      "                   \"and are not listed - they read them regardless. Use -IncludePrivileged to see them\") -Class Note": "                              \"они могут читать пароли независимо от этой проверки. Используйте -IncludePrivileged для просмотра\") -Class Note"
     }
   }
 }
