@@ -1,5 +1,11 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
+
+### ARCH3f — `info@stios.ru.pst` является тестовым источником (решение оператора)
+
+**13.11.2026:** оператор уточнил: файл `C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.pst` — **тестовый PST с реальными письмами**. Именно его можно использовать для следующих контролируемых *реальных* ARCH3f-пилотов (Inbox / Sent / вложенные папки / разные годы), не требуя обязательно нового одноразового PST. При необходимости оператор способен повторно скачать почту по IMAP; однако это не гарантия восстановления локальных POP3-only писем, отправленных, пользовательских папок и метаданных. **Использование источника разрешено после runtime-gates; массовый `Archive/Resume/Auto`, повтор неопределённого `Move`, удаление PST и журнальных доказательств этим решением не разрешены.** Предпочтительна закрытая резервная копия PST перед новым пилотом. Подробные условия и переопределение ARCH3f: [классификация тестового PST](docs/2.6.5-arch3f-test-pst-authorization.md).
+
+
 ### ARCH3e — исходный ArchiveVerifier и DuplicateIndex, запись только после проверки (DEV)
 
 [ARCH3e: original verifier → Reconciled → DuplicateIndex, только synthetic](docs/2.6.5-arch3e-original-verifier-index-gate.md). `Core/Archive/ARCH3ePostRestartIndexGate.ps1` связывает внешне закреплённый `MoveReturned` из исходного `MailMover` с настоящим `Test-OPAArchiveMoves -RequireSemanticWitness` и полным original ARCH2b Body/HTML/attachments. На изолированной тестовой папке нужен source-zero/archive-one; затем через **оригинальные** `Write-OPAOperationJournalEvent -Phase Reconciled` и `Add-OPADuplicateEntry` с принудительным fsync/readback коммитится только фиктивный индекс в TEMP. Нет настоящего Outlook, PST или independent live restart; user CLI `Invoke-ARCH3e.ps1 -Mode Plan|Audit` полностью read-only. `Archive/Resume/Auto` по-прежнему закрыты. Следующий шаг — отдельный disposable PST с реальным Outlook restart для новых интеграционных сочетаний, затем проверка 90 ГБ.
