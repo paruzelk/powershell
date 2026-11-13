@@ -1129,45 +1129,45 @@ Get-LogonScriptPermissions -OPSEC
 
 Анализирует безопасность групповых политик.
 
-**Locating a reported GPO in SYSVOL**: every finding that comes from a Group Policy names
-the policy the same way, whichever check produced it, so it can be opened without guessing:
+**Поиск упомянутой GPO в SYSVOL**: каждая находка, связанная с групповой политикой, именует
+её одинаково независимо от проверявшего модуля, чтобы объект можно было найти без догадок:
 
-- `GPOName` - the display name. Convenient, but not unique and not a path.
-- `GPOGUID` - the policy's identifier, and literally its folder name under
+- `GPOName` — отображаемое имя. Удобно, но не уникально и не является путём.
+- `GPOGUID` — идентификатор политики, совпадающий с именем её каталога в
   `\\<domain>\SYSVOL\<domain>\Policies\`.
-- `GPOPath` - the full path to that folder, as the directory records it in
-  `gPCFileSysPath`. Read from LDAP rather than assembled from the GUID, so that it is the
-  same string in every section: `gPCFileSysPath` names the domain, while adPEAS reads
-  SYSVOL through one specific domain controller, and the two spell the same folder
-  differently.
+- `GPOPath` — полный путь каталога, записанный в AD в
+  `gPCFileSysPath`. Он считывается через LDAP, а не составляется из GUID, поэтому
+  одна и та же строка показывается во всех разделах: `gPCFileSysPath` указывает домен, тогда как adPEAS
+  читает SYSVOL через определённый контроллер домена; это два разных способа записи пути к
+  одной папке.
 
-Checks that report a **setting found inside** a policy add one more row:
+Проверки, сообщающие о **параметре внутри** политики, дополнительно выводят:
 
-- `SourceFile` - the file inside the GPO folder the setting was read from, relative to it,
-  for example `Machine\Registry.pol` or
-  `MACHINE\Microsoft\Windows NT\SecEdit\GptTmpl.inf`. The leading `Machine` or `User`
-  matters: both halves of a policy carry files of the same name and they reach different
-  targets.
+- `SourceFile` — файл относительно каталога GPO, из которого получен параметр,
+  например `Machine\Registry.pol` или
+  `MACHINE\Microsoft\Windows NT\SecEdit\GptTmpl.inf`. Начальная часть `Machine` или `User`
+  имеет значение: в обеих половинах политики бывают одинаково названные файлы, но они действуют
+  на разные объекты.
 
-So the full path to the evidence behind such a finding is `<GPOPath>\<SourceFile>`.
+Итак, полный путь к подтверждению находки — `<GPOPath>\<SourceFile>`.
 
-Checks that report the **GPO object itself** - `Get-GPOPermissions`, the SMB and LDAP
-signing checks, `Get-AddComputerRights` - have no `SourceFile`, because the policy is the
-finding rather than a file inside it. They additionally show `distinguishedName`, which has
-no counterpart among the setting-level findings. Under the hood these are native LDAP
-objects and the three shared rows are relabelled for display only, so `displayName`, `Name`
-and `gPCFileSysPath` keep their LDAP names as properties and in the JSON export.
+Проверки **самого объекта GPO** — `Get-GPOPermissions`, проверка подписи SMB и LDAP,
+`Get-AddComputerRights` — не имеют `SourceFile`: находка относится к политике,
+а не к файлу внутри неё. Дополнительно выводится `distinguishedName`,
+который отсутствует в находках отдельных параметров. Внутри используются исходные LDAP-
+объекты, а три общие строки переименованы лишь для отображения. Поэтому `displayName`, `Name`
+и `gPCFileSysPath` сохраняют имена LDAP-свойств и в экспорте JSON.
 
-One deliberate departure: the credential checks (`Get-CredentialExposure`) print the
-complete path to the file as `FilePath` instead, because they also scan NETLOGON and a
-caller-supplied `-Path`, where there is no GPO folder to be relative to - and for a finding
-that does come from a GPO, that full path already contains the GUID.
+Осознанное исключение: проверки учётных данных (`Get-CredentialExposure`) выводят
+полный путь к файлу в поле `FilePath`, так как также сканируют NETLOGON и указанный
+пользователем `-Path`, где нет каталога GPO для относительного пути. Для находки из GPO
+полный путь уже содержит GUID.
 
-**Dormant policies are held back by default**: a service provider who ships a library of
-Group Policies and links a handful of them leaves the rest configured and applying nowhere.
-Reporting their settings buries the policies that are live, so a finding whose policy is
-not linked or not enabled is not listed. A count line gives the number and names how many
-distinct GPOs it covers, and one card per reason names the policies held back:
+**Неактивные политики по умолчанию скрываются**: поставщик может развернуть целую библиотеку GPO,
+привязать несколько политик, а остальные оставить настроенными, но нигде не применяемыми.
+Их параметры заглушили бы сведения о действующих GPO; поэтому находка по непривязанной
+или отключённой политике не выводится. Сводная строка показывает число скрытых находок и
+число отдельных GPO; карточка для каждой причины перечисляет скрытые политики:
 
 ```
 [?] Analyzing LDAP Signing/Channel Binding via GPO (SYSVOL)... (Get-LDAPConfiguration)
@@ -1184,34 +1184,34 @@ Policies:    Workstation Baseline V2              {11111111-1111-1111-1111-11111
     ... the active findings ...
 ```
 
-**The held-back block comes first, before the active findings.** After the `[?] Analyzing`
-line a reader sees what was held back and why, then `[+] Found ...` as the heading for the
-policies actually reported. The `[+] Found` line heads the finding objects, not the dampening
-block, so it sits directly above them.
+**Сводка скрытых политик выводится первой, перед активными находками.** После строки `[?] Analyzing`
+пользователь видит, что скрыто и почему, затем `[+] Found ...` — заголовок
+действительно отображаемых находок. Строка `[+] Found` относится к объектам находок, не к
+сводке скрытого, и располагается прямо над ними.
 
-Each reason is one **card** - a grey object in the console, a collapsible card in the HTML
-report, folded by default and sorted behind the real findings. One card per reason, not per
-policy: sixteen held-back GPOs become two or three cards. The policies live inside the card,
-display name left and GUID on column 45 - both, because the name is what a reader recognises
-and the GUID is the folder under `\\<domain>\SYSVOL\<domain>\Policies\` they need in order to
-look. A name longer than the column pushes its GUID right rather than being truncated; a
-cut-off GPO name is no longer findable in SYSVOL.
+Каждая причина — одна **карточка**: серый объект в консоли, сворачиваемая карточка HTML,
+изначально свернутая и отсортированная после реальных находок. Одна карточка на причину, не на
+политику: для шестнадцати скрытых GPO достаточно двух-трёх карточек. Внутри карточки
+слева имя политики, начиная с 45-го столбца GUID: нужны оба, поскольку имя узнаваемо,
+а GUID задаёт папку `\\<domain>\SYSVOL\<domain>\Policies\`, которую нужно найти
+в SYSVOL. Длинное имя сдвигает GUID вправо и не обрезается: по обрезанному
+имени политику в SYSVOL нельзя было бы найти.
 
-The count line counts findings and the card counts policies, which is why it names its unit
-(`on N GPO(s)`) whenever the two numbers differ - ten registry values in one unlinked GPO are
-one card line. Unlinked before disabled, since an unlinked policy is a cleanup candidate while
-a disabled one is a switch somebody threw on purpose; within a card the policies sort by name,
-so two runs against the same domain print the same thing. The list is not truncated - its
-length is bounded by the number of policies in the domain, and cutting it off would leave
-`-IncludeInactive` as the only way to learn the missing names, far more output than a cap saves.
+Сводная строка считает находки, а карточка — политики. Поэтому единица счёта указывается
+(`on N GPO(s)`), если два числа различаются: десять значений реестра в одной непривязанной
+политике дают одну строку в карточке. Непривязанные политики идут перед отключёнными:
+первые — кандидаты на очистку, а вторые обычно намеренно выключены. Внутри карточки сортировка
+по именам, чтобы два запуска по одному домену дали одинаковый порядок. Список не обрезается:
+его длина ограничена числом политик домена; обрезка заставила бы использовать
+`-IncludeInactive` только ради пропущенных имён, создавая гораздо больше вывода.
 
-**A configuration that exposes nothing is counted and named, not printed in full.** The same
-reasoning in a second direction: adPEAS reports a right or a setting granted to somebody who
-should not have it, so the opposite - a GPO that hardens - is worth a card and the policy
-named, not a block per finding. It is the same card the dampening summary uses and sits in the
-same place: before the active headline, grey, folded in the HTML report. Both checks are behind
-`-IncludeDefaults` (aliased `-IncludePrivileged`, which `Invoke-adPEAS` passes, so the hint
-naming it is reachable from a full scan), which lists them in full:
+**Безопасные (не создающие доступа) настройки учитываются по имени и числу, а не печатаются полностью.**
+Логика обратная опасным находкам: если adPEAS сообщает о праве или параметре, выданном тому,
+кому его быть не должно, то ужесточающую политику стоит назвать в одной карточке,
+а не создавать блок на каждое её значение. Используется такая же сводная карточка,
+до активных находок, серая и свернутая в HTML. Обе проверки поддерживают
+`-IncludeDefaults` (псевдоним `-IncludePrivileged`, который передаёт `Invoke-adPEAS`, поэтому подсказка
+об этом доступна из полного сканирования) — ключ выводит эти параметры целиком:
 
 ```
 [*] 10 assignment(s) only remove default holders - hardening, or a service about to break on 2 GPO(s) (-IncludeDefaults to list)
@@ -1223,65 +1223,65 @@ Policies:    WSUS Baseline V1                    {44444444-4444-4444-4444-444444
              DC Hardening V2                     {22222222-2222-2222-2222-222222222222}
 ```
 
-- `Get-GPOUserRightsAssignment`: an assignment that only *removes* default holders. Nine of
-  those printed as full blocks ahead of two real findings is how the rule was arrived at. An
-  assignment that adds *and* removes keeps its `RemovedFromDefault` row - there the removals
+- `Get-GPOUserRightsAssignment`: назначение, которое только *удаляет* штатных обладателей права. Правило появилось после того, как девять таких блоков предшествовали двум настоящим находкам.
+  Если назначение одновременно добавляет *и* удаляет обладателей, сохраняется строка
+  `RemovedFromDefault`: удалённые там — часть конечного набора правообладателей, а не отдельная находка.
   are the rest of that right's holder set, not a separate claim.
-- `Get-GPOPointAndPrint`: a configuration whose verdict is *Hardened* or *controls no driver
-  installation*. Printing one meant eight rows agreeing in green with the `Exploitability`
-  line above them. The User Configuration case stays visible: Windows ignores it (KB2307161),
-  so it is not an exposure either, but somebody hardened and it does not take effect - a
-  different statement from a hardening that works.
+- `Get-GPOPointAndPrint`: настройка с оценкой *Hardened* либо *не управляет установкой
+  драйверов*. Полный вывод такой настройки содержал восемь зелёных строк в подтверждение
+  строки `Exploitability`. Случай User Configuration виден отдельно: Windows игнорирует
+  такую настройку (KB2307161), и риска здесь тоже нет, но ужесточение не применяется —
+  это не то же самое, что действующая защита.
 
-As with the dormant cards, the count line counts findings while the card counts policies -
-several rights in one GPO, or both halves of one Point and Print policy - so it names its unit
-(`on N GPO(s)`) whenever the two numbers differ.
+Как и для неактивных политик, строка считает находки, а карточка — политики:
+несколько прав в одной GPO либо обе половины Point and Print могут давать разное число;
+в этом случае указывается единица (`on N GPO(s)`).
 
-It is held back, not dropped. `-IncludeInactive` on the individual check lists the dormant
-findings in full, greyed, with `LinkedOUs` and `GPOStatus` on the row saying why. The switch is
-deliberately not available on `Invoke-adPEAS`, so the hint naming it appears only when a check
-was called directly.
+Находки скрываются, а не удаляются. `-IncludeInactive` у отдельной проверки выводит все
+неактивные находки серым, с полями `LinkedOUs` и `GPOStatus`, объясняющими причину.
+Ключа намеренно нет у `Invoke-adPEAS`; подсказка о нём показывается только при прямом
+запуске соответствующей проверки.
 
-Three things worth knowing about where the line is drawn:
+Три важных ограничения:
 
-- It applies to checks that report a **setting inside** a policy. The credential checks are
-  exempt: a `cpassword` in `Groups.xml` is readable by Authenticated Users whether the
-  policy is linked or not, so linkage has no bearing on the exposure. `Get-GPOPermissions`
-  is exempt too - who may edit a dormant policy still matters, because editing it and then
-  linking it is a two-step path - and it shows `LinkedOUs` and `GPOStatus` anyway.
-- "Not linked or not enabled" is read from the directory: no enabled link, or the relevant
-  configuration half switched off. It is **not** an RSoP answer. A WMI filter that matches
-  nothing, security filtering on the Apply Group Policy right, Enforced and block
-  inheritance are all invisible, and a policy linked to an OU holding no computer counts as
-  active.
-- Nothing is held back when the linkage could not be read. An enumeration that failed
-  answers unknown, and a finding is never demoted on missing information.
+- Это относится к проверкам **параметров внутри** политики. Проверки учётных данных
+  исключены: `cpassword` в `Groups.xml` читается Authenticated Users и без привязки
+  GPO, поэтому применимость политики не влияет на факт утечки. `Get-GPOPermissions`
+  тоже исключён: право редактировать неактивную политику важно, потому что её можно
+  сначала изменить, затем привязать; `LinkedOUs` и `GPOStatus` всё равно выводятся.
+- «Не привязано или не включено» определяется по каталогу: нет активных привязок либо
+  соответствующая половина политики выключена. Это **не** итоговый RSoP. WMI-фильтр,
+  никому не соответствующий, фильтрация безопасности по Apply Group Policy, Enforced и запрет
+  наследования здесь не учитываются; политика, привязанная к пустой OU,
+  считается активной.
+- Если сведения о привязках не удалось прочитать, ничего не скрывается: провал перечисления
+  означает неизвестное состояние, и находка не понижается из-за отсутствия данных.
 
-Suppressing a finding also keeps it out of the HTML report and the JSON export, so a scan
-comparison will show such a finding as gone once someone disables a link.
+Скрытие находки одновременно исключает её из HTML и JSON. Поэтому сравнение сканирований
+покажет её исчезновение после отключения привязки.
 
-**Reading `EffectiveSetting`**: where several GPOs configure the same thing, this row says
-which of them decides the value, and why. It replaced a `True`/`False` called
-`IsEffectiveSetting`, which could not express the answer - a `False` meant either "a
-higher-priority policy overrides this one" or "this policy reaches no machine at all", and
-those call for completely different work.
+**Толкование `EffectiveSetting`**: когда один параметр задан несколькими GPO, это поле показывает
+какая политика определяет значение и почему. Ранее использовался логический флаг
+`IsEffectiveSetting`, не позволявший различить причины: `False` мог значить и
+«политика с более высоким приоритетом переопределяет значение», и «эта политика не
+затрагивает ни один компьютер» — совершенно разные задачи.
 
-| Row reads | Means |
+| Значение поля | Значение |
 |-----------|-------|
-| `Yes - wins precedence on the Domain Controllers OU` | Linked at or below the Domain Controllers OU and first in link order. This is the value the DCs run with. |
-| `Yes - wins precedence at the domain root` | Linked at the domain root, with no Domain Controllers OU policy outranking it. |
-| `Yes - wins precedence on its site` | Linked to the site a domain controller is in, and nowhere above a domain controller. Site policies are applied before the domain's, so it decides only what no domain or OU policy configures - unless its link is enforced. |
-| `Yes - applies on its linked OUs; no precedence comparison there` | Linked to ordinary OUs and applies to the machines in them. The caveat is literal: adPEAS does not compare link order below the domain level, so two policies on the same OU with opposite values are both reported this way. |
-| `Yes - applies below its links, but not on the domain controllers: ...` | Linked above a domain controller, but a container on the way blocks inheritance and none of its links is enforced. It applies to the other machines below its links. |
-| `No - overridden by '<name>' (link order <n>)` | Configured, reaches machines, but another policy wins. Read the named policy to see what actually applies. |
-| `No - the policy is linked nowhere` | Configured and linked to nothing. It changes nothing today, and is worth cleaning up or linking. |
-| `No - every link is disabled` | Linked, but every link is switched off, so it reaches nothing either. `GPOStatus` says the same in its own row. |
+| `Yes - wins precedence on the Domain Controllers OU` | Привязана к OU контроллеров домена или ниже и первая по порядку привязок. Именно это значение действует на DC. |
+| `Yes - wins precedence at the domain root` | Привязана к корню домена, и политики OU контроллеров домена не имеют большего приоритета. |
+| `Yes - wins precedence on its site` | Привязана к сайту DC, не выше самого контроллера домена. Политики сайта применяются раньше доменных, поэтому здесь определяют лишь то, что не задано доменом/OU, если привязка не принудительная (Enforced). |
+| `Yes - applies on its linked OUs; no precedence comparison there` | Привязана к обычным OU и действует на их компьютеры. Важно: adPEAS не сравнивает порядок привязок ниже домена, поэтому две политики одной OU с противоположными значениями обе описываются так. |
+| `Yes - applies below its links, but not on the domain controllers: ...` | Привязана выше контроллера домена, но контейнер на пути блокирует наследование и привязки не принудительны. Действует на другие компьютеры под своими привязками. |
+| `No - overridden by '<name>' (link order <n>)` | Настроена и достигает компьютеров, но другая политика имеет приоритет. Для реального значения проверьте названную GPO. |
+| `No - the policy is linked nowhere` | Настроена, но никуда не привязана: сейчас не меняет ничего; может быть удалена либо привязана. |
+| `No - every link is disabled` | Привязана, но все связи выключены, поэтому ни на кого не действует. `GPOStatus` сообщает то же в отдельном поле. |
 
-`EffectiveSetting` weighs linkage, enforcement and link order. In the LDAP and SMB signing
-checks it reads the domain controllers the way the `reachesDomainControllers` row does:
-where their computer objects actually are, the site each is in, and the containers that
-block inheritance. Whether the policy's computer configuration is switched off is a
-separate question, answered by `GPOStatus`.
+`EffectiveSetting` учитывает привязку, принудительное применение и порядок. Для проверок
+подписи LDAP и SMB расположение контроллеров домена определяется так же, как для
+`reachesDomainControllers`: учитываются реальные контейнеры компьютерных объектов DC, их
+сайты и блокировка наследования. Отключена ли компьютерная часть политики —
+отдельный вопрос, отражённый в `GPOStatus`.
 
 ### Get-GPOPermissions
 
