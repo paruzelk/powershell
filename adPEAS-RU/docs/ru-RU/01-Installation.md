@@ -202,6 +202,59 @@ Import-Module 'C:\Tools\adPEAS.ps1'
 доверенную цепочку и срок действия, а не отключайте
 проверку TLS по умолчанию.
 
+## Дополнительная диагностика установки (DOC5)
+
+### Стабильный релиз и исходная ветка main
+
+Английский оригинал предлагает получать стабильные варианты с [GitHub Releases](https://github.com/61106960/adPEAS/releases), где четыре сборки прикрепляются отдельно. Файлы из main оригинального проекта обновляются с исправлениями и могут иметь версию, отличающуюся от закреплённой русской 2.9.0. Для воспроизводимого русскоязычного аудита используйте ZIP конкретной сборки и проверяйте SHA-256.
+
+~~~powershell
+# Проверить файлы после распаковки, не подключаясь к AD.
+Get-Item .\adPEAS.ps1 | Select-Object FullName, Length
+Import-Module .\adPEAS.ps1 -Force
+Get-Command -Module adPEAS
+Get-Command Invoke-adPEAS, Connect-adPEAS, Get-DomainUser
+
+# Для английского оригинала: сборка из исходного дерева.
+git clone https://github.com/61106960/adPEAS.git
+Set-Location .\adPEAS
+.\Build-Release.ps1
+~~~
+
+Созданные Build-Release.ps1 автономные файлы не требуют RSAT. Русская редакция импортируется отдельно через Import-adPEAS-RU.ps1 с проверкой закреплённого источника.
+
+### Встраивание лицензии и приоритет
+
+В исходном проекте лицензия может быть встроена при сборке или передана во время подключения и сканирования. Приоритет источников: Invoke-adPEAS -License, затем Connect-adPEAS -License, затем встроенная лицензия. Подпись RSA-SHA256 проверяется инструментом, а сведения о лицензиате показываются в консоли и отчёте.
+
+~~~powershell
+# Лицензия при сборке автономных файлов.
+.\Build-Release.ps1 -License '.\license.json'
+
+# Лицензия, переданная при подключении.
+Connect-adPEAS -Domain 'example.local' -UseWindowsAuth -UseLDAPS -IgnoreSSLErrors:$false -License '.\license.json'
+Invoke-adPEAS -OPSEC
+~~~
+
+Отсутствие лицензии не отключает технические функции, но не отменяет юридических условий. JSON-ключи Licensee, ValidUntil и Signature сохраняются неизменными.
+
+### Частые ошибки установки
+
+| Симптом | Проверка |
+|---|---|
+| Import-Module не загружается | PowerShell 5.1, путь, целостность файла, политика исполнения |
+| Команды отсутствуют | Get-Command после импорта и закрытие старой сессии |
+| Запуск скриптов запрещён | Только разрешённое организацией значение ExecutionPolicy |
+| Файл не найден | Текущая директория или полный путь |
+| LDAPS отклоняет соединение | FQDN DC, SAN сертификата, доверенная цепочка и TCP/636 |
+
+~~~powershell
+# Полный путь из исходного руководства.
+Import-Module 'C:\Tools\adPEAS.ps1' -Force
+Remove-Module adPEAS -ErrorAction SilentlyContinue
+Import-Module .\adPEAS.ps1 -Force
+~~~
+
 ## Навигация
 
 [Обзор](00-Home.md) ·
