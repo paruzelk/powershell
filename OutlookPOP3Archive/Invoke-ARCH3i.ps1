@@ -22,18 +22,29 @@ $ErrorActionPreference='Stop'
 if($PSVersionTable.PSEdition -cne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5){throw 'ARCH3i requires Windows PowerShell 5.1.'}
 if($Mode -ceq 'Seal' -and [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -cne 'STA'){throw 'ARCH3i Seal requires -STA.'}
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH3iSealedFullOriginalWitness.ps1')
-$pass=@{
-    Mode=$Mode;RunId=$RunId;SourcePst=$SourcePst;SourceEntryId=$SourceEntryId
-    ArchiveYear=$ArchiveYear;ExpectedSourceFolderEntryId=$ExpectedSourceFolderEntryId
-    ExpectedStoreIdSha256=$ExpectedStoreIdSha256
-    ExpectedSourcePstLengthBytes=$ExpectedSourcePstLengthBytes
-    ExpectedExistingArchiveLengthBytes=$ExpectedExistingArchiveLengthBytes
-    ExpectedAttachmentCount=$ExpectedAttachmentCount
-    ExpectedArchiveDate=$ExpectedArchiveDate
-    ExpectedOriginalWitnessSha256=$ExpectedOriginalWitnessSha256
-    SealSha256=$SealSha256
-    ConfirmEvidenceWrite=$ConfirmEvidenceWrite.IsPresent
-    WhatIf=$WhatIfPreference
-    Confirm=$false
+# Review must never forward an absent ExpectedArchiveDate as $null to
+# non-nullable [datetime] in the original read-only core function. Supply only
+# the two inputs necessary to verify an already sealed file.
+if($Mode -ceq 'Review'){
+    $pass=@{
+        Mode='Review'
+        RunId=$RunId
+        SealSha256=$SealSha256
+    }
+}else{
+    $pass=@{
+        Mode=$Mode;RunId=$RunId;SourcePst=$SourcePst;SourceEntryId=$SourceEntryId
+        ArchiveYear=$ArchiveYear;ExpectedSourceFolderEntryId=$ExpectedSourceFolderEntryId
+        ExpectedStoreIdSha256=$ExpectedStoreIdSha256
+        ExpectedSourcePstLengthBytes=$ExpectedSourcePstLengthBytes
+        ExpectedExistingArchiveLengthBytes=$ExpectedExistingArchiveLengthBytes
+        ExpectedAttachmentCount=$ExpectedAttachmentCount
+        ExpectedArchiveDate=$ExpectedArchiveDate
+        ExpectedOriginalWitnessSha256=$ExpectedOriginalWitnessSha256
+        SealSha256=$SealSha256
+        ConfirmEvidenceWrite=$ConfirmEvidenceWrite.IsPresent
+        WhatIf=$WhatIfPreference
+        Confirm=$false
+    }
 }
 Invoke-OPA265ARCH3iFullWitnessSeal @pass
