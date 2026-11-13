@@ -3,8 +3,8 @@
     adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
 
 .DESCRIPTION
-    Build: 2026-11-13 09:54:25
-    Version: 2.9.0+20261113-0954
+    Build: 2026-11-13 10:34:22
+    Version: 2.9.0+20261113-1034
 
     AUTHORIZED SECURITY TESTING ONLY!
 
@@ -112979,9 +112979,9 @@ function Get-LDAPConfiguration {
                 )
                 ObjectType        = 'LDAPConfigGPO'
                 PostureObjectType = 'EffectiveLDAPConfig'
-                FoundText         = 'LDAP security configuration'
-                NoneActiveText    = "No LDAP security configuration is deployed by a policy that is linked and enabled - all $dcCount DC(s) potentially vulnerable"
-                NoneFoundText     = "No LDAP Security configuration found in any GPO - all $dcCount DC(s) potentially vulnerable"
+                FoundText         = 'безопасности LDAP'
+                NoneActiveText    = "Ни одна привязанная и включённая GPO не применяет настройки безопасности LDAP — все $dcCount контроллеров домена потенциально уязвимы"
+                NoneFoundText     = "Ни в одной GPO не найдены настройки безопасности LDAP — все $dcCount контроллеров домена потенциально уязвимы"
                 NoneClass         = 'Finding'
                 ValueClass        = @{
                     LDAPSigning    = { param($Value) switch ($Value) { 'Required' { 'Secure' } 'Optional' { 'Hint' } 'Not Configured' { 'Hint' } default { 'Finding' } } }
@@ -113004,9 +113004,9 @@ function Get-LDAPConfiguration {
                 )
                 ObjectType        = 'NullSessionGPO'
                 PostureObjectType = 'EffectiveNullSession'
-                FoundText         = 'null session configuration'
-                NoneActiveText    = 'No null session setting is deployed by a policy that is linked and enabled - the domain controllers keep the OS defaults'
-                NoneFoundText     = 'No null session setting found in any GPO - the domain controllers keep the OS defaults'
+                FoundText         = 'анонимных сеансов'
+                NoneActiveText    = 'Ни одна привязанная и включённая GPO не задаёт параметры анонимных сеансов — контроллеры домена используют настройки ОС по умолчанию'
+                NoneFoundText     = 'Ни в одной GPO не найдены параметры анонимных сеансов — контроллеры домена используют настройки ОС по умолчанию'
                 NoneClass         = 'Note'
                 ValueClass        = @{
                     anonymousSamEnumeration     = $nullSessionClass
@@ -146061,10 +146061,26 @@ function Build-FindingSectionsHtml {
                 [void]$sections.AppendLine("</section>")
             }
 
+            # DOC4b: only the emitted HTML label is localized. Group keys remain original.
+            $visibleSectionHeader = [string]$group.Header
+            $ruSectionNames = @{
+                'Analyzing Domain Configuration' = 'Анализ параметров домена'
+                'Analyzing Access Permissions' = 'Анализ прав доступа'
+                'Analyzing Delegation Settings' = 'Анализ делегирования'
+                'Analyzing Certificate Services' = 'Анализ служб сертификатов'
+                'Analyzing Privileged Accounts' = 'Анализ привилегированных учётных записей'
+                'Analyzing Group Policy Objects' = 'Анализ групповых политик'
+            }
+            foreach($pair in $ruSectionNames.GetEnumerator()){
+                if($visibleSectionHeader.EndsWith([string]$pair.Key,[StringComparison]::Ordinal)){
+                    $visibleSectionHeader=$visibleSectionHeader.Substring(0,$visibleSectionHeader.Length - $pair.Key.Length)+$pair.Value
+                    break
+                }
+            }
             $categoryEncoded = ConvertTo-HtmlEncode $categorySlug
             [void]$sections.AppendLine("<section id=`"cat-$categorySlug`" class=`"section`" data-category=`"$categoryEncoded`">")
             [void]$sections.AppendLine("    <div class=`"section-header`">")
-            [void]$sections.AppendLine("        <div class=`"section-title`">$(ConvertTo-HtmlEncode $group.Header)</div>")
+            [void]$sections.AppendLine("        <div class=`"section-title`">$(ConvertTo-HtmlEncode $visibleSectionHeader)</div>")
             [void]$sections.AppendLine("    </div>")
             [void]$sections.AppendLine("    <div class=`"section-content`">")
 
@@ -146320,47 +146336,47 @@ function Get-ObjectCardTitle {
         'Tier0Account' {
             # Only show context if it's not "Unprotected" (that's already clear from the header)
             if ($context -and $context -ne 'Unprotected') {
-                return "Tier-0 Account: $objName ($context)"
+                return "Учётная запись Tier 0: $objName ($context)"
             }
-            return "Tier-0 Account: $objName"
+            return "Учётная запись Tier 0: $objName"
         }
         'OperatorGroup' {
             $grpName = if ($Object.OperatorGroup) { $Object.OperatorGroup } else { $objName }
-            return "Operator Group: $grpName"
+            return "Операторская группа: $grpName"
         }
         'SIDHistory' {
             $ctxInfo = if ($context -eq 'Privileged') { " (Privileged!)" } else { "" }
-            return "SID History: $objName$ctxInfo"
+            return "История SID: $objName$ctxInfo"
         }
         { $_ -in @('GPPCredential', 'SYSVOLCredential') } {
             $credType = if ($Object.CredentialType) { $Object.CredentialType } else { "Credential" }
-            return "Credential ($credType)"
+            return "Учётные данные ($credType)"
         }
         'LAPSConfiguration' {
             $ouName = if ($Object.ouName) { $Object.ouName } else { $objName }
-            return "LAPS Config: $ouName"
+            return "Конфигурация LAPS: $ouName"
         }
         'DomainBasicInfo' {
             $domainName = if ($Object.domainNameDNS) { $Object.domainNameDNS } else { "Domain" }
-            return "Domain: $domainName"
+            return "Домен: $domainName"
         }
         'DomainControllers' {
             $dcList = if ($Object.domainControllers) { @($Object.domainControllers -split "`n") } else { @() }
             $dcCount = $dcList.Count
-            return "Domain Controllers ($dcCount)"
+            return "Контроллеры домена ($dcCount)"
         }
         'FineGrainedPasswordPolicy' {
             $psoName = if ($Object.psoName) { $Object.psoName } elseif ($Object.Name) { $Object.Name } else { "PSO" }
-            return "Fine-Grained Policy: $psoName"
+            return "Тонкая политика паролей: $psoName"
         }
         'DomainTrust' {
             $trustTarget = if ($Object.trustPartner) { $Object.trustPartner } else { $objName }
-            return "Trust: $trustTarget"
+            return "Доверительное отношение: $trustTarget"
         }
         'GPOLocalGroup' {
             $localGrp = if ($Object.TargetGroup) { $Object.TargetGroup } else { "Local Group" }
             $gpoName = if ($Object.GPOName) { " ($($Object.GPOName))" } else { "" }
-            return "GPO Local Group: $localGrp$gpoName"
+            return "Локальная группа через GPO: $localGrp$gpoName"
         }
         'GPOSuppressedGroup' {
             # Group plus count: "Dormant policies: not linked (5)". The count belongs in the
@@ -146372,11 +146388,11 @@ function Get-ObjectCardTitle {
         }
         'GPOScheduledTask' {
             $taskName = if ($Object.taskName) { $Object.taskName } else { "Task" }
-            return "Scheduled Task: $taskName"
+            return "Запланированная задача: $taskName"
         }
         'AddComputerRight' {
             $principal = if ($Object.accountName) { $Object.accountName } else { $objName }
-            return "Add Computer Right: $principal"
+            return "Право добавления компьютеров в домен: $principal"
         }
         default {
             # Use central Get-ObjectTypeTitle for all standard cases
@@ -149360,7 +149376,7 @@ function Get-HTMLTemplate {
             <div class="sidebar-search">
                 <label for="searchInput" class="visually-hidden">Поиск результатов</label>
                 <input type="search" placeholder="Поиск по результатам (нажмите /)" id="searchInput" aria-describedby="searchHint">
-                <span id="searchHint" class="visually-hidden">Type to filter findings by text content</span>
+                <span id="searchHint" class="visually-hidden">Введите текст для фильтрации результатов</span>
             </div>
         </div>
 
@@ -149400,28 +149416,28 @@ function Get-HTMLTemplate {
         <section id="summary" aria-labelledby="summaryTitle">
             <h1 id="summaryTitle" class="visually-hidden">Сводка результатов аудита</h1>
             <div class="summary-grid" role="group" aria-label="Сводка результатов по категориям">
-                <button class="summary-card finding" onclick="filterBySeverity('finding')" aria-label="Filter by Findings: {{FINDING_COUNT}} critical issues">
+                <button class="summary-card finding" onclick="filterBySeverity('finding')" aria-label="Фильтр нарушений: {{FINDING_COUNT}}">
                     <div class="icon" aria-hidden="true">&#33;</div>
                     <div>
                         <div class="value">{{FINDING_COUNT}}</div>
                         <div class="label">Нарушения</div>
                     </div>
                 </button>
-                <button class="summary-card hint" onclick="filterBySeverity('hint')" aria-label="Filter by Hints: {{HINT_COUNT}} items">
+                <button class="summary-card hint" onclick="filterBySeverity('hint')" aria-label="Фильтр предупреждений: {{HINT_COUNT}}">
                     <div class="icon" aria-hidden="true">&#9650;</div>
                     <div>
                         <div class="value">{{HINT_COUNT}}</div>
                         <div class="label">Предупреждения</div>
                     </div>
                 </button>
-                <button class="summary-card note" onclick="filterBySeverity('note')" aria-label="Filter by Notes: {{NOTE_COUNT}} items">
+                <button class="summary-card note" onclick="filterBySeverity('note')" aria-label="Фильтр сведений: {{NOTE_COUNT}}">
                     <div class="icon" aria-hidden="true">&#9679;</div>
                     <div>
                         <div class="value">{{NOTE_COUNT}}</div>
                         <div class="label">Сведения</div>
                     </div>
                 </button>
-                <button class="summary-card secure" onclick="filterBySeverity('secure')" aria-label="Filter by Secure: {{SECURE_COUNT}} items">
+                <button class="summary-card secure" onclick="filterBySeverity('secure')" aria-label="Фильтр безопасных результатов: {{SECURE_COUNT}}">
                     <div class="icon" aria-hidden="true">&#9675;</div>
                     <div>
                         <div class="value">{{SECURE_COUNT}}</div>
@@ -149454,15 +149470,15 @@ function Get-HTMLTemplate {
             </div>
 
             <!-- Card Controls -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;" role="toolbar" aria-label="View controls">
-                <div class="card-controls" id="cardControls" role="group" aria-label="Card expansion controls">
-                    <button class="card-control-btn" onclick="expandAllCards()" title="Expand all cards and top priorities" aria-label="Expand all finding cards">Развернуть всё</button>
-                    <button class="card-control-btn" onclick="collapseAllCards()" title="Collapse all cards and top priorities" aria-label="Collapse all finding cards">Свернуть всё</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;" role="toolbar" aria-label="Управление отображением">
+                <div class="card-controls" id="cardControls" role="group" aria-label="Разворачивание карточек">
+                    <button class="card-control-btn" onclick="expandAllCards()" title="Развернуть все карточки и приоритетные рекомендации" aria-label="Развернуть карточки результатов">Развернуть всё</button>
+                    <button class="card-control-btn" onclick="collapseAllCards()" title="Свернуть все карточки и приоритетные рекомендации" aria-label="Свернуть карточки результатов">Свернуть всё</button>
                 </div>
                 <label class="hide-completed-toggle" style="margin: 0 16px;">
                     <input type="checkbox" id="hideCompletedToggle" onchange="toggleHideCompleted()" aria-describedby="hideCompletedHint">
                     <span>Скрыть выполненные</span>
-                    <span id="hideCompletedHint" class="visually-hidden">Toggle to show or hide findings marked as completed</span>
+                    <span id="hideCompletedHint" class="visually-hidden">Показать или скрыть отмеченные как выполненные результаты</span>
                 </label>
             </div>
 
@@ -150036,6 +150052,111 @@ function Get-HTMLTemplate {
                 const key=node.textContent.trim();
                 if(a11y[key])node.textContent=a11y[key];
             });
+        });
+        // DOC4b: translate rendered attribute values only. No data-* or finding metadata.
+        document.addEventListener('DOMContentLoaded', function ruDOC4bVisibleValue() {
+            const exact = {
+                'Not locked out':'Не заблокирована',
+                'Never':'Никогда',
+                'All settings disabled':'Все настройки отключены',
+                'Not configured (not required before Server 2025)':
+                    'Не настроено (до Windows Server 2025 по умолчанию не требуется)',
+                'Global Security Group':'Глобальная группа безопасности',
+                'Universal Security Group':'Универсальная группа безопасности',
+                'Domain Local Security Group':'Локальная группа безопасности домена',
+                'Yes - wins precedence on the Domain Controllers OU':
+                    'Да — имеет приоритет для OU контроллеров домена'
+            };
+            const gpoEffective = {
+                'LDAP signing':'подпись LDAP',
+                'anonymous SID/name translation':'анонимное сопоставление SID и имени',
+                'server signing':'подпись SMB на сервере'
+            };
+            // Descriptions of effective ACL rights, NOT the permission names themselves.
+            const aclPhrases = [
+                ['WriteProperty on member - may add a member to every protected group',
+                 'WriteProperty для member — позволяет менять состав всех защищённых групп'],
+                ['Self on member - may add itself to every protected group',
+                 'Self для member — позволяет добавлять себя в любую защищённую группу'],
+                ['All extended rights - may reset the password of every protected account',
+                 'Все расширенные права — позволяют сбрасывать пароли защищённых учётных записей'],
+                ['Owner of the group - may rewrite its DACL',
+                 'Владелец группы — может изменять её DACL'],
+                ['Owner of the domain object',
+                 'Владелец объекта домена'],
+                ['DS-Replication-Get-Changes - replicates the directory except secrets but is one right short of DCSync',
+                 'DS-Replication-Get-Changes — репликация каталога без секретов, для DCSync не хватает одного права'],
+                ['DS-Replication-Get-Changes-All - inert without DS-Replication-Get-Changes and one ACE short of DCSync',
+                 'DS-Replication-Get-Changes-All — без DS-Replication-Get-Changes не действует, для DCSync требуется ещё одна ACE'],
+                ['CreateChild (Computer) in the computer container',
+                 'CreateChild (Computer) — создание объектов в контейнере компьютеров'],
+                ['GenericAll (Full Control)', 'GenericAll (полный контроль)'],
+                ['WriteDacl (Modify Permissions)', 'WriteDacl (изменение разрешений)'],
+                ['WriteOwner (Take Ownership)', 'WriteOwner (смена владельца)']
+            ];
+            const roles = {
+                'PDC Emulator':'эмулятор PDC',
+                'Schema Master':'мастер схемы',
+                'Infrastructure Master':'мастер инфраструктуры',
+                'Domain Naming Master':'мастер именования доменов',
+                'RID Master':'мастер RID'
+            };
+            const groups = new Set(['grouptype']);
+            let changed = 0, evaluated = 0;
+            function translateValue(source, key) {
+                const lead=(source.match(/^\s*/) || [''])[0];
+                const tail=(source.match(/\s*$/) || [''])[0];
+                let t=source.slice(lead.length,source.length-tail.length);
+                if(!t) return source;
+                if(key==='grouptype' && Object.prototype.hasOwnProperty.call(exact,t)) {
+                    t=exact[t];
+                } else if(key==='activityStatus') {
+                    const m=t.match(/^INACTIVE \(no login for >(\d+) days\)$/);
+                    if(m) t='НЕАКТИВНА (нет входа более '+m[1]+' дней)';
+                } else if(key==='EffectiveSetting') {
+                    if(t==='Yes - wins precedence on the Domain Controllers OU') t=exact[t];
+                    else {
+                        const m=t.match(/^Yes - in force on the domain controllers: (.+)$/);
+                        if(m && Object.prototype.hasOwnProperty.call(gpoEffective,m[1])) {
+                            t='Да — действует на контроллерах домена: '+gpoEffective[m[1]];
+                        }
+                    }
+                } else if(key==='domainControllers') {
+                    for(const [english,russian] of Object.entries(roles)){
+                        t=t.split(english).join(russian);
+                    }
+                } else if(key==='dangerousRights') {
+                    for(const [english,russian] of aclPhrases){
+                        t=t.split(english).join(russian);
+                    }
+                } else if(t==='Not locked out'||t==='Never'||t==='All settings disabled' ||
+                          t==='Not configured (not required before Server 2025)') {
+                    t=exact[t];
+                }
+                if(key==='userparameters') {
+                    const m=t.match(/^\[userParameters blob: (\d+) bytes, no recognised TSPropertyArray signature\]$/);
+                    if(m) t='[данные userParameters: '+m[1]+' байт; сигнатура TSPropertyArray не распознана]';
+                }
+                return lead+t+tail;
+            }
+            document.querySelectorAll('.attr-row[data-attr-name]').forEach(function(row) {
+                const key=row.getAttribute('data-attr-name');
+                const value=row.querySelector('.attr-value');
+                if(!value) return;
+                const walker=document.createTreeWalker(value,NodeFilter.SHOW_TEXT);
+                let node;
+                while((node=walker.nextNode())){
+                    if(!node.parentElement || node.parentElement.closest('code,pre,a,script,style')) continue;
+                    evaluated++;
+                    const translated=translateValue(node.nodeValue,key);
+                    if(translated!==node.nodeValue){
+                        node.nodeValue=translated;
+                        changed++;
+                    }
+                }
+            });
+            // Local-only diagnostic; no telemetry or network access.
+            window.adPEASRUDOC4b = Object.freeze({ evaluated:evaluated, translated:changed });
         });
         // Scoring context data for context-aware risk calculation
         const scoringContext = {{SCORING_CONTEXT_JSON}};
@@ -157957,7 +158078,7 @@ function Collect-BHIssuancePolicies {
 #Requires -Version 5.1
 
 # ===== Script Variables =====
-$Script:adPEASVersion = "2.9.0+20261113-0954"
+$Script:adPEASVersion = "2.9.0+20261113-1034"
 
 # Handle ScriptPath for different execution contexts:
 # - Normal: $MyInvocation.MyCommand.Path is set

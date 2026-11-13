@@ -811,9 +811,9 @@ function Get-LDAPConfiguration {
                 )
                 ObjectType        = 'LDAPConfigGPO'
                 PostureObjectType = 'EffectiveLDAPConfig'
-                FoundText         = 'LDAP security configuration'
-                NoneActiveText    = "No LDAP security configuration is deployed by a policy that is linked and enabled - all $dcCount DC(s) potentially vulnerable"
-                NoneFoundText     = "No LDAP Security configuration found in any GPO - all $dcCount DC(s) potentially vulnerable"
+                FoundText         = 'безопасности LDAP'
+                NoneActiveText    = "Ни одна привязанная и включённая GPO не применяет настройки безопасности LDAP — все $dcCount контроллеров домена потенциально уязвимы"
+                NoneFoundText     = "Ни в одной GPO не найдены настройки безопасности LDAP — все $dcCount контроллеров домена потенциально уязвимы"
                 NoneClass         = 'Finding'
                 ValueClass        = @{
                     LDAPSigning    = { param($Value) switch ($Value) { 'Required' { 'Secure' } 'Optional' { 'Hint' } 'Not Configured' { 'Hint' } default { 'Finding' } } }
@@ -836,9 +836,9 @@ function Get-LDAPConfiguration {
                 )
                 ObjectType        = 'NullSessionGPO'
                 PostureObjectType = 'EffectiveNullSession'
-                FoundText         = 'null session configuration'
-                NoneActiveText    = 'No null session setting is deployed by a policy that is linked and enabled - the domain controllers keep the OS defaults'
-                NoneFoundText     = 'No null session setting found in any GPO - the domain controllers keep the OS defaults'
+                FoundText         = 'анонимных сеансов'
+                NoneActiveText    = 'Ни одна привязанная и включённая GPO не задаёт параметры анонимных сеансов — контроллеры домена используют настройки ОС по умолчанию'
+                NoneFoundText     = 'Ни в одной GPO не найдены параметры анонимных сеансов — контроллеры домена используют настройки ОС по умолчанию'
                 NoneClass         = 'Note'
                 ValueClass        = @{
                     anonymousSamEnumeration     = $nullSessionClass

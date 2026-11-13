@@ -1043,10 +1043,26 @@ function Build-FindingSectionsHtml {
                 [void]$sections.AppendLine("</section>")
             }
 
+            # DOC4b: only the emitted HTML label is localized. Group keys remain original.
+            $visibleSectionHeader = [string]$group.Header
+            $ruSectionNames = @{
+                'Analyzing Domain Configuration' = 'Анализ параметров домена'
+                'Analyzing Access Permissions' = 'Анализ прав доступа'
+                'Analyzing Delegation Settings' = 'Анализ делегирования'
+                'Analyzing Certificate Services' = 'Анализ служб сертификатов'
+                'Analyzing Privileged Accounts' = 'Анализ привилегированных учётных записей'
+                'Analyzing Group Policy Objects' = 'Анализ групповых политик'
+            }
+            foreach($pair in $ruSectionNames.GetEnumerator()){
+                if($visibleSectionHeader.EndsWith([string]$pair.Key,[StringComparison]::Ordinal)){
+                    $visibleSectionHeader=$visibleSectionHeader.Substring(0,$visibleSectionHeader.Length - $pair.Key.Length)+$pair.Value
+                    break
+                }
+            }
             $categoryEncoded = ConvertTo-HtmlEncode $categorySlug
             [void]$sections.AppendLine("<section id=`"cat-$categorySlug`" class=`"section`" data-category=`"$categoryEncoded`">")
             [void]$sections.AppendLine("    <div class=`"section-header`">")
-            [void]$sections.AppendLine("        <div class=`"section-title`">$(ConvertTo-HtmlEncode $group.Header)</div>")
+            [void]$sections.AppendLine("        <div class=`"section-title`">$(ConvertTo-HtmlEncode $visibleSectionHeader)</div>")
             [void]$sections.AppendLine("    </div>")
             [void]$sections.AppendLine("    <div class=`"section-content`">")
 
@@ -1302,47 +1318,47 @@ function Get-ObjectCardTitle {
         'Tier0Account' {
             # Only show context if it's not "Unprotected" (that's already clear from the header)
             if ($context -and $context -ne 'Unprotected') {
-                return "Tier-0 Account: $objName ($context)"
+                return "Учётная запись Tier 0: $objName ($context)"
             }
-            return "Tier-0 Account: $objName"
+            return "Учётная запись Tier 0: $objName"
         }
         'OperatorGroup' {
             $grpName = if ($Object.OperatorGroup) { $Object.OperatorGroup } else { $objName }
-            return "Operator Group: $grpName"
+            return "Операторская группа: $grpName"
         }
         'SIDHistory' {
             $ctxInfo = if ($context -eq 'Privileged') { " (Privileged!)" } else { "" }
-            return "SID History: $objName$ctxInfo"
+            return "История SID: $objName$ctxInfo"
         }
         { $_ -in @('GPPCredential', 'SYSVOLCredential') } {
             $credType = if ($Object.CredentialType) { $Object.CredentialType } else { "Credential" }
-            return "Credential ($credType)"
+            return "Учётные данные ($credType)"
         }
         'LAPSConfiguration' {
             $ouName = if ($Object.ouName) { $Object.ouName } else { $objName }
-            return "LAPS Config: $ouName"
+            return "Конфигурация LAPS: $ouName"
         }
         'DomainBasicInfo' {
             $domainName = if ($Object.domainNameDNS) { $Object.domainNameDNS } else { "Domain" }
-            return "Domain: $domainName"
+            return "Домен: $domainName"
         }
         'DomainControllers' {
             $dcList = if ($Object.domainControllers) { @($Object.domainControllers -split "`n") } else { @() }
             $dcCount = $dcList.Count
-            return "Domain Controllers ($dcCount)"
+            return "Контроллеры домена ($dcCount)"
         }
         'FineGrainedPasswordPolicy' {
             $psoName = if ($Object.psoName) { $Object.psoName } elseif ($Object.Name) { $Object.Name } else { "PSO" }
-            return "Fine-Grained Policy: $psoName"
+            return "Тонкая политика паролей: $psoName"
         }
         'DomainTrust' {
             $trustTarget = if ($Object.trustPartner) { $Object.trustPartner } else { $objName }
-            return "Trust: $trustTarget"
+            return "Доверительное отношение: $trustTarget"
         }
         'GPOLocalGroup' {
             $localGrp = if ($Object.TargetGroup) { $Object.TargetGroup } else { "Local Group" }
             $gpoName = if ($Object.GPOName) { " ($($Object.GPOName))" } else { "" }
-            return "GPO Local Group: $localGrp$gpoName"
+            return "Локальная группа через GPO: $localGrp$gpoName"
         }
         'GPOSuppressedGroup' {
             # Group plus count: "Dormant policies: not linked (5)". The count belongs in the
@@ -1354,11 +1370,11 @@ function Get-ObjectCardTitle {
         }
         'GPOScheduledTask' {
             $taskName = if ($Object.taskName) { $Object.taskName } else { "Task" }
-            return "Scheduled Task: $taskName"
+            return "Запланированная задача: $taskName"
         }
         'AddComputerRight' {
             $principal = if ($Object.accountName) { $Object.accountName } else { $objName }
-            return "Add Computer Right: $principal"
+            return "Право добавления компьютеров в домен: $principal"
         }
         default {
             # Use central Get-ObjectTypeTitle for all standard cases

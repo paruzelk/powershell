@@ -53,7 +53,7 @@
             <div class="sidebar-search">
                 <label for="searchInput" class="visually-hidden">Поиск результатов</label>
                 <input type="search" placeholder="Поиск по результатам (нажмите /)" id="searchInput" aria-describedby="searchHint">
-                <span id="searchHint" class="visually-hidden">Type to filter findings by text content</span>
+                <span id="searchHint" class="visually-hidden">Введите текст для фильтрации результатов</span>
             </div>
         </div>
 
@@ -93,28 +93,28 @@
         <section id="summary" aria-labelledby="summaryTitle">
             <h1 id="summaryTitle" class="visually-hidden">Сводка результатов аудита</h1>
             <div class="summary-grid" role="group" aria-label="Сводка результатов по категориям">
-                <button class="summary-card finding" onclick="filterBySeverity('finding')" aria-label="Filter by Findings: {{FINDING_COUNT}} critical issues">
+                <button class="summary-card finding" onclick="filterBySeverity('finding')" aria-label="Фильтр нарушений: {{FINDING_COUNT}}">
                     <div class="icon" aria-hidden="true">&#33;</div>
                     <div>
                         <div class="value">{{FINDING_COUNT}}</div>
                         <div class="label">Нарушения</div>
                     </div>
                 </button>
-                <button class="summary-card hint" onclick="filterBySeverity('hint')" aria-label="Filter by Hints: {{HINT_COUNT}} items">
+                <button class="summary-card hint" onclick="filterBySeverity('hint')" aria-label="Фильтр предупреждений: {{HINT_COUNT}}">
                     <div class="icon" aria-hidden="true">&#9650;</div>
                     <div>
                         <div class="value">{{HINT_COUNT}}</div>
                         <div class="label">Предупреждения</div>
                     </div>
                 </button>
-                <button class="summary-card note" onclick="filterBySeverity('note')" aria-label="Filter by Notes: {{NOTE_COUNT}} items">
+                <button class="summary-card note" onclick="filterBySeverity('note')" aria-label="Фильтр сведений: {{NOTE_COUNT}}">
                     <div class="icon" aria-hidden="true">&#9679;</div>
                     <div>
                         <div class="value">{{NOTE_COUNT}}</div>
                         <div class="label">Сведения</div>
                     </div>
                 </button>
-                <button class="summary-card secure" onclick="filterBySeverity('secure')" aria-label="Filter by Secure: {{SECURE_COUNT}} items">
+                <button class="summary-card secure" onclick="filterBySeverity('secure')" aria-label="Фильтр безопасных результатов: {{SECURE_COUNT}}">
                     <div class="icon" aria-hidden="true">&#9675;</div>
                     <div>
                         <div class="value">{{SECURE_COUNT}}</div>
@@ -147,15 +147,15 @@
             </div>
 
             <!-- Card Controls -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;" role="toolbar" aria-label="View controls">
-                <div class="card-controls" id="cardControls" role="group" aria-label="Card expansion controls">
-                    <button class="card-control-btn" onclick="expandAllCards()" title="Expand all cards and top priorities" aria-label="Expand all finding cards">Развернуть всё</button>
-                    <button class="card-control-btn" onclick="collapseAllCards()" title="Collapse all cards and top priorities" aria-label="Collapse all finding cards">Свернуть всё</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;" role="toolbar" aria-label="Управление отображением">
+                <div class="card-controls" id="cardControls" role="group" aria-label="Разворачивание карточек">
+                    <button class="card-control-btn" onclick="expandAllCards()" title="Развернуть все карточки и приоритетные рекомендации" aria-label="Развернуть карточки результатов">Развернуть всё</button>
+                    <button class="card-control-btn" onclick="collapseAllCards()" title="Свернуть все карточки и приоритетные рекомендации" aria-label="Свернуть карточки результатов">Свернуть всё</button>
                 </div>
                 <label class="hide-completed-toggle" style="margin: 0 16px;">
                     <input type="checkbox" id="hideCompletedToggle" onchange="toggleHideCompleted()" aria-describedby="hideCompletedHint">
                     <span>Скрыть выполненные</span>
-                    <span id="hideCompletedHint" class="visually-hidden">Toggle to show or hide findings marked as completed</span>
+                    <span id="hideCompletedHint" class="visually-hidden">Показать или скрыть отмеченные как выполненные результаты</span>
                 </label>
             </div>
 
