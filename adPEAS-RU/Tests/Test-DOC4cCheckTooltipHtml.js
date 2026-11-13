@@ -13,7 +13,8 @@ function getEmbeddedCatalog(name){
   assert(match,'missing embedded '+name);
   return JSON.parse(match[1]);
 }
-const canonical=getEmbeddedCatalog('checkDescriptions');
+assert(process.argv[2],'DOC4c: provide an offline source ObjectTypes JSON fixture from the exact pinned source');
+const canonical=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
 const translated=getEmbeddedCatalog('ruDetailedCheckTooltips');
 assert.strictEqual(Object.keys(canonical).length,125);
 assert.strictEqual(Object.keys(translated).length,125);
