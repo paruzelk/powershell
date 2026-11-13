@@ -1,4 +1,4 @@
-# Система оценки рисков
+# <a id="risk-scoring-system"></a>Система оценки рисков
 
 Документация контекстной системы оценки риска, используемой в HTML-отчётах adPEAS v2.
 
@@ -8,11 +8,11 @@
 
 ---
 
-## Обзор
+## <a id="overview"></a>Обзор
 
 Система оценки adPEAS v2 вычисляет риск с учётом нескольких факторов, а не только названия находки. Это позволяет определять приоритет исправления по реальной эксплуатируемости и последствиям.
 
-### Формула оценки
+### <a id="scoring-formula"></a>Формула оценки
 
 ```
 FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
@@ -53,11 +53,11 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 ---
 
-## Базовые оценки по типам находок
+## <a id="base-scores-by-finding-type"></a>Базовые оценки по типам находок
 
 Базовый балл представляет собственный риск типа уязвимости. Затем он корректируется с учётом контекста.
 
-### Прямая компрометация (база 80–100)
+### <a id="direct-compromise-base-80-100"></a>Прямая компрометация (база 80–100)
 
 Такие проблемы могут привести к немедленной компрометации домена.
 
@@ -79,7 +79,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | `unconstrained delegation` | 85 | Get-UnconstrainedDelegation | Возможен перехват TGT |
 | `sid history` | 80 | Get-SIDHistoryInjection | Внедрение SID History |
 
-### Раскрытие учётных данных (база 40–60)
+### <a id="credential-exposure-base-40-60"></a>Раскрытие учётных данных (база 40–60)
 
 Проблемы, раскрывающие учётные данные или разрешающие доступ к ним.
 
@@ -98,7 +98,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | `sensitive information` | 40 | Get-CredentialExposure | Утечка конфиденциальных данных |
 | `net use` | 40 | Get-CredentialExposure | Команда net use с паролем |
 
-### Требуется подбор пароля (база 30–50)
+### <a id="requires-cracking-base-30-50"></a>Требуется подбор пароля (база 30–50)
 
 Проблемы, требующие автономного подбора пароля.
 
@@ -110,7 +110,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | `as-rep roast` | 30 | Get-ASREPRoastableAccounts | Запись, доступная для AS-REP Roasting |
 | `preauth not required` | 30 | Get-ASREPRoastableAccounts | Предварительная аутентификация отключена |
 
-### Злоупотребление делегированием (база 50–55)
+### <a id="delegation-abuse-base-50-55"></a>Злоупотребление делегированием (база 50–55)
 
 Проблемы настройки делегирования Kerberos.
 
@@ -120,7 +120,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | `resource-based constrained` | 55 | Get-ResourceBasedConstrainedDelegation | Злоупотребление RBCD |
 | `constrained delegation` | 50 | Get-ConstrainedDelegation | Настроено ограниченное делегирование |
 
-### Злоупотребление ACL (база 40–60)
+### <a id="acl-abuse-base-40-60"></a>Злоупотребление ACL (база 40–60)
 
 Проблемы, связанные с опасными записями ACL.
 
@@ -138,7 +138,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | `gpo link` | 45 | Get-GPOPermissions | Возможность привязывать GPO |
 | `ou permission` | 40 | Get-DangerousOUPermissions | Опасные разрешения OU |
 
-### Слабые настройки (база 25–45)
+### <a id="configuration-weakness-base-25-45"></a>Слабые настройки (база 25–45)
 
 Проблемы, связанные с небезопасной конфигурацией.
 
@@ -160,7 +160,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | `ldap signing` | 25 | Get-LDAPConfiguration | Подпись LDAP не обязательна |
 | `channel binding` | 25 | Get-LDAPConfiguration | Channel binding не обязателен |
 
-### Управляемые служебные записи (база 20–25)
+### <a id="managed-service-accounts-base-20-25"></a>Управляемые служебные записи (база 20–25)
 
 Риски настройки служебных учётных записей.
 
@@ -170,7 +170,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | `managed service account` | 25 | Get-ManagedServiceAccountSecurity | Проблема настройки MSA |
 | `smsa` | 20 | Get-ManagedServiceAccountSecurity | Проблема настройки sMSA |
 
-### Инфраструктура (база 30–45)
+### <a id="infrastructure-base-30-45"></a>Инфраструктура (база 30–45)
 
 Проблемы компонентов инфраструктуры.
 
@@ -186,7 +186,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | `unix password` | 30 | Get-UnixPasswordAccounts | Unix-атрибуты паролей |
 | `unixuserpwd` | 30 | Get-UnixPasswordAccounts | Атрибут unixUserPassword |
 
-### Конфигурация LAPS (база 20–35)
+### <a id="laps-configuration-base-20-35"></a>Конфигурация LAPS (база 20–35)
 
 Проблемы внедрения LAPS.
 
@@ -195,7 +195,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | `laps not configured` | 35 | Get-LAPSConfiguration | LAPS отсутствует |
 | `laps` | 20 | Get-LAPSConfiguration | Информационное сообщение о LAPS |
 
-### Информационные сведения (база 10–15)
+### <a id="informational-base-10-15"></a>Информационные сведения (база 10–15)
 
 Информационные сообщения низкой серьёзности.
 
@@ -209,7 +209,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | `domain controller` | 10 | Get-InfrastructureServers | Сведения о контроллере домена |
 | `infrastructure server` | 10 | Get-InfrastructureServers | Сведения об инфраструктурном сервере |
 
-### Резервные оценки
+### <a id="fallback-scores"></a>Резервные оценки
 
 Если ключевое слово не найдено, используется значение по категории серьёзности:
 
@@ -222,11 +222,11 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 ---
 
-## Коэффициенты влияния (уровень записи)
+## <a id="impact-multipliers-account-tier"></a>Коэффициенты влияния (уровень записи)
 
 Коэффициент влияния корректирует базовую оценку в зависимости от привилегий затронутой записи.
 
-### Модель уровней Microsoft
+### <a id="microsoft-tiering-model"></a>Модель уровней Microsoft
 
 adPEAS использует [модель привилегированного доступа Microsoft](https://docs.microsoft.com/en-us/security/privileged-access-workstations/) для определения уровня:
 
@@ -237,7 +237,7 @@ adPEAS использует [модель привилегированного �
 | **Tier 2** | ×1.2 | Other privileged | Прочие административные группы | Рабочие станции |
 | **None** | ×1.0 | Standard | Обычные учётные записи | — |
 
-### Пример расчёта
+### <a id="example-calculation"></a>Пример расчёта
 
 ```
 Kerberoastable Domain Admin:
@@ -253,11 +253,11 @@ Kerberoastable Standard User:
 
 ---
 
-## Коэффициенты эксплуатируемости
+## <a id="exploitability-modifiers"></a>Коэффициенты эксплуатируемости
 
 Этот коэффициент зависит от того, насколько легко воспользоваться уязвимостью.
 
-### Возраст пароля (относительно политики)
+### <a id="password-age-relative-to-policy"></a>Возраст пароля (относительно политики)
 
 Возраст оценивается **относительно maxPwdAge доменной политики**, а не по абсолютному числу дней.
 
@@ -275,11 +275,11 @@ Kerberoastable Standard User:
 - Пароль старше на 180 дней → 2× политики → множитель ×1.2.
 - Пароль старше на 45 дней → 0.5× политики → множитель ×1.0.
 
-### Надёжность парольной политики
+### <a id="password-policy-strength"></a>Надёжность парольной политики
 
 Политика паролей домена влияет на баллы атак, требующих подбора.
 
-#### Минимальная длина пароля
+#### <a id="minimum-password-length"></a>Минимальная длина пароля
 
 | Минимальная длина | Коэффициент | Описание |
 |------------|----------|-------------|
@@ -288,7 +288,7 @@ Kerberoastable Standard User:
 | 12–15 символов | ×1.0 | Стандартный |
 | От 16 символов | ×0.8 | Надёжный, подобрать труднее |
 
-#### Сложность пароля
+#### <a id="password-complexity"></a>Сложность пароля
 
 | Сложность | Коэффициент | Описание |
 |------------|----------|-------------|
@@ -297,7 +297,7 @@ Kerberoastable Standard User:
 
 **Примечание:** сложность читается из атрибута `pwdProperties` (бит 0 = DOMAIN_PASSWORD_COMPLEX).
 
-### Типы шифрования (атаки на Kerberos)
+### <a id="encryption-types-for-kerberos-based-attacks"></a>Типы шифрования (атаки на Kerberos)
 
 | Шифрование | Коэффициент | Описание |
 |------------|----------|-------------|
@@ -307,11 +307,11 @@ Kerberoastable Standard User:
 
 ---
 
-## Коэффициенты защиты (смягчающие факторы)
+## <a id="security-modifiers-mitigating-controls"></a>Коэффициенты защиты (смягчающие факторы)
 
 Когда действуют меры защиты, коэффициенты **уменьшают** оценку риска.
 
-### Флаги UAC
+### <a id="uac-flags"></a>Флаги UAC
 
 | Флаг | Коэффициент | Применение | Описание |
 |------|----------|------------|-------------|
@@ -330,7 +330,7 @@ Kerberoastable Standard User:
   Множитель (×0.3) остаётся в таблице для будущей версии, где измеряется защищённость
   записей, от имени которых стоило бы представляться.
 
-### Группа Protected Users
+### <a id="protected-users-group"></a>Группа Protected Users
 
 | Состояние | Коэффициент | Описание |
 |--------|----------|-------------|
@@ -341,7 +341,7 @@ Kerberoastable Standard User:
 1. SID с окончанием `-525` в `memberOf`.
 2. Флагу `isProtectedUser` в контексте расчёта.
 
-### Порядок применения коэффициентов
+### <a id="modifier-application-logic"></a>Порядок применения коэффициентов
 
 ```javascript
 // Cracking attacks: Kerberoast, AS-REP Roast
@@ -357,11 +357,11 @@ if (hasAccountDisable) {
 
 ---
 
-## Надбавка за корреляцию находок
+## <a id="correlation-bonus"></a>Надбавка за корреляцию находок
 
 Корреляция повышает оценку, когда одна запись фигурирует в нескольких опасных находках. **Для неадминистраторов надбавки выше**, так как сочетания проблем показывают возможный путь повышения привилегий.
 
-### Обычная корреляция (привилегированные записи)
+### <a id="standard-correlation-privileged-accounts"></a>Обычная корреляция (привилегированные записи)
 
 ```javascript
 correlationBonus = (numberOfFindings - 1) * 5
@@ -375,7 +375,7 @@ correlationBonus = (numberOfFindings - 1) * 5
 | 3 находки | +10 |
 | 4 и более | +15 (максимум) |
 
-### Усиленная корреляция (неадминистративные записи)
+### <a id="enhanced-correlation-non-admin-accounts"></a>Усиленная корреляция (неадминистративные записи)
 
 **Причина:** три и более находки у неадминистративного пользователя часто означают возможную цепочку атаки (например, User → чтение LAPS → компьютер → gMSA → DCSync). Такие записи требуют более пристального внимания.
 
@@ -395,7 +395,7 @@ if (isNonAdmin && findingCount >= 3) {
 | 4 находки | +24 | +15 (максимум) |
 | 5 и более | +30 (максимум) | +15 (максимум) |
 
-### Значения параметров
+### <a id="configuration-values"></a>Значения параметров
 
 | Параметр | Обычные записи | Без прав администратора |
 |-----------|----------|-----------|
@@ -403,7 +403,7 @@ if (isNonAdmin && findingCount >= 3) {
 | Максимальная надбавка | 15 | 30 |
 | Порог | 2 | 3 |
 
-### Пример: обнаружение цепочки атаки
+### <a id="example-attack-path-detection"></a>Пример: обнаружение цепочки атаки
 
 Неадминистративный пользователь `john.doe` обнаружен в:
 1. **Правах чтения LAPS** на OU=Servers.
@@ -418,7 +418,7 @@ if (isNonAdmin && findingCount >= 3) {
 
 Повышенный балл отражает возможную цепочку: `john.doe` → LAPS/владелец → компьютер → gMSA → DCSync.
 
-### Опасные сочетания
+### <a id="dangerous-combinations"></a>Опасные сочетания
 
 Некоторые сочетания находок всегда получают максимальную надбавку:
 
@@ -429,9 +429,9 @@ if (isNonAdmin && findingCount >= 3) {
 
 ---
 
-## Полные примеры расчёта
+## <a id="complete-scoring-examples"></a>Полные примеры расчёта
 
-### Пример 1: опасный Kerberoast у Domain Admin
+### <a id="example-1-high-risk-kerberoastable-domain-admin"></a>Пример 1: опасный Kerberoast у Domain Admin
 
 **Находка:** Domain Admin с SPN для Kerberoast, старым паролем и только RC4.
 
@@ -447,7 +447,7 @@ if (isNonAdmin && findingCount >= 3) {
 
 **Итог:** min(max((35 × 2.0 × 1.4 × 1.3 × 1.2 × 1.0) + 10, 0), 100) = **100** (верхняя граница).
 
-### Пример 2: менее опасный Kerberoast с защитой
+### <a id="example-2-low-risk-kerberoastable-with-mitigations"></a>Пример 2: менее опасный Kerberoast с защитой
 
 **Находка:** обычный пользователь, возможен Kerberoast, требуется смарт-карта, состоит в Protected Users.
 
@@ -462,7 +462,7 @@ if (isNonAdmin && findingCount >= 3) {
 
 **Итог:** (35 × 1.0 × 1.0 × 0.15 × 0.2) + 0 = **1** (очень низкий риск).
 
-### Пример 3: права DCSync
+### <a id="example-3-dcsync-rights"></a>Пример 3: права DCSync
 
 **Находка:** пользователь без админправ с DCSync.
 
@@ -478,9 +478,9 @@ if (isNonAdmin && findingCount >= 3) {
 
 ---
 
-## Детали реализации
+## <a id="implementation-details"></a>Детали реализации
 
-### Сбор контекста (PowerShell)
+### <a id="data-collection-powershell"></a>Сбор контекста (PowerShell)
 
 Контекст оценки формируется в `Export-HTMLReport.ps1` функцией `Build-ScoringContext`:
 
@@ -499,7 +499,7 @@ $scoringContext = @{
 }
 ```
 
-### Расчёт оценки (JavaScript)
+### <a id="score-calculation-javascript"></a>Расчёт оценки (JavaScript)
 
 Расчёт выполняется на стороне клиента в HTML-отчёте:
 
@@ -516,7 +516,7 @@ function calculateFindingScore(card) {
 }
 ```
 
-### Отображение оценки
+### <a id="score-display"></a>Отображение оценки
 
 Риски выводятся как цветные индикаторы:
 
@@ -530,11 +530,11 @@ function calculateFindingScore(card) {
 
 ---
 
-## Настройка модели
+## <a id="customization"></a>Настройка модели
 
 Все значения оценки централизованно находятся в `src/modules/Core/adPEAS-ScoringDefinitions.ps1`.
 
-### Добавление базовых оценок
+### <a id="adding-new-base-scores"></a>Добавление базовых оценок
 
 Редактируйте хеш-таблицу `$Script:FindingBaseScores`:
 
@@ -545,12 +545,12 @@ $Script:FindingBaseScores = @{
 }
 ```
 
-### Настройка коэффициентов
+### <a id="adjusting-multipliers"></a>Настройка коэффициентов
 
 Редактируйте соответствующие хеш-таблицы:
 
 ```powershell
-# Коэффициенты влияния (модель уровней Microsoft)
+# <a id="impact-multipliers-microsoft-tiering-model"></a>Коэффициенты влияния (модель уровней Microsoft)
 $Script:ImpactMultipliers = @{
     'tier0' = 2.0    # Domain/Enterprise/Schema Admins (Domain Controllers)
     'tier1' = 1.5    # Operators (Servers)
@@ -558,7 +558,7 @@ $Script:ImpactMultipliers = @{
     'none'  = 1.0    # Standard accounts
 }
 
-# Коэффициенты защиты
+# <a id="security-modifiers"></a>Коэффициенты защиты
 $Script:SecurityModifiers = @{
     'ACCOUNTDISABLE'      = 0.1
     'SMARTCARD_REQUIRED'  = 0.15
@@ -569,7 +569,7 @@ $Script:SecurityModifiers = @{
 
 ## Ограничения
 
-## Ограничения
+## <a id="limitations"></a>Ограничения
 
 1. **Оценка возраста пароля:** вычисляется по `pwdLastSet` и не обязательно отражает фактическую надёжность пароля.
 
@@ -581,7 +581,7 @@ $Script:SecurityModifiers = @{
 
 ---
 
-## Источники
+## <a id="references"></a>Источники
 
 - [Microsoft: группа Protected Users](https://docs.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/protected-users-security-group)
 - [Microsoft: типы шифрования Kerberos](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/network-security-configure-encryption-types-allowed-for-kerberos)
@@ -590,7 +590,7 @@ $Script:SecurityModifiers = @{
 
 ---
 
-## Навигация
+## <a id="navigation"></a>Навигация
 
 - [Назад: архитектура](09-Architecture.md)
 - [Далее: диагностика](11-Troubleshooting.md)
