@@ -550,7 +550,7 @@ $Script:FindingBaseScores = @{
 Редактируйте соответствующие хеш-таблицы:
 
 ```powershell
-# <a id="impact-multipliers-microsoft-tiering-model"></a>Коэффициенты влияния (модель уровней Microsoft)
+# Коэффициенты влияния (модель уровней Microsoft)
 $Script:ImpactMultipliers = @{
     'tier0' = 2.0    # Domain/Enterprise/Schema Admins (Domain Controllers)
     'tier1' = 1.5    # Operators (Servers)
@@ -558,7 +558,7 @@ $Script:ImpactMultipliers = @{
     'none'  = 1.0    # Standard accounts
 }
 
-# <a id="security-modifiers"></a>Коэффициенты защиты
+# Коэффициенты защиты
 $Script:SecurityModifiers = @{
     'ACCOUNTDISABLE'      = 0.1
     'SMARTCARD_REQUIRED'  = 0.15
