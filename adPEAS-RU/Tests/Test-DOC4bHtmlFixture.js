@@ -10,7 +10,8 @@ const src=fs.readFileSync(path.join(root,'src/modules/Reporting/templates/report
 const begin='        // DOC4b: translate rendered attribute values only.';
 const end='        // Scoring context data for context-aware risk calculation';
 const start=src.indexOf(begin);
-const finish=src.indexOf(end,start);
+const doc4cBoundary=src.indexOf('        // DOC4c: complete human-reviewed RU descriptions',start);
+const finish=doc4cBoundary>=0 ? doc4cBoundary : src.indexOf(end,start);
 assert(start>=0 && finish>start,'DOC4b runtime insertion missing');
 assert.strictEqual(src.indexOf(begin,start+1),-1,'DOC4b handler inserted more than once');
 const injected=src.slice(start,finish);
