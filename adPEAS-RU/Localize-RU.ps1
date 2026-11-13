@@ -239,3 +239,7 @@ if(-not $?){throw 'Ошибка локализации наблюдавшихс�
 # DOC4e: только пользовательские пояснения по двум повторным HTML-отчётам.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC4eObservedHTML.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка точечного перевода DOC4e'}
+
+# DOC4f: проверенные на повторных HTML три текстовых пояснения ACL/Tier 0.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC4fObservedHTML.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка предметной локализации пояснений DOC4f'}

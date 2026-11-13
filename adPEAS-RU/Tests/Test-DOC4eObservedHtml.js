@@ -10,7 +10,8 @@ const js=fs.readFileSync(path.join(root,'src/modules/Reporting/templates/report-
 const marker='        // DOC4e: only field-scoped human-readable suffixes and grammar.';
 const ending='        // Scoring context data for context-aware risk calculation';
 const from=js.indexOf(marker);
-const to=js.indexOf(ending,from);
+const next=js.indexOf('        // DOC4f: original HTML evidence identifies exactly three field-scoped',from);
+const to=next>=0 ? next : js.indexOf(ending,from);
 assert(from>=0 && to>from,'DOC4e injection boundaries missing');
 const body=js.slice(from,to);
 let callback;
