@@ -90506,6 +90506,9 @@ function Build-FindingSectionsHtml {
                 'Analyzing Certificate Services' = 'Анализ служб сертификатов'
                 'Analyzing Privileged Accounts' = 'Анализ привилегированных учётных записей'
                 'Analyzing Group Policy Objects' = 'Анализ групповых политик'
+                'Analyzing Credential Exposure' = 'Анализ раскрытия учётных данных'
+                'Analyzing Computer Security' = 'Анализ безопасности компьютеров'
+                'Analyzing Application Infrastructure' = 'Анализ инфраструктуры приложений'
             }
             foreach($pair in $ruSectionNames.GetEnumerator()){
                 if($visibleSectionHeader.EndsWith([string]$pair.Key,[StringComparison]::Ordinal)){
@@ -94458,14 +94461,15 @@ function Get-HTMLTemplate {
         ruDetailedKeys.forEach(function(id) {
             const check = checkDescriptions[id];
             const ru = ruDetailedCheckTooltips[id];
-            if (!check || !Array.isArray(check.whatWeCheck) ||
+            if (!check || !check.originalEnglish ||
+                !Array.isArray(check.originalEnglish.whatWeCheck) ||
                 !Array.isArray(ru.whatWeCheck) ||
-                check.whatWeCheck.length !== ru.whatWeCheck.length ||
-                typeof check.whyItMatters !== 'string' ||
+                check.originalEnglish.whatWeCheck.length !== ru.whatWeCheck.length ||
+                typeof check.originalEnglish.whyItMatters !== 'string' ||
                 !ru.whyItMatters) {
                 throw new Error('DOC4c: detailed criterion count or type differs: ' + id);
             }
-            // The source model and diagnostic originalEnglish are not mutated.
+            // Validate the pinned originalEnglish saved by Apply-Catalogs, NOT its\n            // temporary two-item RU summary. Preserve all original EN for audit.
             check.whyItMatters = ru.whyItMatters;
             check.whatWeCheck = ru.whatWeCheck.slice();
             // The English panel is suppressed only after complete 1:1 parity.
@@ -94476,6 +94480,87 @@ function Get-HTMLTemplate {
             translatedCriteria: ruDetailedKeys.reduce(function(sum,id) {
                 return sum + ruDetailedCheckTooltips[id].whatWeCheck.length;
             }, 0)
+        });
+        // DOC4d: verified field-scoped display translations from two real
+        // reports; never modify source attributes, risk or internal values.
+        document.addEventListener('DOMContentLoaded', function ruDOC4dObservedValues() {
+            const exact = {
+                'logonhours': {
+                    'All hours (no restriction)': 'Любое время (ограничений нет)'
+                },
+                'adSubnet': {
+                    'Not in Sites and Services': 'Не задана в «Сайты и службы Active Directory»'
+                },
+                'whoCanAddComputers': {
+                    'Any authenticated user, up to the quota':
+                        'Любой прошедший проверку подлинности пользователь (в пределах квоты)'
+                },
+                'decidedBy': {
+                    'None (signing is set on the DC OU only)':
+                        'Нет (подпись задана только в OU контроллеров домена)'
+                },
+                'LinkedOUs': {
+                    'Not linked': 'Не привязана'
+                }
+            };
+            const gpoSuffix = {
+                '(LDAP signing)': '(подпись LDAP)',
+                '(anonymous SID/name translation)': '(анонимное сопоставление SID и имени)',
+                '(server signing)': '(подпись SMB на сервере)'
+            };
+            function translate(source, key) {
+                const m = source.match(/^(\s*)([\s\S]*?)(\s*)$/);
+                if (!m) return source;
+                const original = m[2];
+                let replacement = original;
+                if (Object.prototype.hasOwnProperty.call(exact,key) &&
+                    Object.prototype.hasOwnProperty.call(exact[key],original)) {
+                    replacement = exact[key][original];
+                } else if(key==='activityStatus') {
+                    const x=original.match(/^INACTIVE \(no logon recorded, password not changed for >(\d+) days\)$/);
+                    if(x) replacement='НЕАКТИВНА (входы не зарегистрированы, пароль не менялся более '+x[1]+' дней)';
+                } else if(key==='decidedBy') {
+                    // Preserve the actual name of a GPO; translate its explanatory suffix.
+                    for (const [english,russian] of Object.entries(gpoSuffix)) {
+                        if(original.endsWith(' '+english)) {
+                            replacement=original.slice(0,original.length-english.length)+russian;
+                            break;
+                        }
+                    }
+                } else if(key==='dangerousRights') {
+                    const phrases={
+                        'All Extended Rights (grants DS-Replication-Get-Changes and DS-Replication-Get-Changes-All)':
+                            'Все расширенные права (включая DS-Replication-Get-Changes и DS-Replication-Get-Changes-All)',
+                        'DS-Replication-Get-Changes-In-Filtered-Set - replicates the directory except secrets but is one right short of DCSync':
+                            'DS-Replication-Get-Changes-In-Filtered-Set — репликация каталога без секретов; самого этого права для DCSync недостаточно',
+                        'Owner of the account - may rewrite its DACL':
+                            'Владелец учётной записи — может изменять её DACL'
+                    };
+                    if(Object.prototype.hasOwnProperty.call(phrases,original)) {
+                        replacement=phrases[original];
+                    }
+                }
+                return m[1]+replacement+m[3];
+            }
+            let inspected=0, translated=0;
+            document.querySelectorAll('.attr-row[data-attr-name]').forEach(function(row) {
+                const key=row.getAttribute('data-attr-name');
+                const root=row.querySelector('.attr-value');
+                if(!root) return;
+                const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+                let node;
+                while((node=walker.nextNode())){
+                    if(!node.parentElement ||
+                       node.parentElement.closest('pre,code,textarea,script,style,a')) continue;
+                    inspected++;
+                    const after=translate(node.nodeValue,key);
+                    if(after!==node.nodeValue) {
+                        node.nodeValue=after;
+                        translated++;
+                    }
+                }
+            });
+            window.adPEASRUDOC4d=Object.freeze({ inspected:inspected, translated:translated });
         });
         // Scoring context data for context-aware risk calculation
         const scoringContext = {{SCORING_CONTEXT_JSON}};
@@ -100995,7 +101080,7 @@ function Collect-BHIssuancePolicies {
     return $bhPolicies
 }
 #Requires -Version 5.1
-$Script:adPEASVersion = "2.9.0+20261113-1214"
+$Script:adPEASVersion = "2.9.0+20261113-1241"
 if ($MyInvocation.MyCommand.Path) {
     $Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {

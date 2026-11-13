@@ -1052,6 +1052,9 @@ function Build-FindingSectionsHtml {
                 'Analyzing Certificate Services' = 'Анализ служб сертификатов'
                 'Analyzing Privileged Accounts' = 'Анализ привилегированных учётных записей'
                 'Analyzing Group Policy Objects' = 'Анализ групповых политик'
+                'Analyzing Credential Exposure' = 'Анализ раскрытия учётных данных'
+                'Analyzing Computer Security' = 'Анализ безопасности компьютеров'
+                'Analyzing Application Infrastructure' = 'Анализ инфраструктуры приложений'
             }
             foreach($pair in $ruSectionNames.GetEnumerator()){
                 if($visibleSectionHeader.EndsWith([string]$pair.Key,[StringComparison]::Ordinal)){
