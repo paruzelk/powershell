@@ -155,6 +155,15 @@ function Write-OPA265ARCH3dSyntheticBoundary {
     if($Stage -ceq 'MoveReturned' -and $ArchiveEntryId -cnotmatch '^[0-9a-fA-F]{16,1024}$'){
         throw 'ARCH3d returned destination EntryID invalid.'
     }
+    # After PrepareIntent, original OperationJournal must already be force-
+    # flushed. Link its byte hash into each subsequent immutable stage so an
+    # externally pinned MoveReturned also pins the original journal contents.
+    $journalForStage=Join-Path $root 'original-operation-journal.jsonl'
+    $journalSha=''
+    if($Stage -cne 'PrepareIntent'){
+        if(-not [IO.File]::Exists($journalForStage)){throw 'ARCH3d original journal Intent missing.'}
+        $journalSha=(Get-FileHash -LiteralPath $journalForStage -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
     $record=[pscustomobject][ordered]@{
         Schema='2.6.5-ARCH3d.SyntheticBoundaryEvidence.1'
         OperationId=[string]$Operation.OperationId
@@ -162,6 +171,7 @@ function Write-OPA265ARCH3dSyntheticBoundary {
         EntryId=[string]$Operation.EntryId
         Stage=$Stage
         PreviousSha256=$previous
+        OriginalOperationJournalSha256=$journalSha
         ArchivePst=$ArchivePst
         TargetFolderPath=$TargetFolderPath
         SourceWitnessSha256=$WitnessSha256
@@ -209,7 +219,14 @@ function Test-OPA265ARCH3dSyntheticBoundary {
         try{
             $sha=(Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant()
             $item=Read-OPA265ARCH3cPinnedJson -Path $p -ExpectedSha256 $sha
-            if([string]$item.Stage -cne $stage -or [string]$item.OperationId -cne [string]$Operation.OperationId -or
+            $originalJournalPath=Join-Path $root 'original-operation-journal.jsonl'
+            $originalJournalSha=if([IO.File]::Exists($originalJournalPath)){(Get-FileHash -LiteralPath $originalJournalPath -Algorithm SHA256).Hash.ToLowerInvariant()}else{''}
+            $expectedJournalSha=if($stage -ceq 'PrepareIntent'){''}else{$originalJournalSha}
+            if([string]$item.Schema -cne '2.6.5-ARCH3d.SyntheticBoundaryEvidence.1' -or
+               [string]$item.Stage -cne $stage -or [string]$item.OperationId -cne [string]$Operation.OperationId -or
+               [string]$item.TransactionId -cne [string]$Operation.TransactionId -or
+               [string]$item.EntryId -cne [string]$Operation.EntryId -or
+               [string]$item.OriginalOperationJournalSha256 -cne $expectedJournalSha -or
                [string]$item.PreviousSha256 -cne $prior -or -not [bool]$item.SyntheticOnly){
                 throw 'Invalid stage link.'
             }
