@@ -122,14 +122,14 @@
 **Схема:**
 
 ```
-┌──────────┐    Tunnel     ┌─────────────┐    Internal    ┌──────────┐
-│ Attacker │ ◄════════════►│ Pivot Host  │ ──────────────►│   DC     │
-│ Machine  │  (chisel,     │ (internal)  │   Port 389/636 │ Port 389 │
-│          │   ligolo,     │             │   Port 88      │ Port 88  │
+┌──────────┐    Туннель     ┌─────────────┐    Внутренняя    ┌──────────┐
+│ Аудитор │ ◄════════════►│ Промеж. узел  │ ──────────────►│   DC     │
+│ Машина  │  (chisel,     │ (внутри)  │   Порт 389/636 │ Port 389 │
+│          │   ligolo,     │             │   Порт 88      │ Port 88  │
 │          │   socat)      │             │                │          │
 └──────────┘               └─────────────┘                └──────────┘
      │
-     │ adPEAS connects to localhost / tunnel IP
+     │ adPEAS подключается к localhost / IP туннеля
      ▼
   Connect-adPEAS -Server "127.0.0.1" ...
 ```
