@@ -111,9 +111,29 @@ jobs:
         run: |
           node .\adPEAS-RU\Tests\Test-DOC4bHtmlFixture.js
       - name: DOC4c render 125 full Russian tooltips and 490 detailed criteria
-        shell: pwsh
+        shell: powershell
         run: |
-          node .\adPEAS-RU\Tests\Test-DOC4cCheckTooltipHtml.js
+          $ErrorActionPreference = 'Stop'
+          # The raw report-scripts.js retains {{CHECK_DESCRIPTIONS_JSON}} until
+          # Export-HTMLReport runs. Use the pinned ObjectType metadata locally
+          # as a synthetic source model; never connect to AD or load a user report.
+          . .\adPEAS-RU\src\modules\Core\adPEAS-ObjectTypes.ps1
+          $sourceCatalog = [ordered]@{}
+          foreach ($id in $Script:ObjectTypeDefinitions.Keys) {
+            $check = $Script:ObjectTypeDefinitions[$id]
+            $sourceCatalog[[string]$id] = @{
+              summary = [string]$check.Summary
+              whyItMatters = [string]$check.WhyItMatters
+              whatWeCheck = @($check.WhatWeCheck)
+              primaryFindingId = [string]$check.PrimaryFindingId
+              secureMessage = [string]$check.SecureMessage
+            }
+          }
+          if ($sourceCatalog.Count -ne 125) { throw 'DOC4c source fixture count mismatch' }
+          $fixture = Join-Path $env:RUNNER_TEMP 'doc4c-original-objecttypes.json'
+          [IO.File]::WriteAllText($fixture, (ConvertTo-Json -InputObject $sourceCatalog -Depth 20 -Compress), (New-Object Text.UTF8Encoding($false)))
+          node .\adPEAS-RU\Tests\Test-DOC4cCheckTooltipHtml.js $fixture
+          if ($LASTEXITCODE -ne 0) { throw 'DOC4c browser renderer test failed' }
       - name: Package verified RU build for public download
         if: github.event_name != 'pull_request'
         shell: powershell
