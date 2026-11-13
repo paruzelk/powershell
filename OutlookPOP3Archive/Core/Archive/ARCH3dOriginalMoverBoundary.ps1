@@ -143,7 +143,7 @@ function Write-OPA265ARCH3dSyntheticBoundary {
         $expectedRelative=[string]$Operation.TargetFolderPath
         $matchTarget=($TargetFolderPath -cne '' -and
             ($TargetFolderPath -ceq $expectedRelative -or
-             $TargetFolderPath.EndsWith(('\\'+$expectedRelative),[StringComparison]::OrdinalIgnoreCase)))
+             $TargetFolderPath.EndsWith(('\'+$expectedRelative),[StringComparison]::OrdinalIgnoreCase)))
         if(-not $validPart -or -not $matchTarget){
             throw 'ARCH3d original year/part/target routing differs from declared plan.'
         }
