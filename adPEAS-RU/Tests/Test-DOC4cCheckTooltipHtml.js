@@ -80,7 +80,9 @@ for(const [id,check] of Object.entries(canonical)){
   assert.strictEqual(check.originalEnglish.whyItMatters,original[id].whyItMatters,id+' upstream why changed');
   assert.deepStrictEqual(Array.from(check.originalEnglish.whatWeCheck),Array.from(original[id].whatWeCheck),id+' upstream criteria changed');
   assert.strictEqual(check.primaryFindingId,original[id].primaryFindingId,id+' scoring/finding identifier changed');
-  assert.strictEqual(check.secureMessage,original[id].secureMessage,id+' secure status changed');
+  assert.strictEqual(check.originalEnglish.secureMessage,original[id].secureMessage,id+' original secure status changed');
+  const expectedSecure=original[id].secureMessage ? genericRU[id].secureMessage : original[id].secureMessage;
+  assert.strictEqual(check.secureMessage,expectedSecure,id+' secure message changed after prior RU localization');
   const result=render(check,'synthetic check','note');
   assert(!result.includes('Подробные критерии проверки (оригинал EN)'),id+' English panel shown');
   assert(result.includes(escapeHtml(check.whyItMatters)),id+' detailed reason hidden');
