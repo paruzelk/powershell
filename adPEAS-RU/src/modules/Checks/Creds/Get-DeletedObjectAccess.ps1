@@ -387,7 +387,7 @@ function Show-DeletedObjectsReaders {
         $headlineClass = if (@($unexpected | Where-Object { $_.deletedObjectsRights -match 'broad group' }).Count -gt 0) { 'Finding' } else { 'Hint' }
         Show-Line "Найдено субъектов вне Tier 0, которым может быть доступно перечисление удалённых объектов: $($unexpected.Count)" -Class $headlineClass
     } else {
-        Show-Line "Only Tier 0$(if ($exchangeReads) { ' and the Exchange service groups' }) may list deleted objects" -Class Secure
+        Show-Line "Только Tier 0$(if ($exchangeReads) { ' и служебные группы Exchange' }) могут перечислять удалённые объекты" -Class Secure
     }
 
     foreach ($reader in $readers) {

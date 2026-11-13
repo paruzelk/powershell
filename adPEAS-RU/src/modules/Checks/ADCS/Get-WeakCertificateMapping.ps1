@@ -532,12 +532,12 @@ function Show-NoTrustAnchorNote {
     [CmdletBinding()]
     param()
 
-    Show-Line ("No issuer is published in the NTAuth store, so no certificate can " +
-               "currently authenticate against these mappings - neither through PKINIT " +
-               "nor through Schannel. Check the domain controllers' own NTAuth store " +
-               "with 'certutil -viewstore -enterprise NTAuth' before ruling it out, " +
-               "because an issuer can be added there without being published, and treat " +
-               "the mappings as live again the moment one is.") -Class Note
+    Show-Line ("В NTAuth нет опубликованных издателей сертификатов, поэтому сертификаты " +
+                          "пока не могут использоваться для аутентификации по этим сопоставлениям ни через PKINIT, " +
+                          "ни через Schannel. Проверьте локальное хранилище NTAuth на контроллерах домена " +
+                          "командой 'certutil -viewstore -enterprise NTAuth', прежде чем исключать риск: " +
+                          "издатель может находиться в нём без публикации в AD. Как только будет опубликован " +
+                          "доверенный издатель, сопоставления вновь станут действующими.") -Class Note
 }
 
 function Get-CertificateMappingStrength {

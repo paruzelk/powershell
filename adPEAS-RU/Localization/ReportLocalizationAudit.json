@@ -8,108 +8,8 @@
                                "report-scripts.js",
                                "report-styles.css"
                            ],
-    "UntranslatedCandidateCount":  48,
+    "UntranslatedCandidateCount":  27,
     "UntranslatedCandidates":  [
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  654,
-                                       "Text":  "Found $(@($oneSidedLinks).Count) account(s) named as predecessor by a dMSA they do not name back$privilegedText`:"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                                       "Line":  763,
-                                       "Text":  "Found $(@($usableByOthers).Count) dMSA(s) that principals beyond administrators and service hosts may use$broadInfo`:"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                                       "Line":  535,
-                                       "Text":  "No issuer is published in the NTAuth store, so no certificate can "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                                       "Line":  507,
-                                       "Text":  "No non-privileged principal holds a delegated read of the BitLocker recovery passwords, but "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                                       "Line":  510,
-                                       "Text":  "The delegations on the $totalContainers container(s) holding computers were not evaluated - "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                                       "Line":  515,
-                                       "Text":  "No principal holds a delegated read of the BitLocker recovery passwords on the $readContainers "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                                       "Line":  525,
-                                       "Text":  "Found $($findingRows.Count) non-privileged principal(s) who can read BitLocker recovery "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                                       "Line":  531,
-                                       "Text":  "Found $($hintRows.Count) further delegated read(s) of the BitLocker recovery passwords that "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                                       "Line":  242,
-                                       "Text":  "The attributes are not marked confidential in the schema, so reading them follows the "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                                       "Line":  249,
-                                       "Text":  "Both attributes are marked confidential in the schema, so reading them needs the "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                                       "Line":  252,
-                                       "Text":  "Whether the attributes are readable could not be established - the schema could not "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                                       "Line":  267,
-                                       "Text":  "Reading these attributes is not constrained for anybody with DCSync, a copy of ntds.dit or "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                                       "Line":  456,
-                                       "Text":  "No non-privileged principal holds a delegated read of the roaming attributes, but "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                                       "Line":  459,
-                                       "Text":  "The delegations on the $totalContainers container(s) holding this material were not "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                                       "Line":  464,
-                                       "Text":  "No principal holds a delegated read of the roaming attributes on the $readContainers "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                                       "Line":  555,
-                                       "Text":  "Found $(@($findingRows).Count) non-privileged principal(s) with a delegated read of the "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                                       "Line":  561,
-                                       "Text":  "Found $(@($hintRows).Count) further delegated read(s) of the roaming attributes that do not "
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                                       "Line":  390,
-                                       "Text":  "Only Tier 0$(if ($exchangeReads) { \u0027 and the Exchange service groups\u0027 }) may list deleted objects"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Domain\\Get-DomainPasswordPolicy.ps1",
-                                       "Line":  513,
-                                       "Text":  "Found $(@($psos).Count) Fine-Grained Password Polic$(if(@($psos).Count -eq 1){\u0027y\u0027}else{\u0027ies\u0027}):"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Checks\\Domain\\Get-DomainPasswordPolicy.ps1",
-                                       "Line":  743,
-                                       "Text":  "Found $($assignedPSOs.Count) Fine-Grained Password Polic$(if($assignedPSOs.Count -eq 1){\u0027y\u0027}else{\u0027ies\u0027}) $($foundBy):"
-                                   },
                                    {
                                        "File":  "src\\modules\\Core\\adPEAS-Messages.ps1",
                                        "Line":  1042,
@@ -199,11 +99,6 @@
                                        "File":  "src\\modules\\Helpers\\Get-CertificateInfo.ps1",
                                        "Line":  437,
                                        "Text":  "Connect-adPEAS -Domain \u003cdomain\u003e -Certificate \u0027$certPathHint\u0027 -Username $usernameHint"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Helpers\\Get-GCConnection.ps1",
-                                       "Line":  140,
-                                       "Text":  "Global Catalog (port 3268) is not reachable on $($targets -join \u0027, \u0027) - identities from "
                                    },
                                    {
                                        "File":  "src\\modules\\Helpers\\Invoke-ShadowCredentialOperation.ps1",

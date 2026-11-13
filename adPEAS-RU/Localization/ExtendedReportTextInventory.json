@@ -8,20 +8,8 @@
                           "src/modules/Reporting/templates/report-scripts.js",
                           "src/modules/Reporting/templates/diff-template.html"
                       ],
-    "candidateCount":  259,
+    "candidateCount":  231,
     "candidates":  [
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  654,
-                           "snippet":  "Show-Line \"Found $(@($oneSidedLinks).Count) account(s) named as predecessor by a dMSA they do not name back$privilegedText`:\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-ManagedServiceAccountSecurity.ps1",
-                           "line":  763,
-                           "snippet":  "Show-Line \"Found $(@($usableByOthers).Count) dMSA(s) that principals beyond administrators and service hosts may use$broadInfo`:\" -Class Finding"
-                       },
                        {
                            "kind":  "DynamicSummary",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
@@ -47,34 +35,10 @@
                            "snippet":  "Show-Line \"  $denied\" -Class Hint"
                        },
                        {
-                           "kind":  "DynamicSummary",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
-                           "line":  2138,
-                           "snippet":  "$cleanText = \"No principal beyond the expected ones can change the $($examinedGroups.Count) privileged group(s) AdminSDHolder does not protect\""
-                       },
-                       {
-                           "kind":  "DynamicSummary",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
-                           "line":  2140,
-                           "snippet":  "$cleanText += \" - $($suppressed.Count) expected or privileged holder(s) hidden, use -IncludePrivileged to see them\""
-                       },
-                       {
                            "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
                            "line":  2142,
                            "snippet":  "Show-Line $cleanText -Class $cleanClass"
-                       },
-                       {
-                           "kind":  "DynamicSummary",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
-                           "line":  2549,
-                           "snippet":  "$accountCleanText = \"No principal beyond the expected ones can take over the $examinedAccounts privileged account(s) read\""
-                       },
-                       {
-                           "kind":  "DynamicSummary",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-PrivilegedGroupMembers.ps1",
-                           "line":  2551,
-                           "snippet":  "$accountCleanText += \" - $($suppressed.Count) expected or privileged holder(s) hidden, use -IncludePrivileged to see them\""
                        },
                        {
                            "kind":  "DirectShow",
@@ -93,12 +57,6 @@
                            "source":  "src\\modules\\Checks\\Accounts\\Get-ProtectedUsersStatus.ps1",
                            "line":  401,
                            "snippet":  "Show-Line $summaryText -Class $severity"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Accounts\\Get-SIDHistoryInjection.ps1",
-                           "line":  358,
-                           "snippet":  "Show-Line (\"$(@($orphanedAccounts).Count) account(s) carry sIDHistory from $(@($orphanedDomainSIDs).Count) domain(s) this domain \" +"
                        },
                        {
                            "kind":  "DirectShow",
@@ -126,51 +84,9 @@
                        },
                        {
                            "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-WeakCertificateMapping.ps1",
-                           "line":  535,
-                           "snippet":  "Show-Line (\"No issuer is published in the NTAuth store, so no certificate can \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Application\\Get-ExchangeInfrastructure.ps1",
                            "line":  1422,
                            "snippet":  "Show-SubHeader $serviceGroup.Title -ObjectType $serviceGroup.ObjectType"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  507,
-                           "snippet":  "Show-Line (\"No non-privileged principal holds a delegated read of the BitLocker recovery passwords, but \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  510,
-                           "snippet":  "Show-Line (\"The delegations on the $totalContainers container(s) holding computers were not evaluated - \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  515,
-                           "snippet":  "Show-Line (\"No principal holds a delegated read of the BitLocker recovery passwords on the $readContainers \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  525,
-                           "snippet":  "Show-Line (\"Found $($findingRows.Count) non-privileged principal(s) who can read BitLocker recovery \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  531,
-                           "snippet":  "Show-Line (\"Found $($hintRows.Count) further delegated read(s) of the BitLocker recovery passwords that \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-BitLockerRecoveryKeyAccess.ps1",
-                           "line":  537,
-                           "snippet":  "Show-Line (\"$($suppressedPrivileged.Count) privileged principal(s) hold a right on the recovery passwords \" +"
                        },
                        {
                            "kind":  "DirectShow",
@@ -216,87 +132,9 @@
                        },
                        {
                            "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  242,
-                           "snippet":  "Show-Line (\"The attributes are not marked confidential in the schema, so reading them follows the \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  249,
-                           "snippet":  "Show-Line (\"Both attributes are marked confidential in the schema, so reading them needs the \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  252,
-                           "snippet":  "Show-Line (\"Whether the attributes are readable could not be established - the schema could not \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  267,
-                           "snippet":  "Show-Line (\"Reading these attributes is not constrained for anybody with DCSync, a copy of ntds.dit or \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  456,
-                           "snippet":  "Show-Line (\"No non-privileged principal holds a delegated read of the roaming attributes, but \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  459,
-                           "snippet":  "Show-Line (\"The delegations on the $totalContainers container(s) holding this material were not \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  464,
-                           "snippet":  "Show-Line (\"No principal holds a delegated read of the roaming attributes on the $readContainers \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  555,
-                           "snippet":  "Show-Line (\"Found $(@($findingRows).Count) non-privileged principal(s) with a delegated read of the \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  561,
-                           "snippet":  "Show-Line (\"Found $(@($hintRows).Count) further delegated read(s) of the roaming attributes that do not \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-CredentialRoaming.ps1",
-                           "line":  567,
-                           "snippet":  "Show-Line (\"$($suppressedPrivileged.Count) privileged principal(s) hold the same right and are not \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Creds\\Get-DeletedObjectAccess.ps1",
-                           "line":  390,
-                           "snippet":  "Show-Line \"Only Tier 0$(if ($exchangeReads) { \u0027 and the Exchange service groups\u0027 }) may list deleted objects\" -Class Secure"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-DomainPasswordPolicy.ps1",
-                           "line":  513,
-                           "snippet":  "Show-Line \"Found $(@($psos).Count) Fine-Grained Password Polic$(if(@($psos).Count -eq 1){\u0027y\u0027}else{\u0027ies\u0027}):\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
                            "source":  "src\\modules\\Checks\\Domain\\Get-DomainPasswordPolicy.ps1",
                            "line":  694,
                            "snippet":  "Show-Line \"$($weakPSONames.Count) Fine-Grained Password Polic$(if($weakPSONames.Count -eq 1){\u0027y\u0027}else{\u0027ies\u0027}) with a weakness: $($weakPSONames -join \u0027, \u0027)\" -Class Finding -FindingId \u0027WEAK_FGPP\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\Domain\\Get-DomainPasswordPolicy.ps1",
-                           "line":  743,
-                           "snippet":  "Show-Line \"Found $($assignedPSOs.Count) Fine-Grained Password Polic$(if($assignedPSOs.Count -eq 1){\u0027y\u0027}else{\u0027ies\u0027}) $($foundBy):\" -Class Hint"
                        },
                        {
                            "kind":  "DirectShow",
@@ -417,12 +255,6 @@
                            "source":  "src\\modules\\Helpers\\Get-CertificateTrustAnchor.ps1",
                            "line":  94,
                            "snippet":  "Summary                 = \u0027Unknown - the Configuration partition could not be read\u0027"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Helpers\\Get-GCConnection.ps1",
-                           "line":  140,
-                           "snippet":  "Show-Line (\"Global Catalog (port 3268) is not reachable on $($targets -join \u0027, \u0027) - identities from \" +"
                        },
                        {
                            "kind":  "DirectShow",

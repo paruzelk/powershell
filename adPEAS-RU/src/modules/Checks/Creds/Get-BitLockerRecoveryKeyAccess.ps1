@@ -455,11 +455,11 @@ function Show-BitLockerRecoveryDelegation {
         $isLive    = @($verdicts | Where-Object { $_.Verdict -eq 'live' }).Count -gt 0
         $isUnknown = @($verdicts | Where-Object { $_.Verdict -eq 'unknown' }).Count -gt 0
 
-        $readableText = 'No - blocked by the confidential flag on msFVE-RecoveryPassword, live the moment it is cleared'
+        $readableText = 'Нет — флаг конфиденциальности msFVE-RecoveryPassword блокирует чтение; после его снятия право начнёт действовать'
         if ($isLive) {
-            $readableText = 'Yes - the principal can read these recovery passwords today'
+            $readableText = 'Да — этот субъект может читать пароли восстановления сейчас'
         } elseif ($isUnknown) {
-            $readableText = 'Unknown - the schema could not be read, so whether the confidential flag blocks the read is open'
+            $readableText = 'Неизвестно — схема недоступна, поэтому действие флага конфиденциальности определить не удалось'
         }
 
         # A container whose verdict differs from the row's says so. When they all agree the
@@ -472,9 +472,9 @@ function Show-BitLockerRecoveryDelegation {
                 if (-not $rights.Contains($right)) { $rights.Add($right) }
             }
             $suffix = ''
-            if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', blocked by the confidential flag' }
-            if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', not decidable - the schema could not be read' }
-            $containerTexts.Add("$($item.Container) ($($computersByContainer[$item.Container]) computer(s)$suffix)")
+            if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', чтение блокируется флагом конфиденциальности' }
+            if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', не удалось проверить: схема недоступна' }
+            $containerTexts.Add("$($item.Container) ($($computersByContainer[$item.Container]) компьютеров$suffix)")
         }
 
         # A privileged principal reads the recovery passwords anyway, so its right is expected
@@ -504,16 +504,16 @@ function Show-BitLockerRecoveryDelegation {
     if ($rows.Count -eq 0) {
         # "Nobody" and "nobody except the principals filtered out" are different statements.
         if ($suppressedPrivileged.Count -gt 0) {
-            Show-Line ("No non-privileged principal holds a delegated read of the BitLocker recovery passwords, but " +
-                       "$($suppressedPrivileged.Count) privileged one(s) hold a right on them - use -IncludePrivileged to see them") -Class Note
+            Show-Line ("Делегированных прав чтения паролей восстановления BitLocker у непривилегированных субъектов не обнаружено, однако " +
+                                  "$($suppressedPrivileged.Count) привилегированных субъектов имеют такие права; для просмотра используйте -IncludePrivileged") -Class Note
         } elseif ($readContainers -le 0) {
-            Show-Line ("The delegations on the $totalContainers container(s) holding computers were not evaluated - " +
-                       "no security descriptor could be read") -Class Note
+            Show-Line ("Делегированные права в $totalContainers контейнерах компьютеров не проверены: " +
+                                  "не удалось прочитать ни одного дескриптора безопасности") -Class Note
         } else {
             $delegationClass = 'Secure'
             if ($coverageIncomplete) { $delegationClass = 'Note' }
-            Show-Line ("No principal holds a delegated read of the BitLocker recovery passwords on the $readContainers " +
-                       "container(s) holding computers") -Class $delegationClass
+            Show-Line ("Не обнаружено делегированных прав чтения паролей восстановления BitLocker в $readContainers " +
+                                  "проверенных контейнерах компьютеров") -Class $delegationClass
         }
         return
     }
@@ -522,20 +522,20 @@ function Show-BitLockerRecoveryDelegation {
     $hintRows    = @($rows | Where-Object { -not $_._IsFinding })
 
     if ($findingRows.Count -gt 0) {
-        Show-Line ("Found $($findingRows.Count) non-privileged principal(s) who can read BitLocker recovery " +
-                   "passwords") -Class Finding -FindingId 'BITLOCKER_RECOVERY_DELEGATED'
+        Show-Line ("Найдено непривилегированных субъектов с правом чтения паролей восстановления BitLocker: $($findingRows.Count); " +
+                              "права действуют сейчас") -Class Finding -FindingId 'BITLOCKER_RECOVERY_DELEGATED'
         foreach ($row in $findingRows) { Show-Object $row -Class Finding }
     }
 
     if ($hintRows.Count -gt 0) {
-        Show-Line ("Found $($hintRows.Count) further delegated read(s) of the BitLocker recovery passwords that " +
-                   "do not work today or belong to a privileged principal") -Class Hint -FindingId 'BITLOCKER_RECOVERY_DELEGATED'
+        Show-Line ("Найдено дополнительных делегированных прав чтения паролей восстановления BitLocker: $($hintRows.Count); " +
+                              "они пока не действуют либо принадлежат привилегированным субъектам") -Class Hint -FindingId 'BITLOCKER_RECOVERY_DELEGATED'
         foreach ($row in $hintRows) { Show-Object $row -Class Hint }
     }
 
     if ($suppressedPrivileged.Count -gt 0) {
-        Show-Line ("$($suppressedPrivileged.Count) privileged principal(s) hold a right on the recovery passwords " +
-                   "and are not listed - they read them regardless. Use -IncludePrivileged to see them") -Class Note
+        Show-Line ("Привилегированных субъектов, не перечисленных в результатах, но имеющих доступ к паролям восстановления: $($suppressedPrivileged.Count); " +
+                              "они могут читать пароли независимо от этой проверки. Используйте -IncludePrivileged для просмотра") -Class Note
     }
 }
 

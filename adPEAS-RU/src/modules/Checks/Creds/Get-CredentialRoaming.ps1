@@ -232,25 +232,25 @@
             # key of another user - is then one offline step away.
             $privilegedCount = @($findings | Where-Object { $_.PrivilegedAccount -eq 'Yes' }).Count
             $countText = if ($privilegedCount -gt 0) {
-                "$($findings.Count) user(s) carry roamed credential material in Active Directory, $privilegedCount of them privileged"
+                "$($findings.Count) пользователей с синхронизированными учётными данными в AD; привилегированных среди них: $privilegedCount"
             } else {
-                "$($findings.Count) user(s) carry roamed credential material in Active Directory"
+                "$($findings.Count) пользователей с синхронизированными учётными данными в AD"
             }
 
             if ($confidential.Confidential -eq $false) {
                 Show-Line "Обнаружено: $countText" -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
-                Show-Line ("The attributes are not marked confidential in the schema, so reading them follows the " +
-                           "ordinary read permissions of the user object - in a default domain every authenticated " +
-                           "user can read them") -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
+                Show-Line ("Атрибуты не отмечены конфиденциальными в схеме, поэтому их чтение определяется " +
+                                      "обычными правами чтения объекта пользователя; в домене с настройками по умолчанию " +
+                                      "они доступны всем аутентифицированным пользователям") -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
             } else {
                 Show-Line "Обнаружено: $countText" -Class Hint -FindingId 'CREDENTIAL_ROAMING_PRESENT'
 
                 if ($confidential.Confidential -eq $true) {
-                    Show-Line ("Both attributes are marked confidential in the schema, so reading them needs the " +
-                               "Control Access right and generic read does not grant it") -Class Secure
+                    Show-Line ("Оба атрибута помечены конфиденциальными в схеме, поэтому для чтения " +
+                                          "требуется право Control Access; обычного чтения недостаточно") -Class Secure
                 } else {
-                    Show-Line ("Whether the attributes are readable could not be established - the schema could not " +
-                               "be read, so treat them as readable until checked by hand") -Class Note
+                    Show-Line ("Нельзя определить доступность атрибутов: схему прочитать не удалось; " +
+                                          "до ручной проверки считайте их потенциально доступными") -Class Note
                 }
             }
 
@@ -264,8 +264,8 @@
                 -Confidentiality $confidential -IncludePrivileged:$IncludePrivileged `
                 -ConnectionParams $CredParams
 
-            Show-Line ("Reading these attributes is not constrained for anybody with DCSync, a copy of ntds.dit or " +
-                       "an AD backup - the confidential flag protects against ordinary users, not against Tier 0") -Class Note
+            Show-Line ("DCSync, копия ntds.dit или резервная копия AD позволяют прочитать эти атрибуты " +
+                                  "независимо от конфиденциальности: флаг защищает от обычного чтения, но не от Tier 0") -Class Note
         }
         catch {
             Write-Log "[Get-CredentialRoaming] Error: $_" -Level Error
@@ -453,16 +453,16 @@ function Show-CredentialRoamingDelegation {
         # statements. Printing the first when the second is true would call a forest clean on
         # the strength of a filter this function applied itself.
         if ($suppressedPrivileged.Count -gt 0) {
-            Show-Line ("No non-privileged principal holds a delegated read of the roaming attributes, but " +
-                       "$($suppressedPrivileged.Count) privileged one(s) do - use -IncludePrivileged to see them") -Class Note
+            Show-Line ("У непривилегированных субъектов нет делегированного чтения синхронизированных атрибутов, но " +
+                                  "у $($suppressedPrivileged.Count) привилегированных субъектов оно есть; используйте -IncludePrivileged для просмотра") -Class Note
         } elseif ($totalContainers -gt 0 -and $readContainers -le 0) {
-            Show-Line ("The delegations on the $totalContainers container(s) holding this material were not " +
-                       "evaluated - no security descriptor could be read") -Class Note
+            Show-Line ("Делегирование прав чтения в $totalContainers контейнерах пользователей не проверено: " +
+                                  "не удалось прочитать ни одного дескриптора безопасности") -Class Note
         } else {
             $roamingClass = 'Secure'
             if ($coverageIncomplete) { $roamingClass = 'Note' }
-            Show-Line ("No principal holds a delegated read of the roaming attributes on the $readContainers " +
-                       "container(s) holding this material") -Class $roamingClass
+            Show-Line ("Не обнаружено делегированного права чтения синхронизированных атрибутов в $readContainers " +
+                                  "проверенных контейнерах пользователей") -Class $roamingClass
         }
         return
     }
@@ -511,17 +511,17 @@ function Show-CredentialRoamingDelegation {
         $containerTexts = @()
         foreach ($item in $verdicts) {
             $suffix = ''
-            if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', blocked by the confidential flag' }
-            if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', not decidable - the schema could not be read' }
-            $containerTexts += "$($item.Container) ($($usersByContainer[$item.Container]) user(s) with material$suffix)"
+            if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', чтение блокируется флагом конфиденциальности' }
+            if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', нельзя определить: схема недоступна' }
+            $containerTexts += "$($item.Container) ($($usersByContainer[$item.Container]) пользователей с материалом$suffix)"
         }
 
         $effectiveText = if ($isLive -eq $true) {
-            'Yes - the principal can read the material today'
+            'Да — субъект может читать эти данные сейчас'
         } elseif ($isLive -eq $false) {
-            'No - blocked by the confidential flag, live the moment it is cleared'
+            'Нет — флаг конфиденциальности блокирует чтение; после его снятия право начнёт действовать'
         } else {
-            'Unknown - the schema could not be read'
+            'Неизвестно — схема недоступна'
         }
 
         # A privileged principal reads the material anyway, so the right is expected rather
@@ -552,20 +552,20 @@ function Show-CredentialRoamingDelegation {
     $hintRows    = @($rows | Where-Object { -not $_._IsFinding })
 
     if (@($findingRows).Count -gt 0) {
-        Show-Line ("Found $(@($findingRows).Count) non-privileged principal(s) with a delegated read of the " +
-                   "roaming attributes") -Class Finding -FindingId 'CREDENTIAL_ROAMING_DELEGATED'
+        Show-Line ("Найдено непривилегированных субъектов с делегированным чтением синхронизированных атрибутов: $(@($findingRows).Count); " +
+                              "право действует сейчас") -Class Finding -FindingId 'CREDENTIAL_ROAMING_DELEGATED'
         foreach ($row in $findingRows) { Show-Object $row -Class Finding }
     }
 
     if (@($hintRows).Count -gt 0) {
-        Show-Line ("Found $(@($hintRows).Count) further delegated read(s) of the roaming attributes that do not " +
-                   "grant access today or belong to a privileged principal") -Class Hint -FindingId 'CREDENTIAL_ROAMING_DELEGATED'
+        Show-Line ("Найдено дополнительных делегированных прав чтения синхронизированных атрибутов: $(@($hintRows).Count); " +
+                              "они пока не действуют либо принадлежат привилегированным субъектам") -Class Hint -FindingId 'CREDENTIAL_ROAMING_DELEGATED'
         foreach ($row in $hintRows) { Show-Object $row -Class Hint }
     }
 
     if ($suppressedPrivileged.Count -gt 0) {
-        Show-Line ("$($suppressedPrivileged.Count) privileged principal(s) hold the same right and are not " +
-                   "listed - they can read the material regardless. Use -IncludePrivileged to see them") -Class Note
+        Show-Line ("Привилегированных субъектов с аналогичным правом, скрытых из списка: $($suppressedPrivileged.Count); " +
+                              "они могут читать материал независимо от делегирования. Для просмотра используйте -IncludePrivileged") -Class Note
     }
 }
 

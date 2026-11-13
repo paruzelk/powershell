@@ -2135,9 +2135,9 @@ function Show-UnprotectedGroupACL {
         }
         $cleanClass = 'Secure'
         if ($unreadGroups.Count -gt 0) { $cleanClass = 'Note' }
-        $cleanText = "No principal beyond the expected ones can change the $($examinedGroups.Count) privileged group(s) AdminSDHolder does not protect"
+        $cleanText = "Среди субъектов, которым не положены такие права, нет способных изменить $($examinedGroups.Count) привилегированных групп, не защищённых AdminSDHolder"
         if ($suppressed.Count -gt 0) {
-            $cleanText += " - $($suppressed.Count) expected or privileged holder(s) hidden, use -IncludePrivileged to see them"
+            $cleanText += " — скрыто ожидаемых либо привилегированных правообладателей: $($suppressed.Count); для просмотра используйте -IncludePrivileged"
         }
         Show-Line $cleanText -Class $cleanClass
     }
@@ -2546,9 +2546,9 @@ function Show-PrivilegedAccountACL {
         }
         $accountCleanClass = 'Secure'
         if ($unreadAccounts.Count -gt 0) { $accountCleanClass = 'Note' }
-        $accountCleanText = "No principal beyond the expected ones can take over the $examinedAccounts privileged account(s) read"
+        $accountCleanText = "Среди неожиданных субъектов нет способных захватить проверенные привилегированные записи: $examinedAccounts"
         if ($suppressed.Count -gt 0) {
-            $accountCleanText += " - $($suppressed.Count) expected or privileged holder(s) hidden, use -IncludePrivileged to see them"
+            $accountCleanText += " — скрыто ожидаемых либо привилегированных правообладателей: $($suppressed.Count); для просмотра используйте -IncludePrivileged"
         }
         Show-Line $accountCleanText -Class $accountCleanClass
     }

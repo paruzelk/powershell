@@ -650,8 +650,8 @@
                 # whoever wrote it controls the dMSA, and one write to the account completes it.
                 if (@($oneSidedLinks).Count -gt 0) {
                     $privilegedText = ''
-                    if ($oneSidedPrivileged -gt 0) { $privilegedText = " ($oneSidedPrivileged privileged)" }
-                    Show-Line "Found $(@($oneSidedLinks).Count) account(s) named as predecessor by a dMSA they do not name back$privilegedText`:" -Class Hint
+                    if ($oneSidedPrivileged -gt 0) { $privilegedText = " (привилегированных: $oneSidedPrivileged)" }
+                    Show-Line "Найдено записей, которые dMSA называет предшественниками без встречной ссылки: $(@($oneSidedLinks).Count)$privilegedText`:" -Class Hint
                     foreach ($reported in $oneSidedLinks) { Show-Object $reported -Class Hint }
                 }
 
@@ -759,8 +759,8 @@
                     if (@($usableByOthers).Count -gt 0) {
                         $broadCount = @($usableByOthers | Where-Object { $_.HasBroad }).Count
                         $broadInfo = ''
-                        if ($broadCount -gt 0) { $broadInfo = " ($broadCount with broad group access - CRITICAL)" }
-                        Show-Line "Found $(@($usableByOthers).Count) dMSA(s) that principals beyond administrators and service hosts may use$broadInfo`:" -Class Finding
+                        if ($broadCount -gt 0) { $broadInfo = " (широкая группа имеет доступ к $broadCount; КРИТИЧЕСКИЙ РИСК)" }
+                        Show-Line "Найдено dMSA, которые могут использовать субъекты помимо администраторов и служебных узлов: $(@($usableByOthers).Count)$broadInfo`:" -Class Finding
 
                         foreach ($entry in $usableByOthers) {
                             $contextText = 'Non-privileged access'

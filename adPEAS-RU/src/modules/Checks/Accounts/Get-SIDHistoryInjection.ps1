@@ -355,8 +355,8 @@
             # every account and whether or not -IncludeNonPrivileged was given: a leftover
             # to remove, which the per-account rows above show only for privileged SIDs.
             if (@($orphanedAccounts).Count -gt 0) {
-                Show-Line ("$(@($orphanedAccounts).Count) account(s) carry sIDHistory from $(@($orphanedDomainSIDs).Count) domain(s) this domain " +
-                           "neither trusts nor shares a forest with - leftovers of a migration to remove: $(@($orphanedDomainSIDs) -join ', ')") -Class Hint -FindingId 'SID_HISTORY_ORPHANED'
+                Show-Line ("У $(@($orphanedAccounts).Count) учётных записей sIDHistory ссылается на $(@($orphanedDomainSIDs).Count) доменов, с которыми текущий домен " +
+                                      "не имеет доверия и не состоит в одном лесу: следы миграции следует проверить и удалить при необходимости: $(@($orphanedDomainSIDs) -join ', ')") -Class Hint -FindingId 'SID_HISTORY_ORPHANED'
             }
 
             # Non-privileged findings (migration artifacts) - only if requested

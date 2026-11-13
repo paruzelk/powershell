@@ -137,8 +137,8 @@
     # domain come back unresolved - which the checks then say on the row.
     $Script:GCConnectionFailed = $true
     Write-Log "[Get-GCConnection] All GC connection attempts failed - cross-domain resolution unavailable"
-    Show-Line ("Global Catalog (port 3268) is not reachable on $($targets -join ', ') - identities from " +
-               'another domain cannot be resolved and are reported as unresolved') -Class Note
+    Show-Line ("Глобальный каталог (порт 3268) недоступен на $($targets -join ', '): идентификаторы из " +
+                          'других доменов не удаётся сопоставить с именами, поэтому они выводятся как неразрешённые') -Class Note
     return $null
 }
 

@@ -510,7 +510,7 @@ function Get-DomainPasswordPolicy {
 
                     if (@($psos).Count -gt 0) {
                         $psosListed = $true
-                        Show-Line "Found $(@($psos).Count) Fine-Grained Password Polic$(if(@($psos).Count -eq 1){'y'}else{'ies'}):" -Class Hint
+                        Show-Line "Найдено $(@($psos).Count) политик$(if(@($psos).Count -eq 1){'а'}else{'и'}) тонкой настройки паролей:" -Class Hint
 
                         # Every setting read below is a mandatory attribute of
                         # msDS-PasswordSettings (adschema: systemMustContain), so a policy
@@ -739,8 +739,8 @@ function Get-DomainPasswordPolicy {
                     if ($null -ne $assignedPSOs -and $assignedPSOs.Count -gt 0) {
                         # How they were found: the listing of the container gives every
                         # name, the assignments only the policies that are assigned.
-                        $foundBy = if (@($assignedPSOs | Where-Object { $_.Listed }).Count -gt 0) { 'by name and assignment' } else { 'by assignment' }
-                        Show-Line "Found $($assignedPSOs.Count) Fine-Grained Password Polic$(if($assignedPSOs.Count -eq 1){'y'}else{'ies'}) $($foundBy):" -Class Hint
+                        $foundBy = if (@($assignedPSOs | Where-Object { $_.Listed }).Count -gt 0) { 'по имени и назначению' } else { 'по назначению' }
+                        Show-Line "Найдено $($assignedPSOs.Count) политик$(if($assignedPSOs.Count -eq 1){'а'}else{'и'}) тонкой настройки паролей ($($foundBy)):" -Class Hint
 
                         foreach ($assignedPSO in $assignedPSOs) {
                             $targetNames = @()

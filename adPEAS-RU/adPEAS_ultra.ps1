@@ -39446,8 +39446,8 @@ function Get-GCConnection {
 	    }
 	}
 	$Script:GCConnectionFailed = $true
-	Show-Line ("Global Catalog (port 3268) is not reachable on $($targets -join ', ') - identities from " +
-	           'another domain cannot be resolved and are reported as unresolved') -Class Note
+	Show-Line ("Глобальный каталог (порт 3268) недоступен на $($targets -join ', '): идентификаторы из " +
+	                      'других доменов не удаётся сопоставить с именами, поэтому они выводятся как неразрешённые') -Class Note
 	return $null
 }
 function Get-ForestRootExchangeGroup {
@@ -68763,7 +68763,7 @@ function Get-DomainPasswordPolicy {
 	                    $psos = Get-DomainObject -LDAPFilter "(objectClass=msDS-PasswordSettings)" -SearchBase $psoContainerDN @PSBoundParameters
 	                if (@($psos).Count -gt 0) {
 	                    $psosListed = $true
-	                    Show-Line "Found $(@($psos).Count) Fine-Grained Password Polic$(if(@($psos).Count -eq 1){'y'}else{'ies'}):" -Class Hint
+	                    Show-Line "Найдено $(@($psos).Count) политик$(if(@($psos).Count -eq 1){'а'}else{'и'}) тонкой настройки паролей:" -Class Hint
 	                    function Read-PSOSetting {
 	                        param($Value, [switch]$Boolean)
 	                        if ($Boolean) {
@@ -68906,8 +68906,8 @@ function Get-DomainPasswordPolicy {
 	                    Write-Warning "[Get-DomainPasswordPolicy] Failed to look up Fine-Grained Password Policy assignments: $_"
 	                }
 	                if ($null -ne $assignedPSOs -and $assignedPSOs.Count -gt 0) {
-	                    $foundBy = if (@($assignedPSOs | Where-Object { $_.Listed }).Count -gt 0) { 'by name and assignment' } else { 'by assignment' }
-	                    Show-Line "Found $($assignedPSOs.Count) Fine-Grained Password Polic$(if($assignedPSOs.Count -eq 1){'y'}else{'ies'}) $($foundBy):" -Class Hint
+	                    $foundBy = if (@($assignedPSOs | Where-Object { $_.Listed }).Count -gt 0) { 'по имени и назначению' } else { 'по назначению' }
+	                    Show-Line "Найдено $($assignedPSOs.Count) политик$(if($assignedPSOs.Count -eq 1){'а'}else{'и'}) тонкой настройки паролей ($($foundBy)):" -Class Hint
 	                    foreach ($assignedPSO in $assignedPSOs) {
 	                        $targetNames = @()
 	                        $privilegedTargetNames = @()
@@ -71183,9 +71183,9 @@ function Show-UnprotectedGroupACL {
 	    }
 	    $cleanClass = 'Secure'
 	    if ($unreadGroups.Count -gt 0) { $cleanClass = 'Note' }
-	    $cleanText = "No principal beyond the expected ones can change the $($examinedGroups.Count) privileged group(s) AdminSDHolder does not protect"
+	    $cleanText = "Среди субъектов, которым не положены такие права, нет способных изменить $($examinedGroups.Count) привилегированных групп, не защищённых AdminSDHolder"
 	    if ($suppressed.Count -gt 0) {
-	        $cleanText += " - $($suppressed.Count) expected or privileged holder(s) hidden, use -IncludePrivileged to see them"
+	        $cleanText += " — скрыто ожидаемых либо привилегированных правообладателей: $($suppressed.Count); для просмотра используйте -IncludePrivileged"
 	    }
 	    Show-Line $cleanText -Class $cleanClass
 	}
@@ -71447,9 +71447,9 @@ function Show-PrivilegedAccountACL {
 	    }
 	    $accountCleanClass = 'Secure'
 	    if ($unreadAccounts.Count -gt 0) { $accountCleanClass = 'Note' }
-	    $accountCleanText = "No principal beyond the expected ones can take over the $examinedAccounts privileged account(s) read"
+	    $accountCleanText = "Среди неожиданных субъектов нет способных захватить проверенные привилегированные записи: $examinedAccounts"
 	    if ($suppressed.Count -gt 0) {
-	        $accountCleanText += " - $($suppressed.Count) expected or privileged holder(s) hidden, use -IncludePrivileged to see them"
+	        $accountCleanText += " — скрыто ожидаемых либо привилегированных правообладателей: $($suppressed.Count); для просмотра используйте -IncludePrivileged"
 	    }
 	    Show-Line $accountCleanText -Class $accountCleanClass
 	}
@@ -72951,8 +72951,8 @@ function Get-ManagedServiceAccountSecurity {
 	            }
 	            if (@($oneSidedLinks).Count -gt 0) {
 	                $privilegedText = ''
-	                if ($oneSidedPrivileged -gt 0) { $privilegedText = " ($oneSidedPrivileged privileged)" }
-	                Show-Line "Found $(@($oneSidedLinks).Count) account(s) named as predecessor by a dMSA they do not name back$privilegedText`:" -Class Hint
+	                if ($oneSidedPrivileged -gt 0) { $privilegedText = " (привилегированных: $oneSidedPrivileged)" }
+	                Show-Line "Найдено записей, которые dMSA называет предшественниками без встречной ссылки: $(@($oneSidedLinks).Count)$privilegedText`:" -Class Hint
 	                foreach ($reported in $oneSidedLinks) { Show-Object $reported -Class Hint }
 	            }
 	            if (@($privilegedPredecessors).Count -gt 0) {
@@ -73034,8 +73034,8 @@ function Get-ManagedServiceAccountSecurity {
 	                if (@($usableByOthers).Count -gt 0) {
 	                    $broadCount = @($usableByOthers | Where-Object { $_.HasBroad }).Count
 	                    $broadInfo = ''
-	                    if ($broadCount -gt 0) { $broadInfo = " ($broadCount with broad group access - CRITICAL)" }
-	                    Show-Line "Found $(@($usableByOthers).Count) dMSA(s) that principals beyond administrators and service hosts may use$broadInfo`:" -Class Finding
+	                    if ($broadCount -gt 0) { $broadInfo = " (широкая группа имеет доступ к $broadCount; КРИТИЧЕСКИЙ РИСК)" }
+	                    Show-Line "Найдено dMSA, которые могут использовать субъекты помимо администраторов и служебных узлов: $(@($usableByOthers).Count)$broadInfo`:" -Class Finding
 	                    foreach ($entry in $usableByOthers) {
 	                        $contextText = 'Non-privileged access'
 	                        if ($entry.HasBroad) { $contextText = 'CRITICAL: Broad group access' }
@@ -73451,8 +73451,8 @@ function Get-SIDHistoryInjection {
 	            }
 	        }
 	        if (@($orphanedAccounts).Count -gt 0) {
-	            Show-Line ("$(@($orphanedAccounts).Count) account(s) carry sIDHistory from $(@($orphanedDomainSIDs).Count) domain(s) this domain " +
-	                       "neither trusts nor shares a forest with - leftovers of a migration to remove: $(@($orphanedDomainSIDs) -join ', ')") -Class Hint -FindingId 'SID_HISTORY_ORPHANED'
+	            Show-Line ("У $(@($orphanedAccounts).Count) учётных записей sIDHistory ссылается на $(@($orphanedDomainSIDs).Count) доменов, с которыми текущий домен " +
+	                                  "не имеет доверия и не состоит в одном лесу: следы миграции следует проверить и удалить при необходимости: $(@($orphanedDomainSIDs) -join ', ')") -Class Hint -FindingId 'SID_HISTORY_ORPHANED'
 	        }
 	        if ($IncludeNonPrivileged -and @($nonPrivilegedFindings).Count -gt 0) {
 	            Show-SubHeader "Следы миграции: непривилегированные SID в sIDHistory..." -ObjectType "SIDHistory"
@@ -82898,12 +82898,12 @@ function Get-WeakCertificateMapping {
 function Show-NoTrustAnchorNote {
 	[CmdletBinding()]
 	param()
-	Show-Line ("No issuer is published in the NTAuth store, so no certificate can " +
-	           "currently authenticate against these mappings - neither through PKINIT " +
-	           "nor through Schannel. Check the domain controllers' own NTAuth store " +
-	           "with 'certutil -viewstore -enterprise NTAuth' before ruling it out, " +
-	           "because an issuer can be added there without being published, and treat " +
-	           "the mappings as live again the moment one is.") -Class Note
+	Show-Line ("В NTAuth нет опубликованных издателей сертификатов, поэтому сертификаты " +
+	                      "пока не могут использоваться для аутентификации по этим сопоставлениям ни через PKINIT, " +
+	                      "ни через Schannel. Проверьте локальное хранилище NTAuth на контроллерах домена " +
+	                      "командой 'certutil -viewstore -enterprise NTAuth', прежде чем исключать риск: " +
+	                      "издатель может находиться в нём без публикации в AD. Как только будет опубликован " +
+	                      "доверенный издатель, сопоставления вновь станут действующими.") -Class Note
 }
 function Get-CertificateMappingStrength {
 	[CmdletBinding()]
@@ -86080,11 +86080,11 @@ function Show-BitLockerRecoveryDelegation {
 	    }
 	    $isLive    = @($verdicts | Where-Object { $_.Verdict -eq 'live' }).Count -gt 0
 	    $isUnknown = @($verdicts | Where-Object { $_.Verdict -eq 'unknown' }).Count -gt 0
-	    $readableText = 'No - blocked by the confidential flag on msFVE-RecoveryPassword, live the moment it is cleared'
+	    $readableText = 'Нет — флаг конфиденциальности msFVE-RecoveryPassword блокирует чтение; после его снятия право начнёт действовать'
 	    if ($isLive) {
-	        $readableText = 'Yes - the principal can read these recovery passwords today'
+	        $readableText = 'Да — этот субъект может читать пароли восстановления сейчас'
 	    } elseif ($isUnknown) {
-	        $readableText = 'Unknown - the schema could not be read, so whether the confidential flag blocks the read is open'
+	        $readableText = 'Неизвестно — схема недоступна, поэтому действие флага конфиденциальности определить не удалось'
 	    }
 	    $mixed = @($verdicts | ForEach-Object { $_.Verdict } | Sort-Object -Unique).Count -gt 1
 	    $rights = New-Object System.Collections.Generic.List[string]
@@ -86094,9 +86094,9 @@ function Show-BitLockerRecoveryDelegation {
 	            if (-not $rights.Contains($right)) { $rights.Add($right) }
 	        }
 	        $suffix = ''
-	        if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', blocked by the confidential flag' }
-	        if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', not decidable - the schema could not be read' }
-	        $containerTexts.Add("$($item.Container) ($($computersByContainer[$item.Container]) computer(s)$suffix)")
+	        if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', чтение блокируется флагом конфиденциальности' }
+	        if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', не удалось проверить: схема недоступна' }
+	        $containerTexts.Add("$($item.Container) ($($computersByContainer[$item.Container]) компьютеров$suffix)")
 	    }
 	    $isFinding = (-not $entry.IsPrivileged) -and $isLive
 	    $row = [PSCustomObject]@{
@@ -86116,34 +86116,34 @@ function Show-BitLockerRecoveryDelegation {
 	}
 	if ($rows.Count -eq 0) {
 	    if ($suppressedPrivileged.Count -gt 0) {
-	        Show-Line ("No non-privileged principal holds a delegated read of the BitLocker recovery passwords, but " +
-	                   "$($suppressedPrivileged.Count) privileged one(s) hold a right on them - use -IncludePrivileged to see them") -Class Note
+	        Show-Line ("Делегированных прав чтения паролей восстановления BitLocker у непривилегированных субъектов не обнаружено, однако " +
+	                              "$($suppressedPrivileged.Count) привилегированных субъектов имеют такие права; для просмотра используйте -IncludePrivileged") -Class Note
 	    } elseif ($readContainers -le 0) {
-	        Show-Line ("The delegations on the $totalContainers container(s) holding computers were not evaluated - " +
-	                   "no security descriptor could be read") -Class Note
+	        Show-Line ("Делегированные права в $totalContainers контейнерах компьютеров не проверены: " +
+	                              "не удалось прочитать ни одного дескриптора безопасности") -Class Note
 	    } else {
 	        $delegationClass = 'Secure'
 	        if ($coverageIncomplete) { $delegationClass = 'Note' }
-	        Show-Line ("No principal holds a delegated read of the BitLocker recovery passwords on the $readContainers " +
-	                   "container(s) holding computers") -Class $delegationClass
+	        Show-Line ("Не обнаружено делегированных прав чтения паролей восстановления BitLocker в $readContainers " +
+	                              "проверенных контейнерах компьютеров") -Class $delegationClass
 	    }
 	    return
 	}
 	$findingRows = @($rows | Where-Object { $_._IsFinding })
 	$hintRows    = @($rows | Where-Object { -not $_._IsFinding })
 	if ($findingRows.Count -gt 0) {
-	    Show-Line ("Found $($findingRows.Count) non-privileged principal(s) who can read BitLocker recovery " +
-	               "passwords") -Class Finding -FindingId 'BITLOCKER_RECOVERY_DELEGATED'
+	    Show-Line ("Найдено непривилегированных субъектов с правом чтения паролей восстановления BitLocker: $($findingRows.Count); " +
+	                          "права действуют сейчас") -Class Finding -FindingId 'BITLOCKER_RECOVERY_DELEGATED'
 	    foreach ($row in $findingRows) { Show-Object $row -Class Finding }
 	}
 	if ($hintRows.Count -gt 0) {
-	    Show-Line ("Found $($hintRows.Count) further delegated read(s) of the BitLocker recovery passwords that " +
-	               "do not work today or belong to a privileged principal") -Class Hint -FindingId 'BITLOCKER_RECOVERY_DELEGATED'
+	    Show-Line ("Найдено дополнительных делегированных прав чтения паролей восстановления BitLocker: $($hintRows.Count); " +
+	                          "они пока не действуют либо принадлежат привилегированным субъектам") -Class Hint -FindingId 'BITLOCKER_RECOVERY_DELEGATED'
 	    foreach ($row in $hintRows) { Show-Object $row -Class Hint }
 	}
 	if ($suppressedPrivileged.Count -gt 0) {
-	    Show-Line ("$($suppressedPrivileged.Count) privileged principal(s) hold a right on the recovery passwords " +
-	               "and are not listed - they read them regardless. Use -IncludePrivileged to see them") -Class Note
+	    Show-Line ("Привилегированных субъектов, не перечисленных в результатах, но имеющих доступ к паролям восстановления: $($suppressedPrivileged.Count); " +
+	                          "они могут читать пароли независимо от этой проверки. Используйте -IncludePrivileged для просмотра") -Class Note
 	}
 }
 function Get-BitLockerRecoveryConfidentiality {
@@ -86256,23 +86256,23 @@ function Get-CredentialRoaming {
 	        }
 	        $privilegedCount = @($findings | Where-Object { $_.PrivilegedAccount -eq 'Yes' }).Count
 	        $countText = if ($privilegedCount -gt 0) {
-	            "$($findings.Count) user(s) carry roamed credential material in Active Directory, $privilegedCount of them privileged"
+	            "$($findings.Count) пользователей с синхронизированными учётными данными в AD; привилегированных среди них: $privilegedCount"
 	        } else {
-	            "$($findings.Count) user(s) carry roamed credential material in Active Directory"
+	            "$($findings.Count) пользователей с синхронизированными учётными данными в AD"
 	        }
 	        if ($confidential.Confidential -eq $false) {
 	            Show-Line "Обнаружено: $countText" -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
-	            Show-Line ("The attributes are not marked confidential in the schema, so reading them follows the " +
-	                       "ordinary read permissions of the user object - in a default domain every authenticated " +
-	                       "user can read them") -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
+	            Show-Line ("Атрибуты не отмечены конфиденциальными в схеме, поэтому их чтение определяется " +
+	                                  "обычными правами чтения объекта пользователя; в домене с настройками по умолчанию " +
+	                                  "они доступны всем аутентифицированным пользователям") -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'
 	        } else {
 	            Show-Line "Обнаружено: $countText" -Class Hint -FindingId 'CREDENTIAL_ROAMING_PRESENT'
 	            if ($confidential.Confidential -eq $true) {
-	                Show-Line ("Both attributes are marked confidential in the schema, so reading them needs the " +
-	                           "Control Access right and generic read does not grant it") -Class Secure
+	                Show-Line ("Оба атрибута помечены конфиденциальными в схеме, поэтому для чтения " +
+	                                      "требуется право Control Access; обычного чтения недостаточно") -Class Secure
 	            } else {
-	                Show-Line ("Whether the attributes are readable could not be established - the schema could not " +
-	                           "be read, so treat them as readable until checked by hand") -Class Note
+	                Show-Line ("Нельзя определить доступность атрибутов: схему прочитать не удалось; " +
+	                                      "до ручной проверки считайте их потенциально доступными") -Class Note
 	            }
 	        }
 	        foreach ($finding in @($findings | Sort-Object -Property @{Expression = { $_.PrivilegedAccount -ne 'Yes' }}, sAMAccountName)) {
@@ -86281,8 +86281,8 @@ function Get-CredentialRoaming {
 	        Show-CredentialRoamingDelegation -AffectedUserDNs @($byDN.Keys) `
 	            -Confidentiality $confidential -IncludePrivileged:$IncludePrivileged `
 	            -ConnectionParams $CredParams
-	        Show-Line ("Reading these attributes is not constrained for anybody with DCSync, a copy of ntds.dit or " +
-	                   "an AD backup - the confidential flag protects against ordinary users, not against Tier 0") -Class Note
+	        Show-Line ("DCSync, копия ntds.dit или резервная копия AD позволяют прочитать эти атрибуты " +
+	                              "независимо от конфиденциальности: флаг защищает от обычного чтения, но не от Tier 0") -Class Note
 	    }
 	    catch {
 	        Show-Line "Ошибка проверки: $_" -Class Finding
@@ -86367,16 +86367,16 @@ function Show-CredentialRoamingDelegation {
 	$coverageIncomplete = Show-OUPermissionsCoverageNote -UnreadOUs $unreadContainers -TotalOUs $totalContainers
 	if ($byPrincipal.Count -eq 0) {
 	    if ($suppressedPrivileged.Count -gt 0) {
-	        Show-Line ("No non-privileged principal holds a delegated read of the roaming attributes, but " +
-	                   "$($suppressedPrivileged.Count) privileged one(s) do - use -IncludePrivileged to see them") -Class Note
+	        Show-Line ("У непривилегированных субъектов нет делегированного чтения синхронизированных атрибутов, но " +
+	                              "у $($suppressedPrivileged.Count) привилегированных субъектов оно есть; используйте -IncludePrivileged для просмотра") -Class Note
 	    } elseif ($totalContainers -gt 0 -and $readContainers -le 0) {
-	        Show-Line ("The delegations on the $totalContainers container(s) holding this material were not " +
-	                   "evaluated - no security descriptor could be read") -Class Note
+	        Show-Line ("Делегирование прав чтения в $totalContainers контейнерах пользователей не проверено: " +
+	                              "не удалось прочитать ни одного дескриптора безопасности") -Class Note
 	    } else {
 	        $roamingClass = 'Secure'
 	        if ($coverageIncomplete) { $roamingClass = 'Note' }
-	        Show-Line ("No principal holds a delegated read of the roaming attributes on the $readContainers " +
-	                   "container(s) holding this material") -Class $roamingClass
+	        Show-Line ("Не обнаружено делегированного права чтения синхронизированных атрибутов в $readContainers " +
+	                              "проверенных контейнерах пользователей") -Class $roamingClass
 	    }
 	    return
 	}
@@ -86405,16 +86405,16 @@ function Show-CredentialRoamingDelegation {
 	    $containerTexts = @()
 	    foreach ($item in $verdicts) {
 	        $suffix = ''
-	        if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', blocked by the confidential flag' }
-	        if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', not decidable - the schema could not be read' }
-	        $containerTexts += "$($item.Container) ($($usersByContainer[$item.Container]) user(s) with material$suffix)"
+	        if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', чтение блокируется флагом конфиденциальности' }
+	        if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', нельзя определить: схема недоступна' }
+	        $containerTexts += "$($item.Container) ($($usersByContainer[$item.Container]) пользователей с материалом$suffix)"
 	    }
 	    $effectiveText = if ($isLive -eq $true) {
-	        'Yes - the principal can read the material today'
+	        'Да — субъект может читать эти данные сейчас'
 	    } elseif ($isLive -eq $false) {
-	        'No - blocked by the confidential flag, live the moment it is cleared'
+	        'Нет — флаг конфиденциальности блокирует чтение; после его снятия право начнёт действовать'
 	    } else {
-	        'Unknown - the schema could not be read'
+	        'Неизвестно — схема недоступна'
 	    }
 	    $isFinding = (-not $entry.IsPrivileged) -and ($isLive -eq $true)
 	    $row = [PSCustomObject]@{
@@ -86435,18 +86435,18 @@ function Show-CredentialRoamingDelegation {
 	$findingRows = @($rows | Where-Object { $_._IsFinding })
 	$hintRows    = @($rows | Where-Object { -not $_._IsFinding })
 	if (@($findingRows).Count -gt 0) {
-	    Show-Line ("Found $(@($findingRows).Count) non-privileged principal(s) with a delegated read of the " +
-	               "roaming attributes") -Class Finding -FindingId 'CREDENTIAL_ROAMING_DELEGATED'
+	    Show-Line ("Найдено непривилегированных субъектов с делегированным чтением синхронизированных атрибутов: $(@($findingRows).Count); " +
+	                          "право действует сейчас") -Class Finding -FindingId 'CREDENTIAL_ROAMING_DELEGATED'
 	    foreach ($row in $findingRows) { Show-Object $row -Class Finding }
 	}
 	if (@($hintRows).Count -gt 0) {
-	    Show-Line ("Found $(@($hintRows).Count) further delegated read(s) of the roaming attributes that do not " +
-	               "grant access today or belong to a privileged principal") -Class Hint -FindingId 'CREDENTIAL_ROAMING_DELEGATED'
+	    Show-Line ("Найдено дополнительных делегированных прав чтения синхронизированных атрибутов: $(@($hintRows).Count); " +
+	                          "они пока не действуют либо принадлежат привилегированным субъектам") -Class Hint -FindingId 'CREDENTIAL_ROAMING_DELEGATED'
 	    foreach ($row in $hintRows) { Show-Object $row -Class Hint }
 	}
 	if ($suppressedPrivileged.Count -gt 0) {
-	    Show-Line ("$($suppressedPrivileged.Count) privileged principal(s) hold the same right and are not " +
-	               "listed - they can read the material regardless. Use -IncludePrivileged to see them") -Class Note
+	    Show-Line ("Привилегированных субъектов с аналогичным правом, скрытых из списка: $($suppressedPrivileged.Count); " +
+	                          "они могут читать материал независимо от делегирования. Для просмотра используйте -IncludePrivileged") -Class Note
 	}
 }
 function Get-CredentialRoamingConfidentiality {
@@ -86831,7 +86831,7 @@ function Show-DeletedObjectsReaders {
 	    $headlineClass = if (@($unexpected | Where-Object { $_.deletedObjectsRights -match 'broad group' }).Count -gt 0) { 'Finding' } else { 'Hint' }
 	    Show-Line "Найдено субъектов вне Tier 0, которым может быть доступно перечисление удалённых объектов: $($unexpected.Count)" -Class $headlineClass
 	} else {
-	    Show-Line "Only Tier 0$(if ($exchangeReads) { ' and the Exchange service groups' }) may list deleted objects" -Class Secure
+	    Show-Line "Только Tier 0$(if ($exchangeReads) { ' и служебные группы Exchange' }) могут перечислять удалённые объекты" -Class Secure
 	}
 	foreach ($reader in $readers) {
 	    $rowClass = if ($reader._Expected) { 'Note' } elseif ($reader.deletedObjectsRights -match 'broad group') { 'Finding' } else { 'Hint' }
@@ -97716,7 +97716,7 @@ function Collect-BHIssuancePolicies {
 	}
 	return $bhPolicies
 }
-$Script:adPEASVersion = "2.9.0+20261113-0933"
+$Script:adPEASVersion = "2.9.0+20261113-0954"
 if ($MyInvocation.MyCommand.Path) {
 	$Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {
