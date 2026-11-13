@@ -817,104 +817,104 @@ Get-ADCSVulnerabilities -IncludePrivileged
 
 ---
 
-## Accounts Module
+## Модуль Accounts
 
-Analyzes privileged account security.
+Анализирует безопасность привилегированных учётных записей.
 
 ### Get-PrivilegedGroupMembers
 
-**Purpose**: Lists members of privileged groups.
+**Назначение**: перечисляет участников привилегированных групп.
 
-**What it checks**:
-- Domain Admins members
-- Enterprise Admins members
-- Schema Admins members
-- Administrators members
-- Account Operators members
-- Backup Operators members
-- Server Operators members
-- Print Operators members
+**Что проверяется**:
+- Участники Domain Admins.
+- Участники Enterprise Admins.
+- Участники Schema Admins.
+- Участники Administrators.
+- Участники Account Operators.
+- Участники Backup Operators.
+- Участники Server Operators.
+- Участники Print Operators.
 
-**Security Impact**: Identifies all accounts with elevated privileges. Large numbers of privileged accounts increase attack surface.
+**Влияние на безопасность**: выявляет все учётные записи с повышенными привилегиями. Чем их больше, тем шире поверхность атак.
 
-**Groups AdminSDHolder does not protect**: SDProp resets the DACL of the protected groups (Microsoft's list: Account Operators, Administrators, Backup Operators, Domain Admins, Domain Controllers, Enterprise Admins, Enterprise Key Admins, Key Admins, Print Operators, Read-only Domain Controllers, Replicator, Schema Admins, Server Operators) from the AdminSDHolder template, which the check reads. Every other privileged group keeps its own ACEs, so the check also reads the DACL and the owner of each privileged group without `adminCount=1`, of every group nested into one, and of the Exchange groups in `OU=Microsoft Exchange Security Groups`. It reports who may write the `member` attribute (or every attribute), use the Self-Membership validated write, change the DACL or owner, holds full control, or owns the group - explicit and inherited ACEs alike - through the same identity gate as the AdminSDHolder analysis. A holder is a *Finding* where a group it can take over is worth the domain (DnsAdmins, ESX Admins, the Exchange groups, a group reached from a tier-0 group) and a *Hint* where every such group is operator-level (Group Policy Creator Owners, Cert Publishers, Remote Management Users, Hyper-V Administrators, a group nested into Backup Operators). The groups read, and any that could not be read, are one object at the head of the section. Account Operators control every unprotected group through the default security descriptor of the group class; that is said in one line - a *Hint* while Account Operators has members - rather than once per group. A group that was protected once keeps a stale `adminCount=1` and is not read - except where character 16 of `dsHeuristics` takes Account, Server, Print or Backup Operators out of AdminSDHolder protection: those groups, and the groups reached only through them, are read whatever their `adminCount` says, and the summary object names them. Groups in another domain are not read.
+**Привилегированные группы без защиты AdminSDHolder**: SDProp восстанавливает DACL защищённых групп по шаблону AdminSDHolder (список Microsoft: Account Operators, Administrators, Backup Operators, Domain Admins, Domain Controllers, Enterprise Admins, Enterprise Key Admins, Key Admins, Print Operators, Read-only Domain Controllers, Replicator, Schema Admins, Server Operators), который читает проверка. Все остальные привилегированные группы сохраняют собственные ACE. Поэтому проверка также читает DACL и владельца каждой привилегированной группы без `adminCount=1`, каждой вложенной в неё группы и групп Exchange в `OU=Microsoft Exchange Security Groups`. С учётом явных и наследуемых ACE и той же классификации субъектов, что для AdminSDHolder, выводятся те, кто может изменять атрибут `member` (или все атрибуты), воспользоваться валидируемой записью Self-Membership, менять DACL/владельца, имеет полный контроль или владеет группой. Это *находка*, если захват группы критичен для домена (DnsAdmins, ESX Admins, группы Exchange, группы, достижимые из Tier 0), и *подсказка*, если все затронутые группы лишь операторского уровня (Group Policy Creator Owners, Cert Publishers, Remote Management Users, Hyper-V Administrators, группа, вложенная в Backup Operators). Перечень прочитанных и недоступных групп выводится одним объектом в начале раздела. Account Operators по стандартному дескриптору класса групп контролируют все незащищённые группы; это отмечается одной *подсказкой*, пока в Account Operators есть участники, а не повторяется для каждой группы. Группа, ранее защищённая и сохранившая устаревший `adminCount=1`, обычно не читается. Исключение: символ 16 `dsHeuristics` выводит группы Account, Server, Print или Backup Operators из-под защиты AdminSDHolder; тогда они и группы, достижимые только через них, читаются независимо от `adminCount` и перечисляются в сводке. Группы другого домена не анализируются.
 
-**Who may take over a privileged account**: the check reads the DACL and the owner of every privileged user and managed service account of the domain it found - computers are left to `Get-NonDefaultComputerOwners`, which reads the explicit entries on every computer object. It reports who holds full control, may change the DACL or the owner, may write every attribute, holds all extended rights or the password reset right, or may write `msDS-KeyCredentialLink` (shadow credentials), `servicePrincipalName` (targeted Kerberoasting), `altSecurityIdentities` (certificate mapping), `userAccountControl` or the User-Account-Restrictions set, `scriptPath`, or - on a group managed service account - `msDS-GroupMSAMembership`, and who owns the account; explicit and inherited ACEs alike, through the same identity gate. A holder is a *Finding* where an account it can take over is in a group worth the domain (a tier-0 group or one nested into it, DnsAdmins, ESX Admins) and a *Hint* where every one is in operator-level groups only (Group Policy Creator Owners, Cert Publishers, Backup Operators, ...). How many accounts were read, how many of them AdminSDHolder protects, and which could not be read are one object at the head of the section. On an account AdminSDHolder protects (`adminCount=1`) a right the AdminSDHolder template grants the same trustee is reported once, with AdminSDHolder; what is on the account beyond the template is reported. Key Admins and Enterprise Key Admins write `msDS-KeyCredentialLink` by design; Account Operators control every account AdminSDHolder does not protect through the default security descriptor of the user class, which is said in one line.
+**Кто может захватить привилегированную учётную запись**: проверка читает DACL и владельца всех найденных привилегированных пользователей и управляемых служебных записей этого домена. Компьютеры обрабатывает `Get-NonDefaultComputerOwners`, читающий явные ACE на каждом компьютере. Показываются права полного контроля, изменения DACL или владельца, записи всех атрибутов, всех расширенных прав, сброса пароля, изменения `msDS-KeyCredentialLink` (теневые учётные данные), `servicePrincipalName` (целевой Kerberoasting), `altSecurityIdentities` (сопоставление сертификата), `userAccountControl` или User-Account-Restrictions, `scriptPath`, а для gMSA — `msDS-GroupMSAMembership`, а также фактический владелец. Учитываются явные и унаследованные ACE с прежней фильтрацией по субъекту. Это *находка*, когда запись принадлежит группе, критичной для домена (Tier 0 либо вложенная в неё, DnsAdmins, ESX Admins), и *подсказка*, когда все членства только операторского уровня (Group Policy Creator Owners, Cert Publishers, Backup Operators и т. д.). Число прочитанных, защищённых AdminSDHolder и недоступных записей выводится одним объектом в начале раздела. Для записи с `adminCount=1` право, выданное шаблоном AdminSDHolder тому же субъекту, показывается один раз в строке AdminSDHolder; индивидуальные дополнения также выводятся. Key Admins и Enterprise Key Admins штатно могут писать `msDS-KeyCredentialLink`; Account Operators штатным дескриптором класса пользователя контролируют все записи, которые не защищены AdminSDHolder — это отмечается одной строкой.
 
-**Usage**:
+**Использование**:
 ```powershell
-# Show non-privileged accounts with group membership (default)
+# По умолчанию: непривилегированные субъекты с членством в группах
 Get-PrivilegedGroupMembers
 
-# Include privileged accounts (Domain Admins, etc.) in output
+# Включить в вывод привилегированные записи (Domain Admins и др.)
 Get-PrivilegedGroupMembers -IncludePrivileged
 ```
 
-**Parameters**:
+**Параметры**:
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `-IncludePrivileged` | Include privileged accounts in output (shown in yellow) |
+| `-IncludePrivileged` | Включить в вывод привилегированные записи (жёлтая подсветка) |
 
 ---
 
 ### Get-SIDHistoryInjection
 
-**Purpose**: Detects accounts with privileged SIDs in sIDHistory (SID History Injection attack vector).
+**Назначение**: ищет учётные записи с привилегированными SID в sIDHistory (возможное внедрение SID History).
 
-**What it checks**:
-- User and computer accounts with sIDHistory attribute set
-- Privileged SIDs in sIDHistory (Domain Admins, Enterprise Admins, Administrators, etc.)
-- Operator group SIDs (Account Operators, Backup Operators, etc.)
-- Non-privileged SIDs as migration artifacts (optional)
+**Что проверяется**:
+- Пользователи и компьютеры с заполненным sIDHistory.
+- Привилегированные SID в sIDHistory (Domain Admins, Enterprise Admins, Administrators и др.).
+- SID групп операторов (Account Operators, Backup Operators и др.).
+- Непривилегированные SID как следы миграции (необязательно).
 
-**Security Impact**: SID History Injection allows attackers to add privileged SIDs to an account's sIDHistory, granting those privileges without being a direct member of the privileged group. This is a critical persistence and privilege escalation technique.
+**Влияние на безопасность**: внедрение SID History позволяет добавить привилегированные SID в sIDHistory записи и получить соответствующие права без прямого членства в привилегированной группе. Это критический способ закрепления доступа и повышения привилегий.
 
-| SID Type in sIDHistory | Severity |
+| Тип SID в sIDHistory | Серьёзность |
 |-----------------------|----------|
-| Domain Admins (-512) | Critical |
-| Enterprise Admins (-519) | Critical |
-| Administrators (S-1-5-32-544) | Critical |
-| Account Operators (S-1-5-32-548) | High |
-| Backup Operators (S-1-5-32-551) | High |
-| Non-privileged SIDs | Info (migration artifact) |
+| Domain Admins (-512) | Критическая |
+| Enterprise Admins (-519) | Критическая |
+| Administrators (S-1-5-32-544) | Критическая |
+| Account Operators (S-1-5-32-548) | Высокая |
+| Backup Operators (S-1-5-32-551) | Высокая |
+| Непривилегированные SID | Информационная (след миграции) |
 
-**Usage**:
+**Использование**:
 ```powershell
-# Check for privileged SIDs only
+# Проверять только привилегированные SID
 Get-SIDHistoryInjection
 
-# Include non-privileged SIDs (migration artifacts)
+# Также включать непривилегированные SID (следы миграции)
 Get-SIDHistoryInjection -IncludeNonPrivileged
 ```
 
-**Parameters**:
+**Параметры**:
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `-IncludeNonPrivileged` | Also report accounts whose sIDHistory contains only non-privileged SIDs (domain migration artifacts). These are shown in a separate section as Hints. Without this switch, only accounts with privileged SIDs (Domain Admins, Operators, etc.) in sIDHistory are reported. |
+| `-IncludeNonPrivileged` | Также выводить записи, чей sIDHistory содержит только непривилегированные SID (следы миграции); они появляются отдельным разделом как подсказки. Без ключа показываются только записи с привилегированными SID (Domain Admins, группы операторов и др.). |
 
-**Output Properties**:
-- `privilegedSIDHistory`: Formatted list of privileged SIDs found
-- `privilegedSIDHistoryCount`: Number of privileged SIDs
-- `sidHistoryInjectionRisk`: Risk level (CRITICAL for privileged SIDs)
+**Возвращаемые свойства**:
+- `privilegedSIDHistory`: форматированный список найденных привилегированных SID.
+- `privilegedSIDHistoryCount`: число привилегированных SID.
+- `sidHistoryInjectionRisk`: уровень риска (CRITICAL при привилегированных SID).
 
 ---
 
 ### Get-ManagedServiceAccountSecurity
 
-**Purpose**: Analyzes security of (Group) Managed Service Accounts.
+**Назначение**: анализирует защищённость управляемых служебных учётных записей (MSA/gMSA).
 
-**What it checks**:
-- gMSA password readers (who can read the managed password)
-- Constrained delegation configuration
-- Password age and rotation status
-- Delegated Managed Service Account (dMSA, Windows Server 2025) links, read from the accounts a dMSA replaces: pairings outside a regular migration, links the account does not return, privileged accounts replaced by a dMSA, and migrations started or completed
-- Who may use each dMSA (msDS-GroupMSAMembership) and who owns that descriptor, judged like a gMSA's password readers - only where the scan can read the dMSAs, which by default takes an administrator
+**Что проверяется**:
+- Кто может читать управляемый пароль gMSA.
+- Настройки ограниченного делегирования.
+- Возраст пароля и состояние ротации.
+- Связи делегированных управляемых служебных записей (dMSA, Windows Server 2025) по заменяемым ими учётным записям: связи вне штатной миграции, отсутствующие обратные ссылки, замена привилегированных записей и начатые/завершённые миграции.
+- Кто может использовать каждую dMSA (`msDS-GroupMSAMembership`) и кому принадлежит её дескриптор; оценка аналогична читателям паролей gMSA. Доступно лишь если сканирующий субъект читает dMSA, что по умолчанию требует администратора.
 
-**Security Impact**: Overly permissive gMSA password readers can obtain service account credentials. Misconfigured delegation enables privilege escalation. A dMSA paired with an account receives that account's group memberships and keys from the KDC, so a pairing outside a migration hands the account to whoever controls the dMSA.
+**Влияние на безопасность**: чрезмерно широкое чтение пароля gMSA позволяет получить учётные данные службы. Ошибки делегирования ведут к повышению привилегий. dMSA, связанная с записью, получает от KDC её членства и ключи; связь вне миграции фактически передаёт эту запись субъекту, контролирующему dMSA.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-ManagedServiceAccountSecurity
 ```
@@ -923,16 +923,16 @@ Get-ManagedServiceAccountSecurity
 
 ### Get-ProtectedUsersStatus
 
-**Purpose**: Identifies privileged accounts not in Protected Users group.
+**Назначение**: ищет привилегированные записи, не входящие в группу Protected Users.
 
-**What it checks**:
-- Membership of privileged accounts in Protected Users group
-- Which admin accounts are missing protection
-- For a Tier-0 account linked to an authentication policy silo or a policy: whether it actually applies - enforced, audit only, no policy, half an enrollment, superseded by the silo, or exempt as the built-in Administrator
+**Что проверяется**:
+- Членство привилегированных записей в Protected Users.
+- Какие административные записи лишены защиты.
+- Для записей Tier 0 с назначенной политикой аутентификации или silo: действует ли она реально (enforced, audit only, отсутствует политика, неполное зачисление, переопределение silo либо исключение для встроенного Administrator).
 
-**Security Impact**: Protected Users group provides: no NTLM authentication, no delegation, no DES/RC4 encryption, Kerberos TGT limited to 4 hours. Accounts outside this group are more vulnerable to credential theft.
+**Влияние на безопасность**: Protected Users запрещает NTLM и делегирование, DES/RC4, ограничивает TGT Kerberos четырьмя часами. Записи вне этой группы сильнее подвержены краже учётных данных.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-ProtectedUsersStatus
 ```
@@ -941,21 +941,21 @@ Get-ProtectedUsersStatus
 
 ### Get-AuthenticationPolicySilos
 
-**Purpose**: Checks whether authentication policy silos and authentication policies restrict anybody, and who can change them.
+**Назначение**: проверяет, ограничивают ли реально кого-либо политики аутентификации и их silo, и кто может менять их.
 
-**What it checks**:
-- Enforcement of each silo, and of each policy assigned directly to accounts - in audit mode the KDC logs and refuses nothing; for a silo member the silo's flag decides
-- Silos without a policy, or without an enrolled account
-- Incomplete enrollment: an account listed as a member without the silo assigned, or assigned without being listed - the KDC applies a silo only with both (MS-KILE 3.3.5.4)
-- The built-in Administrator in a silo or under a policy - Windows always exempts it
-- Sign-on and service conditions (`AllowedToAuthenticateFrom/To`, shown as SDDL) that admit a broad group such as Domain Computers
-- Write access to silos and policies for principals outside Tier 0
-- TGT lifetimes, shown in minutes
-- Where a condition is set: whether the domain controllers support claims and Kerberos armoring - "KDC support for claims, compound authentication and Kerberos armoring", read from the Registry.pol of the GPOs that reach them, with GPO precedence per value. Without it the KDC cannot evaluate the conditions; the client half of the setting is not read
+**Что проверяется**:
+- Принудительность каждой silo и политик, назначенных непосредственно записям: в режиме аудита KDC только регистрирует события и никому не отказывает; для участника silo действует флаг самой silo.
+- Silo без политики либо без зачисленной записи.
+- Неполное зачисление: запись указана участником, но silo ей не назначено, или назначено, но запись отсутствует в списке участников — KDC применяет silo, только когда выполняются оба условия (MS-KILE 3.3.5.4).
+- Встроенный Administrator в silo или политике — Windows всегда освобождает его от этих ограничений.
+- Условия входа и службы (`AllowedToAuthenticateFrom/To`, выводятся как SDDL), допускающие широкую группу вроде Domain Computers.
+- Права записи на silo и политики у субъектов вне Tier 0.
+- Время жизни TGT в минутах.
+- Если есть условие — поддерживают ли DC claims и Kerberos armoring («KDC support for claims, compound authentication and Kerberos armoring»): читается Registry.pol применяемых к ним GPO с разрешением приоритетов по каждому значению. Без поддержки KDC не способен оценить условия; настройки клиентской части не читаются.
 
-**Security Impact**: Silos keep Tier 0 accounts off ordinary machines. A silo that restricts nobody looks like that protection without providing it, and whoever can write to a silo or a policy decides which restrictions apply - including none. Silos and policies live in the configuration partition and are readable by every domain user.
+**Влияние на безопасность**: silo не позволяют учётным записям Tier 0 входить на обычные машины. Silo, которая никого не ограничивает, создаёт лишь видимость защиты; тот, кто может менять silo или политику, определяет и ограничения, вплоть до их отсутствия. Silo и политики находятся в разделе конфигурации и читаются любым пользователем домена.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-AuthenticationPolicySilos
 ```
@@ -964,16 +964,16 @@ Get-AuthenticationPolicySilos
 
 ### Get-RODCPasswordReplication
 
-**Purpose**: Checks which privileged accounts a read-only Domain Controller may cache, or has cached, the password of.
+**Назначение**: проверяет, чьи привилегированные пароли контроллер домена только для чтения (RODC) может кешировать либо уже закешировал.
 
-**What it checks**:
-- Each RODC's allow list (`msDS-RevealOnDemandGroup`) and deny list (`msDS-NeverRevealGroup`) against the token of every privileged account, primary group included - deny wins
-- The privileged accounts whose secrets the RODC has received already (`msDS-RevealedUsers`)
-- Whether the Denied RODC Password Replication Group is still on the RODC's deny list
+**Что проверяется**:
+- Для каждого RODC списки разрешения (`msDS-RevealOnDemandGroup`) и запрета (`msDS-NeverRevealGroup`) сверяются с токенами всех привилегированных записей, включая основную группу; запрет имеет приоритет.
+- Привилегированные записи, секреты которых RODC уже получил (`msDS-RevealedUsers`).
+- Осталась ли Denied RODC Password Replication Group в списке запрета RODC.
 
-**Security Impact**: An RODC stands where physical security is weakest, and every password it caches can be extracted from it. A privileged account it may cache is outside the Tier-0 boundary.
+**Влияние на безопасность**: RODC обычно расположен там, где физическая защита слабее; любой закешированный на нём пароль может быть извлечён. Привилегированная запись, чей пароль разрешено кешировать, выходит за границы Tier 0.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-RODCPasswordReplication
 ```
@@ -982,16 +982,16 @@ Get-RODCPasswordReplication
 
 ### Get-InactiveAdminAccounts
 
-**Purpose**: Finds privileged accounts that haven't been used.
+**Назначение**: ищет неиспользуемые привилегированные записи.
 
-**What it checks**:
-- Accounts inactive for 90+ days
-- Accounts that have never logged on
-- Enabled accounts with old passwords
+**Что проверяется**:
+- Записи, неактивные более 90 дней.
+- Записи, ни разу не выполнявшие вход.
+- Включённые записи с давно установленным паролем.
 
-**Security Impact**: Inactive admin accounts are forgotten attack vectors. They may have weak/known passwords and can be compromised without detection.
+**Влияние на безопасность**: забытые административные записи остаются точками атаки; их слабые или известные пароли можно использовать незаметно.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-InactiveAdminAccounts
 ```
@@ -1000,15 +1000,15 @@ Get-InactiveAdminAccounts
 
 ### Get-AdminPasswordNeverExpires
 
-**Purpose**: Identifies privileged accounts with non-expiring passwords.
+**Назначение**: выявляет привилегированные записи с бессрочными паролями.
 
-**What it checks**:
-- Password expiration flag on privileged accounts
-- Which admin accounts bypass password rotation
+**Что проверяется**:
+- Флаг истечения пароля у привилегированных записей.
+- Какие административные записи исключены из ротации паролей.
 
-**Security Impact**: Violates password rotation policies and increases exposure window. Compromised passwords remain valid indefinitely.
+**Влияние на безопасность**: обход ротации увеличивает окно риска; скомпрометированный пароль остаётся действительным бесконечно.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-AdminPasswordNeverExpires
 ```
@@ -1017,15 +1017,15 @@ Get-AdminPasswordNeverExpires
 
 ### Get-AdminReversibleEncryption
 
-**Purpose**: Finds privileged accounts storing passwords with reversible encryption.
+**Назначение**: ищет привилегированные записи с обратимым шифрованием паролей.
 
-**What it checks**:
-- Reversible encryption flag on privileged accounts
-- Which admin accounts have this dangerous setting
+**Что проверяется**:
+- Флаг обратимого шифрования у привилегированных записей.
+- Какие административные записи имеют такую опасную настройку.
 
-**Security Impact**: Passwords can be decrypted from ntds.dit if an attacker obtains the database.
+**Влияние на безопасность**: при доступе к ntds.dit злоумышленник может расшифровать сохранённые пароли.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-AdminReversibleEncryption
 ```
@@ -1034,16 +1034,16 @@ Get-AdminReversibleEncryption
 
 ### Get-PasswordNotRequired
 
-**Purpose**: Detects enabled user accounts with the PASSWD_NOTREQD flag set.
+**Назначение**: выявляет включённые пользовательские записи с флагом PASSWD_NOTREQD.
 
-**What it checks**:
-- Enabled user accounts with PASSWD_NOTREQD flag (UAC bit 32)
-- Whether affected accounts are privileged or service accounts
-- Last password change date for risk assessment
+**Что проверяется**:
+- Включённые записи с PASSWD_NOTREQD (бит UAC 32).
+- Привилегированы ли затронутые записи и являются ли они служебными.
+- Дату последней смены пароля для оценки риска.
 
-**Security Impact**: Accounts with the "Password Not Required" flag can bypass the domain password policy and may have an empty password. While the flag alone does not guarantee an empty password (a password may have been set later), it indicates a hygiene issue and potential attack vector.
+**Влияние на безопасность**: флаг «Пароль не требуется» позволяет обойти парольную политику и допускает пустой пароль. Сам флаг не доказывает его отсутствие (пароль могли задать позже), но указывает на недостаточную гигиену и возможный путь атаки.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-PasswordNotRequired
 ```
@@ -1052,82 +1052,82 @@ Get-PasswordNotRequired
 
 ### Get-NonDefaultUserOwners
 
-**Purpose**: Finds user accounts owned by non-default principals.
+**Назначение**: ищет пользователей, чей владелец объекта отличается от стандартного.
 
-**What it checks**:
-- User account owner attribute (nTSecurityDescriptor)
-- Users owned by accounts other than Domain Admins
+**Что проверяется**:
+- Владелец объекта пользователя (nTSecurityDescriptor).
+- Пользователи, чьи владельцы — не Domain Admins.
 
-**Security Impact**: Object owners have implicit WriteDACL permission, allowing them to modify the object's security descriptor. If a low-privileged user owns a user account, they can grant themselves full control over that account, potentially leading to account takeover.
+**Влияние на безопасность**: владельцы объектов неявно обладают WriteDACL, что позволяет менять дескриптор безопасности. Если низкопривилегированный пользователь владеет чужой записью, он может выдать себе полный контроль и захватить запись.
 
-| Owner Type | Severity |
+| Тип владельца | Серьёзность |
 |------------|----------|
-| Domain Admins | Expected (default) |
-| Enterprise Admins | Expected |
-| Regular user | Medium (privilege escalation risk) |
-| Service account | Medium |
+| Domain Admins | Ожидаемо (по умолчанию) |
+| Enterprise Admins | Ожидаемо |
+| Обычный пользователь | Средняя (риск повышения привилегий) |
+| Служебная запись | Средняя |
 
-**Noise Reduction**: Exchange Health Mailboxes (`HealthMailbox*` in `CN=Monitoring Mailboxes,CN=Microsoft Exchange System Objects`) are filtered by default as they are expected to be owned by the Exchange server that created them.
+**Снижение шума**: Exchange Health Mailboxes (`HealthMailbox*` в `CN=Monitoring Mailboxes,CN=Microsoft Exchange System Objects`) по умолчанию исключаются: ожидается, что владельцем является сервер Exchange, создавший такую запись.
 
-**Usage**:
+**Использование**:
 ```powershell
-# Default (excludes Exchange Health Mailboxes)
+# По умолчанию (без Exchange Health Mailboxes)
 Get-NonDefaultUserOwners
 
-# Include Exchange Health Mailboxes
+# Включая Exchange Health Mailboxes
 Get-NonDefaultUserOwners -IncludeHealthMailboxes
 ```
 
-**Parameters**:
+**Параметры**:
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `-IncludeHealthMailboxes` | Include Exchange Health Mailboxes in output |
+| `-IncludeHealthMailboxes` | Включить Exchange Health Mailboxes в результат |
 
-**Output Properties**:
-- `Owner`: Name of the account that owns the user object
-- `OwnerSID`: SID of the owner
+**Возвращаемые свойства**:
+- `Owner`: имя владельца объекта пользователя.
+- `OwnerSID`: SID владельца.
 
-**Common Causes**:
-- User created by a non-admin via delegation
-- Ownership explicitly changed post-creation
-- Migration artifacts
+**Типовые причины**:
+- Пользователь создан неадминистратором через делегирование.
+- Владелец явно изменён после создания.
+- Следы миграции.
 
 ---
 
 ### Get-LogonScriptPermissions
 
-**Purpose**: Finds the logon scripts accounts run that a principal beyond the administrators may change.
+**Назначение**: ищет сценарии входа, выполняемые учётными записями, которые могут изменять субъекты помимо администраторов.
 
-**What it checks**:
-- The `scriptPath` of every enabled account; a relative path is resolved to `\\<domain>\NETLOGON\<path>`
-- The NTFS permissions of each distinct script and of the folder it is in, read over SMB from the domain's own name and enabled computers of the domain - the same reader the GPO script check uses
-- Writers beyond the administrators and privileged accounts, how many accounts run the script, and the privileged accounts among them by name
+**Что проверяется**:
+- `scriptPath` каждой включённой записи; относительный путь разрешается в `\\<domain>\NETLOGON\<path>`.
+- NTFS-разрешения каждого уникального сценария и его каталога, читаемые через SMB по имени домена и включённым компьютерам домена; используется тот же считыватель, что для сценариев GPO.
+- Субъекты записи помимо администраторов и привилегированных записей, число запускающих сценарий записей и имена привилегированных среди них.
 
-**Security Impact**: Windows runs an account's logon script at every logon of that account, as that account. Whoever may change the script runs code as every account that has it set - an administrator among them with the administrator's rights. NETLOGON is the scripts folder of SYSVOL, and its file permissions are nobody's GPO permissions.
+**Влияние на безопасность**: Windows запускает сценарий при каждом входе соответствующей учётной записи с её правами. Кто может менять сценарий, может выполнять код от имени каждой записи с этим путём, в том числе от имени администратора. NETLOGON — каталог сценариев в SYSVOL; разрешения его файлов не равны разрешениям GPO.
 
-A local path exists on each computer and is not read; a path that could not be read is listed with the reason. The share permissions are not read.
+Локальный путь существует на каждом компьютере и не читается проверкой; для недоступного пути приводится причина. Разрешения общего ресурса отдельно не читаются.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-LogonScriptPermissions
 
-# Make no SMB connection - the scripts are not read
+# Не устанавливать SMB-соединений: файлы сценариев не читаются
 Get-LogonScriptPermissions -OPSEC
 ```
 
-**Output Properties**:
-- `logonScript`: The script, as a UNC path
-- `logonScriptRisk`: Who may change it and what that reaches
-- `logonScriptPermissions`: One `path: Identity (Rights)` row per principal beyond the administrators that may write the script or its folder
-- `runByAccounts`: How many enabled accounts run the script
-- `runByPrivilegedAccounts`: The privileged accounts among them, operators included
+**Возвращаемые свойства**:
+- `logonScript`: UNC-путь к сценарию.
+- `logonScriptRisk`: кто может менять сценарий и какие записи затрагиваются.
+- `logonScriptPermissions`: одна строка `path: Identity (Rights)` на каждого субъекта помимо администраторов с правом записи сценария или каталога.
+- `runByAccounts`: сколько включённых записей запускают сценарий.
+- `runByPrivilegedAccounts`: какие из них привилегированные, включая операторов.
 
 ---
 
-## GPO Module
+## Модуль GPO
 
-Analyzes Group Policy security.
+Анализирует безопасность групповых политик.
 
 **Locating a reported GPO in SYSVOL**: every finding that comes from a Group Policy names
 the policy the same way, whichever check produced it, so it can be opened without guessing:
