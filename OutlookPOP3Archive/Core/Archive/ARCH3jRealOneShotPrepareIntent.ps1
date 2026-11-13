@@ -134,6 +134,19 @@ function Get-OPA265ARCH3jIndexSafety {
             [void]$stream.Seek(-1,[IO.SeekOrigin]::End)
             if($stream.ReadByte() -ne 10){throw 'ARCH3j original index JSONL unterminated tail.'}
         }finally{if($null -ne $stream){$stream.Dispose()}}
+        # The original JSONL importer deliberately tolerates a malformed LAST
+        # line for recovery. A NEW real one-shot MUST NOT treat that as a clean
+        # duplicate-free index: parse the last completed record strictly.
+        $last=[string](Get-Content -LiteralPath $jsonl -Encoding UTF8 -Tail 1)
+        if([string]::IsNullOrWhiteSpace($last)){throw 'ARCH3j original index JSONL ends with empty record.'}
+        try{
+            $lastRow=ConvertFrom-Json -InputObject $last -ErrorAction Stop
+            if($null -eq $lastRow -or
+               $lastRow.PSObject.Properties.Name -notcontains 'SourceEntryId' -or
+               [string]::IsNullOrWhiteSpace([string]$lastRow.SourceEntryId)){
+                throw 'Missing original SourceEntryId in last record.'
+            }
+        }catch{throw ('ARCH3j original index JSONL malformed final record, STOP: '+[string]$_.Exception.Message)}
     }
     # Original importer is read-only only because directory EXISTENCE is
     # checked before calling its Get-OPADuplicateIndexPath helpers.
