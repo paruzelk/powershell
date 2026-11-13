@@ -16,19 +16,25 @@ if(-not (Test-Path -LiteralPath $enPath) -or -not (Test-Path -LiteralPath $ruPat
 }
 $en=[IO.File]::ReadAllText($enPath,[Text.Encoding]::UTF8)
 $ru=[IO.File]::ReadAllText($ruPath,[Text.Encoding]::UTF8)
+# Upstream ZIP uses LF; repository checkout on Windows can use CRLF.
+$crlf=([string][char]13+[string][char]10)
+$lf=[string][char]10
+$en=$en.Replace($crlf,$lf)
+$ru=$ru.Replace($crlf,$lf)
 if($ru.Length -lt 25000){throw 'DOC2a: русский справочник неполон'}
 $functions=@('Get-DomainUser','Get-DomainComputer','Get-DomainGroup','Get-DomainGPO',
  'Get-DomainObject','Get-ObjectACL','Get-CertificateTemplate')
 foreach($name in $functions){
  foreach($doc in @($en,$ru)){
-  if(([regex]::Matches($doc,'(?m)^## '+[regex]::Escape($name)+'$')).Count -ne 1){
+  $pattern='(?m)^## '+[regex]::Escape($name)+'\r?$'
+  if(([regex]::Matches($doc,$pattern)).Count -ne 1){
    throw "DOC2a: отсутствует или повторён раздел $name"
   }
  }
 }
-$regex='(?m)^\| (-[A-Za-z][A-Za-z0-9]*) \| (String(?:\[\])?|Switch|Int|PSCredential) \| (.+) \|$'
+$regex='(?m)^\| (-[A-Za-z][A-Za-z0-9]*) \| (String(?:\[\])?|Switch|Int|PSCredential) \| (.+) \|\r?$'
 # Отдельно допускается оформление имени в Markdown как inline code.
-$regex='(?m)^\| ' + [char]96 + '(-[A-Za-z][A-Za-z0-9]*)' + [char]96 + ' \| (String(?:\[\])?|Switch|Int|PSCredential) \| (.+) \|$'
+$regex='(?m)^\| ' + [char]96 + '(-[A-Za-z][A-Za-z0-9]*)' + [char]96 + ' \| (String(?:\[\])?|Switch|Int|PSCredential) \| (.+) \|\r?$'
 $enRows=@([regex]::Matches($en,$regex))
 $ruRows=@([regex]::Matches($ru,$regex))
 if($enRows.Count -ne 146 -or $ruRows.Count -ne 146){
