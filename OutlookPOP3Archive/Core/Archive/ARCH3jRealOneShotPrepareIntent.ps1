@@ -5,6 +5,9 @@
 # PREPARE stops before any irreversible Outlook provider action.
 . (Join-Path $PSScriptRoot 'ARCH3iSealedFullOriginalWitness.ps1')
 . (Join-Path $PSScriptRoot 'ARCH3bOriginalMoverContract.ps1')
+# Standalone ARCH3j must load the ORIGINAL schema constants as well as JSON
+# readers normally initialized by the main OutlookPOP3Archive.ps1 entrypoint.
+. (Join-Path $PSScriptRoot '../Version.ps1')
 # Original DuplicateIndex depends on the original JSON/JSONL readers, which
 # are normally loaded by the full legacy entrypoint. ARCH3j is standalone.
 if(-not (Get-Command Read-OPAJsonFile -ErrorAction SilentlyContinue) -or
