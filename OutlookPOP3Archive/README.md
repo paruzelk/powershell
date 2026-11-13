@@ -1,6 +1,20 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3j — реальный One-Shot PrepareIntent на тестовом PST (DEV, без Move)
+
+После успешного `ARCH3i1 Review` зафиксирован оригинальный полный semantic witness и неизменяемый файл. ARCH3j строит строго один оригинальный Year/Part маршрут в **свободную** `Archive-2020-02.pst`, проверяет существующую Part1 (271360 байт) и исходный общий DuplicateIndex **только на чтение**. Отсутствие индекса или совпадение исходного EntryID блокирует подготовку. Режим `Prepare` с явным разрешением записывает **только** запечатанный `PrepareIntent` и ORIGINAL OperationJournal `Phase=Intent` до любых будущих PST-изменений; сам `Move()` отсутствует.
+
+```powershell
+$run=[guid]::NewGuid().ToString('D')
+$pin=@{RunId=$run;SealRunId='3773bcd7-5a07-4c31-8ce5-dfb16ddd30bf';SealSha256='5f5a86b6c1aba8a3d2ee328a36a5632f8edf1e89fdda8e7fd728688fe881b2a4'}
+.\Invoke-ARCH3j.ps1 -Mode Plan @pin | Format-List
+$audit= .\Invoke-ARCH3j.ps1 -Mode Audit @pin
+$audit | Format-List
+```
+
+**Если Audit заблокировал исходный DuplicateIndex, не вызывайте Prepare.** [Полный синтаксис ARCH3j, примеры Prepare/Review, ограничения](docs/2.6.5-arch3j-real-oneshot-prepare-intent.md). `WriterPermit=False`, оригинальный MailMover Move и массовые режимы закрыты.
+
 ### ARCH3i1 — исправлено чтение Review без даты (DEV)
 
 Реальный ARCH3i Seal успешно создал полный witness RunId 3773bcd7-5a07-4c31-8ce5-dfb16ddd30bf с SHA256 файла 5f5a86b6c1aba8a3d2ee328a36a5632f8edf1e89fdda8e7fd728688fe881b2a4. Отдельный Review падал при передаче NULL в DateTime. ARCH3i1 исправляет публичную передачу параметров и добавляет два end-to-end теста. **Seal не повторять.**

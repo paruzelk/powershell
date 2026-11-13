@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3j (2026-11-13):** успешный ARCH3i1 Review подтвердил SHA и protected evidence. [Реальный One-Shot PrepareIntent](2.6.5-arch3j-real-oneshot-prepare-intent.md) привязан к оригинальному Year/Part2 и исходному full witness; старый `Archive-2020.pst` и `DuplicateIndex` только читаются. Если общего индекса нет, Prepare заблокирован, без обхода. Реального Move пока нет; для него нужно отдельное original MailMover one-shot разрешение, MoveClaimed, пострестартовый verifier и independent reconciliation.
+
+
 > **ARCH3i1 (2026-11-13):** реальный ARCH3i Seal и внутренний readback PASS, исправлена ошибка передачи отсутствующего DateTime в публичном Review. [Два аргумента для Review](2.6.5-arch3i1-review-date-binding-fix.md). Старый RunId/файл не повторять и не перезаписывать. Writer закрыт.
 
 

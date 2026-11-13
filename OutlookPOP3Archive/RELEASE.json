@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3j DEV: source-backed exact original Year 2020 part2 one-shot route from immutable ARCH3i1 operator seal, protected real POP3 Inbox full SHA, read-only shared original DuplicateIndex checked fail-closed, evidence-only original OperationJournal Intent with protected local CreateNew+Flush(true), no Move/PST/AddStoreEx/index writes or production permit; 21 Pester tests, total expected 4344/144 Windows PS5.1.",
     "ARCH3i1: real original full witness Seal passed, public Review DateTime null binding corrected, only Mode RunId SealSha256 forwarded. Preserve existing evidence and no Move. 2 new actual CLI Pester regression cases, total expected 4323 tests in 143 containers.",
     "ARCH3i DEV: original ARCH2b full witness externally pinned SHA 8782b410... persisted only in private LOCALAPPDATA immutable evidence using original ARCH3c CreateNew+Flush(true)/readback; 23 new Pester, 4321 in 143 Windows PS5.1 containers expected; NO PST Move, original OperationJournal Intent, Index or production writer.",
     "ARCH3h DEV step1: operator-pinned real POP3 Inbox original full semantic SHA256 witness using ORIGINAL ARCH2b witness and ARCH3d hash bridge, archive part1 collision 271360 bytes, zero attachments, source PST 7694763008 bytes; no durable move claims or original MailMover writer enabled, future one-shot must isolate shared duplicate index and independently verify after actual Outlook restart. 17 Pester tests, Windows PowerShell 5.1 full 4298 tests / 142 containers expected.",
@@ -87,8 +88,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 143,
-    "ExpectedPesterTests": 4323,
+    "ExpectedTestContainers": 144,
+    "ExpectedPesterTests": 4344,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
