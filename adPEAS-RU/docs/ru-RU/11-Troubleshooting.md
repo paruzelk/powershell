@@ -1,125 +1,125 @@
-# Troubleshooting
+# Диагностика неполадок
 
-Common issues and solutions for adPEAS v2.
+Типовые проблемы и решения для adPEAS v2.
 
 ---
 
-## Connection Issues
+## Проблемы подключения
 
-### Error: "Cannot connect to Domain Controller"
+### Ошибка: «Не удаётся подключиться к контроллеру домена»
 
-**Symptoms**:
-- Connection timeout
-- "The server is not operational"
-- "The RPC server is unavailable"
+**Признаки**:
+- Тайм-аут подключения.
+- «Сервер не работает».
+- «Сервер RPC недоступен».
 
-**Causes and Solutions**:
+**Причины и решения**:
 
-1. **Network connectivity**
+1. **Сетевая доступность**
    ```powershell
-   # Test connectivity
+    # Проверить доступность соединения
    Test-NetConnection -ComputerName dc01.contoso.com -Port 389
    Test-NetConnection -ComputerName dc01.contoso.com -Port 636
    ```
 
-2. **DNS resolution**
+2. **Разрешение DNS**
    ```powershell
-   # Test DNS
+    # Проверить DNS
    Resolve-DnsName contoso.com
    Resolve-DnsName dc01.contoso.com
 
-   # Use custom DNS server
+    # Использовать определённый DNS-сервер
    Connect-adPEAS -Domain "contoso.com" -DnsServer "10.0.0.1" -UseWindowsAuth
    ```
 
-3. **Firewall blocking LDAP**
-   - Ensure TCP 389 (LDAP) or 636 (LDAPS) is open
-   - Ensure TCP 88 (Kerberos) is open for Kerberos auth
-   - Optionally, TCP 3268 (GC) or 3269 (GC over SSL) for cross-domain SID resolution
+3. **Брандмауэр блокирует LDAP**
+    - Проверьте доступность TCP 389 (LDAP) либо 636 (LDAPS).
+    - Для Kerberos необходимо открыть TCP 88.
+    - При необходимости TCP 3268 (GC) или 3269 (GC по SSL) для SID других доменов.
 
-4. **Specify DC directly**
+4. **Указать DC явно**
    ```powershell
    Connect-adPEAS -Domain "contoso.com" -Server "dc01.contoso.com" -UseWindowsAuth
    ```
 
 ---
 
-### Error: "The user name or password is incorrect"
+### Ошибка: «Неверное имя пользователя или пароль»
 
-**Symptoms**:
-- Authentication failure
-- "Logon failure: unknown user name or bad password"
+**Признаки**:
+- Сбой аутентификации.
+- «Ошибка входа: неверное имя пользователя или пароль».
 
-**Solutions**:
+**Решения**:
 
-1. **Verify credentials**
+1. **Проверить учётные данные**
    ```powershell
-   # Test credentials interactively
+    # Проверить учётные данные интерактивно
    $cred = Get-Credential
    Connect-adPEAS -Domain "contoso.com" -Credential $cred
    ```
 
-2. **Check username format**
+2. **Проверить формат имени пользователя**
    ```powershell
-   # Try different formats
+    # Проверить разные форматы
    Connect-adPEAS -Domain "contoso.com" -Username "CONTOSO\john.doe" -Password "pass"
    Connect-adPEAS -Domain "contoso.com" -Username "john.doe@contoso.com" -Password "pass"
    Connect-adPEAS -Domain "contoso.com" -Username "john.doe" -Password "pass"
    ```
 
-3. **Account locked or disabled**
-   - Check if the account is locked out
-   - Check if the account is disabled
+3. **Запись заблокирована или отключена**
+    - Проверьте, не заблокирована ли учётная запись.
+    - Проверьте, не отключена ли она.
 
 ---
 
-### Error: "Kerberos authentication failed"
+### Ошибка: «Не удалось пройти аутентификацию Kerberos»
 
-**Symptoms**:
+**Признаки**:
 - "KRB5KDC_ERR_PREAUTH_FAILED"
 - "KRB5KDC_ERR_C_PRINCIPAL_UNKNOWN"
-- Kerberos port 88 timeout
+- Тайм-аут порта Kerberos 88.
 
-**Solutions**:
+**Решения**:
 
-1. **Port 88 blocked - Use SimpleBind or NTLM**
+1. **Порт 88 заблокирован — используйте SimpleBind либо NTLM**
    ```powershell
-   # Skip Kerberos, use direct LDAP bind
+    # Пропустить Kerberos, привязаться к LDAP напрямую
    Connect-adPEAS -Domain "contoso.com" -Username "john.doe" -Password "pass" -ForceSimpleBind
 
-   # Or use NTLM impersonation (keeps existing Kerberos tickets)
+    # Либо использовать имперсонацию NTLM (существующие билеты Kerberos сохраняются)
    Connect-adPEAS -Domain "contoso.com" -Username "john.doe" -Password "pass" -ForceNTLM
    ```
 
-2. **DNS cannot resolve DC**
+2. **DNS не разрешает имя DC**
    ```powershell
-   # Use custom DNS
+    # Использовать определённый DNS-сервер
    Connect-adPEAS -Domain "contoso.com" -DnsServer "10.0.0.1" -Username "john.doe" -Password "pass"
    ```
 
-3. **Time synchronization issue**
-   - Kerberos requires time within 5 minutes of DC
-   - Check system clock
+3. **Неправильная синхронизация времени**
+    - Kerberos требует расхождения часов с DC не более пяти минут.
+    - Проверьте системное время.
 
-4. **Principal not found**
-   - Verify username exists in domain
-   - Check for typos in domain name
-
----
-
-## Pivoting and Tunneling
-
-### Using adPEAS Through a Network Tunnel
-
-adPEAS does not include a built-in SOCKS proxy or tunneling client. The underlying .NET `LdapConnection` class does not support proxy connections, and implementing a full SOCKS stack would add significant complexity for something that dedicated tools already handle well.
-
-Instead, use **local port forwarding** with your preferred tunneling tool. adPEAS connects to whatever `-Server` address you provide — including `localhost` or any local IP that your tunnel exposes.
+4. **Субъект не найден**
+    - Убедитесь, что имя пользователя существует в домене.
+    - Проверьте опечатки в имени домена.
 
 ---
 
-### Recommended Setup
+## Промежуточные узлы и туннели
 
-**Architecture:**
+### Работа adPEAS через сетевой туннель
+
+В adPEAS нет встроенного SOCKS-прокси или клиента туннелирования. Класс .NET `LdapConnection` не поддерживает прокси-соединения, а реализация полного протокола SOCKS неоправданно усложнила бы проект при наличии готовых специализированных инструментов.
+
+Вместо этого используйте **локальную переадресацию портов** подходящим средством. adPEAS соединяется с адресом, указанным в `-Server`, включая `localhost` или локальный IP туннеля.
+
+---
+
+### Рекомендуемая конфигурация
+
+**Схема:**
 
 ```
 ┌──────────┐    Tunnel     ┌─────────────┐    Internal    ┌──────────┐
@@ -134,220 +134,220 @@ Instead, use **local port forwarding** with your preferred tunneling tool. adPEA
   Connect-adPEAS -Server "127.0.0.1" ...
 ```
 
-**Step 1: Establish the tunnel** (examples for common tools)
+**Шаг 1: создать туннель** (примеры для распространённых инструментов)
 
 ```bash
-# Chisel (reverse tunnel)
-# On pivot host:
+# Chisel (обратный туннель)
+# На промежуточном узле:
 chisel server -p 8080 --reverse
-# On attacker:
+# На проверяющем компьютере:
 chisel client pivot-host:8080 R:389:dc01.contoso.com:389 R:88:dc01.contoso.com:88
 
 # Ligolo-ng
-# Ligolo creates a full tunnel interface — no individual port forwards needed
-# All ports are accessible via the tunnel interface IP
+# Ligolo создаёт полноценный туннельный интерфейс — не нужны отдельные пробросы портов
+# Все порты доступны через IP туннельного интерфейса
 
-# SSH port forward
+# Проброс SSH
 ssh -L 389:dc01.contoso.com:389 -L 88:dc01.contoso.com:88 user@pivot-host
 
-# Socat (simple TCP relay on pivot host)
+# Socat (простой TCP-ретранслятор на промежуточном узле)
 socat TCP-LISTEN:389,fork TCP:dc01.contoso.com:389 &
 socat TCP-LISTEN:88,fork TCP:dc01.contoso.com:88 &
 ```
 
-**Step 2: Connect adPEAS through the tunnel**
+**Шаг 2: подключить adPEAS через туннель**
 
 ```powershell
-# SimpleBind through tunnel (most reliable)
+# SimpleBind через туннель (обычно надёжнее всего)
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 
-# With LDAPS (if tunnel forwards port 636)
+# LDAPS (если туннель перенаправляет порт 636)
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -UseLDAPS -IgnoreSSLErrors -ForceSimpleBind
 
-# Pass-the-Cert through tunnel (if you have a certificate, only needs port 636)
+# Сертификат через туннель (если сертификат есть — нужен только порт 636)
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Certificate "user.pfx" -ForcePassTheCert
 
-# Ligolo-ng tunnel interface (full network tunnel)
+# Интерфейс Ligolo-ng (полноценный сетевой туннель)
 Connect-adPEAS -Domain "contoso.com" -Server "10.10.10.10" -DnsServer "10.10.10.10" -Username "john.doe" -Password "P@ssw0rd"
 ```
 
 ---
 
-### Why Use ForceSimpleBind Over a Tunnel?
+### Почему через туннель рекомендуется ForceSimpleBind?
 
-**Kerberos authentication is problematic over tunnels** for several reasons:
+**Аутентификация Kerberos через туннели проблематична** по нескольким причинам:
 
-| Issue | Explanation |
+| Проблема | Объяснение |
 |-------|-------------|
-| **SPN mismatch** | Kerberos service tickets are bound to the target hostname (e.g., `ldap/dc01.contoso.com`). When connecting to `127.0.0.1`, the SPN doesn't match, causing `LDAP_LOCAL_ERROR` (error 82). |
-| **DNS resolution** | Kerberos relies on DNS to find the KDC. Over a tunnel, DNS may not resolve correctly. |
-| **Port 88 required** | Kerberos needs a separate TCP connection to port 88 on the KDC — your tunnel must forward this port too. |
-| **PTT session isolation** | Pass-the-Ticket injects into the Windows LSA session. If the tunnel changes the network path, the ticket may not be usable for the LDAP connection. |
+| **Несовпадение SPN** | Билет Kerberos связан с целевым именем узла (например, `ldap/dc01.contoso.com`). При подключении к `127.0.0.1` SPN не совпадает, и возникает `LDAP_LOCAL_ERROR` (код 82). |
+| **Разрешение DNS** | Kerberos использует DNS для поиска KDC; через туннель DNS может работать некорректно. |
+| **Требуется порт 88** | Для Kerberos нужно отдельное TCP-соединение к KDC: порт 88 также должен быть проброшен. |
+| **Изоляция сеансов PTT** | Pass-the-Ticket внедряет билет в сеанс Windows LSA. При изменении сетевого пути билет может быть непригоден для LDAP-подключения. |
 
-**Recommendation:** Use `-ForceSimpleBind` when working through port-forward tunnels. For full network tunnels (ligolo-ng with tunnel interface), Kerberos may work if DNS resolves correctly.
+**Рекомендация:** используйте `-ForceSimpleBind` при пробросе отдельных портов. При полном сетевом туннеле (интерфейс Ligolo-ng) Kerberos может работать при правильном DNS.
 
 ---
 
-### Required Ports
+### Необходимые порты
 
-Ensure your tunnel forwards the necessary ports:
+Убедитесь, что туннель перенаправляет нужные порты:
 
-| Port | Protocol | Required For | Mandatory? |
+| Порт | Протокол | Назначение | Обязателен? |
 |------|----------|-------------|------------|
-| 389  | TCP | LDAP | Yes (or 636) |
-| 636  | TCP | LDAPS | Alternative to 389 |
-| 88   | TCP | Kerberos | Only if using Kerberos auth |
-| 3268 | TCP | Global Catalog (LDAP) | Optional — cross-domain/forest SID resolution |
-| 3269 | TCP | Global Catalog (LDAPS) | Optional — cross-domain/forest SID resolution (SSL) |
-| 445  | TCP | SMB/CIFS | Only for SMB checks (`Get-SMBSigningStatus`) |
-| 53   | UDP | DNS | Optional — names `Get-NetworkMap` does not find in the AD-integrated zones (none under `-OPSEC`) |
+| 389 | TCP | LDAP | Да (либо 636) |
+| 636 | TCP | LDAPS | Альтернатива порту 389 |
+| 88 | TCP | Kerberos | Только при Kerberos |
+| 3268 | TCP | Глобальный каталог (LDAP) | Необязательно — SID других доменов/леса |
+| 3269 | TCP | Глобальный каталог (LDAPS) | Необязательно — SID других доменов/леса (SSL) |
+| 445 | TCP | SMB/CIFS | Только для SMB-проверок (`Get-SMBSigningStatus`) |
+| 53 | UDP | DNS | Необязательно — имена, не найденные `Get-NetworkMap` в зонах AD (нет при `-OPSEC`) |
 
-**Minimum for enumeration:** Port 389 (LDAP) + SimpleBind credentials.
+**Минимум для перечисления:** TCP 389 (LDAP) и учётные данные SimpleBind.
 
 ---
 
-### Troubleshooting Tunnel Connections
+### Диагностика туннельных соединений
 
-**Symptom: `LDAP_LOCAL_ERROR` (Error 82) after Kerberos TGT+TGS**
+**Признак: `LDAP_LOCAL_ERROR` (код 82) после TGT+TGS Kerberos**
 
-The Kerberos ticket was obtained successfully, but the LDAP bind with Negotiate auth failed locally. This typically means the SPN in the service ticket doesn't match the connection target.
+Билет Kerberos получен успешно, но локально завершилось ошибкой LDAP-подключение Negotiate. Обычно SPN сервисного билета не совпадает с целью соединения.
 
 ```powershell
-# Fix: Skip Kerberos, use SimpleBind
+# Исправление: пропустить Kerberos и использовать SimpleBind
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
-**Symptom: Connection timeout**
+**Признак: тайм-аут соединения**
 
-The tunnel is not forwarding the required port.
+Туннель не перенаправляет нужный порт.
 
 ```powershell
-# Test if tunnel is working
+# Проверить, работает ли туннель
 Test-NetConnection -ComputerName 127.0.0.1 -Port 389
 ```
 
-**Symptom: "Server unavailable" or no results**
+**Признак: «сервер недоступен» или нет результатов**
 
-DNS may not resolve the domain name through the tunnel.
+DNS-имя домена может не разрешаться через туннель.
 
 ```powershell
-# Specify DC IP directly and use DnsServer parameter
+# Указать IP DC напрямую и параметр DnsServer
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -DnsServer "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
-**Symptom: LDAPS certificate validation error**
+**Признак: ошибка проверки сертификата LDAPS**
 
-The certificate is issued for the DC hostname, not for `127.0.0.1` or `localhost`.
+Сертификат выдан на DNS-имя контроллера домена, а не на `127.0.0.1` или `localhost`.
 
 ```powershell
-# Ignore certificate hostname mismatch
+# Игнорировать несовпадение имени сертификата
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -UseLDAPS -IgnoreSSLErrors -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
-### Slow Connections / Timeouts
+### Медленные соединения и тайм-ауты
 
-**Symptom: `The operation was aborted because the client side timeout limit was exceeded`**
+**Признак: `The operation was aborted because the client side timeout limit was exceeded`**
 
-High-latency connections (SOCKS tunnels, VPN, multi-hop pivots) can cause LDAP queries to exceed the default 30-second timeout, especially for complex operations like ACL analysis.
+При высоких задержках (SOCKS, VPN, несколько промежуточных узлов) LDAP-запрос может превысить стандартные 30 секунд, особенно при сложном анализе ACL.
 
-**Solution: Increase the timeout**
+**Решение: увеличить тайм-аут**
 
 ```powershell
-# Increase timeout to 120 seconds (recommended for tunneled connections)
+# Увеличить до 120 секунд (рекомендуется для туннеля)
 Invoke-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind -TimeoutSeconds 120
 
-# Or with Connect-adPEAS directly
+# Или вызвать Connect-adPEAS напрямую
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind -TimeoutSeconds 120
 
-# Maximum: 600 seconds (10 minutes) for extremely slow connections
+# Максимум: 600 секунд (10 минут) для крайне медленного канала
 Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
-**Additional tips for slow connections:**
-- Run only specific modules: `-Module Domain,Accounts` (skip heavy ACL checks)
-- Use OPSEC mode: `-OPSEC` (fewer queries)
-- Rights checks (ACLs) are the most timeout-prone — consider running specific modules with `-Module Domain,Accounts,Creds` instead
+**Дополнительные советы для медленного подключения:**
+- Запускайте только необходимые модули: `-Module Domain,Accounts` (без тяжёлого анализа ACL).
+- Используйте `-OPSEC` (меньше запросов).
+- Проверки Rights (ACL) чаще превышают тайм-аут; можно ограничиться `-Module Domain,Accounts,Creds`.
 
 ---
 
-## Authentication Method Issues
+## Проблемы способов аутентификации
 
-### NT Hash Authentication Not Working
+### Аутентификация по NT-хешу не работает
 
-**Symptoms**:
-- "Overpass-the-Hash failed"
-- Authentication fails completely (no fallback for hash-based auth)
+**Признаки**:
+- «Сбой Overpass-the-Hash».
+- Полный отказ аутентификации (для входа по хешу резервного способа нет).
 
-**Solutions**:
+**Решения**:
 
-1. **Verify hash format**
+1. **Проверить формат хеша**
    ```powershell
-   # Must be 32 hex characters
+    # Должно быть 32 шестнадцатеричных символа
    $hash = "32ED87BDB5FDC5E9CBA88547376818D4"
    if ($hash.Length -ne 32) { Write-Error "Invalid hash length" }
    ```
 
-2. **RC4 disabled in domain**
-   - If RC4 is disabled, NT hash auth will fail
-   - Use AES256 key instead
+2. **RC4 отключён в домене**
+    - При отключённом RC4 аутентификация по NT-хешу не работает.
+    - Вместо него используйте ключ AES256.
    ```powershell
    Connect-adPEAS -Domain "contoso.com" -Username "john.doe" -AES256Key "..."
    ```
 
-3. **PTT fails due to security policy**
-   - adPEAS uses `LsaConnectUntrusted` - admin rights are NOT required
-   - In rare cases, restrictive security policies may block LSA access
-   - NT Hash/AES key auth has no fallback - Kerberos (port 88) must be reachable
-   - For password-based auth, use `-ForceSimpleBind` as a workaround
+3. **PTT блокируется политикой безопасности**
+    - adPEAS использует `LsaConnectUntrusted`, права администратора НЕ требуются.
+    - В редких случаях строгая политика блокирует доступ к LSA.
+    - NT-хеш/AES не имеют резервного метода — Kerberos (88) должен быть доступен.
+    - Для пароля возможен обход через `-ForceSimpleBind`.
 
 ---
 
-### Certificate (PKINIT) Authentication Not Working
+### Аутентификация сертификатом (PKINIT) не работает
 
-**Symptoms**:
-- "PKINIT authentication failed"
-- "Certificate not valid for logon"
+**Признаки**:
+- «Сбой аутентификации PKINIT».
+- «Сертификат непригоден для входа».
 
-**Solutions**:
+**Решения**:
 
-1. **Verify certificate requirements**
-   - Must contain private key
-   - Must have Smart Card Logon or Client Auth EKU
-   - Must have UPN or other identity in SAN
+1. **Проверить требования к сертификату**
+    - Должен содержать закрытый ключ.
+    - Нужен EKU Smart Card Logon либо Client Auth.
+    - В SAN должен быть UPN или другой идентификатор.
 
-2. **Check certificate password**
+2. **Проверить пароль сертификата**
    ```powershell
-   # Verify PFX is readable
+    # Убедиться, что PFX читается
    $cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new("user.pfx", "password")
    $cert.Subject
    ```
 
-3. **Certificate expired or revoked**
-   - Check certificate validity dates
-   - Check if CA has revoked the certificate
+3. **Истёк или отозван сертификат**
+    - Проверьте даты действия сертификата.
+    - Проверьте, не отозвал ли его УЦ.
 
 ---
 
-### Kirbi/Ccache Import Not Working
+### Не импортируется Kirbi/Ccache
 
-**Symptoms**:
-- "Failed to import ticket"
-- "Access denied"
+**Признаки**:
+- «Не удалось импортировать билет».
+- «Доступ запрещён».
 
-**Solutions**:
+**Решения**:
 
-1. **Restrictive LSA policy**
-   - adPEAS uses `LsaConnectUntrusted` which does NOT require admin rights
-   - In rare cases, restrictive security policies may block LSA access
-   - Try running from a different session or machine
+1. **Ограничивающая политика LSA**
+    - adPEAS использует `LsaConnectUntrusted` без административных прав.
+    - Изредка политика безопасности блокирует доступ к LSA.
+    - Попробуйте другой сеанс или компьютер.
 
-2. **Ticket expired**
-   - Check ticket expiration time
-   - Request a new ticket
+2. **Билет просрочен**
+    - Проверьте время окончания действия.
+    - Запросите новый билет.
 
-3. **Wrong ticket type**
-   - Ensure it's a TGT (krbtgt service)
-   - Or a service ticket for LDAP
+3. **Неправильный тип билета**
+    - Убедитесь, что это TGT (служба krbtgt).
+    - Либо сервисный билет для LDAP.
 
 ---
 
