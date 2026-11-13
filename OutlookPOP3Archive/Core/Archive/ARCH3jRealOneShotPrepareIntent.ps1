@@ -5,6 +5,12 @@
 # PREPARE stops before any irreversible Outlook provider action.
 . (Join-Path $PSScriptRoot 'ARCH3iSealedFullOriginalWitness.ps1')
 . (Join-Path $PSScriptRoot 'ARCH3bOriginalMoverContract.ps1')
+# Original DuplicateIndex depends on the original JSON/JSONL readers, which
+# are normally loaded by the full legacy entrypoint. ARCH3j is standalone.
+if(-not (Get-Command Read-OPAJsonFile -ErrorAction SilentlyContinue) -or
+   -not (Get-Command Read-OPAJsonlEntries -ErrorAction SilentlyContinue)){
+    . (Join-Path $PSScriptRoot '../Runtime/JsonSupport.ps1')
+}
 . (Join-Path $PSScriptRoot 'DuplicateIndex.ps1')
 
 function Get-OPA265ARCH3jLayout {
