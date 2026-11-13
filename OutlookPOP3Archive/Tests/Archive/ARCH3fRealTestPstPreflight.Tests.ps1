@@ -159,6 +159,55 @@ Describe 'ARCH3f reuse the ORIGINAL Year routing on real-mail-shaped fake candid
         $p.ProductionReady | Should -BeFalse
     }
 }
+Describe 'ARCH3f real Inventory code path with only fake Outlook COM wrappers in CI' {
+    It 'reuses original Session/EligibleWalker/Selector and returns actual folder counts with sampled Year routes' {
+        $fakeFolder=[pscustomobject]@{
+            Name='Входящие'
+            EntryID='00000000ABCDEF001234567812345678'
+            FolderPath='\\POP3 Store\Входящие'
+            Items=[pscustomobject]@{Count=25}
+        }
+        $store=[pscustomobject]@{
+            StoreID='ARCH3F-FAKE-STORE'
+            Root=[pscustomobject]@{FolderPath='\\POP3 Store'}
+        }
+        $store | Add-Member -MemberType ScriptMethod -Name GetRootFolder -Value {return $this.Root}
+        $fakeSession=[pscustomobject]@{
+            SourceStore=$store
+            Namespace=[pscustomobject]@{CurrentProfileName='Outlook'}
+            Scope=[pscustomobject]@{Approved=$true}
+            OutlookProcessId=789
+            OutlookProcessStartUtcTicks=[long]1234567
+        }
+        $fakeCandidate=New-ARCH3fCandidate
+        Mock Assert-OPA265ARCH3fRealTestSource {return $script:source}
+        Mock Get-OPA265ARCH2dLayout {return [pscustomobject]@{ArchivePst='C:\none.pst'}}
+        Mock Open-OPA265ARCH2dSession {return $fakeSession}
+        Mock Get-OPAWellKnownFolderEntryIds {@{}}
+        Mock Get-OPAEligiblePop3MailFolders {return @($fakeFolder)}
+        Mock Get-OPAArchiveCandidates {
+            [pscustomobject]@{
+                SelectionErrors=0;UsedSort=$true;UsedRestrict=$false
+                Candidates=@($fakeCandidate);SelectionErrorDetails=@()
+            }
+        }
+        Mock Release-OPA265ARCH2c4Com {}
+        Mock Close-OPA265ARCH2dSession {}
+        $r=Invoke-OPA265ARCH3fRealTestPreflight -Mode Inventory -SourcePst $script:source
+        $r.Status | Should -BeExactly 'ExistingTestPstRealMailRoutePreviewNoPstOrComWrites'
+        $r.Pop3ScopeApproved | Should -BeTrue
+        $r.FolderItemsCountSum | Should -Be 25
+        $r.SampleCandidateCount | Should -Be 1
+        $r.Candidates[0].PlannedTargetFolderPath | Should -BeExactly '2020\Входящие'
+        $r.YearCountsAreFullInventory | Should -BeFalse
+        $r.ArchivePstOpenedOrCreated | Should -BeFalse
+        $r.WriterPermit | Should -BeFalse
+        Should -Invoke Open-OPA265ARCH2dSession -Times 1 -Exactly
+        Should -Invoke Get-OPAEligiblePop3MailFolders -Times 1 -Exactly
+        Should -Invoke Get-OPAArchiveCandidates -Times 1 -Exactly
+        Should -Invoke Close-OPA265ARCH2dSession -Times 1 -Exactly
+    }
+}
 Describe 'ARCH3f source-backed read-only integration safety gates' {
     It 'operators only get Plan and Inventory, never Move/Prepare/Resume/Archive' {
         $s=Get-Content -LiteralPath (Join-Path $script:root 'Invoke-ARCH3f.ps1') -Raw -Encoding UTF8
