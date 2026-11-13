@@ -1452,15 +1452,15 @@ Get-GPORegistrySettings -IncludeUnknown
 
 ### Get-LAPSConfiguration
 
-**Purpose**: Checks LAPS deployment status across the domain.
+**Назначение**: проверяет внедрение LAPS по домену.
 
-**What it checks**:
-- Computers without LAPS configured
-- LAPS schema presence vs. actual deployment
+**Что проверяется**:
+- Компьютеры без настроенного LAPS.
+- Наличие схемы LAPS в сравнении с фактическим внедрением.
 
-**Security Impact**: Computers without LAPS use shared or predictable local admin passwords, enabling pass-the-hash attacks for lateral movement.
+**Влияние на безопасность**: на компьютерах без LAPS локальные административные пароли могут быть общими или предсказуемыми, что позволяет горизонтальное перемещение с Pass-the-Hash.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-LAPSConfiguration
 ```
@@ -1469,26 +1469,26 @@ Get-LAPSConfiguration
 
 ### Get-OutdatedComputers
 
-**Purpose**: Finds computers running outdated operating systems.
+**Назначение**: обнаруживает компьютеры с устаревшими ОС.
 
-**What it checks**:
-Uses a central lifecycle database (`adPEAS-SoftwareLifecycle.ps1`) with EOL dates from Microsoft. Detection is dynamic — as dates pass, systems are automatically flagged.
+**Что проверяется**:
+Использует центральную базу жизненного цикла (`adPEAS-SoftwareLifecycle.ps1`) с датами EOL Microsoft. Определение динамическое: по наступлении даты система автоматически отмечается как устаревшая.
 
-| Operating System | EOL Date | Status (as of 2026) |
+| Операционная система | Дата окончания поддержки | Состояние на 2026 год |
 |-----------------|----------|---------------------|
-| Windows XP | 2014-04-08 | EOL |
-| Windows Vista | 2017-04-11 | EOL |
-| Windows 7 | 2023-01-10 | EOL (incl. ESU) |
+| Windows XP | 2014-04-08 | Поддержка завершена (EOL) |
+| Windows Vista | 2017-04-11 | Поддержка завершена (EOL) |
+| Windows 7 | 2023-01-10 | EOL (включая ESU) |
 | Windows 8 / 8.1 | 2016/2023 | EOL |
 | Windows 10 | 2025-10-14 | EOL |
 | Windows Server 2003 | 2015-07-14 | EOL |
-| Windows Server 2008 (R2) | 2023-01-10 | EOL (incl. ESU) |
-| Windows Server 2012 (R2) | 2026-10-13 | EOL (incl. ESU) |
-| Windows Server 2016 | 2027-01-12 | Approaching EOL |
+| Windows Server 2008 (R2) | 2023-01-10 | EOL (включая ESU) |
+| Windows Server 2012 (R2) | 2026-10-13 | EOL (включая ESU) |
+| Windows Server 2016 | 2027-01-12 | Приближается EOL |
 
-**Security Impact**: End-of-life systems no longer receive security patches and are vulnerable to known exploits.
+**Влияние на безопасность**: ОС после завершения поддержки больше не получают обычных исправлений безопасности и подвержены известным атакам.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-OutdatedComputers
 ```
@@ -1497,19 +1497,19 @@ Get-OutdatedComputers
 
 ### Get-InfrastructureServers
 
-**Purpose**: Identifies critical infrastructure servers.
+**Назначение**: определяет серверы критически важной инфраструктуры.
 
-**What it checks**:
-- Domain Controllers
-- Exchange Servers
-- MSSQL Servers (via `MSSQLSvc/` SPN)
-- SCCM/ConfigMgr Servers
-- SCOM Servers
-- Entra ID Connect (Azure AD Connect)
+**Что проверяется**:
+- Контроллеры домена.
+- Серверы Exchange.
+- Серверы MSSQL (по SPN `MSSQLSvc/`).
+- Серверы SCCM/ConfigMgr.
+- Серверы SCOM.
+- Entra ID Connect (Azure AD Connect).
 
-**Security Impact**: Informational - identifies high-value targets for attackers. Compromise of these systems often leads to domain compromise.
+**Влияние на безопасность**: информационная проверка выявляет особо ценные цели. Их компрометация часто приводит к компрометации домена.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-InfrastructureServers
 ```
@@ -1518,17 +1518,17 @@ Get-InfrastructureServers
 
 ### Get-NonDefaultComputerOwners
 
-**Purpose**: Finds computers owned by non-privileged users, and explicit permissions on computer objects held outside Tier-0.
+**Назначение**: находит компьютеры, владельцы которых — непривилегированные пользователи, и явные разрешения вне Tier 0 на объектах компьютеров.
 
-**What it checks**:
-- Computer object owner attribute
-- Computers owned by regular users instead of Domain Admins
-- Entries written on the computer object itself (not inherited) that give a principal outside Tier-0 full control, a generic write, a write on every attribute or on the DACL, the right to take ownership, all extended rights, the password reset right, or a write on `msDS-AllowedToActOnBehalfOfOtherIdentity`, `msDS-KeyCredentialLink`, `servicePrincipalName` or `dNSHostName`
-- The entries the computer class writes for its creator, the owner, SELF and the operators are not reported; inherited entries are reported by the OU permission check where the delegation is defined
+**Что проверяется**:
+- Владелец объекта компьютера.
+- Компьютеры, принадлежащие обычным пользователям вместо Domain Admins.
+- ACE, записанные на самом объекте компьютера (не унаследованные), которые выдают субъекту вне Tier 0 полный контроль, GenericWrite, запись всех атрибутов или DACL, смену владельца, все расширенные права, сброс пароля либо запись `msDS-AllowedToActOnBehalfOfOtherIdentity`, `msDS-KeyCredentialLink`, `servicePrincipalName` или `dNSHostName`.
+- ACE, которые класс компьютера создаёт для создателя записи, владельца, SELF и операторов, не выводятся; унаследованные ACE проверяются на OU, где задано делегирование.
 
-**Security Impact**: Computer owners can modify the object, potentially adding themselves to `msDS-AllowedToActOnBehalfOfOtherIdentity` and enabling RBCD attacks. An explicit write on that attribute or on `msDS-KeyCredentialLink`, a password reset right or all extended rights (which include reading the LAPS password) lead to administrative access to the computer the same way.
+**Влияние на безопасность**: владелец компьютера может менять объект, потенциально добавляя себя в `msDS-AllowedToActOnBehalfOfOtherIdentity` и открывая путь RBCD. Явная запись этого атрибута или `msDS-KeyCredentialLink`, сброс пароля и все расширенные права (включая чтение LAPS) аналогично могут привести к административному доступу к компьютеру.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-NonDefaultComputerOwners
 ```
@@ -1537,16 +1537,16 @@ Get-NonDefaultComputerOwners
 
 ### Get-ComputerPasswordAge
 
-**Purpose**: Finds active computers whose machine account password is not rotated.
+**Назначение**: находит активные компьютеры, у которых не обновляется пароль машинной учётной записи.
 
-**What it checks**:
-- Enabled computers that logged on within the last 30 days (`-ActiveDays`) and whose machine account password is 90 days old or older (`-PasswordAgeDays`)
-- A domain member and a Domain Controller change it every 30 days by default; one that does not has the change switched off (`DisablePasswordChange`), a non-Windows join tool that does not rotate, or is a clone
-- Domain Controllers are reported as a finding, other computers as a hint
+**Что проверяется**:
+- Включённые компьютеры, входившие в домен за последние 30 дней (`-ActiveDays`), чей пароль компьютера старше 90 дней (`-PasswordAgeDays`).
+- Рядовой компьютер и DC по умолчанию меняют пароль каждые 30 дней; отсутствие ротации означает выключенный `DisablePasswordChange`, стороннее средство присоединения без ротации или клонированный объект.
+- Для контроллеров домена это *находка*, для прочих компьютеров — *подсказка*.
 
-**Security Impact**: A machine account key that does not change never ages out. Whoever extracted it once can forge service tickets to the host; a Domain Controller's key replicates every password hash of the domain.
+**Влияние на безопасность**: неизменный ключ машинной записи не устаревает. Получив его однажды, злоумышленник может подделывать сервисные билеты к узлу, а ключ DC позволяет реплицировать все хеши паролей домена.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-ComputerPasswordAge
 Get-ComputerPasswordAge -PasswordAgeDays 60 -ActiveDays 14
@@ -1556,24 +1556,24 @@ Get-ComputerPasswordAge -PasswordAgeDays 60 -ActiveDays 14
 
 ### Get-NetworkMap
 
-**Purpose**: Maps the IP subnets the active computers of the domain are in, and the OUs they sit in - which networks hold which systems, without a scan.
+**Назначение**: сопоставляет IPv4-подсети активных компьютеров домена и их OU — показывает, где расположены компьютеры, не выполняя сетевого сканирования.
 
-**What it does**:
-- Takes the enabled computers with a logon in the last 30 days (`lastLogonTimestamp`, `-ActiveDays`). The attribute is replicated with a delay of 9 to 14 days by default, so a shorter window misses computers in use.
-- Resolves their DNS name (`dNSHostName`), only below the domain's own DNS name: the computer account may write the attribute, and a name outside the domain is counted instead of looked up.
-- Takes the addresses from the AD-integrated DNS zones the names fall in, read over LDAP from the connected domain controller (`Get-DomainDNSZone`, `Get-DomainDNSRecord`) - every address of a name, and no DNS query. A name not found there is resolved by a DNS query to the domain controller (the session's `-DnsServer`, else the domain controller's address) and to no other server.
-- Shows one object per /24 subnet: the number of computers, how many of them are domain controllers, servers and clients, the most specific subnet Sites and Services defines for the addresses with its site ("Not in Sites and Services" where none contains them), and the OU or container of each computer as a DN with the number of computers from it. The computers themselves are not listed.
-- Lists the subnets Sites and Services defines that hold no active computer, in one object after the /24s: networks the domain knows of and the computers do not show, such as a VPN pool, a DMZ or a floor of appliances. A defined subnet inside one of the /24s is left out, that /24 covers it.
-- Counts what it could not map: names outside the domain, computers without a DNS name or without a usable IPv4 address (loopback, APIPA, multicast), and IPv6-only computers. IPv6 is not mapped.
+**Что выполняется**:
+- Берутся включённые компьютеры со входом за последние 30 дней (`lastLogonTimestamp`, `-ActiveDays`). Атрибут реплицируется с задержкой 9–14 дней, поэтому меньшее окно пропустит используемые компьютеры.
+- Разрешается DNS-имя (`dNSHostName`) только внутри DNS-домена: компьютер может сам писать этот атрибут, поэтому внешние имена подсчитываются без разрешения.
+- Адреса берутся из интегрированных с AD зон DNS, прочитанных по LDAP с подключённого DC (`Get-DomainDNSZone`, `Get-DomainDNSRecord`): все адреса имени, без DNS-запроса. Если имя отсутствует, оно разрешается запросом только к DC (`-DnsServer` сеанса или адресу DC), не к посторонним серверам.
+- Один объект на /24-подсеть: число компьютеров, DC, серверов и клиентов, самая узкая подсеть из Sites and Services, содержащая адрес, с её сайтом («Not in Sites and Services», если нет), а также DN каждой OU/контейнера с числом соответствующих компьютеров. Список самих компьютеров не выводится.
+- Подсети, заданные в Sites and Services без активных компьютеров, выводятся одним объектом после /24: известные сети без увиденных компьютеров (например, пул VPN, DMZ, сеть устройств). Заданная подсеть внутри одной из /24 отдельно не выводится: её покрывает соответствующая /24.
+- Подсчитываются случаи без отображения: имена вне домена, отсутствие DNS-имени или пригодного IPv4 (loopback, APIPA, multicast) и компьютеры только с IPv6. IPv6 не отображается.
 
-A subnet with domain controllers is a hint - the Tier-0 network - and adds nothing to the risk score.
+Подсеть с DC отмечается как *подсказка* (сеть Tier 0) и не повышает оценку риска.
 
-**Parameters**:
-- `-ActiveDays <n>`: how recent the last logon must be (default 30)
-- `-ExportTargets <file>`: writes the subnets to the file, one per line in CIDR notation - the /24s, then the defined subnets without an active computer - as the target list of a scanner (`nmap -iL`, or `Get-Content <file> | Invoke-PortScan`); an existing file is overwritten. A full scan writes no file.
-- `-OPSEC`: no DNS query; computers the zones do not hold are counted and not mapped
+**Параметры**:
+- `-ActiveDays <n>`: допустимый срок с последнего входа (по умолчанию 30 дней).
+- `-ExportTargets <file>`: записать подсети в файл — CIDR по строке: сначала /24, затем заданные подсети без активных компьютеров. Это список целей для сканера (`nmap -iL` либо `Get-Content <file> | Invoke-PortScan`); существующий файл перезаписывается. Полный аудит файл не создаёт.
+- `-OPSEC`: без DNS-запросов; компьютеры, отсутствующие в зонах DNS, учитываются как неотображённые.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-NetworkMap
 Get-NetworkMap -ActiveDays 60 -ExportTargets .\subnets.txt
@@ -1581,25 +1581,25 @@ Get-NetworkMap -ActiveDays 60 -ExportTargets .\subnets.txt
 
 ---
 
-## Application Module
+## Модуль Application
 
-Analyzes enterprise application infrastructure.
+Анализирует инфраструктуру корпоративных приложений.
 
 ### Get-ExchangeInfrastructure
 
-**Purpose**: Enumerates Exchange Server infrastructure.
+**Назначение**: перечисляет инфраструктуру серверов Exchange.
 
-**What it checks**:
-- Exchange Organization presence (msExchOrganizationContainer)
-- Exchange server versions via LDAP attributes and HTTP endpoint probing
-- Extended Protection for Authentication (EPA) status on Exchange web endpoints
-- Exchange Trusted Subsystem group membership (high-privilege service accounts)
-- Exchange Windows Permissions group membership (can have DCSync rights via WriteDacl on domain root)
-- Organization Management group membership (full Exchange admin control)
+**Что проверяется**:
+- Наличие организации Exchange (msExchOrganizationContainer).
+- Версии Exchange через LDAP-атрибуты и опрос HTTP-интерфейсов.
+- Состояние Extended Protection for Authentication (EPA) для веб-интерфейсов Exchange.
+- Членство в Exchange Trusted Subsystem (высокопривилегированные служебные записи).
+- Членство в Exchange Windows Permissions (может иметь DCSync через WriteDacl на корне домена).
+- Членство в Organization Management (полные полномочия администратора Exchange).
 
-**Security Impact**: Exchange servers often have high privileges in AD. The "Exchange Windows Permissions" group has WriteDacl on the domain root by default, which can be abused for DCSync. "Exchange Trusted Subsystem" members can modify any Exchange object. Outdated Exchange versions have known vulnerabilities (ProxyLogon, ProxyShell). Missing EPA enables NTLM relay attacks against Exchange endpoints.
+**Влияние на безопасность**: Exchange часто имеет расширенные права в AD. Exchange Windows Permissions по умолчанию располагает WriteDacl на корне домена, что может использоваться для DCSync. Члены Exchange Trusted Subsystem могут изменять объекты Exchange. Для устаревших версий Exchange известны уязвимости ProxyLogon и ProxyShell. Отсутствие EPA позволяет атаки ретрансляции NTLM на веб-интерфейсы Exchange.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-ExchangeInfrastructure
 ```
@@ -1608,21 +1608,21 @@ Get-ExchangeInfrastructure
 
 ### Get-SCCMInfrastructure
 
-**Purpose**: Enumerates SCCM/MECM infrastructure using LDAP queries against Active Directory.
+**Назначение**: перечисляет инфраструктуру SCCM/MECM с помощью LDAP-запросов к AD.
 
-**What it checks**:
-- System Management container presence
-- SCCM site codes and site hierarchy via `mSSMSSite` AD objects
-- Management Points and site type determination (CAS / Primary / Secondary) via `mSSMSManagementPoint` objects with XML capabilities parsing
-- SCCM server identification via SPNs (SMS*, SMSSQLBKUP*)
-- SCCM client count via CmRcService SPN (compromise blast radius)
-- PXE/WDS boot servers (connectionPoint, intellimirrorSCP objects)
-- SCCM service accounts
-- SCCM-related security groups
+**Что проверяется**:
+- Наличие контейнера System Management.
+- Коды сайтов SCCM и иерархия по объектам AD `mSSMSSite`.
+- Management Points и тип сайта (CAS, Primary, Secondary) по `mSSMSManagementPoint` с разбором XML capabilities.
+- Выявление серверов SCCM по SPN (SMS*, SMSSQLBKUP*).
+- Число клиентов SCCM по SPN CmRcService (масштаб возможного компрометационного воздействия).
+- Серверы загрузки PXE/WDS (объекты connectionPoint, intellimirrorSCP).
+- Служебные учётные записи SCCM.
+- Группы безопасности SCCM.
 
-**Security Impact**: SCCM can deploy software to all managed systems. A Central Administration Site (CAS) controls the entire hierarchy and is a Tier 0 asset. PXE boot servers can be targeted for credential theft or OS deployment manipulation. The number of SCCM clients indicates the blast radius of a potential compromise.
+**Влияние на безопасность**: SCCM развёртывает ПО на всех управляемых системах. Центральный сайт CAS контролирует всю иерархию и является активом Tier 0. PXE-серверы могут использоваться для кражи учётных данных или подмены развёртывания ОС. Число клиентов SCCM характеризует возможный масштаб последствий компрометации.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-SCCMInfrastructure
 ```
@@ -1631,117 +1631,117 @@ Get-SCCMInfrastructure
 
 ### Get-SCOMInfrastructure
 
-**Purpose**: Enumerates SCOM infrastructure.
+**Назначение**: перечисляет инфраструктуру SCOM.
 
-**What it checks**:
-- SCOM management servers
-- Agent configuration
-- RunAs accounts
+**Что проверяется**:
+- Серверы управления SCOM.
+- Конфигурация агентов.
+- Учётные записи RunAs.
 
-**Security Impact**: SCOM runs agents on many systems with local admin rights. RunAs accounts are often overly privileged. Compromise enables lateral movement.
+**Влияние на безопасность**: агенты SCOM работают на множестве систем с правами локального администратора. Учётные записи RunAs часто избыточно привилегированы; их захват открывает путь к перемещению между компьютерами.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-SCOMInfrastructure
 ```
 
 ---
 
-## Shares Module
+## Модуль Shares
 
-Searches the shares of the domain's computers. **Not part of a default scan** - run it with
-`-Module Shares`, or call `Invoke-ShareHunt` directly.
+Ищет общие ресурсы компьютеров домена. **Не входит в обычное сканирование** — запустите с
+`-Module Shares` либо вызовите `Invoke-ShareHunt` отдельно.
 
 ### Invoke-ShareHunt
 
-**Purpose**: Finds the shares this account can read and searches them for credentials.
+**Назначение**: находит ресурсы, которые текущая учётная запись может читать, и ищет на них учётные данные.
 
-**Why it is not in a default scan**: it opens an SMB connection to every Windows computer
-of the domain and reads files off the shares it finds. That is the loudest thing adPEAS
-does, and a monitored network will notice it, so it is a decision for whoever runs the scan
-rather than a default. `-OPSEC` skips it entirely.
+**Почему исключён по умолчанию**: модуль устанавливает SMB-соединение с каждым компьютером
+Windows домена и читает найденные общие ресурсы. Это наиболее заметное сетевое действие adPEAS,
+которое может обнаружить мониторинг, поэтому запуск — отдельное решение оператора,
+а не поведение по умолчанию. `-OPSEC` полностью пропускает его.
 
-**What it does**, in four steps, each bounded so a large domain finishes:
+**Что выполняется**, четыре ограниченных этапа, рассчитанных и на большие домены:
 
-1. **The computers**: enabled Windows computers with a logon in the last 30 days
-   (`-ActiveDays`), by `dNSHostName` - only a name below the domain's own DNS name, since
-   the computer account may write that attribute itself. Or the computers named with
-   `-ComputerName`, or anything piped in: a name, a list of them, or the objects a
-   `Get-Domain*` function returns, which are read by their `dNSHostName`. A name given that
-   way is not checked against the domain's DNS name - the caller named it on purpose. An
-   empty pipeline searches nothing and does not fall back to the domain, so
-   `Get-DomainComputer -OperatingSystem '*Server 2012*' | Invoke-ShareHunt` in a domain with
-   no such computer sweeps nothing rather than everything.
-2. **Who answers on port 445**: one sweep with a deadline per *block* of hosts rather than
-   per host, so a few hundred dead addresses cost one timeout each block instead of one
-   each.
-3. **Their shares**, enumerated through `NetShareEnum` at level 1 - the level an ordinary
-   account may call - in a runspace pool with one deadline for the whole pass, because a
-   host that completes the TCP handshake and then stalls the RPC call would otherwise block
-   for tens of seconds. Of those, the shares worth reading: disk shares only, without the
-   shares Windows creates for itself (`-IncludeAdmin`) - told by the flag Windows sets on
-   them, by name, and by the shape of a drive share - and without SYSVOL and NETLOGON, which
-   `Get-CredentialExposure` reads with the policy each file belongs to (`-IncludeSysvol`).
-   Each is probed for whether this account can list its root. A **hidden** share is
-   searched: a dollar at the end of the name means not browsable, not administrative, and
-   `Software$` or `Profiles$` is an ordinary share somebody kept out of the browse list.
-4. **The readable shares**, walked breadth-first - the files that carry credentials sit near
-   the top of a share - under four limits: depth 10 (`-MaxDepth`), 50000 files
-   (`-MaxEntries`), 600 seconds per share (`-ShareTimeoutSeconds`) and 60 minutes for all
-   of them together (`-MaxMinutes`). The first two defaults are generous on purpose: a small
-   share is far below either, and a file server is the interesting case. Files over 1024 KB
-   (`-MaxFileSizeKB`) are counted, not read. Directories named with `-ExcludeFolder` are
-   skipped on every share, on top of the Windows directories that are always skipped
+1. **Компьютеры**: включённые компьютеры Windows со входом за последние 30 дней
+   (`-ActiveDays`) по `dNSHostName` — только в пределах DNS-имени домена, поскольку
+   компьютер может сам менять этот атрибут. Либо компьютеры, заданные через
+   `-ComputerName` или конвейер: имя, список имён или объекты функций
+   `Get-Domain*`, у которых берётся `dNSHostName`. Явно указанное имя не сверяется
+   с доменным суффиксом DNS — оператор указал его намеренно. Пустой конвейер
+   не сканирует ничего и не переключается на весь домен; например,
+   `Get-DomainComputer -OperatingSystem '*Server 2012*' | Invoke-ShareHunt` при отсутствии
+   таких компьютеров не начинает сканировать всё подряд.
+2. **Доступность TCP 445**: один проход с общим сроком ожидания на *блок* узлов, не на узел;
+   несколько сотен недоступных адресов расходуют один тайм-аут на каждый блок, а не
+   на каждый адрес.
+3. **Их общие ресурсы** перечисляются через `NetShareEnum` уровня 1 — доступного обычной
+   учётной записи — в пуле runspace с одним предельным сроком всей операции.
+   Иначе узел, завершивший TCP handshake, но зависший на RPC, задержал бы работу
+   на десятки секунд. Из них проверяются только дисковые ресурсы, без системных
+   ресурсов Windows (`-IncludeAdmin`), различаемых по системному флагу, имени
+   и форме административного ресурса диска, и без SYSVOL и NETLOGON, которые
+   `Get-CredentialExposure` проверяет вместе с породившей файл политикой (`-IncludeSysvol`).
+   У каждого ресурса проверяется право перечислить его корень. **Скрытые** ресурсы
+   исследуются: символ $ в конце имени означает отсутствие в обзоре сети, а не
+   административные права. `Software$` и `Profiles$` — обычные скрытые ресурсы.
+4. **Читаемые ресурсы** обходятся в ширину: файлы с паролями часто близки к корню.
+   Четыре ограничения: глубина 10 (`-MaxDepth`), 50 000 файлов
+   (`-MaxEntries`), 600 секунд на ресурс (`-ShareTimeoutSeconds`), 60 минут на все
+   (`-MaxMinutes`). Первые два значения выбраны достаточно большими: малый ресурс
+   заканчивается гораздо раньше, а файловый сервер важнее всего. Файлы свыше 1024 КБ
+   (`-MaxFileSizeKB`) учитываются, но не читаются. Каталоги из `-ExcludeFolder`
+   пропускаются на всех ресурсах наряду с всегда исключаемыми папками Windows
    (`Windows`, `WinSxS`, `Program Files`, `Program Files (x86)`, `ProgramData`,
-   `$Recycle.Bin`, `System Volume Information`, `Recovery`, `PerfLogs`) - for the directory
-   that turns out to be worth nothing and takes the budget anyway. Every candidate file is analysed by the same functions the SYSVOL scan uses, so a
-   Group Policy Preferences password, a Winlogon value, an answer file, a VNC password, a
-   `net use` line and a password assignment are found the same way here as there.
+   `$Recycle.Bin`, `System Volume Information`, `Recovery`, `PerfLogs`) — исключение
+   помогает не тратить лимит на бесполезные разделы. Все отобранные файлы анализируются
+   теми же функциями, что используются для SYSVOL: GPP, Winlogon, файлы ответов,
+   пароли VNC, строки `net use` и присваивания паролей обнаруживаются одинаково.
 
-**What it shows while it runs**: the console carries one progress line through all six
-phases - looking for the active computers, checking port 445 (with how many have answered so
-far), enumerating shares, probing each share, collecting the files of each share, and
-searching each file by name. There is no item threshold on the per-share phases: one share on
-an unresponsive host can take as long as thirty on a healthy one, and what the display is for
-is saying which host is being waited for. The search is counted over all the shares together,
+**Ход выполнения**: консоль показывает одну строку прогресса по шести фазам:
+поиск активных компьютеров, проверка 445 (со счётчиком ответивших), перечисление общих
+ресурсов, проба каждого ресурса, сбор файлов ресурса и поиск по каждому файлу.
+Для фаз отдельного ресурса нет порога количества: один зависший узел может занять
+столько же времени, сколько 30 исправных. Индикатор показывает, какого узла ждут;
+поиск считает все ресурсы вместе, чтобы показывать общую долю завершения.
 because what a reader wants there is how much of it is done.
 
-**Exports**: `-ExportShares <file>` writes the readable shares, one UNC path per line, to
-work from or to feed another tool. `-ExportFindings <file>` writes the whole result as JSON:
-the limits the run used, what it could not reach, every readable share with how far its walk
-got, and every finding with its file and its decrypted value. The findings file is written
-even when nothing was found - an empty result is a result, and the limits beside it are what
-makes it comparable with the next run. **It carries the credentials in clear text**, because
-that is what was found; treat it as the finding it is. Inside `Invoke-adPEAS -Outputfile` the
-rows reach the ordinary Text, HTML and JSON report as well; the two parameters are what a
-standalone call needs.
+**Экспорт**: `-ExportShares <file>` записывает читаемые ресурсы, по одному UNC на строку,
+для дальнейшей работы и передачи в другие инструменты. `-ExportFindings <file>` сохраняет весь результат в JSON:
+лимиты запуска, недоступные объекты, каждый читаемый ресурс и глубину его обхода,
+все находки с именами файлов и расшифрованными значениями. Файл результатов создаётся,
+даже если ничего не найдено: пустой результат — тоже результат, а лимиты необходимы
+для сравнения с новым запуском. **В JSON содержатся учётные данные в открытом виде**,
+потому что они найдены, — обращайтесь с файлом как с секретными данными. При запуске через
+`Invoke-adPEAS -Outputfile` те же строки входят в обычный текстовый, HTML и JSON-отчёт;
+два специальных параметра нужны для отдельного вызова.
 
-**`-ShareName`**: searches the shares of that name instead of whatever the computers offer,
-and enumerates nothing - it goes straight to `\\<computer>\<name>`. That is shorter, and it
-is the one way in where a server refuses `NetShareEnum` (Win32 5) but serves the share
-itself, which is a common configuration. A name given there is searched whatever it is, so
-`-ShareName C$` needs no `-IncludeAdmin` and `-ShareName SYSVOL` no `-IncludeSysvol`. Names
-are literal - there is no listing to match a wildcard against, so give several names.
+**`-ShareName`**: исследует ресурсы указанного имени вместо перечисления опубликованных,
+сразу открывая `\\<computer>\<name>`. Это быстрее и помогает, когда сервер запрещает
+`NetShareEnum` (Win32 5), но доступ к самому ресурсу разрешён — распространённая конфигурация.
+Указанное имя принимается независимо от типа ресурса, поэтому
+`-ShareName C$` не требует `-IncludeAdmin`, а `-ShareName SYSVOL` — `-IncludeSysvol`.
+Имена буквальные: список не получается, поэтому маску подставить некуда; задавайте несколько имён.
 
-**`-ListSharesOnly`**: stops after the list of readable shares - no file is read and no
-credential is searched for. The first pass over an unknown domain, where the list of shares
-this account can reach is the answer to "where would I even look", and it comes back in the
-time the sweep and the enumeration take. The report says that nothing was read, so the
-absence of credentials is not mistaken for a result.
+**`-ListSharesOnly`**: останавливается после списка доступных для чтения общих ресурсов —
+файлы не читаются, учётные данные не ищутся. Удобно для первого прохода по незнакомому
+домену, когда нужен лишь ответ «где вообще искать»; время ограничено проверкой
+доступности и перечислением. Отчёт явно пишет, что содержимое не прочитано, чтобы
+отсутствие найденных паролей не было принято за результат полной проверки.
 
-**What it says about what it did not cover**: every limit reached and everything left out is
-counted - computers outside the domain's name or without one, hosts that do not answer,
-hosts that did not list their shares and why, administrative and SYSVOL shares, shares it
-may list but not read, files it could not read, and files over the size limit. A share whose
-walk was stopped carries `notFullySearched` with the reason; a share without that row was
-walked to its end. The all-clear is a note, never "secure": a share is read only as far as
-this account and the limits allowed.
+**Непроверенные области**: каждый достигнутый предел и каждый пропуск подсчитываются:
+компьютеры вне доменного имени или без него, неответившие узлы, узлы без доступного
+перечня ресурсов (с причиной), административные ресурсы и SYSVOL, ресурсы, которые
+можно перечислить, но нельзя читать, недоступные файлы, файлы больше лимита.
+Ресурс, обход которого прерван, содержит `notFullySearched` с причиной; если строки нет,
+ресурс обойдён полностью. Сообщение об отсутствии находок — *примечание*, но никогда
+не «безопасно»: проверено ровно столько, сколько позволили права и лимиты.
 
-**Security Impact**: a password in a script or configuration file on a share is readable by
-everyone who can read the share - usually far more people than the account it belongs to was
-meant for - and unlike SYSVOL nobody reviews who that is.
+**Влияние на безопасность**: пароль в сценарии либо файле настроек общего ресурса
+читают все, кому разрешён сам ресурс, — часто гораздо больше людей, чем следовало бы
+допускать к учётной записи; в отличие от SYSVOL, такой доступ редко пересматривают.
 
-**Usage**:
+**Использование**:
 ```powershell
 Invoke-ShareHunt
 Invoke-ShareHunt -ComputerName fs01.contoso.com, fs02.contoso.com -MaxDepth 8
@@ -1759,8 +1759,8 @@ Invoke-adPEAS -Module Shares
 
 ---
 
-## Navigation
+## Навигация
 
-- [Previous: Authentication-Methods](03-Authentication-Methods.md)
-- [Next: BloodHound-Collector](05-BloodHound-Collector.md)
-- [Back to Home](00-Home.md)
+- [Назад: методы аутентификации](03-Authentication-Methods.md)
+- [Далее: сборщик BloodHound](05-BloodHound-Collector.md)
+- [На главную](00-Home.md)
