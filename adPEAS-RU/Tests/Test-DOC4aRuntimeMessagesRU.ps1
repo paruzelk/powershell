@@ -66,7 +66,7 @@ $critical=@{
  'src/modules/Checks/ADCS/Get-WeakCertificateMapping.ps1'=@(
   'NTAuth','Schannel','PKINIT','certutil -viewstore -enterprise NTAuth')
  'src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1'=@(
-  'КРИТИЧЕСКИЙ РИСК','без встречной ссылки','непривилегированных','dMSA')
+  'КРИТИЧЕСКИЙ РИСК','без встречной ссылки','субъекты помимо администраторов','dMSA')
 }
 foreach($entry in $critical.GetEnumerator()){
  $text=[IO.File]::ReadAllText((Join-Path $ProjectRoot $entry.Key),[Text.Encoding]::UTF8)
