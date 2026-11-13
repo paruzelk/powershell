@@ -16,7 +16,7 @@ $anchor='        // Scoring context data for context-aware risk calculation'
 $render='            tooltip.innerHTML = formatScoreBreakdownHtml(breakdown);'
 foreach($gate in @($anchor,$render)) {
     $n=([regex]::Matches($js,[regex]::Escape($gate))).Count
-    if($n -ne 1){throw "DOC4i: $gate: ожидалось 1 совпадение, найдено $n"}
+    if($n -ne 1){throw "DOC4i: ${gate}: ожидалось 1 совпадение, найдено $n"}
 }
 if($js.Contains('function ruDOC4iGpoHeaders')){throw 'DOC4i уже применён'}
 $block=@'
