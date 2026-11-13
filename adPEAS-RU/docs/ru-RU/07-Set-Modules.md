@@ -785,9 +785,9 @@ Set-DomainGPO -Identity "Script Policy" -RemoveStartupScript -ScriptName "update
 
 ## Set-DomainObject
 
-Low-level function for modifying any AD object. Used internally by other Set-* functions.
+Низкоуровневая функция изменения любых объектов AD. Другие функции Set-* используют её внутри.
 
-### Syntax
+### Синтаксис
 
 ```powershell
 Set-DomainObject
@@ -810,9 +810,9 @@ Set-DomainObject
     [-Credential <PSCredential>]
 ```
 
-### Architecture
+### Архитектура
 
-Set-DomainObject uses the unified `LdapConnection` architecture with `ModifyRequest`:
+Set-DomainObject использует единую архитектуру `LdapConnection` с запросами `ModifyRequest`:
 
 ```
 Set-DomainObject
@@ -838,122 +838,122 @@ Set-DomainObject
             +-> $Script:LdapConnection.SendRequest()
 ```
 
-### Available Operations
+### Доступные операции
 
-| Operation | Parameter | Description |
+| Операция | Параметр | Описание |
 |-----------|-----------|-------------|
-| **Set Attributes** | `-Set` | Replace attribute values |
-| **Append Values** | `-Append` | Add to multi-valued attributes |
-| **Remove Values** | `-Remove` | Remove from multi-valued attributes |
-| **Clear Attributes** | `-Clear` | Remove all values from attributes |
-| **Grant ACE** | `-GrantACE -Principal -Rights` | Add Allow ACE |
-| **Revoke ACE** | `-RevokeACE -Principal -Rights` | Remove ACE |
-| **Deny ACE** | `-DenyACE -Principal -Rights` | Add Deny ACE |
-| **Clear ACE** | `-ClearACE -Principal` | Remove all ACEs for principal |
-| **Set Owner** | `-SetOwner -Principal` | Change object owner |
+| **Установить атрибуты** | `-Set` | Заменить значения атрибутов |
+| **Добавить значения** | `-Append` | Добавить элементы в многозначные атрибуты |
+| **Удалить значения** | `-Remove` | Удалить элементы многозначных атрибутов |
+| **Очистить атрибуты** | `-Clear` | Удалить все значения атрибутов |
+| **Выдать ACE** | `-GrantACE -Principal -Rights` | Добавить разрешающую ACE (Allow) |
+| **Отозвать ACE** | `-RevokeACE -Principal -Rights` | Удалить ACE |
+| **Запретить через ACE** | `-DenyACE -Principal -Rights` | Добавить запрещающую ACE (Deny) |
+| **Очистить ACE** | `-ClearACE -Principal` | Удалить все ACE указанного субъекта |
+| **Установить владельца** | `-SetOwner -Principal` | Изменить владельца объекта |
 
-### Parameters (Attribute Operations)
+### Параметры операций с атрибутами
 
-| Parameter | Type | Description |
+| Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `-Identity` | String | Object identity (sAMAccountName, DN, SID) |
-| `-SearchBase` | String | Alternative SearchBase (DN) |
-| `-Set` | Hashtable | Attributes to set (replace values) |
-| `-Append` | Hashtable | Values to append (multi-valued attributes) |
-| `-Remove` | Hashtable | Values to remove (multi-valued attributes) |
-| `-Clear` | String[] | Attributes to clear (remove all values) |
+| `-Identity` | String | Идентификатор объекта (sAMAccountName, DN, SID) |
+| `-SearchBase` | String | Альтернативная база поиска (DN) |
+| `-Set` | Hashtable | Атрибуты для установки (замена значений) |
+| `-Append` | Hashtable | Значения для добавления в многозначные атрибуты |
+| `-Remove` | Hashtable | Значения для удаления из многозначных атрибутов |
+| `-Clear` | String[] | Атрибуты для полной очистки |
 
-### Parameters (ACL Operations)
+### Параметры операций с ACL
 
-| Parameter | Type | Description |
+| Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `-Principal` | String | Security principal (user/group) for ACL modification |
-| `-Rights` | String | AD rights to grant/revoke (GenericAll, WriteDacl, etc.) |
-| `-ExtendedRight` | String | Extended right alias (DCSync, ResetPassword, etc.) |
-| `-GrantACE` | Switch | Add Allow ACE |
-| `-RevokeACE` | Switch | Remove ACE |
-| `-DenyACE` | Switch | Add Deny ACE |
-| `-ClearACE` | Switch | Remove all ACEs for principal |
-| `-SetOwner` | Switch | Change object owner |
+| `-Principal` | String | Субъект безопасности (пользователь/группа), права которого меняются |
+| `-Rights` | String | Права AD для выдачи/отзыва (GenericAll, WriteDacl и т. д.) |
+| `-ExtendedRight` | String | Псевдоним расширенного права (DCSync, ResetPassword и др.) |
+| `-GrantACE` | Switch | Добавить разрешающую ACE (Allow) |
+| `-RevokeACE` | Switch | Удалить ACE |
+| `-DenyACE` | Switch | Добавить запрещающую ACE (Deny) |
+| `-ClearACE` | Switch | Удалить все ACE указанного субъекта |
+| `-SetOwner` | Switch | Изменить владельца объекта |
 
-### Extended Right Aliases
+### Псевдонимы расширенных прав
 
-| Alias | Description |
+| Псевдоним | Описание |
 |-------|-------------|
-| `DCSync` | All 3 DCSync rights (Get-Changes + Get-Changes-All + Get-Changes-In-Filtered-Set) |
-| `ForceChangePassword` | Reset user password (User-Force-Change-Password) |
-| `ResetPassword` | Alias for ForceChangePassword |
-| `AddMember` | Add to group (Self-Membership WriteProperty) |
-| `SendAs` | Send as user (Exchange) |
-| `ReceiveAs` | Receive as user (Exchange) |
-| `ReadLAPSPassword` | Read LAPS password (ms-Mcs-AdmPwd ReadProperty) |
-| `CertEnroll` | Certificate enrollment |
-| `AutoEnroll` | Certificate auto-enrollment |
-| `AllowedToAuthenticate` | Allowed to authenticate |
-| `ReplicateDirectory` | Replicate directory changes |
-| `InstallReplica` | Install domain replica |
-| `CloneDC` | Clone a domain controller |
-| `MigrateSIDHistory` | Migrate SID history |
-| `ApplyGroupPolicy` | Apply group policy |
-| `CreateGPOLink` | Create GPO link |
-| `GenerateRSoPLogging` | Generate RSoP logging data |
-| `GenerateRSoPPlanning` | Generate RSoP planning data |
-| `ReanimateTombstones` | Reanimate tombstoned objects |
-| `SelfMembership` | Add/remove self from group |
-| `AllExtendedRights` | All extended rights (dangerous!) |
+| `DCSync` | Все три права DCSync (Get-Changes + Get-Changes-All + Get-Changes-In-Filtered-Set) |
+| `ForceChangePassword` | Сбросить пароль пользователя (User-Force-Change-Password) |
+| `ResetPassword` | Псевдоним ForceChangePassword |
+| `AddMember` | Добавить участника в группу (Self-Membership WriteProperty) |
+| `SendAs` | Отправлять от имени пользователя (Exchange) |
+| `ReceiveAs` | Получать от имени пользователя (Exchange) |
+| `ReadLAPSPassword` | Читать пароль LAPS (ms-Mcs-AdmPwd ReadProperty) |
+| `CertEnroll` | Получать сертификат |
+| `AutoEnroll` | Автоматически получать сертификат |
+| `AllowedToAuthenticate` | Право аутентификации |
+| `ReplicateDirectory` | Реплицировать изменения каталога |
+| `InstallReplica` | Установить реплику домена |
+| `CloneDC` | Клонировать контроллер домена |
+| `MigrateSIDHistory` | Переносить историю SID |
+| `ApplyGroupPolicy` | Применять групповую политику |
+| `CreateGPOLink` | Создавать привязку GPO |
+| `GenerateRSoPLogging` | Генерировать журналирование RSoP |
+| `GenerateRSoPPlanning` | Генерировать данные планирования RSoP |
+| `ReanimateTombstones` | Восстанавливать удалённые объекты (tombstones) |
+| `SelfMembership` | Добавлять/удалять себя из группы |
+| `AllExtendedRights` | Все расширенные права (опасно!) |
 
-### Examples
+### Примеры
 
 ```powershell
-# Set attribute
+# Установить значение атрибута
 Set-DomainObject -Identity "jdoe" -Set @{description = "Test User"}
 
-# Append to multi-valued attribute
+# Добавить значение в многозначный атрибут
 Set-DomainObject -Identity "jdoe" -Append @{servicePrincipalName = "HTTP/web01"}
 
-# Remove specific value
+# Удалить определённое значение
 Set-DomainObject -Identity "jdoe" -Remove @{servicePrincipalName = "HTTP/web01"}
 
-# Clear attribute
+# Очистить атрибут
 Set-DomainObject -Identity "jdoe" -Clear @("description")
 
-# Grant DCSync rights
+# Выдать права DCSync
 Set-DomainObject -Identity "DC=contoso,DC=com" -Principal "CONTOSO\attacker" -ExtendedRight "DCSync" -GrantACE
-# Attacker can now DCSync!
+# Теперь субъект может использовать DCSync!
 
-# Grant GenericAll on user
+# Выдать пользователю GenericAll
 Set-DomainObject -Identity "CN=AdminUser,CN=Users,DC=contoso,DC=com" -Principal "CONTOSO\attacker" -Rights "GenericAll" -GrantACE
 
-# Take ownership
+# Получить владение объектом
 Set-DomainObject -Identity "jdoe" -Principal "CONTOSO\newowner" -SetOwner
 
-# Revoke ACE (cleanup)
+# Отозвать ACE (очистка)
 Set-DomainObject -Identity "DC=contoso,DC=com" -Principal "CONTOSO\attacker" -ExtendedRight "DCSync" -RevokeACE
 ```
 
-### Return Value
+### Возвращаемое значение
 
-Returns `$true` on success, `$false` on failure.
+При успехе возвращает `$true`, при ошибке — `$false`.
 
 ---
 
 ## Move-DomainObject
 
-Moves an object to a different container and/or renames it, via LDAP ModifyDN.
+Перемещает объект в другой контейнер и/или переименовывает его через LDAP ModifyDN.
 
-An object's OU membership is **not an attribute**. It is the object's position in the directory tree, carried by its `distinguishedName` — there is nothing to write, which is why `Set-DomainObject` cannot relocate an object and this is a function of its own. Moving and renaming are the same LDAP operation (`ModifyDN`, RFC 4511), so one request can do either or both.
+Принадлежность объекта к OU — **не атрибут**. Она определяется расположением объекта в дереве каталога и отражена в `distinguishedName`: записать новое значение отдельным изменением атрибута нельзя. Поэтому `Set-DomainObject` не умеет перемещать объекты и существует отдельная функция. Перемещение и переименование — одна LDAP-операция (`ModifyDN`, RFC 4511), позволяющая выполнить оба действия одним запросом.
 
-Works on **any** object class: users, computers, groups, GPOs, and organizational units including their entire subtree.
+Работает с **любыми классами объектов**: пользователями, компьютерами, группами, GPO, OU, включая целое поддерево.
 
-### Available Operations
+### Доступные операции
 
-| Operation | Parameter | Description | Attack Technique |
+| Операция | Параметр | Описание | Техника атаки |
 |-----------|-----------|-------------|------------------|
-| **Move** | `-DestinationOU` | Relocate object to another container | Apply a different GPO, or escape a hardening GPO |
-| **Rename** | `-NewName` | Change the object's RDN | Camouflage |
-| **Move + Rename** | both | Both in a single ModifyDN request | Relocate while camouflaging |
+| **Переместить** | `-DestinationOU` | Переместить объект в другой контейнер | Применение другой GPO либо обход политики усиления защиты |
+| **Переименовать** | `-NewName` | Изменить RDN объекта | Маскировка |
+| **Переместить и переименовать** | оба | Обе операции одним ModifyDN-запросом | Перемещение с маскировкой |
 
-### Syntax
+### Синтаксис
 
 ```powershell
 Move-DomainObject
@@ -966,101 +966,101 @@ Move-DomainObject
     [-Credential <PSCredential>]
 ```
 
-At least one of `-DestinationOU` and `-NewName` is required.
+Требуется хотя бы один из ключей `-DestinationOU` и `-NewName`.
 
-`-NewName` takes a **bare value without the attribute prefix** — `"Jane Smith"`, not `"CN=Jane Smith"`. The attribute type is carried over from the current RDN, because AD does not allow changing it (a `CN` cannot become an `OU`). Escaping is applied for you, so a name containing a comma, a leading `#` or a trailing space is handled correctly.
+`-NewName` принимает **только имя без префикса атрибута** — `"Jane Smith"`, а не `"CN=Jane Smith"`. Тип атрибута берётся из текущего RDN, поскольку AD не разрешает изменять его (CN нельзя превратить в OU). Экранирование выполняется автоматически: запятая в имени, начальный `#` или завершающий пробел обрабатываются корректно.
 
-An identity that matches more than one object is rejected rather than resolved to the first match — pass a `distinguishedName` to disambiguate.
+Если идентификатор соответствует нескольким объектам, функция возвращает ошибку вместо выбора первого. Для однозначного поиска задавайте `distinguishedName`.
 
-### Required Permissions
+### Необходимые разрешения
 
-A move needs rights at **both ends**, which is the usual reason it fails:
+Для перемещения нужны разрешения **на обоих концах операции**; их отсутствие — обычная причина отказа:
 
-| Right | Where |
+| Право | Где требуется |
 |-------|-------|
-| `Delete Child` for the object's class | the **source** container |
-| `Create Child` for the object's class | the **target** container |
+| `Delete Child` для класса объекта | в **исходном** контейнере |
+| `Create Child` для класса объекта | в **целевом** контейнере |
 
-A move consumes the delete right, so write access to the target alone is not enough. A "protected from accidental deletion" ACE (`Deny Delete` / `Delete Tree` on Everyone) on the object blocks the move even for an account that holds both rights. A pure rename needs `WriteProperty` on the naming attribute (`cn` / `ou` / `name`) instead.
+Перемещение использует право удаления, поэтому одной записи в целевом контейнере недостаточно. Защитная ACE «запрет случайного удаления» (`Deny Delete` / `Delete Tree` для Everyone) на самом объекте блокирует перемещение даже при наличии обоих прав. Для простого переименования вместо этого требуется `WriteProperty` на атрибуте имени (`cn` / `ou` / `name`).
 
-Check both ends before trying:
+Проверьте оба контейнера перед операцией:
 
 ```powershell
 Get-ObjectACL -Identity "OU=Finance,DC=contoso,DC=com" -WriteOnly
 Get-ObjectACL -Identity "OU=Sales,DC=contoso,DC=com" -WriteOnly
 ```
 
-`Create Child` on an OU is what [Get-AddComputerRights](04-Security-Checks.md#get-addcomputerrights) and [Get-GPOPermissions](04-Security-Checks.md#get-gpopermissions) report — those findings are what make a move possible in the first place.
+Право `Create Child` в OU показывают [Get-AddComputerRights](04-Security-Checks.md#get-addcomputerrights) и [Get-GPOPermissions](04-Security-Checks.md#get-gpopermissions): эти находки объясняют, почему перемещение вообще может быть разрешено.
 
-### What a Move Changes
+### Что меняется при перемещении
 
 | | |
 |---|---|
-| **Unchanged** | `objectGUID`, `objectSID`, group memberships, Kerberos principal, every ACE that references the object |
-| **Changed** | which GPOs apply, which delegated ACLs reach the object, the `distinguishedName` |
+| **Не изменяется** | `objectGUID`, `objectSID`, членство в группах, принципал Kerberos и все ACE со ссылкой на объект |
+| **Изменяется** | применяемые GPO, достигающие объект делегированные ACL и `distinguishedName` |
 
-Because the SID survives, the account keeps working the moment the move completes. What actually changes is its policy and delegation context — which is usually the point of moving it.
+Поскольку SID сохраняется, учётная запись продолжает работать сразу после перемещения. Изменяются прежде всего политика и контекст делегирования.
 
-### Examples
+### Примеры
 
 ```powershell
-# Move a user to another OU
+# Переместить пользователя в другую OU
 Move-DomainObject -Identity "jdoe" -DestinationOU "OU=Sales,DC=contoso,DC=com"
 
-# Rename in place - the comma is escaped automatically
+# Переименовать на месте (запятая экранируется автоматически)
 Move-DomainObject -Identity "jdoe" -NewName "Doe, Jane"
-# Object is now CN=Doe\, Jane,OU=Finance,DC=contoso,DC=com
+# Новый DN: CN=Doe\, Jane,OU=Finance,DC=contoso,DC=com
 
-# Move and rename in a single request
+# Переместить и переименовать одним запросом
 Move-DomainObject -Identity "CN=WS01,CN=Computers,DC=contoso,DC=com" -DestinationOU "OU=Tier0,DC=contoso,DC=com" -NewName "WS01-T0"
 
-# Move an entire OU with its subtree
+# Переместить целую OU со всем поддеревом
 Move-DomainObject -Identity "OU=Old,DC=contoso,DC=com" -DestinationOU "OU=Archive,DC=contoso,DC=com"
 
-# Escalation: move a controlled computer into an OU where a privileged GPO applies
+# Проверка повышения привилегий: переместить контролируемый компьютер в OU с привилегированной GPO
 Move-DomainObject -Identity "EVILPC$" -DestinationOU "OU=Tier0 Servers,DC=contoso,DC=com"
-# On the next policy refresh the computer applies that OU's GPOs - including any
-# Restricted Groups membership or startup script they deploy
+# При следующем обновлении политик компьютер получит GPO этой OU, включая
+# назначения Restricted Groups и развёрнутые сценарии запуска.
 
-# The defensive inverse: move a host OUT of the OU that applies a hardening GPO
+# Обратный защитный сценарий: вывести узел ИЗ OU, назначающей защитную GPO
 Move-DomainObject -Identity "SRV01$" -DestinationOU "OU=Unmanaged,DC=contoso,DC=com"
-# The host stops receiving the hardening policy on the next refresh
+# При следующем обновлении узел перестанет получать защитную политику.
 
-# Scripted use
+# Использование в сценарии
 $result = Move-DomainObject -Identity "jdoe" -DestinationOU "OU=Sales,DC=contoso,DC=com" -PassThru
 $result.NewDistinguishedName
 
-# Cleanup: move it back
+# Очистка: вернуть объект на место
 Move-DomainObject -Identity "jdoe" -DestinationOU "OU=Finance,DC=contoso,DC=com"
 ```
 
-### Validation Before the Write
+### Проверки перед записью
 
-These cases are rejected before any request is sent, because the DC's own error for each of them points away from the cause:
+Следующие случаи отклоняются до отправки запроса, потому что ответная ошибка DC недостаточно явно указывает причину:
 
-| Rejected | Why the DC's own error misleads |
+| Отклоняемое условие | Почему ошибка DC вводит в заблуждение |
 |----------|---------------------------------|
-| Destination in **another domain** | `affectsMultipleDSAs` — ModifyDN cannot cross a domain boundary. A cross-domain move is a different operation entirely, requiring SID history. |
-| Destination is the object itself or **below it** | `unwillingToPerform`. Easy to hit when moving an OU — it would detach the subtree. |
-| Destination container missing or unreadable | `noSuchObject`, which could equally mean the source object. |
-| `systemFlags` forbids move or rename | A bare `unwillingToPerform` with no stated reason. |
-| Object already at that location and name | Reported as a no-op; nothing is written. |
+| Цель в **другом домене** | `affectsMultipleDSAs`: ModifyDN не может пересекать границу домена. Междоменное перемещение — другая операция, требующая истории SID. |
+| Целевой контейнер совпадает с объектом или **находится внутри него** | `unwillingToPerform`: при переносе OU это разорвало бы поддерево. |
+| Контейнер назначения отсутствует или недоступен для чтения | `noSuchObject` может также означать отсутствие исходного объекта. |
+| `systemFlags` запрещает перенос или переименование | Возвращается `unwillingToPerform` без явной причины. |
+| Объект уже имеет этот путь и имя | Сообщается об отсутствии изменений; запись не выполняется. |
 
-**Permissions are not pre-checked.** The DC decides that when the write is sent, so a move can still fail after every check above has passed — lacking rights is the most common outcome in practice. `ModifyDN` is atomic, so a rejected move leaves the object untouched: there is no partial or half-moved state. On failure, the error names the rights the operation needs.
+**Разрешения предварительно не проверяются.** Контроллер домена решает вопрос доступа при записи, поэтому перемещение может завершиться отказом даже после успешных предварительных проверок. Недостаточные права — наиболее распространённая причина. `ModifyDN` атомарен: при отказе объект остаётся на месте, состояния «частично перемещён» не бывает. Ошибка указывает необходимые права.
 
-### Return Value
+### Возвращаемое значение
 
-Returns `$true` on success, or when the object is already in place. Returns `$false` on failure.
+Возвращает `$true` при успехе или если объект уже на месте, `$false` — при ошибке.
 
-With `-PassThru`, returns an object with `Operation`, `Object`, `NewDistinguishedName`, `ObjectClass`, `Success` and `Message`, plus `ResultCode` and `ResultName` when the directory rejected the write.
+С `-PassThru` возвращает объект со свойствами `Operation`, `Object`, `NewDistinguishedName`, `ObjectClass`, `Success` и `Message`; при отказе каталога дополнительно содержит `ResultCode` и `ResultName`.
 
 ---
 
 ## New-DomainUser
 
-Creates a new user account in Active Directory via DirectoryEntry.
+Создаёт новую учётную запись пользователя в AD с помощью DirectoryEntry.
 
-### Syntax
+### Синтаксис
 
 ```powershell
 New-DomainUser
@@ -1075,43 +1075,43 @@ New-DomainUser
     [-Credential <PSCredential>]
 ```
 
-### Parameters
+### Параметры
 
-| Parameter | Type | Description |
+| Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `-Name` | String | sAMAccountName for the new user. Also used for CN and UPN. |
-| `-Password` | String | Password for the new user (plaintext). If not specified, a random 20-character complex password is generated. |
-| `-OrganizationalUnit` | String | DistinguishedName of the OU where the user should be created. Default: CN=Users,DC=domain,DC=com |
-| `-Description` | String | Description attribute for the user account. |
-| `-Enabled` | Boolean | Whether the account should be enabled after creation. Default: $true |
-| `-PassThru` | Switch | Returns a result object instead of console output. Useful for scripting. |
-| `-Domain` | String | Target domain (FQDN) |
-| `-Server` | String | Specific Domain Controller to target |
-| `-Credential` | PSCredential | PSCredential object for authentication |
+| `-Name` | String | sAMAccountName нового пользователя; также используется для CN и UPN |
+| `-Password` | String | Пароль нового пользователя открытым текстом; если не задан, генерируется случайный сложный пароль из 20 символов |
+| `-OrganizationalUnit` | String | DistinguishedName OU для создания; по умолчанию CN=Users,DC=domain,DC=com |
+| `-Description` | String | Описание учётной записи пользователя |
+| `-Enabled` | Boolean | Включить ли учётную запись после создания; по умолчанию `$true` |
+| `-PassThru` | Switch | Вернуть объект результата вместо консольного вывода (для сценариев) |
+| `-Domain` | String | Целевой домен (FQDN) |
+| `-Server` | String | Целевой контроллер домена |
+| `-Credential` | PSCredential | Объект PSCredential для аутентификации |
 
-### Examples
+### Примеры
 
 ```powershell
-# Create user with auto-generated password
+# Создать пользователя с автоматически сгенерированным паролем
 New-DomainUser -Name "testuser"
 
-# Create user with custom password
+# Создать пользователя со своим паролем
 New-DomainUser -Name "testuser" -Password "P@ssw0rd123!"
 
-# Create user in specific OU
+# Создать пользователя в определённой OU
 New-DomainUser -Name "serviceaccount" -Password "C0mpl3x!" -OrganizationalUnit "OU=Service Accounts,DC=contoso,DC=com"
 
-# Create disabled user
+# Создать отключённого пользователя
 New-DomainUser -Name "serviceaccount" -Enabled $false
 
-# Create user and capture result for scripting
+# Создать пользователя и сохранить результат для сценария
 $result = New-DomainUser -Name "testuser" -PassThru
 if ($result.Success) {
     Write-Host "Password: $($result.Password)"
 }
 ```
 
-### Output (Console)
+### Пример консольного вывода
 
 ```
 [+] Successfully created user: testuser
@@ -1120,7 +1120,7 @@ Enabled                                      True
 Password (SAVE THIS!)                        K8#mP2@xL9!nQ4$wR7
 ```
 
-### Output (-PassThru)
+### Результат (-PassThru)
 
 ```powershell
 [PSCustomObject]@{
@@ -1138,9 +1138,9 @@ Password (SAVE THIS!)                        K8#mP2@xL9!nQ4$wR7
 
 ## New-DomainComputer
 
-Creates a new computer account in Active Directory via DirectoryEntry.
+Создаёт новую учётную запись компьютера AD через DirectoryEntry.
 
-### Syntax
+### Синтаксис
 
 ```powershell
 New-DomainComputer
@@ -1155,46 +1155,46 @@ New-DomainComputer
     [-Credential <PSCredential>]
 ```
 
-### Parameters
+### Параметры
 
-| Parameter | Type | Description |
+| Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `-Name` | String | sAMAccountName for the new computer. Will automatically add $ suffix if not present. |
-| `-Password` | String | Password for the new computer account (plaintext). If not specified, a random 20-character complex password is generated. |
-| `-OrganizationalUnit` | String | DistinguishedName of the OU where the computer should be created. Default: CN=Computers,DC=domain,DC=com |
-| `-Description` | String | Description attribute for the computer account. |
-| `-Enabled` | Boolean | Whether the account should be enabled after creation. Default: $true |
-| `-PassThru` | Switch | Returns a result object instead of console output. Useful for scripting. |
-| `-Domain` | String | Target domain (FQDN) |
-| `-Server` | String | Specific Domain Controller to target |
-| `-Credential` | PSCredential | PSCredential object for authentication |
+| `-Name` | String | sAMAccountName нового компьютера; суффикс $ добавляется автоматически, если отсутствует |
+| `-Password` | String | Пароль компьютера открытым текстом; если не задан, генерируется сложный случайный пароль из 20 символов |
+| `-OrganizationalUnit` | String | DistinguishedName OU для создания; по умолчанию CN=Computers,DC=domain,DC=com |
+| `-Description` | String | Атрибут описания учётной записи компьютера |
+| `-Enabled` | Boolean | Включить ли учётную запись после создания; по умолчанию `$true` |
+| `-PassThru` | Switch | Вернуть объект результата вместо консольного вывода (для сценариев) |
+| `-Domain` | String | Целевой домен (FQDN) |
+| `-Server` | String | Целевой контроллер домена |
+| `-Credential` | PSCredential | Объект PSCredential для аутентификации |
 
-### Use Cases
+### Сценарии использования
 
-By default, MachineAccountQuota allows all domain users to create up to 10 computer objects. This can be exploited for:
+По умолчанию параметр MachineAccountQuota позволяет всем пользователям домена создавать до десяти объектов компьютеров. Это может использоваться в:
 
-- **RBCD Attacks**: Create computer account → Configure delegation → Impersonate users
-- **Relay Attacks**: Create machine account for relay targets
-- **Persistence**: Create hidden computer accounts
+- **Атаках RBCD**: создать учётную запись компьютера → настроить делегирование → выступать от имени пользователей.
+- **Атаках с ретрансляцией**: создать компьютерную запись для целевых объектов ретрансляции.
+- **Закреплении доступа**: создать скрытые учётные записи компьютеров.
 
-### Examples
+### Примеры
 
 ```powershell
-# Create computer with auto-generated password
+# Создать компьютер с автоматически сгенерированным паролем
 New-DomainComputer -Name "FAKE-PC01"
 
-# Create computer with custom password (for RBCD attacks)
+# Создать компьютер со своим паролем (для проверки RBCD)
 New-DomainComputer -Name "RBCD-ATTACK" -Password "P@ssw0rd123!"
 
-# Create computer in specific OU
+# Создать компьютер в определённой OU
 New-DomainComputer -Name "TESTPC" -OrganizationalUnit "OU=Workstations,DC=contoso,DC=com"
 
-# Create computer and capture password for scripting
+# Создать компьютер и сохранить пароль для сценария
 $comp = New-DomainComputer -Name "BACKDOOR-PC" -PassThru
 Write-Host "Computer created! Password: $($comp.Password)"
 ```
 
-### Output (Console)
+### Пример консольного вывода
 
 ```
 [+] Successfully created computer: FAKE-PC01$
