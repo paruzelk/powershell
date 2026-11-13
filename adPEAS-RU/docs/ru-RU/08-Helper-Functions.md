@@ -490,7 +490,7 @@ $result.IsPrivileged  # $false (штатные права, не считаетс
 
 **Выявление внедрения SID History**:
 
-`Test-IsPrivileged` автоматически выявляет признаки внедрения SID History: проверяет, содержит ли атрибут sIDHistory субъекта привилегированные SID.
+Test-IsPrivileged автоматически выявляет признаки внедрения SID History: проверяет, содержит ли атрибут sIDHistory субъекта привилегированные SID.
 
 ```powershell
 $result = Test-IsPrivileged -Identity "suspicious_user"
@@ -574,7 +574,7 @@ $script = ConvertFrom-VBE -EncodedScript $vbeContent
 
 | Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `InputObject` | PSCustomObject | Объект из конвейера `Get-DomainUser` |
+| `InputObject` | PSCustomObject | Объект из конвейера Get-DomainUser |
 | `SAMAccountName` | String | sAMAccountName целевого пользователя |
 | `SPN` | String | Целевое имя участника службы SPN |
 | `Domain` | String | Целевой домен |
@@ -845,7 +845,7 @@ $linkage["{6AC1786C-016F-11D2-945F-00C04fB984F9}"]  # Массив OU, к кот
   его разрешает контроллер домена, но не другой сервер. Заданные отдельно цели и компьютеры
   домена сканируются вместе.
 
-Вызов без `-Target`/данных конвейера и без `-DomainComputers` завершается ошибкой, а не сканированием всего домена.
+Вызов без -Target/данных конвейера и без -DomainComputers завершается ошибкой, а не сканированием всего домена.
 `Invoke-adPEAS` не запускает сканирование портов.
 
 Каждый адрес сканируется однократно, даже если указан несколькими способами. Для пропущенных целей
