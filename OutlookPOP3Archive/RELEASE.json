@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3l DEV: operator ARCH3k real Plan/Audit PASS, original MailMover synthetic-only Part2 guard under existing ARCH3d fake TEMP (never real Outlook), bypass preverification index sync only for the fake, reject wrong Part1/Part3/target before fake MoveClaimed; original Archive/Resume/Auto unchanged, no live writer. 20 new Pester, expected 4378 tests / 146 containers.",
     "ARCH3k DEV read-only after operator confirmed one real ARCH3j Prepare/Review: immutable original Intent and OperationJournal SHA, full source ARCH2b witness, original Year Part2 and 500-entry shared index. Source-backed detection of unsafe generic original mover Part1 reuse and DuplicateIndex mutation before actual restart. Original MailMover restored unchanged, 13 new Pester tests, expected 4358/145 Windows PS5.1; NO live writer.",
     "ARCH3j DEV: source-backed exact original Year 2020 part2 one-shot route from immutable ARCH3i1 operator seal, protected real POP3 Inbox full SHA, read-only shared original DuplicateIndex checked fail-closed, evidence-only original OperationJournal Intent with protected local CreateNew+Flush(true), no Move/PST/AddStoreEx/index writes or production permit; 22 Pester tests, total expected 4344/144 Windows PS5.1.",
     "ARCH3i1: real original full witness Seal passed, public Review DateTime null binding corrected, only Mode RunId SealSha256 forwarded. Preserve existing evidence and no Move. 2 new actual CLI Pester regression cases, total expected 4323 tests in 143 containers.",
@@ -89,8 +90,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 145,
-    "ExpectedPesterTests": 4358,
+    "ExpectedTestContainers": 146,
+    "ExpectedPesterTests": 4378,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

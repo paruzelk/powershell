@@ -1,6 +1,17 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3l — защищённая граница original MailMover для Part2 (только синтетика)
+
+Операторский ARCH3k real `Plan` и `Audit` PASS: исходное письмо, оригинальный full witness, 500 записей `DuplicateIndex`, Year2020/Part2 подтверждены; общий `Move-OPAItemsWithLimit` опасен из-за выбора существующей Part1 и индексной синхронизации до перезапуска Outlook. **ARCH3l в исходном MailMover** добавляет `-ARCH3lSyntheticPart2Boundary`, доступный только вместе с `-ARCH3dSyntheticBoundary` в изолированной TEMP-фикстуре; запрещает index-heal, проверяет Part2 и целевую папку до fake MoveClaimed и не меняет оригинальное поведение без флага.
+
+```powershell
+Invoke-Pester -Path .\Tests\Archive\ARCH3lOriginalPart2SyntheticGate.Tests.ps1 -Output Detailed
+.\Invoke-CI.ps1
+```
+
+**Только синтетика; реального Move нет, PST/Index не затрагиваются.** [Контракт и ограничения ARCH3l](docs/2.6.5-arch3l-original-part2-synthetic-gate.md).
+
 ### ARCH3k — source-backed контроль границы оригинального MailMover (DEV, READ ONLY)
 
 **Реальный ARCH3j прошёл:** original `PrepareIntent` и ORIGINAL `OperationJournal Intent` записаны и независимо проверены, SHA256 сохранены. ARCH3k сверяет их с исходным full witness, тестовым POP3 Inbox, Original Year/Part2 и 500-записным shared DuplicateIndex. Аудитор фиксирует реальные препятствия к прямому вызову стандартного массового `Move-OPAItemsWithLimit`: он может выбрать старую Part1 и записать общий DuplicateIndex до независимого перезапуска Outlook. **Никакой новый writer не включён.**

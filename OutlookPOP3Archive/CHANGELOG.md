@@ -1,3 +1,9 @@
+## 2.6.5-ARCH3l DEV — 2026-11-13
+- Operator ARCH3k real Plan/Audit PASS, source ARCH2b witness 8782b410..., original Year2020 part2 contract, original shared 500-entry duplicate index, original SHA of MailMover accepted; still no real writer.
+- Original MailMover Move-OPAItemsWithLimit now supports opt-in ARCH3lSyntheticPart2Boundary strictly within existing ARCH3d synthetic TEMP and fake Outlook scope, Year/Limit 1, no Resume. Original behavior unchanged without switch.
+- ARCH3l refuses original Get-OPAArchiveDestination Part1/Part3/wrong folder before MoveClaimed; bypasses original shared DuplicateIndex Sync-OPADuplicateIndexFromJournal in SYNTHETIC mode only. The ARCH3d receipt still halts before DuplicateIndex append.
+- Additional 20 Pester regression tests; expected full 4378 tests in 146 containers under Windows PowerShell 5.1. No actual PST/Outlook writer or production permit.
+
 ## 2.6.5-ARCH3k DEV — 2026-11-13
 - Operator real ARCH3j Plan/WhatIf/Prepare/Review fully passed. Original protected one-time Intent SHA f0860d55..., Journal SHA a19f113a..., original ARCH2b full witness SHA 8782b410... accepted.
 - New read-only original MailMover risk audit uses exact sealed original source, real POP3 StoreID/FolderID/semantic SHA, original Year Part2 routing and original shared DuplicateIndex read-only. Detects generic mover Part1 reuse risk and index append before independent restart.
