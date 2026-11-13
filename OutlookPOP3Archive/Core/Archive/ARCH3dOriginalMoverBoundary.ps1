@@ -137,7 +137,14 @@ function Write-OPA265ARCH3dSyntheticBoundary {
             $p=Get-OPAArchivePartPath -SourcePst ([string]$Operation.SourcePst) -Year ([int]$Operation.Year) -Part $part
             if([IO.Path]::GetFullPath($p) -ieq [IO.Path]::GetFullPath($ArchivePst)){$validPart=$true;break}
         }
-        if(-not $validPart -or $TargetFolderPath -cne [string]$Operation.TargetFolderPath){
+        # Real Outlook FolderPath contains the PST Store name before the
+        # original relative Year\\Folder path. Accept either full or relative
+        # representation, but require an exact path-component suffix.
+        $expectedRelative=[string]$Operation.TargetFolderPath
+        $matchTarget=($TargetFolderPath -cne '' -and
+            ($TargetFolderPath -ceq $expectedRelative -or
+             $TargetFolderPath.EndsWith(('\\'+$expectedRelative),[StringComparison]::OrdinalIgnoreCase)))
+        if(-not $validPart -or -not $matchTarget){
             throw 'ARCH3d original year/part/target routing differs from declared plan.'
         }
     }
