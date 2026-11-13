@@ -307,7 +307,7 @@ adPEAS использует единый конвейер формировани
         )}
     )
     Extended = @(          # Collapsible attributes (severity == Standard)
-        # Same structure as Primary
+        # Та же структура, что и Primary
     )
     PostObject = @(        # Post-object lines (e.g., activityStatus)
         @{ Text; Severity }
@@ -463,7 +463,7 @@ function Get-SecurityCheck {
 
 ```powershell
 try {
-    # Operation
+    # Операция
 } catch {
     Write-Log "[FunctionName] Error: $_" -Level Error
 }
@@ -471,7 +471,7 @@ try {
 
 ---
 
-## Navigation
+## Навигация
 
 - [Назад: вспомогательные функции](08-Helper-Functions.md)
 - [Далее: оценка рисков](10-Risk-Scoring-System.md)
