@@ -105,7 +105,8 @@ if(-not $localize.Contains('Apply-DOC4cCheckTooltips.ps1')){
  throw 'DOC4c не включён в Localize-RU.ps1'
 }
 $apply=[IO.File]::ReadAllText((Join-Path $ProjectRoot 'Localization/Apply-DOC4cCheckTooltips.ps1'),[Text.Encoding]::UTF8)
-if(-not([IO.File]::ReadAllBytes((Join-Path $ProjectRoot 'Localization/Apply-DOC4cCheckTooltips.ps1'))[0..2] -join ' ' -eq '239 187 191')){
+$scriptBytes=[IO.File]::ReadAllBytes((Join-Path $ProjectRoot 'Localization/Apply-DOC4cCheckTooltips.ps1'))
+if($scriptBytes.Length -lt 3 -or $scriptBytes[0] -ne 239 -or $scriptBytes[1] -ne 187 -or $scriptBytes[2] -ne 191){
  throw 'Нет BOM у PowerShell-скрипта DOC4c'
 }
 $tokens=$null;$errors=$null
