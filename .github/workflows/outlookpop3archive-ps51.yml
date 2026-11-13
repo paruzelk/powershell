@@ -1,0 +1,56 @@
+name: OutlookPOP3Archive Windows PowerShell 5.1
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'OutlookPOP3Archive/**'
+      - '.github/workflows/outlookpop3archive-ps51.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'OutlookPOP3Archive/**'
+      - '.github/workflows/outlookpop3archive-ps51.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-ps51:
+    name: windows-ps51
+    runs-on: windows-2022
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: powershell
+        working-directory: OutlookPOP3Archive
+    steps:
+      - name: Checkout exact PR/commit source
+        uses: actions/checkout@v4
+
+      - name: Confirm Windows PowerShell 5.1 and install test modules
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($PSVersionTable.PSVersion.Major -ne 5) {
+            throw "Windows PowerShell 5.1 required, found $($PSVersionTable.PSVersion)."
+          }
+          Install-Module Pester -RequiredVersion '6.2.0' -Scope CurrentUser -Force -SkipPublisherCheck -ErrorAction Stop
+          Install-Module PSScriptAnalyzer -RequiredVersion '1.24.0' -Scope CurrentUser -Force -ErrorAction Stop
+          Import-Module Pester -RequiredVersion '6.2.0' -Force -ErrorAction Stop
+          Import-Module PSScriptAnalyzer -RequiredVersion '1.24.0' -Force -ErrorAction Stop
+
+      - name: Run project CI (no Outlook COM or PST)
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $releaseFile = Join-Path (Get-Location).Path 'RELEASE.json'
+          if (Test-Path -LiteralPath $releaseFile -PathType Leaf) {
+            $build = [string](Get-Content -LiteralPath $releaseFile -Raw | ConvertFrom-Json).Build
+            if ([string]::IsNullOrWhiteSpace($build)) { throw 'RELEASE.json does not specify Build.' }
+            & .\Invoke-CI.ps1 -ExpectedBuild $build
+          }
+          else {
+            # Compatibility with historic main (2.5.7) before migration.
+            & .\Invoke-CI.ps1
+          }
+          if (-not $?) { throw 'Invoke-CI.ps1 failed.' }
