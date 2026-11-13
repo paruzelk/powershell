@@ -226,3 +226,7 @@ if(-not $?){throw 'Ошибка локализации сообщений DOC4a'
 if(-not $?){throw 'Ошибка создания русских заголовков HTML DOC4b'}
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC4bVisibleValues.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка отображения значений атрибутов DOC4b'}
+
+# DOC4c: 125 индивидуальных справочных карточек; 490 полных критериев вместо шаблонов.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC4cCheckTooltips.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка предметной локализации справочных карточек DOC4c'}
