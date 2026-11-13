@@ -851,6 +851,11 @@ function Move-OPAItemsWithLimit {
                 $dest = Get-OPAArchiveDestination -Namespace $Namespace -Transaction $Transaction -SourcePst $Transaction.State.SourcePst -ReceivedTime $dt -ItemSize $itemSize -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ArchiveGrouping $ArchiveGrouping -SourceFolderName ([string]$source.Name) -SourceFolderPath $folderPath -AccountEmail ([string]$Transaction.State.AccountEmail)
             }
             catch {
+                if($ARCH3dSyntheticBoundary){
+                    # Intent may already be sealed: never downgrade failure
+                    # after destination choice to Skipped or retry another mail.
+                    throw ('ARCH3d protected destination outcome requires manual review: '+[string]$_.Exception.Message)
+                }
                 $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason=$(if ($_.Exception.Message -match 'exceeds safe archive PST capacity') { 'ExceedsArchiveCapacity' } else { 'DestinationFailed' }); Message=$_.Exception.Message; Time=(Get-Date).ToString('o')}) | Out-Null
                 Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message ("Destination selection failed and item was skipped: {0} | {1}" -f [string]$candidate.Subject,$_.Exception.Message) -EntryId ([string]$candidate.EntryId) -ReceivedTime $dt
                 continue
@@ -866,7 +871,10 @@ function Move-OPAItemsWithLimit {
             if ($allIndexes.ContainsKey($dest.Path)) { $index = $allIndexes[$dest.Path] }
             elseif ($sharedIndex) { $index = $sharedIndex; $allIndexes[$dest.Path] = $index }
             else { $index = Import-OPADuplicateIndex -ArchivePst $dest.Path; $allIndexes[$dest.Path] = $index }
-            if (Test-OPADuplicateEntry -Index $index -SourceEntryId ([string]$candidate.EntryId)) { continue }
+            if (Test-OPADuplicateEntry -Index $index -SourceEntryId ([string]$candidate.EntryId)) {
+                if($ARCH3dSyntheticBoundary){throw 'ARCH3d protected operation cannot skip after persisted PrepareIntent; manual review, no retry.'}
+                continue
+            }
 
             # ARCH2b: persist the exact ALREADY-SAVED source message user
             # content (including by-value attachment BYTE SHA256) before
@@ -983,6 +991,13 @@ function Move-OPAItemsWithLimit {
             }
         }
         catch {
+            if($ARCH3dSyntheticBoundary){
+                # An immutable PrepareIntent/MoveClaimed may already exist.
+                # Test-only protected mode NEVER converts an exception into a
+                # harmless Skipped row or normal completion; refuse rerun.
+                Sync-OPAStepJournalStreams
+                throw
+            }
             # Once Outlook.Move() has returned successfully, the source item
             # is no longer safely classifiable as "skipped". A failure in
             # post-move durability must stop the batch and be recovered from
