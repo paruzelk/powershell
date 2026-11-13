@@ -209,6 +209,47 @@ Invoke-adPEASCollector -CollectionMethod CertServices
 когда требуется сбор с компьютеров, локальных групп
 или активных сеансов.
 
+## Дополнения о методах и рёбрах графа (DOC5)
+
+### Учётные данные и сессия сборщика
+
+Invoke-adPEASCollector использует существующую сессию Connect-adPEAS либо собственные параметры Domain, Server, Credential. Результат ограничен правами выбранного субъекта. Сборщик не требует установки SharpHound.
+
+~~~powershell
+# Работа через сессию с защищённым LDAP.
+$cred = Get-Credential
+Connect-adPEAS -Domain 'example.local' -Credential $cred -UseLDAPS -IgnoreSSLErrors:$false
+Invoke-adPEASCollector -CollectionMethod DCOnly -OutputPath '.\Reports\bloodhound.zip'
+Disconnect-adPEAS
+
+# Прямой вызов с ограниченным методом.
+Invoke-adPEASCollector -Domain 'example.local' -Credential (Get-Credential) -CollectionMethod ObjectProps -OutputPath '.\Reports\objects.zip'
+~~~
+
+### Полный перечень методов на примерах
+
+DCOnly — наиболее полный метод LDAP-сбора adPEAS. Он не подключается к рядовым рабочим станциям/серверам для определения интерактивных сеансов или локальных администраторов. ObjectProps пропускает ACL, ACL фокусируется на правах, Trusts — на доверительных отношениях, Container — на дереве, CertServices — на объектах AD CS.
+
+~~~powershell
+Invoke-adPEASCollector -CollectionMethod DCOnly
+Invoke-adPEASCollector -CollectionMethod ObjectProps
+Invoke-adPEASCollector -CollectionMethod ACL
+Invoke-adPEASCollector -CollectionMethod Trusts
+Invoke-adPEASCollector -CollectionMethod Container
+Invoke-adPEASCollector -CollectionMethod CertServices
+
+# Доступные для просмотра файлы JSON без архива.
+Invoke-adPEASCollector -NoZip -PrettyPrint -OutputPath '.\Reports\bloodhound-json'
+~~~
+
+### Как понимать связи ACL и пропущенные данные
+
+Рёбра Owns, GenericAll, GenericWrite, WriteDacl, WriteOwner отражают владение и общие права. WriteSPN, AddKeyCredentialLink, AddAllowedToAct, AddMember и WriteGPLink относятся к конкретным атрибутам. GetChanges, GetChangesAll и GetChangesInFilteredSet характеризуют права репликации; наличие одного разрешения само по себе не доказывает возможность DCSync. ReadLAPSPassword и ReadGMSAPassword относятся к чтению секретов. Для AD CS используются Enroll, AutoEnroll, ManageCA и ManageCertificates.
+
+В схеме BloodHound CE v6 названия прав, свойства ObjectIdentifier, PrincipalSID, RightName и имена файлов JSON остаются **без перевода**. Экспорт может исключать системные SID S-1-5-18, S-1-3-0, S-1-5-10 из части рёбер — это фильтрация представления, а не изменение AD.
+
+SharpHound дополнительно умеет получать данные о локальных группах и сеансах рабочих станций, которых DCOnly не собирает. Отсутствие графовой связи в отчёте не следует трактовать как отсутствие возможного доступа в реальном домене.
+
 ## Навигация
 
 [Предыдущая: Проверки безопасности](04-Security-Checks.md) ·
