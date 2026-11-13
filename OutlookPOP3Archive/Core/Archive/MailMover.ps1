@@ -590,9 +590,17 @@ function Move-OPAItemsWithLimit {
         [switch]$Resume,
         # ARCH3d: test-only hooks within THIS legacy Move-OPAItemsWithLimit.
         # Real Outlook/PST must never enter this mode; default path unchanged.
-        [switch]$ARCH3dSyntheticBoundary
+        [switch]$ARCH3dSyntheticBoundary,
+        # ARCH3l is ONLY an additional fake-PST scope under ARCH3d;
+        # never authorizes an existing Outlook COM/PST writer.
+        [switch]$ARCH3lSyntheticPart2Boundary
     )
 
+    if($ARCH3lSyntheticPart2Boundary){
+        if(-not $ARCH3dSyntheticBoundary -or $Resume -or $ArchiveGrouping -cne 'Year' -or $Limit -ne 1){
+            throw 'ARCH3l accepts only ARCH3d synthetic one-shot Year Part2, never live Outlook/Resume.'
+        }
+    }
     if($ARCH3dSyntheticBoundary){
         # Must run before ANY original file/journal/destination side effects.
         if(-not (Get-Command Write-OPA265ARCH3cJsonOnce -ErrorAction SilentlyContinue)){
@@ -605,6 +613,9 @@ function Move-OPAItemsWithLimit {
         $arch3dScope=Assert-OPA265ARCH3dSyntheticBoundary -Namespace $Namespace -Transaction $Transaction -SourceFolders @($SourceFolders)
     }
 
+    if($ARCH3lSyntheticPart2Boundary){
+        . (Join-Path $PSScriptRoot 'ARCH3lOriginalPart2SyntheticGate.ps1')
+    }
     # SourceFolder may be a single Outlook Folder or an array. The array form
     # is the production path: one transaction spans the complete POP3 PST tree.
     $sourceFolders = @($SourceFolders) | Where-Object { $_ }
@@ -667,7 +678,11 @@ function Move-OPAItemsWithLimit {
         $sharedIndex = Import-OPADuplicateIndex -ArchivePst ([string]$existingArchivePaths[0].Path)
         # Heal from the durable step journal before selecting candidates: any
         # move journaled but not yet index-flushed (crashed run) is re-added.
-        [void](Sync-OPADuplicateIndexFromJournal -Transaction $Transaction -Index $sharedIndex -ArchivePst ([string]$existingArchivePaths[0].Path))
+        if(-not $ARCH3lSyntheticPart2Boundary){
+            [void](Sync-OPADuplicateIndexFromJournal -Transaction $Transaction -Index $sharedIndex -ArchivePst ([string]$existingArchivePaths[0].Path))
+        }
+        # ARCH3l reads the original shared DuplicateIndex but deliberately
+        # NEVER invokes the legacy pre-verification sync/write path.
         foreach ($p in @($existingArchivePaths | ForEach-Object { [string]$_.Path })) { $allIndexes[$p] = $sharedIndex }
     }
     elseif ($Resume) {
@@ -840,6 +855,9 @@ function Move-OPAItemsWithLimit {
             }
 
             $dt = [datetime]$candidate.ReceivedTime
+            if($ARCH3lSyntheticPart2Boundary){
+                [void](Assert-OPA265ARCH3lSyntheticPart2 -Scope $arch3dScope -Transaction $Transaction -Candidate $candidate -ExistingArchiveParts @($existingArchivePaths) -Stage BeforeDestination)
+            }
             if($ARCH3dSyntheticBoundary){
                 # This is the original MailMover loop. Persist the durable
                 # intent BEFORE Get-OPAArchiveDestination can create a PST.
@@ -861,6 +879,9 @@ function Move-OPAItemsWithLimit {
                 continue
             }
 
+            if($ARCH3lSyntheticPart2Boundary){
+                [void](Assert-OPA265ARCH3lSyntheticPart2 -Scope $arch3dScope -Transaction $Transaction -Candidate $candidate -ExistingArchiveParts @($existingArchivePaths) -Stage DestinationReady -Destination $dest)
+            }
             if($ARCH3dSyntheticBoundary){
                 # Bind actual rollover part chosen by ORIGINAL destination API.
                 $arch3dDestinationPath=[string]$dest.Path
