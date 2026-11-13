@@ -85,6 +85,7 @@ jobs:
           .\adPEAS-RU\Tests\Test-DOC2SecurityChecksRU.ps1
           .\adPEAS-RU\Tests\Test-DOC3TechnicalDocumentationRU.ps1
           .\adPEAS-RU\Tests\Test-DOC4aRuntimeMessagesRU.ps1
+          .\adPEAS-RU\Tests\Test-DOC4bReportEvidenceRU.ps1
           .\adPEAS-RU\Tests\Test-CheckSecureMessagesRU.ps1
           .\adPEAS-RU\Tests\Test-StageAVisibleMessages.ps1
           .\adPEAS-RU\Tests\Test-StageBVisibleMessages.ps1
@@ -104,16 +105,20 @@ jobs:
           $tempJs = Join-Path $env:RUNNER_TEMP "adpeas-expanded-report-check.js"
           [IO.File]::WriteAllText($tempJs, $runnable, (New-Object System.Text.UTF8Encoding($false)))
           node --check $tempJs
+      - name: DOC4b synthetic HTML/DOM value translations
+        shell: pwsh
+        run: |
+          node .\adPEAS-RU\Tests\Test-DOC4bHtmlFixture.js
       - name: Package verified RU build for public download
         if: github.event_name != 'pull_request'
         shell: powershell
         run: |
           $ErrorActionPreference = "Stop"
-          $archive = "adPEAS-RU-2.9.0-DOC4a-20261113.zip"
+          $archive = "adPEAS-RU-2.9.0-DOC4b-20261113.zip"
           if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force }
           Compress-Archive -Path "adPEAS-RU" -DestinationPath $archive -CompressionLevel Optimal
           $hash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
-          [IO.File]::WriteAllText("adPEAS-RU-2.9.0-DOC4a-20261113.sha256", "$hash  $archive"+[Environment]::NewLine, (New-Object Text.UTF8Encoding($false)))
+          [IO.File]::WriteAllText("adPEAS-RU-2.9.0-DOC4b-20261113.sha256", "$hash  $archive"+[Environment]::NewLine, (New-Object Text.UTF8Encoding($false)))
           Write-Host "RU BUILD ZIP SHA-256: $hash"
       - name: Upload full source and build artifacts
         if: github.event_name != 'pull_request'
@@ -122,8 +127,8 @@ jobs:
           name: adPEAS-RU-2.9.0-full-source
           path: |
             adPEAS-RU
-            adPEAS-RU-2.9.0-DOC4a-20261113.zip
-            adPEAS-RU-2.9.0-DOC4a-20261113.sha256
+            adPEAS-RU-2.9.0-DOC4b-20261113.zip
+            adPEAS-RU-2.9.0-DOC4b-20261113.sha256
           retention-days: 7
       - name: Commit complete project to dedicated branch
         if: github.event_name != 'pull_request'
@@ -132,7 +137,7 @@ jobs:
           $ErrorActionPreference = "Stop"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- adPEAS-RU adPEAS-RU-2.9.0-DOC4a-20261113.zip adPEAS-RU-2.9.0-DOC4a-20261113.sha256
+          git add -A -- adPEAS-RU adPEAS-RU-2.9.0-DOC4b-20261113.zip adPEAS-RU-2.9.0-DOC4b-20261113.sha256
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -m "adPEAS-RU: full pinned v2.9.0 sources, localized build and verified tests"
