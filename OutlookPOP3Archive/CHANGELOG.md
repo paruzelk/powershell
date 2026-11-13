@@ -2,7 +2,7 @@
 - Confirmed original ARCH3i1 Review PASS: exact operator real test POP3 source full SHA and protected evidence readback. Existing Archive-2020.pst preserved.
 - Added strict read-only original Year Part2 one-shot route + source identity witness SHA + shared DuplicateIndex check. Missing/truncated/indexed message STOPs with no writes. No old shared index healing/mutation.
 - Optional explicit evidence-only Prepare writes protected immutable original source PrepareIntent and ORIGINAL OperationJournal Intent, readback SHA, no PST AddStoreEx/Move or duplicate append.
-- 21 Pester cases; expected 4344 tests in 144 containers on Windows PowerShell 5.1. No production permit.
+- 22 Pester cases; expected 4345 tests in 144 containers on Windows PowerShell 5.1. No production permit.
 
 ## 2.6.5-ARCH3i1 DEV — 2026-11-13
 - Operator Plan and Seal PASS, RunId 3773bcd7-5a07-4c31-8ce5-dfb16ddd30bf; original full witness persisted and independently read back.

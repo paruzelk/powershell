@@ -82,7 +82,7 @@ jobs:
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed' -or
              $docs -cnotmatch 'ARCH2d' -or
              $tests -cnotmatch 'independently approves exact ten semantic matches' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
               throw 'ARCH2d real batch10 fail-closed, SHA witness, claim order or inventory gate incomplete.'
           }
@@ -115,7 +115,7 @@ jobs:
              $realCore -cnotmatch 'GlobalClaimPath' -or
              $realEntry -cnotmatch 'Invoke-OPA265ARCH2dBatch' -or
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
              throw 'ARCH2d3 synthetic fault matrix/no Outlook/real writer compatibility gate failed.'
           }
@@ -145,7 +145,7 @@ jobs:
              $entry -cmatch 'MoveBatch' -or
              $docs -cnotmatch 'PerItemReceiptsExternallyHashPinned' -or
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
              throw 'ARCH2d4 forensic pinned claims/return check and zero real write permissions gate failed.'
           }
@@ -175,7 +175,7 @@ jobs:
              $policy -cnotmatch 'FinalSealExternallyPinned' -or
              $entry -cnotmatch "ValidateSet\('Plan','Inventory','Prepare','MoveBatch','Evidence','Reconcile'\)" -or
              $docs -cnotmatch 'FinalSealSha256' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
               throw 'ARCH2d5 batch100 sealed receipt chain static safety gate failed.'
           }
@@ -207,7 +207,7 @@ jobs:
              $adr -cnotmatch 'ArchiveVerifier.ps1' -or
              $map -cnotmatch 'ARCH3a' -or
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
             throw 'ARCH3a exact original-code reuse/explicit open gaps/writer-closed safety contract missing.'
           }
@@ -239,7 +239,7 @@ jobs:
              $tests -cnotmatch 'durable Prepare intent MUST precede destination PST creation' -or
              $docs -cnotmatch 'ARCH3c' -or
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
             throw 'ARCH3b original MailMover source-backed identity and fail-closed no-write gate missing.'
           }
@@ -270,7 +270,7 @@ jobs:
              $tests -cnotmatch 'indeterminate synthetic crash after claim remains permanently unrepeatable' -or
              $docs -cnotmatch 'ARCH3c' -or
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
             throw 'ARCH3c synthetic ONLY original OperationJournal / SHA-anchored immutable evidence contract failed.'
           }
@@ -310,7 +310,7 @@ jobs:
              $t -cnotmatch 'executes original GetDestination AND exactly one mock Move' -or
              $docs -cnotmatch 'ARCH3d' -or
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
             throw 'ARCH3d original mover linked pre-PST claim, post-COM stop-before-index or no-real-PST safety contract invalid.'
           }
@@ -343,7 +343,7 @@ jobs:
              $t -cnotmatch 'original post-restart fake verifier PASS allows original OperationJournal Reconciled then DuplicateIndex' -or
              $docs -cnotmatch 'ARCH3e' -or
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
             throw 'ARCH3e source-backed original full semantic verification or original journal/index post-restart synthetic gate missing.'
           }
@@ -372,7 +372,7 @@ jobs:
              $t -cnotmatch 'user-created folder named Drafts' -or
              $docs -cnotmatch 'info@stios.ru.pst' -or
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
               throw 'ARCH3f read-only real source scope or original Year/Sent/Folder reuse gate missing.'
           }
@@ -399,7 +399,7 @@ jobs:
              $test -cnotmatch 'flags pre-existing original Archive-2020' -or
              $doc -cnotmatch 'ARCH3g' -or
              $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
             throw 'ARCH3g exact-source Year PST collision gate invalid or a writer was exposed.'
           }
@@ -422,7 +422,7 @@ jobs:
              $core -cmatch '\.Move\(|\.AddStoreEx\(|Add-OPADuplicateEntry|Write-OPAOperationJournalEvent' -or
              $doc -cnotmatch 'ARCH3h' -or
              $test -cnotmatch 'refuses Outlook restart between preflight' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
             throw 'ARCH3h original semantic witness gate invalid / writer accidentally exposed.'
           }
@@ -447,7 +447,7 @@ jobs:
              $core -cmatch '\.Move\(|\.AddStoreEx\(|Add-OPADuplicateEntry|Write-OPAOperationJournalEvent' -or
              $test -cnotmatch 'rejects sealed witness tampering' -or
              $doc -cnotmatch '8782b410253f54cc5374661077cdfc9279bcfba12805f0dab42b461320cb999c' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
             throw 'ARCH3i original complete semantic witness sealing/sha/ACL/anti-replay gate invalid.'
           }
@@ -465,7 +465,7 @@ jobs:
              $tests -cnotmatch 'public Invoke-ARCH3i Review accepts only RunId and SealSha256' -or
              $tests -cnotmatch 'public Invoke-ARCH3i Review rejects wrong SHA' -or
              $doc -cnotmatch '3773bcd7-5a07-4c31-8ce5-dfb16ddd30bf' -or
-             [int]$release.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$release.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$release.Verification.ExpectedTestContainers -ne 144){
             throw 'ARCH3i1 public read-only Review regression gate failed.'
           }
@@ -489,7 +489,7 @@ jobs:
              $core -cmatch '\.Move\(|\.AddStoreEx\(|Add-OPADuplicateEntry|Sync-OPADuplicateIndexFromJournal' -or
              $test -cnotmatch 'never retries Prepare for the same RunId' -or
              $doc -cnotmatch '5f5a86b6c1aba8a3d2ee328a36a5632f8edf1e89fdda8e7fd728688fe881b2a4' -or
-             [int]$rel.Verification.ExpectedPesterTests -ne 4344 -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4345 -or
              [int]$rel.Verification.ExpectedTestContainers -ne 144){
             throw 'ARCH3j original real one-shot PrepareIntent source-backed gate invalid or writer exposed.'
           }
@@ -552,5 +552,5 @@ jobs:
           $sha=Join-Path $dir ($base+'.sha256')
           if(-not (Test-Path -LiteralPath $zip -PathType Leaf) -or -not (Test-Path -LiteralPath $sha -PathType Leaf)){throw 'ZIP/checksum absent'}
           $tag='outlookpop3archive-2.6.5-arch3j-dev-g'+$short
-          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH3j DEV '+$short) --notes 'ARCH3j DEV evidence only: operator ARCH3i1 confirmed real source seal and SHA; exact original Year2020 Part2 target preview with existing Part1 271360 bytes unchanged; original shared DuplicateIndex imported READ ONLY and fail-closed for absent or matching source; original ARCH3b Year route and full ARCH2b SHA. Explicit Prepare writes protected original OperationJournal Intent before any future PST changes, SHA256 readback; no PST AddStoreEx, no MailItem.Move, no MoveClaimed, no index writes, no production permit. 21 new Pester tests, total 4344 in 144 containers expected, project-only ZIP.' --prerelease
+          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH3j DEV '+$short) --notes 'ARCH3j DEV evidence only: operator ARCH3i1 confirmed real source seal and SHA; exact original Year2020 Part2 target preview with existing Part1 271360 bytes unchanged; original shared DuplicateIndex imported READ ONLY and fail-closed for absent or matching source; original ARCH3b Year route and full ARCH2b SHA. Explicit Prepare writes protected original OperationJournal Intent before any future PST changes, SHA256 readback; no PST AddStoreEx, no MailItem.Move, no MoveClaimed, no index writes, no production permit. 22 new Pester tests, total 4345 in 144 containers expected, project-only ZIP.' --prerelease
           if($LASTEXITCODE -ne 0){throw 'GitHub prerelease publication failed'}
