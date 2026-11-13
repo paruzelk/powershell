@@ -63,21 +63,21 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 | Ключевое слово | Базовый балл | Модуль проверки | Описание |
 |---------|------------|--------------|-------------|
-| `dcsync` | 100 | Get-DangerousACLs | DCSync rights - immediate domain compromise |
-| `replication rights` | 100 | Get-DangerousACLs | Same as DCSync |
-| `esc1` | 90 | Get-ADCSVulnerabilities | ADCS ESC1 - enrollee supplies subject + client auth |
-| `esc2` | 80 | Get-ADCSVulnerabilities | ADCS ESC2 - any purpose or SubCA template |
-| `esc3` | 75 | Get-ADCSVulnerabilities | ADCS ESC3 - certificate request agent |
-| `esc4` | 70 | Get-ADCSVulnerabilities | ADCS ESC4 - dangerous template ACL |
-| `esc13` | 70 | Get-ADCSVulnerabilities | ADCS ESC13 - issuance policy linked to AD group |
-| `esc6` | 65 | Get-ADCSVulnerabilities | ADCS ESC6 - EDITF_ATTRIBUTESUBJECTALTNAME2 on CA |
-| `esc7` | 65 | Get-ADCSVulnerabilities | ADCS ESC7 - dangerous CA permissions |
-| `esc8` | 70 | Get-ADCSVulnerabilities | ADCS ESC8 - NTLM relay to web enrollment |
-| `esc9` | 60 | Get-ADCSVulnerabilities | ADCS ESC9 - template without security extension |
-| `esc10` | 60 | Get-ADCSVulnerabilities | ADCS ESC10 - weak certificate mapping |
-| `esc15` | 30 | Get-ADCSVulnerabilities | ADCS ESC15 - schema v1 template with enrollee subject |
-| `unconstrained delegation` | 85 | Get-UnconstrainedDelegation | Can capture TGTs |
-| `sid history` | 80 | Get-SIDHistoryInjection | SID History injection |
+| `dcsync` | 100 | Get-DangerousACLs | Права DCSync — возможность немедленно захватить домен |
+| `replication rights` | 100 | Get-DangerousACLs | То же, что DCSync |
+| `esc1` | 90 | Get-ADCSVulnerabilities | AD CS ESC1 — субъект задаёт заявитель, доступна клиентская аутентификация |
+| `esc2` | 80 | Get-ADCSVulnerabilities | AD CS ESC2 — EKU Any Purpose либо шаблон SubCA |
+| `esc3` | 75 | Get-ADCSVulnerabilities | AD CS ESC3 — агент запроса сертификата |
+| `esc4` | 70 | Get-ADCSVulnerabilities | AD CS ESC4 — опасные ACL шаблона |
+| `esc13` | 70 | Get-ADCSVulnerabilities | AD CS ESC13 — политика выдачи связана с группой AD |
+| `esc6` | 65 | Get-ADCSVulnerabilities | AD CS ESC6 — EDITF_ATTRIBUTESUBJECTALTNAME2 на УЦ |
+| `esc7` | 65 | Get-ADCSVulnerabilities | AD CS ESC7 — опасные права на УЦ |
+| `esc8` | 70 | Get-ADCSVulnerabilities | AD CS ESC8 — NTLM relay к веб-регистрации |
+| `esc9` | 60 | Get-ADCSVulnerabilities | AD CS ESC9 — шаблон без расширения безопасности |
+| `esc10` | 60 | Get-ADCSVulnerabilities | AD CS ESC10 — слабое сопоставление сертификатов |
+| `esc15` | 30 | Get-ADCSVulnerabilities | AD CS ESC15 — шаблон схемы v1, субъект задаётся заявителем |
+| `unconstrained delegation` | 85 | Get-UnconstrainedDelegation | Возможен перехват TGT |
+| `sid history` | 80 | Get-SIDHistoryInjection | Внедрение SID History |
 
 ### Раскрытие учётных данных (база 40–60)
 
@@ -85,18 +85,18 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 | Ключевое слово | Базовый балл | Модуль проверки | Описание |
 |---------|------------|--------------|-------------|
-| `laps credential` | 55 | Get-LAPSCredentialAccess | LAPS password readable |
-| `laps access` | 45 | Get-LAPSPermissions | LAPS password read permissions |
-| `laps password` | 55 | Get-LAPSCredentialAccess | LAPS password readable |
-| `gpp password` | 50 | Get-CredentialExposure | Group Policy Preferences password |
-| `cpassword` | 50 | Get-CredentialExposure | GPP cpassword attribute |
-| `cleartext credential` | 50 | Get-CredentialExposure | Cleartext credentials found |
-| `plaintext credential` | 50 | Get-CredentialExposure | Plaintext credentials found |
-| `credential exposure` | 45 | Get-CredentialExposure | Generic credential exposure |
-| `autoadminlogon` | 45 | Get-CredentialExposure | AutoAdminLogon credentials |
-| `password in script` | 45 | Get-GPOScheduledTasks | Password in scheduled task script |
-| `sensitive information` | 40 | Get-CredentialExposure | Sensitive data exposure |
-| `net use` | 40 | Get-CredentialExposure | Net use with credentials |
+| `laps credential` | 55 | Get-LAPSCredentialAccess | Пароль LAPS доступен для чтения |
+| `laps access` | 45 | Get-LAPSPermissions | Право чтения пароля LAPS |
+| `laps password` | 55 | Get-LAPSCredentialAccess | Пароль LAPS доступен для чтения |
+| `gpp password` | 50 | Get-CredentialExposure | Пароль Group Policy Preferences |
+| `cpassword` | 50 | Get-CredentialExposure | Атрибут GPP cpassword |
+| `cleartext credential` | 50 | Get-CredentialExposure | Обнаружены учётные данные открытым текстом |
+| `plaintext credential` | 50 | Get-CredentialExposure | Обнаружены учётные данные открытым текстом |
+| `credential exposure` | 45 | Get-CredentialExposure | Обычная утечка учётных данных |
+| `autoadminlogon` | 45 | Get-CredentialExposure | Учётные данные AutoAdminLogon |
+| `password in script` | 45 | Get-GPOScheduledTasks | Пароль в сценарии запланированного задания |
+| `sensitive information` | 40 | Get-CredentialExposure | Утечка конфиденциальных данных |
+| `net use` | 40 | Get-CredentialExposure | Команда net use с паролем |
 
 ### Требуется подбор пароля (база 30–50)
 
@@ -104,11 +104,11 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 | Ключевое слово | Базовый балл | Модуль проверки | Описание |
 |---------|------------|--------------|-------------|
-| `kerberoastable` | 35 | Get-KerberoastableAccounts | Kerberoastable service account |
-| `kerberoast` | 35 | Get-KerberoastableAccounts | Kerberoastable service account |
-| `asrep roast` | 30 | Get-ASREPRoastableAccounts | AS-REP roastable account |
-| `as-rep roast` | 30 | Get-ASREPRoastableAccounts | AS-REP roastable account |
-| `preauth not required` | 30 | Get-ASREPRoastableAccounts | Pre-authentication disabled |
+| `kerberoastable` | 35 | Get-KerberoastableAccounts | Служебная запись, доступная для Kerberoasting |
+| `kerberoast` | 35 | Get-KerberoastableAccounts | Служебная запись, доступная для Kerberoasting |
+| `asrep roast` | 30 | Get-ASREPRoastableAccounts | Запись, доступная для AS-REP Roasting |
+| `as-rep roast` | 30 | Get-ASREPRoastableAccounts | Запись, доступная для AS-REP Roasting |
+| `preauth not required` | 30 | Get-ASREPRoastableAccounts | Предварительная аутентификация отключена |
 
 ### Злоупотребление делегированием (база 50–55)
 
@@ -116,9 +116,9 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 | Ключевое слово | Базовый балл | Модуль проверки | Описание |
 |---------|------------|--------------|-------------|
-| `rbcd` | 55 | Get-ResourceBasedConstrainedDelegation | Resource-Based Constrained Delegation |
-| `resource-based constrained` | 55 | Get-ResourceBasedConstrainedDelegation | RBCD abuse |
-| `constrained delegation` | 50 | Get-ConstrainedDelegation | Constrained delegation configured |
+| `rbcd` | 55 | Get-ResourceBasedConstrainedDelegation | Ресурсное ограниченное делегирование |
+| `resource-based constrained` | 55 | Get-ResourceBasedConstrainedDelegation | Злоупотребление RBCD |
+| `constrained delegation` | 50 | Get-ConstrainedDelegation | Настроено ограниченное делегирование |
 
 ### Злоупотребление ACL (база 40–60)
 
@@ -126,17 +126,17 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 | Ключевое слово | Базовый балл | Модуль проверки | Описание |
 |---------|------------|--------------|-------------|
-| `genericall` | 60 | Get-DangerousACLs | Full control over object |
-| `writedacl` | 55 | Get-DangerousACLs | Can modify permissions |
-| `writeowner` | 55 | Get-DangerousACLs | Can change ownership |
-| `genericwrite` | 50 | Get-DangerousACLs | Can write to object |
-| `password reset` | 50 | Get-PasswordResetRights | Can reset passwords |
-| `reset password` | 50 | Get-PasswordResetRights | Can reset passwords |
-| `gpo permission` | 50 | Get-GPOPermissions | Can modify GPOs |
-| `dangerous permission` | 45 | Get-DangerousACLs | Other dangerous ACL |
-| `laps permission` | 45 | Get-LAPSPermissions | Can read LAPS passwords |
-| `gpo link` | 45 | Get-GPOPermissions | Can link GPOs |
-| `ou permission` | 40 | Get-DangerousOUPermissions | Dangerous OU permissions |
+| `genericall` | 60 | Get-DangerousACLs | Полный контроль над объектом |
+| `writedacl` | 55 | Get-DangerousACLs | Возможность менять разрешения |
+| `writeowner` | 55 | Get-DangerousACLs | Возможность менять владельца |
+| `genericwrite` | 50 | Get-DangerousACLs | Возможность записи в объект |
+| `password reset` | 50 | Get-PasswordResetRights | Возможность сбрасывать пароли |
+| `reset password` | 50 | Get-PasswordResetRights | Возможность сбрасывать пароли |
+| `gpo permission` | 50 | Get-GPOPermissions | Возможность изменять GPO |
+| `dangerous permission` | 45 | Get-DangerousACLs | Другие опасные права ACL |
+| `laps permission` | 45 | Get-LAPSPermissions | Возможность читать пароли LAPS |
+| `gpo link` | 45 | Get-GPOPermissions | Возможность привязывать GPO |
+| `ou permission` | 40 | Get-DangerousOUPermissions | Опасные разрешения OU |
 
 ### Слабые настройки (база 25–45)
 
@@ -144,21 +144,21 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 | Ключевое слово | Базовый балл | Модуль проверки | Описание |
 |---------|------------|--------------|-------------|
-| `local admin` | 45 | Get-GPOLocalGroupMembership | Added to local admins via GPO |
-| `computer owner` | 40 | Get-NonDefaultComputerOwners | Non-default computer owner |
-| `local group` | 40 | Get-GPOLocalGroupMembership | GPO local group membership |
-| `password not required` | 35 | Get-PasswordNotRequired | PASSWD_NOTREQD flag |
-| `add computer` | 35 | Get-AddComputerRights | Can add computers to domain |
-| `laps not configured` | 35 | Get-LAPSConfiguration | LAPS not deployed |
-| `reversible encryption` | 30 | Get-AdminReversibleEncryption | Reversible encryption enabled |
-| `inactive admin` | 30 | Get-InactiveAdminAccounts | Inactive admin account |
-| `orphaned admin` | 30 | Get-InactiveAdminAccounts | Orphaned admin account |
-| `smb signing` | 30 | Get-SMBSigningStatus | SMB signing not required |
+| `local admin` | 45 | Get-GPOLocalGroupMembership | Добавление в локальные администраторы через GPO |
+| `computer owner` | 40 | Get-NonDefaultComputerOwners | Нестандартный владелец компьютерной записи |
+| `local group` | 40 | Get-GPOLocalGroupMembership | Назначение членства в локальной группе через GPO |
+| `password not required` | 35 | Get-PasswordNotRequired | Флаг PASSWD_NOTREQD |
+| `add computer` | 35 | Get-AddComputerRights | Право добавлять компьютеры в домен |
+| `laps not configured` | 35 | Get-LAPSConfiguration | LAPS не внедрён |
+| `reversible encryption` | 30 | Get-AdminReversibleEncryption | Включено обратимое шифрование |
+| `inactive admin` | 30 | Get-InactiveAdminAccounts | Неактивная административная запись |
+| `orphaned admin` | 30 | Get-InactiveAdminAccounts | Устаревший административный атрибут |
+| `smb signing` | 30 | Get-SMBSigningStatus | Подпись SMB не обязательна |
 | `machineaccountquota` | 15 | Get-AddComputerRights | MachineAccountQuota > 0 |
-| `kds root key` | 30 | Get-ManagedServiceAccountSecurity | KDS root key issues |
-| `password never expires` | 25 | Get-AdminPasswordNeverExpires | Password never expires |
-| `ldap signing` | 25 | Get-LDAPConfiguration | LDAP signing not required |
-| `channel binding` | 25 | Get-LDAPConfiguration | Channel binding not required |
+| `kds root key` | 30 | Get-ManagedServiceAccountSecurity | Проблемы корневого ключа KDS |
+| `password never expires` | 25 | Get-AdminPasswordNeverExpires | Пароль без срока действия |
+| `ldap signing` | 25 | Get-LDAPConfiguration | Подпись LDAP не обязательна |
+| `channel binding` | 25 | Get-LDAPConfiguration | Channel binding не обязателен |
 
 ### Управляемые служебные записи (база 20–25)
 
@@ -166,9 +166,9 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 | Ключевое слово | Базовый балл | Модуль проверки | Описание |
 |---------|------------|--------------|-------------|
-| `gmsa password readable` | 55 | Get-ManagedServiceAccountSecurity | gMSA password retrievable |
-| `managed service account` | 25 | Get-ManagedServiceAccountSecurity | MSA configuration issue |
-| `smsa` | 20 | Get-ManagedServiceAccountSecurity | sMSA configuration issue |
+| `gmsa password readable` | 55 | Get-ManagedServiceAccountSecurity | Пароль gMSA доступен для получения |
+| `managed service account` | 25 | Get-ManagedServiceAccountSecurity | Проблема настройки MSA |
+| `smsa` | 20 | Get-ManagedServiceAccountSecurity | Проблема настройки sMSA |
 
 ### Инфраструктура (база 30–45)
 
@@ -176,15 +176,15 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 | Ключевое слово | Базовый балл | Модуль проверки | Описание |
 |---------|------------|--------------|-------------|
-| `exchange` | 45 | Get-ExchangeInfrastructure | Exchange infrastructure finding |
-| `unsupported os` | 40 | Get-OutdatedComputers | Unsupported operating system |
-| `scom` | 35 | Get-SCOMInfrastructure | SCOM infrastructure |
-| `sccm site hierarchy` | 30 | Get-SCCMInfrastructure | SCCM multi-site hierarchy |
-| `sccm pxe` | 25 | Get-SCCMInfrastructure | PXE boot server exposure |
-| `sccm client` | 20 | Get-SCCMInfrastructure | SCCM client deployment scope |
-| `aging os` | 15 | Get-OutdatedComputers | Aging operating system (nearing EOL) |
-| `unix password` | 30 | Get-UnixPasswordAccounts | Unix password attributes |
-| `unixuserpwd` | 30 | Get-UnixPasswordAccounts | unixUserPassword attribute |
+| `exchange` | 45 | Get-ExchangeInfrastructure | Находка инфраструктуры Exchange |
+| `unsupported os` | 40 | Get-OutdatedComputers | ОС без поддержки |
+| `scom` | 35 | Get-SCOMInfrastructure | Инфраструктура SCOM |
+| `sccm site hierarchy` | 30 | Get-SCCMInfrastructure | Иерархия SCCM с несколькими сайтами |
+| `sccm pxe` | 25 | Get-SCCMInfrastructure | Риск сервера загрузки PXE |
+| `sccm client` | 20 | Get-SCCMInfrastructure | Область развёртывания клиентов SCCM |
+| `aging os` | 15 | Get-OutdatedComputers | Устаревающая ОС (приближение EOL) |
+| `unix password` | 30 | Get-UnixPasswordAccounts | Unix-атрибуты паролей |
+| `unixuserpwd` | 30 | Get-UnixPasswordAccounts | Атрибут unixUserPassword |
 
 ### Конфигурация LAPS (база 20–35)
 
@@ -192,8 +192,8 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 | Ключевое слово | Базовый балл | Модуль проверки | Описание |
 |---------|------------|--------------|-------------|
-| `laps not configured` | 35 | Get-LAPSConfiguration | LAPS missing |
-| `laps` | 20 | Get-LAPSConfiguration | LAPS informational |
+| `laps not configured` | 35 | Get-LAPSConfiguration | LAPS отсутствует |
+| `laps` | 20 | Get-LAPSConfiguration | Информационное сообщение о LAPS |
 
 ### Информационные сведения (база 10–15)
 
@@ -201,13 +201,13 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 
 | Ключевое слово | Базовый балл | Модуль проверки | Описание |
 |---------|------------|--------------|-------------|
-| `privileged group` | 15 | Get-PrivilegedGroupMembers | Privileged group membership |
-| `trust` | 15 | Get-DomainTrusts | Domain trust |
-| `group member` | 10 | Get-PrivilegedGroupMembers | Group membership info |
-| `protected users` | 10 | Get-ProtectedUsersStatus | Protected Users status |
-| `password policy` | 10 | Get-DomainPasswordPolicy | Password policy info |
-| `domain controller` | 10 | Get-InfrastructureServers | Domain controller info |
-| `infrastructure server` | 10 | Get-InfrastructureServers | Infrastructure server info |
+| `privileged group` | 15 | Get-PrivilegedGroupMembers | Членство в привилегированной группе |
+| `trust` | 15 | Get-DomainTrusts | Доменное доверие |
+| `group member` | 10 | Get-PrivilegedGroupMembers | Сведения о членстве в группе |
+| `protected users` | 10 | Get-ProtectedUsersStatus | Состояние Protected Users |
+| `password policy` | 10 | Get-DomainPasswordPolicy | Сведения о парольной политике |
+| `domain controller` | 10 | Get-InfrastructureServers | Сведения о контроллере домена |
+| `infrastructure server` | 10 | Get-InfrastructureServers | Сведения об инфраструктурном сервере |
 
 ### Резервные оценки
 
