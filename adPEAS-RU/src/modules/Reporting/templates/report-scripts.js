@@ -1005,6 +1005,50 @@
                 byField:Object.freeze(byField)
             });
         });
+        // DOC4h: observed synthetic labels and DC clock note only; no AD values changed.
+        document.addEventListener('DOMContentLoaded', function ruDOC4hObservedReportUI() {
+            const labels=Object.freeze({
+                activityStatus:'Состояние активности',
+                adSubnet:'Подсеть AD',
+                computerCount:'Количество компьютеров',
+                operatingSystems:'Операционные системы',
+                organizationalUnits:'Организационные подразделения',
+                domainControllerCount:'Количество контроллеров домена',
+                domainControllerTime:'Время контроллера домена'
+            });
+            let translatedLabels=0, translatedClockValues=0;
+            const byField=Object.create(null);
+            document.querySelectorAll('.attr-row[data-attr-name]').forEach(function(row) {
+                const key=row.getAttribute('data-attr-name');
+                if(!Object.prototype.hasOwnProperty.call(labels,key)) return;
+                const label=row.querySelector('.attr-name');
+                if(label && label.textContent.trim()===key && label.childNodes.length===1 &&
+                   label.firstChild && label.firstChild.nodeType===Node.TEXT_NODE) {
+                    label.firstChild.nodeValue=labels[key];
+                    translatedLabels++;
+                    byField[key]=(byField[key]||0)+1;
+                }
+                if(key==='domainControllerTime') {
+                    const value=row.querySelector('.attr-value');
+                    if(value && value.childNodes.length===1 && value.firstChild &&
+                       value.firstChild.nodeType===Node.TEXT_NODE) {
+                        const raw=value.firstChild.nodeValue;
+                        const localized=raw.replace(/\(skew:\s*([+-]?\d+)s\)/g,
+                            '(расхождение: $1 с)');
+                        if(localized!==raw) {
+                            value.firstChild.nodeValue=localized;
+                            translatedClockValues++;
+                        }
+                    }
+                }
+            });
+            window.adPEASRUDOC4h=Object.freeze({
+                dictionaryEntries:Object.keys(labels).length,
+                translatedLabels:translatedLabels,
+                translatedClockValues:translatedClockValues,
+                byField:Object.freeze(byField)
+            });
+        });
         // Scoring context data for context-aware risk calculation
         const scoringContext = {{SCORING_CONTEXT_JSON}};
 
@@ -2025,6 +2069,17 @@
                 const el = document.querySelector(summaryMapping[severity]);
                 if (el) {
                     el.textContent = severityCounts[severity];
+                    // Accessible label must reflect the live card count, not raw
+                    // result numbers from the unprocessed report template.
+                    const summaryCard = el.closest('.summary-card');
+                    if(summaryCard) {
+                        const nameNode=summaryCard.querySelector('.label');
+                        if(nameNode) summaryCard.setAttribute('aria-label',
+                            'Фильтр: ' + nameNode.textContent.trim() + '; карточек проверок: ' +
+                            severityCounts[severity]);
+                    }
+                    const summaryCountNote=document.getElementById('doc4hSummaryCountNote');
+                    if(summaryCountNote) summaryCountNote.hidden=false;
                 }
             });
         }
@@ -3714,7 +3769,7 @@
                 badge.className = 'score-badge ' + scoreClass;
                 badge.textContent = breakdown.finalScore;
                 badge.dataset.scoreBreakdown = JSON.stringify(breakdown);
-                badge.title = 'Risk Score (click for details)';
+                badge.title = 'Оценка риска (нажмите для подробностей)';
                 badge.addEventListener('click', function(e) {
                     e.stopPropagation();
                     showScoreTooltip(this, breakdown);
