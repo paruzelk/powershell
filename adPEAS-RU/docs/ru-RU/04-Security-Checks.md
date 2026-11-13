@@ -1,149 +1,149 @@
-# Security Checks Reference
+# Справочник проверок безопасности
 
-Complete reference of all security checks performed by adPEAS v2.
+Полный справочник проверок безопасности, выполняемых adPEAS v2.
 
 ---
 
-## Output Filtering (Noise Reduction)
+## Фильтрация результатов (снижение шума)
 
-Several security checks filter out high-privileged accounts from the output to reduce noise and focus on actionable findings. This is by design: Domain Admins and Enterprise Admins are **expected** to have rights like DCSync, GenericAll, or password reset capabilities - showing them would obscure the real security issues.
+Некоторые проверки исключают из результатов высокопривилегированные учётные записи, чтобы уменьшить шум и выделить находки, требующие действий. Это сделано намеренно: ожидается, что Domain Admins и Enterprise Admins имеют права DCSync, GenericAll или сброса пароля. Их включение скрыло бы действительно нетипичные разрешения.
 
-### Filtered Checks
+### Проверки с фильтрацией
 
-The following checks filter high-privileged accounts by default:
+В следующих проверках высокопривилегированные учётные записи по умолчанию отфильтровываются:
 
-| Check | What's Filtered | Override Parameter |
+| Проверка | Что исключается | Параметр отмены фильтра |
 |-------|-----------------|-------------------|
-| **Get-DangerousACLs** | Domain Admins, Enterprise Admins, SYSTEM with GenericAll/WriteDACL/WriteOwner/DCSync rights | `-IncludePrivileged` |
-| **Get-PrivilegedGroupMembers** | AdminSDHolder ACL analysis excludes expected privileged principals | `-IncludePrivileged` |
-| **Get-PasswordResetRights** | Only Critical/High severity findings shown; privileged accounts with reset rights are low severity | `-IncludePrivileged` |
-| **Get-LAPSPermissions** | Only Critical/High/Medium severity; Domain Admins with LAPS read are expected | `-IncludePrivileged` |
-| **Get-GPOPermissions** | Group Policy Creator Owners, Domain Admins with GPO modification rights | `-IncludePrivileged` |
-| **Get-ADCSVulnerabilities** | Domain Admins, Enterprise Admins with certificate enrollment | `-IncludePrivileged` |
-| **Get-AddComputerRights** | Domain Admins, Account Operators with computer creation rights | `-IncludePrivileged` |
-| **Get-BitLockerRecoveryKeyAccess** | Privileged principals with a delegated read of the recovery passwords - Domain Admins read them by default | `-IncludePrivileged` |
-| **Get-DeletedObjectAccess** | Tier-0 principals and the Exchange service groups that may list the Deleted Objects container - Administrators may by default, Exchange setup grants it | `-IncludePrivileged` |
+| **Get-DangerousACLs** | Domain Admins, Enterprise Admins и SYSTEM с правами GenericAll/WriteDACL/WriteOwner/DCSync | `-IncludePrivileged` |
+| **Get-PrivilegedGroupMembers** | Анализ ACL AdminSDHolder исключает ожидаемых привилегированных субъектов | `-IncludePrivileged` |
+| **Get-PasswordResetRights** | Выводятся только находки Critical/High; привилегированные учётные записи с правом сброса имеют низкую серьёзность | `-IncludePrivileged` |
+| **Get-LAPSPermissions** | Только серьёзности Critical/High/Medium; чтение LAPS группой Domain Admins ожидаемо | `-IncludePrivileged` |
+| **Get-GPOPermissions** | Group Policy Creator Owners и Domain Admins с правами изменения GPO | `-IncludePrivileged` |
+| **Get-ADCSVulnerabilities** | Domain Admins и Enterprise Admins с правом регистрации сертификатов | `-IncludePrivileged` |
+| **Get-AddComputerRights** | Domain Admins и Account Operators с правом создания компьютеров | `-IncludePrivileged` |
+| **Get-BitLockerRecoveryKeyAccess** | Привилегированные субъекты с делегированным чтением паролей восстановления — Domain Admins читают их по умолчанию | `-IncludePrivileged` |
+| **Get-DeletedObjectAccess** | Субъекты Tier 0 и служебные группы Exchange с правом просмотра Deleted Objects: Administrators может иметь его по умолчанию, установка Exchange выдаёт его | `-IncludePrivileged` |
 
-### How Filtering Works
+### Как работает фильтрация
 
-adPEAS uses a **SID-based classification system** that's language-independent (works in English, German, French, etc.):
+adPEAS использует **классификацию по SID**, независимую от языка ОС (работает на английской, немецкой, французской и других локализациях):
 
-1. **Test-IsPrivileged**: Classifies identities into categories:
+1. **Test-IsPrivileged**: распределяет субъекты по категориям:
    - `Privileged`: Domain Admins (-512), Enterprise Admins (-519), Schema Admins (-518), Administrators (S-1-5-32-544), SYSTEM (S-1-5-18)
-   - `Operator`: Account Operators, Server Operators, Backup Operators, Print Operators
-   - `BroadGroup`: Everyone, Authenticated Users, Domain Users
-   - `Standard`: Regular users and groups
+   - `Operator`: Account Operators, Server Operators, Backup Operators, Print Operators.
+   - `BroadGroup`: Everyone, Authenticated Users, Domain Users.
+   - `Standard`: обычные пользователи и группы.
 
-2. **Test-IsExpectedInScope**: Applies context-aware filtering based on the type of check:
-   - Returns `Expected` for accounts that should have the right (filtered from output)
-   - Returns `Attention` for technically expected but security-relevant (shown in yellow when `-IncludePrivileged`)
-   - Returns `Finding` for accounts that should NOT have the right (always shown)
+2. **Test-IsExpectedInScope**: применяет фильтрацию с учётом контекста конкретной проверки:
+   - Возвращает `Expected` для субъектов, которым право положено (исключаются из результатов).
+   - Возвращает `Attention` для формально ожидаемых, но значимых для безопасности субъектов (жёлтая подсветка при `-IncludePrivileged`).
+   - Возвращает `Finding` для субъектов, которым такого права быть НЕ должно (показываются всегда).
 
-### Viewing All Results
+### Как увидеть все результаты
 
-To see all results including privileged accounts, use the `-IncludePrivileged` switch:
+Для отображения всех результатов, включая привилегированные учётные записи, используйте `-IncludePrivileged`:
 
 ```powershell
-# Shows only unexpected/dangerous findings (default)
+# По умолчанию: только неожиданные/опасные находки
 Get-DangerousACLs
 
-# Shows all findings including Domain Admins, Enterprise Admins (yellow highlighting)
+# Все находки, включая Domain Admins и Enterprise Admins (жёлтая подсветка)
 Get-DangerousACLs -IncludePrivileged
 ```
 
-### Checks Without Filtering
+### Проверки без фильтрации
 
-These checks intentionally show ALL accounts regardless of privilege level:
+Следующие проверки намеренно показывают ВСЕ учётные записи независимо от уровня привилегий:
 
-- **Get-KerberoastableAccounts** - Even admin accounts can be Kerberoasted
-- **Get-ASREPRoastableAccounts** - Pre-auth disabled is dangerous for any account
-- **Get-UnconstrainedDelegation** - Unconstrained delegation is risky regardless of account type
-- **Get-ConstrainedDelegation** - Shows all delegation configurations
-- **Get-InactiveAdminAccounts** - Purpose is to find inactive admin accounts
-- **Get-AdminPasswordNeverExpires** - Purpose is to find admin accounts with this setting
+- **Get-KerberoastableAccounts** — Kerberoasting возможен и для административных учётных записей.
+- **Get-ASREPRoastableAccounts** — отсутствие предварительной аутентификации опасно для любой записи.
+- **Get-UnconstrainedDelegation** — неограниченное делегирование опасно независимо от типа записи.
+- **Get-ConstrainedDelegation** — отображает все конфигурации делегирования.
+- **Get-InactiveAdminAccounts** — цель проверки: найти неактивные административные записи.
+- **Get-AdminPasswordNeverExpires** — цель проверки: найти административные записи с бессрочным паролем.
 
-### Admin-Only Checks (adminCount=1)
+### Проверки только администраторов (adminCount=1)
 
-Some checks are scoped exclusively to accounts with `adminCount=1` — accounts that Active Directory marks as having (or having had) privileged group membership:
+Некоторые проверки ограничиваются учётными записями с `adminCount=1` — AD отмечает так записи, состоящие или ранее состоявшие в привилегированных группах:
 
-| Check | LDAP Scope | Additional Validation |
+| Проверка | Область LDAP | Дополнительная проверка |
 |-------|------------|----------------------|
-| **Get-InactiveAdminAccounts** | `adminCount=1` + enabled only | `Test-AccountActivity` for inactivity detection |
-| **Get-AdminPasswordNeverExpires** | `adminCount=1` + password never expires | `Test-IsPrivileged` to filter out orphaned adminCount |
-| **Get-AdminReversibleEncryption** | `adminCount=1` + reversible encryption | None (any admin with this setting is a finding) |
+| **Get-InactiveAdminAccounts** | `adminCount=1` и только включённые записи | `Test-AccountActivity` для обнаружения неактивности |
+| **Get-AdminPasswordNeverExpires** | `adminCount=1` и бессрочный пароль | `Test-IsPrivileged` для исключения устаревшего adminCount |
+| **Get-AdminReversibleEncryption** | `adminCount=1` и обратимое шифрование | Нет (любая такая административная запись — находка) |
 
-**Note on orphaned adminCount:** When a user is removed from a privileged group, Active Directory does **not** automatically clear `adminCount=1`. Get-AdminPasswordNeverExpires validates via `Test-IsPrivileged` whether the account is still actually privileged, and flags orphaned adminCount accounts separately.
+**Об оставшемся adminCount:** при исключении пользователя из привилегированной группы AD **не снимает автоматически** `adminCount=1`. Get-AdminPasswordNeverExpires с помощью `Test-IsPrivileged` проверяет, остаётся ли запись действительно привилегированной, а случаи устаревшего adminCount отмечает отдельно.
 
-### Disabled Account Handling
+### Обработка отключённых учётных записей
 
-adPEAS does **not** globally exclude disabled accounts. Most checks return both, because a disabled account can still be a risk: whoever can re-enable it gets whatever it carried.
+adPEAS **не исключает отключённые учётные записи глобально**. Большинство проверок возвращает и включённые, и отключённые записи: отключённая запись остаётся риском для того, кто сможет включить её и воспользоваться ранее назначенными правами.
 
-The Kerberos checks are the exception, and they exclude disabled accounts for a reason that belongs to the protocol rather than to a preference: the KDC answers a request for a disabled principal with KDC_ERR_CLIENT_REVOKED, so there is no ticket to roast and no delegation to abuse while the account stays disabled.
+Исключение — проверки Kerberos. Они пропускают отключённые записи по причине работы протокола, а не предпочтений аудитора: на запрос билета для отключённого субъекта KDC отвечает KDC_ERR_CLIENT_REVOKED, поэтому получить билет для взлома и злоупотребить делегированием невозможно, пока запись отключена.
 
-Checks that ask the directory for enabled accounts only:
+Проверки, запрашивающие из AD только включённые записи:
 
-| Check | Why |
+| Проверка | Причина |
 |-------|-----|
-| **Get-KerberoastableAccounts** | The KDC issues no service ticket for a disabled principal, so there is no hash to crack |
-| **Get-ASREPRoastableAccounts** | Same: no AS-REP for a disabled account |
-| **Get-UnconstrainedDelegation** | Delegation is performed by an account that can authenticate |
-| **Get-ConstrainedDelegation** | As above, for both of its populations |
-| **Get-ResourceBasedConstrainedDelegation** | As above |
-| **Get-InactiveAdminAccounts** | Only enabled accounts — purpose is to find *active* admins who are not being used |
-| **Get-LAPSPermissions** | Only enabled computers — LAPS passwords for disabled computers are not actionable |
+| **Get-KerberoastableAccounts** | KDC не выдаёт сервисный билет для отключённой записи; хеш для подбора недоступен |
+| **Get-ASREPRoastableAccounts** | Аналогично: AS-REP для отключённой записи не выдаётся |
+| **Get-UnconstrainedDelegation** | Делегирование выполняет запись, способная пройти аутентификацию |
+| **Get-ConstrainedDelegation** | То же для обеих рассматриваемых совокупностей |
+| **Get-ResourceBasedConstrainedDelegation** | Аналогично |
+| **Get-InactiveAdminAccounts** | Только включённые записи — цель: найти *действующих*, но не используемых администраторов |
+| **Get-LAPSPermissions** | Только включённые компьютеры — пароли LAPS отключённых компьютеров не используются при текущем доступе |
 
-A disabled account that carries an SPN, or delegation, is still worth knowing about the moment somebody can re-enable it - that is a question about who may change the account, which `Get-PasswordResetRights` and `Get-DangerousACLs` answer, and not one these checks can answer from a ticket they cannot get.
+Даже отключённая запись с SPN или делегированием представляет интерес, если её можно включить: для оценки нужно знать, кто может изменять запись. Это проверяют `Get-PasswordResetRights` и `Get-DangerousACLs`, а не запрос билета, который KDC не выдаёт.
 
 ---
 
-## Overview
+## Обзор
 
-adPEAS performs 43+ security checks organized into 10 categories. Every module runs by
-default except **Shares**, which has to be asked for by name (`-Module Shares`): it opens
-an SMB connection to every Windows computer of the domain, which is a decision for whoever
-runs the scan.
+adPEAS выполняет более 43 проверок безопасности, организованных в десять категорий. Все модули
+выполняются по умолчанию, **кроме Shares**: его требуется явно запросить (`-Module Shares`), поскольку он открывает
+SMB-соединение со всеми компьютерами Windows домена, что должно быть осознанным решением
+оператора аудита.
 
-| Module        | Checks | Description                               |
+| Модуль | Проверок | Назначение |
 | ------------- | ------ | ----------------------------------------- |
-| Domain        | 5      | Domain configuration, trusts, policies    |
-| Creds         | 7      | Credential exposure vectors               |
-| Rights        | 6      | ACL and permission analysis               |
-| Delegation    | 3      | Kerberos delegation misconfigurations     |
-| ADCS          | 2      | Certificate Services vulnerabilities      |
-| Accounts      | 9      | Privileged accounts and security settings |
-| GPO           | 4      | Group Policy security                     |
-| Computer      | 6      | Computer account security                 |
-| Application   | 3      | Enterprise application infrastructure     |
-| Shares        | 1      | Readable shares and the credentials on them (opt-in) |
+| Domain | 5 | Конфигурация домена, доверия и политики |
+| Creds | 7 | Способы раскрытия учётных данных |
+| Rights | 6 | Анализ ACL и разрешений |
+| Delegation | 3 | Ошибки настройки делегирования Kerberos |
+| ADCS | 2 | Уязвимости служб сертификатов |
+| Accounts | 9 | Привилегированные записи и параметры безопасности |
+| GPO | 4 | Безопасность групповых политик |
+| Computer | 6 | Безопасность компьютерных учётных записей |
+| Application | 3 | Инфраструктура корпоративных приложений |
+| Shares | 1 | Доступные общие ресурсы и учётные данные на них (только по запросу) |
 
 ---
 
-## Domain Module
+## Модуль Domain
 
-Analyzes domain-level configuration and security settings.
+Анализирует конфигурацию домена и параметры его безопасности.
 
 ### Get-DomainInformation
 
-**Purpose**: Retrieves basic domain information and functional level.
+**Назначение**: получает общую информацию о домене и его функциональном уровне.
 
-**What it checks**:
-- Domain functional level
-- Forest functional level
-- Domain Controllers
-- What a deletion leaves behind in the forest: the tombstone lifetime (`tombstoneLifetime` on `CN=Directory Service`, 60 days when not set; below the 180 days of a new forest is a hint - a backup older than that can no longer be restored) and whether the Active Directory Recycle Bin is enabled (`msDS-EnabledFeature` on the Partitions container; disabled at forest functional level 2008 R2 or higher is a hint), with the deleted-object lifetime when it is
-- Which service replicates SYSVOL: DFSR, FRS, or both while a migration has not reached Eliminated - read from the FRS replica set and the DFSR replication group of SYSVOL under `CN=System` and the global state in `msDFSR-Flags`. FRS is a hint: it is deprecated, and no domain controller from Windows Server 1709 on can be added to such a domain
+**Что проверяется**:
+- Функциональный уровень домена.
+- Функциональный уровень леса.
+- Контроллеры домена.
+- Что остаётся после удаления объекта в лесу: срок хранения объектов-заглушек (`tombstoneLifetime` в `CN=Directory Service`, 60 дней при отсутствии настройки; значение меньше 180 дней нового леса — сигнал: более старая резервная копия уже не может быть восстановлена) и включена ли корзина AD (по `msDS-EnabledFeature` в контейнере Partitions; отключённая корзина при уровне леса 2008 R2 или выше — сигнал), а также срок хранения удалённых объектов при включённой корзине.
+- Какая служба реплицирует SYSVOL: DFSR, FRS или обе, пока миграция не достигла состояния Eliminated. Данные читаются из набора реплик FRS и группы репликации DFSR для SYSVOL в `CN=System`, а также из глобального состояния в `msDFSR-Flags`. FRS — сигнал риска: технология устарела, и контроллер Windows Server 1709 или новее в такой домен добавить нельзя.
 
-**Security Impact**: Outdated functional levels may lack security features and indicate older, vulnerable DCs.
+**Влияние на безопасность**: устаревшие функциональные уровни могут не поддерживать защитные механизмы и указывать на наличие старых уязвимых DC.
 
-| Functional Level | Severity |
+| Функциональный уровень | Серьёзность |
 |-----------------|----------|
-| Windows 2000/2003 | Critical (EOL) |
-| Windows 2008/R2 | High (EOL) |
-| Windows 2012/R2 | Medium |
-| Windows 2016 | Low |
-| Windows 2019+ | Info |
+| Windows 2000/2003 | Критическая (EOL) |
+| Windows 2008/R2 | Высокая (EOL) |
+| Windows 2012/R2 | Средняя |
+| Windows 2016 | Низкая |
+| Windows 2019+ | Информационная |
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-DomainInformation
 ```
@@ -152,21 +152,21 @@ Get-DomainInformation
 
 ### Get-DomainPasswordPolicy
 
-**Purpose**: Analyzes the default domain password policy.
+**Назначение**: анализирует политику паролей домена по умолчанию.
 
-**What it checks**:
-- Maximum password age (disabled = passwords never expire)
-- Minimum password length (below 8 = weak)
-- Password complexity requirement
-- Account lockout threshold
-- Reversible encryption setting
-- Password history (`pwdHistoryLength`): 0 lets a user set the password a reset replaced at once - a hint; Microsoft's default remembers 24
-- Fine-Grained Password Policies: the same settings - length, complexity, reversible encryption, lockout threshold, duration and window, minimum and maximum age, password history - plus precedence and whom each policy applies to
-- Without Domain Admin rights the policies themselves cannot be read by default; they are found by name and by assignment instead - the listing of the Password Settings Container, which returns every policy without its attributes, `msDS-PSOApplied` on the users and groups a policy applies to, and `msDS-ResultantPSO` of the scanning account - with name and direct targets, but no settings
+**Что проверяется**:
+- Максимальный срок действия пароля (отключён — пароли бессрочны).
+- Минимальная длина пароля (меньше 8 — слабая политика).
+- Требование сложности паролей.
+- Порог блокировки учётной записи.
+- Настройка обратимого шифрования.
+- История паролей (`pwdHistoryLength`): значение 0 позволяет сразу вернуть пароль, заменённый при сбросе, — предупреждающий признак; стандартная настройка Microsoft запоминает 24 пароля.
+- Детальные политики паролей Fine-Grained Password Policies: те же параметры (длина, сложность, обратимое шифрование, порог и продолжительность блокировки, окно наблюдения, минимальный и максимальный возраст, история паролей), приоритет и объекты применения.
+- Без прав Domain Admin параметры политик по умолчанию прочитать нельзя; вместо этого определяются их имена и назначения: перечисляется Password Settings Container (содержит имена всех политик без атрибутов), `msDS-PSOApplied` на соответствующих пользователях и группах и `msDS-ResultantPSO` текущей учётной записи. Возвращаются имена и прямые назначения, но не настройки.
 
-**Security Impact**: Weak password policies allow attackers to crack passwords more easily or use brute-force attacks without lockout.
+**Влияние на безопасность**: слабая парольная политика упрощает подбор паролей и атаки перебором без блокировки.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-DomainPasswordPolicy
 ```
@@ -175,20 +175,20 @@ Get-DomainPasswordPolicy
 
 ### Get-DomainTrusts
 
-**Purpose**: Enumerates domain and forest trusts.
+**Назначение**: перечисляет доверительные отношения доменов и лесов.
 
-**What it checks**:
-- Trust direction (Inbound, Outbound, Bidirectional)
-- Trust type (Forest, External, Shortcut)
-- SID filtering status
-- Selective authentication configuration
-- The Kerberos encryption types allowed across the trust, from `msDS-SupportedEncryptionTypes` on the trust object - a trust without the attribute supports RC4 and no AES (KB4492348), and the 2026 change that made AES the default for accounts does not cover trusts. A trust without AES is a hint.
-- The domain SID of the partner (`securityIdentifier` on the trust object)
-- On a trust the partner extends to this domain: when the password of its interdomain trust account `<flatName>$` was last changed. The trusting domain changes it about every 30 days; 90 days or more is a hint - the rotation has stopped, and a trust key extracted before stays valid.
+**Что проверяется**:
+- Направление доверия (входящее, исходящее, двустороннее).
+- Тип доверия (лес, внешнее, сокращённое).
+- Состояние фильтрации SID.
+- Настройки выборочной аутентификации.
+- Типы шифрования Kerberos, разрешённые между доверенными доменами, по `msDS-SupportedEncryptionTypes` объекта доверия. Если атрибут отсутствует, доверие использует RC4 без AES (KB4492348); изменение 2026 года, сделавшее AES типом по умолчанию для учётных записей, не распространяется на доверия. Отсутствие AES — предупреждающий признак.
+- SID домена-партнёра (`securityIdentifier` в объекте доверия).
+- Для доверия, при котором партнёр доверяет этому домену, — время последней смены пароля междоменной учётной записи `<flatName>$`. Доверяющий домен меняет его примерно раз в 30 дней; 90 дней и более — сигнал остановки ротации, когда ранее извлечённый ключ доверия остаётся действительным.
 
-**Security Impact**: External trusts may allow lateral movement. Bidirectional trusts expose both domains. SID filtering disabled enables SID history attacks. A trust without AES keeps RC4 in use across it; on a realm trust to MIT Kerberos with an administrator-chosen password, the trust key can be cracked offline from a referral ticket.
+**Влияние на безопасность**: внешние доверия могут позволить горизонтальное перемещение по сети. Двусторонние доверия затрагивают оба домена. Отключённая фильтрация SID допускает атаки через SID History. Отсутствие AES оставляет RC4 на границе доверия; если для доверия с MIT Kerberos пароль выбран администратором, ключ доверия может быть подобран автономно по referral-билету.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-DomainTrusts
 ```
@@ -197,25 +197,25 @@ Get-DomainTrusts
 
 ### Get-LDAPConfiguration
 
-**Purpose**: Checks LDAP security configuration on Domain Controllers.
+**Назначение**: проверяет настройки безопасности LDAP на контроллерах домена.
 
-**What it checks**:
-- LDAP signing requirement
-- LDAP channel binding enforcement
-- `dsHeuristics` on `CN=Directory Service` - one string for the whole forest, which no GPO
-  governs. Four of its characters switch a protection off on every domain controller:
-  - character 7: anonymous LDAP operations beyond rootDSE
-  - character 8: anonymous calls to the NSPI address book interface
-  - character 16: Account, Server, Print or Backup Operators excluded from AdminSDHolder
-    protection, together with their members
-  - character 21: the UPN, SPN or SPN alias uniqueness checks switched off
+**Что проверяется**:
+- Обязательность подписи LDAP.
+- Принудительная привязка канала LDAP (channel binding).
+- `dsHeuristics` в `CN=Directory Service` — одна строка на весь лес, не управляемая
+  GPO. Четыре символа могут отключить защиту сразу на всех контроллерах домена:
+  - символ 7: анонимные LDAP-операции за пределами rootDSE.
+  - символ 8: анонимные вызовы интерфейса адресной книги NSPI.
+  - символ 16: исключение групп Account, Server, Print или Backup Operators и
+    их участников из защиты AdminSDHolder.
+  - символ 21: отключение проверок уникальности UPN, SPN и псевдонимов SPN.
 
-  A character outside the values the specification defines is reported as unknown, not
-  given a meaning.
+  Символ вне определённых спецификацией значений обозначается как неизвестный, без
+  приписывания ему значения.
 
-**Security Impact**: Without LDAP signing, attackers can perform man-in-the-middle attacks. Anonymous access enables reconnaissance without credentials. An operator group outside AdminSDHolder protection keeps whatever rights are granted on it and its members, and those groups lead to the domain controllers. With the SPN alias check off, a principal that may write SPNs can claim a server's service for an account it controls.
+**Влияние на безопасность**: отсутствие подписи LDAP допускает атаки «человек посередине». Анонимный доступ позволяет разведку без учётных данных. Группа операторов, исключённая из AdminSDHolder, сохраняет назначенные ей и участникам права, а такие группы могут влиять на контроллеры домена. При отключённой проверке псевдонимов SPN субъект с правом записи SPN может присвоить своей записи имя службы сервера.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-LDAPConfiguration
 ```
@@ -224,36 +224,36 @@ Get-LDAPConfiguration
 
 ### Get-SMBSigningStatus
 
-**Purpose**: Checks SMB signing configuration on Domain Controllers.
+**Назначение**: проверяет подпись SMB на контроллерах домена.
 
-**What it checks**:
-- SMB signing requirement on DCs
-- SMB signing enablement status
+**Что проверяется**:
+- Требование подписи SMB на контроллерах домена.
+- Состояние включения подписи SMB.
 
-**Security Impact**: Without SMB signing, attackers can perform SMB relay attacks to capture and relay authentication.
+**Влияние на безопасность**: без подписи SMB возможны атаки ретрансляции SMB, перехват и перенаправление аутентификации.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-SMBSigningStatus
 ```
 
 ---
 
-## Creds Module
+## Модуль Creds
 
-Identifies credential exposure vectors.
+Выявляет способы раскрытия учётных данных.
 
 ### Get-LAPSCredentialAccess
 
-**Purpose**: Tests if current user can read LAPS passwords.
+**Назначение**: проверяет, может ли текущий пользователь читать пароли LAPS.
 
-**What it checks**:
-- Actual read access to LAPS password attributes
-- Which computers' LAPS passwords are accessible
+**Что проверяется**:
+- Фактический доступ на чтение атрибутов пароля LAPS.
+- У каких компьютеров текущему пользователю доступны пароли LAPS.
 
-**Security Impact**: If the current user can read LAPS passwords, they can obtain local admin credentials for those computers, enabling lateral movement.
+**Влияние на безопасность**: чтение паролей LAPS даёт доступ к учётным данным локальных администраторов соответствующих компьютеров и может позволить горизонтальное перемещение.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-LAPSCredentialAccess
 ```
@@ -262,24 +262,24 @@ Get-LAPSCredentialAccess
 
 ### Get-BitLockerRecoveryKeyAccess
 
-**Purpose**: Tests which BitLocker recovery keys the current user can read from AD.
+**Назначение**: проверяет, какие ключи восстановления BitLocker текущий пользователь может читать из AD.
 
-**What it checks**:
-- Readable `msFVE-RecoveryPassword` on `msFVE-RecoveryInformation` objects (escrowed as child objects below each computer)
-- The 48-digit recovery password, recovery/volume GUID and escrow time
-- The computer each recovery key belongs to (derived from the parent DN)
+**Что проверяется**:
+- Доступные для чтения `msFVE-RecoveryPassword` у объектов `msFVE-RecoveryInformation` (дочерних объектов компьютера).
+- 48-значный пароль восстановления, GUID восстановления/тома и время сохранения в AD.
+- Компьютер, к которому относится ключ (определяется по родительскому DN).
 
-**How it works**: A single domain-wide, server-side filtered subtree query `(&(objectClass=msFVE-RecoveryInformation)(msFVE-RecoveryPassword=*))`. The presence filter is ACL-gated, so the DC only returns recovery objects whose password the current user is actually allowed to read — no per-computer enumeration. If BitLocker recovery escrow is not used in the domain (no `msFVE-RecoveryInformation` schema/objects), the expensive query is skipped and the result is cached for the session.
+**Как работает**: один запрос по поддереву с серверным фильтром `(&(objectClass=msFVE-RecoveryInformation)(msFVE-RecoveryPassword=*))` для всего домена. Фильтр наличия атрибута учитывает ACL, поэтому DC возвращает только объекты восстановления, пароль которых текущему пользователю действительно разрешено читать; отдельного перебора каждого компьютера нет. Если хранение ключей BitLocker в домене не применяется (нет схемы/объектов `msFVE-RecoveryInformation`), дорогостоящий запрос пропускается, а результат кешируется до конца сеанса.
 
-**Security Impact**: Reading a recovery key is often legitimate (recovery/helpdesk roles) and is reported as a *Hint*, not a Finding. A readable key lets the holder unlock the computer's BitLocker-protected volume offline (given physical access or a disk image), so unexpectedly broad read access can indicate over-permissive delegation on the computer OUs.
+**Влияние на безопасность**: чтение ключа нередко законно для служб поддержки и восстановления, поэтому отмечается как *подсказка*, а не находка. Прочитанный ключ позволяет разблокировать защищённый BitLocker том в автономном режиме при физическом доступе или наличии образа диска; чрезмерно широкое чтение может указывать на избыточное делегирование в OU компьютеров.
 
-**Who else may read them**: A second section lists the principals holding a delegated read of `msFVE-RecoveryPassword` on the containers that hold computers (disabled computers included - a recovery password stays valid for its disk), via `Get-OUPermissions -CheckType BitLocker`. The schema ships the attribute confidential and grants the `msFVE-RecoveryInformation` objects to Domain Admins and SYSTEM only, so a read takes `ReadProperty` **and** `ControlAccess` on the same objects; both halves are combined per container, and the row says whether the right works today, is blocked by the confidential flag (a *Hint*, live the moment the flag is cleared), or cannot be decided because the schema could not be read. `ControlAccess` alone reads nothing and is not listed. An ACE set directly on one computer or recovery object is not seen. Privileged principals are hidden unless `-IncludePrivileged`.
+**Кто ещё может читать**: дополнительный раздел перечисляет субъектов с делегированным правом чтения `msFVE-RecoveryPassword` на контейнерах компьютеров (включая отключённые компьютеры: их пароль восстановления остаётся действительным для диска) через `Get-OUPermissions -CheckType BitLocker`. В схеме атрибут конфиденциальный, а чтение объектов `msFVE-RecoveryInformation` по умолчанию доступно лишь Domain Admins и SYSTEM; нужны **одновременно** `ReadProperty` и `ControlAccess` на этих объектах. Обе части права объединяются по контейнеру, а строка показывает, действует ли оно сейчас, блокируется конфиденциальным флагом (*подсказка*, станет действующим при снятии флага) или невозможно определить из-за недоступности схемы. Один `ControlAccess` без чтения ничего не даёт и не отображается. ACE, заданные непосредственно на одном компьютере или объекте восстановления, не выявляются. Привилегированные субъекты скрыты без `-IncludePrivileged`.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-BitLockerRecoveryKeyAccess
 
-# Also list privileged principals holding a delegated read
+# Также показать привилегированных субъектов с делегированным чтением
 Get-BitLockerRecoveryKeyAccess -IncludePrivileged
 ```
 
@@ -287,35 +287,35 @@ Get-BitLockerRecoveryKeyAccess -IncludePrivileged
 
 ### Get-CredentialRoaming
 
-**Purpose**: Reports users whose DPAPI master keys and private keys are stored in Active Directory, and whether anybody can read them.
+**Назначение**: сообщает о пользователях, чьи мастер-ключи DPAPI и закрытые ключи сохраняются в AD, и о возможности чтения этого материала другими субъектами.
 
-**What it checks**:
-- Which user objects carry roamed credential material (`msPKIDPAPIMasterKeys`, `msPKIAccountCredentials`), and when it last synchronised (`msPKIRoamingTimeStamp`)
-- Whether those two attributes are marked confidential in the schema (`searchFlags` bit 7, `fCONFIDENTIAL`, value 128)
-- Which principals hold a **delegated** read of the attributes on the containers that carry the material
-- Whether any of the affected accounts, or any of the delegated principals, are privileged
+**Что проверяется**:
+- Какие пользователи имеют синхронизированный материал учётных данных (`msPKIDPAPIMasterKeys`, `msPKIAccountCredentials`) и когда он синхронизирован (`msPKIRoamingTimeStamp`).
+- Отмечены ли оба атрибута как конфиденциальные в схеме (`searchFlags`, бит 7, `fCONFIDENTIAL` = 128).
+- Какие субъекты обладают **делегированным** чтением атрибутов на содержащих материал контейнерах.
+- Есть ли привилегированные записи среди затронутых пользователей и субъектов с делегированными правами.
 
-**How it works**: Two server-side presence filters, `(msPKIDPAPIMasterKeys=*)` and `(msPKIAccountCredentials=*)`. The blob attributes themselves are deliberately **not** retrieved — only the account name, DN and timestamp travel. adPEAS has no use for the ciphertext, and writing base64-encoded DPAPI master keys into an HTML report would create the very exposure the check reports. Both attributes are also excluded from display centrally, so no other check can surface them either. Readability is then read once per forest from the two `attributeSchema` objects; the schema object names (`ms-PKI-DPAPIMasterKeys`) differ from the attribute names, so both are matched. The weaker of the two attributes decides, and a forest whose schema cannot be read is reported as *unknown* rather than as either verdict. Finally the containers holding those users are analysed for delegated read ACEs via `Get-OUPermissions -CheckType CredentialRoaming` — once per container, not once per user, since a container's DACL already carries what it inherits from above.
+**Как работает**: используются два серверных фильтра наличия — `(msPKIDPAPIMasterKeys=*)` и `(msPKIAccountCredentials=*)`. Содержимое BLOB-атрибутов намеренно **не извлекается**: передаются только имя записи, DN и время. Для аудита шифротекст не нужен, а помещение DPAPI-ключей в Base64 в HTML-отчёт само создало бы выявляемую утечку. Оба атрибута исключены из отображения централизованно, поэтому их не выводят другие проверки. Флаг конфиденциальности однократно для леса определяется по двум объектам `attributeSchema`; имена объектов схемы (`ms-PKI-DPAPIMasterKeys`) отличаются от имён атрибутов, поэтому проверяются оба варианта. Результат определяется по менее защищённому атрибуту; если схема недоступна, состояние обозначается *неизвестным*, а не подтверждённо безопасным или опасным. Затем `Get-OUPermissions -CheckType CredentialRoaming` проверяет делегированные ACE чтения контейнеров, содержащих пользователей, один раз на контейнер, а не на пользователя: DACL контейнера уже содержит унаследованные права.
 
-**Security Impact**: The attributes hold ciphertext, not plaintext — a master key blob is sealed with a pre-key derived from the user's password **and** with the domain backup key, and the private keys are sealed with those master keys in turn. Material present is therefore a *Hint*: private keys are sitting in the directory where they need not be, and anybody who later obtains the user's hash or the domain backup key can use them. Material a low-privileged account can read is a *Finding*: without the confidential flag, readability follows the ordinary read ACEs of the user object, so in a default domain every authenticated user harvests the roamed material of every other user with a plain LDAP read. Combined with the domain backup key — which every domain administrator holds — that yields another user's private keys offline, and a roamed client-authentication certificate then authenticates as that user without their password. None of this constrains anybody with DCSync, a copy of `ntds.dit` or an AD backup.
+**Влияние на безопасность**: атрибуты содержат шифротекст, не открытый текст. Мастер-ключ запечатан предварительным ключом из пароля пользователя **и** резервным ключом домена, закрытые ключи запечатаны мастер-ключами. Само наличие такого материала — *подсказка*: закрытые ключи хранятся в AD, хотя не обязаны, и могут быть использованы после получения хеша пользователя либо резервного ключа домена. Если материал может читать низкопривилегированный субъект, это *находка*: без флага конфиденциальности чтение следует обычным ACE объекта пользователя, и в типовом домене любой аутентифицированный пользователь может собрать синхронизированный материал других пользователей обычным LDAP-чтением. Вместе с резервным ключом домена (доступным каждому администратору домена) это позволяет восстановить чужие закрытые ключи автономно, а сертификат клиентской аутентификации затем позволяет войти как этот пользователь без пароля. Эти ограничения не распространяются на субъекты с DCSync, копией `ntds.dit` либо резервной копией AD.
 
-**Delegated reads**: the confidential flag covers the blanket case; a delegated read is the one it says nothing about, and the one most likely to have happened by accident. Whether such a right is live depends on the schema, so the same ACE is a *Finding* in one forest and a dormant *Hint* in another:
+**Делегированное чтение**: конфиденциальный флаг регулирует общий доступ, но сам по себе ничего не говорит о делегированных правах, которые могут быть выданы ошибочно. Применимость ACE зависит от схемы: одна и та же ACE в одном лесу является *находкой*, в другом — пока не действующей *подсказкой*:
 
-| ACE grants | Attributes confidential | Verdict |
+| ACE предоставляет | Атрибуты конфиденциальны | Оценка |
 |---|---|---|
-| `ReadProperty` | no | works today — Finding |
-| `ReadProperty` | yes | blocked by the flag — Hint (live the moment it is cleared) |
-| `ReadProperty` + `ControlAccess`, or `GenericAll` | either | works today — Finding |
+| `ReadProperty` | нет | действует сейчас — находка |
+| `ReadProperty` | да | блокируется флагом — подсказка (начнёт действовать после его снятия) |
+| `ReadProperty` + `ControlAccess` либо `GenericAll` | любое значение | действует сейчас — находка |
 
-A `ControlAccess`-only ACE scoped to one of the attributes counts as a grant: the `ReadProperty` half usually needs no delegation at all, because the default ACL already gives every authenticated user a blanket read of all properties. An *unscoped* `ControlAccess` ACE ("all extended rights") is not claimed here — that is `Get-DangerousACLs`' business. Reads covering only `ms-PKI-RoamingTimeStamp` are rated Low and drop out of a default report: a timestamp is a date, not a credential. Privileged holders are hidden unless `-IncludePrivileged`.
+ACE с одним `ControlAccess`, ограниченным определённым атрибутом, учитывается как право: в типовом ACL `ReadProperty` обычно уже доступно всем аутентифицированным пользователям без отдельного делегирования. *Неограниченная* ACE `ControlAccess` («все расширенные права») здесь не заявляется — её анализирует `Get-DangerousACLs`. Чтение лишь `ms-PKI-RoamingTimeStamp` оценивается как Low и скрывается из отчёта по умолчанию: время — не учётные данные. Привилегированные субъекты скрыты без `-IncludePrivileged`.
 
-**Not covered**: an ACE set directly on a single user object, bypassing the container; and a delegation on a container whose users have never roamed anything — there is nothing there to read, and it becomes visible as soon as the first user synchronises.
+**Не охватывается**: ACE, назначенная непосредственно объекту одного пользователя в обход контейнера, и делегирование на контейнере, пользователи которого никогда ничего не синхронизировали. Там пока нечего читать, но это станет видно при первой синхронизации.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-CredentialRoaming
 
-# Also list privileged principals holding a delegated read
+# Также показать привилегированных субъектов с делегированным чтением
 Get-CredentialRoaming -IncludePrivileged
 ```
 
@@ -323,35 +323,35 @@ Get-CredentialRoaming -IncludePrivileged
 
 ### Get-CredentialExposure
 
-**Purpose**: Detects credential exposure in SYSVOL, NETLOGON scripts, and Group Policy Preferences.
+**Назначение**: выявляет учётные данные в SYSVOL, сценариях NETLOGON и Group Policy Preferences.
 
-**What it checks**:
-- GPP passwords in SYSVOL XML files (cpassword attribute, MS14-025)
-- AutoAdminLogon passwords in Registry.xml (plaintext)
-- Hardcoded credentials in NETLOGON/SYSVOL scripts and configuration files (.bat, .cmd, .ps1, .psm1, .psd1, .vbs, .vbe, .kix, .txt, .ini, .inf, .conf, .cnf, .config, .json, .yml, .yaml, .reg, .vnc) and in GPO comment files (.cmtx). Not GptTmpl.inf - every one names the password policy - and not Registry.pol, which is parsed for password values on its own
-- VNC passwords, decrypted: in VNC viewer connection files (.vnc, with the host they name), in the .ini of UltraVNC and TightVNC, and in the registry values a policy deploys for RealVNC, TightVNC, TigerVNC and UltraVNC (REG_SZ or REG_BINARY). Every VNC installation encrypts the password with the same published DES key, so the stored value is the password
-- Passwords in Windows answer files (unattend XML, recognised by its root element): the administrator, local account, automatic logon and domain join passwords, with values hidden by Windows SIM decoded
-- Net use commands with embedded passwords
-- VBScript Encoded (.vbe) files (automatically decoded)
-- Custom UNC paths or local directories (standalone mode)
+**Что проверяется**:
+- Пароли GPP в XML-файлах SYSVOL (атрибут cpassword, MS14-025).
+- Пароли AutoAdminLogon в Registry.xml (открытый текст).
+- Учётные данные, записанные непосредственно в сценариях NETLOGON/SYSVOL и файлах настроек (.bat, .cmd, .ps1, .psm1, .psd1, .vbs, .vbe, .kix, .txt, .ini, .inf, .conf, .cnf, .config, .json, .yml, .yaml, .reg, .vnc) и файлах комментариев GPO (.cmtx). Исключён GptTmpl.inf: в нём каждое совпадение относится к парольной политике; Registry.pol разбирается отдельно для поиска значений паролей.
+- Расшифровываемые пароли VNC: файлы подключения VNC Viewer (.vnc, с указанным в них узлом), .ini UltraVNC и TightVNC, а также параметры реестра, раздаваемые политикой для RealVNC, TightVNC, TigerVNC и UltraVNC (REG_SZ/REG_BINARY). Все эти реализации VNC шифруют пароль одним опубликованным ключом DES, поэтому сохранённое значение фактически является паролем.
+- Пароли из файлов ответов Windows (unattend XML, распознаваемых по корневому элементу): пароли администратора, локальных записей, автоматического входа, присоединения к домену; скрытые Windows SIM значения декодируются.
+- Команды net use, содержащие пароли.
+- Закодированные сценарии VBScript (.vbe, декодируются автоматически).
+- Произвольные UNC-пути и локальные каталоги (автономный режим).
 
-**Detection Tiers**:
+**Уровни достоверности обнаружения**:
 
-| Tier | Severity | Pattern Examples |
+| Уровень | Серьёзность | Примеры шаблонов |
 |------|----------|-----------------|
-| Tier 1 (High Confidence) | Finding | GPP cpassword, `password=Secret123`, `net use ... /user:admin pass`, PSExec with `-p`, connection strings |
-| Tier 2 (Lower Confidence) | Hint | Generic mentions of `password`, `credential`, XML password elements |
+| Уровень 1 (высокая достоверность) | Находка | GPP cpassword, `password=Secret123`, `net use ... /user:admin pass`, PSExec с `-p`, строки подключения |
+| Уровень 2 (ниже достоверность) | Подсказка | Общие упоминания `password`, `credential`, парольные элементы XML |
 
-**Security Impact**: GPP passwords use a published Microsoft AES key and VNC passwords a published DES key; both are trivially decryptable. Credentials in SYSVOL scripts are readable by all authenticated domain users.
+**Влияние на безопасность**: GPP использует опубликованный ключ Microsoft AES, VNC — опубликованный DES; оба легко расшифровать. Учётные данные из сценариев SYSVOL доступны всем аутентифицированным пользователям домена.
 
-**The account behind a credential**: GPP passwords, AutoAdminLogon values and `net use` credentials carry an `accountInAD` row. It says whether a domain account of that name exists, whether it is enabled and privileged, and whether its password was changed after the file was last written. Variables, local and built-in accounts, names qualified with another domain or a computer, and the accounts of a `Groups.xml` (local accounts by definition) are named as such instead of being looked up. Without a directory session the row is left out.
+**Запись, которой принадлежат учётные данные**: пароли GPP, значения AutoAdminLogon и команды `net use` сопровождаются строкой `accountInAD`. Она показывает, существует ли одноимённая доменная запись, включена ли она, привилегирована ли, а также менялся ли пароль после последней записи файла. Переменные, локальные и встроенные учётные записи, имена из другого домена или компьютера и записи из `Groups.xml` (по определению локальные) обозначаются отдельно, а не ищутся в AD. При отсутствии сеанса каталога строка не выводится.
 
-**Usage**:
+**Использование**:
 ```powershell
-# Domain-based scan (SYSVOL/NETLOGON)
+# Сканирование доменных SYSVOL/NETLOGON
 Get-CredentialExposure
 
-# Scan custom UNC path (requires separate Connect-adPEAS session or -Credential)
+# Произвольный UNC-путь (нужен отдельный сеанс Connect-adPEAS либо -Credential)
 Get-CredentialExposure -Path "\\server\share"
 ```
 
@@ -359,26 +359,26 @@ Get-CredentialExposure -Path "\\server\share"
 
 ### Get-PasswordInDescription
 
-**Purpose**: Detects user and computer accounts with potential credentials in description or info attributes.
+**Назначение**: выявляет пользовательские и компьютерные записи с возможными учётными данными в атрибутах description или info.
 
-**What it checks**:
-- Description and info attributes of user accounts
-- Description and info attributes of computer accounts
-- High-confidence password assignments (e.g., `password=Secret123`)
-- Lower-confidence credential mentions for manual review
+**Что проверяется**:
+- Атрибуты description и info у пользователей.
+- Атрибуты description и info у компьютеров.
+- Присваивания пароля высокой достоверности (например, `password=Secret123`).
+- Общие упоминания учётных данных для ручной проверки.
 
-**Security Impact**: Administrators sometimes store passwords directly in the description or info attributes of AD objects. These attributes are readable by all authenticated domain users, exposing credentials to anyone with basic domain access.
+**Влияние на безопасность**: администраторы иногда записывают пароли прямо в description или info объектов AD. Все аутентифицированные пользователи домена могут читать эти атрибуты, что раскрывает пароли даже низкопривилегированным субъектам.
 
-**Detection Tiers**:
+**Уровни достоверности обнаружения**:
 
-| Tier | Severity | Pattern Examples |
+| Уровень | Серьёзность | Примеры шаблонов |
 |------|----------|-----------------|
-| Tier 1 (High Confidence) | Finding | `password=Secret123`, `pwd: admin`, `kennwort=pass` |
-| Tier 2 (Lower Confidence) | Hint | Generic mentions of `password`, `credentials`, `secret=...` |
+| Уровень 1 (высокая достоверность) | Находка | `password=Secret123`, `pwd: admin`, `kennwort=pass` |
+| Уровень 2 (ниже достоверность) | Подсказка | Общие упоминания `password`, `credentials`, `secret=...` |
 
-**Exclusion patterns** filter false positives from password policy text, help text, and placeholders.
+**Шаблоны исключения** отсекают ложные срабатывания по текстам парольных политик, справочной информации и заглушкам.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-PasswordInDescription
 ```
@@ -387,23 +387,23 @@ Get-PasswordInDescription
 
 ### Get-DeletedObjectAccess
 
-**Purpose**: Tests which deleted objects the current user can read, whether they still hold credentials, and who else may list them.
+**Назначение**: проверяет, какие удалённые объекты читает текущий пользователь, остались ли в них учётные данные и кто ещё вправе их перечислять.
 
-**What it checks**:
-- Every deleted object the current user can list in the Deleted Objects container of the domain, found by its well-known GUID and read with the show-deleted control (`1.2.840.113556.1.4.417`)
-- Whether the current user reads them as a member of Administrators, or through a delegation on the container - the latter is a *Hint*
-- The free-text attributes `Get-PasswordInDescription` reads, with the same patterns (shared through `Get-CredentialTextMatch`), and the Unix password attributes `Get-UnixPasswordAccounts` reads
-- The principals outside Tier 0 that may list the container: an ACE that applies to it and grants List Contents, generic read or full control, and its owner
+**Что проверяется**:
+- Все удалённые объекты, перечисляемые текущим пользователем в контейнере Deleted Objects домена; контейнер определяется по well-known GUID, чтение выполняется с контролем показа удалённых (`1.2.840.113556.1.4.417`).
+- Читает ли пользователь через членство в Administrators или благодаря делегированию на контейнере; второй вариант — *подсказка*.
+- Текстовые атрибуты, проверяемые `Get-PasswordInDescription`, с теми же шаблонами из `Get-CredentialTextMatch`, и Unix-атрибуты пароля из `Get-UnixPasswordAccounts`.
+- Субъекты вне Tier 0, которым разрешено перечислять контейнер: применимая к нему ACE с List Contents, общим чтением, полным контролем, а также владелец контейнера.
 
-**Security Impact**: With the AD Recycle Bin enabled, a deleted object keeps every attribute in the Deleted Objects container until its deleted object lifetime ends - 180 days by default. A password typed into the description of a service account outlives the account, and no check that reads live objects sees it any more. By default only SYSTEM and Administrators may list the container (measured: a domain user sees its DN and nothing else); Microsoft documents granting List Contents and Read Property on it to let a team view deleted objects. A deleted object keeps its security descriptor, so whoever may list the container reads of each object what its own ACL allows. A broad group holding the right is a *Finding*, any other principal a *Hint*.
+**Влияние на безопасность**: при включённой корзине AD удалённый объект сохраняет все атрибуты в Deleted Objects до истечения срока хранения удалённых объектов — по умолчанию 180 дней. Пароль, вписанный в описание служебной записи, остаётся после её удаления; проверки действующих объектов больше его не видят. По умолчанию контейнер перечисляют лишь SYSTEM и Administrators (наблюдение: обычный пользователь видит только DN). Microsoft описывает выдачу List Contents и Read Property для доступа службы поддержки к удалённым объектам. Удалённый объект сохраняет собственный дескриптор безопасности, поэтому обладатель права перечислять контейнер читает в каждом объекте лишь разрешённые его ACL поля. Широкая группа с таким правом — *находка*, прочий субъект — *подсказка*.
 
-**Not covered**: The container's ACL is readable by administrators only by default; run as an ordinary user, the check says so. Restoring a deleted object takes Reanimate-Tombstones on the naming context head - reported by `Get-DangerousACLs` for the domain and `Get-CriticalObjectACLs` for the configuration partition. Whether the Recycle Bin is enabled, and the lifetimes, are reported by `Get-DomainInformation`.
+**Не охватывается**: ACL контейнера по умолчанию читают только администраторы; у обычного пользователя проверка сообщает об этом. Для восстановления удалённых объектов необходимо право Reanimate-Tombstones на корне раздела именования, о котором сообщают `Get-DangerousACLs` для домена и `Get-CriticalObjectACLs` для раздела конфигурации. Включение корзины и сроки хранения показываются `Get-DomainInformation`.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-DeletedObjectAccess
 
-# Also list Tier 0 and the Exchange service groups
+# Также перечислить Tier 0 и служебные группы Exchange
 Get-DeletedObjectAccess -IncludePrivileged
 ```
 
@@ -411,18 +411,18 @@ Get-DeletedObjectAccess -IncludePrivileged
 
 ### Get-KerberoastableAccounts
 
-**Purpose**: Finds accounts vulnerable to Kerberoasting.
+**Назначение**: находит учётные записи, уязвимые к Kerberoasting.
 
-**What it checks**:
-- User accounts with servicePrincipalName attribute
-- Account status (enabled, not krbtgt)
-- Encryption types supported
+**Что проверяется**:
+- Пользовательские записи с атрибутом servicePrincipalName.
+- Состояние записи (включена, не krbtgt).
+- Поддерживаемые типы шифрования.
 
-**Security Impact**: Service tickets can be requested for any SPN and cracked offline. Weak passwords are cracked within hours. Output includes Hashcat-compatible hashes.
+**Влияние на безопасность**: для любого SPN можно запросить сервисный билет и подбирать его ключ автономно; слабые пароли могут быть подобраны за часы. Результат содержит хеши, совместимые с Hashcat.
 
-**OPSEC Note**: This check requests TGS tickets from the KDC. Use `-OPSEC` flag to skip.
+**Примечание OPSEC**: проверка запрашивает билеты TGS у KDC. Используйте `-OPSEC` для её пропуска.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-KerberoastableAccounts
 ```
@@ -431,17 +431,17 @@ Get-KerberoastableAccounts
 
 ### Get-ASREPRoastableAccounts
 
-**Purpose**: Finds accounts vulnerable to AS-REP Roasting.
+**Назначение**: находит записи, уязвимые к AS-REP Roasting.
 
-**What it checks**:
-- Accounts with DONT_REQUIRE_PREAUTH flag
-- Account enabled status
+**Что проверяется**:
+- Записи с флагом DONT_REQUIRE_PREAUTH.
+- Состояние включения учётной записи.
 
-**Security Impact**: AS-REP can be requested without credentials and cracked offline. Output includes Hashcat-compatible hashes.
+**Влияние на безопасность**: AS-REP может быть запрошен без учётных данных и подобран автономно; выводятся хеши, совместимые с Hashcat.
 
-**OPSEC Note**: This check requests AS-REP from the KDC. Use `-OPSEC` flag to skip.
+**Примечание OPSEC**: проверка запрашивает AS-REP у KDC. Используйте `-OPSEC` для её пропуска.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-ASREPRoastableAccounts
 ```
@@ -450,18 +450,18 @@ Get-ASREPRoastableAccounts
 
 ### Get-UnixPasswordAccounts
 
-**Purpose**: Finds accounts with passwords stored in Unix attributes.
+**Назначение**: находит записи с паролями в Unix-атрибутах.
 
-**What it checks**:
+**Что проверяется**:
 - `unixUserPassword` attribute
 - `userPassword` attribute
 - `msSFU30Password` attribute
 - `sambaNTPassword` attribute (Samba NT hash)
 - `sambaLMPassword` attribute (Samba LM hash)
 
-**Security Impact**: These attributes may contain passwords in cleartext or weak hash formats (DES, MD5). Samba NT hashes are directly usable for Pass-the-Hash attacks. Any domain user can read these attributes.
+**Влияние на безопасность**: эти атрибуты могут содержать пароли открытым текстом или слабые хеши (DES, MD5). Хеши Samba NT непосредственно применимы для Pass-the-Hash. Любой доменный пользователь может читать эти атрибуты.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-UnixPasswordAccounts
 ```
