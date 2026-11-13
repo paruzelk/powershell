@@ -269,6 +269,46 @@ jobs:
             throw 'ARCH3c synthetic ONLY original OperationJournal / SHA-anchored immutable evidence contract failed.'
           }
           Write-Host 'PASS ARCH3c synthetic immutable SHA-chain, original OperationJournal, no Outlook/PST/Move or production permit.'
+      - name: ARCH3d ORIGINAL MailMover synthetic-only hook ordering and no real writer gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content -LiteralPath 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $h=Get-Content -LiteralPath 'Core/Archive/ARCH3dOriginalMoverBoundary.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3d.ps1' -Raw -Encoding UTF8
+          $t=Get-Content -LiteralPath 'Tests/Archive/ARCH3dOriginalMoverBoundary.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3d-original-mover-boundary-hooks.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $start=$m.IndexOf('function Move-OPAItemsWithLimit')
+          if($start -lt 0){throw 'Original MailMover missing'}
+          $body=$m.Substring($start)
+          $prepare=$body.IndexOf('Stage PrepareIntent')
+          $getDest=$body.IndexOf('$dest = Get-OPAArchiveDestination')
+          $witness=$body.IndexOf('Get-OPA265ARCH2bMailSemanticWitness -Mail $item')
+          $claim=$body.IndexOf('Stage MoveClaimed')
+          $com=$body.IndexOf('$moved = $item.Move($dest.Folder)')
+          $receipt=$body.IndexOf('Stage MoveReturned')
+          $index=$body.IndexOf('Add-OPADuplicateEntry -Index $index -SourceEntryId $candidate.EntryId -ArchiveEntryId $archiveId -SourceFolderPath $folderPath -TargetFolderPath $dest.Folder.FolderPath')
+          if($m -cnotmatch '\[switch\]\$ARCH3dSyntheticBoundary' -or
+             $prepare -lt 0 -or $getDest -le $prepare -or
+             $witness -le $getDest -or $claim -le $witness -or
+             $com -le $claim -or $receipt -le $com -or
+             $index -le $receipt -or
+             $body -cnotmatch 'ARCH3d SYNTHETIC STOP after immutable MoveReturned' -or
+             $h -cnotmatch 'ARCH3D-SYNTHETIC-' -or
+             $h -cnotmatch 'Write-OPA265ARCH3cJsonOnce -Path' -or
+             $h -cnotmatch 'Write-OPAOperationJournalEvent -Path' -or
+             $h -cnotmatch 'OriginalOperationJournalSha256' -or
+             $h -cmatch 'GetActiveObject|AddStoreEx|New-Object -ComObject|Save-OPAArchiveTransaction' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Audit'\)" -or
+             $t -cnotmatch 'executes original GetDestination AND exactly one mock Move' -or
+             $docs -cnotmatch 'ARCH3d' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4207 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 138){
+            throw 'ARCH3d original mover linked pre-PST claim, post-COM stop-before-index or no-real-PST safety contract invalid.'
+          }
+          Write-Host 'PASS ARCH3d existing original Move-OPAItemsWithLimit hooked at all true COM boundaries; only fake COM/TEMP, no production writer.'
       - name: Package only OutlookPOP3Archive from tested commit and calculate SHA-256
         run: |
           $ErrorActionPreference='Stop'
