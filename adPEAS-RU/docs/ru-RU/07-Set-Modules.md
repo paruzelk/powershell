@@ -1,106 +1,106 @@
-# Set- & New-Module Reference (Active Directory Modification Functions)
+# Справочник модулей Set- и New- (функции изменения Active Directory)
 
 
 ---
 
-> ## ⚠️ IMPORTANT LEGAL DISCLAIMER ⚠️
+> ## ⚠️ ВАЖНОЕ ЮРИДИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ ⚠️
 >
-> **USE THESE MODULES AT YOUR OWN RISK!**
+> **ИСПОЛЬЗУЙТЕ ЭТИ МОДУЛИ НА СВОЙ РИСК!**
 > 
-> These modules are EXPERIMENTAL and should be used with caution!
+> Эти модули находятся в ЭКСПЕРИМЕНТАЛЬНОМ состоянии; применяйте их осторожно!
 > 
-> Unauthorized use of these functions is **ILLEGAL** and may violate:
-> - Computer Fraud and Abuse Act (CFAA)
-> - Computer Misuse Act (UK)
-> - StGB §202a-c, §303a-b (Germany)
-> - Similar laws in your jurisdiction
+> Использование функций без разрешения **НЕЗАКОННО** и может нарушать:
+> - Закон США о компьютерном мошенничестве и злоупотреблениях (CFAA).
+> - Закон Великобритании о неправомерном использовании компьютеров (Computer Misuse Act).
+> - `202a–c и `303a–b Уголовного кодекса Германии (StGB).
+> - Аналогичные законы вашей юрисдикции.
 >
-> **You MUST have:**
-> - Written authorization from the system owner
-> - A valid penetration testing contract
-> - Explicit scope definition including AD modifications
+> **Обязательно иметь:**
+> - Письменное разрешение владельца системы.
+> - Действующий договор на проведение тестирования на проникновение.
+> - Явно согласованный объём работ, допускающий изменение AD.
 >
-> **These functions are intended for:**
-> - Authorized penetration testing
-> - Red team engagements
-> - Security research in lab environments
-> - Authorized security assessments
+> **Эти функции предназначены для:**
+> - Санкционированного тестирования на проникновение.
+> - Авторизованных операций Red Team.
+> - Исследования безопасности в лабораторной среде.
+> - Согласованной оценки защищённости.
 >
-> **The authors accept NO LIABILITY for misuse of these tools.**
+> **Авторы НЕ НЕСУТ ОТВЕТСТВЕННОСТИ за неправомерное использование инструментов.**
 
 ---
 
-> ## 🧪 EXPERIMENTAL STATUS
+> ## 🧪 ЭКСПЕРИМЕНТАЛЬНЫЙ СТАТУС
 >
-> The `Set-*` and `New-*` functions in adPEAS are under active development.
-> While they have been tested in lab environments, they may:
+> Функции `Set-*` и `New-*` в adPEAS продолжают разрабатываться.
+> Несмотря на лабораторные испытания, они могут:
 >
-> - Contain bugs that cause unexpected behavior
-> - Produce unintended side effects in certain AD configurations
-> - Not handle all edge cases or error conditions gracefully
-> - Change in behavior between versions
+> - Содержать ошибки, вызывающие непредвиденное поведение.
+> - Вызывать нежелательные побочные эффекты при некоторых конфигурациях AD.
+> - Некорректно обрабатывать отдельные пограничные случаи или ошибки.
+> - Менять поведение между версиями.
 >
-> **Best Practices:**
-> - Always test in a lab environment first
-> - Have a rollback plan before making changes
-> - Document all modifications for cleanup
-> - Use `-PassThru` to verify operations completed as expected
-> - Start with non-critical targets during initial testing
+> **Рекомендации по безопасной работе:**
+> - Сначала проверяйте операции в лаборатории.
+> - Подготавливайте план отката до внесения изменений.
+> - Регистрируйте все изменения для последующей очистки.
+> - Используйте `-PassThru`, чтобы подтвердить ожидаемый результат операции.
+> - На первом этапе проверяйте некритичные объекты.
 
 ---
 
-## Overview
+## Обзор
 
-The Set- and New- Modules provide Active Directory modification capabilities for authorized penetration testing and red team operations. They allow manipulation of:
+Модули Set- и New- позволяют изменять Active Directory в ходе согласованных тестов на проникновение и операций Red Team. Они умеют изменять:
 
-- **User accounts** (Set-DomainUser)
-- **Computer accounts** (Set-DomainComputer)
-- **Groups** (Set-DomainGroup)
-- **Certificate Templates** (Set-CertificateTemplate)
-- **Certificate Requests** (Request-ADCSCertificate)
-- **Group Policy Objects** (Set-DomainGPO)
-- **Generic AD Objects** (Set-DomainObject)
-- **Object location** (Move-DomainObject) — move or rename any object
+- **Учётные записи пользователей** (Set-DomainUser).
+- **Учётные записи компьютеров** (Set-DomainComputer).
+- **Группы** (Set-DomainGroup).
+- **Шаблоны сертификатов** (Set-CertificateTemplate).
+- **Запросы сертификатов** (Request-ADCSCertificate).
+- **Объекты групповой политики** (Set-DomainGPO).
+- **Произвольные объекты AD** (Set-DomainObject).
+- **Расположение объектов** (Move-DomainObject) — перемещение или переименование любого объекта.
 
 ---
 
 ## Set-DomainUser
 
-Modifies user objects in Active Directory for privilege escalation and persistence.
+Изменяет объекты пользователей Active Directory при тестировании повышения привилегий и закрепления доступа.
 
-### Available Operations
+### Доступные операции
 
-| Operation | Parameter | Description | Attack Technique |
+| Операция | Параметр | Описание | Техника атаки |
 |-----------|-----------|-------------|------------------|
-| **Password Reset** | `-NewPassword` | Force-reset user password | Credential theft |
-| **Password Change** | `-NewPassword -OldPassword` | Change password (requires old) | Legitimate change |
-| **Set Owner** | `-Owner` | Take ownership of user object | ACL abuse |
-| **Grant Rights** | `-GrantRights -Principal` | Add ACL permissions | Persistence |
-| **Add RBCD** | `-AddRBCD` | Configure Resource-Based Constrained Delegation | Delegation abuse |
-| **Clear RBCD** | `-ClearRBCD` | Remove RBCD configuration | Cleanup |
-| **Add Shadow Credential** | `-AddShadowCredential` | Add msDS-KeyCredentialLink for PKINIT | Shadow Credentials |
-| **Clear Shadow Credentials** | `-ClearShadowCredentials` | Remove Shadow Credentials | Cleanup |
-| **Set SPN** | `-SetSPN` | Add Service Principal Name | Targeted Kerberoasting |
-| **Clear SPN** | `-ClearSPN` | Remove SPN | Cleanup |
-| **DontReqPreauth** | `-DontReqPreauth` | Set DONT_REQ_PREAUTH flag (UAC 0x400000) | ASREPRoasting |
-| **Clear DontReqPreauth** | `-ClearDontReqPreauth` | Remove DONT_REQ_PREAUTH flag | Cleanup |
-| **Enable Account** | `-Enable` | Enable disabled account | Persistence |
-| **Disable Account** | `-Disable` | Disable account | Denial of Service |
-| **Unlock Account** | `-Unlock` | Unlock locked account | Access recovery |
-| **Password Not Required** | `-PasswordNotRequired` | Set PASSWD_NOTREQD flag (UAC 0x0020) | Account weakening |
-| **Clear Password Not Required** | `-ClearPasswordNotRequired` | Remove PASSWD_NOTREQD flag | Cleanup |
-| **Reversible Encryption** | `-ReversibleEncryption` | Set ENCRYPTED_TEXT_PWD_ALLOWED flag (UAC 0x0080) | Credential theft |
-| **Clear Reversible Encryption** | `-ClearReversibleEncryption` | Remove ENCRYPTED_TEXT_PWD_ALLOWED flag | Cleanup |
-| **Password Never Expires** | `-PasswordNeverExpires` | Set DONT_EXPIRE_PASSWORD flag (UAC 0x10000) | Persistence |
-| **Clear Password Never Expires** | `-ClearPasswordNeverExpires` | Remove DONT_EXPIRE_PASSWORD flag | Cleanup |
-| **Smartcard Required** | `-SmartcardRequired` | Set SMARTCARD_REQUIRED flag (UAC 0x40000) | Account lockout |
-| **Clear Smartcard Required** | `-ClearSmartcardRequired` | Remove SMARTCARD_REQUIRED flag | Cleanup |
-| **Not Delegated** | `-NotDelegated` | Set NOT_DELEGATED flag (UAC 0x100000) | Defensive / Cleanup |
-| **Clear Not Delegated** | `-ClearNotDelegated` | Remove NOT_DELEGATED flag | Cleanup |
-| **Password Expired** | `-PasswordExpired` | Force password change at next logon (pwdLastSet = 0) | Account disruption |
-| **Clear Password Expired** | `-ClearPasswordExpired` | End the password expiry (pwdLastSet = 0, then -1 - the DC writes the current time) | Cleanup |
+| **Сброс пароля** | `-NewPassword` | Принудительно сбросить пароль пользователя | Кража учётных данных |
+| **Смена пароля** | `-NewPassword -OldPassword` | Сменить пароль (требуется старый) | Штатная смена |
+| **Назначить владельца** | `-Owner` | Получить владение объектом пользователя | Злоупотребление ACL |
+| **Выдать права** | `-GrantRights -Principal` | Добавить разрешения в ACL | Закрепление доступа |
+| **Добавить RBCD** | `-AddRBCD` | Настроить ограниченное делегирование на основе ресурсов | Злоупотребление делегированием |
+| **Удалить RBCD** | `-ClearRBCD` | Удалить настройки RBCD | Очистка |
+| **Добавить теневые учётные данные** | `-AddShadowCredential` | Добавить msDS-KeyCredentialLink для PKINIT | Shadow Credentials |
+| **Очистить теневые учётные данные** | `-ClearShadowCredentials` | Удалить Shadow Credentials | Очистка |
+| **Установить SPN** | `-SetSPN` | Добавить имя участника службы SPN | Целевая атака Kerberoasting |
+| **Удалить SPN** | `-ClearSPN` | Удалить SPN | Очистка |
+| **DontReqPreauth** | `-DontReqPreauth` | Установить флаг DONT_REQ_PREAUTH (UAC 0x400000) | ASREPRoasting |
+| **Очистить DontReqPreauth** | `-ClearDontReqPreauth` | Снять флаг DONT_REQ_PREAUTH | Очистка |
+| **Включить учётную запись** | `-Enable` | Включить отключённую запись | Закрепление доступа |
+| **Отключить учётную запись** | `-Disable` | Отключить учётную запись | Отказ в обслуживании |
+| **Разблокировать учётную запись** | `-Unlock` | Разблокировать заблокированную запись | Восстановление доступа |
+| **Пароль не обязателен** | `-PasswordNotRequired` | Установить флаг PASSWD_NOTREQD (UAC 0x0020) | Ослабление защиты учётной записи |
+| **Снять «пароль не обязателен»** | `-ClearPasswordNotRequired` | Снять флаг PASSWD_NOTREQD | Очистка |
+| **Обратимое шифрование** | `-ReversibleEncryption` | Установить флаг ENCRYPTED_TEXT_PWD_ALLOWED (UAC 0x0080) | Кража учётных данных |
+| **Отключить обратимое шифрование** | `-ClearReversibleEncryption` | Снять флаг ENCRYPTED_TEXT_PWD_ALLOWED | Очистка |
+| **Пароль бессрочен** | `-PasswordNeverExpires` | Установить флаг DONT_EXPIRE_PASSWORD (UAC 0x10000) | Закрепление доступа |
+| **Снять бессрочность пароля** | `-ClearPasswordNeverExpires` | Снять флаг DONT_EXPIRE_PASSWORD | Очистка |
+| **Требовать смарт-карту** | `-SmartcardRequired` | Установить флаг SMARTCARD_REQUIRED (UAC 0x40000) | Блокирование учётной записи |
+| **Отменить требование смарт-карты** | `-ClearSmartcardRequired` | Снять флаг SMARTCARD_REQUIRED | Очистка |
+| **Запретить делегирование** | `-NotDelegated` | Установить флаг NOT_DELEGATED (UAC 0x100000) | Защита / очистка |
+| **Снять запрет делегирования** | `-ClearNotDelegated` | Снять флаг NOT_DELEGATED | Очистка |
+| **Пароль истёк** | `-PasswordExpired` | Потребовать смену пароля при следующем входе (pwdLastSet = 0) | Нарушение доступа |
+| **Отменить истечение пароля** | `-ClearPasswordExpired` | Завершить состояние истечения (pwdLastSet = 0, затем -1 — DC запишет текущее время) | Очистка |
 
-### Syntax
+### Синтаксис
 
 ```powershell
 Set-DomainUser
@@ -131,50 +131,50 @@ Set-DomainUser
     [-Credential <PSCredential>]
 ```
 
-### Examples
+### Примеры
 
 ```powershell
-# Targeted Kerberoasting: Add SPN to user
+# Целевой Kerberoasting: добавить пользователю SPN
 Set-DomainUser -Identity "serviceaccount" -SetSPN "HTTP/fakeservice.contoso.com"
-# User is now Kerberoastable!
+# Теперь учётная запись допускает Kerberoasting!
 
-# ASREPRoasting: Disable pre-authentication
+# ASREPRoasting: отключить предварительную аутентификацию
 Set-DomainUser -Identity "targetuser" -DontReqPreauth
-# User's hash can now be retrieved without authentication!
+# Теперь AS-REP-хеш можно получить без аутентификации!
 
-# Shadow Credentials: Add PKINIT certificate
+# Shadow Credentials: добавить сертификат PKINIT
 Set-DomainUser -Identity "targetuser" -AddShadowCredential
-# Returns PFX certificate for authentication!
+# Возвращается PFX-сертификат для аутентификации!
 
-# RBCD: Configure delegation
+# RBCD: настроить делегирование
 Set-DomainUser -Identity "targetuser" -AddRBCD "YOURCOMPUTER$"
-# YOURCOMPUTER$ can now impersonate users TO targetuser!
+# YOURCOMPUTER$ теперь может выдавать пользователей за себя при доступе к targetuser!
 
-# Force password reset (requires ResetPassword rights)
+# Принудительно сбросить пароль (нужно право ResetPassword)
 Set-DomainUser -Identity "targetuser" -NewPassword "NewP@ssw0rd!"
 
-# Enable disabled account
+# Включить отключённую учётную запись
 Set-DomainUser -Identity "disableduser" -Enable
 
-# Cleanup: Remove SPN
+# Очистка: удалить SPN
 Set-DomainUser -Identity "serviceaccount" -ClearSPN "HTTP/fakeservice.contoso.com"
 
-# Cleanup: Re-enable pre-authentication
+# Очистка: снова включить предварительную аутентификацию
 Set-DomainUser -Identity "targetuser" -ClearDontReqPreauth
 
-# UAC Flag Manipulation: Allow empty password
+# Флаги UAC: разрешить пустой пароль
 Set-DomainUser -Identity "targetuser" -PasswordNotRequired
 
-# UAC Flag Manipulation: Password never expires (persistence)
+# Флаги UAC: пароль без срока действия (закрепление доступа)
 Set-DomainUser -Identity "backdooruser" -PasswordNeverExpires
 
-# UAC Flag Manipulation: Enable reversible encryption (credential theft)
+# Флаги UAC: включить обратимое шифрование (кража учётных данных)
 Set-DomainUser -Identity "targetuser" -ReversibleEncryption
 
-# UAC Flag Manipulation: Mark account as sensitive (defensive)
+# Флаги UAC: пометить учётную запись как чувствительную (защитная мера)
 Set-DomainUser -Identity "adminuser" -NotDelegated
 
-# Cleanup: Remove UAC flags
+# Очистка: снять флаги UAC
 Set-DomainUser -Identity "targetuser" -ClearPasswordNotRequired
 Set-DomainUser -Identity "backdooruser" -ClearPasswordNeverExpires
 Set-DomainUser -Identity "targetuser" -ClearReversibleEncryption
@@ -185,34 +185,34 @@ Set-DomainUser -Identity "adminuser" -ClearNotDelegated
 
 ## Set-DomainComputer
 
-Modifies computer objects in Active Directory for delegation attacks and persistence.
+Изменяет объекты компьютеров в Active Directory для тестирования делегирования и закрепления доступа.
 
-### Available Operations
+### Доступные операции
 
-| Operation | Parameter | Description | Attack Technique |
+| Операция | Параметр | Описание | Техника атаки |
 |-----------|-----------|-------------|------------------|
-| **Add RBCD** | `-AddRBCD` | Configure Resource-Based Constrained Delegation | RBCD attack |
-| **Clear RBCD** | `-ClearRBCD` | Remove RBCD configuration | Cleanup |
-| **Set Owner** | `-Owner` | Take ownership of computer object | ACL abuse |
-| **Grant Rights** | `-GrantRights -Principal` | Add ACL permissions | Persistence |
-| **Add Shadow Credential** | `-AddShadowCredential` | Add msDS-KeyCredentialLink | Shadow Credentials |
-| **Clear Shadow Credentials** | `-ClearShadowCredentials` | Remove Shadow Credentials | Cleanup |
-| **Enable Account** | `-Enable` | Enable disabled computer | Persistence |
-| **Disable Account** | `-Disable` | Disable computer account | Denial of Service |
-| **Set Unconstrained Delegation** | `-SetTrustedForDelegation` | Enable Unconstrained Delegation | Delegation abuse |
-| **Clear Unconstrained Delegation** | `-ClearTrustedForDelegation` | Disable Unconstrained Delegation | Cleanup |
-| **Set Constrained Delegation** | `-SetConstrainedDelegation` | Configure Constrained Delegation SPNs | Delegation abuse |
-| **Clear Constrained Delegation** | `-ClearConstrainedDelegation` | Remove Constrained Delegation | Cleanup |
-| **Set Protocol Transition** | `-SetTrustedToAuthForDelegation` | Enable S4U2Self | Delegation abuse |
-| **Clear Protocol Transition** | `-ClearTrustedToAuthForDelegation` | Disable S4U2Self | Cleanup |
-| **Password Not Required** | `-PasswordNotRequired` | Set PASSWD_NOTREQD flag (UAC 0x0020) | Account weakening |
-| **Password Never Expires** | `-PasswordNeverExpires` | Set DONT_EXPIRE_PASSWORD flag (UAC 0x10000) | Persistence |
-| **Not Delegated** | `-NotDelegated` | Set NOT_DELEGATED flag (UAC 0x100000) | Defensive / Cleanup |
-| **Clear Not Delegated** | `-ClearNotDelegated` | Remove NOT_DELEGATED flag (UAC 0x100000) | Re-enable delegation |
-| **Disable Pre-Authentication** | `-DontReqPreauth` | Set DONT_REQ_PREAUTH flag (UAC 0x400000) | AS-REP Roasting |
-| **Enable Pre-Authentication** | `-ClearDontReqPreauth` | Remove DONT_REQ_PREAUTH flag (UAC 0x400000) | Cleanup |
+| **Добавить RBCD** | `-AddRBCD` | Настроить ограниченное делегирование на основе ресурсов | Атака RBCD |
+| **Очистить RBCD** | `-ClearRBCD` | Удалить настройки RBCD | Очистка |
+| **Назначить владельца** | `-Owner` | Получить владение объектом компьютера | Злоупотребление ACL |
+| **Выдать права** | `-GrantRights -Principal` | Добавить разрешения ACL | Закрепление доступа |
+| **Добавить теневые учётные данные** | `-AddShadowCredential` | Добавить msDS-KeyCredentialLink | Shadow Credentials |
+| **Очистить теневые учётные данные** | `-ClearShadowCredentials` | Удалить Shadow Credentials | Очистка |
+| **Включить учётную запись** | `-Enable` | Включить отключённый компьютер | Закрепление доступа |
+| **Отключить учётную запись** | `-Disable` | Отключить учётную запись компьютера | Отказ в обслуживании |
+| **Установить неограниченное делегирование** | `-SetTrustedForDelegation` | Разрешить неограниченное делегирование | Злоупотребление делегированием |
+| **Очистить неограниченное делегирование** | `-ClearTrustedForDelegation` | Запретить неограниченное делегирование | Очистка |
+| **Установить ограниченное делегирование** | `-SetConstrainedDelegation` | Настроить SPN для ограниченного делегирования | Злоупотребление делегированием |
+| **Очистить ограниченное делегирование** | `-ClearConstrainedDelegation` | Удалить ограниченное делегирование | Очистка |
+| **Включить переход протокола** | `-SetTrustedToAuthForDelegation` | Разрешить S4U2Self | Злоупотребление делегированием |
+| **Отключить переход протокола** | `-ClearTrustedToAuthForDelegation` | Запретить S4U2Self | Очистка |
+| **Пароль не обязателен** | `-PasswordNotRequired` | Установить флаг PASSWD_NOTREQD (UAC 0x0020) | Ослабление защиты учётной записи |
+| **Пароль бессрочен** | `-PasswordNeverExpires` | Установить флаг DONT_EXPIRE_PASSWORD (UAC 0x10000) | Закрепление доступа |
+| **Запретить делегирование** | `-NotDelegated` | Установить флаг NOT_DELEGATED (UAC 0x100000) | Защита / очистка |
+| **Снять запрет делегирования** | `-ClearNotDelegated` | Снять флаг NOT_DELEGATED (UAC 0x100000) | Возобновление делегирования |
+| **Отключить предварительную аутентификацию** | `-DontReqPreauth` | Установить флаг DONT_REQ_PREAUTH (UAC 0x400000) | AS-REP Roasting |
+| **Включить предварительную аутентификацию** | `-ClearDontReqPreauth` | Снять флаг DONT_REQ_PREAUTH (UAC 0x400000) | Очистка |
 
-### Syntax
+### Синтаксис
 
 ```powershell
 Set-DomainComputer
