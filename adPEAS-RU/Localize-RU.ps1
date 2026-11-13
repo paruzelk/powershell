@@ -251,3 +251,7 @@ if(-not $?){throw 'Ошибка локализации меток полей DOC
 # DOC4h: проверка двух реальных HTML без публикации доменных данных.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC4hReportPolish.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка точечной локализации HTML DOC4h'}
+
+# DOC4i: исправление заголовков GPO и строк всплывающей оценки риска без изменения машинных данных.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC4iReportPolish.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка исправления отчёта DOC4i'}
