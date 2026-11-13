@@ -4,6 +4,8 @@
 ### ARCH3f — реальный тестовый `info@stios.ru.pst`, безопасная инвентаризация (DEV)
 
 
+**Реальная операторская проверка 13.11.2026:** `Plan` и `Inventory` на тестовом PST завершились без ошибок; исходный Outlook/POP3 scope подтверждён, один непустой eligible Inbox (`Items.Count=26726`), 10 кандидатов за 2020 год, реальный перенос не выполнялся. [Подробная запись приёмки](docs/2.6.5-arch3f-live-operator-acceptance-20261113.md).
+
 **Примеры ARCH3f (Windows PowerShell 5.1, STA):**
 
 ```powershell
