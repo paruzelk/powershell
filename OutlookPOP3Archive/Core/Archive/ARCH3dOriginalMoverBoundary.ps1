@@ -22,7 +22,7 @@ function Assert-OPA265ARCH3dSyntheticBoundary {
     # Reject every actual COM wrapper and anything other than a test double.
     $all=@($Namespace)+@($SourceFolders)
     foreach($obj in $all){
-        if($null -eq $obj -or $obj -is [System.__ComObject] -or $obj.GetType().FullName -ne 'System.Management.Automation.PSCustomObject'){
+        if($null -eq $obj -or $obj.GetType().FullName -ne 'System.Management.Automation.PSCustomObject'){
             throw 'ARCH3d synthetic boundary refuses real Outlook COM objects.'
         }
     }
