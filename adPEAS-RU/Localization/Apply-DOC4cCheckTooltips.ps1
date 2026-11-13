@@ -75,6 +75,9 @@ if($js.Contains('const ruDetailedCheckTooltips = ')){
  throw 'DOC4c: подробный перевод карточек уже установлен'
 }
 $json=ConvertTo-Json -InputObject $translations -Depth 20 -Compress
+# The JSON is embedded in an HTML <script>; no source string may close the tag.
+# Encode markup characters as JSON unicode escapes (JSON values stay equivalent).
+$json=$json.Replace('<','\u003c').Replace('>','\u003e').Replace('&','\u0026')
 $inject=@'
         // DOC4c: complete human-reviewed RU descriptions and criterion-by-criterion
         // parity with checkDescriptions. Original EN remains available for audit only.
