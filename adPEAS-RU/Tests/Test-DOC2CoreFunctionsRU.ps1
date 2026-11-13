@@ -16,6 +16,11 @@ if(-not (Test-Path -LiteralPath $enPath) -or -not (Test-Path -LiteralPath $ruPat
 }
 $en=[IO.File]::ReadAllText($enPath,[Text.Encoding]::UTF8)
 $ru=[IO.File]::ReadAllText($ruPath,[Text.Encoding]::UTF8)
+# Upstream ZIP uses LF; repository checkout on Windows can use CRLF.
+$crlf=([string][char]13+[string][char]10)
+$lf=[string][char]10
+$en=$en.Replace($crlf,$lf)
+$ru=$ru.Replace($crlf,$lf)
 if($ru.Length -lt 25000){throw 'DOC2a: русский справочник неполон'}
 $functions=@('Get-DomainUser','Get-DomainComputer','Get-DomainGroup','Get-DomainGPO',
  'Get-DomainObject','Get-ObjectACL','Get-CertificateTemplate')
