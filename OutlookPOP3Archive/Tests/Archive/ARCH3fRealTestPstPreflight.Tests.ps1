@@ -234,6 +234,6 @@ Describe 'ARCH3f source-backed read-only integration safety gates' {
         $s=Get-Content -LiteralPath (Join-Path $script:root 'docs/2.6.5-arch3f-test-pst-authorization.md') -Raw -Encoding UTF8
         $s | Should -Match 'OperatorDesignatedTestPstWithRealMailboxContent'
         $s | Should -Match 'IMAP'
-        $s | Should -Match 'не должен автоматически'
+        $s | Should -Match 'не должны автоматически'
     }
 }
