@@ -34,7 +34,7 @@ $dest=$body.IndexOf('$dest = Get-OPAArchiveDestination', [StringComparison]::Ord
 $pre=$body.IndexOf('Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage PrepareIntent', [StringComparison]::Ordinal)
 $witness=$body.IndexOf('$sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item',[StringComparison]::Ordinal)
 $witnessReceipt=$body.IndexOf('Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage SourceWitnessAnchored',[StringComparison]::Ordinal)
-$originalStepClaim=$body.IndexOf("Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Move Started'",[StringComparison]::Ordinal)
+$originalStepClaim=$body.IndexOf('Save-OPAArchiveTransaction -Transaction $Transaction -Status ''Running'' -Step ''Move Started''',[StringComparison]::Ordinal)
 $protectedClaim=$body.IndexOf('Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage MoveClaimed',[StringComparison]::Ordinal)
 $com=$body.IndexOf('$moved = $item.Move($dest.Folder)',[StringComparison]::Ordinal)
 $returned=$body.IndexOf('Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage MoveReturned',[StringComparison]::Ordinal)
