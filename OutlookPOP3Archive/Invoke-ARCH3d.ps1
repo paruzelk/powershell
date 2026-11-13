@@ -29,7 +29,7 @@ $main=[IO.File]::ReadAllText((Join-Path $PSScriptRoot 'OutlookPOP3Archive.ps1'),
 $hook=[IO.File]::ReadAllText((Join-Path $PSScriptRoot 'Core/Archive/ARCH3dOriginalMoverBoundary.ps1'),[Text.Encoding]::UTF8)
 # Restrict order assertions to the ORIGINAL production mover body, not
 # earlier helper definitions that legitimately call the same functions.
-$body=$mover.Substring($body.IndexOf('function Move-OPAItemsWithLimit',[StringComparison]::Ordinal))
+$body=$mover.Substring($mover.IndexOf('function Move-OPAItemsWithLimit',[StringComparison]::Ordinal))
 $dest=$body.IndexOf('$dest = Get-OPAArchiveDestination', [StringComparison]::Ordinal)
 $pre=$body.IndexOf('Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage PrepareIntent', [StringComparison]::Ordinal)
 $witness=$body.IndexOf('$sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item',[StringComparison]::Ordinal)
