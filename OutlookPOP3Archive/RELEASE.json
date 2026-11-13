@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3f DEV step 1: operator-designated real-mail info@stios.ru.pst accepted as TEST SOURCE for bounded live validation. New read-only real-Outlook preflight uses ORIGINAL ARCH2d strict POP3 AccountType=2 exact StoreID scope, ORIGINAL Get-OPAEligiblePop3MailFolders and system well-known EntryID map, ORIGINAL Get-OPAArchiveCandidates including SentOn, ORIGINAL Year and PST-part routing to preview Inbox/Sent/user nested folders. No Move/AddStoreEx/PST/JSON writes; YearSampleCounts explicitly not full year census. 29 Pester tests, expected 4267 tests in 140 Windows PS5.1 containers. Live one-shot writer and independent Outlook restart/commit integration NOT YET WIRED; production Archive/Resume/Auto remain blocked.",
     "ARCH3e DEV: original ArchiveVerifier Test-OPAArchiveMoves -RequireSemanticWitness with original ARCH2b full Body, HTML, recipients and attachment SHA witness, externally pinned ARCH3d MoveReturned receipt, fake new Outlook ProcessId, strict source=0 and isolated target folder=1; only then original OperationJournal Intent->Reconciled and original DuplicateIndex append/fsync/readback, immutable SHA-linked synthetic final seal. Source remains nonexistent PST in OS TEMP; all fake PSCustomObject objects, no real Outlook COM or live process evidence; 31 new Pester tests, expected full PS5.1 CI 4238/139. Original Archive/Resume/Auto still closed, 90GB production uncertified.",
 
     "ARCH3d DEV: protected boundary hooks NOW WIRED IN ORIGINAL MailMover Move-OPAItemsWithLimit (opt-in SYNTHETIC only): original pre-destination durable intent and original OperationJournal, original Get-OPAArchiveDestination unchanged, actual chosen Year/PST part/Outlook FolderPath bound, original ARCH2b source witness SHA then one-shot claim, original MailItem.Move exercised with fake PSCustomObject test double, immutable returned receipt or indeterminate journal. Protected mode must stop BEFORE legacy DuplicateIndex commit until independent post-restart reconciliation exists. Real POP3 PST and COM explicitly forbidden under mode, main Archive/Resume/Auto remain blocked. 33 new Pester tests against actual original mover and fake COM, expected full Windows PowerShell 5.1 CI 4207 tests in 138 containers; no production certification.",
@@ -82,8 +83,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 139,
-    "ExpectedPesterTests": 4238,
+    "ExpectedTestContainers": 140,
+    "ExpectedPesterTests": 4267,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
