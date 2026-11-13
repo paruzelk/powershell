@@ -211,6 +211,9 @@ function Invoke-OPA265ARCH3eSyntheticVerifiedIndexCommit {
        TransactionId=[string]$Operation.TransactionId;ArchiveGrouping=[string]$Operation.ArchiveGrouping;
        SourcePst=[string]$Operation.SourcePst;ArchivePst=[string]$receipt.ArchivePst;Subject=$ExpectedSubject}
     Add-OPADuplicateEntry @indexParams
+    # Original DuplicateIndex supports Safe/Fast durability modes; always
+    # force-flush the original writer before independent readback and seal.
+    Sync-OPADuplicateJournalStreams
     $loaded=Import-OPADuplicateIndex -ArchivePst ([string]$receipt.ArchivePst)
     $entry=Test-OPADuplicateEntry -Index $loaded -SourceEntryId ([string]$Operation.EntryId)
     if($null -eq $entry -or [string]$entry.ArchiveEntryId -cne [string]$receipt.DestinationEntryId){
