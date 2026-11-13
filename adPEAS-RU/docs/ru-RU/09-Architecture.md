@@ -47,28 +47,28 @@ adPEAS использует только встроенные классы .NET 
 
 ```
 +-------------------------------------------------------+
-|                      adPEAS.ps1 (Main)                |
-|                    Orchestration Layer                |
+|                      adPEAS.ps1 (основа)                |
+|                    Уровень управления                 |
 +---------------------------+---------------------------+
                             |
         +-------------------+-------------------+
         |                   |                   |
 +-------v-------+   +-------v-------+   +-------v-------+
-|    Helpers    |   |     Core      |   |    Checks     |
+|    Helpers    |   |     Core      |   |    Аудит      |
 +---------------+   +---------------+   +---------------+
-| Convert*      |<--| Get-Domain*   |<--| Security      |
-| Ensure*       |   | Invoke-LDAP*  |   | Analyses      |
-| Test-*        |   | Connect-*     |   | Findings      |
+| Convert*      |<--| Get-Domain*   |<--| Проверки      |
+| Ensure*       |   | Invoke-LDAP*  |   | Риски         |
+| Test-*        |   | Connect-*     |   | Находки       |
 | Kerberos*     |   | Set-Domain*   |   |               |
 +-------+-------+   +-------+-------+   +-------+-------+
         |                   |                   |
         +-------------------+-------------------+
                             |
                     +-------v-------+
-                    |   Reporting   |
+                    |   Отчёты      |
                     +---------------+
-                    | Text Export   |
-                    | Console Out   |
+                    | Текстовый     |
+                    | Консоль       |
                     +---------------+
 ```
 
@@ -77,28 +77,28 @@ adPEAS использует только встроенные классы .NET 
 ## <a id="data-flow"></a>Поток данных
 
 ```
-1. User Input (Parameters)
+1. Ввод (параметры)
          |
          v
-2. Authentication (Connect-adPEAS)
+2. Аутентификация (Connect-adPEAS)
          |
          v
-3. LDAP Connection ($Script:LdapConnection)
+3. LDAP-соединение ($Script:LdapConnection)
          |
          v
-4. Data Caching ($Script:LDAPContext)
+4. Кеширование ($Script:LDAPContext)
          |
          v
-5. Check Execution (Check Modules)
+5. Запуск проверок (модули аудита)
          |
          v
-6. Finding Generation
+6. Формирование находок
          |
          v
-7. Output Formatting (Show-* functions)
+7. Форматирование (функции Show-*)
          |
          v
-8. Report (Console/File)
+8. Отчёт (консоль/файл)
 ```
 
 ---
@@ -108,7 +108,7 @@ adPEAS использует только встроенные классы .NET 
 ### <a id="call-hierarchy"></a>Иерархия вызовов
 
 ```
-Check Module
+Модуль аудита
     |
     +-> Get-DomainUser / Get-DomainGroup / Get-DomainComputer / Get-DomainGPO
     |       |
@@ -118,8 +118,8 @@ Check Module
     |                       |
     |                       +-> $Script:LdapConnection (LdapConnection)
     |
-    +-> Get-ObjectACL (ACL analysis checks)
-    +-> Get-CertificateTemplate / Get-CertificateAuthority (ADCS checks)
+    +-> Get-ObjectACL (анализ ACL)
+    +-> Get-CertificateTemplate / Get-CertificateAuthority (проверки AD CS)
 ```
 
 ### <a id="rules"></a>Правила
@@ -150,7 +150,7 @@ Check Module
 ```
 +-------------------------------------------------------+
 |                    Connect-LDAP                       |
-|                Creates LdapConnection                 |
+|                Создаёт LdapConnection                 |
 +---------------------------+---------------------------+
                             |
                             v
@@ -164,7 +164,7 @@ Check Module
         v                   v                   v
 +---------------+   +---------------+   +---------------+
 | SearchRequest |   | ModifyRequest |   |  Anonymous    |
-| (Queries)     |   | (Set-*)       |   |  Bind Test    |
+| (Queries)     |   | (Set-*)       |   |  Тест bind    |
 +---------------+   +---------------+   +---------------+
 ```
 
@@ -198,28 +198,28 @@ $Script:LDAPContext = @{
 ```
 +-------------------+
 | Connect-adPEAS    |
-| (Entry Point)     |
+| (Точка входа)     |
 +---------+---------+
           |
           v
-+-------------------+      Success      +-------------------+
++-------------------+      Успех      +-------------------+
 | Invoke-Kerberos   |------------------>| Import-Kerberos   |
 | Auth (TGT)        |                   | Ticket (PTT)      |
 +---------+---------+                   +---------+---------+
           |                                       |
-          | Failure                               v
+          | Сбой                                  v
           v                             +-------------------+
 +-------------------+                   | Connect-LDAP      |
-| NTLM              |                   | (Kerberos auth)   |
-| Impersonation     |                   +---------+---------+
-| (Fallback 1)      |                             |
+| NTLM              |                   | (Kerberos     )   |
+| Имперсонация      |                   +---------+---------+
+| (Резерв 1  )      |                             |
 +---------+---------+                             |
           |                                       |
-          | Failure                               |
+          | Сбой                                  |
           v                                       |
 +-------------------+                             |
 | SimpleBind        |                             |
-| (Fallback 2)      |                             |
+| (Резерв 2  )      |                             |
 +---------+---------+                             |
           |                                       |
           +-------------------+-------------------+
@@ -255,17 +255,17 @@ adPEAS использует единый конвейер формировани
 
 ```
 +----------------------------------------------------------+
-|                    Check Module                          |
-|           Returns structured finding objects             |
+|                    Модуль аудита                          |
+|           Возвращает объекты находок                     |
 +---------------------------+------------------------------+
                             |
                             v
 +----------------------------------------------------------+
-|              Get-RenderModel (Model Builder)             |
-|    - Object type detection (User/Computer/GPO/Cert)      |
-|    - Attribute ordering and classification               |
-|    - Delegates to AttributeTransformers per attribute    |
-|    - Returns: { Primary, Extended, PostObject } model    |
+|              Get-RenderModel (Модель вывода)             |
+|    - Тип объекта (User/Computer/GPO/Cert)                |
+|    - Порядок и классы атрибутов                          |
+|    - Преобразует атрибуты через AttributeTransformers    |
+|    - Возвращает: { Primary, Extended, PostObject } model    |
 +---------------------------+------------------------------+
                             |
               +-------------+-------------+
@@ -273,16 +273,16 @@ adPEAS использует единый конвейер формировани
               v                           v
 +---------------------------+  +---------------------------+
 | Render-ConsoleObject      |  | Render-HtmlObject         |
-| - ANSI color codes        |  | - HTML table rows         |
-| - Prefix ([!],[+],etc.)   |  | - Severity CSS classes    |
-| - Multivalue alignment    |  | - Tooltip integration     |
-| - AlignAt column layout   |  | - Collapsible sections    |
+| - ANSI color codes        |  | - Строки HTML-таблиц         |
+| - Prefix ([!],[+],etc.)   |  | - CSS-классы серьёзности    |
+| - Multivalue alignment    |  | - Подсказки               |
+| - AlignAt column layout   |  | - Сворачиваемые блоки     |
 +---------------------------+  +---------------------------+
               |                           |
               v                           v
 +---------------------------+  +---------------------------+
 | Write-adPEASOutput        |  | Export-HTMLReport         |
-| - Console + Text file     |  | - Full HTML report        |
+| - Console + Text file     |  | - Полный HTML-отчёт        |
 +---------------------------+  +---------------------------+
 ```
 
