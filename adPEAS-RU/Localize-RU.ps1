@@ -243,3 +243,7 @@ if(-not $?){throw 'Ошибка точечного перевода DOC4e'}
 # DOC4f: проверенные на повторных HTML три текстовых пояснения ACL/Tier 0.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC4fObservedHTML.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка предметной локализации пояснений DOC4f'}
+
+# DOC4g: только подписи синтетических полей HTML; AD/LDAP имена не заменяются.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC4gVisibleFieldLabels.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации меток полей DOC4g'}
