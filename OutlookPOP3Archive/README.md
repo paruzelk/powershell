@@ -3,6 +3,32 @@
 
 ### ARCH3f — реальный тестовый `info@stios.ru.pst`, безопасная инвентаризация (DEV)
 
+
+**Примеры ARCH3f (Windows PowerShell 5.1, STA):**
+
+```powershell
+$source = 'C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.pst'
+.\Invoke-ARCH3f.ps1 -Mode Plan -SourcePst $source | Format-List
+$inventory = .\Invoke-ARCH3f.ps1 -Mode Inventory -SourcePst $source -SamplePerFolder 5 -MaxFolders 64 -OlderThanMonths 0
+$inventory.Folders | Format-Table SourceFolderPath,ItemsCount,SentLike -AutoSize
+$inventory.YearSampleCounts | Format-Table Year,SampleCount -AutoSize
+$inventory.Candidates | Format-Table ArchiveYear,PlannedArchivePart1Pst,PlannedTargetFolderPath -AutoSize
+```
+
+**Все ключи `Invoke-ARCH3f.ps1` на текущем шаге:**
+
+| Ключ | Тип / диапазон | Умолчание | Назначение |
+| --- | --- | --- | --- |
+| `-Mode` | `Plan` / `Inventory` | `Plan` | План без Outlook либо строго read-only инвентаризация реального тестового PST |
+| `-SourcePst` | `string`, обязательный | нет | Локальный файл с точным именем `info@stios.ru.pst` |
+| `-SamplePerFolder` | `int`, 1–20 | 5 | Верхний предел выборки кандидатов в каждой папке |
+| `-MaxFolders` | `int`, 1–128 | 64 | Максимальное число непустых подходящих почтовых папок |
+| `-OlderThanMonths` | `int`, 0–120 | 0 | Отбор старых писем, 0 означает без фильтра возраста |
+| `-WhatIf` | общий параметр PowerShell | False | Дополнительная защита; оба режима и без неё не пишут PST |
+| `-Verbose`, `-Debug`, `-ErrorAction` | общие параметры PowerShell | стандартные | Диагностика и обработка ошибок |
+
+
+
 **В ARCH3f используется существующий оператором обозначенный тестовый PST с реальными письмами.** Новый `Invoke-ARCH3f.ps1 -Mode Plan|Inventory` проверяет исходный POP3-аккаунт (оригинальная проверка ARCH2d), перебирает Inbox/Sent/пользовательские папки с оригинальной системой исключений и выбирает ограниченные образцы писем через исходный `ArchiveSelector`. Даты SentOn и существующее именование `Archive-2020.pst`, `Archive-2021.pst` сохраняются. Это пока **только реальная read-only проверка Outlook**: не вызываются `Move`, `AddStoreEx`, запись PST/журналов/индекса; годовая статистика относится к образцу, не ко всем письмам. Реальные пилоты на этом PST разрешены решением оператора, но отдельный одноразовый runtime-path и пострестартовая сверка ещё не готовы. [Инструкции, все параметры и примеры](docs/2.6.5-arch3f-real-test-pst-preflight.md); [разрешение использовать существующий тестовый PST](docs/2.6.5-arch3f-test-pst-authorization.md). `Archive/Resume/Auto` остаются закрытыми.
 
 
