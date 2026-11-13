@@ -1,3 +1,8 @@
+## 2.6.5-ARCH3i1 DEV — 2026-11-13
+- Operator Plan and Seal PASS, RunId 3773bcd7-5a07-4c31-8ce5-dfb16ddd30bf; original full witness persisted and independently read back.
+- Fixed public Review null-to-DateTime binding by passing Mode/RunId/SealSha256 only, leaving original writer and protected sealed file intact.
+- Two public CLI regression tests added; expected 4323 Pester in 143 containers; no PST writer, Move or automatic retry.
+
 ## 2.6.5-ARCH3i DEV — 2026-11-13
 - Operator ARCH3h independently pinned complete original ARCH2b semantic SHA256 8782b410253f54cc5374661077cdfc9279bcfba12805f0dab42b461320cb999c.
 - Original full witness exposed only to internal ARCH3i Seal; CreateNew+Flush(true) in protected current user LOCALAPPDATA evidence folder, original schema/digest independent SHA256 readback, never overwrite RunId.

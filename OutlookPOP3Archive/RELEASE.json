@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3i1: real original full witness Seal passed, public Review DateTime null binding corrected, only Mode RunId SealSha256 forwarded. Preserve existing evidence and no Move. 2 new actual CLI Pester regression cases, total expected 4323 tests in 143 containers.",
     "ARCH3i DEV: original ARCH2b full witness externally pinned SHA 8782b410... persisted only in private LOCALAPPDATA immutable evidence using original ARCH3c CreateNew+Flush(true)/readback; 23 new Pester, 4321 in 143 Windows PS5.1 containers expected; NO PST Move, original OperationJournal Intent, Index or production writer.",
     "ARCH3h DEV step1: operator-pinned real POP3 Inbox original full semantic SHA256 witness using ORIGINAL ARCH2b witness and ARCH3d hash bridge, archive part1 collision 271360 bytes, zero attachments, source PST 7694763008 bytes; no durable move claims or original MailMover writer enabled, future one-shot must isolate shared duplicate index and independently verify after actual Outlook restart. 17 Pester tests, Windows PowerShell 5.1 full 4298 tests / 142 containers expected.",
     "ARCH3g DEV READ-ONLY: original annual archive part collision gate recognizes operator-observed existing info@stios.ru.Archive-2020.pst; source EntryID pinned, real existing Outlook/POP3 Inbox/StoreID/date/attachment COUNT checked in Audit with no Move, AddStoreEx, writes or new claim. Preview next annual part is NOT reserved/authorized; current Archive/Resume/Auto and all writers remain blocked. 14 Pester regressions, expected 4281/141 Windows PS5.1 CI. Live original MailMover->Verifier->Journal->DuplicateIndex is not certified.",
@@ -87,7 +88,7 @@
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
     "ExpectedTestContainers": 143,
-    "ExpectedPesterTests": 4321,
+    "ExpectedPesterTests": 4323,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

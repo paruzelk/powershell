@@ -1,6 +1,18 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3i1 — исправлено чтение Review без даты (DEV)
+
+Реальный ARCH3i Seal успешно создал полный witness RunId 3773bcd7-5a07-4c31-8ce5-dfb16ddd30bf с SHA256 файла 5f5a86b6c1aba8a3d2ee328a36a5632f8edf1e89fdda8e7fd728688fe881b2a4. Отдельный Review падал при передаче NULL в DateTime. ARCH3i1 исправляет публичную передачу параметров и добавляет два end-to-end теста. **Seal не повторять.**
+
+```powershell
+.\Invoke-ARCH3i.ps1 -Mode Review `
+    -RunId '3773bcd7-5a07-4c31-8ce5-dfb16ddd30bf' `
+    -SealSha256 '5f5a86b6c1aba8a3d2ee328a36a5632f8edf1e89fdda8e7fd728688fe881b2a4' | Format-List
+```
+
+[Полное описание хотфикса](docs/2.6.5-arch3i1-review-date-binding-fix.md). WriterPermit=False, PST не меняется, Move закрыт.
+
 ### ARCH3i — полный оригинальный semantic witness в защищённом файле (DEV)
 
 Оператор подтвердил исходный полный ARCH3h semantic SHA256 **8782b410253f54cc5374661077cdfc9279bcfba12805f0dab42b461320cb999c**. ARCH3i повторно получает полный original ARCH2b witness и сверяет его с этим SHA, затем сохраняет в приватном **LOCALAPPDATA**, через CreateNew/Flush(true), с независимой SHA256-проверкой чтения. **Только evidence JSON, без Move, PST и Index**. Новый GUID RunId обязателен, запись не повторяется; Review не открывает Outlook. [Примеры запуска и все параметры](docs/2.6.5-arch3i-sealed-full-original-witness.md).

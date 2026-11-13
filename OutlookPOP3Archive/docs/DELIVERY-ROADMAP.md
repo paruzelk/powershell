@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3i1 (2026-11-13):** реальный ARCH3i Seal и внутренний readback PASS, исправлена ошибка передачи отсутствующего DateTime в публичном Review. [Два аргумента для Review](2.6.5-arch3i1-review-date-binding-fix.md). Старый RunId/файл не повторять и не перезаписывать. Writer закрыт.
+
+
 > **ARCH3i (2026-11-13):** исходный полный ARCH3h semantic SHA подтверждён 8782b410253f54cc5374661077cdfc9279bcfba12805f0dab42b461320cb999c. [Sealed full original witness с приватным ACL, CreateNew+Flush(true), независимым SHA readback](2.6.5-arch3i-sealed-full-original-witness.md). Это запись evidence, НЕ writer. Далее: настоящий одноразовый original MailMover с изоляцией существующей Part1 PST и общего DuplicateIndex, durable intent, postrestart verifier.
 
 
