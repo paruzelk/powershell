@@ -1,3 +1,8 @@
+## 2.6.5-ARCH3g DEV — 2026-11-13
+- ARCH3f operator showed an already existing `Archive-2020.pst`: prevent using its mere presence as a fresh one-shot target. New read-only original Year/Part collision inspection and separately pinned existing Inbox MailItem/StoreID/date/actual attachment COUNT audit.
+- Enforces a non-reserved next-part preview, exact original POP3 scope, no writer permission, immutable historical evidence unchanged. No semantic attachment SHA snapshot, Move, PST creation, journal/index commit or production claim.
+- 14 pure/fake-COM Pester cases; expected full Windows PowerShell 5.1 CI 4281 tests/141 containers; SHA256 ZIP only after PASS.
+
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
 

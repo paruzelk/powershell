@@ -1,6 +1,18 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3g — существующий Archive-2020.pst обнаружен: защищённый Plan/Audit (DEV)
+
+**ARCH3f операторская приёмка PASS:** для `info@stios.ru.pst` подтверждены `ProfileName=Outlook`, `Pop3ScopeApproved=True`, `Items.Count=26726`, 10 старых писем за 2020 год. При следующей проверке оператор подтвердил, что `Archive-2020.pst` **уже существует**. ARCH3g не перемещает сообщения: он считывает оригинальные годовые части с диска, строго проверяет точный Inbox `EntryID` и фактический счётчик вложений только через открытый Outlook. Предлагаемый путь `Archive-2020-02.pst` — лишь предварительное имя, не разрешение на создание или запись. [Все параметры и команды ARCH3g](docs/2.6.5-arch3g-existing-year-pst-collision-gate.md).
+
+```powershell
+$source = 'C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.pst'
+$id = '00000000E1878292411BC64291BD506DCEFD2A35E4FC3B00'
+.\Invoke-ARCH3g.ps1 -Mode Plan -SourcePst $source -SourceEntryId $id -ArchiveYear 2020 | Format-List
+$audit = .\Invoke-ARCH3g.ps1 -Mode Audit -SourcePst $source -SourceEntryId $id -ArchiveYear 2020
+$audit | Format-List
+```
+
 ### ARCH3f — реальный тестовый `info@stios.ru.pst`, безопасная инвентаризация (DEV)
 
 

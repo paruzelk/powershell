@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3g read-only collision gate (2026-11-13):** архив `Archive-2020.pst` уже существует, поэтому первый новый live one-shot нельзя молча направить в него. [Операторский Plan/Audit ARCH3g](2.6.5-arch3g-existing-year-pst-collision-gate.md) повторно проверяет оригинальные части PST и точный исходный Inbox EntryID/реальный счётчик вложений. Полный SHA witness, Move, restart commit и production по-прежнему закрыты.
+
 
 > **ARCH3f, этап 1 — настоящий тестовый PST, только чтение (2026-11-13):** добавлен [реальный POP3 preflight с примерами](2.6.5-arch3f-real-test-pst-preflight.md). `Invoke-ARCH3f.ps1 -Mode Plan|Inventory` использует действующий `info@stios.ru.pst` как **тестовый источник реальной почты**, старый ARCH2d POP3 StoreID/profile scope, SystemFolders/well-known EntryID, ArchiveSelector с SentOn и старый Year/part-folder naming. Никаких PST/JSON/COM Move записей. Следующие ARCH3f шаги: отдельное разрешение на строго одну реальную bounded операцию через исходный mover + durable claim, реальный независимый Outlook restart, сверка исходного witness/папок/нескольких годов и индекс только после подтверждения; 90 ГБ — отдельная нагрузочная приёмка. `Archive/Resume/Auto` всё ещё закрыты, `ProductionReady=False`.
 
