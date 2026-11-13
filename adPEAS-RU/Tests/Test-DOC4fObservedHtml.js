@@ -9,7 +9,8 @@ const source=fs.readFileSync(path.join(root,'src/modules/Reporting/templates/rep
 const startMarker='        // DOC4f: original HTML evidence identifies exactly three field-scoped';
 const endMarker='        // Scoring context data for context-aware risk calculation';
 const from=source.indexOf(startMarker);
-const to=source.indexOf(endMarker,from);
+const next=source.indexOf('        // DOC4g: display labels for synthetic report fields only.',from);
+const to=next>=0 ? next : source.indexOf(endMarker,from);
 assert(from>=0&&to>from,'DOC4f emitted JS block missing');
 let onLoad=null,rows=[];
 const document={
