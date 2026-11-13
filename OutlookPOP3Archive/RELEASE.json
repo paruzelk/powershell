@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3h DEV step1: operator-pinned real POP3 Inbox original full semantic SHA256 witness using ORIGINAL ARCH2b witness and ARCH3d hash bridge, archive part1 collision 271360 bytes, zero attachments, source PST 7694763008 bytes; no durable move claims or original MailMover writer enabled, future one-shot must isolate shared duplicate index and independently verify after actual Outlook restart. 17 Pester tests, Windows PowerShell 5.1 full 4298 tests / 142 containers expected.",
     "ARCH3g DEV READ-ONLY: original annual archive part collision gate recognizes operator-observed existing info@stios.ru.Archive-2020.pst; source EntryID pinned, real existing Outlook/POP3 Inbox/StoreID/date/attachment COUNT checked in Audit with no Move, AddStoreEx, writes or new claim. Preview next annual part is NOT reserved/authorized; current Archive/Resume/Auto and all writers remain blocked. 14 Pester regressions, expected 4281/141 Windows PS5.1 CI. Live original MailMover->Verifier->Journal->DuplicateIndex is not certified.",
     "ARCH3f DEV step 1: operator-designated real-mail info@stios.ru.pst accepted as TEST SOURCE for bounded live validation. New read-only real-Outlook preflight uses ORIGINAL ARCH2d strict POP3 AccountType=2 exact StoreID scope, ORIGINAL Get-OPAEligiblePop3MailFolders and system well-known EntryID map, ORIGINAL Get-OPAArchiveCandidates including SentOn, ORIGINAL Year and PST-part routing to preview Inbox/Sent/user nested folders. No Move/AddStoreEx/PST/JSON writes; YearSampleCounts explicitly not full year census. 29 Pester tests, expected 4267 tests in 140 Windows PS5.1 containers. Live one-shot writer and independent Outlook restart/commit integration NOT YET WIRED; production Archive/Resume/Auto remain blocked.",
     "ARCH3e DEV: original ArchiveVerifier Test-OPAArchiveMoves -RequireSemanticWitness with original ARCH2b full Body, HTML, recipients and attachment SHA witness, externally pinned ARCH3d MoveReturned receipt, fake new Outlook ProcessId, strict source=0 and isolated target folder=1; only then original OperationJournal Intent->Reconciled and original DuplicateIndex append/fsync/readback, immutable SHA-linked synthetic final seal. Source remains nonexistent PST in OS TEMP; all fake PSCustomObject objects, no real Outlook COM or live process evidence; 31 new Pester tests, expected full PS5.1 CI 4238/139. Original Archive/Resume/Auto still closed, 90GB production uncertified.",
@@ -84,8 +85,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 141,
-    "ExpectedPesterTests": 4281,
+    "ExpectedTestContainers": 142,
+    "ExpectedPesterTests": 4298,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

@@ -1,3 +1,8 @@
+## 2.6.5-ARCH3h DEV — 2026-11-13
+- Real ARCH3g operator audit confirmed exact existing POP3 Inbox EntryID, FolderID, StoreID SHA256, original PST 7,694,763,008 bytes, existing 2020 archive part 1 271,360 bytes, 0 attachments.
+- Added read-only exact pinned real Outlook original full ARCH2b Body/HTML/recipients/attachment SHA256 semantic witness, invoking existing original SHA bridge without another mover.
+- New 17 pure and fake COM Pester tests, expected full 4298 tests in 142 containers. No real Move, pre-move durable intent or write permit; next step must handle existing DuplicateIndex without mutating previous records.
+
 ## 2.6.5-ARCH3g DEV — 2026-11-13
 - ARCH3f operator showed an already existing `Archive-2020.pst`: prevent using its mere presence as a fresh one-shot target. New read-only original Year/Part collision inspection and separately pinned existing Inbox MailItem/StoreID/date/actual attachment COUNT audit.
 - Enforces a non-reserved next-part preview, exact original POP3 scope, no writer permission, immutable historical evidence unchanged. No semantic attachment SHA snapshot, Move, PST creation, journal/index commit or production claim.

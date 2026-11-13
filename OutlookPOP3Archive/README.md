@@ -1,6 +1,12 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3h — оригинальный полный semantic witness реального тестового письма (DEV, read-only)
+
+Реальная проверка ARCH3g подтвердила `ExactInboxItemIndependentlyLocated=True`, `AttachmentCount=0`, существующую 2020 Part 1 (271360 байт), точные StoreID SHA256 / Folder EntryID и исходный размер PST (7694763008 байт). ARCH3h закрепляет все эти признаки и повторно открывает оригинал для полного semantic witness — **только чтение, без Move и без изменений существующего PST**.
+
+[Команды для запуска и полный синтаксис ключей ARCH3h](docs/2.6.5-arch3h-real-original-semantic-witness.md). Подтверждение семантики источника — ещё не независимая пострестартовая сверка назначения. `Archive/Resume/Auto` остаются закрытыми.
+
 ### ARCH3g — существующий Archive-2020.pst обнаружен: защищённый Plan/Audit (DEV)
 
 **ARCH3f операторская приёмка PASS:** для `info@stios.ru.pst` подтверждены `ProfileName=Outlook`, `Pop3ScopeApproved=True`, `Items.Count=26726`, 10 старых писем за 2020 год. При следующей проверке оператор подтвердил, что `Archive-2020.pst` **уже существует**. ARCH3g не перемещает сообщения: он считывает оригинальные годовые части с диска, строго проверяет точный Inbox `EntryID` и фактический счётчик вложений только через открытый Outlook. Предлагаемый путь `Archive-2020-02.pst` — лишь предварительное имя, не разрешение на создание или запись. [Все параметры и команды ARCH3g](docs/2.6.5-arch3g-existing-year-pst-collision-gate.md).
