@@ -9,3 +9,8 @@ OutlookPOP3Archive-Transactions/
 *.bak
 *.tmp
 *.log
+
+# Build outputs are generated from validated sources, never tracked
+/dist/
+/*.sha256
+/BUILD-INFO.json
