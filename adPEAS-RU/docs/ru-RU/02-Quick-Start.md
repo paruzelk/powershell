@@ -281,6 +281,72 @@ Get-adPEASSession -TestConnection
 Disconnect-adPEAS
 ~~~
 
+## Дополнительные практические примеры оригинала (DOC5)
+
+### Сессия v2 и Tab-дополнение
+
+В исходном справочнике приведены два эквивалентных стиля: однокомандный вызов Invoke-adPEAS с параметрами подключения или многократное использование соединения, созданного Connect-adPEAS. Второй позволяет после полного аудита запускать нужные проверки без повторного создания сессии.
+
+~~~powershell
+Connect-adPEAS -Domain 'example.local' -UseWindowsAuth -UseLDAPS -IgnoreSSLErrors:$false -BuildCompletionCache
+Invoke-adPEAS -OPSEC
+Get-DomainUser -Identity 'aud'
+Get-DomainGroup -Identity 'Domain Admins'
+Get-DomainGPO -Identity 'Default Domain Policy'
+Disconnect-adPEAS
+~~~
+
+BuildCompletionCache дополнительно перечисляет объекты для Tab-дополнения и увеличивает первоначальный объём запросов. Запись [TAB] в исходных примерах означает нажатие клавиши, а не буквальный параметр.
+
+### Все варианты формата и подробное логирование
+
+Outputfile исходной функции задаёт базовое имя отчёта без расширения. При Format All формируются TXT, HTML и JSON. NoColor позволяет читать текст в редакторах без ANSI-последовательностей; VerboseLogging автоматически включает подробный вывод в консоль и сохраняет диагностические сообщения с временем в TXT.
+
+~~~powershell
+Invoke-adPEAS -Domain 'example.local' -UseWindowsAuth -OPSEC -Outputfile '.\Reports\audit' -Format All
+Invoke-adPEAS -Domain 'example.local' -UseWindowsAuth -OPSEC -Outputfile '.\Reports\text' -Format Text -NoColor
+Invoke-adPEAS -Domain 'example.local' -UseWindowsAuth -OPSEC -Outputfile '.\Reports\html' -Format HTML
+Invoke-adPEAS -Domain 'example.local' -UseWindowsAuth -OPSEC -Outputfile '.\Reports\diagnostic' -VerboseLogging
+~~~
+
+В русской обёртке Run-AD-Audit-RU.ps1 параметры пути и диагностики отличаются от исходной функции. Не передавайте VerboseLogging обёртке как будто это её собственный ключ.
+
+### Инкрементальные проверки, офлайн-отчёт и сравнение
+
+OutputAppend добавляет результаты новых модулей к JSON-кэшу с тем же Outputfile и пересоздаёт объединённый HTML. Без этого ключа готовые файлы могут перезаписываться.
+
+~~~powershell
+Connect-adPEAS -Domain 'example.local' -UseWindowsAuth -UseLDAPS -IgnoreSSLErrors:$false
+Invoke-adPEAS -Module Domain -Outputfile '.\Reports\audit' -OPSEC
+Invoke-adPEAS -Module Creds,Rights -Outputfile '.\Reports\audit' -OutputAppend -OPSEC
+Invoke-adPEAS -Module ADCS,Delegation -Outputfile '.\Reports\audit' -OutputAppend -OPSEC
+Disconnect-adPEAS
+
+Convert-adPEASReport -InputJson '.\Reports\audit.json' -OutputPath '.\Reports\rebuilt' -Format All
+Convert-adPEASReport -InputJson '.\Reports\audit.json' -OutputPath '.\Reports\rebuilt_html' -Format HTML
+Convert-adPEASReport -InputJson '.\Reports\audit.json' -OutputPath '.\Reports\rebuilt_text' -Format Text -NoColor
+Convert-adPEASReport -InputJson '.\Reports\audit.json' -OutputPath '.\Reports\rebuilt_json' -Format JSON
+
+Compare-adPEASReport -Baseline '.\Reports\scan_q1.json' -Current '.\Reports\scan_q2.json'
+Compare-adPEASReport -Baseline '.\Reports\scan_jan.json' -Current '.\Reports\scan_apr.json' -OutputPath '.\Reports\diff_report'
+~~~
+
+Конвертация из JSON не требует активного LDAP, но не обновляет собранные данные. При сравнении необходимо одинаковое покрытие модулей и полномочий; разницу в режимах OPSEC нельзя выдавать за улучшение безопасности.
+
+### Повторение отдельной проверки и диагностика команд
+
+В полном консольном аудите имя функции проверки показывается в скобках после заголовка раздела. Можно найти нужную функцию и запустить её отдельно. В HTML и текстовом отчёте её имя намеренно опускается для более читаемого представления; при прямом вызове оно уже известно оператору.
+
+~~~powershell
+Get-Command Get-KerberoastableAccounts -Syntax
+Get-Command Get-DomainTrusts -Syntax
+Get-adPEASSession
+Get-adPEASSession -TestConnection
+~~~
+
+Для некоторых проверок доступны IncludeInactive и IncludeDefaults — значения необходимо сверять по синтаксису самой функции. Invoke-PortScan с явно заданными целями может использоваться без сессии, но является активным сетевым сканированием и требует согласования нагрузки.
+
+
 ## Навигация
 
 [Установка](01-Installation.md) ·
