@@ -247,3 +247,7 @@ if(-not $?){throw 'Ошибка предметной локализации по
 # DOC4g: только подписи синтетических полей HTML; AD/LDAP имена не заменяются.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC4gVisibleFieldLabels.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации меток полей DOC4g'}
+
+# DOC4h: проверка двух реальных HTML без публикации доменных данных.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC4hReportPolish.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка точечной локализации HTML DOC4h'}
