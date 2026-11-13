@@ -48,10 +48,10 @@ foreach($entry in $files){
     }
     $tokens=$null;$errors=$null
     $afterAst=[Management.Automation.Language.Parser]::ParseInput($result,[ref]$tokens,[ref]$errors)
-    if(@($errors).Count -gt 0){throw "DOC4a: синтаксис $relative : $($errors[0].Message)"}
+    if($errors -and $errors.Count -gt 0){throw "DOC4a: синтаксис $relative : $($errors[0].Message)"}
     $tokens=$null;$errors=$null
     $beforeAst=[Management.Automation.Language.Parser]::ParseInput($source,[ref]$tokens,[ref]$errors)
-    if(@($errors).Count -gt 0){throw "DOC4a: ошибка исходного синтаксиса $relative"}
+    if($errors -and $errors.Count -gt 0){throw "DOC4a: ошибка исходного синтаксиса $relative"}
     $variableType=[Management.Automation.Language.VariableExpressionAst]
     $commandType=[Management.Automation.Language.CommandAst]
     $varsBefore=@($beforeAst.FindAll({param($node) $node -is [Management.Automation.Language.VariableExpressionAst]},$true) |
