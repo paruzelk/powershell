@@ -1,5 +1,12 @@
 ## 2.6.5-ARCH2b — existing main Archive/Resume semantic integrity integration (DEV, 2026-11-11)
 
+
+## 2.6.5-ARCH3f DEV step 1 — 2026-11-13
+- Operator-designated real-mail `info@stios.ru.pst` is a permitted TEST SOURCE for future bounded live pilots. New `Core/Archive/ARCH3fRealTestPstPreflight.ps1` and `Invoke-ARCH3f.ps1` provide read-only real Outlook 2019/POP3 source inventory: reuse original ARCH2d GetActiveObject verified POP3 scope, exact AccountType/StoreID/profile, original eligible mail-folder walker, official system-folder EntryIDs, original ArchiveSelector with SentOn and original Year/Part1/folder routing. Bounded 1..20 candidate samples per up to 128 folders, explicit separation of sample-year counts from full item count.
+- 29 new Pester tests include fake Outlook Session/FolderWalker/Selector integration, nested folders, custom Drafts preserving original EntryId map, Outbox exclusion, SentOn/year partitions, limits, no source PST writes, strict read-only/production gates. Expected full CI 4267 Pester tests in 140 containers, PS5.1, BOM/PSSA/JSON gates.
+- Real one-shot integration into ARCH3d/e and real restart reconciliation remain incomplete; mass Archive/Resume/Auto disabled. ARCH2d5 previous 100/100 evidence not replayed.
+
+
 ## 2.6.5-ARCH3e DEV — 2026-11-13
 - Integrate original `Test-OPAArchiveMoves -RequireSemanticWitness` and original ARCH2b semantic source witness into the ARCH3d externally pinned synthetic original mover receipt chain. Require source=0, target-folder=1 in a strict isolated fixture to prevent hidden unknown/duplicate destination items. This is not a general production rule for existing multi-mail Year PST folders.
 - Only on successful original verifier call, write immutable synthetic proof, original `Write-OPAOperationJournalEvent -Phase Reconciled`, verify original `Resolve-OPAOperationRecovery`, append via ORIGINAL `Add-OPADuplicateEntry`, `Sync-OPADuplicateJournalStreams`, re-import original DuplicateIndex and seal stage + original journal/index SHA256. Inject failures: source remains, unknown archive item, wrong Body/HTML, missing receipt pin, same fake Outlook process, existing PST, corrupt journal, replay. No real COM/PST, no worker, no 90GB permit.
