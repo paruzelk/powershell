@@ -21,7 +21,8 @@ $functions=@('Get-DomainUser','Get-DomainComputer','Get-DomainGroup','Get-Domain
  'Get-DomainObject','Get-ObjectACL','Get-CertificateTemplate')
 foreach($name in $functions){
  foreach($doc in @($en,$ru)){
-  if(([regex]::Matches($doc,'(?m)^## '+[regex]::Escape($name)+'\r?)).Count -ne 1){
+  $pattern='(?m)^## '+[regex]::Escape($name)+'\r?$'
+  if(([regex]::Matches($doc,$pattern)).Count -ne 1){
    throw "DOC2a: отсутствует или повторён раздел $name"
   }
  }
