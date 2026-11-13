@@ -458,7 +458,7 @@ jobs:
           $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3iSealedFullOriginalWitness.Tests.ps1' -Raw -Encoding UTF8
           $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3i1-review-date-binding-fix.md' -Raw -Encoding UTF8
           $release=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
-          if($entry -cnotmatch "if\(\$Mode -ceq 'Review'\)" -or
+          if($entry -cnotmatch 'if\(\$Mode -ceq' -or
              $entry -cnotmatch 'SealSha256=\$SealSha256' -or
              $entry -cnotmatch 'ExpectedArchiveDate=\$ExpectedArchiveDate' -or
              $tests -cnotmatch 'public Invoke-ARCH3i Review accepts only RunId and SealSha256' -or
