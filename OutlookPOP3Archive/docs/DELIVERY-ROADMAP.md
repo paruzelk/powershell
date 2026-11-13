@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3k (2026-11-13):** операторский ARCH3j Plan, WhatIf, Prepare и Review пройдены на тестовом PST, Intent/Journal SHA закреплены. [Source-backed read-only original MailMover barrier](2.6.5-arch3k-original-mover-live-boundary.md) проверяет реальные original Year/Part2 и исходный индекс; обнаруживает блокирующие Part1/index-до-restart риски обычного Move-OPAItemsWithLimit. Никакого реального Move: следующий этап должен исправить границу внутри оригинального mover и проверить её синтетикой перед единственным live one-shot.
+
+
 > **ARCH3j (2026-11-13):** успешный ARCH3i1 Review подтвердил SHA и protected evidence. [Реальный One-Shot PrepareIntent](2.6.5-arch3j-real-oneshot-prepare-intent.md) привязан к оригинальному Year/Part2 и исходному full witness; старый `Archive-2020.pst` и `DuplicateIndex` только читаются. Если общего индекса нет, Prepare заблокирован, без обхода. Реального Move пока нет; для него нужно отдельное original MailMover one-shot разрешение, MoveClaimed, пострестартовый verifier и independent reconciliation.
 
 

@@ -1,3 +1,9 @@
+## 2.6.5-ARCH3k DEV — 2026-11-13
+- Operator real ARCH3j Plan/WhatIf/Prepare/Review fully passed. Original protected one-time Intent SHA f0860d55..., Journal SHA a19f113a..., original ARCH2b full witness SHA 8782b410... accepted.
+- New read-only original MailMover risk audit uses exact sealed original source, real POP3 StoreID/FolderID/semantic SHA, original Year Part2 routing and original shared DuplicateIndex read-only. Detects generic mover Part1 reuse risk and index append before independent restart.
+- Reverted experimental unverified provider call; original MailMover restored bit-for-bit. Plan and Audit only, no real Move or PST/Journal/Index changes.
+- 13 new Pester tests; expected 4358 tests in 145 containers, Windows PowerShell 5.1 full PSSA/BOM/JSON gates. No production certification.
+
 ## 2.6.5-ARCH3j DEV — 2026-11-13
 - Confirmed original ARCH3i1 Review PASS: exact operator real test POP3 source full SHA and protected evidence readback. Existing Archive-2020.pst preserved.
 - Added strict read-only original Year Part2 one-shot route + source identity witness SHA + shared DuplicateIndex check. Missing/truncated/indexed message STOPs with no writes. No old shared index healing/mutation.

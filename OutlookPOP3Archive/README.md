@@ -1,6 +1,18 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3k — source-backed контроль границы оригинального MailMover (DEV, READ ONLY)
+
+**Реальный ARCH3j прошёл:** original `PrepareIntent` и ORIGINAL `OperationJournal Intent` записаны и независимо проверены, SHA256 сохранены. ARCH3k сверяет их с исходным full witness, тестовым POP3 Inbox, Original Year/Part2 и 500-записным shared DuplicateIndex. Аудитор фиксирует реальные препятствия к прямому вызову стандартного массового `Move-OPAItemsWithLimit`: он может выбрать старую Part1 и записать общий DuplicateIndex до независимого перезапуска Outlook. **Никакой новый writer не включён.**
+
+```powershell
+$pin=@{RunId='9d276dc4-a0e6-4e74-891f-81502fafe7db';IntentSha256='f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b';JournalSha256='a19f113a6454b1d17333c9a53fc22d065876754b9fbab3167087487d0b2b981e'}
+.\Invoke-ARCH3k.ps1 -Mode Plan @pin | Format-List
+.\Invoke-ARCH3k.ps1 -Mode Audit @pin | Format-List
+```
+
+[Полный синтаксис, объяснение ограничений и дальнейшая интеграция](docs/2.6.5-arch3k-original-mover-live-boundary.md). `WriterPermit=False`, `MoveClaimed=False`, `ProductionReady=False`.
+
 ### ARCH3j — реальный One-Shot PrepareIntent на тестовом PST (DEV, без Move)
 
 После успешного `ARCH3i1 Review` зафиксирован оригинальный полный semantic witness и неизменяемый файл. ARCH3j строит строго один оригинальный Year/Part маршрут в **свободную** `Archive-2020-02.pst`, проверяет существующую Part1 (271360 байт) и исходный общий DuplicateIndex **только на чтение**. Отсутствие индекса или совпадение исходного EntryID блокирует подготовку. Режим `Prepare` с явным разрешением записывает **только** запечатанный `PrepareIntent` и ORIGINAL OperationJournal `Phase=Intent` до любых будущих PST-изменений; сам `Move()` отсутствует.
