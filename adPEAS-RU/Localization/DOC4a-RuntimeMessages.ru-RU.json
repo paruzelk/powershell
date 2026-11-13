@@ -1,0 +1,43 @@
+﻿{
+  "schema": "adPEAS-RU.DOC4a.RuntimeMessages.1",
+  "locale": "ru-RU",
+  "source": "pinned-localized-2.9.0",
+  "files": {
+    "src/modules/Checks/Accounts/Get-PrivilegedGroupMembers.ps1": {
+      "        $cleanText = \"No principal beyond the expected ones can change the $($examinedGroups.Count) privileged group(s) AdminSDHolder does not protect\"": "        $cleanText = \"Среди субъектов, которым не положены такие права, нет способных изменить $($examinedGroups.Count) привилегированных групп, не защищённых AdminSDHolder\"",
+      "            $cleanText += \" - $($suppressed.Count) expected or privileged holder(s) hidden, use -IncludePrivileged to see them\"": "            $cleanText += \" — скрыто ожидаемых либо привилегированных правообладателей: $($suppressed.Count); для просмотра используйте -IncludePrivileged\"",
+      "        $accountCleanText = \"No principal beyond the expected ones can take over the $examinedAccounts privileged account(s) read\"": "        $accountCleanText = \"Среди неожиданных субъектов нет способных захватить проверенные привилегированные записи: $examinedAccounts\"",
+      "            $accountCleanText += \" - $($suppressed.Count) expected or privileged holder(s) hidden, use -IncludePrivileged to see them\"": "            $accountCleanText += \" — скрыто ожидаемых либо привилегированных правообладателей: $($suppressed.Count); для просмотра используйте -IncludePrivileged\""
+    },
+    "src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1": {
+      "                    if ($oneSidedPrivileged -gt 0) { $privilegedText = \" ($oneSidedPrivileged privileged)\" }": "                    if ($oneSidedPrivileged -gt 0) { $privilegedText = \" (привилегированных: $oneSidedPrivileged)\" }",
+      "                    Show-Line \"Found $(@($oneSidedLinks).Count) account(s) named as predecessor by a dMSA they do not name back$privilegedText`:\" -Class Hint": "                    Show-Line \"Найдено записей, которые dMSA называет предшественниками без встречной ссылки: $(@($oneSidedLinks).Count)$privilegedText`:\" -Class Hint",
+      "                        if ($broadCount -gt 0) { $broadInfo = \" ($broadCount with broad group access - CRITICAL)\" }": "                        if ($broadCount -gt 0) { $broadInfo = \" (широкая группа имеет доступ к $broadCount; КРИТИЧЕСКИЙ РИСК)\" }",
+      "                        Show-Line \"Found $(@($usableByOthers).Count) dMSA(s) that principals beyond administrators and service hosts may use$broadInfo`:\" -Class Finding": "                        Show-Line \"Найдено dMSA, которые могут использовать субъекты помимо администраторов и служебных узлов: $(@($usableByOthers).Count)$broadInfo`:\" -Class Finding"
+    },
+    "src/modules/Checks/ADCS/Get-WeakCertificateMapping.ps1": {
+      "    Show-Line (\"No issuer is published in the NTAuth store, so no certificate can \" +": "    Show-Line (\"В NTAuth нет опубликованных издателей сертификатов, поэтому сертификаты \" +",
+      "               \"currently authenticate against these mappings - neither through PKINIT \" +": "                          \"пока не могут использоваться для аутентификации по этим сопоставлениям ни через PKINIT, \" +",
+      "               \"nor through Schannel. Check the domain controllers' own NTAuth store \" +": "                          \"ни через Schannel. Проверьте локальное хранилище NTAuth на контроллерах домена \" +",
+      "               \"with 'certutil -viewstore -enterprise NTAuth' before ruling it out, \" +": "                          \"командой 'certutil -viewstore -enterprise NTAuth', прежде чем исключать риск: \" +",
+      "               \"because an issuer can be added there without being published, and treat \" +": "                          \"издатель может находиться в нём без публикации в AD. Как только будет опубликован \" +",
+      "               \"the mappings as live again the moment one is.\") -Class Note": "                          \"доверенный издатель, сопоставления вновь станут действующими.\") -Class Note"
+    },
+    "src/modules/Checks/Creds/Get-DeletedObjectAccess.ps1": {
+      "        Show-Line \"Only Tier 0$(if ($exchangeReads) { ' and the Exchange service groups' }) may list deleted objects\" -Class Secure": "        Show-Line \"Только Tier 0$(if ($exchangeReads) { ' и служебные группы Exchange' }) могут перечислять удалённые объекты\" -Class Secure"
+    },
+    "src/modules/Checks/Domain/Get-DomainPasswordPolicy.ps1": {
+      "                        Show-Line \"Found $(@($psos).Count) Fine-Grained Password Polic$(if(@($psos).Count -eq 1){'y'}else{'ies'}):\" -Class Hint": "                        Show-Line \"Найдено $(@($psos).Count) политик$(if(@($psos).Count -eq 1){'а'}else{'и'}) тонкой настройки паролей:\" -Class Hint",
+      "                        $foundBy = if (@($assignedPSOs | Where-Object { $_.Listed }).Count -gt 0) { 'by name and assignment' } else { 'by assignment' }": "                        $foundBy = if (@($assignedPSOs | Where-Object { $_.Listed }).Count -gt 0) { 'по имени и назначению' } else { 'по назначению' }",
+      "                        Show-Line \"Found $($assignedPSOs.Count) Fine-Grained Password Polic$(if($assignedPSOs.Count -eq 1){'y'}else{'ies'}) $($foundBy):\" -Class Hint": "                        Show-Line \"Найдено $($assignedPSOs.Count) политик$(if($assignedPSOs.Count -eq 1){'а'}else{'и'}) тонкой настройки паролей ($foundBy):\" -Class Hint"
+    },
+    "src/modules/Checks/Accounts/Get-SIDHistoryInjection.ps1": {
+      "                Show-Line (\"$(@($orphanedAccounts).Count) account(s) carry sIDHistory from $(@($orphanedDomainSIDs).Count) domain(s) this domain \" +": "                Show-Line (\"У $(@($orphanedAccounts).Count) учётных записей sIDHistory ссылается на $(@($orphanedDomainSIDs).Count) доменов, с которыми текущий домен \" +",
+      "                           \"neither trusts nor shares a forest with - leftovers of a migration to remove: $(@($orphanedDomainSIDs) -join ', ')\") -Class Hint -FindingId 'SID_HISTORY_ORPHANED'": "                                      \"не имеет доверия и не состоит в одном лесу: следы миграции следует проверить и удалить при необходимости: $(@($orphanedDomainSIDs) -join ', ')\") -Class Hint -FindingId 'SID_HISTORY_ORPHANED'"
+    },
+    "src/modules/Helpers/Get-GCConnection.ps1": {
+      "    Show-Line (\"Global Catalog (port 3268) is not reachable on $($targets -join ', ') - identities from \" +": "    Show-Line (\"Глобальный каталог (порт 3268) недоступен на $($targets -join ', '): идентификаторы из \" +",
+      "               'another domain cannot be resolved and are reported as unresolved') -Class Note": "                          'других доменов не удаётся сопоставить с именами, поэтому они выводятся как неразрешённые') -Class Note"
+    }
+  }
+}
