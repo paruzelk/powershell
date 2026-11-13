@@ -37,6 +37,7 @@ function ConvertTo-OPA265ARCH3fOriginalYearPreview {
     param([Parameter(Mandatory=$true)][string]$SourcePst,
           [Parameter(Mandatory=$true)][AllowEmptyCollection()][object[]]$Folders,
           [Parameter(Mandatory=$true)][AllowEmptyCollection()][object[]]$Candidates,
+          [object]$WellKnownEntryIdMap=$null,
           [ValidateSet('Year')][string]$ArchiveGrouping='Year',
           [ValidateRange(1,500)][int]$MaximumCandidates=500)
     $p=Assert-OPA265ARCH3fRealTestSource -SourcePst $SourcePst
@@ -53,7 +54,7 @@ function ConvertTo-OPA265ARCH3fOriginalYearPreview {
            [int]$folder.ItemsCount -lt 0 -or [int]$folder.ItemsCount -gt 500000){
             throw 'ARCH3f malformed/duplicated original folder.'
         }
-        if(Test-OPAExcludedSystemFolder -Name ([string]$folder.FolderName) -EntryID ([string]$folder.FolderEntryId) -WellKnownEntryIdMap $null){
+        if(Test-OPAExcludedSystemFolder -Name ([string]$folder.FolderName) -EntryID ([string]$folder.FolderEntryId) -WellKnownEntryIdMap $WellKnownEntryIdMap){
             throw 'ARCH3f excluded system folder reached candidate plan.'
         }
         $folderRows.Add([pscustomobject][ordered]@{
@@ -190,7 +191,7 @@ function Invoke-OPA265ARCH3fRealTestPreflight {
                 $candidates.Add($item)|Out-Null
             }
         }
-        $preview=ConvertTo-OPA265ARCH3fOriginalYearPreview -SourcePst $source -Folders @($folderRows.ToArray()) -Candidates @($candidates.ToArray())
+        $preview=ConvertTo-OPA265ARCH3fOriginalYearPreview -SourcePst $source -Folders @($folderRows.ToArray()) -Candidates @($candidates.ToArray()) -WellKnownEntryIdMap $known
         $preview | Add-Member -NotePropertyName OutlookProcessId -NotePropertyValue ([int]$session.OutlookProcessId)
         $preview | Add-Member -NotePropertyName OutlookProcessStartUtcTicks -NotePropertyValue ([int64]$session.OutlookProcessStartUtcTicks)
         $preview | Add-Member -NotePropertyName ProfileName -NotePropertyValue ([string]$session.Namespace.CurrentProfileName)
