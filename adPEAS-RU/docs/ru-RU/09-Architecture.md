@@ -320,21 +320,21 @@ adPEAS использует единый конвейер формировани
 Модули проверок используют обёртки, передающие данные в конвейер RenderModel:
 
 ```powershell
-# <a id="display-ad-object-with-all-properties"></a>Показать объект AD со всеми свойствами
+# Показать объект AD со всеми свойствами
 Show-Object $user
-# <a id="internally-get-rendermodel---render-consoleobject-render-htmlobject"></a>Внутри: Get-RenderModel -> Render-ConsoleObject + Render-HtmlObject
+# Внутри: Get-RenderModel -> Render-ConsoleObject + Render-HtmlObject
 
-# <a id="display-finding-text"></a>Показать текст находки
+# Показать текст находки
 Show-Line "Finding text" -Class Finding
-# <a id="internally-write-adpeasoutput-with-appropriate-formatting"></a>Внутри: Write-adPEASOutput с соответствующим форматированием
+# Внутри: Write-adPEASOutput с соответствующим форматированием
 
-# <a id="section-headers"></a>Заголовки разделов
+# Заголовки разделов
 Show-Header "Analyzing Security"
-# <a id="internally-write-adpeasoutput-with-header-class"></a>Внутри: Write-adPEASOutput с классом Header
+# Внутри: Write-adPEASOutput с классом Header
 
-# <a id="sub-section-headers"></a>Заголовки подразделов
+# Заголовки подразделов
 Show-SubHeader "Searching for accounts..."
-# <a id="internally-write-adpeasoutput-with-subinfo-class"></a>Внутри: Write-adPEASOutput с классом SubInfo
+# Внутри: Write-adPEASOutput с классом SubInfo
 ```
 
 **Доступные функции** (определены в `adPEAS-Messages.ps1`):
