@@ -230,3 +230,8 @@ if(-not $?){throw 'Ошибка отображения значений атри
 # DOC4c: 125 индивидуальных справочных карточек; 490 полных критериев вместо шаблонов.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC4cCheckTooltips.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка предметной локализации справочных карточек DOC4c'}
+
+# DOC4d: исправления по двум реальным HTML: сохранение оригинала для DOC4c
+# и безопасный точечный перевод подписей дополнительных модулей.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC4dObservedHTML.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации наблюдавшихся значений DOC4d'}

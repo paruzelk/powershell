@@ -89,14 +89,15 @@ $inject=@'
         ruDetailedKeys.forEach(function(id) {
             const check = checkDescriptions[id];
             const ru = ruDetailedCheckTooltips[id];
-            if (!check || !Array.isArray(check.whatWeCheck) ||
+            if (!check || !check.originalEnglish ||
+                !Array.isArray(check.originalEnglish.whatWeCheck) ||
                 !Array.isArray(ru.whatWeCheck) ||
-                check.whatWeCheck.length !== ru.whatWeCheck.length ||
-                typeof check.whyItMatters !== 'string' ||
+                check.originalEnglish.whatWeCheck.length !== ru.whatWeCheck.length ||
+                typeof check.originalEnglish.whyItMatters !== 'string' ||
                 !ru.whyItMatters) {
                 throw new Error('DOC4c: detailed criterion count or type differs: ' + id);
             }
-            // The source model and diagnostic originalEnglish are not mutated.
+            // Validate the pinned originalEnglish saved by Apply-Catalogs, NOT its\n            // temporary two-item RU summary. Preserve all original EN for audit.
             check.whyItMatters = ru.whyItMatters;
             check.whatWeCheck = ru.whatWeCheck.slice();
             // The English panel is suppressed only after complete 1:1 parity.
