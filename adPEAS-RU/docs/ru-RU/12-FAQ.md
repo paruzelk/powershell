@@ -321,6 +321,57 @@ Import-Module .\adPEAS.ps1 -Force
 платные работы требуют коммерческой лицензии.
 [Условия](../../license/LICENSE.md).
 
+## Дополнительные вопросы исходного FAQ (DOC5)
+
+### Можно ли использовать NT-хеш при аудите?
+
+Оригинальная функция принимает NTHash (32 шестнадцатеричных символа), но это специализированная аутентификация Kerberos, для которой нет парольного NTLM/SimpleBind fallback. Для обычного разрешённого аудита предпочтительны Credential и LDAPS с проверкой сертификата.
+
+~~~powershell
+# Только формат параметра, а не действительные учётные данные.
+Connect-adPEAS -Domain 'example.local' -Username 'auditor' -NTHash '<32_hex_chars>'
+~~~
+
+### Можно ли подключиться по сертификату, если TCP/88 закрыт?
+
+PKINIT зависит от Kerberos. Режим ForcePassTheCert использует сертификат через TLS/LDAPS (обычно TCP/636) и работает иначе, чем PKINIT. Сертификат должен корректно сопоставляться с учётной записью; сертификат Shadow Credentials не является универсальной заменой Schannel-сертификата.
+
+~~~powershell
+Connect-adPEAS -Domain 'example.local' -Certificate 'C:\Certs\auditor.pfx' -CertificatePassword (Read-Host 'Пароль PFX' -AsSecureString) -ForcePassTheCert -IgnoreSSLErrors:$false
+~~~
+
+### Как работает совместное использование Module и ExcludeModule?
+
+Module определяет исходный набор категорий, а ExcludeModule исключает указанные категории из него. Это важно для воспроизводимости и сравнения отчётов разных запусков.
+
+~~~powershell
+Invoke-adPEAS -Module ADCS -OPSEC
+Invoke-adPEAS -Module Domain,Accounts,Creds -OPSEC
+Invoke-adPEAS -ExcludeModule Bloodhound -OPSEC
+Invoke-adPEAS -Module Domain,Rights,GPO -ExcludeModule GPO -OPSEC
+~~~
+
+### Какие проверки AD CS не охватывает LDAP?
+
+В английском FAQ отмечаются ограничения ESC6 и ESC7: для оценки некоторых настроек CA требуется реестр/RPC или DCOM/RPC, а не только LDAP. Отсутствие этих находок в отчёте не доказывает отсутствие небезопасных настроек центра сертификации.
+
+~~~powershell
+Get-ADCSVulnerabilities
+~~~
+
+### Есть ли встроенная поддержка SOCKS и что с туннелями?
+
+Встроенного SOCKS-клиента нет. При работе через имеющийся туннель отдельно проверяйте DNS, Kerberos, маршрут до контроллера и соответствие имени SAN сертификата LDAPS. Использование 127.0.0.1 вместо FQDN контроллера может нарушить проверку TLS. Для медленных подключений есть TimeoutSeconds.
+
+~~~powershell
+$cred = Get-Credential
+Connect-adPEAS -Domain 'example.local' -Server 'dc01.example.local' -Credential $cred -UseLDAPS -IgnoreSSLErrors:$false -TimeoutSeconds 120
+~~~
+
+### Нужны ли письменное разрешение и коммерческая лицензия?
+
+Для профессионального аудита предварительно согласуйте владельца инфраструктуры, область, временное окно, допустимую нагрузку, порядок обращения с паролями и отчётами. Возможность технически запустить инструмент без лицензии не отменяет коммерческих условий автора. Для воспроизводимости сохраняйте SHA-256 архива и сведения о версии, указанной в отчёте.
+
 ## Навигация
 
 [Решение проблем](11-Troubleshooting.md) ·
