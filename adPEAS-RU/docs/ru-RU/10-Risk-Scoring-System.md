@@ -24,7 +24,7 @@ FINAL_SCORE = (BASE × IMPACT × EXPLOITABILITY × SECURITY) + CORRELATION
 | **IMPACT** | 1.0-2.0 | Коэффициент привилегий затронутой учётной записи |
 | **EXPLOITABILITY** | 0.72-3.64 | Произведение четырёх факторов: возраст пароля, минимальная длина, сложность, шифрование |
 | **SECURITY** | 0.003-1.3 | Существующие защитные меры, применяемые перемножением |
-| **CORRELATION** | 0-15, or 0-30 for a non-privileged account | Надбавка за несколько находок у одной записи |
+| **CORRELATION** | 0-15, или 0-30 для непривилегированной записи | Надбавка за несколько находок у одной записи |
 
 **Итоговая оценка ограничивается интервалом 0–100.**
 
@@ -321,8 +321,8 @@ Kerberoastable Standard User:
 
 Не применяются:
 
-- **Заблокированная запись или истёкший пароль.** Контроллер домена вычисляет
-  `LOCKOUT` и `PASSWORD_EXPIRED` в `msDS-User-Account-Control-Computed`, но не сохраняет
+- **Заблокированная запись или истёкший пароль.** Контроллер домена вычисляет `LOCKOUT` и
+  `PASSWORD_EXPIRED` в `msDS-User-Account-Control-Computed`, но не сохраняет
   их в `userAccountControl`, откуда отчёт читает флаги.
 - **`NOT_DELEGATED`** («учётная запись чувствительная, делегирование запрещено»): защищает
   от делегирования этой записи другим субъектом, но ничего не говорит о делегировании,
@@ -482,7 +482,7 @@ if (isNonAdmin && findingCount >= 3) {
 
 ### Сбор контекста (PowerShell)
 
-Контекст оценки формируется функцией `Build-ScoringContext` в `Export-HTMLReport.ps1`:
+Контекст оценки формируется в `Export-HTMLReport.ps1` функцией `Build-ScoringContext`:
 
 ```powershell
 $scoringContext = @{
@@ -540,7 +540,7 @@ function calculateFindingScore(card) {
 
 ```powershell
 $Script:FindingBaseScores = @{
-    # ... existing scores ...
+    # ... существующие оценки ...
     'new finding keyword'  = 45    # Add your keyword (lowercase)
 }
 ```
@@ -569,7 +569,7 @@ $Script:SecurityModifiers = @{
 
 ## Ограничения
 
-## Limitations
+## Ограничения
 
 1. **Оценка возраста пароля:** вычисляется по `pwdLastSet` и не обязательно отражает фактическую надёжность пароля.
 
