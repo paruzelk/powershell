@@ -122,6 +122,13 @@ Describe 'ARCH3f reuse the ORIGINAL Year routing on real-mail-shaped fake candid
             {ConvertTo-OPA265ARCH3fOriginalYearPreview -SourcePst $script:source -Folders @($f) -Candidates @()} | Should -Throw
         }
     }
+    It 'keeps a user-created folder named Drafts when original well-known map identifies a different system Drafts ID' {
+        $f=New-ARCH3fFolder -FolderName 'Черновики' -FolderPath '\\POP3 Store\Проекты\Черновики' -Count 4
+        $c=New-ARCH3fCandidate -FolderName 'Черновики' -FolderPath $f.FolderPath
+        $map=@{'00000000FFFFFFFFFFFFFFFFFFFFFFFF'='Drafts'}
+        $p=ConvertTo-OPA265ARCH3fOriginalYearPreview -SourcePst $script:source -Folders @($f) -Candidates @($c) -WellKnownEntryIdMap $map
+        $p.Candidates[0].PlannedTargetFolderPath | Should -BeExactly '2020\Проекты\Черновики'
+    }
     It 'rejects a candidate in any folder absent from approved folder plan' {
         $c=New-ARCH3fCandidate -FolderPath '\\POP3 Store\Other'
         {ConvertTo-OPA265ARCH3fOriginalYearPreview -SourcePst $script:source -Folders $script:folders -Candidates @($c)} | Should -Throw
