@@ -1,6 +1,10 @@
 # НАЧНИ ЗДЕСЬ — OutlookPOP3Archive: контекст и запрет повторять MAPI-исследования
 
 
+**ARCH3f step 1 DEV (2026-11-13):** `Core/Archive/ARCH3fRealTestPstPreflight.ps1`, `Invoke-ARCH3f.ps1 -Mode Plan|Inventory`: first read-only **real Outlook** inventory of operator-designated real-mail TEST PST `info@stios.ru.pst`. Reuse original ARCH2d strict POP3 AccountType=2/store/profile identity, original `Get-OPAEligiblePop3MailFolders` / well-known EntryId map, original `Get-OPAArchiveCandidates` (SentOn), original `Get-OPAArchivePartPath` and `Get-OPAArchiveTargetPath` (Year). 29 tests expected 4267/140. No AddStoreEx/Move/PST/JSON journal writes, no live writer path yet; `Archive/Resume/Auto` and automatic Move replay prohibited. Follow operator [permission](2.6.5-arch3f-test-pst-authorization.md) and [preflight guide](2.6.5-arch3f-real-test-pst-preflight.md); next must implement explicitly bounded real one-shot integrated cross-process reconciliation without changing legacy routing.
+
+
+
 **ПЕРВООЧЕРЕДНО: решение пользователя для ARCH3f (2026-11-13).** Файл `C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.pst` — **тестовый**, хотя содержит реальные письма и много элементов; пользователь **разрешает использовать его для дальнейших контролируемых реальных тестов** и указывает, что может перекачать почту по IMAP. НЕ требовать автоматически отдельный disposable PST как условие реальных ARCH3f-пилотов. Но IMAP восстановление полной PST-семантики не проверено, локальные письма/отправленные/пользовательские папки могут отсутствовать на сервере; перед следующим пилотом предпочесть backup и закрепить отдельный манифест. Не отменять `Archive/Resume/Auto` fence, one-shot claims, no-retry-after-ambiguous-Move, независимый Outlook restart и SHA reconciliation. Пока ARCH3d/ARCH3e умеют только fake COM и отсутствующий TEMP PST; нужен отдельный явно ограниченный runtime путь для **реального** тестового PST, не простое снятие защит. Подробнее: [ARCH3f test PST authorization](2.6.5-arch3f-test-pst-authorization.md). Предыдущий ARCH2d5 100/100 — сохранить и не повторять.
 
 
