@@ -297,17 +297,17 @@ Set-DomainComputer -Identity "DC01" -ClearNotDelegated
 ### Цепочка атаки с делегированием
 
 ```
-1. Create computer account (New-DomainComputer)
+1. Создать учётную запись компьютера (New-DomainComputer)
         ↓
-2. Configure RBCD on target (Set-DomainComputer -AddRBCD)
+2. Настроить RBCD на целевом объекте (Set-DomainComputer -AddRBCD)
         ↓
-3. Request TGT for created computer (Invoke-KerberosAuth)
+3. Запросить TGT для созданного компьютера (Invoke-KerberosAuth)
         ↓
-4. S4U2Self: Get service ticket as any user
+4. S4U2Self: получить сервисный билет от имени другого пользователя
         ↓
-5. S4U2Proxy: Delegate to target service
+5. S4U2Proxy: делегировать полномочия целевой службе
         ↓
-6. Impersonate Domain Admin to target!
+6. Выступить от имени Domain Admin при обращении к целевому объекту!
 ```
 
 ---
