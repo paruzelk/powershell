@@ -241,6 +241,7 @@ Describe 'ARCH3d real original MailMover integration hooks: protected scope, no 
     }
     It 'read-only operator audit validates all original runtime integration markers without COM' {
         $r=& (Join-Path $script:root 'Invoke-ARCH3d.ps1') -Mode Audit
+        if($r.ChecksPassed -ne $r.ChecksTotal){throw ('ARCH3d audit exact failing checks: '+(@($r.FailedChecks) -join ', '))}
         $r.Status | Should -BeExactly 'OriginalMailMoverSyntheticBoundariesWiredProductionStillClosed'
         $r.ChecksPassed | Should -Be $r.ChecksTotal
         $r.OutlookContacted | Should -BeFalse
