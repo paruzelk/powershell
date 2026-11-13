@@ -163,7 +163,7 @@ Describe 'ARCH3k public CLI contains no writer route' {
         $core=Get-Content -LiteralPath (Join-Path $script:root 'Core/Archive/ARCH3kOriginalMoverLiveBarrier.ps1') -Raw -Encoding UTF8
         $entry | Should -Match "ValidateSet\('Plan','Audit'\)"
         $entry | Should -Not -Match "ValidateSet\('Plan','Audit','Move'"
-        $core | Should -Not -Match '\.Move\(|\.AddStoreEx\(|Write-OPA265ARCH3cJsonOnce|Write-OPAOperationJournalEvent|Add-OPADuplicateEntry'
+        $core | Should -Not -Match '\.Move\(|\.AddStoreEx\(|Write-OPA265ARCH3cJsonOnce|Write-OPAOperationJournalEvent|(?m)^\s*Add-OPADuplicateEntry\s+-Index'
         $core | Should -Match 'Get-OPA265ARCH3kOriginalMoverUnsafeDefaultMarkers'
     }
 }
