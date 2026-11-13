@@ -595,8 +595,12 @@ function Move-OPAItemsWithLimit {
 
     if($ARCH3dSyntheticBoundary){
         # Must run before ANY original file/journal/destination side effects.
-        . (Join-Path $PSScriptRoot 'ARCH3cDurableOperationLedger.ps1')
-        . (Join-Path $PSScriptRoot 'ARCH3dOriginalMoverBoundary.ps1')
+        if(-not (Get-Command Write-OPA265ARCH3cJsonOnce -ErrorAction SilentlyContinue)){
+            . (Join-Path $PSScriptRoot 'ARCH3cDurableOperationLedger.ps1')
+        }
+        if(-not (Get-Command Assert-OPA265ARCH3dSyntheticBoundary -ErrorAction SilentlyContinue)){
+            . (Join-Path $PSScriptRoot 'ARCH3dOriginalMoverBoundary.ps1')
+        }
         if($Resume){throw 'ARCH3d synthetic one-shot integration forbids Resume.'}
         $arch3dScope=Assert-OPA265ARCH3dSyntheticBoundary -Namespace $Namespace -Transaction $Transaction -SourceFolders @($SourceFolders)
     }
