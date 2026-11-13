@@ -289,6 +289,15 @@ Describe 'ARCH3e original OperationJournal and DuplicateIndex commit ONLY AFTER 
         [IO.File]::Exists($script:f.IndexPath) | Should -BeFalse
     }
 }
+Describe 'ARCH3e operator source audit uses actual original module markers, no PST' {
+    It 'reports fully linked original functions but never a live writer certification' {
+        $r=& (Join-Path $script:root 'Invoke-ARCH3e.ps1') -Mode Audit
+        if($r.ChecksPassed -ne $r.ChecksTotal){throw ('ARCH3e failed source markers: '+(@($r.FailedChecks) -join ', '))}
+        $r.Status | Should -BeExactly 'OriginalVerifierAndIndexSyntheticCommitIntegratedLiveRestartNotCertified'
+        $r.LiveOutlookRestartProofPresent | Should -BeFalse
+        $r.ProductionReady | Should -BeFalse
+    }
+}
 Describe 'ARCH3e code and production safety fences' {
     It 'new adapter calls original full semantic ArchiveVerifier rather than copying or bypassing it' {
         $s=Get-Content -LiteralPath (Join-Path $script:root 'Core/Archive/ARCH3ePostRestartIndexGate.ps1') -Raw -Encoding UTF8
