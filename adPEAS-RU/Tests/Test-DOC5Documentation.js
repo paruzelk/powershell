@@ -58,7 +58,7 @@ for(const filename of files){
  }
 }
 const readme=fs.readFileSync(path.join(__dirname,'..','README_RU.md'),'utf8');
-assert(readme.startsWith('# adPEAS-RU 2.9.0\n\n## Быстрый старт и полный синтаксис параметров'),
+assert(readme.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').startsWith('# adPEAS-RU 2.9.0\n\n## Быстрый старт и полный синтаксис параметров'),
  'README full syntax must stay at the beginning');
 console.log('PASS DOC5: '+files.length+' RU docs, '+inspectedTopics+' topic markers, '+inspectedIdentifiers+
  ' source identifiers, '+inspectedBlocks+' fenced examples, local links and README front syntax');
