@@ -6,6 +6,12 @@ BeforeAll {
     . (Join-Path $script:root 'Core/Archive/ARCH3cDurableOperationLedger.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH3dOriginalMoverBoundary.ps1')
     . (Join-Path $script:root 'Core/Archive/ArchiveTransaction.ps1')
+    . (Join-Path $script:root 'Core/Archive/DuplicateIndex.ps1')
+    . (Join-Path $script:root 'Core/Archive/ARCH2bSemanticWitness.ps1')
+    # Existing COM-release helper is optional for this fake-only fixture.
+    if(-not (Get-Command Release-OPAComObject -ErrorAction SilentlyContinue)){
+        function Release-OPAComObject {param([object]$Object)}
+    }
     $script:fixtures=New-Object 'System.Collections.Generic.List[object]'
     function New-ARCH3dFixture {
         $id='ARCH3D-SYNTHETIC-'+[guid]::NewGuid().ToString('N')
