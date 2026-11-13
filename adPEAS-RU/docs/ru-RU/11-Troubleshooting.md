@@ -351,265 +351,265 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-## Query Issues
+## Проблемы запросов
 
-### Error: "Access denied" on specific objects
+### Ошибка «Доступ запрещён» для отдельных объектов
 
-**Symptoms**:
-- Some objects return, others don't
-- "Insufficient access rights"
+**Признаки**:
+- Одни объекты возвращаются, другие нет.
+- «Недостаточно прав доступа».
 
-**Cause**: The authenticated account lacks read permissions.
+**Причина**: используемая учётная запись не имеет прав чтения.
 
-**Solutions**:
+**Решения**:
 
-1. **Use account with more privileges**
+1. **Использовать запись с большими правами**
    ```powershell
    Connect-adPEAS -Domain "contoso.com" -Credential (Get-Credential)
-   # Enter an account with more access
+    # Указать запись с дополнительными правами
    ```
 
-2. **This is expected behavior**
-   - Some objects are protected (e.g., AdminSDHolder)
-   - Document what couldn't be read
+2. **Иногда это штатное поведение**
+    - Некоторые объекты защищены, например AdminSDHolder.
+    - Документируйте, что прочитать не удалось.
 
 ---
 
-### Error: "The search filter is invalid"
+### Ошибка «Неверный поисковый фильтр»
 
-**Symptoms**:
-- LDAP filter syntax error
-- Empty results unexpectedly
+**Признаки**:
+- Ошибка синтаксиса LDAP-фильтра.
+- Неожиданно пустой результат.
 
-**Solutions**:
+**Решения**:
 
-1. **Check filter syntax**
+1. **Проверить синтаксис фильтра**
    ```powershell
-   # Correct: parentheses balanced
+    # Правильно: все скобки закрыты
    Get-DomainUser -LDAPFilter "(sAMAccountName=admin)"
 
-   # Wrong: missing parenthesis
+    # Неправильно: пропущена закрывающая скобка
    Get-DomainUser -LDAPFilter "(sAMAccountName=admin"
    ```
 
-2. **Escape special characters**
+2. **Экранировать специальные символы**
    ```powershell
-   # Characters to escape: * ( ) \ NUL
-   # Use \2a for *, \28 for (, \29 for ), \5c for \
+    # Символы, требующие экранирования: * ( ) \ NUL
+    # Для * используйте \2a, для ( — \28, для ) — \29, для \ — \5c
    Get-DomainUser -LDAPFilter "(description=*\2a*)"
    ```
 
 ---
 
-### No Results Returned
+### Результат пуст
 
-**Symptoms**:
-- Query returns $null or empty array
-- Expected objects not found
+**Признаки**:
+- Запрос возвращает $null либо пустой массив.
+- Ожидаемые объекты не найдены.
 
-**Solutions**:
+**Решения**:
 
-1. **Verify object exists**
+1. **Проверить существование объекта**
    ```powershell
    Get-DomainUser -Identity "username"
    ```
 
-2. **Check search base**
+2. **Проверить базу поиска**
    ```powershell
-   # Might be searching wrong OU
+    # Возможно, поиск выполняется не в той OU
    Get-DomainUser -SearchBase "DC=contoso,DC=com"
    ```
 
-3. **Verify connection**
+3. **Проверить подключение**
    ```powershell
    Get-adPEASSession -TestConnection
    ```
 
 ---
 
-## Performance Issues
+## Проблемы производительности
 
-### Queries Taking Too Long
+### Запросы выполняются слишком долго
 
-**Symptoms**:
-- Timeouts
-- Slow response
+**Признаки**:
+- Тайм-ауты.
+- Медленный отклик.
 
-**Solutions**:
+**Решения**:
 
-1. **Target specific DC**
+1. **Обратиться к конкретному DC**
    ```powershell
    Connect-adPEAS -Domain "contoso.com" -Server "dc01.contoso.com" -UseWindowsAuth
    ```
 
-2. **Limit result set**
+2. **Ограничить выборку**
    ```powershell
-   # Add more specific filter
+    # Указать более точный фильтр
    Get-DomainUser -LDAPFilter "(&(objectCategory=person)(adminCount=1))"
    ```
 
-3. **Check network latency**
+3. **Проверить сетевую задержку**
    ```powershell
    Test-Connection dc01.contoso.com
    ```
 
 ---
 
-## Output Issues
+## Проблемы вывода
 
-### Colors Not Displaying
+### Не отображаются цвета
 
-**Symptoms**:
-- ANSI codes showing as text
-- No color output
+**Признаки**:
+- ANSI-коды выводятся как текст.
+- Отсутствует цветной вывод.
 
-**Solutions**:
+**Решения**:
 
-1. **Use Windows Terminal or ConEmu**
-   - Legacy cmd.exe doesn't support ANSI
-   - Windows Terminal has full support
+1. **Использовать Windows Terminal или ConEmu**
+    - Устаревшая cmd.exe не поддерживает ANSI.
+    - Windows Terminal имеет полноценную поддержку.
 
-2. **Enable VirtualTerminal**
+2. **Включить VirtualTerminal**
    ```powershell
-   # In Windows 10+
+    # На Windows 10 и новее
    Set-ItemProperty HKCU:\Console VirtualTerminalLevel -Type DWORD 1
    ```
 
-3. **Output to file instead**
+3. **Сохранить отчёт в файл**
    ```powershell
    Invoke-adPEAS -Outputfile .\report
    ```
 
 ---
 
-### File Output Not Created
+### Файл отчёта не создан
 
-**Symptoms**:
-- No file created
-- "Cannot write to file" error
+**Признаки**:
+- Файл не появился.
+- Ошибка «Невозможно записать файл».
 
-**Solutions**:
+**Решения**:
 
-1. **Check path exists**
+1. **Проверить существование пути**
    ```powershell
-   # Use existing directory
+    # Использовать существующий каталог
    Invoke-adPEAS -Outputfile "C:\existing\path\report"
    ```
 
-2. **Check write permissions**
-   - Ensure you can write to the target directory
-   - Try different location
+2. **Проверить права записи**
+    - Проверьте право записи в целевой каталог.
+    - Попробуйте другой каталог.
 
-3. **Close file if open**
-   - If file is open in another program, writing fails
-
----
-
-### Functions Not Available After Loading adPEAS
-
-**Symptoms**:
-- Logo displays correctly
-- `Invoke-adPEAS` not recognized
-
-**Cause**: Script was executed instead of dot-sourced
-
-**Solution**:
-- Use dot-sourcing to load adPEAS: `. .\adPEAS.ps1`
-- Do NOT run `.\adPEAS.ps1` directly (functions stay in script scope)
-- After dot-sourcing, `Invoke-adPEAS`, `Connect-adPEAS` and other functions are available
+3. **Закрыть открытый файл**
+    - Если файл открыт другой программой, запись может не сработать.
 
 ---
 
-## Diagnostic Commands
+### Функции недоступны после загрузки adPEAS
 
-### Check PowerShell Version
+**Признаки**:
+- Логотип отображается правильно.
+- `Invoke-adPEAS` не распознаётся.
+
+**Причина**: сценарий запущен напрямую, а не загружен через dot-sourcing.
+
+**Решение**:
+- Используйте dot-sourcing: `. .\adPEAS.ps1`.
+- НЕ запускайте `.\adPEAS.ps1` напрямую (функции останутся в области сценария).
+- После dot-sourcing доступны `Invoke-adPEAS`, `Connect-adPEAS` и остальные функции.
+
+---
+
+## Диагностические команды
+
+### Проверить версию PowerShell
 
 ```powershell
 $PSVersionTable.PSVersion
-# Requires 5.1 or higher
+# Требуется версия 5.1 или новее
 ```
 
-### Check .NET Framework Version
+### Проверить версию .NET Framework
 
 ```powershell
 [System.Environment]::Version
-# or
+# либо
 Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" | Select-Object Version
 ```
 
-### Test Network Connectivity
+### Проверить сетевую доступность
 
 ```powershell
-# Test LDAP
+# Проверить LDAP
 Test-NetConnection -ComputerName dc01.contoso.com -Port 389
 
-# Test LDAPS
+# Проверить LDAPS
 Test-NetConnection -ComputerName dc01.contoso.com -Port 636
 
-# Test Kerberos
+# Проверить Kerberos
 Test-NetConnection -ComputerName dc01.contoso.com -Port 88
 ```
 
-### Verify DNS Resolution
+### Проверить разрешение DNS
 
 ```powershell
 Resolve-DnsName contoso.com
 Resolve-DnsName _ldap._tcp.contoso.com -Type SRV
 ```
 
-### Check Current Session
+### Проверить текущий сеанс
 
 ```powershell
 Get-adPEASSession
 Get-adPEASSession -TestConnection
 ```
 
-### Enable Verbose Output
+### Включить подробный вывод
 
 ```powershell
-# Display verbose messages in console
+# Показывать подробные сообщения в консоли
 $VerbosePreference = "Continue"
 Connect-adPEAS -Domain "contoso.com" -UseWindowsAuth -Verbose
 ```
 
-### Enable Verbose Logging to File
+### Записывать подробный журнал в файл
 
-For detailed troubleshooting, write verbose messages to a file with timestamps:
+Для диагностики сохраняйте подробные сообщения с временными отметками в файл:
 
 ```powershell
-# Write verbose messages to output file (timestamped)
-# -VerboseLogging automatically enables -Verbose for console output
+# Записывать подробные сообщения в файл вывода (с временными метками)
+# -VerboseLogging автоматически включает -Verbose для консоли
 Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth -Outputfile .\debug_report -VerboseLogging
 
-# Output text file contains timestamped entries like:
+# Пример строк файла с временными метками:
 # 2026-01-14 18:42:15 [Verbose] [Get-DomainUser] Querying users...
 # 2026-01-14 18:42:16 [Verbose] [Invoke-LDAPSearch] Filter: (objectClass=user)
 ```
 
-**Parameters:**
-- `-Outputfile` - Required: Path to output file (text format needed for logging)
-- `-VerboseLogging` - Writes verbose log messages to the output file AND automatically enables `-Verbose` for console output
+**Параметры:**
+- `-Outputfile` — обязательно: путь к файлу результата (текстовый файл для журнала).
+- `-VerboseLogging` — пишет подробный журнал в файл и автоматически включает `-Verbose` в консоли.
 
-**Note:** `-VerboseLogging` without `-Outputfile` will show a warning. Verbose messages will still appear in the console, but file logging is skipped.
-
----
-
-## Getting Help
-
-If you cannot resolve an issue:
-
-1. **Enable verbose mode** and capture the output
-2. **Check if the issue is reproducible** with minimal parameters
-3. **Open an issue** on GitHub with:
-   - PowerShell version
-   - Windows version
-   - Error message
-   - Steps to reproduce
+**Примечание:** без `-Outputfile` параметр `-VerboseLogging` выводит предупреждение. Подробные сообщения остаются в консоли, но запись журнала в файл пропускается.
 
 ---
 
-## Navigation
+## Получение помощи
 
-- [Previous: Risk-Scoring-System](10-Risk-Scoring-System.md)
-- [Next: FAQ](12-FAQ.md)
-- [Back to Home](00-Home.md)
+Если проблему не удалось решить:
+
+1. **Включите подробный вывод** и сохраните результат.
+2. **Проверьте воспроизводимость** с минимальными параметрами.
+3. **Создайте issue** на GitHub, указав:
+   - Версию PowerShell.
+   - Версию Windows.
+   - Текст ошибки.
+   - Действия для воспроизведения.
+
+---
+
+## Навигация
+
+- [Назад: система оценки рисков](10-Risk-Scoring-System.md)
+- [Далее: часто задаваемые вопросы](12-FAQ.md)
+- [На главную](00-Home.md)
