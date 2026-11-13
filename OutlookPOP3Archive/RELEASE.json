@@ -12,6 +12,8 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3e DEV: original ArchiveVerifier Test-OPAArchiveMoves -RequireSemanticWitness with original ARCH2b full Body, HTML, recipients and attachment SHA witness, externally pinned ARCH3d MoveReturned receipt, fake new Outlook ProcessId, strict source=0 and isolated target folder=1; only then original OperationJournal Intent->Reconciled and original DuplicateIndex append/fsync/readback, immutable SHA-linked synthetic final seal. Source remains nonexistent PST in OS TEMP; all fake PSCustomObject objects, no real Outlook COM or live process evidence; 31 new Pester tests, expected full PS5.1 CI 4238/139. Original Archive/Resume/Auto still closed, 90GB production uncertified.",
+
     "ARCH3d DEV: protected boundary hooks NOW WIRED IN ORIGINAL MailMover Move-OPAItemsWithLimit (opt-in SYNTHETIC only): original pre-destination durable intent and original OperationJournal, original Get-OPAArchiveDestination unchanged, actual chosen Year/PST part/Outlook FolderPath bound, original ARCH2b source witness SHA then one-shot claim, original MailItem.Move exercised with fake PSCustomObject test double, immutable returned receipt or indeterminate journal. Protected mode must stop BEFORE legacy DuplicateIndex commit until independent post-restart reconciliation exists. Real POP3 PST and COM explicitly forbidden under mode, main Archive/Resume/Auto remain blocked. 33 new Pester tests against actual original mover and fake COM, expected full Windows PowerShell 5.1 CI 4207 tests in 138 containers; no production certification.",
     "ARCH3c DEV: seven immutable synthetic durable JSON stage records with FileMode.CreateNew + Flush(true), canonical ARCH3b original Year/Store/EntryID/TransactionId OperationId, SHA256 linked stage order and final operator-pinned seal also binding the EXISTING original OperationJournal read/write/recovery API. 29 new Pester tests for crash after claim and return, missing stage, journal/truncated and tampered evidence, idempotent no replay, no real Outlook/PST or DuplicateIndex/legacy MailMover writes. Development Archive/Resume/Auto remain blocked; 4174 Pester tests in 137 containers expected in Windows PS5.1 CI. Real cross-process Move integration NOT certified.",
 
@@ -80,8 +82,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 138,
-    "ExpectedPesterTests": 4207,
+    "ExpectedTestContainers": 139,
+    "ExpectedPesterTests": 4238,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
