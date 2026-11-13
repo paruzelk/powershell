@@ -94644,6 +94644,60 @@ function Get-HTMLTemplate {
                 byField:Object.freeze(byField)
             });
         });
+        // DOC4f: original HTML evidence identifies exactly three field-scoped
+        // phrases; keep AD names, DNs and security identifiers untouched.
+        document.addEventListener('DOMContentLoaded', function ruDOC4fObservedSuffixes() {
+            const eligible={ privilegedGroups:1, affectedOUs:1, tier0Groups:1 };
+            const stats={ inspected:0, translated:0, byField:Object.create(null) };
+            function translate(source,key) {
+                const parts=source.match(/^(\s*)([\s\S]*?)(\s*)$/);
+                if(!parts) return source;
+                let value=parts[2], output=value;
+                if(key==='privilegedGroups') {
+                    if(value.endsWith(' (direct)')) {
+                        output=value.slice(0,-' (direct)'.length)+' (прямое членство)';
+                    }
+                } else if(key==='affectedOUs') {
+                    // Source: DN (domain root, inherited by N OU и M контейнеров).
+                    // These are displayed counts, not permissions to re-compute.
+                    const match=value.match(/^((?:DC|OU|CN)=[^\r\n]+?) \(domain root, inherited by (\d+) OU и (\d+) контейнеров\)$/);
+                    if(match) {
+                        output=match[1]+' (корень домена; наследование распространяется на '+
+                            match[2]+' OU и '+match[3]+' контейнеров)';
+                    }
+                } else if(key==='tier0Groups') {
+                    // Built-in Administrator is a descriptive label, not a
+                    // stored account name; preserve its security RID 500.
+                    output=value.replaceAll('Built-in Administrator (RID 500)',
+                        'Встроенная учётная запись администратора (RID 500)');
+                }
+                return parts[1]+output+parts[3];
+            }
+            document.querySelectorAll('.attr-row[data-attr-name]').forEach(function(row) {
+                const key=row.getAttribute('data-attr-name');
+                if(!Object.prototype.hasOwnProperty.call(eligible,key)) return;
+                const root=row.querySelector('.attr-value');
+                if(!root) return;
+                const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+                let node;
+                while((node=walker.nextNode())) {
+                    if(!node.parentElement ||
+                        node.parentElement.closest('pre,code,textarea,script,style,a')) continue;
+                    stats.inspected++;
+                    const after=translate(node.nodeValue,key);
+                    if(after!==node.nodeValue) {
+                        node.nodeValue=after;
+                        stats.translated++;
+                        stats.byField[key]=(stats.byField[key]||0)+1;
+                    }
+                }
+            });
+            window.adPEASRUDOC4f=Object.freeze({
+                inspected:stats.inspected,
+                translated:stats.translated,
+                byField:Object.freeze(stats.byField)
+            });
+        });
         // Scoring context data for context-aware risk calculation
         const scoringContext = {{SCORING_CONTEXT_JSON}};
 
@@ -101162,7 +101216,7 @@ function Collect-BHIssuancePolicies {
     return $bhPolicies
 }
 #Requires -Version 5.1
-$Script:adPEASVersion = "2.9.0+20261113-1319"
+$Script:adPEASVersion = "2.9.0+20261113-1346"
 if ($MyInvocation.MyCommand.Path) {
     $Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {
