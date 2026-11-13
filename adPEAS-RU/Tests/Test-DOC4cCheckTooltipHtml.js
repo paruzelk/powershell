@@ -39,13 +39,28 @@ const end=js.indexOf(endMarker,start);
 assert(start>=0 && end>start,'DOC4c injection boundaries missing');
 const injection=js.slice(start,end);
 const original=JSON.parse(JSON.stringify(canonical));
-Object.values(canonical).forEach(check=>{
+// Recreate the exact prior Apply-Catalogs behavior. It stores the source
+// criteria in originalEnglish before overwriting whatWeCheck with two short RU
+// summary items. The old DOC4c guard erroneously checked these short items,
+// so production HTML crashed although the former synthetic fixture passed.
+const genericRU=getEmbeddedCatalog('ruCheckContext');
+assert.deepStrictEqual(Object.keys(genericRU).sort(),Object.keys(canonical).sort());
+Object.entries(canonical).forEach(([id,check])=>{
   check.originalEnglish={
     whyItMatters:check.whyItMatters,
     whatWeCheck:check.whatWeCheck.slice(),
-    secureMessage:check.secureMessage
+    secureMessage:check.secureMessage,
+    filteringNote:check.filteringNote
   };
+  check.title=genericRU[id].title;
+  check.summary=genericRU[id].summary;
+  check.whyItMatters=genericRU[id].whyItMatters;
+  check.whatWeCheck=genericRU[id].whatWeCheck.slice();
+  if(check.secureMessage) check.secureMessage=genericRU[id].secureMessage;
+  if(check.filteringNote) check.filteringNote=genericRU[id].filteringNote;
 });
+assert.strictEqual(canonical.BitLockerRecoveryKey.whatWeCheck.length,2);
+assert.strictEqual(canonical.BitLockerRecoveryKey.originalEnglish.whatWeCheck.length,3);
 const fakeWindow={};
 vm.runInNewContext(injection,{checkDescriptions:canonical,window:fakeWindow},{timeout:3000});
 assert.strictEqual(fakeWindow.adPEASRUCheckTooltipAudit.translatedObjectTypes,125);
@@ -81,11 +96,17 @@ assert(!rbcd.includes('RBCD allows specified accounts to impersonate users'));
 assert(!rbcd.includes('Подробные критерии проверки (оригинал EN)'));
 // Verify that a changed upstream criterion count blocks the build rather than
 // hiding untranslated details.
-const altered=JSON.parse(JSON.stringify(original));
-altered.RBCDelegation.whatWeCheck.pop();
+const altered=JSON.parse(JSON.stringify(canonical));
+altered.RBCDelegation.originalEnglish.whatWeCheck.pop();
 assert.throws(()=>vm.runInNewContext(injection,{
   checkDescriptions:altered,window:{}
 },{timeout:3000}),/DOC4c: detailed criterion count or type differs/);
+// Even when a legacy brief summary has any number of items, the original
+// pinned English criterion list must govern the completeness decision.
+const shortened=JSON.parse(JSON.stringify(canonical));
+shortened.BitLockerRecoveryKey.whatWeCheck=['Это временный перевод'];
+vm.runInNewContext(injection,{checkDescriptions:shortened,window:{}},{timeout:3000});
+assert.strictEqual(shortened.BitLockerRecoveryKey.whatWeCheck.length,3);
 // HTML data is escaped inside the tooltip instead of interpreted.
 const malicious=Object.assign({},canonical.RBCDelegation,{
   whyItMatters:'Проверка <img src=x onerror=alert(1)>',
