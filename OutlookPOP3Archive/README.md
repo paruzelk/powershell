@@ -1,6 +1,10 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3i — полный оригинальный semantic witness в защищённом файле (DEV)
+
+Оператор подтвердил исходный полный ARCH3h semantic SHA256 **8782b410253f54cc5374661077cdfc9279bcfba12805f0dab42b461320cb999c**. ARCH3i повторно получает полный original ARCH2b witness и сверяет его с этим SHA, затем сохраняет в приватном **LOCALAPPDATA**, через CreateNew/Flush(true), с независимой SHA256-проверкой чтения. **Только evidence JSON, без Move, PST и Index**. Новый GUID RunId обязателен, запись не повторяется; Review не открывает Outlook. [Примеры запуска и все параметры](docs/2.6.5-arch3i-sealed-full-original-witness.md).
+
 ### ARCH3h — оригинальный полный semantic witness реального тестового письма (DEV, read-only)
 
 Реальная проверка ARCH3g подтвердила `ExactInboxItemIndependentlyLocated=True`, `AttachmentCount=0`, существующую 2020 Part 1 (271360 байт), точные StoreID SHA256 / Folder EntryID и исходный размер PST (7694763008 байт). ARCH3h закрепляет все эти признаки и повторно открывает оригинал для полного semantic witness — **только чтение, без Move и без изменений существующего PST**.

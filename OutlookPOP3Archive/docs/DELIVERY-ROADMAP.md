@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3i (2026-11-13):** исходный полный ARCH3h semantic SHA подтверждён 8782b410253f54cc5374661077cdfc9279bcfba12805f0dab42b461320cb999c. [Sealed full original witness с приватным ACL, CreateNew+Flush(true), независимым SHA readback](2.6.5-arch3i-sealed-full-original-witness.md). Это запись evidence, НЕ writer. Далее: настоящий одноразовый original MailMover с изоляцией существующей Part1 PST и общего DuplicateIndex, durable intent, postrestart verifier.
+
+
 > **ARCH3h step 1 (2026-11-13):** [реальное полномасштабное semantic SHA свидетельство одного конкретного письма](2.6.5-arch3h-real-original-semantic-witness.md) с pinned Source StoreID SHA / FolderID / PST length / archived part1 length / ArchiveDate / attachment count. Вне LIVE writer: исходный shared DuplicateIndex существующего Archive-2020.pst не должен переписываться во время пилота, пока нет отдельной защищённой интеграции. No Move, no PostRestart, no production.
 
 > **ARCH3g read-only collision gate (2026-11-13):** архив `Archive-2020.pst` уже существует, поэтому первый новый live one-shot нельзя молча направить в него. [Операторский Plan/Audit ARCH3g](2.6.5-arch3g-existing-year-pst-collision-gate.md) повторно проверяет оригинальные части PST и точный исходный Inbox EntryID/реальный счётчик вложений. Полный SHA witness, Move, restart commit и production по-прежнему закрыты.

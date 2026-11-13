@@ -1,3 +1,8 @@
+## 2.6.5-ARCH3i DEV — 2026-11-13
+- Operator ARCH3h independently pinned complete original ARCH2b semantic SHA256 8782b410253f54cc5374661077cdfc9279bcfba12805f0dab42b461320cb999c.
+- Original full witness exposed only to internal ARCH3i Seal; CreateNew+Flush(true) in protected current user LOCALAPPDATA evidence folder, original schema/digest independent SHA256 readback, never overwrite RunId.
+- Plan/Seal/Review, explicit ConfirmEvidenceWrite, WhatIf; no MailItem.Move, PST creation, OperationJournal Intent/Index or production permit. 23 new Pester tests, expected 4321/143 Windows PS5.1 CI.
+
 ## 2.6.5-ARCH3h DEV — 2026-11-13
 - Real ARCH3g operator audit confirmed exact existing POP3 Inbox EntryID, FolderID, StoreID SHA256, original PST 7,694,763,008 bytes, existing 2020 archive part 1 271,360 bytes, 0 attachments.
 - Added read-only exact pinned real Outlook original full ARCH2b Body/HTML/recipients/attachment SHA256 semantic witness, invoking existing original SHA bridge without another mover.
