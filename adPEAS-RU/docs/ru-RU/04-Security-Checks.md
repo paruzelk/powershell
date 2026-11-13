@@ -1285,56 +1285,56 @@ Policies:    WSUS Baseline V1                    {44444444-4444-4444-4444-444444
 
 ### Get-GPOPermissions
 
-**Purpose**: Identifies who can modify Group Policy Objects.
+**Назначение**: определяет, кто может изменять объекты групповой политики.
 
-**What it checks**:
-- Write permissions on GPO objects
-- Non-privileged accounts with GPO edit rights
-- Write access to each policy's folder in SYSVOL (`Policies\{GUID}`), the other half of a GPO
-- GPO linkage to sensitive OUs
-- Affected computer count (including Domain Controllers)
-- Policies whose folder or `gpt.ini` is missing in SYSVOL on the domain controller read - a hint when the policy is linked, because a client that cannot open the `gpt.ini` of a policy in its scope aborts Group Policy processing (Event 1058); a note when it is not. A folder that is there but could not be read is reported as such, not as missing
-- Folders in `SYSVOL\Policies` named for no policy object the account can read - left over from a deleted policy, or a policy hidden from the account by its security filtering (note)
-- A policy that applies nowhere - nothing links it, or its links are disabled - while a broad group (Authenticated Users, Domain Users, Everyone, ...) may change it on the directory object or in its SYSVOL folder: the `oneLinkAway` row (hint) says that a single link applies whatever it then holds
+**Что проверяется**:
+- Права записи на объекты GPO.
+- Непривилегированные записи с правами редактирования GPO.
+- Права записи в каталог каждой политики в SYSVOL (`Policies\{GUID}`), вторую часть GPO.
+- Привязка GPO к критическим OU.
+- Число затронутых компьютеров, включая контроллеры домена.
+- Политики, у которых отсутствует каталог или `gpt.ini` в SYSVOL на читаемом DC: подсказка при активной привязке (если клиент не может открыть `gpt.ini` относящейся к нему политики, обработка групповых политик прерывается, событие 1058), примечание — если привязки нет. Наличие, но недоступность каталога обозначается как отказ чтения, а не как отсутствие.
+- Каталоги в `SYSVOL\Policies` без соответствующего видимого данной учётной записи объекта политики: остаток удалённой политики либо политика, скрытая ACL объекта (примечание).
+- Политика, которая нигде не применяется (нет привязок или они отключены), но широкая группа (Authenticated Users, Domain Users, Everyone и др.) может менять объект AD или его папку SYSVOL: строка `oneLinkAway` (подсказка) означает, что одной привязки достаточно для распространения внесённого содержимого.
 
-**Security Impact**: GPO modification enables code execution on all computers where the GPO is linked. An attacker with GPO write access can deploy malware domain-wide.
+**Влияние на безопасность**: изменение GPO даёт возможность выполнять код на всех компьютерах её области. Злоумышленник с правом записи GPO может развернуть вредоносный код по домену.
 
-**Usage**:
+**Использование**:
 ```powershell
-# Show non-privileged accounts with GPO modification rights (default)
+# По умолчанию: непривилегированные субъекты с правом изменения GPO
 Get-GPOPermissions
 
-# Include privileged accounts (Domain Admins, Group Policy Creator Owners, etc.)
+# Включить привилегированных субъектов (Domain Admins, Group Policy Creator Owners и др.)
 Get-GPOPermissions -IncludePrivileged
 ```
 
-**Parameters**:
+**Параметры**:
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `-IncludePrivileged` | Include privileged accounts in output (shown in yellow) |
+| `-IncludePrivileged` | Включить привилегированные записи в вывод (жёлтая подсветка) |
 
-**Output Properties**:
-- `VulnerableIdentity`: Account(s) with dangerous GPO permissions
-- `Scope`: GPO scope (DOMAIN-WIDE, Linked to X OU(s), or NOT LINKED)
-- `LinkedOUs`: Full DN of OUs where the GPO is linked
-- `AffectedComputers`: Number of computers affected by this GPO
+**Возвращаемые свойства**:
+- `VulnerableIdentity`: учётные записи с опасными разрешениями GPO.
+- `Scope`: область GPO (DOMAIN-WIDE, Linked to X OU(s) или NOT LINKED).
+- `LinkedOUs`: полные DN OU, к которым привязана GPO.
+- `AffectedComputers`: число компьютеров, затрагиваемых GPO.
 
 ---
 
 ### Get-GPOLocalGroupMembership
 
-**Purpose**: Analyzes GPO-defined local group memberships.
+**Назначение**: анализирует членство в локальных группах, заданное GPO.
 
-**What it checks**:
-- Local Administrators group additions via GPO
-- Remote Desktop Users additions
-- Other privileged local group modifications
-- Every member added, by SID: a broad group (Everyone, Domain Users, ...) raises the assignment; a Tier 0 principal holds the group's rights already and is not marked; every other principal - a user, a group of the domain, an operator group - is marked in the colour of the target group (red for Administrators and the operator groups, yellow for Backup Operators, Remote Desktop Users and the like). An assignment that adds Tier 0 principals only is a *Note*, unless it empties the group first
+**Что проверяется**:
+- Добавление участников локальной Administrators через GPO.
+- Добавление участников Remote Desktop Users.
+- Изменения других привилегированных локальных групп.
+- Каждый добавленный участник определяется по SID: широкая группа (Everyone, Domain Users и др.) повышает опасность назначения, а субъект Tier 0 и так имеет права группы и не помечается. Любой другой субъект — пользователь, группа домена, группа операторов — окрашивается по целевой группе (красный для Administrators и групп операторов; жёлтый для Backup Operators, Remote Desktop Users и сходных). Если назначение добавляет только Tier 0, оно является *примечанием*, кроме случая предварительной очистки всей группы.
 
-**Security Impact**: GPOs adding users to local admin groups can provide persistent privileged access across many systems.
+**Влияние на безопасность**: добавление пользователей в локальные администраторы через GPO может обеспечивать постоянный привилегированный доступ на многих машинах.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-GPOLocalGroupMembership
 ```
@@ -1343,112 +1343,112 @@ Get-GPOLocalGroupMembership
 
 ### Get-GPOScheduledTasks
 
-**Purpose**: Rates the scheduled tasks Group Policy Preferences deploy (`ScheduledTasks.xml` in SYSVOL) by what each task starts and as which account.
+**Назначение**: оценивает задания, развернутые Group Policy Preferences (`ScheduledTasks.xml` в SYSVOL), по запускаемой программе и учётной записи выполнения.
 
-**What it checks**:
-- Every Exec action of a task - regular and immediate tasks, both file formats - and the account it runs as, from the Preferences item or from the task's own principal
-- Tasks running as SYSTEM, LOCAL SERVICE, NETWORK SERVICE or a privileged account
-- Programs started from a directory in which every user may change files (`C:\Temp`, `C:\Users\Public`, ...) or add files (`C:\ProgramData`, `C:\Windows\Temp`, ...) by Windows default
-- UNC paths: whoever can write the share, or answer for its server name, controls what the task runs. Who may write the share is not read - a task's command line names shares as programs, arguments, copy sources and wildcards, and the read broke on too many of them - so a task on a share is a hint, unless its account makes it a finding
-- A task that runs as a Tier 0 account is a finding. SYSTEM and the operator accounts make a task a finding where its program lies in a directory every user may write by Windows default; otherwise they make it a hint
-- `cmd.exe /c` lines with an unquoted program path containing a space, which cmd.exe splits at the first space. The program field of a task is not affected: the Task Scheduler quotes it itself
-- Tasks of policies that are not linked or not enabled are held back and summarized, and so are task items with the action Delete: they remove the task they name, nothing runs
+**Что проверяется**:
+- Каждое действие Exec обычных и немедленных задач в обоих форматах файлов и учётная запись запуска из элемента Preferences либо собственного principal задания.
+- Задачи, выполняемые от SYSTEM, LOCAL SERVICE, NETWORK SERVICE или привилегированной записи.
+- Программы, запускаемые из каталогов, файлы которых по умолчанию может менять каждый пользователь (`C:\Temp`, `C:\Users\Public` и др.) или куда может добавлять файлы (`C:\ProgramData`, `C:\Windows\Temp` и др.).
+- UNC-пути: выполнение определяет тот, кто может писать в общий ресурс либо отвечать за имя его сервера. Разрешения записи ресурса не читаются: командные строки могут указывать общий ресурс как программу, аргумент, источник копирования или маску, и попытки их разбора давали много ошибок. Поэтому выполнение из ресурса — *подсказка*, если привилегии учётной записи не повышают её до находки.
+- Задание от Tier 0 — *находка*. Задания от SYSTEM и операторских записей становятся *находками*, если программа лежит в общедоступно изменяемом по умолчанию каталоге; иначе — *подсказками*.
+- Строки `cmd.exe /c` с незаключённым в кавычки путём к программе, содержащим пробел; cmd.exe делит такой путь по первому пробелу. Само поле программы планировщика не затронуто: Task Scheduler заключает его в кавычки.
+- Задания из непривязанных или выключенных GPO сворачиваются в сводку; то же для элементов с действием Delete, которые только удаляют именованное задание и ничего не выполняют.
 
-A password stored in a task (`cpassword`) is reported by `Get-CredentialExposure`.
+Пароль задания (`cpassword`) обнаруживает `Get-CredentialExposure`.
 
-**Console colours**: The program path (`Command`) is yellow on every task that runs, and red where a directory every user may write by Windows default makes the task a finding; it carries the card of a task that runs from a share as SYSTEM, an operator or a Tier 0 account. The account (`RunAs`) is red for a Tier 0 account, and yellow for an operator account and for SYSTEM, LOCAL SERVICE and NETWORK SERVICE. Every task rated a finding shows one of the two in red, so the headline is red only above a red row. The full sentence (`RiskReason`) is on the HTML card only.
+**Цвета консоли**: путь к программе (`Command`) подсвечивается жёлтым для всех исполняемых заданий и красным, если общедоступный каталог делает задание находкой; он входит в карточку задания, выполняемого с общего ресурса под SYSTEM, оператором или Tier 0. Запускающая запись (`RunAs`) красная для Tier 0, жёлтая — для операторов, SYSTEM, LOCAL SERVICE, NETWORK SERVICE. У каждой находки хотя бы одно из двух полей красное, поэтому красный заголовок соответствует красной строке. Полная причина (`RiskReason`) выводится только в HTML-карточке.
 
-**Security Impact**: A task runs on every computer the policy reaches. Whoever can replace what a SYSTEM task starts runs code as SYSTEM on all of them; for a task that runs as a privileged domain account, as that account - for a domain administrator, that is the domain.
+**Влияние на безопасность**: задание запускается на каждом компьютере области GPO. Кто может подменить программу для задания от SYSTEM, запускает код под SYSTEM на всех таких компьютерах; если оно запускается от привилегированной доменной записи, то с её правами (для Domain Admin — весь домен).
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-GPOScheduledTasks
 
-# Also list the tasks of policies that are not linked or not enabled
+# Также показать задания непривязанных и выключенных политик
 Get-GPOScheduledTasks -IncludeInactive
 ```
 
-**Parameters**:
+**Параметры**:
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `-IncludeInactive` | Also list the tasks of policies that are not linked or not enabled |
+| `-IncludeInactive` | Также перечислить задания непривязанных или выключенных политик |
 
 ---
 
 ### Get-GPOScriptPaths
 
-**Purpose**: Detects Logon/Logoff/Startup/Shutdown scripts distributed via Group Policy.
+**Назначение**: обнаруживает сценарии входа/выхода пользователя и запуска/выключения компьютера, раздаваемые GPO.
 
-**What it checks**:
-- Startup/Shutdown scripts (run as SYSTEM in Machine context)
-- Logon/Logoff scripts (run in user context)
-- Scripts loaded from UNC paths (credential exposure risk)
-- PowerShell scripts configured via psscripts.ini
-- Who may write a script that runs from outside the policy's own folder - NETLOGON, SYSVOL outside a GPO folder, or a file share: the NTFS permissions of the file and of its folder are read over SMB from the domain's own name and enabled computers of the domain - by the DNS name the directory records, never by a short name, and never from an address or a host the domain does not know. SYSVOL and NETLOGON under the domain's own name are read on the domain controller the session uses: `\\<domain>` itself asks for a Kerberos ticket to `cifs/<domain>`, which no account carries. A principal beyond the administrators that may write them makes the script a finding and is named in `scriptPathPermissions`; a script in NETLOGON only administrators may change is a note, one on another server a hint (its administrators decide what runs). The share permissions are not read, and a local path is not read over the network.
+**Что проверяется**:
+- Сценарии запуска/выключения компьютера (выполняются от SYSTEM в Machine).
+- Сценарии входа/выхода пользователя (выполняются от имени пользователя).
+- Сценарии, загружаемые через UNC (риск раскрытия учётных данных).
+- Сценарии PowerShell из psscripts.ini.
+- Кто может менять сценарий вне собственной папки GPO — NETLOGON, SYSVOL за пределами каталога GPO либо файловый ресурс. NTFS-права файла и его каталога читаются через SMB по имени домена и включённым компьютерам, причём только по DNS-имени из AD, никогда по короткому имени или IP/хосту, неизвестному домену. SYSVOL и NETLOGON по доменному имени читаются на DC текущего сеанса: запрос к самому `\\<domain>` потребовал бы билет Kerberos для `cifs/<domain>`, которого нет ни у одной учётной записи. Субъект помимо администраторов, способный писать туда, делает сценарий *находкой* и перечисляется в `scriptPathPermissions`; сценарий NETLOGON, изменяемый только администраторами, — *примечание*, а на другом сервере — *подсказка* (его администраторы определяют содержимое). Разрешения общего ресурса не читаются, локальные пути удалённо не проверяются.
 
-**Security Impact**: GPO scripts execute automatically on target systems. Startup and Shutdown scripts run as SYSTEM, making them high-value targets for privilege escalation. Scripts loaded from UNC paths expose machine credentials on the network.
+**Влияние на безопасность**: сценарии GPO запускаются автоматически. Сценарии запуска/выключения выполняются от SYSTEM и могут привести к повышению привилегий; сценарии по UNC показывают учётные данные машины в сети.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-GPOScriptPaths
 
-# Make no SMB connection to the hosts a script path names
+# Не устанавливать SMB-соединения с хостами из путей сценариев
 Get-GPOScriptPaths -OPSEC
 ```
 
-**Output Properties**:
-- `GPOName`: Name of the GPO deploying the script
-- `GPOGUID`: The GPO's folder name under SYSVOL
-- `GPOPath`: Full path to that folder
-- `SourceFile`: The `scripts.ini` / `psscripts.ini` the entry was parsed from, relative to
-  the GPO folder - not to be confused with `ScriptPath` below, which is the script that
-  .ini points at
-- `ScriptType`: Startup, Shutdown, Logon, or Logoff
-- `ScriptPath`: Path to the script
-- `Parameters`: Script parameters (if configured)
-- `ExecutionContext`: SYSTEM or User
-- `ScriptLanguage`: PowerShell, Batch, VBScript, etc.
-- `HasUNCPath`: Whether the script is loaded from a network share
-- `scriptRisk`: What the script's location is worth - the policy store, NETLOGON, a share or a local path, with who may change it or why that was not checked
-- `scriptPathPermissions`: One `path: Identity (Rights)` row per principal beyond the administrators that may write the script or its folder (only present when there is one)
+**Возвращаемые свойства**:
+- `GPOName`: имя GPO, разворачивающей сценарий.
+- `GPOGUID`: имя каталога GPO в SYSVOL.
+- `GPOPath`: полный путь к этому каталогу.
+- `SourceFile`: `scripts.ini` / `psscripts.ini`, из которого прочитана запись, относительно
+  каталога GPO; не путать с `ScriptPath` ниже — это сам сценарий, на который
+  ссылается .ini.
+- `ScriptType`: Startup, Shutdown, Logon или Logoff.
+- `ScriptPath`: путь к сценарию.
+- `Parameters`: параметры сценария, если заданы.
+- `ExecutionContext`: SYSTEM или User.
+- `ScriptLanguage`: PowerShell, Batch, VBScript и др.
+- `HasUNCPath`: загружается ли сценарий с общего ресурса.
+- `scriptRisk`: значение расположения сценария для риска (хранилище GPO, NETLOGON, общий ресурс или локальный путь); кто может менять содержимое или почему право не проверено.
+- `scriptPathPermissions`: одна строка `path: Identity (Rights)` на субъекта помимо администраторов с правом записи файла или каталога (выводится только при наличии).
 
 ---
 
 ### Get-GPORegistrySettings
 
-**Purpose**: Reports registry values a Group Policy deploys in a state that enables an attack.
+**Назначение**: сообщает о значениях реестра, которые групповая политика задаёт в состоянии, допускающем атаку.
 
-**What it checks**:
-- Every registry value a policy deploys, from all three places a policy writes one: Administrative Templates (`Registry.pol`), Group Policy Preferences (`Registry.xml`) and Security Options (`GptTmpl.inf`, section `[Registry Values]`)
-- Against a fixed list of known dangerous settings (`adPEAS-RegistryKeys.ps1`): credential theft (WDigest, LM/NTLMv1, LM hashes, more cached logons than the default of 10, logon credentials delegated by CredSSP to any server), privilege escalation (AlwaysInstallElevated in both hives, UAC), Kerberos and certificates (Zerologon allow-list, ESC10, DES or RC4 among the allowed encryption types), switched-off defenses (Defender, LSA protection, Credential Guard, firewall, script block logging), remote access (RDP, WinRM unencrypted or with Basic authentication, unsolicited Remote Assistance), SMB, LDAP client signing, LLMNR and legacy protocols, updates over HTTP, and Office macros enabled without a prompt (every Office version and application)
-- Only values set to the dangerous state. A hardening value that is missing is not a finding: a policy that does not configure a setting does not weaken it. A Preferences item that deletes its value or is switched off deploys nothing
+**Что проверяется**:
+- Любое значение реестра, раздаваемое политикой, из трёх источников: административные шаблоны (`Registry.pol`), Group Policy Preferences (`Registry.xml`) и Security Options (`GptTmpl.inf`, раздел `[Registry Values]`).
+- Проверка по фиксированному списку опасных параметров (`adPEAS-RegistryKeys.ps1`): кража учётных данных (WDigest, LM/NTLMv1, LM-хеши, больше десяти сохранённых входов вместо стандартных 10, делегирование CredSSP любому серверу), повышение привилегий (AlwaysInstallElevated в двух ветках, UAC), Kerberos и сертификаты (список исключений Zerologon, ESC10, DES/RC4 среди разрешённых типов шифрования), отключённые средства защиты (Defender, LSA protection, Credential Guard, брандмауэр, журналирование блоков сценариев), удалённый доступ (RDP, WinRM без шифрования или с Basic, незапрошенная Remote Assistance), SMB, подпись LDAP на клиенте, LLMNR и устаревшие протоколы, обновления через HTTP и Office-макросы без предупреждения (все версии и приложения Office).
+- Только значения в опасном состоянии. Отсутствующая настройка усиления защиты не является находкой: политика, не задающая её, сама не ослабляет защиту. Элемент Preferences с действием удаления либо отключённый не разворачивает значение.
 
-**What it does not judge**: every other value - the settings of applications, and Windows settings without a rule. The check counts them ("N further registry value(s) from M policies are not on the list of this check - not judged"), and its all-clear reads "No known vulnerable registry setting is deployed via GPO". Values another check judges are not counted: Point and Print (`Get-GPOPointAndPrint`), SMB signing (`Get-SMBSigningStatus`), LDAP signing and channel binding (`Get-LDAPConfiguration`), LAPS (`Get-LAPSConfiguration`), and string values named like a password (`Get-CredentialExposure`). `-IncludeUnknown` lists them, one object per policy file with a row per value - read them with someone who knows the applications. A full scan counts them only; run the check on its own to list them.
+**Что не оценивается**: остальные параметры приложений и Windows без правил. Проверка считает их («N дополнительных значений реестра из M политик отсутствуют в списке этой проверки — не оценены»), а сообщение об отсутствии проблем формулируется «Через GPO не развёрнуты известные уязвимые значения реестра». Значения, которые оценивают другие проверки, не включаются в этот счёт: Point and Print (`Get-GPOPointAndPrint`), подпись SMB (`Get-SMBSigningStatus`), подпись LDAP и channel binding (`Get-LDAPConfiguration`), LAPS (`Get-LAPSConfiguration`) и строковые значения, похожие на пароль (`Get-CredentialExposure`). `-IncludeUnknown` выводит все прочие значения — по одному объекту на файл политики и по одной строке на значение; анализировать следует со специалистом по приложениям. Полное сканирование лишь подсчитывает их, для подробностей вызывайте проверку отдельно.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-GPORegistrySettings
 
-# Also list the settings of policies that are not linked or not enabled
+# Также показать настройки непривязанных и выключенных политик
 Get-GPORegistrySettings -IncludeInactive
 
-# Also list every deployed value the check does not judge, per policy file
+# Также вывести все развёрнутые значения, которые проверка не оценивает, по файлам политики
 Get-GPORegistrySettings -IncludeUnknown
 ```
 
-**Output Properties**:
-- `GPOName`, `GPOGUID`, `GPOPath`, `SourceFile`: the policy and the file inside it
-- `RegistryKey`: hive, key and value name
-- `ConfiguredValue`: the value the policy writes
-- `VulnerabilityName`, `RiskReason`: what the value enables
-- With `-IncludeUnknown`, per policy file: `RegistryValues`, one row `hive\key\value = data` per value not judged, without a severity. Long strings are cut at 100 characters; a binary value of `Registry.pol` reads `(binary)`
+**Возвращаемые свойства**:
+- `GPOName`, `GPOGUID`, `GPOPath`, `SourceFile`: политика и её файл.
+- `RegistryKey`: раздел реестра, ключ и имя параметра.
+- `ConfiguredValue`: значение, записываемое политикой.
+- `VulnerabilityName`, `RiskReason`: почему такое значение опасно.
+- С `-IncludeUnknown`, по каждому файлу: `RegistryValues` — строка `hive\key\value = data` для каждого неоценённого значения без серьёзности. Длинные строки обрезаются после 100 символов; бинарное значение `Registry.pol` показывается как `(binary)`.
 
 ---
 
-## Computer Module
+## Модуль Computer
 
-Analyzes computer account security.
+Анализирует безопасность компьютерных учётных записей.
 
 ### Get-LAPSConfiguration
 
