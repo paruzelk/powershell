@@ -214,6 +214,11 @@ function Invoke-OPA265ARCH3eSyntheticVerifiedIndexCommit {
     # Original DuplicateIndex supports Safe/Fast durability modes; always
     # force-flush the original writer before independent readback and seal.
     Sync-OPADuplicateJournalStreams
+    # Original append-only index keeps a writable file handle open. Windows
+    # Get-FileHash requests read sharing that this handle cannot satisfy.
+    # After force-flush, close the ORIGINAL writer before independent readback
+    # and hash anchoring; this is permitted only in synthetic isolated mode.
+    Close-OPADuplicateJournalStreams
     $loaded=Import-OPADuplicateIndex -ArchivePst ([string]$receipt.ArchivePst)
     $entry=Test-OPADuplicateEntry -Index $loaded -SourceEntryId ([string]$Operation.EntryId)
     if($null -eq $entry -or [string]$entry.ArchiveEntryId -cne [string]$receipt.DestinationEntryId){
