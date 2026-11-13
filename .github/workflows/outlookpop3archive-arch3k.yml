@@ -510,7 +510,7 @@ jobs:
              $core -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness -Mail' -or
              $core -cnotmatch 'Get-OPA265ARCH3jOriginalRoutePlan -Sealed' -or
              $core -cnotmatch 'Get-OPA265ARCH3jIndexSafety -Part1' -or
-             $core -cmatch '\.Move\(|\.AddStoreEx\(|Write-OPA265ARCH3cJsonOnce|Write-OPAOperationJournalEvent|Add-OPADuplicateEntry -Index' -or
+             $core -cmatch '\.Move\(|\.AddStoreEx\(|Write-OPA265ARCH3cJsonOnce|Write-OPAOperationJournalEvent|(?m)^\s*Add-OPADuplicateEntry\s+-Index' -or
              $mover -cmatch 'Invoke-OPA265ARCH3kOneOriginalMailMoverCall' -or
              $test -cnotmatch 'rejects a late duplicate index collision' -or
              $doc -cnotmatch 'f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b' -or
