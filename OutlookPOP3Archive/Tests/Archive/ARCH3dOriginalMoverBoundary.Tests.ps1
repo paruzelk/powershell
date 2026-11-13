@@ -231,6 +231,21 @@ Describe 'ARCH3d real original MailMover integration hooks: protected scope, no 
         $r=Test-OPA265ARCH3dSyntheticBoundary -Operation $f.Operation -ExternallyPinnedReceiptSha256 $s.Sha256
         $r.Issues.Count | Should -BeGreaterThan 0
     }
+    It 'tampered original OperationJournal after MoveReturned cannot pass pinned receipt' {
+        $f=New-ARCH3dFixture
+        $s=Step-ARCH3dFixture -Fixture $f -Through MoveReturned
+        [IO.File]::AppendAllText((Join-Path $f.Operation.Root 'original-operation-journal.jsonl'),' ')
+        $r=Test-OPA265ARCH3dSyntheticBoundary -Operation $f.Operation -ExternallyPinnedReceiptSha256 $s.Sha256
+        $r.Issues.Count | Should -BeGreaterThan 0
+        $r.WriterPermit | Should -BeFalse
+    }
+    It 'read-only operator audit validates all original runtime integration markers without COM' {
+        $r=& (Join-Path $script:root 'Invoke-ARCH3d.ps1') -Mode Audit
+        $r.Status | Should -BeExactly 'OriginalMailMoverSyntheticBoundariesWiredProductionStillClosed'
+        $r.ChecksPassed | Should -Be $r.ChecksTotal
+        $r.OutlookContacted | Should -BeFalse
+        $r.ProductionReady | Should -BeFalse
+    }
     It 'all synthetic boundaries preserve original writer fence and no production permit' {
         $f=New-ARCH3dFixture
         $s=Step-ARCH3dFixture -Fixture $f -Through MoveReturned
