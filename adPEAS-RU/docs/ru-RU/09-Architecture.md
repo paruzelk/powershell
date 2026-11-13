@@ -1,49 +1,49 @@
-# Architecture
+# Архитектура
 
-Technical architecture overview of adPEAS v2.
-
----
-
-## Design Principles
-
-### 1. Zero External Dependencies
-
-adPEAS uses only built-in .NET Framework classes:
-
-- `System.DirectoryServices.Protocols.LdapConnection` - Unified LDAP operations (queries and modifications)
-- `System.DirectoryServices.Protocols.SearchRequest` - LDAP search operations
-- `System.DirectoryServices.Protocols.ModifyRequest` - LDAP modify operations (Set-DomainObject)
-- `System.DirectoryServices.ActiveDirectorySecurity` - ACL parsing and modification
-- `System.Security.Principal` - SID handling
-- `System.Security.Cryptography` - Kerberos crypto
-- `System.Net` - Network operations
-
-**Note**: adPEAS v2 uses a **unified LdapConnection architecture**. All LDAP operations (queries, schema lookups, modifications) use `System.DirectoryServices.Protocols.LdapConnection` instead of the older `DirectoryEntry`/`DirectorySearcher` pattern. This provides:
-- Better LDAPS support (native SSL/TLS handling)
-- Consistent behavior across all operations
-- Support for Configuration and Schema partition queries
-- Unified authentication handling
-
-### 2. Standalone Deployment
-
-The final product is a single .ps1 file:
-
-- All modules combined during build
-- No external files or dependencies
-- Easy to transfer and execute
-- Works on any Windows system with PowerShell 5.1+
-
-### 3. Auth-Agnostic Architecture
-
-Authentication is handled once at connection time. All subsequent operations are independent of the authentication method used.
-
-### 4. Layered Design
-
-Clear separation between data retrieval, security analysis, and output formatting.
+Технический обзор архитектуры adPEAS v2.
 
 ---
 
-## Module Architecture
+## Принципы проектирования
+
+### 1. Без внешних зависимостей
+
+adPEAS использует только встроенные классы .NET Framework:
+
+- `System.DirectoryServices.Protocols.LdapConnection` — единый интерфейс LDAP (запросы и изменения).
+- `System.DirectoryServices.Protocols.SearchRequest` — поисковые LDAP-запросы.
+- `System.DirectoryServices.Protocols.ModifyRequest` — изменение LDAP (Set-DomainObject).
+- `System.DirectoryServices.ActiveDirectorySecurity` — разбор и изменение ACL.
+- `System.Security.Principal` — работа с SID.
+- `System.Security.Cryptography` — криптография Kerberos.
+- `System.Net` — сетевые операции.
+
+**Примечание**: adPEAS v2 использует **единую архитектуру LdapConnection**. Все LDAP-операции (запросы, чтение схемы и изменения) выполняются через `System.DirectoryServices.Protocols.LdapConnection` вместо прежнего сочетания `DirectoryEntry`/`DirectorySearcher`. Это обеспечивает:
+- Улучшенную поддержку LDAPS (встроенная работа с SSL/TLS).
+- Единообразное поведение всех операций.
+- Доступ к разделам Configuration и Schema.
+- Единый механизм аутентификации.
+
+### 2. Автономное развёртывание
+
+Итоговый продукт — один файл .ps1:
+
+- Во время сборки объединяются все модули.
+- Не нужны дополнительные файлы или зависимости.
+- Удобно переносить и запускать.
+- Работает на Windows с PowerShell 5.1 и новее.
+
+### 3. Независимость от способа аутентификации
+
+Аутентификация выполняется однократно при соединении. Все последующие операции не зависят от выбранного способа входа.
+
+### 4. Многоуровневая структура
+
+Получение данных, анализ безопасности и форматирование вывода чётко разделены.
+
+---
+
+## Архитектура модулей
 
 ```
 +-------------------------------------------------------+
@@ -74,7 +74,7 @@ Clear separation between data retrieval, security analysis, and output formattin
 
 ---
 
-## Data Flow
+## Поток данных
 
 ```
 1. User Input (Parameters)
@@ -103,9 +103,9 @@ Clear separation between data retrieval, security analysis, and output formattin
 
 ---
 
-## Module Hierarchy
+## Иерархия модулей
 
-### Call Hierarchy
+### Иерархия вызовов
 
 ```
 Check Module
@@ -122,30 +122,30 @@ Check Module
     +-> Get-CertificateTemplate / Get-CertificateAuthority (ADCS checks)
 ```
 
-### Rules
+### Правила
 
-1. **Check Modules**: Call Get-Domain* functions, Get-ObjectACL, Get-CertificateTemplate, and Get-CertificateAuthority
-2. **Get-Domain Functions**: Only call Get-DomainObject
-3. **Get-DomainObject**: Only calls Invoke-LDAPSearch
-4. **Invoke-LDAPSearch**: Only uses `$Script:LdapConnection`
-5. **Set-DomainObject**: Uses `ModifyRequest` via `$Script:LdapConnection`
+1. **Модули проверок**: вызывают Get-Domain*, Get-ObjectACL, Get-CertificateTemplate и Get-CertificateAuthority.
+2. **Функции Get-Domain**: вызывают только Get-DomainObject.
+3. **Get-DomainObject**: вызывает только Invoke-LDAPSearch.
+4. **Invoke-LDAPSearch**: использует только `$Script:LdapConnection`.
+5. **Set-DomainObject**: отправляет `ModifyRequest` через `$Script:LdapConnection`.
 
 ---
 
-## Session Management
+## Управление сеансом
 
-### Session Variables
+### Переменные сеанса
 
-| Variable | Type | Purpose |
+| Переменная | Тип | Назначение |
 |----------|------|---------|
-| `$Script:LdapConnection` | LdapConnection | Used for ALL LDAP operations (queries and modifications) |
-| `$Script:LDAPContext` | Hashtable | Session metadata (domain, server, auth info) |
-| `$Script:LDAPCredential` | PSCredential | Stored credentials |
-| `$Script:SIDResolutionCache` | Hashtable | SID to name cache |
+| `$Script:LdapConnection` | LdapConnection | Используется для ВСЕХ операций LDAP (чтение и изменение) |
+| `$Script:LDAPContext` | Hashtable | Метаданные сеанса: домен, сервер, сведения об аутентификации |
+| `$Script:LDAPCredential` | PSCredential | Хранимые учётные данные |
+| `$Script:SIDResolutionCache` | Hashtable | Кеш преобразования SID в имена |
 
-### Unified LdapConnection Architecture
+### Единая архитектура LdapConnection
 
-All LDAP operations flow through `$Script:LdapConnection`:
+Все LDAP-операции выполняются через `$Script:LdapConnection`:
 
 ```
 +-------------------------------------------------------+
@@ -168,9 +168,9 @@ All LDAP operations flow through `$Script:LdapConnection`:
 +---------------+   +---------------+   +---------------+
 ```
 
-**Global Catalog Connection**: `Connect-LDAP -AsGlobalCatalog` creates a secondary connection to the Global Catalog (port 3268 for LDAP, 3269 for LDAPS). This is used internally by `ConvertFrom-SID` to resolve SIDs from foreign domains in the forest. The GC connection is cached in `$Script:GCConnection` and cleaned up by `Disconnect-adPEAS`. If the GC is unreachable, SID resolution falls back to a RID-based format.
+**Подключение к глобальному каталогу**: `Connect-LDAP -AsGlobalCatalog` создаёт второе соединение с GC (порт 3268 для LDAP, 3269 для LDAPS). `ConvertFrom-SID` использует его для разрешения SID из других доменов леса. Соединение GC кешируется в `$Script:GCConnection` и закрывается через `Disconnect-adPEAS`. Если GC недоступен, SID возвращается в формате на основе RID.
 
-### LDAPContext Structure
+### Структура LDAPContext
 
 ```powershell
 $Script:LDAPContext = @{
@@ -191,9 +191,9 @@ $Script:LDAPContext = @{
 
 ---
 
-## Authentication Flow
+## Последовательность аутентификации
 
-### Kerberos-First Design
+### Приоритет Kerberos
 
 ```
 +-------------------+
@@ -231,27 +231,27 @@ $Script:LDAPContext = @{
                     +-------------------+
 ```
 
-### Authentication Methods
+### Способы аутентификации
 
-| Method | Kerberos Attempt | Fallback |
+| Способ | Попытка Kerberos | Резервный способ |
 |--------|-----------------|----------|
-| Windows Auth | SSPI (automatic) | N/A |
-| PSCredential | TGT + TGS + PTT | NTLM Impersonation -> SimpleBind |
-| Username/Password | TGT + TGS + PTT | NTLM Impersonation -> SimpleBind |
-| NT Hash | TGT (RC4) + TGS + PTT | None |
-| AES256 Key | TGT (AES256) + TGS + PTT | None |
-| AES128 Key | TGT (AES128) + TGS + PTT | None |
-| Certificate | PKINIT + TGS + PTT | None |
-| Kirbi | PTT | None |
-| Ccache | PTT | None |
+| Windows Auth | SSPI (автоматически) | Нет |
+| PSCredential | TGT + TGS + PTT | Имперсонация NTLM → SimpleBind |
+| Имя пользователя/пароль | TGT + TGS + PTT | Имперсонация NTLM → SimpleBind |
+| Хеш NT | TGT (RC4) + TGS + PTT | Нет |
+| Ключ AES256 | TGT (AES256) + TGS + PTT | Нет |
+| Ключ AES128 | TGT (AES128) + TGS + PTT | Нет |
+| Сертификат | PKINIT + TGS + PTT | Нет |
+| Kirbi | PTT | Нет |
+| Ccache | PTT | Нет |
 
 ---
 
-## Output Architecture
+## Архитектура вывода
 
-### Unified RenderModel Pipeline
+### Единый конвейер RenderModel
 
-adPEAS uses a unified rendering pipeline where a single data model drives both Console and HTML output:
+adPEAS использует единый конвейер формирования представления: одна модель данных управляет выводом в консоль и HTML:
 
 ```
 +----------------------------------------------------------+
@@ -286,18 +286,18 @@ adPEAS uses a unified rendering pipeline where a single data model drives both C
 +---------------------------+  +---------------------------+
 ```
 
-**Key components:**
+**Основные компоненты:**
 
-| Component | File | Purpose |
+| Компонент | Файл | Назначение |
 |-----------|------|---------|
-| `Get-RenderModel` | `Get-RenderModel.ps1` | Builds a renderer-agnostic data model from AD objects |
-| `AttributeTransformers` | `AttributeTransformers.ps1` | Per-attribute transform functions (memberOf, UAC, SPN, etc.) |
-| `Get-AttributeSeverity` | `AttributeTransformers.ps1` | Classifies attribute values by security relevance |
-| `Render-ConsoleObject` | `Render-ConsoleObject.ps1` | Renders the model to colored console output |
-| `Render-HtmlObject` | `Render-HtmlObject.ps1` | Renders the model to HTML table rows with tooltips |
-| `Write-adPEASOutput` | `Write-adPEASOutput.ps1` | Low-level output (ANSI codes, file writing, prefixes) |
+| `Get-RenderModel` | `Get-RenderModel.ps1` | Создаёт независимую от рендерера модель данных из объектов AD |
+| `AttributeTransformers` | `AttributeTransformers.ps1` | Преобразования атрибутов (memberOf, UAC, SPN и др.) |
+| `Get-AttributeSeverity` | `AttributeTransformers.ps1` | Классифицирует значения атрибутов по значимости для безопасности |
+| `Render-ConsoleObject` | `Render-ConsoleObject.ps1` | Отображает модель в консоли с цветами |
+| `Render-HtmlObject` | `Render-HtmlObject.ps1` | Формирует строки HTML-таблиц и всплывающие подсказки |
+| `Write-adPEASOutput` | `Write-adPEASOutput.ps1` | Низкоуровневый вывод (ANSI, запись в файл, префиксы) |
 
-**RenderModel structure:**
+**Структура RenderModel:**
 
 ```powershell
 @{
@@ -315,41 +315,41 @@ adPEAS uses a unified rendering pipeline where a single data model drives both C
 }
 ```
 
-### Semantic Output Functions
+### Семантические функции вывода
 
-Check modules use semantic wrapper functions that delegate to the RenderModel pipeline:
+Модули проверок используют обёртки, передающие данные в конвейер RenderModel:
 
 ```powershell
-# Display AD object with all properties
+# Показать объект AD со всеми свойствами
 Show-Object $user
-# Internally: Get-RenderModel -> Render-ConsoleObject + Render-HtmlObject
+# Внутри: Get-RenderModel -> Render-ConsoleObject + Render-HtmlObject
 
-# Display finding text
+# Показать текст находки
 Show-Line "Finding text" -Class Finding
-# Internally: Write-adPEASOutput with appropriate formatting
+# Внутри: Write-adPEASOutput с соответствующим форматированием
 
-# Section headers
+# Заголовки разделов
 Show-Header "Analyzing Security"
-# Internally: Write-adPEASOutput with Header class
+# Внутри: Write-adPEASOutput с классом Header
 
-# Sub-section headers
+# Заголовки подразделов
 Show-SubHeader "Searching for accounts..."
-# Internally: Write-adPEASOutput with SubInfo class
+# Внутри: Write-adPEASOutput с классом SubInfo
 ```
 
-**Available Functions** (defined in `adPEAS-Messages.ps1`):
-- `Show-Header` - Main section headers with decorative lines
-- `Show-SubHeader` - Sub-section headers
-- `Show-Line` - Single line output with optional styling
-- `Show-KeyValue` - Key-value pairs with alignment
-- `Show-Object` - AD object output via RenderModel pipeline
-- `Show-Logo` - adPEAS logo display
+**Доступные функции** (определены в `adPEAS-Messages.ps1`):
+- `Show-Header` — заголовок раздела с декоративными линиями.
+- `Show-SubHeader` — заголовок подраздела.
+- `Show-Line` — строка вывода с необязательным оформлением.
+- `Show-KeyValue` — пары ключ-значение с выравниванием.
+- `Show-Object` — вывод объекта AD через RenderModel.
+- `Show-Logo` — логотип adPEAS.
 
 ---
 
-## Check Module Pattern
+## Шаблон модуля проверки
 
-All check modules follow a consistent pattern:
+Модули проверок используют общий шаблон:
 
 ```powershell
 function Get-SecurityCheck {
@@ -365,25 +365,25 @@ function Get-SecurityCheck {
     }
 
     process {
-        # 1. Ensure connection
+        # 1. Обеспечить наличие подключения
         if (-not (Ensure-LDAPConnection @PSBoundParameters)) {
             return
         }
 
-        # 2. Display section header
+        # 2. Показать заголовок раздела
         Show-SubHeader "Analyzing security configuration..."
 
-        # 3. Query data using Get-Domain* functions
+        # 3. Получить данные через Get-Domain*
         $data = Get-DomainUser -LDAPFilter "(condition=*)" @PSBoundParameters
 
-        # 4. Analyze and output findings
+        # 4. Проанализировать и вывести находки
         foreach ($item in $data) {
             if ($item.IsVulnerable) {
                 Show-Object $item
             }
         }
 
-        # 5. Summary message
+        # 5. Итоговое сообщение
         if ($findings.Count -eq 0) {
             Show-Line "No issues found" -Class Note
         }
@@ -397,69 +397,69 @@ function Get-SecurityCheck {
 
 ---
 
-## Security Considerations
+## Соображения безопасности
 
-### OPSEC Mode
+### Режим OPSEC
 
-When `-OPSEC` is specified:
-- Kerberoasting is skipped (no TGS requests)
-- AS-REP Roasting is skipped (no AS-REQ without pre-auth)
-- BloodHound collection is skipped (generates many LDAP queries)
-- No SMB connection is made to the file servers a GPO script names, or to NETLOGON for the logon scripts of accounts (the NTFS permissions of a script a policy runs from NETLOGON or a share, and of the logon script an account's scriptPath names are not read)
-- Only passive enumeration is performed
+При указании `-OPSEC`:
+- Пропускается Kerberoasting (нет запросов TGS).
+- Пропускается AS-REP Roasting (нет AS-REQ без предварительной аутентификации).
+- Пропускается сбор BloodHound (создаёт много LDAP-запросов).
+- Нет SMB-соединений с файловыми серверами из путей сценариев GPO или NETLOGON для сценариев входа учётных записей (не проверяются NTFS-права сценария из NETLOGON/общего ресурса и файла, на который ссылается scriptPath).
+- Выполняется только пассивное перечисление.
 
-### Credential Handling
+### Обращение с учётными данными
 
-- Credentials stored only in `$Script:LDAPCredential`
-- Cleared on Disconnect-adPEAS
-- Never written to disk
-- Never logged in verbose output
+- Учётные данные хранятся только в `$Script:LDAPCredential`.
+- Очищаются при Disconnect-adPEAS.
+- Никогда не записываются на диск.
+- Никогда не выводятся в подробный журнал.
 
-### SID-Based Checks
+### Проверки по SID
 
-All identity checks use SIDs, not names:
-- Language-independent (works in any locale)
-- Reliable (names can be duplicated)
-- Faster (no name resolution needed for well-known SIDs)
+Проверка субъектов использует SID, а не имена:
+- Не зависит от языка ОС.
+- Надёжна (имена могут совпадать).
+- Быстрее (для известных SID не требуется разрешать имя).
 
 ---
 
-## Performance Optimizations
+## Оптимизация производительности
 
-### Caching
+### Кеширование
 
-| Cache            | Purpose                         |
+| Кеш | Назначение |
 | ---------------- | ------------------------------- |
-| SID Resolution   | Avoid repeated LDAP lookups     |
-| LAPS Schema      | Check schema once per session   |
-| Group Membership | Recursive membership resolution |
+| Разрешение SID | Без повторных LDAP-поисков |
+| Схема LAPS | Одна проверка схемы на сеанс |
+| Членство в группах | Рекурсивное раскрытие участников |
 
-### LDAP Query Optimization
+### Оптимизация LDAP-запросов
 
-- Server-side filtering (LDAP filters, not client-side Where-Object)
-- Paged results for large result sets via `PageResultRequestControl`
-- Attribute selection for targeted queries (internal use only)
-- Unified `LdapConnection` for both LDAP and LDAPS
-- Configurable timeouts (Operation timeout, Send timeout)
-- Support for all partitions (Domain, Configuration, Schema) via `-SearchBase`
+- Фильтрация на сервере (LDAP-фильтры, а не клиентский Where-Object).
+- Страничная выдача больших наборов через `PageResultRequestControl`.
+- Выбор атрибутов для адресных запросов (только внутреннее использование).
+- Единый `LdapConnection` для LDAP и LDAPS.
+- Настраиваемые тайм-ауты (Operation и Send).
+- Доступ ко всем разделам (Domain, Configuration, Schema) через `-SearchBase`.
 
 ---
 
-## Error Handling
+## Обработка ошибок
 
-### Two-Level Approach
+### Два уровня
 
-**Critical Errors** (script stops):
-- LDAP connection failure
-- Authentication failure
-- No DC reachable
+**Критические ошибки** (скрипт останавливается):
+- Сбой LDAP-соединения.
+- Ошибка аутентификации.
+- Недоступность всех контроллеров домена.
 
-**Non-Critical Errors** (continue):
-- Single object query failure
-- Permission denied on specific object
-- Timeout on single query
+**Некритические ошибки** (продолжить работу):
+- Ошибка чтения одного объекта.
+- Отказ в правах на конкретный объект.
+- Тайм-аут одного запроса.
 
-### Error Display
+### Отображение ошибок
 
 ```powershell
 try {
@@ -473,6 +473,6 @@ try {
 
 ## Navigation
 
-- [Previous: Helper-Functions](08-Helper-Functions.md)
-- [Next: Risk-Scoring-System](10-Risk-Scoring-System.md)
-- [Back to Home](00-Home.md)
+- [Назад: вспомогательные функции](08-Helper-Functions.md)
+- [Далее: оценка рисков](10-Risk-Scoring-System.md)
+- [На главную](00-Home.md)
