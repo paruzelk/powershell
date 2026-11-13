@@ -23,6 +23,8 @@
 
 ---
 
+<a id="session-management"></a>
+
 ## Управление сеансом
 
 ### Connect-adPEAS
@@ -171,6 +173,8 @@ CacheExists : True
 
 ---
 
+<a id="kerberos-authentication"></a>
+
 ## Аутентификация Kerberos
 
 ### Invoke-KerberosAuth
@@ -306,6 +310,8 @@ Import-KerberosTicket -TicketBase64 "doIFxjCC..."
 
 ---
 
+<a id="password-hash-derivation"></a>
+
 ## Вычисление хешей по паролю
 
 ### Get-Hash
@@ -376,6 +382,8 @@ Connect-adPEAS -Domain "contoso.com" -Username "admin" -AES256Key $h.AES256
 **Примечание.** RC4, MD5, SHA1, SHA256 и SHA512 не зависят от домена: один пароль всегда даёт один и тот же хеш. В AES и DCC/DCC2 для формирования соли используется имя пользователя (а для AES также домен).
 
 ---
+
+<a id="sid-and-acl-utilities"></a>
 
 ## Утилиты SID и ACL
 
@@ -512,6 +520,8 @@ $owner = Get-ObjectOwner -DistinguishedName "CN=Computer01,CN=Computers,DC=conto
 
 ---
 
+<a id="credential-decryption"></a>
+
 ## Расшифровка учётных данных
 
 ### ConvertFrom-GPPPassword
@@ -547,6 +557,8 @@ $script = ConvertFrom-VBE -EncodedScript $vbeContent
 **Где встречается:** сценарии входа могут быть закодированы и содержать учётные данные.
 
 ---
+
+<a id="testing-functions"></a>
 
 ## Функции тестирования
 
@@ -659,6 +671,8 @@ if ($result.Success) {
 
 ---
 
+<a id="adcs-certificate-enrollment"></a>
+
 ## Запрос сертификатов AD CS
 
 ### Request-ADCSCertificate
@@ -730,6 +744,8 @@ Request-ADCSCertificate -TemplateName "User" -Credential (Get-Credential)
 
 ---
 
+<a id="laps-utilities"></a>
+
 ## Утилиты LAPS
 
 ### Get-LAPSGPOConfig
@@ -783,6 +799,8 @@ $perms = Get-OUPermissions -DistinguishedName "OU=Admins,DC=contoso,DC=com" -Che
 
 ---
 
+<a id="gpo-utilities"></a>
+
 ## Утилиты GPO
 
 ### Get-GPOLinkage
@@ -798,6 +816,8 @@ $linkage["{6AC1786C-016F-11D2-945F-00C04fB984F9}"]  # Массив OU, к кот
 **Возвращает:** Hashtable, где ключ — GUID GPO (верхний регистр, с фигурными скобками), а значение — массив объектов мест привязки.
 
 ---
+
+<a id="network-utilities"></a>
 
 ## Сетевые утилиты
 
