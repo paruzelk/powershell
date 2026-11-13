@@ -292,6 +292,81 @@ DC, метод аутентификации, LDAP/LDAPS и
 данные о полученном NT-хеше.
 Храните такие сведения как конфиденциальные.
 
+## Расширенные сценарии аутентификации (DOC5)
+
+### NTLM impersonation и альтернативы Kerberos
+
+При парольной аутентификации Kerberos запрашивает TGT, затем билеты сервисов LDAP/CIFS. Если KDC отвечает KDC_ERR_ETYPE_NOSUPP (14), adPEAS перебирает AES256 (etype 18), AES128 (17) и RC4-HMAC (23). При KDC_ERR_PREAUTH_REQUIRED (25) поле PA-ETYPE-INFO2 сообщает корректный salt для AES, зависящий от realm и регистра имени. Для готового NT-хеша salt не требуется. После неуспешного Kerberos для парольных режимов предусмотрены NTLM impersonation и SimpleBind. Готовые хеши и AES-ключи не поддерживают такой fallback.
+
+ForceNTLM использует LogonUser и LOGON32_LOGON_NEW_CREDENTIALS (аналог runas /netonly), позволяя избежать целенаправленной замены существующих Kerberos-билетов текущей записи. NTLM совместим с LDAP Signing, если доменная политика его разрешает.
+
+~~~powershell
+$cred = Get-Credential
+Connect-adPEAS -Domain 'example.local' -Credential $cred -ForceNTLM -UseLDAPS -IgnoreSSLErrors:$false
+Get-adPEASSession
+Disconnect-adPEAS
+~~~
+
+### NT-хеш и ключи AES128/AES256
+
+| Параметр | Формат | Метод |
+|---|---|---|
+| -NTHash | 32 шестнадцатеричных символа | Kerberos RC4-HMAC |
+| -AES128Key | 32 шестнадцатеричных символа | Kerberos AES128 |
+| -AES256Key | 64 шестнадцатеричных символа | Kerberos AES256 |
+
+~~~powershell
+# Примеры формы, не действительные секреты.
+Connect-adPEAS -Domain 'example.local' -Username 'auditor' -NTHash '<32_hex_chars>'
+Connect-adPEAS -Domain 'example.local' -Username 'auditor' -AES128Key '<32_hex_chars>'
+Connect-adPEAS -Domain 'example.local' -Username 'auditor' -AES256Key '<64_hex_chars>'
+~~~
+
+При использовании этих параметров Kerberos обязателен. Настоящие хеши, AES-ключи и билеты нельзя хранить в общих отчётах, GitHub и истории консоли.
+
+### PKINIT: защищённый PFX и Base64
+
+Параметр Certificate принимает путь к PFX или Base64. CertificatePassword нужен, если контейнер зашифрован. PKINIT требует Kerberos на TCP/88 и корректного сопоставления сертификата с записью AD.
+
+~~~powershell
+Connect-adPEAS -Domain 'example.local' -Certificate 'C:\Certs\auditor.pfx' -CertificatePassword (Read-Host 'Пароль PFX' -AsSecureString) -UseLDAPS -IgnoreSSLErrors:$false
+$pfxBase64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes('C:\Certs\auditor.pfx'))
+Connect-adPEAS -Domain 'example.local' -Certificate $pfxBase64 -CertificatePassword (Read-Host 'Пароль PFX' -AsSecureString) -UseLDAPS -IgnoreSSLErrors:$false
+~~~
+
+UnPAC-the-Hash при определённых конфигурациях может извлекать NT-хеш из PAC_CREDENTIAL_INFO после PKINIT через U2U; это не универсальная возможность. Изменение msDS-KeyCredentialLink (Shadow Credentials), также упоминаемое в оригинале, является **записью в AD**, а не обычной проверкой соединения: требуется отдельное разрешение и план восстановления.
+
+### Pass-the-Cert, Kirbi и Ccache
+
+ForcePassTheCert использует клиентский TLS-сертификат через LDAPS, а не Kerberos TGT/TGS. Сертификат Shadow Credentials не следует считать подходящим для Schannel без проверки сопоставления субъекта.
+
+~~~powershell
+Connect-adPEAS -Domain 'example.local' -Server 'dc01.example.local' -Certificate 'C:\Certs\auditor.pfx' -CertificatePassword (Read-Host 'Пароль PFX' -AsSecureString) -ForcePassTheCert -IgnoreSSLErrors:$false
+Connect-adPEAS -Domain 'example.local' -Kirbi 'C:\Tickets\auditor.kirbi'
+Connect-adPEAS -Domain 'example.local' -Ccache 'C:\Tickets\auditor.ccache'
+~~~
+
+Kirbi и Ccache принимают также Base64-билеты. Используйте только законно полученные, действительные билеты с правильным realm. Импорт билета не выполняет парольный fallback.
+
+### Выбор режима при ограничениях сети
+
+| Сценарий | Режим | Условие |
+|---|---|---|
+| Доменная Windows-сессия | UseWindowsAuth | SSPI и текущие права |
+| Отдельная аудиторская запись | Credential | Не хранить пароль открытым текстом |
+| Kerberos обязателен | ForceKerberos | Нет перехода на NTLM/SimpleBind |
+| Сохранить существующие билеты | ForceNTLM | NTLM разрешён политикой |
+| Порт 88 закрыт, есть подходящий сертификат | ForcePassTheCert | LDAPS/Schannel |
+| Порт 88 закрыт, разрешён парольный bind | ForceSimpleBind | LDAPS и проверенный сертификат |
+| Готовый билет | Kirbi или Ccache | Проверить срок и realm |
+
+~~~powershell
+$cred = Get-Credential
+Connect-adPEAS -Domain 'example.local' -Credential $cred -ForceKerberos -UseLDAPS -IgnoreSSLErrors:$false
+Get-adPEASSession -TestConnection
+Disconnect-adPEAS
+~~~
+
 ## Навигация
 
 [Быстрый запуск](02-Quick-Start.md) ·
