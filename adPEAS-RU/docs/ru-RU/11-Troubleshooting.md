@@ -137,20 +137,20 @@
 **Шаг 1: создать туннель** (примеры для распространённых инструментов)
 
 ```bash
-# <a id="chisel-reverse-tunnel"></a>Chisel (обратный туннель)
-# <a id="on-pivot-host"></a>На промежуточном узле:
+# Chisel (обратный туннель)
+# На промежуточном узле:
 chisel server -p 8080 --reverse
-# <a id="on-attacker"></a>На проверяющем компьютере:
+# На проверяющем компьютере:
 chisel client pivot-host:8080 R:389:dc01.contoso.com:389 R:88:dc01.contoso.com:88
 
-# <a id="ligolo-ng"></a>Ligolo-ng — сетевой туннель
-# <a id="ligolo-creates-a-full-tunnel-interface-no-individual-port-forwards-needed"></a>Ligolo создаёт полноценный туннельный интерфейс — не нужны отдельные пробросы портов
-# <a id="all-ports-are-accessible-via-the-tunnel-interface-ip"></a>Все порты доступны через IP туннельного интерфейса
+# Ligolo-ng — сетевой туннель
+# Ligolo создаёт полноценный туннельный интерфейс — не нужны отдельные пробросы портов
+# Все порты доступны через IP туннельного интерфейса
 
-# <a id="ssh-port-forward"></a>Проброс SSH
+# Проброс SSH
 ssh -L 389:dc01.contoso.com:389 -L 88:dc01.contoso.com:88 user@pivot-host
 
-# <a id="socat-simple-tcp-relay-on-pivot-host"></a>Socat (простой TCP-ретранслятор на промежуточном узле)
+# Socat (простой TCP-ретранслятор на промежуточном узле)
 socat TCP-LISTEN:389,fork TCP:dc01.contoso.com:389 &
 socat TCP-LISTEN:88,fork TCP:dc01.contoso.com:88 &
 ```
@@ -158,16 +158,16 @@ socat TCP-LISTEN:88,fork TCP:dc01.contoso.com:88 &
 **Шаг 2: подключить adPEAS через туннель**
 
 ```powershell
-# <a id="simplebind-through-tunnel-most-reliable"></a>SimpleBind через туннель (обычно надёжнее всего)
+# SimpleBind через туннель (обычно надёжнее всего)
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 
-# <a id="with-ldaps-if-tunnel-forwards-port-636"></a>LDAPS (если туннель перенаправляет порт 636)
+# LDAPS (если туннель перенаправляет порт 636)
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -UseLDAPS -IgnoreSSLErrors -ForceSimpleBind
 
-# <a id="pass-the-cert-through-tunnel-if-you-have-a-certificate-only-needs-port-636"></a>Сертификат через туннель (если сертификат есть — нужен только порт 636)
+# Сертификат через туннель (если сертификат есть — нужен только порт 636)
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Certificate "user.pfx" -ForcePassTheCert
 
-# <a id="ligolo-ng-tunnel-interface-full-network-tunnel"></a>Интерфейс Ligolo-ng (полноценный сетевой туннель)
+# Интерфейс Ligolo-ng (полноценный сетевой туннель)
 Connect-adPEAS -Domain "contoso.com" -Server "10.10.10.10" -DnsServer "10.10.10.10" -Username "john.doe" -Password "P@ssw0rd"
 ```
 
@@ -213,7 +213,7 @@ Connect-adPEAS -Domain "contoso.com" -Server "10.10.10.10" -DnsServer "10.10.10.
 Билет Kerberos получен успешно, но локально завершилось ошибкой LDAP-подключение Negotiate. Обычно SPN сервисного билета не совпадает с целью соединения.
 
 ```powershell
-# <a id="fix-skip-kerberos-use-simplebind"></a>Исправление: пропустить Kerberos и использовать SimpleBind
+# Исправление: пропустить Kerberos и использовать SimpleBind
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
@@ -222,7 +222,7 @@ Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -P
 Туннель не перенаправляет нужный порт.
 
 ```powershell
-# <a id="test-if-tunnel-is-working"></a>Проверить, работает ли туннель
+# Проверить, работает ли туннель
 Test-NetConnection -ComputerName 127.0.0.1 -Port 389
 ```
 
@@ -231,7 +231,7 @@ Test-NetConnection -ComputerName 127.0.0.1 -Port 389
 DNS-имя домена может не разрешаться через туннель.
 
 ```powershell
-# <a id="specify-dc-ip-directly-and-use-dnsserver-parameter"></a>Указать IP DC напрямую и параметр DnsServer
+# Указать IP DC напрямую и параметр DnsServer
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -DnsServer "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
@@ -240,7 +240,7 @@ Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -DnsServer "127.0.0.1" 
 Сертификат выдан на DNS-имя контроллера домена, а не на `127.0.0.1` или `localhost`.
 
 ```powershell
-# <a id="ignore-certificate-hostname-mismatch"></a>Игнорировать несовпадение имени сертификата
+# Игнорировать несовпадение имени сертификата
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -UseLDAPS -IgnoreSSLErrors -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
@@ -253,13 +253,13 @@ Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -UseLDAPS -IgnoreSSLErr
 **Решение: увеличить тайм-аут**
 
 ```powershell
-# <a id="increase-timeout-to-120-seconds-recommended-for-tunneled-connections"></a>Увеличить до 120 секунд (рекомендуется для туннеля)
+# Увеличить до 120 секунд (рекомендуется для туннеля)
 Invoke-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind -TimeoutSeconds 120
 
-# <a id="or-with-connect-adpeas-directly"></a>Или вызвать Connect-adPEAS напрямую
+# Или вызвать Connect-adPEAS напрямую
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind -TimeoutSeconds 120
 
-# <a id="maximum-600-seconds-10-minutes-for-extremely-slow-connections"></a>Максимум: 600 секунд (10 минут) для крайне медленного канала
+# Максимум: 600 секунд (10 минут) для крайне медленного канала
 Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
@@ -526,27 +526,27 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ```powershell
 $PSVersionTable.PSVersion
-# <a id="requires-51-or-higher"></a>Требуется версия 5.1 или новее
+# Требуется версия 5.1 или новее
 ```
 
 ### <a id="check-net-framework-version"></a>Проверить версию .NET Framework
 
 ```powershell
 [System.Environment]::Version
-# <a id="or"></a>либо
+# либо
 Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" | Select-Object Version
 ```
 
 ### <a id="test-network-connectivity"></a>Проверить сетевую доступность
 
 ```powershell
-# <a id="test-ldap"></a>Проверить LDAP
+# Проверить LDAP
 Test-NetConnection -ComputerName dc01.contoso.com -Port 389
 
-# <a id="test-ldaps"></a>Проверить LDAPS
+# Проверить LDAPS
 Test-NetConnection -ComputerName dc01.contoso.com -Port 636
 
-# <a id="test-kerberos"></a>Проверить Kerberos
+# Проверить Kerberos
 Test-NetConnection -ComputerName dc01.contoso.com -Port 88
 ```
 
@@ -567,7 +567,7 @@ Get-adPEASSession -TestConnection
 ### <a id="enable-verbose-output"></a>Включить подробный вывод
 
 ```powershell
-# <a id="display-verbose-messages-in-console"></a>Показывать подробные сообщения в консоли
+# Показывать подробные сообщения в консоли
 $VerbosePreference = "Continue"
 Connect-adPEAS -Domain "contoso.com" -UseWindowsAuth -Verbose
 ```
@@ -577,11 +577,11 @@ Connect-adPEAS -Domain "contoso.com" -UseWindowsAuth -Verbose
 Для диагностики сохраняйте подробные сообщения с временными отметками в файл:
 
 ```powershell
-# <a id="write-verbose-messages-to-output-file-timestamped"></a>Записывать подробные сообщения в файл вывода (с временными метками)
-# <a id="-verboselogging-automatically-enables--verbose-for-console-output"></a>-VerboseLogging автоматически включает -Verbose для консоли
+# Записывать подробные сообщения в файл вывода (с временными метками)
+# -VerboseLogging автоматически включает -Verbose для консоли
 Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth -Outputfile .\debug_report -VerboseLogging
 
-# <a id="output-text-file-contains-timestamped-entries-like"></a>Пример строк файла с временными метками:
+# Пример строк файла с временными метками:
 # 2026-01-14 18:42:15 [Verbose] [Get-DomainUser] Querying users...
 # 2026-01-14 18:42:16 [Verbose] [Invoke-LDAPSearch] Filter: (objectClass=user)
 ```
