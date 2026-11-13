@@ -216,3 +216,7 @@ if(-not $?){throw 'Ошибка перевода отображаемых зна
 
 & (Join-Path $PSScriptRoot 'Localization/Apply-ReportHtmlPolish.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации оставшихся HTML-подписей'}
+
+# DOC4a: проверенные строки реальных сообщений проверок, после всех старых наложений.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC4aRuntimeMessages.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации сообщений DOC4a'}

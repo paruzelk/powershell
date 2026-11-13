@@ -1,0 +1,94 @@
+﻿{
+  "schema": "adPEAS-RU.DOC4a.RuntimeMessages.1",
+  "locale": "ru-RU",
+  "source": "pinned-localized-2.9.0",
+  "files": {
+    "src/modules/Checks/Accounts/Get-PrivilegedGroupMembers.ps1": {
+      "        $cleanText = \"No principal beyond the expected ones can change the $($examinedGroups.Count) privileged group(s) AdminSDHolder does not protect\"": "        $cleanText = \"Среди субъектов, которым не положены такие права, нет способных изменить $($examinedGroups.Count) привилегированных групп, не защищённых AdminSDHolder\"",
+      "            $cleanText += \" - $($suppressed.Count) expected or privileged holder(s) hidden, use -IncludePrivileged to see them\"": "            $cleanText += \" — скрыто ожидаемых либо привилегированных правообладателей: $($suppressed.Count); для просмотра используйте -IncludePrivileged\"",
+      "        $accountCleanText = \"No principal beyond the expected ones can take over the $examinedAccounts privileged account(s) read\"": "        $accountCleanText = \"Среди неожиданных субъектов нет способных захватить проверенные привилегированные записи: $examinedAccounts\"",
+      "            $accountCleanText += \" - $($suppressed.Count) expected or privileged holder(s) hidden, use -IncludePrivileged to see them\"": "            $accountCleanText += \" — скрыто ожидаемых либо привилегированных правообладателей: $($suppressed.Count); для просмотра используйте -IncludePrivileged\""
+    },
+    "src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1": {
+      "                    if ($oneSidedPrivileged -gt 0) { $privilegedText = \" ($oneSidedPrivileged privileged)\" }": "                    if ($oneSidedPrivileged -gt 0) { $privilegedText = \" (привилегированных: $oneSidedPrivileged)\" }",
+      "                    Show-Line \"Found $(@($oneSidedLinks).Count) account(s) named as predecessor by a dMSA they do not name back$privilegedText`:\" -Class Hint": "                    Show-Line \"Найдено записей, которые dMSA называет предшественниками без встречной ссылки: $(@($oneSidedLinks).Count)$privilegedText`:\" -Class Hint",
+      "                        if ($broadCount -gt 0) { $broadInfo = \" ($broadCount with broad group access - CRITICAL)\" }": "                        if ($broadCount -gt 0) { $broadInfo = \" (широкая группа имеет доступ к $broadCount; КРИТИЧЕСКИЙ РИСК)\" }",
+      "                        Show-Line \"Found $(@($usableByOthers).Count) dMSA(s) that principals beyond administrators and service hosts may use$broadInfo`:\" -Class Finding": "                        Show-Line \"Найдено dMSA, которые могут использовать субъекты помимо администраторов и служебных узлов: $(@($usableByOthers).Count)$broadInfo`:\" -Class Finding"
+    },
+    "src/modules/Checks/ADCS/Get-WeakCertificateMapping.ps1": {
+      "    Show-Line (\"No issuer is published in the NTAuth store, so no certificate can \" +": "    Show-Line (\"В NTAuth нет опубликованных издателей сертификатов, поэтому сертификаты \" +",
+      "               \"currently authenticate against these mappings - neither through PKINIT \" +": "                          \"пока не могут использоваться для аутентификации по этим сопоставлениям ни через PKINIT, \" +",
+      "               \"nor through Schannel. Check the domain controllers' own NTAuth store \" +": "                          \"ни через Schannel. Проверьте локальное хранилище NTAuth на контроллерах домена \" +",
+      "               \"with 'certutil -viewstore -enterprise NTAuth' before ruling it out, \" +": "                          \"командой 'certutil -viewstore -enterprise NTAuth', прежде чем исключать риск: \" +",
+      "               \"because an issuer can be added there without being published, and treat \" +": "                          \"издатель может находиться в нём без публикации в AD. Как только будет опубликован \" +",
+      "               \"the mappings as live again the moment one is.\") -Class Note": "                          \"доверенный издатель, сопоставления вновь станут действующими.\") -Class Note"
+    },
+    "src/modules/Checks/Creds/Get-DeletedObjectAccess.ps1": {
+      "        Show-Line \"Only Tier 0$(if ($exchangeReads) { ' and the Exchange service groups' }) may list deleted objects\" -Class Secure": "        Show-Line \"Только Tier 0$(if ($exchangeReads) { ' и служебные группы Exchange' }) могут перечислять удалённые объекты\" -Class Secure"
+    },
+    "src/modules/Checks/Domain/Get-DomainPasswordPolicy.ps1": {
+      "                        Show-Line \"Found $(@($psos).Count) Fine-Grained Password Polic$(if(@($psos).Count -eq 1){'y'}else{'ies'}):\" -Class Hint": "                        Show-Line \"Найдено $(@($psos).Count) политик$(if(@($psos).Count -eq 1){'а'}else{'и'}) тонкой настройки паролей:\" -Class Hint",
+      "                        $foundBy = if (@($assignedPSOs | Where-Object { $_.Listed }).Count -gt 0) { 'by name and assignment' } else { 'by assignment' }": "                        $foundBy = if (@($assignedPSOs | Where-Object { $_.Listed }).Count -gt 0) { 'по имени и назначению' } else { 'по назначению' }",
+      "                        Show-Line \"Found $($assignedPSOs.Count) Fine-Grained Password Polic$(if($assignedPSOs.Count -eq 1){'y'}else{'ies'}) $($foundBy):\" -Class Hint": "                        Show-Line \"Найдено $($assignedPSOs.Count) политик$(if($assignedPSOs.Count -eq 1){'а'}else{'и'}) тонкой настройки паролей ($($foundBy)):\" -Class Hint"
+    },
+    "src/modules/Checks/Accounts/Get-SIDHistoryInjection.ps1": {
+      "                Show-Line (\"$(@($orphanedAccounts).Count) account(s) carry sIDHistory from $(@($orphanedDomainSIDs).Count) domain(s) this domain \" +": "                Show-Line (\"У $(@($orphanedAccounts).Count) учётных записей sIDHistory ссылается на $(@($orphanedDomainSIDs).Count) доменов, с которыми текущий домен \" +",
+      "                           \"neither trusts nor shares a forest with - leftovers of a migration to remove: $(@($orphanedDomainSIDs) -join ', ')\") -Class Hint -FindingId 'SID_HISTORY_ORPHANED'": "                                      \"не имеет доверия и не состоит в одном лесу: следы миграции следует проверить и удалить при необходимости: $(@($orphanedDomainSIDs) -join ', ')\") -Class Hint -FindingId 'SID_HISTORY_ORPHANED'"
+    },
+    "src/modules/Helpers/Get-GCConnection.ps1": {
+      "    Show-Line (\"Global Catalog (port 3268) is not reachable on $($targets -join ', ') - identities from \" +": "    Show-Line (\"Глобальный каталог (порт 3268) недоступен на $($targets -join ', '): идентификаторы из \" +",
+      "               'another domain cannot be resolved and are reported as unresolved') -Class Note": "                          'других доменов не удаётся сопоставить с именами, поэтому они выводятся как неразрешённые') -Class Note"
+    },
+    "src/modules/Checks/Creds/Get-BitLockerRecoveryKeyAccess.ps1": {
+      "        $readableText = 'No - blocked by the confidential flag on msFVE-RecoveryPassword, live the moment it is cleared'": "        $readableText = 'Нет — флаг конфиденциальности msFVE-RecoveryPassword блокирует чтение; после его снятия право начнёт действовать'",
+      "            $readableText = 'Yes - the principal can read these recovery passwords today'": "            $readableText = 'Да — этот субъект может читать пароли восстановления сейчас'",
+      "            $readableText = 'Unknown - the schema could not be read, so whether the confidential flag blocks the read is open'": "            $readableText = 'Неизвестно — схема недоступна, поэтому действие флага конфиденциальности определить не удалось'",
+      "            if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', blocked by the confidential flag' }": "            if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', чтение блокируется флагом конфиденциальности' }",
+      "            if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', not decidable - the schema could not be read' }": "            if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', не удалось проверить: схема недоступна' }",
+      "            $containerTexts.Add(\"$($item.Container) ($($computersByContainer[$item.Container]) computer(s)$suffix)\")": "            $containerTexts.Add(\"$($item.Container) ($($computersByContainer[$item.Container]) компьютеров$suffix)\")",
+      "            Show-Line (\"No non-privileged principal holds a delegated read of the BitLocker recovery passwords, but \" +": "            Show-Line (\"Делегированных прав чтения паролей восстановления BitLocker у непривилегированных субъектов не обнаружено, однако \" +",
+      "                       \"$($suppressedPrivileged.Count) privileged one(s) hold a right on them - use -IncludePrivileged to see them\") -Class Note": "                                  \"$($suppressedPrivileged.Count) привилегированных субъектов имеют такие права; для просмотра используйте -IncludePrivileged\") -Class Note",
+      "            Show-Line (\"The delegations on the $totalContainers container(s) holding computers were not evaluated - \" +": "            Show-Line (\"Делегированные права в $totalContainers контейнерах компьютеров не проверены: \" +",
+      "                       \"no security descriptor could be read\") -Class Note": "                                  \"не удалось прочитать ни одного дескриптора безопасности\") -Class Note",
+      "            Show-Line (\"No principal holds a delegated read of the BitLocker recovery passwords on the $readContainers \" +": "            Show-Line (\"Не обнаружено делегированных прав чтения паролей восстановления BitLocker в $readContainers \" +",
+      "                       \"container(s) holding computers\") -Class $delegationClass": "                                  \"проверенных контейнерах компьютеров\") -Class $delegationClass",
+      "        Show-Line (\"Found $($findingRows.Count) non-privileged principal(s) who can read BitLocker recovery \" +": "        Show-Line (\"Найдено непривилегированных субъектов с правом чтения паролей восстановления BitLocker: $($findingRows.Count); \" +",
+      "                   \"passwords\") -Class Finding -FindingId 'BITLOCKER_RECOVERY_DELEGATED'": "                              \"права действуют сейчас\") -Class Finding -FindingId 'BITLOCKER_RECOVERY_DELEGATED'",
+      "        Show-Line (\"Found $($hintRows.Count) further delegated read(s) of the BitLocker recovery passwords that \" +": "        Show-Line (\"Найдено дополнительных делегированных прав чтения паролей восстановления BitLocker: $($hintRows.Count); \" +",
+      "                   \"do not work today or belong to a privileged principal\") -Class Hint -FindingId 'BITLOCKER_RECOVERY_DELEGATED'": "                              \"они пока не действуют либо принадлежат привилегированным субъектам\") -Class Hint -FindingId 'BITLOCKER_RECOVERY_DELEGATED'",
+      "        Show-Line (\"$($suppressedPrivileged.Count) privileged principal(s) hold a right on the recovery passwords \" +": "        Show-Line (\"Привилегированных субъектов, не перечисленных в результатах, но имеющих доступ к паролям восстановления: $($suppressedPrivileged.Count); \" +",
+      "                   \"and are not listed - they read them regardless. Use -IncludePrivileged to see them\") -Class Note": "                              \"они могут читать пароли независимо от этой проверки. Используйте -IncludePrivileged для просмотра\") -Class Note"
+    },
+    "src/modules/Checks/Creds/Get-CredentialRoaming.ps1": {
+      "                \"$($findings.Count) user(s) carry roamed credential material in Active Directory, $privilegedCount of them privileged\"": "                \"$($findings.Count) пользователей с синхронизированными учётными данными в AD; привилегированных среди них: $privilegedCount\"",
+      "                \"$($findings.Count) user(s) carry roamed credential material in Active Directory\"": "                \"$($findings.Count) пользователей с синхронизированными учётными данными в AD\"",
+      "                Show-Line (\"The attributes are not marked confidential in the schema, so reading them follows the \" +": "                Show-Line (\"Атрибуты не отмечены конфиденциальными в схеме, поэтому их чтение определяется \" +",
+      "                           \"ordinary read permissions of the user object - in a default domain every authenticated \" +": "                                      \"обычными правами чтения объекта пользователя; в домене с настройками по умолчанию \" +",
+      "                           \"user can read them\") -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'": "                                      \"они доступны всем аутентифицированным пользователям\") -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'",
+      "                    Show-Line (\"Both attributes are marked confidential in the schema, so reading them needs the \" +": "                    Show-Line (\"Оба атрибута помечены конфиденциальными в схеме, поэтому для чтения \" +",
+      "                               \"Control Access right and generic read does not grant it\") -Class Secure": "                                          \"требуется право Control Access; обычного чтения недостаточно\") -Class Secure",
+      "                    Show-Line (\"Whether the attributes are readable could not be established - the schema could not \" +": "                    Show-Line (\"Нельзя определить доступность атрибутов: схему прочитать не удалось; \" +",
+      "                               \"be read, so treat them as readable until checked by hand\") -Class Note": "                                          \"до ручной проверки считайте их потенциально доступными\") -Class Note",
+      "            Show-Line (\"Reading these attributes is not constrained for anybody with DCSync, a copy of ntds.dit or \" +": "            Show-Line (\"DCSync, копия ntds.dit или резервная копия AD позволяют прочитать эти атрибуты \" +",
+      "                       \"an AD backup - the confidential flag protects against ordinary users, not against Tier 0\") -Class Note": "                                  \"независимо от конфиденциальности: флаг защищает от обычного чтения, но не от Tier 0\") -Class Note",
+      "            Show-Line (\"No non-privileged principal holds a delegated read of the roaming attributes, but \" +": "            Show-Line (\"У непривилегированных субъектов нет делегированного чтения синхронизированных атрибутов, но \" +",
+      "                       \"$($suppressedPrivileged.Count) privileged one(s) do - use -IncludePrivileged to see them\") -Class Note": "                                  \"у $($suppressedPrivileged.Count) привилегированных субъектов оно есть; используйте -IncludePrivileged для просмотра\") -Class Note",
+      "            Show-Line (\"The delegations on the $totalContainers container(s) holding this material were not \" +": "            Show-Line (\"Делегирование прав чтения в $totalContainers контейнерах пользователей не проверено: \" +",
+      "                       \"evaluated - no security descriptor could be read\") -Class Note": "                                  \"не удалось прочитать ни одного дескриптора безопасности\") -Class Note",
+      "            Show-Line (\"No principal holds a delegated read of the roaming attributes on the $readContainers \" +": "            Show-Line (\"Не обнаружено делегированного права чтения синхронизированных атрибутов в $readContainers \" +",
+      "                       \"container(s) holding this material\") -Class $roamingClass": "                                  \"проверенных контейнерах пользователей\") -Class $roamingClass",
+      "            if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', blocked by the confidential flag' }": "            if ($mixed -and $item.Verdict -eq 'dormant') { $suffix = ', чтение блокируется флагом конфиденциальности' }",
+      "            if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', not decidable - the schema could not be read' }": "            if ($mixed -and $item.Verdict -eq 'unknown') { $suffix = ', нельзя определить: схема недоступна' }",
+      "            $containerTexts += \"$($item.Container) ($($usersByContainer[$item.Container]) user(s) with material$suffix)\"": "            $containerTexts += \"$($item.Container) ($($usersByContainer[$item.Container]) пользователей с материалом$suffix)\"",
+      "            'Yes - the principal can read the material today'": "            'Да — субъект может читать эти данные сейчас'",
+      "            'No - blocked by the confidential flag, live the moment it is cleared'": "            'Нет — флаг конфиденциальности блокирует чтение; после его снятия право начнёт действовать'",
+      "            'Unknown - the schema could not be read'": "            'Неизвестно — схема недоступна'",
+      "        Show-Line (\"Found $(@($findingRows).Count) non-privileged principal(s) with a delegated read of the \" +": "        Show-Line (\"Найдено непривилегированных субъектов с делегированным чтением синхронизированных атрибутов: $(@($findingRows).Count); \" +",
+      "                   \"roaming attributes\") -Class Finding -FindingId 'CREDENTIAL_ROAMING_DELEGATED'": "                              \"право действует сейчас\") -Class Finding -FindingId 'CREDENTIAL_ROAMING_DELEGATED'",
+      "        Show-Line (\"Found $(@($hintRows).Count) further delegated read(s) of the roaming attributes that do not \" +": "        Show-Line (\"Найдено дополнительных делегированных прав чтения синхронизированных атрибутов: $(@($hintRows).Count); \" +",
+      "                   \"grant access today or belong to a privileged principal\") -Class Hint -FindingId 'CREDENTIAL_ROAMING_DELEGATED'": "                              \"они пока не действуют либо принадлежат привилегированным субъектам\") -Class Hint -FindingId 'CREDENTIAL_ROAMING_DELEGATED'",
+      "        Show-Line (\"$($suppressedPrivileged.Count) privileged principal(s) hold the same right and are not \" +": "        Show-Line (\"Привилегированных субъектов с аналогичным правом, скрытых из списка: $($suppressedPrivileged.Count); \" +",
+      "                   \"listed - they can read the material regardless. Use -IncludePrivileged to see them\") -Class Note": "                              \"они могут читать материал независимо от делегирования. Для просмотра используйте -IncludePrivileged\") -Class Note"
+    }
+  }
+}
