@@ -1,12 +1,12 @@
-# Диагностика неполадок
+# <a id="troubleshooting"></a>Диагностика неполадок
 
 Типовые проблемы и решения для adPEAS v2.
 
 ---
 
-## Проблемы подключения
+## <a id="connection-issues"></a>Проблемы подключения
 
-### Ошибка: «Не удаётся подключиться к контроллеру домена»
+### <a id="error-cannot-connect-to-domain-controller"></a>Ошибка: «Не удаётся подключиться к контроллеру домена»
 
 **Признаки**:
 - Тайм-аут подключения.
@@ -44,7 +44,7 @@
 
 ---
 
-### Ошибка: «Неверное имя пользователя или пароль»
+### <a id="error-the-user-name-or-password-is-incorrect"></a>Ошибка: «Неверное имя пользователя или пароль»
 
 **Признаки**:
 - Сбой аутентификации.
@@ -73,7 +73,7 @@
 
 ---
 
-### Ошибка: «Не удалось пройти аутентификацию Kerberos»
+### <a id="error-kerberos-authentication-failed"></a>Ошибка: «Не удалось пройти аутентификацию Kerberos»
 
 **Признаки**:
 - "KRB5KDC_ERR_PREAUTH_FAILED"
@@ -107,9 +107,9 @@
 
 ---
 
-## Промежуточные узлы и туннели
+## <a id="pivoting-and-tunneling"></a>Промежуточные узлы и туннели
 
-### Работа adPEAS через сетевой туннель
+### <a id="using-adpeas-through-a-network-tunnel"></a>Работа adPEAS через сетевой туннель
 
 В adPEAS нет встроенного SOCKS-прокси или клиента туннелирования. Класс .NET `LdapConnection` не поддерживает прокси-соединения, а реализация полного протокола SOCKS неоправданно усложнила бы проект при наличии готовых специализированных инструментов.
 
@@ -117,7 +117,7 @@
 
 ---
 
-### Рекомендуемая конфигурация
+### <a id="recommended-setup"></a>Рекомендуемая конфигурация
 
 **Схема:**
 
@@ -137,20 +137,20 @@
 **Шаг 1: создать туннель** (примеры для распространённых инструментов)
 
 ```bash
-# Chisel (обратный туннель)
-# На промежуточном узле:
+# <a id="chisel-reverse-tunnel"></a>Chisel (обратный туннель)
+# <a id="on-pivot-host"></a>На промежуточном узле:
 chisel server -p 8080 --reverse
-# На проверяющем компьютере:
+# <a id="on-attacker"></a>На проверяющем компьютере:
 chisel client pivot-host:8080 R:389:dc01.contoso.com:389 R:88:dc01.contoso.com:88
 
-# Ligolo-ng — сетевой туннель
-# Ligolo создаёт полноценный туннельный интерфейс — не нужны отдельные пробросы портов
-# Все порты доступны через IP туннельного интерфейса
+# <a id="ligolo-ng"></a>Ligolo-ng — сетевой туннель
+# <a id="ligolo-creates-a-full-tunnel-interface-no-individual-port-forwards-needed"></a>Ligolo создаёт полноценный туннельный интерфейс — не нужны отдельные пробросы портов
+# <a id="all-ports-are-accessible-via-the-tunnel-interface-ip"></a>Все порты доступны через IP туннельного интерфейса
 
-# Проброс SSH
+# <a id="ssh-port-forward"></a>Проброс SSH
 ssh -L 389:dc01.contoso.com:389 -L 88:dc01.contoso.com:88 user@pivot-host
 
-# Socat (простой TCP-ретранслятор на промежуточном узле)
+# <a id="socat-simple-tcp-relay-on-pivot-host"></a>Socat (простой TCP-ретранслятор на промежуточном узле)
 socat TCP-LISTEN:389,fork TCP:dc01.contoso.com:389 &
 socat TCP-LISTEN:88,fork TCP:dc01.contoso.com:88 &
 ```
@@ -158,22 +158,22 @@ socat TCP-LISTEN:88,fork TCP:dc01.contoso.com:88 &
 **Шаг 2: подключить adPEAS через туннель**
 
 ```powershell
-# SimpleBind через туннель (обычно надёжнее всего)
+# <a id="simplebind-through-tunnel-most-reliable"></a>SimpleBind через туннель (обычно надёжнее всего)
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 
-# LDAPS (если туннель перенаправляет порт 636)
+# <a id="with-ldaps-if-tunnel-forwards-port-636"></a>LDAPS (если туннель перенаправляет порт 636)
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -UseLDAPS -IgnoreSSLErrors -ForceSimpleBind
 
-# Сертификат через туннель (если сертификат есть — нужен только порт 636)
+# <a id="pass-the-cert-through-tunnel-if-you-have-a-certificate-only-needs-port-636"></a>Сертификат через туннель (если сертификат есть — нужен только порт 636)
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Certificate "user.pfx" -ForcePassTheCert
 
-# Интерфейс Ligolo-ng (полноценный сетевой туннель)
+# <a id="ligolo-ng-tunnel-interface-full-network-tunnel"></a>Интерфейс Ligolo-ng (полноценный сетевой туннель)
 Connect-adPEAS -Domain "contoso.com" -Server "10.10.10.10" -DnsServer "10.10.10.10" -Username "john.doe" -Password "P@ssw0rd"
 ```
 
 ---
 
-### Почему через туннель рекомендуется ForceSimpleBind?
+### <a id="why-use-forcesimplebind-over-a-tunnel"></a>Почему через туннель рекомендуется ForceSimpleBind?
 
 **Аутентификация Kerberos через туннели проблематична** по нескольким причинам:
 
@@ -188,7 +188,7 @@ Connect-adPEAS -Domain "contoso.com" -Server "10.10.10.10" -DnsServer "10.10.10.
 
 ---
 
-### Необходимые порты
+### <a id="required-ports"></a>Необходимые порты
 
 Убедитесь, что туннель перенаправляет нужные порты:
 
@@ -206,14 +206,14 @@ Connect-adPEAS -Domain "contoso.com" -Server "10.10.10.10" -DnsServer "10.10.10.
 
 ---
 
-### Диагностика туннельных соединений
+### <a id="troubleshooting-tunnel-connections"></a>Диагностика туннельных соединений
 
 **Признак: `LDAP_LOCAL_ERROR` (код 82) после TGT+TGS Kerberos**
 
 Билет Kerberos получен успешно, но локально завершилось ошибкой LDAP-подключение Negotiate. Обычно SPN сервисного билета не совпадает с целью соединения.
 
 ```powershell
-# Исправление: пропустить Kerberos и использовать SimpleBind
+# <a id="fix-skip-kerberos-use-simplebind"></a>Исправление: пропустить Kerberos и использовать SimpleBind
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
@@ -222,7 +222,7 @@ Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -P
 Туннель не перенаправляет нужный порт.
 
 ```powershell
-# Проверить, работает ли туннель
+# <a id="test-if-tunnel-is-working"></a>Проверить, работает ли туннель
 Test-NetConnection -ComputerName 127.0.0.1 -Port 389
 ```
 
@@ -231,7 +231,7 @@ Test-NetConnection -ComputerName 127.0.0.1 -Port 389
 DNS-имя домена может не разрешаться через туннель.
 
 ```powershell
-# Указать IP DC напрямую и параметр DnsServer
+# <a id="specify-dc-ip-directly-and-use-dnsserver-parameter"></a>Указать IP DC напрямую и параметр DnsServer
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -DnsServer "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
@@ -240,11 +240,11 @@ Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -DnsServer "127.0.0.1" 
 Сертификат выдан на DNS-имя контроллера домена, а не на `127.0.0.1` или `localhost`.
 
 ```powershell
-# Игнорировать несовпадение имени сертификата
+# <a id="ignore-certificate-hostname-mismatch"></a>Игнорировать несовпадение имени сертификата
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -UseLDAPS -IgnoreSSLErrors -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
-### Медленные соединения и тайм-ауты
+### <a id="slow-connections-timeouts"></a>Медленные соединения и тайм-ауты
 
 **Признак: `The operation was aborted because the client side timeout limit was exceeded`**
 
@@ -253,13 +253,13 @@ Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -UseLDAPS -IgnoreSSLErr
 **Решение: увеличить тайм-аут**
 
 ```powershell
-# Увеличить до 120 секунд (рекомендуется для туннеля)
+# <a id="increase-timeout-to-120-seconds-recommended-for-tunneled-connections"></a>Увеличить до 120 секунд (рекомендуется для туннеля)
 Invoke-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind -TimeoutSeconds 120
 
-# Или вызвать Connect-adPEAS напрямую
+# <a id="or-with-connect-adpeas-directly"></a>Или вызвать Connect-adPEAS напрямую
 Connect-adPEAS -Domain "contoso.com" -Server "127.0.0.1" -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind -TimeoutSeconds 120
 
-# Максимум: 600 секунд (10 минут) для крайне медленного канала
+# <a id="maximum-600-seconds-10-minutes-for-extremely-slow-connections"></a>Максимум: 600 секунд (10 минут) для крайне медленного канала
 Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -Password "P@ssw0rd" -ForceSimpleBind
 ```
 
@@ -270,9 +270,9 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-## Проблемы способов аутентификации
+## <a id="authentication-method-issues"></a>Проблемы способов аутентификации
 
-### Аутентификация по NT-хешу не работает
+### <a id="nt-hash-authentication-not-working"></a>Аутентификация по NT-хешу не работает
 
 **Признаки**:
 - «Сбой Overpass-the-Hash».
@@ -302,7 +302,7 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-### Аутентификация сертификатом (PKINIT) не работает
+### <a id="certificate-pkinit-authentication-not-working"></a>Аутентификация сертификатом (PKINIT) не работает
 
 **Признаки**:
 - «Сбой аутентификации PKINIT».
@@ -328,7 +328,7 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-### Не импортируется Kirbi/Ccache
+### <a id="kirbiccache-import-not-working"></a>Не импортируется Kirbi/Ccache
 
 **Признаки**:
 - «Не удалось импортировать билет».
@@ -351,9 +351,9 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-## Проблемы запросов
+## <a id="query-issues"></a>Проблемы запросов
 
-### Ошибка «Доступ запрещён» для отдельных объектов
+### <a id="error-access-denied-on-specific-objects"></a>Ошибка «Доступ запрещён» для отдельных объектов
 
 **Признаки**:
 - Одни объекты возвращаются, другие нет.
@@ -375,7 +375,7 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-### Ошибка «Неверный поисковый фильтр»
+### <a id="error-the-search-filter-is-invalid"></a>Ошибка «Неверный поисковый фильтр»
 
 **Признаки**:
 - Ошибка синтаксиса LDAP-фильтра.
@@ -401,7 +401,7 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-### Результат пуст
+### <a id="no-results-returned"></a>Результат пуст
 
 **Признаки**:
 - Запрос возвращает $null либо пустой массив.
@@ -427,9 +427,9 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-## Проблемы производительности
+## <a id="performance-issues"></a>Проблемы производительности
 
-### Запросы выполняются слишком долго
+### <a id="queries-taking-too-long"></a>Запросы выполняются слишком долго
 
 **Признаки**:
 - Тайм-ауты.
@@ -455,9 +455,9 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-## Проблемы вывода
+## <a id="output-issues"></a>Проблемы вывода
 
-### Не отображаются цвета
+### <a id="colors-not-displaying"></a>Не отображаются цвета
 
 **Признаки**:
 - ANSI-коды выводятся как текст.
@@ -482,7 +482,7 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-### Файл отчёта не создан
+### <a id="file-output-not-created"></a>Файл отчёта не создан
 
 **Признаки**:
 - Файл не появился.
@@ -505,7 +505,7 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-### Функции недоступны после загрузки adPEAS
+### <a id="functions-not-available-after-loading-adpeas"></a>Функции недоступны после загрузки adPEAS
 
 **Признаки**:
 - Логотип отображается правильно.
@@ -520,68 +520,68 @@ Connect-adPEAS -Domain "contoso.com" -TimeoutSeconds 600 -Username "john.doe" -P
 
 ---
 
-## Диагностические команды
+## <a id="diagnostic-commands"></a>Диагностические команды
 
-### Проверить версию PowerShell
+### <a id="check-powershell-version"></a>Проверить версию PowerShell
 
 ```powershell
 $PSVersionTable.PSVersion
-# Требуется версия 5.1 или новее
+# <a id="requires-51-or-higher"></a>Требуется версия 5.1 или новее
 ```
 
-### Проверить версию .NET Framework
+### <a id="check-net-framework-version"></a>Проверить версию .NET Framework
 
 ```powershell
 [System.Environment]::Version
-# либо
+# <a id="or"></a>либо
 Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" | Select-Object Version
 ```
 
-### Проверить сетевую доступность
+### <a id="test-network-connectivity"></a>Проверить сетевую доступность
 
 ```powershell
-# Проверить LDAP
+# <a id="test-ldap"></a>Проверить LDAP
 Test-NetConnection -ComputerName dc01.contoso.com -Port 389
 
-# Проверить LDAPS
+# <a id="test-ldaps"></a>Проверить LDAPS
 Test-NetConnection -ComputerName dc01.contoso.com -Port 636
 
-# Проверить Kerberos
+# <a id="test-kerberos"></a>Проверить Kerberos
 Test-NetConnection -ComputerName dc01.contoso.com -Port 88
 ```
 
-### Проверить разрешение DNS
+### <a id="verify-dns-resolution"></a>Проверить разрешение DNS
 
 ```powershell
 Resolve-DnsName contoso.com
 Resolve-DnsName _ldap._tcp.contoso.com -Type SRV
 ```
 
-### Проверить текущий сеанс
+### <a id="check-current-session"></a>Проверить текущий сеанс
 
 ```powershell
 Get-adPEASSession
 Get-adPEASSession -TestConnection
 ```
 
-### Включить подробный вывод
+### <a id="enable-verbose-output"></a>Включить подробный вывод
 
 ```powershell
-# Показывать подробные сообщения в консоли
+# <a id="display-verbose-messages-in-console"></a>Показывать подробные сообщения в консоли
 $VerbosePreference = "Continue"
 Connect-adPEAS -Domain "contoso.com" -UseWindowsAuth -Verbose
 ```
 
-### Записывать подробный журнал в файл
+### <a id="enable-verbose-logging-to-file"></a>Записывать подробный журнал в файл
 
 Для диагностики сохраняйте подробные сообщения с временными отметками в файл:
 
 ```powershell
-# Записывать подробные сообщения в файл вывода (с временными метками)
-# -VerboseLogging автоматически включает -Verbose для консоли
+# <a id="write-verbose-messages-to-output-file-timestamped"></a>Записывать подробные сообщения в файл вывода (с временными метками)
+# <a id="-verboselogging-automatically-enables--verbose-for-console-output"></a>-VerboseLogging автоматически включает -Verbose для консоли
 Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth -Outputfile .\debug_report -VerboseLogging
 
-# Пример строк файла с временными метками:
+# <a id="output-text-file-contains-timestamped-entries-like"></a>Пример строк файла с временными метками:
 # 2026-01-14 18:42:15 [Verbose] [Get-DomainUser] Querying users...
 # 2026-01-14 18:42:16 [Verbose] [Invoke-LDAPSearch] Filter: (objectClass=user)
 ```
@@ -594,7 +594,7 @@ Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth -Outputfile .\debug_report -
 
 ---
 
-## Получение помощи
+## <a id="getting-help"></a>Получение помощи
 
 Если проблему не удалось решить:
 
@@ -608,7 +608,7 @@ Invoke-adPEAS -Domain "contoso.com" -UseWindowsAuth -Outputfile .\debug_report -
 
 ---
 
-## Навигация
+## <a id="navigation"></a>Навигация
 
 - [Назад: система оценки рисков](10-Risk-Scoring-System.md)
 - [Далее: часто задаваемые вопросы](12-FAQ.md)
