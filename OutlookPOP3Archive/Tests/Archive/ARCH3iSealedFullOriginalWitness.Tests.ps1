@@ -198,6 +198,22 @@ Describe 'ARCH3i private immutable full witness evidence, real Windows filesyste
         $r.OriginalWitnessSha256 | Should -BeExactly $script:testDigest
         Should -Invoke Invoke-OPA265ARCH3hPinnedSemanticWitness -Exactly -Times 1
     }
+    It 'public Invoke-ARCH3i Review accepts only RunId and SealSha256 after real protected seal' {
+        $first=Invoke-OPA265ARCH3iFullWitnessSeal -Mode Seal -ConfirmEvidenceWrite -Confirm:$false @script:params
+        $r=& (Join-Path $script:root 'Invoke-ARCH3i.ps1') -Mode Review -RunId $script:testRunId -SealSha256 $first.SealSha256
+        $r.Status | Should -BeExactly 'OriginalFullWitnessSealedAndIndependentlyReadBackNoMove'
+        $r.IndependentReadbackPassed | Should -BeTrue
+        $r.SealSha256 | Should -BeExactly $first.SealSha256
+        $r.OriginalWitnessSha256 | Should -BeExactly $script:testDigest
+        $r.WriterPermit | Should -BeFalse
+        Should -Invoke Invoke-OPA265ARCH3hPinnedSemanticWitness -Exactly -Times 1
+    }
+    It 'public Invoke-ARCH3i Review rejects wrong SHA without any source inputs' {
+        $first=Invoke-OPA265ARCH3iFullWitnessSeal -Mode Seal -ConfirmEvidenceWrite -Confirm:$false @script:params
+        { & (Join-Path $script:root 'Invoke-ARCH3i.ps1') -Mode Review -RunId $script:testRunId -SealSha256 ('f'*64) } | Should -Throw
+        Test-Path -LiteralPath $first.SealPath | Should -BeTrue
+        Should -Invoke Invoke-OPA265ARCH3hPinnedSemanticWitness -Exactly -Times 1
+    }
     It 'refuses reuse of the exact same RunId after sealed file exists' {
         $first=Invoke-OPA265ARCH3iFullWitnessSeal -Mode Seal -ConfirmEvidenceWrite -Confirm:$false @script:params
         {Invoke-OPA265ARCH3iFullWitnessSeal -Mode Seal -ConfirmEvidenceWrite -Confirm:$false @script:params} | Should -Throw
