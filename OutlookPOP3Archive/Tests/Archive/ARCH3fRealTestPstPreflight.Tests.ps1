@@ -161,7 +161,7 @@ Describe 'ARCH3f reuse the ORIGINAL Year routing on real-mail-shaped fake candid
 }
 Describe 'ARCH3f real Inventory code path with only fake Outlook COM wrappers in CI' {
     It 'reuses original Session/EligibleWalker/Selector and returns actual folder counts with sampled Year routes' {
-        $fakeFolder=[pscustomobject]@{
+        $script:fakeFolder=[pscustomobject]@{
             Name='Входящие'
             EntryID='00000000ABCDEF001234567812345678'
             FolderPath='\\POP3 Store\Входящие'
@@ -172,23 +172,23 @@ Describe 'ARCH3f real Inventory code path with only fake Outlook COM wrappers in
             Root=[pscustomobject]@{FolderPath='\\POP3 Store'}
         }
         $store | Add-Member -MemberType ScriptMethod -Name GetRootFolder -Value {return $this.Root}
-        $fakeSession=[pscustomobject]@{
+        $script:fakeSession=[pscustomobject]@{
             SourceStore=$store
             Namespace=[pscustomobject]@{CurrentProfileName='Outlook'}
             Scope=[pscustomobject]@{Approved=$true}
             OutlookProcessId=789
             OutlookProcessStartUtcTicks=[long]1234567
         }
-        $fakeCandidate=New-ARCH3fCandidate
+        $script:fakeCandidate=New-ARCH3fCandidate
         Mock Assert-OPA265ARCH3fRealTestSource {return $script:source}
         Mock Get-OPA265ARCH2dLayout {return [pscustomobject]@{ArchivePst='C:\none.pst'}}
-        Mock Open-OPA265ARCH2dSession {return $fakeSession}
+        Mock Open-OPA265ARCH2dSession {return $script:fakeSession}
         Mock Get-OPAWellKnownFolderEntryIds {@{}}
-        Mock Get-OPAEligiblePop3MailFolders {return @($fakeFolder)}
+        Mock Get-OPAEligiblePop3MailFolders {return @($script:fakeFolder)}
         Mock Get-OPAArchiveCandidates {
             [pscustomobject]@{
                 SelectionErrors=0;UsedSort=$true;UsedRestrict=$false
-                Candidates=@($fakeCandidate);SelectionErrorDetails=@()
+                Candidates=@($script:fakeCandidate);SelectionErrorDetails=@()
             }
         }
         Mock Release-OPA265ARCH2c4Com {}
