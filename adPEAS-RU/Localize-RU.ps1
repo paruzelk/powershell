@@ -220,3 +220,9 @@ if(-not $?){throw 'Ошибка локализации оставшихся HTML
 # DOC4a: проверенные строки реальных сообщений проверок, после всех старых наложений.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC4aRuntimeMessages.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации сообщений DOC4a'}
+
+# DOC4b: серверные заголовки/доступность и отображение значений проверенных атрибутов.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC4bStaticReport.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка создания русских заголовков HTML DOC4b'}
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC4bVisibleValues.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка отображения значений атрибутов DOC4b'}
