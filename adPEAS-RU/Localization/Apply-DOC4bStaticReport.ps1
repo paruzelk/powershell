@@ -39,6 +39,9 @@ $inject=@'
                 'Analyzing Certificate Services' = 'Анализ служб сертификатов'
                 'Analyzing Privileged Accounts' = 'Анализ привилегированных учётных записей'
                 'Analyzing Group Policy Objects' = 'Анализ групповых политик'
+                'Analyzing Credential Exposure' = 'Анализ раскрытия учётных данных'
+                'Analyzing Computer Security' = 'Анализ безопасности компьютеров'
+                'Analyzing Application Infrastructure' = 'Анализ инфраструктуры приложений'
             }
             foreach($pair in $ruSectionNames.GetEnumerator()){
                 if($visibleSectionHeader.EndsWith([string]$pair.Key,[StringComparison]::Ordinal)){
@@ -98,4 +101,4 @@ $labels=@(
 )
 foreach($p in $labels){Change-Exact ([string]$p[0]) ([string]$p[1])}
 [IO.File]::WriteAllText((Join-Path $ProjectRoot $relative),$src,$utf8)
-Write-Host "[RU] PASS DOC4b: 6 заголовков разделов, $($titlePairs.Count) названий объектов, 6 сообщений LDAP и $($labels.Count) доступных подписей"
+Write-Host "[RU] PASS DOC4b/DOC4d: 9 заголовков разделов, $($titlePairs.Count) названий объектов, 6 сообщений LDAP и $($labels.Count) доступных подписей"
