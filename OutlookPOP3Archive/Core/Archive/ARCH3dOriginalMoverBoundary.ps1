@@ -212,6 +212,26 @@ function Test-OPA265ARCH3dSyntheticBoundary {
     $issues=New-Object 'System.Collections.Generic.List[string]'
     $prior=''
     $gap=$false
+    $unknown=[IO.File]::Exists((Join-Path $root 'MoveIndeterminate.json'))
+    # Indeterminate is appended to original JSONL AFTER the MoveClaimed
+    # evidence was sealed. Compare the earlier immutable stage against the
+    # original Intent line bytes; do not rebase it to the newer whole file.
+    $intentOnlyJournalSha=''
+    if($unknown){
+        $jp=Join-Path $root 'original-operation-journal.jsonl'
+        if([IO.File]::Exists($jp)){
+            $bytes=[IO.File]::ReadAllBytes($jp)
+            $idx=[Array]::IndexOf($bytes,[byte]10)
+            if($idx -ge 0){
+                $s=[Security.Cryptography.SHA256]::Create()
+                try{
+                    $subset=New-Object 'byte[]' ($idx+1)
+                    [Array]::Copy($bytes,0,$subset,0,$idx+1)
+                    $intentOnlyJournalSha=[BitConverter]::ToString($s.ComputeHash($subset)).Replace('-','').ToLowerInvariant()
+                }finally{$s.Dispose()}
+            }
+        }
+    }
     foreach($stage in $stages){
         $p=Join-Path $root ($stage+'.json')
         if(-not [IO.File]::Exists($p)){$gap=$true;continue}
@@ -221,7 +241,7 @@ function Test-OPA265ARCH3dSyntheticBoundary {
             $item=Read-OPA265ARCH3cPinnedJson -Path $p -ExpectedSha256 $sha
             $originalJournalPath=Join-Path $root 'original-operation-journal.jsonl'
             $originalJournalSha=if([IO.File]::Exists($originalJournalPath)){(Get-FileHash -LiteralPath $originalJournalPath -Algorithm SHA256).Hash.ToLowerInvariant()}else{''}
-            $expectedJournalSha=if($stage -ceq 'PrepareIntent'){''}else{$originalJournalSha}
+            $expectedJournalSha=if($stage -ceq 'PrepareIntent'){''}elseif($unknown){$intentOnlyJournalSha}else{$originalJournalSha}
             if([string]$item.Schema -cne '2.6.5-ARCH3d.SyntheticBoundaryEvidence.1' -or
                [string]$item.Stage -cne $stage -or [string]$item.OperationId -cne [string]$Operation.OperationId -or
                [string]$item.TransactionId -cne [string]$Operation.TransactionId -or
@@ -233,7 +253,6 @@ function Test-OPA265ARCH3dSyntheticBoundary {
             $seen.Add($stage)|Out-Null;$prior=$sha
         }catch{$issues.Add(('InvalidStage:'+ $stage))|Out-Null;$prior='BROKEN'}
     }
-    $unknown=[IO.File]::Exists((Join-Path $root 'MoveIndeterminate.json'))
     $returned=($seen.Contains('MoveReturned') -and -not $unknown)
     $pinned=$false
     if($returned -and $ExternallyPinnedReceiptSha256 -cmatch '^[a-f0-9]{64}$'){
