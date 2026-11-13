@@ -587,8 +587,19 @@ function Move-OPAItemsWithLimit {
         [Nullable[datetime]]$OlderThanCutoff,
         [double]$MaxArchivePstSizeGB = 10,
         [double]$SafetyMarginGB = 0.5,
-        [switch]$Resume
+        [switch]$Resume,
+        # ARCH3d: test-only hooks within THIS legacy Move-OPAItemsWithLimit.
+        # Real Outlook/PST must never enter this mode; default path unchanged.
+        [switch]$ARCH3dSyntheticBoundary
     )
+
+    if($ARCH3dSyntheticBoundary){
+        # Must run before ANY original file/journal/destination side effects.
+        . (Join-Path $PSScriptRoot 'ARCH3cDurableOperationLedger.ps1')
+        . (Join-Path $PSScriptRoot 'ARCH3dOriginalMoverBoundary.ps1')
+        if($Resume){throw 'ARCH3d synthetic one-shot integration forbids Resume.'}
+        $arch3dScope=Assert-OPA265ARCH3dSyntheticBoundary -Namespace $Namespace -Transaction $Transaction -SourceFolders @($SourceFolders)
+    }
 
     # SourceFolder may be a single Outlook Folder or an array. The array form
     # is the production path: one transaction spans the complete POP3 PST tree.
@@ -781,6 +792,7 @@ function Move-OPAItemsWithLimit {
 
         $item = $null; $moved = $null; $moveCompleted = $false; $moveAttemptClaimed = $false
         $semanticPreflightBlocked = $false
+        $arch3dOperation=$null; $arch3dDestinationPath=''; $arch3dTargetFolder=''; $arch3dWitnessSha=''
         try {
             try { $item = Get-OPAItemByEntryIdFromSourceFolder -Namespace $Namespace -SourceFolder $source -EntryId ([string]$candidate.EntryId) }
             catch {
@@ -824,6 +836,12 @@ function Move-OPAItemsWithLimit {
             }
 
             $dt = [datetime]$candidate.ReceivedTime
+            if($ARCH3dSyntheticBoundary){
+                # This is the original MailMover loop. Persist the durable
+                # intent BEFORE Get-OPAArchiveDestination can create a PST.
+                $arch3dOperation=Get-OPA265ARCH3dOperationIdentity -Scope $arch3dScope -Candidate $candidate -ArchiveGrouping $ArchiveGrouping
+                [void](Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage PrepareIntent)
+            }
             $dest = $null
             try {
                 $dest = Get-OPAArchiveDestination -Namespace $Namespace -Transaction $Transaction -SourcePst $Transaction.State.SourcePst -ReceivedTime $dt -ItemSize $itemSize -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ArchiveGrouping $ArchiveGrouping -SourceFolderName ([string]$source.Name) -SourceFolderPath $folderPath -AccountEmail ([string]$Transaction.State.AccountEmail)
@@ -834,6 +852,12 @@ function Move-OPAItemsWithLimit {
                 continue
             }
 
+            if($ARCH3dSyntheticBoundary){
+                # Bind actual rollover part chosen by ORIGINAL destination API.
+                $arch3dDestinationPath=[string]$dest.Path
+                $arch3dTargetFolder=[string]$dest.Folder.FolderPath
+                [void](Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage DestinationReady -ArchivePst $arch3dDestinationPath -TargetFolderPath $arch3dTargetFolder)
+            }
             $index = $null
             if ($allIndexes.ContainsKey($dest.Path)) { $index = $allIndexes[$dest.Path] }
             elseif ($sharedIndex) { $index = $sharedIndex; $allIndexes[$dest.Path] = $index }
@@ -846,6 +870,10 @@ function Move-OPAItemsWithLimit {
             # The captured witness is never rebaselined after the Move.
             $semanticPreflightBlocked = $true
             $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item
+            if($ARCH3dSyntheticBoundary){
+                $arch3dWitnessSha=Get-OPA265ARCH3dOriginalWitnessHash -Witness $sourceSemanticWitness
+                [void](Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage SourceWitnessAnchored -ArchivePst $arch3dDestinationPath -TargetFolderPath $arch3dTargetFolder -WitnessSha256 $arch3dWitnessSha)
+            }
             $semanticPreflightBlocked = $false
 
             # ARCH2a: claim before any possible Outlook provider mutation.
@@ -854,6 +882,11 @@ function Move-OPAItemsWithLimit {
             $moveAttemptClaimed = $true
             Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Move Started' -Message ("Starting Move: {0}" -f [string]$candidate.Subject) -EntryId $candidate.EntryId -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -ReceivedTime $dt -SemanticWitness $sourceSemanticWitness -WriteCheckpoint
             Sync-OPAStepJournalStreams
+            if($ARCH3dSyntheticBoundary){
+                # The real legacy step claim is already force-flushed.
+                # This second linked claim is immutable and must precede Move.
+                [void](Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage MoveClaimed -ArchivePst $arch3dDestinationPath -TargetFolderPath $arch3dTargetFolder -WitnessSha256 $arch3dWitnessSha)
+            }
 
             try {
                 $moved = $item.Move($dest.Folder)
@@ -866,6 +899,11 @@ function Move-OPAItemsWithLimit {
                 # Never classify this message as skipped or select another
                 # candidate; only independent read-only reconciliation is safe.
                 $originalMoveError = [string]$_.Exception.Message
+                if($ARCH3dSyntheticBoundary -and $null -ne $arch3dOperation){
+                    try{
+                        [void](Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage MoveIndeterminate -ArchivePst $arch3dDestinationPath -TargetFolderPath $arch3dTargetFolder -WitnessSha256 $arch3dWitnessSha)
+                    }catch{Write-Warning ('ARCH3d original indeterminate claim remains immutable: '+[string]$_.Exception.Message)}
+                }
                 try {
                     Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Failed' -Step 'Move Indeterminate' -Message 'Outlook COM Move outcome unknown; independent reconciliation required; no automatic retry.' -EntryId ([string]$candidate.EntryId) -ReceivedTime $dt -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -WriteCheckpoint
                     Sync-OPAStepJournalStreams
@@ -882,6 +920,13 @@ function Move-OPAItemsWithLimit {
                 throw "Move succeeded but Outlook returned no destination EntryID for source $($candidate.EntryId)."
             }
 
+            if($ARCH3dSyntheticBoundary){
+                # Synthetic original mover actually returned via a TEST DOUBLE.
+                # The linked receipt is pinned separately; WITHOUT independent
+                # post-restart verification, index/transaction completion blocked.
+                $arch3dReceipt=Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage MoveReturned -ArchivePst $arch3dDestinationPath -TargetFolderPath $arch3dTargetFolder -WitnessSha256 $arch3dWitnessSha -ArchiveEntryId $archiveId
+                throw ('ARCH3d SYNTHETIC STOP after immutable MoveReturned receipt SHA256='+[string]$arch3dReceipt.Sha256+'; no DuplicateIndex until independent Outlook restart reconciliation; NEVER retry.')
+            }
             Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Move Completed' -Message ("Move completed: {0}" -f [string]$candidate.Subject) -EntryId $candidate.EntryId -ArchiveEntryId $archiveId -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -ReceivedTime $dt
 
             $executed++
