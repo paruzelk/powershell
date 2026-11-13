@@ -99,7 +99,7 @@ foreach ($term in @('ЮРИДИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ','ЭК�
  'ModifyDN','атомарен','SID','Delete Child','Create Child','NoSYSVOL',
  'Credential','Password','Shadow Credentials','msDS-KeyCredentialLink',
  'PKINIT','MachineAccountQuota','20 символов','отзыва','PassThru')) {
- if (-not $target.Contains($term)) {
+ if ($target.IndexOf($term,[StringComparison]::OrdinalIgnoreCase) -lt 0) {
   throw "DOC2c: утеряно критическое условие: $term"
  }
 }
