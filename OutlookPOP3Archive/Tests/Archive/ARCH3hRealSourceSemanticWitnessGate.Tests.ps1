@@ -151,7 +151,8 @@ Describe 'ARCH3h fake Outlook original full semantic witness path' {
 }
 Describe 'ARCH3h public API protects old writer and exact operator intent' {
     It 'Plan never contacts Outlook or obtains writer permit' {
-        $p=Invoke-OPA265ARCH3hPinnedSemanticWitness -Mode Plan -SourcePst 'C:\Fake\info@stios.ru.pst' -ArchiveYear 2020 @((Get-ARCH3hPins))
+        $pins=Get-ARCH3hPins
+        $p=Invoke-OPA265ARCH3hPinnedSemanticWitness -Mode Plan -SourcePst 'C:\Fake\info@stios.ru.pst' -ArchiveYear 2020 @pins
         $p.OutlookContacted | Should -BeFalse
         $p.FullWitnessCaptured | Should -BeFalse
         $p.WriterPermit | Should -BeFalse
