@@ -468,29 +468,29 @@ Get-UnixPasswordAccounts
 
 ---
 
-## Rights Module
+## Модуль Rights
 
-Analyzes Access Control Lists and permissions.
+Анализирует списки управления доступом ACL и разрешения.
 
 ### Get-DangerousACLs
 
-**Purpose**: Identifies dangerous permissions on the domain root object.
+**Назначение**: выявляет опасные разрешения на корневом объекте домена.
 
-**What it checks**:
-- DCSync rights (DS-Replication-Get-Changes + Get-Changes-All)
+**Что проверяется**:
+- Права DCSync (DS-Replication-Get-Changes + Get-Changes-All).
 - GenericAll (Full Control)
 - GenericWrite
 - WriteDacl
 - WriteOwner
 
-**Security Impact**: Non-privileged accounts with these rights can escalate to Domain Admin through DCSync attacks or by modifying privileged objects.
+**Влияние на безопасность**: непривилегированные записи с такими разрешениями могут повысить права до Domain Admin через DCSync или изменение привилегированных объектов.
 
-**Usage**:
+**Использование**:
 ```powershell
-# Show non-privileged accounts with dangerous rights (default)
+# По умолчанию: показать непривилегированных обладателей опасных прав
 Get-DangerousACLs
 
-# Include privileged accounts (Domain Admins, Enterprise Admins, etc.)
+# Также включить привилегированные записи (Domain Admins, Enterprise Admins и др.)
 Get-DangerousACLs -IncludePrivileged
 ```
 
@@ -498,46 +498,46 @@ Get-DangerousACLs -IncludePrivileged
 
 ### Get-CriticalObjectACLs
 
-**Purpose**: Finds principals outside Tier-0 that control the schema, the configuration partition, the partitions container, the RID Manager, the infrastructure object or a site.
+**Назначение**: ищет субъектов вне Tier 0, которые контролируют схему, раздел конфигурации, контейнер Partitions, RID Manager, объект Infrastructure или сайт.
 
-**What it checks**:
-- The schema naming context head, the configuration naming context head, `CN=Partitions` in the configuration naming context, `CN=RID Manager$,CN=System` and `CN=Infrastructure`
-- Owner, GenericAll, GenericWrite, WriteDacl, WriteOwner and unrestricted WriteProperty on each
-- The role transfer right of each object (Change-Schema-Master, Change-Domain-Master, Change-Rid-Master, Change-Infrastructure-Master) and all extended rights
-- Reanimate-Tombstones on the configuration head - the right a restore of an object deleted from the configuration is checked against, certificate templates among them. By default only Enterprise Admins hold it there. Not on the schema head: schema objects cannot be deleted
-- WriteProperty on `rIDAvailablePool` of the RID Manager
-- WriteProperty on `gPLink` of every site - a GPO linked there reaches every computer of the site, domain controllers included
-- Operator groups count as outside Tier-0
+**Что проверяется**:
+- Корень раздела схемы, корень раздела конфигурации, `CN=Partitions` в конфигурации, `CN=RID Manager$,CN=System` и `CN=Infrastructure`.
+- Владелец и права GenericAll, GenericWrite, WriteDacl, WriteOwner, а также неограниченное WriteProperty на каждом объекте.
+- Право передачи роли на каждом объекте (Change-Schema-Master, Change-Domain-Master, Change-Rid-Master, Change-Infrastructure-Master) и все расширенные права.
+- Reanimate-Tombstones на корне конфигурации — это право проверяется при восстановлении удалённых объектов конфигурации, включая шаблоны сертификатов. По умолчанию здесь его имеют только Enterprise Admins. На корне схемы оно не проверяется: объекты схемы нельзя удалить.
+- WriteProperty на `rIDAvailablePool` у RID Manager.
+- WriteProperty на `gPLink` каждого сайта: привязанная туда GPO достигает всех компьютеров сайта, включая контроллеры домена.
+- Группы операторов считаются находящимися вне Tier 0.
 
-**Security Impact**: Schema control changes the default security descriptor of every new object in the forest; a role object under control moves its operations master role, and the RID pool can be exhausted.
+**Влияние на безопасность**: контроль над схемой меняет дескриптор безопасности по умолчанию всех новых объектов леса; контроль над объектом роли позволяет передать роль мастера операций, а пул RID можно исчерпать.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-CriticalObjectACLs
 ```
 
-**Parameters**:
+**Параметры**:
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `-IncludePrivileged` | Include privileged accounts in output (shown in yellow) |
+| `-IncludePrivileged` | Включить в вывод привилегированные записи (жёлтая подсветка) |
 
 ---
 
 ### Get-DangerousOUPermissions
 
-**Purpose**: Scans all OUs for dangerous permissions.
+**Назначение**: проверяет опасные разрешения во всех OU.
 
-**What it checks**:
-- GenericAll on OUs containing privileged users
-- Password reset rights on OUs
-- Account control modification rights
-- Group membership modification rights
-- Object creation rights
+**Что проверяется**:
+- GenericAll для OU с привилегированными пользователями.
+- Права сброса пароля на OU.
+- Права изменения параметров управления учётной записью.
+- Права изменения членства в группах.
+- Права создания объектов.
 
-**Security Impact**: Dangerous OU permissions enable attackers to reset passwords, modify group memberships, or create new privileged accounts within the OU.
+**Влияние на безопасность**: опасные разрешения на OU позволяют злоумышленникам сбрасывать пароли, изменять состав групп либо создавать новые привилегированные записи в этой OU.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-DangerousOUPermissions
 ```
@@ -546,16 +546,16 @@ Get-DangerousOUPermissions
 
 ### Get-PasswordResetRights
 
-**Purpose**: Identifies who can reset passwords on privileged OUs.
+**Назначение**: определяет, кто вправе сбрасывать пароли в привилегированных OU.
 
-**What it checks**:
-- Accounts with User-Force-Change-Password right
-- Accounts with AllExtendedRights on user objects
-- Scope of password reset permissions
+**Что проверяется**:
+- Учётные записи с правом User-Force-Change-Password.
+- Учётные записи с AllExtendedRights на объектах пользователей.
+- Область распространения прав сброса пароля.
 
-**Security Impact**: Password reset rights on admin accounts enable immediate account takeover without knowing the current password.
+**Влияние на безопасность**: право сброса пароля административной записи позволяет немедленно захватить её без знания прежнего пароля.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-PasswordResetRights
 ```
@@ -564,104 +564,104 @@ Get-PasswordResetRights
 
 ### Get-AddComputerRights
 
-**Purpose**: Analyzes "Add Computer to Domain" permissions.
+**Назначение**: анализирует право «Добавление рабочих станций в домен».
 
-**What it checks**:
-- `ms-DS-MachineAccountQuota` attribute (default: 10)
-- ACLs on CN=Computers container
-- GPO User Rights Assignment (SeMachineAccountPrivilege)
+**Что проверяется**:
+- Атрибут `ms-DS-MachineAccountQuota` (по умолчанию 10).
+- ACL контейнера CN=Computers.
+- Назначение пользовательских прав GPO (SeMachineAccountPrivilege).
 
-**Security Impact**: Creating rogue computer accounts enables RBCD attacks. Attackers can add a computer they control and configure delegation to compromise other resources.
+**Влияние на безопасность**: создание посторонних учётных записей компьютеров открывает путь к RBCD. Злоумышленник может добавить контролируемый компьютер и настроить делегирование для компрометации других ресурсов.
 
-**Usage**:
+**Использование**:
 ```powershell
-# Show non-privileged accounts with add computer rights (default)
+# По умолчанию: непривилегированные записи с правом добавления компьютеров
 Get-AddComputerRights
 
-# Include privileged accounts (Domain Admins, Account Operators, etc.)
+# Включая привилегированные записи (Domain Admins, Account Operators и др.)
 Get-AddComputerRights -IncludePrivileged
 ```
 
-**Parameters**:
+**Параметры**:
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `-IncludePrivileged` | Include privileged accounts in output (shown in yellow) |
+| `-IncludePrivileged` | Включить привилегированные записи (жёлтая подсветка) |
 
 ---
 
 ### Get-GPOUserRightsAssignment
 
-**Purpose**: Compares the Windows user rights a GPO assigns against the set Windows ships, and reports the difference.
+**Назначение**: сравнивает пользовательские права Windows, выдаваемые GPO, со штатным набором Windows и сообщает об отклонениях.
 
-**Why a comparison**: the `[Privilege Rights]` section of `GptTmpl.inf` is absolute, not additive. The principals a GPO lists for a right become the complete set of holders on every computer the policy reaches. The GPO's list and the documented default list therefore describe the same thing, and the difference between them is what matters — in both directions.
+**Почему сравнение**: раздел `[Privilege Rights]` файла `GptTmpl.inf` задаёт права абсолютно, а не дополняет существующие. Субъекты, перечисленные GPO для определённого права, становятся полным набором обладателей этого права на каждом компьютере, где применяется политика. Список GPO и документированный стандартный список описывают одно и то же; важны различия в обе стороны.
 
-**What it checks**:
-- The `[Privilege Rights]` section of `GptTmpl.inf` in every GPO
-- **Holders beyond the Windows default** — the escalation risk, reported at the right's own tier. Privilege-escalation/credential privileges (SeDebug, SeBackup, SeRestore, SeTakeOwnership, SeImpersonate, SeAssignPrimaryToken, SeCreateToken, SeTcb, SeLoadDriver, SeEnableDelegation, SeSyncAgent, SeManageVolume, SeSecurity, SeRelabel, SeTrustedCredManAccess) are Findings; logon rights (RDP / service / batch / interactive logon, change system time, shutdown) are Hints
-- **Default holders the GPO removes** — reported as a Note. Usually deliberate hardening, occasionally a service about to break
-- Rights granted to broad principals (Everyone, Authenticated Users, Domain Users) — escalated to Finding regardless of tier
-- The correct baseline for the machines the policy reaches: domain controllers and member computers have different defaults, and a policy reaching both is measured against the union
-- Whether the GPO currently applies at all (disabled half, no link)
-- Maps each finding to the affected OUs / domain-wide scope via GPO links
+**Что проверяется**:
+- Раздел `[Privilege Rights]` файла `GptTmpl.inf` каждой GPO.
+- **Обладатели сверх штатных Windows** — риск повышения привилегий; серьёзность зависит от самого права. Права повышения привилегий и доступа к учётным данным (SeDebug, SeBackup, SeRestore, SeTakeOwnership, SeImpersonate, SeAssignPrimaryToken, SeCreateToken, SeTcb, SeLoadDriver, SeEnableDelegation, SeSyncAgent, SeManageVolume, SeSecurity, SeRelabel, SeTrustedCredManAccess) относятся к находкам; права входа (RDP, вход службой, пакетное задание, интерактивный вход, изменение времени, выключение) — к подсказкам.
+- **Штатные обладатели, удалённые политикой** — примечание. Чаще осознанное ужесточение, иногда причина отказа службы.
+- Права, выданные широким группам (Everyone, Authenticated Users, Domain Users), всегда повышаются до находки.
+- Верный эталон для затронутых компьютеров: у контроллеров домена и рядовых узлов наборы различаются; политика для обоих сравнивается с их объединением.
+- Применяется ли GPO сейчас вообще (отключённая часть, нет привязки).
+- Привязки каждой находки к затронутым OU и ко всему домену по связям GPO.
 
-**Why not a filter on the holder**: an identity filter — hide privileged SIDs, operator groups, service identities — fails in both directions. `Backup Operators` holding `SeDebugPrivilege` is not a Windows default and is a clean path to SYSTEM, and an identity filter hides it because the group looks privileged. Meanwhile which principals hold a right by default depends on the right, not on how privileged the holder looks.
+**Почему не фильтровать по субъекту**: скрытие привилегированных SID, групп операторов и служебных идентификаторов даёт ошибки в обе стороны. Например, `Backup Operators` с `SeDebugPrivilege` — не штатное право Windows, а прямой путь к SYSTEM; фильтр по субъекту скрыл бы его как «привилегированную группу». При этом штатные обладатели права зависят от конкретного права, а не только от уровня привилегий субъекта.
 
-**Baseline gaps are visible, not guessed**: a right whose default set is not established carries no baseline, and the finding says so. `SeServiceLogonRight` is that case — what holds it depends on which products are installed — and the check falls back to an identity filter for that one right.
+**Пробелы эталона показываются, а не домысливаются**: если для права штатный набор неизвестен, эталон не назначается, и это явно отмечается. Пример — `SeServiceLogonRight`, зависящее от установленных продуктов; только для этого права проверка использует резервную фильтрацию по идентификаторам.
 
-**Security Impact**: A single GPO can grant a low-level privilege (e.g. SeDebugPrivilege → SYSTEM, SeBackupPrivilege → read SAM/NTDS) across every computer it applies to — a direct, often domain-wide privilege-escalation and lateral-movement path. `SeMachineAccountPrivilege` is covered separately by Get-AddComputerRights; `Se*Deny*` rights take access away and are not evaluated.
+**Влияние на безопасность**: одна GPO может выдать низкоуровневые права (например, SeDebugPrivilege → SYSTEM, SeBackupPrivilege → чтение SAM/NTDS) всем компьютерам своей области. Это может стать прямым, иногда доменным путём повышения привилегий и перемещения между узлами. `SeMachineAccountPrivilege` анализируется отдельно в Get-AddComputerRights, а запрещающие права `Se*Deny*`, отнимающие доступ, не оцениваются.
 
-**Usage**:
+**Использование**:
 ```powershell
-# Show the assignments that depart from the Windows default (default)
+# Показать назначения, отклоняющиеся от штатного набора Windows (по умолчанию)
 Get-GPOUserRightsAssignment
 
-# Show every assignment, including the ones matching the default
+# Показать все назначения, включая соответствующие штатному набору
 Get-GPOUserRightsAssignment -IncludeDefaults
 ```
 
-**Parameters**:
+**Параметры**:
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `-IncludeDefaults` | Also report assignments that match the Windows default |
-| `-IncludePrivileged` | Alias of `-IncludeDefaults`, kept so existing invocations keep working |
+| `-IncludeDefaults` | Дополнительно показывать назначения, совпадающие со штатными Windows |
+| `-IncludePrivileged` | Псевдоним `-IncludeDefaults` для совместимости со старыми вызовами |
 
 ---
 
 ### Get-LAPSPermissions
 
-**Purpose**: Identifies who can read LAPS passwords.
+**Назначение**: выявляет, кто может читать пароли LAPS.
 
-**What it checks**:
-- Read permissions on `ms-Mcs-AdmPwd` (Legacy LAPS)
-- Read permissions on `msLAPS-Password` (Windows LAPS)
-- Non-privileged accounts with LAPS read access
+**Что проверяется**:
+- Разрешения на чтение `ms-Mcs-AdmPwd` (Legacy LAPS).
+- Разрешения на чтение `msLAPS-Password` (Windows LAPS).
+- Непривилегированные учётные записи с доступом чтения LAPS.
 
-**Security Impact**: Non-privileged accounts with LAPS read access can obtain local administrator passwords for computers, enabling lateral movement.
+**Влияние на безопасность**: непривилегированные читатели LAPS могут получить пароли локальных администраторов и перемещаться между компьютерами.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-LAPSPermissions
 ```
 
 ---
 
-## Delegation Module
+## Модуль Delegation
 
-Identifies Kerberos delegation misconfigurations.
+Выявляет ошибки настройки делегирования Kerberos.
 
 ### Get-UnconstrainedDelegation
 
-**Purpose**: Finds accounts with unconstrained delegation.
+**Назначение**: находит записи с неограниченным делегированием.
 
-**What it checks**:
-- User accounts with TRUSTED_FOR_DELEGATION flag
-- Computer accounts with unconstrained delegation (excluding DCs)
+**Что проверяется**:
+- Пользователи с флагом TRUSTED_FOR_DELEGATION.
+- Компьютеры с неограниченным делегированием (без DC).
 
-**Security Impact**: Accounts can impersonate any user to any service. Attackers can use print spooler coercion or similar techniques to capture TGTs and impersonate any domain user.
+**Влияние на безопасность**: такие записи могут выступать от имени произвольного пользователя при обращении к любой службе. Злоумышленник может принудить службу печати или похожую службу к аутентификации, перехватить TGT и выступать от имени пользователя домена.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-UnconstrainedDelegation
 ```
@@ -670,16 +670,16 @@ Get-UnconstrainedDelegation
 
 ### Get-ConstrainedDelegation
 
-**Purpose**: Finds accounts with constrained delegation.
+**Назначение**: находит записи с ограниченным делегированием.
 
-**What it checks**:
+**Что проверяется**:
 - `msDS-AllowedToDelegateTo` attribute
-- Protocol transition capability (S4U2Self)
-- Delegation whose target SPN points at a Domain Controller
+- Возможность перехода протокола S4U2Self.
+- Делегирование к SPN, указывающему на контроллер домена.
 
-**Security Impact**: While more restricted than unconstrained, constrained delegation to a Domain Controller enables privilege escalation to Domain Admin. The service class in the SPN is not a limit: all SPNs registered to one host account share a single key, so a ticket issued for one service can be rewritten to another.
+**Влияние на безопасность**: даже ограниченное делегирование к DC допускает повышение прав до Domain Admin. Класс службы в SPN не является границей защиты: все SPN одного хоста используют общий ключ его записи, и билет на одну службу можно переписать для другой.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-ConstrainedDelegation
 ```
@@ -688,37 +688,37 @@ Get-ConstrainedDelegation
 
 ### Get-ResourceBasedConstrainedDelegation
 
-**Purpose**: Finds Resource-Based Constrained Delegation (RBCD) configurations.
+**Назначение**: находит конфигурации ограниченного делегирования на основе ресурсов (RBCD).
 
-**What it checks**:
+**Что проверяется**:
 - `msDS-AllowedToActOnBehalfOfOtherIdentity` attribute
-- Which accounts can delegate to which resources
+- Какие записи могут делегировать полномочия к каким ресурсам.
 
-**Security Impact**: RBCD can be exploited if an attacker can modify the `msDS-AllowedToActOnBehalfOfOtherIdentity` attribute on a computer object, enabling impersonation attacks.
+**Влияние на безопасность**: RBCD можно эксплуатировать при наличии права изменять `msDS-AllowedToActOnBehalfOfOtherIdentity` на объекте компьютера, что позволяет выступать от имени других пользователей.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-ResourceBasedConstrainedDelegation
 ```
 
 ---
 
-## ADCS Module
+## Модуль ADCS
 
-Analyzes Active Directory Certificate Services.
+Анализирует службы сертификатов Active Directory.
 
 ### Get-CertificateAuthority
 
-**Purpose**: Enumerates Certificate Authority infrastructure.
+**Назначение**: перечисляет инфраструктуру удостоверяющих центров.
 
-**What it checks**:
-- CA servers and their configuration
-- Published certificate templates
-- Enrollment endpoints (HTTP, RPC)
+**Что проверяется**:
+- Серверы УЦ и их конфигурация.
+- Опубликованные шаблоны сертификатов.
+- Интерфейсы выдачи (HTTP, RPC).
 
-**Security Impact**: Informational - provides an overview of the PKI infrastructure for further analysis. Identifies attack surface for ADCS exploits.
+**Влияние на безопасность**: информационная проверка даёт обзор PKI и поверхности атак на AD CS.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-CertificateAuthority
 ```
@@ -727,17 +727,17 @@ Get-CertificateAuthority
 
 ### Get-ADCSTemplate
 
-**Purpose**: Lists all certificate templates and their configuration.
+**Назначение**: перечисляет шаблоны сертификатов и их настройки.
 
-**What it checks**:
-- Template name and OID
-- Enrollment permissions
-- Extended Key Usage (EKU)
-- Authentication capability settings
+**Что проверяется**:
+- Имя шаблона и OID.
+- Права регистрации сертификатов.
+- Расширенное использование ключа EKU.
+- Настройки возможности аутентификации.
 
-**Security Impact**: Informational - required to understand which templates might be vulnerable. Templates with Client Authentication EKU are particularly interesting.
+**Влияние на безопасность**: информационная проверка для выявления потенциально уязвимых шаблонов, особенно с EKU Client Authentication.
 
-**Usage**:
+**Использование**:
 ```powershell
 Get-ADCSTemplate
 ```
@@ -746,74 +746,74 @@ Get-ADCSTemplate
 
 ### Get-ADCSVulnerabilities
 
-**Purpose**: Identifies vulnerable ADCS configurations.
+**Назначение**: выявляет уязвимые настройки AD CS.
 
-**What it checks**:
+**Что проверяется**:
 
-| ESC   | Vulnerability                                            |
+| ESC | Уязвимость |
 | ----- | -------------------------------------------------------- |
-| ESC1  | Template allows enrollee-supplied SAN + client auth      |
-| ESC2  | Template allows any purpose EKU                          |
-| ESC3  | Enrollment agent template abuse (both the agent template and its target) |
-| ESC4  | Template with vulnerable ACLs                            |
-| ESC5  | Vulnerable PKI container permissions                     |
-| ESC8  | Web enrollment detection (HTTP/HTTPS + NTLM/EPA config)  |
-| ESC9  | No security extension + client auth                      |
-| ESC13 | Issuance policy linked to AD group                       |
-| ESC15 | Schema v1 + enrollee-supplied subject (CVE-2024-49019)   |
+| ESC1 | Шаблон допускает SAN от заявителя и клиентскую аутентификацию |
+| ESC2 | Шаблон допускает EKU Any Purpose |
+| ESC3 | Злоупотребление шаблоном агента регистрации (шаблон агента и целевой шаблон) |
+| ESC4 | Уязвимые ACL шаблона |
+| ESC5 | Уязвимые разрешения контейнеров PKI |
+| ESC8 | Проверка веб-регистрации (HTTP/HTTPS и настройки NTLM/EPA) |
+| ESC9 | Нет расширения безопасности + клиентская аутентификация |
+| ESC13 | Политика выдачи, связанная с группой AD |
+| ESC15 | Схема v1 и Subject от заявителя (CVE-2024-49019) |
 
-Two more are covered by other checks, because the misconfiguration does not live on a
-template or a CA:
+Ещё две проблемы обнаруживаются другими проверками, потому что ошибки настройки находятся не в
+шаблоне или УЦ:
 
-| ESC   | Vulnerability                                            | Check |
+| ESC | Уязвимость | Проверка |
 | ----- | -------------------------------------------------------- | ----- |
-| ESC10 | Weak certificate mapping on the domain controllers - `StrongCertificateBindingEnforcement=0`, or the UPN bit in `CertificateMappingMethods` | `Get-GPORegistrySettings`, where Group Policy deploys them |
-| ESC14 | Weak explicit mapping in `altSecurityIdentities`, and write access to that attribute on a privileged account | `Get-WeakCertificateMapping` |
+| ESC10 | Слабое сопоставление сертификатов на DC — `StrongCertificateBindingEnforcement=0` либо бит UPN в `CertificateMappingMethods` | `Get-GPORegistrySettings`, если значения назначены групповой политикой |
+| ESC14 | Слабое явное сопоставление `altSecurityIdentities` и право записи этого атрибута у привилегированной записи | `Get-WeakCertificateMapping` |
 
-**Deliberately not implemented**: ESC6 (`EDITF_ATTRIBUTESUBJECTALTNAME2`), ESC7
-(`ManageCA` / `ManageCertificates`), ESC11 (`IF_ENFORCEENCRYPTICERTREQUEST`) and ESC16
+**Преднамеренно не реализовано**: ESC6 (`EDITF_ATTRIBUTESUBJECTALTNAME2`), ESC7
+(`ManageCA` / `ManageCertificates`), ESC11 (`IF_ENFORCEENCRYPTICERTREQUEST`) и ESC16
 (`DisableExtensionList`).
 
-All four live in the registry of the CA host, under
-`HKLM\SYSTEM\CurrentControlSet\Services\CertSvc\Configuration`, and reading them needs
-administrative access to that host - either remote registry as a local administrator, or
-the `ICertAdminD2` RPC interface with `ManageCA`. adPEAS is built to run as an ordinary
-domain user. A check that answers "cannot tell" in the normal case is worse than no check:
-a quiet result reads as a clean domain. Where those rights do exist, Certipy reports all
-four.
+Все четыре параметра находятся в реестре сервера УЦ по пути
+`HKLM\SYSTEM\CurrentControlSet\Services\CertSvc\Configuration`; для чтения нужны
+права администратора на этом сервере: удалённый реестр от локального администратора либо
+RPC-интерфейс `ICertAdminD2` с разрешением `ManageCA`. adPEAS рассчитан на запуск обычным
+пользователем домена. Проверка, которая обычно отвечает «невозможно определить», хуже её отсутствия:
+пустой вывод воспринимается как безопасный домен. При наличии нужных прав все
+четыре параметра проверяет Certipy.
 
-ESC12 (private key on a YubiHSM, extractable with shell access to the CA) is outside what
-any directory scan can see.
+ESC12 (закрытый ключ на YubiHSM, извлекаемый при доступе к оболочке УЦ) не виден
+при сканировании каталога.
 
-**ESC5 Details**: Checks dangerous permissions on PKI container objects:
-- `CN=Public Key Services` - Root PKI container
-- `CN=Certificate Templates` - Allows creating/modifying templates
-- `CN=Enrollment Services` - Controls enrollment services
-- `CN=NTAuthCertificates` - Controls trusted CAs for Kerberos
-- `CN=AIA` - Controls the CA certificates published for chain building
-- `CN=CDP` - Controls where revocation lists are looked up
-- `CN=OID` - Controls issuance policies (ESC13-related)
+**Подробности ESC5**: проверяются опасные разрешения на объектах контейнеров PKI:
+- `CN=Public Key Services` — корневой контейнер PKI.
+- `CN=Certificate Templates` — позволяет создавать или менять шаблоны.
+- `CN=Enrollment Services` — управляет службами выдачи.
+- `CN=NTAuthCertificates` — определяет доверенные УЦ для Kerberos.
+- `CN=AIA` — сертификаты УЦ, опубликованные для построения цепочек.
+- `CN=CDP` — расположения списков отзыва.
+- `CN=OID` — политики выдачи (связаны с ESC13).
 
-Dangerous rights: GenericAll, WriteDacl, WriteOwner, GenericWrite. If unprivileged users have these permissions, they can manipulate the entire PKI infrastructure.
+Опасные права: GenericAll, WriteDacl, WriteOwner, GenericWrite. При наличии у непривилегированных пользователей они позволяют изменять инфраструктуру PKI.
 
-**NTAuth Store**: Every certificate in `CN=NTAuthCertificates` names an issuer trusted to issue a certificate that logs on as any account. An Enterprise CA publishes its own certificate there, so each entry gets an `EnterpriseCA` row: the Enterprise CA of this forest that holds it, an earlier certificate of one (renewed since), or none - a third-party, standalone or removed CA, which is a *Hint* to verify. Expired and SHA1/MD5-signed entries are hints as well, and the section says when more than one CA is trusted. An issuer added on a single machine with `certutil -enterprise -addstore NTAuth` is not in the directory and cannot be seen.
+**Хранилище NTAuth**: каждый сертификат в `CN=NTAuthCertificates` задаёт издателя, которому доверена выдача сертификатов для входа от имени любой записи. Enterprise CA публикует там свой сертификат, поэтому для каждой записи выводится `EnterpriseCA`: УЦ этого леса, которому она принадлежит; старый сертификат перевыпущенного УЦ либо отсутствие соответствия — сторонний, автономный или удалённый УЦ (требует проверки как *подсказка*). Истёкшие и подписанные SHA1/MD5 записи также отмечаются подсказками; раздел сообщает, когда доверено несколько УЦ. Издатель, добавленный только на отдельном компьютере через `certutil -enterprise -addstore NTAuth`, в каталоге не хранится и не обнаруживается.
 
-**Security Impact**: ADCS vulnerabilities can allow any domain user to obtain certificates for any other user, including Domain Admins, leading to full domain compromise.
+**Влияние на безопасность**: уязвимости AD CS могут позволить любому пользователю домена получить сертификат на имя другого, включая Domain Admins, вплоть до полного захвата домена.
 
-**Usage**:
+**Использование**:
 ```powershell
-# Show non-privileged accounts with enrollment rights (default)
+# По умолчанию: непривилегированные записи с правами регистрации сертификатов
 Get-ADCSVulnerabilities
 
-# Include privileged accounts (Domain Admins, Enterprise Admins, etc.)
+# Также включить привилегированные записи (Domain Admins, Enterprise Admins и др.)
 Get-ADCSVulnerabilities -IncludePrivileged
 ```
 
-**Parameters**:
+**Параметры**:
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `-IncludePrivileged` | Include privileged accounts in output (shown in yellow) |
+| `-IncludePrivileged` | Включить в вывод привилегированные записи (жёлтая подсветка) |
 
 ---
 
