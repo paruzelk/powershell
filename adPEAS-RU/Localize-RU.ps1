@@ -235,3 +235,7 @@ if(-not $?){throw 'Ошибка предметной локализации сп
 # и безопасный точечный перевод подписей дополнительных модулей.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC4dObservedHTML.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации наблюдавшихся значений DOC4d'}
+
+# DOC4e: только пользовательские пояснения по двум повторным HTML-отчётам.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC4eObservedHTML.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка точечного перевода DOC4e'}

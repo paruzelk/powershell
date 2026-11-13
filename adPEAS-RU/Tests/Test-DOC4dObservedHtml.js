@@ -10,7 +10,8 @@ const js=fs.readFileSync(path.join(root,'src/modules/Reporting/templates/report-
 const marker='        // DOC4d: verified field-scoped display translations';
 const endMarker='        // Scoring context data for context-aware risk calculation';
 const begin=js.indexOf(marker);
-const end=js.indexOf(endMarker,begin);
+const next=js.indexOf('        // DOC4e: only field-scoped human-readable suffixes and grammar.',begin);
+const end=next>=0 ? next : js.indexOf(endMarker,begin);
 assert(begin>=0 && end>begin,'DOC4d dynamic handler absent');
 const handler=js.slice(begin,end);
 let domLoaded=null;
