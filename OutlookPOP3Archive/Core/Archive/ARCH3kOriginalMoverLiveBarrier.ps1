@@ -32,8 +32,7 @@ function Assert-OPA265ARCH3kPinnedPreparation {
        -not [bool]$intent.OriginalSharedIndexReadOnlyApproved){
         throw 'ARCH3k Prepared original MailMover destination/source evidence inconsistent.'
     }
-    $sealed=Get-OPA265ARCH3jSealedSource -SealRunId ([string]$intent.SourceSealRunId) -SealSha256 ([string]$intent.SourceSealSha256
-    )
+    $sealed=Get-OPA265ARCH3jSealedSource -SealRunId ([string]$intent.SourceSealRunId) -SealSha256 ([string]$intent.SourceSealSha256)
     if([string]$sealed.SourceEntryId -cne [string]$intent.SourceEntryId -or
        [string]$sealed.OriginalWitnessSha256 -cne [string]$intent.FullOriginalWitnessSha256 -or
        [string]$sealed.SourceFolderEntryId -cne [string]$intent.SourceFolderEntryId -or
