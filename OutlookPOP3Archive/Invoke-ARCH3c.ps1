@@ -47,7 +47,14 @@ if($Mode -ceq 'Evidence' -and ([string]::IsNullOrWhiteSpace($TransactionId) -or
 if([string]::IsNullOrWhiteSpace($ScratchRoot)){
     $ScratchRoot=Join-Path ([IO.Path]::GetTempPath()) $TransactionId
 }
-. (Join-Path $PSScriptRoot 'Core/Archive/ARCH3cDurableOperationLedger.ps1')
+# Importing original MailMover defines a backward-compatibility alias.
+# Suppress only its unrelated Set-Alias WhatIf notice, not the transaction's
+# ShouldProcess and not any synthetic disk write.
+$originalWhatIfPreference=$WhatIfPreference
+try{
+    $WhatIfPreference=$false
+    . (Join-Path $PSScriptRoot 'Core/Archive/ARCH3cDurableOperationLedger.ps1')
+}finally{$WhatIfPreference=$originalWhatIfPreference}
 $candidate=[pscustomobject][ordered]@{
     EntryID='00000000E1878292411BC64291BD506DCEFD2A35040A3C00'
     ArchiveDate=[datetime]'2020-02-12T12:30:00'
