@@ -1,12 +1,12 @@
-# Архитектура
+# <a id="architecture"></a>Архитектура
 
 Технический обзор архитектуры adPEAS v2.
 
 ---
 
-## Принципы проектирования
+## <a id="design-principles"></a>Принципы проектирования
 
-### 1. Без внешних зависимостей
+### <a id="1-zero-external-dependencies"></a>1. Без внешних зависимостей
 
 adPEAS использует только встроенные классы .NET Framework:
 
@@ -24,7 +24,7 @@ adPEAS использует только встроенные классы .NET 
 - Доступ к разделам Configuration и Schema.
 - Единый механизм аутентификации.
 
-### 2. Автономное развёртывание
+### <a id="2-standalone-deployment"></a>2. Автономное развёртывание
 
 Итоговый продукт — один файл .ps1:
 
@@ -33,17 +33,17 @@ adPEAS использует только встроенные классы .NET 
 - Удобно переносить и запускать.
 - Работает на Windows с PowerShell 5.1 и новее.
 
-### 3. Независимость от способа аутентификации
+### <a id="3-auth-agnostic-architecture"></a>3. Независимость от способа аутентификации
 
 Аутентификация выполняется однократно при соединении. Все последующие операции не зависят от выбранного способа входа.
 
-### 4. Многоуровневая структура
+### <a id="4-layered-design"></a>4. Многоуровневая структура
 
 Получение данных, анализ безопасности и форматирование вывода чётко разделены.
 
 ---
 
-## Архитектура модулей
+## <a id="module-architecture"></a>Архитектура модулей
 
 ```
 +-------------------------------------------------------+
@@ -74,7 +74,7 @@ adPEAS использует только встроенные классы .NET 
 
 ---
 
-## Поток данных
+## <a id="data-flow"></a>Поток данных
 
 ```
 1. User Input (Parameters)
@@ -103,9 +103,9 @@ adPEAS использует только встроенные классы .NET 
 
 ---
 
-## Иерархия модулей
+## <a id="module-hierarchy"></a>Иерархия модулей
 
-### Иерархия вызовов
+### <a id="call-hierarchy"></a>Иерархия вызовов
 
 ```
 Check Module
@@ -122,7 +122,7 @@ Check Module
     +-> Get-CertificateTemplate / Get-CertificateAuthority (ADCS checks)
 ```
 
-### Правила
+### <a id="rules"></a>Правила
 
 1. **Модули проверок**: вызывают Get-Domain*, Get-ObjectACL, Get-CertificateTemplate и Get-CertificateAuthority.
 2. **Функции Get-Domain**: вызывают только Get-DomainObject.
@@ -132,9 +132,9 @@ Check Module
 
 ---
 
-## Управление сеансом
+## <a id="session-management"></a>Управление сеансом
 
-### Переменные сеанса
+### <a id="session-variables"></a>Переменные сеанса
 
 | Переменная | Тип | Назначение |
 |----------|------|---------|
@@ -143,7 +143,7 @@ Check Module
 | `$Script:LDAPCredential` | PSCredential | Хранимые учётные данные |
 | `$Script:SIDResolutionCache` | Hashtable | Кеш преобразования SID в имена |
 
-### Единая архитектура LdapConnection
+### <a id="unified-ldapconnection-architecture"></a>Единая архитектура LdapConnection
 
 Все LDAP-операции выполняются через `$Script:LdapConnection`:
 
@@ -170,7 +170,7 @@ Check Module
 
 **Подключение к глобальному каталогу**: `Connect-LDAP -AsGlobalCatalog` создаёт второе соединение с GC (порт 3268 для LDAP, 3269 для LDAPS). `ConvertFrom-SID` использует его для разрешения SID из других доменов леса. Соединение GC кешируется в `$Script:GCConnection` и закрывается через `Disconnect-adPEAS`. Если GC недоступен, SID возвращается в формате на основе RID.
 
-### Структура LDAPContext
+### <a id="ldapcontext-structure"></a>Структура LDAPContext
 
 ```powershell
 $Script:LDAPContext = @{
@@ -191,9 +191,9 @@ $Script:LDAPContext = @{
 
 ---
 
-## Последовательность аутентификации
+## <a id="authentication-flow"></a>Последовательность аутентификации
 
-### Приоритет Kerberos
+### <a id="kerberos-first-design"></a>Приоритет Kerberos
 
 ```
 +-------------------+
@@ -231,7 +231,7 @@ $Script:LDAPContext = @{
                     +-------------------+
 ```
 
-### Способы аутентификации
+### <a id="authentication-methods"></a>Способы аутентификации
 
 | Способ | Попытка Kerberos | Резервный способ |
 |--------|-----------------|----------|
@@ -247,9 +247,9 @@ $Script:LDAPContext = @{
 
 ---
 
-## Архитектура вывода
+## <a id="output-architecture"></a>Архитектура вывода
 
-### Единый конвейер RenderModel
+### <a id="unified-rendermodel-pipeline"></a>Единый конвейер RenderModel
 
 adPEAS использует единый конвейер формирования представления: одна модель данных управляет выводом в консоль и HTML:
 
@@ -315,26 +315,26 @@ adPEAS использует единый конвейер формировани
 }
 ```
 
-### Семантические функции вывода
+### <a id="semantic-output-functions"></a>Семантические функции вывода
 
 Модули проверок используют обёртки, передающие данные в конвейер RenderModel:
 
 ```powershell
-# Показать объект AD со всеми свойствами
+# <a id="display-ad-object-with-all-properties"></a>Показать объект AD со всеми свойствами
 Show-Object $user
-# Внутри: Get-RenderModel -> Render-ConsoleObject + Render-HtmlObject
+# <a id="internally-get-rendermodel---render-consoleobject-render-htmlobject"></a>Внутри: Get-RenderModel -> Render-ConsoleObject + Render-HtmlObject
 
-# Показать текст находки
+# <a id="display-finding-text"></a>Показать текст находки
 Show-Line "Finding text" -Class Finding
-# Внутри: Write-adPEASOutput с соответствующим форматированием
+# <a id="internally-write-adpeasoutput-with-appropriate-formatting"></a>Внутри: Write-adPEASOutput с соответствующим форматированием
 
-# Заголовки разделов
+# <a id="section-headers"></a>Заголовки разделов
 Show-Header "Analyzing Security"
-# Внутри: Write-adPEASOutput с классом Header
+# <a id="internally-write-adpeasoutput-with-header-class"></a>Внутри: Write-adPEASOutput с классом Header
 
-# Заголовки подразделов
+# <a id="sub-section-headers"></a>Заголовки подразделов
 Show-SubHeader "Searching for accounts..."
-# Внутри: Write-adPEASOutput с классом SubInfo
+# <a id="internally-write-adpeasoutput-with-subinfo-class"></a>Внутри: Write-adPEASOutput с классом SubInfo
 ```
 
 **Доступные функции** (определены в `adPEAS-Messages.ps1`):
@@ -347,7 +347,7 @@ Show-SubHeader "Searching for accounts..."
 
 ---
 
-## Шаблон модуля проверки
+## <a id="check-module-pattern"></a>Шаблон модуля проверки
 
 Модули проверок используют общий шаблон:
 
@@ -397,9 +397,9 @@ function Get-SecurityCheck {
 
 ---
 
-## Соображения безопасности
+## <a id="security-considerations"></a>Соображения безопасности
 
-### Режим OPSEC
+### <a id="opsec-mode"></a>Режим OPSEC
 
 При указании `-OPSEC`:
 - Пропускается Kerberoasting (нет запросов TGS).
@@ -408,14 +408,14 @@ function Get-SecurityCheck {
 - Нет SMB-соединений с файловыми серверами из путей сценариев GPO или NETLOGON для сценариев входа учётных записей (не проверяются NTFS-права сценария из NETLOGON/общего ресурса и файла, на который ссылается scriptPath).
 - Выполняется только пассивное перечисление.
 
-### Обращение с учётными данными
+### <a id="credential-handling"></a>Обращение с учётными данными
 
 - Учётные данные хранятся только в `$Script:LDAPCredential`.
 - Очищаются при Disconnect-adPEAS.
 - Никогда не записываются на диск.
 - Никогда не выводятся в подробный журнал.
 
-### Проверки по SID
+### <a id="sid-based-checks"></a>Проверки по SID
 
 Проверка субъектов использует SID, а не имена:
 - Не зависит от языка ОС.
@@ -424,9 +424,9 @@ function Get-SecurityCheck {
 
 ---
 
-## Оптимизация производительности
+## <a id="performance-optimizations"></a>Оптимизация производительности
 
-### Кеширование
+### <a id="caching"></a>Кеширование
 
 | Кеш | Назначение |
 | ---------------- | ------------------------------- |
@@ -434,7 +434,7 @@ function Get-SecurityCheck {
 | Схема LAPS | Одна проверка схемы на сеанс |
 | Членство в группах | Рекурсивное раскрытие участников |
 
-### Оптимизация LDAP-запросов
+### <a id="ldap-query-optimization"></a>Оптимизация LDAP-запросов
 
 - Фильтрация на сервере (LDAP-фильтры, а не клиентский Where-Object).
 - Страничная выдача больших наборов через `PageResultRequestControl`.
@@ -445,9 +445,9 @@ function Get-SecurityCheck {
 
 ---
 
-## Обработка ошибок
+## <a id="error-handling"></a>Обработка ошибок
 
-### Два уровня
+### <a id="two-level-approach"></a>Два уровня
 
 **Критические ошибки** (скрипт останавливается):
 - Сбой LDAP-соединения.
@@ -459,7 +459,7 @@ function Get-SecurityCheck {
 - Отказ в правах на конкретный объект.
 - Тайм-аут одного запроса.
 
-### Отображение ошибок
+### <a id="error-display"></a>Отображение ошибок
 
 ```powershell
 try {
@@ -471,7 +471,7 @@ try {
 
 ---
 
-## Навигация
+## <a id="navigation"></a>Навигация
 
 - [Назад: вспомогательные функции](08-Helper-Functions.md)
 - [Далее: оценка рисков](10-Risk-Scoring-System.md)
