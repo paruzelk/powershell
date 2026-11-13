@@ -28,7 +28,7 @@ function Assert-OPA265ARCH3fRealTestSource {
         if(([IO.File]::GetAttributes($p) -band [IO.FileAttributes]::ReparsePoint) -ne 0){
             throw 'ARCH3f forbids reparse/link test PST.'
         }
-        if((New-Object IO.FileInfo($p)).Length -le 0){throw 'ARCH3f test PST is empty.'}
+        if(([IO.FileInfo]::new($p)).Length -le 0){throw 'ARCH3f test PST is empty.'}
     }
     return $p
 }
@@ -201,7 +201,7 @@ function Invoke-OPA265ARCH3fRealTestPreflight {
         $preview | Add-Member -NotePropertyName SourcePstOpened -NotePropertyValue $true
         $preview | Add-Member -NotePropertyName ArchivePstOpenedOrCreated -NotePropertyValue $false
         $preview | Add-Member -NotePropertyName NoPstOrJournalWrites -NotePropertyValue $true
-        $preview | Add-Member -NotePropertyName SourcePstLengthBytes -NotePropertyValue ([int64](New-Object IO.FileInfo($source)).Length)
+        $preview | Add-Member -NotePropertyName SourcePstLengthBytes -NotePropertyValue ([int64]([IO.FileInfo]::new($source)).Length)
         return $preview
     }finally {
         # Session owns its SourceStore and Namespace COM wrappers. Release only
