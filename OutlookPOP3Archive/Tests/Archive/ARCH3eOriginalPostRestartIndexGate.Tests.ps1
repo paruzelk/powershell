@@ -3,6 +3,7 @@
 # Outlook test doubles with immutable original ARCH3d receipt and temp JSONL.
 BeforeAll {
     $script:root=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+    . (Join-Path $script:root 'Core/Runtime/JsonSupport.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH3cDurableOperationLedger.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH3dOriginalMoverBoundary.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH2bSemanticWitness.ps1')
