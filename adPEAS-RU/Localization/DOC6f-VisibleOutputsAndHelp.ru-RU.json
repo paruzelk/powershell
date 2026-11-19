@@ -1,0 +1,581 @@
+{
+  "schema": "adPEAS-RU.DOC6f.VisibleOutputsAndHelp.1",
+  "note": "Exact full source line replacements for display-only labels, messages and help. PowerShell variable interpolation and commands validated before commit.",
+  "files": [
+    {
+      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
+      "entries": [
+        {
+          "line": 68,
+          "original": "                    Show-KeyValue \"Session Variables:\" \"FAIL: No active session found\" -Class Finding",
+          "target": "                    Show-KeyValue \"Переменные сеанса:\" \"ОШИБКА: активный сеанс отсутствует\" -Class Finding"
+        },
+        {
+          "line": 98,
+          "original": "                    Show-KeyValue \"Session Variables:\" \"PASS\" -Class Standard",
+          "target": "                    Show-KeyValue \"Переменные сеанса:\" \"ПРОЙДЕНО\" -Class Standard"
+        },
+        {
+          "line": 106,
+          "original": "                        Show-KeyValue \"LDAP Connection Object:\" \"PASS (LdapConnection for $protocol)\" -Class Standard",
+          "target": "                        Show-KeyValue \"Объект подключения LDAP:\" \"ПРОЙДЕНО (LdapConnection для $protocol)\" -Class Standard"
+        },
+        {
+          "line": 111,
+          "original": "                        Show-KeyValue \"LDAP Connection Object:\" \"FAIL: No connection object found\" -Class Finding",
+          "target": "                        Show-KeyValue \"Объект подключения LDAP:\" \"ОШИБКА: объект подключения не найден\" -Class Finding"
+        },
+        {
+          "line": 125,
+          "original": "                            Show-KeyValue \"LDAP Query Execution:\" \"FAIL: Test query returned no results\" -Class Finding",
+          "target": "                            Show-KeyValue \"Выполнение LDAP-запроса:\" \"ОШИБКА: тестовый запрос не вернул результатов\" -Class Finding"
+        },
+        {
+          "line": 135,
+          "original": "                        Show-KeyValue \"LDAP Query Execution:\" \"PASS (Latency: $([math]::Round($latency, 2)) ms)\" -Class Standard",
+          "target": "                        Show-KeyValue \"Выполнение LDAP-запроса:\" \"ПРОЙДЕНО (задержка: $([math]::Round($latency, 2)) мс)\" -Class Standard"
+        },
+        {
+          "line": 143,
+          "original": "                        Show-KeyValue \"LDAP Query Execution:\" \"FAIL: $($_.Exception.Message)\" -Class Finding",
+          "target": "                        Show-KeyValue \"Выполнение LDAP-запроса:\" \"ОШИБКА: $($_.Exception.Message)\" -Class Finding"
+        },
+        {
+          "line": 153,
+          "original": "                    Show-KeyValue \"Result:\" \"PASS (All tests passed - Connection is healthy)\" -Class Note",
+          "target": "                    Show-KeyValue \"Результат:\" \"ПРОЙДЕНО (все проверки успешны — соединение исправно)\" -Class Note"
+        },
+        {
+          "line": 162,
+          "original": "                    Show-KeyValue \"Unexpected Error:\" \"FAIL: $($_.Exception.Message)\" -Class Finding",
+          "target": "                    Show-KeyValue \"Непредвиденная ошибка:\" \"ОШИБКА: $($_.Exception.Message)\" -Class Finding"
+        },
+        {
+          "line": 177,
+          "original": "            Show-KeyValue \"Domain:\" $Script:LDAPContext.Domain",
+          "target": "            Show-KeyValue \"Домен:\" $Script:LDAPContext.Domain"
+        },
+        {
+          "line": 181,
+          "original": "                Show-KeyValue \"Domain SID:\" $Script:LDAPContext.DomainSID",
+          "target": "                Show-KeyValue \"SID домена:\" $Script:LDAPContext.DomainSID"
+        },
+        {
+          "line": 184,
+          "original": "            Show-KeyValue \"Server:\" $Script:LDAPContext.Server",
+          "target": "            Show-KeyValue \"Сервер:\" $Script:LDAPContext.Server"
+        },
+        {
+          "line": 186,
+          "original": "                Show-KeyValue \"Server IP:\" $Script:LDAPContext['ServerIP']",
+          "target": "                Show-KeyValue \"IP сервера:\" $Script:LDAPContext['ServerIP']"
+        },
+        {
+          "line": 188,
+          "original": "            Show-KeyValue \"Protocol:\" \"$($Script:LDAPContext.Protocol) (Port $($Script:LDAPContext.Port))\"",
+          "target": "            Show-KeyValue \"Протокол:\" \"$($Script:LDAPContext.Protocol) (порт $($Script:LDAPContext.Port))\""
+        },
+        {
+          "line": 189,
+          "original": "            Show-KeyValue \"Domain DN:\" $Script:LDAPContext.DomainDN",
+          "target": "            Show-KeyValue \"DN домена:\" $Script:LDAPContext.DomainDN"
+        },
+        {
+          "line": 198,
+          "original": "                Show-KeyValue \"Authenticated as:\" $TGTUser",
+          "target": "                Show-KeyValue \"Подключение от имени:\" $TGTUser"
+        },
+        {
+          "line": 202,
+          "original": "                    Show-KeyValue \"User SID:\" $Script:LDAPContext.AuthenticatedUserSID",
+          "target": "                    Show-KeyValue \"SID пользователя:\" $Script:LDAPContext.AuthenticatedUserSID"
+        },
+        {
+          "line": 211,
+          "original": "                Show-KeyValue \"Authenticated as:\" $Script:LDAPContext.AuthenticatedUser",
+          "target": "                Show-KeyValue \"Подключение от имени:\" $Script:LDAPContext.AuthenticatedUser"
+        },
+        {
+          "line": 215,
+          "original": "                    Show-KeyValue \"User SID:\" $Script:LDAPContext.AuthenticatedUserSID",
+          "target": "                    Show-KeyValue \"SID пользователя:\" $Script:LDAPContext.AuthenticatedUserSID"
+        },
+        {
+          "line": 219,
+          "original": "                    Show-KeyValue \"Local Identity:\" $Script:LDAPContext.LocalIdentity",
+          "target": "                    Show-KeyValue \"Локальная учётная запись:\" $Script:LDAPContext.LocalIdentity"
+        },
+        {
+          "line": 225,
+          "original": "                    Show-KeyValue \"Distinguished Name:\" $Script:LDAPContext.AuthenticatedUserDN",
+          "target": "                    Show-KeyValue \"Различающееся имя (DN):\" $Script:LDAPContext.AuthenticatedUserDN"
+        },
+        {
+          "line": 228,
+          "original": "                    Show-KeyValue \"User Principal Name:\" $Script:LDAPContext.AuthenticatedUserUPN",
+          "target": "                    Show-KeyValue \"Основное имя пользователя (UPN):\" $Script:LDAPContext.AuthenticatedUserUPN"
+        },
+        {
+          "line": 233,
+          "original": "                Show-KeyValue \"Authenticated as:\" $Script:LDAPContext.Credential.UserName",
+          "target": "                Show-KeyValue \"Подключение от имени:\" $Script:LDAPContext.Credential.UserName"
+        },
+        {
+          "line": 236,
+          "original": "                Show-KeyValue \"Authenticated as:\" \"$env:USERDOMAIN\\$env:USERNAME\"",
+          "target": "                Show-KeyValue \"Подключение от имени:\" \"$env:USERDOMAIN\\$env:USERNAME\""
+        },
+        {
+          "line": 257,
+          "original": "            Show-KeyValue \"Authentication Method:\" $AuthMethodDisplay",
+          "target": "            Show-KeyValue \"Метод аутентификации:\" $AuthMethodDisplay"
+        },
+        {
+          "line": 270,
+          "original": "                Show-KeyValue \"TGT Encryption:\" $ETypeDisplay",
+          "target": "                Show-KeyValue \"Шифрование TGT:\" $ETypeDisplay"
+        },
+        {
+          "line": 274,
+          "original": "                    Show-KeyValue \"TGT Method:\" $TGT.Method",
+          "target": "                    Show-KeyValue \"Способ получения TGT:\" $TGT.Method"
+        },
+        {
+          "line": 279,
+          "original": "                    Show-KeyValue \"TGT Realm:\" $TGT.Domain",
+          "target": "                    Show-KeyValue \"Область Kerberos (TGT):\" $TGT.Domain"
+        },
+        {
+          "line": 296,
+          "original": "                        Show-KeyValue \"Clock Skew:\" \"$skewDisplay (WARNING: exceeds 5-minute Kerberos limit!)\" -Class Finding",
+          "target": "                        Show-KeyValue \"Расхождение времени:\" \"$skewDisplay (ПРЕДУПРЕЖДЕНИЕ: превышен допустимый для Kerberos предел в 5 минут!)\" -Class Finding"
+        },
+        {
+          "line": 299,
+          "original": "                        Show-KeyValue \"Clock Skew:\" \"$skewDisplay (WARNING: close to 5-minute Kerberos limit)\" -Class Finding",
+          "target": "                        Show-KeyValue \"Расхождение времени:\" \"$skewDisplay (ПРЕДУПРЕЖДЕНИЕ: приближение к пределу Kerberos в 5 минут)\" -Class Finding"
+        },
+        {
+          "line": 301,
+          "original": "                        Show-KeyValue \"Clock Skew:\" $skewDisplay -Class Hint",
+          "target": "                        Show-KeyValue \"Расхождение времени:\" $skewDisplay -Class Hint"
+        },
+        {
+          "line": 303,
+          "original": "                        Show-KeyValue \"Clock Skew:\" $skewDisplay",
+          "target": "                        Show-KeyValue \"Расхождение времени:\" $skewDisplay"
+        },
+        {
+          "line": 319,
+          "original": "                        Show-KeyValue \"TGT Valid Until:\" \"$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss') (in $remainingDisplay)\"",
+          "target": "                        Show-KeyValue \"TGT действителен до:\" \"$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss') (осталось $remainingDisplay)\""
+        },
+        {
+          "line": 322,
+          "original": "                        Show-KeyValue \"TGT Valid Until:\" \"$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss')\" -Class Finding",
+          "target": "                        Show-KeyValue \"TGT действителен до:\" \"$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss')\" -Class Finding"
+        },
+        {
+          "line": 329,
+          "original": "                    Show-KeyValue \"TGT Status:\" \"NO TICKETS IN CACHE - Re-authenticate with Connect-adPEAS\" -Class Finding",
+          "target": "                    Show-KeyValue \"Состояние TGT:\" \"В КЭШЕ НЕТ БИЛЕТОВ — повторите аутентификацию через Connect-adPEAS\" -Class Finding"
+        },
+        {
+          "line": 333,
+          "original": "                    Show-KeyValue \"TGT Status:\" \"NO TGT FOUND ($($LiveTicketStatus.TicketCount) service tickets) - Re-authenticate with Connect-adPEAS\" -Class Finding",
+          "target": "                    Show-KeyValue \"Состояние TGT:\" \"TGT НЕ НАЙДЕН (служебных билетов: $($LiveTicketStatus.TicketCount)) — повторите аутентификацию через Connect-adPEAS\" -Class Finding"
+        },
+        {
+          "line": 340,
+          "original": "                    Show-KeyValue \"TGT Status:\" \"EXPIRED at $expiredTime - Re-authenticate with Connect-adPEAS\" -Class Finding",
+          "target": "                    Show-KeyValue \"Состояние TGT:\" \"ИСТЁК в $expiredTime — повторите аутентификацию через Connect-adPEAS\" -Class Finding"
+        },
+        {
+          "line": 346,
+          "original": "                    Show-KeyValue \"TGT Status:\" \"CLIENT MISMATCH (TGT=$tgtClient, Expected=$expectedClient) - Re-authenticate with Connect-adPEAS\" -Class Finding",
+          "target": "                    Show-KeyValue \"Состояние TGT:\" \"НЕСОВПАДЕНИЕ ПОЛЬЗОВАТЕЛЯ (TGT=$tgtClient, ожидался=$expectedClient) — повторите аутентификацию через Connect-adPEAS\" -Class Finding"
+        },
+        {
+          "line": 350,
+          "original": "                    Show-KeyValue \"TGT Status:\" \"INVALID - Re-authenticate with Connect-adPEAS\" -Class Finding",
+          "target": "                    Show-KeyValue \"Состояние TGT:\" \"НЕДЕЙСТВИТЕЛЕН — повторите аутентификацию через Connect-adPEAS\" -Class Finding"
+        },
+        {
+          "line": 363,
+          "original": "                Show-KeyValue \"Session Started:\" (Format-adPEASDate $Script:LDAPContext.SessionStartTime 'yyyy-MM-dd HH:mm:ss')",
+          "target": "                Show-KeyValue \"Начало сеанса:\" (Format-adPEASDate $Script:LDAPContext.SessionStartTime 'yyyy-MM-dd HH:mm:ss')"
+        },
+        {
+          "line": 364,
+          "original": "                Show-KeyValue \"Session Duration:\" ('{0:00}:{1:mm\\:ss}' -f [Math]::Floor($sessionDuration.TotalHours), $sessionDuration)",
+          "target": "                Show-KeyValue \"Продолжительность сеанса:\" ('{0:00}:{1:mm\\:ss}' -f [Math]::Floor($sessionDuration.TotalHours), $sessionDuration)"
+        },
+        {
+          "line": 375,
+          "original": "                    Show-KeyValue \"Connection State:\" \"Connected (Kerberos TGT valid)\"",
+          "target": "                    Show-KeyValue \"Состояние подключения:\" \"Подключено (Kerberos TGT действителен)\""
+        },
+        {
+          "line": 378,
+          "original": "                    Show-KeyValue \"Connection State:\" \"DEGRADED (No Kerberos tickets)\" -Class Finding",
+          "target": "                    Show-KeyValue \"Состояние подключения:\" \"НЕПОЛНОЕ ПОДКЛЮЧЕНИЕ (нет билетов Kerberos)\" -Class Finding"
+        },
+        {
+          "line": 381,
+          "original": "                    Show-KeyValue \"Connection State:\" \"DEGRADED (No TGT, only service tickets)\" -Class Finding",
+          "target": "                    Show-KeyValue \"Состояние подключения:\" \"НЕПОЛНОЕ ПОДКЛЮЧЕНИЕ (нет TGT, есть только служебные билеты)\" -Class Finding"
+        },
+        {
+          "line": 384,
+          "original": "                    Show-KeyValue \"Connection State:\" \"DEGRADED (TGT expired)\" -Class Finding",
+          "target": "                    Show-KeyValue \"Состояние подключения:\" \"НЕПОЛНОЕ ПОДКЛЮЧЕНИЕ (срок TGT истёк)\" -Class Finding"
+        },
+        {
+          "line": 387,
+          "original": "                    Show-KeyValue \"Connection State:\" \"DEGRADED (TGT client mismatch)\" -Class Finding",
+          "target": "                    Show-KeyValue \"Состояние подключения:\" \"НЕПОЛНОЕ ПОДКЛЮЧЕНИЕ (пользователь TGT не совпадает)\" -Class Finding"
+        },
+        {
+          "line": 390,
+          "original": "                    Show-KeyValue \"Connection State:\" \"DEGRADED (TGT invalid)\" -Class Finding",
+          "target": "                    Show-KeyValue \"Состояние подключения:\" \"НЕПОЛНОЕ ПОДКЛЮЧЕНИЕ (TGT недействителен)\" -Class Finding"
+        },
+        {
+          "line": 394,
+          "original": "                Show-KeyValue \"Connection State:\" \"Connected (Schannel/TLS)\"",
+          "target": "                Show-KeyValue \"Состояние подключения:\" \"Подключено (Schannel/TLS)\""
+        },
+        {
+          "line": 397,
+          "original": "                Show-KeyValue \"Connection State:\" \"Connected\"",
+          "target": "                Show-KeyValue \"Состояние подключения:\" \"Подключено\""
+        },
+        {
+          "line": 403,
+          "original": "            Show-KeyValue \"Get-adPEASSession -TestConnection\" \"Test connection health\"",
+          "target": "            Show-KeyValue \"Get-adPEASSession -TestConnection\" \"Проверить состояние подключения\""
+        },
+        {
+          "line": 404,
+          "original": "            Show-KeyValue \"Disconnect-adPEAS\" \"End the session\"",
+          "target": "            Show-KeyValue \"Disconnect-adPEAS\" \"Завершить сеанс\""
+        }
+      ]
+    },
+    {
+      "path": "src/modules/Core/adPEAS-Messages.ps1",
+      "entries": [
+        {
+          "line": 89,
+          "original": "    Write-Log \"[FindingsCollection] Initialized\"",
+          "target": "    Write-Log \"[FindingsCollection] Сбор результатов инициализирован\""
+        },
+        {
+          "line": 285,
+          "original": "    Write-Log \"[FindingsCollection] Cleared\"",
+          "target": "    Write-Log \"[FindingsCollection] Результаты очищены\""
+        },
+        {
+          "line": 311,
+          "original": "    Write-Log \"[FindingsCollection] Set to $($Findings.Count) findings\"",
+          "target": "    Write-Log \"[FindingsCollection] Установлено находок: $($Findings.Count)\""
+        },
+        {
+          "line": 601,
+          "original": "        Write-Log \"[FindingsCache] Atomic replace failed, writing directly: $($_.Exception.Message)\" -Level Warning",
+          "target": "        Write-Log \"[FindingsCache] Атомарная замена не удалась; выполняется прямая запись: $($_.Exception.Message)\" -Level Warning"
+        },
+        {
+          "line": 608,
+          "original": "    Write-Log \"[FindingsCache] Exported $($serializable.Count) findings to '$Path' (complete: $(-not $Partial))\"",
+          "target": "    Write-Log \"[FindingsCache] Экспортировано находок: $($serializable.Count) в '$Path' (полный: $(-not $Partial))\""
+        },
+        {
+          "line": 632,
+          "original": "        Write-Warning \"[FindingsCache] Unsupported cache version $($cache.CacheVersion) - expected 1\"",
+          "target": "        Write-Warning \"[FindingsCache] Неподдерживаемая версия кэша $($cache.CacheVersion), ожидается 1\""
+        },
+        {
+          "line": 639,
+          "original": "        Write-Warning \"[FindingsCache] Cache domain '$($cache.Domain)' differs from current domain '$currentDomain'\"",
+          "target": "        Write-Warning \"[FindingsCache] Домен кэша '$($cache.Domain)' отличается от текущего домена '$currentDomain'\""
+        },
+        {
+          "line": 640,
+          "original": "        Write-Warning \"[FindingsCache] Continuing with merge - findings may be from different domains\"",
+          "target": "        Write-Warning \"[FindingsCache] Слияние продолжено; находки могут относиться к разным доменам\""
+        },
+        {
+          "line": 644,
+          "original": "    Write-Log \"[FindingsCache] Loaded $(@($result).Count) findings from '$Path'\"",
+          "target": "    Write-Log \"[FindingsCache] Загружено находок: $(@($result).Count) из '$Path'\""
+        },
+        {
+          "line": 699,
+          "original": "                Write-Log \"[Import-FindingsFromCache] Unreadable timestamp, finding kept without one: $($f.Timestamp)\"",
+          "target": "                Write-Log \"[Import-FindingsFromCache] Не удалось прочитать метку времени; находка сохранена без даты: $($f.Timestamp)\""
+        },
+        {
+          "line": 770,
+          "original": "    Write-Log \"[FindingsCache] Merge: kept $($kept.Count) previous, added $($CurrentFindings.Count) new, total $($sorted.Count)\"",
+          "target": "    Write-Log \"[FindingsCache] Слияние: сохранено прежних $($kept.Count), добавлено новых $($CurrentFindings.Count), всего $($sorted.Count)\""
+        },
+        {
+          "line": 1530,
+          "original": "    Show-KeyValue \"Session:\" \"Not connected\" -Class Finding -NoCollect",
+          "target": "    Show-KeyValue \"Сеанс:\" \"Нет подключения\" -Class Finding -NoCollect"
+        },
+        {
+          "line": 1631,
+          "original": "                \"ERROR: Insufficient permissions to $Message '$Target'\"",
+          "target": "                \"ОШИБКА: недостаточно прав для $Message '$Target'\""
+        },
+        {
+          "line": 1633,
+          "original": "                \"ERROR: Insufficient permissions to $Message\"",
+          "target": "                \"ОШИБКА: недостаточно прав для $Message\""
+        },
+        {
+          "line": 1637,
+          "original": "            \"ERROR: $Message '$Target' not found\"",
+          "target": "            \"ОШИБКА: $Message '$Target' не найден\""
+        },
+        {
+          "line": 1641,
+          "original": "                \"ERROR: $Message '$Target'\"",
+          "target": "                \"ОШИБКА: $Message '$Target'\""
+        },
+        {
+          "line": 1643,
+          "original": "                \"ERROR: $Message\"",
+          "target": "                \"ОШИБКА: $Message\""
+        },
+        {
+          "line": 1648,
+          "original": "                \"CONNECTION FAILED - $Message\"",
+          "target": "                \"ОШИБКА ПОДКЛЮЧЕНИЯ — $Message\""
+        },
+        {
+          "line": 1650,
+          "original": "                \"CONNECTION FAILED - see error messages above\"",
+          "target": "                \"ОШИБКА ПОДКЛЮЧЕНИЯ — подробности приведены выше\""
+        },
+        {
+          "line": 1655,
+          "original": "                \"CONNECTION HEALTH CHECK FAILED - $Message\"",
+          "target": "                \"ПРОВЕРКА ПОДКЛЮЧЕНИЯ НЕ ПРОЙДЕНА — $Message\""
+        },
+        {
+          "line": 1657,
+          "original": "                \"CONNECTION HEALTH CHECK FAILED\"",
+          "target": "                \"ПРОВЕРКА ПОДКЛЮЧЕНИЯ НЕ ПРОЙДЕНА\""
+        },
+        {
+          "line": 1665,
+          "original": "        $details += \"Reason: $Reason\"",
+          "target": "        $details += \"Причина: $Reason\""
+        },
+        {
+          "line": 1698,
+          "original": "    $details = @(\"Error: $ErrorMessage\")",
+          "target": "    $details = @(\"Ошибка: $ErrorMessage\")"
+        },
+        {
+          "line": 1700,
+          "original": "        \"Use -Force to force disconnect despite errors\",",
+          "target": "        \"Используйте -Force для принудительного отключения несмотря на ошибки\","
+        },
+        {
+          "line": 1701,
+          "original": "        \"Check if session is already disconnected (Get-adPEASSession)\"",
+          "target": "        \"Проверьте, не завершён ли уже сеанс (Get-adPEASSession)\""
+        },
+        {
+          "line": 1704,
+          "original": "    Show-Message -Type Error -Title \"DISCONNECT FAILED\" -Details $details -Hints $hints -NoLeadingLine -NoTrailingLine",
+          "target": "    Show-Message -Type Error -Title \"ОШИБКА ЗАВЕРШЕНИЯ СЕАНСА\" -Details $details -Hints $hints -NoLeadingLine -NoTrailingLine"
+        },
+        {
+          "line": 1732,
+          "original": "    $hints = @(\"For more information, run: Get-Help $FunctionName -Examples\")",
+          "target": "    $hints = @(\"Для примеров выполните: Get-Help $FunctionName -Examples\")"
+        },
+        {
+          "line": 1734,
+          "original": "    Show-Message -Type Error -Title \"${FunctionName}: No modification parameters specified\" -Hints $hints",
+          "target": "    Show-Message -Type Error -Title \"${FunctionName}: не указаны параметры изменения\" -Hints $hints"
+        },
+        {
+          "line": 1815,
+          "original": "        Show-Line \"Invoke-adPEAS (without -Module)\"",
+          "target": "        Show-Line \"Invoke-adPEAS (без -Module)\""
+        },
+        {
+          "line": 1871,
+          "original": "        Show-KeyValue \"Connect-adPEAS\" \"Establish LDAP session\"",
+          "target": "        Show-KeyValue \"Connect-adPEAS\" \"Установить сеанс LDAP\""
+        },
+        {
+          "line": 1872,
+          "original": "        Show-KeyValue \"Disconnect-adPEAS\" \"Close LDAP session\"",
+          "target": "        Show-KeyValue \"Disconnect-adPEAS\" \"Завершить сеанс LDAP\""
+        },
+        {
+          "line": 1873,
+          "original": "        Show-KeyValue \"Get-adPEASSession\" \"Show session status\"",
+          "target": "        Show-KeyValue \"Get-adPEASSession\" \"Показать состояние сеанса\""
+        },
+        {
+          "line": 1878,
+          "original": "        Show-KeyValue \"Get-DomainUser\" \"Query AD users\"",
+          "target": "        Show-KeyValue \"Get-DomainUser\" \"Запрос пользователей AD\""
+        },
+        {
+          "line": 1879,
+          "original": "        Show-KeyValue \"Get-DomainComputer\" \"Query AD computers\"",
+          "target": "        Show-KeyValue \"Get-DomainComputer\" \"Запрос компьютеров AD\""
+        },
+        {
+          "line": 1880,
+          "original": "        Show-KeyValue \"Get-DomainGroup\" \"Query AD groups\"",
+          "target": "        Show-KeyValue \"Get-DomainGroup\" \"Запрос групп AD\""
+        },
+        {
+          "line": 1881,
+          "original": "        Show-KeyValue \"Get-DomainGPO\" \"Query Group Policy Objects\"",
+          "target": "        Show-KeyValue \"Get-DomainGPO\" \"Запрос объектов групповой политики\""
+        },
+        {
+          "line": 1882,
+          "original": "        Show-KeyValue \"Get-DomainObject\" \"Query any AD object\"",
+          "target": "        Show-KeyValue \"Get-DomainObject\" \"Запрос любого объекта AD\""
+        },
+        {
+          "line": 1883,
+          "original": "        Show-KeyValue \"Get-ObjectACL\" \"Query object ACLs\"",
+          "target": "        Show-KeyValue \"Get-ObjectACL\" \"Запрос ACL объекта\""
+        },
+        {
+          "line": 1884,
+          "original": "        Show-KeyValue \"Get-CertificateTemplate\" \"Query certificate templates\"",
+          "target": "        Show-KeyValue \"Get-CertificateTemplate\" \"Запрос шаблонов сертификатов\""
+        },
+        {
+          "line": 1885,
+          "original": "        Show-KeyValue \"Get-CertificateAuthority\" \"Query certificate authorities\"",
+          "target": "        Show-KeyValue \"Get-CertificateAuthority\" \"Запрос центров сертификации\""
+        },
+        {
+          "line": 1890,
+          "original": "        Show-KeyValue \"Set-DomainUser\" \"Modify user attributes\"",
+          "target": "        Show-KeyValue \"Set-DomainUser\" \"Изменить атрибуты пользователя\""
+        },
+        {
+          "line": 1891,
+          "original": "        Show-KeyValue \"Set-DomainComputer\" \"Modify computer attributes\"",
+          "target": "        Show-KeyValue \"Set-DomainComputer\" \"Изменить атрибуты компьютера\""
+        },
+        {
+          "line": 1892,
+          "original": "        Show-KeyValue \"Set-DomainGroup\" \"Modify group attributes\"",
+          "target": "        Show-KeyValue \"Set-DomainGroup\" \"Изменить атрибуты группы\""
+        },
+        {
+          "line": 1893,
+          "original": "        Show-KeyValue \"Set-DomainObject\" \"Modify any AD object\"",
+          "target": "        Show-KeyValue \"Set-DomainObject\" \"Изменить любой объект AD\""
+        },
+        {
+          "line": 1894,
+          "original": "        Show-KeyValue \"Set-DomainGPO\" \"Modify Group Policy Objects\"",
+          "target": "        Show-KeyValue \"Set-DomainGPO\" \"Изменить объекты групповой политики\""
+        },
+        {
+          "line": 1895,
+          "original": "        Show-KeyValue \"Set-CertificateTemplate\" \"Modify certificate templates\"",
+          "target": "        Show-KeyValue \"Set-CertificateTemplate\" \"Изменить шаблоны сертификатов\""
+        },
+        {
+          "line": 1896,
+          "original": "        Show-KeyValue \"New-DomainUser\" \"Create AD user\"",
+          "target": "        Show-KeyValue \"New-DomainUser\" \"Создать пользователя AD\""
+        },
+        {
+          "line": 1897,
+          "original": "        Show-KeyValue \"New-DomainComputer\" \"Create AD computer\"",
+          "target": "        Show-KeyValue \"New-DomainComputer\" \"Создать компьютер AD\""
+        },
+        {
+          "line": 1898,
+          "original": "        Show-KeyValue \"New-DomainGroup\" \"Create AD group\"",
+          "target": "        Show-KeyValue \"New-DomainGroup\" \"Создать группу AD\""
+        },
+        {
+          "line": 1899,
+          "original": "        Show-KeyValue \"New-DomainGPO\" \"Create Group Policy Object\"",
+          "target": "        Show-KeyValue \"New-DomainGPO\" \"Создать объект групповой политики\""
+        },
+        {
+          "line": 1904,
+          "original": "        Show-KeyValue \"Invoke-KerberosAuth\" \"Request TGT (Password/Hash/Key/Cert)\"",
+          "target": "        Show-KeyValue \"Invoke-KerberosAuth\" \"Запрос TGT (пароль/хеш/ключ/сертификат)\""
+        },
+        {
+          "line": 1905,
+          "original": "        Show-KeyValue \"Request-ServiceTicket\" \"Request TGS for a service\"",
+          "target": "        Show-KeyValue \"Request-ServiceTicket\" \"Запрос TGS для службы\""
+        },
+        {
+          "line": 1906,
+          "original": "        Show-KeyValue \"Import-KerberosTicket\" \"Pass-the-Ticket (inject into session)\"",
+          "target": "        Show-KeyValue \"Import-KerberosTicket\" \"Pass-the-Ticket (внедрить билет в сеанс)\""
+        },
+        {
+          "line": 1911,
+          "original": "        Show-KeyValue \"Invoke-Kerberoast\" \"Kerberoasting (request service tickets)\"",
+          "target": "        Show-KeyValue \"Invoke-Kerberoast\" \"Kerberoasting (запрос служебных билетов)\""
+        },
+        {
+          "line": 1912,
+          "original": "        Show-KeyValue \"Invoke-ASREPRoast\" \"AS-REP Roasting (no preauth)\"",
+          "target": "        Show-KeyValue \"Invoke-ASREPRoast\" \"AS-REP Roasting (без предварительной аутентификации)\""
+        },
+        {
+          "line": 1913,
+          "original": "        Show-KeyValue \"Invoke-DCSync\" \"DCSync (directory replication)\"",
+          "target": "        Show-KeyValue \"Invoke-DCSync\" \"DCSync (репликация каталога)\""
+        },
+        {
+          "line": 1914,
+          "original": "        Show-KeyValue \"Invoke-PasswordSpray\" \"Password spraying\"",
+          "target": "        Show-KeyValue \"Invoke-PasswordSpray\" \"Перебор одного пароля по множеству учётных записей\""
+        },
+        {
+          "line": 1919,
+          "original": "        Show-KeyValue \"Invoke-TicketForge\" \"Golden/Silver/Diamond Tickets\"",
+          "target": "        Show-KeyValue \"Invoke-TicketForge\" \"Билеты Golden/Silver/Diamond\""
+        },
+        {
+          "line": 1920,
+          "original": "        Show-KeyValue \"Invoke-S4U\" \"S4U delegation attacks\"",
+          "target": "        Show-KeyValue \"Invoke-S4U\" \"Атаки через делегирование S4U\""
+        },
+        {
+          "line": 1921,
+          "original": "        Show-KeyValue \"Invoke-RBCDOperation\" \"Resource-Based Constrained Delegation\"",
+          "target": "        Show-KeyValue \"Invoke-RBCDOperation\" \"Ограниченное делегирование на основе ресурсов (RBCD)\""
+        },
+        {
+          "line": 1922,
+          "original": "        Show-KeyValue \"Invoke-ShadowCredentialOperation\" \"Shadow Credentials\"",
+          "target": "        Show-KeyValue \"Invoke-ShadowCredentialOperation\" \"Теневые учётные данные (Shadow Credentials)\""
+        },
+        {
+          "line": 1923,
+          "original": "        Show-KeyValue \"Request-ADCSCertificate\" \"Request ADCS certificate\"",
+          "target": "        Show-KeyValue \"Request-ADCSCertificate\" \"Запрос сертификата ADCS\""
+        }
+      ]
+    }
+  ]
+}
