@@ -1269,6 +1269,50 @@
             });
         });
         // DOC6a END: verified report display translations.
+        // DOC6b BEGIN: field-scoped, human-readable GPO CSE labels.
+        document.addEventListener('DOMContentLoaded', function ruDOC6bGpoExtensions() {
+            const exact=Object.freeze({
+                'Registry (Wireless Group Policy)':'Реестр (групповая политика беспроводной сети)',
+                'Security (Security Settings)':'Безопасность (параметры безопасности)'
+            });
+            let translated=0;
+            const guid='\\{[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\\}';
+            const gpoSoftware=new RegExp('^('+guid+') \\(Software Installation\\)$');
+            const gpoRegistry=new RegExp('^Registry \\(('+guid+')\\)$');
+            const gpoRecovery=new RegExp('^EFS Recovery \\(('+guid+')\\)$');
+            function localized(raw) {
+                if(Object.prototype.hasOwnProperty.call(exact,raw)) return exact[raw];
+                let m=gpoSoftware.exec(raw);
+                if(m) return m[1]+' (установка программного обеспечения)';
+                m=gpoRegistry.exec(raw);
+                if(m) return 'Реестр ('+m[1]+')';
+                m=gpoRecovery.exec(raw);
+                if(m) return 'Восстановление EFS ('+m[1]+')';
+                return raw;
+            }
+            function visit(node) {
+                if(node.nodeType===Node.TEXT_NODE) {
+                    const raw=node.nodeValue;
+                    const prefix=(/^\s*/.exec(raw)||[''])[0];
+                    const suffix=(/\s*$/.exec(raw)||[''])[0];
+                    const core=raw.slice(prefix.length,raw.length-suffix.length);
+                    const next=localized(core);
+                    if(next!==core) {
+                        node.nodeValue=prefix+next+suffix;
+                        translated++;
+                    }
+                    return;
+                }
+                if(node.nodeType!==Node.ELEMENT_NODE ||
+                   /^(CODE|PRE|SCRIPT|STYLE|A)$/.test(node.tagName))return;
+                Array.from(node.childNodes).forEach(visit);
+            }
+            document.querySelectorAll('.attr-row[data-attr-name="gpcmachineextensionnames"] .attr-value')
+                .forEach(visit);
+            window.adPEASRUDOC6b=Object.freeze({translatedTextNodes:translated});
+        });
+        // DOC6b END: no raw AD mutations.
+
 
         const scoringContext = {{SCORING_CONTEXT_JSON}};
 
