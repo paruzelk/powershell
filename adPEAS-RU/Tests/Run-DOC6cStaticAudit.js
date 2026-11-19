@@ -75,8 +75,8 @@ const result={
  schema:'adPEAS-RU.DOC6c.StaticSourceInventory.1',
  note:'Heuristic candidates, NOT a list of verified untranslated messages; source code only',
  summary:{...stats,totalCandidates:items.length,byType,strongContextCandidates:high.length,jsContextCandidates:js.length,translatedPhrases:totalPhrases},
- candidates:items.slice(0,1200),
- omitted:Math.max(0,items.length-1200)
+ candidates:items,
+ omitted:0
 };
 fs.writeFileSync(outJson,JSON.stringify(result,null,2)+'\n','utf8');
 const q=String.fromCharCode(96);
@@ -106,7 +106,7 @@ const md=[
 '',
 'Сканируются только исходные файлы каталога '+q+'src/'+q+': явные PowerShell-операции вывода, текстовые HTML-узлы и доступные подписи, литералы JS около UI-API. Скрытые динамически собранные строки, многорядные строковые выражения и косвенные ссылки могут остаться незамеченными. Каталоги документации, локализации и тестов не рассматриваются как исходный интерфейс.',
 '',
-'Технические идентификаторы LDAP/AD, SID, GUID, DNS/DN, имена GPO, команды PowerShell и ключи JSON не переводить. Машинный реестр (максимум 1200 кандидатов): '+q+'Localization/DOC6c-StaticSourceAudit.json'+q+'. При большем объёме указывается отсечение.',
+'Технические идентификаторы LDAP/AD, SID, GUID, DNS/DN, имена GPO, команды PowerShell и ключи JSON не переводить. Полный машинный реестр всех обнаруженных кандидатов: '+q+'Localization/DOC6c-StaticSourceAudit.json'+q+'.',
 ''
 ].join('\n');
 fs.writeFileSync(outMd,md,'utf8');
