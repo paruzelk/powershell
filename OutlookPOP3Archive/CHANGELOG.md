@@ -1,3 +1,9 @@
+## 2.6.5-ARCH3r DEV — 2026-11-19
+- User completed real ARCH3q Seal/Commit/Status/independent Review PASS: original journal Reconciled, original shared index 501. Historical SHA pinned: original journal 6c0a0fc5..., shared JSONL 5ada35eb..., original final commit seal 0fa26ba6...
+- New read-only real checkpoint Plan/Audit reuses ORIGINAL ARCH3q Reconciled resolver, original shared DuplicateIndex importer, original full semantic witness and independent final SHA readback; no Outlook writer or data mutation.
+- New 10-message synthetic original ARCH2b semantic witness comparer, original OperationJournal and original append-only DuplicateIndex only under OS TEMP, 10 distinct subjects/IDs and attachment digest fixtures. Inject unknown provider, claim crash, HTML drift, attachment drift, partially Reconciled journal or index append. Original full Outlook ArchiveVerifier is NOT integrated into this 10-item synthetic harness; no real writer.
+- 27 additional Pester tests; full expected 4513 / 152 Windows PowerShell 5.1 CI, UTF8 BOM and project-only SHA-256 ZIP. ProductionReady=False.
+
 ## 2.6.5-ARCH3q DEV — 2026-11-19
 - Operator ARCH3o real single Move + ARCH3p after actual Outlook process restart and ORIGINAL ArchiveVerifier PASS, including full original semantic witness and archive exactly one. Original journal Intent and shared index 500 still unchanged.
 - ARCH3q Plan/Status, independent real Outlook original verifier Seal via protected immutable CreateNew, explicit Commit original OperationJournal Reconciled then original append-only DuplicateIndex + independent 501 readback and final immutable SHA.

@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3r (2026-11-19):** User confirmed **ARCH3q real final readback PASS**: original `OperationJournal Intent→Reconciled`, original shared `DuplicateIndex` **501**, immutable SHA checkpoints preserved. [ARCH3r completed real pilot historical checkpoint + TEMP-only 10-message original semantic/journal/index fault-injection suite](2.6.5-arch3r-completed-checkpoint-and-synthetic-ten.md). No real batch writer; independent original Outlook `Test-OPAArchiveMoves` for ten not yet integrated, next barrier. ProductionReady=False.
+
+
 > **ARCH3q (2026-11-19):** User completed real ARCH3o one-mail original MailMover plus real ARCH3p Outlook restart and ORIGINAL ArchiveVerifier full semantic PASS. [ARCH3q seals independent review, then original OperationJournal Reconciled and shared DuplicateIndex 500→501 with readback](2.6.5-arch3q-original-postrestart-journal-index-commit.md), plus explicit no-Move partial-index recovery. Only bounded TEST-PST operation; production Archive/Resume/Auto remain CLOSED.
 
 

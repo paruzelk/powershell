@@ -1,6 +1,17 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3r — завершённый реальный checkpoint ARCH3q и 10 синтетических писем (CI-only)
+
+Оператор завершил реальный ARCH3o → ARCH3p → ARCH3q: **один реальный `MailItem.Move`**, новый PID Outlook и ORIGINAL `ArchiveVerifier` подтвердили source absent / archive one / полный semantic match; оригинальный `OperationJournal` содержит `Intent → Reconciled`, общий `DuplicateIndex` увеличился **500 → 501**, независимый `Readback` PASS. ARCH3r проверяет эти результаты в `Plan/Audit` со строгими закреплёнными SHA и реализует `Synthetic10` только в **OS TEMP** через оригинальный full semantic comparer, OperationJournal и DuplicateIndex. На реальный архив и индекс ARCH3r ничего не записывает.
+
+```powershell
+.\Invoke-ARCH3r.ps1 -Mode Synthetic10 | Format-List
+.\Invoke-ARCH3r.ps1 -Mode Synthetic10 -InjectFault ProviderUnknown -FaultAt 4 | Format-List
+```
+
+Примечание: синтетический прогон **не является** полным Outlook `Test-OPAArchiveMoves` на десяти сообщениях; `WriterPermit=False`, `ProductionReady=False`. [Команды, точные SHA, полные ключи и границы ARCH3r](docs/2.6.5-arch3r-completed-checkpoint-and-synthetic-ten.md).
+
 ### ARCH3q — после реального ARCH3p: оригинальный Reconciled + общий DuplicateIndex 501
 
 Реальный ARCH3o Move и ARCH3p независимый postrestart `ArchiveVerifier` подтверждены. ARCH3q добавляет защищённый `Seal`, затем **отдельное** решение `Commit`: оригинальный `OperationJournal -Phase Reconciled` и лишь после независимого readback — оригинальный append-only `DuplicateIndex`, переход 500 → 501, затем final SHA и readback. `Recover` умеет завершить частичный index-commit **без второго Reconciled и без `Move()`**. `Plan`, `Status`, `Review` не пишут.
