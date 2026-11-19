@@ -1,0 +1,66 @@
+﻿{
+  "Schema": "adPEAS-RU.MIG3.ChangedFields.1",
+  "UpstreamCommit": "477696f48d6b486be5d9a99b598f72e3ccfcc0c0",
+  "Locale": "ru-RU",
+  "Translations": {
+    "ESC8_WEB_ENROLLMENT": {
+      "SourceEnglishDescription": "The CA has Web Enrollment enabled without Extended Protection for Authentication (EPA) being required. Attackers can relay NTLM authentication to the CA's web interface to obtain certificates as the relayed user. adPEAS decides EPA by logging on as the session's account three times: with the TLS channel binding, without it, and with the binding of another channel. An endpoint marked [EPA: Accept] is not reported here: Accept rejects a logon whose binding names no or another channel, which every current Windows client sends and a relayed machine logon therefore carries; it is listed as a hint of its own, and so is [EPA: Service binding], an endpoint that checks the SPN the client named instead of the binding. [EPA: Undetermined] means the endpoint could not be tested: the session has no password or NT hash to log on with (a key, certificate or ticket), or the account could not log on there. IIS does not enforce EPA on web enrollment unless it was set, so read the tokenChecking setting of such an endpoint before treating it as relayable.",
+      "description": "На удостоверяющем центре (CA) включена веб-регистрация сертификатов без обязательной Extended Protection for Authentication (EPA). Это может позволить ретрансляцию NTLM на веб-интерфейс CA с выпуском сертификата от имени ретранслированного пользователя. Для определения EPA adPEAS трижды выполняет вход текущей учётной записью: с привязкой к TLS-каналу (CBT), без привязки и с привязкой к другому каналу. Конечная точка с [EPA: Accept] здесь НЕ считается уязвимой: Accept отклоняет нулевую или чужую привязку, которую передают современные Windows-клиенты, включая аутентификацию принуждённого компьютера. Такой режим выводится отдельным предупреждением, как и [EPA: Service binding], проверяющий SPN вместо CBT. [EPA: Undetermined] означает, что проверить вход не удалось: у сеанса нет пароля или NT-хеша (используется ключ, сертификат или билет) либо эта запись не имеет права входа на службу. Поскольку без явной настройки IIS не требует EPA для веб-регистрации, перед выводом о возможности ретрансляции следует проверить tokenChecking на соответствующей конечной точке."
+    },
+    "CREDENTIAL_VNC_PASSWORD": {
+      "SourceEnglishDescription": "A VNC password is stored where it can be read here: in a VNC viewer's connection file (.vnc), the .ini of UltraVNC or TightVNC, or a registry value a Group Policy deploys for RealVNC, TightVNC, TigerVNC or UltraVNC. VNC keeps it DES-encrypted with a key that is the same in every installation and part of the published source code, so the stored value is the password - shown decrypted here. The reason that form exists: the classic VNC authentication is a DES operation keyed with the password itself, so the server has to be able to read it back. One 8-byte block carries a password of up to eight characters, and a longer one is stored as several blocks encrypted the same way. A VNC password is not tied to an account: whoever has it connects to every VNC server that uses it.",
+      "description": "Пароль VNC хранится в обратимом виде в доступном проверке месте: файле подключений VNC Viewer (.vnc), INI-файле UltraVNC/TightVNC либо значении реестра, распространяемом GPO для RealVNC, TightVNC, TigerVNC или UltraVNC. Пароль зашифрован DES с фиксированным ключом, одинаковым во всех установках и опубликованным в исходниках, поэтому сохранённое значение фактически эквивалентно паролю; проверка показывает его расшифрованным. Причина такого формата — классическая аутентификация VNC использует DES с ключом из самого пароля, поэтому сервер должен уметь восстановить его. Один восьмибайтный блок содержит до восьми символов, более длинные пароли хранятся в нескольких блоках с тем же алгоритмом. Пароль VNC не связан с учётной записью: знающий его подключается ко всем серверам с этим паролем.",
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Read the .vnc file, the .ini or the policy from the share",
+        "2. Decrypt every 16 hex digits of the value with the fixed VNC DES key",
+        "3. Connect to the host the file names, or to any VNC server that shares the password"
+      ],
+      "attack": [
+        "1. Прочитать файл .vnc, .ini либо политику из общего сетевого ресурса.",
+        "2. Расшифровать каждые 16 шестнадцатеричных символов сохранённого значения с фиксированным DES-ключом VNC.",
+        "3. Подключиться к серверу, указанному в файле, или любому VNC-серверу с тем же паролем."
+      ]
+    },
+    "WEB_ENDPOINT_EPA_ENABLED": {
+      "SourceEnglishDescription": "This web endpoint has Extended Protection for Authentication (EPA) enabled with NTLM authentication. EPA binds the authentication to the TLS channel, preventing NTLM relay attacks even when NTLM is used over HTTPS. adPEAS logged on with and without the channel binding: the endpoint requires it. When the scan logged on as the current Windows user, through SSPI, Enabled also covers the Accept setting - an SSPI logon always sends a binding and cannot tell the two apart.",
+      "description": "На веб-службе включена Extended Protection for Authentication (EPA) при использовании NTLM. EPA привязывает аутентификацию к TLS-каналу и препятствует NTLM-relay даже при NTLM поверх HTTPS. adPEAS выполнил вход с привязкой к каналу и без неё; сервер потребовал привязку. Если аудит подключался как текущий пользователь Windows через SSPI, отметка Enabled также может соответствовать режиму Accept: SSPI всегда отправляет привязку, поэтому эти режимы невозможно различить такой попыткой."
+    },
+    "EXCHANGE_WEB_ENDPOINTS": {
+      "SourceEnglishDescription": "Exchange web endpoints expose authentication interfaces. Endpoints using NTLM authentication are vulnerable to relay attacks unless Extended Protection for Authentication (EPA) is enabled. EPA binds authentication to the TLS channel, preventing relay. It is configured per virtual directory, so each endpoint listed carries its own verdict and one of them being protected says nothing about the others - MRSProxy in particular sits inside the EWS directory but is governed separately, and a pre-authentication remote code execution chain has been demonstrated against it on servers where only that endpoint was left unprotected. adPEAS decides EPA by logging on as the session's account three times: with the TLS channel binding, without it, and with the binding of another channel. An endpoint marked [EPA: Accept] is not reported here: Accept rejects a logon whose binding names no or another channel, which every current Windows client sends and a relayed logon therefore carries; it is listed as a hint of its own, and so is [EPA: Service binding], an endpoint that checks the SPN the client named instead of the binding. [EPA: Undetermined] means the endpoint could not be tested: the session has no password or NT hash to log on with (a key, certificate or ticket), or the account could not log on there; Exchange 2019 CU14 and later enable Extended Protection by default, so read the state of such an endpoint on the server before treating it as relayable.",
+      "description": "Веб-конечные точки Exchange предоставляют интерфейсы аутентификации. При NTLM без Extended Protection for Authentication (EPA) возможна ретрансляция; EPA привязывает вход к TLS-каналу. Защита настраивается для каждого виртуального каталога отдельно: безопасное состояние одной точки ничего не говорит о других. Особенно важен MRSProxy: он расположен внутри EWS, но управляется отдельно; на серверах с единственной незащищённой этой точкой демонстрировалась цепочка удалённого выполнения кода до аутентификации. Для определения EPA adPEAS выполняет три входа текущей записью: с CBT, без него и с чужой привязкой. [EPA: Accept] здесь не считается незащищённым: он отклоняет нулевую/чужую привязку современных Windows-клиентов, поэтому такой режим выделен отдельным предупреждением. Аналогично отдельно отмечается [EPA: Service binding], проверяющий SPN вместо CBT. [EPA: Undetermined] означает, что проверить вход не удалось: нет пароля или NT-хеша текущего сеанса (вместо них ключ, сертификат или билет) либо нет доступа к службе. В Exchange 2019 CU14+ EPA включается по умолчанию, поэтому прежде чем считать такую точку уязвимой, проверьте её состояние на сервере."
+    },
+    "LAPS_ENCRYPTED_PASSWORD": {
+      "SourceEnglishDescription": "msLAPS-EncryptedPassword came back for this computer, so the account adPEAS runs as can read it. What came back is a blob: Windows LAPS encrypts the password for the principal named in ADPasswordEncryptionPrincipal - Domain Admins by default - and only a member of that principal can open it through NCryptUnprotectSecret, with a key the domain controller hands out to members alone. Reading the attribute takes the read right, opening it takes that membership, and this row shows only the first. Whether this account can open the blob is decided by the check 'Testing LAPS password read access for current user': a computer it opens is listed there with msLAPS-Password and the password-readable write-up, one it cannot open is counted there as stored but not readable.",
+      "description": "Аудит смог прочитать msLAPS-EncryptedPassword данного компьютера. Полученное значение — зашифрованный блок Windows LAPS, а не открытый пароль. Он зашифрован для субъекта ADPasswordEncryptionPrincipal (по умолчанию Domain Admins) и может быть раскрыт через NCryptUnprotectSecret лишь участником этого субъекта с ключом, который DC выдаёт только уполномоченным. Чтение атрибута требует разрешения чтения, а расшифровка — соответствующего членства; эта находка удостоверяет только первое. Может ли текущая учётная запись раскрыть блок, решает отдельная проверка «Testing LAPS password read access for current user»: успешно расшифрованные пароли показываются там как msLAPS-Password; нераскрытые блоки учитываются как сохранённые, но недоступные для чтения в открытом виде.",
+      "SourceEnglishImpactCount": 5,
+      "SourceEnglishImpact": [
+        "Not a password read for an account outside the decryptor principal - for that account the blob stays a blob",
+        "A password read for an account inside it - an audit run as Domain Admins, the default decryptor, reads a blob it can open",
+        "Where the account is outside, the read right is granted though, so it becomes a password read the moment the account reaches the decryptor principal, which is a group membership rather than an ACL change",
+        "The blob names its decryptor: the target SID parses out of it without any right, which tells an attacker precisely which group to go after",
+        "Reported as a hint rather than a finding on purpose - calling every readable blob a password read teaches the reader that the encryption buys nothing; the check that opens them reports the ones that are"
+      ],
+      "impact": [
+        "Для учётной записи вне субъекта расшифровки это НЕ чтение пароля: значение остаётся зашифрованным блоком.",
+        "Для участника субъекта расшифровки, по умолчанию Domain Admins, доступ к блоку означает возможность извлечь пароль.",
+        "Для посторонней записи право чтения блока уже существует: при получении членства в группе расшифровки тот же блок станет читаемым паролем без изменения ACL.",
+        "Зашифрованный блок содержит SID получателя: извлечь его можно без прав расшифровки, что показывает нарушителю целевую группу.",
+        "Находка намеренно имеет статус предупреждения, а не нарушения: не каждый читаемый блок содержит доступный для раскрытия пароль. Успешную расшифровку фиксирует отдельная проверка."
+      ],
+      "SourceEnglishAttackCount": 4,
+      "SourceEnglishAttack": [
+        "1. Attacker reads msLAPS-EncryptedPassword, which the ACL allows, and keeps the blobs",
+        "2. Parses the target SID out of them to learn which principal can decrypt",
+        "3. Looks for a path into that principal, by default Domain Admins",
+        "4. Opens every blob collected earlier as soon as that path exists - from any domain member, where Windows requests the key from a DC"
+      ],
+      "attack": [
+        "1. Прочитать разрешённые ACL значения msLAPS-EncryptedPassword и сохранить зашифрованные блоки.",
+        "2. Извлечь из блоков SID получателя, определив группу, способную расшифровывать пароли.",
+        "3. Искать путь получения членства в этом субъекте, по умолчанию Domain Admins.",
+        "4. После получения членства раскрыть ранее собранные блоки с любого доменного компьютера, запросив через Windows ключ у DC."
+      ]
+    }
+  }
+}
