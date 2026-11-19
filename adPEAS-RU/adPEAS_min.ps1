@@ -77821,7 +77821,7 @@ function Get-AddComputerRights {
         [switch]$IncludeInactive
     )
     begin {
-        Write-Log "[Get-AddComputerRights] Starting check"
+        Write-Log "[Get-AddComputerRights] Начата проверка"
     }
     process {
         try {
@@ -77859,9 +77859,9 @@ function Get-AddComputerRights {
                     }
                 }
             } catch {
-                Write-Log "[Get-AddComputerRights] Could not read wellKnownObjects: $($_.Exception.Message)"
+                Write-Log "[Get-AddComputerRights] Не удалось прочитать wellKnownObjects: $($_.Exception.Message)"
             }
-            Write-Log "[Get-AddComputerRights] Default computer container: $computersContainerDN"
+            Write-Log "[Get-AddComputerRights] Контейнер компьютеров по умолчанию: $computersContainerDN"
             $createComputerAccounts = @()
             $computerClassGUID = 'bf967a86-0de6-11d0-a285-00aa003049e2'
             $aclResult = Get-ObjectACL -DistinguishedName $computersContainerDN -Rights 'GenericAll','CreateChild' -AllowOnly @connectionParams
@@ -77870,12 +77870,12 @@ function Get-AddComputerRights {
                 foreach ($ace in $aclResult.ACEs) {
                     $trusteeSID = $ace.TrusteeSID
                     if ([string]::IsNullOrEmpty($trusteeSID)) {
-                        Write-Log "[Get-AddComputerRights] Skipping ACE with empty SID"
+                        Write-Log "[Get-AddComputerRights] Пропущен ACE с пустым SID"
                         continue
                     }
                     if ($seenSIDs.ContainsKey($trusteeSID)) { continue }
                     if (-not (Test-ACEAppliesToSelf -ACE $ace)) {
-                        Write-Log "[Get-AddComputerRights] Skipping descendants-only ACE: $($ace.Trustee) ($trusteeSID), PropagationFlags=$($ace.PropagationFlags)"
+                        Write-Log "[Get-AddComputerRights] Пропущен ACE только для дочерних объектов: $($ace.Trustee) ($trusteeSID), PropagationFlags=$($ace.PropagationFlags)"
                         continue
                     }
                     $forComputers = (-not $ace.ObjectType) -or ($ace.ObjectType -eq $computerClassGUID)
@@ -77885,29 +77885,29 @@ function Get-AddComputerRights {
                         $seenSIDs[$trusteeSID] = $true
                         $expectedCheck = Test-IsExpectedACLIdentity -SID $trusteeSID -Context 'Container'
                         if ($expectedCheck.Skip) {
-                            Write-Log "[Get-AddComputerRights] Skipping expected identity: $($ace.Trustee) ($trusteeSID) - $($expectedCheck.Reason)"
+                            Write-Log "[Get-AddComputerRights] Пропущен ожидаемый субъект: $($ace.Trustee) ($trusteeSID) — $($expectedCheck.Reason)"
                             continue
                         }
                         if ($trusteeSID -eq 'S-1-5-11' -and $quotaValue -gt 0) {
-                            Write-Log "[Get-AddComputerRights] Skipping Authenticated Users ACL (already covered by quota)"
+                            Write-Log "[Get-AddComputerRights] Пропущен ACL Authenticated Users (уже учтён квотой)"
                             continue
                         }
                         $severity = 'Finding'
                         if (-not $IncludePrivileged) {
                             $scopeResult = Test-IsExpectedInScope -Identity $trusteeSID -Scope 'ComputerContainerACL' -ReturnDetails
                             if ($scopeResult.Severity -eq 'Expected') {
-                                Write-Log "[Get-AddComputerRights] CreateChild (expected): $($ace.Trustee) - $($scopeResult.Reason)"
+                                Write-Log "[Get-AddComputerRights] CreateChild (ожидаемое право): $($ace.Trustee) — $($scopeResult.Reason)"
                                 continue
                             }
                             if ($scopeResult.Severity -eq 'Attention') {
-                                Write-Log "[Get-AddComputerRights] CreateChild (attention): $($ace.Trustee) - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)"
+                                Write-Log "[Get-AddComputerRights] CreateChild (требует внимания): $($ace.Trustee) — $($scopeResult.Reason); пропущено (для включения укажите -IncludePrivileged)"
                                 continue
                             }
                             $severity = $scopeResult.Severity
                         } else {
                             $scopeResult = Test-IsExpectedInScope -Identity $trusteeSID -Scope 'ComputerContainerACL' -ReturnDetails
                             $severity = $scopeResult.Severity
-                            Write-Log "[Get-AddComputerRights] IncludePrivileged: Including $($ace.Trustee) ($trusteeSID) with severity $severity"
+                            Write-Log "[Get-AddComputerRights] IncludePrivileged: включён $($ace.Trustee) ($trusteeSID) с критичностью $severity"
                         }
                         $createComputerAccounts += [PSCustomObject]@{
                             SID = $trusteeSID
@@ -78043,12 +78043,12 @@ function Get-AddComputerRights {
                 Show-Line "Права добавления компьютеров в домен настроены корректно" -Class $quotaClass
             }
         } catch {
-            Write-Log "[Get-AddComputerRights] Error: $_" -Level Error
+            Write-Log "[Get-AddComputerRights] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить права добавления компьютеров в домен: $_" -Class Finding
         }
     }
     end {
-        Write-Log "[Get-AddComputerRights] Check completed"
+        Write-Log "[Get-AddComputerRights] Проверка завершена"
     }
 }
 function Check-GPOAddComputerRights {
@@ -78078,7 +78078,7 @@ function Check-GPOAddComputerRights {
         $dcServer = $Script:LDAPContext.Server
         $domainDN = $Script:LDAPContext.DomainDN
         $dcOUDN = "OU=Domain Controllers,$domainDN"
-        Write-Log "[Check-GPOAddComputerRights] Building GPO precedence map from GPO linkage data"
+        Write-Log "[Check-GPOAddComputerRights] Построение карты приоритета GPO по данным привязок политик"
         $Script:gpoAddComputerPrecedenceMap = @{}
         $allGPOLinkage = Get-GPOLinkage
         if ($allGPOLinkage) {
@@ -78104,12 +78104,12 @@ function Check-GPOAddComputerRights {
                 }
             }
         }
-        Write-Log "[Check-GPOAddComputerRights] Precedence map: $($Script:gpoAddComputerPrecedenceMap.Count) GPO(s) linked to DC OU or domain root"
+        Write-Log "[Check-GPOAddComputerRights] Карта приоритета: $($Script:gpoAddComputerPrecedenceMap.Count) GPO связаны с OU контроллеров домена или корнем домена"
         $Script:gpoAddComputerFindings = @()
         Invoke-SMBAccess -Description "Scanning GPO User Rights Assignment" -ScriptBlock {
             $sysvolPath = "\\$dcServer\SYSVOL\$DomainFQDN\Policies"
             if (-not (Test-Path $sysvolPath)) {
-                Write-Log "[Check-GPOAddComputerRights] SYSVOL path not accessible: $sysvolPath"
+                Write-Log "[Check-GPOAddComputerRights] Путь SYSVOL недоступен: $sysvolPath"
                 return
             }
             $gptTmplFiles = @(Get-CachedSYSVOLFiles -Filter "GptTmpl.inf")
@@ -78203,7 +78203,7 @@ function Check-GPOAddComputerRights {
             $effectiveGPO = $linkedResults | Sort-Object @{Expression={$scopePriority[$_._PrecedenceScope]}}, _PrecedenceOrder | Select-Object -First 1
             if ($effectiveGPO) {
                 $effectiveGPO._IsEffective = $true
-                Write-Log "[Check-GPOAddComputerRights] Effective GPO: '$($effectiveGPO.displayName)' (Scope=$($effectiveGPO._PrecedenceScope), LinkOrder=$($effectiveGPO._PrecedenceOrder))"
+                Write-Log "[Check-GPOAddComputerRights] Применяемая GPO: '$($effectiveGPO.displayName)' (Scope=$($effectiveGPO._PrecedenceScope), LinkOrder=$($effectiveGPO._PrecedenceOrder))"
             }
         }
         foreach ($gpo in @($result | Where-Object { $_._PrecedenceScope -eq 'OtherOU' })) {
@@ -78220,7 +78220,7 @@ function Check-GPOAddComputerRights {
         }
         return $result
     } catch {
-        Write-Log "[Check-GPOAddComputerRights] Error: $_" -Level Error
+        Write-Log "[Check-GPOAddComputerRights] Ошибка: $_" -Level Error
         return @()
     }
 }
@@ -79588,7 +79588,7 @@ function Show-SPNServiceAccounts {
         $accounts = @(Get-DomainObject -LDAPFilter "(&$SPNFilter(!(objectCategory=computer)))" `
             -Properties 'sAMAccountName', 'servicePrincipalName', 'objectClass', 'objectSid' @ConnectionParams)
     } catch {
-        Write-Log "[Get-InfrastructureServers] $ServiceName service account lookup failed: $_" -Level Error
+        Write-Log "[Get-InfrastructureServers] $ServiceName — ошибка поиска служебной учётной записи: $_" -Level Error
         Show-Line "Учётные записи службы $ServiceName прочитать не удалось — результат неизвестен, а не пуст" -Class "Note"
         return
     }
@@ -79616,7 +79616,7 @@ function Show-SPNServiceAccounts {
             try {
                 $privilegeCheck = Test-IsPrivileged -Identity $accountSID -IncludeOperators
             } catch {
-                Write-Log "[Get-InfrastructureServers] Could not evaluate privileges of $($account.sAMAccountName): $_"
+                Write-Log "[Get-InfrastructureServers] Не удалось проверить привилегии $($account.sAMAccountName): $_"
             }
         }
         if ($null -eq $privilegeCheck -or $null -eq $privilegeCheck.IsPrivileged) {
@@ -79680,7 +79680,7 @@ function Get-RegisteredDomainControllerDN {
         }
         return $registered
     } catch {
-        Write-Log "[Get-RegisteredDomainControllerDN] The configuration partition could not be read: $_"
+        Write-Log "[Get-RegisteredDomainControllerDN] Не удалось прочитать раздел Configuration: $_"
         return $null
     }
 }
@@ -79695,7 +79695,7 @@ function Get-InfrastructureServers {
         [System.Management.Automation.PSCredential]$Credential
     )
     begin {
-        Write-Log "[Get-InfrastructureServers] Starting check"
+        Write-Log "[Get-InfrastructureServers] Начата проверка"
     }
     process {
         if (-not (Ensure-LDAPConnection @PSBoundParameters)) {
@@ -79739,7 +79739,7 @@ function Get-InfrastructureServers {
                 Show-Line "Контроллеры домена не найдены (неожиданный результат)" -Class "Note"
             }
         } catch {
-            Write-Log "[Get-InfrastructureServers] Domain Controller enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления контроллеров домена: $_" -Level Error
             Show-Line "Не удалось перечислить контроллеры домена; результат неизвестен, их отсутствие не подтверждено" -Class "Note"
         }
         Show-SubHeader "Поиск серверов Microsoft Exchange..." -ObjectType "ExchangeServerBasic"
@@ -79756,7 +79756,7 @@ function Get-InfrastructureServers {
                     $exchangeVersionByName[$exchName.ToLowerInvariant()] = $(if ($serialBuild) { $serialBuild } else { $serialValue })
                 }
             } else {
-                Write-Log "[Get-InfrastructureServers] No Configuration naming context - falling back to SPN detection for Exchange"
+                Write-Log "[Get-InfrastructureServers] Отсутствует контекст Configuration — для Exchange используется поиск по SPN"
             }
             $exchangeServers = @()
             if ($exchangeVersionByName.Count -gt 0) {
@@ -79783,7 +79783,7 @@ function Get-InfrastructureServers {
                 Show-Line "Серверы Exchange не найдены" -Class "Note"
             }
         } catch {
-            Write-Log "[Get-InfrastructureServers] Exchange Server enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления серверов Exchange: $_" -Level Error
             Show-Line "Ошибка перечисления серверов Exchange; результат неизвестен" -Class "Note"
         }
         Show-SubHeader "Поиск серверов Microsoft SQL Server..." -ObjectType "MSSQLServer"
@@ -79803,7 +79803,7 @@ function Get-InfrastructureServers {
                 -SPNPrefix @('MSSQLSvc/') -ConnectionParams $PSBoundParameters `
                 -PrivilegedFindingId 'MSSQL_SERVICE_ACCOUNT_PRIVILEGED'
         } catch {
-            Write-Log "[Get-InfrastructureServers] MSSQL Server enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления серверов MSSQL: $_" -Level Error
             Show-Line "Ошибка перечисления SQL Server; результат неизвестен" -Class "Note"
         }
         Show-SubHeader "Поиск серверов Microsoft Configuration Manager..." -ObjectType "SCCMServerBasic"
@@ -79822,7 +79822,7 @@ function Get-InfrastructureServers {
             Show-SPNServiceAccounts -ServiceName 'SCCM' -SPNFilter "(|(servicePrincipalName=SMS*)(servicePrincipalName=CCM*))" `
                 -SPNPrefix @('SMS_', 'CCM') -ConnectionParams $PSBoundParameters
         } catch {
-            Write-Log "[Get-InfrastructureServers] SCCM Server enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления серверов SCCM: $_" -Level Error
             Show-Line "Не удалось перечислить серверы SCCM — результат неизвестен, а не пуст" -Class "Note"
         }
         Show-SubHeader "Поиск серверов Microsoft Operations Manager..." -ObjectType "SCOMServerBasic"
@@ -79841,7 +79841,7 @@ function Get-InfrastructureServers {
             Show-SPNServiceAccounts -ServiceName 'SCOM' -SPNFilter "(|(servicePrincipalName=MSOMHSvc/*)(servicePrincipalName=MSOMSdkSvc/*))" `
                 -SPNPrefix @('MSOMHSvc/', 'MSOMSdkSvc/') -ConnectionParams $PSBoundParameters
         } catch {
-            Write-Log "[Get-InfrastructureServers] SCOM Server enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления серверов SCOM: $_" -Level Error
             Show-Line "Не удалось перечислить серверы SCOM — результат неизвестен, а не пуст" -Class "Note"
         }
         Show-SubHeader "Поиск серверов служб федерации AD FS..." -ObjectType "ADFSServer"
@@ -79854,7 +79854,7 @@ function Get-InfrastructureServers {
                 try {
                     $dkmObjects = @(Get-DomainObject -LDAPFilter "(objectClass=contact)" -SearchBase $dkmBase @PSBoundParameters)
                 } catch {
-                    Write-Log "[Get-InfrastructureServers] No AD FS DKM container under $dkmBase : $_"
+                    Write-Log "[Get-InfrastructureServers] Контейнер DKM AD FS по пути $dkmBase не найден: $_"
                 }
                 if ($dkmObjects.Count -gt 0) {
                     $dkmObject = [PSCustomObject]@{
@@ -79873,7 +79873,7 @@ function Get-InfrastructureServers {
                     $adfsIndicators += $adfsServer
                 }
             } catch {
-                Write-Log "[Get-InfrastructureServers] AD FS server lookup failed: $_" -Level Error
+                Write-Log "[Get-InfrastructureServers] Ошибка поиска серверов AD FS: $_" -Level Error
                 Show-Line "Не удалось перечислить серверы AD FS; найденные контейнеры DKM при этом отображаются отдельно" -Class "Note"
             }
             if ($adfsIndicators.Count -gt 0) {
@@ -79885,7 +79885,7 @@ function Get-InfrastructureServers {
                 Show-Line "Развёртывание AD FS не обнаружено" -Class "Note"
             }
         } catch {
-            Write-Log "[Get-InfrastructureServers] AD FS enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления AD FS: $_" -Level Error
             Show-Line "Ошибка перечисления AD FS; результат неизвестен, отсутствие серверов не подтверждено" -Class "Note"
         }
         Show-SubHeader "Поиск серверов Microsoft Entra Connect..." -ObjectType "EntraConnect"
@@ -79920,12 +79920,12 @@ function Get-InfrastructureServers {
                 Show-Line "Серверы Microsoft Entra Connect не найдены" -Class "Note"
             }
         } catch {
-            Write-Log "[Get-InfrastructureServers] Entra ID Connect enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления Entra ID Connect: $_" -Level Error
             Show-Line "Не удалось перечислить серверы Entra ID Connect; результат неизвестен" -Class "Note"
         }
     }
     end {
-        Write-Log "[Get-InfrastructureServers] Check completed"
+        Write-Log "[Get-InfrastructureServers] Проверка завершена"
     }
 }
 function Get-ComputerExplicitRight {
@@ -81676,7 +81676,7 @@ function Get-GPOLocalGroupMembership {
         [switch]$IncludeInactive
     )
     begin {
-        Write-Log "[Get-GPOLocalGroupMembership] Starting check"
+        Write-Log "[Get-GPOLocalGroupMembership] Начата проверка"
         $Script:LocalGroupSIDs = @{
             'S-1-5-32-544' = 'Administrators'
             'S-1-5-32-548' = 'Account Operators'
@@ -81745,7 +81745,7 @@ function Get-GPOLocalGroupMembership {
             Invoke-SMBAccess -Description "Scanning GPO Groups.xml files" -ScriptBlock {
                 $sysvolPath = "\\$($Script:LDAPContext.Server)\SYSVOL\$domainFQDN\Policies"
                 if (-not (Test-Path $sysvolPath)) {
-                    Write-Log "[Get-GPOLocalGroupMembership] SYSVOL path not accessible: $sysvolPath"
+                    Write-Log "[Get-GPOLocalGroupMembership] Путь SYSVOL недоступен: $sysvolPath"
                     return
                 }
                 $Script:sysvolAccessible = $true
@@ -81759,7 +81759,7 @@ function Get-GPOLocalGroupMembership {
                         $gpoGUID = $Matches[1]
                         $gpoName = if ($gpoNameMap.ContainsKey($gpoGUID)) { $gpoNameMap[$gpoGUID] } else { $gpoGUID }
                         try {
-                            Write-Log "[Get-GPOLocalGroupMembership] Reading: $($file.FullName)"
+                            Write-Log "[Get-GPOLocalGroupMembership] Чтение: $($file.FullName)"
                             $restrictedGroupsFindings = Parse-RestrictedGroups -FilePath $file.FullName -GPOName $gpoName -GPOGUID $gpoGUID -GPOPath $gpoPathMap[([string]$gpoGUID).ToUpper()]
                             if ($restrictedGroupsFindings) {
                                 $linkedOUs = $null
@@ -81789,7 +81789,7 @@ function Get-GPOLocalGroupMembership {
                                 $Script:vulnerableGPOs += @($restrictedGroupsFindings)
                             }
                         } catch {
-                            Write-Log "[Get-GPOLocalGroupMembership] Error parsing $($file.FullName): $_"
+                            Write-Log "[Get-GPOLocalGroupMembership] Ошибка разбора $($file.FullName): $_"
                             Register-SYSVOLFileGap -Path $file.FullName -ErrorRecord $_
                         }
                     }
@@ -81805,7 +81805,7 @@ function Get-GPOLocalGroupMembership {
                         $gpoGUID = $Matches[1]
                         $gpoName = if ($gpoNameMap.ContainsKey($gpoGUID)) { $gpoNameMap[$gpoGUID] } else { $gpoGUID }
                         try {
-                            Write-Log "[Get-GPOLocalGroupMembership] Reading: $($file.FullName)"
+                            Write-Log "[Get-GPOLocalGroupMembership] Чтение: $($file.FullName)"
                             $gppGroupsFindings = Parse-GPPGroups -FilePath $file.FullName -GPOName $gpoName -GPOGUID $gpoGUID -GPOPath $gpoPathMap[([string]$gpoGUID).ToUpper()]
                             if ($gppGroupsFindings) {
                                 $linkedOUs = $null
@@ -81837,7 +81837,7 @@ function Get-GPOLocalGroupMembership {
                                 $Script:vulnerableGPOs += @($gppGroupsFindings)
                             }
                         } catch {
-                            Write-Log "[Get-GPOLocalGroupMembership] Error parsing $($file.FullName): $_"
+                            Write-Log "[Get-GPOLocalGroupMembership] Ошибка разбора $($file.FullName): $_"
                             Register-SYSVOLFileGap -Path $file.FullName -ErrorRecord $_
                         }
                     }
@@ -81899,12 +81899,12 @@ function Get-GPOLocalGroupMembership {
                 Show-Line "Небезопасных назначений в локальные группы через GPO не обнаружено; проанализировано политик: $(@($gpos).Count)" -Class $groupClass
             }
         } catch {
-            Write-Log "[Get-GPOLocalGroupMembership] Error: $_" -Level Error
+            Write-Log "[Get-GPOLocalGroupMembership] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить назначения локальных групп через GPO: $_" -Class Finding
         }
     }
     end {
-        Write-Log "[Get-GPOLocalGroupMembership] Check completed"
+        Write-Log "[Get-GPOLocalGroupMembership] Проверка завершена"
     }
 }
 function Resolve-LocalGroupTargetName {
@@ -81924,10 +81924,10 @@ function Resolve-LocalGroupTargetName {
     $resolved = $null
     try { $resolved = ConvertFrom-SID -SID $trimmed } catch { $resolved = $null }
     if ($resolved -and $resolved -ne $trimmed) {
-        Write-Log "[Resolve-LocalGroupTargetName] Target group $trimmed is not in the table - reported as '$resolved'"
+        Write-Log "[Resolve-LocalGroupTargetName] Целевая группа $trimmed отсутствует в таблице — в отчёте используется '$resolved'"
         return [string]$resolved
     }
-    Write-Log "[Resolve-LocalGroupTargetName] Target group $trimmed is not in the table and did not resolve to a name"
+    Write-Log "[Resolve-LocalGroupTargetName] Целевая группа $trimmed отсутствует в таблице, имя определить не удалось"
     return $trimmed
 }
 function Get-GroupAssignmentSeverity {
@@ -81983,11 +81983,11 @@ function Resolve-RestrictedGroupSID {
     try {
         $resolved = ConvertTo-SID -Identity $trimmed
         if ($resolved) {
-            Write-Log "[Resolve-RestrictedGroupSID] Resolved name '$trimmed' to $resolved"
+            Write-Log "[Resolve-RestrictedGroupSID] Имя '$trimmed' преобразовано в $resolved"
             return [string]$resolved
         }
     } catch {
-        Write-Log "[Resolve-RestrictedGroupSID] Could not resolve '$trimmed' to a SID: $_"
+        Write-Log "[Resolve-RestrictedGroupSID] Не удалось определить SID для '$trimmed': $_"
     }
     return $trimmed
 }
@@ -82126,7 +82126,7 @@ function Parse-RestrictedGroups {
         }
         return $findings
     } catch {
-        Write-Log "[Parse-RestrictedGroups] Error parsing $FilePath : $_"
+        Write-Log "[Parse-RestrictedGroups] Ошибка разбора $FilePath : $_"
         Register-SYSVOLFileGap -Path $FilePath -ErrorRecord $_
         return $null
     }
@@ -82229,7 +82229,7 @@ function Parse-GPPGroups {
                 continue
             }
             if (-not $targetGroupKnown -and @($riskyMembers).Count -eq 0) {
-                Write-Log "[Parse-GPPGroups] Item for '$canonicalGroupName' names no BUILTIN group and no broad principal - not reported"
+                Write-Log "[Parse-GPPGroups] Элемент для '$canonicalGroupName' не содержит ни группы BUILTIN, ни субъекта с широкими правами — в отчёт не включён"
                 continue
             }
             $severityResult = Get-GroupAssignmentSeverity -GroupSID $groupSID -RiskyMembers $riskyMembers `
@@ -82266,7 +82266,7 @@ function Parse-GPPGroups {
         }
         return $findings
     } catch {
-        Write-Log "[Parse-GPPGroups] Error parsing $FilePath : $_"
+        Write-Log "[Parse-GPPGroups] Ошибка разбора $FilePath : $_"
         Register-SYSVOLFileGap -Path $FilePath -ErrorRecord $_
         return $null
     }
@@ -88710,7 +88710,7 @@ function Resolve-LAPSEncryptedComputer {
         try {
             $converted = ConvertFrom-LDAPAttribute -Name $property.Name -Value $property.Value
         } catch {
-            Write-Log "[Resolve-LAPSEncryptedComputer] Could not convert $($property.Name): $_"
+            Write-Log "[Resolve-LAPSEncryptedComputer] Не удалось преобразовать $($property.Name): $_"
             continue
         }
         $Computer.PSObject.Properties.Remove($property.Name)
@@ -88736,7 +88736,7 @@ function Get-LAPSCredentialAccess {
         [System.Management.Automation.PSCredential]$Credential
     )
     begin {
-        Write-Log "[Get-LAPSCredentialAccess] Starting check"
+        Write-Log "[Get-LAPSCredentialAccess] Начата проверка"
     }
     process {
         try {
@@ -88758,37 +88758,37 @@ function Get-LAPSCredentialAccess {
                 -not [string]::IsNullOrWhiteSpace([string]$Object.$Attribute)
             }
             if ($lapsLegacySchemaPresent) {
-                Write-Log "[Get-LAPSCredentialAccess] Querying for readable Legacy LAPS passwords"
+                Write-Log "[Get-LAPSCredentialAccess] Поиск доступных для чтения паролей Legacy LAPS"
                 $computersWithLegacy = @(Get-DomainComputer -LDAPFilter "(ms-Mcs-AdmPwd=*)" @PSBoundParameters)
                 foreach ($comp in $computersWithLegacy) {
                     if (& $hasValue $comp 'ms-Mcs-AdmPwd') {
                         $readableComputers += $comp
                     } else {
                         $withheldCount++
-                        Write-Log "[Get-LAPSCredentialAccess] Legacy LAPS attribute withheld for '$($comp.distinguishedName)'"
+                        Write-Log "[Get-LAPSCredentialAccess] Атрибут Legacy LAPS недоступен для '$($comp.distinguishedName)'"
                     }
                 }
             }
             if ($windowsLAPSSchemaPresent) {
-                Write-Log "[Get-LAPSCredentialAccess] Querying for readable Windows LAPS plaintext passwords"
+                Write-Log "[Get-LAPSCredentialAccess] Поиск доступных для чтения паролей Windows LAPS в открытом виде"
                 $computersWithPlaintext = @(Get-DomainComputer -LDAPFilter "(msLAPS-Password=*)" @PSBoundParameters)
                 foreach ($comp in $computersWithPlaintext) {
                     if (& $hasValue $comp 'msLAPS-Password') {
                         $readableComputers += $comp
                     } else {
                         $withheldCount++
-                        Write-Log "[Get-LAPSCredentialAccess] Windows LAPS attribute withheld for '$($comp.distinguishedName)'"
+                        Write-Log "[Get-LAPSCredentialAccess] Атрибут Windows LAPS недоступен для '$($comp.distinguishedName)'"
                     }
                 }
             }
             if ($windowsLAPSSchemaPresent) {
-                Write-Log "[Get-LAPSCredentialAccess] Checking encrypted LAPS passwords (optimized)"
+                Write-Log "[Get-LAPSCredentialAccess] Проверка зашифрованных паролей LAPS (оптимизированный метод)"
                 $myTokenGroups = Get-CurrentUserTokenGroups
                 if ($myTokenGroups -and $myTokenGroups.Count -gt 0) {
-                    Write-Log "[Get-LAPSCredentialAccess] Got $($myTokenGroups.Count) token groups for current user"
+                    Write-Log "[Get-LAPSCredentialAccess] Получено групп токена текущего пользователя: $($myTokenGroups.Count)"
                     $encryptedComputers = @(Get-DomainComputer -LDAPFilter "(msLAPS-EncryptedPassword=*)" -Raw @PSBoundParameters)
                     if (@($encryptedComputers).Count -gt 0) {
-                        Write-Log "[Get-LAPSCredentialAccess] Found $($encryptedComputers.Count) computers with encrypted LAPS"
+                        Write-Log "[Get-LAPSCredentialAccess] Найдено компьютеров с зашифрованными паролями LAPS: $($encryptedComputers.Count)"
                         $authorizedCount = 0
                         foreach ($comp in $encryptedComputers) {
                             $readable = $false
@@ -88805,13 +88805,13 @@ function Get-LAPSCredentialAccess {
                             }
                             if (-not $readable) {
                                 $withheldCount++
-                                Write-Log "[Get-LAPSCredentialAccess] Encrypted LAPS password not readable for '$($comp.distinguishedName)'"
+                                Write-Log "[Get-LAPSCredentialAccess] Зашифрованный пароль LAPS недоступен для чтения у '$($comp.distinguishedName)'"
                             }
                         }
-                        Write-Log "[Get-LAPSCredentialAccess] User is authorized for $authorizedCount of $($encryptedComputers.Count) encrypted LAPS computers"
+                        Write-Log "[Get-LAPSCredentialAccess] Пользователь имеет доступ к $authorizedCount из $($encryptedComputers.Count) компьютеров с зашифрованными паролями LAPS"
                     }
                 } else {
-                    Write-Log "[Get-LAPSCredentialAccess] No token groups - sampling decryption instead"
+                    Write-Log "[Get-LAPSCredentialAccess] Группы токена отсутствуют — используется пробная расшифровка"
                     $encryptedComputers = @(Get-DomainComputer -LDAPFilter "(msLAPS-EncryptedPassword=*)" -Raw @PSBoundParameters)
                     $sampleDecrypts = $false
                     foreach ($comp in @($encryptedComputers | Select-Object -First 3)) {
@@ -88819,7 +88819,7 @@ function Get-LAPSCredentialAccess {
                         if ($sampleInfo -and $sampleInfo.DecryptionSucceeded) { $sampleDecrypts = $true; break }
                     }
                     if ($sampleDecrypts) {
-                        Write-Log "[Get-LAPSCredentialAccess] Fallback: decryption works, trying all $(@($encryptedComputers).Count)"
+                        Write-Log "[Get-LAPSCredentialAccess] Резервный метод: расшифровка работает, проверяются все $(@($encryptedComputers).Count) объектов"
                         foreach ($comp in $encryptedComputers) {
                             if (Resolve-LAPSEncryptedComputer -Computer $comp) {
                                 $readableComputers += $comp
@@ -88840,7 +88840,7 @@ function Get-LAPSCredentialAccess {
                 try {
                     $readerIsPrivileged = ((Test-IsPrivileged -Identity $readerName).IsPrivileged -eq $true)
                 } catch {
-                    Write-Log "[Get-LAPSCredentialAccess] Privilege check failed for '$readerName': $_"
+                    Write-Log "[Get-LAPSCredentialAccess] Ошибка проверки привилегий для '$readerName': $_"
                 }
             }
             if (@($readableComputers).Count -gt 0) {
@@ -88871,12 +88871,12 @@ function Get-LAPSCredentialAccess {
                 Show-Line "У $withheldCount компьютеров хранится пароль LAPS, который текущая учётная запись не может прочитать" -Class "Note"
             }
         } catch {
-            Write-Log "[Get-LAPSCredentialAccess] Error: $_" -Level Error
+            Write-Log "[Get-LAPSCredentialAccess] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить доступ к паролям LAPS: $_" -Class Finding
         }
     }
     end {
-        Write-Log "[Get-LAPSCredentialAccess] Check completed"
+        Write-Log "[Get-LAPSCredentialAccess] Проверка завершена"
     }
 }
 function Get-BitLockerRecoveryKeyAccess {
@@ -88892,7 +88892,7 @@ function Get-BitLockerRecoveryKeyAccess {
         [switch]$IncludePrivileged
     )
     begin {
-        Write-Log "[Get-BitLockerRecoveryKeyAccess] Starting check"
+        Write-Log "[Get-BitLockerRecoveryKeyAccess] Начата проверка"
     }
     process {
         try {
@@ -88907,7 +88907,7 @@ function Get-BitLockerRecoveryKeyAccess {
             $bitLockerPresent = $false
             if ($Script:BitLockerSchemaInfo) {
                 $bitLockerPresent = $Script:BitLockerSchemaInfo.Present
-                Write-Log "[Get-BitLockerRecoveryKeyAccess] Using cached schema info: Present=$bitLockerPresent"
+                Write-Log "[Get-BitLockerRecoveryKeyAccess] Используются сведения о схеме из кэша: Present=$bitLockerPresent"
             } else {
                 $schemaDN = $Script:LDAPContext.SchemaNamingContext
                 if ($schemaDN) {
@@ -88916,17 +88916,17 @@ function Get-BitLockerRecoveryKeyAccess {
                         $schemaResult = @(Get-DomainObject -LDAPFilter $schemaFilter -SearchBase $schemaDN -Properties 'cn' -ResultLimit 1 @connectionParams)
                         if ($schemaResult.Count -gt 0) {
                             $bitLockerPresent = $true
-                            Write-Log "[Get-BitLockerRecoveryKeyAccess] msFVE-RecoveryInformation schema class found"
+                            Write-Log "[Get-BitLockerRecoveryKeyAccess] В схеме найден класс msFVE-RecoveryInformation"
                         }
                     } catch {
-                        Write-Log "[Get-BitLockerRecoveryKeyAccess] Schema query error: $($_.Exception.Message)"
+                        Write-Log "[Get-BitLockerRecoveryKeyAccess] Ошибка запроса схемы: $($_.Exception.Message)"
                     }
                 }
                 if (-not $bitLockerPresent) {
                     $existsCheck = @(Get-DomainObject -LDAPFilter "(objectClass=msFVE-RecoveryInformation)" -Properties 'distinguishedName' -ResultLimit 1 @connectionParams)
                     if ($existsCheck.Count -gt 0) {
                         $bitLockerPresent = $true
-                        Write-Log "[Get-BitLockerRecoveryKeyAccess] msFVE-RecoveryInformation objects detected"
+                        Write-Log "[Get-BitLockerRecoveryKeyAccess] Обнаружены объекты msFVE-RecoveryInformation"
                     }
                 }
                 $Script:BitLockerSchemaInfo = @{ Present = $bitLockerPresent }
@@ -88935,7 +88935,7 @@ function Get-BitLockerRecoveryKeyAccess {
                 Show-Line "В домене не обнаружено хранение ключей восстановления BitLocker (объекты msFVE-RecoveryInformation отсутствуют)" -Class "Note"
                 return
             }
-            Write-Log "[Get-BitLockerRecoveryKeyAccess] Querying for readable BitLocker recovery keys"
+            Write-Log "[Get-BitLockerRecoveryKeyAccess] Поиск доступных для чтения ключей восстановления BitLocker"
             $recoveryProperties = @(
                 'msFVE-RecoveryPassword',
                 'msFVE-RecoveryGuid',
@@ -88943,7 +88943,7 @@ function Get-BitLockerRecoveryKeyAccess {
                 'whenCreated'
             )
             $recoveryObjects = @(Get-DomainObject -LDAPFilter "(&(objectClass=msFVE-RecoveryInformation)(msFVE-RecoveryPassword=*))" -Properties $recoveryProperties -Raw @connectionParams)
-            Write-Log "[Get-BitLockerRecoveryKeyAccess] Found $($recoveryObjects.Count) readable recovery key(s)"
+            Write-Log "[Get-BitLockerRecoveryKeyAccess] Найдено доступных для чтения ключей восстановления: $($recoveryObjects.Count)"
             $withheldObjects = @($recoveryObjects | Where-Object {
                 [string]::IsNullOrWhiteSpace([string]$_.'msFVE-RecoveryPassword')
             })
@@ -88951,7 +88951,7 @@ function Get-BitLockerRecoveryKeyAccess {
                 -not [string]::IsNullOrWhiteSpace([string]$_.'msFVE-RecoveryPassword')
             })
             if ($withheldObjects.Count -gt 0) {
-                Write-Log "[Get-BitLockerRecoveryKeyAccess] $($withheldObjects.Count) recovery object(s) returned without a readable password"
+                Write-Log "[Get-BitLockerRecoveryKeyAccess] Объекты восстановления без читаемого пароля: $($withheldObjects.Count)"
             }
             if ($recoveryObjects.Count -gt 0) {
                 Show-Line "Найдено доступных для чтения ключей восстановления BitLocker: $($recoveryObjects.Count)" -Class "Hint"
@@ -88972,7 +88972,7 @@ function Get-BitLockerRecoveryKeyAccess {
                                 $guidObj = New-Object System.Guid -ArgumentList (,$guidValue)
                                 $recoveryObject | Add-Member -NotePropertyName $guidAttr -NotePropertyValue $guidObj.ToString() -Force
                             } catch {
-                                Write-Log "[Get-BitLockerRecoveryKeyAccess] Failed to convert $guidAttr for '$parentDN': $($_.Exception.Message)"
+                                Write-Log "[Get-BitLockerRecoveryKeyAccess] Не удалось преобразовать $guidAttr для '$parentDN': $($_.Exception.Message)"
                             }
                         }
                     }
@@ -88997,16 +88997,16 @@ function Get-BitLockerRecoveryKeyAccess {
             try {
                 Show-BitLockerRecoveryDelegation -IncludePrivileged:$IncludePrivileged -ConnectionParams $connectionParams
             } catch {
-                Write-Log "[Get-BitLockerRecoveryKeyAccess] Delegation analysis failed: $_" -Level Error
+                Write-Log "[Get-BitLockerRecoveryKeyAccess] Ошибка анализа делегирования: $_" -Level Error
                 Show-Line "Ошибка анализа делегирования: не удалось определить, кто может читать пароли восстановления: $_" -Class Finding
             }
         } catch {
-            Write-Log "[Get-BitLockerRecoveryKeyAccess] Error: $_" -Level Error
+            Write-Log "[Get-BitLockerRecoveryKeyAccess] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить доступ к ключам восстановления BitLocker: $_" -Class Finding
         }
     }
     end {
-        Write-Log "[Get-BitLockerRecoveryKeyAccess] Check completed"
+        Write-Log "[Get-BitLockerRecoveryKeyAccess] Проверка завершена"
     }
 }
 function Show-BitLockerRecoveryDelegation {
@@ -89047,7 +89047,7 @@ function Show-BitLockerRecoveryDelegation {
         }
         catch {
             $unreadContainers += $containerDN
-            Write-Log "[Get-BitLockerRecoveryKeyAccess] Failed to read permissions for '$containerDN': $($_.Exception.Message)"
+            Write-Log "[Get-BitLockerRecoveryKeyAccess] Не удалось прочитать разрешения для '$containerDN': $($_.Exception.Message)"
             continue
         }
         if (-not $perms -or $perms.Read -eq $false) { $unreadContainers += $containerDN }
@@ -89120,7 +89120,7 @@ function Show-BitLockerRecoveryDelegation {
             }
         }
         if ($verdicts.Count -eq 0) {
-            Write-Log "[Get-BitLockerRecoveryKeyAccess] $($entry.Principal) holds control access but no read of the recovery objects - not listed"
+            Write-Log "[Get-BitLockerRecoveryKeyAccess] У $($entry.Principal) есть право управления доступом, но нет права чтения объектов восстановления — в отчёт не включён"
             continue
         }
         $isLive    = @($verdicts | Where-Object { $_.Verdict -eq 'live' }).Count -gt 0
@@ -89210,7 +89210,7 @@ function Get-BitLockerRecoveryConfidentiality {
     $schemaDN = $null
     if ($Script:LDAPContext) { $schemaDN = $Script:LDAPContext.SchemaNamingContext }
     if ([string]::IsNullOrWhiteSpace($schemaDN)) {
-        Write-Log "[Get-BitLockerRecoveryConfidentiality] No SchemaNamingContext - answer stays unknown"
+        Write-Log "[Get-BitLockerRecoveryConfidentiality] Отсутствует SchemaNamingContext — результат остаётся неопределённым"
         return $unknown
     }
     $filter = '(&(objectClass=attributeSchema)' +
@@ -89220,11 +89220,11 @@ function Get-BitLockerRecoveryConfidentiality {
             -Properties 'lDAPDisplayName', 'cn', 'searchFlags' @CredParams)[0]
     }
     catch {
-        Write-Log "[Get-BitLockerRecoveryConfidentiality] Schema query failed: $($_.Exception.Message)"
+        Write-Log "[Get-BitLockerRecoveryConfidentiality] Ошибка запроса схемы: $($_.Exception.Message)"
         return $unknown
     }
     if (-not $attribute) {
-        Write-Log "[Get-BitLockerRecoveryConfidentiality] msFVE-RecoveryPassword not found in the schema"
+        Write-Log "[Get-BitLockerRecoveryConfidentiality] Атрибут msFVE-RecoveryPassword в схеме не найден"
         return $unknown
     }
     $flags = 0
@@ -101633,7 +101633,7 @@ function Collect-BHIssuancePolicies {
     return $bhPolicies
 }
 #Requires -Version 5.1
-$Script:adPEASVersion = "2.9.0+20261119-1134"
+$Script:adPEASVersion = "2.9.0+20261119-1145"
 if ($MyInvocation.MyCommand.Path) {
     $Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {

@@ -77,7 +77,7 @@
     )
 
     begin {
-        Write-Log "[Get-BitLockerRecoveryKeyAccess] Starting check"
+        Write-Log "[Get-BitLockerRecoveryKeyAccess] Начата проверка"
     }
 
     process {
@@ -105,7 +105,7 @@
 
             if ($Script:BitLockerSchemaInfo) {
                 $bitLockerPresent = $Script:BitLockerSchemaInfo.Present
-                Write-Log "[Get-BitLockerRecoveryKeyAccess] Using cached schema info: Present=$bitLockerPresent"
+                Write-Log "[Get-BitLockerRecoveryKeyAccess] Используются сведения о схеме из кэша: Present=$bitLockerPresent"
             } else {
                 $schemaDN = $Script:LDAPContext.SchemaNamingContext
 
@@ -116,10 +116,10 @@
                         $schemaResult = @(Get-DomainObject -LDAPFilter $schemaFilter -SearchBase $schemaDN -Properties 'cn' -ResultLimit 1 @connectionParams)
                         if ($schemaResult.Count -gt 0) {
                             $bitLockerPresent = $true
-                            Write-Log "[Get-BitLockerRecoveryKeyAccess] msFVE-RecoveryInformation schema class found"
+                            Write-Log "[Get-BitLockerRecoveryKeyAccess] В схеме найден класс msFVE-RecoveryInformation"
                         }
                     } catch {
-                        Write-Log "[Get-BitLockerRecoveryKeyAccess] Schema query error: $($_.Exception.Message)"
+                        Write-Log "[Get-BitLockerRecoveryKeyAccess] Ошибка запроса схемы: $($_.Exception.Message)"
                     }
                 }
 
@@ -128,7 +128,7 @@
                     $existsCheck = @(Get-DomainObject -LDAPFilter "(objectClass=msFVE-RecoveryInformation)" -Properties 'distinguishedName' -ResultLimit 1 @connectionParams)
                     if ($existsCheck.Count -gt 0) {
                         $bitLockerPresent = $true
-                        Write-Log "[Get-BitLockerRecoveryKeyAccess] msFVE-RecoveryInformation objects detected"
+                        Write-Log "[Get-BitLockerRecoveryKeyAccess] Обнаружены объекты msFVE-RecoveryInformation"
                     }
                 }
 
@@ -144,7 +144,7 @@
             # ===== Step 2: Single ACL-gated subtree query for readable recovery keys =====
             # The (msFVE-RecoveryPassword=*) presence filter only matches objects whose
             # password the bound user is permitted to read (ACL-based attribute return).
-            Write-Log "[Get-BitLockerRecoveryKeyAccess] Querying for readable BitLocker recovery keys"
+            Write-Log "[Get-BitLockerRecoveryKeyAccess] Поиск доступных для чтения ключей восстановления BitLocker"
 
             $recoveryProperties = @(
                 'msFVE-RecoveryPassword',
@@ -155,7 +155,7 @@
 
             $recoveryObjects = @(Get-DomainObject -LDAPFilter "(&(objectClass=msFVE-RecoveryInformation)(msFVE-RecoveryPassword=*))" -Properties $recoveryProperties -Raw @connectionParams)
 
-            Write-Log "[Get-BitLockerRecoveryKeyAccess] Found $($recoveryObjects.Count) readable recovery key(s)"
+            Write-Log "[Get-BitLockerRecoveryKeyAccess] Найдено доступных для чтения ключей восстановления: $($recoveryObjects.Count)"
 
             # ===== Step 3: Output =====
             # The presence filter is ACL-gated, so a returned object is normally a readable
@@ -171,7 +171,7 @@
             })
 
             if ($withheldObjects.Count -gt 0) {
-                Write-Log "[Get-BitLockerRecoveryKeyAccess] $($withheldObjects.Count) recovery object(s) returned without a readable password"
+                Write-Log "[Get-BitLockerRecoveryKeyAccess] Объекты восстановления без читаемого пароля: $($withheldObjects.Count)"
             }
 
             if ($recoveryObjects.Count -gt 0) {
@@ -201,7 +201,7 @@
                                 $guidObj = New-Object System.Guid -ArgumentList (,$guidValue)
                                 $recoveryObject | Add-Member -NotePropertyName $guidAttr -NotePropertyValue $guidObj.ToString() -Force
                             } catch {
-                                Write-Log "[Get-BitLockerRecoveryKeyAccess] Failed to convert $guidAttr for '$parentDN': $($_.Exception.Message)"
+                                Write-Log "[Get-BitLockerRecoveryKeyAccess] Не удалось преобразовать $guidAttr для '$parentDN': $($_.Exception.Message)"
                             }
                         }
                     }
@@ -240,18 +240,18 @@
             try {
                 Show-BitLockerRecoveryDelegation -IncludePrivileged:$IncludePrivileged -ConnectionParams $connectionParams
             } catch {
-                Write-Log "[Get-BitLockerRecoveryKeyAccess] Delegation analysis failed: $_" -Level Error
+                Write-Log "[Get-BitLockerRecoveryKeyAccess] Ошибка анализа делегирования: $_" -Level Error
                 Show-Line "Ошибка анализа делегирования: не удалось определить, кто может читать пароли восстановления: $_" -Class Finding
             }
 
         } catch {
-            Write-Log "[Get-BitLockerRecoveryKeyAccess] Error: $_" -Level Error
+            Write-Log "[Get-BitLockerRecoveryKeyAccess] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить доступ к ключам восстановления BitLocker: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-BitLockerRecoveryKeyAccess] Check completed"
+        Write-Log "[Get-BitLockerRecoveryKeyAccess] Проверка завершена"
     }
 }
 
@@ -355,7 +355,7 @@ function Show-BitLockerRecoveryDelegation {
         }
         catch {
             $unreadContainers += $containerDN
-            Write-Log "[Get-BitLockerRecoveryKeyAccess] Failed to read permissions for '$containerDN': $($_.Exception.Message)"
+            Write-Log "[Get-BitLockerRecoveryKeyAccess] Не удалось прочитать разрешения для '$containerDN': $($_.Exception.Message)"
             continue
         }
 
@@ -448,7 +448,7 @@ function Show-BitLockerRecoveryDelegation {
         # Control access alone reads nothing: the recovery object grants no read to anybody
         # but Domain Admins and SYSTEM unless a delegation adds one.
         if ($verdicts.Count -eq 0) {
-            Write-Log "[Get-BitLockerRecoveryKeyAccess] $($entry.Principal) holds control access but no read of the recovery objects - not listed"
+            Write-Log "[Get-BitLockerRecoveryKeyAccess] У $($entry.Principal) есть право управления доступом, но нет права чтения объектов восстановления — в отчёт не включён"
             continue
         }
 
@@ -591,7 +591,7 @@ function Get-BitLockerRecoveryConfidentiality {
     $schemaDN = $null
     if ($Script:LDAPContext) { $schemaDN = $Script:LDAPContext.SchemaNamingContext }
     if ([string]::IsNullOrWhiteSpace($schemaDN)) {
-        Write-Log "[Get-BitLockerRecoveryConfidentiality] No SchemaNamingContext - answer stays unknown"
+        Write-Log "[Get-BitLockerRecoveryConfidentiality] Отсутствует SchemaNamingContext — результат остаётся неопределённым"
         return $unknown
     }
 
@@ -605,12 +605,12 @@ function Get-BitLockerRecoveryConfidentiality {
             -Properties 'lDAPDisplayName', 'cn', 'searchFlags' @CredParams)[0]
     }
     catch {
-        Write-Log "[Get-BitLockerRecoveryConfidentiality] Schema query failed: $($_.Exception.Message)"
+        Write-Log "[Get-BitLockerRecoveryConfidentiality] Ошибка запроса схемы: $($_.Exception.Message)"
         return $unknown
     }
 
     if (-not $attribute) {
-        Write-Log "[Get-BitLockerRecoveryConfidentiality] msFVE-RecoveryPassword not found in the schema"
+        Write-Log "[Get-BitLockerRecoveryConfidentiality] Атрибут msFVE-RecoveryPassword в схеме не найден"
         return $unknown
     }
 

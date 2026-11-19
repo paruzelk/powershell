@@ -42,7 +42,7 @@
         try {
             $converted = ConvertFrom-LDAPAttribute -Name $property.Name -Value $property.Value
         } catch {
-            Write-Log "[Resolve-LAPSEncryptedComputer] Could not convert $($property.Name): $_"
+            Write-Log "[Resolve-LAPSEncryptedComputer] Не удалось преобразовать $($property.Name): $_"
             continue
         }
         $Computer.PSObject.Properties.Remove($property.Name)
@@ -116,7 +116,7 @@ function Get-LAPSCredentialAccess {
     )
 
     begin {
-        Write-Log "[Get-LAPSCredentialAccess] Starting check"
+        Write-Log "[Get-LAPSCredentialAccess] Начата проверка"
     }
 
     process {
@@ -156,28 +156,28 @@ function Get-LAPSCredentialAccess {
             # Test Legacy LAPS - query for readable ms-Mcs-AdmPwd
             # ACL-based: attribute only returned if user has read permission
             if ($lapsLegacySchemaPresent) {
-                Write-Log "[Get-LAPSCredentialAccess] Querying for readable Legacy LAPS passwords"
+                Write-Log "[Get-LAPSCredentialAccess] Поиск доступных для чтения паролей Legacy LAPS"
                 $computersWithLegacy = @(Get-DomainComputer -LDAPFilter "(ms-Mcs-AdmPwd=*)" @PSBoundParameters)
                 foreach ($comp in $computersWithLegacy) {
                     if (& $hasValue $comp 'ms-Mcs-AdmPwd') {
                         $readableComputers += $comp
                     } else {
                         $withheldCount++
-                        Write-Log "[Get-LAPSCredentialAccess] Legacy LAPS attribute withheld for '$($comp.distinguishedName)'"
+                        Write-Log "[Get-LAPSCredentialAccess] Атрибут Legacy LAPS недоступен для '$($comp.distinguishedName)'"
                     }
                 }
             }
 
             # Test Windows LAPS plaintext - query for msLAPS-Password attribute in AD
             if ($windowsLAPSSchemaPresent) {
-                Write-Log "[Get-LAPSCredentialAccess] Querying for readable Windows LAPS plaintext passwords"
+                Write-Log "[Get-LAPSCredentialAccess] Поиск доступных для чтения паролей Windows LAPS в открытом виде"
                 $computersWithPlaintext = @(Get-DomainComputer -LDAPFilter "(msLAPS-Password=*)" @PSBoundParameters)
                 foreach ($comp in $computersWithPlaintext) {
                     if (& $hasValue $comp 'msLAPS-Password') {
                         $readableComputers += $comp
                     } else {
                         $withheldCount++
-                        Write-Log "[Get-LAPSCredentialAccess] Windows LAPS attribute withheld for '$($comp.distinguishedName)'"
+                        Write-Log "[Get-LAPSCredentialAccess] Атрибут Windows LAPS недоступен для '$($comp.distinguishedName)'"
                     }
                 }
             }
@@ -189,19 +189,19 @@ function Get-LAPSCredentialAccess {
             # 4. Check if Target SID is in our token groups (local check)
             # 5. For authorized: decrypt blob directly (no second LDAP query!)
             if ($windowsLAPSSchemaPresent) {
-                Write-Log "[Get-LAPSCredentialAccess] Checking encrypted LAPS passwords (optimized)"
+                Write-Log "[Get-LAPSCredentialAccess] Проверка зашифрованных паролей LAPS (оптимизированный метод)"
 
                 # Step 1: Get current user's token groups (cached after first call)
                 $myTokenGroups = Get-CurrentUserTokenGroups
                 if ($myTokenGroups -and $myTokenGroups.Count -gt 0) {
-                    Write-Log "[Get-LAPSCredentialAccess] Got $($myTokenGroups.Count) token groups for current user"
+                    Write-Log "[Get-LAPSCredentialAccess] Получено групп токена текущего пользователя: $($myTokenGroups.Count)"
 
                     # Step 2: Query all computers with encrypted LAPS - ALL properties but Raw (no decryption)
                     # This way we have the full object and only need to decrypt the blob locally
                     $encryptedComputers = @(Get-DomainComputer -LDAPFilter "(msLAPS-EncryptedPassword=*)" -Raw @PSBoundParameters)
 
                     if (@($encryptedComputers).Count -gt 0) {
-                        Write-Log "[Get-LAPSCredentialAccess] Found $($encryptedComputers.Count) computers with encrypted LAPS"
+                        Write-Log "[Get-LAPSCredentialAccess] Найдено компьютеров с зашифрованными паролями LAPS: $($encryptedComputers.Count)"
 
                         # Step 3, 4 & 5: Parse Target SID, check authorization, decrypt if authorized
                         $authorizedCount = 0
@@ -228,11 +228,11 @@ function Get-LAPSCredentialAccess {
                             # in green, with no mention that there were passwords at all.
                             if (-not $readable) {
                                 $withheldCount++
-                                Write-Log "[Get-LAPSCredentialAccess] Encrypted LAPS password not readable for '$($comp.distinguishedName)'"
+                                Write-Log "[Get-LAPSCredentialAccess] Зашифрованный пароль LAPS недоступен для чтения у '$($comp.distinguishedName)'"
                             }
                         }
 
-                        Write-Log "[Get-LAPSCredentialAccess] User is authorized for $authorizedCount of $($encryptedComputers.Count) encrypted LAPS computers"
+                        Write-Log "[Get-LAPSCredentialAccess] Пользователь имеет доступ к $authorizedCount из $($encryptedComputers.Count) компьютеров с зашифрованными паролями LAPS"
                     }
                 } else {
                     # No token groups, so the authorization pre-check is unavailable. That
@@ -248,7 +248,7 @@ function Get-LAPSCredentialAccess {
                     # was dead, and nothing was counted as withheld either. On a domain
                     # using encrypted LAPS, a failed token-group lookup therefore ended the
                     # section with "No readable LAPS passwords found" in green.
-                    Write-Log "[Get-LAPSCredentialAccess] No token groups - sampling decryption instead"
+                    Write-Log "[Get-LAPSCredentialAccess] Группы токена отсутствуют — используется пробная расшифровка"
                     $encryptedComputers = @(Get-DomainComputer -LDAPFilter "(msLAPS-EncryptedPassword=*)" -Raw @PSBoundParameters)
 
                     $sampleDecrypts = $false
@@ -258,7 +258,7 @@ function Get-LAPSCredentialAccess {
                     }
 
                     if ($sampleDecrypts) {
-                        Write-Log "[Get-LAPSCredentialAccess] Fallback: decryption works, trying all $(@($encryptedComputers).Count)"
+                        Write-Log "[Get-LAPSCredentialAccess] Резервный метод: расшифровка работает, проверяются все $(@($encryptedComputers).Count) объектов"
                         foreach ($comp in $encryptedComputers) {
                             if (Resolve-LAPSEncryptedComputer -Computer $comp) {
                                 $readableComputers += $comp
@@ -293,7 +293,7 @@ function Get-LAPSCredentialAccess {
                 try {
                     $readerIsPrivileged = ((Test-IsPrivileged -Identity $readerName).IsPrivileged -eq $true)
                 } catch {
-                    Write-Log "[Get-LAPSCredentialAccess] Privilege check failed for '$readerName': $_"
+                    Write-Log "[Get-LAPSCredentialAccess] Ошибка проверки привилегий для '$readerName': $_"
                 }
             }
 
@@ -335,13 +335,13 @@ function Get-LAPSCredentialAccess {
             }
 
         } catch {
-            Write-Log "[Get-LAPSCredentialAccess] Error: $_" -Level Error
+            Write-Log "[Get-LAPSCredentialAccess] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить доступ к паролям LAPS: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-LAPSCredentialAccess] Check completed"
+        Write-Log "[Get-LAPSCredentialAccess] Проверка завершена"
     }
 }
 

@@ -54,7 +54,7 @@
     )
 
     begin {
-        Write-Log "[Get-AddComputerRights] Starting check"
+        Write-Log "[Get-AddComputerRights] Начата проверка"
     }
 
     process {
@@ -118,9 +118,9 @@
                     }
                 }
             } catch {
-                Write-Log "[Get-AddComputerRights] Could not read wellKnownObjects: $($_.Exception.Message)"
+                Write-Log "[Get-AddComputerRights] Не удалось прочитать wellKnownObjects: $($_.Exception.Message)"
             }
-            Write-Log "[Get-AddComputerRights] Default computer container: $computersContainerDN"
+            Write-Log "[Get-AddComputerRights] Контейнер компьютеров по умолчанию: $computersContainerDN"
 
             $createComputerAccounts = @()
 
@@ -140,7 +140,7 @@
 
                     # Skip ACEs with empty SID (can occur with orphaned/deleted principals)
                     if ([string]::IsNullOrEmpty($trusteeSID)) {
-                        Write-Log "[Get-AddComputerRights] Skipping ACE with empty SID"
+                        Write-Log "[Get-AddComputerRights] Пропущен ACE с пустым SID"
                         continue
                     }
 
@@ -163,7 +163,7 @@
                     # whatever the class. Comparing the filter with the container's class
                     # used to drop that last one.
                     if (-not (Test-ACEAppliesToSelf -ACE $ace)) {
-                        Write-Log "[Get-AddComputerRights] Skipping descendants-only ACE: $($ace.Trustee) ($trusteeSID), PropagationFlags=$($ace.PropagationFlags)"
+                        Write-Log "[Get-AddComputerRights] Пропущен ACE только для дочерних объектов: $($ace.Trustee) ($trusteeSID), PropagationFlags=$($ace.PropagationFlags)"
                         continue
                     }
 
@@ -185,13 +185,13 @@
                         # SELF, Creator Owner, Pre-Windows 2000 Compatible Access are NORMAL here
                         $expectedCheck = Test-IsExpectedACLIdentity -SID $trusteeSID -Context 'Container'
                         if ($expectedCheck.Skip) {
-                            Write-Log "[Get-AddComputerRights] Skipping expected identity: $($ace.Trustee) ($trusteeSID) - $($expectedCheck.Reason)"
+                            Write-Log "[Get-AddComputerRights] Пропущен ожидаемый субъект: $($ace.Trustee) ($trusteeSID) — $($expectedCheck.Reason)"
                             continue
                         }
 
                         # Skip Authenticated Users if quota > 0 (they already have implicit rights via quota)
                         if ($trusteeSID -eq 'S-1-5-11' -and $quotaValue -gt 0) {
-                            Write-Log "[Get-AddComputerRights] Skipping Authenticated Users ACL (already covered by quota)"
+                            Write-Log "[Get-AddComputerRights] Пропущен ACL Authenticated Users (уже учтён квотой)"
                             continue
                         }
 
@@ -203,12 +203,12 @@
                             $scopeResult = Test-IsExpectedInScope -Identity $trusteeSID -Scope 'ComputerContainerACL' -ReturnDetails
 
                             if ($scopeResult.Severity -eq 'Expected') {
-                                Write-Log "[Get-AddComputerRights] CreateChild (expected): $($ace.Trustee) - $($scopeResult.Reason)"
+                                Write-Log "[Get-AddComputerRights] CreateChild (ожидаемое право): $($ace.Trustee) — $($scopeResult.Reason)"
                                 continue
                             }
 
                             if ($scopeResult.Severity -eq 'Attention') {
-                                Write-Log "[Get-AddComputerRights] CreateChild (attention): $($ace.Trustee) - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)"
+                                Write-Log "[Get-AddComputerRights] CreateChild (требует внимания): $($ace.Trustee) — $($scopeResult.Reason); пропущено (для включения укажите -IncludePrivileged)"
                                 continue
                             }
 
@@ -217,7 +217,7 @@
                             # -IncludePrivileged: Show ALL accounts, but mark privileged ones for yellow display
                             $scopeResult = Test-IsExpectedInScope -Identity $trusteeSID -Scope 'ComputerContainerACL' -ReturnDetails
                             $severity = $scopeResult.Severity
-                            Write-Log "[Get-AddComputerRights] IncludePrivileged: Including $($ace.Trustee) ($trusteeSID) with severity $severity"
+                            Write-Log "[Get-AddComputerRights] IncludePrivileged: включён $($ace.Trustee) ($trusteeSID) с критичностью $severity"
                         }
 
                         $createComputerAccounts += [PSCustomObject]@{
@@ -475,13 +475,13 @@
             }
 
         } catch {
-            Write-Log "[Get-AddComputerRights] Error: $_" -Level Error
+            Write-Log "[Get-AddComputerRights] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить права добавления компьютеров в домен: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-AddComputerRights] Check completed"
+        Write-Log "[Get-AddComputerRights] Проверка завершена"
     }
 }
 
@@ -532,7 +532,7 @@ function Check-GPOAddComputerRights {
 
         # Build GPO precedence map using Get-GPOLinkage (which reliably reads gPLink via Invoke-LDAPSearch)
         # Filter to DC OU and domain root - these are the containers that determine effective DC policy
-        Write-Log "[Check-GPOAddComputerRights] Building GPO precedence map from GPO linkage data"
+        Write-Log "[Check-GPOAddComputerRights] Построение карты приоритета GPO по данным привязок политик"
         $Script:gpoAddComputerPrecedenceMap = @{}
 
         $allGPOLinkage = Get-GPOLinkage
@@ -563,7 +563,7 @@ function Check-GPOAddComputerRights {
                 }
             }
         }
-        Write-Log "[Check-GPOAddComputerRights] Precedence map: $($Script:gpoAddComputerPrecedenceMap.Count) GPO(s) linked to DC OU or domain root"
+        Write-Log "[Check-GPOAddComputerRights] Карта приоритета: $($Script:gpoAddComputerPrecedenceMap.Count) GPO связаны с OU контроллеров домена или корнем домена"
 
         # Use Invoke-SMBAccess for SYSVOL access (handles SimpleBind credentials and custom DNS)
         $Script:gpoAddComputerFindings = @()
@@ -572,7 +572,7 @@ function Check-GPOAddComputerRights {
             $sysvolPath = "\\$dcServer\SYSVOL\$DomainFQDN\Policies"
 
             if (-not (Test-Path $sysvolPath)) {
-                Write-Log "[Check-GPOAddComputerRights] SYSVOL path not accessible: $sysvolPath"
+                Write-Log "[Check-GPOAddComputerRights] Путь SYSVOL недоступен: $sysvolPath"
                 return
             }
 
@@ -746,7 +746,7 @@ function Check-GPOAddComputerRights {
             $effectiveGPO = $linkedResults | Sort-Object @{Expression={$scopePriority[$_._PrecedenceScope]}}, _PrecedenceOrder | Select-Object -First 1
             if ($effectiveGPO) {
                 $effectiveGPO._IsEffective = $true
-                Write-Log "[Check-GPOAddComputerRights] Effective GPO: '$($effectiveGPO.displayName)' (Scope=$($effectiveGPO._PrecedenceScope), LinkOrder=$($effectiveGPO._PrecedenceOrder))"
+                Write-Log "[Check-GPOAddComputerRights] Применяемая GPO: '$($effectiveGPO.displayName)' (Scope=$($effectiveGPO._PrecedenceScope), LinkOrder=$($effectiveGPO._PrecedenceOrder))"
             }
         }
 
@@ -769,7 +769,7 @@ function Check-GPOAddComputerRights {
 
         return $result
     } catch {
-        Write-Log "[Check-GPOAddComputerRights] Error: $_" -Level Error
+        Write-Log "[Check-GPOAddComputerRights] Ошибка: $_" -Level Error
         return @()
     }
 }

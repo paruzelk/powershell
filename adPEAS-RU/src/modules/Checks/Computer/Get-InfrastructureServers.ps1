@@ -62,7 +62,7 @@ function Show-SPNServiceAccounts {
         $accounts = @(Get-DomainObject -LDAPFilter "(&$SPNFilter(!(objectCategory=computer)))" `
             -Properties 'sAMAccountName', 'servicePrincipalName', 'objectClass', 'objectSid' @ConnectionParams)
     } catch {
-        Write-Log "[Get-InfrastructureServers] $ServiceName service account lookup failed: $_" -Level Error
+        Write-Log "[Get-InfrastructureServers] $ServiceName — ошибка поиска служебной учётной записи: $_" -Level Error
         Show-Line "Учётные записи службы $ServiceName прочитать не удалось — результат неизвестен, а не пуст" -Class "Note"
         return
     }
@@ -101,7 +101,7 @@ function Show-SPNServiceAccounts {
             try {
                 $privilegeCheck = Test-IsPrivileged -Identity $accountSID -IncludeOperators
             } catch {
-                Write-Log "[Get-InfrastructureServers] Could not evaluate privileges of $($account.sAMAccountName): $_"
+                Write-Log "[Get-InfrastructureServers] Не удалось проверить привилегии $($account.sAMAccountName): $_"
             }
         }
 
@@ -224,7 +224,7 @@ function Get-RegisteredDomainControllerDN {
         }
         return $registered
     } catch {
-        Write-Log "[Get-RegisteredDomainControllerDN] The configuration partition could not be read: $_"
+        Write-Log "[Get-RegisteredDomainControllerDN] Не удалось прочитать раздел Configuration: $_"
         return $null
     }
 }
@@ -297,7 +297,7 @@ function Get-InfrastructureServers {
     )
 
     begin {
-        Write-Log "[Get-InfrastructureServers] Starting check"
+        Write-Log "[Get-InfrastructureServers] Начата проверка"
     }
 
     process {
@@ -363,7 +363,7 @@ function Get-InfrastructureServers {
                 Show-Line "Контроллеры домена не найдены (неожиданный результат)" -Class "Note"
             }
         } catch {
-            Write-Log "[Get-InfrastructureServers] Domain Controller enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления контроллеров домена: $_" -Level Error
             Show-Line "Не удалось перечислить контроллеры домена; результат неизвестен, их отсутствие не подтверждено" -Class "Note"
         }
 
@@ -398,7 +398,7 @@ function Get-InfrastructureServers {
                     $exchangeVersionByName[$exchName.ToLowerInvariant()] = $(if ($serialBuild) { $serialBuild } else { $serialValue })
                 }
             } else {
-                Write-Log "[Get-InfrastructureServers] No Configuration naming context - falling back to SPN detection for Exchange"
+                Write-Log "[Get-InfrastructureServers] Отсутствует контекст Configuration — для Exchange используется поиск по SPN"
             }
 
             $exchangeServers = @()
@@ -431,7 +431,7 @@ function Get-InfrastructureServers {
                 Show-Line "Серверы Exchange не найдены" -Class "Note"
             }
         } catch {
-            Write-Log "[Get-InfrastructureServers] Exchange Server enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления серверов Exchange: $_" -Level Error
             Show-Line "Ошибка перечисления серверов Exchange; результат неизвестен" -Class "Note"
         }
 
@@ -462,7 +462,7 @@ function Get-InfrastructureServers {
                 -SPNPrefix @('MSSQLSvc/') -ConnectionParams $PSBoundParameters `
                 -PrivilegedFindingId 'MSSQL_SERVICE_ACCOUNT_PRIVILEGED'
         } catch {
-            Write-Log "[Get-InfrastructureServers] MSSQL Server enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления серверов MSSQL: $_" -Level Error
             Show-Line "Ошибка перечисления SQL Server; результат неизвестен" -Class "Note"
         }
 
@@ -490,7 +490,7 @@ function Get-InfrastructureServers {
             Show-SPNServiceAccounts -ServiceName 'SCCM' -SPNFilter "(|(servicePrincipalName=SMS*)(servicePrincipalName=CCM*))" `
                 -SPNPrefix @('SMS_', 'CCM') -ConnectionParams $PSBoundParameters
         } catch {
-            Write-Log "[Get-InfrastructureServers] SCCM Server enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления серверов SCCM: $_" -Level Error
             Show-Line "Не удалось перечислить серверы SCCM — результат неизвестен, а не пуст" -Class "Note"
         }
 
@@ -518,7 +518,7 @@ function Get-InfrastructureServers {
             Show-SPNServiceAccounts -ServiceName 'SCOM' -SPNFilter "(|(servicePrincipalName=MSOMHSvc/*)(servicePrincipalName=MSOMSdkSvc/*))" `
                 -SPNPrefix @('MSOMHSvc/', 'MSOMSdkSvc/') -ConnectionParams $PSBoundParameters
         } catch {
-            Write-Log "[Get-InfrastructureServers] SCOM Server enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления серверов SCOM: $_" -Level Error
             Show-Line "Не удалось перечислить серверы SCOM — результат неизвестен, а не пуст" -Class "Note"
         }
 
@@ -546,7 +546,7 @@ function Get-InfrastructureServers {
                 } catch {
                     # An absent container is the normal case in a domain without AD FS and
                     # must not read as an error
-                    Write-Log "[Get-InfrastructureServers] No AD FS DKM container under $dkmBase : $_"
+                    Write-Log "[Get-InfrastructureServers] Контейнер DKM AD FS по пути $dkmBase не найден: $_"
                 }
 
                 if ($dkmObjects.Count -gt 0) {
@@ -573,7 +573,7 @@ function Get-InfrastructureServers {
                     $adfsIndicators += $adfsServer
                 }
             } catch {
-                Write-Log "[Get-InfrastructureServers] AD FS server lookup failed: $_" -Level Error
+                Write-Log "[Get-InfrastructureServers] Ошибка поиска серверов AD FS: $_" -Level Error
                 Show-Line "Не удалось перечислить серверы AD FS; найденные контейнеры DKM при этом отображаются отдельно" -Class "Note"
             }
 
@@ -586,7 +586,7 @@ function Get-InfrastructureServers {
                 Show-Line "Развёртывание AD FS не обнаружено" -Class "Note"
             }
         } catch {
-            Write-Log "[Get-InfrastructureServers] AD FS enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления AD FS: $_" -Level Error
             Show-Line "Ошибка перечисления AD FS; результат неизвестен, отсутствие серверов не подтверждено" -Class "Note"
         }
 
@@ -644,12 +644,12 @@ function Get-InfrastructureServers {
                 Show-Line "Серверы Microsoft Entra Connect не найдены" -Class "Note"
             }
         } catch {
-            Write-Log "[Get-InfrastructureServers] Entra ID Connect enumeration failed: $_" -Level Error
+            Write-Log "[Get-InfrastructureServers] Ошибка перечисления Entra ID Connect: $_" -Level Error
             Show-Line "Не удалось перечислить серверы Entra ID Connect; результат неизвестен" -Class "Note"
         }
     }
 
     end {
-        Write-Log "[Get-InfrastructureServers] Check completed"
+        Write-Log "[Get-InfrastructureServers] Проверка завершена"
     }
 }

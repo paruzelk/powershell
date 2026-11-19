@@ -48,7 +48,7 @@
     )
 
     begin {
-        Write-Log "[Get-GPOLocalGroupMembership] Starting check"
+        Write-Log "[Get-GPOLocalGroupMembership] Начата проверка"
 
         # The local groups this check reports a membership assignment for.
         #
@@ -169,7 +169,7 @@
                 $sysvolPath = "\\$($Script:LDAPContext.Server)\SYSVOL\$domainFQDN\Policies"
 
                 if (-not (Test-Path $sysvolPath)) {
-                    Write-Log "[Get-GPOLocalGroupMembership] SYSVOL path not accessible: $sysvolPath"
+                    Write-Log "[Get-GPOLocalGroupMembership] Путь SYSVOL недоступен: $sysvolPath"
                     return
                 }
 
@@ -189,7 +189,7 @@
                         $gpoName = if ($gpoNameMap.ContainsKey($gpoGUID)) { $gpoNameMap[$gpoGUID] } else { $gpoGUID }
 
                         try {
-                            Write-Log "[Get-GPOLocalGroupMembership] Reading: $($file.FullName)"
+                            Write-Log "[Get-GPOLocalGroupMembership] Чтение: $($file.FullName)"
                             $restrictedGroupsFindings = Parse-RestrictedGroups -FilePath $file.FullName -GPOName $gpoName -GPOGUID $gpoGUID -GPOPath $gpoPathMap[([string]$gpoGUID).ToUpper()]
 
                             if ($restrictedGroupsFindings) {
@@ -245,7 +245,7 @@
                                 $Script:vulnerableGPOs += @($restrictedGroupsFindings)
                             }
                         } catch {
-                            Write-Log "[Get-GPOLocalGroupMembership] Error parsing $($file.FullName): $_"
+                            Write-Log "[Get-GPOLocalGroupMembership] Ошибка разбора $($file.FullName): $_"
                             Register-SYSVOLFileGap -Path $file.FullName -ErrorRecord $_
                         }
                     }
@@ -266,7 +266,7 @@
                         $gpoName = if ($gpoNameMap.ContainsKey($gpoGUID)) { $gpoNameMap[$gpoGUID] } else { $gpoGUID }
 
                         try {
-                            Write-Log "[Get-GPOLocalGroupMembership] Reading: $($file.FullName)"
+                            Write-Log "[Get-GPOLocalGroupMembership] Чтение: $($file.FullName)"
                             $gppGroupsFindings = Parse-GPPGroups -FilePath $file.FullName -GPOName $gpoName -GPOGUID $gpoGUID -GPOPath $gpoPathMap[([string]$gpoGUID).ToUpper()]
 
                             if ($gppGroupsFindings) {
@@ -315,7 +315,7 @@
                                 $Script:vulnerableGPOs += @($gppGroupsFindings)
                             }
                         } catch {
-                            Write-Log "[Get-GPOLocalGroupMembership] Error parsing $($file.FullName): $_"
+                            Write-Log "[Get-GPOLocalGroupMembership] Ошибка разбора $($file.FullName): $_"
                             Register-SYSVOLFileGap -Path $file.FullName -ErrorRecord $_
                         }
                     }
@@ -425,13 +425,13 @@
             }
 
         } catch {
-            Write-Log "[Get-GPOLocalGroupMembership] Error: $_" -Level Error
+            Write-Log "[Get-GPOLocalGroupMembership] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить назначения локальных групп через GPO: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-GPOLocalGroupMembership] Check completed"
+        Write-Log "[Get-GPOLocalGroupMembership] Проверка завершена"
     }
 }
 
@@ -480,11 +480,11 @@ function Resolve-LocalGroupTargetName {
     $resolved = $null
     try { $resolved = ConvertFrom-SID -SID $trimmed } catch { $resolved = $null }
     if ($resolved -and $resolved -ne $trimmed) {
-        Write-Log "[Resolve-LocalGroupTargetName] Target group $trimmed is not in the table - reported as '$resolved'"
+        Write-Log "[Resolve-LocalGroupTargetName] Целевая группа $trimmed отсутствует в таблице — в отчёте используется '$resolved'"
         return [string]$resolved
     }
 
-    Write-Log "[Resolve-LocalGroupTargetName] Target group $trimmed is not in the table and did not resolve to a name"
+    Write-Log "[Resolve-LocalGroupTargetName] Целевая группа $trimmed отсутствует в таблице, имя определить не удалось"
     return $trimmed
 }
 
@@ -600,11 +600,11 @@ function Resolve-RestrictedGroupSID {
     try {
         $resolved = ConvertTo-SID -Identity $trimmed
         if ($resolved) {
-            Write-Log "[Resolve-RestrictedGroupSID] Resolved name '$trimmed' to $resolved"
+            Write-Log "[Resolve-RestrictedGroupSID] Имя '$trimmed' преобразовано в $resolved"
             return [string]$resolved
         }
     } catch {
-        Write-Log "[Resolve-RestrictedGroupSID] Could not resolve '$trimmed' to a SID: $_"
+        Write-Log "[Resolve-RestrictedGroupSID] Не удалось определить SID для '$trimmed': $_"
     }
 
     return $trimmed
@@ -844,7 +844,7 @@ function Parse-RestrictedGroups {
 
         return $findings
     } catch {
-        Write-Log "[Parse-RestrictedGroups] Error parsing $FilePath : $_"
+        Write-Log "[Parse-RestrictedGroups] Ошибка разбора $FilePath : $_"
         Register-SYSVOLFileGap -Path $FilePath -ErrorRecord $_
         return $null
     }
@@ -1039,7 +1039,7 @@ function Parse-GPPGroups {
             # involved - see the note at the top of this loop. Everything else about it is
             # unknowable from one policy.
             if (-not $targetGroupKnown -and @($riskyMembers).Count -eq 0) {
-                Write-Log "[Parse-GPPGroups] Item for '$canonicalGroupName' names no BUILTIN group and no broad principal - not reported"
+                Write-Log "[Parse-GPPGroups] Элемент для '$canonicalGroupName' не содержит ни группы BUILTIN, ни субъекта с широкими правами — в отчёт не включён"
                 continue
             }
 
@@ -1084,7 +1084,7 @@ function Parse-GPPGroups {
 
         return $findings
     } catch {
-        Write-Log "[Parse-GPPGroups] Error parsing $FilePath : $_"
+        Write-Log "[Parse-GPPGroups] Ошибка разбора $FilePath : $_"
         Register-SYSVOLFileGap -Path $FilePath -ErrorRecord $_
         return $null
     }
