@@ -279,3 +279,7 @@ if(-not $?){throw 'Ошибка применения DOC6e'}
 # DOC6f: видимые статусы LDAP/Kerberos, ошибки, подсказки команд и справка.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC6fVisibleOutputsAndHelp.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации вывода DOC6f'}
+
+# DOC6g: предметная локализация вывода проверок привилегированных групп, домена и AD CS.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC6gSecurityChecks.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации DOC6g'}
