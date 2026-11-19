@@ -255,3 +255,7 @@ if(-not $?){throw 'Ошибка точечной локализации HTML DOC
 # DOC4i: исправление заголовков GPO и строк всплывающей оценки риска без изменения машинных данных.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC4iReportPolish.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка исправления отчёта DOC4i'}
+
+# DOC6a: безопасный перевод вычисленных пояснений по двум отчётам 19.11.2026.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC6aObservedValues.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации наблюдаемых HTML-значений DOC6a'}
