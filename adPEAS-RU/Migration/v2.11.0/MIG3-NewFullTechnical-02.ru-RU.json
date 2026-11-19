@@ -1,0 +1,311 @@
+﻿{
+  "Schema": "adPEAS-RU.MIG3.VerifiedFullTechnical.02",
+  "UpstreamCommit": "477696f48d6b486be5d9a99b598f72e3ccfcc0c0",
+  "Locale": "ru-RU",
+  "Translations": {
+    "CREDENTIAL_VNC_PASSWORD_HASH": {
+      "SourceEnglishDescription": "A Group Policy deploys a VNC password as a registry value, and the stored value is not the form that can be read back. RealVNC Server stores the password as a salted hash - PBKDF2, 20000 rounds by default - from 6.11.0 onwards wherever its own encryption is enabled. Its RSA/AES security types carry the password inside the encrypted channel, so the server checks the password against the hash instead of having to read the password back out of its own configuration, which is what the classic DES-keyed challenge required. That makes the stored value useless on its own: it is not a credential, holding it authenticates nobody, and with the layout undocumented there is nothing to crack it with either. What the value does say is worth reading: the machines the policy reaches run a VNC server, they authenticate against a shared VNC password rather than a Windows account, and every one of them has the same password.",
+      "description": "GPO распространяет пароль VNC в реестре в необратимом формате. Начиная с RealVNC Server 6.11.0, когда включено собственное шифрование, сервер хранит хеш с солью (PBKDF2, по умолчанию 20 000 итераций). Для защищённых RSA/AES-соединений сервер сверяет пароль с хешем, а не восстанавливает его; это отличается от старой DES-аутентификации. Само значение не даёт войти в VNC и не является готовыми учётными данными. Но политика раскрывает компьютеры с VNC и наличие единого общего пароля, не привязанного к учётным записям Windows.",
+      "SourceEnglishImpactDeclared": true,
+      "SourceEnglishImpactCount": 3,
+      "SourceEnglishImpact": [
+        "No password is recovered from the value itself - this is what it is, not what it opens",
+        "Names the machines that run a VNC server with password authentication, to every authenticated user who reads SYSVOL",
+        "One password for all of them: whoever learns it anywhere else reaches every machine in the policy's scope"
+      ],
+      "impact": [
+        "Из сохранённого значения пароль не извлекается — обнаружен хеш, а не обратимый секрет.",
+        "Любой пользователь с доступом к SYSVOL узнает, на каких компьютерах работает VNC с парольной аутентификацией.",
+        "Если общий пароль будет найден на другом узле, он подойдёт ко всем компьютерам в области действия политики."
+      ],
+      "SourceEnglishAttackDeclared": true,
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Read the policy from SYSVOL to learn which machines run a VNC server",
+        "2. Find those servers on the network (TCP 5900 upwards) and look for a password that can be read back - an older server that still stores the reversible form, a viewer's connection file with a saved password, or a host where the registry can be read",
+        "3. Use what recovers there against every machine the policy reaches, because they share the password"
+      ],
+      "attack": [
+        "1. Прочитать GPO в SYSVOL и определить компьютеры с сервером VNC.",
+        "2. Найти их сетевые службы (обычно TCP 5900 и выше) и другие источники обратимо сохранённого пароля: старый сервер VNC, файл подключений Viewer либо доступный реестр.",
+        "3. Использовать пароль, полученный из другого источника, на всех компьютерах, где политика задаёт тот же секрет."
+      ],
+      "SourceEnglishRemediationDeclared": true,
+      "SourceEnglishRemediationCount": 3,
+      "SourceEnglishRemediation": [
+        "Authenticate VNC against the Windows account (RealVNC system authentication, UltraVNC MS-Logon) instead of one shared VNC password",
+        "Do not deploy a VNC password by Group Policy: the policy itself tells every authenticated user which machines run a VNC server and that they share one password",
+        "Keep the VNC server's own encryption enabled - that is what makes the stored form irreversible, and turning it off converts the password back to the reversible one"
+      ],
+      "remediation": [
+        "Используйте VNC с аутентификацией через Windows (RealVNC system authentication или UltraVNC MS-Logon) вместо одного пароля на всех узлах.",
+        "Не распространяйте общий пароль VNC через GPO: политика раскрывает местоположение серверов и факт единого пароля.",
+        "Сохраняйте включённым штатное шифрование VNC, которое обеспечивает необратимый формат хранения; отключение может вернуть обратимый пароль."
+      ]
+    },
+    "COMPUTER_PASSWORD_NEVER_SET": {
+      "SourceEnglishDescription": "This computer account has never had a password set: pwdLastSet is 0, userAccountControl carries PASSWD_NOTREQD, and no Windows client ever joined it - operatingSystem and dNSHostName are empty. 'dsadd computer' creates computer accounts this way. The account has no Kerberos keys at all, but over NTLM it logs on with an empty password, so anyone who knows its name has a domain identity.",
+      "description": "Пароль компьютерной записи ни разу не задавался: pwdLastSet = 0, в userAccountControl установлен PASSWD_NOTREQD, а operatingSystem и dNSHostName пусты — Windows-клиент не присоединялся. Такую запись может создать dsadd computer. У записи нет ключей Kerberos, но NTLM допускает вход с пустым паролем; знание имени позволяет получить соответствующую доменную идентичность.",
+      "SourceEnglishImpactDeclared": true,
+      "SourceEnglishImpactCount": 3,
+      "SourceEnglishImpact": [
+        "A domain identity for anyone on the network who knows or guesses the account name - no password needed",
+        "Whatever the account was given in preparation for a join that never came - group memberships, delegated rights - comes with it",
+        "Where ms-DS-MachineAccountQuota is 0, it is the computer account an attacker could not create"
+      ],
+      "impact": [
+        "Субъект в сети, знающий или угадавший имя записи, получает доменную идентичность без знания пароля.",
+        "Доступны заранее назначенные записи группы и делегированные права, даже если компьютер так и не был присоединён.",
+        "При ms-DS-MachineAccountQuota = 0 это особенно существенно: нарушитель получает компьютерную запись, которую самостоятельно создать не мог."
+      ],
+      "SourceEnglishAttackDeclared": true,
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Attacker lists computer accounts without operatingSystem whose pwdLastSet is 0",
+        "2. Authenticates over NTLM as the account with an empty password",
+        "3. Uses the identity - to read the directory, through the account's own rights, or as the computer account an RBCD setup needs"
+      ],
+      "attack": [
+        "1. Найти компьютерные записи без operatingSystem и с pwdLastSet = 0.",
+        "2. Выполнить NTLM-вход от имени такой записи с пустым паролем.",
+        "3. Использовать предоставленные записи права, доступ к каталогу либо её идентичность для сценариев RBCD."
+      ],
+      "SourceEnglishRemediationDeclared": true,
+      "SourceEnglishRemediationCount": 3,
+      "SourceEnglishRemediation": [
+        "Join the computer the account was created for - the join sets a random password - or delete the account",
+        "Otherwise set a random password and clear PASSWD_NOTREQD",
+        "Create computer accounts in advance with a tool that sets a random password"
+      ],
+      "remediation": [
+        "Присоедините предусмотренный компьютер: операция задаёт случайный пароль, — либо удалите ненужную запись.",
+        "Если запись сохраняется отдельно, задайте случайный пароль и снимите PASSWD_NOTREQD.",
+        "Предварительно создавайте компьютерные записи средствами, устанавливающими случайный пароль."
+      ]
+    },
+    "COMPUTER_CREATION_PASSWORD_IN_USE": {
+      "SourceEnglishDescription": "This computer account has logged on, but no Windows client ever joined it - operatingSystem and dNSHostName are empty - and its password still dates from the creation of the account. A join sets a new password, so whatever uses this account uses the password it was created with. ADUC with 'Assign this computer account as a pre-Windows 2000 computer' and 'net computer /add' set that password to the computer name in lowercase; Kerberos issues a ticket for it, NTLM refuses a workstation account. A computer account created by a user through ms-DS-MachineAccountQuota - for an RBCD setup, for instance - looks the same, with ms-DS-CreatorSID naming the user. Invoke-PasswordSpray -Auto -ComputerDefault tests the default password, one Kerberos request per account.",
+      "description": "Запись компьютера использовалась для входа, но Windows-клиент не присоединялся (operatingSystem и dNSHostName пусты), а пароль остаётся первоначальным. Штатное присоединение меняет пароль. ADUC с вариантом pre-Windows 2000 и net computer /add задают пароль из имени компьютера в нижнем регистре; Kerberos может выдать билет, тогда как NTLM не допускает вход workstation account. Запись, созданная пользователем через ms-DS-MachineAccountQuota, в том числе для RBCD, может выглядеть аналогично; ms-DS-CreatorSID указывает её создателя. Invoke-PasswordSpray -Auto -ComputerDefault проверяет типовой пароль активным запросом Kerberos.",
+      "SourceEnglishImpactDeclared": true,
+      "SourceEnglishImpactCount": 2,
+      "SourceEnglishImpact": [
+        "If the creation password is the default, anyone who knows the name has the account",
+        "What uses it is not a joined Windows member: an appliance, a script - or someone who guessed the password"
+      ],
+      "impact": [
+        "Если первоначальный пароль предсказуем, любой знающий имя компьютера может использовать учётную запись.",
+        "Запись используется не присоединённым Windows-клиентом: её может применять устройство, сценарий либо посторонний субъект."
+      ],
+      "SourceEnglishAttackDeclared": true,
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Attacker lists computer accounts without operatingSystem whose password dates from their creation",
+        "2. Requests a Kerberos ticket for each with the computer name in lowercase",
+        "3. Uses the accounts that answer, and their rights"
+      ],
+      "attack": [
+        "1. Найти компьютерные записи без operatingSystem, пароль которых не менялся после создания.",
+        "2. Проверить предполагаемый пароль из имени компьютера в нижнем регистре запросом Kerberos.",
+        "3. Использовать доступные записи и их полномочия в случае успешной аутентификации."
+      ],
+      "SourceEnglishRemediationDeclared": true,
+      "SourceEnglishRemediationCount": 3,
+      "SourceEnglishRemediation": [
+        "Find out what uses the account; delete it if nothing should",
+        "Set a random password, and give it to the owner of what uses the account",
+        "Where ms-DS-CreatorSID names a user, find out why that user created a computer account"
+      ],
+      "remediation": [
+        "Выясните назначение записи и удалите её, если она не нужна.",
+        "Назначьте случайный пароль и передайте его владельцу системы, использующей запись.",
+        "Если ms-DS-CreatorSID указывает пользователя, выясните причину создания им компьютерной записи."
+      ]
+    },
+    "COMPUTER_PRECREATED_NOT_JOINED": {
+      "SourceEnglishDescription": "This computer account was created in advance and never joined or used: operatingSystem and dNSHostName are empty, lastLogonTimestamp is not set, and its password still dates from the creation of the account. How guessable that password is depends on the tool that created it: ADUC with 'Assign this computer account as a pre-Windows 2000 computer' and 'net computer /add' set the computer name in lowercase, ADUC without that option and New-ADComputer do not. Nothing in the directory tells these apart. One Kerberos request with the name in lowercase does - and a miss counts against the account's bad password count. Invoke-PasswordSpray -Auto -ComputerDefault makes that request for every such account.",
+      "description": "Компьютерная запись создана заранее, но ни разу не присоединялась и не входила: operatingSystem, dNSHostName и lastLogonTimestamp не заполнены, пароль неизменен с момента создания. Предсказуемость зависит от инструмента: ADUC с флагом pre-Windows 2000 и net computer /add устанавливают имя компьютера в нижнем регистре; ADUC без флага и New-ADComputer — нет. LDAP-данные не позволяют отличить эти варианты. Проверка пароля требует запроса Kerberos; неудача учитывается в badPwdCount. Invoke-PasswordSpray -Auto -ComputerDefault делает такие активные попытки по каждой записи; обычное сканирование их не выполняет.",
+      "SourceEnglishImpactDeclared": true,
+      "SourceEnglishImpactCount": 2,
+      "SourceEnglishImpact": [
+        "If the password is the default, anyone who knows the name gets a domain identity - and the account's first logon is theirs",
+        "Rights granted to the account in preparation for the join come with it"
+      ],
+      "impact": [
+        "При стандартном пароле знание имени даёт доменную идентичность, и первый вход в запись может выполнить нарушитель.",
+        "Заранее назначенные группы и делегированные права станут доступны использующему запись субъекту."
+      ],
+      "SourceEnglishAttackDeclared": true,
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Attacker lists enabled computer accounts without operatingSystem that never logged on",
+        "2. Requests a Kerberos ticket for each with the computer name in lowercase",
+        "3. Uses the accounts that answer"
+      ],
+      "attack": [
+        "1. Найти включённые компьютерные записи без operatingSystem, которые ещё не выполняли вход.",
+        "2. Проверить через Kerberos возможный пароль, равный имени компьютера в нижнем регистре.",
+        "3. Использовать записи, для которых запрос аутентификации успешен."
+      ],
+      "SourceEnglishRemediationDeclared": true,
+      "SourceEnglishRemediationCount": 2,
+      "SourceEnglishRemediation": [
+        "Join the computer the account was created for, or delete the account",
+        "Create computer accounts in advance without the pre-Windows 2000 option"
+      ],
+      "remediation": [
+        "Присоедините запланированный компьютер или удалите ненужную запись.",
+        "При предварительном создании не используйте вариант pre-Windows 2000 с предсказуемым паролем."
+      ]
+    },
+    "ADCS_TEMPLATE_OUTDATED_ALGORITHM": {
+      "SourceEnglishDescription": "A schema version 4 certificate template tells the enrolling client which algorithms to use, and one of them is outdated. The settings live in msPKI-RA-Application-Policies, which for such a template holds name-type-value triplets rather than the policy OIDs its name suggests (MS-CRTD syntax option 2), so they are easy to miss. Two of them matter. msPKI-Hash-Algorithm is the hash the client signs its request with: that signature is the proof that the requester holds the private key belonging to the public key in the request, and a hash open to collisions is as much proof as the hash is worth. msPKI-Symmetric-Algorithm and msPKI-Symmetric-Key-Length are used where the template archives the private key: the client encrypts the key with that algorithm before sending it to the CA, so the algorithm is the whole protection of a private key in transit and in the CA's archive. Note what this is not: the algorithm the CA signs the issued certificate with is the CA's own setting, not the template's.",
+      "description": "Шаблон сертификата версии схемы 4 предписывает клиенту устаревшие алгоритмы. Настройки содержатся в msPKI-RA-Application-Policies в формате троек имя–тип–значение, а не обычных OID (MS-CRTD, синтаксис 2). msPKI-Hash-Algorithm определяет хеш подписи запроса, доказывающей владение закрытым ключом. msPKI-Symmetric-Algorithm и msPKI-Symmetric-Key-Length определяют защиту архивируемого закрытого ключа при передаче в CA и его хранении. Слабый хеш ослабляет доказательство владения, слабый симметричный алгоритм — защиту закрытого ключа. Это не алгоритм подписи самого выданного сертификата: его выбирает CA отдельно.",
+      "SourceEnglishImpactDeclared": true,
+      "SourceEnglishImpactCount": 3,
+      "SourceEnglishImpact": [
+        "Where the template archives private keys, every key enrolled through it is wrapped with the named algorithm - a 56-bit or RC2 wrapper is recoverable, and the archived key belongs to the subject, not to the CA",
+        "A request signed with MD5 or SHA1 carries a proof of possession only as strong as that hash",
+        "The setting reaches every enrollment from this template, and a template is usually a copy of an older one - the same value tends to sit on several"
+      ],
+      "impact": [
+        "Когда ключи архивируются, каждый закрытый ключ обёрнут заданным алгоритмом; 56-битный ключ или RC2 могут быть преодолены, причём речь о ключе владельца, а не CA.",
+        "При MD5 или SHA-1 доказательство владения в запросе ограничено стойкостью этого хеша.",
+        "Небезопасная настройка действует на все регистрации по шаблону и часто переносится в скопированные шаблоны."
+      ],
+      "SourceEnglishAttackDeclared": true,
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Read the template from the Configuration partition, which every authenticated user may do, and note the algorithms it prescribes",
+        "2. Where key archival is on and the symmetric algorithm is weak, obtain an enrollment request - from the network, from the CA's request queue, or from its key archive - and unwrap the private key offline",
+        "3. Use the recovered private key with the certificate that was issued for it, as the subject it was issued to"
+      ],
+      "attack": [
+        "1. Прочитать свойства шаблона из раздела Configuration и определить предписанные алгоритмы.",
+        "2. При слабом алгоритме архивирования получить запрос из сетевого обмена, очереди CA или архива ключей и попытаться раскрыть закрытый ключ вне системы.",
+        "3. Применить восстановленный ключ с соответствующим выданным сертификатом от имени его субъекта."
+      ],
+      "SourceEnglishRemediationDeclared": true,
+      "SourceEnglishRemediationCount": 4,
+      "SourceEnglishRemediation": [
+        "In certtmpl.msc, Cryptography tab of the template: set the request hash to SHA256 or stronger",
+        "Where the template archives the subject's key, choose AES-256 for the archival algorithm instead of a 3DES or DES default",
+        "Re-enroll the certificates issued from the template whose private key was archived under the weak algorithm - changing the template does not re-protect a key already in the archive",
+        "Check the templates this one was copied from and copied to: the setting travels with the copy"
+      ],
+      "remediation": [
+        "В certtmpl.msc на вкладке Cryptography задайте для подписи запроса SHA-256 или более стойкий алгоритм.",
+        "При архивировании закрытого ключа субъекта выберите AES-256 вместо 3DES или DES.",
+        "Перевыпустите сертификаты, ключи которых уже архивированы со слабой защитой: изменение шаблона не перешифрует старые данные.",
+        "Проверьте исходный шаблон и его копии: настройки распространяются при копировании."
+      ]
+    },
+    "WEB_ENDPOINT_EPA_ACCEPT": {
+      "SourceEnglishDescription": "This web endpoint has Extended Protection for Authentication (EPA) set to Accept (IIS tokenChecking Allow) rather than Required. adPEAS logged on three times: with the TLS channel binding, without a binding, and with the binding of another channel. Accept took the logon without a binding and rejected the foreign one. Measured against IIS, Accept rejects a logon that carries a binding of no or another channel - every current Windows client sends one, a zero binding when it has no channel, so the relay of a coerced Windows machine or user fails - and takes only a logon that carries no binding at all, the logon of an NTLM client that implements no channel binding.",
+      "description": "Веб-служба настроена с EPA в режиме Accept (IIS tokenChecking Allow), а не Required. adPEAS проверил три входа: с привязкой к TLS-каналу, без привязки и с привязкой к другому каналу. Вход без привязки прошёл, с чужой — отклонён. В IIS Accept отвергает нулевую или чужую привязку, которую передают современные Windows-клиенты, поэтому типичная ретрансляция NTLM от принуждённого клиента не проходит. Принимается только NTLM-клиент, который вообще не поддерживает channel binding. Режим Accept нельзя трактовать как отключённую EPA.",
+      "SourceEnglishImpactDeclared": true,
+      "SourceEnglishImpactCount": 3,
+      "SourceEnglishImpact": [
+        "The relay of a Windows client's NTLM logon is rejected, whether it was captured over SMB, plain HTTP or another TLS channel",
+        "A logon from an NTLM client without channel binding support is accepted unbound and can be relayed to this endpoint",
+        "The configuration is one setting away from Required, which Microsoft recommends for Exchange and AD CS web enrollment"
+      ],
+      "impact": [
+        "Ретрансляция NTLM Windows-клиента отклоняется при перехвате по SMB, HTTP либо другому TLS-каналу.",
+        "NTLM-клиент без поддержки channel binding может войти без привязки; его аутентификация допускает ретрансляцию.",
+        "Microsoft рекомендует Required для Exchange и веб-регистрации AD CS; от него настройка отличается одним параметром."
+      ],
+      "SourceEnglishAttackDeclared": true,
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Capture the NTLM logon of an account whose client implements no channel binding",
+        "2. Relay it to this endpoint, which accepts a logon without a binding",
+        "3. Act as the relayed identity against the endpoint"
+      ],
+      "attack": [
+        "1. Получить NTLM-вход клиента, не реализующего channel binding.",
+        "2. Ретранслировать его на конечную точку, которая принимает вход без привязки.",
+        "3. Выполнить разрешённые операции от имени ретранслированной учётной записи."
+      ],
+      "SourceEnglishRemediationDeclared": true,
+      "SourceEnglishRemediationCount": 2,
+      "SourceEnglishRemediation": [
+        "Set Extended Protection to Required on this virtual directory once every client that authenticates to it supports channel binding",
+        "Find the clients that still log on without a binding before switching - they are the ones Required will reject"
+      ],
+      "remediation": [
+        "После проверки совместимости клиентов установите EPA Required для соответствующего виртуального каталога.",
+        "Предварительно найдите клиенты, всё ещё входящие без channel binding: режим Required отклонит их запросы."
+      ]
+    },
+    "WEB_ENDPOINT_EPA_SERVICE_BINDING": {
+      "SourceEnglishDescription": "This web endpoint does not verify the TLS channel binding but checks the service binding instead: the SPN the client named in its NTLM logon must be one the server lists. That is what IIS does with the Proxy flag set on Extended Protection, for a server whose TLS ends at a proxy in front of it, and the only protection plain HTTP can have. adPEAS logged on naming this server and naming another host; only the first was accepted. Measured against IIS, a logon relayed from a client that authenticated to the attacker names the attacker and is rejected, and so is the zero binding a Windows client sends without a channel. What remains is a client that names this server's own SPN while talking to the attacker over TLS - a victim whose name resolution the attacker controls - and only if it accepts the attacker's certificate for that name, because a binding that is not zero passes unverified.",
+      "description": "Веб-служба проверяет привязку NTLM к имени службы (SPN), а не к TLS-каналу. Так IIS работает с флагом Extended Protection Proxy, если TLS завершается на прокси перед сервером; для обычного HTTP это единственный доступный вид защиты. adPEAS смог войти с SPN настоящего сервера, но не другого узла. Обычная ретрансляция с именем нарушителя и нулевая привязка Windows-клиента без TLS отклоняются. Остаточный риск: при подмене разрешения имени жертва может обратиться по TLS к нарушителю, назвав настоящий SPN, и принять его сертификат; непустая привязка при этом не проверяется.",
+      "SourceEnglishImpactDeclared": true,
+      "SourceEnglishImpactCount": 3,
+      "SourceEnglishImpact": [
+        "The relay of a logon that names another host - every ordinary relay - is rejected",
+        "A Windows client without a channel, coerced over SMB or plain HTTP, sends a zero binding and is rejected",
+        "A client deceived into naming this server over TLS, and trusting the attacker's certificate for that name, can be relayed: the binding is not verified"
+      ],
+      "impact": [
+        "Обычная ретрансляция с SPN другого узла отклоняется.",
+        "Windows-клиент, принуждённый к входу по SMB или HTTP без TLS, передаёт нулевую привязку и тоже отклоняется.",
+        "Клиент, обманутый относительно имени сервера и доверяющий сертификату нарушителя, может быть перенаправлен: непустая TLS-привязка не проверяется."
+      ],
+      "SourceEnglishAttackDeclared": true,
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Control the victim's name resolution for this server's name (DNS, LLMNR/NBT-NS or ADIDNS records)",
+        "2. Present a certificate for that name the victim trusts, so that its TLS session to the attacker succeeds",
+        "3. Relay the victim's NTLM logon, which names this server and carries an unverifiable binding, to this endpoint"
+      ],
+      "attack": [
+        "1. Подменить разрешение имени целевого сервера для клиента через DNS, LLMNR/NBT-NS либо ADIDNS.",
+        "2. Предъявить сертификат для имени сервера, которому клиент доверяет, установив TLS-сеанс с узлом нарушителя.",
+        "3. Ретранслировать NTLM-вход клиента с SPN настоящего сервера и непроверяемой привязкой на целевую службу."
+      ],
+      "SourceEnglishRemediationDeclared": true,
+      "SourceEnglishRemediationCount": 3,
+      "SourceEnglishRemediation": [
+        "Where TLS can end on the IIS server itself, enable Extended Protection there without the Proxy flag, so that the channel binding is verified",
+        "Keep the SPN list to the names clients actually use for this endpoint",
+        "Disable the plain HTTP binding where no client needs it"
+      ],
+      "remediation": [
+        "Когда TLS можно завершать на самом IIS, включите EPA без флага Proxy, чтобы проверять настоящую привязку к каналу.",
+        "Оставьте в перечне SPN только имена, которые действительно используют клиенты.",
+        "Отключите HTTP, если он не требуется."
+      ]
+    },
+    "MSA_READER_DELETED": {
+      "SourceEnglishDescription": "msDS-GroupMSAMembership of this managed service account names a SID of this domain that no object carries any more, and that no account holds in its sIDHistory either. The principal it stood for has been deleted. A SID is never issued again, so no account can ever hold this entry, and nobody retrieves the password - or, on a delegated Managed Service Account, uses it - through it. It is a stale entry. Seen from an account that is not privileged, the same picture can also mean an object that account may not read; the row then says so.",
+      "description": "В msDS-GroupMSAMembership управляемой служебной записи указан SID домена, которому больше не соответствует существующий объект и который не найден в sIDHistory. Прежний субъект удалён; SID не переиспользуется, поэтому это разрешение более не позволяет получить пароль gMSA или использовать dMSA. Запись устарела. В непривилегированном контексте похожий результат иногда означает объект, недоступный для чтения; проверка отдельно указывает эту неопределённость.",
+      "SourceEnglishImpactDeclared": true,
+      "SourceEnglishImpactCount": 3,
+      "SourceEnglishImpact": [
+        "Nobody can use the entry: the SID belongs to no account and is never reissued",
+        "Restoring the deleted principal from the Recycle Bin would bring it back with its SID - which takes a privileged account",
+        "The entry makes the list harder to review, and an unreadable SID is easily taken for an unknown reader"
+      ],
+      "impact": [
+        "Запись не даёт доступа: SID больше не принадлежит существующему субъекту и не будет выдан повторно.",
+        "Восстановление субъекта из AD Recycle Bin вернёт его прежний SID; для этого требуются привилегии.",
+        "Устаревшее разрешение затрудняет аудит, а SID скрытого объекта легко ошибочно принять за неизвестного получателя."
+      ],
+      "SourceEnglishAttackDeclared": false,
+      "SourceEnglishAttackCount": 0,
+      "SourceEnglishAttack": [],
+      "attack": [],
+      "SourceEnglishRemediationDeclared": true,
+      "SourceEnglishRemediationCount": 2,
+      "SourceEnglishRemediation": [
+        "Remove the entry, so the list names only the hosts that run the service",
+        "Re-set PrincipalsAllowedToRetrieveManagedPassword to the principals that should be there - Set-ADServiceAccount writes the whole list"
+      ],
+      "remediation": [
+        "Удалите устаревшую запись, чтобы перечень разрешённых субъектов соответствовал реально используемым служебным компьютерам.",
+        "Повторно задайте PrincipalsAllowedToRetrieveManagedPassword для необходимых субъектов. Set-ADServiceAccount заменяет список целиком."
+      ]
+    }
+  }
+}
