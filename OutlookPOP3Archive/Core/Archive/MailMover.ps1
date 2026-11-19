@@ -202,9 +202,21 @@ function New-OPAArchivePst {
     param(
         [Parameter(Mandatory=$true)][object]$Namespace,
         [Parameter(Mandatory=$true)][string]$ArchivePst,
-        [string]$AccountEmail
+        [string]$AccountEmail,
+        [switch]$ARCH3oRequireNewUnusedPst
     )
 
+    # ARCH3o: original creator must NEVER open an existing/mounted archive
+    # when the operator explicitly pins a fresh Year 2020 Part2. Default
+    # behavior is identical for all legacy callers without this switch.
+    if($ARCH3oRequireNewUnusedPst){
+        if([IO.File]::Exists($ArchivePst) -or [IO.Directory]::Exists($ArchivePst)){
+            throw 'ARCH3o original New-OPAArchivePst requires a NEW absent target.'
+        }
+        if($null -ne (Get-OpaStoreByPathCached -Namespace $Namespace -Path $ArchivePst)){
+            throw 'ARCH3o original New-OPAArchivePst refuses a mounted existing store.'
+        }
+    }
     $store = Get-OpaStoreByPathCached -Namespace $Namespace -Path $ArchivePst
     if ($null -eq $store) {
         $target = [IO.Path]::GetFullPath($ArchivePst)
@@ -214,6 +226,9 @@ function New-OPAArchivePst {
             New-Item -ItemType Directory -Path $dir -Force | Out-Null
         }
 
+        if($ARCH3oRequireNewUnusedPst -and (Test-Path -LiteralPath $target)){
+            throw 'ARCH3o target appeared immediately before AddStoreEx. No Attach/Overwrite.'
+        }
         if (-not (Test-Path -LiteralPath $target)) {
             # AddStoreEx StoreType: 2 = olStoreUnicode (new PSTs must be
             # Unicode to avoid the legacy ANSI size limits).
@@ -1129,3 +1144,79 @@ function Move-OPAItemsWithLimit {
 }
 # Backward-compat alias. New callers should use New-OPAArchivePst.
 Set-Alias -Name Ensure-OPAArchivePst -Value New-OPAArchivePst -Scope Script
+
+
+# ARCH3o: Exactly ONE operator-pinned real test-PST Outlook MailItem.Move,
+# inside the ORIGINAL MailMover module. Called ONLY with a durably sealed
+# ARCH3o-MoveClaimed CreateNew record, and a SECOND provider-invocation fence.
+# Do not use this for production Archive/Resume/Auto or batch movement.
+function Invoke-OPA265ARCH3oOneOriginalMailMoverProviderCall {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][object]$Mail,
+        [Parameter(Mandatory=$true)][object]$Folder,
+        [Parameter(Mandatory=$true)][string]$RunId,
+        [Parameter(Mandatory=$true)][string]$ClaimSha256
+    )
+    if($RunId -cne '9d276dc4-a0e6-4e74-891f-81502fafe7db' -or
+       $ClaimSha256 -cnotmatch '^[a-f0-9]{64}$'){
+        throw 'ARCH3o provider identity not pinned to operator ARCH3j one-shot.'
+    }
+    $root=Join-Path $env:LOCALAPPDATA ('OPA265-ARCH3j-'+$RunId)
+    if(-not [IO.Directory]::Exists($root) -or
+       (([IO.File]::GetAttributes($root) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
+        throw 'ARCH3o provider protected operator workspace missing or redirected.'
+    }
+    [void](Assert-OPA265ARCH2c2PrivateWorkspaceAcl -WorkspacePath $root)
+    $claim=Read-OPA265ARCH3cPinnedJson -Path (Join-Path $root 'ARCH3o-MoveClaimed.json') -ExpectedSha256 $ClaimSha256
+    if([string]$claim.Schema -cne '2.6.5-ARCH3o.RealOneShotMoveClaim.1' -or
+       [string]$claim.RunId -cne $RunId -or
+       [string]$claim.IntentSha256 -cne 'f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b' -or
+       [string]$claim.JournalSha256 -cne 'a19f113a6454b1d17333c9a53fc22d065876754b9fbab3167087487d0b2b981e' -or
+       [string]$claim.SourceEntryId -cne '00000000E1878292411BC64291BD506DCEFD2A35E4FC3B00' -or
+       [string]$claim.SourceEntryId -cne [string]$Mail.EntryID -or
+       [int]$Mail.Class -ne 43 -or
+       [string]$claim.OriginalWitnessSha256 -cne '8782b410253f54cc5374661077cdfc9279bcfba12805f0dab42b461320cb999c' -or
+       [string]$claim.DestinationFolderEntryId -cne [string]$Folder.EntryID -or
+       [string]$claim.DestinationStoreId -cne [string]$Folder.StoreID -or
+       [string]$claim.NewArchivePst -cne 'C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.Archive-2020-02.pst' -or
+       -not [bool]$claim.OperatorApprovedOneRealMove -or
+       [bool]$claim.AutomaticRetryAllowed -or [bool]$claim.ProductionReady){
+        throw 'ARCH3o provider claim does not match original operator source/Part2.'
+    }
+    $record=[pscustomobject][ordered]@{
+        Schema='2.6.5-ARCH3o.ProviderInvocation.1'
+        RunId=$RunId
+        ClaimSha256=$ClaimSha256
+        SourceEntryId=[string]$claim.SourceEntryId
+        NewArchivePst=[string]$claim.NewArchivePst
+        DestinationFolderEntryId=[string]$Folder.EntryID
+        OneProviderInvocationOnly=$true
+        AutomaticRetryAllowed=$false
+        ProductionReady=$false
+    }
+    # CreateNew + Flush(true) before COM: if process dies during Move, second
+    # invocation is impossible even when previous MoveReturned is missing.
+    $invocationSha=Write-OPA265ARCH3cJsonOnce -Path (Join-Path $root 'ARCH3o-ProviderInvocation.json') -Record $record
+    $moved=$null
+    try{
+        $moved=$Mail.Move($Folder)
+        if($null -eq $moved -or [string]::IsNullOrWhiteSpace([string]$moved.EntryID) -or
+           [int]$moved.Class -ne 43){
+            throw 'ARCH3o Outlook COM Move outcome UNKNOWN: no automatic replay.'
+        }
+        return [pscustomobject]@{
+            Schema='2.6.5-ARCH3o.OriginalMailMoverProviderReturned.1'
+            RunId=$RunId
+            DestinationEntryId=[string]$moved.EntryID
+            ProviderInvocationSha256=$invocationSha
+            OneMoveReturned=$true
+            IndependentPostRestartVerified=$false
+            AutomaticRetryAllowed=$false
+        }
+    }finally{
+        if($null -ne $moved -and $moved -is [__ComObject]){
+            [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($moved)
+        }
+    }
+}
