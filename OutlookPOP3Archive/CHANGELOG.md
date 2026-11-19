@@ -1,3 +1,9 @@
+## 2.6.5-ARCH3s DEV — 2026-11-19
+- User confirmed ARCH3r historical real one-mail completed checkpoint and ten fake original semantic/journal/index PASS; original shared 501-entry index unchanged.
+- NEW fake Outlook ten MailItems with actual namespace GetItemFromID, Store.GetRootFolder, real original full ARCH2b MailItem semantic builder, per-recipient and attachment SaveAsFile TEMP byte SHA; UNMODIFIED ORIGINAL ArchiveVerifier Test-OPAArchiveMoves validates exactly ten target and source zero.
+- After full original verifier PASS only: reuse ARCH3r TEMP-only original OperationJournal and append-only DuplicateIndex with crash injection AfterJournalReconciled or AfterIndexAppend, fail closed on missing/duplicate/ambiguous content, no Move or original production writes.
+- 23 new Pester, expected full 4536 / 153 Windows PowerShell 5.1 CI, project-only ZIP and SHA256, ProductionReady=False. No real 10-item Outlook COM yet.
+
 ## 2.6.5-ARCH3r DEV — 2026-11-19
 - User completed real ARCH3q Seal/Commit/Status/independent Review PASS: original journal Reconciled, original shared index 501. Historical SHA pinned: original journal 6c0a0fc5..., shared JSONL 5ada35eb..., original final commit seal 0fa26ba6...
 - New read-only real checkpoint Plan/Audit reuses ORIGINAL ARCH3q Reconciled resolver, original shared DuplicateIndex importer, original full semantic witness and independent final SHA readback; no Outlook writer or data mutation.

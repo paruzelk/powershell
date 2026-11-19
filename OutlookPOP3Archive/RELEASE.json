@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3s DEV: unmodified ORIGINAL Test-OPAArchiveMoves with ten fake Outlook MailItems, actual original ARCH2b semantic builder including private TEMP SaveAsFile attachment byte SHA, exact source absent/archive ten and stale-ID uniqueness; after PASS only original ARCH3r TEMP journal/index integration with crash faults. 23 new Pester; full expected 4536/153 Windows PS5.1. NO real Outlook batch or writer.",
     "ARCH3r DEV: completed user real ARCH3q one-item journal Reconciled+shared DuplicateIndex 501 final independent readback PASS, pinned immutable historical SHA; new read-only original checkpoint audit plus 10 fake-only OS TEMP original full ARCH2b semantic compare, original journal/index and crash/fault matrix. No 10-item original Outlook ArchiveVerifier or production writer. 27 new Pester, expected full 4513 tests/152 containers Windows PS5.1.",
     "ARCH3q DEV: accepted real ARCH3o+ARCH3p independent original verifier PASS; new protected real independent Seal and explicitly controlled original OperationJournal Reconciled then shared append-only DuplicateIndex 500->501 and independent readback; partial post-Reconciled index recovery NEVER replays Move. 23 new Pester, expected 4486/151 Windows PS5.1; production writer closed.",
     "ARCH3p DEV READ ONLY: independent REAL Outlook process restart and ORIGINAL ArchiveVerifier full semantic witness for exactly one archived POP3 item after ARCH3o. Pins all original durable claim/provider SHA stages, tolerates missing receipt only after provider invocation, no Move/Resume or premature Original Journal/Index mutation. 21 new Pester, expected full 4463/150 Windows PS5.1. NOT production certified.",
@@ -96,8 +97,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 152,
-    "ExpectedPesterTests": 4513,
+    "ExpectedTestContainers": 153,
+    "ExpectedPesterTests": 4536,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

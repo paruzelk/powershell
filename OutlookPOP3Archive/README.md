@@ -1,6 +1,19 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3s — оригинальный `ArchiveVerifier` на десяти fake Outlook MailItems (без реальных PST)
+
+Развивает успешный ARCH3r: не модифицируя original `ArchiveVerifier.ps1`, запускает `Test-OPAArchiveMoves` на десяти fake MailItem с реальным оригинальным ARCH2b full semantic SHA (Body/HTML/Recipients/attachment `SaveAsFile`), source absent и exactly 10 destination objects. Только после полного PASS разрешена **TEMP-only** интеграция original OperationJournal / DuplicateIndex. Для следующего этапа остаётся восстановление частичного пакетного commit и затем отдельно авторизованный реальный тестовый batch; `WriterPermit=False`.
+
+```powershell
+.\Invoke-ARCH3s.ps1 -Mode VerifierOnly | Format-List
+.\Invoke-ARCH3s.ps1 -Mode Integration | Format-List
+.\Invoke-ARCH3s.ps1 -Mode Integration -VerifierFault AttachmentDrift -FaultAt 4 | Format-List
+.\Invoke-ARCH3s.ps1 -Mode Integration -JournalFault AfterIndexAppend -FaultAt 2 | Format-List
+```
+
+Все ключи, значения, ожидаемые статусы и пределы: [ARCH3s](docs/2.6.5-arch3s-original-verifier-fake-ten.md). Существующий завершённый ARCH3q journal/index checkpoint не меняется.
+
 ### ARCH3r — завершённый реальный checkpoint ARCH3q и 10 синтетических писем (CI-only)
 
 Оператор завершил реальный ARCH3o → ARCH3p → ARCH3q: **один реальный `MailItem.Move`**, новый PID Outlook и ORIGINAL `ArchiveVerifier` подтвердили source absent / archive one / полный semantic match; оригинальный `OperationJournal` содержит `Intent → Reconciled`, общий `DuplicateIndex` увеличился **500 → 501**, независимый `Readback` PASS. ARCH3r проверяет эти результаты в `Plan/Audit` со строгими закреплёнными SHA и реализует `Synthetic10` только в **OS TEMP** через оригинальный full semantic comparer, OperationJournal и DuplicateIndex. На реальный архив и индекс ARCH3r ничего не записывает.

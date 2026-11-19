@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3s (2026-11-19):** User real ARCH3q completed one-shot and ARCH3r read-only checkpoint + 10 synthetic journal/index checks PASS. [ARCH3s ORIGINAL ArchiveVerifier executes ten fake MailItems with full ORIGINAL ARCH2b semantic and SaveAsFile attachment SHA](2.6.5-arch3s-original-verifier-fake-ten.md); only after exact ten PASS, original TEMP-only journal/index integration with injected partial commit. Next gate: prove idempotent index-only recovery and authorize separate TEST-PST real batch-10. ProductionReady=False.
+
+
 > **ARCH3r (2026-11-19):** User confirmed **ARCH3q real final readback PASS**: original `OperationJournal Intent→Reconciled`, original shared `DuplicateIndex` **501**, immutable SHA checkpoints preserved. [ARCH3r completed real pilot historical checkpoint + TEMP-only 10-message original semantic/journal/index fault-injection suite](2.6.5-arch3r-completed-checkpoint-and-synthetic-ten.md). No real batch writer; independent original Outlook `Test-OPAArchiveMoves` for ten not yet integrated, next barrier. ProductionReady=False.
 
 
