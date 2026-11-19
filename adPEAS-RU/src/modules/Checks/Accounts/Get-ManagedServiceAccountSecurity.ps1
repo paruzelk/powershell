@@ -78,7 +78,7 @@
     )
 
     begin {
-        Write-Log "[Get-ManagedServiceAccountSecurity] Starting check"
+        Write-Log "[Get-ManagedServiceAccountSecurity] Начата проверка"
     }
 
     process {
@@ -97,14 +97,14 @@
             Show-SubHeader "Анализ защищённости управляемых учётных записей служб..." -ObjectType "gMSA"
 
             # ===== Check 1: gMSA Password Access Analysis =====
-            Write-Log "[Get-ManagedServiceAccountSecurity] Checking gMSA password access permissions"
+            Write-Log "[Get-ManagedServiceAccountSecurity] Проверка прав чтения паролей gMSA"
 
             # Get all gMSAs with details (includes msds-groupmsamembership)
             $gmsaAccounts = @(Get-DomainUser -GMSA -ShowGMSADetails @PSBoundParameters |
                 Where-Object { $_.objectClass -icontains 'msDS-GroupManagedServiceAccount' })
 
             if ($gmsaAccounts.Count -gt 0) {
-                Write-Log "[Get-ManagedServiceAccountSecurity] Found $($gmsaAccounts.Count) gMSA account(s)"
+                Write-Log "[Get-ManagedServiceAccountSecurity] Найдено учётных записей gMSA: $($gmsaAccounts.Count)"
 
                 $nonPrivilegedAccessFindings = @()
 
@@ -156,7 +156,7 @@
                         $gmsaReaderSIDs[$gmsaName] = @($descriptor.SIDs)
                     } catch {
                         $unparsedGMSAs += $gmsaName
-                        Write-Log "[Get-ManagedServiceAccountSecurity] Failed to parse msDS-GroupMSAMembership for $gmsaName : $_"
+                        Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось разобрать msDS-GroupMSAMembership для $gmsaName : $_"
                     }
                 }
                 if ($totalGMSAs -gt $Script:ProgressThreshold) { Show-Progress -Activity "Analyzing gMSA security" -Completed }
@@ -328,7 +328,7 @@
                             $expiresValue -gt 0 -and $expiresValue -ne 9223372036854775807) {
                             $expiryText = 'unreadable'
                             try { $expiryText = Format-adPEASDate ([DateTime]::FromFileTimeUtc($expiresValue)) 'yyyy-MM-dd' } catch {
-                                Write-Log "[Get-ManagedServiceAccountSecurity] Could not read accountExpires of $($gmsa.sAMAccountName): $_"
+                                Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось прочитать accountExpires для $($gmsa.sAMAccountName): $_"
                             }
                         }
                     }
@@ -345,7 +345,7 @@
                 }
 
                 # ===== Check 2: Attempt to read gMSA passwords =====
-                Write-Log "[Get-ManagedServiceAccountSecurity] Attempting to read gMSA passwords"
+                Write-Log "[Get-ManagedServiceAccountSecurity] Попытка чтения паролей gMSA"
                 Show-SubHeader "Проверка доступа текущего пользователя к паролям gMSA..." -ObjectType "gMSAPassword"
 
                 $passwordsRetrieved = 0
@@ -364,7 +364,7 @@
                     $gmsaName = $gmsa.sAMAccountName
                     $gmsaDN = $gmsa.distinguishedName
 
-                    Write-Log "[Get-ManagedServiceAccountSecurity] Attempting to read password for $gmsaName"
+                    Write-Log "[Get-ManagedServiceAccountSecurity] Попытка чтения пароля для $gmsaName"
 
                     try {
                         # Query msDS-ManagedPassword - this is a constructed attribute
@@ -425,17 +425,17 @@
                                     Show-Line "NT-хеш можно использовать для Pass-the-Hash, Overpass-the-Hash или имитации DCSync" -Class Hint
                                     Show-EmptyLine
                                 } else {
-                                    Write-Log "[Get-ManagedServiceAccountSecurity] Failed to parse password blob for $gmsaName"
+                                    Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось разобрать блок данных пароля для $gmsaName"
                                 }
                             } else {
-                                Write-Log "[Get-ManagedServiceAccountSecurity] Password blob is empty or invalid type for $gmsaName"
+                                Write-Log "[Get-ManagedServiceAccountSecurity] Блок данных пароля пуст или имеет неверный тип для $gmsaName"
                             }
                         } else {
-                            Write-Log "[Get-ManagedServiceAccountSecurity] No msDS-ManagedPassword returned for $gmsaName (access denied or not available)"
+                            Write-Log "[Get-ManagedServiceAccountSecurity] Атрибут msDS-ManagedPassword для $gmsaName не возвращён (нет доступа или недоступен)"
                         }
                     } catch {
                         $readFailures++
-                        Write-Log "[Get-ManagedServiceAccountSecurity] Error reading password for $gmsaName : $_"
+                        Write-Log "[Get-ManagedServiceAccountSecurity] Ошибка чтения пароля для $gmsaName : $_"
                     }
                 }
                 if ($totalGMSAs -gt $Script:ProgressThreshold) { Show-Progress -Activity "Analyzing gMSA security" -Completed }
@@ -454,7 +454,7 @@
                         $encryptedSession = $true
                     }
                 } catch {
-                    Write-Log "[Get-ManagedServiceAccountSecurity] Could not read the session's encryption state: $_"
+                    Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось прочитать состояние шифрования сеанса: $_"
                 }
                 if (-not $encryptedSession -and $Script:LDAPContext -and $Script:LDAPContext.UseLDAPS) {
                     $encryptedSession = $true
@@ -509,7 +509,7 @@
             }
 
             # ===== Check 3: Standalone MSA Detection =====
-            Write-Log "[Get-ManagedServiceAccountSecurity] Checking for standalone MSAs"
+            Write-Log "[Get-ManagedServiceAccountSecurity] Проверка отдельных учётных записей MSA"
 
             # Standalone MSAs are a different account type answering a different question,
             # and every other stage of this check announces itself. Without a header of its
@@ -554,7 +554,7 @@
             # while every link showed on the accounts. Get-DomainUser -GMSA does not find a
             # dMSA either - the class derives from computer, not from
             # msDS-ManagedServiceAccount.
-            Write-Log "[Get-ManagedServiceAccountSecurity] Checking delegated Managed Service Account links"
+            Write-Log "[Get-ManagedServiceAccountSecurity] Проверка связей делегированных управляемых служебных учётных записей"
 
             # Only a schema with the class can hold a dMSA. Without it the section stays away
             # rather than reporting the absence of something the forest cannot have.
@@ -571,7 +571,7 @@
             if ($schemaDN) {
                 $dmsaClass = @(Get-DomainObject -LDAPFilter '(&(objectClass=classSchema)(lDAPDisplayName=msDS-DelegatedManagedServiceAccount))' -SearchBase $schemaDN -Properties 'lDAPDisplayName' @PSBoundParameters)[0]
             } else {
-                Write-Log "[Get-ManagedServiceAccountSecurity] No schema naming context - dMSA links not checked"
+                Write-Log "[Get-ManagedServiceAccountSecurity] Контекст именования схемы отсутствует — связи dMSA не проверены"
             }
 
             if ($dmsaClass) {
@@ -681,7 +681,7 @@
                     try {
                         $readableDMSA = @(Get-DomainObject -Identity ([string]@($linkedDMSAs)[0]) -Properties 'objectClass' @PSBoundParameters)[0]
                     } catch {
-                        Write-Log "[Get-ManagedServiceAccountSecurity] Could not read the dMSA $(@($linkedDMSAs)[0]): $_"
+                        Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось прочитать dMSA $(@($linkedDMSAs)[0]): $_"
                     }
                     if (-not $readableDMSA) {
                         Show-Line "Текущая учётная запись не может прочитать объекты dMSA — проверка прав использования каждой dMSA не выполнена" -Class Note
@@ -730,7 +730,7 @@
                             if ($descriptor.Owner) { $dmsaOwners[$dmsaName] = $descriptor.Owner }
                         } catch {
                             $unparsedDMSAs += $dmsaName
-                            Write-Log "[Get-ManagedServiceAccountSecurity] Failed to parse msDS-GroupMSAMembership for $dmsaName : $_"
+                            Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось разобрать msDS-GroupMSAMembership для $dmsaName : $_"
                         }
                     }
 
@@ -811,13 +811,13 @@
             }
 
         } catch {
-            Write-Log "[Get-ManagedServiceAccountSecurity] Error: $_" -Level Error
+            Write-Log "[Get-ManagedServiceAccountSecurity] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: управляемые учётные записи служб оценить не удалось: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-ManagedServiceAccountSecurity] Check completed"
+        Write-Log "[Get-ManagedServiceAccountSecurity] Проверка завершена"
     }
 }
 
@@ -950,7 +950,7 @@ function Get-ManagedAccountDescriptorMap {
             }
         }
     } catch {
-        Write-Log "[Get-ManagedServiceAccountSecurity] Could not read the managed service account membership descriptors: $_" -Level Warning
+        Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось прочитать дескрипторы членства управляемых служебных учётных записей: $_" -Level Warning
     }
     return $descriptors
 }
@@ -1011,7 +1011,7 @@ function Get-ManagedAccountDescriptorReader {
         $sdOwner = $sd.GetOwner([System.Security.Principal.SecurityIdentifier])
         if ($sdOwner) { $owner = [string]$sdOwner.Value }
     } catch {
-        Write-Log "[Get-ManagedServiceAccountSecurity] Could not read the descriptor owner of $Name : $_"
+        Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось прочитать владельца дескриптора для $Name : $_"
     }
 
     [PSCustomObject]@{
@@ -1090,7 +1090,7 @@ function Get-ManagedAccountReaderKind {
             }
         } catch {
             $readerKind = 'Unresolved'
-            Write-Log "[Get-ManagedServiceAccountSecurity] Could not classify password reader $readerSID : $_"
+            Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось определить категорию читателя пароля $readerSID : $_"
         }
         $readerKinds[$readerSID] = $readerKind
     }

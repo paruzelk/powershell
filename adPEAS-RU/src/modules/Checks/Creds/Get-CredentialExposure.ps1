@@ -772,7 +772,7 @@ function Find-ScriptFileCredential {
         foreach ($exclusion in $Script:CredentialExclusionPatterns) {
             if ($trimmedLine -match $exclusion) {
                 $isExcluded = $true
-                Write-Log "[Find-ScriptFileCredential] Excluded by pattern: $trimmedLine"
+                Write-Log "[Find-ScriptFileCredential] Исключено по шаблону: $trimmedLine"
                 break
             }
         }
@@ -876,7 +876,7 @@ function Get-CredentialExposure {
     )
 
     begin {
-        Write-Log "[Get-CredentialExposure] Starting check"
+        Write-Log "[Get-CredentialExposure] Начата проверка"
     }
 
     process {
@@ -893,7 +893,7 @@ function Get-CredentialExposure {
                 $scanPath = $Path
 
                 if ($Path -match '^\\\\' -and $Credential) {
-                    Write-Log "[Get-CredentialExposure] UNC path with credentials - creating temporary drive mapping"
+                    Write-Log "[Get-CredentialExposure] UNC-путь с учётными данными — создаётся временное подключение диска"
 
                     # Find an available drive letter (starting from Z: going down)
                     $usedDrives = (Get-PSDrive -PSProvider FileSystem).Name
@@ -904,7 +904,7 @@ function Get-CredentialExposure {
                             $null = New-PSDrive -Name $tempDriveLetter -PSProvider FileSystem -Root $Path -Credential $Credential -ErrorAction Stop
                             $scanPath = "${tempDriveLetter}:\"
                             $useTempDrive = $true
-                            Write-Log "[Get-CredentialExposure] Mapped $Path to ${tempDriveLetter}:"
+                            Write-Log "[Get-CredentialExposure] Подключён путь $Path как диск ${tempDriveLetter}:"
                         }
                         catch {
                             Show-Line "Не удалось подключиться к $Path с указанными учётными данными: $_" -Class "Finding"
@@ -932,7 +932,7 @@ function Get-CredentialExposure {
                 # Scan XML files for GPP passwords and AutoAdminLogon
                 $xmlFiles = Get-ChildItem -Force -Path $scanPath -Recurse -Include "*.xml" -ErrorAction SilentlyContinue
                 if (@($xmlFiles).Count -gt 0) {
-                    Write-Log "[Get-CredentialExposure] Found $(@($xmlFiles).Count) XML file(s) in custom path"
+                    Write-Log "[Get-CredentialExposure] В указанном каталоге найдено XML-файлов: $(@($xmlFiles).Count)"
                     foreach ($xmlFile in $xmlFiles) {
                         try {
                             [xml]$xmlContent = Get-Content -Path $xmlFile.Fullname -ErrorAction Stop
@@ -948,7 +948,7 @@ function Get-CredentialExposure {
                             }
                         }
                         catch {
-                            Write-Log "[Get-CredentialExposure] Error parsing $($xmlFile.Fullname): $_"
+                            Write-Log "[Get-CredentialExposure] Ошибка разбора $($xmlFile.Fullname): $_"
                         }
                     }
                 }
@@ -966,7 +966,7 @@ function Get-CredentialExposure {
                         }
                     }
                     catch {
-                        Write-Log "[Get-CredentialExposure] Error parsing $($polFile.FullName): $_"
+                        Write-Log "[Get-CredentialExposure] Ошибка разбора $($polFile.FullName): $_"
                     }
                 }
 
@@ -976,7 +976,7 @@ function Get-CredentialExposure {
                     Where-Object { $Script:CredentialScanSkippedFiles -notcontains $_.Name })
 
                 if (@($files).Count -gt 0) {
-                    Write-Log "[Get-CredentialExposure] Found $(@($files).Count) script/config file(s) in custom path"
+                    Write-Log "[Get-CredentialExposure] В указанном каталоге найдено файлов скриптов и конфигурации: $(@($files).Count)"
                     foreach ($file in $files) {
                         try {
                             $fileContent = $null
@@ -984,10 +984,10 @@ function Get-CredentialExposure {
                                 try {
                                     $encodedContent = Get-Content -Path $file.FullName -Raw -ErrorAction Stop
                                     $fileContent = ConvertFrom-VBE -EncodedScript $encodedContent
-                                    Write-Log "[Get-CredentialExposure] Decoded VBE file: $($file.Name)"
+                                    Write-Log "[Get-CredentialExposure] Файл VBE декодирован: $($file.Name)"
                                 }
                                 catch {
-                                    Write-Log "[Get-CredentialExposure] Failed to decode VBE file: $($file.Name)"
+                                    Write-Log "[Get-CredentialExposure] Не удалось декодировать файл VBE: $($file.Name)"
                                     continue
                                 }
                             }
@@ -1005,7 +1005,7 @@ function Get-CredentialExposure {
                             }
                         }
                         catch {
-                            Write-Log "[Get-CredentialExposure] Error analyzing $($file.Name): $_"
+                            Write-Log "[Get-CredentialExposure] Ошибка анализа $($file.Name): $_"
                         }
                     }
                 }
@@ -1019,10 +1019,10 @@ function Get-CredentialExposure {
                     if ($useTempDrive -and $tempDriveLetter) {
                         try {
                             Remove-PSDrive -Name $tempDriveLetter -Force -ErrorAction SilentlyContinue
-                            Write-Log "[Get-CredentialExposure] Removed temporary drive mapping ${tempDriveLetter}:"
+                            Write-Log "[Get-CredentialExposure] Отключён временный диск ${tempDriveLetter}:"
                         }
                         catch {
-                            Write-Log "[Get-CredentialExposure] Failed to remove temporary drive: $_"
+                            Write-Log "[Get-CredentialExposure] Не удалось отключить временный диск: $_"
                         }
                     }
                 }
@@ -1077,11 +1077,11 @@ function Get-CredentialExposure {
                     # Reported once, after the SMB block, where Test-SysvolAccessible can tell
                     # "not reachable at all" from "reachable but this read failed". Emitting it
                     # here as well printed the identical red line twice.
-                    Write-Log "[Get-CredentialExposure] SYSVOL path not accessible: $sysvolBase"
+                    Write-Log "[Get-CredentialExposure] Путь SYSVOL недоступен: $sysvolBase"
                 }
                 else {
                     $Script:sysvolAccessible = $true
-                    Write-Log "[Get-CredentialExposure] SYSVOL accessible: $sysvolBase"
+                    Write-Log "[Get-CredentialExposure] Путь SYSVOL доступен: $sysvolBase"
 
                     # Use cached SYSVOL file listing (builds cache on first call, reuses on subsequent calls)
                     # One walk for both halves: the preference files are parsed as XML, the
@@ -1095,11 +1095,11 @@ function Get-CredentialExposure {
                     $scriptFiles = @($allFiles | Where-Object { $_.Extension -ne '.xml' -and $_.Name -ine 'Registry.pol' -and
                         $Script:CredentialScanSkippedFiles -notcontains $_.Name })
 
-                    Write-Log "[Get-CredentialExposure] Split: $($xmlFiles.Count) XML, $($scriptFiles.Count) script/config"
+                    Write-Log "[Get-CredentialExposure] Разделение файлов: XML — $($xmlFiles.Count), скрипты/конфигурация — $($scriptFiles.Count)"
 
                     # ===== Part 1: GPP Password Search (XML files) =====
                     if ($xmlFiles.Count -gt 0) {
-                        Write-Log "[Get-CredentialExposure] Analyzing $($xmlFiles.Count) XML file(s)..."
+                        Write-Log "[Get-CredentialExposure] Анализ XML-файлов: $($xmlFiles.Count)..."
 
                         $totalXmlFiles = @($xmlFiles).Count
                         $currentXmlIndex = 0
@@ -1109,7 +1109,7 @@ function Get-CredentialExposure {
                                 Show-Progress -Activity "Scanning SYSVOL for GPP credentials" -Current $currentXmlIndex -Total $totalXmlFiles -ObjectName $xmlFile.Name
                             }
                             try {
-                                Write-Log "[Get-CredentialExposure] Reading XML: $($xmlFile.FullName)"
+                                Write-Log "[Get-CredentialExposure] Чтение XML: $($xmlFile.FullName)"
                                 [xml]$xmlContent = Get-Content -Path $xmlFile.Fullname -ErrorAction Stop
                                 $fileName = Split-Path $xmlFile.FullName -Leaf
 
@@ -1154,7 +1154,7 @@ function Get-CredentialExposure {
                                 }
                             }
                             catch {
-                                Write-Log "[Get-CredentialExposure] Error parsing $($xmlFile.Fullname): $_"
+                                Write-Log "[Get-CredentialExposure] Ошибка разбора $($xmlFile.Fullname): $_"
                                 Register-SYSVOLFileGap -Path $xmlFile.FullName -ErrorRecord $_
                             }
                         }
@@ -1190,7 +1190,7 @@ function Get-CredentialExposure {
                             }
                         }
                         catch {
-                            Write-Log "[Get-CredentialExposure] Error parsing $($polFile.FullName): $_"
+                            Write-Log "[Get-CredentialExposure] Ошибка разбора $($polFile.FullName): $_"
                             Register-SYSVOLFileGap -Path $polFile.FullName -ErrorRecord $_
                         }
                     }
@@ -1209,7 +1209,7 @@ function Get-CredentialExposure {
                     Show-SubHeader "Поиск чувствительных данных в SYSVOL и NETLOGON..." -ObjectType "SYSVOLCredential"
 
                     if ($scriptFiles.Count -gt 0) {
-                        Write-Log "[Get-CredentialExposure] Analyzing $($scriptFiles.Count) script/config file(s)..."
+                        Write-Log "[Get-CredentialExposure] Анализ файлов скриптов и конфигурации: $($scriptFiles.Count)..."
 
                         $totalScriptFiles = @($scriptFiles).Count
                         $currentScriptIndex = 0
@@ -1219,7 +1219,7 @@ function Get-CredentialExposure {
                                 Show-Progress -Activity "Scanning SYSVOL for sensitive information" -Current $currentScriptIndex -Total $totalScriptFiles -ObjectName $file.Name
                             }
                             try {
-                                Write-Log "[Get-CredentialExposure] Reading script/config: $($file.FullName)"
+                                Write-Log "[Get-CredentialExposure] Чтение скрипта или конфигурации: $($file.FullName)"
 
                                 # Extract GPO GUID from SYSVOL path for linkage resolution
                                 $fileGpoGUID = $null
@@ -1247,10 +1247,10 @@ function Get-CredentialExposure {
                                     try {
                                         $encodedContent = Get-Content -Path $file.FullName -Raw -ErrorAction Stop
                                         $fileContent = ConvertFrom-VBE -EncodedScript $encodedContent
-                                        Write-Log "[Get-CredentialExposure] Decoded VBE file: $($file.Name)"
+                                        Write-Log "[Get-CredentialExposure] Файл VBE декодирован: $($file.Name)"
                                     }
                                     catch {
-                                        Write-Log "[Get-CredentialExposure] Failed to decode VBE file: $($file.Name)"
+                                        Write-Log "[Get-CredentialExposure] Не удалось декодировать файл VBE: $($file.Name)"
                                         Register-SYSVOLFileGap -Path $file.FullName -ErrorRecord $_
                                         continue
                                     }
@@ -1272,7 +1272,7 @@ function Get-CredentialExposure {
                                 }
                             }
                             catch {
-                                Write-Log "[Get-CredentialExposure] Error analyzing $($file.Name): $_"
+                                Write-Log "[Get-CredentialExposure] Ошибка анализа $($file.Name): $_"
                                 Register-SYSVOLFileGap -Path $file.FullName -ErrorRecord $_
                             }
                         }
@@ -1309,12 +1309,12 @@ function Get-CredentialExposure {
             }
 
         } catch {
-            Write-Log "[Get-CredentialExposure] Error: $_" -Level Error
+            Write-Log "[Get-CredentialExposure] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить учётные данные в SYSVOL и NETLOGON: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-CredentialExposure] Check completed"
+        Write-Log "[Get-CredentialExposure] Проверка завершена"
     }
 }

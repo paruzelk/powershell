@@ -7,7 +7,7 @@
 - Всего файлов исходников: **203** (PowerShell 200, JavaScript 1, HTML 2).
 - Строк исходников: **156557**.
 - Подтверждённые переводы DOC6c: **54** в 4 файлах подсистемы отчётов.
-- Эвристические кандидаты на проверку: **3396** (вызовы PowerShell/HTML: 3236; JS-контексты: 160).
+- Эвристические кандидаты на проверку: **3281** (вызовы PowerShell/HTML: 3121; JS-контексты: 160).
 
 **Внимание:** это не число фактически непереведённых пользовательских строк. Среди кандидатов могут быть английские названия продуктов, технические идентификаторы, программные сообщения, значения протоколов, составные строки. Требуется ручная проверка контекста.
 
@@ -55,31 +55,31 @@
 | `src/modules/Checks/Accounts/Get-LogonScriptPermissions.ps1` | 153 | ps-diagnostic | [Get-LogonScriptPermissions] Could not tell the privileged accounts apart: $_ |
 | `src/modules/Checks/Accounts/Get-LogonScriptPermissions.ps1` | 200 | ps-diagnostic | [Get-LogonScriptPermissions] Error: $_ |
 | `src/modules/Checks/Accounts/Get-LogonScriptPermissions.ps1` | 208 | ps-diagnostic | [Get-LogonScriptPermissions] Check completed |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 81 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Starting check |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 100 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Checking gMSA password access permissions |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 107 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Found $($gmsaAccounts.Count) gMSA account(s) |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 159 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Failed to parse msDS-GroupMSAMembership for $gmsaName : $_ |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 331 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not read accountExpires of $($gmsa.sAMAccountName): $_ |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 348 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Attempting to read gMSA passwords |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 367 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Attempting to read password for $gmsaName |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 428 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Failed to parse password blob for $gmsaName |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 431 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Password blob is empty or invalid type for $gmsaName |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 434 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] No msDS-ManagedPassword returned for $gmsaName (access denied or not available) |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 438 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Error reading password for $gmsaName : $_ |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 457 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not read the session's encryption state: $_ |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 512 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Checking for standalone MSAs |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 557 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Checking delegated Managed Service Account links |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 574 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] No schema naming context - dMSA links not checked |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 684 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not read the dMSA $(@($linkedDMSAs)[0]): $_ |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 733 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Failed to parse msDS-GroupMSAMembership for $dmsaName : $_ |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 814 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Error: $_ |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 820 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Check completed |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 953 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not read the managed service account membership descriptors: $_ |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 1014 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not read the descriptor owner of $Name : $_ |
-| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 1093 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not classify password reader $readerSID : $_ |
 | `src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1` | 60 | ps-diagnostic | [Get-NonDefaultUserOwners] Starting check |
 | `src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1` | 94 | ps-diagnostic | [Get-NonDefaultUserOwners] Found $($usersWithOwner.Count) users, filtering non-default owners clientside... |
 | `src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1` | 118 | ps-diagnostic | [Get-NonDefaultUserOwners] Filtered Exchange Health Mailbox: $dn |
+| `src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1` | 136 | ps-diagnostic | [Get-NonDefaultUserOwners] Found $($nonDefaultOwnerDNs.Count) user(s) with non-default owners, loading full objects... |
+| `src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1` | 154 | ps-diagnostic | [Get-NonDefaultUserOwners] Filtered Exchange Health Mailbox: $($fullUser.sAMAccountName) |
+| `src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1` | 220 | ps-diagnostic | [Get-NonDefaultUserOwners] Error: $_ |
+| `src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1` | 226 | ps-diagnostic | [Get-NonDefaultUserOwners] Check completed |
+| `src/modules/Checks/Accounts/Get-PasswordNotRequired.ps1` | 48 | ps-diagnostic | [Get-PasswordNotRequired] Starting check |
+| `src/modules/Checks/Accounts/Get-PasswordNotRequired.ps1` | 191 | ps-diagnostic | [Get-PasswordNotRequired] Error: $_ |
+| `src/modules/Checks/Accounts/Get-PasswordNotRequired.ps1` | 197 | ps-diagnostic | [Get-PasswordNotRequired] Check completed |
+| `src/modules/Checks/Accounts/Get-PrivilegedGroupMembers.ps1` | 1145 | ps-diagnostic | AdminSDHolder security descriptor not available |
+| `src/modules/Checks/Accounts/Get-PrivilegedGroupMembers.ps1` | 1578 | ps-diagnostic | PreWindows2000Access |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 74 | ps-diagnostic | [Get-ProtectedUsersStatus] Starting check |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 84 | ps-diagnostic | Tier0Account |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 102 | ps-diagnostic | [Get-ProtectedUsersStatus] Looking for Protected Users group with SID: $protectedUsersSID |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 166 | ps-diagnostic | [Get-ProtectedUsersStatus] Found $($protectedMemberSIDs.Count) members in Protected Users group |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 199 | ps-diagnostic | [Get-ProtectedUsersStatus] Group not found: $groupSID |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 204 | ps-diagnostic | [Get-ProtectedUsersStatus] Processing Tier-0 group: $groupName ($groupSID) |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 291 | ps-diagnostic | [Get-ProtectedUsersStatus] Found $($tier0Accounts.Count) unique Tier-0 accounts |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 312 | ps-diagnostic | [Get-ProtectedUsersStatus] Excluded: $($account.sAMAccountName) - $($exclusionCheck.Reason) |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 321 | ps-diagnostic | [Get-ProtectedUsersStatus] Eligible for protection: $($eligibleAccounts.Count), Excluded: $($excludedAccounts.Count) |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 494 | ps-diagnostic | [Get-ProtectedUsersStatus] Error: $_ |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 500 | ps-diagnostic | [Get-ProtectedUsersStatus] Check completed |
+| `src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1` | 567 | ps-diagnostic | [Get-ProtectedUsersStatus] The authentication policy silos could not be read: $_ |
+| `src/modules/Checks/Accounts/Get-RODCPasswordReplication.ps1` | 55 | ps-diagnostic | [Get-RODCPasswordReplication] Starting check |
 | `src/modules/Reporting/templates/report-scripts.js` | 36 | js-ui-candidate | aria-pressed |
 | `src/modules/Reporting/templates/report-scripts.js` | 43 | js-ui-candidate | aria-expanded |
 | `src/modules/Reporting/templates/report-scripts.js` | 85 | js-ui-candidate | data-theme |

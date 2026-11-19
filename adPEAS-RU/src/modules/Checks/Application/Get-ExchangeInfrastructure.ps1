@@ -51,7 +51,7 @@
     )
 
     begin {
-        Write-Log "[Get-ExchangeInfrastructure] Starting check"
+        Write-Log "[Get-ExchangeInfrastructure] Начата проверка"
     }
 
     process {
@@ -129,7 +129,7 @@
                 }
             }
             catch {
-                Write-Log "[Get-ExchangeInfrastructure] Exchange Organization not Found: $_"
+                Write-Log "[Get-ExchangeInfrastructure] Организация Exchange не найдена: $_"
             }
 
             if (-not $exchangeOrgExists) {
@@ -161,7 +161,7 @@
                     $_.distinguishedName -match "CN=$([regex]::Escape($_.name)),CN=Servers,"
                 })
             } catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error querying Config partition servers: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса серверов из раздела Configuration: $_" -Level Error
             }
 
             try {
@@ -174,25 +174,25 @@
                 $vdirFilter = '(|' + ($vdirParts -join '') + ')'
                 $allVDirs = @(Get-DomainObject -LDAPFilter $vdirFilter -SearchBase $exchangeBase @PSBoundParameters)
             } catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error querying Virtual Directories: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса виртуальных каталогов: $_" -Level Error
             }
 
             try {
                 $allRecvConnectors = @(Get-DomainObject -LDAPFilter "(objectClass=msExchSmtpReceiveConnector)" -SearchBase $exchangeBase @PSBoundParameters)
             } catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error querying SMTP Receive Connectors: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса SMTP-коннекторов приёма: $_" -Level Error
             }
 
             try {
                 $allSendConnectors = @(Get-DomainObject -LDAPFilter "(objectClass=msExchRoutingSMTPConnector)" -SearchBase $exchangeBase @PSBoundParameters)
             } catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error querying SMTP Send Connectors: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса SMTP-коннекторов отправки: $_" -Level Error
             }
 
             try {
                 $allAcceptedDomains = @(Get-DomainObject -LDAPFilter "(objectClass=msExchAcceptedDomain)" -SearchBase $exchangeBase @PSBoundParameters)
             } catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error querying Accepted Domains: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса обслуживаемых доменов: $_" -Level Error
             }
 
             # The coexistence relationship, read here with the rest so the organization
@@ -205,7 +205,7 @@
             }
             catch {
                 $hybridQueryFailed = $true
-                Write-Log "[Get-ExchangeInfrastructure] Error querying hybrid configuration: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса гибридной конфигурации: $_" -Level Error
             }
 
             # Every organization has an accepted domain: setup creates the default one, and
@@ -486,7 +486,7 @@
                 }
             }
             catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error enumerating Exchange servers: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка перечисления серверов Exchange: $_" -Level Error
             }
 
             if (@($exchangeServers).Count -gt 0) {
@@ -509,7 +509,7 @@
                             if ($isInactive) {
                                 # Deliberately silent: the INACTIVE activity marker on the card
                                 # already explains why no endpoints were probed.
-                                Write-Log "[Get-ExchangeInfrastructure] Skipping HTTP check for $($exServer.DNSHostName) - server inactive"
+                                Write-Log "[Get-ExchangeInfrastructure] HTTP-проверка $($exServer.DNSHostName) пропущена — сервер неактивен"
                             } else {
                                 # Fast TCP reachability check before expensive HTTP tests
                                 # This avoids multiple 3-second timeouts for unreachable servers
@@ -524,7 +524,7 @@
                                     }
                                 }
                                 catch {
-                                    Write-Log "[Get-ExchangeInfrastructure] TCP check failed for $($exServer.DNSHostName): $_"
+                                    Write-Log "[Get-ExchangeInfrastructure] Ошибка проверки TCP для $($exServer.DNSHostName): $_"
                                     $tcpReachable = $false
                                 }
                                 finally {
@@ -535,9 +535,9 @@
                                 }
 
                                 if (-not $tcpReachable) {
-                                    Write-Log "[Get-ExchangeInfrastructure] Skipping HTTP check for $($exServer.DNSHostName) - TCP port 443 not reachable"
+                                    Write-Log "[Get-ExchangeInfrastructure] HTTP-проверка $($exServer.DNSHostName) пропущена — порт TCP 443 недоступен"
                                 } else {
-                                    Write-Log "[Get-ExchangeInfrastructure] Detecting Exchange endpoints and EPA for $($exServer.DNSHostName)..."
+                                    Write-Log "[Get-ExchangeInfrastructure] Определение конечных точек Exchange и EPA для $($exServer.DNSHostName)..."
 
                                     try {
                                         # Request with -TestEPA to check Extended Protection for Authentication
@@ -547,7 +547,7 @@
                                         if ($httpResult.Success) {
                                             $httpBuildNumber = $httpResult.BuildNumber
                                             $httpVersion = Convert-ExchangeBuildToVersion -BuildNumber $httpBuildNumber
-                                            Write-Log "[Get-ExchangeInfrastructure] HTTP detection successful: $httpBuildNumber"
+                                            Write-Log "[Get-ExchangeInfrastructure] Обнаружена версия Exchange через HTTP: $httpBuildNumber"
 
                                             # Add ExchangeVersion and ExchangeBuildNumber as properties to the object
                                             if ($httpBuildNumber) {
@@ -557,12 +557,12 @@
 
                                             # Log EPA detection result
                                             if ($null -ne $httpResult.EPAEnabled) {
-                                                Write-Log "[Get-ExchangeInfrastructure] EPA detection: Enabled=$($httpResult.EPAEnabled), Confidence=$($httpResult.EPAConfidence)"
+                                                Write-Log "[Get-ExchangeInfrastructure] Обнаружение EPA: включено=$($httpResult.EPAEnabled), достоверность=$($httpResult.EPAConfidence)"
                                             }
                                         }
                                     }
                                     catch {
-                                        Write-Log "[Get-ExchangeInfrastructure] HTTP detection failed: $_"
+                                        Write-Log "[Get-ExchangeInfrastructure] Не удалось выполнить обнаружение через HTTP: $_"
                                     }
                                 }
 
@@ -818,10 +818,10 @@
                             $smtpRightsByGuid[([string]$right.rightsGuid).ToLower()] = ([string]$right.displayName).ToLower()
                         }
                     }
-                    Write-Log "[Get-ExchangeInfrastructure] Resolved $($smtpRightsByGuid.Count) SMTP extended right(s) from the Configuration partition"
+                    Write-Log "[Get-ExchangeInfrastructure] Определены расширенные права SMTP из раздела Configuration: $($smtpRightsByGuid.Count)"
                 }
                 catch {
-                    Write-Log "[Get-ExchangeInfrastructure] Error resolving SMTP extended rights: $_" -Level Error
+                    Write-Log "[Get-ExchangeInfrastructure] Ошибка определения расширенных прав SMTP: $_" -Level Error
                 }
 
                 # Security descriptors for all connectors in one query. Get-ObjectACL reads
@@ -837,7 +837,7 @@
                     }
                 }
                 catch {
-                    Write-Log "[Get-ExchangeInfrastructure] Error reading receive connector descriptors: $_" -Level Error
+                    Write-Log "[Get-ExchangeInfrastructure] Ошибка чтения дескрипторов коннекторов приёма: $_" -Level Error
                 }
 
                 # The unauthenticated subset of the central broad-principal list
@@ -958,7 +958,7 @@
                             }
                         }
                         catch {
-                            Write-Log "[Get-ExchangeInfrastructure] Error parsing connector ACL for ${connectorDN}: $_" -Level Error
+                            Write-Log "[Get-ExchangeInfrastructure] Ошибка разбора ACL коннектора ${connectorDN}: $_" -Level Error
                         }
                     }
 
@@ -1124,7 +1124,7 @@
                     }
                 }
                 catch {
-                    Write-Log "[Get-ExchangeInfrastructure] Error resolving ${modelGroupName}: $_" -Level Error
+                    Write-Log "[Get-ExchangeInfrastructure] Ошибка определения ${modelGroupName}: $_" -Level Error
                 }
             }
 
@@ -1166,7 +1166,7 @@
                 $protectedGroupsOU = @(Get-DomainObject -Identity "OU=Microsoft Exchange Protected Groups,$domainDN" @PSBoundParameters)[0]
             }
             catch {
-                Write-Log "[Get-ExchangeInfrastructure] Microsoft Exchange Protected Groups OU not present: $_"
+                Write-Log "[Get-ExchangeInfrastructure] OU Microsoft Exchange Protected Groups отсутствует: $_"
             }
 
             # Setup /PrepareAD creates that OU in the forest root only, so in a child domain
@@ -1205,7 +1205,7 @@
                     }
                 }
                 catch {
-                    Write-Log "[Get-ExchangeInfrastructure] Error reading domain object ACL: $_" -Level Error
+                    Write-Log "[Get-ExchangeInfrastructure] Ошибка чтения ACL объекта домена: $_" -Level Error
                 }
 
                 if (-not $domainACLReadable) {
@@ -1238,7 +1238,7 @@
                         # finding. Get-DangerousACLs reads these ACEs the same way.
                         $aceObjectType = [string]$ace.ObjectType
                         if ($aceObjectType -and $aceObjectType -ne '00000000-0000-0000-0000-000000000000') {
-                            Write-Log "[Get-ExchangeInfrastructure] Object-specific ACE grants no DACL rewrite: $($matchedGroup.Name), ObjectType=$aceObjectType"
+                            Write-Log "[Get-ExchangeInfrastructure] ACE для определённого типа объекта не даёт права изменения DACL: $($matchedGroup.Name), ObjectType=$aceObjectType"
                             continue
                         }
 
@@ -1461,7 +1461,7 @@
                     Show-Object $groupObject -Class Hint
                 }
                 catch {
-                    Write-Log "[Get-ExchangeInfrastructure] Error checking $($serviceGroup.Name): $_" -Level Error
+                    Write-Log "[Get-ExchangeInfrastructure] Ошибка проверки $($serviceGroup.Name): $_" -Level Error
                     Show-Line "Не удалось прочитать группу $($serviceGroup.Name) — результат неизвестен, а не означает отсутствие участников" -Class Note
                 }
             }
@@ -1471,12 +1471,12 @@
 
         }
         catch {
-            Write-Log "[Get-ExchangeInfrastructure] Error: $_" -Level Error
+            Write-Log "[Get-ExchangeInfrastructure] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить инфраструктуру Exchange: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-ExchangeInfrastructure] Check completed"
+        Write-Log "[Get-ExchangeInfrastructure] Проверка завершена"
     }
 }

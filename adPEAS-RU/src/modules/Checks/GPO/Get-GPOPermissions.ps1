@@ -47,7 +47,7 @@
     )
 
     begin {
-        Write-Log "[Get-GPOPermissions] Starting check"
+        Write-Log "[Get-GPOPermissions] Начата проверка"
 
         # Dangerous ACE Types for GPOs
         # Must cover everything Get-ObjectACL -DangerousOnly hands over, otherwise a
@@ -147,12 +147,12 @@
                         $descriptorLookup[[string]$rawGPO.distinguishedName] = $rawGPO.nTSecurityDescriptor
                     }
                 }
-                Write-Log "[Get-GPOPermissions] Prefetched $($descriptorLookup.Count) security descriptor(s) in one query"
+                Write-Log "[Get-GPOPermissions] Дескрипторов безопасности, полученных одним запросом: $($descriptorLookup.Count)"
             }
             catch {
                 # A failed prefetch is not fatal: the loop falls back to reading each
                 # descriptor itself, which is what it did before.
-                Write-Log "[Get-GPOPermissions] Descriptor prefetch failed, falling back to one read per GPO: $_" -Level Warning
+                Write-Log "[Get-GPOPermissions] Не удалось предварительно получить дескрипторы — переход к отдельному чтению каждой GPO: $_" -Level Warning
             }
 
             # ===== Step 2: Enumerate Computers for Impact Analysis =====
@@ -199,7 +199,7 @@
                 $gpoDN = $gpo.DistinguishedName
                 $gpoGUID = $gpo.Name
 
-                Write-Log "[Get-GPOPermissions] Analyzing GPO: $gpoDisplayName ($gpoGUID)"
+                Write-Log "[Get-GPOPermissions] Анализ GPO: $gpoDisplayName ($gpoGUID)"
 
                 try {
                     # Use Get-ObjectACL for ACL analysis (handles credentials automatically)
@@ -235,7 +235,7 @@
                     # the descriptor could not be read and when it could not be parsed, and
                     # the GPO then counted as analyzed and clean in the Secure line below.
                     if (-not $aclResult) {
-                        Write-Log "[Get-GPOPermissions] Security descriptor of GPO '$gpoDisplayName' could not be read or parsed - its permissions are unknown" -Level Warning
+                        Write-Log "[Get-GPOPermissions] Дескриптор безопасности GPO '$gpoDisplayName' нельзя прочитать или разобрать — права неизвестны" -Level Warning
                         $unreadGPOs += $gpoDisplayName
                         continue
                     }
@@ -251,11 +251,11 @@
                             Owner    = if ($aclResult.Owner) { $aclResult.Owner } else { ConvertFrom-SID -SID $aclResult.OwnerSID }
                             OwnerSID = $aclResult.OwnerSID
                         }
-                        Write-Log "[Get-GPOPermissions] GPO '$gpoDisplayName' is owned by $($ownerFinding.Owner), which is not a default owner"
+                        Write-Log "[Get-GPOPermissions] Владелец GPO '$gpoDisplayName' — $($ownerFinding.Owner), это не владелец по умолчанию"
                     }
 
                     if (-not $aclResult.ACEs -or @($aclResult.ACEs).Count -eq 0) {
-                        Write-Log "[Get-GPOPermissions] No dangerous ACEs found for GPO: $gpoDisplayName"
+                        Write-Log "[Get-GPOPermissions] Опасных ACE для GPO не найдено: $gpoDisplayName"
                         if ($ownerFinding) { $ownerOnlyGPOs[$gpoGUID] = @{ GPO = $gpo; Owner = $ownerFinding } }
                         continue
                     }
@@ -282,7 +282,7 @@
                     }
 
                     $dangerousAces = @($aclResult.ACEs | Where-Object { $_.AccessControlType -eq 'Allow' })
-                    Write-Log "[Get-GPOPermissions] Processing $($dangerousAces.Count) dangerous ACE(s) for GPO: $gpoDisplayName"
+                    Write-Log "[Get-GPOPermissions] Обработка $($dangerousAces.Count) опасных ACE для GPO: $gpoDisplayName"
                     $vulnerableIdentities = @()
 
                     foreach ($ace in $dangerousAces) {
@@ -293,7 +293,7 @@
 
                         # Skip ACEs with empty SID (can occur with orphaned/deleted principals)
                         if ([string]::IsNullOrEmpty($aceSID)) {
-                            Write-Log "[Get-GPOPermissions] Skipping ACE with empty SID on GPO $gpoDisplayName (ACE object type: $($ace.GetType().FullName))"
+                            Write-Log "[Get-GPOPermissions] Пропуск ACE с пустым SID в GPO $gpoDisplayName (тип объекта ACE: $($ace.GetType().FullName))"
                             continue
                         }
 
@@ -303,7 +303,7 @@
                         # settings live in SYSVOL and the link lives on the OU, so a right over
                         # those two sub-containers is not a path to modifying the GPO.
                         if (-not (Test-ACEAppliesToSelf -ACE $ace)) {
-                            Write-Log "[Get-GPOPermissions] Skipping descendants-only ACE on GPO $gpoDisplayName : $($ace.Trustee), PropagationFlags=$($ace.PropagationFlags)"
+                            Write-Log "[Get-GPOPermissions] Пропуск ACE только для потомков в GPO $gpoDisplayName : $($ace.Trustee), PropagationFlags=$($ace.PropagationFlags)"
                             continue
                         }
 
@@ -331,7 +331,7 @@
                         foreach ($dangerousRight in $Script:DangerousGPOAccessRights) {
                             if ($aceRightsRaw -notcontains $dangerousRight) { continue }
                             if ($deniedForTrustee -contains $dangerousRight) {
-                                Write-Log "[Get-GPOPermissions] $aceSID holds $dangerousRight on GPO $gpoDisplayName but a Deny ACE takes it away"
+                                Write-Log "[Get-GPOPermissions] Субъект $aceSID имеет право $dangerousRight в GPO $gpoDisplayName, но оно отменено запрещающим ACE"
                                 continue
                             }
                             $matchedRights += $dangerousRight
@@ -396,7 +396,7 @@
                             if ($resolvedScope -and $resolvedScope.Type -eq 'SchemaClass') {
                                 # Scoped to a child class: creates and deletes objects of that
                                 # class below the GPO, and writes nothing of it.
-                                Write-Log "[Get-GPOPermissions] $($ace.Trustee) holds $aceRights on GPO $gpoDisplayName scoped to the class $($resolvedScope.Name) - no right over the policy"
+                                Write-Log "[Get-GPOPermissions] Субъект $($ace.Trustee) имеет права $aceRights в GPO $gpoDisplayName для класса $($resolvedScope.Name) — прав на саму политику нет"
                                 continue
                             }
                             # GenericAll and GenericWrite carry the WriteProperty bit, which is
@@ -435,7 +435,7 @@
                         # Check if SID is expected (Creator Owner, SELF, etc.) using GPO context
                         $expectedCheck = Test-IsExpectedACLIdentity -SID $aceSID -Context 'GPO'
                         if ($expectedCheck.Skip) {
-                            Write-Log "[Get-GPOPermissions] Skipping expected identity $aceSID on GPO $gpoDisplayName : $($expectedCheck.Reason)"
+                            Write-Log "[Get-GPOPermissions] Пропущен ожидаемый субъект $aceSID в GPO $gpoDisplayName : $($expectedCheck.Reason)"
                             continue
                         }
 
@@ -450,12 +450,12 @@
                             $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'GPO' -ReturnDetails
 
                             if ($scopeResult.Severity -eq 'Expected') {
-                                Write-Log "[Get-GPOPermissions] Expected identity $aceSID has $aceRights on GPO $gpoDisplayName - $($scopeResult.Reason)"
+                                Write-Log "[Get-GPOPermissions] Ожидаемый субъект $aceSID имеет права $aceRights в GPO $gpoDisplayName — $($scopeResult.Reason)"
                                 continue
                             }
 
                             if ($scopeResult.Severity -eq 'Attention') {
-                                Write-Log "[Get-GPOPermissions] Attention: $identityName has $aceRights on GPO $gpoDisplayName - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)"
+                                Write-Log "[Get-GPOPermissions] Требует внимания: $identityName имеет права $aceRights в GPO $gpoDisplayName — $($scopeResult.Reason); пропущен (для включения укажите -IncludePrivileged)"
                                 continue
                             }
 
@@ -464,7 +464,7 @@
                             # -IncludePrivileged: Show ALL accounts, but mark privileged ones for yellow display
                             $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'GPO' -ReturnDetails
                             $severity = $scopeResult.Severity
-                            Write-Log "[Get-GPOPermissions] IncludePrivileged: Including $identityName ($aceSID) with severity $severity on GPO $gpoDisplayName"
+                            Write-Log "[Get-GPOPermissions] IncludePrivileged: субъект $identityName ($aceSID) включён с критичностью $severity в GPO $gpoDisplayName"
                         }
 
                         # A write that cannot reach the policy content is not the takeover
@@ -475,7 +475,7 @@
                             $severity = 'Hint'
                         }
 
-                        Write-Log "[Get-GPOPermissions] FINDING: $identityName has $dangerousRightMatched on GPO $gpoDisplayName (inherited: $([bool]$ace.IsInherited))"
+                        Write-Log "[Get-GPOPermissions] НАХОДКА: субъект $identityName обладает опасным правом $dangerousRightMatched в GPO $gpoDisplayName (унаследовано: $([bool]$ace.IsInherited))"
 
                         $vulnerableIdentities += [PSCustomObject]@{
                             Identity = $identityName
@@ -712,7 +712,7 @@
                     }
                 }
                 catch {
-                    Write-Log "[Get-GPOPermissions] Error analyzing GPO $gpoDisplayName : $_"
+                    Write-Log "[Get-GPOPermissions] Ошибка анализа GPO $gpoDisplayName : $_"
                 }
             }
             if ($totalGPOs -gt $Script:ProgressThreshold) { Show-Progress -Activity "Checking GPO permissions" -Completed }
@@ -744,7 +744,7 @@
                 $policiesPath = "\\$($Script:LDAPContext.Server)\SYSVOL\$($Script:LDAPContext.Domain)\Policies"
 
                 if (-not (Test-Path $policiesPath)) {
-                    Write-Log "[Get-GPOPermissions] SYSVOL is not reachable at $policiesPath - the folder permissions were not examined"
+                    Write-Log "[Get-GPOPermissions] SYSVOL по пути $policiesPath недоступен — разрешения на папки не проверялись"
                     return
                 }
 
@@ -759,7 +759,7 @@
                     $policyFolders = @{}
                     foreach ($listedFolder in $listedFolders) { $policyFolders[[string]$listedFolder.Name] = $true }
                 } else {
-                    Write-Log "[Get-GPOPermissions] Could not list $policiesPath - missing and orphaned policy folders are not told apart: $($folderListErrors[0])"
+                    Write-Log "[Get-GPOPermissions] Невозможно перечислить $policiesPath — нельзя отличить отсутствующие папки политик от осиротевших: $($folderListErrors[0])"
                 }
 
                 # The policies with a gpt.ini, from the SYSVOL listing. A client opens the
@@ -1059,12 +1059,12 @@
             }
 
         } catch {
-            Write-Log "[Get-GPOPermissions] Error: $_" -Level Error
+            Write-Log "[Get-GPOPermissions] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить разрешения GPO: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-GPOPermissions] Check completed"
+        Write-Log "[Get-GPOPermissions] Проверка завершена"
     }
 }

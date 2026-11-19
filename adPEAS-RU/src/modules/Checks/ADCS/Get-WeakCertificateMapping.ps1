@@ -86,7 +86,7 @@
     )
 
     begin {
-        Write-Log "[Get-WeakCertificateMapping] Starting ESC14 explicit certificate mapping analysis"
+        Write-Log "[Get-WeakCertificateMapping] Начат анализ явных сопоставлений сертификатов ESC14"
     }
 
     process {
@@ -129,12 +129,12 @@
             }
         }
         catch {
-            Write-Log "[Get-WeakCertificateMapping] Query for altSecurityIdentities failed: $_" -Level Warning
+            Write-Log "[Get-WeakCertificateMapping] Ошибка запроса altSecurityIdentities: $_" -Level Warning
             Show-Line "Не удалось прочитать явные сопоставления сертификатов: $($_.Exception.Message)" -Class Note
             return
         }
 
-        Write-Log "[Get-WeakCertificateMapping] Found $(@($candidates).Count) principal(s) with an explicit mapping"
+        Write-Log "[Get-WeakCertificateMapping] Найдено субъектов с явным сопоставлением: $(@($candidates).Count)"
 
         $weakFindings = @()
         foreach ($candidate in $candidates) {
@@ -155,7 +155,7 @@
                     # Neither an X509 form nor anything AD maps a certificate through -
                     # Kerberos and NTLM identities also live in this attribute. Reported as
                     # neither, rather than guessed at.
-                    Write-Log "[Get-WeakCertificateMapping] Ignoring non-X509 mapping on '$($principal.sAMAccountName)': $mapping"
+                    Write-Log "[Get-WeakCertificateMapping] Пропущено сопоставление не-X509 для '$($principal.sAMAccountName)': $mapping"
                 }
             }
 
@@ -172,7 +172,7 @@
             try {
                 $isPrivileged = ((Test-IsPrivileged -Identity $principal.objectSid).IsPrivileged -eq $true)
             } catch {
-                Write-Log "[Get-WeakCertificateMapping] Privilege check failed for '$($principal.sAMAccountName)': $_"
+                Write-Log "[Get-WeakCertificateMapping] Ошибка проверки привилегий '$($principal.sAMAccountName)': $_"
             }
 
             # Phase 2, and only now: the full object, without -Properties, because this one
@@ -186,7 +186,7 @@
                     @(Get-DomainUser -Identity $principal.distinguishedName @connectionParams)[0]
                 }
             } catch {
-                Write-Log "[Get-WeakCertificateMapping] Could not re-read '$($principal.distinguishedName)': $_"
+                Write-Log "[Get-WeakCertificateMapping] Не удалось повторно прочитать '$($principal.distinguishedName)': $_"
             }
 
             # The light object still carries name, SID and the mappings, so a failed
@@ -280,11 +280,11 @@
             # recognised as what it is.
             $altSecPropertySet = Get-AltSecurityIdentitiesPropertySet -CredParams $connectionParams
             if ($altSecPropertySet) {
-                Write-Log "[Get-WeakCertificateMapping] altSecurityIdentities belongs to property set $altSecPropertySet"
+                Write-Log "[Get-WeakCertificateMapping] Атрибут altSecurityIdentities относится к набору свойств $altSecPropertySet"
             } elseif (@($privilegedTargets).Count -gt 0) {
                 Show-Line "Не удалось прочитать набор свойств с altSecurityIdentities; делегирование на этот набор не проверено" -Class Note
             }
-            Write-Log "[Get-WeakCertificateMapping] Checking altSecurityIdentities write access on $(@($privilegedTargets).Count) privileged principal(s)"
+            Write-Log "[Get-WeakCertificateMapping] Проверка права записи altSecurityIdentities для привилегированных субъектов: $(@($privilegedTargets).Count)"
 
             foreach ($target in $privilegedTargets) {
                 if (-not $target.distinguishedName) { continue }
@@ -294,7 +294,7 @@
                 try {
                     $descriptor = ConvertFrom-SecurityDescriptor -SecurityDescriptorBytes $target.nTSecurityDescriptor
                 } catch {
-                    Write-Log "[Get-WeakCertificateMapping] Could not read the descriptor of '$($target.distinguishedName)': $_"
+                    Write-Log "[Get-WeakCertificateMapping] Не удалось прочитать дескриптор '$($target.distinguishedName)': $_"
                     continue
                 }
 
@@ -351,7 +351,7 @@
                     try {
                         $trusteePrivileged = ((Test-IsPrivileged -Identity $trusteeSID).IsPrivileged -eq $true)
                     } catch {
-                        Write-Log "[Get-WeakCertificateMapping] Privilege check failed for trustee '$trusteeSID': $_"
+                        Write-Log "[Get-WeakCertificateMapping] Ошибка проверки привилегий доверенного субъекта '$trusteeSID': $_"
                     }
 
                     # A trustee that is already privileged holds nothing it did not have.
@@ -372,7 +372,7 @@
                     try {
                         $trusteeIsExchange = [bool](Test-IsExchangeServiceGroup -Identity $trusteeSID).IsExchangeService
                     } catch {
-                        Write-Log "[Get-WeakCertificateMapping] Exchange check failed for trustee '$trusteeSID': $_"
+                        Write-Log "[Get-WeakCertificateMapping] Ошибка проверки Exchange для доверенного субъекта '$trusteeSID': $_"
                     }
 
                     if ($trusteeIsExchange) { $exchangeWriters += $entry } else { $writers += $entry }
@@ -390,7 +390,7 @@
                     try {
                         $ownerPrivileged = ((Test-IsPrivileged -Identity $ownerSID).IsPrivileged -eq $true)
                     } catch {
-                        Write-Log "[Get-WeakCertificateMapping] Privilege check failed for owner '$ownerSID': $_"
+                        Write-Log "[Get-WeakCertificateMapping] Ошибка проверки привилегий владельца '$ownerSID': $_"
                     }
 
                     if (-not $ownerPrivileged) {
@@ -402,7 +402,7 @@
                             try {
                                 $ownerIsExchange = [bool](Test-IsExchangeServiceGroup -Identity $ownerSID).IsExchangeService
                             } catch {
-                                Write-Log "[Get-WeakCertificateMapping] Exchange check failed for owner '$ownerSID': $_"
+                                Write-Log "[Get-WeakCertificateMapping] Ошибка проверки Exchange для владельца '$ownerSID': $_"
                             }
                             if ($ownerIsExchange) { $exchangeWriters += $ownerEntry } else { $writers += $ownerEntry }
                         }
@@ -421,7 +421,7 @@
                 try {
                     $displayObject = @(Get-DomainObject -Identity $target.distinguishedName @connectionParams)[0]
                 } catch {
-                    Write-Log "[Get-WeakCertificateMapping] Could not re-read '$($target.distinguishedName)': $_"
+                    Write-Log "[Get-WeakCertificateMapping] Не удалось повторно прочитать '$($target.distinguishedName)': $_"
                 }
                 if (-not $displayObject) {
                     # The raw result as a last resort, without the binary descriptor: it
@@ -451,7 +451,7 @@
             }
         }
         catch {
-            Write-Log "[Get-WeakCertificateMapping] Write-access analysis failed: $_" -Level Warning
+            Write-Log "[Get-WeakCertificateMapping] Ошибка анализа прав записи: $_" -Level Warning
             # A failed analysis found nothing, which is not the same as nothing to find:
             # the green line below used to close this section after an exception.
             $writeAnalysisFailed = $true
@@ -493,7 +493,7 @@
     }
 
     end {
-        Write-Log "[Get-WeakCertificateMapping] Completed"
+        Write-Log "[Get-WeakCertificateMapping] Проверка завершена"
     }
 }
 
@@ -685,7 +685,7 @@ function Get-AltSecurityIdentitiesPropertySet {
         }
         return ([string]$raw).Trim('{', '}')
     } catch {
-        Write-Log "[Get-AltSecurityIdentitiesPropertySet] Schema lookup failed: $_"
+        Write-Log "[Get-AltSecurityIdentitiesPropertySet] Ошибка поиска в схеме: $_"
         return $null
     }
 }

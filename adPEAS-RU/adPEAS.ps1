@@ -3,8 +3,8 @@
     adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
 
 .DESCRIPTION
-    Build: 2026-11-19 11:12:38
-    Version: 2.9.0+20261119-1112
+    Build: 2026-11-19 11:34:27
+    Version: 2.9.0+20261119-1134
 
     AUTHORIZED SECURITY TESTING ONLY!
 
@@ -118393,7 +118393,7 @@ function Get-ManagedServiceAccountSecurity {
     )
 
     begin {
-        Write-Log "[Get-ManagedServiceAccountSecurity] Starting check"
+        Write-Log "[Get-ManagedServiceAccountSecurity] Начата проверка"
     }
 
     process {
@@ -118412,14 +118412,14 @@ function Get-ManagedServiceAccountSecurity {
             Show-SubHeader "Анализ защищённости управляемых учётных записей служб..." -ObjectType "gMSA"
 
             # ===== Check 1: gMSA Password Access Analysis =====
-            Write-Log "[Get-ManagedServiceAccountSecurity] Checking gMSA password access permissions"
+            Write-Log "[Get-ManagedServiceAccountSecurity] Проверка прав чтения паролей gMSA"
 
             # Get all gMSAs with details (includes msds-groupmsamembership)
             $gmsaAccounts = @(Get-DomainUser -GMSA -ShowGMSADetails @PSBoundParameters |
                 Where-Object { $_.objectClass -icontains 'msDS-GroupManagedServiceAccount' })
 
             if ($gmsaAccounts.Count -gt 0) {
-                Write-Log "[Get-ManagedServiceAccountSecurity] Found $($gmsaAccounts.Count) gMSA account(s)"
+                Write-Log "[Get-ManagedServiceAccountSecurity] Найдено учётных записей gMSA: $($gmsaAccounts.Count)"
 
                 $nonPrivilegedAccessFindings = @()
 
@@ -118471,7 +118471,7 @@ function Get-ManagedServiceAccountSecurity {
                         $gmsaReaderSIDs[$gmsaName] = @($descriptor.SIDs)
                     } catch {
                         $unparsedGMSAs += $gmsaName
-                        Write-Log "[Get-ManagedServiceAccountSecurity] Failed to parse msDS-GroupMSAMembership for $gmsaName : $_"
+                        Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось разобрать msDS-GroupMSAMembership для $gmsaName : $_"
                     }
                 }
                 if ($totalGMSAs -gt $Script:ProgressThreshold) { Show-Progress -Activity "Analyzing gMSA security" -Completed }
@@ -118643,7 +118643,7 @@ function Get-ManagedServiceAccountSecurity {
                             $expiresValue -gt 0 -and $expiresValue -ne 9223372036854775807) {
                             $expiryText = 'unreadable'
                             try { $expiryText = Format-adPEASDate ([DateTime]::FromFileTimeUtc($expiresValue)) 'yyyy-MM-dd' } catch {
-                                Write-Log "[Get-ManagedServiceAccountSecurity] Could not read accountExpires of $($gmsa.sAMAccountName): $_"
+                                Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось прочитать accountExpires для $($gmsa.sAMAccountName): $_"
                             }
                         }
                     }
@@ -118660,7 +118660,7 @@ function Get-ManagedServiceAccountSecurity {
                 }
 
                 # ===== Check 2: Attempt to read gMSA passwords =====
-                Write-Log "[Get-ManagedServiceAccountSecurity] Attempting to read gMSA passwords"
+                Write-Log "[Get-ManagedServiceAccountSecurity] Попытка чтения паролей gMSA"
                 Show-SubHeader "Проверка доступа текущего пользователя к паролям gMSA..." -ObjectType "gMSAPassword"
 
                 $passwordsRetrieved = 0
@@ -118679,7 +118679,7 @@ function Get-ManagedServiceAccountSecurity {
                     $gmsaName = $gmsa.sAMAccountName
                     $gmsaDN = $gmsa.distinguishedName
 
-                    Write-Log "[Get-ManagedServiceAccountSecurity] Attempting to read password for $gmsaName"
+                    Write-Log "[Get-ManagedServiceAccountSecurity] Попытка чтения пароля для $gmsaName"
 
                     try {
                         # Query msDS-ManagedPassword - this is a constructed attribute
@@ -118740,17 +118740,17 @@ function Get-ManagedServiceAccountSecurity {
                                     Show-Line "NT-хеш можно использовать для Pass-the-Hash, Overpass-the-Hash или имитации DCSync" -Class Hint
                                     Show-EmptyLine
                                 } else {
-                                    Write-Log "[Get-ManagedServiceAccountSecurity] Failed to parse password blob for $gmsaName"
+                                    Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось разобрать блок данных пароля для $gmsaName"
                                 }
                             } else {
-                                Write-Log "[Get-ManagedServiceAccountSecurity] Password blob is empty or invalid type for $gmsaName"
+                                Write-Log "[Get-ManagedServiceAccountSecurity] Блок данных пароля пуст или имеет неверный тип для $gmsaName"
                             }
                         } else {
-                            Write-Log "[Get-ManagedServiceAccountSecurity] No msDS-ManagedPassword returned for $gmsaName (access denied or not available)"
+                            Write-Log "[Get-ManagedServiceAccountSecurity] Атрибут msDS-ManagedPassword для $gmsaName не возвращён (нет доступа или недоступен)"
                         }
                     } catch {
                         $readFailures++
-                        Write-Log "[Get-ManagedServiceAccountSecurity] Error reading password for $gmsaName : $_"
+                        Write-Log "[Get-ManagedServiceAccountSecurity] Ошибка чтения пароля для $gmsaName : $_"
                     }
                 }
                 if ($totalGMSAs -gt $Script:ProgressThreshold) { Show-Progress -Activity "Analyzing gMSA security" -Completed }
@@ -118769,7 +118769,7 @@ function Get-ManagedServiceAccountSecurity {
                         $encryptedSession = $true
                     }
                 } catch {
-                    Write-Log "[Get-ManagedServiceAccountSecurity] Could not read the session's encryption state: $_"
+                    Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось прочитать состояние шифрования сеанса: $_"
                 }
                 if (-not $encryptedSession -and $Script:LDAPContext -and $Script:LDAPContext.UseLDAPS) {
                     $encryptedSession = $true
@@ -118824,7 +118824,7 @@ function Get-ManagedServiceAccountSecurity {
             }
 
             # ===== Check 3: Standalone MSA Detection =====
-            Write-Log "[Get-ManagedServiceAccountSecurity] Checking for standalone MSAs"
+            Write-Log "[Get-ManagedServiceAccountSecurity] Проверка отдельных учётных записей MSA"
 
             # Standalone MSAs are a different account type answering a different question,
             # and every other stage of this check announces itself. Without a header of its
@@ -118869,7 +118869,7 @@ function Get-ManagedServiceAccountSecurity {
             # while every link showed on the accounts. Get-DomainUser -GMSA does not find a
             # dMSA either - the class derives from computer, not from
             # msDS-ManagedServiceAccount.
-            Write-Log "[Get-ManagedServiceAccountSecurity] Checking delegated Managed Service Account links"
+            Write-Log "[Get-ManagedServiceAccountSecurity] Проверка связей делегированных управляемых служебных учётных записей"
 
             # Only a schema with the class can hold a dMSA. Without it the section stays away
             # rather than reporting the absence of something the forest cannot have.
@@ -118886,7 +118886,7 @@ function Get-ManagedServiceAccountSecurity {
             if ($schemaDN) {
                 $dmsaClass = @(Get-DomainObject -LDAPFilter '(&(objectClass=classSchema)(lDAPDisplayName=msDS-DelegatedManagedServiceAccount))' -SearchBase $schemaDN -Properties 'lDAPDisplayName' @PSBoundParameters)[0]
             } else {
-                Write-Log "[Get-ManagedServiceAccountSecurity] No schema naming context - dMSA links not checked"
+                Write-Log "[Get-ManagedServiceAccountSecurity] Контекст именования схемы отсутствует — связи dMSA не проверены"
             }
 
             if ($dmsaClass) {
@@ -118996,7 +118996,7 @@ function Get-ManagedServiceAccountSecurity {
                     try {
                         $readableDMSA = @(Get-DomainObject -Identity ([string]@($linkedDMSAs)[0]) -Properties 'objectClass' @PSBoundParameters)[0]
                     } catch {
-                        Write-Log "[Get-ManagedServiceAccountSecurity] Could not read the dMSA $(@($linkedDMSAs)[0]): $_"
+                        Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось прочитать dMSA $(@($linkedDMSAs)[0]): $_"
                     }
                     if (-not $readableDMSA) {
                         Show-Line "Текущая учётная запись не может прочитать объекты dMSA — проверка прав использования каждой dMSA не выполнена" -Class Note
@@ -119045,7 +119045,7 @@ function Get-ManagedServiceAccountSecurity {
                             if ($descriptor.Owner) { $dmsaOwners[$dmsaName] = $descriptor.Owner }
                         } catch {
                             $unparsedDMSAs += $dmsaName
-                            Write-Log "[Get-ManagedServiceAccountSecurity] Failed to parse msDS-GroupMSAMembership for $dmsaName : $_"
+                            Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось разобрать msDS-GroupMSAMembership для $dmsaName : $_"
                         }
                     }
 
@@ -119126,13 +119126,13 @@ function Get-ManagedServiceAccountSecurity {
             }
 
         } catch {
-            Write-Log "[Get-ManagedServiceAccountSecurity] Error: $_" -Level Error
+            Write-Log "[Get-ManagedServiceAccountSecurity] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: управляемые учётные записи служб оценить не удалось: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-ManagedServiceAccountSecurity] Check completed"
+        Write-Log "[Get-ManagedServiceAccountSecurity] Проверка завершена"
     }
 }
 
@@ -119265,7 +119265,7 @@ function Get-ManagedAccountDescriptorMap {
             }
         }
     } catch {
-        Write-Log "[Get-ManagedServiceAccountSecurity] Could not read the managed service account membership descriptors: $_" -Level Warning
+        Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось прочитать дескрипторы членства управляемых служебных учётных записей: $_" -Level Warning
     }
     return $descriptors
 }
@@ -119326,7 +119326,7 @@ function Get-ManagedAccountDescriptorReader {
         $sdOwner = $sd.GetOwner([System.Security.Principal.SecurityIdentifier])
         if ($sdOwner) { $owner = [string]$sdOwner.Value }
     } catch {
-        Write-Log "[Get-ManagedServiceAccountSecurity] Could not read the descriptor owner of $Name : $_"
+        Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось прочитать владельца дескриптора для $Name : $_"
     }
 
     [PSCustomObject]@{
@@ -119405,7 +119405,7 @@ function Get-ManagedAccountReaderKind {
             }
         } catch {
             $readerKind = 'Unresolved'
-            Write-Log "[Get-ManagedServiceAccountSecurity] Could not classify password reader $readerSID : $_"
+            Write-Log "[Get-ManagedServiceAccountSecurity] Не удалось определить категорию читателя пароля $readerSID : $_"
         }
         $readerKinds[$readerSID] = $readerKind
     }
@@ -129294,7 +129294,7 @@ function Get-GPOPermissions {
     )
 
     begin {
-        Write-Log "[Get-GPOPermissions] Starting check"
+        Write-Log "[Get-GPOPermissions] Начата проверка"
 
         # Dangerous ACE Types for GPOs
         # Must cover everything Get-ObjectACL -DangerousOnly hands over, otherwise a
@@ -129394,12 +129394,12 @@ function Get-GPOPermissions {
                         $descriptorLookup[[string]$rawGPO.distinguishedName] = $rawGPO.nTSecurityDescriptor
                     }
                 }
-                Write-Log "[Get-GPOPermissions] Prefetched $($descriptorLookup.Count) security descriptor(s) in one query"
+                Write-Log "[Get-GPOPermissions] Дескрипторов безопасности, полученных одним запросом: $($descriptorLookup.Count)"
             }
             catch {
                 # A failed prefetch is not fatal: the loop falls back to reading each
                 # descriptor itself, which is what it did before.
-                Write-Log "[Get-GPOPermissions] Descriptor prefetch failed, falling back to one read per GPO: $_" -Level Warning
+                Write-Log "[Get-GPOPermissions] Не удалось предварительно получить дескрипторы — переход к отдельному чтению каждой GPO: $_" -Level Warning
             }
 
             # ===== Step 2: Enumerate Computers for Impact Analysis =====
@@ -129446,7 +129446,7 @@ function Get-GPOPermissions {
                 $gpoDN = $gpo.DistinguishedName
                 $gpoGUID = $gpo.Name
 
-                Write-Log "[Get-GPOPermissions] Analyzing GPO: $gpoDisplayName ($gpoGUID)"
+                Write-Log "[Get-GPOPermissions] Анализ GPO: $gpoDisplayName ($gpoGUID)"
 
                 try {
                     # Use Get-ObjectACL for ACL analysis (handles credentials automatically)
@@ -129482,7 +129482,7 @@ function Get-GPOPermissions {
                     # the descriptor could not be read and when it could not be parsed, and
                     # the GPO then counted as analyzed and clean in the Secure line below.
                     if (-not $aclResult) {
-                        Write-Log "[Get-GPOPermissions] Security descriptor of GPO '$gpoDisplayName' could not be read or parsed - its permissions are unknown" -Level Warning
+                        Write-Log "[Get-GPOPermissions] Дескриптор безопасности GPO '$gpoDisplayName' нельзя прочитать или разобрать — права неизвестны" -Level Warning
                         $unreadGPOs += $gpoDisplayName
                         continue
                     }
@@ -129498,11 +129498,11 @@ function Get-GPOPermissions {
                             Owner    = if ($aclResult.Owner) { $aclResult.Owner } else { ConvertFrom-SID -SID $aclResult.OwnerSID }
                             OwnerSID = $aclResult.OwnerSID
                         }
-                        Write-Log "[Get-GPOPermissions] GPO '$gpoDisplayName' is owned by $($ownerFinding.Owner), which is not a default owner"
+                        Write-Log "[Get-GPOPermissions] Владелец GPO '$gpoDisplayName' — $($ownerFinding.Owner), это не владелец по умолчанию"
                     }
 
                     if (-not $aclResult.ACEs -or @($aclResult.ACEs).Count -eq 0) {
-                        Write-Log "[Get-GPOPermissions] No dangerous ACEs found for GPO: $gpoDisplayName"
+                        Write-Log "[Get-GPOPermissions] Опасных ACE для GPO не найдено: $gpoDisplayName"
                         if ($ownerFinding) { $ownerOnlyGPOs[$gpoGUID] = @{ GPO = $gpo; Owner = $ownerFinding } }
                         continue
                     }
@@ -129529,7 +129529,7 @@ function Get-GPOPermissions {
                     }
 
                     $dangerousAces = @($aclResult.ACEs | Where-Object { $_.AccessControlType -eq 'Allow' })
-                    Write-Log "[Get-GPOPermissions] Processing $($dangerousAces.Count) dangerous ACE(s) for GPO: $gpoDisplayName"
+                    Write-Log "[Get-GPOPermissions] Обработка $($dangerousAces.Count) опасных ACE для GPO: $gpoDisplayName"
                     $vulnerableIdentities = @()
 
                     foreach ($ace in $dangerousAces) {
@@ -129540,7 +129540,7 @@ function Get-GPOPermissions {
 
                         # Skip ACEs with empty SID (can occur with orphaned/deleted principals)
                         if ([string]::IsNullOrEmpty($aceSID)) {
-                            Write-Log "[Get-GPOPermissions] Skipping ACE with empty SID on GPO $gpoDisplayName (ACE object type: $($ace.GetType().FullName))"
+                            Write-Log "[Get-GPOPermissions] Пропуск ACE с пустым SID в GPO $gpoDisplayName (тип объекта ACE: $($ace.GetType().FullName))"
                             continue
                         }
 
@@ -129550,7 +129550,7 @@ function Get-GPOPermissions {
                         # settings live in SYSVOL and the link lives on the OU, so a right over
                         # those two sub-containers is not a path to modifying the GPO.
                         if (-not (Test-ACEAppliesToSelf -ACE $ace)) {
-                            Write-Log "[Get-GPOPermissions] Skipping descendants-only ACE on GPO $gpoDisplayName : $($ace.Trustee), PropagationFlags=$($ace.PropagationFlags)"
+                            Write-Log "[Get-GPOPermissions] Пропуск ACE только для потомков в GPO $gpoDisplayName : $($ace.Trustee), PropagationFlags=$($ace.PropagationFlags)"
                             continue
                         }
 
@@ -129578,7 +129578,7 @@ function Get-GPOPermissions {
                         foreach ($dangerousRight in $Script:DangerousGPOAccessRights) {
                             if ($aceRightsRaw -notcontains $dangerousRight) { continue }
                             if ($deniedForTrustee -contains $dangerousRight) {
-                                Write-Log "[Get-GPOPermissions] $aceSID holds $dangerousRight on GPO $gpoDisplayName but a Deny ACE takes it away"
+                                Write-Log "[Get-GPOPermissions] Субъект $aceSID имеет право $dangerousRight в GPO $gpoDisplayName, но оно отменено запрещающим ACE"
                                 continue
                             }
                             $matchedRights += $dangerousRight
@@ -129643,7 +129643,7 @@ function Get-GPOPermissions {
                             if ($resolvedScope -and $resolvedScope.Type -eq 'SchemaClass') {
                                 # Scoped to a child class: creates and deletes objects of that
                                 # class below the GPO, and writes nothing of it.
-                                Write-Log "[Get-GPOPermissions] $($ace.Trustee) holds $aceRights on GPO $gpoDisplayName scoped to the class $($resolvedScope.Name) - no right over the policy"
+                                Write-Log "[Get-GPOPermissions] Субъект $($ace.Trustee) имеет права $aceRights в GPO $gpoDisplayName для класса $($resolvedScope.Name) — прав на саму политику нет"
                                 continue
                             }
                             # GenericAll and GenericWrite carry the WriteProperty bit, which is
@@ -129682,7 +129682,7 @@ function Get-GPOPermissions {
                         # Check if SID is expected (Creator Owner, SELF, etc.) using GPO context
                         $expectedCheck = Test-IsExpectedACLIdentity -SID $aceSID -Context 'GPO'
                         if ($expectedCheck.Skip) {
-                            Write-Log "[Get-GPOPermissions] Skipping expected identity $aceSID on GPO $gpoDisplayName : $($expectedCheck.Reason)"
+                            Write-Log "[Get-GPOPermissions] Пропущен ожидаемый субъект $aceSID в GPO $gpoDisplayName : $($expectedCheck.Reason)"
                             continue
                         }
 
@@ -129697,12 +129697,12 @@ function Get-GPOPermissions {
                             $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'GPO' -ReturnDetails
 
                             if ($scopeResult.Severity -eq 'Expected') {
-                                Write-Log "[Get-GPOPermissions] Expected identity $aceSID has $aceRights on GPO $gpoDisplayName - $($scopeResult.Reason)"
+                                Write-Log "[Get-GPOPermissions] Ожидаемый субъект $aceSID имеет права $aceRights в GPO $gpoDisplayName — $($scopeResult.Reason)"
                                 continue
                             }
 
                             if ($scopeResult.Severity -eq 'Attention') {
-                                Write-Log "[Get-GPOPermissions] Attention: $identityName has $aceRights on GPO $gpoDisplayName - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)"
+                                Write-Log "[Get-GPOPermissions] Требует внимания: $identityName имеет права $aceRights в GPO $gpoDisplayName — $($scopeResult.Reason); пропущен (для включения укажите -IncludePrivileged)"
                                 continue
                             }
 
@@ -129711,7 +129711,7 @@ function Get-GPOPermissions {
                             # -IncludePrivileged: Show ALL accounts, but mark privileged ones for yellow display
                             $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'GPO' -ReturnDetails
                             $severity = $scopeResult.Severity
-                            Write-Log "[Get-GPOPermissions] IncludePrivileged: Including $identityName ($aceSID) with severity $severity on GPO $gpoDisplayName"
+                            Write-Log "[Get-GPOPermissions] IncludePrivileged: субъект $identityName ($aceSID) включён с критичностью $severity в GPO $gpoDisplayName"
                         }
 
                         # A write that cannot reach the policy content is not the takeover
@@ -129722,7 +129722,7 @@ function Get-GPOPermissions {
                             $severity = 'Hint'
                         }
 
-                        Write-Log "[Get-GPOPermissions] FINDING: $identityName has $dangerousRightMatched on GPO $gpoDisplayName (inherited: $([bool]$ace.IsInherited))"
+                        Write-Log "[Get-GPOPermissions] НАХОДКА: субъект $identityName обладает опасным правом $dangerousRightMatched в GPO $gpoDisplayName (унаследовано: $([bool]$ace.IsInherited))"
 
                         $vulnerableIdentities += [PSCustomObject]@{
                             Identity = $identityName
@@ -129959,7 +129959,7 @@ function Get-GPOPermissions {
                     }
                 }
                 catch {
-                    Write-Log "[Get-GPOPermissions] Error analyzing GPO $gpoDisplayName : $_"
+                    Write-Log "[Get-GPOPermissions] Ошибка анализа GPO $gpoDisplayName : $_"
                 }
             }
             if ($totalGPOs -gt $Script:ProgressThreshold) { Show-Progress -Activity "Checking GPO permissions" -Completed }
@@ -129991,7 +129991,7 @@ function Get-GPOPermissions {
                 $policiesPath = "\\$($Script:LDAPContext.Server)\SYSVOL\$($Script:LDAPContext.Domain)\Policies"
 
                 if (-not (Test-Path $policiesPath)) {
-                    Write-Log "[Get-GPOPermissions] SYSVOL is not reachable at $policiesPath - the folder permissions were not examined"
+                    Write-Log "[Get-GPOPermissions] SYSVOL по пути $policiesPath недоступен — разрешения на папки не проверялись"
                     return
                 }
 
@@ -130006,7 +130006,7 @@ function Get-GPOPermissions {
                     $policyFolders = @{}
                     foreach ($listedFolder in $listedFolders) { $policyFolders[[string]$listedFolder.Name] = $true }
                 } else {
-                    Write-Log "[Get-GPOPermissions] Could not list $policiesPath - missing and orphaned policy folders are not told apart: $($folderListErrors[0])"
+                    Write-Log "[Get-GPOPermissions] Невозможно перечислить $policiesPath — нельзя отличить отсутствующие папки политик от осиротевших: $($folderListErrors[0])"
                 }
 
                 # The policies with a gpt.ini, from the SYSVOL listing. A client opens the
@@ -130306,13 +130306,13 @@ function Get-GPOPermissions {
             }
 
         } catch {
-            Write-Log "[Get-GPOPermissions] Error: $_" -Level Error
+            Write-Log "[Get-GPOPermissions] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить разрешения GPO: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-GPOPermissions] Check completed"
+        Write-Log "[Get-GPOPermissions] Проверка завершена"
     }
 }
 
@@ -137272,7 +137272,7 @@ function Get-WeakCertificateMapping {
     )
 
     begin {
-        Write-Log "[Get-WeakCertificateMapping] Starting ESC14 explicit certificate mapping analysis"
+        Write-Log "[Get-WeakCertificateMapping] Начат анализ явных сопоставлений сертификатов ESC14"
     }
 
     process {
@@ -137315,12 +137315,12 @@ function Get-WeakCertificateMapping {
             }
         }
         catch {
-            Write-Log "[Get-WeakCertificateMapping] Query for altSecurityIdentities failed: $_" -Level Warning
+            Write-Log "[Get-WeakCertificateMapping] Ошибка запроса altSecurityIdentities: $_" -Level Warning
             Show-Line "Не удалось прочитать явные сопоставления сертификатов: $($_.Exception.Message)" -Class Note
             return
         }
 
-        Write-Log "[Get-WeakCertificateMapping] Found $(@($candidates).Count) principal(s) with an explicit mapping"
+        Write-Log "[Get-WeakCertificateMapping] Найдено субъектов с явным сопоставлением: $(@($candidates).Count)"
 
         $weakFindings = @()
         foreach ($candidate in $candidates) {
@@ -137341,7 +137341,7 @@ function Get-WeakCertificateMapping {
                     # Neither an X509 form nor anything AD maps a certificate through -
                     # Kerberos and NTLM identities also live in this attribute. Reported as
                     # neither, rather than guessed at.
-                    Write-Log "[Get-WeakCertificateMapping] Ignoring non-X509 mapping on '$($principal.sAMAccountName)': $mapping"
+                    Write-Log "[Get-WeakCertificateMapping] Пропущено сопоставление не-X509 для '$($principal.sAMAccountName)': $mapping"
                 }
             }
 
@@ -137358,7 +137358,7 @@ function Get-WeakCertificateMapping {
             try {
                 $isPrivileged = ((Test-IsPrivileged -Identity $principal.objectSid).IsPrivileged -eq $true)
             } catch {
-                Write-Log "[Get-WeakCertificateMapping] Privilege check failed for '$($principal.sAMAccountName)': $_"
+                Write-Log "[Get-WeakCertificateMapping] Ошибка проверки привилегий '$($principal.sAMAccountName)': $_"
             }
 
             # Phase 2, and only now: the full object, without -Properties, because this one
@@ -137372,7 +137372,7 @@ function Get-WeakCertificateMapping {
                     @(Get-DomainUser -Identity $principal.distinguishedName @connectionParams)[0]
                 }
             } catch {
-                Write-Log "[Get-WeakCertificateMapping] Could not re-read '$($principal.distinguishedName)': $_"
+                Write-Log "[Get-WeakCertificateMapping] Не удалось повторно прочитать '$($principal.distinguishedName)': $_"
             }
 
             # The light object still carries name, SID and the mappings, so a failed
@@ -137466,11 +137466,11 @@ function Get-WeakCertificateMapping {
             # recognised as what it is.
             $altSecPropertySet = Get-AltSecurityIdentitiesPropertySet -CredParams $connectionParams
             if ($altSecPropertySet) {
-                Write-Log "[Get-WeakCertificateMapping] altSecurityIdentities belongs to property set $altSecPropertySet"
+                Write-Log "[Get-WeakCertificateMapping] Атрибут altSecurityIdentities относится к набору свойств $altSecPropertySet"
             } elseif (@($privilegedTargets).Count -gt 0) {
                 Show-Line "Не удалось прочитать набор свойств с altSecurityIdentities; делегирование на этот набор не проверено" -Class Note
             }
-            Write-Log "[Get-WeakCertificateMapping] Checking altSecurityIdentities write access on $(@($privilegedTargets).Count) privileged principal(s)"
+            Write-Log "[Get-WeakCertificateMapping] Проверка права записи altSecurityIdentities для привилегированных субъектов: $(@($privilegedTargets).Count)"
 
             foreach ($target in $privilegedTargets) {
                 if (-not $target.distinguishedName) { continue }
@@ -137480,7 +137480,7 @@ function Get-WeakCertificateMapping {
                 try {
                     $descriptor = ConvertFrom-SecurityDescriptor -SecurityDescriptorBytes $target.nTSecurityDescriptor
                 } catch {
-                    Write-Log "[Get-WeakCertificateMapping] Could not read the descriptor of '$($target.distinguishedName)': $_"
+                    Write-Log "[Get-WeakCertificateMapping] Не удалось прочитать дескриптор '$($target.distinguishedName)': $_"
                     continue
                 }
 
@@ -137537,7 +137537,7 @@ function Get-WeakCertificateMapping {
                     try {
                         $trusteePrivileged = ((Test-IsPrivileged -Identity $trusteeSID).IsPrivileged -eq $true)
                     } catch {
-                        Write-Log "[Get-WeakCertificateMapping] Privilege check failed for trustee '$trusteeSID': $_"
+                        Write-Log "[Get-WeakCertificateMapping] Ошибка проверки привилегий доверенного субъекта '$trusteeSID': $_"
                     }
 
                     # A trustee that is already privileged holds nothing it did not have.
@@ -137558,7 +137558,7 @@ function Get-WeakCertificateMapping {
                     try {
                         $trusteeIsExchange = [bool](Test-IsExchangeServiceGroup -Identity $trusteeSID).IsExchangeService
                     } catch {
-                        Write-Log "[Get-WeakCertificateMapping] Exchange check failed for trustee '$trusteeSID': $_"
+                        Write-Log "[Get-WeakCertificateMapping] Ошибка проверки Exchange для доверенного субъекта '$trusteeSID': $_"
                     }
 
                     if ($trusteeIsExchange) { $exchangeWriters += $entry } else { $writers += $entry }
@@ -137576,7 +137576,7 @@ function Get-WeakCertificateMapping {
                     try {
                         $ownerPrivileged = ((Test-IsPrivileged -Identity $ownerSID).IsPrivileged -eq $true)
                     } catch {
-                        Write-Log "[Get-WeakCertificateMapping] Privilege check failed for owner '$ownerSID': $_"
+                        Write-Log "[Get-WeakCertificateMapping] Ошибка проверки привилегий владельца '$ownerSID': $_"
                     }
 
                     if (-not $ownerPrivileged) {
@@ -137588,7 +137588,7 @@ function Get-WeakCertificateMapping {
                             try {
                                 $ownerIsExchange = [bool](Test-IsExchangeServiceGroup -Identity $ownerSID).IsExchangeService
                             } catch {
-                                Write-Log "[Get-WeakCertificateMapping] Exchange check failed for owner '$ownerSID': $_"
+                                Write-Log "[Get-WeakCertificateMapping] Ошибка проверки Exchange для владельца '$ownerSID': $_"
                             }
                             if ($ownerIsExchange) { $exchangeWriters += $ownerEntry } else { $writers += $ownerEntry }
                         }
@@ -137607,7 +137607,7 @@ function Get-WeakCertificateMapping {
                 try {
                     $displayObject = @(Get-DomainObject -Identity $target.distinguishedName @connectionParams)[0]
                 } catch {
-                    Write-Log "[Get-WeakCertificateMapping] Could not re-read '$($target.distinguishedName)': $_"
+                    Write-Log "[Get-WeakCertificateMapping] Не удалось повторно прочитать '$($target.distinguishedName)': $_"
                 }
                 if (-not $displayObject) {
                     # The raw result as a last resort, without the binary descriptor: it
@@ -137637,7 +137637,7 @@ function Get-WeakCertificateMapping {
             }
         }
         catch {
-            Write-Log "[Get-WeakCertificateMapping] Write-access analysis failed: $_" -Level Warning
+            Write-Log "[Get-WeakCertificateMapping] Ошибка анализа прав записи: $_" -Level Warning
             # A failed analysis found nothing, which is not the same as nothing to find:
             # the green line below used to close this section after an exception.
             $writeAnalysisFailed = $true
@@ -137679,7 +137679,7 @@ function Get-WeakCertificateMapping {
     }
 
     end {
-        Write-Log "[Get-WeakCertificateMapping] Completed"
+        Write-Log "[Get-WeakCertificateMapping] Проверка завершена"
     }
 }
 
@@ -137871,7 +137871,7 @@ function Get-AltSecurityIdentitiesPropertySet {
         }
         return ([string]$raw).Trim('{', '}')
     } catch {
-        Write-Log "[Get-AltSecurityIdentitiesPropertySet] Schema lookup failed: $_"
+        Write-Log "[Get-AltSecurityIdentitiesPropertySet] Ошибка поиска в схеме: $_"
         return $null
     }
 }
@@ -137933,7 +137933,7 @@ function Get-ExchangeInfrastructure {
     )
 
     begin {
-        Write-Log "[Get-ExchangeInfrastructure] Starting check"
+        Write-Log "[Get-ExchangeInfrastructure] Начата проверка"
     }
 
     process {
@@ -138011,7 +138011,7 @@ function Get-ExchangeInfrastructure {
                 }
             }
             catch {
-                Write-Log "[Get-ExchangeInfrastructure] Exchange Organization not Found: $_"
+                Write-Log "[Get-ExchangeInfrastructure] Организация Exchange не найдена: $_"
             }
 
             if (-not $exchangeOrgExists) {
@@ -138043,7 +138043,7 @@ function Get-ExchangeInfrastructure {
                     $_.distinguishedName -match "CN=$([regex]::Escape($_.name)),CN=Servers,"
                 })
             } catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error querying Config partition servers: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса серверов из раздела Configuration: $_" -Level Error
             }
 
             try {
@@ -138056,25 +138056,25 @@ function Get-ExchangeInfrastructure {
                 $vdirFilter = '(|' + ($vdirParts -join '') + ')'
                 $allVDirs = @(Get-DomainObject -LDAPFilter $vdirFilter -SearchBase $exchangeBase @PSBoundParameters)
             } catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error querying Virtual Directories: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса виртуальных каталогов: $_" -Level Error
             }
 
             try {
                 $allRecvConnectors = @(Get-DomainObject -LDAPFilter "(objectClass=msExchSmtpReceiveConnector)" -SearchBase $exchangeBase @PSBoundParameters)
             } catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error querying SMTP Receive Connectors: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса SMTP-коннекторов приёма: $_" -Level Error
             }
 
             try {
                 $allSendConnectors = @(Get-DomainObject -LDAPFilter "(objectClass=msExchRoutingSMTPConnector)" -SearchBase $exchangeBase @PSBoundParameters)
             } catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error querying SMTP Send Connectors: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса SMTP-коннекторов отправки: $_" -Level Error
             }
 
             try {
                 $allAcceptedDomains = @(Get-DomainObject -LDAPFilter "(objectClass=msExchAcceptedDomain)" -SearchBase $exchangeBase @PSBoundParameters)
             } catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error querying Accepted Domains: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса обслуживаемых доменов: $_" -Level Error
             }
 
             # The coexistence relationship, read here with the rest so the organization
@@ -138087,7 +138087,7 @@ function Get-ExchangeInfrastructure {
             }
             catch {
                 $hybridQueryFailed = $true
-                Write-Log "[Get-ExchangeInfrastructure] Error querying hybrid configuration: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка запроса гибридной конфигурации: $_" -Level Error
             }
 
             # Every organization has an accepted domain: setup creates the default one, and
@@ -138368,7 +138368,7 @@ function Get-ExchangeInfrastructure {
                 }
             }
             catch {
-                Write-Log "[Get-ExchangeInfrastructure] Error enumerating Exchange servers: $_" -Level Error
+                Write-Log "[Get-ExchangeInfrastructure] Ошибка перечисления серверов Exchange: $_" -Level Error
             }
 
             if (@($exchangeServers).Count -gt 0) {
@@ -138391,7 +138391,7 @@ function Get-ExchangeInfrastructure {
                             if ($isInactive) {
                                 # Deliberately silent: the INACTIVE activity marker on the card
                                 # already explains why no endpoints were probed.
-                                Write-Log "[Get-ExchangeInfrastructure] Skipping HTTP check for $($exServer.DNSHostName) - server inactive"
+                                Write-Log "[Get-ExchangeInfrastructure] HTTP-проверка $($exServer.DNSHostName) пропущена — сервер неактивен"
                             } else {
                                 # Fast TCP reachability check before expensive HTTP tests
                                 # This avoids multiple 3-second timeouts for unreachable servers
@@ -138406,7 +138406,7 @@ function Get-ExchangeInfrastructure {
                                     }
                                 }
                                 catch {
-                                    Write-Log "[Get-ExchangeInfrastructure] TCP check failed for $($exServer.DNSHostName): $_"
+                                    Write-Log "[Get-ExchangeInfrastructure] Ошибка проверки TCP для $($exServer.DNSHostName): $_"
                                     $tcpReachable = $false
                                 }
                                 finally {
@@ -138417,9 +138417,9 @@ function Get-ExchangeInfrastructure {
                                 }
 
                                 if (-not $tcpReachable) {
-                                    Write-Log "[Get-ExchangeInfrastructure] Skipping HTTP check for $($exServer.DNSHostName) - TCP port 443 not reachable"
+                                    Write-Log "[Get-ExchangeInfrastructure] HTTP-проверка $($exServer.DNSHostName) пропущена — порт TCP 443 недоступен"
                                 } else {
-                                    Write-Log "[Get-ExchangeInfrastructure] Detecting Exchange endpoints and EPA for $($exServer.DNSHostName)..."
+                                    Write-Log "[Get-ExchangeInfrastructure] Определение конечных точек Exchange и EPA для $($exServer.DNSHostName)..."
 
                                     try {
                                         # Request with -TestEPA to check Extended Protection for Authentication
@@ -138429,7 +138429,7 @@ function Get-ExchangeInfrastructure {
                                         if ($httpResult.Success) {
                                             $httpBuildNumber = $httpResult.BuildNumber
                                             $httpVersion = Convert-ExchangeBuildToVersion -BuildNumber $httpBuildNumber
-                                            Write-Log "[Get-ExchangeInfrastructure] HTTP detection successful: $httpBuildNumber"
+                                            Write-Log "[Get-ExchangeInfrastructure] Обнаружена версия Exchange через HTTP: $httpBuildNumber"
 
                                             # Add ExchangeVersion and ExchangeBuildNumber as properties to the object
                                             if ($httpBuildNumber) {
@@ -138439,12 +138439,12 @@ function Get-ExchangeInfrastructure {
 
                                             # Log EPA detection result
                                             if ($null -ne $httpResult.EPAEnabled) {
-                                                Write-Log "[Get-ExchangeInfrastructure] EPA detection: Enabled=$($httpResult.EPAEnabled), Confidence=$($httpResult.EPAConfidence)"
+                                                Write-Log "[Get-ExchangeInfrastructure] Обнаружение EPA: включено=$($httpResult.EPAEnabled), достоверность=$($httpResult.EPAConfidence)"
                                             }
                                         }
                                     }
                                     catch {
-                                        Write-Log "[Get-ExchangeInfrastructure] HTTP detection failed: $_"
+                                        Write-Log "[Get-ExchangeInfrastructure] Не удалось выполнить обнаружение через HTTP: $_"
                                     }
                                 }
 
@@ -138700,10 +138700,10 @@ function Get-ExchangeInfrastructure {
                             $smtpRightsByGuid[([string]$right.rightsGuid).ToLower()] = ([string]$right.displayName).ToLower()
                         }
                     }
-                    Write-Log "[Get-ExchangeInfrastructure] Resolved $($smtpRightsByGuid.Count) SMTP extended right(s) from the Configuration partition"
+                    Write-Log "[Get-ExchangeInfrastructure] Определены расширенные права SMTP из раздела Configuration: $($smtpRightsByGuid.Count)"
                 }
                 catch {
-                    Write-Log "[Get-ExchangeInfrastructure] Error resolving SMTP extended rights: $_" -Level Error
+                    Write-Log "[Get-ExchangeInfrastructure] Ошибка определения расширенных прав SMTP: $_" -Level Error
                 }
 
                 # Security descriptors for all connectors in one query. Get-ObjectACL reads
@@ -138719,7 +138719,7 @@ function Get-ExchangeInfrastructure {
                     }
                 }
                 catch {
-                    Write-Log "[Get-ExchangeInfrastructure] Error reading receive connector descriptors: $_" -Level Error
+                    Write-Log "[Get-ExchangeInfrastructure] Ошибка чтения дескрипторов коннекторов приёма: $_" -Level Error
                 }
 
                 # The unauthenticated subset of the central broad-principal list
@@ -138840,7 +138840,7 @@ function Get-ExchangeInfrastructure {
                             }
                         }
                         catch {
-                            Write-Log "[Get-ExchangeInfrastructure] Error parsing connector ACL for ${connectorDN}: $_" -Level Error
+                            Write-Log "[Get-ExchangeInfrastructure] Ошибка разбора ACL коннектора ${connectorDN}: $_" -Level Error
                         }
                     }
 
@@ -139006,7 +139006,7 @@ function Get-ExchangeInfrastructure {
                     }
                 }
                 catch {
-                    Write-Log "[Get-ExchangeInfrastructure] Error resolving ${modelGroupName}: $_" -Level Error
+                    Write-Log "[Get-ExchangeInfrastructure] Ошибка определения ${modelGroupName}: $_" -Level Error
                 }
             }
 
@@ -139048,7 +139048,7 @@ function Get-ExchangeInfrastructure {
                 $protectedGroupsOU = @(Get-DomainObject -Identity "OU=Microsoft Exchange Protected Groups,$domainDN" @PSBoundParameters)[0]
             }
             catch {
-                Write-Log "[Get-ExchangeInfrastructure] Microsoft Exchange Protected Groups OU not present: $_"
+                Write-Log "[Get-ExchangeInfrastructure] OU Microsoft Exchange Protected Groups отсутствует: $_"
             }
 
             # Setup /PrepareAD creates that OU in the forest root only, so in a child domain
@@ -139087,7 +139087,7 @@ function Get-ExchangeInfrastructure {
                     }
                 }
                 catch {
-                    Write-Log "[Get-ExchangeInfrastructure] Error reading domain object ACL: $_" -Level Error
+                    Write-Log "[Get-ExchangeInfrastructure] Ошибка чтения ACL объекта домена: $_" -Level Error
                 }
 
                 if (-not $domainACLReadable) {
@@ -139120,7 +139120,7 @@ function Get-ExchangeInfrastructure {
                         # finding. Get-DangerousACLs reads these ACEs the same way.
                         $aceObjectType = [string]$ace.ObjectType
                         if ($aceObjectType -and $aceObjectType -ne '00000000-0000-0000-0000-000000000000') {
-                            Write-Log "[Get-ExchangeInfrastructure] Object-specific ACE grants no DACL rewrite: $($matchedGroup.Name), ObjectType=$aceObjectType"
+                            Write-Log "[Get-ExchangeInfrastructure] ACE для определённого типа объекта не даёт права изменения DACL: $($matchedGroup.Name), ObjectType=$aceObjectType"
                             continue
                         }
 
@@ -139343,7 +139343,7 @@ function Get-ExchangeInfrastructure {
                     Show-Object $groupObject -Class Hint
                 }
                 catch {
-                    Write-Log "[Get-ExchangeInfrastructure] Error checking $($serviceGroup.Name): $_" -Level Error
+                    Write-Log "[Get-ExchangeInfrastructure] Ошибка проверки $($serviceGroup.Name): $_" -Level Error
                     Show-Line "Не удалось прочитать группу $($serviceGroup.Name) — результат неизвестен, а не означает отсутствие участников" -Class Note
                 }
             }
@@ -139353,13 +139353,13 @@ function Get-ExchangeInfrastructure {
 
         }
         catch {
-            Write-Log "[Get-ExchangeInfrastructure] Error: $_" -Level Error
+            Write-Log "[Get-ExchangeInfrastructure] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить инфраструктуру Exchange: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-ExchangeInfrastructure] Check completed"
+        Write-Log "[Get-ExchangeInfrastructure] Проверка завершена"
     }
 }
 
@@ -142134,7 +142134,7 @@ function Find-ScriptFileCredential {
         foreach ($exclusion in $Script:CredentialExclusionPatterns) {
             if ($trimmedLine -match $exclusion) {
                 $isExcluded = $true
-                Write-Log "[Find-ScriptFileCredential] Excluded by pattern: $trimmedLine"
+                Write-Log "[Find-ScriptFileCredential] Исключено по шаблону: $trimmedLine"
                 break
             }
         }
@@ -142238,7 +142238,7 @@ function Get-CredentialExposure {
     )
 
     begin {
-        Write-Log "[Get-CredentialExposure] Starting check"
+        Write-Log "[Get-CredentialExposure] Начата проверка"
     }
 
     process {
@@ -142255,7 +142255,7 @@ function Get-CredentialExposure {
                 $scanPath = $Path
 
                 if ($Path -match '^\\\\' -and $Credential) {
-                    Write-Log "[Get-CredentialExposure] UNC path with credentials - creating temporary drive mapping"
+                    Write-Log "[Get-CredentialExposure] UNC-путь с учётными данными — создаётся временное подключение диска"
 
                     # Find an available drive letter (starting from Z: going down)
                     $usedDrives = (Get-PSDrive -PSProvider FileSystem).Name
@@ -142266,7 +142266,7 @@ function Get-CredentialExposure {
                             $null = New-PSDrive -Name $tempDriveLetter -PSProvider FileSystem -Root $Path -Credential $Credential -ErrorAction Stop
                             $scanPath = "${tempDriveLetter}:\"
                             $useTempDrive = $true
-                            Write-Log "[Get-CredentialExposure] Mapped $Path to ${tempDriveLetter}:"
+                            Write-Log "[Get-CredentialExposure] Подключён путь $Path как диск ${tempDriveLetter}:"
                         }
                         catch {
                             Show-Line "Не удалось подключиться к $Path с указанными учётными данными: $_" -Class "Finding"
@@ -142294,7 +142294,7 @@ function Get-CredentialExposure {
                 # Scan XML files for GPP passwords and AutoAdminLogon
                 $xmlFiles = Get-ChildItem -Force -Path $scanPath -Recurse -Include "*.xml" -ErrorAction SilentlyContinue
                 if (@($xmlFiles).Count -gt 0) {
-                    Write-Log "[Get-CredentialExposure] Found $(@($xmlFiles).Count) XML file(s) in custom path"
+                    Write-Log "[Get-CredentialExposure] В указанном каталоге найдено XML-файлов: $(@($xmlFiles).Count)"
                     foreach ($xmlFile in $xmlFiles) {
                         try {
                             [xml]$xmlContent = Get-Content -Path $xmlFile.Fullname -ErrorAction Stop
@@ -142310,7 +142310,7 @@ function Get-CredentialExposure {
                             }
                         }
                         catch {
-                            Write-Log "[Get-CredentialExposure] Error parsing $($xmlFile.Fullname): $_"
+                            Write-Log "[Get-CredentialExposure] Ошибка разбора $($xmlFile.Fullname): $_"
                         }
                     }
                 }
@@ -142328,7 +142328,7 @@ function Get-CredentialExposure {
                         }
                     }
                     catch {
-                        Write-Log "[Get-CredentialExposure] Error parsing $($polFile.FullName): $_"
+                        Write-Log "[Get-CredentialExposure] Ошибка разбора $($polFile.FullName): $_"
                     }
                 }
 
@@ -142338,7 +142338,7 @@ function Get-CredentialExposure {
                     Where-Object { $Script:CredentialScanSkippedFiles -notcontains $_.Name })
 
                 if (@($files).Count -gt 0) {
-                    Write-Log "[Get-CredentialExposure] Found $(@($files).Count) script/config file(s) in custom path"
+                    Write-Log "[Get-CredentialExposure] В указанном каталоге найдено файлов скриптов и конфигурации: $(@($files).Count)"
                     foreach ($file in $files) {
                         try {
                             $fileContent = $null
@@ -142346,10 +142346,10 @@ function Get-CredentialExposure {
                                 try {
                                     $encodedContent = Get-Content -Path $file.FullName -Raw -ErrorAction Stop
                                     $fileContent = ConvertFrom-VBE -EncodedScript $encodedContent
-                                    Write-Log "[Get-CredentialExposure] Decoded VBE file: $($file.Name)"
+                                    Write-Log "[Get-CredentialExposure] Файл VBE декодирован: $($file.Name)"
                                 }
                                 catch {
-                                    Write-Log "[Get-CredentialExposure] Failed to decode VBE file: $($file.Name)"
+                                    Write-Log "[Get-CredentialExposure] Не удалось декодировать файл VBE: $($file.Name)"
                                     continue
                                 }
                             }
@@ -142367,7 +142367,7 @@ function Get-CredentialExposure {
                             }
                         }
                         catch {
-                            Write-Log "[Get-CredentialExposure] Error analyzing $($file.Name): $_"
+                            Write-Log "[Get-CredentialExposure] Ошибка анализа $($file.Name): $_"
                         }
                     }
                 }
@@ -142381,10 +142381,10 @@ function Get-CredentialExposure {
                     if ($useTempDrive -and $tempDriveLetter) {
                         try {
                             Remove-PSDrive -Name $tempDriveLetter -Force -ErrorAction SilentlyContinue
-                            Write-Log "[Get-CredentialExposure] Removed temporary drive mapping ${tempDriveLetter}:"
+                            Write-Log "[Get-CredentialExposure] Отключён временный диск ${tempDriveLetter}:"
                         }
                         catch {
-                            Write-Log "[Get-CredentialExposure] Failed to remove temporary drive: $_"
+                            Write-Log "[Get-CredentialExposure] Не удалось отключить временный диск: $_"
                         }
                     }
                 }
@@ -142439,11 +142439,11 @@ function Get-CredentialExposure {
                     # Reported once, after the SMB block, where Test-SysvolAccessible can tell
                     # "not reachable at all" from "reachable but this read failed". Emitting it
                     # here as well printed the identical red line twice.
-                    Write-Log "[Get-CredentialExposure] SYSVOL path not accessible: $sysvolBase"
+                    Write-Log "[Get-CredentialExposure] Путь SYSVOL недоступен: $sysvolBase"
                 }
                 else {
                     $Script:sysvolAccessible = $true
-                    Write-Log "[Get-CredentialExposure] SYSVOL accessible: $sysvolBase"
+                    Write-Log "[Get-CredentialExposure] Путь SYSVOL доступен: $sysvolBase"
 
                     # Use cached SYSVOL file listing (builds cache on first call, reuses on subsequent calls)
                     # One walk for both halves: the preference files are parsed as XML, the
@@ -142457,11 +142457,11 @@ function Get-CredentialExposure {
                     $scriptFiles = @($allFiles | Where-Object { $_.Extension -ne '.xml' -and $_.Name -ine 'Registry.pol' -and
                         $Script:CredentialScanSkippedFiles -notcontains $_.Name })
 
-                    Write-Log "[Get-CredentialExposure] Split: $($xmlFiles.Count) XML, $($scriptFiles.Count) script/config"
+                    Write-Log "[Get-CredentialExposure] Разделение файлов: XML — $($xmlFiles.Count), скрипты/конфигурация — $($scriptFiles.Count)"
 
                     # ===== Part 1: GPP Password Search (XML files) =====
                     if ($xmlFiles.Count -gt 0) {
-                        Write-Log "[Get-CredentialExposure] Analyzing $($xmlFiles.Count) XML file(s)..."
+                        Write-Log "[Get-CredentialExposure] Анализ XML-файлов: $($xmlFiles.Count)..."
 
                         $totalXmlFiles = @($xmlFiles).Count
                         $currentXmlIndex = 0
@@ -142471,7 +142471,7 @@ function Get-CredentialExposure {
                                 Show-Progress -Activity "Scanning SYSVOL for GPP credentials" -Current $currentXmlIndex -Total $totalXmlFiles -ObjectName $xmlFile.Name
                             }
                             try {
-                                Write-Log "[Get-CredentialExposure] Reading XML: $($xmlFile.FullName)"
+                                Write-Log "[Get-CredentialExposure] Чтение XML: $($xmlFile.FullName)"
                                 [xml]$xmlContent = Get-Content -Path $xmlFile.Fullname -ErrorAction Stop
                                 $fileName = Split-Path $xmlFile.FullName -Leaf
 
@@ -142516,7 +142516,7 @@ function Get-CredentialExposure {
                                 }
                             }
                             catch {
-                                Write-Log "[Get-CredentialExposure] Error parsing $($xmlFile.Fullname): $_"
+                                Write-Log "[Get-CredentialExposure] Ошибка разбора $($xmlFile.Fullname): $_"
                                 Register-SYSVOLFileGap -Path $xmlFile.FullName -ErrorRecord $_
                             }
                         }
@@ -142552,7 +142552,7 @@ function Get-CredentialExposure {
                             }
                         }
                         catch {
-                            Write-Log "[Get-CredentialExposure] Error parsing $($polFile.FullName): $_"
+                            Write-Log "[Get-CredentialExposure] Ошибка разбора $($polFile.FullName): $_"
                             Register-SYSVOLFileGap -Path $polFile.FullName -ErrorRecord $_
                         }
                     }
@@ -142571,7 +142571,7 @@ function Get-CredentialExposure {
                     Show-SubHeader "Поиск чувствительных данных в SYSVOL и NETLOGON..." -ObjectType "SYSVOLCredential"
 
                     if ($scriptFiles.Count -gt 0) {
-                        Write-Log "[Get-CredentialExposure] Analyzing $($scriptFiles.Count) script/config file(s)..."
+                        Write-Log "[Get-CredentialExposure] Анализ файлов скриптов и конфигурации: $($scriptFiles.Count)..."
 
                         $totalScriptFiles = @($scriptFiles).Count
                         $currentScriptIndex = 0
@@ -142581,7 +142581,7 @@ function Get-CredentialExposure {
                                 Show-Progress -Activity "Scanning SYSVOL for sensitive information" -Current $currentScriptIndex -Total $totalScriptFiles -ObjectName $file.Name
                             }
                             try {
-                                Write-Log "[Get-CredentialExposure] Reading script/config: $($file.FullName)"
+                                Write-Log "[Get-CredentialExposure] Чтение скрипта или конфигурации: $($file.FullName)"
 
                                 # Extract GPO GUID from SYSVOL path for linkage resolution
                                 $fileGpoGUID = $null
@@ -142609,10 +142609,10 @@ function Get-CredentialExposure {
                                     try {
                                         $encodedContent = Get-Content -Path $file.FullName -Raw -ErrorAction Stop
                                         $fileContent = ConvertFrom-VBE -EncodedScript $encodedContent
-                                        Write-Log "[Get-CredentialExposure] Decoded VBE file: $($file.Name)"
+                                        Write-Log "[Get-CredentialExposure] Файл VBE декодирован: $($file.Name)"
                                     }
                                     catch {
-                                        Write-Log "[Get-CredentialExposure] Failed to decode VBE file: $($file.Name)"
+                                        Write-Log "[Get-CredentialExposure] Не удалось декодировать файл VBE: $($file.Name)"
                                         Register-SYSVOLFileGap -Path $file.FullName -ErrorRecord $_
                                         continue
                                     }
@@ -142634,7 +142634,7 @@ function Get-CredentialExposure {
                                 }
                             }
                             catch {
-                                Write-Log "[Get-CredentialExposure] Error analyzing $($file.Name): $_"
+                                Write-Log "[Get-CredentialExposure] Ошибка анализа $($file.Name): $_"
                                 Register-SYSVOLFileGap -Path $file.FullName -ErrorRecord $_
                             }
                         }
@@ -142671,13 +142671,13 @@ function Get-CredentialExposure {
             }
 
         } catch {
-            Write-Log "[Get-CredentialExposure] Error: $_" -Level Error
+            Write-Log "[Get-CredentialExposure] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить учётные данные в SYSVOL и NETLOGON: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-CredentialExposure] Check completed"
+        Write-Log "[Get-CredentialExposure] Проверка завершена"
     }
 }
 
@@ -158745,7 +158745,7 @@ function Collect-BHIssuancePolicies {
 #Requires -Version 5.1
 
 # ===== Script Variables =====
-$Script:adPEASVersion = "2.9.0+20261119-1112"
+$Script:adPEASVersion = "2.9.0+20261119-1134"
 
 # Handle ScriptPath for different execution contexts:
 # - Normal: $MyInvocation.MyCommand.Path is set
