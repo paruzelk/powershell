@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3q DEV: accepted real ARCH3o+ARCH3p independent original verifier PASS; new protected real independent Seal and explicitly controlled original OperationJournal Reconciled then shared append-only DuplicateIndex 500->501 and independent readback; partial post-Reconciled index recovery NEVER replays Move. 23 new Pester, expected 4486/151 Windows PS5.1; production writer closed.",
     "ARCH3p DEV READ ONLY: independent REAL Outlook process restart and ORIGINAL ArchiveVerifier full semantic witness for exactly one archived POP3 item after ARCH3o. Pins all original durable claim/provider SHA stages, tolerates missing receipt only after provider invocation, no Move/Resume or premature Original Journal/Index mutation. 21 new Pester, expected full 4463/150 Windows PS5.1. NOT production certified.",
     "ARCH3o DEV: operator-only exact single real TEST-PST Outlook MailItem.Move through original MailMover. Immutable WriterEntry before original NEW Part2 PST, MoveClaimed and ProviderInvocation before COM, no replay, original Journal remains Intent, shared DuplicateIndex untouched until real restart + original ArchiveVerifier. 20 Pester new; expected 4442/149 Windows PS5.1; production writer remains closed.",
     "ARCH3n DEV: exact immutable operator ARCH3j RunId and original Intent/Journal SHA plus full ARCH3i witness linked to ORIGINAL Get-OPAArchiveDestination fake ARCH3m Year2020 Part2 preallocation. Plan/Audit real evidence read-only; 22 new Pester, expected 4422/148 Windows PS5.1; real Move remains CLOSED.",
@@ -94,8 +95,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 150,
-    "ExpectedPesterTests": 4463,
+    "ExpectedTestContainers": 151,
+    "ExpectedPesterTests": 4486,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

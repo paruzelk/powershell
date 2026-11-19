@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3q (2026-11-19):** User completed real ARCH3o one-mail original MailMover plus real ARCH3p Outlook restart and ORIGINAL ArchiveVerifier full semantic PASS. [ARCH3q seals independent review, then original OperationJournal Reconciled and shared DuplicateIndex 500→501 with readback](2.6.5-arch3q-original-postrestart-journal-index-commit.md), plus explicit no-Move partial-index recovery. Only bounded TEST-PST operation; production Archive/Resume/Auto remain CLOSED.
+
+
 > **ARCH3p (2026-11-19):** [независимая реальная Outlook restart сверка через ORIGINAL ArchiveVerifier](2.6.5-arch3p-independent-postrestart-original-verifier.md). ARCH3o Audit/WhatIf/Status пройдены, Move ещё НЕ выполнялся. Новый PostRestartReview требует exact original SHA chain, новый PID/StartUtcTicks, источник отсутствует и ровно одна семантически совпавшая запись в Part2. Оригинальные `OperationJournal` и `DuplicateIndex` до приёмки ARCH3p не меняются; следующий ARCH3q — строго однократная postverification journal/index readback-транзакция. ProductionReady=False.
 
 

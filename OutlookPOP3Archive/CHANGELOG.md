@@ -1,3 +1,9 @@
+## 2.6.5-ARCH3q DEV — 2026-11-19
+- Operator ARCH3o real single Move + ARCH3p after actual Outlook process restart and ORIGINAL ArchiveVerifier PASS, including full original semantic witness and archive exactly one. Original journal Intent and shared index 500 still unchanged.
+- ARCH3q Plan/Status, independent real Outlook original verifier Seal via protected immutable CreateNew, explicit Commit original OperationJournal Reconciled then original append-only DuplicateIndex + independent 501 readback and final immutable SHA.
+- Original journal Intent byte prefix SHA anchored even after Reconciled; explicit Recover can complete only missing index/seal after Reconciled, NEVER a second journal event or Outlook Move. Fail-closed on indeterminate partial journal or unknown index state.
+- 23 synthetic Pester tests; expected full 4486 / 151 containers on Windows PowerShell 5.1 PSScriptAnalyzer UTF-8 BOM. ProductionReady=False.
+
 ## 2.6.5-ARCH3p DEV — 2026-11-19
 - User actual ARCH3o Audit/WhatIf/Status PASS: no real MoveClaimed, no Part2, original protected RunId/Intent/Journal and full source witness unchanged.
 - New READ-ONLY independent real Outlook PostRestartReview: pins original ARCH3o durable WriterEntry/DestinationReady/MoveClaimed/ProviderInvocation/(optional MoveReturned) SHA chain, real process PID + start ticks greater, mounted Part2 exactly one source-matched mail.

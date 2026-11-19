@@ -1,6 +1,19 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3q — после реального ARCH3p: оригинальный Reconciled + общий DuplicateIndex 501
+
+Реальный ARCH3o Move и ARCH3p независимый postrestart `ArchiveVerifier` подтверждены. ARCH3q добавляет защищённый `Seal`, затем **отдельное** решение `Commit`: оригинальный `OperationJournal -Phase Reconciled` и лишь после независимого readback — оригинальный append-only `DuplicateIndex`, переход 500 → 501, затем final SHA и readback. `Recover` умеет завершить частичный index-commit **без второго Reconciled и без `Move()`**. `Plan`, `Status`, `Review` не пишут.
+
+```powershell
+$pin=@{RunId='9d276dc4-a0e6-4e74-891f-81502fafe7db'; IntentSha256='f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b'; JournalSha256='a19f113a6454b1d17333c9a53fc22d065876754b9fbab3167087487d0b2b981e'}
+.\Invoke-ARCH3q.ps1 -Mode Plan @pin | Format-List
+.\Invoke-ARCH3q.ps1 -Mode Status @pin | Format-List
+.\Invoke-ARCH3q.ps1 -Mode Seal @pin -ConfirmSeal -WhatIf | Format-List
+```
+
+**Сначала только Plan/Status/WhatIf.** Режим `Commit` действительно изменяет оригинальный журнал и индекс, поэтому выполняется отдельно после принятия Seal. Полный синтаксис: [ARCH3q](docs/2.6.5-arch3q-original-postrestart-journal-index-commit.md). `ProductionReady=False`.
+
 ### ARCH3p — независимый реальный Outlook restart + ORIGINAL ArchiveVerifier (READ ONLY)
 
 После подтверждения ARCH3o `Audit`, `WhatIf`, `Status` создан независимый **PostRestartReview**: сверка исходного защищённого ARCH3j Intent/Journal и ARCH3o `WriterEntry → DestinationReady → MoveClaimed → ProviderInvocation → (MoveReturned)`, обязательное подтверждение НОВОГО процесса Outlook, ровно одной записи в уже созданной Part2 и полного semantic witness оригинальным `Test-OPAArchiveMoves`. Если COM вернул результат, но `MoveReturned` не записался, можно расследовать исходный outcome **без повтора Move**. `DuplicateIndex` и original `OperationJournal` остаются без изменений.
