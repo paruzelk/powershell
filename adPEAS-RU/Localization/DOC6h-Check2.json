@@ -1,0 +1,141 @@
+{
+  "schema": "adPEAS-RU.DOC6h.SecurityLog.1",
+  "path": "src/modules/Checks/Creds/Get-CredentialExposure.ps1",
+  "entries": [
+    {
+      "line": 775,
+      "original": "                Write-Log \"[Find-ScriptFileCredential] Excluded by pattern: $trimmedLine\"",
+      "target": "                Write-Log \"[Find-ScriptFileCredential] Исключено по шаблону: $trimmedLine\""
+    },
+    {
+      "line": 879,
+      "original": "        Write-Log \"[Get-CredentialExposure] Starting check\"",
+      "target": "        Write-Log \"[Get-CredentialExposure] Начата проверка\""
+    },
+    {
+      "line": 896,
+      "original": "                    Write-Log \"[Get-CredentialExposure] UNC path with credentials - creating temporary drive mapping\"",
+      "target": "                    Write-Log \"[Get-CredentialExposure] UNC-путь с учётными данными — создаётся временное подключение диска\""
+    },
+    {
+      "line": 907,
+      "original": "                            Write-Log \"[Get-CredentialExposure] Mapped $Path to ${tempDriveLetter}:\"",
+      "target": "                            Write-Log \"[Get-CredentialExposure] Подключён путь $Path как диск ${tempDriveLetter}:\""
+    },
+    {
+      "line": 935,
+      "original": "                    Write-Log \"[Get-CredentialExposure] Found $(@($xmlFiles).Count) XML file(s) in custom path\"",
+      "target": "                    Write-Log \"[Get-CredentialExposure] В указанном каталоге найдено XML-файлов: $(@($xmlFiles).Count)\""
+    },
+    {
+      "line": 951,
+      "original": "                            Write-Log \"[Get-CredentialExposure] Error parsing $($xmlFile.Fullname): $_\"",
+      "target": "                            Write-Log \"[Get-CredentialExposure] Ошибка разбора $($xmlFile.Fullname): $_\""
+    },
+    {
+      "line": 969,
+      "original": "                        Write-Log \"[Get-CredentialExposure] Error parsing $($polFile.FullName): $_\"",
+      "target": "                        Write-Log \"[Get-CredentialExposure] Ошибка разбора $($polFile.FullName): $_\""
+    },
+    {
+      "line": 979,
+      "original": "                    Write-Log \"[Get-CredentialExposure] Found $(@($files).Count) script/config file(s) in custom path\"",
+      "target": "                    Write-Log \"[Get-CredentialExposure] В указанном каталоге найдено файлов скриптов и конфигурации: $(@($files).Count)\""
+    },
+    {
+      "line": 987,
+      "original": "                                    Write-Log \"[Get-CredentialExposure] Decoded VBE file: $($file.Name)\"",
+      "target": "                                    Write-Log \"[Get-CredentialExposure] Файл VBE декодирован: $($file.Name)\""
+    },
+    {
+      "line": 990,
+      "original": "                                    Write-Log \"[Get-CredentialExposure] Failed to decode VBE file: $($file.Name)\"",
+      "target": "                                    Write-Log \"[Get-CredentialExposure] Не удалось декодировать файл VBE: $($file.Name)\""
+    },
+    {
+      "line": 1008,
+      "original": "                            Write-Log \"[Get-CredentialExposure] Error analyzing $($file.Name): $_\"",
+      "target": "                            Write-Log \"[Get-CredentialExposure] Ошибка анализа $($file.Name): $_\""
+    },
+    {
+      "line": 1022,
+      "original": "                            Write-Log \"[Get-CredentialExposure] Removed temporary drive mapping ${tempDriveLetter}:\"",
+      "target": "                            Write-Log \"[Get-CredentialExposure] Отключён временный диск ${tempDriveLetter}:\""
+    },
+    {
+      "line": 1025,
+      "original": "                            Write-Log \"[Get-CredentialExposure] Failed to remove temporary drive: $_\"",
+      "target": "                            Write-Log \"[Get-CredentialExposure] Не удалось отключить временный диск: $_\""
+    },
+    {
+      "line": 1080,
+      "original": "                    Write-Log \"[Get-CredentialExposure] SYSVOL path not accessible: $sysvolBase\"",
+      "target": "                    Write-Log \"[Get-CredentialExposure] Путь SYSVOL недоступен: $sysvolBase\""
+    },
+    {
+      "line": 1084,
+      "original": "                    Write-Log \"[Get-CredentialExposure] SYSVOL accessible: $sysvolBase\"",
+      "target": "                    Write-Log \"[Get-CredentialExposure] Путь SYSVOL доступен: $sysvolBase\""
+    },
+    {
+      "line": 1098,
+      "original": "                    Write-Log \"[Get-CredentialExposure] Split: $($xmlFiles.Count) XML, $($scriptFiles.Count) script/config\"",
+      "target": "                    Write-Log \"[Get-CredentialExposure] Разделение файлов: XML — $($xmlFiles.Count), скрипты/конфигурация — $($scriptFiles.Count)\""
+    },
+    {
+      "line": 1102,
+      "original": "                        Write-Log \"[Get-CredentialExposure] Analyzing $($xmlFiles.Count) XML file(s)...\"",
+      "target": "                        Write-Log \"[Get-CredentialExposure] Анализ XML-файлов: $($xmlFiles.Count)...\""
+    },
+    {
+      "line": 1112,
+      "original": "                                Write-Log \"[Get-CredentialExposure] Reading XML: $($xmlFile.FullName)\"",
+      "target": "                                Write-Log \"[Get-CredentialExposure] Чтение XML: $($xmlFile.FullName)\""
+    },
+    {
+      "line": 1157,
+      "original": "                                Write-Log \"[Get-CredentialExposure] Error parsing $($xmlFile.Fullname): $_\"",
+      "target": "                                Write-Log \"[Get-CredentialExposure] Ошибка разбора $($xmlFile.Fullname): $_\""
+    },
+    {
+      "line": 1193,
+      "original": "                            Write-Log \"[Get-CredentialExposure] Error parsing $($polFile.FullName): $_\"",
+      "target": "                            Write-Log \"[Get-CredentialExposure] Ошибка разбора $($polFile.FullName): $_\""
+    },
+    {
+      "line": 1212,
+      "original": "                        Write-Log \"[Get-CredentialExposure] Analyzing $($scriptFiles.Count) script/config file(s)...\"",
+      "target": "                        Write-Log \"[Get-CredentialExposure] Анализ файлов скриптов и конфигурации: $($scriptFiles.Count)...\""
+    },
+    {
+      "line": 1222,
+      "original": "                                Write-Log \"[Get-CredentialExposure] Reading script/config: $($file.FullName)\"",
+      "target": "                                Write-Log \"[Get-CredentialExposure] Чтение скрипта или конфигурации: $($file.FullName)\""
+    },
+    {
+      "line": 1250,
+      "original": "                                        Write-Log \"[Get-CredentialExposure] Decoded VBE file: $($file.Name)\"",
+      "target": "                                        Write-Log \"[Get-CredentialExposure] Файл VBE декодирован: $($file.Name)\""
+    },
+    {
+      "line": 1253,
+      "original": "                                        Write-Log \"[Get-CredentialExposure] Failed to decode VBE file: $($file.Name)\"",
+      "target": "                                        Write-Log \"[Get-CredentialExposure] Не удалось декодировать файл VBE: $($file.Name)\""
+    },
+    {
+      "line": 1275,
+      "original": "                                Write-Log \"[Get-CredentialExposure] Error analyzing $($file.Name): $_\"",
+      "target": "                                Write-Log \"[Get-CredentialExposure] Ошибка анализа $($file.Name): $_\""
+    },
+    {
+      "line": 1312,
+      "original": "            Write-Log \"[Get-CredentialExposure] Error: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-CredentialExposure] Ошибка: $_\" -Level Error"
+    },
+    {
+      "line": 1318,
+      "original": "        Write-Log \"[Get-CredentialExposure] Check completed\"",
+      "target": "        Write-Log \"[Get-CredentialExposure] Проверка завершена\""
+    }
+  ]
+}
