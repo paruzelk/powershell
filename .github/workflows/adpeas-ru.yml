@@ -291,16 +291,29 @@ jobs:
           }
           node .\adPEAS-RU\Tests\Test-DOC6iSecurityLogs.js
           if ($LASTEXITCODE -ne 0) { throw 'DOC6i translation regression failed' }
+      - name: DOC6j generated HTML tooltip presentation, PS5.1 and JavaScript tests
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $file = '.\adPEAS-RU\Localization\Apply-DOC6jObservedReportTooltips.ps1'
+          $tokens = $null
+          $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $file).Path, [ref]$tokens, [ref]$errors)
+          if ($errors.Count -ne 0) { throw "DOC6j PowerShell 5.1 syntax: $($errors[0].Message)" }
+          node --check .\adPEAS-RU\src\modules\Reporting\templates\report-scripts.js
+          if ($LASTEXITCODE -ne 0) { throw 'DOC6j JS syntax error' }
+          node .\adPEAS-RU\Tests\Test-DOC6jObservedReportTooltips.js
+          if ($LASTEXITCODE -ne 0) { throw 'DOC6j rendered-tooltip regression failed' }
       - name: Package verified RU build for public download
         if: github.event_name != 'pull_request'
         shell: powershell
         run: |
           $ErrorActionPreference = "Stop"
-          $archive = "adPEAS-RU-2.9.0-DOC6i-20261119.zip"
+          $archive = "adPEAS-RU-2.9.0-DOC6j-20261119.zip"
           if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force }
           Compress-Archive -Path "adPEAS-RU" -DestinationPath $archive -CompressionLevel Optimal
           $hash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
-          [IO.File]::WriteAllText("adPEAS-RU-2.9.0-DOC6i-20261119.sha256", "$hash  $archive"+[Environment]::NewLine, (New-Object Text.UTF8Encoding($false)))
+          [IO.File]::WriteAllText("adPEAS-RU-2.9.0-DOC6j-20261119.sha256", "$hash  $archive"+[Environment]::NewLine, (New-Object Text.UTF8Encoding($false)))
           Write-Host "RU BUILD ZIP SHA-256: $hash"
       - name: Upload full source and build artifacts
         if: github.event_name != 'pull_request'
@@ -309,8 +322,8 @@ jobs:
           name: adPEAS-RU-2.9.0-full-source
           path: |
             adPEAS-RU
-            adPEAS-RU-2.9.0-DOC6i-20261119.zip
-            adPEAS-RU-2.9.0-DOC6i-20261119.sha256
+            adPEAS-RU-2.9.0-DOC6j-20261119.zip
+            adPEAS-RU-2.9.0-DOC6j-20261119.sha256
           retention-days: 7
       - name: Commit complete project to dedicated branch
         if: github.event_name != 'pull_request'
@@ -319,7 +332,7 @@ jobs:
           $ErrorActionPreference = "Stop"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- adPEAS-RU adPEAS-RU-2.9.0-DOC6i-20261119.zip adPEAS-RU-2.9.0-DOC6i-20261119.sha256
+          git add -A -- adPEAS-RU adPEAS-RU-2.9.0-DOC6j-20261119.zip adPEAS-RU-2.9.0-DOC6j-20261119.sha256
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -m "adPEAS-RU: full pinned v2.9.0 sources, localized build and verified tests"

@@ -291,3 +291,7 @@ if(-not $?){throw 'Ошибка локализации DOC6h'}
 # DOC6i: диагностика BitLocker, добавления компьютеров, LAPS, инфраструктуры и GPO.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC6iSecurityLogs.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации DOC6i'}
+
+# DOC6j: все русские технические описания в подсказках; EN по запросу разработчика.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC6jObservedReportTooltips.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации DOC6j'}
