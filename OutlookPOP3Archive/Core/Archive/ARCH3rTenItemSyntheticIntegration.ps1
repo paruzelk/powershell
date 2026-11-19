@@ -62,7 +62,7 @@ function New-OPA265ARCH3rTenSyntheticPlan {
         $id=('{0:X32}' -f $i)
         $dest=('{0:X32}' -f (40960+$i))
         if($InjectIdentityFault -eq 'DuplicateSource' -and $i -eq 5){$id=('{0:X32}' -f 1)}
-        if($InjectIdentityFault -eq 'DuplicateDestination' -and $i -eq 5){$dest=('{0:X32}' -f 1+40960)}
+        if($InjectIdentityFault -eq 'DuplicateDestination' -and $i -eq 5){$dest=('{0:X32}' -f 40961)}
         $w=New-OPA265ARCH3rSyntheticWitness -Number $i
         [void]$rows.Add([pscustomobject][ordered]@{
             Number=$i;SourceEntryId=$id;ArchiveEntryId=$dest
