@@ -180,6 +180,11 @@ Describe 'ARCH3p original ArchiveVerifier fresh REAL Outlook restart safety gate
             Items=[pscustomobject]@{Count=$script:sourceCount}
         }
         $script:archive=[pscustomobject]@{StoreID='NEW-STORE';FilePath=$script:chain.Claim.NewArchivePst}
+        # The ORIGINAL ArchiveVerifier works with a COM-like Store that
+        # implements GetRootFolder; the synthetic test facade must too.
+        $script:archive | Add-Member -MemberType ScriptMethod -Name GetRootFolder -Value {
+            return [pscustomobject]@{Name='ArchiveRoot';FolderPath='\\ArchiveRoot'}
+        }
         $script:session=[pscustomobject]@{
             Scope=[pscustomobject]@{Approved=$true}
             SourceStore=[pscustomobject]@{StoreID='OLD-POP3'}
