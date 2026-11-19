@@ -25846,12 +25846,12 @@ function Connect-LDAP {
 	                $ResolvedIPString = Resolve-adPEASName -Name $Server -DnsServer $CustomDnsServer
 	                if ($ResolvedIPString) {
 	                } else {
-	                    throw "Custom DNS resolution failed for $Server"
+	                    throw "Не удалось разрешить $Server через собственный DNS"
 	                }
 	            } else {
 	                $ResolvedIPs = [System.Net.Dns]::GetHostAddresses($Server)
 	                if (-not $ResolvedIPs -or $ResolvedIPs.Count -eq 0) {
-	                    throw "DNS resolution returned no addresses"
+	                    throw "DNS не вернул адресов"
 	                }
 	                $ResolvedIPString = $ResolvedIPs[0].IPAddressToString
 	            }
@@ -26074,7 +26074,7 @@ function Connect-LDAP {
 	                $ConnectionEstablished = $true
 	                $Script:LdapConnection = $LdapProtocolConn
 	            } else {
-	                throw "$ProtocolDisplay search returned no results"
+	                throw "Поиск $ProtocolDisplay не вернул результатов"
 	            }
 	        } catch {
 	            if ($ClientCertificate) {
@@ -26124,7 +26124,7 @@ function Connect-LDAP {
 	                    }
 	                }
 	            } else {
-	                throw "RootDSE query returned no results"
+	                throw "Запрос RootDSE не вернул результатов"
 	            }
 	        } catch {
 	            Resolve-LDAPConnectionError -ErrorRecord $_ -Context "RootDSE retrieval"
@@ -26678,7 +26678,7 @@ function Connect-adPEAS {
 	            $Script:RuntimeLicense = Get-Content $License -Raw -Encoding UTF8
 	        }
 	        else {
-	            Write-Warning "[Connect-adPEAS] License file not found: $License"
+	            Write-Warning "[Connect-adPEAS] Файл лицензии не найден: $License"
 	        }
 	    }
 	    $ParamSetDisplay = switch ($PSCmdlet.ParameterSetName) {
@@ -26698,7 +26698,7 @@ function Connect-adPEAS {
 	    $sessionEstablished = $false
 	    try {
 	        if ($Host.Name -eq 'Windows PowerShell ISE Host') {
-	            Write-Warning "PowerShell ISE is deprecated and not supported by adPEAS. Console output may be garbled. Use powershell.exe or VS Code instead."
+	            Write-Warning "PowerShell ISE устарела и не поддерживается adPEAS. Консольный вывод может отображаться некорректно. Используйте powershell.exe или VS Code."
 	        }
 	        $AuthMethod = $PSCmdlet.ParameterSetName
 	        if ($ForceNTLM -and $ForceKerberos) {
@@ -26774,13 +26774,13 @@ function Connect-adPEAS {
 	                $null = Resolve-DnsName -Name $Domain -Server $DnsServer -Type A -DnsOnly -ErrorAction Stop
 	            }
 	            catch {
-	                Write-Warning "[Connect-adPEAS] DNS server $DnsServer not reachable or cannot resolve '$Domain'"
+	                Write-Warning "[Connect-adPEAS] DNS-сервер $DnsServer недоступен либо не разрешает имя '$Domain'"
 	            }
 	            if ($PatchHostsFile) {
 	                $isAdmin = Test-adPEASAdminPrivileges
 	                if (-not $isAdmin) {
-	                    Write-Warning "[Connect-adPEAS] -PatchHostsFile requires Administrator privileges!"
-	                    Write-Warning "[Connect-adPEAS] Hosts file patching will be skipped. Run as Administrator for full functionality."
+	                    Write-Warning "[Connect-adPEAS] Параметру -PatchHostsFile нужны права администратора!"
+	                    Write-Warning "[Connect-adPEAS] Изменение файла hosts пропущено. Для полной функциональности запустите от имени администратора."
 	                    $PatchHostsFile = $false
 	                }
 	                else {
@@ -26809,7 +26809,7 @@ function Connect-adPEAS {
 	                        }
 	                    }
 	                    else {
-	                        Write-Warning "[Connect-adPEAS] Could not resolve $earlyResolveTarget via custom DNS - hosts patching skipped"
+	                        Write-Warning "[Connect-adPEAS] Не удалось разрешить $earlyResolveTarget через собственный DNS — изменение hosts пропущено"
 	                    }
 	                }
 	            }
@@ -26893,7 +26893,7 @@ function Connect-adPEAS {
 	                        $SecurePassword = ConvertTo-SecureString -String $PlainPassword -AsPlainText -Force
 	                    }
 	                    else {
-	                        throw "Password must be either String, SecureString, or empty"
+	                        throw "Пароль должен быть String, SecureString либо пустым"
 	                    }
 	                    $CredentialUsername = $Username
 	                    if ($Username -notmatch '\\' -and $Username -notmatch '@') {
@@ -27164,8 +27164,8 @@ function Connect-adPEAS {
 	                }
 	                if ($ForcePassTheCert) {
 	                    if ($ForceKerberos) {
-	                        Write-Warning "[!] -ForceKerberos has no effect with -ForcePassTheCert"
-	                        Write-Warning "[!] Pass-the-Cert always uses Schannel (TLS client cert), never Kerberos"
+	                        Write-Warning "[!] -ForceKerberos не действует при -ForcePassTheCert"
+	                        Write-Warning "[!] Pass-the-Cert использует Schannel (клиентский TLS-сертификат), а не Kerberos"
 	                    }
 	                    if (-not $UseLDAPS) {
 	                        $UseLDAPS = $true
@@ -98503,7 +98503,7 @@ function Collect-BHIssuancePolicies {
 	}
 	return $bhPolicies
 }
-$Script:adPEASVersion = "2.9.0+20261119-0956"
+$Script:adPEASVersion = "2.9.0+20261119-1015"
 if ($MyInvocation.MyCommand.Path) {
 	$Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {
@@ -98591,16 +98591,16 @@ function Invoke-adPEAS {
 	    $VerbosePreference = 'Continue'
 	}
 	if ($OutputAppend -and -not $PSBoundParameters['Outputfile']) {
-	    Write-Warning "[adPEAS] -OutputAppend requires -Outputfile. Ignoring -OutputAppend."
+	    Write-Warning "[adPEAS] Для -OutputAppend необходим -Outputfile. Параметр -OutputAppend игнорируется."
 	    $OutputAppend = [switch]::new($false)
 	}
 	if ($OutputAppend -and $Format -notin @('All', 'JSON')) {
-	    Write-Warning "[adPEAS] -OutputAppend requires JSON findings cache. Use -Format All or -Format JSON. Ignoring -OutputAppend."
+	    Write-Warning "[adPEAS] Для -OutputAppend необходим JSON-кэш находок. Укажите -Format All или -Format JSON. Параметр игнорируется."
 	    $OutputAppend = [switch]::new($false)
 	}
 	$Module = @(Resolve-adPEASModules -Module $Module -ExcludeModule $ExcludeModule)
 	if ($Module.Count -eq 0) {
-	    Write-Warning "[adPEAS] -ExcludeModule leaves no module to run. Nothing to do."
+	    Write-Warning "[adPEAS] После исключения модулей через -ExcludeModule не осталось заданий. Выполнение завершено."
 	    return
 	}
 	if ($Format -in @('HTML', 'JSON', 'All')) {
@@ -98616,9 +98616,9 @@ function Invoke-adPEAS {
 	    if ($OutputDir -and -not (Test-Path $OutputDir)) {
 	        try {
 	            New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
-	            Write-Warning "[adPEAS] Directory '$OutputDir' did not exist and was created"
+	            Write-Warning "[adPEAS] Каталог '$OutputDir' отсутствовал и был создан"
 	        } catch {
-	            Write-Warning "[adPEAS] Could not create directory '$OutputDir': $_"
+	            Write-Warning "[adPEAS] Не удалось создать каталог '$OutputDir': $_"
 	            return
 	        }
 	    }
@@ -98630,7 +98630,7 @@ function Invoke-adPEAS {
 	            }
 	            $Script:adPEAS_Outputfile = $textPath
 	        } catch {
-	            Write-Warning "[adPEAS] Unable to write text output to '$textPath', please check path and permissions!"
+	            Write-Warning "[adPEAS] Невозможно записать текстовый отчёт в '$textPath'; проверьте путь и права доступа."
 	        }
 	    }
 	    if ($Format -in @('HTML', 'All')) {
@@ -98641,7 +98641,7 @@ function Invoke-adPEAS {
 	    }
 	}
 	if ($VerboseLogging -and -not $Script:adPEAS_Outputfile) {
-	    Write-Warning "[adPEAS] -VerboseLogging: File logging requires -Outputfile with Text format. Verbose messages will be shown in console only."
+	    Write-Warning "[adPEAS] -VerboseLogging: для журнала в файл необходимы -Outputfile и формат Text. Подробности будут выводиться только в консоль."
 	}
 try {
 	$_licJson = $null
@@ -98683,7 +98683,7 @@ try {
 	        'WindowsSSPI' { if ($Script:LDAPContext.KerberosUsed) { "Kerberos (SSPI)" } else { "Windows SSPI" } }
 	        default       { $Script:LDAPContext.Protocol }
 	    }
-	    Show-Line "Connected to domain '$($Script:LDAPContext.Domain)' on server '$($Script:LDAPContext.Server)' as '$AuthenticatedUser' via $AuthDisplay"
+	    Show-Line "Подключено к домену '$($Script:LDAPContext.Domain)' на сервере '$($Script:LDAPContext.Server)' как '$AuthenticatedUser' через $AuthDisplay"
 	}
 	elseif ($HasConnectionParams) {
 	    Show-Header "Установка LDAP-подключения"
@@ -98737,7 +98737,7 @@ try {
 	            'WindowsSSPI' { if ($Connection.KerberosUsed) { "Kerberos (SSPI)" } else { "Windows SSPI" } }
 	            default       { $Connection.Protocol }
 	        }
-	        Show-Line "Successfully connected to domain '$($Connection.Domain)' on server '$($Connection.Server)' as '$AuthenticatedUser' via $AuthDisplay" -Class Note
+	        Show-Line "Успешное подключение к домену '$($Connection.Domain)' на сервере '$($Connection.Server)' как '$AuthenticatedUser' через $AuthDisplay" -Class Note
 	    } catch {
 	        Show-Error -Type Connection
 	        return
@@ -98765,7 +98765,7 @@ try {
 	if ($OPSEC) {
 	    $Module = @($Module | Where-Object { $_ -ne 'Bloodhound' })
 	    if ($Module.Count -eq 0) {
-	        Write-Warning "[adPEAS] -OPSEC excludes BloodHound collection, which was the only module selected. Nothing to do."
+	        Write-Warning "[adPEAS] Режим -OPSEC исключает BloodHound — единственный выбранный модуль. Заданий нет."
 	        return
 	    }
 	}
@@ -98794,11 +98794,11 @@ try {
 	            -CurrentFindings @() `
 	            -ReplacedCategories @($Module))
 	        Set-FindingsCollection -Findings $keptFindings
-	        Show-Line "Appending to existing report: kept $($keptFindings.Count) of $($previousFindings.Count) previous findings, re-running $($Module -join ', ')" -Class Note
+	        Show-Line "Добавление к отчёту: сохранено $($keptFindings.Count) из $($previousFindings.Count) прежних находок; повторный запуск $($Module -join ', ')" -Class Note
 	    }
 	    catch {
-	        Write-Warning "[adPEAS] Could not load previous findings from '$appendCachePath': $_"
-	        Write-Warning "[adPEAS] Continuing without append - creating fresh report"
+	        Write-Warning "[adPEAS] Не удалось прочитать прежние находки из '$appendCachePath': $_"
+	        Write-Warning "[adPEAS] Продолжение без добавления — создаётся новый отчёт"
 	    }
 	} elseif ($OutputAppend) {
 	}
@@ -98834,8 +98834,8 @@ try {
 	    try {
 	        & $Check
 	    } catch {
-	        Write-Warning "[adPEAS] Check '$CheckName' failed: $_"
-	        Show-Line "This check did not complete - its results are incomplete or absent. Reason: $($_.Exception.Message)" -Class Hint
+	        Write-Warning "[adPEAS] Ошибка проверки '$CheckName': $_"
+	        Show-Line "Проверка не завершена — результаты неполные или отсутствуют. Причина: $($_.Exception.Message)" -Class Hint
 	        if ($null -eq $Script:adPEAS_IncompleteChecks) { $Script:adPEAS_IncompleteChecks = @() }
 	        $Script:adPEAS_IncompleteChecks += $CheckName
 	    } finally {
@@ -99068,7 +99068,7 @@ try {
 	    try {
 	        Export-HTMLReport -OutputPath $Script:HTMLOutputPath
 	    } catch {
-	        Write-Warning "[adPEAS] Error generating HTML report: $_"
+	        Write-Warning "[adPEAS] Ошибка формирования HTML-отчёта: $_"
 	        $Script:HTMLOutputPath = $null
 	    }
 	}
@@ -99079,7 +99079,7 @@ try {
 	        $Script:JSONOutputPath = $jsonPath
 	    }
 	    catch {
-	        Write-Warning "[adPEAS] Could not save JSON export to '$jsonPath': $_"
+	        Write-Warning "[adPEAS] Не удалось записать JSON в '$jsonPath': $_"
 	        $Script:JSONOutputPath = $null
 	    }
 	}
@@ -99116,13 +99116,13 @@ try {
 	    Show-Line "Аудит прерван: недействительная LDAP-сессия. Отчёты не созданы." -Class Finding
 	    Show-Line "Подключитесь повторно через Connect-adPEAS и повторите проверку." -Class Hint
 	    if ($checkpointPath -and (Test-Path $checkpointPath)) {
-	        Show-Line "Partial JSON export from the modules that completed: $checkpointPath" -Class Hint
-	        Show-Line "Rebuild a report from it with: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath'" -Class Hint
+	        Show-Line "Частичный JSON завершённых модулей: $checkpointPath" -Class Hint
+	        Show-Line "Сформировать отчёт из него: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath'" -Class Hint
 	    }
 	} else {
 	    if ($Script:adPEAS_IncompleteChecks -and $Script:adPEAS_IncompleteChecks.Count -gt 0) {
 	        $incomplete = @($Script:adPEAS_IncompleteChecks | Select-Object -Unique)
-	        Show-Line "$($incomplete.Count) check(s) did not complete - their sections are incomplete and must not be read as clean:" -Class Finding
+	        Show-Line "Не завершено проверок: $($incomplete.Count). Их результаты неполны — нельзя считать разделы безопасными:" -Class Finding
 	        foreach ($name in $incomplete) {
 	            Show-Line "  $name" -Class Finding
 	        }

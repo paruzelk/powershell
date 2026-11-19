@@ -3,8 +3,8 @@
     adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
 
 .DESCRIPTION
-    Build: 2026-11-19 09:56:14
-    Version: 2.9.0+20261119-0956
+    Build: 2026-11-19 10:15:23
+    Version: 2.9.0+20261119-1015
 
     AUTHORIZED SECURITY TESTING ONLY!
 
@@ -35360,7 +35360,7 @@ function Connect-LDAP {
     )
 
     begin {
-        Write-Log "[Connect-LDAP] Starting LDAP connection..."
+        Write-Log "[Connect-LDAP] Начало подключения LDAP..."
 
         # Reset connection state at the beginning.
         #
@@ -35504,18 +35504,18 @@ function Connect-LDAP {
             if ($AsGlobalCatalog) {
                 # GC mode: Domain and Server must be pre-populated from existing session
                 if ([string]::IsNullOrEmpty($Domain) -or [string]::IsNullOrEmpty($Server)) {
-                    Write-Log "[Connect-LDAP] AsGlobalCatalog requires -Domain and -Server parameters"
+                    Write-Log "[Connect-LDAP] Для AsGlobalCatalog необходимы -Domain и -Server"
                     return $null
                 }
                 $DomainDN = "DC=" + ($Domain -replace "\.", ",DC=")
-                Write-Log "[Connect-LDAP] GC mode: Server=$Server, Domain=$Domain"
+                Write-Log "[Connect-LDAP] Режим GC: сервер=$Server, домен=$Domain"
             } else {
                 if ([string]::IsNullOrEmpty($Domain)) {
-                    Write-Log "[Connect-LDAP] No domain specified, attempting automatic discovery..."
+                    Write-Log "[Connect-LDAP] Домен не указан, запускается автообнаружение..."
                     try {
                         $CurrentDomain = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
                         $Domain = $CurrentDomain.Name
-                        Write-Log "[Connect-LDAP] Automatically detected domain: $Domain"
+                        Write-Log "[Connect-LDAP] Автоматически обнаружен домен: $Domain"
                     } catch {
                         if (-not $AsGlobalCatalog) { $Script:ConnectionState = "DomainError" }
                         if (-not $SuppressErrorDisplay) {
@@ -35527,17 +35527,17 @@ function Connect-LDAP {
 
                 # Determine Domain Controller if not specified
                 if ([string]::IsNullOrEmpty($Server)) {
-                    Write-Log "[Connect-LDAP] No server specified, using domain name: $Domain"
+                    Write-Log "[Connect-LDAP] Сервер не указан — используется имя домена: $Domain"
                     $Server = $Domain
                 }
 
                 # Create Distinguished Name for Domain
                 $DomainDN = "DC=" + ($Domain -replace "\.", ",DC=")
-                Write-Log "[Connect-LDAP] Domain DN: $DomainDN"
+                Write-Log "[Connect-LDAP] DN домена: $DomainDN"
             }
 
             # ===== Phase 2: DNS Resolution =====
-            Write-Log "[Connect-LDAP] Testing DNS resolution for: $Server"
+            Write-Log "[Connect-LDAP] Проверка DNS для: $Server"
             $ResolvedIPs = $null
             $ResolvedIPString = $null
 
@@ -35545,7 +35545,7 @@ function Connect-LDAP {
             $CustomDnsServer = $null
             if ($Script:LDAPContext -and $Script:LDAPContext['DnsServer']) {
                 $CustomDnsServer = $Script:LDAPContext['DnsServer']
-                Write-Log "[Connect-LDAP] Using custom DNS server: $CustomDnsServer"
+                Write-Log "[Connect-LDAP] Используется собственный DNS-сервер: $CustomDnsServer"
             }
 
             try {
@@ -35553,18 +35553,18 @@ function Connect-LDAP {
                     # Use custom DNS resolution via Resolve-adPEASName
                     $ResolvedIPString = Resolve-adPEASName -Name $Server -DnsServer $CustomDnsServer
                     if ($ResolvedIPString) {
-                        Write-Log "[Connect-LDAP] DNS resolution via custom DNS successful: $ResolvedIPString"
+                        Write-Log "[Connect-LDAP] Разрешение имени через собственный DNS успешно: $ResolvedIPString"
                     } else {
-                        throw "Custom DNS resolution failed for $Server"
+                        throw "Не удалось разрешить $Server через собственный DNS"
                     }
                 } else {
                     # Use system DNS
                     $ResolvedIPs = [System.Net.Dns]::GetHostAddresses($Server)
                     if (-not $ResolvedIPs -or $ResolvedIPs.Count -eq 0) {
-                        throw "DNS resolution returned no addresses"
+                        throw "DNS не вернул адресов"
                     }
                     $ResolvedIPString = $ResolvedIPs[0].IPAddressToString
-                    Write-Log "[Connect-LDAP] DNS resolution successful: $ResolvedIPString"
+                    Write-Log "[Connect-LDAP] Разрешение DNS успешно: $ResolvedIPString"
                 }
             } catch {
                 if (-not $AsGlobalCatalog) { $Script:ConnectionState = "DomainError" }
@@ -35582,7 +35582,7 @@ function Connect-LDAP {
             # ===== Phase 3: Port Reachability =====
             # Use resolved IP for connection test when custom DNS is active
             $ConnectTarget = if ($CustomDnsServer -and $ResolvedIPString) { $ResolvedIPString } else { $Server }
-            Write-Log "[Connect-LDAP] Testing port reachability to: $ConnectTarget"
+            Write-Log "[Connect-LDAP] Проверка доступности порта узла: $ConnectTarget"
             $ServerReachable = $false
             $TestPort = if ($AsGlobalCatalog) {
                 if ($UseLDAPS) { 3269 } else { 3268 }
@@ -35598,11 +35598,11 @@ function Connect-LDAP {
                 if ($WaitHandle.WaitOne(2000, $false)) {
                     $TcpClient.EndConnect($ConnectTask)
                     $ServerReachable = $true
-                    Write-Log "[Connect-LDAP] Server is reachable on port $TestPort"
+                    Write-Log "[Connect-LDAP] Сервер доступен на порту $TestPort"
                 }
                 $TcpClient.Close()
             } catch {
-                Write-Log "[Connect-LDAP] Port test failed: $_"
+                Write-Log "[Connect-LDAP] Ошибка проверки порта: $_"
             }
 
             if (-not $ServerReachable) {
@@ -35617,7 +35617,7 @@ function Connect-LDAP {
             # ===== Phase 3b: SSL/TLS Handshake Test (LDAPS only) =====
             if ($UseLDAPS) {
                 $SSLPort = $TestPort  # Already set to 3269 for GC, 636 for normal LDAPS
-                Write-Log "[Connect-LDAP] Testing SSL/TLS handshake on port $SSLPort..."
+                Write-Log "[Connect-LDAP] Проверка согласования SSL/TLS на порту $SSLPort..."
                 $SSLTestPassed = $false
                 $sslErrorInfo = $null
 
@@ -35637,12 +35637,12 @@ function Connect-LDAP {
                     $SslStream.AuthenticateAsClient($Server)
                     $SSLTestPassed = $true
 
-                    Write-Log "[Connect-LDAP] SSL/TLS handshake successful"
-                    Write-Log "[Connect-LDAP] SSL Protocol: $($SslStream.SslProtocol)"
-                    Write-Log "[Connect-LDAP] Cipher: $($SslStream.CipherAlgorithm)"
+                    Write-Log "[Connect-LDAP] Согласование SSL/TLS успешно"
+                    Write-Log "[Connect-LDAP] Протокол SSL: $($SslStream.SslProtocol)"
+                    Write-Log "[Connect-LDAP] Алгоритм шифрования: $($SslStream.CipherAlgorithm)"
                     if ($SslStream.RemoteCertificate) {
-                        Write-Log "[Connect-LDAP] Certificate Subject: $($SslStream.RemoteCertificate.Subject)"
-                        Write-Log "[Connect-LDAP] Certificate Issuer: $($SslStream.RemoteCertificate.Issuer)"
+                        Write-Log "[Connect-LDAP] Субъект сертификата: $($SslStream.RemoteCertificate.Subject)"
+                        Write-Log "[Connect-LDAP] Издатель сертификата: $($SslStream.RemoteCertificate.Issuer)"
 
                         # Pre-cache the certificate chain with CRL check disabled (X509RevocationMode.NoCheck)
                         # This prevents a ~15s timeout during LdapConnection.Bind() when SChannel tries to
@@ -35657,9 +35657,9 @@ function Connect-LDAP {
                                 $chain.ChainPolicy.VerificationFlags = [System.Security.Cryptography.X509Certificates.X509VerificationFlags]::AllFlags
                                 [void]$chain.Build($cert2)
                                 $chain.Reset()
-                                Write-Log "[Connect-LDAP] Certificate chain pre-cached (CRL check disabled)"
+                                Write-Log "[Connect-LDAP] Цепочка сертификатов закэширована (CRL не проверяется)"
                             } catch {
-                                Write-Log "[Connect-LDAP] Certificate chain pre-cache failed (non-critical): $_"
+                                Write-Log "[Connect-LDAP] Не удалось закэшировать цепочку сертификатов (некритично): $_"
                             }
                         }
                     }
@@ -35669,10 +35669,10 @@ function Connect-LDAP {
                 }
                 catch {
                     $sslErrorInfo = Get-ExceptionErrorInfo -Exception $_.Exception -Context "SSL handshake"
-                    Write-Log "[Connect-LDAP] SSL/TLS handshake FAILED: $($sslErrorInfo.Message)"
+                    Write-Log "[Connect-LDAP] ОШИБКА согласования SSL/TLS: $($sslErrorInfo.Message)"
 
                     if ($sslErrorInfo.Category -eq 'SSLCertificate' -and -not $IgnoreSSLErrors) {
-                        Write-Log "[Connect-LDAP] Consider using -IgnoreSSLErrors parameter"
+                        Write-Log "[Connect-LDAP] При необходимости используйте параметр -IgnoreSSLErrors"
                     }
                 }
 
@@ -35729,11 +35729,11 @@ function Connect-LDAP {
             $Script:AnonymousAccessSkipReason = $null
 
             if ($AsGlobalCatalog) {
-                Write-Log "[Connect-LDAP] Skipping anonymous access check for GC mode"
+                Write-Log "[Connect-LDAP] Проверка анонимного доступа пропущена для GC"
                 $Script:AnonymousAccessSkipReason = 'global catalog'
             }
             elseif ($UseLDAPS) {
-                Write-Log "[Connect-LDAP] Skipping anonymous access check for LDAPS (rarely enabled over SSL)"
+                Write-Log "[Connect-LDAP] Проверка анонимного доступа пропущена для LDAPS (редко разрешена поверх SSL)"
                 $Script:AnonymousAccessSkipReason = 'LDAPS'
             }
             else {
@@ -35759,15 +35759,15 @@ function Connect-LDAP {
                 if ($UseLDAPS) { 636 } else { 389 }
             }
             $LDAPTarget = $Server
-            Write-Log "[Connect-LDAP] Using hostname for LDAP connection: $LDAPTarget"
+            Write-Log "[Connect-LDAP] Для LDAP используется имя узла: $LDAPTarget"
 
             $ProtocolDisplay = if ($AsGlobalCatalog) { "GC" } elseif ($UseLDAPS) { "LDAPS" } else { "LDAP" }
-            Write-Log "[Connect-LDAP] Attempting $ProtocolDisplay connection to ${LDAPTarget}:${LDAPPort}..."
+            Write-Log "[Connect-LDAP] Попытка соединения $ProtocolDisplay с ${LDAPTarget}:${LDAPPort}..."
 
             try {
                 # ===== UNIFIED: Always use System.DirectoryServices.Protocols.LdapConnection =====
                 # This works reliably for both LDAP (389) and LDAPS (636)
-                Write-Log "[Connect-LDAP] Using System.DirectoryServices.Protocols.LdapConnection for $ProtocolDisplay..."
+                Write-Log "[Connect-LDAP] Используется System.DirectoryServices.Protocols.LdapConnection для $ProtocolDisplay..."
 
                 # Load the assembly
                 Add-Type -AssemblyName System.DirectoryServices.Protocols -ErrorAction Stop
@@ -35796,18 +35796,18 @@ function Connect-LDAP {
                     $LdapProtocolConn.Timeout = [TimeSpan]::FromSeconds($TimeoutSeconds)
                     $SendTimeoutSeconds = [Math]::Max(5, [Math]::Floor($TimeoutSeconds / 2))
                     $LdapProtocolConn.SessionOptions.SendTimeout = [TimeSpan]::FromSeconds($SendTimeoutSeconds)
-                    Write-Log "[Connect-LDAP] Configured timeouts: Operation=${TimeoutSeconds}s, Send=${SendTimeoutSeconds}s"
+                    Write-Log "[Connect-LDAP] Таймауты: операция=${TimeoutSeconds}с, отправка=${SendTimeoutSeconds}с"
 
                     # Disable referral chasing
                     $LdapProtocolConn.SessionOptions.ReferralChasing = [System.DirectoryServices.Protocols.ReferralChasingOptions]::None
-                    Write-Log "[Connect-LDAP] Referral chasing disabled (domain-local queries only)"
+                    Write-Log "[Connect-LDAP] Переадресация LDAP отключена (запросы только внутри домена)"
 
                     # Configure SSL for LDAPS
                     if ($UseLDAPS) {
                         $LdapProtocolConn.SessionOptions.SecureSocketLayer = $true
                         if ($IgnoreSSLErrors) {
                             $LdapProtocolConn.SessionOptions.VerifyServerCertificate = { param($conn, $cert) return $true }
-                            Write-Log "[Connect-LDAP] SSL certificate validation disabled (IgnoreSSLErrors)"
+                            Write-Log "[Connect-LDAP] Проверка сертификата SSL отключена (IgnoreSSLErrors)"
                         }
                     }
                 }
@@ -35828,7 +35828,7 @@ function Connect-LDAP {
                     $NtlmDomain = $NtlmNetCred.Domain
                     $NtlmPass   = $NtlmNetCred.Password
 
-                    Write-Log "[Connect-LDAP] Configuring explicit NTLM authentication (Sicily): $NtlmDomain\$NtlmUser"
+                    Write-Log "[Connect-LDAP] Явная NTLM-аутентификация (Sicily): $NtlmDomain\$NtlmUser"
                     $LdapProtocolConn.AuthType  = [System.DirectoryServices.Protocols.AuthType]::Ntlm
                     $LdapProtocolConn.Credential = New-Object System.Net.NetworkCredential($NtlmUser, $NtlmPass, $NtlmDomain)
                 }
@@ -35850,29 +35850,29 @@ function Connect-LDAP {
                     if (-not [string]::IsNullOrEmpty($CredDomain)) {
                         # User specified DOMAIN\username format - reconstruct it
                         $UserName = "$CredDomain\$UserName"
-                        Write-Log "[Connect-LDAP] Username from credential (NETBIOS format): $UserName"
+                        Write-Log "[Connect-LDAP] Имя пользователя из учётных данных (формат NETBIOS): $UserName"
                     }
                     elseif ($UserName -match '@') {
                         # User specified UPN format (user@domain.com) - keep as-is
-                        Write-Log "[Connect-LDAP] Username from credential (UPN format): $UserName"
+                        Write-Log "[Connect-LDAP] Имя пользователя из учётных данных (формат UPN): $UserName"
                     }
                     else {
                         # Bare username without domain/UPN - auto-qualify with UPN format
                         if ($Domain) {
                             $UserName = "$UserName@$Domain"
-                            Write-Log "[Connect-LDAP] Username qualified for SimpleBind (UPN): $UserName"
+                            Write-Log "[Connect-LDAP] Уточнено имя пользователя SimpleBind (UPN): $UserName"
                         } else {
-                            Write-Log "[Connect-LDAP] WARNING: Username '$UserName' is not domain-qualified and no domain available"
+                            Write-Log "[Connect-LDAP] ПРЕДУПРЕЖДЕНИЕ: в '$UserName' не указан домен; данные о домене отсутствуют"
                         }
                     }
 
-                    Write-Log "[Connect-LDAP] Configuring SimpleBind with credentials: $UserName"
+                    Write-Log "[Connect-LDAP] Настройка SimpleBind для $UserName"
 
                     # Use Basic auth for SimpleBind
                     $LdapProtocolConn.AuthType = [System.DirectoryServices.Protocols.AuthType]::Basic
                     $LdapProtocolConn.Credential = New-Object System.Net.NetworkCredential($UserName, $Password)
                 } else {
-                    Write-Log "[Connect-LDAP] Configuring Negotiate (Kerberos/NTLM) authentication"
+                    Write-Log "[Connect-LDAP] Настройка аутентификации Negotiate (Kerberos/NTLM)"
                     $LdapProtocolConn.AuthType = [System.DirectoryServices.Protocols.AuthType]::Negotiate
                 }
 
@@ -35882,11 +35882,11 @@ function Connect-LDAP {
                     Write-Log "[Connect-LDAP] Schannel: Skipping Bind() - first SendRequest() will trigger AutoBind"
                     $LdapBindSucceeded = $true  # AutoBind - treat as succeeded for error context
                 } else {
-                    Write-Log "[Connect-LDAP] Binding to $ProtocolDisplay server..."
+                    Write-Log "[Connect-LDAP] Привязка к серверу $ProtocolDisplay..."
                     $bindStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
                     $LdapProtocolConn.Bind()
                     $bindStopwatch.Stop()
-                    Write-Log "[Connect-LDAP] $ProtocolDisplay bind successful! ($($bindStopwatch.ElapsedMilliseconds)ms)"
+                    Write-Log "[Connect-LDAP] Привязка $ProtocolDisplay успешна! ($($bindStopwatch.ElapsedMilliseconds) мс)"
                     $LdapBindSucceeded = $true
                 }
 
@@ -35911,26 +35911,26 @@ function Connect-LDAP {
                             }
                         }
                         if (-not $isGC) {
-                            Write-Log "[Connect-LDAP] GC mode: ${LDAPTarget}:${LDAPPort} is NOT a Global Catalog (isGlobalCatalogReady != TRUE)"
+                            Write-Log "[Connect-LDAP] Режим GC: ${LDAPTarget}:${LDAPPort} НЕ является глобальным каталогом (isGlobalCatalogReady != TRUE)"
                             try { $LdapProtocolConn.Dispose() } catch { }
                             return $null
                         }
                     } catch {
-                        Write-Log "[Connect-LDAP] GC mode: Could not verify GC status on ${LDAPTarget}:${LDAPPort}: $($_.Exception.Message)"
+                        Write-Log "[Connect-LDAP] Режим GC: состояние GC на ${LDAPTarget}:${LDAPPort} проверить не удалось: $($_.Exception.Message)"
                         try { $LdapProtocolConn.Dispose() } catch { }
                         return $null
                     }
 
-                    Write-Log "[Connect-LDAP] GC mode: Connection to ${LDAPTarget}:${LDAPPort} established and verified as Global Catalog"
+                    Write-Log "[Connect-LDAP] Режим GC: соединение с ${LDAPTarget}:${LDAPPort} установлено и подтверждено как глобальный каталог"
                     return $LdapProtocolConn
                 }
 
                 # ===== Normal Mode: Test search and store globally =====
                 # Test by searching for domain root
-                Write-Log "[Connect-LDAP] Testing $ProtocolDisplay connection with search query..."
-                Write-Log "[Connect-LDAP] Connection state: AuthType=$($LdapProtocolConn.AuthType), AutoBind=$($LdapProtocolConn.AutoBind)"
+                Write-Log "[Connect-LDAP] Проверка соединения $ProtocolDisplay поисковым запросом..."
+                Write-Log "[Connect-LDAP] Состояние соединения: AuthType=$($LdapProtocolConn.AuthType), AutoBind=$($LdapProtocolConn.AutoBind)"
                 if ($ClientCertificate) {
-                    Write-Log "[Connect-LDAP] Client certificates count: $($LdapProtocolConn.ClientCertificates.Count)"
+                    Write-Log "[Connect-LDAP] Клиентских сертификатов: $($LdapProtocolConn.ClientCertificates.Count)"
                 }
                 $SearchRequest = New-Object System.DirectoryServices.Protocols.SearchRequest(
                     $DomainDN,
@@ -35943,15 +35943,15 @@ function Connect-LDAP {
 
                 if ($SearchResponse -and $SearchResponse.Entries.Count -gt 0) {
                     $TestDN = $SearchResponse.Entries[0].DistinguishedName
-                    Write-Log "[Connect-LDAP] $ProtocolDisplay search successful! DN: $TestDN"
+                    Write-Log "[Connect-LDAP] Поиск $ProtocolDisplay успешен! DN: $TestDN"
                     $ConnectionEstablished = $true
 
                     # Store the LdapConnection for ALL operations (queries AND modifications)
                     $Script:LdapConnection = $LdapProtocolConn
-                    Write-Log "[Connect-LDAP] LdapConnection stored for all LDAP operations"
+                    Write-Log "[Connect-LDAP] LdapConnection сохранён для операций LDAP"
 
                 } else {
-                    throw "$ProtocolDisplay search returned no results"
+                    throw "Поиск $ProtocolDisplay не вернул результатов"
                 }
 
             } catch {
@@ -35987,7 +35987,7 @@ function Connect-LDAP {
 
             # ===== Phase 6: RootDSE Retrieval =====
             # UNIFIED: Always use LdapConnection (works for both LDAP and LDAPS)
-            Write-Log "[Connect-LDAP] Retrieving RootDSE via LdapConnection..."
+            Write-Log "[Connect-LDAP] Получение RootDSE через LdapConnection..."
             $RootDSEData = @{}
 
             try {
@@ -36013,7 +36013,7 @@ function Connect-LDAP {
                     [void]$RootDSERequest.Attributes.Add($attr)
                 }
 
-                Write-Log "[Connect-LDAP] Sending RootDSE request for attributes: $($attributesToExtract -join ', ')"
+                Write-Log "[Connect-LDAP] Запрос RootDSE для атрибутов: $($attributesToExtract -join ', ')"
 
                 $RootDSEResponse = $Script:LdapConnection.SendRequest($RootDSERequest)
 
@@ -36021,7 +36021,7 @@ function Connect-LDAP {
                     $RootDSEEntry = $RootDSEResponse.Entries[0]
 
                     # Debug: Log what we got back
-                    Write-Log "[Connect-LDAP] RootDSE entry returned, Attributes.Count = $($RootDSEEntry.Attributes.Count)"
+                    Write-Log "[Connect-LDAP] Получена запись RootDSE; атрибутов: $($RootDSEEntry.Attributes.Count)"
 
                     # Extract attributes from the response
                     # Use direct access by attribute name (case-insensitive in LDAP)
@@ -36032,16 +36032,16 @@ function Connect-LDAP {
                                 # GetValues returns the actual values as the specified type
                                 $value = $dirAttr.GetValues([string])[0]
                                 $RootDSEData[$attrName] = $value
-                                Write-Log "[Connect-LDAP] RootDSE attribute $attrName = $value"
+                                Write-Log "[Connect-LDAP] Атрибут RootDSE $attrName = $value"
                             }
                         } else {
-                            Write-Log "[Connect-LDAP] RootDSE attribute $attrName not found in server response"
+                            Write-Log "[Connect-LDAP] Атрибут RootDSE $attrName не найден в ответе сервера"
                         }
                     }
 
-                    Write-Log "[Connect-LDAP] RootDSE retrieved successfully with $($RootDSEData.Count) attributes"
+                    Write-Log "[Connect-LDAP] RootDSE получен; атрибутов: $($RootDSEData.Count)"
                 } else {
-                    throw "RootDSE query returned no results"
+                    throw "Запрос RootDSE не вернул результатов"
                 }
 
             } catch {
@@ -36092,7 +36092,7 @@ function Connect-LDAP {
 
             # ===== Phase 7b: Get Domain SID =====
             # UNIFIED: Always use LdapConnection (works for both LDAP and LDAPS)
-            Write-Log "[Connect-LDAP] Retrieving Domain SID via LdapConnection..."
+            Write-Log "[Connect-LDAP] Чтение SID домена через LdapConnection..."
             $DomainSID = $null
             try {
                 $SIDRequest = New-Object System.DirectoryServices.Protocols.SearchRequest(
@@ -36106,10 +36106,10 @@ function Connect-LDAP {
                 if ($SIDResponse -and $SIDResponse.Entries.Count -gt 0 -and $SIDResponse.Entries[0].Attributes["objectsid"]) {
                     $SIDBytes = $SIDResponse.Entries[0].Attributes["objectsid"][0]
                     $DomainSID = (New-Object System.Security.Principal.SecurityIdentifier($SIDBytes, 0)).Value
-                    Write-Log "[Connect-LDAP] Domain SID: $DomainSID"
+                    Write-Log "[Connect-LDAP] SID домена: $DomainSID"
                 }
             } catch {
-                Write-Log "[Connect-LDAP] Could not retrieve Domain SID: $_"
+                Write-Log "[Connect-LDAP] Не удалось получить SID домена: $_"
             }
 
             $DomainInfo['DomainSID'] = $DomainSID
@@ -36136,16 +36136,16 @@ function Connect-LDAP {
                     $CrossRefResponse = $Script:LdapConnection.SendRequest($CrossRefRequest)
                     if ($CrossRefResponse -and $CrossRefResponse.Entries.Count -gt 0 -and $CrossRefResponse.Entries[0].Attributes["netbiosname"]) {
                         $DomainNetBIOS = [string]$CrossRefResponse.Entries[0].Attributes["netbiosname"][0]
-                        Write-Log "[Connect-LDAP] Domain NetBIOS name (from crossRef): $DomainNetBIOS"
+                        Write-Log "[Connect-LDAP] Имя NetBIOS домена из crossRef: $DomainNetBIOS"
                     }
                 }
             } catch {
-                Write-Log "[Connect-LDAP] Could not resolve NetBIOS name from crossRef: $_"
+                Write-Log "[Connect-LDAP] Не удалось определить NetBIOS через crossRef: $_"
             }
             if (-not $DomainNetBIOS) {
                 # Fallback only: first DNS label, upper-cased. Logged so the guess is traceable.
                 $DomainNetBIOS = ($Domain -split '\.')[0].ToUpper()
-                Write-Log "[Connect-LDAP] NetBIOS name not resolved via crossRef - falling back to DNS label guess: $DomainNetBIOS" -Level Warning
+                Write-Log "[Connect-LDAP] NetBIOS не определён через crossRef — предполагается метка DNS: $DomainNetBIOS" -Level Warning
             }
             $DomainInfo['DomainNetBIOS'] = $DomainNetBIOS
 
@@ -36157,7 +36157,7 @@ function Connect-LDAP {
             $DomainInfo['AnonymousAccessSkipReason'] = $Script:AnonymousAccessSkipReason
 
             # ===== Phase 8: User Context Verification via LDAP =====
-            Write-Log "[Connect-LDAP] Verifying authenticated user context via LDAP..."
+            Write-Log "[Connect-LDAP] Проверка пользователя через LDAP..."
 
             $AuthenticatedUser = $null
             $AuthenticatedUserDN = $null
@@ -36169,7 +36169,7 @@ function Connect-LDAP {
                 if ($Credential) {
                     # Explicit credentials - use the provided username
                     $AuthenticatedUser = $Credential.UserName
-                    Write-Log "[Connect-LDAP] Using explicit credential: $AuthenticatedUser"
+                    Write-Log "[Connect-LDAP] Используются явные учётные данные: $AuthenticatedUser"
 
                     # Extract sAMAccountName from credential for LDAP lookup
                     $CredentialSAM = $Credential.UserName
@@ -36191,16 +36191,16 @@ function Connect-LDAP {
                             $AuthenticatedUserSAM = $BoundAccount.SAMAccountName
                             $AuthenticatedUserUPN = $BoundAccount.UPN
                             $AuthenticatedUserSID = $BoundAccount.SID
-                            Write-Log "[Connect-LDAP] Verified user: $AuthenticatedUserDN"
+                            Write-Log "[Connect-LDAP] Пользователь проверен: $AuthenticatedUserDN"
                         }
                     } catch {
-                        Write-Log "[Connect-LDAP] Could not verify user via LDAP: $_"
+                        Write-Log "[Connect-LDAP] Не удалось проверить пользователя через LDAP: $_"
                     }
                 } else {
                     # Windows Authentication (SSPI) - use LDAP "Who Am I?" Extended Operation
                     # This is the authoritative way to determine the authenticated identity
                     # UNIFIED: Always use existing LdapConnection (works for both LDAP and LDAPS)
-                    Write-Log "[Connect-LDAP] Using LDAP Who Am I? Extended Operation..."
+                    Write-Log "[Connect-LDAP] Выполняется расширенная операция LDAP Who Am I?..."
 
                     try {
                         # Send Who Am I? Extended Operation (OID 1.3.6.1.4.1.4203.1.11.3)
@@ -36210,7 +36210,7 @@ function Connect-LDAP {
                         if ($WhoAmIResponse -and $WhoAmIResponse.ResponseValue) {
                             # Response format: "u:DOMAIN\username" or "dn:CN=User,OU=Users,DC=domain,DC=com"
                             $WhoAmIResult = [System.Text.Encoding]::UTF8.GetString($WhoAmIResponse.ResponseValue)
-                            Write-Log "[Connect-LDAP] LDAP Who Am I? response: $WhoAmIResult"
+                            Write-Log "[Connect-LDAP] Ответ LDAP Who Am I?: $WhoAmIResult"
 
                             if ($WhoAmIResult -match '^u:(.+)$') {
                                 # Format: u:DOMAIN\username
@@ -36228,11 +36228,11 @@ function Connect-LDAP {
                                 $AuthenticatedUser = $WhoAmIResult
                             }
 
-                            Write-Log "[Connect-LDAP] Authenticated user from LDAP: $AuthenticatedUser"
+                            Write-Log "[Connect-LDAP] Аутентифицированный пользователь LDAP: $AuthenticatedUser"
                         }
 
                     } catch {
-                        Write-Log "[Connect-LDAP] LDAP Who Am I? failed: $_ - falling back to LSA ticket cache"
+                        Write-Log "[Connect-LDAP] Ошибка LDAP Who Am I?: $_; переход к кэшу билетов LSA"
 
                         # Fallback: Query Kerberos ticket cache via native LSA API.
                         # Reuse the NetBIOS name resolved via crossRef in Phase 7b2; only guess from
@@ -36242,13 +36242,13 @@ function Connect-LDAP {
                             $TGTStatus = Test-KerberosTGTExists -Detailed -Force
                             if ($TGTStatus.Valid -and $TGTStatus.ClientName) {
                                 $AuthenticatedUser = "$DomainNetBIOS\$($TGTStatus.ClientName)"
-                                Write-Log "[Connect-LDAP] Found user via LSA ticket cache: $AuthenticatedUser"
+                                Write-Log "[Connect-LDAP] Пользователь определён по кэшу билетов LSA: $AuthenticatedUser"
                             } else {
                                 $AuthenticatedUser = "$DomainNetBIOS\[Kerberos Authenticated]"
-                                Write-Log "[Connect-LDAP] Kerberos authenticated but no valid TGT in cache"
+                                Write-Log "[Connect-LDAP] Kerberos выполнен, но действующий TGT в кэше отсутствует"
                             }
                         } catch {
-                            Write-Log "[Connect-LDAP] LSA ticket cache query failed: $_"
+                            Write-Log "[Connect-LDAP] Ошибка чтения кэша билетов LSA: $_"
                             $AuthenticatedUser = "$DomainNetBIOS\[Kerberos Authenticated]"
                         }
                     }
@@ -36271,7 +36271,7 @@ function Connect-LDAP {
                             if ($BoundAccountName) {
                                 $BoundAccount = Read-LDAPBoundAccount -Connection $Script:LdapConnection -DomainDN $DomainDN -SAMAccountName $BoundAccountName
                             } else {
-                                Write-Log "[Connect-LDAP] '$AuthenticatedUser' is not an account name of $DomainNetBIOS - not looked up"
+                                Write-Log "[Connect-LDAP] '$AuthenticatedUser' не является именем учётной записи домена $DomainNetBIOS — поиск пропущен"
                             }
                         }
                         if ($BoundAccount) {
@@ -36279,10 +36279,10 @@ function Connect-LDAP {
                             $AuthenticatedUserSAM = $BoundAccount.SAMAccountName
                             $AuthenticatedUserUPN = $BoundAccount.UPN
                             $AuthenticatedUserSID = $BoundAccount.SID
-                            Write-Log "[Connect-LDAP] Bound account: $AuthenticatedUserDN ($AuthenticatedUserSID)"
+                            Write-Log "[Connect-LDAP] Привязанная учётная запись: $AuthenticatedUserDN ($AuthenticatedUserSID)"
                         }
                     } catch {
-                        Write-Log "[Connect-LDAP] Could not read the bound account $AuthenticatedUser : $_"
+                        Write-Log "[Connect-LDAP] Не удалось прочитать привязанную учётную запись $AuthenticatedUser — $_"
                     }
                 }
 
@@ -36291,7 +36291,7 @@ function Connect-LDAP {
                     $AuthenticatedUser = "[LDAP Identity Unknown]"
                 }
 
-                Write-Log "[Connect-LDAP] Final Authenticated User: $AuthenticatedUser"
+                Write-Log "[Connect-LDAP] Итоговый аутентифицированный пользователь: $AuthenticatedUser"
                 $DomainInfo['AuthenticatedUser'] = $AuthenticatedUser
                 $DomainInfo['AuthenticatedUserDN'] = $AuthenticatedUserDN
                 $DomainInfo['AuthenticatedUserSAM'] = $AuthenticatedUserSAM
@@ -36312,13 +36312,13 @@ function Connect-LDAP {
                 # Detect if Kerberos was used for authentication
                 if ($AuthenticatedUser -notmatch '^\[' -and -not $Credential) {
                     $DomainInfo['DetectedKerberos'] = $true
-                    Write-Log "[Connect-LDAP] Kerberos authentication detected (Who Am I? returned domain user)"
+                    Write-Log "[Connect-LDAP] Обнаружен Kerberos (Who Am I? вернул доменного пользователя)"
                 } else {
                     $DomainInfo['DetectedKerberos'] = $false
                 }
 
             } catch {
-                Write-Log "[Connect-LDAP] User verification failed (non-critical): $_"
+                Write-Log "[Connect-LDAP] Ошибка проверки пользователя (некритично): $_"
                 $DomainInfo['AuthenticatedUser'] = "[Error determining identity]"
             }
 
@@ -36350,11 +36350,11 @@ function Connect-LDAP {
                 } else {
                     $Script:LDAPContext['AuthMethod'] = 'WindowsAuth'
                 }
-                Write-Log "[Connect-LDAP] Set AuthMethod: $($Script:LDAPContext['AuthMethod'])"
+                Write-Log "[Connect-LDAP] Установлен AuthMethod: $($Script:LDAPContext['AuthMethod'])"
             }
 
-            Write-Log "[Connect-LDAP] Connection established successfully"
-            Write-Log "[Connect-LDAP] Domain: $Domain, Server: $ActualDCName, Protocol: $ProtocolDisplay"
+            Write-Log "[Connect-LDAP] Соединение успешно установлено"
+            Write-Log "[Connect-LDAP] Домен: $Domain, сервер: $ActualDCName, протокол: $ProtocolDisplay"
 
             return $DomainInfo
 
@@ -36369,7 +36369,7 @@ function Connect-LDAP {
 
     end {
         if ($Script:LdapConnection) {
-            Write-Log "[Connect-LDAP] LDAP connection setup completed"
+            Write-Log "[Connect-LDAP] Настройка LDAP-соединения завершена"
         }
     }
 }
@@ -37210,7 +37210,7 @@ function Connect-adPEAS {
     )
 
     begin {
-        Write-Log "[Connect-adPEAS] Starting authentication process..."
+        Write-Log "[Connect-adPEAS] Начало аутентификации..."
 
         # ===== Automatic Session Cleanup =====
         # Clean up any existing session BEFORE establishing a new one.
@@ -37222,17 +37222,17 @@ function Connect-adPEAS {
                               ($Script:NTLMTokenHandle -and $Script:NTLMTokenHandle -ne [IntPtr]::Zero)
             if (-not $existingSession) { return }
 
-            Write-Log "[Connect-adPEAS] Existing session state detected - performing automatic cleanup..."
+            Write-Log "[Connect-adPEAS] Обнаружена прежняя сессия — выполняется автоматическая очистка..."
 
             # Step 1: Revert NTLM impersonation (MUST be done first!)
             if ($Script:NTLMTokenHandle -and $Script:NTLMTokenHandle -ne [IntPtr]::Zero) {
-                Write-Log "[Connect-adPEAS] Reverting existing NTLM impersonation..."
+                Write-Log "[Connect-adPEAS] Отмена действующего олицетворения NTLM..."
                 try {
                     Invoke-RevertToSelf -TokenHandle $Script:NTLMTokenHandle
-                    Write-Log "[Connect-adPEAS] NTLM impersonation reverted successfully"
+                    Write-Log "[Connect-adPEAS] Олицетворение NTLM успешно отменено"
                 }
                 catch {
-                    Write-Log "[Connect-adPEAS] Warning: Failed to revert NTLM impersonation: $_"
+                    Write-Log "[Connect-adPEAS] Не удалось отменить олицетворение NTLM: $_"
                 }
                 $Script:NTLMTokenHandle = [IntPtr]::Zero
             }
@@ -37241,11 +37241,11 @@ function Connect-adPEAS {
             if ($Script:LdapConnection) {
                 try {
                     $Script:LdapConnection.Dispose()
-                    Write-Log "[Connect-adPEAS] Previous LdapConnection disposed"
+                    Write-Log "[Connect-adPEAS] Предыдущее соединение LdapConnection закрыто"
                 }
                 catch {
                     # Ignore disposal errors (may already be disposed)
-                    Write-Log "[Connect-adPEAS] Note: LdapConnection disposal: $_"
+                    Write-Log "[Connect-adPEAS] Примечание при закрытии LdapConnection: $_"
                 }
             }
 
@@ -37254,11 +37254,11 @@ function Connect-adPEAS {
                 try {
                     $hostsResult = Remove-adPEASHostsEntry
                     if ($hostsResult.Success -and $hostsResult.RemovedCount -gt 0) {
-                        Write-Log "[Connect-adPEAS] Cleaned up $($hostsResult.RemovedCount) hosts file entries from previous session"
+                        Write-Log "[Connect-adPEAS] Удалено записей hosts предыдущей сессии: $($hostsResult.RemovedCount)"
                     }
                 }
                 catch {
-                    Write-Log "[Connect-adPEAS] Warning: Hosts file cleanup failed: $_"
+                    Write-Log "[Connect-adPEAS] Не удалось очистить файл hosts: $_"
                 }
             }
 
@@ -37267,7 +37267,7 @@ function Connect-adPEAS {
             # is reset before the new session starts.
             Clear-SessionState
 
-            Write-Log "[Connect-adPEAS] Session state cleanup completed"
+            Write-Log "[Connect-adPEAS] Состояние прежней сессии очищено"
         }
 
         Remove-ConnectSessionState
@@ -37279,10 +37279,10 @@ function Connect-adPEAS {
         if ($PSBoundParameters.ContainsKey('License') -and $License) {
             if (Test-Path $License -ErrorAction SilentlyContinue) {
                 $Script:RuntimeLicense = Get-Content $License -Raw -Encoding UTF8
-                Write-Log "[Connect-adPEAS] Loaded runtime license from: $License"
+                Write-Log "[Connect-adPEAS] Лицензия выполнения загружена из: $License"
             }
             else {
-                Write-Warning "[Connect-adPEAS] License file not found: $License"
+                Write-Warning "[Connect-adPEAS] Файл лицензии не найден: $License"
             }
         }
 
@@ -37299,7 +37299,7 @@ function Connect-adPEAS {
             'Ccache' { 'Ccache Ticket File (Pass-the-Ticket)' }
             default { $PSCmdlet.ParameterSetName }
         }
-        Write-Log "[Connect-adPEAS] Parameter Set: $ParamSetDisplay"
+        Write-Log "[Connect-adPEAS] Набор параметров: $ParamSetDisplay"
     }
 
     process {
@@ -37307,7 +37307,7 @@ function Connect-adPEAS {
         try {
             # ===== ISE Compatibility Warning =====
             if ($Host.Name -eq 'Windows PowerShell ISE Host') {
-                Write-Warning "PowerShell ISE is deprecated and not supported by adPEAS. Console output may be garbled. Use powershell.exe or VS Code instead."
+                Write-Warning "PowerShell ISE устарела и не поддерживается adPEAS. Консольный вывод может отображаться некорректно. Используйте powershell.exe или VS Code."
             }
 
             # ===== Determine Authentication Method =====
@@ -37393,12 +37393,12 @@ function Connect-adPEAS {
             # Store UseLDAPS for use by Resolve-adPEASName (DC reachability checks)
             if ($UseLDAPS) {
                 $Script:LDAPContext['UseLDAPS'] = $true
-                Write-Log "[Connect-adPEAS] LDAPS mode enabled - DC reachability will check port 636"
+                Write-Log "[Connect-adPEAS] Включён LDAPS — доступность контроллера домена проверяется по порту 636"
             }
 
             # ===== Custom DNS Server Handling =====
             if ($DnsServer) {
-                Write-Log "[Connect-adPEAS] Custom DNS server specified: $DnsServer"
+                Write-Log "[Connect-adPEAS] Указан собственный DNS-сервер: $DnsServer"
 
                 # Store DNS server for use by other functions
                 $Script:LDAPContext['DnsServer'] = $DnsServer
@@ -37408,28 +37408,28 @@ function Connect-adPEAS {
                 # Validate DNS server can resolve the target domain
                 try {
                     $null = Resolve-DnsName -Name $Domain -Server $DnsServer -Type A -DnsOnly -ErrorAction Stop
-                    Write-Log "[Connect-adPEAS] Custom DNS server can resolve $Domain"
+                    Write-Log "[Connect-adPEAS] Собственный DNS-сервер разрешает имя $Domain"
                 }
                 catch {
-                    Write-Warning "[Connect-adPEAS] DNS server $DnsServer not reachable or cannot resolve '$Domain'"
+                    Write-Warning "[Connect-adPEAS] DNS-сервер $DnsServer недоступен либо не разрешает имя '$Domain'"
                 }
 
                 # If PatchHostsFile is requested, verify admin privileges
                 if ($PatchHostsFile) {
                     $isAdmin = Test-adPEASAdminPrivileges
                     if (-not $isAdmin) {
-                        Write-Warning "[Connect-adPEAS] -PatchHostsFile requires Administrator privileges!"
-                        Write-Warning "[Connect-adPEAS] Hosts file patching will be skipped. Run as Administrator for full functionality."
+                        Write-Warning "[Connect-adPEAS] Параметру -PatchHostsFile нужны права администратора!"
+                        Write-Warning "[Connect-adPEAS] Изменение файла hosts пропущено. Для полной функциональности запустите от имени администратора."
                         $PatchHostsFile = $false
                     }
                     else {
-                        Write-Log "[Connect-adPEAS] Administrator privileges confirmed for hosts file patching"
+                        Write-Log "[Connect-adPEAS] Права администратора на изменение hosts подтверждены"
                         $Script:LDAPContext['PatchHostsFile'] = $true
 
                         # ===== EARLY Hosts File Patching =====
                         # Kerberos PTT requires Windows to resolve the DC hostname for SPN matching.
                         # Without hosts file entries, the LDAP connect after PTT fails with "Invalid credentials" because Windows cannot resolve the DC hostname via system DNS.
-                        Write-Log "[Connect-adPEAS] Early hosts file patching for Kerberos authentication..."
+                        Write-Log "[Connect-adPEAS] Предварительное изменение hosts для Kerberos..."
 
                         # First, resolve the server/domain to get IP
                         $earlyResolveTarget = if ($Server) { $Server } else { $Domain }
@@ -37467,7 +37467,7 @@ function Connect-adPEAS {
                             }
                         }
                         else {
-                            Write-Warning "[Connect-adPEAS] Could not resolve $earlyResolveTarget via custom DNS - hosts patching skipped"
+                            Write-Warning "[Connect-adPEAS] Не удалось разрешить $earlyResolveTarget через собственный DNS — изменение hosts пропущено"
                         }
                     }
                 }
@@ -37477,14 +37477,14 @@ function Connect-adPEAS {
             if ($AuthMethod -eq 'WindowsAuth' -and -not $Domain) {
                 try {
                     $Domain = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().Name
-                    Write-Log "[Connect-adPEAS] No domain specified, using current domain: $Domain"
+                    Write-Log "[Connect-adPEAS] Домен не указан — используется текущий: $Domain"
                 } catch {
                     Show-ConnectionError -ErrorType "DomainError" -Details "Specify domain with -Domain parameter" -NoThrow
                     return $null
                 }
             }
 
-            Write-Log "[Connect-adPEAS] Establishing connection..."
+            Write-Log "[Connect-adPEAS] Установка соединения..."
 
             # Create readable authentication method name for verbose output
             $AuthMethodDisplay = switch ($AuthMethod) {
@@ -37499,7 +37499,7 @@ function Connect-adPEAS {
                 'Ccache' { 'Ccache Ticket File (Pass-the-Ticket)' }
                 default { $AuthMethod }
             }
-            Write-Log "[Connect-adPEAS] Authentication Method: $AuthMethodDisplay"
+            Write-Log "[Connect-adPEAS] Метод аутентификации: $AuthMethodDisplay"
 
             # ===== Parameter-Set Specific Handling =====
             switch ($AuthMethod) {
@@ -37511,9 +37511,9 @@ function Connect-adPEAS {
                     #   $CredObject      - PSCredential for NTLM impersonation and SimpleBind
 
                     if ($AuthMethod -eq 'PSCredential') {
-                        Write-Log "[Connect-adPEAS] Domain: $Domain"
-                        if ($Server) { Write-Log "[Connect-adPEAS] Server: $Server" }
-                        Write-Log "[Connect-adPEAS] Username: $($Credential.UserName)"
+                        Write-Log "[Connect-adPEAS] Домен: $Domain"
+                        if ($Server) { Write-Log "[Connect-adPEAS] Сервер: $Server" }
+                        Write-Log "[Connect-adPEAS] Имя пользователя: $($Credential.UserName)"
 
                         # Extract password from credential for Kerberos (with proper memory cleanup)
                         $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Credential.Password)
@@ -37538,9 +37538,9 @@ function Connect-adPEAS {
                             if ($UserDomainPrefix -ine $targetPrefix -and $UserDomainPrefix -ine $Domain) {
                                 $UserRealm = $UserDomainPrefix
                                 if ($UserRealm -match '\.') {
-                                    Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'"
+                                    Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (FQDN), целевой домен '$Domain'"
                                 } else {
-                                    Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'"
+                                    Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (NetBIOS), целевой домен '$Domain'"
                                 }
                             }
                         }
@@ -37549,7 +37549,7 @@ function Connect-adPEAS {
                             $upnDomain = $Matches[2]
                             if ($upnDomain -ine $Domain) {
                                 $UserRealm = $upnDomain
-                                Write-Log "[Connect-adPEAS] Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'"
+                                Write-Log "[Connect-adPEAS] Междоменное подключение: область UPN '$UserRealm', целевой домен '$Domain'"
                             }
                         }
 
@@ -37557,8 +37557,8 @@ function Connect-adPEAS {
                     }
                     else {
                         # UsernamePassword
-                        Write-Log "[Connect-adPEAS] Domain: $Domain"
-                        if ($Server) { Write-Log "[Connect-adPEAS] Server: $Server" }
+                        Write-Log "[Connect-adPEAS] Домен: $Domain"
+                        if ($Server) { Write-Log "[Connect-adPEAS] Сервер: $Server" }
                         Write-Log "[Connect-adPEAS] Username: $Username"
 
                         # Convert Password to plain string for Kerberos, SecureString for SimpleBind
@@ -37568,7 +37568,7 @@ function Connect-adPEAS {
                             $PlainPassword = ""
                             # Create empty SecureString manually (ConvertTo-SecureString rejects empty string in some PS versions)
                             $SecurePassword = New-Object System.Security.SecureString
-                            Write-Log "[Connect-adPEAS] Empty password provided (PASSWD_NOTREQD account)"
+                            Write-Log "[Connect-adPEAS] Получен пустой пароль (учётная запись PASSWD_NOTREQD)"
                         }
                         elseif ($Password -is [string]) {
                             $PlainPassword = $Password
@@ -37589,10 +37589,10 @@ function Connect-adPEAS {
                             # Numeric password (PowerShell auto-parses "12345" as int) - convert to string
                             $PlainPassword = $Password.ToString()
                             $SecurePassword = ConvertTo-SecureString -String $PlainPassword -AsPlainText -Force
-                            Write-Log "[Connect-adPEAS] Password was numeric, converted to string"
+                            Write-Log "[Connect-adPEAS] Числовой пароль преобразован в строку"
                         }
                         else {
-                            throw "Password must be either String, SecureString, or empty"
+                            throw "Пароль должен быть String, SecureString либо пустым"
                         }
 
                         # Normalize Username for credential creation
@@ -37601,7 +37601,7 @@ function Connect-adPEAS {
                         if ($Username -notmatch '\\' -and $Username -notmatch '@') {
                             $NetBIOSDomain = ($Domain -split '\.')[0].ToUpper()
                             $CredentialUsername = "$NetBIOSDomain\$Username"
-                            Write-Log "[Connect-adPEAS] Username normalized for SMB: $Username -> $CredentialUsername"
+                            Write-Log "[Connect-adPEAS] Имя пользователя нормализовано для SMB: $Username -> $CredentialUsername"
                         }
 
                         # Create PSCredential for NTLM impersonation and SimpleBind fallback
@@ -37621,9 +37621,9 @@ function Connect-adPEAS {
                             if ($UserDomainPrefix -ine $targetPrefix -and $UserDomainPrefix -ine $Domain) {
                                 $UserRealm = $UserDomainPrefix
                                 if ($UserRealm -match '\.') {
-                                    Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'"
+                                    Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (FQDN), целевой домен '$Domain'"
                                 } else {
-                                    Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'"
+                                    Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (NetBIOS), целевой домен '$Domain'"
                                 }
                             }
                         }
@@ -37632,7 +37632,7 @@ function Connect-adPEAS {
                             $upnDomain = $Matches[2]
                             if ($upnDomain -ine $Domain) {
                                 $UserRealm = $upnDomain
-                                Write-Log "[Connect-adPEAS] Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'"
+                                Write-Log "[Connect-adPEAS] Междоменное подключение: область UPN '$UserRealm', целевой домен '$Domain'"
                             }
                         }
                     }
@@ -37665,7 +37665,7 @@ function Connect-adPEAS {
 
                     # ===== Explicit NTLM (if requested) =====
                     if ($ForceNTLM) {
-                        Write-Log "[Connect-adPEAS] Using explicit NTLM authentication (AuthType::Ntlm)..."
+                        Write-Log "[Connect-adPEAS] Используется явная аутентификация NTLM (AuthType::Ntlm)..."
 
                         $ConnParams = @{}
                         $ConnParams['Domain'] = $Domain
@@ -37673,7 +37673,7 @@ function Connect-adPEAS {
                             $ConnParams['Server'] = $Server
                         } elseif ($DCResolution -and $DCResolution.Hostname) {
                             $ConnParams['Server'] = $DCResolution.Hostname
-                            Write-Log "[Connect-adPEAS] ForceNTLM: Using discovered DC: $($DCResolution.Hostname)"
+                            Write-Log "[Connect-adPEAS] ForceNTLM: обнаружен контроллер домена $($DCResolution.Hostname)"
                         }
                         if ($UseLDAPS) { $ConnParams['UseLDAPS'] = $true }
                         $ConnParams['IgnoreSSLErrors'] = $IgnoreSSLErrors
@@ -37713,7 +37713,7 @@ function Connect-adPEAS {
                         # Fall through to NTLM Impersonation / SimpleBind below
                     }
                     elseif (-not $ForceSimpleBind) {
-                        Write-Log "[Connect-adPEAS] Attempting Kerberos authentication..."
+                        Write-Log "[Connect-adPEAS] Попытка аутентификации Kerberos..."
 
                         # Cross-domain with FQDN UserRealm: resolve KDC for user's realm
                         $UserRealmDC = $null
@@ -37754,7 +37754,7 @@ function Connect-adPEAS {
                         if ($KerbFlowResult.Success) {
                             $KerberosAuthSuccess = $true
                             $Connection = $KerbFlowResult.Connection
-                            Write-Log "[Connect-adPEAS] Kerberos authentication completed successfully"
+                            Write-Log "[Connect-adPEAS] Аутентификация Kerberos успешна"
 
                             $Script:AuthInfo.Method = 'Kerberos'
                             $Script:AuthInfo.KerberosUsed = $true
@@ -37773,7 +37773,7 @@ function Connect-adPEAS {
                         else {
                             $ErrorMessage = $KerbFlowResult.Error
                             $KdcErrorCode = $KerbFlowResult.ErrorCode
-                            Write-Log "[Connect-adPEAS] Kerberos authentication failed: $ErrorMessage (ErrorCode: $KdcErrorCode)"
+                            Write-Log "[Connect-adPEAS] Ошибка аутентификации Kerberos: $ErrorMessage (код $KdcErrorCode)"
 
                             # KDC errors indicate authentication/credential issues - fallback makes no sense
                             # Exception: cross-domain auth may get Error 6 (user not found) if TGS fails,
@@ -37784,7 +37784,7 @@ function Connect-adPEAS {
                                 return $null
                             }
                             if ($IsCrossDomain) {
-                                Write-Log "[Connect-adPEAS] Cross-domain: Kerberos failed, allowing NTLM/SimpleBind fallback"
+                                Write-Log "[Connect-adPEAS] Междоменное подключение: ошибка Kerberos, возможен переход на NTLM/SimpleBind"
                                 Show-Line "Междоменная аутентификация: переход на NTLM/SimpleBind" -Class Hint
                             }
 
@@ -37793,13 +37793,13 @@ function Connect-adPEAS {
                             if ($IsDnsResolutionIssue) {
                                 Show-Line "Билеты Kerberos TGT/TGS получены, но для LDAP требуется разрешение имени узла" -Class Note
                                 Show-Line "Для полноценной аутентификации Kerberos используйте -PatchHostsFile" -Class Note
-                                Write-Log "[Connect-adPEAS] Custom DNS active without hosts patching - SimpleBind fallback"
+                                Write-Log "[Connect-adPEAS] Используется собственный DNS без изменения hosts — переход на SimpleBind"
                             }
 
                             # Technical error (PTT failed, LDAP without Kerberos, etc.) - fallback is OK
                             $IsPTTError = $ErrorMessage -match "non-domain-joined|Remote Credential Guard|Ticket import failed|ticket not used|ticket not usable"
                             if ($IsPTTError) {
-                                Write-Log "[Connect-adPEAS] Kerberos PTT not available on this system - using SimpleBind"
+                                Write-Log "[Connect-adPEAS] Kerberos PTT недоступен — используется SimpleBind"
                             }
 
                             if ($ForceKerberos) {
@@ -37837,25 +37837,25 @@ function Connect-adPEAS {
                             # Connect-LDAP has already shown the error, so this only says why
                             # nothing further is tried.
                             if ($UseLDAPS -and $Script:ConnectionState -in @('SSLHandshakeError', 'CertificateError')) {
-                                Write-Log "[Connect-adPEAS] LDAPS transport failed ($Script:ConnectionState) - no authentication fallback can help"
+                                Write-Log "[Connect-adPEAS] Ошибка транспорта LDAPS ($Script:ConnectionState) — смена метода аутентификации не поможет"
                                 Show-Line ('LDAPS transport failed - authentication runs inside TLS, so NTLM and ' +
                                            'SimpleBind are not attempted') -Class Note
                                 return $null
                             }
 
-                            Write-Log "[Connect-adPEAS] Kerberos PTT failed - trying NTLM impersonation fallback..."
+                            Write-Log "[Connect-adPEAS] Не удалось применить Kerberos PTT — попытка олицетворения NTLM..."
                             Show-Line "Аутентификация Kerberos не удалась — попытка олицетворения через NTLM" -Class Info
                         }
                     }
                     else {
-                        Write-Log "[Connect-adPEAS] ForceSimpleBind specified, skipping Kerberos"
+                        Write-Log "[Connect-adPEAS] Указан ForceSimpleBind — Kerberos пропускается"
                     }
 
                     # ===== Fallback: Explicit NTLM -> SimpleBind =====
                     if (-not $KerberosAuthSuccess -and -not $ForceNTLM) {
                         # Try explicit NTLM first (better than SimpleBind: supports LDAP signing)
                         if (-not $ForceSimpleBind) {
-                            Write-Log "[Connect-adPEAS] Attempting explicit NTLM fallback (AuthType::Ntlm)..."
+                            Write-Log "[Connect-adPEAS] Резервная попытка явной аутентификации NTLM (AuthType::Ntlm)..."
 
                             $ConnParams = @{}
                             $ConnParams['Domain'] = $Domain
@@ -37880,13 +37880,13 @@ function Connect-adPEAS {
                                 # be the one that reaches LDAPS at all, so the state this reads
                                 # is the one that attempt produced.
                                 if ($UseLDAPS -and $Script:ConnectionState -in @('SSLHandshakeError', 'CertificateError')) {
-                                    Write-Log "[Connect-adPEAS] LDAPS transport failed ($Script:ConnectionState) - not attempting SimpleBind"
+                                    Write-Log "[Connect-adPEAS] Ошибка транспорта LDAPS ($Script:ConnectionState) — SimpleBind не выполняется"
                                     Show-Line ('LDAPS transport failed - authentication runs inside TLS, so SimpleBind ' +
                                                'is not attempted') -Class Note
                                     return $null
                                 }
 
-                                Write-Log "[Connect-adPEAS] LDAP connection failed with explicit NTLM - trying SimpleBind..."
+                                Write-Log "[Connect-adPEAS] Соединение LDAP через явный NTLM не удалось — попытка SimpleBind..."
                                 Show-Line "Аутентификация NTLM не удалась — переход на SimpleBind" -Class Hint
                                 # Fall through to SimpleBind below
                             }
@@ -37902,7 +37902,7 @@ function Connect-adPEAS {
 
                         # Final fallback: SimpleBind
                         if (-not $Connection) {
-                            Write-Log "[Connect-adPEAS] Using SimpleBind authentication..."
+                            Write-Log "[Connect-adPEAS] Используется аутентификация SimpleBind..."
 
                             $ConnParams = @{}
                             $ConnParams['Domain'] = $Domain
@@ -37945,7 +37945,7 @@ function Connect-adPEAS {
                                 }
                             }
                             if (-not $Connection -and -not $UseLDAPS -and $Script:LastLDAPErrorCode -eq 8) {
-                                Write-Log "[Connect-adPEAS] SimpleBind failed with LDAP_STRONG_AUTH_REQUIRED - auto-upgrading to LDAPS..."
+                                Write-Log "[Connect-adPEAS] SimpleBind отклонён (LDAP_STRONG_AUTH_REQUIRED) — автоматический переход на LDAPS..."
                                 # Port 389 without TLS: there is no channel to bind, so the
                                 # refusal can only be the signing requirement - a simple bind
                                 # cannot be signed. The line used to name channel binding too.
@@ -37966,9 +37966,9 @@ function Connect-adPEAS {
                 }
 
                 'Certificate' {
-                    Write-Log "[Connect-adPEAS] Domain: $Domain"
+                    Write-Log "[Connect-adPEAS] Домен: $Domain"
                     if ($Server) {
-                        Write-Log "[Connect-adPEAS] Server: $Server"
+                        Write-Log "[Connect-adPEAS] Сервер: $Server"
                     }
                     Write-Log "[Connect-adPEAS] Certificate: $Certificate"
 
@@ -38025,15 +38025,15 @@ function Connect-adPEAS {
                         # Direct LDAPS bind with client certificate - no Kerberos involved
                         # Works when: Port 88 blocked, no Smart Card Logon EKU, no admin rights for PTT
                         if ($ForceKerberos) {
-                            Write-Warning "[!] -ForceKerberos has no effect with -ForcePassTheCert"
-                            Write-Warning "[!] Pass-the-Cert always uses Schannel (TLS client cert), never Kerberos"
+                            Write-Warning "[!] -ForceKerberos не действует при -ForcePassTheCert"
+                            Write-Warning "[!] Pass-the-Cert использует Schannel (клиентский TLS-сертификат), а не Kerberos"
                         }
-                        Write-Log "[Connect-adPEAS] Using Pass-the-Cert (Schannel) - bypassing Kerberos"
+                        Write-Log "[Connect-adPEAS] Используется Pass-the-Cert (Schannel), Kerberos пропускается"
 
                         # Force LDAPS (Schannel requires TLS)
                         if (-not $UseLDAPS) {
                             $UseLDAPS = $true
-                            Write-Log "[Connect-adPEAS] LDAPS automatically enabled for Pass-the-Cert"
+                            Write-Log "[Connect-adPEAS] LDAPS автоматически включён для Pass-the-Cert"
                         }
 
                         # Extract display identity from cert (for console output only, not for auth)
@@ -38422,9 +38422,9 @@ function Connect-adPEAS {
                 }
 
                 'WindowsAuth' {
-                    Write-Log "[Connect-adPEAS] Domain: $Domain"
+                    Write-Log "[Connect-adPEAS] Домен: $Domain"
                     if ($Server) {
-                        Write-Log "[Connect-adPEAS] Server: $Server"
+                        Write-Log "[Connect-adPEAS] Сервер: $Server"
                     }
                     Write-Log "[Connect-adPEAS] Username: $env:USERDOMAIN\$env:USERNAME"
 
@@ -38480,9 +38480,9 @@ function Connect-adPEAS {
                     # Primary: Kerberos TGT + TGS for LDAP + Pass-the-Ticket
                     # No fallback - hash/key auth requires Kerberos
 
-                    Write-Log "[Connect-adPEAS] Domain: $Domain"
+                    Write-Log "[Connect-adPEAS] Домен: $Domain"
                     if ($Server) {
-                        Write-Log "[Connect-adPEAS] Server: $Server"
+                        Write-Log "[Connect-adPEAS] Сервер: $Server"
                     }
                     Write-Log "[Connect-adPEAS] Username: $Username"
                     Write-Log "[Connect-adPEAS] Auth Type: $AuthMethod"
@@ -38499,9 +38499,9 @@ function Connect-adPEAS {
                         if ($UserDomainPrefix -ine $targetPrefix -and $UserDomainPrefix -ine $Domain) {
                             $UserRealm = $UserDomainPrefix
                             if ($UserRealm -match '\.') {
-                                Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'"
+                                Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (FQDN), целевой домен '$Domain'"
                             } else {
-                                Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'"
+                                Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (NetBIOS), целевой домен '$Domain'"
                             }
                         }
                     }
@@ -38510,7 +38510,7 @@ function Connect-adPEAS {
                         $upnDomain = $Matches[2]
                         if ($upnDomain -ine $Domain) {
                             $UserRealm = $upnDomain
-                            Write-Log "[Connect-adPEAS] Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'"
+                            Write-Log "[Connect-adPEAS] Междоменное подключение: область UPN '$UserRealm', целевой домен '$Domain'"
                         }
                     }
                     Write-Log "[Connect-adPEAS] Extracted sAMAccountName: $SamAccountName"
@@ -38594,7 +38594,7 @@ function Connect-adPEAS {
                         if ($KerbFlowResult.Success) {
                             $KerberosAuthSuccess = $true
                             $Connection = $KerbFlowResult.Connection
-                            Write-Log "[Connect-adPEAS] Kerberos authentication completed successfully"
+                            Write-Log "[Connect-adPEAS] Аутентификация Kerberos успешна"
 
                             # Track auth info
                             $Script:AuthInfo.Method = 'Kerberos'
@@ -38618,7 +38618,7 @@ function Connect-adPEAS {
                         }
                     }
                     else {
-                        Write-Log "[Connect-adPEAS] ForceSimpleBind specified, skipping Kerberos"
+                        Write-Log "[Connect-adPEAS] Указан ForceSimpleBind — Kerberos пропускается"
                         $KerberosError = "Skipped (ForceSimpleBind)"
                     }
 
@@ -38645,9 +38645,9 @@ function Connect-adPEAS {
                     }
 
                     $TicketInput = if ($AuthMethod -eq 'Kirbi') { $Kirbi } else { $Ccache }
-                    Write-Log "[Connect-adPEAS] Domain: $Domain"
+                    Write-Log "[Connect-adPEAS] Домен: $Domain"
                     if ($Server) {
-                        Write-Log "[Connect-adPEAS] Server: $Server"
+                        Write-Log "[Connect-adPEAS] Сервер: $Server"
                     }
                     Write-Log "[Connect-adPEAS] Ticket Input: $($TicketInput.Substring(0, [Math]::Min(50, $TicketInput.Length)))..."
 
@@ -38689,7 +38689,7 @@ function Connect-adPEAS {
                         $Connection = Connect-LDAP @ConnParams
 
                         if ($Connection) {
-                            Write-Log "[Connect-adPEAS] Kerberos authentication completed successfully"
+                            Write-Log "[Connect-adPEAS] Аутентификация Kerberos успешна"
 
                             # Track auth info
                             $Script:AuthInfo.Method = 'Kerberos'
@@ -158745,7 +158745,7 @@ function Collect-BHIssuancePolicies {
 #Requires -Version 5.1
 
 # ===== Script Variables =====
-$Script:adPEASVersion = "2.9.0+20261119-0956"
+$Script:adPEASVersion = "2.9.0+20261119-1015"
 
 # Handle ScriptPath for different execution contexts:
 # - Normal: $MyInvocation.MyCommand.Path is set
@@ -159056,13 +159056,13 @@ function Invoke-adPEAS {
 
     # Validate -OutputAppend requires -Outputfile
     if ($OutputAppend -and -not $PSBoundParameters['Outputfile']) {
-        Write-Warning "[adPEAS] -OutputAppend requires -Outputfile. Ignoring -OutputAppend."
+        Write-Warning "[adPEAS] Для -OutputAppend необходим -Outputfile. Параметр -OutputAppend игнорируется."
         $OutputAppend = [switch]::new($false)
     }
 
     # Validate -OutputAppend requires a format that produces JSON (for findings merge)
     if ($OutputAppend -and $Format -notin @('All', 'JSON')) {
-        Write-Warning "[adPEAS] -OutputAppend requires JSON findings cache. Use -Format All or -Format JSON. Ignoring -OutputAppend."
+        Write-Warning "[adPEAS] Для -OutputAppend необходим JSON-кэш находок. Укажите -Format All или -Format JSON. Параметр игнорируется."
         $OutputAppend = [switch]::new($false)
     }
 
@@ -159081,14 +159081,14 @@ function Invoke-adPEAS {
     $Module = @(Resolve-adPEASModules -Module $Module -ExcludeModule $ExcludeModule)
 
     if ($Module.Count -eq 0) {
-        Write-Warning "[adPEAS] -ExcludeModule leaves no module to run. Nothing to do."
+        Write-Warning "[adPEAS] После исключения модулей через -ExcludeModule не осталось заданий. Выполнение завершено."
         return
     }
 
     # Initialize findings collection if HTML or JSON format requested
     if ($Format -in @('HTML', 'JSON', 'All')) {
         Initialize-FindingsCollection
-        Write-Log "[adPEAS] Findings collection enabled (Format: $Format)"
+        Write-Log "[adPEAS] Сбор результатов включён (формат: $Format)"
     }
 
     # ===== Output File Configuration =====
@@ -159112,9 +159112,9 @@ function Invoke-adPEAS {
         if ($OutputDir -and -not (Test-Path $OutputDir)) {
             try {
                 New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
-                Write-Warning "[adPEAS] Directory '$OutputDir' did not exist and was created"
+                Write-Warning "[adPEAS] Каталог '$OutputDir' отсутствовал и был создан"
             } catch {
-                Write-Warning "[adPEAS] Could not create directory '$OutputDir': $_"
+                Write-Warning "[adPEAS] Не удалось создать каталог '$OutputDir': $_"
                 return
             }
         }
@@ -159130,7 +159130,7 @@ function Invoke-adPEAS {
                 # Append mode: File will be created or appended to by Write-adPEASOutput
                 $Script:adPEAS_Outputfile = $textPath
             } catch {
-                Write-Warning "[adPEAS] Unable to write text output to '$textPath', please check path and permissions!"
+                Write-Warning "[adPEAS] Невозможно записать текстовый отчёт в '$textPath'; проверьте путь и права доступа."
             }
         }
 
@@ -159146,7 +159146,7 @@ function Invoke-adPEAS {
 
     # Warn if VerboseLogging is enabled without text output (but still enable console verbose)
     if ($VerboseLogging -and -not $Script:adPEAS_Outputfile) {
-        Write-Warning "[adPEAS] -VerboseLogging: File logging requires -Outputfile with Text format. Verbose messages will be shown in console only."
+        Write-Warning "[adPEAS] -VerboseLogging: для журнала в файл необходимы -Outputfile и формат Text. Подробности будут выводиться только в консоль."
         # Keep VerboseLogging = $true so that $VerbosePreference stays 'Continue' for console output
         # File logging won't happen since $Script:adPEAS_Outputfile is $null
     }
@@ -159166,11 +159166,11 @@ try {
     # what it last showed; the text report always starts with them.
     Show-ScanLogo -Version $Script:adPEASVersion -Disclaimer $_disclaimer
 
-    Write-Log "[adPEAS] Script started: $StartTime"
-    Write-Log "[adPEAS] Version: $Script:adPEASVersion"
+    Write-Log "[adPEAS] Время начала: $StartTime"
+    Write-Log "[adPEAS] Версия: $Script:adPEASVersion"
 
     if ($OPSEC) {
-        Write-Log "[adPEAS] OPSEC mode enabled: No ASREPRoast/Kerberoast/BloodHound"
+        Write-Log "[adPEAS] Включён OPSEC: ASREPRoast/Kerberoast/BloodHound отключены"
     }
 
     # ===== Connection Handling =====
@@ -159197,7 +159197,7 @@ try {
 
     # Scenario 2: Active session exists AND no new connection parameters ? Reuse session
     if ($HasActiveSession -and -not $HasConnectionParams) {
-        Write-Log "[adPEAS] Reusing existing LDAP session"
+        Write-Log "[adPEAS] Повторное использование действующей LDAP-сессии"
         Show-Header "Используется существующее LDAP-подключение"
 
         # Use LDAP-verified identity if available
@@ -159217,7 +159217,7 @@ try {
             default       { $Script:LDAPContext.Protocol }  # Fallback to protocol if AuthMethod not set
         }
 
-        Show-Line "Connected to domain '$($Script:LDAPContext.Domain)' on server '$($Script:LDAPContext.Server)' as '$AuthenticatedUser' via $AuthDisplay"
+        Show-Line "Подключено к домену '$($Script:LDAPContext.Domain)' на сервере '$($Script:LDAPContext.Server)' как '$AuthenticatedUser' через $AuthDisplay"
     }
     # Scenario 3: Connection parameters provided ? Establish new connection via Connect-adPEAS
     elseif ($HasConnectionParams) {
@@ -159257,12 +159257,12 @@ try {
             # No new auth method specified - check if we can reuse existing session credentials
             if ($HasActiveSession -and $Script:LDAPContext.Credential) {
                 # Reuse credentials from existing session
-                Write-Log "[adPEAS] Reusing credentials from existing session"
+                Write-Log "[adPEAS] Повторно используются учётные данные действующей сессии"
                 $ConnectionParams['Credential'] = $Script:LDAPContext.Credential
             }
             elseif ($HasActiveSession -and $Script:LDAPContext.Certificate) {
                 # Reuse certificate auth from existing session
-                Write-Log "[adPEAS] Reusing certificate authentication from existing session"
+                Write-Log "[adPEAS] Повторно используется аутентификация по сертификату действующей сессии"
                 $ConnectionParams['Certificate'] = $Script:LDAPContext.Certificate
                 if ($Script:LDAPContext.CertificatePassword) {
                     $ConnectionParams['CertificatePassword'] = $Script:LDAPContext.CertificatePassword
@@ -159270,7 +159270,7 @@ try {
             }
             else {
                 # No session or session uses Windows Auth - default to Windows Auth
-                Write-Log "[adPEAS] No authentication method specified - defaulting to Windows Authentication"
+                Write-Log "[adPEAS] Метод аутентификации не указан — используется аутентификация Windows"
                 $ConnectionParams['UseWindowsAuth'] = $true
             }
         }
@@ -159303,7 +159303,7 @@ try {
                 default       { $Connection.Protocol }  # Fallback to protocol if AuthMethod not set
             }
 
-            Show-Line "Successfully connected to domain '$($Connection.Domain)' on server '$($Connection.Server)' as '$AuthenticatedUser' via $AuthDisplay" -Class Note
+            Show-Line "Успешное подключение к домену '$($Connection.Domain)' на сервере '$($Connection.Server)' как '$AuthenticatedUser' через $AuthDisplay" -Class Note
         } catch {
             # Connect-adPEAS threw an error (already displayed by Connect-adPEAS)
             Show-Error -Type Connection
@@ -159313,7 +159313,7 @@ try {
 
     # ===== Connection Health Check =====
     # Verify that the DC is actually reachable by performing a test query
-    Write-Log "[adPEAS] Verifying Domain Controller connectivity..."
+    Write-Log "[adPEAS] Проверка доступности контроллера домена..."
 
     # Use -Quiet mode to suppress detailed output
     $connectionHealthy = Get-adPEASSession -TestConnection -Quiet
@@ -159326,7 +159326,7 @@ try {
         return
     }
 
-    Write-Log "[adPEAS] Connection health check passed - DC is reachable"
+    Write-Log "[adPEAS] Проверка соединения пройдена — контроллер домена доступен"
 
     # ===== Kerberos Session Health Check =====
     # For Kerberos-based sessions, verify the TGT is still valid before starting module execution
@@ -159334,7 +159334,7 @@ try {
     # Reset SessionInvalid flag from any previous failed run - give fresh TGT check a fair chance
     if ($Script:LDAPContext -and $Script:LDAPContext['SessionInvalid']) {
         $Script:LDAPContext.Remove('SessionInvalid')
-        Write-Log "[adPEAS] Cleared SessionInvalid flag from previous run"
+        Write-Log "[adPEAS] Сброшен флаг SessionInvalid предыдущего запуска"
     }
 
     # Checks that threw during this run. Reset per run so a second scan in the same session
@@ -159360,12 +159360,12 @@ try {
         # the run announces an empty module list and produces a report with nothing in
         # it, which reads like the domain came back clean.
         if ($Module.Count -eq 0) {
-            Write-Warning "[adPEAS] -OPSEC excludes BloodHound collection, which was the only module selected. Nothing to do."
+            Write-Warning "[adPEAS] Режим -OPSEC исключает BloodHound — единственный выбранный модуль. Заданий нет."
             return
         }
     }
 
-    Write-Log "[adPEAS] Executing Modules: $($Module -join ', ')"
+    Write-Log "[adPEAS] Запускаемые модули: $($Module -join ', ')"
     Show-Line "Запуск модулей: $($Module -join ', ')"
 
     # Module progress counter
@@ -159407,14 +159407,14 @@ try {
                 -ReplacedCategories @($Module))
 
             Set-FindingsCollection -Findings $keptFindings
-            Show-Line "Appending to existing report: kept $($keptFindings.Count) of $($previousFindings.Count) previous findings, re-running $($Module -join ', ')" -Class Note
+            Show-Line "Добавление к отчёту: сохранено $($keptFindings.Count) из $($previousFindings.Count) прежних находок; повторный запуск $($Module -join ', ')" -Class Note
         }
         catch {
-            Write-Warning "[adPEAS] Could not load previous findings from '$appendCachePath': $_"
-            Write-Warning "[adPEAS] Continuing without append - creating fresh report"
+            Write-Warning "[adPEAS] Не удалось прочитать прежние находки из '$appendCachePath': $_"
+            Write-Warning "[adPEAS] Продолжение без добавления — создаётся новый отчёт"
         }
     } elseif ($OutputAppend) {
-        Write-Log "[adPEAS] No previous cache found at '$appendCachePath' - first append run"
+        Write-Log "[adPEAS] Прежний кэш '$appendCachePath' не найден — первый запуск в режиме добавления"
     }
 
     # 3. Execute checks
@@ -159451,7 +159451,7 @@ try {
         # CompletedModules that were skipped, which is the one thing the field exists to
         # say. The last checkpoint before the session died is the honest one; leave it.
         if ($Script:LDAPContext -and $Script:LDAPContext['SessionInvalid']) {
-            Write-Log "[adPEAS] Skipping checkpoint after module '$ModuleName' - session invalid"
+            Write-Log "[adPEAS] Пропущена контрольная точка после '$ModuleName' — сессия недействительна"
             return
         }
 
@@ -159469,7 +159469,7 @@ try {
             Export-FindingsCache -Path $checkpointPath -Partial -CompletedModules @($completedModules)
         }
         catch {
-            Write-Log "[adPEAS] Checkpoint after module '$ModuleName' failed: $_" -Level Warning
+            Write-Log "[adPEAS] Ошибка контрольной точки после '$ModuleName': $_" -Level Warning
         }
     }
 
@@ -159483,15 +159483,15 @@ try {
         )
         # Skip all remaining checks if session became invalid (e.g., expired Kerberos TGT)
         if ($Script:LDAPContext -and $Script:LDAPContext['SessionInvalid']) {
-            Write-Log "[adPEAS] Skipping check '$CheckName' - session invalid"
+            Write-Log "[adPEAS] Проверка '$CheckName' пропущена — сессия недействительна"
             return
         }
         Set-CheckContext -Category $Category -CheckName $CheckName -Title $Title
         try {
             & $Check
         } catch {
-            Write-Warning "[adPEAS] Check '$CheckName' failed: $_"
-            Write-Log "[adPEAS] Check '$CheckName' failed: $_" -Level Error
+            Write-Warning "[adPEAS] Ошибка проверки '$CheckName': $_"
+            Write-Log "[adPEAS] Ошибка проверки '$CheckName': $_" -Level Error
 
             # The warning above goes to the console only. Without the line below the HTML
             # report, the JSON export and the text report contain nothing at all about the
@@ -159500,7 +159500,7 @@ try {
             # expensive kind of defect, because the finding does not go missing visibly.
             # Emitted while the check context is still set, so it is filed under the right
             # category and check.
-            Show-Line "This check did not complete - its results are incomplete or absent. Reason: $($_.Exception.Message)" -Class Hint
+            Show-Line "Проверка не завершена — результаты неполные или отсутствуют. Причина: $($_.Exception.Message)" -Class Hint
             if ($null -eq $Script:adPEAS_IncompleteChecks) { $Script:adPEAS_IncompleteChecks = @() }
             $Script:adPEAS_IncompleteChecks += $CheckName
         } finally {
@@ -159775,9 +159775,9 @@ try {
     if ($Script:HTMLOutputPath -and -not $sessionAborted) {
         try {
             Export-HTMLReport -OutputPath $Script:HTMLOutputPath
-            Write-Log "[adPEAS] HTML report generated: $($Script:HTMLOutputPath)"
+            Write-Log "[adPEAS] HTML-отчёт создан: $($Script:HTMLOutputPath)"
         } catch {
-            Write-Warning "[adPEAS] Error generating HTML report: $_"
+            Write-Warning "[adPEAS] Ошибка формирования HTML-отчёта: $_"
             $Script:HTMLOutputPath = $null  # Clear path so we don't show it in summary
         }
     }
@@ -159793,10 +159793,10 @@ try {
             # the last module - the statistics summary and the scan summary.
             Export-FindingsCache -Path $jsonPath -CompletedModules @($completedModules)
             $Script:JSONOutputPath = $jsonPath
-            Write-Log "[adPEAS] Findings JSON saved to: $jsonPath"
+            Write-Log "[adPEAS] JSON с результатами сохранён: $jsonPath"
         }
         catch {
-            Write-Warning "[adPEAS] Could not save JSON export to '$jsonPath': $_"
+            Write-Warning "[adPEAS] Не удалось записать JSON в '$jsonPath': $_"
             $Script:JSONOutputPath = $null
         }
     }
@@ -159847,15 +159847,15 @@ try {
         # file is marked incomplete and names the modules it covers, so it is worth
         # naming rather than leaving for the user to find.
         if ($checkpointPath -and (Test-Path $checkpointPath)) {
-            Show-Line "Partial JSON export from the modules that completed: $checkpointPath" -Class Hint
-            Show-Line "Rebuild a report from it with: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath'" -Class Hint
+            Show-Line "Частичный JSON завершённых модулей: $checkpointPath" -Class Hint
+            Show-Line "Сформировать отчёт из него: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath'" -Class Hint
         }
     } else {
         # Checks that threw are named here, not just warned about on the console. A reader
         # of the report has to be able to tell "nothing found" from "not looked at".
         if ($Script:adPEAS_IncompleteChecks -and $Script:adPEAS_IncompleteChecks.Count -gt 0) {
             $incomplete = @($Script:adPEAS_IncompleteChecks | Select-Object -Unique)
-            Show-Line "$($incomplete.Count) check(s) did not complete - their sections are incomplete and must not be read as clean:" -Class Finding
+            Show-Line "Не завершено проверок: $($incomplete.Count). Их результаты неполны — нельзя считать разделы безопасными:" -Class Finding
             foreach ($name in $incomplete) {
                 Show-Line "  $name" -Class Finding
             }
@@ -159891,8 +159891,8 @@ finally {
     # Session is always kept alive after Invoke-adPEAS completes.
     # This allows users to run Get-adPEASSession, Get-Domain* queries, or additional scans.
     # Use Disconnect-adPEAS to explicitly close the session when done.
-    Write-Log "[adPEAS] Session kept alive - use Disconnect-adPEAS to close"
-    Write-Log "[adPEAS] adPEAS v2 completed"
+    Write-Log "[adPEAS] Сессия оставлена активной — завершите её командой Disconnect-adPEAS"
+    Write-Log "[adPEAS] Работа adPEAS v2 завершена"
 }
 }
 # ===== End of Invoke-adPEAS Function =====

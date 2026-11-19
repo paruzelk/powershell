@@ -7,12 +7,12 @@
     "javascript": 1,
     "html": 2,
     "sourceLines": 156557,
-    "totalCandidates": 3969,
+    "totalCandidates": 3767,
     "byType": {
-      "ps-diagnostic": 3809,
+      "ps-diagnostic": 3607,
       "js-ui-candidate": 160
     },
-    "strongContextCandidates": 3809,
+    "strongContextCandidates": 3607,
     "jsContextCandidates": 160,
     "translatedPhrases": 54
   },
@@ -22,198 +22,6 @@
       "line": 147,
       "type": "ps-diagnostic",
       "text": "$Script:ScriptPath\\modules\\Helpers\\Write-Log.ps1"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 585,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] -OutputAppend requires -Outputfile. Ignoring -OutputAppend."
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 591,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] -OutputAppend requires JSON findings cache. Use -Format All or -Format JSON. Ignoring -OutputAppend."
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 610,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] -ExcludeModule leaves no module to run. Nothing to do."
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 617,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Findings collection enabled (Format: $Format)"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 641,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Directory '$OutputDir' did not exist and was created"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 643,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Could not create directory '$OutputDir': $_"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 659,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Unable to write text output to '$textPath', please check path and permissions!"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 675,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] -VerboseLogging: File logging requires -Outputfile with Text format. Verbose messages will be shown in console only."
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 695,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Script started: $StartTime"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 696,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Version: $Script:adPEASVersion"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 699,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] OPSEC mode enabled: No ASREPRoast/Kerberoast/BloodHound"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 726,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Reusing existing LDAP session"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 746,
-      "type": "ps-diagnostic",
-      "text": "Connected to domain '$($Script:LDAPContext.Domain)' on server '$($Script:LDAPContext.Server)' as '$AuthenticatedUser' via $AuthDisplay"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 786,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Reusing credentials from existing session"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 791,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Reusing certificate authentication from existing session"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 799,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] No authentication method specified - defaulting to Windows Authentication"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 832,
-      "type": "ps-diagnostic",
-      "text": "Successfully connected to domain '$($Connection.Domain)' on server '$($Connection.Server)' as '$AuthenticatedUser' via $AuthDisplay"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 842,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Verifying Domain Controller connectivity..."
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 855,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Connection health check passed - DC is reachable"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 863,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Cleared SessionInvalid flag from previous run"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 889,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] -OPSEC excludes BloodHound collection, which was the only module selected. Nothing to do."
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 894,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Executing Modules: $($Module -join ', ')"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 936,
-      "type": "ps-diagnostic",
-      "text": "Appending to existing report: kept $($keptFindings.Count) of $($previousFindings.Count) previous findings, re-running $($Module -join ', ')"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 939,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Could not load previous findings from '$appendCachePath': $_"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 940,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Continuing without append - creating fresh report"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 943,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] No previous cache found at '$appendCachePath' - first append run"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 980,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Skipping checkpoint after module '$ModuleName' - session invalid"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 998,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Checkpoint after module '$ModuleName' failed: $_"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1012,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Skipping check '$CheckName' - session invalid"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1019,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Check '$CheckName' failed: $_"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1020,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Check '$CheckName' failed: $_"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1029,
-      "type": "ps-diagnostic",
-      "text": "This check did not complete - its results are incomplete or absent. Reason: $($_.Exception.Message)"
     },
     {
       "path": "src/adPEAS.ps1",
@@ -292,60 +100,6 @@
       "line": 1285,
       "type": "ps-diagnostic",
       "text": "[adPEAS] Error executing Bloodhound Module: $_"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1304,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] HTML report generated: $($Script:HTMLOutputPath)"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1306,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Error generating HTML report: $_"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1322,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Findings JSON saved to: $jsonPath"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1325,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Could not save JSON export to '$jsonPath': $_"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1376,
-      "type": "ps-diagnostic",
-      "text": "Partial JSON export from the modules that completed: $checkpointPath"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1377,
-      "type": "ps-diagnostic",
-      "text": "Rebuild a report from it with: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath'"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1384,
-      "type": "ps-diagnostic",
-      "text": "$($incomplete.Count) check(s) did not complete - their sections are incomplete and must not be read as clean:"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1420,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] Session kept alive - use Disconnect-adPEAS to close"
-    },
-    {
-      "path": "src/adPEAS.ps1",
-      "line": 1421,
-      "type": "ps-diagnostic",
-      "text": "[adPEAS] adPEAS v2 completed"
     },
     {
       "path": "src/modules/Checks/Accounts/Get-AdminPasswordNeverExpires.ps1",
@@ -5323,138 +5077,6 @@
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 463,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Starting authentication process..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 475,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Existing session state detected - performing automatic cleanup..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 479,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Reverting existing NTLM impersonation..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 482,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] NTLM impersonation reverted successfully"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 485,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Warning: Failed to revert NTLM impersonation: $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 494,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Previous LdapConnection disposed"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 498,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Note: LdapConnection disposal: $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 507,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cleaned up $($hostsResult.RemovedCount) hosts file entries from previous session"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 511,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Warning: Hosts file cleanup failed: $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 520,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Session state cleanup completed"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 532,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Loaded runtime license from: $License"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 535,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] License file not found: $License"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 552,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Parameter Set: $ParamSetDisplay"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 560,
-      "type": "ps-diagnostic",
-      "text": "PowerShell ISE is deprecated and not supported by adPEAS. Console output may be garbled. Use powershell.exe or VS Code instead."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 646,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] LDAPS mode enabled - DC reachability will check port 636"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 651,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Custom DNS server specified: $DnsServer"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 661,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Custom DNS server can resolve $Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 664,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] DNS server $DnsServer not reachable or cannot resolve '$Domain'"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 671,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] -PatchHostsFile requires Administrator privileges!"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 672,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Hosts file patching will be skipped. Run as Administrator for full functionality."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 676,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Administrator privileges confirmed for hosts file patching"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 682,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Early hosts file patching for Kerberos authentication..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
       "line": 696,
       "type": "ps-diagnostic",
       "text": "[Connect-adPEAS] Early hosts entry: $resolvedIP -> $Server"
@@ -5467,147 +5089,15 @@
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 720,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Could not resolve $earlyResolveTarget via custom DNS - hosts patching skipped"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 730,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] No domain specified, using current domain: $Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 737,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Establishing connection..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 752,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Authentication Method: $AuthMethodDisplay"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 764,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Domain: $Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 765,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Server: $Server"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 766,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Username: $($Credential.UserName)"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 791,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 793,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 802,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 810,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Domain: $Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 811,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Server: $Server"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
       "line": 812,
       "type": "ps-diagnostic",
       "text": "[Connect-adPEAS] Username: $Username"
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 821,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Empty password provided (PASSWD_NOTREQD account)"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 842,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Password was numeric, converted to string"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 845,
-      "type": "ps-diagnostic",
-      "text": "Password must be either String, SecureString, or empty"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 854,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Username normalized for SMB: $Username -> $CredentialUsername"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 874,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 876,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 885,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 918,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Using explicit NTLM authentication (AuthType::Ntlm)..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 926,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] ForceNTLM: Using discovered DC: $($DCResolution.Hostname)"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
       "line": 961,
       "type": "ps-diagnostic",
       "text": "[Connect-adPEAS] Cross-domain with NetBIOS prefix '$UserRealm' - skipping Kerberos (cannot discover KDC)"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 966,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Attempting Kerberos authentication..."
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
@@ -5629,105 +5119,15 @@
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1007,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Kerberos authentication completed successfully"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1026,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Kerberos authentication failed: $ErrorMessage (ErrorCode: $KdcErrorCode)"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1037,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cross-domain: Kerberos failed, allowing NTLM/SimpleBind fallback"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1046,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Custom DNS active without hosts patching - SimpleBind fallback"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1052,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Kerberos PTT not available on this system - using SimpleBind"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1090,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] LDAPS transport failed ($Script:ConnectionState) - no authentication fallback can help"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1096,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Kerberos PTT failed - trying NTLM impersonation fallback..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1101,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] ForceSimpleBind specified, skipping Kerberos"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1108,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Attempting explicit NTLM fallback (AuthType::Ntlm)..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
       "line": 1116,
       "type": "ps-diagnostic",
       "text": "[Connect-adPEAS] NTLM fallback: Using discovered DC: $($DCResolution.Hostname)"
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1133,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] LDAPS transport failed ($Script:ConnectionState) - not attempting SimpleBind"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1139,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] LDAP connection failed with explicit NTLM - trying SimpleBind..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1155,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Using SimpleBind authentication..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
       "line": 1163,
       "type": "ps-diagnostic",
       "text": "[Connect-adPEAS] Using discovered DC: $($DCResolution.Hostname)"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1198,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] SimpleBind failed with LDAP_STRONG_AUTH_REQUIRED - auto-upgrading to LDAPS..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1219,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Domain: $Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1221,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Server: $Server"
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
@@ -5758,30 +5158,6 @@
       "line": 1270,
       "type": "ps-diagnostic",
       "text": "Certificate load failed"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1278,
-      "type": "ps-diagnostic",
-      "text": "[!] -ForceKerberos has no effect with -ForcePassTheCert"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1279,
-      "type": "ps-diagnostic",
-      "text": "[!] Pass-the-Cert always uses Schannel (TLS client cert), never Kerberos"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1281,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Using Pass-the-Cert (Schannel) - bypassing Kerberos"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1286,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] LDAPS automatically enabled for Pass-the-Cert"
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
@@ -6067,18 +5443,6 @@
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1675,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Domain: $Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1677,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Server: $Server"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
       "line": 1679,
       "type": "ps-diagnostic",
       "text": "[Connect-adPEAS] Username: $env:USERDOMAIN\\$env:USERNAME"
@@ -6133,18 +5497,6 @@
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1733,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Domain: $Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1735,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Server: $Server"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
       "line": 1737,
       "type": "ps-diagnostic",
       "text": "[Connect-adPEAS] Username: $Username"
@@ -6154,24 +5506,6 @@
       "line": 1738,
       "type": "ps-diagnostic",
       "text": "[Connect-adPEAS] Auth Type: $AuthMethod"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1752,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1754,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1763,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'"
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
@@ -6211,39 +5545,15 @@
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1847,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Kerberos authentication completed successfully"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
       "line": 1867,
       "type": "ps-diagnostic",
       "text": "[Connect-adPEAS] Kerberos authentication failed: $KerberosError"
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1871,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] ForceSimpleBind specified, skipping Kerberos"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
       "line": 1894,
       "type": "ps-diagnostic",
       "text": "[!] -Username is ignored for ticket-based auth (identity is embedded in ticket)"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1898,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Domain: $Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1900,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Server: $Server"
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
@@ -6274,12 +5584,6 @@
       "line": 1928,
       "type": "ps-diagnostic",
       "text": "[Connect-adPEAS] Step 2: Establishing LDAP connection with Kerberos..."
-    },
-    {
-      "path": "src/modules/Core/Connect-adPEAS.ps1",
-      "line": 1942,
-      "type": "ps-diagnostic",
-      "text": "[Connect-adPEAS] Kerberos authentication completed successfully"
     },
     {
       "path": "src/modules/Core/Connect-adPEAS.ps1",
@@ -6451,12 +5755,6 @@
     },
     {
       "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 125,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Starting LDAP connection..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
       "line": 194,
       "type": "ps-diagnostic",
       "text": "[Connect-LDAP] $Context failed: $msg (LDAP error $ldapErrorCode`: $($errorInfo.Name))"
@@ -6481,207 +5779,9 @@
     },
     {
       "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 269,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] AsGlobalCatalog requires -Domain and -Server parameters"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 273,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] GC mode: Server=$Server, Domain=$Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 276,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] No domain specified, attempting automatic discovery..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 280,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Automatically detected domain: $Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 292,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] No server specified, using domain name: $Domain"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 298,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Domain DN: $DomainDN"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 302,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Testing DNS resolution for: $Server"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 310,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Using custom DNS server: $CustomDnsServer"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 318,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] DNS resolution via custom DNS successful: $ResolvedIPString"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 320,
-      "type": "ps-diagnostic",
-      "text": "Custom DNS resolution failed for $Server"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 326,
-      "type": "ps-diagnostic",
-      "text": "DNS resolution returned no addresses"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 329,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] DNS resolution successful: $ResolvedIPString"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 347,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Testing port reachability to: $ConnectTarget"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 363,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Server is reachable on port $TestPort"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 367,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Port test failed: $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 382,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Testing SSL/TLS handshake on port $SSLPort..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 402,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] SSL/TLS handshake successful"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 403,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] SSL Protocol: $($SslStream.SslProtocol)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 404,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Cipher: $($SslStream.CipherAlgorithm)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 406,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Certificate Subject: $($SslStream.RemoteCertificate.Subject)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 407,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Certificate Issuer: $($SslStream.RemoteCertificate.Issuer)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 422,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Certificate chain pre-cached (CRL check disabled)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 424,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Certificate chain pre-cache failed (non-critical): $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 434,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] SSL/TLS handshake FAILED: $($sslErrorInfo.Message)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 437,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Consider using -IgnoreSSLErrors parameter"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 494,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Skipping anonymous access check for GC mode"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 498,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Skipping anonymous access check for LDAPS (rarely enabled over SSL)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 524,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Using hostname for LDAP connection: $LDAPTarget"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 527,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Attempting $ProtocolDisplay connection to ${LDAPTarget}:${LDAPPort}..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 532,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Using System.DirectoryServices.Protocols.LdapConnection for $ProtocolDisplay..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
       "line": 551,
       "type": "ps-diagnostic",
       "text": "[Connect-LDAP] Schannel: Minimal config (ClientCert + SSL + VerifyServerCert)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 561,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Configured timeouts: Operation=${TimeoutSeconds}s, Send=${SendTimeoutSeconds}s"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 565,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Referral chasing disabled (domain-local queries only)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 572,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] SSL certificate validation disabled (IgnoreSSLErrors)"
     },
     {
       "path": "src/modules/Core/Connect-LDAP.ps1",
@@ -6691,117 +5791,9 @@
     },
     {
       "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 593,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Configuring explicit NTLM authentication (Sicily): $NtlmDomain\\$NtlmUser"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 615,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Username from credential (NETBIOS format): $UserName"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 619,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Username from credential (UPN format): $UserName"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 625,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Username qualified for SimpleBind (UPN): $UserName"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 627,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] WARNING: Username '$UserName' is not domain-qualified and no domain available"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 631,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Configuring SimpleBind with credentials: $UserName"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 637,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Configuring Negotiate (Kerberos/NTLM) authentication"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
       "line": 644,
       "type": "ps-diagnostic",
       "text": "[Connect-LDAP] Schannel: Skipping Bind() - first SendRequest() will trigger AutoBind"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 647,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Binding to $ProtocolDisplay server..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 651,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] $ProtocolDisplay bind successful! ($($bindStopwatch.ElapsedMilliseconds)ms)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 676,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] GC mode: ${LDAPTarget}:${LDAPPort} is NOT a Global Catalog (isGlobalCatalogReady != TRUE)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 681,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] GC mode: Could not verify GC status on ${LDAPTarget}:${LDAPPort}: $($_.Exception.Message)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 686,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] GC mode: Connection to ${LDAPTarget}:${LDAPPort} established and verified as Global Catalog"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 692,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Testing $ProtocolDisplay connection with search query..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 693,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Connection state: AuthType=$($LdapProtocolConn.AuthType), AutoBind=$($LdapProtocolConn.AutoBind)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 695,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Client certificates count: $($LdapProtocolConn.ClientCertificates.Count)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 708,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] $ProtocolDisplay search successful! DN: $TestDN"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 713,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] LdapConnection stored for all LDAP operations"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 716,
-      "type": "ps-diagnostic",
-      "text": "$ProtocolDisplay search returned no results"
     },
     {
       "path": "src/modules/Core/Connect-LDAP.ps1",
@@ -6844,210 +5836,6 @@
       "line": 733,
       "type": "ps-diagnostic",
       "text": "[Connect-LDAP] ErrorMessage: $($dirEx.Response.ErrorMessage)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 752,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Retrieving RootDSE via LdapConnection..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 778,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Sending RootDSE request for attributes: $($attributesToExtract -join ', ')"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 786,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] RootDSE entry returned, Attributes.Count = $($RootDSEEntry.Attributes.Count)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 797,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] RootDSE attribute $attrName = $value"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 800,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] RootDSE attribute $attrName not found in server response"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 804,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] RootDSE retrieved successfully with $($RootDSEData.Count) attributes"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 806,
-      "type": "ps-diagnostic",
-      "text": "RootDSE query returned no results"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 857,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Retrieving Domain SID via LdapConnection..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 871,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Domain SID: $DomainSID"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 874,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Could not retrieve Domain SID: $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 901,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Domain NetBIOS name (from crossRef): $DomainNetBIOS"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 905,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Could not resolve NetBIOS name from crossRef: $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 910,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] NetBIOS name not resolved via crossRef - falling back to DNS label guess: $DomainNetBIOS"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 922,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Verifying authenticated user context via LDAP..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 934,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Using explicit credential: $AuthenticatedUser"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 956,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Verified user: $AuthenticatedUserDN"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 959,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Could not verify user via LDAP: $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 965,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Using LDAP Who Am I? Extended Operation..."
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 975,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] LDAP Who Am I? response: $WhoAmIResult"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 993,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Authenticated user from LDAP: $AuthenticatedUser"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 997,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] LDAP Who Am I? failed: $_ - falling back to LSA ticket cache"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1007,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Found user via LSA ticket cache: $AuthenticatedUser"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1010,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Kerberos authenticated but no valid TGT in cache"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1013,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] LSA ticket cache query failed: $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1036,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] '$AuthenticatedUser' is not an account name of $DomainNetBIOS - not looked up"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1044,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Bound account: $AuthenticatedUserDN ($AuthenticatedUserSID)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1047,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Could not read the bound account $AuthenticatedUser : $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1056,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Final Authenticated User: $AuthenticatedUser"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1077,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Kerberos authentication detected (Who Am I? returned domain user)"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1083,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] User verification failed (non-critical): $_"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1115,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Set AuthMethod: $($Script:LDAPContext['AuthMethod'])"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1118,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Connection established successfully"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1119,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] Domain: $Domain, Server: $ActualDCName, Protocol: $ProtocolDisplay"
-    },
-    {
-      "path": "src/modules/Core/Connect-LDAP.ps1",
-      "line": 1134,
-      "type": "ps-diagnostic",
-      "text": "[Connect-LDAP] LDAP connection setup completed"
     },
     {
       "path": "src/modules/Core/Connect-LDAP.ps1",

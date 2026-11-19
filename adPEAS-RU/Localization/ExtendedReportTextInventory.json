@@ -8,7 +8,7 @@
                           "src/modules/Reporting/templates/report-scripts.js",
                           "src/modules/Reporting/templates/diff-template.html"
                       ],
-    "candidateCount":  231,
+    "candidateCount":  224,
     "candidates":  [
                        {
                            "kind":  "DynamicSummary",
@@ -1273,30 +1273,6 @@
                        {
                            "kind":  "DirectShow",
                            "source":  "src\\adPEAS.ps1",
-                           "line":  746,
-                           "snippet":  "Show-Line \"Connected to domain \u0027$($Script:LDAPContext.Domain)\u0027 on server \u0027$($Script:LDAPContext.Server)\u0027 as \u0027$AuthenticatedUser\u0027 via $AuthDisplay\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\adPEAS.ps1",
-                           "line":  832,
-                           "snippet":  "Show-Line \"Successfully connected to domain \u0027$($Connection.Domain)\u0027 on server \u0027$($Connection.Server)\u0027 as \u0027$AuthenticatedUser\u0027 via $AuthDisplay\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\adPEAS.ps1",
-                           "line":  936,
-                           "snippet":  "Show-Line \"Appending to existing report: kept $($keptFindings.Count) of $($previousFindings.Count) previous findings, re-running $($Module -join \u0027, \u0027)\" -Class Note"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\adPEAS.ps1",
-                           "line":  1029,
-                           "snippet":  "Show-Line \"This check did not complete - its results are incomplete or absent. Reason: $($_.Exception.Message)\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\adPEAS.ps1",
                            "line":  1067,
                            "snippet":  "Show-SubHeader \"LDAP Statistics for $displayName\""
                        },
@@ -1365,24 +1341,6 @@
                            "source":  "src\\adPEAS.ps1",
                            "line":  1269,
                            "snippet":  "Show-Header \"[$moduleCounter/$moduleTotal] Collecting $($Script:ModuleCategoryHeaders[\u0027Bloodhound\u0027])\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\adPEAS.ps1",
-                           "line":  1376,
-                           "snippet":  "Show-Line \"Partial JSON export from the modules that completed: $checkpointPath\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\adPEAS.ps1",
-                           "line":  1377,
-                           "snippet":  "Show-Line \"Rebuild a report from it with: Convert-adPEASReport -InputJson \u0027$checkpointPath\u0027 -OutputPath \u0027$basePath\u0027\" -Class Hint"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\adPEAS.ps1",
-                           "line":  1384,
-                           "snippet":  "Show-Line \"$($incomplete.Count) check(s) did not complete - their sections are incomplete and must not be read as clean:\" -Class Finding"
                        },
                        {
                            "kind":  "DirectShow",

@@ -7,7 +7,7 @@
 - Всего файлов исходников: **203** (PowerShell 200, JavaScript 1, HTML 2).
 - Строк исходников: **156557**.
 - Подтверждённые переводы DOC6c: **54** в 4 файлах подсистемы отчётов.
-- Эвристические кандидаты на проверку: **3969** (вызовы PowerShell/HTML: 3809; JS-контексты: 160).
+- Эвристические кандидаты на проверку: **3767** (вызовы PowerShell/HTML: 3607; JS-контексты: 160).
 
 **Внимание:** это не число фактически непереведённых пользовательских строк. Среди кандидатов могут быть английские названия продуктов, технические идентификаторы, программные сообщения, значения протоколов, составные строки. Требуется ручная проверка контекста.
 
@@ -16,38 +16,6 @@
 | Файл | Строка | Контекст | Выдержка |
 |---|---:|---|---|
 | `src/adPEAS.ps1` | 147 | ps-diagnostic | $Script:ScriptPath\modules\Helpers\Write-Log.ps1 |
-| `src/adPEAS.ps1` | 585 | ps-diagnostic | [adPEAS] -OutputAppend requires -Outputfile. Ignoring -OutputAppend. |
-| `src/adPEAS.ps1` | 591 | ps-diagnostic | [adPEAS] -OutputAppend requires JSON findings cache. Use -Format All or -Format JSON. Ignoring -OutputAppend. |
-| `src/adPEAS.ps1` | 610 | ps-diagnostic | [adPEAS] -ExcludeModule leaves no module to run. Nothing to do. |
-| `src/adPEAS.ps1` | 617 | ps-diagnostic | [adPEAS] Findings collection enabled (Format: $Format) |
-| `src/adPEAS.ps1` | 641 | ps-diagnostic | [adPEAS] Directory '$OutputDir' did not exist and was created |
-| `src/adPEAS.ps1` | 643 | ps-diagnostic | [adPEAS] Could not create directory '$OutputDir': $_ |
-| `src/adPEAS.ps1` | 659 | ps-diagnostic | [adPEAS] Unable to write text output to '$textPath', please check path and permissions! |
-| `src/adPEAS.ps1` | 675 | ps-diagnostic | [adPEAS] -VerboseLogging: File logging requires -Outputfile with Text format. Verbose messages will be shown in console only. |
-| `src/adPEAS.ps1` | 695 | ps-diagnostic | [adPEAS] Script started: $StartTime |
-| `src/adPEAS.ps1` | 696 | ps-diagnostic | [adPEAS] Version: $Script:adPEASVersion |
-| `src/adPEAS.ps1` | 699 | ps-diagnostic | [adPEAS] OPSEC mode enabled: No ASREPRoast/Kerberoast/BloodHound |
-| `src/adPEAS.ps1` | 726 | ps-diagnostic | [adPEAS] Reusing existing LDAP session |
-| `src/adPEAS.ps1` | 746 | ps-diagnostic | Connected to domain '$($Script:LDAPContext.Domain)' on server '$($Script:LDAPContext.Server)' as '$AuthenticatedUser' via $AuthDisplay |
-| `src/adPEAS.ps1` | 786 | ps-diagnostic | [adPEAS] Reusing credentials from existing session |
-| `src/adPEAS.ps1` | 791 | ps-diagnostic | [adPEAS] Reusing certificate authentication from existing session |
-| `src/adPEAS.ps1` | 799 | ps-diagnostic | [adPEAS] No authentication method specified - defaulting to Windows Authentication |
-| `src/adPEAS.ps1` | 832 | ps-diagnostic | Successfully connected to domain '$($Connection.Domain)' on server '$($Connection.Server)' as '$AuthenticatedUser' via $AuthDisplay |
-| `src/adPEAS.ps1` | 842 | ps-diagnostic | [adPEAS] Verifying Domain Controller connectivity... |
-| `src/adPEAS.ps1` | 855 | ps-diagnostic | [adPEAS] Connection health check passed - DC is reachable |
-| `src/adPEAS.ps1` | 863 | ps-diagnostic | [adPEAS] Cleared SessionInvalid flag from previous run |
-| `src/adPEAS.ps1` | 889 | ps-diagnostic | [adPEAS] -OPSEC excludes BloodHound collection, which was the only module selected. Nothing to do. |
-| `src/adPEAS.ps1` | 894 | ps-diagnostic | [adPEAS] Executing Modules: $($Module -join ', ') |
-| `src/adPEAS.ps1` | 936 | ps-diagnostic | Appending to existing report: kept $($keptFindings.Count) of $($previousFindings.Count) previous findings, re-running $($Module -join ', ') |
-| `src/adPEAS.ps1` | 939 | ps-diagnostic | [adPEAS] Could not load previous findings from '$appendCachePath': $_ |
-| `src/adPEAS.ps1` | 940 | ps-diagnostic | [adPEAS] Continuing without append - creating fresh report |
-| `src/adPEAS.ps1` | 943 | ps-diagnostic | [adPEAS] No previous cache found at '$appendCachePath' - first append run |
-| `src/adPEAS.ps1` | 980 | ps-diagnostic | [adPEAS] Skipping checkpoint after module '$ModuleName' - session invalid |
-| `src/adPEAS.ps1` | 998 | ps-diagnostic | [adPEAS] Checkpoint after module '$ModuleName' failed: $_ |
-| `src/adPEAS.ps1` | 1012 | ps-diagnostic | [adPEAS] Skipping check '$CheckName' - session invalid |
-| `src/adPEAS.ps1` | 1019 | ps-diagnostic | [adPEAS] Check '$CheckName' failed: $_ |
-| `src/adPEAS.ps1` | 1020 | ps-diagnostic | [adPEAS] Check '$CheckName' failed: $_ |
-| `src/adPEAS.ps1` | 1029 | ps-diagnostic | This check did not complete - its results are incomplete or absent. Reason: $($_.Exception.Message) |
 | `src/adPEAS.ps1` | 1067 | ps-diagnostic | LDAP Statistics for $displayName |
 | `src/adPEAS.ps1` | 1070 | ps-diagnostic | Estimated Traffic |
 | `src/adPEAS.ps1` | 1092 | ps-diagnostic | [adPEAS] Error executing Domain Module: $_ |
@@ -61,15 +29,6 @@
 | `src/adPEAS.ps1` | 1245 | ps-diagnostic | [adPEAS] Error executing Application Module: $_ |
 | `src/adPEAS.ps1` | 1259 | ps-diagnostic | [adPEAS] Error executing Shares Module: $_ |
 | `src/adPEAS.ps1` | 1285 | ps-diagnostic | [adPEAS] Error executing Bloodhound Module: $_ |
-| `src/adPEAS.ps1` | 1304 | ps-diagnostic | [adPEAS] HTML report generated: $($Script:HTMLOutputPath) |
-| `src/adPEAS.ps1` | 1306 | ps-diagnostic | [adPEAS] Error generating HTML report: $_ |
-| `src/adPEAS.ps1` | 1322 | ps-diagnostic | [adPEAS] Findings JSON saved to: $jsonPath |
-| `src/adPEAS.ps1` | 1325 | ps-diagnostic | [adPEAS] Could not save JSON export to '$jsonPath': $_ |
-| `src/adPEAS.ps1` | 1376 | ps-diagnostic | Partial JSON export from the modules that completed: $checkpointPath |
-| `src/adPEAS.ps1` | 1377 | ps-diagnostic | Rebuild a report from it with: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath' |
-| `src/adPEAS.ps1` | 1384 | ps-diagnostic | $($incomplete.Count) check(s) did not complete - their sections are incomplete and must not be read as clean: |
-| `src/adPEAS.ps1` | 1420 | ps-diagnostic | [adPEAS] Session kept alive - use Disconnect-adPEAS to close |
-| `src/adPEAS.ps1` | 1421 | ps-diagnostic | [adPEAS] adPEAS v2 completed |
 | `src/modules/Checks/Accounts/Get-AdminPasswordNeverExpires.ps1` | 57 | ps-diagnostic | [Get-AdminPasswordNeverExpires] Starting check |
 | `src/modules/Checks/Accounts/Get-AdminPasswordNeverExpires.ps1` | 92 | ps-diagnostic | [Get-AdminPasswordNeverExpires] Password age threshold: $PasswordAgeDays days (before $(Format-adPEASDate $thresholdDate 'yyyy-MM-dd')) |
 | `src/modules/Checks/Accounts/Get-AdminPasswordNeverExpires.ps1` | 112 | ps-diagnostic | [Get-AdminPasswordNeverExpires] Found $(@($candidates).Count) candidate(s) with adminCount=1, verifying actual privilege status... |
@@ -80,6 +39,47 @@
 | `src/modules/Checks/Accounts/Get-AdminReversibleEncryption.ps1` | 42 | ps-diagnostic | [Get-AdminReversibleEncryption] Starting check |
 | `src/modules/Checks/Accounts/Get-AdminReversibleEncryption.ps1` | 107 | ps-diagnostic | [Get-AdminReversibleEncryption] Error: $_ |
 | `src/modules/Checks/Accounts/Get-AdminReversibleEncryption.ps1` | 115 | ps-diagnostic | [Get-AdminReversibleEncryption] Check completed |
+| `src/modules/Checks/Accounts/Get-AuthenticationPolicySilos.ps1` | 64 | ps-diagnostic | [Get-AuthenticationPolicySilos] Starting check |
+| `src/modules/Checks/Accounts/Get-AuthenticationPolicySilos.ps1` | 94 | ps-diagnostic | [Get-AuthenticationPolicySilos] The authentication policy configuration could not be read: $_ |
+| `src/modules/Checks/Accounts/Get-AuthenticationPolicySilos.ps1` | 114 | ps-diagnostic | [Get-AuthenticationPolicySilos] The built-in Administrator could not be looked up: $_ |
+| `src/modules/Checks/Accounts/Get-AuthenticationPolicySilos.ps1` | 284 | ps-diagnostic | [Get-AuthenticationPolicySilos] Error: $_ |
+| `src/modules/Checks/Accounts/Get-AuthenticationPolicySilos.ps1` | 290 | ps-diagnostic | [Get-AuthenticationPolicySilos] Check completed |
+| `src/modules/Checks/Accounts/Get-AuthenticationPolicySilos.ps1` | 401 | ps-diagnostic | [Get-AuthenticationPolicySilos] A condition could not be read: $_ |
+| `src/modules/Checks/Accounts/Get-AuthenticationPolicySilos.ps1` | 520 | ps-diagnostic | [Get-AuthenticationPolicySilos] The ACL of $DistinguishedName could not be read: $_ |
+| `src/modules/Checks/Accounts/Get-AuthenticationPolicySilos.ps1` | 601 | ps-diagnostic | [Get-AuthenticationPolicySilos] The GPOs could not be read: $_ |
+| `src/modules/Checks/Accounts/Get-AuthenticationPolicySilos.ps1` | 633 | ps-diagnostic | [Get-AuthenticationPolicySilos] Could not read $($polFile.FullName): $($_.Exception.Message) |
+| `src/modules/Checks/Accounts/Get-InactiveAdminAccounts.ps1` | 50 | ps-diagnostic | [Get-InactiveAdminAccounts] Starting check |
+| `src/modules/Checks/Accounts/Get-InactiveAdminAccounts.ps1` | 210 | ps-diagnostic | [Get-InactiveAdminAccounts] Error: $_ |
+| `src/modules/Checks/Accounts/Get-InactiveAdminAccounts.ps1` | 216 | ps-diagnostic | [Get-InactiveAdminAccounts] Check completed |
+| `src/modules/Checks/Accounts/Get-LogonScriptPermissions.ps1` | 65 | ps-diagnostic | [Get-LogonScriptPermissions] Starting check |
+| `src/modules/Checks/Accounts/Get-LogonScriptPermissions.ps1` | 153 | ps-diagnostic | [Get-LogonScriptPermissions] Could not tell the privileged accounts apart: $_ |
+| `src/modules/Checks/Accounts/Get-LogonScriptPermissions.ps1` | 200 | ps-diagnostic | [Get-LogonScriptPermissions] Error: $_ |
+| `src/modules/Checks/Accounts/Get-LogonScriptPermissions.ps1` | 208 | ps-diagnostic | [Get-LogonScriptPermissions] Check completed |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 81 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Starting check |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 100 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Checking gMSA password access permissions |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 107 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Found $($gmsaAccounts.Count) gMSA account(s) |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 159 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Failed to parse msDS-GroupMSAMembership for $gmsaName : $_ |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 331 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not read accountExpires of $($gmsa.sAMAccountName): $_ |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 348 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Attempting to read gMSA passwords |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 367 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Attempting to read password for $gmsaName |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 428 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Failed to parse password blob for $gmsaName |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 431 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Password blob is empty or invalid type for $gmsaName |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 434 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] No msDS-ManagedPassword returned for $gmsaName (access denied or not available) |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 438 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Error reading password for $gmsaName : $_ |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 457 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not read the session's encryption state: $_ |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 512 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Checking for standalone MSAs |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 557 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Checking delegated Managed Service Account links |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 574 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] No schema naming context - dMSA links not checked |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 684 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not read the dMSA $(@($linkedDMSAs)[0]): $_ |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 733 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Failed to parse msDS-GroupMSAMembership for $dmsaName : $_ |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 814 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Error: $_ |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 820 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Check completed |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 953 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not read the managed service account membership descriptors: $_ |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 1014 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not read the descriptor owner of $Name : $_ |
+| `src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1` | 1093 | ps-diagnostic | [Get-ManagedServiceAccountSecurity] Could not classify password reader $readerSID : $_ |
+| `src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1` | 60 | ps-diagnostic | [Get-NonDefaultUserOwners] Starting check |
+| `src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1` | 94 | ps-diagnostic | [Get-NonDefaultUserOwners] Found $($usersWithOwner.Count) users, filtering non-default owners clientside... |
+| `src/modules/Checks/Accounts/Get-NonDefaultUserOwners.ps1` | 118 | ps-diagnostic | [Get-NonDefaultUserOwners] Filtered Exchange Health Mailbox: $dn |
 | `src/modules/Reporting/templates/report-scripts.js` | 36 | js-ui-candidate | aria-pressed |
 | `src/modules/Reporting/templates/report-scripts.js` | 43 | js-ui-candidate | aria-expanded |
 | `src/modules/Reporting/templates/report-scripts.js` | 85 | js-ui-candidate | data-theme |

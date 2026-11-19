@@ -122,7 +122,7 @@ function Connect-LDAP {
     )
 
     begin {
-        Write-Log "[Connect-LDAP] Starting LDAP connection..."
+        Write-Log "[Connect-LDAP] Начало подключения LDAP..."
 
         # Reset connection state at the beginning.
         #
@@ -266,18 +266,18 @@ function Connect-LDAP {
             if ($AsGlobalCatalog) {
                 # GC mode: Domain and Server must be pre-populated from existing session
                 if ([string]::IsNullOrEmpty($Domain) -or [string]::IsNullOrEmpty($Server)) {
-                    Write-Log "[Connect-LDAP] AsGlobalCatalog requires -Domain and -Server parameters"
+                    Write-Log "[Connect-LDAP] Для AsGlobalCatalog необходимы -Domain и -Server"
                     return $null
                 }
                 $DomainDN = "DC=" + ($Domain -replace "\.", ",DC=")
-                Write-Log "[Connect-LDAP] GC mode: Server=$Server, Domain=$Domain"
+                Write-Log "[Connect-LDAP] Режим GC: сервер=$Server, домен=$Domain"
             } else {
                 if ([string]::IsNullOrEmpty($Domain)) {
-                    Write-Log "[Connect-LDAP] No domain specified, attempting automatic discovery..."
+                    Write-Log "[Connect-LDAP] Домен не указан, запускается автообнаружение..."
                     try {
                         $CurrentDomain = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
                         $Domain = $CurrentDomain.Name
-                        Write-Log "[Connect-LDAP] Automatically detected domain: $Domain"
+                        Write-Log "[Connect-LDAP] Автоматически обнаружен домен: $Domain"
                     } catch {
                         if (-not $AsGlobalCatalog) { $Script:ConnectionState = "DomainError" }
                         if (-not $SuppressErrorDisplay) {
@@ -289,17 +289,17 @@ function Connect-LDAP {
 
                 # Determine Domain Controller if not specified
                 if ([string]::IsNullOrEmpty($Server)) {
-                    Write-Log "[Connect-LDAP] No server specified, using domain name: $Domain"
+                    Write-Log "[Connect-LDAP] Сервер не указан — используется имя домена: $Domain"
                     $Server = $Domain
                 }
 
                 # Create Distinguished Name for Domain
                 $DomainDN = "DC=" + ($Domain -replace "\.", ",DC=")
-                Write-Log "[Connect-LDAP] Domain DN: $DomainDN"
+                Write-Log "[Connect-LDAP] DN домена: $DomainDN"
             }
 
             # ===== Phase 2: DNS Resolution =====
-            Write-Log "[Connect-LDAP] Testing DNS resolution for: $Server"
+            Write-Log "[Connect-LDAP] Проверка DNS для: $Server"
             $ResolvedIPs = $null
             $ResolvedIPString = $null
 
@@ -307,7 +307,7 @@ function Connect-LDAP {
             $CustomDnsServer = $null
             if ($Script:LDAPContext -and $Script:LDAPContext['DnsServer']) {
                 $CustomDnsServer = $Script:LDAPContext['DnsServer']
-                Write-Log "[Connect-LDAP] Using custom DNS server: $CustomDnsServer"
+                Write-Log "[Connect-LDAP] Используется собственный DNS-сервер: $CustomDnsServer"
             }
 
             try {
@@ -315,18 +315,18 @@ function Connect-LDAP {
                     # Use custom DNS resolution via Resolve-adPEASName
                     $ResolvedIPString = Resolve-adPEASName -Name $Server -DnsServer $CustomDnsServer
                     if ($ResolvedIPString) {
-                        Write-Log "[Connect-LDAP] DNS resolution via custom DNS successful: $ResolvedIPString"
+                        Write-Log "[Connect-LDAP] Разрешение имени через собственный DNS успешно: $ResolvedIPString"
                     } else {
-                        throw "Custom DNS resolution failed for $Server"
+                        throw "Не удалось разрешить $Server через собственный DNS"
                     }
                 } else {
                     # Use system DNS
                     $ResolvedIPs = [System.Net.Dns]::GetHostAddresses($Server)
                     if (-not $ResolvedIPs -or $ResolvedIPs.Count -eq 0) {
-                        throw "DNS resolution returned no addresses"
+                        throw "DNS не вернул адресов"
                     }
                     $ResolvedIPString = $ResolvedIPs[0].IPAddressToString
-                    Write-Log "[Connect-LDAP] DNS resolution successful: $ResolvedIPString"
+                    Write-Log "[Connect-LDAP] Разрешение DNS успешно: $ResolvedIPString"
                 }
             } catch {
                 if (-not $AsGlobalCatalog) { $Script:ConnectionState = "DomainError" }
@@ -344,7 +344,7 @@ function Connect-LDAP {
             # ===== Phase 3: Port Reachability =====
             # Use resolved IP for connection test when custom DNS is active
             $ConnectTarget = if ($CustomDnsServer -and $ResolvedIPString) { $ResolvedIPString } else { $Server }
-            Write-Log "[Connect-LDAP] Testing port reachability to: $ConnectTarget"
+            Write-Log "[Connect-LDAP] Проверка доступности порта узла: $ConnectTarget"
             $ServerReachable = $false
             $TestPort = if ($AsGlobalCatalog) {
                 if ($UseLDAPS) { 3269 } else { 3268 }
@@ -360,11 +360,11 @@ function Connect-LDAP {
                 if ($WaitHandle.WaitOne(2000, $false)) {
                     $TcpClient.EndConnect($ConnectTask)
                     $ServerReachable = $true
-                    Write-Log "[Connect-LDAP] Server is reachable on port $TestPort"
+                    Write-Log "[Connect-LDAP] Сервер доступен на порту $TestPort"
                 }
                 $TcpClient.Close()
             } catch {
-                Write-Log "[Connect-LDAP] Port test failed: $_"
+                Write-Log "[Connect-LDAP] Ошибка проверки порта: $_"
             }
 
             if (-not $ServerReachable) {
@@ -379,7 +379,7 @@ function Connect-LDAP {
             # ===== Phase 3b: SSL/TLS Handshake Test (LDAPS only) =====
             if ($UseLDAPS) {
                 $SSLPort = $TestPort  # Already set to 3269 for GC, 636 for normal LDAPS
-                Write-Log "[Connect-LDAP] Testing SSL/TLS handshake on port $SSLPort..."
+                Write-Log "[Connect-LDAP] Проверка согласования SSL/TLS на порту $SSLPort..."
                 $SSLTestPassed = $false
                 $sslErrorInfo = $null
 
@@ -399,12 +399,12 @@ function Connect-LDAP {
                     $SslStream.AuthenticateAsClient($Server)
                     $SSLTestPassed = $true
 
-                    Write-Log "[Connect-LDAP] SSL/TLS handshake successful"
-                    Write-Log "[Connect-LDAP] SSL Protocol: $($SslStream.SslProtocol)"
-                    Write-Log "[Connect-LDAP] Cipher: $($SslStream.CipherAlgorithm)"
+                    Write-Log "[Connect-LDAP] Согласование SSL/TLS успешно"
+                    Write-Log "[Connect-LDAP] Протокол SSL: $($SslStream.SslProtocol)"
+                    Write-Log "[Connect-LDAP] Алгоритм шифрования: $($SslStream.CipherAlgorithm)"
                     if ($SslStream.RemoteCertificate) {
-                        Write-Log "[Connect-LDAP] Certificate Subject: $($SslStream.RemoteCertificate.Subject)"
-                        Write-Log "[Connect-LDAP] Certificate Issuer: $($SslStream.RemoteCertificate.Issuer)"
+                        Write-Log "[Connect-LDAP] Субъект сертификата: $($SslStream.RemoteCertificate.Subject)"
+                        Write-Log "[Connect-LDAP] Издатель сертификата: $($SslStream.RemoteCertificate.Issuer)"
 
                         # Pre-cache the certificate chain with CRL check disabled (X509RevocationMode.NoCheck)
                         # This prevents a ~15s timeout during LdapConnection.Bind() when SChannel tries to
@@ -419,9 +419,9 @@ function Connect-LDAP {
                                 $chain.ChainPolicy.VerificationFlags = [System.Security.Cryptography.X509Certificates.X509VerificationFlags]::AllFlags
                                 [void]$chain.Build($cert2)
                                 $chain.Reset()
-                                Write-Log "[Connect-LDAP] Certificate chain pre-cached (CRL check disabled)"
+                                Write-Log "[Connect-LDAP] Цепочка сертификатов закэширована (CRL не проверяется)"
                             } catch {
-                                Write-Log "[Connect-LDAP] Certificate chain pre-cache failed (non-critical): $_"
+                                Write-Log "[Connect-LDAP] Не удалось закэшировать цепочку сертификатов (некритично): $_"
                             }
                         }
                     }
@@ -431,10 +431,10 @@ function Connect-LDAP {
                 }
                 catch {
                     $sslErrorInfo = Get-ExceptionErrorInfo -Exception $_.Exception -Context "SSL handshake"
-                    Write-Log "[Connect-LDAP] SSL/TLS handshake FAILED: $($sslErrorInfo.Message)"
+                    Write-Log "[Connect-LDAP] ОШИБКА согласования SSL/TLS: $($sslErrorInfo.Message)"
 
                     if ($sslErrorInfo.Category -eq 'SSLCertificate' -and -not $IgnoreSSLErrors) {
-                        Write-Log "[Connect-LDAP] Consider using -IgnoreSSLErrors parameter"
+                        Write-Log "[Connect-LDAP] При необходимости используйте параметр -IgnoreSSLErrors"
                     }
                 }
 
@@ -491,11 +491,11 @@ function Connect-LDAP {
             $Script:AnonymousAccessSkipReason = $null
 
             if ($AsGlobalCatalog) {
-                Write-Log "[Connect-LDAP] Skipping anonymous access check for GC mode"
+                Write-Log "[Connect-LDAP] Проверка анонимного доступа пропущена для GC"
                 $Script:AnonymousAccessSkipReason = 'global catalog'
             }
             elseif ($UseLDAPS) {
-                Write-Log "[Connect-LDAP] Skipping anonymous access check for LDAPS (rarely enabled over SSL)"
+                Write-Log "[Connect-LDAP] Проверка анонимного доступа пропущена для LDAPS (редко разрешена поверх SSL)"
                 $Script:AnonymousAccessSkipReason = 'LDAPS'
             }
             else {
@@ -521,15 +521,15 @@ function Connect-LDAP {
                 if ($UseLDAPS) { 636 } else { 389 }
             }
             $LDAPTarget = $Server
-            Write-Log "[Connect-LDAP] Using hostname for LDAP connection: $LDAPTarget"
+            Write-Log "[Connect-LDAP] Для LDAP используется имя узла: $LDAPTarget"
 
             $ProtocolDisplay = if ($AsGlobalCatalog) { "GC" } elseif ($UseLDAPS) { "LDAPS" } else { "LDAP" }
-            Write-Log "[Connect-LDAP] Attempting $ProtocolDisplay connection to ${LDAPTarget}:${LDAPPort}..."
+            Write-Log "[Connect-LDAP] Попытка соединения $ProtocolDisplay с ${LDAPTarget}:${LDAPPort}..."
 
             try {
                 # ===== UNIFIED: Always use System.DirectoryServices.Protocols.LdapConnection =====
                 # This works reliably for both LDAP (389) and LDAPS (636)
-                Write-Log "[Connect-LDAP] Using System.DirectoryServices.Protocols.LdapConnection for $ProtocolDisplay..."
+                Write-Log "[Connect-LDAP] Используется System.DirectoryServices.Protocols.LdapConnection для $ProtocolDisplay..."
 
                 # Load the assembly
                 Add-Type -AssemblyName System.DirectoryServices.Protocols -ErrorAction Stop
@@ -558,18 +558,18 @@ function Connect-LDAP {
                     $LdapProtocolConn.Timeout = [TimeSpan]::FromSeconds($TimeoutSeconds)
                     $SendTimeoutSeconds = [Math]::Max(5, [Math]::Floor($TimeoutSeconds / 2))
                     $LdapProtocolConn.SessionOptions.SendTimeout = [TimeSpan]::FromSeconds($SendTimeoutSeconds)
-                    Write-Log "[Connect-LDAP] Configured timeouts: Operation=${TimeoutSeconds}s, Send=${SendTimeoutSeconds}s"
+                    Write-Log "[Connect-LDAP] Таймауты: операция=${TimeoutSeconds}с, отправка=${SendTimeoutSeconds}с"
 
                     # Disable referral chasing
                     $LdapProtocolConn.SessionOptions.ReferralChasing = [System.DirectoryServices.Protocols.ReferralChasingOptions]::None
-                    Write-Log "[Connect-LDAP] Referral chasing disabled (domain-local queries only)"
+                    Write-Log "[Connect-LDAP] Переадресация LDAP отключена (запросы только внутри домена)"
 
                     # Configure SSL for LDAPS
                     if ($UseLDAPS) {
                         $LdapProtocolConn.SessionOptions.SecureSocketLayer = $true
                         if ($IgnoreSSLErrors) {
                             $LdapProtocolConn.SessionOptions.VerifyServerCertificate = { param($conn, $cert) return $true }
-                            Write-Log "[Connect-LDAP] SSL certificate validation disabled (IgnoreSSLErrors)"
+                            Write-Log "[Connect-LDAP] Проверка сертификата SSL отключена (IgnoreSSLErrors)"
                         }
                     }
                 }
@@ -590,7 +590,7 @@ function Connect-LDAP {
                     $NtlmDomain = $NtlmNetCred.Domain
                     $NtlmPass   = $NtlmNetCred.Password
 
-                    Write-Log "[Connect-LDAP] Configuring explicit NTLM authentication (Sicily): $NtlmDomain\$NtlmUser"
+                    Write-Log "[Connect-LDAP] Явная NTLM-аутентификация (Sicily): $NtlmDomain\$NtlmUser"
                     $LdapProtocolConn.AuthType  = [System.DirectoryServices.Protocols.AuthType]::Ntlm
                     $LdapProtocolConn.Credential = New-Object System.Net.NetworkCredential($NtlmUser, $NtlmPass, $NtlmDomain)
                 }
@@ -612,29 +612,29 @@ function Connect-LDAP {
                     if (-not [string]::IsNullOrEmpty($CredDomain)) {
                         # User specified DOMAIN\username format - reconstruct it
                         $UserName = "$CredDomain\$UserName"
-                        Write-Log "[Connect-LDAP] Username from credential (NETBIOS format): $UserName"
+                        Write-Log "[Connect-LDAP] Имя пользователя из учётных данных (формат NETBIOS): $UserName"
                     }
                     elseif ($UserName -match '@') {
                         # User specified UPN format (user@domain.com) - keep as-is
-                        Write-Log "[Connect-LDAP] Username from credential (UPN format): $UserName"
+                        Write-Log "[Connect-LDAP] Имя пользователя из учётных данных (формат UPN): $UserName"
                     }
                     else {
                         # Bare username without domain/UPN - auto-qualify with UPN format
                         if ($Domain) {
                             $UserName = "$UserName@$Domain"
-                            Write-Log "[Connect-LDAP] Username qualified for SimpleBind (UPN): $UserName"
+                            Write-Log "[Connect-LDAP] Уточнено имя пользователя SimpleBind (UPN): $UserName"
                         } else {
-                            Write-Log "[Connect-LDAP] WARNING: Username '$UserName' is not domain-qualified and no domain available"
+                            Write-Log "[Connect-LDAP] ПРЕДУПРЕЖДЕНИЕ: в '$UserName' не указан домен; данные о домене отсутствуют"
                         }
                     }
 
-                    Write-Log "[Connect-LDAP] Configuring SimpleBind with credentials: $UserName"
+                    Write-Log "[Connect-LDAP] Настройка SimpleBind для $UserName"
 
                     # Use Basic auth for SimpleBind
                     $LdapProtocolConn.AuthType = [System.DirectoryServices.Protocols.AuthType]::Basic
                     $LdapProtocolConn.Credential = New-Object System.Net.NetworkCredential($UserName, $Password)
                 } else {
-                    Write-Log "[Connect-LDAP] Configuring Negotiate (Kerberos/NTLM) authentication"
+                    Write-Log "[Connect-LDAP] Настройка аутентификации Negotiate (Kerberos/NTLM)"
                     $LdapProtocolConn.AuthType = [System.DirectoryServices.Protocols.AuthType]::Negotiate
                 }
 
@@ -644,11 +644,11 @@ function Connect-LDAP {
                     Write-Log "[Connect-LDAP] Schannel: Skipping Bind() - first SendRequest() will trigger AutoBind"
                     $LdapBindSucceeded = $true  # AutoBind - treat as succeeded for error context
                 } else {
-                    Write-Log "[Connect-LDAP] Binding to $ProtocolDisplay server..."
+                    Write-Log "[Connect-LDAP] Привязка к серверу $ProtocolDisplay..."
                     $bindStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
                     $LdapProtocolConn.Bind()
                     $bindStopwatch.Stop()
-                    Write-Log "[Connect-LDAP] $ProtocolDisplay bind successful! ($($bindStopwatch.ElapsedMilliseconds)ms)"
+                    Write-Log "[Connect-LDAP] Привязка $ProtocolDisplay успешна! ($($bindStopwatch.ElapsedMilliseconds) мс)"
                     $LdapBindSucceeded = $true
                 }
 
@@ -673,26 +673,26 @@ function Connect-LDAP {
                             }
                         }
                         if (-not $isGC) {
-                            Write-Log "[Connect-LDAP] GC mode: ${LDAPTarget}:${LDAPPort} is NOT a Global Catalog (isGlobalCatalogReady != TRUE)"
+                            Write-Log "[Connect-LDAP] Режим GC: ${LDAPTarget}:${LDAPPort} НЕ является глобальным каталогом (isGlobalCatalogReady != TRUE)"
                             try { $LdapProtocolConn.Dispose() } catch { }
                             return $null
                         }
                     } catch {
-                        Write-Log "[Connect-LDAP] GC mode: Could not verify GC status on ${LDAPTarget}:${LDAPPort}: $($_.Exception.Message)"
+                        Write-Log "[Connect-LDAP] Режим GC: состояние GC на ${LDAPTarget}:${LDAPPort} проверить не удалось: $($_.Exception.Message)"
                         try { $LdapProtocolConn.Dispose() } catch { }
                         return $null
                     }
 
-                    Write-Log "[Connect-LDAP] GC mode: Connection to ${LDAPTarget}:${LDAPPort} established and verified as Global Catalog"
+                    Write-Log "[Connect-LDAP] Режим GC: соединение с ${LDAPTarget}:${LDAPPort} установлено и подтверждено как глобальный каталог"
                     return $LdapProtocolConn
                 }
 
                 # ===== Normal Mode: Test search and store globally =====
                 # Test by searching for domain root
-                Write-Log "[Connect-LDAP] Testing $ProtocolDisplay connection with search query..."
-                Write-Log "[Connect-LDAP] Connection state: AuthType=$($LdapProtocolConn.AuthType), AutoBind=$($LdapProtocolConn.AutoBind)"
+                Write-Log "[Connect-LDAP] Проверка соединения $ProtocolDisplay поисковым запросом..."
+                Write-Log "[Connect-LDAP] Состояние соединения: AuthType=$($LdapProtocolConn.AuthType), AutoBind=$($LdapProtocolConn.AutoBind)"
                 if ($ClientCertificate) {
-                    Write-Log "[Connect-LDAP] Client certificates count: $($LdapProtocolConn.ClientCertificates.Count)"
+                    Write-Log "[Connect-LDAP] Клиентских сертификатов: $($LdapProtocolConn.ClientCertificates.Count)"
                 }
                 $SearchRequest = New-Object System.DirectoryServices.Protocols.SearchRequest(
                     $DomainDN,
@@ -705,15 +705,15 @@ function Connect-LDAP {
 
                 if ($SearchResponse -and $SearchResponse.Entries.Count -gt 0) {
                     $TestDN = $SearchResponse.Entries[0].DistinguishedName
-                    Write-Log "[Connect-LDAP] $ProtocolDisplay search successful! DN: $TestDN"
+                    Write-Log "[Connect-LDAP] Поиск $ProtocolDisplay успешен! DN: $TestDN"
                     $ConnectionEstablished = $true
 
                     # Store the LdapConnection for ALL operations (queries AND modifications)
                     $Script:LdapConnection = $LdapProtocolConn
-                    Write-Log "[Connect-LDAP] LdapConnection stored for all LDAP operations"
+                    Write-Log "[Connect-LDAP] LdapConnection сохранён для операций LDAP"
 
                 } else {
-                    throw "$ProtocolDisplay search returned no results"
+                    throw "Поиск $ProtocolDisplay не вернул результатов"
                 }
 
             } catch {
@@ -749,7 +749,7 @@ function Connect-LDAP {
 
             # ===== Phase 6: RootDSE Retrieval =====
             # UNIFIED: Always use LdapConnection (works for both LDAP and LDAPS)
-            Write-Log "[Connect-LDAP] Retrieving RootDSE via LdapConnection..."
+            Write-Log "[Connect-LDAP] Получение RootDSE через LdapConnection..."
             $RootDSEData = @{}
 
             try {
@@ -775,7 +775,7 @@ function Connect-LDAP {
                     [void]$RootDSERequest.Attributes.Add($attr)
                 }
 
-                Write-Log "[Connect-LDAP] Sending RootDSE request for attributes: $($attributesToExtract -join ', ')"
+                Write-Log "[Connect-LDAP] Запрос RootDSE для атрибутов: $($attributesToExtract -join ', ')"
 
                 $RootDSEResponse = $Script:LdapConnection.SendRequest($RootDSERequest)
 
@@ -783,7 +783,7 @@ function Connect-LDAP {
                     $RootDSEEntry = $RootDSEResponse.Entries[0]
 
                     # Debug: Log what we got back
-                    Write-Log "[Connect-LDAP] RootDSE entry returned, Attributes.Count = $($RootDSEEntry.Attributes.Count)"
+                    Write-Log "[Connect-LDAP] Получена запись RootDSE; атрибутов: $($RootDSEEntry.Attributes.Count)"
 
                     # Extract attributes from the response
                     # Use direct access by attribute name (case-insensitive in LDAP)
@@ -794,16 +794,16 @@ function Connect-LDAP {
                                 # GetValues returns the actual values as the specified type
                                 $value = $dirAttr.GetValues([string])[0]
                                 $RootDSEData[$attrName] = $value
-                                Write-Log "[Connect-LDAP] RootDSE attribute $attrName = $value"
+                                Write-Log "[Connect-LDAP] Атрибут RootDSE $attrName = $value"
                             }
                         } else {
-                            Write-Log "[Connect-LDAP] RootDSE attribute $attrName not found in server response"
+                            Write-Log "[Connect-LDAP] Атрибут RootDSE $attrName не найден в ответе сервера"
                         }
                     }
 
-                    Write-Log "[Connect-LDAP] RootDSE retrieved successfully with $($RootDSEData.Count) attributes"
+                    Write-Log "[Connect-LDAP] RootDSE получен; атрибутов: $($RootDSEData.Count)"
                 } else {
-                    throw "RootDSE query returned no results"
+                    throw "Запрос RootDSE не вернул результатов"
                 }
 
             } catch {
@@ -854,7 +854,7 @@ function Connect-LDAP {
 
             # ===== Phase 7b: Get Domain SID =====
             # UNIFIED: Always use LdapConnection (works for both LDAP and LDAPS)
-            Write-Log "[Connect-LDAP] Retrieving Domain SID via LdapConnection..."
+            Write-Log "[Connect-LDAP] Чтение SID домена через LdapConnection..."
             $DomainSID = $null
             try {
                 $SIDRequest = New-Object System.DirectoryServices.Protocols.SearchRequest(
@@ -868,10 +868,10 @@ function Connect-LDAP {
                 if ($SIDResponse -and $SIDResponse.Entries.Count -gt 0 -and $SIDResponse.Entries[0].Attributes["objectsid"]) {
                     $SIDBytes = $SIDResponse.Entries[0].Attributes["objectsid"][0]
                     $DomainSID = (New-Object System.Security.Principal.SecurityIdentifier($SIDBytes, 0)).Value
-                    Write-Log "[Connect-LDAP] Domain SID: $DomainSID"
+                    Write-Log "[Connect-LDAP] SID домена: $DomainSID"
                 }
             } catch {
-                Write-Log "[Connect-LDAP] Could not retrieve Domain SID: $_"
+                Write-Log "[Connect-LDAP] Не удалось получить SID домена: $_"
             }
 
             $DomainInfo['DomainSID'] = $DomainSID
@@ -898,16 +898,16 @@ function Connect-LDAP {
                     $CrossRefResponse = $Script:LdapConnection.SendRequest($CrossRefRequest)
                     if ($CrossRefResponse -and $CrossRefResponse.Entries.Count -gt 0 -and $CrossRefResponse.Entries[0].Attributes["netbiosname"]) {
                         $DomainNetBIOS = [string]$CrossRefResponse.Entries[0].Attributes["netbiosname"][0]
-                        Write-Log "[Connect-LDAP] Domain NetBIOS name (from crossRef): $DomainNetBIOS"
+                        Write-Log "[Connect-LDAP] Имя NetBIOS домена из crossRef: $DomainNetBIOS"
                     }
                 }
             } catch {
-                Write-Log "[Connect-LDAP] Could not resolve NetBIOS name from crossRef: $_"
+                Write-Log "[Connect-LDAP] Не удалось определить NetBIOS через crossRef: $_"
             }
             if (-not $DomainNetBIOS) {
                 # Fallback only: first DNS label, upper-cased. Logged so the guess is traceable.
                 $DomainNetBIOS = ($Domain -split '\.')[0].ToUpper()
-                Write-Log "[Connect-LDAP] NetBIOS name not resolved via crossRef - falling back to DNS label guess: $DomainNetBIOS" -Level Warning
+                Write-Log "[Connect-LDAP] NetBIOS не определён через crossRef — предполагается метка DNS: $DomainNetBIOS" -Level Warning
             }
             $DomainInfo['DomainNetBIOS'] = $DomainNetBIOS
 
@@ -919,7 +919,7 @@ function Connect-LDAP {
             $DomainInfo['AnonymousAccessSkipReason'] = $Script:AnonymousAccessSkipReason
 
             # ===== Phase 8: User Context Verification via LDAP =====
-            Write-Log "[Connect-LDAP] Verifying authenticated user context via LDAP..."
+            Write-Log "[Connect-LDAP] Проверка пользователя через LDAP..."
 
             $AuthenticatedUser = $null
             $AuthenticatedUserDN = $null
@@ -931,7 +931,7 @@ function Connect-LDAP {
                 if ($Credential) {
                     # Explicit credentials - use the provided username
                     $AuthenticatedUser = $Credential.UserName
-                    Write-Log "[Connect-LDAP] Using explicit credential: $AuthenticatedUser"
+                    Write-Log "[Connect-LDAP] Используются явные учётные данные: $AuthenticatedUser"
 
                     # Extract sAMAccountName from credential for LDAP lookup
                     $CredentialSAM = $Credential.UserName
@@ -953,16 +953,16 @@ function Connect-LDAP {
                             $AuthenticatedUserSAM = $BoundAccount.SAMAccountName
                             $AuthenticatedUserUPN = $BoundAccount.UPN
                             $AuthenticatedUserSID = $BoundAccount.SID
-                            Write-Log "[Connect-LDAP] Verified user: $AuthenticatedUserDN"
+                            Write-Log "[Connect-LDAP] Пользователь проверен: $AuthenticatedUserDN"
                         }
                     } catch {
-                        Write-Log "[Connect-LDAP] Could not verify user via LDAP: $_"
+                        Write-Log "[Connect-LDAP] Не удалось проверить пользователя через LDAP: $_"
                     }
                 } else {
                     # Windows Authentication (SSPI) - use LDAP "Who Am I?" Extended Operation
                     # This is the authoritative way to determine the authenticated identity
                     # UNIFIED: Always use existing LdapConnection (works for both LDAP and LDAPS)
-                    Write-Log "[Connect-LDAP] Using LDAP Who Am I? Extended Operation..."
+                    Write-Log "[Connect-LDAP] Выполняется расширенная операция LDAP Who Am I?..."
 
                     try {
                         # Send Who Am I? Extended Operation (OID 1.3.6.1.4.1.4203.1.11.3)
@@ -972,7 +972,7 @@ function Connect-LDAP {
                         if ($WhoAmIResponse -and $WhoAmIResponse.ResponseValue) {
                             # Response format: "u:DOMAIN\username" or "dn:CN=User,OU=Users,DC=domain,DC=com"
                             $WhoAmIResult = [System.Text.Encoding]::UTF8.GetString($WhoAmIResponse.ResponseValue)
-                            Write-Log "[Connect-LDAP] LDAP Who Am I? response: $WhoAmIResult"
+                            Write-Log "[Connect-LDAP] Ответ LDAP Who Am I?: $WhoAmIResult"
 
                             if ($WhoAmIResult -match '^u:(.+)$') {
                                 # Format: u:DOMAIN\username
@@ -990,11 +990,11 @@ function Connect-LDAP {
                                 $AuthenticatedUser = $WhoAmIResult
                             }
 
-                            Write-Log "[Connect-LDAP] Authenticated user from LDAP: $AuthenticatedUser"
+                            Write-Log "[Connect-LDAP] Аутентифицированный пользователь LDAP: $AuthenticatedUser"
                         }
 
                     } catch {
-                        Write-Log "[Connect-LDAP] LDAP Who Am I? failed: $_ - falling back to LSA ticket cache"
+                        Write-Log "[Connect-LDAP] Ошибка LDAP Who Am I?: $_; переход к кэшу билетов LSA"
 
                         # Fallback: Query Kerberos ticket cache via native LSA API.
                         # Reuse the NetBIOS name resolved via crossRef in Phase 7b2; only guess from
@@ -1004,13 +1004,13 @@ function Connect-LDAP {
                             $TGTStatus = Test-KerberosTGTExists -Detailed -Force
                             if ($TGTStatus.Valid -and $TGTStatus.ClientName) {
                                 $AuthenticatedUser = "$DomainNetBIOS\$($TGTStatus.ClientName)"
-                                Write-Log "[Connect-LDAP] Found user via LSA ticket cache: $AuthenticatedUser"
+                                Write-Log "[Connect-LDAP] Пользователь определён по кэшу билетов LSA: $AuthenticatedUser"
                             } else {
                                 $AuthenticatedUser = "$DomainNetBIOS\[Kerberos Authenticated]"
-                                Write-Log "[Connect-LDAP] Kerberos authenticated but no valid TGT in cache"
+                                Write-Log "[Connect-LDAP] Kerberos выполнен, но действующий TGT в кэше отсутствует"
                             }
                         } catch {
-                            Write-Log "[Connect-LDAP] LSA ticket cache query failed: $_"
+                            Write-Log "[Connect-LDAP] Ошибка чтения кэша билетов LSA: $_"
                             $AuthenticatedUser = "$DomainNetBIOS\[Kerberos Authenticated]"
                         }
                     }
@@ -1033,7 +1033,7 @@ function Connect-LDAP {
                             if ($BoundAccountName) {
                                 $BoundAccount = Read-LDAPBoundAccount -Connection $Script:LdapConnection -DomainDN $DomainDN -SAMAccountName $BoundAccountName
                             } else {
-                                Write-Log "[Connect-LDAP] '$AuthenticatedUser' is not an account name of $DomainNetBIOS - not looked up"
+                                Write-Log "[Connect-LDAP] '$AuthenticatedUser' не является именем учётной записи домена $DomainNetBIOS — поиск пропущен"
                             }
                         }
                         if ($BoundAccount) {
@@ -1041,10 +1041,10 @@ function Connect-LDAP {
                             $AuthenticatedUserSAM = $BoundAccount.SAMAccountName
                             $AuthenticatedUserUPN = $BoundAccount.UPN
                             $AuthenticatedUserSID = $BoundAccount.SID
-                            Write-Log "[Connect-LDAP] Bound account: $AuthenticatedUserDN ($AuthenticatedUserSID)"
+                            Write-Log "[Connect-LDAP] Привязанная учётная запись: $AuthenticatedUserDN ($AuthenticatedUserSID)"
                         }
                     } catch {
-                        Write-Log "[Connect-LDAP] Could not read the bound account $AuthenticatedUser : $_"
+                        Write-Log "[Connect-LDAP] Не удалось прочитать привязанную учётную запись $AuthenticatedUser — $_"
                     }
                 }
 
@@ -1053,7 +1053,7 @@ function Connect-LDAP {
                     $AuthenticatedUser = "[LDAP Identity Unknown]"
                 }
 
-                Write-Log "[Connect-LDAP] Final Authenticated User: $AuthenticatedUser"
+                Write-Log "[Connect-LDAP] Итоговый аутентифицированный пользователь: $AuthenticatedUser"
                 $DomainInfo['AuthenticatedUser'] = $AuthenticatedUser
                 $DomainInfo['AuthenticatedUserDN'] = $AuthenticatedUserDN
                 $DomainInfo['AuthenticatedUserSAM'] = $AuthenticatedUserSAM
@@ -1074,13 +1074,13 @@ function Connect-LDAP {
                 # Detect if Kerberos was used for authentication
                 if ($AuthenticatedUser -notmatch '^\[' -and -not $Credential) {
                     $DomainInfo['DetectedKerberos'] = $true
-                    Write-Log "[Connect-LDAP] Kerberos authentication detected (Who Am I? returned domain user)"
+                    Write-Log "[Connect-LDAP] Обнаружен Kerberos (Who Am I? вернул доменного пользователя)"
                 } else {
                     $DomainInfo['DetectedKerberos'] = $false
                 }
 
             } catch {
-                Write-Log "[Connect-LDAP] User verification failed (non-critical): $_"
+                Write-Log "[Connect-LDAP] Ошибка проверки пользователя (некритично): $_"
                 $DomainInfo['AuthenticatedUser'] = "[Error determining identity]"
             }
 
@@ -1112,11 +1112,11 @@ function Connect-LDAP {
                 } else {
                     $Script:LDAPContext['AuthMethod'] = 'WindowsAuth'
                 }
-                Write-Log "[Connect-LDAP] Set AuthMethod: $($Script:LDAPContext['AuthMethod'])"
+                Write-Log "[Connect-LDAP] Установлен AuthMethod: $($Script:LDAPContext['AuthMethod'])"
             }
 
-            Write-Log "[Connect-LDAP] Connection established successfully"
-            Write-Log "[Connect-LDAP] Domain: $Domain, Server: $ActualDCName, Protocol: $ProtocolDisplay"
+            Write-Log "[Connect-LDAP] Соединение успешно установлено"
+            Write-Log "[Connect-LDAP] Домен: $Domain, сервер: $ActualDCName, протокол: $ProtocolDisplay"
 
             return $DomainInfo
 
@@ -1131,7 +1131,7 @@ function Connect-LDAP {
 
     end {
         if ($Script:LdapConnection) {
-            Write-Log "[Connect-LDAP] LDAP connection setup completed"
+            Write-Log "[Connect-LDAP] Настройка LDAP-соединения завершена"
         }
     }
 }

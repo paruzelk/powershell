@@ -460,7 +460,7 @@
     )
 
     begin {
-        Write-Log "[Connect-adPEAS] Starting authentication process..."
+        Write-Log "[Connect-adPEAS] Начало аутентификации..."
 
         # ===== Automatic Session Cleanup =====
         # Clean up any existing session BEFORE establishing a new one.
@@ -472,17 +472,17 @@
                               ($Script:NTLMTokenHandle -and $Script:NTLMTokenHandle -ne [IntPtr]::Zero)
             if (-not $existingSession) { return }
 
-            Write-Log "[Connect-adPEAS] Existing session state detected - performing automatic cleanup..."
+            Write-Log "[Connect-adPEAS] Обнаружена прежняя сессия — выполняется автоматическая очистка..."
 
             # Step 1: Revert NTLM impersonation (MUST be done first!)
             if ($Script:NTLMTokenHandle -and $Script:NTLMTokenHandle -ne [IntPtr]::Zero) {
-                Write-Log "[Connect-adPEAS] Reverting existing NTLM impersonation..."
+                Write-Log "[Connect-adPEAS] Отмена действующего олицетворения NTLM..."
                 try {
                     Invoke-RevertToSelf -TokenHandle $Script:NTLMTokenHandle
-                    Write-Log "[Connect-adPEAS] NTLM impersonation reverted successfully"
+                    Write-Log "[Connect-adPEAS] Олицетворение NTLM успешно отменено"
                 }
                 catch {
-                    Write-Log "[Connect-adPEAS] Warning: Failed to revert NTLM impersonation: $_"
+                    Write-Log "[Connect-adPEAS] Не удалось отменить олицетворение NTLM: $_"
                 }
                 $Script:NTLMTokenHandle = [IntPtr]::Zero
             }
@@ -491,11 +491,11 @@
             if ($Script:LdapConnection) {
                 try {
                     $Script:LdapConnection.Dispose()
-                    Write-Log "[Connect-adPEAS] Previous LdapConnection disposed"
+                    Write-Log "[Connect-adPEAS] Предыдущее соединение LdapConnection закрыто"
                 }
                 catch {
                     # Ignore disposal errors (may already be disposed)
-                    Write-Log "[Connect-adPEAS] Note: LdapConnection disposal: $_"
+                    Write-Log "[Connect-adPEAS] Примечание при закрытии LdapConnection: $_"
                 }
             }
 
@@ -504,11 +504,11 @@
                 try {
                     $hostsResult = Remove-adPEASHostsEntry
                     if ($hostsResult.Success -and $hostsResult.RemovedCount -gt 0) {
-                        Write-Log "[Connect-adPEAS] Cleaned up $($hostsResult.RemovedCount) hosts file entries from previous session"
+                        Write-Log "[Connect-adPEAS] Удалено записей hosts предыдущей сессии: $($hostsResult.RemovedCount)"
                     }
                 }
                 catch {
-                    Write-Log "[Connect-adPEAS] Warning: Hosts file cleanup failed: $_"
+                    Write-Log "[Connect-adPEAS] Не удалось очистить файл hosts: $_"
                 }
             }
 
@@ -517,7 +517,7 @@
             # is reset before the new session starts.
             Clear-SessionState
 
-            Write-Log "[Connect-adPEAS] Session state cleanup completed"
+            Write-Log "[Connect-adPEAS] Состояние прежней сессии очищено"
         }
 
         Remove-ConnectSessionState
@@ -529,10 +529,10 @@
         if ($PSBoundParameters.ContainsKey('License') -and $License) {
             if (Test-Path $License -ErrorAction SilentlyContinue) {
                 $Script:RuntimeLicense = Get-Content $License -Raw -Encoding UTF8
-                Write-Log "[Connect-adPEAS] Loaded runtime license from: $License"
+                Write-Log "[Connect-adPEAS] Лицензия выполнения загружена из: $License"
             }
             else {
-                Write-Warning "[Connect-adPEAS] License file not found: $License"
+                Write-Warning "[Connect-adPEAS] Файл лицензии не найден: $License"
             }
         }
 
@@ -549,7 +549,7 @@
             'Ccache' { 'Ccache Ticket File (Pass-the-Ticket)' }
             default { $PSCmdlet.ParameterSetName }
         }
-        Write-Log "[Connect-adPEAS] Parameter Set: $ParamSetDisplay"
+        Write-Log "[Connect-adPEAS] Набор параметров: $ParamSetDisplay"
     }
 
     process {
@@ -557,7 +557,7 @@
         try {
             # ===== ISE Compatibility Warning =====
             if ($Host.Name -eq 'Windows PowerShell ISE Host') {
-                Write-Warning "PowerShell ISE is deprecated and not supported by adPEAS. Console output may be garbled. Use powershell.exe or VS Code instead."
+                Write-Warning "PowerShell ISE устарела и не поддерживается adPEAS. Консольный вывод может отображаться некорректно. Используйте powershell.exe или VS Code."
             }
 
             # ===== Determine Authentication Method =====
@@ -643,12 +643,12 @@
             # Store UseLDAPS for use by Resolve-adPEASName (DC reachability checks)
             if ($UseLDAPS) {
                 $Script:LDAPContext['UseLDAPS'] = $true
-                Write-Log "[Connect-adPEAS] LDAPS mode enabled - DC reachability will check port 636"
+                Write-Log "[Connect-adPEAS] Включён LDAPS — доступность контроллера домена проверяется по порту 636"
             }
 
             # ===== Custom DNS Server Handling =====
             if ($DnsServer) {
-                Write-Log "[Connect-adPEAS] Custom DNS server specified: $DnsServer"
+                Write-Log "[Connect-adPEAS] Указан собственный DNS-сервер: $DnsServer"
 
                 # Store DNS server for use by other functions
                 $Script:LDAPContext['DnsServer'] = $DnsServer
@@ -658,28 +658,28 @@
                 # Validate DNS server can resolve the target domain
                 try {
                     $null = Resolve-DnsName -Name $Domain -Server $DnsServer -Type A -DnsOnly -ErrorAction Stop
-                    Write-Log "[Connect-adPEAS] Custom DNS server can resolve $Domain"
+                    Write-Log "[Connect-adPEAS] Собственный DNS-сервер разрешает имя $Domain"
                 }
                 catch {
-                    Write-Warning "[Connect-adPEAS] DNS server $DnsServer not reachable or cannot resolve '$Domain'"
+                    Write-Warning "[Connect-adPEAS] DNS-сервер $DnsServer недоступен либо не разрешает имя '$Domain'"
                 }
 
                 # If PatchHostsFile is requested, verify admin privileges
                 if ($PatchHostsFile) {
                     $isAdmin = Test-adPEASAdminPrivileges
                     if (-not $isAdmin) {
-                        Write-Warning "[Connect-adPEAS] -PatchHostsFile requires Administrator privileges!"
-                        Write-Warning "[Connect-adPEAS] Hosts file patching will be skipped. Run as Administrator for full functionality."
+                        Write-Warning "[Connect-adPEAS] Параметру -PatchHostsFile нужны права администратора!"
+                        Write-Warning "[Connect-adPEAS] Изменение файла hosts пропущено. Для полной функциональности запустите от имени администратора."
                         $PatchHostsFile = $false
                     }
                     else {
-                        Write-Log "[Connect-adPEAS] Administrator privileges confirmed for hosts file patching"
+                        Write-Log "[Connect-adPEAS] Права администратора на изменение hosts подтверждены"
                         $Script:LDAPContext['PatchHostsFile'] = $true
 
                         # ===== EARLY Hosts File Patching =====
                         # Kerberos PTT requires Windows to resolve the DC hostname for SPN matching.
                         # Without hosts file entries, the LDAP connect after PTT fails with "Invalid credentials" because Windows cannot resolve the DC hostname via system DNS.
-                        Write-Log "[Connect-adPEAS] Early hosts file patching for Kerberos authentication..."
+                        Write-Log "[Connect-adPEAS] Предварительное изменение hosts для Kerberos..."
 
                         # First, resolve the server/domain to get IP
                         $earlyResolveTarget = if ($Server) { $Server } else { $Domain }
@@ -717,7 +717,7 @@
                             }
                         }
                         else {
-                            Write-Warning "[Connect-adPEAS] Could not resolve $earlyResolveTarget via custom DNS - hosts patching skipped"
+                            Write-Warning "[Connect-adPEAS] Не удалось разрешить $earlyResolveTarget через собственный DNS — изменение hosts пропущено"
                         }
                     }
                 }
@@ -727,14 +727,14 @@
             if ($AuthMethod -eq 'WindowsAuth' -and -not $Domain) {
                 try {
                     $Domain = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().Name
-                    Write-Log "[Connect-adPEAS] No domain specified, using current domain: $Domain"
+                    Write-Log "[Connect-adPEAS] Домен не указан — используется текущий: $Domain"
                 } catch {
                     Show-ConnectionError -ErrorType "DomainError" -Details "Specify domain with -Domain parameter" -NoThrow
                     return $null
                 }
             }
 
-            Write-Log "[Connect-adPEAS] Establishing connection..."
+            Write-Log "[Connect-adPEAS] Установка соединения..."
 
             # Create readable authentication method name for verbose output
             $AuthMethodDisplay = switch ($AuthMethod) {
@@ -749,7 +749,7 @@
                 'Ccache' { 'Ccache Ticket File (Pass-the-Ticket)' }
                 default { $AuthMethod }
             }
-            Write-Log "[Connect-adPEAS] Authentication Method: $AuthMethodDisplay"
+            Write-Log "[Connect-adPEAS] Метод аутентификации: $AuthMethodDisplay"
 
             # ===== Parameter-Set Specific Handling =====
             switch ($AuthMethod) {
@@ -761,9 +761,9 @@
                     #   $CredObject      - PSCredential for NTLM impersonation and SimpleBind
 
                     if ($AuthMethod -eq 'PSCredential') {
-                        Write-Log "[Connect-adPEAS] Domain: $Domain"
-                        if ($Server) { Write-Log "[Connect-adPEAS] Server: $Server" }
-                        Write-Log "[Connect-adPEAS] Username: $($Credential.UserName)"
+                        Write-Log "[Connect-adPEAS] Домен: $Domain"
+                        if ($Server) { Write-Log "[Connect-adPEAS] Сервер: $Server" }
+                        Write-Log "[Connect-adPEAS] Имя пользователя: $($Credential.UserName)"
 
                         # Extract password from credential for Kerberos (with proper memory cleanup)
                         $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Credential.Password)
@@ -788,9 +788,9 @@
                             if ($UserDomainPrefix -ine $targetPrefix -and $UserDomainPrefix -ine $Domain) {
                                 $UserRealm = $UserDomainPrefix
                                 if ($UserRealm -match '\.') {
-                                    Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'"
+                                    Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (FQDN), целевой домен '$Domain'"
                                 } else {
-                                    Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'"
+                                    Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (NetBIOS), целевой домен '$Domain'"
                                 }
                             }
                         }
@@ -799,7 +799,7 @@
                             $upnDomain = $Matches[2]
                             if ($upnDomain -ine $Domain) {
                                 $UserRealm = $upnDomain
-                                Write-Log "[Connect-adPEAS] Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'"
+                                Write-Log "[Connect-adPEAS] Междоменное подключение: область UPN '$UserRealm', целевой домен '$Domain'"
                             }
                         }
 
@@ -807,8 +807,8 @@
                     }
                     else {
                         # UsernamePassword
-                        Write-Log "[Connect-adPEAS] Domain: $Domain"
-                        if ($Server) { Write-Log "[Connect-adPEAS] Server: $Server" }
+                        Write-Log "[Connect-adPEAS] Домен: $Domain"
+                        if ($Server) { Write-Log "[Connect-adPEAS] Сервер: $Server" }
                         Write-Log "[Connect-adPEAS] Username: $Username"
 
                         # Convert Password to plain string for Kerberos, SecureString for SimpleBind
@@ -818,7 +818,7 @@
                             $PlainPassword = ""
                             # Create empty SecureString manually (ConvertTo-SecureString rejects empty string in some PS versions)
                             $SecurePassword = New-Object System.Security.SecureString
-                            Write-Log "[Connect-adPEAS] Empty password provided (PASSWD_NOTREQD account)"
+                            Write-Log "[Connect-adPEAS] Получен пустой пароль (учётная запись PASSWD_NOTREQD)"
                         }
                         elseif ($Password -is [string]) {
                             $PlainPassword = $Password
@@ -839,10 +839,10 @@
                             # Numeric password (PowerShell auto-parses "12345" as int) - convert to string
                             $PlainPassword = $Password.ToString()
                             $SecurePassword = ConvertTo-SecureString -String $PlainPassword -AsPlainText -Force
-                            Write-Log "[Connect-adPEAS] Password was numeric, converted to string"
+                            Write-Log "[Connect-adPEAS] Числовой пароль преобразован в строку"
                         }
                         else {
-                            throw "Password must be either String, SecureString, or empty"
+                            throw "Пароль должен быть String, SecureString либо пустым"
                         }
 
                         # Normalize Username for credential creation
@@ -851,7 +851,7 @@
                         if ($Username -notmatch '\\' -and $Username -notmatch '@') {
                             $NetBIOSDomain = ($Domain -split '\.')[0].ToUpper()
                             $CredentialUsername = "$NetBIOSDomain\$Username"
-                            Write-Log "[Connect-adPEAS] Username normalized for SMB: $Username -> $CredentialUsername"
+                            Write-Log "[Connect-adPEAS] Имя пользователя нормализовано для SMB: $Username -> $CredentialUsername"
                         }
 
                         # Create PSCredential for NTLM impersonation and SimpleBind fallback
@@ -871,9 +871,9 @@
                             if ($UserDomainPrefix -ine $targetPrefix -and $UserDomainPrefix -ine $Domain) {
                                 $UserRealm = $UserDomainPrefix
                                 if ($UserRealm -match '\.') {
-                                    Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'"
+                                    Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (FQDN), целевой домен '$Domain'"
                                 } else {
-                                    Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'"
+                                    Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (NetBIOS), целевой домен '$Domain'"
                                 }
                             }
                         }
@@ -882,7 +882,7 @@
                             $upnDomain = $Matches[2]
                             if ($upnDomain -ine $Domain) {
                                 $UserRealm = $upnDomain
-                                Write-Log "[Connect-adPEAS] Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'"
+                                Write-Log "[Connect-adPEAS] Междоменное подключение: область UPN '$UserRealm', целевой домен '$Domain'"
                             }
                         }
                     }
@@ -915,7 +915,7 @@
 
                     # ===== Explicit NTLM (if requested) =====
                     if ($ForceNTLM) {
-                        Write-Log "[Connect-adPEAS] Using explicit NTLM authentication (AuthType::Ntlm)..."
+                        Write-Log "[Connect-adPEAS] Используется явная аутентификация NTLM (AuthType::Ntlm)..."
 
                         $ConnParams = @{}
                         $ConnParams['Domain'] = $Domain
@@ -923,7 +923,7 @@
                             $ConnParams['Server'] = $Server
                         } elseif ($DCResolution -and $DCResolution.Hostname) {
                             $ConnParams['Server'] = $DCResolution.Hostname
-                            Write-Log "[Connect-adPEAS] ForceNTLM: Using discovered DC: $($DCResolution.Hostname)"
+                            Write-Log "[Connect-adPEAS] ForceNTLM: обнаружен контроллер домена $($DCResolution.Hostname)"
                         }
                         if ($UseLDAPS) { $ConnParams['UseLDAPS'] = $true }
                         $ConnParams['IgnoreSSLErrors'] = $IgnoreSSLErrors
@@ -963,7 +963,7 @@
                         # Fall through to NTLM Impersonation / SimpleBind below
                     }
                     elseif (-not $ForceSimpleBind) {
-                        Write-Log "[Connect-adPEAS] Attempting Kerberos authentication..."
+                        Write-Log "[Connect-adPEAS] Попытка аутентификации Kerberos..."
 
                         # Cross-domain with FQDN UserRealm: resolve KDC for user's realm
                         $UserRealmDC = $null
@@ -1004,7 +1004,7 @@
                         if ($KerbFlowResult.Success) {
                             $KerberosAuthSuccess = $true
                             $Connection = $KerbFlowResult.Connection
-                            Write-Log "[Connect-adPEAS] Kerberos authentication completed successfully"
+                            Write-Log "[Connect-adPEAS] Аутентификация Kerberos успешна"
 
                             $Script:AuthInfo.Method = 'Kerberos'
                             $Script:AuthInfo.KerberosUsed = $true
@@ -1023,7 +1023,7 @@
                         else {
                             $ErrorMessage = $KerbFlowResult.Error
                             $KdcErrorCode = $KerbFlowResult.ErrorCode
-                            Write-Log "[Connect-adPEAS] Kerberos authentication failed: $ErrorMessage (ErrorCode: $KdcErrorCode)"
+                            Write-Log "[Connect-adPEAS] Ошибка аутентификации Kerberos: $ErrorMessage (код $KdcErrorCode)"
 
                             # KDC errors indicate authentication/credential issues - fallback makes no sense
                             # Exception: cross-domain auth may get Error 6 (user not found) if TGS fails,
@@ -1034,7 +1034,7 @@
                                 return $null
                             }
                             if ($IsCrossDomain) {
-                                Write-Log "[Connect-adPEAS] Cross-domain: Kerberos failed, allowing NTLM/SimpleBind fallback"
+                                Write-Log "[Connect-adPEAS] Междоменное подключение: ошибка Kerberos, возможен переход на NTLM/SimpleBind"
                                 Show-Line "Междоменная аутентификация: переход на NTLM/SimpleBind" -Class Hint
                             }
 
@@ -1043,13 +1043,13 @@
                             if ($IsDnsResolutionIssue) {
                                 Show-Line "Билеты Kerberos TGT/TGS получены, но для LDAP требуется разрешение имени узла" -Class Note
                                 Show-Line "Для полноценной аутентификации Kerberos используйте -PatchHostsFile" -Class Note
-                                Write-Log "[Connect-adPEAS] Custom DNS active without hosts patching - SimpleBind fallback"
+                                Write-Log "[Connect-adPEAS] Используется собственный DNS без изменения hosts — переход на SimpleBind"
                             }
 
                             # Technical error (PTT failed, LDAP without Kerberos, etc.) - fallback is OK
                             $IsPTTError = $ErrorMessage -match "non-domain-joined|Remote Credential Guard|Ticket import failed|ticket not used|ticket not usable"
                             if ($IsPTTError) {
-                                Write-Log "[Connect-adPEAS] Kerberos PTT not available on this system - using SimpleBind"
+                                Write-Log "[Connect-adPEAS] Kerberos PTT недоступен — используется SimpleBind"
                             }
 
                             if ($ForceKerberos) {
@@ -1087,25 +1087,25 @@
                             # Connect-LDAP has already shown the error, so this only says why
                             # nothing further is tried.
                             if ($UseLDAPS -and $Script:ConnectionState -in @('SSLHandshakeError', 'CertificateError')) {
-                                Write-Log "[Connect-adPEAS] LDAPS transport failed ($Script:ConnectionState) - no authentication fallback can help"
+                                Write-Log "[Connect-adPEAS] Ошибка транспорта LDAPS ($Script:ConnectionState) — смена метода аутентификации не поможет"
                                 Show-Line ('LDAPS transport failed - authentication runs inside TLS, so NTLM and ' +
                                            'SimpleBind are not attempted') -Class Note
                                 return $null
                             }
 
-                            Write-Log "[Connect-adPEAS] Kerberos PTT failed - trying NTLM impersonation fallback..."
+                            Write-Log "[Connect-adPEAS] Не удалось применить Kerberos PTT — попытка олицетворения NTLM..."
                             Show-Line "Аутентификация Kerberos не удалась — попытка олицетворения через NTLM" -Class Info
                         }
                     }
                     else {
-                        Write-Log "[Connect-adPEAS] ForceSimpleBind specified, skipping Kerberos"
+                        Write-Log "[Connect-adPEAS] Указан ForceSimpleBind — Kerberos пропускается"
                     }
 
                     # ===== Fallback: Explicit NTLM -> SimpleBind =====
                     if (-not $KerberosAuthSuccess -and -not $ForceNTLM) {
                         # Try explicit NTLM first (better than SimpleBind: supports LDAP signing)
                         if (-not $ForceSimpleBind) {
-                            Write-Log "[Connect-adPEAS] Attempting explicit NTLM fallback (AuthType::Ntlm)..."
+                            Write-Log "[Connect-adPEAS] Резервная попытка явной аутентификации NTLM (AuthType::Ntlm)..."
 
                             $ConnParams = @{}
                             $ConnParams['Domain'] = $Domain
@@ -1130,13 +1130,13 @@
                                 # be the one that reaches LDAPS at all, so the state this reads
                                 # is the one that attempt produced.
                                 if ($UseLDAPS -and $Script:ConnectionState -in @('SSLHandshakeError', 'CertificateError')) {
-                                    Write-Log "[Connect-adPEAS] LDAPS transport failed ($Script:ConnectionState) - not attempting SimpleBind"
+                                    Write-Log "[Connect-adPEAS] Ошибка транспорта LDAPS ($Script:ConnectionState) — SimpleBind не выполняется"
                                     Show-Line ('LDAPS transport failed - authentication runs inside TLS, so SimpleBind ' +
                                                'is not attempted') -Class Note
                                     return $null
                                 }
 
-                                Write-Log "[Connect-adPEAS] LDAP connection failed with explicit NTLM - trying SimpleBind..."
+                                Write-Log "[Connect-adPEAS] Соединение LDAP через явный NTLM не удалось — попытка SimpleBind..."
                                 Show-Line "Аутентификация NTLM не удалась — переход на SimpleBind" -Class Hint
                                 # Fall through to SimpleBind below
                             }
@@ -1152,7 +1152,7 @@
 
                         # Final fallback: SimpleBind
                         if (-not $Connection) {
-                            Write-Log "[Connect-adPEAS] Using SimpleBind authentication..."
+                            Write-Log "[Connect-adPEAS] Используется аутентификация SimpleBind..."
 
                             $ConnParams = @{}
                             $ConnParams['Domain'] = $Domain
@@ -1195,7 +1195,7 @@
                                 }
                             }
                             if (-not $Connection -and -not $UseLDAPS -and $Script:LastLDAPErrorCode -eq 8) {
-                                Write-Log "[Connect-adPEAS] SimpleBind failed with LDAP_STRONG_AUTH_REQUIRED - auto-upgrading to LDAPS..."
+                                Write-Log "[Connect-adPEAS] SimpleBind отклонён (LDAP_STRONG_AUTH_REQUIRED) — автоматический переход на LDAPS..."
                                 # Port 389 without TLS: there is no channel to bind, so the
                                 # refusal can only be the signing requirement - a simple bind
                                 # cannot be signed. The line used to name channel binding too.
@@ -1216,9 +1216,9 @@
                 }
 
                 'Certificate' {
-                    Write-Log "[Connect-adPEAS] Domain: $Domain"
+                    Write-Log "[Connect-adPEAS] Домен: $Domain"
                     if ($Server) {
-                        Write-Log "[Connect-adPEAS] Server: $Server"
+                        Write-Log "[Connect-adPEAS] Сервер: $Server"
                     }
                     Write-Log "[Connect-adPEAS] Certificate: $Certificate"
 
@@ -1275,15 +1275,15 @@
                         # Direct LDAPS bind with client certificate - no Kerberos involved
                         # Works when: Port 88 blocked, no Smart Card Logon EKU, no admin rights for PTT
                         if ($ForceKerberos) {
-                            Write-Warning "[!] -ForceKerberos has no effect with -ForcePassTheCert"
-                            Write-Warning "[!] Pass-the-Cert always uses Schannel (TLS client cert), never Kerberos"
+                            Write-Warning "[!] -ForceKerberos не действует при -ForcePassTheCert"
+                            Write-Warning "[!] Pass-the-Cert использует Schannel (клиентский TLS-сертификат), а не Kerberos"
                         }
-                        Write-Log "[Connect-adPEAS] Using Pass-the-Cert (Schannel) - bypassing Kerberos"
+                        Write-Log "[Connect-adPEAS] Используется Pass-the-Cert (Schannel), Kerberos пропускается"
 
                         # Force LDAPS (Schannel requires TLS)
                         if (-not $UseLDAPS) {
                             $UseLDAPS = $true
-                            Write-Log "[Connect-adPEAS] LDAPS automatically enabled for Pass-the-Cert"
+                            Write-Log "[Connect-adPEAS] LDAPS автоматически включён для Pass-the-Cert"
                         }
 
                         # Extract display identity from cert (for console output only, not for auth)
@@ -1672,9 +1672,9 @@
                 }
 
                 'WindowsAuth' {
-                    Write-Log "[Connect-adPEAS] Domain: $Domain"
+                    Write-Log "[Connect-adPEAS] Домен: $Domain"
                     if ($Server) {
-                        Write-Log "[Connect-adPEAS] Server: $Server"
+                        Write-Log "[Connect-adPEAS] Сервер: $Server"
                     }
                     Write-Log "[Connect-adPEAS] Username: $env:USERDOMAIN\$env:USERNAME"
 
@@ -1730,9 +1730,9 @@
                     # Primary: Kerberos TGT + TGS for LDAP + Pass-the-Ticket
                     # No fallback - hash/key auth requires Kerberos
 
-                    Write-Log "[Connect-adPEAS] Domain: $Domain"
+                    Write-Log "[Connect-adPEAS] Домен: $Domain"
                     if ($Server) {
-                        Write-Log "[Connect-adPEAS] Server: $Server"
+                        Write-Log "[Connect-adPEAS] Сервер: $Server"
                     }
                     Write-Log "[Connect-adPEAS] Username: $Username"
                     Write-Log "[Connect-adPEAS] Auth Type: $AuthMethod"
@@ -1749,9 +1749,9 @@
                         if ($UserDomainPrefix -ine $targetPrefix -and $UserDomainPrefix -ine $Domain) {
                             $UserRealm = $UserDomainPrefix
                             if ($UserRealm -match '\.') {
-                                Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'"
+                                Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (FQDN), целевой домен '$Domain'"
                             } else {
-                                Write-Log "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'"
+                                Write-Log "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (NetBIOS), целевой домен '$Domain'"
                             }
                         }
                     }
@@ -1760,7 +1760,7 @@
                         $upnDomain = $Matches[2]
                         if ($upnDomain -ine $Domain) {
                             $UserRealm = $upnDomain
-                            Write-Log "[Connect-adPEAS] Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'"
+                            Write-Log "[Connect-adPEAS] Междоменное подключение: область UPN '$UserRealm', целевой домен '$Domain'"
                         }
                     }
                     Write-Log "[Connect-adPEAS] Extracted sAMAccountName: $SamAccountName"
@@ -1844,7 +1844,7 @@
                         if ($KerbFlowResult.Success) {
                             $KerberosAuthSuccess = $true
                             $Connection = $KerbFlowResult.Connection
-                            Write-Log "[Connect-adPEAS] Kerberos authentication completed successfully"
+                            Write-Log "[Connect-adPEAS] Аутентификация Kerberos успешна"
 
                             # Track auth info
                             $Script:AuthInfo.Method = 'Kerberos'
@@ -1868,7 +1868,7 @@
                         }
                     }
                     else {
-                        Write-Log "[Connect-adPEAS] ForceSimpleBind specified, skipping Kerberos"
+                        Write-Log "[Connect-adPEAS] Указан ForceSimpleBind — Kerberos пропускается"
                         $KerberosError = "Skipped (ForceSimpleBind)"
                     }
 
@@ -1895,9 +1895,9 @@
                     }
 
                     $TicketInput = if ($AuthMethod -eq 'Kirbi') { $Kirbi } else { $Ccache }
-                    Write-Log "[Connect-adPEAS] Domain: $Domain"
+                    Write-Log "[Connect-adPEAS] Домен: $Domain"
                     if ($Server) {
-                        Write-Log "[Connect-adPEAS] Server: $Server"
+                        Write-Log "[Connect-adPEAS] Сервер: $Server"
                     }
                     Write-Log "[Connect-adPEAS] Ticket Input: $($TicketInput.Substring(0, [Math]::Min(50, $TicketInput.Length)))..."
 
@@ -1939,7 +1939,7 @@
                         $Connection = Connect-LDAP @ConnParams
 
                         if ($Connection) {
-                            Write-Log "[Connect-adPEAS] Kerberos authentication completed successfully"
+                            Write-Log "[Connect-adPEAS] Аутентификация Kerberos успешна"
 
                             # Track auth info
                             $Script:AuthInfo.Method = 'Kerberos'

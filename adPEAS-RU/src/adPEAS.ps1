@@ -582,13 +582,13 @@ function Invoke-adPEAS {
 
     # Validate -OutputAppend requires -Outputfile
     if ($OutputAppend -and -not $PSBoundParameters['Outputfile']) {
-        Write-Warning "[adPEAS] -OutputAppend requires -Outputfile. Ignoring -OutputAppend."
+        Write-Warning "[adPEAS] Для -OutputAppend необходим -Outputfile. Параметр -OutputAppend игнорируется."
         $OutputAppend = [switch]::new($false)
     }
 
     # Validate -OutputAppend requires a format that produces JSON (for findings merge)
     if ($OutputAppend -and $Format -notin @('All', 'JSON')) {
-        Write-Warning "[adPEAS] -OutputAppend requires JSON findings cache. Use -Format All or -Format JSON. Ignoring -OutputAppend."
+        Write-Warning "[adPEAS] Для -OutputAppend необходим JSON-кэш находок. Укажите -Format All или -Format JSON. Параметр игнорируется."
         $OutputAppend = [switch]::new($false)
     }
 
@@ -607,14 +607,14 @@ function Invoke-adPEAS {
     $Module = @(Resolve-adPEASModules -Module $Module -ExcludeModule $ExcludeModule)
 
     if ($Module.Count -eq 0) {
-        Write-Warning "[adPEAS] -ExcludeModule leaves no module to run. Nothing to do."
+        Write-Warning "[adPEAS] После исключения модулей через -ExcludeModule не осталось заданий. Выполнение завершено."
         return
     }
 
     # Initialize findings collection if HTML or JSON format requested
     if ($Format -in @('HTML', 'JSON', 'All')) {
         Initialize-FindingsCollection
-        Write-Log "[adPEAS] Findings collection enabled (Format: $Format)"
+        Write-Log "[adPEAS] Сбор результатов включён (формат: $Format)"
     }
 
     # ===== Output File Configuration =====
@@ -638,9 +638,9 @@ function Invoke-adPEAS {
         if ($OutputDir -and -not (Test-Path $OutputDir)) {
             try {
                 New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
-                Write-Warning "[adPEAS] Directory '$OutputDir' did not exist and was created"
+                Write-Warning "[adPEAS] Каталог '$OutputDir' отсутствовал и был создан"
             } catch {
-                Write-Warning "[adPEAS] Could not create directory '$OutputDir': $_"
+                Write-Warning "[adPEAS] Не удалось создать каталог '$OutputDir': $_"
                 return
             }
         }
@@ -656,7 +656,7 @@ function Invoke-adPEAS {
                 # Append mode: File will be created or appended to by Write-adPEASOutput
                 $Script:adPEAS_Outputfile = $textPath
             } catch {
-                Write-Warning "[adPEAS] Unable to write text output to '$textPath', please check path and permissions!"
+                Write-Warning "[adPEAS] Невозможно записать текстовый отчёт в '$textPath'; проверьте путь и права доступа."
             }
         }
 
@@ -672,7 +672,7 @@ function Invoke-adPEAS {
 
     # Warn if VerboseLogging is enabled without text output (but still enable console verbose)
     if ($VerboseLogging -and -not $Script:adPEAS_Outputfile) {
-        Write-Warning "[adPEAS] -VerboseLogging: File logging requires -Outputfile with Text format. Verbose messages will be shown in console only."
+        Write-Warning "[adPEAS] -VerboseLogging: для журнала в файл необходимы -Outputfile и формат Text. Подробности будут выводиться только в консоль."
         # Keep VerboseLogging = $true so that $VerbosePreference stays 'Continue' for console output
         # File logging won't happen since $Script:adPEAS_Outputfile is $null
     }
@@ -692,11 +692,11 @@ try {
     # what it last showed; the text report always starts with them.
     Show-ScanLogo -Version $Script:adPEASVersion -Disclaimer $_disclaimer
 
-    Write-Log "[adPEAS] Script started: $StartTime"
-    Write-Log "[adPEAS] Version: $Script:adPEASVersion"
+    Write-Log "[adPEAS] Время начала: $StartTime"
+    Write-Log "[adPEAS] Версия: $Script:adPEASVersion"
 
     if ($OPSEC) {
-        Write-Log "[adPEAS] OPSEC mode enabled: No ASREPRoast/Kerberoast/BloodHound"
+        Write-Log "[adPEAS] Включён OPSEC: ASREPRoast/Kerberoast/BloodHound отключены"
     }
 
     # ===== Connection Handling =====
@@ -723,7 +723,7 @@ try {
 
     # Scenario 2: Active session exists AND no new connection parameters ? Reuse session
     if ($HasActiveSession -and -not $HasConnectionParams) {
-        Write-Log "[adPEAS] Reusing existing LDAP session"
+        Write-Log "[adPEAS] Повторное использование действующей LDAP-сессии"
         Show-Header "Используется существующее LDAP-подключение"
 
         # Use LDAP-verified identity if available
@@ -743,7 +743,7 @@ try {
             default       { $Script:LDAPContext.Protocol }  # Fallback to protocol if AuthMethod not set
         }
 
-        Show-Line "Connected to domain '$($Script:LDAPContext.Domain)' on server '$($Script:LDAPContext.Server)' as '$AuthenticatedUser' via $AuthDisplay"
+        Show-Line "Подключено к домену '$($Script:LDAPContext.Domain)' на сервере '$($Script:LDAPContext.Server)' как '$AuthenticatedUser' через $AuthDisplay"
     }
     # Scenario 3: Connection parameters provided ? Establish new connection via Connect-adPEAS
     elseif ($HasConnectionParams) {
@@ -783,12 +783,12 @@ try {
             # No new auth method specified - check if we can reuse existing session credentials
             if ($HasActiveSession -and $Script:LDAPContext.Credential) {
                 # Reuse credentials from existing session
-                Write-Log "[adPEAS] Reusing credentials from existing session"
+                Write-Log "[adPEAS] Повторно используются учётные данные действующей сессии"
                 $ConnectionParams['Credential'] = $Script:LDAPContext.Credential
             }
             elseif ($HasActiveSession -and $Script:LDAPContext.Certificate) {
                 # Reuse certificate auth from existing session
-                Write-Log "[adPEAS] Reusing certificate authentication from existing session"
+                Write-Log "[adPEAS] Повторно используется аутентификация по сертификату действующей сессии"
                 $ConnectionParams['Certificate'] = $Script:LDAPContext.Certificate
                 if ($Script:LDAPContext.CertificatePassword) {
                     $ConnectionParams['CertificatePassword'] = $Script:LDAPContext.CertificatePassword
@@ -796,7 +796,7 @@ try {
             }
             else {
                 # No session or session uses Windows Auth - default to Windows Auth
-                Write-Log "[adPEAS] No authentication method specified - defaulting to Windows Authentication"
+                Write-Log "[adPEAS] Метод аутентификации не указан — используется аутентификация Windows"
                 $ConnectionParams['UseWindowsAuth'] = $true
             }
         }
@@ -829,7 +829,7 @@ try {
                 default       { $Connection.Protocol }  # Fallback to protocol if AuthMethod not set
             }
 
-            Show-Line "Successfully connected to domain '$($Connection.Domain)' on server '$($Connection.Server)' as '$AuthenticatedUser' via $AuthDisplay" -Class Note
+            Show-Line "Успешное подключение к домену '$($Connection.Domain)' на сервере '$($Connection.Server)' как '$AuthenticatedUser' через $AuthDisplay" -Class Note
         } catch {
             # Connect-adPEAS threw an error (already displayed by Connect-adPEAS)
             Show-Error -Type Connection
@@ -839,7 +839,7 @@ try {
 
     # ===== Connection Health Check =====
     # Verify that the DC is actually reachable by performing a test query
-    Write-Log "[adPEAS] Verifying Domain Controller connectivity..."
+    Write-Log "[adPEAS] Проверка доступности контроллера домена..."
 
     # Use -Quiet mode to suppress detailed output
     $connectionHealthy = Get-adPEASSession -TestConnection -Quiet
@@ -852,7 +852,7 @@ try {
         return
     }
 
-    Write-Log "[adPEAS] Connection health check passed - DC is reachable"
+    Write-Log "[adPEAS] Проверка соединения пройдена — контроллер домена доступен"
 
     # ===== Kerberos Session Health Check =====
     # For Kerberos-based sessions, verify the TGT is still valid before starting module execution
@@ -860,7 +860,7 @@ try {
     # Reset SessionInvalid flag from any previous failed run - give fresh TGT check a fair chance
     if ($Script:LDAPContext -and $Script:LDAPContext['SessionInvalid']) {
         $Script:LDAPContext.Remove('SessionInvalid')
-        Write-Log "[adPEAS] Cleared SessionInvalid flag from previous run"
+        Write-Log "[adPEAS] Сброшен флаг SessionInvalid предыдущего запуска"
     }
 
     # Checks that threw during this run. Reset per run so a second scan in the same session
@@ -886,12 +886,12 @@ try {
         # the run announces an empty module list and produces a report with nothing in
         # it, which reads like the domain came back clean.
         if ($Module.Count -eq 0) {
-            Write-Warning "[adPEAS] -OPSEC excludes BloodHound collection, which was the only module selected. Nothing to do."
+            Write-Warning "[adPEAS] Режим -OPSEC исключает BloodHound — единственный выбранный модуль. Заданий нет."
             return
         }
     }
 
-    Write-Log "[adPEAS] Executing Modules: $($Module -join ', ')"
+    Write-Log "[adPEAS] Запускаемые модули: $($Module -join ', ')"
     Show-Line "Запуск модулей: $($Module -join ', ')"
 
     # Module progress counter
@@ -933,14 +933,14 @@ try {
                 -ReplacedCategories @($Module))
 
             Set-FindingsCollection -Findings $keptFindings
-            Show-Line "Appending to existing report: kept $($keptFindings.Count) of $($previousFindings.Count) previous findings, re-running $($Module -join ', ')" -Class Note
+            Show-Line "Добавление к отчёту: сохранено $($keptFindings.Count) из $($previousFindings.Count) прежних находок; повторный запуск $($Module -join ', ')" -Class Note
         }
         catch {
-            Write-Warning "[adPEAS] Could not load previous findings from '$appendCachePath': $_"
-            Write-Warning "[adPEAS] Continuing without append - creating fresh report"
+            Write-Warning "[adPEAS] Не удалось прочитать прежние находки из '$appendCachePath': $_"
+            Write-Warning "[adPEAS] Продолжение без добавления — создаётся новый отчёт"
         }
     } elseif ($OutputAppend) {
-        Write-Log "[adPEAS] No previous cache found at '$appendCachePath' - first append run"
+        Write-Log "[adPEAS] Прежний кэш '$appendCachePath' не найден — первый запуск в режиме добавления"
     }
 
     # 3. Execute checks
@@ -977,7 +977,7 @@ try {
         # CompletedModules that were skipped, which is the one thing the field exists to
         # say. The last checkpoint before the session died is the honest one; leave it.
         if ($Script:LDAPContext -and $Script:LDAPContext['SessionInvalid']) {
-            Write-Log "[adPEAS] Skipping checkpoint after module '$ModuleName' - session invalid"
+            Write-Log "[adPEAS] Пропущена контрольная точка после '$ModuleName' — сессия недействительна"
             return
         }
 
@@ -995,7 +995,7 @@ try {
             Export-FindingsCache -Path $checkpointPath -Partial -CompletedModules @($completedModules)
         }
         catch {
-            Write-Log "[adPEAS] Checkpoint after module '$ModuleName' failed: $_" -Level Warning
+            Write-Log "[adPEAS] Ошибка контрольной точки после '$ModuleName': $_" -Level Warning
         }
     }
 
@@ -1009,15 +1009,15 @@ try {
         )
         # Skip all remaining checks if session became invalid (e.g., expired Kerberos TGT)
         if ($Script:LDAPContext -and $Script:LDAPContext['SessionInvalid']) {
-            Write-Log "[adPEAS] Skipping check '$CheckName' - session invalid"
+            Write-Log "[adPEAS] Проверка '$CheckName' пропущена — сессия недействительна"
             return
         }
         Set-CheckContext -Category $Category -CheckName $CheckName -Title $Title
         try {
             & $Check
         } catch {
-            Write-Warning "[adPEAS] Check '$CheckName' failed: $_"
-            Write-Log "[adPEAS] Check '$CheckName' failed: $_" -Level Error
+            Write-Warning "[adPEAS] Ошибка проверки '$CheckName': $_"
+            Write-Log "[adPEAS] Ошибка проверки '$CheckName': $_" -Level Error
 
             # The warning above goes to the console only. Without the line below the HTML
             # report, the JSON export and the text report contain nothing at all about the
@@ -1026,7 +1026,7 @@ try {
             # expensive kind of defect, because the finding does not go missing visibly.
             # Emitted while the check context is still set, so it is filed under the right
             # category and check.
-            Show-Line "This check did not complete - its results are incomplete or absent. Reason: $($_.Exception.Message)" -Class Hint
+            Show-Line "Проверка не завершена — результаты неполные или отсутствуют. Причина: $($_.Exception.Message)" -Class Hint
             if ($null -eq $Script:adPEAS_IncompleteChecks) { $Script:adPEAS_IncompleteChecks = @() }
             $Script:adPEAS_IncompleteChecks += $CheckName
         } finally {
@@ -1301,9 +1301,9 @@ try {
     if ($Script:HTMLOutputPath -and -not $sessionAborted) {
         try {
             Export-HTMLReport -OutputPath $Script:HTMLOutputPath
-            Write-Log "[adPEAS] HTML report generated: $($Script:HTMLOutputPath)"
+            Write-Log "[adPEAS] HTML-отчёт создан: $($Script:HTMLOutputPath)"
         } catch {
-            Write-Warning "[adPEAS] Error generating HTML report: $_"
+            Write-Warning "[adPEAS] Ошибка формирования HTML-отчёта: $_"
             $Script:HTMLOutputPath = $null  # Clear path so we don't show it in summary
         }
     }
@@ -1319,10 +1319,10 @@ try {
             # the last module - the statistics summary and the scan summary.
             Export-FindingsCache -Path $jsonPath -CompletedModules @($completedModules)
             $Script:JSONOutputPath = $jsonPath
-            Write-Log "[adPEAS] Findings JSON saved to: $jsonPath"
+            Write-Log "[adPEAS] JSON с результатами сохранён: $jsonPath"
         }
         catch {
-            Write-Warning "[adPEAS] Could not save JSON export to '$jsonPath': $_"
+            Write-Warning "[adPEAS] Не удалось записать JSON в '$jsonPath': $_"
             $Script:JSONOutputPath = $null
         }
     }
@@ -1373,15 +1373,15 @@ try {
         # file is marked incomplete and names the modules it covers, so it is worth
         # naming rather than leaving for the user to find.
         if ($checkpointPath -and (Test-Path $checkpointPath)) {
-            Show-Line "Partial JSON export from the modules that completed: $checkpointPath" -Class Hint
-            Show-Line "Rebuild a report from it with: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath'" -Class Hint
+            Show-Line "Частичный JSON завершённых модулей: $checkpointPath" -Class Hint
+            Show-Line "Сформировать отчёт из него: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath'" -Class Hint
         }
     } else {
         # Checks that threw are named here, not just warned about on the console. A reader
         # of the report has to be able to tell "nothing found" from "not looked at".
         if ($Script:adPEAS_IncompleteChecks -and $Script:adPEAS_IncompleteChecks.Count -gt 0) {
             $incomplete = @($Script:adPEAS_IncompleteChecks | Select-Object -Unique)
-            Show-Line "$($incomplete.Count) check(s) did not complete - their sections are incomplete and must not be read as clean:" -Class Finding
+            Show-Line "Не завершено проверок: $($incomplete.Count). Их результаты неполны — нельзя считать разделы безопасными:" -Class Finding
             foreach ($name in $incomplete) {
                 Show-Line "  $name" -Class Finding
             }
@@ -1417,8 +1417,8 @@ finally {
     # Session is always kept alive after Invoke-adPEAS completes.
     # This allows users to run Get-adPEASSession, Get-Domain* queries, or additional scans.
     # Use Disconnect-adPEAS to explicitly close the session when done.
-    Write-Log "[adPEAS] Session kept alive - use Disconnect-adPEAS to close"
-    Write-Log "[adPEAS] adPEAS v2 completed"
+    Write-Log "[adPEAS] Сессия оставлена активной — завершите её командой Disconnect-adPEAS"
+    Write-Log "[adPEAS] Работа adPEAS v2 завершена"
 }
 }
 # ===== End of Invoke-adPEAS Function =====
