@@ -1,0 +1,116 @@
+{
+  "schema": "adPEAS-RU.DOC6h.SecurityLog.1",
+  "path": "src/modules/Checks/Accounts/Get-ManagedServiceAccountSecurity.ps1",
+  "entries": [
+    {
+      "line": 81,
+      "original": "        Write-Log \"[Get-ManagedServiceAccountSecurity] Starting check\"",
+      "target": "        Write-Log \"[Get-ManagedServiceAccountSecurity] Начата проверка\""
+    },
+    {
+      "line": 100,
+      "original": "            Write-Log \"[Get-ManagedServiceAccountSecurity] Checking gMSA password access permissions\"",
+      "target": "            Write-Log \"[Get-ManagedServiceAccountSecurity] Проверка прав чтения паролей gMSA\""
+    },
+    {
+      "line": 107,
+      "original": "                Write-Log \"[Get-ManagedServiceAccountSecurity] Found $($gmsaAccounts.Count) gMSA account(s)\"",
+      "target": "                Write-Log \"[Get-ManagedServiceAccountSecurity] Найдено учётных записей gMSA: $($gmsaAccounts.Count)\""
+    },
+    {
+      "line": 159,
+      "original": "                        Write-Log \"[Get-ManagedServiceAccountSecurity] Failed to parse msDS-GroupMSAMembership for $gmsaName : $_\"",
+      "target": "                        Write-Log \"[Get-ManagedServiceAccountSecurity] Не удалось разобрать msDS-GroupMSAMembership для $gmsaName : $_\""
+    },
+    {
+      "line": 331,
+      "original": "                                Write-Log \"[Get-ManagedServiceAccountSecurity] Could not read accountExpires of $($gmsa.sAMAccountName): $_\"",
+      "target": "                                Write-Log \"[Get-ManagedServiceAccountSecurity] Не удалось прочитать accountExpires для $($gmsa.sAMAccountName): $_\""
+    },
+    {
+      "line": 348,
+      "original": "                Write-Log \"[Get-ManagedServiceAccountSecurity] Attempting to read gMSA passwords\"",
+      "target": "                Write-Log \"[Get-ManagedServiceAccountSecurity] Попытка чтения паролей gMSA\""
+    },
+    {
+      "line": 367,
+      "original": "                    Write-Log \"[Get-ManagedServiceAccountSecurity] Attempting to read password for $gmsaName\"",
+      "target": "                    Write-Log \"[Get-ManagedServiceAccountSecurity] Попытка чтения пароля для $gmsaName\""
+    },
+    {
+      "line": 428,
+      "original": "                                    Write-Log \"[Get-ManagedServiceAccountSecurity] Failed to parse password blob for $gmsaName\"",
+      "target": "                                    Write-Log \"[Get-ManagedServiceAccountSecurity] Не удалось разобрать блок данных пароля для $gmsaName\""
+    },
+    {
+      "line": 431,
+      "original": "                                Write-Log \"[Get-ManagedServiceAccountSecurity] Password blob is empty or invalid type for $gmsaName\"",
+      "target": "                                Write-Log \"[Get-ManagedServiceAccountSecurity] Блок данных пароля пуст или имеет неверный тип для $gmsaName\""
+    },
+    {
+      "line": 434,
+      "original": "                            Write-Log \"[Get-ManagedServiceAccountSecurity] No msDS-ManagedPassword returned for $gmsaName (access denied or not available)\"",
+      "target": "                            Write-Log \"[Get-ManagedServiceAccountSecurity] Атрибут msDS-ManagedPassword для $gmsaName не возвращён (нет доступа или недоступен)\""
+    },
+    {
+      "line": 438,
+      "original": "                        Write-Log \"[Get-ManagedServiceAccountSecurity] Error reading password for $gmsaName : $_\"",
+      "target": "                        Write-Log \"[Get-ManagedServiceAccountSecurity] Ошибка чтения пароля для $gmsaName : $_\""
+    },
+    {
+      "line": 457,
+      "original": "                    Write-Log \"[Get-ManagedServiceAccountSecurity] Could not read the session's encryption state: $_\"",
+      "target": "                    Write-Log \"[Get-ManagedServiceAccountSecurity] Не удалось прочитать состояние шифрования сеанса: $_\""
+    },
+    {
+      "line": 512,
+      "original": "            Write-Log \"[Get-ManagedServiceAccountSecurity] Checking for standalone MSAs\"",
+      "target": "            Write-Log \"[Get-ManagedServiceAccountSecurity] Проверка отдельных учётных записей MSA\""
+    },
+    {
+      "line": 557,
+      "original": "            Write-Log \"[Get-ManagedServiceAccountSecurity] Checking delegated Managed Service Account links\"",
+      "target": "            Write-Log \"[Get-ManagedServiceAccountSecurity] Проверка связей делегированных управляемых служебных учётных записей\""
+    },
+    {
+      "line": 574,
+      "original": "                Write-Log \"[Get-ManagedServiceAccountSecurity] No schema naming context - dMSA links not checked\"",
+      "target": "                Write-Log \"[Get-ManagedServiceAccountSecurity] Контекст именования схемы отсутствует — связи dMSA не проверены\""
+    },
+    {
+      "line": 684,
+      "original": "                        Write-Log \"[Get-ManagedServiceAccountSecurity] Could not read the dMSA $(@($linkedDMSAs)[0]): $_\"",
+      "target": "                        Write-Log \"[Get-ManagedServiceAccountSecurity] Не удалось прочитать dMSA $(@($linkedDMSAs)[0]): $_\""
+    },
+    {
+      "line": 733,
+      "original": "                            Write-Log \"[Get-ManagedServiceAccountSecurity] Failed to parse msDS-GroupMSAMembership for $dmsaName : $_\"",
+      "target": "                            Write-Log \"[Get-ManagedServiceAccountSecurity] Не удалось разобрать msDS-GroupMSAMembership для $dmsaName : $_\""
+    },
+    {
+      "line": 814,
+      "original": "            Write-Log \"[Get-ManagedServiceAccountSecurity] Error: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-ManagedServiceAccountSecurity] Ошибка: $_\" -Level Error"
+    },
+    {
+      "line": 820,
+      "original": "        Write-Log \"[Get-ManagedServiceAccountSecurity] Check completed\"",
+      "target": "        Write-Log \"[Get-ManagedServiceAccountSecurity] Проверка завершена\""
+    },
+    {
+      "line": 953,
+      "original": "        Write-Log \"[Get-ManagedServiceAccountSecurity] Could not read the managed service account membership descriptors: $_\" -Level Warning",
+      "target": "        Write-Log \"[Get-ManagedServiceAccountSecurity] Не удалось прочитать дескрипторы членства управляемых служебных учётных записей: $_\" -Level Warning"
+    },
+    {
+      "line": 1014,
+      "original": "        Write-Log \"[Get-ManagedServiceAccountSecurity] Could not read the descriptor owner of $Name : $_\"",
+      "target": "        Write-Log \"[Get-ManagedServiceAccountSecurity] Не удалось прочитать владельца дескриптора для $Name : $_\""
+    },
+    {
+      "line": 1093,
+      "original": "            Write-Log \"[Get-ManagedServiceAccountSecurity] Could not classify password reader $readerSID : $_\"",
+      "target": "            Write-Log \"[Get-ManagedServiceAccountSecurity] Не удалось определить категорию читателя пароля $readerSID : $_\""
+    }
+  ]
+}
