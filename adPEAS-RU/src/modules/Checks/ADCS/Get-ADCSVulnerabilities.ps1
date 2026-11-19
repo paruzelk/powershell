@@ -116,7 +116,7 @@
                 # Use SID if available (more reliable), otherwise use name
                 $identity = if ($principalSID) { $principalSID } else { $principalName }
 
-                Write-Log "[Get-EnrollmentPrivilegeState] Checking: $principalName (SID: $principalSID, using: $identity)"
+                Write-Log "[Get-EnrollmentPrivilegeState] Проверка субъекта: $principalName (SID: $principalSID, используется: $identity)"
 
                 # Use central Test-IsPrivileged function
                 $result = Test-IsPrivileged -Identity $identity
@@ -124,15 +124,15 @@
                 # Only Category 'Privileged' counts as truly privileged
                 # Operators, BroadGroups, Standard, and Unknown are NOT privileged for enrollment purposes
                 if ($result.Category -ne 'Privileged') {
-                    Write-Log "[Get-EnrollmentPrivilegeState] Found non-privileged: $principalName (Category: $($result.Category), Reason: $($result.Reason))"
+                    Write-Log "[Get-EnrollmentPrivilegeState] Найден непривилегированный субъект: $principalName (категория: $($result.Category), причина: $($result.Reason))"
                     return 'NonPrivileged'
                 }
 
-                Write-Log "[Get-EnrollmentPrivilegeState] Privileged: $principalName (Category: $($result.Category))"
+                Write-Log "[Get-EnrollmentPrivilegeState] Привилегированный субъект: $principalName (категория: $($result.Category))"
             }
 
             # All principals are truly privileged
-            Write-Log "[Get-EnrollmentPrivilegeState] All enrollment principals are truly privileged"
+            Write-Log "[Get-EnrollmentPrivilegeState] Все субъекты с правом регистрации сертификатов действительно привилегированы"
             return 'Privileged'
         }
     }
@@ -202,7 +202,7 @@
                 }
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] Error querying Root CAs: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] Ошибка запроса корневых УЦ: $_" -Level Warning
             }
 
             # --- NTAuth Store (certificates trusted for domain authentication / PKINIT) ---
@@ -282,12 +282,12 @@
                         }
 
                         if ($ntAuthIssuers.Count -gt 1) {
-                            Show-Line ("$($ntAuthIssuers.Count) different CAs are trusted to issue a certificate that logs " +
-                                       "on as any account - each one is a trust anchor for the whole forest") -Class Hint
+                            Show-Line ("$($ntAuthIssuers.Count) различных УЦ могут выдавать сертификаты для входа " +
+                                       "от имени любой учётной записи — каждый из них является якорем доверия всего леса") -Class Hint
                         }
                         if ($foreignCount -gt 0) {
-                            Show-Line ("$foreignCount NTAuth certificate(s) belong to no Enterprise CA of this forest - " +
-                                       "verify each was added on purpose, and who holds its key") -Class Hint -FindingId 'NTAUTH_FOREIGN_ISSUER'
+                            Show-Line ("$foreignCount сертификатов NTAuth не относятся ни к одному корпоративному УЦ этого леса — " +
+                                       "проверьте обоснованность их добавления и владельцев закрытых ключей") -Class Hint -FindingId 'NTAUTH_FOREIGN_ISSUER'
                         }
                         if ($expiredCount -gt 0) {
                             Show-Line "Сертификатов NTAuth с истёкшим сроком действия, которые можно удалить после проверки зависимостей: $expiredCount" -Class Hint -FindingId 'PKI_CERTIFICATE_EXPIRED'
@@ -307,7 +307,7 @@
                 }
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] Error querying NTAuth Store: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] Ошибка запроса хранилища NTAuth: $_" -Level Warning
             }
 
             # --- AIA CAs (Authority Information Access) ---
@@ -343,7 +343,7 @@
                 }
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] Error querying AIA CAs: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] Ошибка запроса УЦ AIA: $_" -Level Warning
             }
 
             # Step 1: Enumerate Certificate Authorities (Infrastructure)
@@ -352,7 +352,7 @@
             # Check if query failed (auth error, network issue, etc.)
             $queryError = $caResults | Where-Object { $_._QueryError -eq $true }
             if ($queryError) {
-                Write-Log "[Get-ADCSVulnerabilities] CA query failed: $($queryError.ErrorMessage)"
+                Write-Log "[Get-ADCSVulnerabilities] Не удалось запросить УЦ: $($queryError.ErrorMessage)"
                 Show-Line "Не удалось запросить центры сертификации: ошибка LDAP, проверки подлинности или сети" -Class Finding
                 return
             }
@@ -390,28 +390,28 @@
                     if ($caComputer) {
                         $isInactive = $null -ne ($caComputer | Test-AccountActivity -IsInactive)
                         if ($isInactive) {
-                            Write-Log "[Get-ADCSVulnerabilities] Skipping HTTP check for $($ca.DNSHostName) - CA server inactive"
+                            Write-Log "[Get-ADCSVulnerabilities] HTTP-проверка для $($ca.DNSHostName) пропущена — сервер УЦ неактивен"
                             $skipHttpCheck = $true
                         }
                     }
                     # No computer object (cross-domain) - still attempt HTTP check since we have the hostname
 
                     if (-not $skipHttpCheck) {
-                        Write-Log "[Get-ADCSVulnerabilities] Checking web enrollment for $($ca.DNSHostName) (CA: $($ca.Name))..."
+                        Write-Log "[Get-ADCSVulnerabilities] Проверка веб-регистрации для $($ca.DNSHostName) (УЦ: $($ca.Name))..."
 
                         try {
                             # Pass CA name for CES endpoint detection
                             # The CES URL pattern is: https://<hostname>/<CAName>_CES_<AuthType>/service.svc
                             $webEnrollmentResult = Invoke-HTTPRequest -ScanADCS -Uri $ca.DNSHostName -CAName $ca.Name -TestEPA
                             if ($webEnrollmentResult.Success) {
-                                Write-Log "[Get-ADCSVulnerabilities] Web enrollment check successful for $($ca.DNSHostName)"
+                                Write-Log "[Get-ADCSVulnerabilities] Проверка веб-регистрации для $($ca.DNSHostName) успешна"
                                 if ($null -ne $webEnrollmentResult.EPAEnabled) {
-                                    Write-Log "[Get-ADCSVulnerabilities] EPA detection: Enabled=$($webEnrollmentResult.EPAEnabled), Confidence=$($webEnrollmentResult.EPAConfidence)"
+                                    Write-Log "[Get-ADCSVulnerabilities] Определение EPA: включено=$($webEnrollmentResult.EPAEnabled), достоверность=$($webEnrollmentResult.EPAConfidence)"
                                 }
                             }
                         }
                         catch {
-                            Write-Log "[Get-ADCSVulnerabilities] Web enrollment check failed: $_"
+                            Write-Log "[Get-ADCSVulnerabilities] Не удалось проверить веб-регистрацию: $_"
                         }
                     }
                 }
@@ -521,7 +521,7 @@
                             $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'ADCSEnroll' -ReturnDetails
 
                             if ($scopeResult.Severity -eq 'Expected') {
-                                Write-Log "[Get-ADCSVulnerabilities] Expected identity $aceSID has $aceRights on CA $($ca.Name)"
+                                Write-Log "[Get-ADCSVulnerabilities] Ожидаемый субъект $aceSID имеет права $aceRights на УЦ $($ca.Name)"
                                 continue
                             }
 
@@ -529,7 +529,7 @@
                             # Test-IsPrivileged checks static SIDs, RID suffixes, AND recursive group membership
                             $privCheck = Test-IsPrivileged -Identity $aceSID
                             if ($privCheck.IsPrivileged -eq $true) {
-                                Write-Log "[Get-ADCSVulnerabilities] Privileged identity $identityName ($($privCheck.Category): $($privCheck.Reason)) has $aceRights on CA $($ca.Name) - expected"
+                                Write-Log "[Get-ADCSVulnerabilities] Привилегированный субъект $identityName ($($privCheck.Category): $($privCheck.Reason)) имеет ожидаемые права $aceRights на УЦ $($ca.Name)"
                                 continue
                             }
 
@@ -538,7 +538,7 @@
                             if ($identityName -and $ca.DNSHostName) {
                                 $caComputerName = ($ca.DNSHostName -split '\.')[0]
                                 if ($identityName -match "\\$caComputerName`$" -or $identityName -eq "$caComputerName`$") {
-                                    Write-Log "[Get-ADCSVulnerabilities] CA server $caComputerName has $aceRights on its own AD object - expected"
+                                    Write-Log "[Get-ADCSVulnerabilities] Сервер УЦ $caComputerName имеет ожидаемые права $aceRights на собственный объект AD"
                                     continue
                                 }
                             }
@@ -554,7 +554,7 @@
                     }
                 }
                 catch {
-                    Write-Log "[Get-ADCSVulnerabilities] CA AD object ACL check failed for '$($ca.Name)': $_"
+                    Write-Log "[Get-ADCSVulnerabilities] Не удалось проверить ACL объекта УЦ '$($ca.Name)' в AD: $_"
                 }
 
                 # ===== Display: CA info =====
@@ -709,21 +709,21 @@
                             if ($caCert.SignatureAlgorithm -and $caCert.SignatureAlgorithm -match 'sha1|md5|md2') {
                                 $caComputer | Add-Member -NotePropertyName 'CACertWeakSignature' -NotePropertyValue "Weak signature algorithm: $($caCert.SignatureAlgorithm)" -Force
                                 $caVulnerabilityCount++
-                                Write-Log "[Get-ADCSVulnerabilities] CA '$($ca.Name)' uses weak signature algorithm: $($caCert.SignatureAlgorithm)"
+                                Write-Log "[Get-ADCSVulnerabilities] УЦ '$($ca.Name)' использует слабый алгоритм подписи: $($caCert.SignatureAlgorithm)"
                             }
 
                             # Flag short key length
                             if ($caCert.PublicKeyLength -gt 0 -and $caCert.PublicKeyLength -lt 2048) {
                                 $caComputer | Add-Member -NotePropertyName 'CACertShortKey' -NotePropertyValue "Insufficient key length: $($caCert.PublicKeyLength) bit (minimum 2048 recommended)" -Force
                                 $caVulnerabilityCount++
-                                Write-Log "[Get-ADCSVulnerabilities] CA '$($ca.Name)' uses short key: $($caCert.PublicKeyLength) bit"
+                                Write-Log "[Get-ADCSVulnerabilities] УЦ '$($ca.Name)' использует короткий ключ: $($caCert.PublicKeyLength) бит"
                             }
 
                             # Flag expired certificates
                             if ($caCert.Status -eq 'EXPIRED') {
                                 $caComputer | Add-Member -NotePropertyName 'CACertExpired' -NotePropertyValue "CA certificate expired on $(Format-adPEASDate $caCert.NotAfter 'yyyy-MM-dd')" -Force
                                 $caVulnerabilityCount++
-                                Write-Log "[Get-ADCSVulnerabilities] CA '$($ca.Name)' certificate is EXPIRED"
+                                Write-Log "[Get-ADCSVulnerabilities] Срок сертификата УЦ '$($ca.Name)' ИСТЁК"
                             }
                         }
 
@@ -751,7 +751,7 @@
                         # Computer object not found in current domain partition
                         # (e.g., CA server is in root domain but we query from sub-domain)
                         # Build a synthetic object from CA enrollment service data (Configuration Partition)
-                        Write-Log "[Get-ADCSVulnerabilities] CA computer '$($ca.DNSHostName)' not found in current domain - using Configuration Partition data"
+                        Write-Log "[Get-ADCSVulnerabilities] Компьютер УЦ '$($ca.DNSHostName)' не найден в текущем домене — используются данные Configuration"
                         # Assigned as a statement, not inside the literal below: an "if" used
                         # as an expression unrolls a one-element array to a scalar, so a CA
                         # publishing a single template would arrive as a string here and the
@@ -942,7 +942,7 @@
                 $allFindings = @()
 
                 foreach ($container in $pkiContainers) {
-                    Write-Log "[Get-ADCSVulnerabilities] ESC5: Checking $($container.Name)..."
+                    Write-Log "[Get-ADCSVulnerabilities] ESC5: проверка $($container.Name)..."
 
                     try {
                         # Get ACL for container - use Invoke-LDAPSearch with explicit SearchBase and -Raw
@@ -1035,12 +1035,12 @@
                                         $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'PKIContainer' -ReturnDetails
 
                                         if ($scopeResult.Severity -eq 'Expected') {
-                                            Write-Log "[Get-ADCSVulnerabilities] Expected identity $aceSID has $aceRights on $($container.Name)"
+                                            Write-Log "[Get-ADCSVulnerabilities] Ожидаемый субъект $aceSID имеет права $aceRights на $($container.Name)"
                                             continue
                                         }
 
                                         if ($scopeResult.Severity -eq 'Attention') {
-                                            Write-Log "[Get-ADCSVulnerabilities] Privileged identity $aceSID has $aceRights on $($container.Name) - skipped (use -IncludePrivileged to include)"
+                                            Write-Log "[Get-ADCSVulnerabilities] Привилегированный субъект $aceSID обладает правами $aceRights на $($container.Name) — пропущен (для включения укажите -IncludePrivileged)"
                                             continue
                                         }
 
@@ -1049,7 +1049,7 @@
                                         # -IncludePrivileged: Show ALL accounts, but mark privileged ones
                                         $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'PKIContainer' -ReturnDetails
                                         $severity = $scopeResult.Severity
-                                        Write-Log "[Get-ADCSVulnerabilities] IncludePrivileged: Including $aceSID with severity $severity"
+                                        Write-Log "[Get-ADCSVulnerabilities] IncludePrivileged: субъект $aceSID включён с критичностью $severity"
                                     }
 
                                     # Add to findings
@@ -1075,7 +1075,7 @@
                             try {
                                 $containerOwnerSID = [string]$secDescriptor.GetOwner([System.Security.Principal.SecurityIdentifier])
                             } catch {
-                                Write-Log "[Get-ADCSVulnerabilities] ESC5: Owner of $($container.Name) could not be read: $_"
+                                Write-Log "[Get-ADCSVulnerabilities] ESC5: не удалось прочитать владельца $($container.Name): $_"
                             }
 
                             if ($containerOwnerSID) {
@@ -1091,13 +1091,13 @@
                                         ContainerDescription = $container.Description
                                     }
                                 } else {
-                                    Write-Log "[Get-ADCSVulnerabilities] ESC5: $($container.Name) is owned by $containerOwnerSID, which the PKIContainer scope expects"
+                                    Write-Log "[Get-ADCSVulnerabilities] ESC5: владелец $($container.Name) — $containerOwnerSID, что соответствует правилам области PKIContainer"
                                 }
                             }
                         }
                     }
                     catch {
-                        Write-Log "[Get-ADCSVulnerabilities] Error checking $($container.Name): $_" -Level Warning
+                        Write-Log "[Get-ADCSVulnerabilities] Ошибка проверки $($container.Name): $_" -Level Warning
                     }
                 }
 
@@ -1157,7 +1157,7 @@
                 }
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] Error during ESC5 check: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] Ошибка проверки ESC5: $_" -Level Warning
                 Show-Line "Ошибка проверки разрешений контейнеров PKI" -Class Hint
             }
 
@@ -1168,7 +1168,7 @@
             # Check if query failed (auth error, network issue, etc.)
             $templateQueryError = $templateResults | Where-Object { $_._QueryError -eq $true }
             if ($templateQueryError) {
-                Write-Log "[Get-ADCSVulnerabilities] Template query failed: $($templateQueryError.ErrorMessage)"
+                Write-Log "[Get-ADCSVulnerabilities] Не удалось запросить шаблоны: $($templateQueryError.ErrorMessage)"
                 Show-Line "Не удалось запросить шаблоны сертификатов: ошибка LDAP, проверки подлинности или сети" -Class Finding
                 return
             }
@@ -1215,11 +1215,11 @@
                 }
 
                 if ($oidToGroupLink.Count -gt 0) {
-                    Write-Log "[Get-ADCSVulnerabilities] ESC13 cache: Found $($oidToGroupLink.Count) issuance policy OID(s) with group links"
+                    Write-Log "[Get-ADCSVulnerabilities] Кэш ESC13: найдено политик выдачи с OID и привязкой к группам — $($oidToGroupLink.Count)"
                 }
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] ESC13: Error loading issuance policy cache: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] ESC13: ошибка загрузки кэша политик выдачи: $_" -Level Warning
             }
 
             # One line for the whole section when the publication gate could not be applied.
@@ -1254,7 +1254,7 @@
                 }
             }
             if (@($agentTemplateNames).Count -gt 0) {
-                Write-Log "[Get-ADCSVulnerabilities] ESC3 chain: $(@($agentTemplateNames).Count) enrollment agent template(s) enrollable by non-privileged principals: $($agentTemplateNames -join ', ')"
+                Write-Log "[Get-ADCSVulnerabilities] Цепочка ESC3: шаблонов агента регистрации, доступных непривилегированным субъектам — $(@($agentTemplateNames).Count): $($agentTemplateNames -join ', ')"
             }
 
             # Every template's security descriptor in one query. The ESC4 analysis below
@@ -1274,10 +1274,10 @@
                         $templateDescriptors[[string]$rawTemplate.distinguishedName] = $rawTemplate.nTSecurityDescriptor
                     }
                 }
-                Write-Log "[Get-ADCSVulnerabilities] Prefetched $($templateDescriptors.Count) template security descriptor(s) in one query"
+                Write-Log "[Get-ADCSVulnerabilities] Дескрипторов безопасности шаблонов, предварительно полученных одним запросом: $($templateDescriptors.Count)"
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] Template descriptor prefetch failed, falling back to one read per template: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] Не удалось предварительно получить дескрипторы шаблонов; переход к отдельным запросам: $_" -Level Warning
             }
 
             # Step 3: Analyze Templates for Vulnerabilities (only enabled templates)
@@ -1306,11 +1306,11 @@
                 $enrollmentRightsUnknown = ($enrollmentState -eq 'Unknown')
 
                 if ($enrollmentState -eq 'Privileged') {
-                    Write-Log "[Get-ADCSVulnerabilities] Template '$($template.Name)': All enrollment principals are truly privileged - skipping ESC1/2/3/9/15"
+                    Write-Log "[Get-ADCSVulnerabilities] Шаблон '$($template.Name)': все субъекты регистрации привилегированы — ESC1/2/3/9/15 пропущены"
                 } elseif ($enrollmentState -eq 'NotEnrollable') {
-                    Write-Log "[Get-ADCSVulnerabilities] Template '$($template.Name)': no principal holds Certificate-Enrollment - skipping ESC1/2/3/9/15"
+                    Write-Log "[Get-ADCSVulnerabilities] Шаблон '$($template.Name)': нет субъекта с правом Certificate-Enrollment — ESC1/2/3/9/15 пропущены"
                 } elseif ($enrollmentRightsUnknown) {
-                    Write-Log "[Get-ADCSVulnerabilities] Template '$($template.Name)': enrollment rights could not be read - ESC1/2/3/9/15 cannot be decided" -Level Warning
+                    Write-Log "[Get-ADCSVulnerabilities] Шаблон '$($template.Name)': не удалось прочитать права регистрации — невозможно оценить ESC1/2/3/9/15" -Level Warning
                 }
 
                 # Registration Authority barrier: a template that demands co-signatures cannot be
@@ -1542,13 +1542,13 @@
 
                                 # Skip Expected (direct match like Domain Admins group)
                                 if ($scopeResult.Severity -eq 'Expected') {
-                                    Write-Log "[Get-ADCSVulnerabilities] Expected identity $aceSID has $aceRights on template $($template.Name)"
+                                    Write-Log "[Get-ADCSVulnerabilities] Ожидаемый субъект $aceSID имеет права $aceRights на шаблон $($template.Name)"
                                     continue
                                 }
 
                                 # Skip Attention (member of privileged group)
                                 if ($scopeResult.Severity -eq 'Attention') {
-                                    Write-Log "[Get-ADCSVulnerabilities] Privileged identity $aceSID (member of admin group) has $aceRights on template $($template.Name) - skipped (use -IncludePrivileged to include)"
+                                    Write-Log "[Get-ADCSVulnerabilities] Привилегированный субъект $aceSID (участник группы администраторов) обладает правами $aceRights на шаблон $($template.Name) — пропущен (для включения укажите -IncludePrivileged)"
                                     continue
                                 }
 
@@ -1559,7 +1559,7 @@
                                 # Expected or Attention -> will be shown in yellow (Hint)
                                 # Finding -> will be shown in red
                                 $severity = $scopeResult.Severity
-                                Write-Log "[Get-ADCSVulnerabilities] IncludePrivileged: Including $identityName ($aceSID) with severity $severity"
+                                Write-Log "[Get-ADCSVulnerabilities] IncludePrivileged: субъект $identityName ($aceSID) включён с критичностью $severity"
                             }
 
                             # Account with dangerous rights - ESC4
@@ -1583,7 +1583,7 @@
                         try {
                             $templateOwnerSID = [string]$securityDescriptor.GetOwner([System.Security.Principal.SecurityIdentifier])
                         } catch {
-                            Write-Log "[Get-ADCSVulnerabilities] ESC4: Owner of template '$($template.Name)' could not be read: $_"
+                            Write-Log "[Get-ADCSVulnerabilities] ESC4: не удалось прочитать владельца шаблона '$($template.Name)': $_"
                         }
 
                         if ($templateOwnerSID) {
@@ -1599,7 +1599,7 @@
                                     Severity = $ownerScope.Severity
                                 }
                             } else {
-                                Write-Log "[Get-ADCSVulnerabilities] ESC4: Template '$($template.Name)' is owned by $templateOwnerSID, which the ADCSTemplateWrite scope expects"
+                                Write-Log "[Get-ADCSVulnerabilities] ESC4: владелец шаблона '$($template.Name)' — $templateOwnerSID, что соответствует правилам области ADCSTemplateWrite"
                             }
                         }
 
@@ -1617,12 +1617,12 @@
                                 DangerousACEs = $dangerousACEs
                             }
 
-                            Write-Log "[Get-ADCSVulnerabilities] ESC4: Template '$($template.Name)' has dangerous permissions for: $identities"
+                            Write-Log "[Get-ADCSVulnerabilities] ESC4: обнаружены опасные права на шаблон '$($template.Name)' у субъектов: $identities"
                         }
                     }
                 }
                 catch {
-                    Write-Log "[Get-ADCSVulnerabilities] ESC4 check failed for template '$($template.Name)': $_"
+                    Write-Log "[Get-ADCSVulnerabilities] Ошибка проверки ESC4 для шаблона '$($template.Name)': $_"
                 }
 
                 # ===== ESC9: No Security Extension + Client Auth =====
@@ -1681,7 +1681,7 @@
                                 }
                             }
                             catch {
-                                Write-Log "[Get-ADCSVulnerabilities] ESC13: Error resolving group '$($linkInfo.GroupLinkDN)': $_" -Level Debug
+                                Write-Log "[Get-ADCSVulnerabilities] ESC13: не удалось определить группу '$($linkInfo.GroupLinkDN)': $_" -Level Debug
                             }
 
                             $verdictText = 'privilege not assessed - the group could not be resolved'
@@ -1693,7 +1693,7 @@
                             }
 
                             $linkedPolicies += "$($linkInfo.PolicyName) (OID: $policyOID) -> $groupName [$verdictText]"
-                            Write-Log "[Get-ADCSVulnerabilities] ESC13: Template '$($template.Name)' - Policy '$($linkInfo.PolicyName)' linked to group '$groupName'"
+                            Write-Log "[Get-ADCSVulnerabilities] ESC13: шаблон '$($template.Name)' — политика '$($linkInfo.PolicyName)' связана с группой '$groupName'"
                         }
                     }
 
@@ -1825,13 +1825,13 @@
 
         }
         catch {
-            Write-Log "[Get-ADCSVulnerabilities] Error: $_" -Level Error
+            Write-Log "[Get-ADCSVulnerabilities] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: уязвимости служб сертификатов оценить не удалось: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-ADCSVulnerabilities] AD CS vulnerability scan complete"
+        Write-Log "[Get-ADCSVulnerabilities] Проверка уязвимостей AD CS завершена"
     }
 }
 

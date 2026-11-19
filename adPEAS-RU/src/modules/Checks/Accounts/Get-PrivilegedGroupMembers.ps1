@@ -58,7 +58,7 @@
     )
 
     begin {
-        Write-Log "[Get-PrivilegedGroupMembers] Starting privileged group enumeration"
+        Write-Log "[Get-PrivilegedGroupMembers] Начато перечисление привилегированных групп"
 
         # Built-in privileged groups (well-known SIDs)
         $Script:PrivilegedGroupSIDs = @{
@@ -148,13 +148,13 @@
                 if ($domainDN) {
                     $local = $groups | Where-Object { $_.distinguishedName -like "*,$domainDN" }
                     if ($local) {
-                        Write-Log "[Get-PrivilegedGroupMembers] GC returned $($groups.Count) results - filtered to current domain"
+                        Write-Log "[Get-PrivilegedGroupMembers] GC вернул $($groups.Count) результатов — выполнена фильтрация по текущему домену"
                         return $local | Select-Object -First 1
                     }
                 }
 
                 # Fallback: first result
-                Write-Log "[Get-PrivilegedGroupMembers] GC returned $($groups.Count) results - using first"
+                Write-Log "[Get-PrivilegedGroupMembers] GC вернул $($groups.Count) результатов — используется первый"
                 return $groups | Select-Object -First 1
             }
 
@@ -180,7 +180,7 @@
     # the "how do I get to Domain Admin" section is for. The entry is removed again on the
     # way out, below.
     if ($Visited.ContainsKey($GroupDN)) {
-                    Write-Log "[Get-PrivilegedGroupMembers] Circular reference detected: $GroupDN"
+                    Write-Log "[Get-PrivilegedGroupMembers] Обнаружена циклическая ссылка: $GroupDN"
                     return @{
                         DirectMembers = @()
                         NestedGroups = @()
@@ -196,23 +196,23 @@
                     $Group = $GroupObject
                     if (-not $Group) {
                         $Group = @(Get-DomainGroup -Identity $GroupDN @CredentialParams)[0]
-                        Write-Log "[Get-PrivilegedGroupMembers] Fetched nested group: $GroupName (DN: $GroupDN)"
+                        Write-Log "[Get-PrivilegedGroupMembers] Получена вложенная группа: $GroupName (DN: $GroupDN)"
                     } else {
-                        Write-Log "[Get-PrivilegedGroupMembers] Using pre-fetched group: $GroupName (DN: $GroupDN)"
+                        Write-Log "[Get-PrivilegedGroupMembers] Используется уже полученная группа: $GroupName (DN: $GroupDN)"
                     }
 
                     if (-not $Group) {
-                        Write-Log "[Get-PrivilegedGroupMembers] WARNING: Group not found by DN: $GroupDN"
+                        Write-Log "[Get-PrivilegedGroupMembers] ПРЕДУПРЕЖДЕНИЕ: группа по DN не найдена: $GroupDN"
                         return @{ DirectMembers = @(); NestedGroups = @() }
                     }
 
                     $memberAttr = $Group.member
                     $memberCount = if ($memberAttr) { @($memberAttr).Count } else { 0 }
-                    Write-Log "[Get-PrivilegedGroupMembers] Group found: True, Member count: $memberCount"
+                    Write-Log "[Get-PrivilegedGroupMembers] Группа найдена: True, число участников: $memberCount"
 
                     if ($memberAttr) {
                         $MemberDNs = @($Group.member)
-                        Write-Log "[Get-PrivilegedGroupMembers] Group '$GroupName' has $($MemberDNs.Count) direct members (Nesting Level: $NestingLevel)"
+                        Write-Log "[Get-PrivilegedGroupMembers] У группы '$GroupName' прямых участников: $($MemberDNs.Count) (уровень вложенности: $NestingLevel)"
 
                         foreach ($MemberDN in $MemberDNs) {
                             # Skip empty/null member DNs (can occur with GC multi-domain results)
@@ -225,7 +225,7 @@
                             # to a different domain (e.g. parent domain user in child domain group),
                             # try resolving via Global Catalog (port 3268/3269)
                             if (-not $Member -and $domainDN -and -not $MemberDN.EndsWith(",$domainDN")) {
-                                Write-Log "[Get-PrivilegedGroupMembers] Cross-domain member detected: $MemberDN - trying GC lookup"
+                                Write-Log "[Get-PrivilegedGroupMembers] Участник другого домена: $MemberDN — поиск через GC"
                                 try {
                                     $gcConn = Get-GCConnection
                                     if ($gcConn) {
@@ -234,11 +234,11 @@
                                         $escapedMemberDN = Escape-LDAPFilterDN -DistinguishedName $MemberDN
                                         $Member = @(Invoke-LDAPSearch -Filter "(&(objectClass=*)(distinguishedName=$escapedMemberDN))" -SizeLimit 1 -LdapConnection $gcConn)[0]
                                         if ($Member) {
-                                            Write-Log "[Get-PrivilegedGroupMembers] GC resolved cross-domain member: $($Member.distinguishedName)"
+                                            Write-Log "[Get-PrivilegedGroupMembers] Участник другого домена определён через GC: $($Member.distinguishedName)"
                                         }
                                     }
                                 } catch {
-                                    Write-Log "[Get-PrivilegedGroupMembers] GC lookup failed for $MemberDN : $_"
+                                    Write-Log "[Get-PrivilegedGroupMembers] Ошибка поиска через GC для $MemberDN — $_"
                                 }
                             }
 
@@ -372,7 +372,7 @@
                         }
                     }
                 } catch {
-                    Write-Log "[Get-PrivilegedGroupMembers] Error resolving members for $GroupDN : $_"
+                    Write-Log "[Get-PrivilegedGroupMembers] Ошибка определения участников $GroupDN — $_"
                 } finally {
                     # Out of this branch again, so $Visited describes the current path rather
                     # than everything the walk has seen. A real cycle is still caught: an
@@ -515,11 +515,11 @@
 
                 $primaryTotal = ($PrimaryGroupMembers.Values | ForEach-Object { @($_).Count } | Measure-Object -Sum).Sum
                 if (-not $primaryTotal) { $primaryTotal = 0 }
-                Write-Log "[Get-PrivilegedGroupMembers] $primaryTotal account(s) hold a privileged group as their primary group"
+                Write-Log "[Get-PrivilegedGroupMembers] Учётных записей с привилегированной первичной группой: $primaryTotal"
             } catch {
                 # Not fatal: the member-based enumeration below is the main path, and losing
                 # this one costs coverage rather than the whole check.
-                Write-Log "[Get-PrivilegedGroupMembers] Primary group query failed: $($_.Exception.Message)" -Level Warning
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка запроса первичных групп: $($_.Exception.Message)" -Level Warning
             }
 
             foreach ($RID in $Script:PrivilegedGroupRIDs.Keys) {
@@ -527,7 +527,7 @@
                     $GroupSID = "$DomainSID-$RID"
                     $GroupNameEN = $Script:PrivilegedGroupRIDs[$RID]
 
-                    Write-Log "[Get-PrivilegedGroupMembers] Checking group: $GroupNameEN (SID: $GroupSID)"
+                    Write-Log "[Get-PrivilegedGroupMembers] Проверка группы: $GroupNameEN (SID: $GroupSID)"
 
                     # Find group by SID using Get-DomainGroup
                     $Group = Select-LocalDomainGroup (Get-DomainGroup -Identity $GroupSID @CredParams)
@@ -535,7 +535,7 @@
                     if ($Group) {
                         # Use actual sAMAccountName from AD (localized, e.g. "Domaenen-Admins" in German)
                         $GroupName = $Group.sAMAccountName
-                        Write-Log "[Get-PrivilegedGroupMembers] Found group: $GroupName ($($Group.distinguishedName))"
+                        Write-Log "[Get-PrivilegedGroupMembers] Группа найдена: $GroupName ($($Group.distinguishedName))"
 
                         # Each top-level group gets its own Visited hashtable to avoid cross-contamination
                         # Pass the already-fetched group object to avoid duplicate LDAP query
@@ -565,7 +565,7 @@
                             # in member as well. Counting it twice would inflate the group and
                             # print the account twice.
                             if (@($Result.DirectMembers | ForEach-Object { $_.DistinguishedName }) -contains $primaryDN) {
-                                Write-Log "[Get-PrivilegedGroupMembers] $primaryDN is a listed and a primary-group member of $GroupName"
+                                Write-Log "[Get-PrivilegedGroupMembers] $primaryDN состоит в $GroupName как прямой участник и через первичную группу"
                                 continue
                             }
 
@@ -595,7 +595,7 @@
                             }
 
                             $PrimaryGroupOf[$primaryDN] = $GroupName
-                            Write-Log "[Get-PrivilegedGroupMembers] $GroupName - primary group member: $primaryDN"
+                            Write-Log "[Get-PrivilegedGroupMembers] $GroupName — участник через первичную группу: $primaryDN"
                         }
 
                         $DirectMemberCount = @($Result.DirectMembers).Count
@@ -604,7 +604,7 @@
                         if ($null -eq $NestedSum) { $NestedSum = 0 }
                         $TotalMemberCount = $DirectMemberCount + $NestedSum
 
-                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName - Direct: $DirectMemberCount, Nested groups: $NestedGroupCount, Total: $TotalMemberCount"
+                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName — прямых участников: $DirectMemberCount, вложенных групп: $NestedGroupCount, всего: $TotalMemberCount"
 
                         # Track unique members and their paths (including nested group members)
                         $AllMembersFromGroup = Get-AllMembersFromResult -Result $Result
@@ -634,10 +634,10 @@
                             }
                         }
                     } else {
-                        Write-Log "[Get-PrivilegedGroupMembers] Group not found: $GroupNameEN (SID: $GroupSID)"
+                        Write-Log "[Get-PrivilegedGroupMembers] Группа не найдена: $GroupNameEN (SID: $GroupSID)"
                     }
                 } catch {
-                    Write-Warning "[Get-PrivilegedGroupMembers] Error checking group $GroupNameEN : $_"
+                    Write-Warning "[Get-PrivilegedGroupMembers] Ошибка проверки группы $GroupNameEN — $_"
                 }
             }
 
@@ -645,14 +645,14 @@
             foreach ($SID in $Script:PrivilegedGroupSIDs.Keys) {
                 try {
                     $GroupNameEN = $Script:PrivilegedGroupSIDs[$SID]
-                    Write-Log "[Get-PrivilegedGroupMembers] Checking built-in group: $GroupNameEN (SID: $SID)"
+                    Write-Log "[Get-PrivilegedGroupMembers] Проверка встроенной группы: $GroupNameEN (SID: $SID)"
 
                     $Group = Select-LocalDomainGroup (Get-DomainGroup -Identity $SID @CredParams)
 
                     if ($Group) {
                         # Use actual sAMAccountName from AD (localized, e.g. "Administratoren" in German)
                         $GroupName = $Group.sAMAccountName
-                        Write-Log "[Get-PrivilegedGroupMembers] Found built-in group: $GroupName ($($Group.distinguishedName))"
+                        Write-Log "[Get-PrivilegedGroupMembers] Встроенная группа найдена: $GroupName ($($Group.distinguishedName))"
 
                         # Each top-level group gets its own Visited hashtable to avoid cross-contamination
                         # Pass the already-fetched group object to avoid duplicate LDAP query
@@ -667,7 +667,7 @@
                         $TotalMemberCount = $DirectMemberCount + $NestedSum
                         if ($SID -eq 'S-1-5-32-548') { $accountOperatorMembers = $TotalMemberCount }
 
-                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName - Direct: $DirectMemberCount, Nested groups: $NestedGroupCount, Total: $TotalMemberCount"
+                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName — прямых участников: $DirectMemberCount, вложенных групп: $NestedGroupCount, всего: $TotalMemberCount"
 
                         # Track unique members and their paths (including nested group members)
                         $AllMembersFromGroup = Get-AllMembersFromResult -Result $Result
@@ -696,10 +696,10 @@
                             }
                         }
                     } else {
-                        Write-Log "[Get-PrivilegedGroupMembers] Built-in group not found: $GroupNameEN (SID: $SID)"
+                        Write-Log "[Get-PrivilegedGroupMembers] Встроенная группа не найдена: $GroupNameEN (SID: $SID)"
                     }
                 } catch {
-                    Write-Warning "[Get-PrivilegedGroupMembers] Error checking built-in group $GroupNameEN : $_"
+                    Write-Warning "[Get-PrivilegedGroupMembers] Ошибка проверки встроенной группы $GroupNameEN — $_"
                 }
             }
 
@@ -707,14 +707,14 @@
             $domainDN = $Script:LDAPContext.DomainDN
             foreach ($GroupNameDynamic in $Script:DynamicPrivilegedGroups) {
                 try {
-                    Write-Log "[Get-PrivilegedGroupMembers] Checking dynamic group: $GroupNameDynamic"
+                    Write-Log "[Get-PrivilegedGroupMembers] Проверка динамической группы: $GroupNameDynamic"
 
                     $Group = Select-LocalDomainGroup (Get-DomainGroup -Identity $GroupNameDynamic @CredParams)
 
                     if ($Group) {
                         # Use actual sAMAccountName from AD (dynamic groups may have localized names)
                         $GroupName = $Group.sAMAccountName
-                        Write-Log "[Get-PrivilegedGroupMembers] Found dynamic group: $GroupName ($($Group.distinguishedName))"
+                        Write-Log "[Get-PrivilegedGroupMembers] Динамическая группа найдена: $GroupName ($($Group.distinguishedName))"
 
                         # Each top-level group gets its own Visited hashtable to avoid cross-contamination
                         # Pass the already-fetched group object to avoid duplicate LDAP query
@@ -729,7 +729,7 @@
                         if ($null -eq $NestedSum) { $NestedSum = 0 }
                         $TotalMemberCount = $DirectMemberCount + $NestedSum
 
-                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName - Direct: $DirectMemberCount, Nested groups: $NestedGroupCount, Total: $TotalMemberCount"
+                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName — прямых участников: $DirectMemberCount, вложенных групп: $NestedGroupCount, всего: $TotalMemberCount"
 
                         # Track unique members and their paths (including nested group members)
                         $AllMembersFromGroup = Get-AllMembersFromResult -Result $Result
@@ -758,10 +758,10 @@
                             }
                         }
                     } else {
-                        Write-Log "[Get-PrivilegedGroupMembers] Dynamic group not found: $GroupNameDynamic"
+                        Write-Log "[Get-PrivilegedGroupMembers] Динамическая группа не найдена: $GroupNameDynamic"
                     }
                 } catch {
-                    Write-Warning "[Get-PrivilegedGroupMembers] Error checking dynamic group $GroupNameDynamic : $_"
+                    Write-Warning "[Get-PrivilegedGroupMembers] Ошибка проверки динамической группы $GroupNameDynamic — $_"
                 }
             }
 
@@ -777,7 +777,7 @@
                         Add-GroupForACLReview -DistinguishedName $exchangeGroup.distinguishedName -Name $exchangeGroup.sAMAccountName -Source 'Exchange group' -Weight 'Finding'
                     }
                 } catch {
-                    Write-Log "[Get-PrivilegedGroupMembers] Lookup of $exchangeGroupName failed: $_"
+                    Write-Log "[Get-PrivilegedGroupMembers] Поиск группы $exchangeGroupName не удался: $_"
                 }
             }
 
@@ -810,21 +810,21 @@
                 $objClass = $memberData.ObjectClass
                 $samName = $memberData.SAMAccountName
 
-                Write-Log "[Get-PrivilegedGroupMembers] Counting member: $samName, ObjectClass: '$objClass'"
+                Write-Log "[Get-PrivilegedGroupMembers] Подсчёт участника: $samName, класс объекта: '$objClass'"
 
                 # gMSA and sMSA are service accounts (specific objectClass)
                 if ($objClass -ieq 'msDS-GroupManagedServiceAccount' -or $objClass -ieq 'msDS-ManagedServiceAccount') {
                     $gMSACount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as gMSA"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как gMSA"
                 }
                 elseif ($objClass -ieq 'msDS-DelegatedManagedServiceAccount') {
                     $dMSACount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as dMSA"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как dMSA"
                 }
                 # Computer accounts (regular computers and DCs)
                 elseif ($objClass -ieq 'computer') {
                     $ComputerCount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as Computer"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как компьютер"
                 }
                 # A principal from a trusted domain or forest. Counted apart from the users:
                 # adPEAS resolves the SID to a name but cannot read the object behind it, so
@@ -833,23 +833,23 @@
                 # other side of the trust and were never enumerated.
                 elseif ($objClass -ieq 'foreignSecurityPrincipal') {
                     $ForeignCount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as foreign principal"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как внешний субъект безопасности"
                 }
                 # User accounts
                 elseif ($objClass -ieq 'user') {
                     $UserCount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as User"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как пользователь"
                 }
                 # Fallback: Check sAMAccountName for $ suffix (computer/gMSA indicator)
                 elseif ($samName -and $samName.EndsWith('$')) {
                     # Could be computer or gMSA - check for gMSA pattern (often has specific naming)
                     $ComputerCount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as Computer ($ suffix fallback)"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как компьютер (резервный признак: суффикс $)"
                 }
                 else {
                     # Default to user for unknown types
                     $UserCount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as User (default fallback, class was: '$objClass')"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как пользователь (резервный вариант; исходный класс: '$objClass')"
                 }
             }
 
@@ -858,13 +858,13 @@
                 Show-Progress -Activity "Analyzing privileged members" -Completed
             }
 
-            Write-Log "[Get-PrivilegedGroupMembers] Count summary: Users=$UserCount, gMSAs=$gMSACount, Computers=$ComputerCount, Foreign=$ForeignCount"
+            Write-Log "[Get-PrivilegedGroupMembers] Сводка: пользователей=$UserCount, gMSA=$gMSACount, компьютеров=$ComputerCount, внешних=$ForeignCount"
 
-            Write-Log "[Get-PrivilegedGroupMembers] AllGroupData contains $TotalGroups groups:"
+            Write-Log "[Get-PrivilegedGroupMembers] В AllGroupData содержится групп: $TotalGroups"
             foreach ($gd in $AllGroupData) {
-                Write-Log "[Get-PrivilegedGroupMembers]   - $($gd.GroupName) (Type: $($gd.GroupType), Members: $($gd.TotalMemberCount))"
+                Write-Log "[Get-PrivilegedGroupMembers]   - $($gd.GroupName) (тип: $($gd.GroupType), участников: $($gd.TotalMemberCount))"
             }
-            Write-Log "[Get-PrivilegedGroupMembers] TotalUniqueMembers: $TotalMembers"
+            Write-Log "[Get-PrivilegedGroupMembers] Всего уникальных участников (TotalUniqueMembers): $TotalMembers"
 
             # Build per-member group membership tracking
             $MemberGroupMemberships = @{}  # DN -> @{ Groups = @(); DirectGroups = @(); NestedVia = @{} }
@@ -1018,7 +1018,7 @@
                     # Cross-domain member resolved via GC - use GC object directly
                     # (local Get-DomainUser/Computer would fail because DN is in another partition)
                     $FullUserObject = $BasicInfo.GCObject
-                    Write-Log "[Get-PrivilegedGroupMembers] Using GC-resolved object for cross-domain member: $($BasicInfo.SAMAccountName)"
+                    Write-Log "[Get-PrivilegedGroupMembers] Используется объект другого домена, найденный через GC: $($BasicInfo.SAMAccountName)"
                 } else {
                     # Get full user/computer object with all attributes
                     $FullUserObject = @(Get-DomainUser -Identity $dn @CredParams)[0]
@@ -1125,7 +1125,7 @@
                 }
             } catch {
                 # Coverage, not a reason to lose the rest of the check.
-                Write-Log "[Get-PrivilegedGroupMembers] Primary-group query for the DC groups failed: $($_.Exception.Message)" -Level Warning
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка запроса первичных групп для групп DC: $($_.Exception.Message)" -Level Warning
             }
 
             # ===== STEP 5: Check AdminSDHolder ACLs =====
@@ -1141,7 +1141,7 @@
                 # Use auth-agnostic LDAP pipeline (works with Kerberos PTT, SimpleBind, etc.)
                 $AdminSDHolderObj = @(Get-DomainObject -Identity $AdminSDHolderDN -Properties 'nTSecurityDescriptor' -Raw @connectionParams)[0]
                 if (-not $AdminSDHolderObj -or -not $AdminSDHolderObj.nTSecurityDescriptor) {
-                    Write-Log "[Get-PrivilegedGroupMembers] Could not retrieve AdminSDHolder security descriptor" -Level Error
+                    Write-Log "[Get-PrivilegedGroupMembers] Не удалось получить дескриптор безопасности AdminSDHolder" -Level Error
                     throw "AdminSDHolder security descriptor not available"
                 }
 
@@ -1188,7 +1188,7 @@
                         # control over AdminSDHolder and, copied by SDProp, over every
                         # protected group and account. This skipped every ACE with a class.
                         if (([string]$ACE.PropagationFlags) -match 'InheritOnly') {
-                            Write-Log "[Get-PrivilegedGroupMembers] Skipping inherit-only ACE on AdminSDHolder: Trustee=$TrusteeSID"
+                            Write-Log "[Get-PrivilegedGroupMembers] Пропущен ACE только для наследования в AdminSDHolder: субъект=$TrusteeSID"
                             continue
                         }
 
@@ -1340,7 +1340,7 @@
 
                         $reported = @($entries | Where-Object { $defaultRights -notcontains $_[0] })
                         if (@($reported).Count -eq 0) {
-                            Write-Log "[Get-PrivilegedGroupMembers] AdminSDHolder: $TrusteeSID holds only its default rights"
+                            Write-Log "[Get-PrivilegedGroupMembers] В AdminSDHolder у $TrusteeSID только права по умолчанию"
                             continue
                         }
                         $Permissions = @($reported | ForEach-Object { $_[1] })
@@ -1356,12 +1356,12 @@
                             $scopeResult = Test-IsExpectedInScope -Identity $TrusteeSID -Scope 'DomainRootACL' -ReturnDetails
 
                             if ($scopeResult.Severity -eq 'Expected') {
-                                Write-Log "[Get-PrivilegedGroupMembers] AdminSDHolder expected: $TrusteeName - $($scopeResult.Reason)"
+                                Write-Log "[Get-PrivilegedGroupMembers] AdminSDHolder: ожидаемые права $TrusteeName — $($scopeResult.Reason)"
                                 continue
                             }
 
                             if ($scopeResult.Severity -eq 'Attention') {
-                                Write-Log "[Get-PrivilegedGroupMembers] AdminSDHolder attention: $TrusteeName - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)"
+                                Write-Log "[Get-PrivilegedGroupMembers] AdminSDHolder: требует внимания $TrusteeName — $($scopeResult.Reason); пропущено (для включения укажите -IncludePrivileged)"
                                 continue
                             }
 
@@ -1370,7 +1370,7 @@
                             # -IncludePrivileged: Show ALL accounts, but mark privileged ones for yellow display
                             $scopeResult = Test-IsExpectedInScope -Identity $TrusteeSID -Scope 'DomainRootACL' -ReturnDetails
                             $severity = $scopeResult.Severity
-                            Write-Log "[Get-PrivilegedGroupMembers] IncludePrivileged: Including AdminSDHolder $TrusteeName ($TrusteeSID) with severity $severity"
+                            Write-Log "[Get-PrivilegedGroupMembers] IncludePrivileged: участник AdminSDHolder $TrusteeName ($TrusteeSID) включён с критичностью $severity"
                         }
 
                         $finding = [PSCustomObject]@{
@@ -1431,7 +1431,7 @@
                                     (Test-ADRightsMask -Rights $ACE.ActiveDirectoryRights -Has ([System.DirectoryServices.ActiveDirectoryRights]::ListChildren)) -or
                                     (Test-ADRightsMask -Rights $ACE.ActiveDirectoryRights -Has ([System.DirectoryServices.ActiveDirectoryRights]::ListObject))))
                             if (-not $hidesTemplate) {
-                                Write-Log "[Get-PrivilegedGroupMembers] Deny on AdminSDHolder that hides nothing: $aceSID $($ACE.ActiveDirectoryRights) $denyType"
+                                Write-Log "[Get-PrivilegedGroupMembers] Запрещающий ACE в AdminSDHolder, который ничего не скрывает: $aceSID $($ACE.ActiveDirectoryRights) $denyType"
                                 continue
                             }
                             $denyName = ConvertFrom-SID -SID $aceSID
@@ -1471,7 +1471,7 @@
                     # object.
                     $holderOwnerSID = $null
                     try { $holderOwnerSID = $SecurityDescriptor.GetOwner([System.Security.Principal.SecurityIdentifier]).Value } catch {
-                        Write-Log "[Get-PrivilegedGroupMembers] Could not read the AdminSDHolder owner: $_"
+                        Write-Log "[Get-PrivilegedGroupMembers] Не удалось прочитать владельца AdminSDHolder: $_"
                     }
                     if ($holderOwnerSID) {
                         $ownerScope = Test-IsExpectedInScope -Identity $holderOwnerSID -Scope 'DomainRootACL' -ReturnDetails
@@ -1506,7 +1506,7 @@
                 }
                 $adminSDHolderRead = $true
             } catch {
-                Write-Log "[Get-PrivilegedGroupMembers] Error checking AdminSDHolder: $_" -Level Error
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка проверки AdminSDHolder: $_" -Level Error
                 $adminSDHolderRead = $false
             }
 
@@ -1528,7 +1528,7 @@
                     -ConnectionParams $connectionParams -AccountOperatorMembers $accountOperatorMembers `
                     -AdminSDExcludedGroups $adminSDExcludedGroups
             } catch {
-                Write-Log "[Get-PrivilegedGroupMembers] Group ACL analysis failed: $_" -Level Error
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка анализа ACL групп: $_" -Level Error
                 Show-Line "Ошибка анализа ACL групп: не удалось оценить привилегированные группы вне защиты AdminSDHolder: $_" -Class Finding
             }
 
@@ -1570,7 +1570,7 @@
                 Show-PrivilegedAccountACL -Accounts $AccountsForACLReview -TemplateRules $AdminSDHolderRules -IncludePrivileged:$IncludePrivileged `
                     -ConnectionParams $connectionParams -AccountOperatorMembers $accountOperatorMembers
             } catch {
-                Write-Log "[Get-PrivilegedGroupMembers] Account ACL analysis failed: $_" -Level Error
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка анализа ACL учётных записей: $_" -Level Error
                 Show-Line "Ошибка анализа ACL привилегированных учётных записей: $_" -Class Finding
             }
 
@@ -1626,7 +1626,7 @@
 
                         if (-not $MemberSID) {
                             $PreWin2000Unresolved += $MemberDN
-                            Write-Log "[Get-PrivilegedGroupMembers] Pre-Windows 2000 member could not be resolved to a SID: $MemberDN" -Level Warning
+                            Write-Log "[Get-PrivilegedGroupMembers] Не удалось определить SID участника Pre-Windows 2000 Compatible Access: $MemberDN" -Level Warning
                             continue
                         }
 
@@ -1709,18 +1709,18 @@
                     Show-Line "Участников Pre-Windows 2000 Compatible Access, которые не разрешены до SID и потому не оценивались: $(@($PreWin2000Unresolved).Count)" -Class Hint
                 }
             } catch {
-                Write-Log "[Get-PrivilegedGroupMembers] Error checking Pre-Windows 2000 Compatible Access: $_" -Level Error
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка проверки Pre-Windows 2000 Compatible Access: $_" -Level Error
                 Show-Line "Не удалось прочитать состав Pre-Windows 2000 Compatible Access; членство не оценивалось" -Class Finding
             }
 
         } catch {
-            Write-Log "[Get-PrivilegedGroupMembers] Error: $_" -Level Error
+            Write-Log "[Get-PrivilegedGroupMembers] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить членство в привилегированных группах: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-PrivilegedGroupMembers] Privileged group enumeration completed"
+        Write-Log "[Get-PrivilegedGroupMembers] Перечисление привилегированных групп завершено"
     }
 }
 
@@ -1766,7 +1766,7 @@ function Get-AdminSDHolderExcludedGroup {
             }
         }
     } catch {
-        Write-Log "[Get-PrivilegedGroupMembers] Could not read dsHeuristics for the AdminSDHolder exclusions: $_"
+        Write-Log "[Get-PrivilegedGroupMembers] Не удалось прочитать dsHeuristics для исключений AdminSDHolder: $_"
     }
     return $excluded
 }
@@ -1919,7 +1919,7 @@ function Show-UnprotectedGroupACL {
         try {
             $groupObject = @(Get-DomainObject -Identity $group.DistinguishedName -Properties 'nTSecurityDescriptor', 'adminCount' -Raw @ConnectionParams)[0]
         } catch {
-            Write-Log "[Get-PrivilegedGroupMembers] Could not read $($group.DistinguishedName): $_"
+            Write-Log "[Get-PrivilegedGroupMembers] Не удалось прочитать $($group.DistinguishedName): $_"
         }
         if (-not $groupObject -or -not $groupObject.nTSecurityDescriptor) {
             $unreadGroups += $groupLabel
@@ -1942,7 +1942,7 @@ function Show-UnprotectedGroupACL {
         try {
             $descriptor.SetSecurityDescriptorBinaryForm([byte[]]$groupObject.nTSecurityDescriptor)
         } catch {
-            Write-Log "[Get-PrivilegedGroupMembers] Could not parse the descriptor of $($group.DistinguishedName): $_"
+            Write-Log "[Get-PrivilegedGroupMembers] Не удалось разобрать дескриптор $($group.DistinguishedName): $_"
             $unreadGroups += $groupLabel
             continue
         }
@@ -2360,7 +2360,7 @@ function Show-PrivilegedAccountACL {
         try {
             $accountObject = @(Get-DomainObject -Identity $account.DistinguishedName -Properties 'nTSecurityDescriptor', 'adminCount' -Raw @ConnectionParams)[0]
         } catch {
-            Write-Log "[Get-PrivilegedGroupMembers] Could not read $($account.DistinguishedName): $_"
+            Write-Log "[Get-PrivilegedGroupMembers] Не удалось прочитать $($account.DistinguishedName): $_"
         }
         if (-not $accountObject -or -not $accountObject.nTSecurityDescriptor) {
             $unreadAccounts += $accountName
@@ -2371,7 +2371,7 @@ function Show-PrivilegedAccountACL {
         try {
             $descriptor.SetSecurityDescriptorBinaryForm([byte[]]$accountObject.nTSecurityDescriptor)
         } catch {
-            Write-Log "[Get-PrivilegedGroupMembers] Could not parse the descriptor of $($account.DistinguishedName): $_"
+            Write-Log "[Get-PrivilegedGroupMembers] Не удалось разобрать дескриптор $($account.DistinguishedName): $_"
             $unreadAccounts += $accountName
             continue
         }

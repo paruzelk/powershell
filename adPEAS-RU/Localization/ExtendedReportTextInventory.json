@@ -8,7 +8,7 @@
                           "src/modules/Reporting/templates/report-scripts.js",
                           "src/modules/Reporting/templates/diff-template.html"
                       ],
-    "candidateCount":  223,
+    "candidateCount":  221,
     "candidates":  [
                        {
                            "kind":  "DynamicSummary",
@@ -57,18 +57,6 @@
                            "source":  "src\\modules\\Checks\\Accounts\\Get-ProtectedUsersStatus.ps1",
                            "line":  401,
                            "snippet":  "Show-Line $summaryText -Class $severity"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                           "line":  285,
-                           "snippet":  "Show-Line (\"$($ntAuthIssuers.Count) different CAs are trusted to issue a certificate that logs \" +"
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Checks\\ADCS\\Get-ADCSVulnerabilities.ps1",
-                           "line":  289,
-                           "snippet":  "Show-Line (\"$foreignCount NTAuth certificate(s) belong to no Enterprise CA of this forest - \" +"
                        },
                        {
                            "kind":  "DynamicSummary",

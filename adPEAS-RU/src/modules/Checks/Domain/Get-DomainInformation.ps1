@@ -49,7 +49,7 @@ function Get-DomainInformation {
     )
 
     begin {
-        Write-Log "[Get-DomainInformation] Starting domain enumeration"
+        Write-Log "[Get-DomainInformation] Начат сбор сведений о домене"
 
         # Domain Functional Level Mapping
         $DomainModeLevel = @{
@@ -83,7 +83,7 @@ function Get-DomainInformation {
             # the session had it in hand.
             if ($Script:LDAPContext.DomainNetBIOS) {
                 $NetBIOSName = $Script:LDAPContext.DomainNetBIOS
-                Write-Log "[Get-DomainInformation] NetBIOS name (from crossRef): $NetBIOSName"
+                Write-Log "[Get-DomainInformation] Имя NetBIOS (из crossRef): $NetBIOSName"
             }
 
             # Use cached RootDSE data from LDAPContext (already available after Ensure-LDAPConnection)
@@ -106,7 +106,7 @@ function Get-DomainInformation {
                     # crossRef lookup above produced nothing.
                     if (-not $NetBIOSName -and $DomainObject.name) {
                         $NetBIOSName = $DomainObject.name
-                        Write-Log "[Get-DomainInformation] NetBIOS name fallback (domain object name/DNS label): $NetBIOSName"
+                        Write-Log "[Get-DomainInformation] Резервное имя NetBIOS (имя объекта домена или метка DNS): $NetBIOSName"
                     }
 
                     # The Kerberos policy is not read here: maxTicketAge and maxRenewAge
@@ -116,7 +116,7 @@ function Get-DomainInformation {
                     $PdcFSMO = $DomainObject.fSMORoleOwner
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving domain object: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения объекта домена: $_"
             }
 
             # Parent/Child Domain Detection
@@ -124,7 +124,7 @@ function Get-DomainInformation {
             $ChildDomains = @()
 
             try {
-                Write-Log "[Get-DomainInformation] Checking for parent/child domains"
+                Write-Log "[Get-DomainInformation] Проверка родительских и дочерних доменов"
 
                 # Check if current domain is NOT the forest root (= has parent)
                 if ($DomainDN -ne $ForestDN) {
@@ -150,13 +150,13 @@ function Get-DomainInformation {
                     }
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving parent/child domains: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения родительских и дочерних доменов: $_"
             }
 
             $DomainControllers = @()
 
             try {
-                Write-Log "[Get-DomainInformation] Querying Domain Controllers with full details"
+                Write-Log "[Get-DomainInformation] Запрос подробных сведений о контроллерах домена"
                 $DCs = Get-DomainComputer -LDAPFilter "(primaryGroupID=516)" @PSBoundParameters
 
                 if ($DCs) {
@@ -167,7 +167,7 @@ function Get-DomainInformation {
                     $DomainControllers = @($DomainControllers)
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving domain controllers: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения контроллеров домена: $_"
             }
 
             # krbtgt Account Age Check
@@ -176,7 +176,7 @@ function Get-DomainInformation {
             $KrbtgtSeverity = "Info"
 
             try {
-                Write-Log "[Get-DomainInformation] Checking krbtgt account password age"
+                Write-Log "[Get-DomainInformation] Проверка возраста пароля учётной записи krbtgt"
 
                 # By RID, not by name. krbtgt can be renamed - it happens after an
                 # incident, which is exactly when its password age matters most - and a
@@ -189,7 +189,7 @@ function Get-DomainInformation {
                 $krbtgtFilter = if ($krbtgtDomainSID) {
                     "(objectSid=$krbtgtDomainSID-502)"
                 } else {
-                    Write-Log "[Get-DomainInformation] No domain SID in session - looking up krbtgt by name"
+                    Write-Log "[Get-DomainInformation] В сеансе отсутствует SID домена — поиск krbtgt по имени"
                     "(sAMAccountName=krbtgt)"
                 }
                 $KrbtgtAccount = @(Get-DomainObject -LDAPFilter $krbtgtFilter @PSBoundParameters)[0]
@@ -228,7 +228,7 @@ function Get-DomainInformation {
                     }
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving krbtgt account: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения учётной записи krbtgt: $_"
             }
 
             # Guest Account Status Check
@@ -236,13 +236,13 @@ function Get-DomainInformation {
             $GuestEnabled = $false
 
             try {
-                Write-Log "[Get-DomainInformation] Checking Guest account status"
+                Write-Log "[Get-DomainInformation] Проверка состояния учётной записи Guest"
 
                 # Guest account has fixed RID 501 in domain
                 $GuestSID = "$DomainSID-501"
-                Write-Log "[Get-DomainInformation] Guest SID: $GuestSID"
+                Write-Log "[Get-DomainInformation] SID учётной записи Guest: $GuestSID"
                 $GuestAccount = @(Get-DomainUser -Identity $GuestSID @PSBoundParameters)[0]
-                Write-Log "[Get-DomainInformation] Found Guest accounts: $(@(Get-DomainUser -Identity $GuestSID @PSBoundParameters).Count)"
+                Write-Log "[Get-DomainInformation] Найдено учётных записей Guest: $(@(Get-DomainUser -Identity $GuestSID @PSBoundParameters).Count)"
 
                 if ($GuestAccount) {
                     # Check if account is enabled (userAccountControl already parsed by Get-DomainUser)
@@ -261,7 +261,7 @@ function Get-DomainInformation {
                     # Check if Guest is in privileged groups
                     $GuestSID = @($GuestAccount.objectSid)[0]
                     $IsPrivileged = (Test-IsPrivileged -Identity $GuestSID).IsPrivileged
-                    Write-Log "[Get-DomainInformation] Guest IsPrivileged: $IsPrivileged"
+                    Write-Log "[Get-DomainInformation] Guest, статус IsPrivileged: $IsPrivileged"
 
                     $GuestInfo = @{
                         Enabled = $GuestEnabled
@@ -270,7 +270,7 @@ function Get-DomainInformation {
                     }
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving Guest account: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения учётной записи Guest: $_"
             }
 
             # Sites and Subnets - Query via LDAP from Configuration Partition
@@ -283,7 +283,7 @@ function Get-DomainInformation {
                 $configNC = $Script:LDAPContext.ConfigurationNamingContext
                 if ($configNC) {
                     $sitesContainer = "CN=Sites,$configNC"
-                    Write-Log "[Get-DomainInformation] Querying Sites and Subnets via LDAP from $sitesContainer"
+                    Write-Log "[Get-DomainInformation] Запрос сайтов и подсетей через LDAP из $sitesContainer"
 
                     # Query all site objects
                     $siteObjects = Get-DomainObject -LDAPFilter "(objectClass=site)" -SearchBase $sitesContainer -Properties 'name','distinguishedName' @PSBoundParameters
@@ -313,7 +313,7 @@ function Get-DomainInformation {
                         }
                     }
 
-                    Write-Log "[Get-DomainInformation] Found $($Sites.Count) sites and $($Subnets.Count) subnets"
+                    Write-Log "[Get-DomainInformation] Найдено сайтов: $($Sites.Count), подсетей: $($Subnets.Count)"
 
                     # Resolve DC-to-Site mapping
                     # Server objects: CN=<DC>,CN=Servers,CN=<SiteName>,CN=Sites,CN=Configuration,...
@@ -333,12 +333,12 @@ function Get-DomainInformation {
                             }
                         }
                     }
-                    Write-Log "[Get-DomainInformation] DC-to-Site mapping completed"
+                    Write-Log "[Get-DomainInformation] Сопоставление контроллеров домена и сайтов завершено"
                 } else {
-                    Write-Log "[Get-DomainInformation] No ConfigurationNamingContext available - skipping Sites/Subnets"
+                    Write-Log "[Get-DomainInformation] Отсутствует ConfigurationNamingContext — проверка сайтов и подсетей пропущена"
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving Sites/Subnets: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения сайтов и подсетей: $_"
             }
 
             # ===================================================================
@@ -596,7 +596,7 @@ function Get-DomainInformation {
                 }
             }
             catch {
-                Write-Log "[Get-DomainInformation] Failed to query DC currentTime: $_"
+                Write-Log "[Get-DomainInformation] Не удалось запросить currentTime контроллера домена: $_"
             }
 
             $kerberosObj = [PSCustomObject]@{
@@ -656,14 +656,14 @@ function Get-DomainInformation {
                 if ($GuestInfo.Enabled) {
                     if ($GuestInfo.IsPrivileged) {
                         $guestClass = "Finding"  # Enabled + privileged = critical
-                        Write-Log "[Get-DomainInformation] Guest severity: Finding (enabled + privileged)"
+                        Write-Log "[Get-DomainInformation] Критичность Guest: Finding (включён и привилегирован)"
                     } else {
                         $guestClass = "Hint"     # Enabled but not privileged
-                        Write-Log "[Get-DomainInformation] Guest severity: Hint (enabled but not privileged)"
+                        Write-Log "[Get-DomainInformation] Критичность Guest: Hint (включён, но не привилегирован)"
                     }
                 } else {
                     $guestClass = "Secure"       # Disabled = secure
-                    Write-Log "[Get-DomainInformation] Guest severity: Secure (disabled)"
+                    Write-Log "[Get-DomainInformation] Критичность Guest: Secure (отключён)"
                 }
 
                 # Build guest account object for display
@@ -698,12 +698,12 @@ function Get-DomainInformation {
             $FSMORoles = @{}
             $FSMOByDC = @{}  # Map DC DN to list of FSMO roles
             try {
-                Write-Log "[Get-DomainInformation] Querying FSMO role holders"
+                Write-Log "[Get-DomainInformation] Запрос владельцев ролей FSMO"
 
                 # PDC Emulator (from domain object)
                 if ($PdcFSMO) {
                     $FSMORoles['PDC Emulator'] = $PdcFSMO
-                    Write-Log "[Get-DomainInformation] PDC Emulator: $PdcFSMO"
+                    Write-Log "[Get-DomainInformation] Эмулятор PDC: $PdcFSMO"
                 }
 
                 # Schema Master (forest-wide)
@@ -743,9 +743,9 @@ function Get-DomainInformation {
                     }
                 }
 
-                Write-Log "[Get-DomainInformation] FSMO role mapping complete: $($FSMOByDC.Count) DCs have FSMO roles"
+                Write-Log "[Get-DomainInformation] Сопоставление ролей FSMO завершено: контроллеров с ролями FSMO — $($FSMOByDC.Count)"
             } catch {
-                Write-Log "[Get-DomainInformation] Error querying FSMO roles: $_"
+                Write-Log "[Get-DomainInformation] Ошибка запроса ролей FSMO: $_"
             }
 
             # Output Domain Controllers with FSMO roles
@@ -820,13 +820,13 @@ function Get-DomainInformation {
             }
 
         } catch {
-            Write-Log "[Get-DomainInformation] Error: $_" -Level Error
+            Write-Log "[Get-DomainInformation] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить сведения о домене: $_" -Class Finding
         }
     }
 
     end {
-        Write-Log "[Get-DomainInformation] Domain enumeration completed"
+        Write-Log "[Get-DomainInformation] Сбор сведений о домене завершён"
     }
 }
 
@@ -893,7 +893,7 @@ function Get-ForestDeletionSetting {
             }
         }
     } catch {
-        Write-Log "[Get-DomainInformation] Could not read the tombstone lifetime: $_"
+        Write-Log "[Get-DomainInformation] Не удалось прочитать срок хранения удалённых объектов (tombstone lifetime): $_"
     }
 
     try {
@@ -904,7 +904,7 @@ function Get-ForestDeletionSetting {
             }).Count -gt 0)
         }
     } catch {
-        Write-Log "[Get-DomainInformation] Could not read the enabled optional features: $_"
+        Write-Log "[Get-DomainInformation] Не удалось прочитать включённые дополнительные возможности: $_"
     }
 
     return $result
@@ -953,13 +953,13 @@ function Get-SysvolReplication {
     try {
         $frsSet = @(Get-DomainObject -Identity "CN=Domain System Volume (SYSVOL share),CN=File Replication Service,CN=System,$DomainDN" -Properties 'distinguishedName' @ConnectionParams)[0]
     } catch {
-        Write-Log "[Get-DomainInformation] Could not read the FRS replica set of SYSVOL: $_"
+        Write-Log "[Get-DomainInformation] Не удалось прочитать набор реплик FRS для SYSVOL: $_"
     }
     try {
         $dfsrGroup = @(Get-DomainObject -Identity "CN=Domain System Volume,CN=DFSR-GlobalSettings,CN=System,$DomainDN" -Properties 'distinguishedName' @ConnectionParams)[0]
         $globalSettings = @(Get-DomainObject -Identity "CN=DFSR-GlobalSettings,CN=System,$DomainDN" -Properties 'msDFSR-Flags' @ConnectionParams)[0]
     } catch {
-        Write-Log "[Get-DomainInformation] Could not read the DFSR replication group of SYSVOL: $_"
+        Write-Log "[Get-DomainInformation] Не удалось прочитать группу репликации DFSR для SYSVOL: $_"
     }
 
     $state = $null
@@ -1017,7 +1017,7 @@ function Get-DomainKerberosPolicy {
         }
         $linkage = Get-GPOLinkage
         if ($null -eq $linkage) {
-            Write-Log "[Get-DomainKerberosPolicy] GPO linkage could not be resolved"
+            Write-Log "[Get-DomainKerberosPolicy] Не удалось определить привязку GPO"
             return $null
         }
 
@@ -1061,7 +1061,7 @@ function Get-DomainKerberosPolicy {
             $Script:KerberosPolicySysvolRead = $true
         }
         if (-not $Script:KerberosPolicySysvolRead) {
-            Write-Log "[Get-DomainKerberosPolicy] SYSVOL could not be read"
+            Write-Log "[Get-DomainKerberosPolicy] Не удалось прочитать SYSVOL"
             return $null
         }
 
@@ -1079,7 +1079,7 @@ function Get-DomainKerberosPolicy {
         }
         return $policy
     } catch {
-        Write-Log "[Get-DomainKerberosPolicy] Error: $_"
+        Write-Log "[Get-DomainKerberosPolicy] Ошибка: $_"
         return $null
     } finally {
         $Script:KerberosPolicySections = $null

@@ -70111,7 +70111,7 @@ function Get-DomainInformation {
         [System.Management.Automation.PSCredential]$Credential
     )
     begin {
-        Write-Log "[Get-DomainInformation] Starting domain enumeration"
+        Write-Log "[Get-DomainInformation] Начат сбор сведений о домене"
         $DomainModeLevel = @{
             0 = "Windows 2000 native"
             1 = "Windows 2003 interim"
@@ -70134,7 +70134,7 @@ function Get-DomainInformation {
             $PdcFSMO = $null
             if ($Script:LDAPContext.DomainNetBIOS) {
                 $NetBIOSName = $Script:LDAPContext.DomainNetBIOS
-                Write-Log "[Get-DomainInformation] NetBIOS name (from crossRef): $NetBIOSName"
+                Write-Log "[Get-DomainInformation] Имя NetBIOS (из crossRef): $NetBIOSName"
             }
             $DomainDN = $Script:LDAPContext.DomainDN
             $ForestDN = $Script:LDAPContext.RootDomainNamingContext
@@ -70149,17 +70149,17 @@ function Get-DomainInformation {
                 if ($DomainObject) {
                     if (-not $NetBIOSName -and $DomainObject.name) {
                         $NetBIOSName = $DomainObject.name
-                        Write-Log "[Get-DomainInformation] NetBIOS name fallback (domain object name/DNS label): $NetBIOSName"
+                        Write-Log "[Get-DomainInformation] Резервное имя NetBIOS (имя объекта домена или метка DNS): $NetBIOSName"
                     }
                     $PdcFSMO = $DomainObject.fSMORoleOwner
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving domain object: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения объекта домена: $_"
             }
             $ParentDomain = $null
             $ChildDomains = @()
             try {
-                Write-Log "[Get-DomainInformation] Checking for parent/child domains"
+                Write-Log "[Get-DomainInformation] Проверка родительских и дочерних доменов"
                 if ($DomainDN -ne $ForestDN) {
                     $ParentDomain = $ForestRootName
                 }
@@ -70177,11 +70177,11 @@ function Get-DomainInformation {
                     }
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving parent/child domains: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения родительских и дочерних доменов: $_"
             }
             $DomainControllers = @()
             try {
-                Write-Log "[Get-DomainInformation] Querying Domain Controllers with full details"
+                Write-Log "[Get-DomainInformation] Запрос подробных сведений о контроллерах домена"
                 $DCs = Get-DomainComputer -LDAPFilter "(primaryGroupID=516)" @PSBoundParameters
                 if ($DCs) {
                     $DomainControllers = @($DCs) | Where-Object {
@@ -70190,18 +70190,18 @@ function Get-DomainInformation {
                     $DomainControllers = @($DomainControllers)
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving domain controllers: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения контроллеров домена: $_"
             }
             $KrbtgtInfo = $null
             $KrbtgtPasswordAge = $null
             $KrbtgtSeverity = "Info"
             try {
-                Write-Log "[Get-DomainInformation] Checking krbtgt account password age"
+                Write-Log "[Get-DomainInformation] Проверка возраста пароля учётной записи krbtgt"
                 $krbtgtDomainSID = $Script:LDAPContext['DomainSID']
                 $krbtgtFilter = if ($krbtgtDomainSID) {
                     "(objectSid=$krbtgtDomainSID-502)"
                 } else {
-                    Write-Log "[Get-DomainInformation] No domain SID in session - looking up krbtgt by name"
+                    Write-Log "[Get-DomainInformation] В сеансе отсутствует SID домена — поиск krbtgt по имени"
                     "(sAMAccountName=krbtgt)"
                 }
                 $KrbtgtAccount = @(Get-DomainObject -LDAPFilter $krbtgtFilter @PSBoundParameters)[0]
@@ -70228,16 +70228,16 @@ function Get-DomainInformation {
                     }
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving krbtgt account: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения учётной записи krbtgt: $_"
             }
             $GuestInfo = $null
             $GuestEnabled = $false
             try {
-                Write-Log "[Get-DomainInformation] Checking Guest account status"
+                Write-Log "[Get-DomainInformation] Проверка состояния учётной записи Guest"
                 $GuestSID = "$DomainSID-501"
-                Write-Log "[Get-DomainInformation] Guest SID: $GuestSID"
+                Write-Log "[Get-DomainInformation] SID учётной записи Guest: $GuestSID"
                 $GuestAccount = @(Get-DomainUser -Identity $GuestSID @PSBoundParameters)[0]
-                Write-Log "[Get-DomainInformation] Found Guest accounts: $(@(Get-DomainUser -Identity $GuestSID @PSBoundParameters).Count)"
+                Write-Log "[Get-DomainInformation] Найдено учётных записей Guest: $(@(Get-DomainUser -Identity $GuestSID @PSBoundParameters).Count)"
                 if ($GuestAccount) {
                     $uacFlags = $GuestAccount.userAccountControl
                     if ($uacFlags) {
@@ -70249,7 +70249,7 @@ function Get-DomainInformation {
                     }
                     $GuestSID = @($GuestAccount.objectSid)[0]
                     $IsPrivileged = (Test-IsPrivileged -Identity $GuestSID).IsPrivileged
-                    Write-Log "[Get-DomainInformation] Guest IsPrivileged: $IsPrivileged"
+                    Write-Log "[Get-DomainInformation] Guest, статус IsPrivileged: $IsPrivileged"
                     $GuestInfo = @{
                         Enabled = $GuestEnabled
                         MemberOf = $GuestGroups
@@ -70257,7 +70257,7 @@ function Get-DomainInformation {
                     }
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving Guest account: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения учётной записи Guest: $_"
             }
             $Sites = @()
             $Subnets = @()
@@ -70265,7 +70265,7 @@ function Get-DomainInformation {
                 $configNC = $Script:LDAPContext.ConfigurationNamingContext
                 if ($configNC) {
                     $sitesContainer = "CN=Sites,$configNC"
-                    Write-Log "[Get-DomainInformation] Querying Sites and Subnets via LDAP from $sitesContainer"
+                    Write-Log "[Get-DomainInformation] Запрос сайтов и подсетей через LDAP из $sitesContainer"
                     $siteObjects = Get-DomainObject -LDAPFilter "(objectClass=site)" -SearchBase $sitesContainer -Properties 'name','distinguishedName' @PSBoundParameters
                     foreach ($siteObj in @($siteObjects)) {
                         if ($siteObj.name) {
@@ -70289,7 +70289,7 @@ function Get-DomainInformation {
                             }
                         }
                     }
-                    Write-Log "[Get-DomainInformation] Found $($Sites.Count) sites and $($Subnets.Count) subnets"
+                    Write-Log "[Get-DomainInformation] Найдено сайтов: $($Sites.Count), подсетей: $($Subnets.Count)"
                     $serverObjects = Get-DomainObject -LDAPFilter "(objectClass=server)" -SearchBase $sitesContainer -Properties 'dNSHostName','distinguishedName' @PSBoundParameters
                     foreach ($serverObj in @($serverObjects)) {
                         $serverDN = $serverObj.distinguishedName
@@ -70303,12 +70303,12 @@ function Get-DomainInformation {
                             }
                         }
                     }
-                    Write-Log "[Get-DomainInformation] DC-to-Site mapping completed"
+                    Write-Log "[Get-DomainInformation] Сопоставление контроллеров домена и сайтов завершено"
                 } else {
-                    Write-Log "[Get-DomainInformation] No ConfigurationNamingContext available - skipping Sites/Subnets"
+                    Write-Log "[Get-DomainInformation] Отсутствует ConfigurationNamingContext — проверка сайтов и подсетей пропущена"
                 }
             } catch {
-                Write-Log "[Get-DomainInformation] Error retrieving Sites/Subnets: $_"
+                Write-Log "[Get-DomainInformation] Ошибка получения сайтов и подсетей: $_"
             }
             Show-SubHeader "Сбор сведений о домене..." -ObjectType "DomainBasicInfo"
             $DomainFuncLevelText = $DomainModeLevel[[int]$DomainFunc]
@@ -70480,7 +70480,7 @@ function Get-DomainInformation {
                 }
             }
             catch {
-                Write-Log "[Get-DomainInformation] Failed to query DC currentTime: $_"
+                Write-Log "[Get-DomainInformation] Не удалось запросить currentTime контроллера домена: $_"
             }
             $kerberosObj = [PSCustomObject]@{
                 maxTicketAgeTGT = $maxTicketAgeText
@@ -70514,14 +70514,14 @@ function Get-DomainInformation {
                 if ($GuestInfo.Enabled) {
                     if ($GuestInfo.IsPrivileged) {
                         $guestClass = "Finding"
-                        Write-Log "[Get-DomainInformation] Guest severity: Finding (enabled + privileged)"
+                        Write-Log "[Get-DomainInformation] Критичность Guest: Finding (включён и привилегирован)"
                     } else {
                         $guestClass = "Hint"
-                        Write-Log "[Get-DomainInformation] Guest severity: Hint (enabled but not privileged)"
+                        Write-Log "[Get-DomainInformation] Критичность Guest: Hint (включён, но не привилегирован)"
                     }
                 } else {
                     $guestClass = "Secure"
-                    Write-Log "[Get-DomainInformation] Guest severity: Secure (disabled)"
+                    Write-Log "[Get-DomainInformation] Критичность Guest: Secure (отключён)"
                 }
                 $guestObj = [PSCustomObject]@{
                     accountStatus = $statusText
@@ -70539,10 +70539,10 @@ function Get-DomainInformation {
             $FSMORoles = @{}
             $FSMOByDC = @{}
             try {
-                Write-Log "[Get-DomainInformation] Querying FSMO role holders"
+                Write-Log "[Get-DomainInformation] Запрос владельцев ролей FSMO"
                 if ($PdcFSMO) {
                     $FSMORoles['PDC Emulator'] = $PdcFSMO
-                    Write-Log "[Get-DomainInformation] PDC Emulator: $PdcFSMO"
+                    Write-Log "[Get-DomainInformation] Эмулятор PDC: $PdcFSMO"
                 }
                 $SchemaRole = @(Get-DomainObject -LDAPFilter "(objectClass=*)" -SearchBase "CN=Schema,$ConfigDN" -Scope Base @PSBoundParameters)[0]
                 if ($SchemaRole -and $SchemaRole.fSMORoleOwner) {
@@ -70570,9 +70570,9 @@ function Get-DomainInformation {
                         $FSMOByDC[$dcName] += $roleName
                     }
                 }
-                Write-Log "[Get-DomainInformation] FSMO role mapping complete: $($FSMOByDC.Count) DCs have FSMO roles"
+                Write-Log "[Get-DomainInformation] Сопоставление ролей FSMO завершено: контроллеров с ролями FSMO — $($FSMOByDC.Count)"
             } catch {
-                Write-Log "[Get-DomainInformation] Error querying FSMO roles: $_"
+                Write-Log "[Get-DomainInformation] Ошибка запроса ролей FSMO: $_"
             }
             if (@($DomainControllers).Count -gt 0) {
                 $dcDisplayList = @()
@@ -70627,12 +70627,12 @@ function Get-DomainInformation {
                 Show-Line "Сайты Active Directory не найдены" -Class Hint
             }
         } catch {
-            Write-Log "[Get-DomainInformation] Error: $_" -Level Error
+            Write-Log "[Get-DomainInformation] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить сведения о домене: $_" -Class Finding
         }
     }
     end {
-        Write-Log "[Get-DomainInformation] Domain enumeration completed"
+        Write-Log "[Get-DomainInformation] Сбор сведений о домене завершён"
     }
 }
 function Get-ForestDeletionSetting {
@@ -70669,7 +70669,7 @@ function Get-ForestDeletionSetting {
             }
         }
     } catch {
-        Write-Log "[Get-DomainInformation] Could not read the tombstone lifetime: $_"
+        Write-Log "[Get-DomainInformation] Не удалось прочитать срок хранения удалённых объектов (tombstone lifetime): $_"
     }
     try {
         $partitions = @(Get-DomainObject -Identity "CN=Partitions,$configDN" -Properties 'msDS-EnabledFeature' @ConnectionParams)[0]
@@ -70679,7 +70679,7 @@ function Get-ForestDeletionSetting {
             }).Count -gt 0)
         }
     } catch {
-        Write-Log "[Get-DomainInformation] Could not read the enabled optional features: $_"
+        Write-Log "[Get-DomainInformation] Не удалось прочитать включённые дополнительные возможности: $_"
     }
     return $result
 }
@@ -70697,13 +70697,13 @@ function Get-SysvolReplication {
     try {
         $frsSet = @(Get-DomainObject -Identity "CN=Domain System Volume (SYSVOL share),CN=File Replication Service,CN=System,$DomainDN" -Properties 'distinguishedName' @ConnectionParams)[0]
     } catch {
-        Write-Log "[Get-DomainInformation] Could not read the FRS replica set of SYSVOL: $_"
+        Write-Log "[Get-DomainInformation] Не удалось прочитать набор реплик FRS для SYSVOL: $_"
     }
     try {
         $dfsrGroup = @(Get-DomainObject -Identity "CN=Domain System Volume,CN=DFSR-GlobalSettings,CN=System,$DomainDN" -Properties 'distinguishedName' @ConnectionParams)[0]
         $globalSettings = @(Get-DomainObject -Identity "CN=DFSR-GlobalSettings,CN=System,$DomainDN" -Properties 'msDFSR-Flags' @ConnectionParams)[0]
     } catch {
-        Write-Log "[Get-DomainInformation] Could not read the DFSR replication group of SYSVOL: $_"
+        Write-Log "[Get-DomainInformation] Не удалось прочитать группу репликации DFSR для SYSVOL: $_"
     }
     $state = $null
     if ($globalSettings) {
@@ -70735,7 +70735,7 @@ function Get-DomainKerberosPolicy {
         }
         $linkage = Get-GPOLinkage
         if ($null -eq $linkage) {
-            Write-Log "[Get-DomainKerberosPolicy] GPO linkage could not be resolved"
+            Write-Log "[Get-DomainKerberosPolicy] Не удалось определить привязку GPO"
             return $null
         }
         $candidates = @()
@@ -70773,7 +70773,7 @@ function Get-DomainKerberosPolicy {
             $Script:KerberosPolicySysvolRead = $true
         }
         if (-not $Script:KerberosPolicySysvolRead) {
-            Write-Log "[Get-DomainKerberosPolicy] SYSVOL could not be read"
+            Write-Log "[Get-DomainKerberosPolicy] Не удалось прочитать SYSVOL"
             return $null
         }
         $ranked = @($candidates | Sort-Object Rank, Order, Name)
@@ -70790,7 +70790,7 @@ function Get-DomainKerberosPolicy {
         }
         return $policy
     } catch {
-        Write-Log "[Get-DomainKerberosPolicy] Error: $_"
+        Write-Log "[Get-DomainKerberosPolicy] Ошибка: $_"
         return $null
     } finally {
         $Script:KerberosPolicySections = $null
@@ -72263,7 +72263,7 @@ function Get-PrivilegedGroupMembers {
         [switch]$IncludePrivileged
     )
     begin {
-        Write-Log "[Get-PrivilegedGroupMembers] Starting privileged group enumeration"
+        Write-Log "[Get-PrivilegedGroupMembers] Начато перечисление привилегированных групп"
         $Script:PrivilegedGroupSIDs = @{
             'S-1-5-32-544' = 'Administrators'
             'S-1-5-32-548' = 'Account Operators'
@@ -72314,11 +72314,11 @@ function Get-PrivilegedGroupMembers {
                 if ($domainDN) {
                     $local = $groups | Where-Object { $_.distinguishedName -like "*,$domainDN" }
                     if ($local) {
-                        Write-Log "[Get-PrivilegedGroupMembers] GC returned $($groups.Count) results - filtered to current domain"
+                        Write-Log "[Get-PrivilegedGroupMembers] GC вернул $($groups.Count) результатов — выполнена фильтрация по текущему домену"
                         return $local | Select-Object -First 1
                     }
                 }
-                Write-Log "[Get-PrivilegedGroupMembers] GC returned $($groups.Count) results - using first"
+                Write-Log "[Get-PrivilegedGroupMembers] GC вернул $($groups.Count) результатов — используется первый"
                 return $groups | Select-Object -First 1
             }
             function Get-GroupMembersRecursive {
@@ -72332,7 +72332,7 @@ function Get-PrivilegedGroupMembers {
                     [object]$GroupObject = $null
                 )
     if ($Visited.ContainsKey($GroupDN)) {
-                    Write-Log "[Get-PrivilegedGroupMembers] Circular reference detected: $GroupDN"
+                    Write-Log "[Get-PrivilegedGroupMembers] Обнаружена циклическая ссылка: $GroupDN"
                     return @{
                         DirectMembers = @()
                         NestedGroups = @()
@@ -72345,36 +72345,36 @@ function Get-PrivilegedGroupMembers {
                     $Group = $GroupObject
                     if (-not $Group) {
                         $Group = @(Get-DomainGroup -Identity $GroupDN @CredentialParams)[0]
-                        Write-Log "[Get-PrivilegedGroupMembers] Fetched nested group: $GroupName (DN: $GroupDN)"
+                        Write-Log "[Get-PrivilegedGroupMembers] Получена вложенная группа: $GroupName (DN: $GroupDN)"
                     } else {
-                        Write-Log "[Get-PrivilegedGroupMembers] Using pre-fetched group: $GroupName (DN: $GroupDN)"
+                        Write-Log "[Get-PrivilegedGroupMembers] Используется уже полученная группа: $GroupName (DN: $GroupDN)"
                     }
                     if (-not $Group) {
-                        Write-Log "[Get-PrivilegedGroupMembers] WARNING: Group not found by DN: $GroupDN"
+                        Write-Log "[Get-PrivilegedGroupMembers] ПРЕДУПРЕЖДЕНИЕ: группа по DN не найдена: $GroupDN"
                         return @{ DirectMembers = @(); NestedGroups = @() }
                     }
                     $memberAttr = $Group.member
                     $memberCount = if ($memberAttr) { @($memberAttr).Count } else { 0 }
-                    Write-Log "[Get-PrivilegedGroupMembers] Group found: True, Member count: $memberCount"
+                    Write-Log "[Get-PrivilegedGroupMembers] Группа найдена: True, число участников: $memberCount"
                     if ($memberAttr) {
                         $MemberDNs = @($Group.member)
-                        Write-Log "[Get-PrivilegedGroupMembers] Group '$GroupName' has $($MemberDNs.Count) direct members (Nesting Level: $NestingLevel)"
+                        Write-Log "[Get-PrivilegedGroupMembers] У группы '$GroupName' прямых участников: $($MemberDNs.Count) (уровень вложенности: $NestingLevel)"
                         foreach ($MemberDN in $MemberDNs) {
                             if ([string]::IsNullOrWhiteSpace($MemberDN)) { continue }
                             $Member = @(Get-DomainObject -Identity $MemberDN @CredentialParams)[0]
                             if (-not $Member -and $domainDN -and -not $MemberDN.EndsWith(",$domainDN")) {
-                                Write-Log "[Get-PrivilegedGroupMembers] Cross-domain member detected: $MemberDN - trying GC lookup"
+                                Write-Log "[Get-PrivilegedGroupMembers] Участник другого домена: $MemberDN — поиск через GC"
                                 try {
                                     $gcConn = Get-GCConnection
                                     if ($gcConn) {
                                         $escapedMemberDN = Escape-LDAPFilterDN -DistinguishedName $MemberDN
                                         $Member = @(Invoke-LDAPSearch -Filter "(&(objectClass=*)(distinguishedName=$escapedMemberDN))" -SizeLimit 1 -LdapConnection $gcConn)[0]
                                         if ($Member) {
-                                            Write-Log "[Get-PrivilegedGroupMembers] GC resolved cross-domain member: $($Member.distinguishedName)"
+                                            Write-Log "[Get-PrivilegedGroupMembers] Участник другого домена определён через GC: $($Member.distinguishedName)"
                                         }
                                     }
                                 } catch {
-                                    Write-Log "[Get-PrivilegedGroupMembers] GC lookup failed for $MemberDN : $_"
+                                    Write-Log "[Get-PrivilegedGroupMembers] Ошибка поиска через GC для $MemberDN — $_"
                                 }
                             }
                             if ($Member) {
@@ -72476,7 +72476,7 @@ function Get-PrivilegedGroupMembers {
                         }
                     }
                 } catch {
-                    Write-Log "[Get-PrivilegedGroupMembers] Error resolving members for $GroupDN : $_"
+                    Write-Log "[Get-PrivilegedGroupMembers] Ошибка определения участников $GroupDN — $_"
                 } finally {
                     [void]$Visited.Remove($GroupDN)
                 }
@@ -72556,19 +72556,19 @@ function Get-PrivilegedGroupMembers {
                 }
                 $primaryTotal = ($PrimaryGroupMembers.Values | ForEach-Object { @($_).Count } | Measure-Object -Sum).Sum
                 if (-not $primaryTotal) { $primaryTotal = 0 }
-                Write-Log "[Get-PrivilegedGroupMembers] $primaryTotal account(s) hold a privileged group as their primary group"
+                Write-Log "[Get-PrivilegedGroupMembers] Учётных записей с привилегированной первичной группой: $primaryTotal"
             } catch {
-                Write-Log "[Get-PrivilegedGroupMembers] Primary group query failed: $($_.Exception.Message)" -Level Warning
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка запроса первичных групп: $($_.Exception.Message)" -Level Warning
             }
             foreach ($RID in $Script:PrivilegedGroupRIDs.Keys) {
                 try {
                     $GroupSID = "$DomainSID-$RID"
                     $GroupNameEN = $Script:PrivilegedGroupRIDs[$RID]
-                    Write-Log "[Get-PrivilegedGroupMembers] Checking group: $GroupNameEN (SID: $GroupSID)"
+                    Write-Log "[Get-PrivilegedGroupMembers] Проверка группы: $GroupNameEN (SID: $GroupSID)"
                     $Group = Select-LocalDomainGroup (Get-DomainGroup -Identity $GroupSID @CredParams)
                     if ($Group) {
                         $GroupName = $Group.sAMAccountName
-                        Write-Log "[Get-PrivilegedGroupMembers] Found group: $GroupName ($($Group.distinguishedName))"
+                        Write-Log "[Get-PrivilegedGroupMembers] Группа найдена: $GroupName ($($Group.distinguishedName))"
                         $Result = Get-GroupMembersRecursive -GroupDN $Group.distinguishedName -GroupName $GroupName -CredentialParams $CredParams -Visited @{} -GroupObject $Group
                         Add-GroupForACLReview -DistinguishedName $Group.distinguishedName -Name $GroupName -Source 'privileged group' -NestedGroups $Result.NestedGroups -RootSID $GroupSID `
                             -Weight (Get-GroupTakeoverWeight -GroupSID $GroupSID)
@@ -72580,7 +72580,7 @@ function Get-PrivilegedGroupMembers {
                                 $primaryMember.distinguishedName
                             }
                             if (@($Result.DirectMembers | ForEach-Object { $_.DistinguishedName }) -contains $primaryDN) {
-                                Write-Log "[Get-PrivilegedGroupMembers] $primaryDN is a listed and a primary-group member of $GroupName"
+                                Write-Log "[Get-PrivilegedGroupMembers] $primaryDN состоит в $GroupName как прямой участник и через первичную группу"
                                 continue
                             }
                             $primaryClassArray = @($primaryMember.objectClass)
@@ -72607,14 +72607,14 @@ function Get-PrivilegedGroupMembers {
                                 MembershipPath    = 'Primary group'
                             }
                             $PrimaryGroupOf[$primaryDN] = $GroupName
-                            Write-Log "[Get-PrivilegedGroupMembers] $GroupName - primary group member: $primaryDN"
+                            Write-Log "[Get-PrivilegedGroupMembers] $GroupName — участник через первичную группу: $primaryDN"
                         }
                         $DirectMemberCount = @($Result.DirectMembers).Count
                         $NestedGroupCount = @($Result.NestedGroups).Count
                         $NestedSum = ($Result.NestedGroups | Measure-Object -Property TotalMembers -Sum).Sum
                         if ($null -eq $NestedSum) { $NestedSum = 0 }
                         $TotalMemberCount = $DirectMemberCount + $NestedSum
-                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName - Direct: $DirectMemberCount, Nested groups: $NestedGroupCount, Total: $TotalMemberCount"
+                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName — прямых участников: $DirectMemberCount, вложенных групп: $NestedGroupCount, всего: $TotalMemberCount"
                         $AllMembersFromGroup = Get-AllMembersFromResult -Result $Result
                         foreach ($Member in $AllMembersFromGroup) {
                             $TotalUniqueMembers[$Member.DistinguishedName] = $Member
@@ -72638,20 +72638,20 @@ function Get-PrivilegedGroupMembers {
                             }
                         }
                     } else {
-                        Write-Log "[Get-PrivilegedGroupMembers] Group not found: $GroupNameEN (SID: $GroupSID)"
+                        Write-Log "[Get-PrivilegedGroupMembers] Группа не найдена: $GroupNameEN (SID: $GroupSID)"
                     }
                 } catch {
-                    Write-Warning "[Get-PrivilegedGroupMembers] Error checking group $GroupNameEN : $_"
+                    Write-Warning "[Get-PrivilegedGroupMembers] Ошибка проверки группы $GroupNameEN — $_"
                 }
             }
             foreach ($SID in $Script:PrivilegedGroupSIDs.Keys) {
                 try {
                     $GroupNameEN = $Script:PrivilegedGroupSIDs[$SID]
-                    Write-Log "[Get-PrivilegedGroupMembers] Checking built-in group: $GroupNameEN (SID: $SID)"
+                    Write-Log "[Get-PrivilegedGroupMembers] Проверка встроенной группы: $GroupNameEN (SID: $SID)"
                     $Group = Select-LocalDomainGroup (Get-DomainGroup -Identity $SID @CredParams)
                     if ($Group) {
                         $GroupName = $Group.sAMAccountName
-                        Write-Log "[Get-PrivilegedGroupMembers] Found built-in group: $GroupName ($($Group.distinguishedName))"
+                        Write-Log "[Get-PrivilegedGroupMembers] Встроенная группа найдена: $GroupName ($($Group.distinguishedName))"
                         $Result = Get-GroupMembersRecursive -GroupDN $Group.distinguishedName -GroupName $GroupName -CredentialParams $CredParams -Visited @{} -GroupObject $Group
                         Add-GroupForACLReview -DistinguishedName $Group.distinguishedName -Name $GroupName -Source 'privileged group' -NestedGroups $Result.NestedGroups -RootSID $SID `
                             -Weight (Get-GroupTakeoverWeight -GroupSID $SID)
@@ -72661,7 +72661,7 @@ function Get-PrivilegedGroupMembers {
                         if ($null -eq $NestedSum) { $NestedSum = 0 }
                         $TotalMemberCount = $DirectMemberCount + $NestedSum
                         if ($SID -eq 'S-1-5-32-548') { $accountOperatorMembers = $TotalMemberCount }
-                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName - Direct: $DirectMemberCount, Nested groups: $NestedGroupCount, Total: $TotalMemberCount"
+                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName — прямых участников: $DirectMemberCount, вложенных групп: $NestedGroupCount, всего: $TotalMemberCount"
                         $AllMembersFromGroup = Get-AllMembersFromResult -Result $Result
                         foreach ($Member in $AllMembersFromGroup) {
                             $TotalUniqueMembers[$Member.DistinguishedName] = $Member
@@ -72685,20 +72685,20 @@ function Get-PrivilegedGroupMembers {
                             }
                         }
                     } else {
-                        Write-Log "[Get-PrivilegedGroupMembers] Built-in group not found: $GroupNameEN (SID: $SID)"
+                        Write-Log "[Get-PrivilegedGroupMembers] Встроенная группа не найдена: $GroupNameEN (SID: $SID)"
                     }
                 } catch {
-                    Write-Warning "[Get-PrivilegedGroupMembers] Error checking built-in group $GroupNameEN : $_"
+                    Write-Warning "[Get-PrivilegedGroupMembers] Ошибка проверки встроенной группы $GroupNameEN — $_"
                 }
             }
             $domainDN = $Script:LDAPContext.DomainDN
             foreach ($GroupNameDynamic in $Script:DynamicPrivilegedGroups) {
                 try {
-                    Write-Log "[Get-PrivilegedGroupMembers] Checking dynamic group: $GroupNameDynamic"
+                    Write-Log "[Get-PrivilegedGroupMembers] Проверка динамической группы: $GroupNameDynamic"
                     $Group = Select-LocalDomainGroup (Get-DomainGroup -Identity $GroupNameDynamic @CredParams)
                     if ($Group) {
                         $GroupName = $Group.sAMAccountName
-                        Write-Log "[Get-PrivilegedGroupMembers] Found dynamic group: $GroupName ($($Group.distinguishedName))"
+                        Write-Log "[Get-PrivilegedGroupMembers] Динамическая группа найдена: $GroupName ($($Group.distinguishedName))"
                         $Result = Get-GroupMembersRecursive -GroupDN $Group.distinguishedName -GroupName $GroupName -CredentialParams $CredParams -Visited @{} -GroupObject $Group
                         Add-GroupForACLReview -DistinguishedName $Group.distinguishedName -Name $GroupName -Source 'privileged group' -NestedGroups $Result.NestedGroups -Weight 'Finding'
                         $DirectMemberCount = @($Result.DirectMembers).Count
@@ -72706,7 +72706,7 @@ function Get-PrivilegedGroupMembers {
                         $NestedSum = ($Result.NestedGroups | Measure-Object -Property TotalMembers -Sum).Sum
                         if ($null -eq $NestedSum) { $NestedSum = 0 }
                         $TotalMemberCount = $DirectMemberCount + $NestedSum
-                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName - Direct: $DirectMemberCount, Nested groups: $NestedGroupCount, Total: $TotalMemberCount"
+                        Write-Log "[Get-PrivilegedGroupMembers] $GroupName — прямых участников: $DirectMemberCount, вложенных групп: $NestedGroupCount, всего: $TotalMemberCount"
                         $AllMembersFromGroup = Get-AllMembersFromResult -Result $Result
                         foreach ($Member in $AllMembersFromGroup) {
                             $TotalUniqueMembers[$Member.DistinguishedName] = $Member
@@ -72730,10 +72730,10 @@ function Get-PrivilegedGroupMembers {
                             }
                         }
                     } else {
-                        Write-Log "[Get-PrivilegedGroupMembers] Dynamic group not found: $GroupNameDynamic"
+                        Write-Log "[Get-PrivilegedGroupMembers] Динамическая группа не найдена: $GroupNameDynamic"
                     }
                 } catch {
-                    Write-Warning "[Get-PrivilegedGroupMembers] Error checking dynamic group $GroupNameDynamic : $_"
+                    Write-Warning "[Get-PrivilegedGroupMembers] Ошибка проверки динамической группы $GroupNameDynamic — $_"
                 }
             }
             foreach ($exchangeGroupName in @('Organization Management', 'Exchange Trusted Subsystem', 'Exchange Windows Permissions')) {
@@ -72743,7 +72743,7 @@ function Get-PrivilegedGroupMembers {
                         Add-GroupForACLReview -DistinguishedName $exchangeGroup.distinguishedName -Name $exchangeGroup.sAMAccountName -Source 'Exchange group' -Weight 'Finding'
                     }
                 } catch {
-                    Write-Log "[Get-PrivilegedGroupMembers] Lookup of $exchangeGroupName failed: $_"
+                    Write-Log "[Get-PrivilegedGroupMembers] Поиск группы $exchangeGroupName не удался: $_"
                 }
             }
             $TotalGroups = $AllGroupData.Count
@@ -72762,45 +72762,45 @@ function Get-PrivilegedGroupMembers {
                 }
                 $objClass = $memberData.ObjectClass
                 $samName = $memberData.SAMAccountName
-                Write-Log "[Get-PrivilegedGroupMembers] Counting member: $samName, ObjectClass: '$objClass'"
+                Write-Log "[Get-PrivilegedGroupMembers] Подсчёт участника: $samName, класс объекта: '$objClass'"
                 if ($objClass -ieq 'msDS-GroupManagedServiceAccount' -or $objClass -ieq 'msDS-ManagedServiceAccount') {
                     $gMSACount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as gMSA"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как gMSA"
                 }
                 elseif ($objClass -ieq 'msDS-DelegatedManagedServiceAccount') {
                     $dMSACount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as dMSA"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как dMSA"
                 }
                 elseif ($objClass -ieq 'computer') {
                     $ComputerCount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as Computer"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как компьютер"
                 }
                 elseif ($objClass -ieq 'foreignSecurityPrincipal') {
                     $ForeignCount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as foreign principal"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как внешний субъект безопасности"
                 }
                 elseif ($objClass -ieq 'user') {
                     $UserCount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as User"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как пользователь"
                 }
                 elseif ($samName -and $samName.EndsWith('$')) {
                     $ComputerCount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as Computer ($ suffix fallback)"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как компьютер (резервный признак: суффикс $)"
                 }
                 else {
                     $UserCount++
-                    Write-Log "[Get-PrivilegedGroupMembers]   -> Counted as User (default fallback, class was: '$objClass')"
+                    Write-Log "[Get-PrivilegedGroupMembers]   -> Учтён как пользователь (резервный вариант; исходный класс: '$objClass')"
                 }
             }
             if ($totalMembers -gt $Script:ProgressThreshold) {
                 Show-Progress -Activity "Analyzing privileged members" -Completed
             }
-            Write-Log "[Get-PrivilegedGroupMembers] Count summary: Users=$UserCount, gMSAs=$gMSACount, Computers=$ComputerCount, Foreign=$ForeignCount"
-            Write-Log "[Get-PrivilegedGroupMembers] AllGroupData contains $TotalGroups groups:"
+            Write-Log "[Get-PrivilegedGroupMembers] Сводка: пользователей=$UserCount, gMSA=$gMSACount, компьютеров=$ComputerCount, внешних=$ForeignCount"
+            Write-Log "[Get-PrivilegedGroupMembers] В AllGroupData содержится групп: $TotalGroups"
             foreach ($gd in $AllGroupData) {
-                Write-Log "[Get-PrivilegedGroupMembers]   - $($gd.GroupName) (Type: $($gd.GroupType), Members: $($gd.TotalMemberCount))"
+                Write-Log "[Get-PrivilegedGroupMembers]   - $($gd.GroupName) (тип: $($gd.GroupType), участников: $($gd.TotalMemberCount))"
             }
-            Write-Log "[Get-PrivilegedGroupMembers] TotalUniqueMembers: $TotalMembers"
+            Write-Log "[Get-PrivilegedGroupMembers] Всего уникальных участников (TotalUniqueMembers): $TotalMembers"
             $MemberGroupMemberships = @{}
             foreach ($GroupData in $AllGroupData) {
                 function Get-AllMembersWithPaths {
@@ -72913,7 +72913,7 @@ function Get-PrivilegedGroupMembers {
                     }
                 } elseif ($BasicInfo.IsCrossDomain -and $BasicInfo.GCObject) {
                     $FullUserObject = $BasicInfo.GCObject
-                    Write-Log "[Get-PrivilegedGroupMembers] Using GC-resolved object for cross-domain member: $($BasicInfo.SAMAccountName)"
+                    Write-Log "[Get-PrivilegedGroupMembers] Используется объект другого домена, найденный через GC: $($BasicInfo.SAMAccountName)"
                 } else {
                     $FullUserObject = @(Get-DomainUser -Identity $dn @CredParams)[0]
                     if (-not $FullUserObject) {
@@ -72978,7 +72978,7 @@ function Get-PrivilegedGroupMembers {
                     }
                 }
             } catch {
-                Write-Log "[Get-PrivilegedGroupMembers] Primary-group query for the DC groups failed: $($_.Exception.Message)" -Level Warning
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка запроса первичных групп для групп DC: $($_.Exception.Message)" -Level Warning
             }
             Show-SubHeader "Проверка списков управления доступом объекта AdminSDHolder..." -ObjectType "AdminSDHolderACL"
             $AdminSDHolderFindings = @()
@@ -72988,7 +72988,7 @@ function Get-PrivilegedGroupMembers {
             try {
                 $AdminSDHolderObj = @(Get-DomainObject -Identity $AdminSDHolderDN -Properties 'nTSecurityDescriptor' -Raw @connectionParams)[0]
                 if (-not $AdminSDHolderObj -or -not $AdminSDHolderObj.nTSecurityDescriptor) {
-                    Write-Log "[Get-PrivilegedGroupMembers] Could not retrieve AdminSDHolder security descriptor" -Level Error
+                    Write-Log "[Get-PrivilegedGroupMembers] Не удалось получить дескриптор безопасности AdminSDHolder" -Level Error
                     throw "AdminSDHolder security descriptor not available"
                 }
                 $sdBytes = $AdminSDHolderObj.nTSecurityDescriptor
@@ -73008,7 +73008,7 @@ function Get-PrivilegedGroupMembers {
                         }
                         if (-not $TrusteeSID) { continue }
                         if (([string]$ACE.PropagationFlags) -match 'InheritOnly') {
-                            Write-Log "[Get-PrivilegedGroupMembers] Skipping inherit-only ACE on AdminSDHolder: Trustee=$TrusteeSID"
+                            Write-Log "[Get-PrivilegedGroupMembers] Пропущен ACE только для наследования в AdminSDHolder: субъект=$TrusteeSID"
                             continue
                         }
                         $objectType = $ACE.ObjectType
@@ -73090,7 +73090,7 @@ function Get-PrivilegedGroupMembers {
                         }
                         $reported = @($entries | Where-Object { $defaultRights -notcontains $_[0] })
                         if (@($reported).Count -eq 0) {
-                            Write-Log "[Get-PrivilegedGroupMembers] AdminSDHolder: $TrusteeSID holds only its default rights"
+                            Write-Log "[Get-PrivilegedGroupMembers] В AdminSDHolder у $TrusteeSID только права по умолчанию"
                             continue
                         }
                         $Permissions = @($reported | ForEach-Object { $_[1] })
@@ -73099,18 +73099,18 @@ function Get-PrivilegedGroupMembers {
                         if (-not $IncludePrivileged) {
                             $scopeResult = Test-IsExpectedInScope -Identity $TrusteeSID -Scope 'DomainRootACL' -ReturnDetails
                             if ($scopeResult.Severity -eq 'Expected') {
-                                Write-Log "[Get-PrivilegedGroupMembers] AdminSDHolder expected: $TrusteeName - $($scopeResult.Reason)"
+                                Write-Log "[Get-PrivilegedGroupMembers] AdminSDHolder: ожидаемые права $TrusteeName — $($scopeResult.Reason)"
                                 continue
                             }
                             if ($scopeResult.Severity -eq 'Attention') {
-                                Write-Log "[Get-PrivilegedGroupMembers] AdminSDHolder attention: $TrusteeName - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)"
+                                Write-Log "[Get-PrivilegedGroupMembers] AdminSDHolder: требует внимания $TrusteeName — $($scopeResult.Reason); пропущено (для включения укажите -IncludePrivileged)"
                                 continue
                             }
                             $severity = $scopeResult.Severity
                         } else {
                             $scopeResult = Test-IsExpectedInScope -Identity $TrusteeSID -Scope 'DomainRootACL' -ReturnDetails
                             $severity = $scopeResult.Severity
-                            Write-Log "[Get-PrivilegedGroupMembers] IncludePrivileged: Including AdminSDHolder $TrusteeName ($TrusteeSID) with severity $severity"
+                            Write-Log "[Get-PrivilegedGroupMembers] IncludePrivileged: участник AdminSDHolder $TrusteeName ($TrusteeSID) включён с критичностью $severity"
                         }
                         $finding = [PSCustomObject]@{
                             Name = $TrusteeName
@@ -73144,7 +73144,7 @@ function Get-PrivilegedGroupMembers {
                                     (Test-ADRightsMask -Rights $ACE.ActiveDirectoryRights -Has ([System.DirectoryServices.ActiveDirectoryRights]::ListChildren)) -or
                                     (Test-ADRightsMask -Rights $ACE.ActiveDirectoryRights -Has ([System.DirectoryServices.ActiveDirectoryRights]::ListObject))))
                             if (-not $hidesTemplate) {
-                                Write-Log "[Get-PrivilegedGroupMembers] Deny on AdminSDHolder that hides nothing: $aceSID $($ACE.ActiveDirectoryRights) $denyType"
+                                Write-Log "[Get-PrivilegedGroupMembers] Запрещающий ACE в AdminSDHolder, который ничего не скрывает: $aceSID $($ACE.ActiveDirectoryRights) $denyType"
                                 continue
                             }
                             $denyName = ConvertFrom-SID -SID $aceSID
@@ -73170,7 +73170,7 @@ function Get-PrivilegedGroupMembers {
                     }
                     $holderOwnerSID = $null
                     try { $holderOwnerSID = $SecurityDescriptor.GetOwner([System.Security.Principal.SecurityIdentifier]).Value } catch {
-                        Write-Log "[Get-PrivilegedGroupMembers] Could not read the AdminSDHolder owner: $_"
+                        Write-Log "[Get-PrivilegedGroupMembers] Не удалось прочитать владельца AdminSDHolder: $_"
                     }
                     if ($holderOwnerSID) {
                         $ownerScope = Test-IsExpectedInScope -Identity $holderOwnerSID -Scope 'DomainRootACL' -ReturnDetails
@@ -73203,7 +73203,7 @@ function Get-PrivilegedGroupMembers {
                 }
                 $adminSDHolderRead = $true
             } catch {
-                Write-Log "[Get-PrivilegedGroupMembers] Error checking AdminSDHolder: $_" -Level Error
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка проверки AdminSDHolder: $_" -Level Error
                 $adminSDHolderRead = $false
             }
             if (-not $adminSDHolderRead) {
@@ -73218,7 +73218,7 @@ function Get-PrivilegedGroupMembers {
                     -ConnectionParams $connectionParams -AccountOperatorMembers $accountOperatorMembers `
                     -AdminSDExcludedGroups $adminSDExcludedGroups
             } catch {
-                Write-Log "[Get-PrivilegedGroupMembers] Group ACL analysis failed: $_" -Level Error
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка анализа ACL групп: $_" -Level Error
                 Show-Line "Ошибка анализа ACL групп: не удалось оценить привилегированные группы вне защиты AdminSDHolder: $_" -Class Finding
             }
             try {
@@ -73250,7 +73250,7 @@ function Get-PrivilegedGroupMembers {
                 Show-PrivilegedAccountACL -Accounts $AccountsForACLReview -TemplateRules $AdminSDHolderRules -IncludePrivileged:$IncludePrivileged `
                     -ConnectionParams $connectionParams -AccountOperatorMembers $accountOperatorMembers
             } catch {
-                Write-Log "[Get-PrivilegedGroupMembers] Account ACL analysis failed: $_" -Level Error
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка анализа ACL учётных записей: $_" -Level Error
                 Show-Line "Ошибка анализа ACL привилегированных учётных записей: $_" -Class Finding
             }
             Show-SubHeader "Проверка группы Pre-Windows 2000 Compatible Access..." -ObjectType "PreWindows2000Access"
@@ -73282,7 +73282,7 @@ function Get-PrivilegedGroupMembers {
                         }
                         if (-not $MemberSID) {
                             $PreWin2000Unresolved += $MemberDN
-                            Write-Log "[Get-PrivilegedGroupMembers] Pre-Windows 2000 member could not be resolved to a SID: $MemberDN" -Level Warning
+                            Write-Log "[Get-PrivilegedGroupMembers] Не удалось определить SID участника Pre-Windows 2000 Compatible Access: $MemberDN" -Level Warning
                             continue
                         }
                         if (-not (Test-IsBroadTrustee -SID $MemberSID)) { continue }
@@ -73325,16 +73325,16 @@ function Get-PrivilegedGroupMembers {
                     Show-Line "Участников Pre-Windows 2000 Compatible Access, которые не разрешены до SID и потому не оценивались: $(@($PreWin2000Unresolved).Count)" -Class Hint
                 }
             } catch {
-                Write-Log "[Get-PrivilegedGroupMembers] Error checking Pre-Windows 2000 Compatible Access: $_" -Level Error
+                Write-Log "[Get-PrivilegedGroupMembers] Ошибка проверки Pre-Windows 2000 Compatible Access: $_" -Level Error
                 Show-Line "Не удалось прочитать состав Pre-Windows 2000 Compatible Access; членство не оценивалось" -Class Finding
             }
         } catch {
-            Write-Log "[Get-PrivilegedGroupMembers] Error: $_" -Level Error
+            Write-Log "[Get-PrivilegedGroupMembers] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: не удалось оценить членство в привилегированных группах: $_" -Class Finding
         }
     }
     end {
-        Write-Log "[Get-PrivilegedGroupMembers] Privileged group enumeration completed"
+        Write-Log "[Get-PrivilegedGroupMembers] Перечисление привилегированных групп завершено"
     }
 }
 function Get-AdminSDHolderExcludedGroup {
@@ -73355,7 +73355,7 @@ function Get-AdminSDHolderExcludedGroup {
             }
         }
     } catch {
-        Write-Log "[Get-PrivilegedGroupMembers] Could not read dsHeuristics for the AdminSDHolder exclusions: $_"
+        Write-Log "[Get-PrivilegedGroupMembers] Не удалось прочитать dsHeuristics для исключений AdminSDHolder: $_"
     }
     return $excluded
 }
@@ -73404,7 +73404,7 @@ function Show-UnprotectedGroupACL {
         try {
             $groupObject = @(Get-DomainObject -Identity $group.DistinguishedName -Properties 'nTSecurityDescriptor', 'adminCount' -Raw @ConnectionParams)[0]
         } catch {
-            Write-Log "[Get-PrivilegedGroupMembers] Could not read $($group.DistinguishedName): $_"
+            Write-Log "[Get-PrivilegedGroupMembers] Не удалось прочитать $($group.DistinguishedName): $_"
         }
         if (-not $groupObject -or -not $groupObject.nTSecurityDescriptor) {
             $unreadGroups += $groupLabel
@@ -73421,7 +73421,7 @@ function Show-UnprotectedGroupACL {
         try {
             $descriptor.SetSecurityDescriptorBinaryForm([byte[]]$groupObject.nTSecurityDescriptor)
         } catch {
-            Write-Log "[Get-PrivilegedGroupMembers] Could not parse the descriptor of $($group.DistinguishedName): $_"
+            Write-Log "[Get-PrivilegedGroupMembers] Не удалось разобрать дескриптор $($group.DistinguishedName): $_"
             $unreadGroups += $groupLabel
             continue
         }
@@ -73688,7 +73688,7 @@ function Show-PrivilegedAccountACL {
         try {
             $accountObject = @(Get-DomainObject -Identity $account.DistinguishedName -Properties 'nTSecurityDescriptor', 'adminCount' -Raw @ConnectionParams)[0]
         } catch {
-            Write-Log "[Get-PrivilegedGroupMembers] Could not read $($account.DistinguishedName): $_"
+            Write-Log "[Get-PrivilegedGroupMembers] Не удалось прочитать $($account.DistinguishedName): $_"
         }
         if (-not $accountObject -or -not $accountObject.nTSecurityDescriptor) {
             $unreadAccounts += $accountName
@@ -73698,7 +73698,7 @@ function Show-PrivilegedAccountACL {
         try {
             $descriptor.SetSecurityDescriptorBinaryForm([byte[]]$accountObject.nTSecurityDescriptor)
         } catch {
-            Write-Log "[Get-PrivilegedGroupMembers] Could not parse the descriptor of $($account.DistinguishedName): $_"
+            Write-Log "[Get-PrivilegedGroupMembers] Не удалось разобрать дескриптор $($account.DistinguishedName): $_"
             $unreadAccounts += $accountName
             continue
         }
@@ -84382,15 +84382,15 @@ function Get-ADCSVulnerabilities {
                     $null
                 }
                 $identity = if ($principalSID) { $principalSID } else { $principalName }
-                Write-Log "[Get-EnrollmentPrivilegeState] Checking: $principalName (SID: $principalSID, using: $identity)"
+                Write-Log "[Get-EnrollmentPrivilegeState] Проверка субъекта: $principalName (SID: $principalSID, используется: $identity)"
                 $result = Test-IsPrivileged -Identity $identity
                 if ($result.Category -ne 'Privileged') {
-                    Write-Log "[Get-EnrollmentPrivilegeState] Found non-privileged: $principalName (Category: $($result.Category), Reason: $($result.Reason))"
+                    Write-Log "[Get-EnrollmentPrivilegeState] Найден непривилегированный субъект: $principalName (категория: $($result.Category), причина: $($result.Reason))"
                     return 'NonPrivileged'
                 }
-                Write-Log "[Get-EnrollmentPrivilegeState] Privileged: $principalName (Category: $($result.Category))"
+                Write-Log "[Get-EnrollmentPrivilegeState] Привилегированный субъект: $principalName (категория: $($result.Category))"
             }
-            Write-Log "[Get-EnrollmentPrivilegeState] All enrollment principals are truly privileged"
+            Write-Log "[Get-EnrollmentPrivilegeState] Все субъекты с правом регистрации сертификатов действительно привилегированы"
             return 'Privileged'
         }
     }
@@ -84442,7 +84442,7 @@ function Get-ADCSVulnerabilities {
                 }
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] Error querying Root CAs: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] Ошибка запроса корневых УЦ: $_" -Level Warning
             }
             try {
                 $ntAuthSearchBase = "CN=Public Key Services,CN=Services,$configNC"
@@ -84498,12 +84498,12 @@ function Get-ADCSVulnerabilities {
                             }
                         }
                         if ($ntAuthIssuers.Count -gt 1) {
-                            Show-Line ("$($ntAuthIssuers.Count) different CAs are trusted to issue a certificate that logs " +
-                                       "on as any account - each one is a trust anchor for the whole forest") -Class Hint
+                            Show-Line ("$($ntAuthIssuers.Count) различных УЦ могут выдавать сертификаты для входа " +
+                                       "от имени любой учётной записи — каждый из них является якорем доверия всего леса") -Class Hint
                         }
                         if ($foreignCount -gt 0) {
-                            Show-Line ("$foreignCount NTAuth certificate(s) belong to no Enterprise CA of this forest - " +
-                                       "verify each was added on purpose, and who holds its key") -Class Hint -FindingId 'NTAUTH_FOREIGN_ISSUER'
+                            Show-Line ("$foreignCount сертификатов NTAuth не относятся ни к одному корпоративному УЦ этого леса — " +
+                                       "проверьте обоснованность их добавления и владельцев закрытых ключей") -Class Hint -FindingId 'NTAUTH_FOREIGN_ISSUER'
                         }
                         if ($expiredCount -gt 0) {
                             Show-Line "Сертификатов NTAuth с истёкшим сроком действия, которые можно удалить после проверки зависимостей: $expiredCount" -Class Hint -FindingId 'PKI_CERTIFICATE_EXPIRED'
@@ -84522,7 +84522,7 @@ function Get-ADCSVulnerabilities {
                 }
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] Error querying NTAuth Store: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] Ошибка запроса хранилища NTAuth: $_" -Level Warning
             }
             try {
                 $aiaSearchBase = "CN=AIA,CN=Public Key Services,CN=Services,$configNC"
@@ -84554,12 +84554,12 @@ function Get-ADCSVulnerabilities {
                 }
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] Error querying AIA CAs: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] Ошибка запроса УЦ AIA: $_" -Level Warning
             }
             Show-SubHeader "Поиск компонентов служб сертификатов Active Directory (AD CS)..." -ObjectType "CertificateAuthority"
             $queryError = $caResults | Where-Object { $_._QueryError -eq $true }
             if ($queryError) {
-                Write-Log "[Get-ADCSVulnerabilities] CA query failed: $($queryError.ErrorMessage)"
+                Write-Log "[Get-ADCSVulnerabilities] Не удалось запросить УЦ: $($queryError.ErrorMessage)"
                 Show-Line "Не удалось запросить центры сертификации: ошибка LDAP, проверки подлинности или сети" -Class Finding
                 return
             }
@@ -84579,23 +84579,23 @@ function Get-ADCSVulnerabilities {
                     if ($caComputer) {
                         $isInactive = $null -ne ($caComputer | Test-AccountActivity -IsInactive)
                         if ($isInactive) {
-                            Write-Log "[Get-ADCSVulnerabilities] Skipping HTTP check for $($ca.DNSHostName) - CA server inactive"
+                            Write-Log "[Get-ADCSVulnerabilities] HTTP-проверка для $($ca.DNSHostName) пропущена — сервер УЦ неактивен"
                             $skipHttpCheck = $true
                         }
                     }
                     if (-not $skipHttpCheck) {
-                        Write-Log "[Get-ADCSVulnerabilities] Checking web enrollment for $($ca.DNSHostName) (CA: $($ca.Name))..."
+                        Write-Log "[Get-ADCSVulnerabilities] Проверка веб-регистрации для $($ca.DNSHostName) (УЦ: $($ca.Name))..."
                         try {
                             $webEnrollmentResult = Invoke-HTTPRequest -ScanADCS -Uri $ca.DNSHostName -CAName $ca.Name -TestEPA
                             if ($webEnrollmentResult.Success) {
-                                Write-Log "[Get-ADCSVulnerabilities] Web enrollment check successful for $($ca.DNSHostName)"
+                                Write-Log "[Get-ADCSVulnerabilities] Проверка веб-регистрации для $($ca.DNSHostName) успешна"
                                 if ($null -ne $webEnrollmentResult.EPAEnabled) {
-                                    Write-Log "[Get-ADCSVulnerabilities] EPA detection: Enabled=$($webEnrollmentResult.EPAEnabled), Confidence=$($webEnrollmentResult.EPAConfidence)"
+                                    Write-Log "[Get-ADCSVulnerabilities] Определение EPA: включено=$($webEnrollmentResult.EPAEnabled), достоверность=$($webEnrollmentResult.EPAConfidence)"
                                 }
                             }
                         }
                         catch {
-                            Write-Log "[Get-ADCSVulnerabilities] Web enrollment check failed: $_"
+                            Write-Log "[Get-ADCSVulnerabilities] Не удалось проверить веб-регистрацию: $_"
                         }
                     }
                 }
@@ -84647,18 +84647,18 @@ function Get-ADCSVulnerabilities {
                             $identityName = ConvertFrom-SID -SID $aceSID
                             $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'ADCSEnroll' -ReturnDetails
                             if ($scopeResult.Severity -eq 'Expected') {
-                                Write-Log "[Get-ADCSVulnerabilities] Expected identity $aceSID has $aceRights on CA $($ca.Name)"
+                                Write-Log "[Get-ADCSVulnerabilities] Ожидаемый субъект $aceSID имеет права $aceRights на УЦ $($ca.Name)"
                                 continue
                             }
                             $privCheck = Test-IsPrivileged -Identity $aceSID
                             if ($privCheck.IsPrivileged -eq $true) {
-                                Write-Log "[Get-ADCSVulnerabilities] Privileged identity $identityName ($($privCheck.Category): $($privCheck.Reason)) has $aceRights on CA $($ca.Name) - expected"
+                                Write-Log "[Get-ADCSVulnerabilities] Привилегированный субъект $identityName ($($privCheck.Category): $($privCheck.Reason)) имеет ожидаемые права $aceRights на УЦ $($ca.Name)"
                                 continue
                             }
                             if ($identityName -and $ca.DNSHostName) {
                                 $caComputerName = ($ca.DNSHostName -split '\.')[0]
                                 if ($identityName -match "\\$caComputerName`$" -or $identityName -eq "$caComputerName`$") {
-                                    Write-Log "[Get-ADCSVulnerabilities] CA server $caComputerName has $aceRights on its own AD object - expected"
+                                    Write-Log "[Get-ADCSVulnerabilities] Сервер УЦ $caComputerName имеет ожидаемые права $aceRights на собственный объект AD"
                                     continue
                                 }
                             }
@@ -84673,7 +84673,7 @@ function Get-ADCSVulnerabilities {
                     }
                 }
                 catch {
-                    Write-Log "[Get-ADCSVulnerabilities] CA AD object ACL check failed for '$($ca.Name)': $_"
+                    Write-Log "[Get-ADCSVulnerabilities] Не удалось проверить ACL объекта УЦ '$($ca.Name)' в AD: $_"
                 }
                 $hasDangerousADPermissions = @($dangerousACEs).Count -gt 0
                 if ($hasDangerousADPermissions) {
@@ -84769,17 +84769,17 @@ function Get-ADCSVulnerabilities {
                             if ($caCert.SignatureAlgorithm -and $caCert.SignatureAlgorithm -match 'sha1|md5|md2') {
                                 $caComputer | Add-Member -NotePropertyName 'CACertWeakSignature' -NotePropertyValue "Weak signature algorithm: $($caCert.SignatureAlgorithm)" -Force
                                 $caVulnerabilityCount++
-                                Write-Log "[Get-ADCSVulnerabilities] CA '$($ca.Name)' uses weak signature algorithm: $($caCert.SignatureAlgorithm)"
+                                Write-Log "[Get-ADCSVulnerabilities] УЦ '$($ca.Name)' использует слабый алгоритм подписи: $($caCert.SignatureAlgorithm)"
                             }
                             if ($caCert.PublicKeyLength -gt 0 -and $caCert.PublicKeyLength -lt 2048) {
                                 $caComputer | Add-Member -NotePropertyName 'CACertShortKey' -NotePropertyValue "Insufficient key length: $($caCert.PublicKeyLength) bit (minimum 2048 recommended)" -Force
                                 $caVulnerabilityCount++
-                                Write-Log "[Get-ADCSVulnerabilities] CA '$($ca.Name)' uses short key: $($caCert.PublicKeyLength) bit"
+                                Write-Log "[Get-ADCSVulnerabilities] УЦ '$($ca.Name)' использует короткий ключ: $($caCert.PublicKeyLength) бит"
                             }
                             if ($caCert.Status -eq 'EXPIRED') {
                                 $caComputer | Add-Member -NotePropertyName 'CACertExpired' -NotePropertyValue "CA certificate expired on $(Format-adPEASDate $caCert.NotAfter 'yyyy-MM-dd')" -Force
                                 $caVulnerabilityCount++
-                                Write-Log "[Get-ADCSVulnerabilities] CA '$($ca.Name)' certificate is EXPIRED"
+                                Write-Log "[Get-ADCSVulnerabilities] Срок сертификата УЦ '$($ca.Name)' ИСТЁК"
                             }
                         }
                         if ($ca.CertificateTemplates -and @($ca.CertificateTemplates).Count -gt 0) {
@@ -84791,7 +84791,7 @@ function Get-ADCSVulnerabilities {
                         $caComputer | Add-Member -NotePropertyName '_adPEASObjectType' -NotePropertyValue 'CertificateAuthority' -Force
                         Show-Object $caComputer -Class Hint
                     } else {
-                        Write-Log "[Get-ADCSVulnerabilities] CA computer '$($ca.DNSHostName)' not found in current domain - using Configuration Partition data"
+                        Write-Log "[Get-ADCSVulnerabilities] Компьютер УЦ '$($ca.DNSHostName)' не найден в текущем домене — используются данные Configuration"
                         $syntheticTemplates = $null
                         if ($ca.CertificateTemplates) { $syntheticTemplates = @($ca.CertificateTemplates) }
                         $syntheticCA = [PSCustomObject]@{
@@ -84935,7 +84935,7 @@ function Get-ADCSVulnerabilities {
                 )
                 $allFindings = @()
                 foreach ($container in $pkiContainers) {
-                    Write-Log "[Get-ADCSVulnerabilities] ESC5: Checking $($container.Name)..."
+                    Write-Log "[Get-ADCSVulnerabilities] ESC5: проверка $($container.Name)..."
                     try {
                         $containerObj = @(Invoke-LDAPSearch -Filter "(distinguishedName=$($container.DN))" -SearchBase $configNC -Properties 'nTSecurityDescriptor' -Raw -Scope Subtree)[0]
                         $containerACL = @()
@@ -84981,18 +84981,18 @@ function Get-ADCSVulnerabilities {
                                     if (-not $IncludePrivileged) {
                                         $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'PKIContainer' -ReturnDetails
                                         if ($scopeResult.Severity -eq 'Expected') {
-                                            Write-Log "[Get-ADCSVulnerabilities] Expected identity $aceSID has $aceRights on $($container.Name)"
+                                            Write-Log "[Get-ADCSVulnerabilities] Ожидаемый субъект $aceSID имеет права $aceRights на $($container.Name)"
                                             continue
                                         }
                                         if ($scopeResult.Severity -eq 'Attention') {
-                                            Write-Log "[Get-ADCSVulnerabilities] Privileged identity $aceSID has $aceRights on $($container.Name) - skipped (use -IncludePrivileged to include)"
+                                            Write-Log "[Get-ADCSVulnerabilities] Привилегированный субъект $aceSID обладает правами $aceRights на $($container.Name) — пропущен (для включения укажите -IncludePrivileged)"
                                             continue
                                         }
                                         $severity = $scopeResult.Severity
                                     } else {
                                         $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'PKIContainer' -ReturnDetails
                                         $severity = $scopeResult.Severity
-                                        Write-Log "[Get-ADCSVulnerabilities] IncludePrivileged: Including $aceSID with severity $severity"
+                                        Write-Log "[Get-ADCSVulnerabilities] IncludePrivileged: субъект $aceSID включён с критичностью $severity"
                                     }
                                     $allFindings += [PSCustomObject]@{
                                         SID = $aceSID
@@ -85007,7 +85007,7 @@ function Get-ADCSVulnerabilities {
                             try {
                                 $containerOwnerSID = [string]$secDescriptor.GetOwner([System.Security.Principal.SecurityIdentifier])
                             } catch {
-                                Write-Log "[Get-ADCSVulnerabilities] ESC5: Owner of $($container.Name) could not be read: $_"
+                                Write-Log "[Get-ADCSVulnerabilities] ESC5: не удалось прочитать владельца $($container.Name): $_"
                             }
                             if ($containerOwnerSID) {
                                 $ownerScope = Test-IsExpectedInScope -Identity $containerOwnerSID -Scope 'PKIContainer' -ReturnDetails
@@ -85021,13 +85021,13 @@ function Get-ADCSVulnerabilities {
                                         ContainerDescription = $container.Description
                                     }
                                 } else {
-                                    Write-Log "[Get-ADCSVulnerabilities] ESC5: $($container.Name) is owned by $containerOwnerSID, which the PKIContainer scope expects"
+                                    Write-Log "[Get-ADCSVulnerabilities] ESC5: владелец $($container.Name) — $containerOwnerSID, что соответствует правилам области PKIContainer"
                                 }
                             }
                         }
                     }
                     catch {
-                        Write-Log "[Get-ADCSVulnerabilities] Error checking $($container.Name): $_" -Level Warning
+                        Write-Log "[Get-ADCSVulnerabilities] Ошибка проверки $($container.Name): $_" -Level Warning
                     }
                 }
                 if (@($allFindings).Count -gt 0) {
@@ -85075,14 +85075,14 @@ function Get-ADCSVulnerabilities {
                 }
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] Error during ESC5 check: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] Ошибка проверки ESC5: $_" -Level Warning
                 Show-Line "Ошибка проверки разрешений контейнеров PKI" -Class Hint
             }
             Show-SubHeader "Поиск шаблонов сертификатов AD CS..." -ObjectType "CertificateTemplate"
             $templateResults = @(Get-ADCSTemplate @CredParams)
             $templateQueryError = $templateResults | Where-Object { $_._QueryError -eq $true }
             if ($templateQueryError) {
-                Write-Log "[Get-ADCSVulnerabilities] Template query failed: $($templateQueryError.ErrorMessage)"
+                Write-Log "[Get-ADCSVulnerabilities] Не удалось запросить шаблоны: $($templateQueryError.ErrorMessage)"
                 Show-Line "Не удалось запросить шаблоны сертификатов: ошибка LDAP, проверки подлинности или сети" -Class Finding
                 return
             }
@@ -85115,11 +85115,11 @@ function Get-ADCSVulnerabilities {
                     }
                 }
                 if ($oidToGroupLink.Count -gt 0) {
-                    Write-Log "[Get-ADCSVulnerabilities] ESC13 cache: Found $($oidToGroupLink.Count) issuance policy OID(s) with group links"
+                    Write-Log "[Get-ADCSVulnerabilities] Кэш ESC13: найдено политик выдачи с OID и привязкой к группам — $($oidToGroupLink.Count)"
                 }
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] ESC13: Error loading issuance policy cache: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] ESC13: ошибка загрузки кэша политик выдачи: $_" -Level Warning
             }
             if (@($templates | Where-Object { $_.PublicationUnknown }).Count -gt 0) {
                 Show-Line "Не удалось определить, какие шаблоны опубликованы на ЦС; ниже могут отображаться отключённые шаблоны" -Class "Note"
@@ -85139,7 +85139,7 @@ function Get-ADCSVulnerabilities {
                 }
             }
             if (@($agentTemplateNames).Count -gt 0) {
-                Write-Log "[Get-ADCSVulnerabilities] ESC3 chain: $(@($agentTemplateNames).Count) enrollment agent template(s) enrollable by non-privileged principals: $($agentTemplateNames -join ', ')"
+                Write-Log "[Get-ADCSVulnerabilities] Цепочка ESC3: шаблонов агента регистрации, доступных непривилегированным субъектам — $(@($agentTemplateNames).Count): $($agentTemplateNames -join ', ')"
             }
             $templateDescriptors = @{}
             try {
@@ -85151,10 +85151,10 @@ function Get-ADCSVulnerabilities {
                         $templateDescriptors[[string]$rawTemplate.distinguishedName] = $rawTemplate.nTSecurityDescriptor
                     }
                 }
-                Write-Log "[Get-ADCSVulnerabilities] Prefetched $($templateDescriptors.Count) template security descriptor(s) in one query"
+                Write-Log "[Get-ADCSVulnerabilities] Дескрипторов безопасности шаблонов, предварительно полученных одним запросом: $($templateDescriptors.Count)"
             }
             catch {
-                Write-Log "[Get-ADCSVulnerabilities] Template descriptor prefetch failed, falling back to one read per template: $_" -Level Warning
+                Write-Log "[Get-ADCSVulnerabilities] Не удалось предварительно получить дескрипторы шаблонов; переход к отдельным запросам: $_" -Level Warning
             }
             $totalTemplates = @($templates).Count
             $currentIndex = 0
@@ -85166,11 +85166,11 @@ function Get-ADCSVulnerabilities {
                 $allEnrollmentPrivileged = ($enrollmentState -eq 'Privileged' -or $enrollmentState -eq 'NotEnrollable')
                 $enrollmentRightsUnknown = ($enrollmentState -eq 'Unknown')
                 if ($enrollmentState -eq 'Privileged') {
-                    Write-Log "[Get-ADCSVulnerabilities] Template '$($template.Name)': All enrollment principals are truly privileged - skipping ESC1/2/3/9/15"
+                    Write-Log "[Get-ADCSVulnerabilities] Шаблон '$($template.Name)': все субъекты регистрации привилегированы — ESC1/2/3/9/15 пропущены"
                 } elseif ($enrollmentState -eq 'NotEnrollable') {
-                    Write-Log "[Get-ADCSVulnerabilities] Template '$($template.Name)': no principal holds Certificate-Enrollment - skipping ESC1/2/3/9/15"
+                    Write-Log "[Get-ADCSVulnerabilities] Шаблон '$($template.Name)': нет субъекта с правом Certificate-Enrollment — ESC1/2/3/9/15 пропущены"
                 } elseif ($enrollmentRightsUnknown) {
-                    Write-Log "[Get-ADCSVulnerabilities] Template '$($template.Name)': enrollment rights could not be read - ESC1/2/3/9/15 cannot be decided" -Level Warning
+                    Write-Log "[Get-ADCSVulnerabilities] Шаблон '$($template.Name)': не удалось прочитать права регистрации — невозможно оценить ESC1/2/3/9/15" -Level Warning
                 }
                 $requiresRASignature = $template.RASignatureCount -ge 1
                 if ($template.EnrolleeSuppliesSubject -and $template.ClientAuthentication -and -not $allEnrollmentPrivileged) {
@@ -85287,18 +85287,18 @@ function Get-ADCSVulnerabilities {
                             if (-not $IncludePrivileged) {
                                 $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'ADCSTemplateWrite' -ReturnDetails
                                 if ($scopeResult.Severity -eq 'Expected') {
-                                    Write-Log "[Get-ADCSVulnerabilities] Expected identity $aceSID has $aceRights on template $($template.Name)"
+                                    Write-Log "[Get-ADCSVulnerabilities] Ожидаемый субъект $aceSID имеет права $aceRights на шаблон $($template.Name)"
                                     continue
                                 }
                                 if ($scopeResult.Severity -eq 'Attention') {
-                                    Write-Log "[Get-ADCSVulnerabilities] Privileged identity $aceSID (member of admin group) has $aceRights on template $($template.Name) - skipped (use -IncludePrivileged to include)"
+                                    Write-Log "[Get-ADCSVulnerabilities] Привилегированный субъект $aceSID (участник группы администраторов) обладает правами $aceRights на шаблон $($template.Name) — пропущен (для включения укажите -IncludePrivileged)"
                                     continue
                                 }
                                 $severity = $scopeResult.Severity
                             } else {
                                 $scopeResult = Test-IsExpectedInScope -Identity $aceSID -Scope 'ADCSTemplateWrite' -ReturnDetails
                                 $severity = $scopeResult.Severity
-                                Write-Log "[Get-ADCSVulnerabilities] IncludePrivileged: Including $identityName ($aceSID) with severity $severity"
+                                Write-Log "[Get-ADCSVulnerabilities] IncludePrivileged: субъект $identityName ($aceSID) включён с критичностью $severity"
                             }
                             $dangerousACEs += [PSCustomObject]@{
                                 Identity = $identityName
@@ -85312,7 +85312,7 @@ function Get-ADCSVulnerabilities {
                         try {
                             $templateOwnerSID = [string]$securityDescriptor.GetOwner([System.Security.Principal.SecurityIdentifier])
                         } catch {
-                            Write-Log "[Get-ADCSVulnerabilities] ESC4: Owner of template '$($template.Name)' could not be read: $_"
+                            Write-Log "[Get-ADCSVulnerabilities] ESC4: не удалось прочитать владельца шаблона '$($template.Name)': $_"
                         }
                         if ($templateOwnerSID) {
                             $ownerScope = Test-IsExpectedInScope -Identity $templateOwnerSID -Scope 'ADCSTemplateWrite' -ReturnDetails
@@ -85326,7 +85326,7 @@ function Get-ADCSVulnerabilities {
                                     Severity = $ownerScope.Severity
                                 }
                             } else {
-                                Write-Log "[Get-ADCSVulnerabilities] ESC4: Template '$($template.Name)' is owned by $templateOwnerSID, which the ADCSTemplateWrite scope expects"
+                                Write-Log "[Get-ADCSVulnerabilities] ESC4: владелец шаблона '$($template.Name)' — $templateOwnerSID, что соответствует правилам области ADCSTemplateWrite"
                             }
                         }
                         if (@($dangerousACEs).Count -gt 0) {
@@ -85340,12 +85340,12 @@ function Get-ADCSVulnerabilities {
                                 Reference = "https://github.com/ly4k/Certipy/wiki/06-%E2%80%90-Privilege-Escalation#esc4"
                                 DangerousACEs = $dangerousACEs
                             }
-                            Write-Log "[Get-ADCSVulnerabilities] ESC4: Template '$($template.Name)' has dangerous permissions for: $identities"
+                            Write-Log "[Get-ADCSVulnerabilities] ESC4: обнаружены опасные права на шаблон '$($template.Name)' у субъектов: $identities"
                         }
                     }
                 }
                 catch {
-                    Write-Log "[Get-ADCSVulnerabilities] ESC4 check failed for template '$($template.Name)': $_"
+                    Write-Log "[Get-ADCSVulnerabilities] Ошибка проверки ESC4 для шаблона '$($template.Name)': $_"
                 }
                 if ($template.NoSecurityExtension -and $template.ClientAuthentication -and -not $allEnrollmentPrivileged) {
                     $templateVulns += [PSCustomObject]@{
@@ -85382,7 +85382,7 @@ function Get-ADCSVulnerabilities {
                                 }
                             }
                             catch {
-                                Write-Log "[Get-ADCSVulnerabilities] ESC13: Error resolving group '$($linkInfo.GroupLinkDN)': $_" -Level Debug
+                                Write-Log "[Get-ADCSVulnerabilities] ESC13: не удалось определить группу '$($linkInfo.GroupLinkDN)': $_" -Level Debug
                             }
                             $verdictText = 'privilege not assessed - the group could not be resolved'
                             if ($groupPrivileged -eq $true) {
@@ -85392,7 +85392,7 @@ function Get-ADCSVulnerabilities {
                                 $verdictText = 'not a privileged group'
                             }
                             $linkedPolicies += "$($linkInfo.PolicyName) (OID: $policyOID) -> $groupName [$verdictText]"
-                            Write-Log "[Get-ADCSVulnerabilities] ESC13: Template '$($template.Name)' - Policy '$($linkInfo.PolicyName)' linked to group '$groupName'"
+                            Write-Log "[Get-ADCSVulnerabilities] ESC13: шаблон '$($template.Name)' — политика '$($linkInfo.PolicyName)' связана с группой '$groupName'"
                         }
                     }
                     if (@($linkedPolicies).Count -gt 0) {
@@ -85472,12 +85472,12 @@ function Get-ADCSVulnerabilities {
             }
         }
         catch {
-            Write-Log "[Get-ADCSVulnerabilities] Error: $_" -Level Error
+            Write-Log "[Get-ADCSVulnerabilities] Ошибка: $_" -Level Error
             Show-Line "Ошибка проверки: уязвимости служб сертификатов оценить не удалось: $_" -Class Finding
         }
     }
     end {
-        Write-Log "[Get-ADCSVulnerabilities] AD CS vulnerability scan complete"
+        Write-Log "[Get-ADCSVulnerabilities] Проверка уязвимостей AD CS завершена"
     }
 }
 function Get-NTAuthIssuerVerdict {
@@ -101633,7 +101633,7 @@ function Collect-BHIssuancePolicies {
     return $bhPolicies
 }
 #Requires -Version 5.1
-$Script:adPEASVersion = "2.9.0+20261119-1100"
+$Script:adPEASVersion = "2.9.0+20261119-1112"
 if ($MyInvocation.MyCommand.Path) {
     $Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {

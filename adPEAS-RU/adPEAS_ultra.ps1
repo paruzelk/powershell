@@ -70293,7 +70293,7 @@ function Get-PrivilegedGroupMembers {
 	                } else {
 	                }
 	            } catch {
-	                Write-Warning "[Get-PrivilegedGroupMembers] Error checking group $GroupNameEN : $_"
+	                Write-Warning "[Get-PrivilegedGroupMembers] Ошибка проверки группы $GroupNameEN — $_"
 	            }
 	        }
 	        foreach ($SID in $Script:PrivilegedGroupSIDs.Keys) {
@@ -70336,7 +70336,7 @@ function Get-PrivilegedGroupMembers {
 	                } else {
 	                }
 	            } catch {
-	                Write-Warning "[Get-PrivilegedGroupMembers] Error checking built-in group $GroupNameEN : $_"
+	                Write-Warning "[Get-PrivilegedGroupMembers] Ошибка проверки встроенной группы $GroupNameEN — $_"
 	            }
 	        }
 	        $domainDN = $Script:LDAPContext.DomainDN
@@ -70377,7 +70377,7 @@ function Get-PrivilegedGroupMembers {
 	                } else {
 	                }
 	            } catch {
-	                Write-Warning "[Get-PrivilegedGroupMembers] Error checking dynamic group $GroupNameDynamic : $_"
+	                Write-Warning "[Get-PrivilegedGroupMembers] Ошибка проверки динамической группы $GroupNameDynamic — $_"
 	            }
 	        }
 	        foreach ($exchangeGroupName in @('Organization Management', 'Exchange Trusted Subsystem', 'Exchange Windows Permissions')) {
@@ -81683,12 +81683,12 @@ function Get-ADCSVulnerabilities {
 	                        }
 	                    }
 	                    if ($ntAuthIssuers.Count -gt 1) {
-	                        Show-Line ("$($ntAuthIssuers.Count) different CAs are trusted to issue a certificate that logs " +
-	                                   "on as any account - each one is a trust anchor for the whole forest") -Class Hint
+	                        Show-Line ("$($ntAuthIssuers.Count) различных УЦ могут выдавать сертификаты для входа " +
+	                                   "от имени любой учётной записи — каждый из них является якорем доверия всего леса") -Class Hint
 	                    }
 	                    if ($foreignCount -gt 0) {
-	                        Show-Line ("$foreignCount NTAuth certificate(s) belong to no Enterprise CA of this forest - " +
-	                                   "verify each was added on purpose, and who holds its key") -Class Hint -FindingId 'NTAUTH_FOREIGN_ISSUER'
+	                        Show-Line ("$foreignCount сертификатов NTAuth не относятся ни к одному корпоративному УЦ этого леса — " +
+	                                   "проверьте обоснованность их добавления и владельцев закрытых ключей") -Class Hint -FindingId 'NTAUTH_FOREIGN_ISSUER'
 	                    }
 	                    if ($expiredCount -gt 0) {
 	                        Show-Line "Сертификатов NTAuth с истёкшим сроком действия, которые можно удалить после проверки зависимостей: $expiredCount" -Class Hint -FindingId 'PKI_CERTIFICATE_EXPIRED'
@@ -98503,7 +98503,7 @@ function Collect-BHIssuancePolicies {
 	}
 	return $bhPolicies
 }
-$Script:adPEASVersion = "2.9.0+20261119-1100"
+$Script:adPEASVersion = "2.9.0+20261119-1112"
 if ($MyInvocation.MyCommand.Path) {
 	$Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {
