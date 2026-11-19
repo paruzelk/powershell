@@ -429,12 +429,46 @@ function Get-OPAArchiveDestination {
         [ValidateSet('None','Year','YearQuarter','YearMonth')][string]$ArchiveGrouping = 'YearQuarter',
         [string]$SourceFolderName,
         [string]$SourceFolderPath,
-        [string]$AccountEmail
+        [string]$AccountEmail,
+        # ARCH3m only: forced Part2 route INSIDE the original destination
+        # API, accepted with an independently validated ARCH3d fake scope.
+        [object]$ARCH3mSyntheticPart2Scope,
+        [object]$ARCH3mSyntheticCandidate,
+        [object[]]$ARCH3mSyntheticExistingParts
     )
 
     $year = $ReceivedTime.Year
     $safeBytes = Get-OPAArchiveSafeCapacityBytes -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB
     if ($ItemSize -gt $safeBytes) { throw "Message size $ItemSize bytes exceeds safe archive PST capacity $safeBytes bytes." }
+
+    if($null -ne $ARCH3mSyntheticPart2Scope){
+        # This branch is INSIDE the original Get-OPAArchiveDestination and
+        # BEFORE existing part selection / New-OPAArchivePst / AddStoreEx.
+        # The caller MUST already be within the original ARCH3d synthetic
+        # boundary. Revalidate here to reject direct unsafe callers.
+        . (Join-Path $PSScriptRoot 'ARCH3mOriginalPart2PreAllocation.ps1')
+        $plan=Assert-OPA265ARCH3mSyntheticPreAllocation -Namespace $Namespace -Transaction $Transaction -Scope $ARCH3mSyntheticPart2Scope -Candidate $ARCH3mSyntheticCandidate -ExistingArchiveParts @($ARCH3mSyntheticExistingParts) -SourcePst $SourcePst -ReceivedTime $ReceivedTime -SourceFolderName $SourceFolderName -SourceFolderPath $SourceFolderPath -AccountEmail $AccountEmail
+        $estimate=[double]$ItemSize * [double]$script:OPAArchiveGrowthRatioDefault
+        if($estimate -gt [double]$safeBytes){
+            throw 'ARCH3m original synthetic Part2 size would exceed safe capacity.'
+        }
+        # Only the original PST and folder functions allocate the destination.
+        # In GitHub Actions these functions are mocked; no PST is created.
+        $forcedPath=[string]$plan.ForcedPart2
+        $store=New-OPAArchivePst -Namespace $Namespace -ArchivePst $forcedPath -AccountEmail $AccountEmail
+        Register-OPAArchivePstInTransaction -Transaction $Transaction -ArchivePst $forcedPath -Year 2020 -Part 2 -PhysicalSizeBeforeBytes (Get-OPAArchivePstSizeBytes -Path $forcedPath)
+        Clear-OPAArchivePartCache -SourcePst $SourcePst
+        $Transaction.State.ArchivePst=$forcedPath
+        $Transaction.State.CurrentArchivePst=$forcedPath
+        $folder=Get-OPAArchiveFolder -ArchiveStore $store -SourceFolderName $SourceFolderName -SourceFolderPath $SourceFolderPath -ReceivedTime $ReceivedTime -Grouping Year
+        $afterSize=Get-OPAArchivePstSizeBytes -Path $forcedPath
+        if(([double]$afterSize + $estimate) -gt [double]$safeBytes){
+            throw 'ARCH3m original synthetic Part2 capacity after initialization exceeded.'
+        }
+        $dest=[pscustomobject]@{Store=$store;Folder=$folder;Path=$forcedPath;Year=2020;Part=2}
+        [void](Assert-OPA265ARCH3lSyntheticPart2 -Scope $ARCH3mSyntheticPart2Scope -Transaction $Transaction -Candidate $ARCH3mSyntheticCandidate -ExistingArchiveParts @($ARCH3mSyntheticExistingParts) -Stage DestinationReady -Destination $dest)
+        return $dest
+    }
 
     # A persisted transaction can reference an archive part that was moved or
     # deleted after interruption. Treat this as a recovery error; never silently
@@ -593,9 +627,14 @@ function Move-OPAItemsWithLimit {
         [switch]$ARCH3dSyntheticBoundary,
         # ARCH3l is ONLY an additional fake-PST scope under ARCH3d;
         # never authorizes an existing Outlook COM/PST writer.
-        [switch]$ARCH3lSyntheticPart2Boundary
+        [switch]$ARCH3lSyntheticPart2Boundary,
+        # ARCH3m: fake-only forced Part2 INSIDE original destination API.
+        [switch]$ARCH3mSyntheticForcePart2
     )
 
+    if($ARCH3mSyntheticForcePart2 -and -not $ARCH3lSyntheticPart2Boundary){
+        throw 'ARCH3m requires original ARCH3d+ARCH3l synthetic boundaries and is not a real Outlook writer.'
+    }
     if($ARCH3lSyntheticPart2Boundary){
         if(-not $ARCH3dSyntheticBoundary -or $Resume -or $ArchiveGrouping -cne 'Year' -or $Limit -ne 1){
             throw 'ARCH3l accepts only ARCH3d synthetic one-shot Year Part2, never live Outlook/Resume.'
@@ -866,7 +905,11 @@ function Move-OPAItemsWithLimit {
             }
             $dest = $null
             try {
-                $dest = Get-OPAArchiveDestination -Namespace $Namespace -Transaction $Transaction -SourcePst $Transaction.State.SourcePst -ReceivedTime $dt -ItemSize $itemSize -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ArchiveGrouping $ArchiveGrouping -SourceFolderName ([string]$source.Name) -SourceFolderPath $folderPath -AccountEmail ([string]$Transaction.State.AccountEmail)
+                if($ARCH3mSyntheticForcePart2){
+                    $dest=Get-OPAArchiveDestination -Namespace $Namespace -Transaction $Transaction -SourcePst $Transaction.State.SourcePst -ReceivedTime $dt -ItemSize $itemSize -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ArchiveGrouping $ArchiveGrouping -SourceFolderName ([string]$source.Name) -SourceFolderPath $folderPath -AccountEmail ([string]$Transaction.State.AccountEmail) -ARCH3mSyntheticPart2Scope $arch3dScope -ARCH3mSyntheticCandidate $candidate -ARCH3mSyntheticExistingParts @($existingArchivePaths)
+                }else{
+                    $dest=Get-OPAArchiveDestination -Namespace $Namespace -Transaction $Transaction -SourcePst $Transaction.State.SourcePst -ReceivedTime $dt -ItemSize $itemSize -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ArchiveGrouping $ArchiveGrouping -SourceFolderName ([string]$source.Name) -SourceFolderPath $folderPath -AccountEmail ([string]$Transaction.State.AccountEmail)
+                }
             }
             catch {
                 if($ARCH3dSyntheticBoundary){
