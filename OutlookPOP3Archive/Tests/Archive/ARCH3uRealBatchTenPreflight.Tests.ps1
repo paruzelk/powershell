@@ -112,7 +112,7 @@ Describe 'ARCH3u exact ten original MailMover route READ ONLY' {
         {New-OPA265ARCH3uTenPreview @script:fixture} | Should -Throw
     }
     It 'blocks Year split when no single year has ten eligible messages' {
-        $script:fixture.Candidates=@(New-ARCH3uFixture -Count 10 -Year 2020).Candidates
+        $script:fixture.Candidates=@((New-ARCH3uFixture -Count 10 -Year 2020).Candidates)
         $script:fixture.Candidates[9].ArchiveDate=[datetime]::new(2021,2,1)
         {New-OPA265ARCH3uTenPreview @script:fixture} | Should -Throw
     }
