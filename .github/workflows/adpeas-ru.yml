@@ -300,8 +300,8 @@ jobs:
           $errors = $null
           [void][System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $file).Path, [ref]$tokens, [ref]$errors)
           if ($errors.Count -ne 0) { throw "DOC6j PowerShell 5.1 syntax: $($errors[0].Message)" }
-          node --check .\adPEAS-RU\src\modules\Reporting\templates\report-scripts.js
-          if ($LASTEXITCODE -ne 0) { throw 'DOC6j JS syntax error' }
+          # report-scripts.js is an HTML template with {{..._JSON}} markers.
+          # The DOC6j test compiles and executes the actual tooltip functions in Node VM.
           node .\adPEAS-RU\Tests\Test-DOC6jObservedReportTooltips.js
           if ($LASTEXITCODE -ne 0) { throw 'DOC6j rendered-tooltip regression failed' }
       - name: Package verified RU build for public download
