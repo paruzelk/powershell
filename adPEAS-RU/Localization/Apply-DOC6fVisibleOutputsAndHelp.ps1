@@ -34,18 +34,30 @@ foreach($file in @($manifest.files)){
     if(-not(Test-Path -LiteralPath $fullPath -PathType Leaf)){throw "DOC6f: файл не найден $($relative)"}
     $source=[IO.File]::ReadAllText($fullPath,[Text.Encoding]::UTF8)
     $updated=$source
-    $seen=New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+    $groups=New-Object 'System.Collections.Generic.Dictionary[string,object]' ([StringComparer]::Ordinal)
     foreach($entry in @($file.entries)){
         $old=[string]$entry.original
         $new=[string]$entry.target
         if([string]::IsNullOrWhiteSpace($old) -or [string]::IsNullOrWhiteSpace($new) -or
-           $old -ceq $new -or [int]$entry.line -lt 1 -or -not $seen.Add($old)){
+           $old -ceq $new -or [int]$entry.line -lt 1){
             throw "DOC6f: некорректный перевод $($relative):$($entry.line)"
         }
-        $matches=([regex]::Matches($updated,[regex]::Escape($old))).Count
-        if($matches -ne 1){throw "DOC6f: изменена исходная строка $($relative):$($entry.line); совпадений $matches"}
-        $updated=$updated.Replace($old,$new)
+        if($groups.ContainsKey($old)){
+            $item=$groups[$old]
+            if($item.Target -cne $new){throw "DOC6f: противоречивый перевод дублированной строки $($relative):$($entry.line)"}
+            $item.Count++
+        } else {
+            $groups.Add($old,[PSCustomObject]@{Target=$new;Count=1;FirstLine=[int]$entry.line})
+        }
         $total++
+    }
+    foreach($old in @($groups.Keys)){
+        $item=$groups[$old]
+        $matches=([regex]::Matches($updated,[regex]::Escape($old))).Count
+        if($matches -ne $item.Count){
+            throw "DOC6f: исходная строка изменилась $($relative):$($item.FirstLine); ожидалось $($item.Count), найдено $matches"
+        }
+        $updated=$updated.Replace($old,$item.Target)
     }
     $plans.Add([PSCustomObject]@{Relative=$relative;Path=$fullPath;Updated=$updated})
 }

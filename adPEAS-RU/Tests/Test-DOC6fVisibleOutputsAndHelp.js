@@ -17,11 +17,11 @@ for(const f of map.files){
  assert.equal(f.entries.length,expected.get(f.path));
  const b=fs.readFileSync(path.join(root,f.path)),text=b.toString('utf8'),lines=text.split(/\r?\n/);
  assert.equal(b.subarray(0,3).toString('hex'),'efbbbf','PowerShell UTF8 BOM missing: '+f.path);
- const seen=new Set();
+ const seen=new Map();
  for(const e of f.entries){
   assert(e.line>=1&&e.original&&e.target&&e.original!==e.target);
-  assert(!seen.has(e.original),'duplicate source line '+f.path+':'+e.line);
-  seen.add(e.original);
+  assert(!seen.has(e.original)||seen.get(e.original)===e.target,'contradictory translation for duplicate line '+f.path+':'+e.line);
+  seen.set(e.original,e.target);
   assert(/[А-ЯЁа-яё]/.test(e.target),'untranslated target '+e.line);
   assert.equal(vars(e.original),vars(e.target),'PowerShell interpolation altered '+f.path+':'+e.line);
   assert.equal(maskStrings(e.original),maskStrings(e.target),'non-string code altered '+f.path+':'+e.line);
