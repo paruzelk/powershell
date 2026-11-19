@@ -1,0 +1,300 @@
+﻿{
+  "Schema": "adPEAS-RU.MIG1.2.11.0.SourceFieldDelta.1",
+  "OldCanonical": "61106960/adPEAS@ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082",
+  "NewCanonical": "61106960/adPEAS@477696f48d6b486be5d9a99b598f72e3ccfcc0c0",
+  "OldFindingCount": 392,
+  "NewFindingCount": 408,
+  "NewFindingIds": [
+    "RODC_DELEGATED_ADMIN",
+    "RODC_ADMIN_BROAD_GROUP",
+    "RODC_MANAGEDBY_WRITE",
+    "LAPS_PASSWORD_DECRYPTABLE",
+    "GPO_TIER0_LOGON_NOT_DENIED",
+    "GPO_LOCAL_ADMIN_NETWORK_NOT_DENIED",
+    "GPO_LOGON_LOCKOUT",
+    "GPO_LOGON_DENIAL_HARDENING",
+    "CREDENTIAL_VNC_PASSWORD_HASH",
+    "COMPUTER_PASSWORD_NEVER_SET",
+    "COMPUTER_CREATION_PASSWORD_IN_USE",
+    "COMPUTER_PRECREATED_NOT_JOINED",
+    "ADCS_TEMPLATE_OUTDATED_ALGORITHM",
+    "WEB_ENDPOINT_EPA_ACCEPT",
+    "WEB_ENDPOINT_EPA_SERVICE_BINDING",
+    "MSA_READER_DELETED"
+  ],
+  "RemovedFindingIds": [],
+  "ModifiedFindingIds": [
+    "KERBEROASTABLE_SPN",
+    "ASREP_ROASTABLE",
+    "KERBEROS_HASH_CRACKABLE",
+    "RBCD_DANGEROUS_PRINCIPALS",
+    "ESC8_WEB_ENROLLMENT",
+    "ADCS_HTTP_AVAILABLE",
+    "DANGEROUS_ACL_GPO_WRITEPROPERTY",
+    "GPO_SYSVOL_WRITABLE",
+    "GPO_NON_DEFAULT_OWNER",
+    "GPO_UNLINKED_BROAD_WRITE",
+    "DANGEROUS_ACL_DCSYNC_BROAD",
+    "OU_PERM_SPN_WRITE",
+    "OU_PERM_KEYCREDENTIALLINK_WRITE",
+    "LAPS_PASSWORD_READABLE",
+    "BITLOCKER_RECOVERY_DELEGATED",
+    "GPO_USERRIGHT_SECREATETOKEN",
+    "GPO_USERRIGHT_SEBACKUP",
+    "GPO_USERRIGHT_SERESTORE",
+    "GPO_USERRIGHT_SERELABEL",
+    "GPO_USERRIGHT_SEINTERACTIVELOGON",
+    "GPO_USERRIGHT_SEDELEGATESESSIONUSERIMPERSONATE",
+    "GPO_USERRIGHT_SEAUDIT",
+    "GPO_USERRIGHT_SECREATEGLOBAL",
+    "GPO_USERRIGHT_SEPROFILESINGLEPROCESS",
+    "GPO_USERRIGHT_SESYSTEMPROFILE",
+    "GPO_USERRIGHT_DEFAULT_REMOVED",
+    "SMB_SIGNING_DISABLED",
+    "CREDENTIAL_VNC_PASSWORD",
+    "CREDENTIAL_SCRIPT_PASSWORD",
+    "KERBEROS_TICKET_LIFETIME_EXTENDED",
+    "TRUST_USES_RC4",
+    "TRUST_TREAT_AS_EXTERNAL",
+    "NETWORK_SUBNET_DOMAIN_CONTROLLERS",
+    "OUTDATED_OS",
+    "CREDENTIAL_ROAMING_PRESENT",
+    "CREDENTIAL_ROAMING_READABLE",
+    "CREDENTIAL_ROAMING_DELEGATED",
+    "ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED",
+    "WEB_ENDPOINT_EPA_ENABLED",
+    "TIER0_NOT_IN_PROTECTED_USERS",
+    "GMSA_MEMBERSHIP_INFO",
+    "EXCHANGE_WEB_ENDPOINTS",
+    "CREDENTIAL_TYPE_INFO",
+    "LAPS_ENCRYPTED_PASSWORD",
+    "ENCRYPTION_RC4_ONLY",
+    "DANGEROUS_RIGHTS_CONTEXT",
+    "GPO_LINK_REACHES_DC",
+    "WEB_ENDPOINT_SECURITY",
+    "REGISTRY_NOLMHASH",
+    "REGISTRY_REMOTEUAC",
+    "REGISTRY_ENABLELUA",
+    "REGISTRY_DEFENDER_DISABLED",
+    "REGISTRY_FILTERADMINTOKEN",
+    "REGISTRY_CREDSSP_ORACLE",
+    "REGISTRY_MACHINE_PASSWORD_STATIC",
+    "REGISTRY_RDP_NLA",
+    "REGISTRY_RDP_SECURITYLAYER",
+    "REGISTRY_RDP_ENCRYPTION",
+    "REGISTRY_FIREWALL_DISABLED",
+    "REGISTRY_INSECURE_GUEST_AUTH",
+    "REGISTRY_CACHED_LOGONS",
+    "GPO_PRINT_SPOOLER_RPC",
+    "UAC_SEVERITY_OVERRIDE"
+  ],
+  "ChangedFieldHistogram": {
+    "Tools": 44,
+    "Triggers": 12,
+    "Description": 5,
+    "References": 4,
+    "Attack": 2,
+    "Title": 1,
+    "Impact": 1,
+    "FindingId": 1
+  },
+  "ModifiedFindingFields": {
+    "KERBEROASTABLE_SPN": [
+      "Tools"
+    ],
+    "ASREP_ROASTABLE": [
+      "Tools"
+    ],
+    "KERBEROS_HASH_CRACKABLE": [
+      "Tools"
+    ],
+    "RBCD_DANGEROUS_PRINCIPALS": [
+      "Triggers"
+    ],
+    "ESC8_WEB_ENROLLMENT": [
+      "Description",
+      "Triggers"
+    ],
+    "ADCS_HTTP_AVAILABLE": [
+      "Triggers"
+    ],
+    "DANGEROUS_ACL_GPO_WRITEPROPERTY": [
+      "References"
+    ],
+    "GPO_SYSVOL_WRITABLE": [
+      "References"
+    ],
+    "GPO_NON_DEFAULT_OWNER": [
+      "References"
+    ],
+    "GPO_UNLINKED_BROAD_WRITE": [
+      "References"
+    ],
+    "DANGEROUS_ACL_DCSYNC_BROAD": [
+      "Tools"
+    ],
+    "OU_PERM_SPN_WRITE": [
+      "Tools"
+    ],
+    "OU_PERM_KEYCREDENTIALLINK_WRITE": [
+      "Tools"
+    ],
+    "LAPS_PASSWORD_READABLE": [
+      "Triggers"
+    ],
+    "BITLOCKER_RECOVERY_DELEGATED": [
+      "Triggers"
+    ],
+    "GPO_USERRIGHT_SECREATETOKEN": [
+      "Tools"
+    ],
+    "GPO_USERRIGHT_SEBACKUP": [
+      "Tools"
+    ],
+    "GPO_USERRIGHT_SERESTORE": [
+      "Tools"
+    ],
+    "GPO_USERRIGHT_SERELABEL": [
+      "Tools"
+    ],
+    "GPO_USERRIGHT_SEINTERACTIVELOGON": [
+      "Tools"
+    ],
+    "GPO_USERRIGHT_SEDELEGATESESSIONUSERIMPERSONATE": [
+      "Tools"
+    ],
+    "GPO_USERRIGHT_SEAUDIT": [
+      "Tools"
+    ],
+    "GPO_USERRIGHT_SECREATEGLOBAL": [
+      "Tools"
+    ],
+    "GPO_USERRIGHT_SEPROFILESINGLEPROCESS": [
+      "Tools"
+    ],
+    "GPO_USERRIGHT_SESYSTEMPROFILE": [
+      "Tools"
+    ],
+    "GPO_USERRIGHT_DEFAULT_REMOVED": [
+      "Tools"
+    ],
+    "SMB_SIGNING_DISABLED": [
+      "Triggers"
+    ],
+    "CREDENTIAL_VNC_PASSWORD": [
+      "Description",
+      "Attack"
+    ],
+    "CREDENTIAL_SCRIPT_PASSWORD": [
+      "Triggers"
+    ],
+    "KERBEROS_TICKET_LIFETIME_EXTENDED": [
+      "Tools"
+    ],
+    "TRUST_USES_RC4": [
+      "Tools"
+    ],
+    "TRUST_TREAT_AS_EXTERNAL": [
+      "Tools"
+    ],
+    "NETWORK_SUBNET_DOMAIN_CONTROLLERS": [
+      "Tools"
+    ],
+    "OUTDATED_OS": [
+      "Tools"
+    ],
+    "CREDENTIAL_ROAMING_PRESENT": [
+      "Tools"
+    ],
+    "CREDENTIAL_ROAMING_READABLE": [
+      "Tools"
+    ],
+    "CREDENTIAL_ROAMING_DELEGATED": [
+      "Tools"
+    ],
+    "ANONYMOUS_SID_NAME_TRANSLATION_ALLOWED": [
+      "Tools"
+    ],
+    "WEB_ENDPOINT_EPA_ENABLED": [
+      "Description",
+      "Triggers"
+    ],
+    "TIER0_NOT_IN_PROTECTED_USERS": [
+      "Tools"
+    ],
+    "GMSA_MEMBERSHIP_INFO": [
+      "Triggers"
+    ],
+    "EXCHANGE_WEB_ENDPOINTS": [
+      "Description",
+      "Triggers"
+    ],
+    "CREDENTIAL_TYPE_INFO": [
+      "Triggers"
+    ],
+    "LAPS_ENCRYPTED_PASSWORD": [
+      "Title",
+      "Description",
+      "Impact",
+      "Attack"
+    ],
+    "ENCRYPTION_RC4_ONLY": [
+      "Tools"
+    ],
+    "DANGEROUS_RIGHTS_CONTEXT": [
+      "Tools"
+    ],
+    "GPO_LINK_REACHES_DC": [
+      "Tools"
+    ],
+    "WEB_ENDPOINT_SECURITY": [
+      "Triggers"
+    ],
+    "REGISTRY_NOLMHASH": [
+      "Tools"
+    ],
+    "REGISTRY_REMOTEUAC": [
+      "Tools"
+    ],
+    "REGISTRY_ENABLELUA": [
+      "Tools"
+    ],
+    "REGISTRY_DEFENDER_DISABLED": [
+      "Tools"
+    ],
+    "REGISTRY_FILTERADMINTOKEN": [
+      "Tools"
+    ],
+    "REGISTRY_CREDSSP_ORACLE": [
+      "Tools"
+    ],
+    "REGISTRY_MACHINE_PASSWORD_STATIC": [
+      "Tools"
+    ],
+    "REGISTRY_RDP_NLA": [
+      "Tools"
+    ],
+    "REGISTRY_RDP_SECURITYLAYER": [
+      "Tools"
+    ],
+    "REGISTRY_RDP_ENCRYPTION": [
+      "Tools"
+    ],
+    "REGISTRY_FIREWALL_DISABLED": [
+      "Tools"
+    ],
+    "REGISTRY_INSECURE_GUEST_AUTH": [
+      "Tools"
+    ],
+    "REGISTRY_CACHED_LOGONS": [
+      "Tools"
+    ],
+    "GPO_PRINT_SPOOLER_RPC": [
+      "Tools"
+    ],
+    "UAC_SEVERITY_OVERRIDE": [
+      "FindingId"
+    ]
+  },
+  "Note": "Field diff normalized whitespace. Changed fields MUST be re-reviewed before reusing technical Russian translations."
+}
