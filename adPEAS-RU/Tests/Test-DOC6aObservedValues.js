@@ -38,8 +38,12 @@ const rows=[
 ];
 let callback=null;
 const window={};
+const countTexts=['1 элементов','2 элементов','3 элементов','4 элементов','5 элементов','11 элементов','21 элементов','22 элементов','1 результат'];
+const countLabels=countTexts.map(x=>E('SPAN',T(x)));
 const document={addEventListener:(name,cb)=>{assert.equal(name,'DOMContentLoaded');callback=cb;},querySelectorAll:q=>{
- assert.equal(q,'.attr-row[data-attr-name]');return rows;}};
+ if(q==='.attr-row[data-attr-name]') return rows;
+ if(q==='.finding-count') return countLabels;
+ throw Error('unexpected selector: '+q);}};
 vm.runInNewContext(src.slice(begin,end),{document,window,Node:{TEXT_NODE:3,ELEMENT_NODE:1}},{timeout:4000});
 assert.equal(typeof callback,'function');
 const before=rows.map(r=>({key:r.key,attrs:JSON.stringify(r.attrs),tags:JSON.stringify((function tags(n){return [n.tagName,...(n.childNodes||[]).flatMap(tags)]})(r.content))}));
@@ -67,10 +71,14 @@ assert.equal(values(rows[15]),'INACTIVE (no login for >90 days)');
 assert.equal(values(rows[16]),'Owner of the group - may rewrite its DACL');
 assert.equal(values(rows[17]),'GenericAll');
 assert(window.adPEASRUDOC6a.translatedTextNodes>=14);
+assert.deepEqual(countLabels.map(x=>x.childNodes[0].nodeValue),
+ ['1 элемент','2 элемента','3 элемента','4 элемента','5 элементов','11 элементов','21 элемент','22 элемента','1 результат']);
+assert.equal(window.adPEASRUDOC6a.correctedCountLabels,6);
 rows.forEach((r,i)=>{
  assert.equal(JSON.stringify(r.attrs),before[i].attrs,'raw attribute changed');
  assert.equal(JSON.stringify((function tags(n){return [n.tagName,...(n.childNodes||[]).flatMap(tags)]})(r.content)),before[i].tags,'HTML changed');
 });
 callback();
 assert.equal(window.adPEASRUDOC6a.translatedTextNodes,0,'must be idempotent');
+assert.equal(window.adPEASRUDOC6a.correctedCountLabels,0,'count grammar must be idempotent');
 console.log('PASS DOC6a: 18 scoped DOM fixtures, synthetic AD identities preserved, no mutation of markup, zero second-pass changes');

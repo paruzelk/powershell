@@ -125,8 +125,30 @@ $block=@'
                 }
                 visit(field);
             });
+            // DOC6a: correct only grammar in fixed object-count captions.
+            // The number, severity/category, and all underlying data stay intact.
+            let correctedCountLabels=0;
+            document.querySelectorAll('.finding-count').forEach(function(label) {
+                if(label.childNodes.length!==1 || !label.firstChild ||
+                   label.firstChild.nodeType!==Node.TEXT_NODE) return;
+                const raw=label.firstChild.nodeValue;
+                const match=/^(\s*)(\d+) элементов(\s*)$/.exec(raw);
+                if(!match) return;
+                const n=Number(match[2]);
+                if(!Number.isSafeInteger(n)) return;
+                const lastTwo=n%100,last=n%10;
+                const word=(lastTwo>=11 && lastTwo<=14) ? 'элементов' :
+                    last===1 ? 'элемент' : (last>=2 && last<=4) ? 'элемента' : 'элементов';
+                const revised=match[1]+match[2]+' '+word+match[3];
+                if(revised!==raw) {
+                    label.firstChild.nodeValue=revised;
+                    correctedCountLabels++;
+                }
+            });
             window.adPEASRUDOC6a=Object.freeze({
-                translatedTextNodes:changed,byAttribute:Object.freeze(counts)
+                translatedTextNodes:changed,
+                byAttribute:Object.freeze(counts),
+                correctedCountLabels:correctedCountLabels
             });
         });
         // DOC6a END: verified report display translations.
