@@ -1,0 +1,1113 @@
+{
+  "schema": "adPEAS-RU.DOC6d.AuthenticationDiagnostics.1",
+  "description": "Presentation messages only. Exact quoted source literal, matching PowerShell variable interpolation and count.",
+  "files": [
+    {
+      "path": "src/adPEAS.ps1",
+      "messages": [
+        {
+          "from": "[adPEAS] -OutputAppend requires -Outputfile. Ignoring -OutputAppend.",
+          "to": "[adPEAS] Для -OutputAppend необходим -Outputfile. Параметр -OutputAppend игнорируется.",
+          "sourceLine": 585,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] -OutputAppend requires JSON findings cache. Use -Format All or -Format JSON. Ignoring -OutputAppend.",
+          "to": "[adPEAS] Для -OutputAppend необходим JSON-кэш находок. Укажите -Format All или -Format JSON. Параметр игнорируется.",
+          "sourceLine": 591,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] -ExcludeModule leaves no module to run. Nothing to do.",
+          "to": "[adPEAS] После исключения модулей через -ExcludeModule не осталось заданий. Выполнение завершено.",
+          "sourceLine": 610,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Findings collection enabled (Format: $Format)",
+          "to": "[adPEAS] Сбор результатов включён (формат: $Format)",
+          "sourceLine": 617,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Directory '$OutputDir' did not exist and was created",
+          "to": "[adPEAS] Каталог '$OutputDir' отсутствовал и был создан",
+          "sourceLine": 641,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Could not create directory '$OutputDir': $_",
+          "to": "[adPEAS] Не удалось создать каталог '$OutputDir': $_",
+          "sourceLine": 643,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Unable to write text output to '$textPath', please check path and permissions!",
+          "to": "[adPEAS] Невозможно записать текстовый отчёт в '$textPath'; проверьте путь и права доступа.",
+          "sourceLine": 659,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] -VerboseLogging: File logging requires -Outputfile with Text format. Verbose messages will be shown in console only.",
+          "to": "[adPEAS] -VerboseLogging: для журнала в файл необходимы -Outputfile и формат Text. Подробности будут выводиться только в консоль.",
+          "sourceLine": 675,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Script started: $StartTime",
+          "to": "[adPEAS] Время начала: $StartTime",
+          "sourceLine": 695,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Version: $Script:adPEASVersion",
+          "to": "[adPEAS] Версия: $Script:adPEASVersion",
+          "sourceLine": 696,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] OPSEC mode enabled: No ASREPRoast/Kerberoast/BloodHound",
+          "to": "[adPEAS] Включён OPSEC: ASREPRoast/Kerberoast/BloodHound отключены",
+          "sourceLine": 699,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Reusing existing LDAP session",
+          "to": "[adPEAS] Повторное использование действующей LDAP-сессии",
+          "sourceLine": 726,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "Connected to domain '$($Script:LDAPContext.Domain)' on server '$($Script:LDAPContext.Server)' as '$AuthenticatedUser' via $AuthDisplay",
+          "to": "Подключено к домену '$($Script:LDAPContext.Domain)' на сервере '$($Script:LDAPContext.Server)' как '$AuthenticatedUser' через $AuthDisplay",
+          "sourceLine": 746,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Reusing credentials from existing session",
+          "to": "[adPEAS] Повторно используются учётные данные действующей сессии",
+          "sourceLine": 786,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Reusing certificate authentication from existing session",
+          "to": "[adPEAS] Повторно используется аутентификация по сертификату действующей сессии",
+          "sourceLine": 791,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] No authentication method specified - defaulting to Windows Authentication",
+          "to": "[adPEAS] Метод аутентификации не указан — используется аутентификация Windows",
+          "sourceLine": 799,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "Successfully connected to domain '$($Connection.Domain)' on server '$($Connection.Server)' as '$AuthenticatedUser' via $AuthDisplay",
+          "to": "Успешное подключение к домену '$($Connection.Domain)' на сервере '$($Connection.Server)' как '$AuthenticatedUser' через $AuthDisplay",
+          "sourceLine": 832,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Verifying Domain Controller connectivity...",
+          "to": "[adPEAS] Проверка доступности контроллера домена...",
+          "sourceLine": 842,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Connection health check passed - DC is reachable",
+          "to": "[adPEAS] Проверка соединения пройдена — контроллер домена доступен",
+          "sourceLine": 855,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Cleared SessionInvalid flag from previous run",
+          "to": "[adPEAS] Сброшен флаг SessionInvalid предыдущего запуска",
+          "sourceLine": 863,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] -OPSEC excludes BloodHound collection, which was the only module selected. Nothing to do.",
+          "to": "[adPEAS] Режим -OPSEC исключает BloodHound — единственный выбранный модуль. Заданий нет.",
+          "sourceLine": 889,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Executing Modules: $($Module -join ', ')",
+          "to": "[adPEAS] Запускаемые модули: $($Module -join ', ')",
+          "sourceLine": 894,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "Appending to existing report: kept $($keptFindings.Count) of $($previousFindings.Count) previous findings, re-running $($Module -join ', ')",
+          "to": "Добавление к отчёту: сохранено $($keptFindings.Count) из $($previousFindings.Count) прежних находок; повторный запуск $($Module -join ', ')",
+          "sourceLine": 936,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Could not load previous findings from '$appendCachePath': $_",
+          "to": "[adPEAS] Не удалось прочитать прежние находки из '$appendCachePath': $_",
+          "sourceLine": 939,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Continuing without append - creating fresh report",
+          "to": "[adPEAS] Продолжение без добавления — создаётся новый отчёт",
+          "sourceLine": 940,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] No previous cache found at '$appendCachePath' - first append run",
+          "to": "[adPEAS] Прежний кэш '$appendCachePath' не найден — первый запуск в режиме добавления",
+          "sourceLine": 943,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Skipping checkpoint after module '$ModuleName' - session invalid",
+          "to": "[adPEAS] Пропущена контрольная точка после '$ModuleName' — сессия недействительна",
+          "sourceLine": 980,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Checkpoint after module '$ModuleName' failed: $_",
+          "to": "[adPEAS] Ошибка контрольной точки после '$ModuleName': $_",
+          "sourceLine": 998,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Skipping check '$CheckName' - session invalid",
+          "to": "[adPEAS] Проверка '$CheckName' пропущена — сессия недействительна",
+          "sourceLine": 1012,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Check '$CheckName' failed: $_",
+          "to": "[adPEAS] Ошибка проверки '$CheckName': $_",
+          "sourceLine": 1019,
+          "expectedOccurrences": 2
+        },
+        {
+          "from": "This check did not complete - its results are incomplete or absent. Reason: $($_.Exception.Message)",
+          "to": "Проверка не завершена — результаты неполные или отсутствуют. Причина: $($_.Exception.Message)",
+          "sourceLine": 1029,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] HTML report generated: $($Script:HTMLOutputPath)",
+          "to": "[adPEAS] HTML-отчёт создан: $($Script:HTMLOutputPath)",
+          "sourceLine": 1304,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Error generating HTML report: $_",
+          "to": "[adPEAS] Ошибка формирования HTML-отчёта: $_",
+          "sourceLine": 1306,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Findings JSON saved to: $jsonPath",
+          "to": "[adPEAS] JSON с результатами сохранён: $jsonPath",
+          "sourceLine": 1322,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Could not save JSON export to '$jsonPath': $_",
+          "to": "[adPEAS] Не удалось записать JSON в '$jsonPath': $_",
+          "sourceLine": 1325,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "Partial JSON export from the modules that completed: $checkpointPath",
+          "to": "Частичный JSON завершённых модулей: $checkpointPath",
+          "sourceLine": 1376,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "Rebuild a report from it with: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath'",
+          "to": "Сформировать отчёт из него: Convert-adPEASReport -InputJson '$checkpointPath' -OutputPath '$basePath'",
+          "sourceLine": 1377,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "$($incomplete.Count) check(s) did not complete - their sections are incomplete and must not be read as clean:",
+          "to": "Не завершено проверок: $($incomplete.Count). Их результаты неполны — нельзя считать разделы безопасными:",
+          "sourceLine": 1384,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] Session kept alive - use Disconnect-adPEAS to close",
+          "to": "[adPEAS] Сессия оставлена активной — завершите её командой Disconnect-adPEAS",
+          "sourceLine": 1420,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[adPEAS] adPEAS v2 completed",
+          "to": "[adPEAS] Работа adPEAS v2 завершена",
+          "sourceLine": 1421,
+          "expectedOccurrences": 1
+        }
+      ]
+    },
+    {
+      "path": "src/modules/Core/Connect-adPEAS.ps1",
+      "messages": [
+        {
+          "from": "[Connect-adPEAS] Starting authentication process...",
+          "to": "[Connect-adPEAS] Начало аутентификации...",
+          "sourceLine": 463,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Existing session state detected - performing automatic cleanup...",
+          "to": "[Connect-adPEAS] Обнаружена прежняя сессия — выполняется автоматическая очистка...",
+          "sourceLine": 475,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Reverting existing NTLM impersonation...",
+          "to": "[Connect-adPEAS] Отмена действующего олицетворения NTLM...",
+          "sourceLine": 479,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] NTLM impersonation reverted successfully",
+          "to": "[Connect-adPEAS] Олицетворение NTLM успешно отменено",
+          "sourceLine": 482,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Warning: Failed to revert NTLM impersonation: $_",
+          "to": "[Connect-adPEAS] Не удалось отменить олицетворение NTLM: $_",
+          "sourceLine": 485,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Previous LdapConnection disposed",
+          "to": "[Connect-adPEAS] Предыдущее соединение LdapConnection закрыто",
+          "sourceLine": 494,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Note: LdapConnection disposal: $_",
+          "to": "[Connect-adPEAS] Примечание при закрытии LdapConnection: $_",
+          "sourceLine": 498,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Cleaned up $($hostsResult.RemovedCount) hosts file entries from previous session",
+          "to": "[Connect-adPEAS] Удалено записей hosts предыдущей сессии: $($hostsResult.RemovedCount)",
+          "sourceLine": 507,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Warning: Hosts file cleanup failed: $_",
+          "to": "[Connect-adPEAS] Не удалось очистить файл hosts: $_",
+          "sourceLine": 511,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Session state cleanup completed",
+          "to": "[Connect-adPEAS] Состояние прежней сессии очищено",
+          "sourceLine": 520,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Loaded runtime license from: $License",
+          "to": "[Connect-adPEAS] Лицензия выполнения загружена из: $License",
+          "sourceLine": 532,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] License file not found: $License",
+          "to": "[Connect-adPEAS] Файл лицензии не найден: $License",
+          "sourceLine": 535,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Parameter Set: $ParamSetDisplay",
+          "to": "[Connect-adPEAS] Набор параметров: $ParamSetDisplay",
+          "sourceLine": 552,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "PowerShell ISE is deprecated and not supported by adPEAS. Console output may be garbled. Use powershell.exe or VS Code instead.",
+          "to": "PowerShell ISE устарела и не поддерживается adPEAS. Консольный вывод может отображаться некорректно. Используйте powershell.exe или VS Code.",
+          "sourceLine": 560,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] LDAPS mode enabled - DC reachability will check port 636",
+          "to": "[Connect-adPEAS] Включён LDAPS — доступность контроллера домена проверяется по порту 636",
+          "sourceLine": 646,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Custom DNS server specified: $DnsServer",
+          "to": "[Connect-adPEAS] Указан собственный DNS-сервер: $DnsServer",
+          "sourceLine": 651,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Custom DNS server can resolve $Domain",
+          "to": "[Connect-adPEAS] Собственный DNS-сервер разрешает имя $Domain",
+          "sourceLine": 661,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] DNS server $DnsServer not reachable or cannot resolve '$Domain'",
+          "to": "[Connect-adPEAS] DNS-сервер $DnsServer недоступен либо не разрешает имя '$Domain'",
+          "sourceLine": 664,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] -PatchHostsFile requires Administrator privileges!",
+          "to": "[Connect-adPEAS] Параметру -PatchHostsFile нужны права администратора!",
+          "sourceLine": 671,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Hosts file patching will be skipped. Run as Administrator for full functionality.",
+          "to": "[Connect-adPEAS] Изменение файла hosts пропущено. Для полной функциональности запустите от имени администратора.",
+          "sourceLine": 672,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Administrator privileges confirmed for hosts file patching",
+          "to": "[Connect-adPEAS] Права администратора на изменение hosts подтверждены",
+          "sourceLine": 676,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Early hosts file patching for Kerberos authentication...",
+          "to": "[Connect-adPEAS] Предварительное изменение hosts для Kerberos...",
+          "sourceLine": 682,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Could not resolve $earlyResolveTarget via custom DNS - hosts patching skipped",
+          "to": "[Connect-adPEAS] Не удалось разрешить $earlyResolveTarget через собственный DNS — изменение hosts пропущено",
+          "sourceLine": 720,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] No domain specified, using current domain: $Domain",
+          "to": "[Connect-adPEAS] Домен не указан — используется текущий: $Domain",
+          "sourceLine": 730,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Establishing connection...",
+          "to": "[Connect-adPEAS] Установка соединения...",
+          "sourceLine": 737,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Authentication Method: $AuthMethodDisplay",
+          "to": "[Connect-adPEAS] Метод аутентификации: $AuthMethodDisplay",
+          "sourceLine": 752,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Domain: $Domain",
+          "to": "[Connect-adPEAS] Домен: $Domain",
+          "sourceLine": 764,
+          "expectedOccurrences": 6
+        },
+        {
+          "from": "[Connect-adPEAS] Server: $Server",
+          "to": "[Connect-adPEAS] Сервер: $Server",
+          "sourceLine": 765,
+          "expectedOccurrences": 6
+        },
+        {
+          "from": "[Connect-adPEAS] Username: $($Credential.UserName)",
+          "to": "[Connect-adPEAS] Имя пользователя: $($Credential.UserName)",
+          "sourceLine": 766,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'",
+          "to": "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (FQDN), целевой домен '$Domain'",
+          "sourceLine": 791,
+          "expectedOccurrences": 3
+        },
+        {
+          "from": "[Connect-adPEAS] Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'",
+          "to": "[Connect-adPEAS] Междоменное подключение: пользователь '$UserRealm' (NetBIOS), целевой домен '$Domain'",
+          "sourceLine": 793,
+          "expectedOccurrences": 3
+        },
+        {
+          "from": "[Connect-adPEAS] Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'",
+          "to": "[Connect-adPEAS] Междоменное подключение: область UPN '$UserRealm', целевой домен '$Domain'",
+          "sourceLine": 802,
+          "expectedOccurrences": 3
+        },
+        {
+          "from": "[Connect-adPEAS] Empty password provided (PASSWD_NOTREQD account)",
+          "to": "[Connect-adPEAS] Получен пустой пароль (учётная запись PASSWD_NOTREQD)",
+          "sourceLine": 821,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Password was numeric, converted to string",
+          "to": "[Connect-adPEAS] Числовой пароль преобразован в строку",
+          "sourceLine": 842,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "Password must be either String, SecureString, or empty",
+          "to": "Пароль должен быть String, SecureString либо пустым",
+          "sourceLine": 845,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Username normalized for SMB: $Username -> $CredentialUsername",
+          "to": "[Connect-adPEAS] Имя пользователя нормализовано для SMB: $Username -> $CredentialUsername",
+          "sourceLine": 854,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Using explicit NTLM authentication (AuthType::Ntlm)...",
+          "to": "[Connect-adPEAS] Используется явная аутентификация NTLM (AuthType::Ntlm)...",
+          "sourceLine": 918,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] ForceNTLM: Using discovered DC: $($DCResolution.Hostname)",
+          "to": "[Connect-adPEAS] ForceNTLM: обнаружен контроллер домена $($DCResolution.Hostname)",
+          "sourceLine": 926,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Attempting Kerberos authentication...",
+          "to": "[Connect-adPEAS] Попытка аутентификации Kerberos...",
+          "sourceLine": 966,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Kerberos authentication completed successfully",
+          "to": "[Connect-adPEAS] Аутентификация Kerberos успешна",
+          "sourceLine": 1007,
+          "expectedOccurrences": 3
+        },
+        {
+          "from": "[Connect-adPEAS] Kerberos authentication failed: $ErrorMessage (ErrorCode: $KdcErrorCode)",
+          "to": "[Connect-adPEAS] Ошибка аутентификации Kerberos: $ErrorMessage (код $KdcErrorCode)",
+          "sourceLine": 1026,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Cross-domain: Kerberos failed, allowing NTLM/SimpleBind fallback",
+          "to": "[Connect-adPEAS] Междоменное подключение: ошибка Kerberos, возможен переход на NTLM/SimpleBind",
+          "sourceLine": 1037,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Custom DNS active without hosts patching - SimpleBind fallback",
+          "to": "[Connect-adPEAS] Используется собственный DNS без изменения hosts — переход на SimpleBind",
+          "sourceLine": 1046,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Kerberos PTT not available on this system - using SimpleBind",
+          "to": "[Connect-adPEAS] Kerberos PTT недоступен — используется SimpleBind",
+          "sourceLine": 1052,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] LDAPS transport failed ($Script:ConnectionState) - no authentication fallback can help",
+          "to": "[Connect-adPEAS] Ошибка транспорта LDAPS ($Script:ConnectionState) — смена метода аутентификации не поможет",
+          "sourceLine": 1090,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Kerberos PTT failed - trying NTLM impersonation fallback...",
+          "to": "[Connect-adPEAS] Не удалось применить Kerberos PTT — попытка олицетворения NTLM...",
+          "sourceLine": 1096,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] ForceSimpleBind specified, skipping Kerberos",
+          "to": "[Connect-adPEAS] Указан ForceSimpleBind — Kerberos пропускается",
+          "sourceLine": 1101,
+          "expectedOccurrences": 2
+        },
+        {
+          "from": "[Connect-adPEAS] Attempting explicit NTLM fallback (AuthType::Ntlm)...",
+          "to": "[Connect-adPEAS] Резервная попытка явной аутентификации NTLM (AuthType::Ntlm)...",
+          "sourceLine": 1108,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] LDAPS transport failed ($Script:ConnectionState) - not attempting SimpleBind",
+          "to": "[Connect-adPEAS] Ошибка транспорта LDAPS ($Script:ConnectionState) — SimpleBind не выполняется",
+          "sourceLine": 1133,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] LDAP connection failed with explicit NTLM - trying SimpleBind...",
+          "to": "[Connect-adPEAS] Соединение LDAP через явный NTLM не удалось — попытка SimpleBind...",
+          "sourceLine": 1139,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Using SimpleBind authentication...",
+          "to": "[Connect-adPEAS] Используется аутентификация SimpleBind...",
+          "sourceLine": 1155,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] SimpleBind failed with LDAP_STRONG_AUTH_REQUIRED - auto-upgrading to LDAPS...",
+          "to": "[Connect-adPEAS] SimpleBind отклонён (LDAP_STRONG_AUTH_REQUIRED) — автоматический переход на LDAPS...",
+          "sourceLine": 1198,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[!] -ForceKerberos has no effect with -ForcePassTheCert",
+          "to": "[!] -ForceKerberos не действует при -ForcePassTheCert",
+          "sourceLine": 1278,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[!] Pass-the-Cert always uses Schannel (TLS client cert), never Kerberos",
+          "to": "[!] Pass-the-Cert использует Schannel (клиентский TLS-сертификат), а не Kerberos",
+          "sourceLine": 1279,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] Using Pass-the-Cert (Schannel) - bypassing Kerberos",
+          "to": "[Connect-adPEAS] Используется Pass-the-Cert (Schannel), Kerberos пропускается",
+          "sourceLine": 1281,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-adPEAS] LDAPS automatically enabled for Pass-the-Cert",
+          "to": "[Connect-adPEAS] LDAPS автоматически включён для Pass-the-Cert",
+          "sourceLine": 1286,
+          "expectedOccurrences": 1
+        }
+      ]
+    },
+    {
+      "path": "src/modules/Core/Connect-LDAP.ps1",
+      "messages": [
+        {
+          "from": "[Connect-LDAP] Starting LDAP connection...",
+          "to": "[Connect-LDAP] Начало подключения LDAP...",
+          "sourceLine": 125,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] AsGlobalCatalog requires -Domain and -Server parameters",
+          "to": "[Connect-LDAP] Для AsGlobalCatalog необходимы -Domain и -Server",
+          "sourceLine": 269,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] GC mode: Server=$Server, Domain=$Domain",
+          "to": "[Connect-LDAP] Режим GC: сервер=$Server, домен=$Domain",
+          "sourceLine": 273,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] No domain specified, attempting automatic discovery...",
+          "to": "[Connect-LDAP] Домен не указан, запускается автообнаружение...",
+          "sourceLine": 276,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Automatically detected domain: $Domain",
+          "to": "[Connect-LDAP] Автоматически обнаружен домен: $Domain",
+          "sourceLine": 280,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] No server specified, using domain name: $Domain",
+          "to": "[Connect-LDAP] Сервер не указан — используется имя домена: $Domain",
+          "sourceLine": 292,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Domain DN: $DomainDN",
+          "to": "[Connect-LDAP] DN домена: $DomainDN",
+          "sourceLine": 298,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Testing DNS resolution for: $Server",
+          "to": "[Connect-LDAP] Проверка DNS для: $Server",
+          "sourceLine": 302,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Using custom DNS server: $CustomDnsServer",
+          "to": "[Connect-LDAP] Используется собственный DNS-сервер: $CustomDnsServer",
+          "sourceLine": 310,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] DNS resolution via custom DNS successful: $ResolvedIPString",
+          "to": "[Connect-LDAP] Разрешение имени через собственный DNS успешно: $ResolvedIPString",
+          "sourceLine": 318,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "Custom DNS resolution failed for $Server",
+          "to": "Не удалось разрешить $Server через собственный DNS",
+          "sourceLine": 320,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "DNS resolution returned no addresses",
+          "to": "DNS не вернул адресов",
+          "sourceLine": 326,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] DNS resolution successful: $ResolvedIPString",
+          "to": "[Connect-LDAP] Разрешение DNS успешно: $ResolvedIPString",
+          "sourceLine": 329,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Testing port reachability to: $ConnectTarget",
+          "to": "[Connect-LDAP] Проверка доступности порта узла: $ConnectTarget",
+          "sourceLine": 347,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Server is reachable on port $TestPort",
+          "to": "[Connect-LDAP] Сервер доступен на порту $TestPort",
+          "sourceLine": 363,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Port test failed: $_",
+          "to": "[Connect-LDAP] Ошибка проверки порта: $_",
+          "sourceLine": 367,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Testing SSL/TLS handshake on port $SSLPort...",
+          "to": "[Connect-LDAP] Проверка согласования SSL/TLS на порту $SSLPort...",
+          "sourceLine": 382,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] SSL/TLS handshake successful",
+          "to": "[Connect-LDAP] Согласование SSL/TLS успешно",
+          "sourceLine": 402,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] SSL Protocol: $($SslStream.SslProtocol)",
+          "to": "[Connect-LDAP] Протокол SSL: $($SslStream.SslProtocol)",
+          "sourceLine": 403,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Cipher: $($SslStream.CipherAlgorithm)",
+          "to": "[Connect-LDAP] Алгоритм шифрования: $($SslStream.CipherAlgorithm)",
+          "sourceLine": 404,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Certificate Subject: $($SslStream.RemoteCertificate.Subject)",
+          "to": "[Connect-LDAP] Субъект сертификата: $($SslStream.RemoteCertificate.Subject)",
+          "sourceLine": 406,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Certificate Issuer: $($SslStream.RemoteCertificate.Issuer)",
+          "to": "[Connect-LDAP] Издатель сертификата: $($SslStream.RemoteCertificate.Issuer)",
+          "sourceLine": 407,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Certificate chain pre-cached (CRL check disabled)",
+          "to": "[Connect-LDAP] Цепочка сертификатов закэширована (CRL не проверяется)",
+          "sourceLine": 422,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Certificate chain pre-cache failed (non-critical): $_",
+          "to": "[Connect-LDAP] Не удалось закэшировать цепочку сертификатов (некритично): $_",
+          "sourceLine": 424,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] SSL/TLS handshake FAILED: $($sslErrorInfo.Message)",
+          "to": "[Connect-LDAP] ОШИБКА согласования SSL/TLS: $($sslErrorInfo.Message)",
+          "sourceLine": 434,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Consider using -IgnoreSSLErrors parameter",
+          "to": "[Connect-LDAP] При необходимости используйте параметр -IgnoreSSLErrors",
+          "sourceLine": 437,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Skipping anonymous access check for GC mode",
+          "to": "[Connect-LDAP] Проверка анонимного доступа пропущена для GC",
+          "sourceLine": 494,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Skipping anonymous access check for LDAPS (rarely enabled over SSL)",
+          "to": "[Connect-LDAP] Проверка анонимного доступа пропущена для LDAPS (редко разрешена поверх SSL)",
+          "sourceLine": 498,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Using hostname for LDAP connection: $LDAPTarget",
+          "to": "[Connect-LDAP] Для LDAP используется имя узла: $LDAPTarget",
+          "sourceLine": 524,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Attempting $ProtocolDisplay connection to ${LDAPTarget}:${LDAPPort}...",
+          "to": "[Connect-LDAP] Попытка соединения $ProtocolDisplay с ${LDAPTarget}:${LDAPPort}...",
+          "sourceLine": 527,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Using System.DirectoryServices.Protocols.LdapConnection for $ProtocolDisplay...",
+          "to": "[Connect-LDAP] Используется System.DirectoryServices.Protocols.LdapConnection для $ProtocolDisplay...",
+          "sourceLine": 532,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Configured timeouts: Operation=${TimeoutSeconds}s, Send=${SendTimeoutSeconds}s",
+          "to": "[Connect-LDAP] Таймауты: операция=${TimeoutSeconds}с, отправка=${SendTimeoutSeconds}с",
+          "sourceLine": 561,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Referral chasing disabled (domain-local queries only)",
+          "to": "[Connect-LDAP] Переадресация LDAP отключена (запросы только внутри домена)",
+          "sourceLine": 565,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] SSL certificate validation disabled (IgnoreSSLErrors)",
+          "to": "[Connect-LDAP] Проверка сертификата SSL отключена (IgnoreSSLErrors)",
+          "sourceLine": 572,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Configuring explicit NTLM authentication (Sicily): $NtlmDomain\\$NtlmUser",
+          "to": "[Connect-LDAP] Явная NTLM-аутентификация (Sicily): $NtlmDomain\\$NtlmUser",
+          "sourceLine": 593,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Username from credential (NETBIOS format): $UserName",
+          "to": "[Connect-LDAP] Имя пользователя из учётных данных (формат NETBIOS): $UserName",
+          "sourceLine": 615,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Username from credential (UPN format): $UserName",
+          "to": "[Connect-LDAP] Имя пользователя из учётных данных (формат UPN): $UserName",
+          "sourceLine": 619,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Username qualified for SimpleBind (UPN): $UserName",
+          "to": "[Connect-LDAP] Уточнено имя пользователя SimpleBind (UPN): $UserName",
+          "sourceLine": 625,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] WARNING: Username '$UserName' is not domain-qualified and no domain available",
+          "to": "[Connect-LDAP] ПРЕДУПРЕЖДЕНИЕ: в '$UserName' не указан домен; данные о домене отсутствуют",
+          "sourceLine": 627,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Configuring SimpleBind with credentials: $UserName",
+          "to": "[Connect-LDAP] Настройка SimpleBind для $UserName",
+          "sourceLine": 631,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Configuring Negotiate (Kerberos/NTLM) authentication",
+          "to": "[Connect-LDAP] Настройка аутентификации Negotiate (Kerberos/NTLM)",
+          "sourceLine": 637,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Binding to $ProtocolDisplay server...",
+          "to": "[Connect-LDAP] Привязка к серверу $ProtocolDisplay...",
+          "sourceLine": 647,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] $ProtocolDisplay bind successful! ($($bindStopwatch.ElapsedMilliseconds)ms)",
+          "to": "[Connect-LDAP] Привязка $ProtocolDisplay успешна! ($($bindStopwatch.ElapsedMilliseconds) мс)",
+          "sourceLine": 651,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] GC mode: ${LDAPTarget}:${LDAPPort} is NOT a Global Catalog (isGlobalCatalogReady != TRUE)",
+          "to": "[Connect-LDAP] Режим GC: ${LDAPTarget}:${LDAPPort} НЕ является глобальным каталогом (isGlobalCatalogReady != TRUE)",
+          "sourceLine": 676,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] GC mode: Could not verify GC status on ${LDAPTarget}:${LDAPPort}: $($_.Exception.Message)",
+          "to": "[Connect-LDAP] Режим GC: состояние GC на ${LDAPTarget}:${LDAPPort} проверить не удалось: $($_.Exception.Message)",
+          "sourceLine": 681,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] GC mode: Connection to ${LDAPTarget}:${LDAPPort} established and verified as Global Catalog",
+          "to": "[Connect-LDAP] Режим GC: соединение с ${LDAPTarget}:${LDAPPort} установлено и подтверждено как глобальный каталог",
+          "sourceLine": 686,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Testing $ProtocolDisplay connection with search query...",
+          "to": "[Connect-LDAP] Проверка соединения $ProtocolDisplay поисковым запросом...",
+          "sourceLine": 692,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Connection state: AuthType=$($LdapProtocolConn.AuthType), AutoBind=$($LdapProtocolConn.AutoBind)",
+          "to": "[Connect-LDAP] Состояние соединения: AuthType=$($LdapProtocolConn.AuthType), AutoBind=$($LdapProtocolConn.AutoBind)",
+          "sourceLine": 693,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Client certificates count: $($LdapProtocolConn.ClientCertificates.Count)",
+          "to": "[Connect-LDAP] Клиентских сертификатов: $($LdapProtocolConn.ClientCertificates.Count)",
+          "sourceLine": 695,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] $ProtocolDisplay search successful! DN: $TestDN",
+          "to": "[Connect-LDAP] Поиск $ProtocolDisplay успешен! DN: $TestDN",
+          "sourceLine": 708,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] LdapConnection stored for all LDAP operations",
+          "to": "[Connect-LDAP] LdapConnection сохранён для операций LDAP",
+          "sourceLine": 713,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "$ProtocolDisplay search returned no results",
+          "to": "Поиск $ProtocolDisplay не вернул результатов",
+          "sourceLine": 716,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Retrieving RootDSE via LdapConnection...",
+          "to": "[Connect-LDAP] Получение RootDSE через LdapConnection...",
+          "sourceLine": 752,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Sending RootDSE request for attributes: $($attributesToExtract -join ', ')",
+          "to": "[Connect-LDAP] Запрос RootDSE для атрибутов: $($attributesToExtract -join ', ')",
+          "sourceLine": 778,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] RootDSE entry returned, Attributes.Count = $($RootDSEEntry.Attributes.Count)",
+          "to": "[Connect-LDAP] Получена запись RootDSE; атрибутов: $($RootDSEEntry.Attributes.Count)",
+          "sourceLine": 786,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] RootDSE attribute $attrName = $value",
+          "to": "[Connect-LDAP] Атрибут RootDSE $attrName = $value",
+          "sourceLine": 797,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] RootDSE attribute $attrName not found in server response",
+          "to": "[Connect-LDAP] Атрибут RootDSE $attrName не найден в ответе сервера",
+          "sourceLine": 800,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] RootDSE retrieved successfully with $($RootDSEData.Count) attributes",
+          "to": "[Connect-LDAP] RootDSE получен; атрибутов: $($RootDSEData.Count)",
+          "sourceLine": 804,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "RootDSE query returned no results",
+          "to": "Запрос RootDSE не вернул результатов",
+          "sourceLine": 806,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Retrieving Domain SID via LdapConnection...",
+          "to": "[Connect-LDAP] Чтение SID домена через LdapConnection...",
+          "sourceLine": 857,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Domain SID: $DomainSID",
+          "to": "[Connect-LDAP] SID домена: $DomainSID",
+          "sourceLine": 871,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Could not retrieve Domain SID: $_",
+          "to": "[Connect-LDAP] Не удалось получить SID домена: $_",
+          "sourceLine": 874,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Domain NetBIOS name (from crossRef): $DomainNetBIOS",
+          "to": "[Connect-LDAP] Имя NetBIOS домена из crossRef: $DomainNetBIOS",
+          "sourceLine": 901,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Could not resolve NetBIOS name from crossRef: $_",
+          "to": "[Connect-LDAP] Не удалось определить NetBIOS через crossRef: $_",
+          "sourceLine": 905,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] NetBIOS name not resolved via crossRef - falling back to DNS label guess: $DomainNetBIOS",
+          "to": "[Connect-LDAP] NetBIOS не определён через crossRef — предполагается метка DNS: $DomainNetBIOS",
+          "sourceLine": 910,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Verifying authenticated user context via LDAP...",
+          "to": "[Connect-LDAP] Проверка пользователя через LDAP...",
+          "sourceLine": 922,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Using explicit credential: $AuthenticatedUser",
+          "to": "[Connect-LDAP] Используются явные учётные данные: $AuthenticatedUser",
+          "sourceLine": 934,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Verified user: $AuthenticatedUserDN",
+          "to": "[Connect-LDAP] Пользователь проверен: $AuthenticatedUserDN",
+          "sourceLine": 956,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Could not verify user via LDAP: $_",
+          "to": "[Connect-LDAP] Не удалось проверить пользователя через LDAP: $_",
+          "sourceLine": 959,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Using LDAP Who Am I? Extended Operation...",
+          "to": "[Connect-LDAP] Выполняется расширенная операция LDAP Who Am I?...",
+          "sourceLine": 965,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] LDAP Who Am I? response: $WhoAmIResult",
+          "to": "[Connect-LDAP] Ответ LDAP Who Am I?: $WhoAmIResult",
+          "sourceLine": 975,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Authenticated user from LDAP: $AuthenticatedUser",
+          "to": "[Connect-LDAP] Аутентифицированный пользователь LDAP: $AuthenticatedUser",
+          "sourceLine": 993,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] LDAP Who Am I? failed: $_ - falling back to LSA ticket cache",
+          "to": "[Connect-LDAP] Ошибка LDAP Who Am I?: $_; переход к кэшу билетов LSA",
+          "sourceLine": 997,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Found user via LSA ticket cache: $AuthenticatedUser",
+          "to": "[Connect-LDAP] Пользователь определён по кэшу билетов LSA: $AuthenticatedUser",
+          "sourceLine": 1007,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Kerberos authenticated but no valid TGT in cache",
+          "to": "[Connect-LDAP] Kerberos выполнен, но действующий TGT в кэше отсутствует",
+          "sourceLine": 1010,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] LSA ticket cache query failed: $_",
+          "to": "[Connect-LDAP] Ошибка чтения кэша билетов LSA: $_",
+          "sourceLine": 1013,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] '$AuthenticatedUser' is not an account name of $DomainNetBIOS - not looked up",
+          "to": "[Connect-LDAP] '$AuthenticatedUser' не является именем учётной записи домена $DomainNetBIOS — поиск пропущен",
+          "sourceLine": 1036,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Bound account: $AuthenticatedUserDN ($AuthenticatedUserSID)",
+          "to": "[Connect-LDAP] Привязанная учётная запись: $AuthenticatedUserDN ($AuthenticatedUserSID)",
+          "sourceLine": 1044,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Could not read the bound account $AuthenticatedUser : $_",
+          "to": "[Connect-LDAP] Не удалось прочитать привязанную учётную запись $AuthenticatedUser — $_",
+          "sourceLine": 1047,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Final Authenticated User: $AuthenticatedUser",
+          "to": "[Connect-LDAP] Итоговый аутентифицированный пользователь: $AuthenticatedUser",
+          "sourceLine": 1056,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Kerberos authentication detected (Who Am I? returned domain user)",
+          "to": "[Connect-LDAP] Обнаружен Kerberos (Who Am I? вернул доменного пользователя)",
+          "sourceLine": 1077,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] User verification failed (non-critical): $_",
+          "to": "[Connect-LDAP] Ошибка проверки пользователя (некритично): $_",
+          "sourceLine": 1083,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Set AuthMethod: $($Script:LDAPContext['AuthMethod'])",
+          "to": "[Connect-LDAP] Установлен AuthMethod: $($Script:LDAPContext['AuthMethod'])",
+          "sourceLine": 1115,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Connection established successfully",
+          "to": "[Connect-LDAP] Соединение успешно установлено",
+          "sourceLine": 1118,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] Domain: $Domain, Server: $ActualDCName, Protocol: $ProtocolDisplay",
+          "to": "[Connect-LDAP] Домен: $Domain, сервер: $ActualDCName, протокол: $ProtocolDisplay",
+          "sourceLine": 1119,
+          "expectedOccurrences": 1
+        },
+        {
+          "from": "[Connect-LDAP] LDAP connection setup completed",
+          "to": "[Connect-LDAP] Настройка LDAP-соединения завершена",
+          "sourceLine": 1134,
+          "expectedOccurrences": 1
+        }
+      ]
+    }
+  ]
+}
