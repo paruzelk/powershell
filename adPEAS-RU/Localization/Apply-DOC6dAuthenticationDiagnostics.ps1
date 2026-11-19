@@ -29,12 +29,12 @@ foreach($entry in $manifest.files){
         $to=[string]$item.to
         $expect=[int]$item.expectedOccurrences
         if([string]::IsNullOrEmpty($from) -or [string]::IsNullOrEmpty($to) -or $from -ceq $to -or $expect -lt 1){
-            throw "DOC6d: некорректный элемент перевода $relative:$($item.sourceLine)"
+            throw "DOC6d: некорректный элемент перевода ${relative}:$($item.sourceLine)"
         }
         $quotedFrom='"'+$from+'"'
         $count=([regex]::Matches($source,[regex]::Escape($quotedFrom))).Count
         if($count -ne $expect){
-            throw "DOC6d: исходный текст изменился ($relative:$($item.sourceLine)); ожидалось $expect, найдено $count"
+            throw "DOC6d: исходный текст изменился (${relative}:$($item.sourceLine)); ожидалось $expect, найдено $count"
         }
         $source=$source.Replace($quotedFrom,'"'+$to+'"')
         $totals++
