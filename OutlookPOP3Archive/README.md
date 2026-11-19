@@ -1,6 +1,20 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3o — защищённый ровно один реальный Move ТЕСТОВОГО POP3 PST (DEV)
+
+Разработан новый ограниченный one-shot путь **внутри оригинального `MailMover.ps1`**: новый Year2020 Part2, без открытия Part1, неизменяемый `WriterEntry` до PST, `MoveClaimed` и `ProviderInvocation` до единственного Outlook COM `Move`, без записи в общий `DuplicateIndex` и без `OperationJournal Reconciled` до независимого настоящего Outlook restart. `Move` является **разрушительной тестовой операцией**, требует explicit `-ConfirmOneRealMove`, не допускает retry. `ProductionReady=False`.
+
+```powershell
+$pin=@{RunId='9d276dc4-a0e6-4e74-891f-81502fafe7db'; IntentSha256='f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b'; JournalSha256='a19f113a6454b1d17333c9a53fc22d065876754b9fbab3167087487d0b2b981e'}
+.\Invoke-ARCH3o.ps1 -Mode Plan @pin | Format-List
+.\Invoke-ARCH3o.ps1 -Mode Audit @pin | Format-List
+.\Invoke-ARCH3o.ps1 -Mode Move @pin -ConfirmOneRealMove -WhatIf | Format-List
+.\Invoke-ARCH3o.ps1 -Mode Status @pin | Format-List
+```
+
+**Реальный `-Mode Move` не запускать до просмотра `Plan`/`Audit` и планирования независимой проверки после перезапуска Outlook.** [Подробный контракт, синтаксис и предупреждения ARCH3o](docs/2.6.5-arch3o-one-real-original-mover.md).
+
 ### ARCH3n — original ARCH3j Intent ↔ original synthetic Year Part2 (READ ONLY)
 
 Синтетическая принудительная Part2 из ARCH3m привязана к существующим *неизменным* реальным ARCH3j PrepareIntent, OperationJournal, ARCH3i full witness и original DuplicateIndex. Проверяются exact RunId, SHA, единственная Part1 271360 байт, свободная Part2 и 500 индексных записей. Реальный `Move` по-прежнему ЗАБЛОКИРОВАН.

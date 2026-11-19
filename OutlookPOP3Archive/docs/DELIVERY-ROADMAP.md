@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3o (2026-11-19):** [оригинальный MailMover содержит ограниченный one-real TEST-PST provider Move с необратимыми WriterEntry/MoveClaimed/ProviderInvocation и обязательным новым Part2](2.6.5-arch3o-one-real-original-mover.md). Не трогает original DuplicateIndex и Original Journal terminal state до independent postrestart. Режим Move требует explicit operator confirmation. Следующий ARCH3p — свежий Outlook restart и original ArchiveVerifier, затем Reconciled/Index. ProductionReady=False.
+
+
 > **ARCH3n (2026-11-19):** [привязка ранее запечатанного реального ARCH3j оригинального Intent к синтетической исходной Part2 до PST allocation](2.6.5-arch3n-pinned-real-intent-bridge.md). Read-only `Plan/Audit` требует exact original SHA+full witness, неизменную Part1 и 500-entry shared index; при любом дрейфе fail-closed. Нет live writer и автоматического повтора. Дальше — один bounded реальный claim+Move с независимым real Outlook restart и оригинальным ArchiveVerifier, только после отдельного допуска.
 
 

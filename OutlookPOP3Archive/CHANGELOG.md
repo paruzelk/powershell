@@ -1,3 +1,9 @@
+## 2.6.5-ARCH3o DEV — 2026-11-19
+- User live read-only ARCH3n Plan/Audit PASS; original protected ARCH3j Intent and Journal hashes plus full source semantic witness remain unchanged.
+- Added inside original MailMover optional -ARCH3oRequireNewUnusedPst to fail closed if old/mounted target PST exists, and one real MailItem.Move provider helper protected by second CreateNew+Flush(true) ProviderInvocation SHA fence.
+- New operator-only Invoke-ARCH3o Plan/Audit/Move/Status uses exact original test POP3 scope, original archive creator and Year folder, 2 immutable pre-COM fences and no automatic retry; NEVER original DuplicateIndex append or terminal OperationJournal Reconciled before fresh Outlook restart.
+- 20 new synthetic Pester tests, expected full 4442 tests in 149 containers Windows PowerShell 5.1. Real Outlook test ONLY explicitly operator-approved and with later independent verifier. ProductionReady=False.
+
 ## 2.6.5-ARCH3n DEV — 2026-11-19
 - New exact READ-ONLY operator ARCH3j pinned real Intent/Journal/ARCH3i source witness binding to original Get-OPAArchiveDestination ARCH3m fake preallocation, rejects forged SHA/contract/EntryID/Year/part/index and consumed real Part2.
 - New Invoke-ARCH3n Plan/Audit, Audit reuses original ARCH3k real source full witness and POP3 Inbox read-only, never authorizes Move/Resume/Auto.
