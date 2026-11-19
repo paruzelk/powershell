@@ -1,0 +1,141 @@
+{
+  "schema": "adPEAS-RU.DOC6h.SecurityLog.1",
+  "path": "src/modules/Checks/Application/Get-ExchangeInfrastructure.ps1",
+  "entries": [
+    {
+      "line": 54,
+      "original": "        Write-Log \"[Get-ExchangeInfrastructure] Starting check\"",
+      "target": "        Write-Log \"[Get-ExchangeInfrastructure] Начата проверка\""
+    },
+    {
+      "line": 132,
+      "original": "                Write-Log \"[Get-ExchangeInfrastructure] Exchange Organization not Found: $_\"",
+      "target": "                Write-Log \"[Get-ExchangeInfrastructure] Организация Exchange не найдена: $_\""
+    },
+    {
+      "line": 164,
+      "original": "                Write-Log \"[Get-ExchangeInfrastructure] Error querying Config partition servers: $_\" -Level Error",
+      "target": "                Write-Log \"[Get-ExchangeInfrastructure] Ошибка запроса серверов из раздела Configuration: $_\" -Level Error"
+    },
+    {
+      "line": 177,
+      "original": "                Write-Log \"[Get-ExchangeInfrastructure] Error querying Virtual Directories: $_\" -Level Error",
+      "target": "                Write-Log \"[Get-ExchangeInfrastructure] Ошибка запроса виртуальных каталогов: $_\" -Level Error"
+    },
+    {
+      "line": 183,
+      "original": "                Write-Log \"[Get-ExchangeInfrastructure] Error querying SMTP Receive Connectors: $_\" -Level Error",
+      "target": "                Write-Log \"[Get-ExchangeInfrastructure] Ошибка запроса SMTP-коннекторов приёма: $_\" -Level Error"
+    },
+    {
+      "line": 189,
+      "original": "                Write-Log \"[Get-ExchangeInfrastructure] Error querying SMTP Send Connectors: $_\" -Level Error",
+      "target": "                Write-Log \"[Get-ExchangeInfrastructure] Ошибка запроса SMTP-коннекторов отправки: $_\" -Level Error"
+    },
+    {
+      "line": 195,
+      "original": "                Write-Log \"[Get-ExchangeInfrastructure] Error querying Accepted Domains: $_\" -Level Error",
+      "target": "                Write-Log \"[Get-ExchangeInfrastructure] Ошибка запроса обслуживаемых доменов: $_\" -Level Error"
+    },
+    {
+      "line": 208,
+      "original": "                Write-Log \"[Get-ExchangeInfrastructure] Error querying hybrid configuration: $_\" -Level Error",
+      "target": "                Write-Log \"[Get-ExchangeInfrastructure] Ошибка запроса гибридной конфигурации: $_\" -Level Error"
+    },
+    {
+      "line": 489,
+      "original": "                Write-Log \"[Get-ExchangeInfrastructure] Error enumerating Exchange servers: $_\" -Level Error",
+      "target": "                Write-Log \"[Get-ExchangeInfrastructure] Ошибка перечисления серверов Exchange: $_\" -Level Error"
+    },
+    {
+      "line": 512,
+      "original": "                                Write-Log \"[Get-ExchangeInfrastructure] Skipping HTTP check for $($exServer.DNSHostName) - server inactive\"",
+      "target": "                                Write-Log \"[Get-ExchangeInfrastructure] HTTP-проверка $($exServer.DNSHostName) пропущена — сервер неактивен\""
+    },
+    {
+      "line": 527,
+      "original": "                                    Write-Log \"[Get-ExchangeInfrastructure] TCP check failed for $($exServer.DNSHostName): $_\"",
+      "target": "                                    Write-Log \"[Get-ExchangeInfrastructure] Ошибка проверки TCP для $($exServer.DNSHostName): $_\""
+    },
+    {
+      "line": 538,
+      "original": "                                    Write-Log \"[Get-ExchangeInfrastructure] Skipping HTTP check for $($exServer.DNSHostName) - TCP port 443 not reachable\"",
+      "target": "                                    Write-Log \"[Get-ExchangeInfrastructure] HTTP-проверка $($exServer.DNSHostName) пропущена — порт TCP 443 недоступен\""
+    },
+    {
+      "line": 540,
+      "original": "                                    Write-Log \"[Get-ExchangeInfrastructure] Detecting Exchange endpoints and EPA for $($exServer.DNSHostName)...\"",
+      "target": "                                    Write-Log \"[Get-ExchangeInfrastructure] Определение конечных точек Exchange и EPA для $($exServer.DNSHostName)...\""
+    },
+    {
+      "line": 550,
+      "original": "                                            Write-Log \"[Get-ExchangeInfrastructure] HTTP detection successful: $httpBuildNumber\"",
+      "target": "                                            Write-Log \"[Get-ExchangeInfrastructure] Обнаружена версия Exchange через HTTP: $httpBuildNumber\""
+    },
+    {
+      "line": 560,
+      "original": "                                                Write-Log \"[Get-ExchangeInfrastructure] EPA detection: Enabled=$($httpResult.EPAEnabled), Confidence=$($httpResult.EPAConfidence)\"",
+      "target": "                                                Write-Log \"[Get-ExchangeInfrastructure] Обнаружение EPA: включено=$($httpResult.EPAEnabled), достоверность=$($httpResult.EPAConfidence)\""
+    },
+    {
+      "line": 565,
+      "original": "                                        Write-Log \"[Get-ExchangeInfrastructure] HTTP detection failed: $_\"",
+      "target": "                                        Write-Log \"[Get-ExchangeInfrastructure] Не удалось выполнить обнаружение через HTTP: $_\""
+    },
+    {
+      "line": 821,
+      "original": "                    Write-Log \"[Get-ExchangeInfrastructure] Resolved $($smtpRightsByGuid.Count) SMTP extended right(s) from the Configuration partition\"",
+      "target": "                    Write-Log \"[Get-ExchangeInfrastructure] Определены расширенные права SMTP из раздела Configuration: $($smtpRightsByGuid.Count)\""
+    },
+    {
+      "line": 824,
+      "original": "                    Write-Log \"[Get-ExchangeInfrastructure] Error resolving SMTP extended rights: $_\" -Level Error",
+      "target": "                    Write-Log \"[Get-ExchangeInfrastructure] Ошибка определения расширенных прав SMTP: $_\" -Level Error"
+    },
+    {
+      "line": 840,
+      "original": "                    Write-Log \"[Get-ExchangeInfrastructure] Error reading receive connector descriptors: $_\" -Level Error",
+      "target": "                    Write-Log \"[Get-ExchangeInfrastructure] Ошибка чтения дескрипторов коннекторов приёма: $_\" -Level Error"
+    },
+    {
+      "line": 961,
+      "original": "                            Write-Log \"[Get-ExchangeInfrastructure] Error parsing connector ACL for ${connectorDN}: $_\" -Level Error",
+      "target": "                            Write-Log \"[Get-ExchangeInfrastructure] Ошибка разбора ACL коннектора ${connectorDN}: $_\" -Level Error"
+    },
+    {
+      "line": 1127,
+      "original": "                    Write-Log \"[Get-ExchangeInfrastructure] Error resolving ${modelGroupName}: $_\" -Level Error",
+      "target": "                    Write-Log \"[Get-ExchangeInfrastructure] Ошибка определения ${modelGroupName}: $_\" -Level Error"
+    },
+    {
+      "line": 1169,
+      "original": "                Write-Log \"[Get-ExchangeInfrastructure] Microsoft Exchange Protected Groups OU not present: $_\"",
+      "target": "                Write-Log \"[Get-ExchangeInfrastructure] OU Microsoft Exchange Protected Groups отсутствует: $_\""
+    },
+    {
+      "line": 1208,
+      "original": "                    Write-Log \"[Get-ExchangeInfrastructure] Error reading domain object ACL: $_\" -Level Error",
+      "target": "                    Write-Log \"[Get-ExchangeInfrastructure] Ошибка чтения ACL объекта домена: $_\" -Level Error"
+    },
+    {
+      "line": 1241,
+      "original": "                            Write-Log \"[Get-ExchangeInfrastructure] Object-specific ACE grants no DACL rewrite: $($matchedGroup.Name), ObjectType=$aceObjectType\"",
+      "target": "                            Write-Log \"[Get-ExchangeInfrastructure] ACE для определённого типа объекта не даёт права изменения DACL: $($matchedGroup.Name), ObjectType=$aceObjectType\""
+    },
+    {
+      "line": 1464,
+      "original": "                    Write-Log \"[Get-ExchangeInfrastructure] Error checking $($serviceGroup.Name): $_\" -Level Error",
+      "target": "                    Write-Log \"[Get-ExchangeInfrastructure] Ошибка проверки $($serviceGroup.Name): $_\" -Level Error"
+    },
+    {
+      "line": 1474,
+      "original": "            Write-Log \"[Get-ExchangeInfrastructure] Error: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-ExchangeInfrastructure] Ошибка: $_\" -Level Error"
+    },
+    {
+      "line": 1480,
+      "original": "        Write-Log \"[Get-ExchangeInfrastructure] Check completed\"",
+      "target": "        Write-Log \"[Get-ExchangeInfrastructure] Проверка завершена\""
+    }
+  ]
+}
