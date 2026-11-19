@@ -267,3 +267,7 @@ if(-not $?){throw 'Ошибка локализации расширений гр
 # DOC6c: консольные и HTML-сообщения сравнения/конвертации/экспорта.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC6cReportingTexts.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации подсистемы отчётов DOC6c'}
+
+# DOC6d: осторожный перевод сообщений запуска, Kerberos/NTLM/LDAPS и ошибок подключения.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC6dAuthenticationDiagnostics.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации диагностических сообщений DOC6d'}
