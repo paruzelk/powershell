@@ -1,6 +1,22 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3u — реальный тестовый POP3 PST, предварительный batch-10 без Move
+
+Тестовый `info@stios.ru.pst` разрешён для **чтения**: новый ARCH3u находит 10 ещё не индексированных исходных Inbox MailItems одного года через ORIGINAL `ArchiveSelector`, проверяет исходный POP3 StoreID и повторно читает каждый EntryID, оригинальный `DuplicateIndex` и имеющиеся годовые части, строит оригинальные `ARCH3b` контракты на **следующую свободную часть архива**. `Plan` не подключается к Outlook; `Inventory` обращается к Outlook только для чтения. Без durable witness, Intent, PST/Journal/Index writer; `WriterPermit=False`, `ProductionReady=False`.
+
+```powershell
+$run=[guid]::NewGuid().ToString('D')
+$source='C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.pst'
+.\Invoke-ARCH3u.ps1 -Mode Plan -RunId $run -SourcePst $source | Format-List
+# PowerShell 5.1 -STA; Outlook профиля Outlook уже запущен
+.\Invoke-ARCH3u.ps1 -Mode Inventory -RunId $run -SourcePst $source | Format-List
+```
+
+[ARCH3u: полный синтаксис, runbook и предупреждения](docs/2.6.5-arch3u-real-test-pst-ten-readonly-preflight.md). Следующий отдельный этап ARCH3v — полные ARCH2b witness и durable evidence до любого реального Move; текущий `Archive/Resume/Auto` заблокирован.
+
+
+
 ### ARCH3t — восстановление только частичного TEMP DuplicateIndex после original verifier (без Outlook)
 
 ARCH3s уже выполняет оригинальный `ArchiveVerifier` на 10 fake Outlook MailItems и затем создаёт original TEMP `OperationJournal` и `DuplicateIndex`. ARCH3t добавляет независимый `Audit` и явно разрешаемый `Recover` **только недостающих index entries** из состояния `10 Reconciled / 2 Indexed`. Требуются исходные SHA256 и повторный оригинальный fake-verifier; повреждённые, дублированные или незавершённые записи блокируются. **Нет Move, реального PST и разрешения на production.**
