@@ -271,3 +271,7 @@ if(-not $?){throw 'Ошибка локализации подсистемы от
 # DOC6d: осторожный перевод сообщений запуска, Kerberos/NTLM/LDAPS и ошибок подключения.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC6dAuthenticationDiagnostics.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации диагностических сообщений DOC6d'}
+
+# DOC6e: пользовательские сообщения DNS/SRV, привилегий и TGT.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC6eHelperDiagnostics.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка применения DOC6e'}
