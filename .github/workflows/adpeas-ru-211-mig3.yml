@@ -64,8 +64,10 @@ jobs:
           python adPEAS-RU/Migration/v2.11.0/Build-MIG3Preview.py --new $new[0].FullName --candidate _mig/candidate --report _mig/2.11.0-mig3-coverage.json
           if ($LASTEXITCODE -ne 0) { throw 'MIG3 translation source-witness gate failed' }
           $audit = Get-Content '_mig/2.11.0-mig3-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
-          if ($audit.FindingIds -ne 408 -or $audit.NewFullyTranslatedFindingIds.Count -ne 16 -or
-              $audit.UpdatedFindingIds.PSObject.Properties.Count -ne 5) {
+          $newCount = @($audit.NewFullyTranslatedFindingIds).Count
+          $updatedCount = @($audit.UpdatedFindingIds.PSObject.Properties | ForEach-Object { $_.Name }).Count
+          Write-Host "MIG3 coverage: FindingIds=$($audit.FindingIds), New=$newCount, Updated=$updatedCount"
+          if ([int]$audit.FindingIds -ne 408 -or $newCount -ne 16 -or $updatedCount -ne 5) {
             throw 'MIG3 408/16/5 coverage gate failed'
           }
           Write-Host 'PASS: 408 descriptions, 16 new findings, 5 amended findings'
@@ -125,7 +127,6 @@ jobs:
             _mig/candidate/adPEAS_min.ps1
             _mig/candidate/adPEAS_ultra.ps1
             _mig/candidate/adPEAS_obf.ps1
-            _mig/candidate/adPEAS.exe
             _mig/candidate/adPEAS.exe
           retention-days: 14
           if-no-files-found: error
