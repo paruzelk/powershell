@@ -283,3 +283,7 @@ if(-not $?){throw 'Ошибка локализации вывода DOC6f'}
 # DOC6g: предметная локализация вывода проверок привилегированных групп, домена и AD CS.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC6gSecurityChecks.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации DOC6g'}
+
+# DOC6h: диагностика Exchange, SYSVOL, GPO, gMSA/dMSA и ESC14.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC6hSecurityLogs.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации DOC6h'}
