@@ -65,13 +65,13 @@
     )
 
     begin {
-        Write-Log "[Convert-adPEASReport] Starting offline report generation"
+        Write-Log "[Convert-adPEASReport] Начато автономное формирование отчёта"
     }
 
     process {
         # Validate input file
         if (-not (Test-Path $InputJson)) {
-            Write-Error "[Convert-adPEASReport] Input file not found: $InputJson"
+            Write-Error "[Convert-adPEASReport] Не найден входной файл: $InputJson"
             return
         }
 
@@ -88,11 +88,11 @@
             $cache = ConvertFrom-FindingsCacheJson -Json $rawJson
 
             if (-not $cache.CacheVersion) {
-                Write-Error "[Convert-adPEASReport] Invalid JSON file - missing CacheVersion field"
+                Write-Error "[Convert-adPEASReport] Некорректный JSON: отсутствует поле CacheVersion"
                 return
             }
             if ($cache.CacheVersion -ne 1) {
-                Write-Error "[Convert-adPEASReport] Unsupported cache version $($cache.CacheVersion) - expected 1"
+                Write-Error "[Convert-adPEASReport] Неподдерживаемая версия кэша $($cache.CacheVersion) — ожидается 1"
                 return
             }
 
@@ -122,14 +122,14 @@
             # the export only ever ran at the end, so a missing flag means complete.
             if ($null -ne $cache.Complete -and -not $cache.Complete) {
                 $covered = if ($cache.CompletedModules) { @($cache.CompletedModules) -join ', ' } else { 'unknown' }
-                Write-Warning "[Convert-adPEASReport] This export is from an interrupted scan - it covers only: $covered"
+                Write-Warning "[Convert-adPEASReport] Этот экспорт получен из прерванной проверки; охвачены только: $covered"
                 Show-Line "Исходный аудит был прерван — проверены только следующие модули: $covered" -Class Finding -NoCollect
             }
 
             # 2. Import findings from already-parsed cache (avoids re-reading the file)
             $findings = Import-FindingsFromCache -Cache $cache
             if (@($findings).Count -eq 0) {
-                Write-Warning "[Convert-adPEASReport] No findings loaded from JSON file"
+                Write-Warning "[Convert-adPEASReport] В JSON-файле не найдено результатов проверок"
                 return
             }
 
@@ -148,7 +148,7 @@
                 if (Test-Path $License) {
                     $_licJson = Get-Content -Path $License -Raw -Encoding UTF8
                 } else {
-                    Write-Warning "[Convert-adPEASReport] License file not found: $License"
+                    Write-Warning "[Convert-adPEASReport] Файл лицензии не найден: $License"
                 }
             } elseif ($Script:RuntimeLicense) {
                 $_licJson = $Script:RuntimeLicense
@@ -177,7 +177,7 @@
             $resolvedInput = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($InputJson)
             $outputJsonPath = "$resolvedBase.json"
             if ($Format -in @('All', 'JSON') -and $resolvedInput -eq $outputJsonPath) {
-                Write-Warning "[Convert-adPEASReport] Output path '$outputJsonPath' is the same as input file. JSON will be re-exported in place."
+                Write-Warning "[Convert-adPEASReport] Output path '$outputJsonPath' совпадает с входным файлом. JSON будет перезаписан."
             }
 
             # Ensure output directory exists
@@ -198,7 +198,7 @@
                     $htmlWritten = $true
                     Show-Line "HTML-отчёт сохранён: $htmlPath" -Class Hint -NoCollect
                 } catch {
-                    Write-Warning "[Convert-adPEASReport] Error generating HTML report: $_"
+                    Write-Warning "[Convert-adPEASReport] Ошибка создания HTML-отчёта: $_"
                 }
 
                 Clear-FindingsCollection
@@ -214,7 +214,7 @@
                     Export-FindingsCache -Path $jsonPath
                     Show-Line "Экспорт JSON сохранён: $jsonPath" -Class Hint -NoCollect
                 } catch {
-                    Write-Warning "[Convert-adPEASReport] Error saving JSON: $_"
+                    Write-Warning "[Convert-adPEASReport] Ошибка сохранения JSON: $_"
                 }
 
                 Clear-FindingsCollection
@@ -258,7 +258,7 @@
     }
 
     end {
-        Write-Log "[Convert-adPEASReport] Report generation completed"
+        Write-Log "[Convert-adPEASReport] Создание отчёта завершено"
     }
 }
 

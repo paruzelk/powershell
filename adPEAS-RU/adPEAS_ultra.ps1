@@ -86862,7 +86862,7 @@ function Export-HTMLReport {
 	begin {
 	    $findings = Get-FindingsCollection
 	    if (-not $findings -or $findings.Count -eq 0) {
-	        Write-Warning "[Export-HTMLReport] No findings collected. HTML report will be empty."
+	        Write-Warning "[Export-HTMLReport] Результаты проверок отсутствуют. HTML-отчёт будет пустым."
 	        $findings = @()
 	    }
 	    $domain = if ($Script:LDAPContext) { $Script:LDAPContext.Domain } else { "Unknown" }
@@ -86884,7 +86884,7 @@ function Export-HTMLReport {
 	    $sectionsHtml = Build-FindingSectionsHtml -Findings $findings
 	    $html = Get-HTMLTemplate
 	    if (-not $html) {
-	        throw "[Export-HTMLReport] Failed to load HTML template. Ensure template files exist in 'templates/' directory or build the project first."
+	        throw "[Export-HTMLReport] Не удалось загрузить HTML-шаблон. Проверьте файлы в каталоге 'templates/' или сначала соберите проект."
 	    }
 	    $findingDefsJson = Protect-JsonForScriptBlock (Export-FindingDefinitionsJson -Minified)
 	    $checkDefsJson = Protect-JsonForScriptBlock (Export-CheckDescriptionsJson -Minified)
@@ -86923,7 +86923,7 @@ function Export-HTMLReport {
 	        [System.IO.File]::WriteAllText($resolvedPath, $html, $utf8NoBom)
 	    }
 	    catch {
-	        throw "Failed to write HTML report to '$OutputPath': $_"
+	        throw "Не удалось записать HTML-отчёт в '$OutputPath': $_"
 	    }
 	}
 }
@@ -95266,7 +95266,7 @@ function Convert-adPEASReport {
 	)
 	process {
 	    if (-not (Test-Path $InputJson)) {
-	        Write-Error "[Convert-adPEASReport] Input file not found: $InputJson"
+	        Write-Error "[Convert-adPEASReport] Не найден входной файл: $InputJson"
 	        return
 	    }
 	    $previousLDAPContext = $Script:LDAPContext
@@ -95278,11 +95278,11 @@ function Convert-adPEASReport {
 	        $rawJson = Get-Content -Path $InputJson -Raw -Encoding UTF8
 	        $cache = ConvertFrom-FindingsCacheJson -Json $rawJson
 	        if (-not $cache.CacheVersion) {
-	            Write-Error "[Convert-adPEASReport] Invalid JSON file - missing CacheVersion field"
+	            Write-Error "[Convert-adPEASReport] Некорректный JSON: отсутствует поле CacheVersion"
 	            return
 	        }
 	        if ($cache.CacheVersion -ne 1) {
-	            Write-Error "[Convert-adPEASReport] Unsupported cache version $($cache.CacheVersion) - expected 1"
+	            Write-Error "[Convert-adPEASReport] Неподдерживаемая версия кэша $($cache.CacheVersion) — ожидается 1"
 	            return
 	        }
 	        $sourceDomain = if ($cache.Domain -and $cache.Domain -ne 'Unknown') { $cache.Domain } else { 'Unknown' }
@@ -95300,12 +95300,12 @@ function Convert-adPEASReport {
 	        }
 	        if ($null -ne $cache.Complete -and -not $cache.Complete) {
 	            $covered = if ($cache.CompletedModules) { @($cache.CompletedModules) -join ', ' } else { 'unknown' }
-	            Write-Warning "[Convert-adPEASReport] This export is from an interrupted scan - it covers only: $covered"
+	            Write-Warning "[Convert-adPEASReport] Этот экспорт получен из прерванной проверки; охвачены только: $covered"
 	            Show-Line "Исходный аудит был прерван — проверены только следующие модули: $covered" -Class Finding -NoCollect
 	        }
 	        $findings = Import-FindingsFromCache -Cache $cache
 	        if (@($findings).Count -eq 0) {
-	            Write-Warning "[Convert-adPEASReport] No findings loaded from JSON file"
+	            Write-Warning "[Convert-adPEASReport] В JSON-файле не найдено результатов проверок"
 	            return
 	        }
 	        $Script:LDAPContext = @{
@@ -95319,7 +95319,7 @@ function Convert-adPEASReport {
 	            if (Test-Path $License) {
 	                $_licJson = Get-Content -Path $License -Raw -Encoding UTF8
 	            } else {
-	                Write-Warning "[Convert-adPEASReport] License file not found: $License"
+	                Write-Warning "[Convert-adPEASReport] Файл лицензии не найден: $License"
 	            }
 	        } elseif ($Script:RuntimeLicense) {
 	            $_licJson = $Script:RuntimeLicense
@@ -95338,7 +95338,7 @@ function Convert-adPEASReport {
 	        $resolvedInput = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($InputJson)
 	        $outputJsonPath = "$resolvedBase.json"
 	        if ($Format -in @('All', 'JSON') -and $resolvedInput -eq $outputJsonPath) {
-	            Write-Warning "[Convert-adPEASReport] Output path '$outputJsonPath' is the same as input file. JSON will be re-exported in place."
+	            Write-Warning "[Convert-adPEASReport] Output path '$outputJsonPath' совпадает с входным файлом. JSON будет перезаписан."
 	        }
 	        $outputDir = Split-Path -Parent $resolvedBase
 	        if ($outputDir -and -not (Test-Path $outputDir)) {
@@ -95354,7 +95354,7 @@ function Convert-adPEASReport {
 	                $htmlWritten = $true
 	                Show-Line "HTML-отчёт сохранён: $htmlPath" -Class Hint -NoCollect
 	            } catch {
-	                Write-Warning "[Convert-adPEASReport] Error generating HTML report: $_"
+	                Write-Warning "[Convert-adPEASReport] Ошибка создания HTML-отчёта: $_"
 	            }
 	            Clear-FindingsCollection
 	        }
@@ -95366,7 +95366,7 @@ function Convert-adPEASReport {
 	                Export-FindingsCache -Path $jsonPath
 	                Show-Line "Экспорт JSON сохранён: $jsonPath" -Class Hint -NoCollect
 	            } catch {
-	                Write-Warning "[Convert-adPEASReport] Error saving JSON: $_"
+	                Write-Warning "[Convert-adPEASReport] Ошибка сохранения JSON: $_"
 	            }
 	            Clear-FindingsCollection
 	        }
@@ -95448,11 +95448,11 @@ function Compare-adPEASReport {
 	)
 	process {
 	    if (-not (Test-Path $Baseline)) {
-	        Write-Error "[Compare-adPEASReport] Baseline file not found: $Baseline"
+	        Write-Error "[Compare-adPEASReport] Не найден исходный файл: $Baseline"
 	        return
 	    }
 	    if (-not (Test-Path $Current)) {
-	        Write-Error "[Compare-adPEASReport] Current file not found: $Current"
+	        Write-Error "[Compare-adPEASReport] Не найден текущий файл: $Current"
 	        return
 	    }
 	    $previousOutputfile = $Script:adPEAS_Outputfile
@@ -95474,11 +95474,11 @@ function Compare-adPEASReport {
 	        $currentCache = ConvertFrom-FindingsCacheJson -Json (Get-Content -Path $Current -Raw -Encoding UTF8)
 	        foreach ($entry in @(@{Name='Baseline'; Cache=$baselineCache; Path=$Baseline}, @{Name='Current'; Cache=$currentCache; Path=$Current})) {
 	            if (-not $entry.Cache.CacheVersion) {
-	                Write-Error "[Compare-adPEASReport] Invalid JSON file ($($entry.Name)): $($entry.Path)"
+	                Write-Error "[Compare-adPEASReport] Некорректный JSON-файл ($($entry.Name)): $($entry.Path)"
 	                return
 	            }
 	            if ($entry.Cache.CacheVersion -ne 1) {
-	                Write-Error "[Compare-adPEASReport] Unsupported cache version $($entry.Cache.CacheVersion) in $($entry.Name): $($entry.Path)"
+	                Write-Error "[Compare-adPEASReport] Неподдерживаемая версия кэша $($entry.Cache.CacheVersion) in $($entry.Name): $($entry.Path)"
 	                return
 	            }
 	        }
@@ -95496,14 +95496,14 @@ function Compare-adPEASReport {
 	        }
 	        if ($baselineMeta.Domain -ne 'Unknown' -and $currentMeta.Domain -ne 'Unknown' -and
 	            $baselineMeta.Domain -ne $currentMeta.Domain) {
-	            Write-Warning "[Compare-adPEASReport] Domain mismatch: Baseline='$($baselineMeta.Domain)' vs Current='$($currentMeta.Domain)'"
-	            Write-Warning "[Compare-adPEASReport] Comparison results may not be meaningful across different domains"
+	            Write-Warning "[Compare-adPEASReport] Несоответствие доменов: Baseline='$($baselineMeta.Domain)' vs Current='$($currentMeta.Domain)'"
+	            Write-Warning "[Compare-adPEASReport] Результаты сравнения разных доменов могут быть некорректными"
 	        }
 	        foreach ($entry in @(@{Name='Baseline'; Cache=$baselineCache}, @{Name='Current'; Cache=$currentCache})) {
 	            if ($null -ne $entry.Cache.Complete -and -not $entry.Cache.Complete) {
 	                $covered = if ($entry.Cache.CompletedModules) { @($entry.Cache.CompletedModules) -join ', ' } else { 'unknown' }
-	                Write-Warning "[Compare-adPEASReport] $($entry.Name) is from an interrupted scan covering only: $covered"
-	                Write-Warning "[Compare-adPEASReport] Findings from modules it never ran will appear as resolved"
+	                Write-Warning "[Compare-adPEASReport] $($entry.Name) получен из прерванной проверки; охвачены только: $covered"
+	                Write-Warning "[Compare-adPEASReport] Находки из незапущенных модулей будут ошибочно отмечены как устранённые"
 	            }
 	        }
 	        $baselineFindings = Import-FindingsFromCache -Cache $baselineCache
@@ -95534,17 +95534,17 @@ function Compare-adPEASReport {
 	            $scopeOnlyCurrent = @($added | Where-Object { $_.Category -in $onlyInCurrent })
 	            $added = [System.Collections.ArrayList]@($added | Where-Object { $_.Category -notin $onlyInCurrent })
 	        }
-	        Show-Output -Class Info -Value "adPEAS Report Comparison" -NoCollect
+	        Show-Output -Class Info -Value "Сравнение отчётов adPEAS" -NoCollect
 	        Show-Line "Исходный отчёт: $(Split-Path -Leaf $Baseline) ($($baselineMeta.Date), $($baselineMeta.Domain), adPEAS $($baselineMeta.Version))" -Class Note -NoCollect
 	        Show-Line "Текущий отчёт: $(Split-Path -Leaf $Current) ($($currentMeta.Date), $($currentMeta.Domain), adPEAS $($currentMeta.Version))" -Class Note -NoCollect
-	        Show-Output -Class Info -Value "Comparison Summary" -NoCollect
-	        Show-Output -Key "New findings (added)" -Value "$($added.Count)" -Class $(if ($added.Count -gt 0) { 'Finding' } else { 'Note' }) -NoCollect
-	        Show-Output -Key "Remediated findings (removed)" -Value "$($removed.Count)" -Class $(if ($removed.Count -gt 0) { 'Secure' } else { 'Note' }) -NoCollect
-	        Show-Output -Key "Changed findings" -Value "$($changed.Count)" -Class $(if ($changed.Count -gt 0) { 'Hint' } else { 'Note' }) -NoCollect
-	        Show-Output -Key "Unchanged findings" -Value "$unchangedCount" -Class Note -NoCollect
-	        Show-Output -Key "Compared categories" -Value "$($sharedCategories.Count) ($($sharedCategories -join ', '))" -Class Note -NoCollect
+	        Show-Output -Class Info -Value "Сводка сравнения" -NoCollect
+	        Show-Output -Key "Новые находки (добавлены)" -Value "$($added.Count)" -Class $(if ($added.Count -gt 0) { 'Finding' } else { 'Note' }) -NoCollect
+	        Show-Output -Key "Устранённые находки (исчезли)" -Value "$($removed.Count)" -Class $(if ($removed.Count -gt 0) { 'Secure' } else { 'Note' }) -NoCollect
+	        Show-Output -Key "Изменённые находки" -Value "$($changed.Count)" -Class $(if ($changed.Count -gt 0) { 'Hint' } else { 'Note' }) -NoCollect
+	        Show-Output -Key "Находки без изменений" -Value "$unchangedCount" -Class Note -NoCollect
+	        Show-Output -Key "Сравниваемые категории" -Value "$($sharedCategories.Count) ($($sharedCategories -join ', '))" -Class Note -NoCollect
 	        if ($added.Count -gt 0) {
-	            Show-Output -Class Info -Value "New Findings ($($added.Count))" -NoCollect
+	            Show-Output -Class Info -Value "Новые находки ($($added.Count))" -NoCollect
 	            $addedGroups = $added | Group-Object -Property { "$($_.Category) > $($_.CheckTitle)" }
 	            foreach ($group in ($addedGroups | Sort-Object Name)) {
 	                Show-SubHeader $group.Name -NoCollect
@@ -95555,7 +95555,7 @@ function Compare-adPEASReport {
 	            }
 	        }
 	        if ($removed.Count -gt 0) {
-	            Show-Output -Class Info -Value "Remediated Findings ($($removed.Count))" -NoCollect
+	            Show-Output -Class Info -Value "Устранённые находки ($($removed.Count))" -NoCollect
 	            $removedGroups = $removed | Group-Object -Property { "$($_.Category) > $($_.CheckTitle)" }
 	            foreach ($group in ($removedGroups | Sort-Object Name)) {
 	                Show-SubHeader $group.Name -NoCollect
@@ -95566,7 +95566,7 @@ function Compare-adPEASReport {
 	            }
 	        }
 	        if ($changed.Count -gt 0) {
-	            Show-Output -Class Info -Value "Changed Findings ($($changed.Count))" -NoCollect
+	            Show-Output -Class Info -Value "Изменённые находки ($($changed.Count))" -NoCollect
 	            $changedGroups = $changed | Group-Object -Property { "$($_.Current.Category) > $($_.Current.CheckTitle)" }
 	            foreach ($group in ($changedGroups | Sort-Object Name)) {
 	                Show-SubHeader $group.Name -NoCollect
@@ -95574,13 +95574,13 @@ function Compare-adPEASReport {
 	                    $displayName = Get-FindingDisplayName -Finding $entry.Current
 	                    $changeDesc = @()
 	                    if ($entry.Baseline.Severity -ne $entry.Current.Severity) {
-	                        $changeDesc += "severity: $($entry.Baseline.Severity) -> $($entry.Current.Severity)"
+	                        $changeDesc += "критичность: $($entry.Baseline.Severity) -> $($entry.Current.Severity)"
 	                    }
 	                    if ($entry.Current.Type -eq 'KeyValue' -and $entry.Baseline.Value -ne $entry.Current.Value) {
-	                        $changeDesc += "value: $($entry.Baseline.Value) -> $($entry.Current.Value)"
+	                        $changeDesc += "значение: $($entry.Baseline.Value) -> $($entry.Current.Value)"
 	                    }
 	                    if ($entry.Current.Type -eq 'Line' -and $entry.Baseline.Text -ne $entry.Current.Text) {
-	                        $changeDesc += "text changed"
+	                        $changeDesc += "текст изменился"
 	                    }
 	                    $changeText = $changeDesc -join ', '
 	                    Show-Line "$displayName ($changeText)" -Class Hint -NoCollect
@@ -95610,7 +95610,7 @@ function Compare-adPEASReport {
 	                    -ScopeOnlyBaseline $scopeOnlyBaseline -ScopeOnlyCurrent $scopeOnlyCurrent
 	                Show-Line "HTML-отчёт об изменениях сохранён: $htmlPath" -Class Hint -NoCollect
 	            } catch {
-	                Write-Warning "[Compare-adPEASReport] Error generating HTML diff report: $_"
+	                Write-Warning "[Compare-adPEASReport] Ошибка создания HTML-отчёта сравнения: $_"
 	            }
 	        }
 	        if ($OutputPath) {
@@ -95817,17 +95817,17 @@ function Export-DiffHtmlReport {
 	)
 	$html = Get-DiffHTMLTemplate
 	if (-not $html) {
-	    throw "[Export-DiffHtmlReport] Failed to load diff HTML template"
+	    throw "[Export-DiffHtmlReport] Не удалось загрузить HTML-шаблон сравнения"
 	}
 	$sectionsHtml = [System.Text.StringBuilder]::new()
 	if ($Added.Count -gt 0) {
-	    [void]$sectionsHtml.Append((Build-DiffSectionHtml -Title "New Findings" -Findings $Added -SectionType 'new'))
+	    [void]$sectionsHtml.Append((Build-DiffSectionHtml -Title "Новые находки" -Findings $Added -SectionType 'new'))
 	}
 	if ($Removed.Count -gt 0) {
-	    [void]$sectionsHtml.Append((Build-DiffSectionHtml -Title "Remediated Findings" -Findings $Removed -SectionType 'remediated'))
+	    [void]$sectionsHtml.Append((Build-DiffSectionHtml -Title "Устранённые находки" -Findings $Removed -SectionType 'remediated'))
 	}
 	if ($Changed.Count -gt 0) {
-	    [void]$sectionsHtml.Append((Build-DiffChangedSectionHtml -Title "Changed Findings" -ChangedEntries $Changed))
+	    [void]$sectionsHtml.Append((Build-DiffChangedSectionHtml -Title "Изменённые находки" -ChangedEntries $Changed))
 	}
 	if ($OnlyInBaseline.Count -gt 0 -or $OnlyInCurrent.Count -gt 0) {
 	    $scopeHtml = [System.Text.StringBuilder]::new()
@@ -95944,7 +95944,7 @@ function Build-DiffChangedSectionHtml {
 	            $changeDesc += "$oldVal &#8594; $newVal"
 	        }
 	        if ($entry.Current.Type -eq 'Line' -and $entry.Baseline.Text -ne $entry.Current.Text) {
-	            $changeDesc += "text changed"
+	            $changeDesc += "текст изменился"
 	        }
 	        $changeHtml = $changeDesc -join ', '
 	        [void]$sb.AppendLine("    <div class=`"diff-item`">")
@@ -95966,7 +95966,7 @@ function Get-DiffHTMLTemplate {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>adPEAS Comparison Report - {{DOMAIN}}</title>
+    <title>adPEAS — сравнение отчётов — {{DOMAIN}}</title>
     <script>
         (function() {
             try {
@@ -96230,10 +96230,10 @@ function Get-DiffHTMLTemplate {
         <div class="header-brand">
             <img class="header-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAU0SURBVGhD7dZrTJNXGAfwf29QLi1QoFwqVbfpZMYYFdgkwgREkYAIKCAoyJ0ChcpNLirFIvdVUJjKZMpAXSmZc7qLDI3xg8zNZcvYl+3rkm3Jkuniki1byH95ERLXOS/7Mk3eX/IkzXPOaZ/nnNP2BUQikUgkEolEItFTYDmAcMfks6QCwFcA1joOPEv2AHgPQAkAZwABAFIB7ASwxnHy02oUUvlVvP9DM7ov3FEY2inNNxONbxITt8+DdHFc8ABSx8QTaRteqnljctUKko5Dj2M5YrOzMHGHmCYNd8lRkopvSdwiUdJeI0ya+jFdW9+vC9tWrAmuaH4pqNO2ZmnneW30wDXlSLst8GaRWXspMsHNsH6r+xZjp3792M3wlZ22F5cmJz9Gc9kNSmvTCR0NhzymDW2eYyUWb0vfpFvd0atq24GhBbZdtb6G3Aa/SENz4Nrmk4vXvD2VsnloMiLP1O0XdeX7V/TuHvIRqP2JlbH02ZjD1elGIjab0AcLO/IdgImiqoifBideZnWf9vfcBt/baUbVHx32AJ6c8mHXeBAbjwWxcL8/d9d7M3+/htn1aiYVOX2+qhByx3r/hiyUV1sXfLbd6MLtJrDAAtYOaHjyhj+HPvFlh01PY4c/t+SpmFKqpPlUEN/9MoH2W1E0n9axuMWH2gUyhkZImJbpwcwcPaMSpYx8FQwNBzVaGTVaOeMzFrDHHsy6o37MqPBkXKY7TV067jv+HKteC2JWlTfjc1y4IUPG6DQwajsYGo9NjvX+g3BtTIdVVyp7NMze68WcBhVLWgJYZdWxtk/HsjYtM01efDXJlaklau4dCKBlZCEPDutZddifuQ0a+gRIuTFDzZpePQcvh9F6/gVmVXkxNMaVi4KdGJHoxqJmX+4dCKSxTcfCfTrm1gcyr1HLFIM716fKGLbpXtHxuRLGZuKXmAxkO9b6r+pOYK1lzInmURXrBjTcY/VjRUcAy1oDWbAvgBlGLROyvZlWqmVegz9LWwNnx4TX6eU+XB7iTlc3BRcvc+GiZc7UL1Ey6HkXenoruW6zhhXtehrbFtLUpWex2Y/Z9SqmmRRMLAQTCsDkUgm3V0qYVII/N+3C2bA4BDvW+EgHRqTlvR8r2H9NwbbzclrGnGmxudF8xp0HhlVsGlKz9nUVa/rVrDqipqlXzUqrmhU9Hqzs8WRhi5o79rhxW5kr04xuzKpWsajFk8YuL5Z1qmlod2WBRc6iQ1JW9MpY1a9gfouUu/eDqeX4LW437CExiAEgcaztccwuKm7H1hYbbjS9BXZelPD4lBOP33DmwHVnWi/LeNAu5GXsm1Ty8ISS1o+U7PlAyY4L8pn9o5ix2GXsvuTM7ktKdl5wZuu4E5uGMVM7iJnmMzJa7Aq22oUNUrDxlJRZe/FrdBrO6ZYgHoA3ACXwiC/tQ8wv9AqJRVxKGVpyzbhY2oNvjL24u6cfLLeC1cfAA2ekbB2XzZ7UoXfkbD4roekoWD8Eto5LZ/Ozp2iX0nzu3ljNMbDxtIR1g2D+QfwckwGbhxaJAPwBeAJQA1A41PTEhN9coRHhRIRwBaBTe2P1stWIXxWF3JBY1ITFoSU8EV2RyTgSmYIT65JwOnwLxtdtxYfR6bgek4lPN2Tii407Mb1hB76OTsd0dBqmIlMwtmItmgBEAfAB4DYXTv/16jyM0IxsrqEH/ZkIHzjfsLBzwqOE+9xuCtdBO7e7wuOF31x+/orMrxHe/38xf0JCA/eHUJAQ9+fm594fIpFIJBKJRCKRSCR65vwFlworxjr7mRwAAAAASUVORK5CYII=" alt="adPEAS Logo">
             <span class="header-title">adPEAS</span>
-            <span class="header-subtitle">Comparison Report</span>
+            <span class="header-subtitle">Сравнение отчётов</span>
         </div>
         <div class="header-actions">
-            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Переключить тему оформления">
                 <span class="theme-toggle-slider"></span>
                 <span class="theme-icon" aria-hidden="true">&#9788;</span>
             </button>
@@ -96283,11 +96283,11 @@ function Get-DiffHTMLTemplate {
                 <div class="value">{{CURRENT_INFO}}</div>
             </div>
             <div class="info-item">
-                <div class="label">Compared</div>
+                <div class="label">Сравниваемые категории</div>
                 <div class="value">{{COMPARED_CATEGORIES}}</div>
             </div>
             <div class="info-item">
-                <div class="label">Generated</div>
+                <div class="label">Создан</div>
                 <div class="value">{{GENERATED}}</div>
             </div>
             <div class="info-item">
@@ -98503,7 +98503,7 @@ function Collect-BHIssuancePolicies {
 	}
 	return $bhPolicies
 }
-$Script:adPEASVersion = "2.9.0+20261119-0817"
+$Script:adPEASVersion = "2.9.0+20261119-0951"
 if ($MyInvocation.MyCommand.Path) {
 	$Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {

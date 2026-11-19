@@ -80,17 +80,17 @@ function Export-HTMLReport {
     )
 
     begin {
-        Write-Log "[Export-HTMLReport] Starting HTML report generation"
+        Write-Log "[Export-HTMLReport] Начато формирование HTML-отчёта"
 
         # Get collected findings
         $findings = Get-FindingsCollection
 
         if (-not $findings -or $findings.Count -eq 0) {
-            Write-Warning "[Export-HTMLReport] No findings collected. HTML report will be empty."
+            Write-Warning "[Export-HTMLReport] Результаты проверок отсутствуют. HTML-отчёт будет пустым."
             $findings = @()
         }
 
-        Write-Log "[Export-HTMLReport] Processing $($findings.Count) findings"
+        Write-Log "[Export-HTMLReport] Обрабатываются результаты проверок: $($findings.Count)"
 
         # Get context information
         $domain = if ($Script:LDAPContext) { $Script:LDAPContext.Domain } else { "Unknown" }
@@ -137,7 +137,7 @@ function Export-HTMLReport {
         # generated" and keeps the path for the summary. Both callers already wrap the call
         # in try/catch, and end{} throws on a failed write for the same reason.
         if (-not $html) {
-            throw "[Export-HTMLReport] Failed to load HTML template. Ensure template files exist in 'templates/' directory or build the project first."
+            throw "[Export-HTMLReport] Не удалось загрузить HTML-шаблон. Проверьте файлы в каталоге 'templates/' или сначала соберите проект."
         }
 
         # Export finding definitions as JSON for tooltips
@@ -201,11 +201,11 @@ function Export-HTMLReport {
             $utf8NoBom = New-Object System.Text.UTF8Encoding $false
             $resolvedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
             [System.IO.File]::WriteAllText($resolvedPath, $html, $utf8NoBom)
-            Write-Log "[Export-HTMLReport] Report saved to: $OutputPath"
+            Write-Log "[Export-HTMLReport] Отчёт сохранён: $OutputPath"
         }
         catch {
             # Re-throw with context - no separate warning needed as throw displays the error
-            throw "Failed to write HTML report to '$OutputPath': $_"
+            throw "Не удалось записать HTML-отчёт в '$OutputPath': $_"
         }
     }
 }
@@ -1489,7 +1489,7 @@ function Get-HTMLTemplate {
 
     # Check if template files exist (development mode)
     if ((Test-Path $htmlTemplatePath) -and (Test-Path $cssPath) -and (Test-Path $jsPath)) {
-        Write-Log "[Get-HTMLTemplate] Loading templates from separate files (development mode)"
+        Write-Log "[Get-HTMLTemplate] Загрузка шаблонов из отдельных файлов (режим разработки)"
 
         $htmlTemplate = Get-Content $htmlTemplatePath -Raw -Encoding UTF8
         $cssContent = Get-Content $cssPath -Raw -Encoding UTF8
@@ -1503,8 +1503,8 @@ function Get-HTMLTemplate {
     }
 
     # Fallback: Return error message if templates not found and not embedded
-    Write-Warning "[Get-HTMLTemplate] Template files not found at: $templatesDir"
-    Write-Warning "[Get-HTMLTemplate] Either run from source directory or build the project first."
+    Write-Warning "[Get-HTMLTemplate] Файлы шаблонов не найдены: $templatesDir"
+    Write-Warning "[Get-HTMLTemplate] Запустите проект из каталога исходников или сначала выполните сборку."
     return $null
 }
 #endregion BUILD:EMBED

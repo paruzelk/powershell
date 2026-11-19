@@ -9,7 +9,7 @@
 
     - New findings (in current but not in baseline) - potential new vulnerabilities
     - Remediated findings (in baseline but not in current) - fixed issues
-    - Changed findings (severity changed between scans)
+    - Изменённые находки (severity changed between scans)
     - Summary statistics
 
     This enables tracking remediation progress, detecting new vulnerabilities,
@@ -54,17 +54,17 @@
     )
 
     begin {
-        Write-Log "[Compare-adPEASReport] Starting report comparison"
+        Write-Log "[Compare-adPEASReport] Начато сравнение отчётов"
     }
 
     process {
         # Validate input files
         if (-not (Test-Path $Baseline)) {
-            Write-Error "[Compare-adPEASReport] Baseline file not found: $Baseline"
+            Write-Error "[Compare-adPEASReport] Не найден исходный файл: $Baseline"
             return
         }
         if (-not (Test-Path $Current)) {
-            Write-Error "[Compare-adPEASReport] Current file not found: $Current"
+            Write-Error "[Compare-adPEASReport] Не найден текущий файл: $Current"
             return
         }
 
@@ -96,11 +96,11 @@
             # Validate cache versions
             foreach ($entry in @(@{Name='Baseline'; Cache=$baselineCache; Path=$Baseline}, @{Name='Current'; Cache=$currentCache; Path=$Current})) {
                 if (-not $entry.Cache.CacheVersion) {
-                    Write-Error "[Compare-adPEASReport] Invalid JSON file ($($entry.Name)): $($entry.Path)"
+                    Write-Error "[Compare-adPEASReport] Некорректный JSON-файл ($($entry.Name)): $($entry.Path)"
                     return
                 }
                 if ($entry.Cache.CacheVersion -ne 1) {
-                    Write-Error "[Compare-adPEASReport] Unsupported cache version $($entry.Cache.CacheVersion) in $($entry.Name): $($entry.Path)"
+                    Write-Error "[Compare-adPEASReport] Неподдерживаемая версия кэша $($entry.Cache.CacheVersion) in $($entry.Name): $($entry.Path)"
                     return
                 }
             }
@@ -128,8 +128,8 @@
             # Cross-domain warning
             if ($baselineMeta.Domain -ne 'Unknown' -and $currentMeta.Domain -ne 'Unknown' -and
                 $baselineMeta.Domain -ne $currentMeta.Domain) {
-                Write-Warning "[Compare-adPEASReport] Domain mismatch: Baseline='$($baselineMeta.Domain)' vs Current='$($currentMeta.Domain)'"
-                Write-Warning "[Compare-adPEASReport] Comparison results may not be meaningful across different domains"
+                Write-Warning "[Compare-adPEASReport] Несоответствие доменов: Baseline='$($baselineMeta.Domain)' vs Current='$($currentMeta.Domain)'"
+                Write-Warning "[Compare-adPEASReport] Результаты сравнения разных доменов могут быть некорректными"
             }
 
             # Interrupted-scan warning. A scan writes its export after every module, so a
@@ -142,8 +142,8 @@
             foreach ($entry in @(@{Name='Baseline'; Cache=$baselineCache}, @{Name='Current'; Cache=$currentCache})) {
                 if ($null -ne $entry.Cache.Complete -and -not $entry.Cache.Complete) {
                     $covered = if ($entry.Cache.CompletedModules) { @($entry.Cache.CompletedModules) -join ', ' } else { 'unknown' }
-                    Write-Warning "[Compare-adPEASReport] $($entry.Name) is from an interrupted scan covering only: $covered"
-                    Write-Warning "[Compare-adPEASReport] Findings from modules it never ran will appear as resolved"
+                    Write-Warning "[Compare-adPEASReport] $($entry.Name) получен из прерванной проверки; охвачены только: $covered"
+                    Write-Warning "[Compare-adPEASReport] Находки из незапущенных модулей будут ошибочно отмечены как устранённые"
                 }
             }
 
@@ -193,23 +193,23 @@
             }
 
             # 6. Output report
-            Show-Output -Class Info -Value "adPEAS Report Comparison" -NoCollect
+            Show-Output -Class Info -Value "Сравнение отчётов adPEAS" -NoCollect
 
             Show-Line "Исходный отчёт: $(Split-Path -Leaf $Baseline) ($($baselineMeta.Date), $($baselineMeta.Domain), adPEAS $($baselineMeta.Version))" -Class Note -NoCollect
             Show-Line "Текущий отчёт: $(Split-Path -Leaf $Current) ($($currentMeta.Date), $($currentMeta.Domain), adPEAS $($currentMeta.Version))" -Class Note -NoCollect
 
             # Summary
-            Show-Output -Class Info -Value "Comparison Summary" -NoCollect
+            Show-Output -Class Info -Value "Сводка сравнения" -NoCollect
 
-            Show-Output -Key "New findings (added)" -Value "$($added.Count)" -Class $(if ($added.Count -gt 0) { 'Finding' } else { 'Note' }) -NoCollect
-            Show-Output -Key "Remediated findings (removed)" -Value "$($removed.Count)" -Class $(if ($removed.Count -gt 0) { 'Secure' } else { 'Note' }) -NoCollect
-            Show-Output -Key "Changed findings" -Value "$($changed.Count)" -Class $(if ($changed.Count -gt 0) { 'Hint' } else { 'Note' }) -NoCollect
-            Show-Output -Key "Unchanged findings" -Value "$unchangedCount" -Class Note -NoCollect
-            Show-Output -Key "Compared categories" -Value "$($sharedCategories.Count) ($($sharedCategories -join ', '))" -Class Note -NoCollect
+            Show-Output -Key "Новые находки (добавлены)" -Value "$($added.Count)" -Class $(if ($added.Count -gt 0) { 'Finding' } else { 'Note' }) -NoCollect
+            Show-Output -Key "Устранённые находки (исчезли)" -Value "$($removed.Count)" -Class $(if ($removed.Count -gt 0) { 'Secure' } else { 'Note' }) -NoCollect
+            Show-Output -Key "Изменённые находки" -Value "$($changed.Count)" -Class $(if ($changed.Count -gt 0) { 'Hint' } else { 'Note' }) -NoCollect
+            Show-Output -Key "Находки без изменений" -Value "$unchangedCount" -Class Note -NoCollect
+            Show-Output -Key "Сравниваемые категории" -Value "$($sharedCategories.Count) ($($sharedCategories -join ', '))" -Class Note -NoCollect
 
             # New findings detail
             if ($added.Count -gt 0) {
-                Show-Output -Class Info -Value "New Findings ($($added.Count))" -NoCollect
+                Show-Output -Class Info -Value "Новые находки ($($added.Count))" -NoCollect
 
                 $addedGroups = $added | Group-Object -Property { "$($_.Category) > $($_.CheckTitle)" }
                 foreach ($group in ($addedGroups | Sort-Object Name)) {
@@ -223,7 +223,7 @@
 
             # Remediated findings detail
             if ($removed.Count -gt 0) {
-                Show-Output -Class Info -Value "Remediated Findings ($($removed.Count))" -NoCollect
+                Show-Output -Class Info -Value "Устранённые находки ($($removed.Count))" -NoCollect
 
                 $removedGroups = $removed | Group-Object -Property { "$($_.Category) > $($_.CheckTitle)" }
                 foreach ($group in ($removedGroups | Sort-Object Name)) {
@@ -235,9 +235,9 @@
                 }
             }
 
-            # Changed findings detail
+            # Изменённые находки detail
             if ($changed.Count -gt 0) {
-                Show-Output -Class Info -Value "Changed Findings ($($changed.Count))" -NoCollect
+                Show-Output -Class Info -Value "Изменённые находки ($($changed.Count))" -NoCollect
 
                 $changedGroups = $changed | Group-Object -Property { "$($_.Current.Category) > $($_.Current.CheckTitle)" }
                 foreach ($group in ($changedGroups | Sort-Object Name)) {
@@ -247,13 +247,13 @@
                         # Build change description based on what changed
                         $changeDesc = @()
                         if ($entry.Baseline.Severity -ne $entry.Current.Severity) {
-                            $changeDesc += "severity: $($entry.Baseline.Severity) -> $($entry.Current.Severity)"
+                            $changeDesc += "критичность: $($entry.Baseline.Severity) -> $($entry.Current.Severity)"
                         }
                         if ($entry.Current.Type -eq 'KeyValue' -and $entry.Baseline.Value -ne $entry.Current.Value) {
-                            $changeDesc += "value: $($entry.Baseline.Value) -> $($entry.Current.Value)"
+                            $changeDesc += "значение: $($entry.Baseline.Value) -> $($entry.Current.Value)"
                         }
                         if ($entry.Current.Type -eq 'Line' -and $entry.Baseline.Text -ne $entry.Current.Text) {
-                            $changeDesc += "text changed"
+                            $changeDesc += "текст изменился"
                         }
                         $changeText = $changeDesc -join ', '
                         Show-Line "$displayName ($changeText)" -Class Hint -NoCollect
@@ -288,7 +288,7 @@
                         -ScopeOnlyBaseline $scopeOnlyBaseline -ScopeOnlyCurrent $scopeOnlyCurrent
                     Show-Line "HTML-отчёт об изменениях сохранён: $htmlPath" -Class Hint -NoCollect
                 } catch {
-                    Write-Warning "[Compare-adPEASReport] Error generating HTML diff report: $_"
+                    Write-Warning "[Compare-adPEASReport] Ошибка создания HTML-отчёта сравнения: $_"
                 }
             }
 
@@ -304,7 +304,7 @@
     }
 
     end {
-        Write-Log "[Compare-adPEASReport] Comparison completed"
+        Write-Log "[Compare-adPEASReport] Сравнение завершено"
     }
 }
 
@@ -609,25 +609,25 @@ function Export-DiffHtmlReport {
     # Export-HTMLReport reports a missing template the same way.
     $html = Get-DiffHTMLTemplate
     if (-not $html) {
-        throw "[Export-DiffHtmlReport] Failed to load diff HTML template"
+        throw "[Export-DiffHtmlReport] Не удалось загрузить HTML-шаблон сравнения"
     }
 
     # Build diff sections HTML
     $sectionsHtml = [System.Text.StringBuilder]::new()
 
-    # New Findings section
+    # Новые находки section
     if ($Added.Count -gt 0) {
-        [void]$sectionsHtml.Append((Build-DiffSectionHtml -Title "New Findings" -Findings $Added -SectionType 'new'))
+        [void]$sectionsHtml.Append((Build-DiffSectionHtml -Title "Новые находки" -Findings $Added -SectionType 'new'))
     }
 
-    # Remediated Findings section
+    # Устранённые находки section
     if ($Removed.Count -gt 0) {
-        [void]$sectionsHtml.Append((Build-DiffSectionHtml -Title "Remediated Findings" -Findings $Removed -SectionType 'remediated'))
+        [void]$sectionsHtml.Append((Build-DiffSectionHtml -Title "Устранённые находки" -Findings $Removed -SectionType 'remediated'))
     }
 
-    # Changed Findings section
+    # Изменённые находки section
     if ($Changed.Count -gt 0) {
-        [void]$sectionsHtml.Append((Build-DiffChangedSectionHtml -Title "Changed Findings" -ChangedEntries $Changed))
+        [void]$sectionsHtml.Append((Build-DiffChangedSectionHtml -Title "Изменённые находки" -ChangedEntries $Changed))
     }
 
     # Scope Differences section
@@ -690,14 +690,14 @@ function Export-DiffHtmlReport {
     $resolvedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
     [System.IO.File]::WriteAllText($resolvedPath, $html, $utf8NoBom)
 
-    Write-Log "[Export-DiffHtmlReport] HTML diff report saved to: $OutputPath"
+    Write-Log "[Export-DiffHtmlReport] HTML-отчёт сравнения сохранён: $OutputPath"
 }
 
 <#
 .SYNOPSIS
     Builds an HTML section with finding items for the diff report.
 .PARAMETER Title
-    Section title (e.g., "New Findings", "Remediated Findings").
+    Section title (e.g., "Новые находки", "Устранённые находки").
 .PARAMETER Findings
     Array of finding objects to render.
 .PARAMETER SectionType
@@ -785,7 +785,7 @@ function Build-DiffChangedSectionHtml {
                 $changeDesc += "$oldVal &#8594; $newVal"
             }
             if ($entry.Current.Type -eq 'Line' -and $entry.Baseline.Text -ne $entry.Current.Text) {
-                $changeDesc += "text changed"
+                $changeDesc += "текст изменился"
             }
             $changeHtml = $changeDesc -join ', '
 
@@ -833,13 +833,13 @@ function Get-DiffHTMLTemplate {
     $diffTemplatePath = Join-Path $templatesDir "diff-template.html"
 
     if (Test-Path $diffTemplatePath) {
-        Write-Log "[Get-DiffHTMLTemplate] Loading diff template from file (development mode)"
+        Write-Log "[Get-DiffHTMLTemplate] Загрузка шаблона сравнения из файла (режим разработки)"
         return (Get-Content $diffTemplatePath -Raw -Encoding UTF8)
     }
 
     # Fallback: embedded template (replaced by Build-Release.ps1)
     # {{DIFF_TEMPLATE_EMBEDDED}}
-    Write-Warning "[Get-DiffHTMLTemplate] Diff template not found at: $diffTemplatePath"
+    Write-Warning "[Get-DiffHTMLTemplate] Шаблон сравнения не найден: $diffTemplatePath"
     return $null
 }
 #endregion BUILD:EMBED
