@@ -1,0 +1,91 @@
+{
+  "schema": "adPEAS-RU.DOC6h.SecurityLog.1",
+  "path": "src/modules/Checks/ADCS/Get-WeakCertificateMapping.ps1",
+  "entries": [
+    {
+      "line": 89,
+      "original": "        Write-Log \"[Get-WeakCertificateMapping] Starting ESC14 explicit certificate mapping analysis\"",
+      "target": "        Write-Log \"[Get-WeakCertificateMapping] Начат анализ явных сопоставлений сертификатов ESC14\""
+    },
+    {
+      "line": 132,
+      "original": "            Write-Log \"[Get-WeakCertificateMapping] Query for altSecurityIdentities failed: $_\" -Level Warning",
+      "target": "            Write-Log \"[Get-WeakCertificateMapping] Ошибка запроса altSecurityIdentities: $_\" -Level Warning"
+    },
+    {
+      "line": 137,
+      "original": "        Write-Log \"[Get-WeakCertificateMapping] Found $(@($candidates).Count) principal(s) with an explicit mapping\"",
+      "target": "        Write-Log \"[Get-WeakCertificateMapping] Найдено субъектов с явным сопоставлением: $(@($candidates).Count)\""
+    },
+    {
+      "line": 158,
+      "original": "                    Write-Log \"[Get-WeakCertificateMapping] Ignoring non-X509 mapping on '$($principal.sAMAccountName)': $mapping\"",
+      "target": "                    Write-Log \"[Get-WeakCertificateMapping] Пропущено сопоставление не-X509 для '$($principal.sAMAccountName)': $mapping\""
+    },
+    {
+      "line": 175,
+      "original": "                Write-Log \"[Get-WeakCertificateMapping] Privilege check failed for '$($principal.sAMAccountName)': $_\"",
+      "target": "                Write-Log \"[Get-WeakCertificateMapping] Ошибка проверки привилегий '$($principal.sAMAccountName)': $_\""
+    },
+    {
+      "line": 189,
+      "original": "                Write-Log \"[Get-WeakCertificateMapping] Could not re-read '$($principal.distinguishedName)': $_\"",
+      "target": "                Write-Log \"[Get-WeakCertificateMapping] Не удалось повторно прочитать '$($principal.distinguishedName)': $_\""
+    },
+    {
+      "line": 283,
+      "original": "                Write-Log \"[Get-WeakCertificateMapping] altSecurityIdentities belongs to property set $altSecPropertySet\"",
+      "target": "                Write-Log \"[Get-WeakCertificateMapping] Атрибут altSecurityIdentities относится к набору свойств $altSecPropertySet\""
+    },
+    {
+      "line": 287,
+      "original": "            Write-Log \"[Get-WeakCertificateMapping] Checking altSecurityIdentities write access on $(@($privilegedTargets).Count) privileged principal(s)\"",
+      "target": "            Write-Log \"[Get-WeakCertificateMapping] Проверка права записи altSecurityIdentities для привилегированных субъектов: $(@($privilegedTargets).Count)\""
+    },
+    {
+      "line": 297,
+      "original": "                    Write-Log \"[Get-WeakCertificateMapping] Could not read the descriptor of '$($target.distinguishedName)': $_\"",
+      "target": "                    Write-Log \"[Get-WeakCertificateMapping] Не удалось прочитать дескриптор '$($target.distinguishedName)': $_\""
+    },
+    {
+      "line": 354,
+      "original": "                        Write-Log \"[Get-WeakCertificateMapping] Privilege check failed for trustee '$trusteeSID': $_\"",
+      "target": "                        Write-Log \"[Get-WeakCertificateMapping] Ошибка проверки привилегий доверенного субъекта '$trusteeSID': $_\""
+    },
+    {
+      "line": 375,
+      "original": "                        Write-Log \"[Get-WeakCertificateMapping] Exchange check failed for trustee '$trusteeSID': $_\"",
+      "target": "                        Write-Log \"[Get-WeakCertificateMapping] Ошибка проверки Exchange для доверенного субъекта '$trusteeSID': $_\""
+    },
+    {
+      "line": 393,
+      "original": "                        Write-Log \"[Get-WeakCertificateMapping] Privilege check failed for owner '$ownerSID': $_\"",
+      "target": "                        Write-Log \"[Get-WeakCertificateMapping] Ошибка проверки привилегий владельца '$ownerSID': $_\""
+    },
+    {
+      "line": 405,
+      "original": "                                Write-Log \"[Get-WeakCertificateMapping] Exchange check failed for owner '$ownerSID': $_\"",
+      "target": "                                Write-Log \"[Get-WeakCertificateMapping] Ошибка проверки Exchange для владельца '$ownerSID': $_\""
+    },
+    {
+      "line": 424,
+      "original": "                    Write-Log \"[Get-WeakCertificateMapping] Could not re-read '$($target.distinguishedName)': $_\"",
+      "target": "                    Write-Log \"[Get-WeakCertificateMapping] Не удалось повторно прочитать '$($target.distinguishedName)': $_\""
+    },
+    {
+      "line": 454,
+      "original": "            Write-Log \"[Get-WeakCertificateMapping] Write-access analysis failed: $_\" -Level Warning",
+      "target": "            Write-Log \"[Get-WeakCertificateMapping] Ошибка анализа прав записи: $_\" -Level Warning"
+    },
+    {
+      "line": 496,
+      "original": "        Write-Log \"[Get-WeakCertificateMapping] Completed\"",
+      "target": "        Write-Log \"[Get-WeakCertificateMapping] Проверка завершена\""
+    },
+    {
+      "line": 688,
+      "original": "        Write-Log \"[Get-AltSecurityIdentitiesPropertySet] Schema lookup failed: $_\"",
+      "target": "        Write-Log \"[Get-AltSecurityIdentitiesPropertySet] Ошибка поиска в схеме: $_\""
+    }
+  ]
+}
