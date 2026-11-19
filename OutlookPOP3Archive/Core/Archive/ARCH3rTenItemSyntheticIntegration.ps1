@@ -226,6 +226,9 @@ function Invoke-OPA265ARCH3rSyntheticTen {
                 Add-OPADuplicateEntry -Index $index -SourceEntryId $item.SourceEntryId -ArchiveEntryId $item.ArchiveEntryId -SourceFolderPath $item.SourceFolderPath -TargetFolderPath $item.TargetFolderPath -ReceivedTime ([datetime]::new(2020,2,1,12,0,0,[DateTimeKind]::Utc).AddDays($item.Number)) -Subject $item.Subject -TransactionId $run -TransactionLimit 10 -ArchiveGrouping Year -SourcePst (Join-Path $root 'SYNTHETIC-NOT-A-REAL-SOURCE.pst') -ArchivePst $fakeArchivePst
                 Sync-OPADuplicateJournalStreams
                 if($InjectFault -ceq 'AfterIndexAppend' -and $item.Number -eq $FaultAt){
+                    # Independent readback must first release the ORIGINAL
+                    # append-only JSONL writer handle, not hash a live stream.
+                    Close-OPADuplicateJournalStreams
                     return (Get-OPA265ARCH3rSyntheticSnapshot -JournalPath $journalPath -FakeArchivePst $fakeArchivePst -Claimed $nClaim -ProviderInvoked $nProvider -Compared $nCompared -Status 'SimulatedPartialOriginalIndexAppendNoAutoReplay' -Workspace $root)
                 }
             }
