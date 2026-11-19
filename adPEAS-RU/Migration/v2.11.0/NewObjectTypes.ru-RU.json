@@ -1,0 +1,50 @@
+﻿{
+  "Schema": "adPEAS-RU.2.11.0.MIG1.NewObjectTypes.1",
+  "UpstreamCommit": "477696f48d6b486be5d9a99b598f72e3ccfcc0c0",
+  "Locale": "ru-RU",
+  "Translations": {
+    "GPOLogonRestriction": {
+      "EnglishSectionTitle": "Logons Denied via GPO",
+      "EnglishSummary": "Reports which logons Group Policy denies, to whom and on which machines, and whether any policy keeps Domain Admins and local administrator accounts off member computers.",
+      "SectionTitle": "Запреты входа, заданные групповой политикой",
+      "Summary": "Показывает, какие виды входа запрещены через GPO, кому и на каких компьютерах, а также ограничивают ли политики вход Domain Admins и локальных администраторов на рядовые компьютеры.",
+      "WhyItMatters": "Запрет определённого вида входа имеет приоритет над разрешениями. Ограничение входа Domain Admins на рабочих станциях и серверах снижает риск кражи привилегированных учётных данных; запрет сетевого входа локальным администраторам ограничивает распространение при повторном использовании паролей. Избыточный запрет для широкой группы, напротив, способен заблокировать доступ.",
+      "WhatWeCheck": [
+        "Пять прав запрета входа в GptTmpl.inf каждой GPO: сетевой, локальный, RDP, пакетный и вход в качестве службы.",
+        "Запрещён ли вход Domain Admins (включая группы, куда они входят) на компьютерах-участниках.",
+        "Запрещён ли вход локальным административным учётным записям на компьютерах-участниках.",
+        "Нет ли запретов широким группам или Domain Admins на контроллерах домена.",
+        "Охватывают ли применимые GPO нужные категории входа Domain Admins и локальных администраторов.",
+        "Не определяются приоритет конфликтующих GPO и локальная политика компьютера."
+      ],
+      "SecureMessage": "Политики ограничивают вход Domain Admins и локальных администраторов на рядовые компьютеры; запреты для широких групп не обнаружены."
+    },
+    "GPOUserRightValue": {
+      "EnglishSectionTitle": "User Rights via GPO That Depart From the Windows Default",
+      "EnglishSummary": "Lists the user rights a policy file assigns that Get-GPOUserRightsAssignment does not judge (-IncludeUnknown).",
+      "SectionTitle": "Права пользователей из GPO, отличающиеся от стандартных",
+      "Summary": "Перечисляет назначения прав пользователей, которые Get-GPOUserRightsAssignment не оценивает (ключ -IncludeUnknown).",
+      "WhyItMatters": "Автоматическая классификация охватывает отдельные права, связанные с повышением привилегий и перемещением внутри сети. Остальные права тоже назначаются через GPO, но здесь только показываются без вывода об их опасности.",
+      "WhatWeCheck": [
+        "Права в разделе [Privilege Rights] файла GptTmpl.inf, которых нет в оценочной таблице проверки.",
+        "Пять прав запрета входа исключаются: их проверяет Get-GPOLogonRestrictions.",
+        "Назначения выводятся без классификации риска."
+      ],
+      "SecureMessage": "В политике не обнаружены дополнительные назначения прав вне оценочной таблицы."
+    },
+    "ComputerInitialPassword": {
+      "EnglishSectionTitle": "Computer Accounts With Their Creation Password",
+      "EnglishSummary": "Finds enabled computer accounts that no Windows client joined and whose password is still the one they were created with.",
+      "SectionTitle": "Учётные записи компьютеров с первоначальным паролем",
+      "Summary": "Находит включённые учётные записи компьютеров, которые не присоединялись к Windows и пароль которых не менялся с момента создания.",
+      "WhyItMatters": "При предварительном создании учётной записи пароль может совпадать с именем компьютера в нижнем регистре либо отсутствовать вовсе. Присоединение Windows-клиента заменяет его случайным. Неиспользованная запись может сохранить предсказуемый пароль.",
+      "WhatWeCheck": [
+        "Включённые учётные записи компьютеров без operatingSystem и dNSHostName.",
+        "Был ли установлен пароль (pwdLastSet = 0 вместе с PASSWD_NOTREQD) либо он остался с момента создания.",
+        "Использовалась ли запись для входа (lastLogonTimestamp).",
+        "Реальное совпадение пароля со стандартным не проверяется: для этого нужна попытка входа для каждой записи."
+      ],
+      "SecureMessage": "Включённых учётных записей компьютеров с первоначальными паролями не обнаружено."
+    }
+  }
+}
