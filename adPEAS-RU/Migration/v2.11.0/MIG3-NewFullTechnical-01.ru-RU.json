@@ -1,0 +1,273 @@
+﻿{
+  "Schema": "adPEAS-RU.MIG3.VerifiedFullTechnical.01",
+  "UpstreamCommit": "477696f48d6b486be5d9a99b598f72e3ccfcc0c0",
+  "Locale": "ru-RU",
+  "Translations": {
+    "RODC_DELEGATED_ADMIN": {
+      "SourceEnglishDescription": "managedBy on the computer object of this read-only Domain Controller names a principal that is not Tier-0 - a user account, a group of the domain, an operator group - and the principal named there is an implicit member of the server's Administrators group, of that server and of no other (MS-ADTS 6.1.1.3.2). It is the delegated administrator a branch office promotion or Add-ADDSReadOnlyDomainControllerAccount -DelegatedAdministratorAccountName sets, meant for a site without a Domain Admin. Administrator on a read-only Domain Controller is more than administrator on a server: it reaches every secret the server has cached and the keys of its own krbtgt account, which signs the tickets it issues. Tier-0 principals are not marked - they administer every Domain Controller already. Whether the principal is meant to hold the right is not something the directory can say; a dedicated branch administration group may well be.",
+      "description": "В managedBy объекта компьютера контроллера домена только для чтения (RODC) указан субъект вне Tier-0: пользователь, доменная или операторская группа. Указанный субъект неявно входит в локальную группу Administrators только этого RODC (MS-ADTS 6.1.1.3.2). Это штатный механизм делегирования администрирования филиального RODC, например при развёртывании с Add-ADDSReadOnlyDomainControllerAccount -DelegatedAdministratorAccountName. Администратор RODC получает доступ к сохранённым на нём секретам и ключам его собственной учётной записи krbtgt, подписывающей выдаваемые им билеты. Субъекты Tier-0 исключены из находки: они и так администрируют контроллеры домена. По каталогу нельзя определить, оправдано ли делегирование: специализированная группа филиала может быть назначена намеренно.",
+      "SourceEnglishImpactCount": 4,
+      "SourceEnglishImpact": [
+        "Whoever controls the principal - its password, a session where it is logged on, a delegated right to reset it or to change the group's members - is administrator on the read-only Domain Controller",
+        "As administrator it extracts the password hashes of every account cached on the server",
+        "With the keys of the server's krbtgt account it signs tickets for any account the server's password replication policy allows; a writable Domain Controller honours such a ticket, and answers a key list request for the account with its password hash",
+        "Where that policy allows a privileged account - reported in this section when it does - that is the domain"
+      ],
+      "impact": [
+        "Контролирующий указанный субъект — его пароль, сеанс, делегированный сброс пароля или изменение состава группы — становится администратором RODC.",
+        "Администратор RODC может извлечь хеши паролей всех учётных записей, чьи секреты кешированы на этом сервере.",
+        "Ключи собственной записи krbtgt RODC позволяют подписывать билеты для записей, разрешённых его политикой репликации паролей. Записываемый DC принимает такой билет и может выдать хеш пароля записи по запросу списка ключей.",
+        "Если политика репликации допускает привилегированную запись, о чём отдельно сообщает эта проверка, последствия могут затронуть весь домен."
+      ],
+      "SourceEnglishAttackCount": 4,
+      "SourceEnglishAttack": [
+        "1. Read managedBy of the read-only Domain Controller - any domain user may",
+        "2. Take over the principal it names: spray or phish the account, reset its password with a delegated right, or add a member to the group",
+        "3. Log on to the read-only Domain Controller as administrator and extract the cached secrets and the keys of its krbtgt account",
+        "4. Use the cached hashes, or sign tickets for the accounts its password replication policy allows"
+      ],
+      "attack": [
+        "1. Прочитать managedBy объекта RODC: это доступно обычному пользователю домена.",
+        "2. Получить контроль над указанным субъектом: скомпрометировать запись, воспользоваться делегированным сбросом пароля либо изменить состав группы.",
+        "3. Войти на RODC с правами администратора и получить кешированные секреты и ключи его записи krbtgt.",
+        "4. Использовать кешированные хеши или подписать билеты для записей, разрешённых политикой репликации паролей RODC."
+      ],
+      "SourceEnglishRemediationCount": 3,
+      "SourceEnglishRemediation": [
+        "Check that the principal is meant to administer this read-only Domain Controller; clear managedBy where no delegated administrator is needed",
+        "Name a dedicated group rather than a user account, and protect it as well as the server: whoever may reset its members' passwords or change its members administers the server",
+        "Keep the password replication policy to the accounts of the branch office the server serves, so that its administrator reaches no more than those"
+      ],
+      "remediation": [
+        "Проверьте необходимость назначенного администратора RODC; удалите managedBy, если делегирование не требуется.",
+        "Используйте отдельную защищённую группу, а не индивидуальную запись. Субъекты, способные сбрасывать пароли её участников или менять состав, фактически администрируют RODC.",
+        "Ограничьте политику репликации паролей учётными записями обслуживаемого филиала, не допуская ненужного доступа администратора RODC к другим секретам."
+      ]
+    },
+    "RODC_ADMIN_BROAD_GROUP": {
+      "SourceEnglishDescription": "managedBy on the computer object of this read-only Domain Controller names a group that covers most or all of the domain - Domain Users, Domain Computers, Authenticated Users, Everyone - and the principal named there is an implicit member of the server's Administrators group (MS-ADTS 6.1.1.3.2). Every member of the group is administrator on a Domain Controller. Administrator there reaches every secret the server has cached and the keys of its own krbtgt account, which signs the tickets it issues.",
+      "description": "В managedBy объекта RODC указана группа с чрезмерно широким охватом, например Domain Users, Domain Computers, Authenticated Users или Everyone. По MS-ADTS 6.1.1.3.2 такой субъект неявно включается в локальную группу Administrators RODC: все участники этой группы получают права администратора на контроллере домена. Эти права позволяют читать кешированные секреты и ключи собственной записи krbtgt данного RODC.",
+      "SourceEnglishImpactCount": 3,
+      "SourceEnglishImpact": [
+        "Any domain account - one phished or sprayed password - is administrator on the read-only Domain Controller",
+        "That reaches the password hashes of every account cached on the server",
+        "With the keys of the server's krbtgt account any member signs tickets for every account the server's password replication policy allows, and a writable Domain Controller answers a key list request for such an account with its password hash"
+      ],
+      "impact": [
+        "Любая доменная запись, охваченная широкой группой, включая запись со скомпрометированным паролем, получает административный доступ к RODC.",
+        "Становятся доступны хеши паролей всех записей, секреты которых кешированы на этом RODC.",
+        "Используя ключи собственной записи krbtgt RODC, участник может подписать билеты для записей, разрешённых политикой репликации, и запросить у записываемого DC выдачу их хешей."
+      ],
+      "SourceEnglishAttackCount": 4,
+      "SourceEnglishAttack": [
+        "1. Read managedBy of the read-only Domain Controller - any domain user may",
+        "2. Log on to the server with any account the group covers - it is administrator there",
+        "3. Extract the cached secrets and the keys of the server's krbtgt account",
+        "4. Use the cached hashes, or sign tickets for the accounts its password replication policy allows"
+      ],
+      "attack": [
+        "1. Прочитать managedBy объекта RODC: это доступно обычному пользователю домена.",
+        "2. Войти на RODC под любой учётной записью, входящей в указанную широкую группу, получив административные права.",
+        "3. Извлечь кешированные секреты и ключи собственной записи krbtgt RODC.",
+        "4. Использовать кешированные хеши или подписать билеты для записей, разрешённых политикой репликации паролей."
+      ],
+      "SourceEnglishRemediationCount": 2,
+      "SourceEnglishRemediation": [
+        "Replace the broad group in managedBy with a dedicated group of the branch office's administrators, or clear managedBy",
+        "Treat what the server holds as exposed for as long as the setting stood: reset the passwords of the accounts whose secrets it has cached, and the password of its krbtgt account - the account msDS-KrbTgtLink names"
+      ],
+      "remediation": [
+        "Замените широкую группу в managedBy на специальную группу администраторов филиала либо очистите атрибут.",
+        "Считайте секреты, кешированные на RODC в период ошибочной настройки, потенциально раскрытыми. Смените пароли соответствующих учётных записей и пароль krbtgt этого RODC — запись указывается в msDS-KrbTgtLink."
+      ]
+    },
+    "RODC_MANAGEDBY_WRITE": {
+      "SourceEnglishDescription": "The principals listed may write managedBy on the computer object of this read-only Domain Controller, and the principal named in managedBy is an implicit member of the server's Administrators group (MS-ADTS 6.1.1.3.2). Writing their own name there makes them administrator on a Domain Controller, without a change to any group. Counted: the owner, which may rewrite the DACL; GenericAll; GenericWrite or WriteProperty on every property; WriteProperty on managedBy itself; WriteDacl and WriteOwner, with which the write can be granted. managedBy belongs to no property set. An explicit Deny of the write is honoured, except against a holder that may rewrite the DACL. Tier-0 principals are not listed - they hold full control on a Domain Controller account by default; an operator group is listed.",
+      "description": "Обнаружены субъекты, которые могут изменять managedBy объекта компьютера RODC. Субъект, записанный в managedBy, неявно становится локальным администратором RODC (MS-ADTS 6.1.1.3.2); поэтому запись собственного имени предоставляет права без изменения членства в группах. Учитываются владелец объекта с возможностью изменить DACL, GenericAll, GenericWrite, WriteProperty на все свойства или конкретно managedBy, WriteDacl и WriteOwner. managedBy не входит в набор свойств (property set). Явный Deny учитывается, кроме субъектов, способных переписать DACL. Субъекты Tier-0 не перечисляются, поскольку штатно контролируют объекты DC; операторские группы проверяются.",
+      "SourceEnglishImpactCount": 3,
+      "SourceEnglishImpact": [
+        "The principal becomes administrator on the read-only Domain Controller by changing one attribute - no group that an audit of privileged memberships watches changes",
+        "As administrator it reaches every secret cached on the server and the keys of its krbtgt account",
+        "A write to every property also reaches the password replication policy on the same object (msDS-RevealOnDemandGroup, msDS-NeverRevealGroup): allowing a Domain Admin there and signing a ticket for it with the server's krbtgt key is the domain"
+      ],
+      "impact": [
+        "Субъект может назначить себя администратором RODC изменением одного атрибута без изменения групп, контролируемых аудитом привилегий.",
+        "Полученные административные права дают доступ ко всем кешированным секретам RODC и ключам его собственной записи krbtgt.",
+        "Полное право записи всех свойств также позволяет изменить политику репликации паролей (msDS-RevealOnDemandGroup, msDS-NeverRevealGroup). При разрешении привилегированной записи и использовании ключа krbtgt RODC последствия могут распространиться на домен."
+      ],
+      "SourceEnglishAttackCount": 4,
+      "SourceEnglishAttack": [
+        "1. Write the attacker's own account into managedBy of the read-only Domain Controller",
+        "2. Once the change has replicated to the server, log on to it as administrator",
+        "3. Extract the cached secrets and the keys of its krbtgt account",
+        "4. With a write to every property as well: put a privileged account on the allow list, take its groups off the deny list, sign a ticket for it with the server's krbtgt key, and ask a writable Domain Controller for its password hash with a key list request"
+      ],
+      "attack": [
+        "1. Записать собственную учётную запись в managedBy объекта RODC.",
+        "2. После репликации изменения на RODC войти на него с административными правами.",
+        "3. Получить кешированные секреты и ключи собственной записи krbtgt RODC.",
+        "4. Если доступны права записи всех свойств, изменить списки разрешённой и запрещённой репликации для привилегированной записи, подписать билет ключом krbtgt RODC и запросить её хеш у записываемого DC."
+      ],
+      "SourceEnglishRemediationCount": 3,
+      "SourceEnglishRemediation": [
+        "Remove the right from the principals listed - on the computer object, or on the container it is inherited from",
+        "Where the owner is listed, make Domain Admins the owner of the computer object",
+        "Check that managedBy names the intended principal, and who changed it last (event 5136 for the computer object, with directory service changes audited)"
+      ],
+      "remediation": [
+        "Удалите избыточные права перечисленных субъектов на объекте компьютера RODC либо на контейнере, откуда они наследуются.",
+        "Если причиной является владение объектом, назначьте владельцем Domain Admins.",
+        "Убедитесь, что managedBy указывает на ожидаемого администратора; проверьте изменения объекта по событию 5136 при включённом аудите изменений службы каталогов."
+      ]
+    },
+    "LAPS_PASSWORD_DECRYPTABLE": {
+      "SourceEnglishDescription": "The account this scan runs as is in the group this computer's Windows LAPS password is encrypted for - its token groups hold the SID the blob names, which is exactly what a domain controller checks before it hands out the key. It can therefore read the password: the scan only did not take the last step on this host. The row says why - Windows' own error code, or a scanning host that is in no domain, where Windows requests no key at all. From a domain member of any domain, a Kerberos session of this account decrypts it.",
+      "description": "Учётная запись, под которой выполняется аудит, входит в группу, для которой зашифрован пароль Windows LAPS данного компьютера: SID этой группы присутствует в её tokenGroups и совпадает с SID получателя, записанным в зашифрованном блоке. Именно это членство проверяет DC при выдаче ключа расшифровки. Следовательно, учётная запись может получить пароль; отсутствие расшифровки при текущем сканировании объясняется только условиями на сканирующем компьютере — указанной ошибкой Windows либо отсутствием членства компьютера в домене. С доменного компьютера, используя Kerberos-сеанс этой записи, пароль можно расшифровать.",
+      "SourceEnglishImpactCount": 3,
+      "SourceEnglishImpact": [
+        "The account can obtain the local administrator password of this computer",
+        "The password gives local administrator access, and with it the credentials cached on the machine",
+        "That the scan did not decrypt it here does not limit the account - only the host the scan ran on"
+      ],
+      "impact": [
+        "Данная учётная запись может получить пароль локального администратора проверяемого компьютера.",
+        "Этот пароль открывает административный доступ и, в частности, доступ к учётным данным, кешированным на компьютере.",
+        "Неудачная расшифровка в данном сеансе характеризует ограничения сканирующего узла, а не права учётной записи."
+      ],
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Read msLAPS-EncryptedPassword, which the account may read",
+        "2. Decrypt it on any domain member, with this account's credentials in the logon session",
+        "3. Log on to the computer as its local administrator"
+      ],
+      "attack": [
+        "1. Прочитать msLAPS-EncryptedPassword, доступный данной учётной записи.",
+        "2. Расшифровать значение на любом компьютере домена с учётными данными этой записи в сеансе входа.",
+        "3. Войти на целевой компьютер под локальным администратором."
+      ],
+      "SourceEnglishRemediationCount": 3,
+      "SourceEnglishRemediation": [
+        "Review who is in the group ADPasswordEncryptionPrincipal names - by default Domain Admins - and keep it as small as the password deserves",
+        "Grant the read right on msLAPS-EncryptedPassword only to accounts that are meant to decrypt it",
+        "Expected for an administrative account: then this is the access the account is meant to have"
+      ],
+      "remediation": [
+        "Проверьте состав группы, заданной в ADPasswordEncryptionPrincipal (по умолчанию Domain Admins), и ограничьте его субъектами, действительно нуждающимися в пароле.",
+        "Предоставляйте право чтения msLAPS-EncryptedPassword только учётным записям, которым положено расшифровывать пароль.",
+        "Если проверяется уполномоченная административная учётная запись, это ожидаемый доступ, а не обязательно ошибка конфигурации."
+      ]
+    },
+    "GPO_TIER0_LOGON_NOT_DENIED": {
+      "SourceEnglishDescription": "No Group Policy that reaches member computers denies Domain Admins the local or Remote Desktop logon (Deny log on locally, Deny log on through Remote Desktop Services) - neither by naming the group nor a group Domain Admins is a member of. Windows denies only the Guest account by default, so a Domain Admin may sign in to every workstation and member server, and each sign-in leaves credential material on the machine: in LSASS, as a Kerberos ticket, as a cached logon. Whoever holds administrator rights on any one of those machines can take it. Microsoft's guidance for securing Active Directory is to deny Domain Admins these two logons, and the network, batch and service logon, in policies linked to the OUs of member servers and workstations. A machine's local policy is not visible here.",
+      "description": "Не обнаружена GPO, действующая на компьютеры-участники домена и запрещающая Domain Admins локальный или RDP-вход (Deny log on locally, Deny log on through Remote Desktop Services), напрямую либо через группу, участником которой является Domain Admins. По умолчанию Windows запрещает такой вход только Guest. Поэтому администратор домена может войти на рабочую станцию или рядовой сервер и оставить там материал учётных данных: в LSASS, кеше Kerberos или кеше входа. Локальный администратор скомпрометированной машины может получить эти данные. Microsoft рекомендует запрещать Domain Admins локальный, RDP, сетевой, пакетный вход и вход в качестве службы в GPO для OU рядовых серверов и рабочих станций. Локальная политика отдельных компьютеров здесь не видна.",
+      "SourceEnglishImpactCount": 2,
+      "SourceEnglishImpact": [
+        "A Domain Admin who signs in to a workstation or member server - by habit, for a quick fix - leaves credentials behind that a local administrator of that machine can extract",
+        "One compromised workstation is then one support call away from the domain"
+      ],
+      "impact": [
+        "Вход администратора домена на рабочую станцию или рядовой сервер ради поддержки оставляет учётные данные, доступные локальному администратору скомпрометированной машины.",
+        "Для компрометации домена может оказаться достаточно одной захваченной рабочей станции и последующего административного входа."
+      ],
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Gain administrator rights on any workstation or member server - a local privilege escalation, a reused local administrator password",
+        "2. Wait for, or provoke, a Domain Admin sign-in to that machine - a support ticket, a scheduled task, a service",
+        "3. Extract the Domain Admin's credentials from LSASS or the Kerberos ticket cache"
+      ],
+      "attack": [
+        "1. Получить локальные административные права на рабочей станции или рядовом сервере, например через повышение привилегий или повторно используемый локальный пароль.",
+        "2. Дождаться или спровоцировать вход Domain Admins на эту машину, например при обработке обращения поддержки.",
+        "3. Извлечь материал учётных данных администратора домена из LSASS или кеша билетов Kerberos."
+      ],
+      "SourceEnglishRemediationCount": 3,
+      "SourceEnglishRemediation": [
+        "Add Domain Admins to Deny access to this computer from the network, Deny log on as a batch job, Deny log on as a service, Deny log on locally and Deny log on through Remote Desktop Services in a policy linked to every OU that holds workstations or member servers",
+        "Keep the jump servers used to administer the domain controllers out of those OUs",
+        "Administer member computers with accounts that are not Domain Admins"
+      ],
+      "remediation": [
+        "Добавьте Domain Admins во все пять политик запрета входа: Deny access to this computer from the network, Deny log on as a batch job, Deny log on as a service, Deny log on locally, Deny log on through Remote Desktop Services. Привяжите GPO ко всем OU рабочих станций и рядовых серверов.",
+        "Не включайте административные jump-серверы для управления контроллерами домена в эти OU.",
+        "Администрируйте рядовые компьютеры учётными записями без членства в Domain Admins."
+      ]
+    },
+    "GPO_LOCAL_ADMIN_NETWORK_NOT_DENIED": {
+      "SourceEnglishDescription": "No Group Policy that reaches member computers denies local administrator accounts the network logon (Deny access to this computer from the network) - not Local account and member of Administrators group (S-1-5-114), not Local account (S-1-5-113), not the local Administrator account by its name. Windows denies only the Guest account by default. Where several machines share a local administrator password - a cloned image, a password set by script - the password or its hash taken from one machine opens every other one over the network. Its own password on every machine, as Windows LAPS sets it, takes the reuse away; the deny right takes the network logon away whatever the password is.",
+      "description": "Ни одна GPO, применимая к рядовым компьютерам, не запрещает сетевой вход локальным административным записям через Deny access to this computer from the network: не указаны Local account and member of Administrators group (S-1-5-114), Local account (S-1-5-113) или локальный Administrator по имени. По умолчанию Windows запрещает этот вид входа лишь Guest. Если на нескольких машинах совпадает пароль локального администратора (клонированный образ или сценарий настройки), извлечённый пароль или хеш открывает сетевой вход на остальные машины. Windows LAPS устраняет повторное использование паролей; запрет сетевого входа ограничивает возможность его применения независимо от пароля.",
+      "SourceEnglishImpactCount": 2,
+      "SourceEnglishImpact": [
+        "A local administrator password or hash taken from one machine logs on to every machine that shares it, over SMB, WMI or WinRM",
+        "Lateral movement across workstations and servers then needs no domain account"
+      ],
+      "impact": [
+        "Пароль или NT-хеш локального администратора одной машины может использоваться по SMB, WMI либо WinRM на других компьютерах с тем же паролем.",
+        "Для перемещения между рабочими станциями и серверами тогда не требуется доменная учётная запись."
+      ],
+      "SourceEnglishAttackCount": 3,
+      "SourceEnglishAttack": [
+        "1. Extract the local administrator's NT hash from one machine's SAM",
+        "2. Authenticate with it to other machines over the network (pass-the-hash)",
+        "3. Repeat from every machine reached until a domain credential turns up"
+      ],
+      "attack": [
+        "1. Получить NT-хеш локального администратора из SAM одной машины.",
+        "2. Использовать его для сетевой аутентификации на других машинах (pass-the-hash).",
+        "3. Повторять переходы между компьютерами до получения доменных учётных данных."
+      ],
+      "SourceEnglishRemediationCount": 2,
+      "SourceEnglishRemediation": [
+        "Add Local account and member of Administrators group to Deny access to this computer from the network, and Local account to Deny log on through Remote Desktop Services, in a policy linked to the OUs of member servers and workstations",
+        "Give every machine its own local administrator password with Windows LAPS"
+      ],
+      "remediation": [
+        "Через GPO запретите сетевой вход для Local account and member of Administrators group и RDP-вход для Local account. Привяжите политику к OU рядовых серверов и рабочих станций.",
+        "Используйте Windows LAPS, чтобы каждый компьютер имел собственный пароль локального администратора."
+      ]
+    },
+    "GPO_LOGON_LOCKOUT": {
+      "SourceEnglishDescription": "This Group Policy denies a logon to a principal that covers most or all accounts - Everyone, Authenticated Users, Users, Domain Users, Domain Computers, NETWORK or INTERACTIVE - or denies Domain Admins a logon on the domain controllers it reaches. A deny right wins over every right that would allow the logon, so every account the principal covers loses that kind of logon on every machine in scope, administrators included; on a domain controller every Active Directory operation is a network logon. A configuration mistake rather than an exposure: it either breaks what the policy reaches, or the policy does not reach what its author assumes.",
+      "description": "В GPO обнаружен запрет входа для субъекта, включающего большинство или все учётные записи: Everyone, Authenticated Users, Users, Domain Users, Domain Computers, NETWORK либо INTERACTIVE, — или запрет входа Domain Admins на контроллерах домена, охваченных политикой. Запрещающее право имеет приоритет над любым разрешением: соответствующий вид входа блокируется для всех затронутых учётных записей на всех компьютерах области действия. На DC каждая операция AD требует сетевого входа. Это прежде всего потенциальная ошибка конфигурации и доступности, а не признак возможности атаки; политика может блокировать нужные действия или не охватывать устройства, на которые рассчитывал администратор.",
+      "SourceEnglishImpactCount": 2,
+      "SourceEnglishImpact": [
+        "Every account the principal covers loses that kind of logon on every machine the policy reaches",
+        "Denied on a domain controller, the network logon takes Active Directory itself away from those accounts"
+      ],
+      "impact": [
+        "Все учётные записи, охваченные запрещённым субъектом, лишаются соответствующего вида входа на компьютерах области действия GPO.",
+        "Если на контроллере домена запрещён сетевой вход, затронутые учётные записи теряют доступ к операциям Active Directory."
+      ],
+      "SourceEnglishAttackCount": 0,
+      "SourceEnglishAttack": [],
+      "attack": [],
+      "SourceEnglishRemediationCount": 2,
+      "SourceEnglishRemediation": [
+        "Replace the broad group with the accounts that are meant to be denied - Guests, Local account, service accounts",
+        "Link a policy that denies Domain Admins a logon to the OUs of member computers only, never to the Domain Controllers OU or the domain"
+      ],
+      "remediation": [
+        "Замените широкую группу точным перечнем учётных записей, которым действительно нужно запретить вход, например Guests, Local account или назначенными служебными записями.",
+        "Привязывайте запрет входа для Domain Admins только к OU рядовых компьютеров, никогда — к Domain Controllers OU или корню домена."
+      ]
+    },
+    "GPO_LOGON_DENIAL_HARDENING": {
+      "SourceEnglishDescription": "This Group Policy denies Domain Admins, or local administrator accounts, a logon on the member computers it reaches. A deny right wins over every right that would allow the logon, so their credentials cannot be used there in that way and leave nothing behind for a local administrator to take. Not evaluated: which of several policies setting the same right wins on a machine - a policy of higher precedence that sets the right again without these principals replaces the list.",
+      "description": "Данная GPO запрещает Domain Admins либо локальным административным учётным записям определённые виды входа на обычных компьютерах в области её действия. Запрещающее право имеет приоритет над разрешающим: соответствующие привилегированные учётные данные не используются на этих машинах и не остаются доступными локальному администратору. Ограничение оценки: не вычисляется итоговый приоритет нескольких GPO, задающих одно и то же право; политика с большим приоритетом может заменить список запрещённых субъектов.",
+      "SourceEnglishImpactCount": 0,
+      "SourceEnglishImpact": [],
+      "impact": [],
+      "SourceEnglishAttackCount": 0,
+      "SourceEnglishAttack": [],
+      "attack": [],
+      "SourceEnglishRemediationCount": 2,
+      "SourceEnglishRemediation": [
+        "No action required",
+        "Check that the policy is linked to every OU that holds workstations and member servers, and that no policy of higher precedence sets the same right without these principals"
+      ],
+      "remediation": [
+        "Исправление не требуется.",
+        "Проверьте, что GPO привязана ко всем OU рабочих станций и рядовых серверов, а более приоритетная политика не переопределяет то же право без этих субъектов."
+      ]
+    }
+  }
+}
