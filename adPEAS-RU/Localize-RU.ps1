@@ -259,3 +259,7 @@ if(-not $?){throw 'Ошибка исправления отчёта DOC4i'}
 # DOC6a: безопасный перевод вычисленных пояснений по двум отчётам 19.11.2026.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC6aObservedValues.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации наблюдаемых HTML-значений DOC6a'}
+
+# DOC6b: локализация человекочитаемых названий расширений GPO по двум HTML-отчётам DOC6a.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC6bGpoExtensions.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации расширений групповой политики DOC6b'}
