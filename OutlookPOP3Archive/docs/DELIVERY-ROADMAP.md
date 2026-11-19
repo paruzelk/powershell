@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3t (2026-11-19):** [strict OS TEMP-only original DuplicateIndex index-only recovery after 10 Reconciled/2 Indexed](2.6.5-arch3t-synthetic-index-only-recovery.md). Original journal SHA and partial index SHA pinned from independent Audit; raw JSONL duplicates/conflicts/torn tail rejected, original fake Outlook ArchiveVerifier rerun, exclusive TEMP lease, only missing original Add-OPADuplicateEntry followed by readback, idempotent no-op. Partial 3/10 Reconciled rejected. No PST/COM/Move; next separate live TEST-PST batch-10. ProductionReady=False.
+
+
 > **ARCH3s (2026-11-19):** User real ARCH3q completed one-shot and ARCH3r read-only checkpoint + 10 synthetic journal/index checks PASS. [ARCH3s ORIGINAL ArchiveVerifier executes ten fake MailItems with full ORIGINAL ARCH2b semantic and SaveAsFile attachment SHA](2.6.5-arch3s-original-verifier-fake-ten.md); only after exact ten PASS, original TEMP-only journal/index integration with injected partial commit. Next gate: prove idempotent index-only recovery and authorize separate TEST-PST real batch-10. ProductionReady=False.
 
 
