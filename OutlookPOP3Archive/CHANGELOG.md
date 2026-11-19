@@ -1,3 +1,8 @@
+## 2.6.5-ARCH3u DEV — 2026-11-19
+- User ARCH3t local 2/10 -> 10/10 index-only recovery verified, original journal SHA preserved, second Recover no-op (no real Move). Historical ARCH3q real one-mail checkpoint unchanged.
+- ARCH3u read-only existing real TEST PST exactly ten original Inbox candidates from ONE year: original ARCH2d strict Outlook POP3 profile/store scope, original ArchiveSelector bounded 128 and second exact EntryID/parent/date readback, strict shared DuplicateIndex JSONL audit and original importer, existing year parts gate and original ARCH3b MailMover/Grouping contract for next UNUSED annual part; no new archive PST, no Intent/Claim/Journal/Index writes, no Move.
+- 18 new Pester, expected 4569 tests / 155 containers Windows PowerShell 5.1. CLI Plan/Inventory only; production Archive/Resume/Auto disabled. Next ARCH3v full semantic and durable prepare.
+
 ## 2.6.5-ARCH3t DEV — 2026-11-19
 - Strict synthetic OS TEMP-only recovery of ORIGINAL append-only DuplicateIndex after 10/10 Reconciled with partial 2/10 index: immutable journal/index SHA pins, raw conflict/duplicate/truncated JSONL rejects, exact claim/provider SHA chains and original fake Outlook ArchiveVerifier on all ten.
 - Exclusive TEMP lease, only missing Add-OPADuplicateEntry records, Safe flush and independent readback; second Recover is idempotent and never replays Move or Reconciled.
