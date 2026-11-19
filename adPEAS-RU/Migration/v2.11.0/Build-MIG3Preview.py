@@ -139,7 +139,10 @@ def patch_js(js, tech):
                    ("Why It Matters", "Почему это важно"),
                    ("What We Check", "Что проверяется"),
                    ("Output Filtering", "Фильтрация результатов")):
-        block = replace_exact_one(block, en, ru, "check tooltip")
+        # Match the visible HTML label, never comments or internal terminology.
+        before = ">" + en + "<"
+        after = ">" + ru + "<"
+        block = replace_exact_one(block, before, after, "check tooltip")
     js = js[:start] + block + js[end:]
     if original == js:
         raise ValueError("MIG3 failed to patch JavaScript")
