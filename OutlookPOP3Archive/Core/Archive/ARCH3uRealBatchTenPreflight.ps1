@@ -129,6 +129,16 @@ function New-OPA265ARCH3uTenPreview {
     $rows=New-Object 'System.Collections.Generic.List[object]'
     $digestParts=New-Object 'System.Collections.Generic.List[object]'
     foreach($x in @($contract.Items)){
+        # ARCH3b contract contains ArchiveDateUtc, NOT ArchiveDate.
+        # Keep the original selector's local DateTime for exact Outlook COM
+        # recheck, but prove it is the date hashed in the original contract.
+        $sourceRow=@($chosen | Where-Object {[string]$_.EntryID -ceq [string]$x.SourceEntryId})
+        if($sourceRow.Count -ne 1){throw 'ARCH3u original contract has no unique source selector row.'}
+        $selectedDate=[datetime]$sourceRow[0].ArchiveDate
+        $dateUtc=$selectedDate.ToUniversalTime().ToString('o',[Globalization.CultureInfo]::InvariantCulture)
+        if([string]$x.ArchiveDateUtc -cne $dateUtc){
+            throw 'ARCH3u original ArchiveDateUtc contract drift from selector DateTime.'
+        }
         if([int]$x.ArchiveYear -ne $year -or
            [string]$x.PlannedArchivePst -cne [string]$partPlan.NextUnusedPartPathPreview -or
            [string]$x.SourceFolderPath -cne $InboxPath -or
@@ -140,7 +150,7 @@ function New-OPA265ARCH3uTenPreview {
             SourceEntryId=[string]$x.SourceEntryId
             SourceFolderPath=[string]$x.SourceFolderPath
             ArchiveYear=[int]$x.ArchiveYear
-            ArchiveDate=[datetime]$x.ArchiveDate
+            ArchiveDate=$selectedDate
             OriginalOperationId=[string]$x.OperationId
             OriginalContractSha256=[string]$x.ContractSha256
             TargetFolderPath=[string]$x.PlannedTargetFolderPath
