@@ -92,7 +92,7 @@ $js=[IO.File]::ReadAllText(
 foreach($marker in @(
  'const ruDetailedCheckTooltips = ',
  'check.ruDetailedCheckReady = true',
- 'if (!check.ruDetailedCheckReady && check.originalEnglish && check.originalEnglish.whyItMatters) {',
+ 'if (window.adPEASShowOriginalEnglish === true && !check.ruDetailedCheckReady && check.originalEnglish && check.originalEnglish.whyItMatters) {',
  'window.adPEASRUCheckTooltipAudit'
 )){
  if(-not $js.Contains($marker)){throw "DOC4c: отсутствует JS-механизм: $marker"}
