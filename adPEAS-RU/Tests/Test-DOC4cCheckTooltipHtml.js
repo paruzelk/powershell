@@ -72,7 +72,7 @@ const builderStart=js.indexOf('function buildCheckTooltipHtml(');
 assert(builderStart>=0,'check-tooltip renderer not found');
 const builderMatch=js.slice(builderStart).match(/^(function buildCheckTooltipHtml\([\s\S]*?\n        \})\s*\n\s*\/\/ ={12,}/);
 assert(builderMatch,'cannot isolate actual check-tooltip renderer');
-const render=vm.runInNewContext('('+builderMatch[1]+')',{escapeHtml},{timeout:3000});
+const render=vm.runInNewContext('('+builderMatch[1]+')',{escapeHtml,window:fakeWindow},{timeout:3000});
 for(const [id,check] of Object.entries(canonical)){
   assert(check.ruDetailedCheckReady===true,id+' translation flag missing');
   assert.deepStrictEqual(Array.from(check.whatWeCheck),Array.from(translated[id].whatWeCheck),id+' bullets not applied');
