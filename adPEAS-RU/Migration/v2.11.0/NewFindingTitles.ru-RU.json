@@ -1,0 +1,105 @@
+﻿{
+  "Schema": "adPEAS-RU.2.11.0.MIG1.NewFindingTitles.1",
+  "Upstream": "61106960/adPEAS",
+  "UpstreamCommit": "477696f48d6b486be5d9a99b598f72e3ccfcc0c0",
+  "Locale": "ru-RU",
+  "TranslationScope": "UI title + concise description; full Attack/Impact/Remediation not yet translated",
+  "Translations": {
+    "RODC_DELEGATED_ADMIN": {
+      "EnglishTitle": "Principal Outside Tier-0 Administers a Read-Only Domain Controller",
+      "RussianTitle": "RODC администрируется субъектом вне Tier-0",
+      "RussianSummary": "В атрибуте managedBy контроллера домена только для чтения (RODC) указан пользователь или группа вне Tier-0. Этот субъект получает локальные административные права на данном RODC; такое делегирование может быть предусмотрено для филиала и требует проверки полномочий.",
+      "RiskWitness": "Finding"
+    },
+    "RODC_ADMIN_BROAD_GROUP": {
+      "EnglishTitle": "Broad Group Administers a Read-Only Domain Controller",
+      "RussianTitle": "Широкая группа администрирует RODC",
+      "RussianSummary": "В managedBy объекта RODC назначена группа с широким членством. Её участники получают административный доступ к RODC, включая потенциальный доступ к сохранённым на нём секретам.",
+      "RiskWitness": "Finding"
+    },
+    "RODC_MANAGEDBY_WRITE": {
+      "EnglishTitle": "Principal Outside Tier-0 May Make Itself Administrator of a Read-Only Domain Controller",
+      "RussianTitle": "Субъект вне Tier-0 может назначить себя администратором RODC",
+      "RussianSummary": "Указанные субъекты могут изменить managedBy объекта RODC напрямую либо через управление ACL/владением. Записав туда себя, субъект получает административные права на RODC без изменения членства в группах.",
+      "RiskWitness": "Finding"
+    },
+    "LAPS_PASSWORD_DECRYPTABLE": {
+      "EnglishTitle": "Encrypted LAPS Password Decryptable by This Account",
+      "RussianTitle": "Учётная запись может расшифровать пароль Windows LAPS",
+      "RussianSummary": "Сканирующая учётная запись входит в группу, которой предназначен зашифрованный пароль LAPS. Несмотря на неудачную расшифровку на текущем компьютере, её права позволяют получить пароль; причина локальной ошибки выводится отдельно.",
+      "RiskWitness": "Finding"
+    },
+    "GPO_TIER0_LOGON_NOT_DENIED": {
+      "EnglishTitle": "No Policy Keeps Domain Admins Off Member Computers",
+      "RussianTitle": "Политики не запрещают вход Domain Admins на рядовых компьютерах",
+      "RussianSummary": "Не обнаружено GPO, запрещающей Domain Admins локальный или RDP-вход на компьютерах-участниках домена. Это предупреждение относится к анализируемым GPO и не учитывает локальную политику конкретной машины.",
+      "RiskWitness": "Hint"
+    },
+    "GPO_LOCAL_ADMIN_NETWORK_NOT_DENIED": {
+      "EnglishTitle": "No Policy Denies Local Administrator Accounts the Network Logon",
+      "RussianTitle": "Политики не запрещают сетевой вход локальным администраторам",
+      "RussianSummary": "Не обнаружена GPO, запрещающая сетевой вход локальным административным учётным записям на компьютерах-участниках. При повторном использовании паролей это облегчает перемещение между машинами.",
+      "RiskWitness": "Hint"
+    },
+    "GPO_LOGON_LOCKOUT": {
+      "EnglishTitle": "Policy Denies a Logon to the Accounts That Need It",
+      "RussianTitle": "Политика запрещает необходимый вход широкому кругу учётных записей",
+      "RussianSummary": "В GPO обнаружен запрет входа для слишком широкой группы или запрет для Domain Admins на контроллерах домена. Право запрета имеет приоритет над разрешением и может нарушить доступность служб и администрирование.",
+      "RiskWitness": "Hint"
+    },
+    "GPO_LOGON_DENIAL_HARDENING": {
+      "EnglishTitle": "Policy Keeps Privileged Credentials Off Member Computers",
+      "RussianTitle": "GPO ограничивает вход с привилегированными учётными данными",
+      "RussianSummary": "Политика запрещает определённые виды входа Domain Admins или локальным администраторам на обычных компьютерах. Это полезная защита; фактический результат при конфликтующих GPO более высокого приоритета здесь не установлен.",
+      "RiskWitness": "Secure"
+    },
+    "CREDENTIAL_VNC_PASSWORD_HASH": {
+      "EnglishTitle": "VNC Password Deployed in a Form That Cannot Be Reversed",
+      "RussianTitle": "Пароль VNC развёрнут в необратимом виде",
+      "RussianSummary": "GPO распространяет хеш пароля VNC вместо извлекаемого пароля. Само значение не позволяет аутентифицироваться, но указывает на использование VNC и возможный общий пароль на нескольких компьютерах.",
+      "RiskWitness": "Hint"
+    },
+    "COMPUTER_PASSWORD_NEVER_SET": {
+      "EnglishTitle": "Computer Account Without a Password",
+      "RussianTitle": "Для учётной записи компьютера не задан пароль",
+      "RussianSummary": "У предварительно созданной записи компьютера отсутствует установленный пароль (pwdLastSet = 0, PASSWD_NOTREQD). У неё нет ключей Kerberos, но возможен вход через NTLM с пустым паролем.",
+      "RiskWitness": "Finding"
+    },
+    "COMPUTER_CREATION_PASSWORD_IN_USE": {
+      "EnglishTitle": "Computer Account in Use With Its Creation Password",
+      "RussianTitle": "Компьютер использует пароль, заданный при создании записи",
+      "RussianSummary": "Запись компьютера использовалась для входа, но признаков присоединения Windows-клиента нет и пароль не менялся после создания. Предсказуемость первоначального пароля зависит от способа создания записи.",
+      "RiskWitness": "Hint"
+    },
+    "COMPUTER_PRECREATED_NOT_JOINED": {
+      "EnglishTitle": "Computer Account Created in Advance and Never Used",
+      "RussianTitle": "Запись компьютера заранее создана, но не использовалась",
+      "RussianSummary": "Предварительно созданная запись компьютера никогда не присоединялась и не использовалась, а пароль остался первоначальным. Возможность подбора зависит от средства создания; автоматическое сканирование пароль не проверяет.",
+      "RiskWitness": "Hint"
+    },
+    "ADCS_TEMPLATE_OUTDATED_ALGORITHM": {
+      "EnglishTitle": "Certificate Template Prescribes an Outdated Algorithm",
+      "RussianTitle": "Шаблон сертификата задаёт устаревший алгоритм",
+      "RussianSummary": "В шаблоне сертификата версии схемы 4 обнаружен устаревший алгоритм подписи запроса или шифрования архивируемого закрытого ключа. Это не означает, что ЦС подписывает выданные сертификаты тем же алгоритмом.",
+      "RiskWitness": "Hint"
+    },
+    "WEB_ENDPOINT_EPA_ACCEPT": {
+      "EnglishTitle": "Extended Protection for Authentication Set to Accept",
+      "RussianTitle": "Защита EPA веб-службы настроена в режиме Accept",
+      "RussianSummary": "Веб-служба принимает NTLM-аутентификацию без привязки к TLS-каналу, но отклоняет чужую привязку. Режим Accept не равен отключённой EPA: для обычных Windows-клиентов защита от типичного NTLM-relay сохраняется.",
+      "RiskWitness": "Hint"
+    },
+    "WEB_ENDPOINT_EPA_SERVICE_BINDING": {
+      "EnglishTitle": "Extended Protection by Service Binding",
+      "RussianTitle": "EPA использует привязку к имени службы",
+      "RussianSummary": "Веб-служба проверяет целевой SPN при NTLM-входе, но не проверяет привязку к TLS-каналу. Такая защита ограничивает ретрансляцию, однако не эквивалентна полной проверке CBT.",
+      "RiskWitness": "Hint"
+    },
+    "MSA_READER_DELETED": {
+      "EnglishTitle": "Managed Service Account Names a Principal That No Longer Exists",
+      "RussianTitle": "В разрешениях MSA указан удалённый субъект",
+      "RussianSummary": "В msDS-GroupMSAMembership указан SID домена, который больше не принадлежит действующему объекту и не найден в sIDHistory. Такой SID не переиспользуется; для непривилегированной сессии также возможно отсутствие прав видеть объект.",
+      "RiskWitness": "Hint"
+    }
+  }
+}
