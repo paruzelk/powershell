@@ -74,7 +74,7 @@ def make_technical(old, new, locale, old_ru):
         raise ValueError("Technical dictionaries do not cover original 392 IDs")
     witness_counts = {}
     overlay_source_verified(entries, locale, "SourceVerifiedCore-*.ru-RU.json",
-                            ("description", "impact", "remediation"), witness_counts)
+                            ("impact", "remediation"), witness_counts)
     overlay_source_verified(entries, locale, "SourceVerifiedAttack-*.ru-RU.json",
                             ("attack",), witness_counts)
     parity = read_json(locale / "SourceFieldParity392.json")
