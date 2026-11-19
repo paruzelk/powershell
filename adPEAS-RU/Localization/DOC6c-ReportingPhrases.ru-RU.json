@@ -1,0 +1,242 @@
+{
+  "schema": "adPEAS-RU.DOC6c.ReportingDisplayTranslation.1",
+  "scope": "four source files; user-facing strings only",
+  "files": [
+    {
+      "path": "src/modules/Reporting/templates/diff-template.html",
+      "replacements": [
+        {
+          "from": "<title>adPEAS Comparison Report - {{DOMAIN}}</title>",
+          "to": "<title>adPEAS — сравнение отчётов — {{DOMAIN}}</title>"
+        },
+        {
+          "from": "<span class=\"header-subtitle\">Comparison Report</span>",
+          "to": "<span class=\"header-subtitle\">Сравнение отчётов</span>"
+        },
+        {
+          "from": "aria-label=\"Toggle theme\"",
+          "to": "aria-label=\"Переключить тему оформления\""
+        },
+        {
+          "from": "<div class=\"label\">Compared</div>",
+          "to": "<div class=\"label\">Сравниваемые категории</div>"
+        },
+        {
+          "from": "<div class=\"label\">Generated</div>",
+          "to": "<div class=\"label\">Создан</div>"
+        }
+      ]
+    },
+    {
+      "path": "src/modules/Reporting/Compare-adPEASReport.ps1",
+      "replacements": [
+        {
+          "from": "adPEAS Report Comparison",
+          "to": "Сравнение отчётов adPEAS"
+        },
+        {
+          "from": "Comparison Summary",
+          "to": "Сводка сравнения"
+        },
+        {
+          "from": "New findings (added)",
+          "to": "Новые находки (добавлены)"
+        },
+        {
+          "from": "Remediated findings (removed)",
+          "to": "Устранённые находки (исчезли)"
+        },
+        {
+          "from": "Changed findings",
+          "to": "Изменённые находки"
+        },
+        {
+          "from": "Unchanged findings",
+          "to": "Находки без изменений"
+        },
+        {
+          "from": "Compared categories",
+          "to": "Сравниваемые категории"
+        },
+        {
+          "from": "New Findings",
+          "to": "Новые находки"
+        },
+        {
+          "from": "Remediated Findings",
+          "to": "Устранённые находки"
+        },
+        {
+          "from": "Changed Findings",
+          "to": "Изменённые находки"
+        },
+        {
+          "from": "severity: ",
+          "to": "критичность: "
+        },
+        {
+          "from": "value: ",
+          "to": "значение: "
+        },
+        {
+          "from": "text changed",
+          "to": "текст изменился"
+        },
+        {
+          "from": "Starting report comparison",
+          "to": "Начато сравнение отчётов"
+        },
+        {
+          "from": "Baseline file not found:",
+          "to": "Не найден исходный файл:"
+        },
+        {
+          "from": "Current file not found:",
+          "to": "Не найден текущий файл:"
+        },
+        {
+          "from": "Invalid JSON file (",
+          "to": "Некорректный JSON-файл ("
+        },
+        {
+          "from": "Unsupported cache version ",
+          "to": "Неподдерживаемая версия кэша "
+        },
+        {
+          "from": "Domain mismatch:",
+          "to": "Несоответствие доменов:"
+        },
+        {
+          "from": "Comparison results may not be meaningful across different domains",
+          "to": "Результаты сравнения разных доменов могут быть некорректными"
+        },
+        {
+          "from": " is from an interrupted scan covering only: ",
+          "to": " получен из прерванной проверки; охвачены только: "
+        },
+        {
+          "from": "Findings from modules it never ran will appear as resolved",
+          "to": "Находки из незапущенных модулей будут ошибочно отмечены как устранённые"
+        },
+        {
+          "from": "Error generating HTML diff report:",
+          "to": "Ошибка создания HTML-отчёта сравнения:"
+        },
+        {
+          "from": "Comparison completed",
+          "to": "Сравнение завершено"
+        },
+        {
+          "from": "Failed to load diff HTML template",
+          "to": "Не удалось загрузить HTML-шаблон сравнения"
+        },
+        {
+          "from": "HTML diff report saved to:",
+          "to": "HTML-отчёт сравнения сохранён:"
+        },
+        {
+          "from": "Loading diff template from file (development mode)",
+          "to": "Загрузка шаблона сравнения из файла (режим разработки)"
+        },
+        {
+          "from": "Diff template not found at:",
+          "to": "Шаблон сравнения не найден:"
+        }
+      ]
+    },
+    {
+      "path": "src/modules/Reporting/Convert-adPEASReport.ps1",
+      "replacements": [
+        {
+          "from": "Starting offline report generation",
+          "to": "Начато автономное формирование отчёта"
+        },
+        {
+          "from": "Input file not found:",
+          "to": "Не найден входной файл:"
+        },
+        {
+          "from": "Invalid JSON file - missing CacheVersion field",
+          "to": "Некорректный JSON: отсутствует поле CacheVersion"
+        },
+        {
+          "from": "Unsupported cache version ",
+          "to": "Неподдерживаемая версия кэша "
+        },
+        {
+          "from": " - expected 1",
+          "to": " — ожидается 1"
+        },
+        {
+          "from": "This export is from an interrupted scan - it covers only:",
+          "to": "Этот экспорт получен из прерванной проверки; охвачены только:"
+        },
+        {
+          "from": "No findings loaded from JSON file",
+          "to": "В JSON-файле не найдено результатов проверок"
+        },
+        {
+          "from": "License file not found:",
+          "to": "Файл лицензии не найден:"
+        },
+        {
+          "from": " is the same as input file. JSON will be re-exported in place.",
+          "to": " совпадает с входным файлом. JSON будет перезаписан."
+        },
+        {
+          "from": "Error generating HTML report:",
+          "to": "Ошибка создания HTML-отчёта:"
+        },
+        {
+          "from": "Error saving JSON:",
+          "to": "Ошибка сохранения JSON:"
+        },
+        {
+          "from": "Report generation completed",
+          "to": "Создание отчёта завершено"
+        }
+      ]
+    },
+    {
+      "path": "src/modules/Reporting/Export-HTMLReport.ps1",
+      "replacements": [
+        {
+          "from": "Starting HTML report generation",
+          "to": "Начато формирование HTML-отчёта"
+        },
+        {
+          "from": "No findings collected. HTML report will be empty.",
+          "to": "Результаты проверок отсутствуют. HTML-отчёт будет пустым."
+        },
+        {
+          "from": "Processing $($findings.Count) findings",
+          "to": "Обрабатываются результаты проверок: $($findings.Count)"
+        },
+        {
+          "from": "Failed to load HTML template. Ensure template files exist in 'templates/' directory or build the project first.",
+          "to": "Не удалось загрузить HTML-шаблон. Проверьте файлы в каталоге 'templates/' или сначала соберите проект."
+        },
+        {
+          "from": "Report saved to:",
+          "to": "Отчёт сохранён:"
+        },
+        {
+          "from": "Failed to write HTML report to",
+          "to": "Не удалось записать HTML-отчёт в"
+        },
+        {
+          "from": "Loading templates from separate files (development mode)",
+          "to": "Загрузка шаблонов из отдельных файлов (режим разработки)"
+        },
+        {
+          "from": "Template files not found at:",
+          "to": "Файлы шаблонов не найдены:"
+        },
+        {
+          "from": "Either run from source directory or build the project first.",
+          "to": "Запустите проект из каталога исходников или сначала выполните сборку."
+        }
+      ]
+    }
+  ]
+}

@@ -263,3 +263,7 @@ if(-not $?){throw 'Ошибка локализации наблюдаемых HT
 # DOC6b: локализация человекочитаемых названий расширений GPO по двум HTML-отчётам DOC6a.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC6bGpoExtensions.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка локализации расширений групповой политики DOC6b'}
+
+# DOC6c: консольные и HTML-сообщения сравнения/конвертации/экспорта.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC6cReportingTexts.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации подсистемы отчётов DOC6c'}
