@@ -1,3 +1,9 @@
+## 2.6.5-ARCH3m DEV — 2026-11-19
+- User real ARCH3k Plan/Audit PASS: exact old POP3 witness, Part1 271360 bytes, original shared 500-entry index, protected ARCH3j PrepareIntent+Journal SHA remain unchanged.
+- Added original Get-OPAArchiveDestination forced Part2 preallocation branch guarded by original ARCH3d+ARCH3l fake TEMP scope. Original New-OPAArchivePst and Get-OPAArchiveFolder used under mocks; no real PST writes.
+- Reuses original ARCH3d immutable synthetic PrepareIntent/DestinationReady/MoveClaimed/MoveReturned stop; zero DuplicateIndex heal/append, zero replay. Regular Archive/Resume/Auto remain closed.
+- 22 additional Pester cases, expected full 4400 tests in 147 containers, Windows PowerShell 5.1 PSSA/BOM/JSON.
+
 ## 2.6.5-ARCH3l DEV — 2026-11-13
 - Operator ARCH3k real Plan/Audit PASS, source ARCH2b witness 8782b410..., original Year2020 part2 contract, original shared 500-entry duplicate index, original SHA of MailMover accepted; still no real writer.
 - Original MailMover Move-OPAItemsWithLimit now supports opt-in ARCH3lSyntheticPart2Boundary strictly within existing ARCH3d synthetic TEMP and fake Outlook scope, Year/Limit 1, no Resume. Original behavior unchanged without switch.

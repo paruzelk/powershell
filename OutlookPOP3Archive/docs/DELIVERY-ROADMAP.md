@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3m (2026-11-19):** [исходный Get-OPAArchiveDestination принудительно выбирает Part2 ДО PST allocation](2.6.5-arch3m-original-part2-preallocation-synthetic.md) под ARCH3d+ARCH3l fake TEMP. Пользователь ARCH3k подтвердил real read-only Plan/Audit; old ARCH3j Intent/Journal остаются нетронутыми. Для настоящего Move нужен отдельный операторский one-shot live gate и original verifier ПОСЛЕ реального Outlook restart. ProductionReady=False.
+
+
 > **ARCH3l (2026-11-13):** user real ARCH3k Plan/Audit PASS. [Синтетическая, строго TEMP-fake граница Part2 внутри исходного MailMover](2.6.5-arch3l-original-part2-synthetic-gate.md) запрещает preverification shared index sync и любой выбранный Part1/3 до mock MoveClaimed. Оригинальный GetDestination ещё НЕ умеет принудительно выбирать новый Part2 до создания PST, поэтому live writer остаётся закрыт; следующий этап — preallocation Part2 original API и защита Index до пострестартового оригинального ArchiveVerifier.
 
 

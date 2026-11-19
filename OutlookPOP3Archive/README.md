@@ -1,6 +1,18 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3m — оригинальный Part2 ДО создания PST (только синтетика)
+
+Внутри исходного Get-OPAArchiveDestination под строгими ARCH3d+ARCH3l fake TEMP границами -ARCH3mSyntheticForcePart2 проверяет exact Year2020 Part2 ДО New-OPAArchivePst, не открывая Part1. Оригинальная синтетическая цепочка PrepareIntent → DestinationReady → SourceWitnessAnchored → MoveClaimed → MoveReturned не добавляет записи в shared DuplicateIndex и запрещает retry.
+
+~~~powershell
+Invoke-Pester -Path .\Tests\Archive\ARCH3mOriginalPart2PreAllocation.Tests.ps1 -Output Detailed
+.\Invoke-CI.ps1
+~~~
+
+[Описание, синтаксис новых флагов, безопасность](docs/2.6.5-arch3m-original-part2-preallocation-synthetic.md). Реальный Outlook Move запрещён; existing ARCH3j Prepare не повторять.
+
+
 ### ARCH3l — защищённая граница original MailMover для Part2 (только синтетика)
 
 Операторский ARCH3k real `Plan` и `Audit` PASS: исходное письмо, оригинальный full witness, 500 записей `DuplicateIndex`, Year2020/Part2 подтверждены; общий `Move-OPAItemsWithLimit` опасен из-за выбора существующей Part1 и индексной синхронизации до перезапуска Outlook. **ARCH3l в исходном MailMover** добавляет `-ARCH3lSyntheticPart2Boundary`, доступный только вместе с `-ARCH3dSyntheticBoundary` в изолированной TEMP-фикстуре; запрещает index-heal, проверяет Part2 и целевую папку до fake MoveClaimed и не меняет оригинальное поведение без флага.
