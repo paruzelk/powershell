@@ -39,6 +39,21 @@ jobs:
           if ($old.Count -ne 1 -or $new.Count -ne 1) { throw 'Unexpected source ZIP layout' }
           python adPEAS-RU/Migration/v2.11.0/Build-MIG1Preview.py --old $old[0].FullName --new $new[0].FullName --ru adPEAS-RU --candidate _mig/candidate --report _mig/2.11.0-parity.json
           if ($LASTEXITCODE -ne 0) { throw 'Migration parity or preview failed' }
+      - name: Check generated JavaScript syntax
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $file = '_mig\candidate\src\modules\Reporting\templates\report-scripts.js'
+          $js = [IO.File]::ReadAllText((Resolve-Path $file), [Text.Encoding]::UTF8)
+          foreach ($token in @('FINDING_DEFINITIONS_JSON','CHECK_DESCRIPTIONS_JSON','SCORING_CONTEXT_JSON')) {
+            $js = $js.Replace(('{{' + $token + '}}'), '{}')
+          }
+          $js = $js.Replace('{{SCORING_DEFINITIONS}}','')
+          $check = Join-Path $env:RUNNER_TEMP 'adpeas-mig1-report-scripts.js'
+          [IO.File]::WriteAllText($check,$js,(New-Object Text.UTF8Encoding($false)))
+          & node --check $check
+          if ($LASTEXITCODE -ne 0) { throw 'JavaScript syntax check failed' }
+          Write-Host 'PASS: report JS parses without syntax errors'
       - name: Check syntax (Windows PowerShell 5.1)
         shell: powershell
         run: |
