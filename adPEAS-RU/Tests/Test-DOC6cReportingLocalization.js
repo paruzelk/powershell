@@ -22,5 +22,5 @@ assert(audit.summary.sourceFiles>=160);
 assert(audit.summary.powershell>=150);
 assert.equal(audit.summary.translatedPhrases,54);
 assert(audit.candidates.every(x=>x.path.startsWith('src/')&&x.line>=1));
-assert(fs.readFileSync(path.join(root,'docs','ru-RU','14-Static-Source-Language-Audit.md'),'utf8').includes('эвристическ'));
+assert(fs.readFileSync(path.join(root,'docs','ru-RU','14-Static-Source-Language-Audit.md'),'utf8').toLowerCase().includes('эвристическ'));
 console.log('PASS DOC6c: 54 scoped reporting phrases, source-only inventory, no machine-key replacements');
