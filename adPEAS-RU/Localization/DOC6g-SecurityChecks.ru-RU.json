@@ -1,0 +1,811 @@
+{
+  "schema": "adPEAS-RU.DOC6g.SecurityChecks.1",
+  "description": "Exact source-line translations in three AD security modules. Two NTAuth paragraphs are visible report messages. No changes to code, finding IDs, conditions, AD data or severity fields.",
+  "files": [
+    {
+      "path": "src/modules/Checks/Accounts/Get-PrivilegedGroupMembers.ps1",
+      "entries": [
+        {
+          "line": 61,
+          "original": "        Write-Log \"[Get-PrivilegedGroupMembers] Starting privileged group enumeration\"",
+          "target": "        Write-Log \"[Get-PrivilegedGroupMembers] Начато перечисление привилегированных групп\""
+        },
+        {
+          "line": 151,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] GC returned $($groups.Count) results - filtered to current domain\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] GC вернул $($groups.Count) результатов — выполнена фильтрация по текущему домену\""
+        },
+        {
+          "line": 157,
+          "original": "                Write-Log \"[Get-PrivilegedGroupMembers] GC returned $($groups.Count) results - using first\"",
+          "target": "                Write-Log \"[Get-PrivilegedGroupMembers] GC вернул $($groups.Count) результатов — используется первый\""
+        },
+        {
+          "line": 183,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers] Circular reference detected: $GroupDN\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers] Обнаружена циклическая ссылка: $GroupDN\""
+        },
+        {
+          "line": 199,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] Fetched nested group: $GroupName (DN: $GroupDN)\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] Получена вложенная группа: $GroupName (DN: $GroupDN)\""
+        },
+        {
+          "line": 201,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] Using pre-fetched group: $GroupName (DN: $GroupDN)\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] Используется уже полученная группа: $GroupName (DN: $GroupDN)\""
+        },
+        {
+          "line": 205,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] WARNING: Group not found by DN: $GroupDN\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] ПРЕДУПРЕЖДЕНИЕ: группа по DN не найдена: $GroupDN\""
+        },
+        {
+          "line": 211,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers] Group found: True, Member count: $memberCount\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers] Группа найдена: True, число участников: $memberCount\""
+        },
+        {
+          "line": 215,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] Group '$GroupName' has $($MemberDNs.Count) direct members (Nesting Level: $NestingLevel)\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] У группы '$GroupName' прямых участников: $($MemberDNs.Count) (уровень вложенности: $NestingLevel)\""
+        },
+        {
+          "line": 228,
+          "original": "                                Write-Log \"[Get-PrivilegedGroupMembers] Cross-domain member detected: $MemberDN - trying GC lookup\"",
+          "target": "                                Write-Log \"[Get-PrivilegedGroupMembers] Участник другого домена: $MemberDN — поиск через GC\""
+        },
+        {
+          "line": 237,
+          "original": "                                            Write-Log \"[Get-PrivilegedGroupMembers] GC resolved cross-domain member: $($Member.distinguishedName)\"",
+          "target": "                                            Write-Log \"[Get-PrivilegedGroupMembers] Участник другого домена определён через GC: $($Member.distinguishedName)\""
+        },
+        {
+          "line": 241,
+          "original": "                                    Write-Log \"[Get-PrivilegedGroupMembers] GC lookup failed for $MemberDN : $_\"",
+          "target": "                                    Write-Log \"[Get-PrivilegedGroupMembers] Ошибка поиска через GC для $MemberDN — $_\""
+        },
+        {
+          "line": 375,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers] Error resolving members for $GroupDN : $_\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers] Ошибка определения участников $GroupDN — $_\""
+        },
+        {
+          "line": 518,
+          "original": "                Write-Log \"[Get-PrivilegedGroupMembers] $primaryTotal account(s) hold a privileged group as their primary group\"",
+          "target": "                Write-Log \"[Get-PrivilegedGroupMembers] Учётных записей с привилегированной первичной группой: $primaryTotal\""
+        },
+        {
+          "line": 522,
+          "original": "                Write-Log \"[Get-PrivilegedGroupMembers] Primary group query failed: $($_.Exception.Message)\" -Level Warning",
+          "target": "                Write-Log \"[Get-PrivilegedGroupMembers] Ошибка запроса первичных групп: $($_.Exception.Message)\" -Level Warning"
+        },
+        {
+          "line": 530,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers] Checking group: $GroupNameEN (SID: $GroupSID)\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers] Проверка группы: $GroupNameEN (SID: $GroupSID)\""
+        },
+        {
+          "line": 538,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] Found group: $GroupName ($($Group.distinguishedName))\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] Группа найдена: $GroupName ($($Group.distinguishedName))\""
+        },
+        {
+          "line": 568,
+          "original": "                                Write-Log \"[Get-PrivilegedGroupMembers] $primaryDN is a listed and a primary-group member of $GroupName\"",
+          "target": "                                Write-Log \"[Get-PrivilegedGroupMembers] $primaryDN состоит в $GroupName как прямой участник и через первичную группу\""
+        },
+        {
+          "line": 598,
+          "original": "                            Write-Log \"[Get-PrivilegedGroupMembers] $GroupName - primary group member: $primaryDN\"",
+          "target": "                            Write-Log \"[Get-PrivilegedGroupMembers] $GroupName — участник через первичную группу: $primaryDN\""
+        },
+        {
+          "line": 607,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] $GroupName - Direct: $DirectMemberCount, Nested groups: $NestedGroupCount, Total: $TotalMemberCount\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] $GroupName — прямых участников: $DirectMemberCount, вложенных групп: $NestedGroupCount, всего: $TotalMemberCount\""
+        },
+        {
+          "line": 637,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] Group not found: $GroupNameEN (SID: $GroupSID)\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] Группа не найдена: $GroupNameEN (SID: $GroupSID)\""
+        },
+        {
+          "line": 640,
+          "original": "                    Write-Warning \"[Get-PrivilegedGroupMembers] Error checking group $GroupNameEN : $_\"",
+          "target": "                    Write-Warning \"[Get-PrivilegedGroupMembers] Ошибка проверки группы $GroupNameEN — $_\""
+        },
+        {
+          "line": 648,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers] Checking built-in group: $GroupNameEN (SID: $SID)\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers] Проверка встроенной группы: $GroupNameEN (SID: $SID)\""
+        },
+        {
+          "line": 655,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] Found built-in group: $GroupName ($($Group.distinguishedName))\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] Встроенная группа найдена: $GroupName ($($Group.distinguishedName))\""
+        },
+        {
+          "line": 670,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] $GroupName - Direct: $DirectMemberCount, Nested groups: $NestedGroupCount, Total: $TotalMemberCount\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] $GroupName — прямых участников: $DirectMemberCount, вложенных групп: $NestedGroupCount, всего: $TotalMemberCount\""
+        },
+        {
+          "line": 699,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] Built-in group not found: $GroupNameEN (SID: $SID)\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] Встроенная группа не найдена: $GroupNameEN (SID: $SID)\""
+        },
+        {
+          "line": 702,
+          "original": "                    Write-Warning \"[Get-PrivilegedGroupMembers] Error checking built-in group $GroupNameEN : $_\"",
+          "target": "                    Write-Warning \"[Get-PrivilegedGroupMembers] Ошибка проверки встроенной группы $GroupNameEN — $_\""
+        },
+        {
+          "line": 710,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers] Checking dynamic group: $GroupNameDynamic\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers] Проверка динамической группы: $GroupNameDynamic\""
+        },
+        {
+          "line": 717,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] Found dynamic group: $GroupName ($($Group.distinguishedName))\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] Динамическая группа найдена: $GroupName ($($Group.distinguishedName))\""
+        },
+        {
+          "line": 732,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] $GroupName - Direct: $DirectMemberCount, Nested groups: $NestedGroupCount, Total: $TotalMemberCount\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] $GroupName — прямых участников: $DirectMemberCount, вложенных групп: $NestedGroupCount, всего: $TotalMemberCount\""
+        },
+        {
+          "line": 761,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] Dynamic group not found: $GroupNameDynamic\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] Динамическая группа не найдена: $GroupNameDynamic\""
+        },
+        {
+          "line": 764,
+          "original": "                    Write-Warning \"[Get-PrivilegedGroupMembers] Error checking dynamic group $GroupNameDynamic : $_\"",
+          "target": "                    Write-Warning \"[Get-PrivilegedGroupMembers] Ошибка проверки динамической группы $GroupNameDynamic — $_\""
+        },
+        {
+          "line": 780,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers] Lookup of $exchangeGroupName failed: $_\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers] Поиск группы $exchangeGroupName не удался: $_\""
+        },
+        {
+          "line": 813,
+          "original": "                Write-Log \"[Get-PrivilegedGroupMembers] Counting member: $samName, ObjectClass: '$objClass'\"",
+          "target": "                Write-Log \"[Get-PrivilegedGroupMembers] Подсчёт участника: $samName, класс объекта: '$objClass'\""
+        },
+        {
+          "line": 818,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Counted as gMSA\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Учтён как gMSA\""
+        },
+        {
+          "line": 822,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Counted as dMSA\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Учтён как dMSA\""
+        },
+        {
+          "line": 827,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Counted as Computer\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Учтён как компьютер\""
+        },
+        {
+          "line": 836,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Counted as foreign principal\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Учтён как внешний субъект безопасности\""
+        },
+        {
+          "line": 841,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Counted as User\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Учтён как пользователь\""
+        },
+        {
+          "line": 847,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Counted as Computer ($ suffix fallback)\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Учтён как компьютер (резервный признак: суффикс $)\""
+        },
+        {
+          "line": 852,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Counted as User (default fallback, class was: '$objClass')\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers]   -> Учтён как пользователь (резервный вариант; исходный класс: '$objClass')\""
+        },
+        {
+          "line": 861,
+          "original": "            Write-Log \"[Get-PrivilegedGroupMembers] Count summary: Users=$UserCount, gMSAs=$gMSACount, Computers=$ComputerCount, Foreign=$ForeignCount\"",
+          "target": "            Write-Log \"[Get-PrivilegedGroupMembers] Сводка: пользователей=$UserCount, gMSA=$gMSACount, компьютеров=$ComputerCount, внешних=$ForeignCount\""
+        },
+        {
+          "line": 863,
+          "original": "            Write-Log \"[Get-PrivilegedGroupMembers] AllGroupData contains $TotalGroups groups:\"",
+          "target": "            Write-Log \"[Get-PrivilegedGroupMembers] В AllGroupData содержится групп: $TotalGroups\""
+        },
+        {
+          "line": 865,
+          "original": "                Write-Log \"[Get-PrivilegedGroupMembers]   - $($gd.GroupName) (Type: $($gd.GroupType), Members: $($gd.TotalMemberCount))\"",
+          "target": "                Write-Log \"[Get-PrivilegedGroupMembers]   - $($gd.GroupName) (тип: $($gd.GroupType), участников: $($gd.TotalMemberCount))\""
+        },
+        {
+          "line": 867,
+          "original": "            Write-Log \"[Get-PrivilegedGroupMembers] TotalUniqueMembers: $TotalMembers\"",
+          "target": "            Write-Log \"[Get-PrivilegedGroupMembers] Всего уникальных участников (TotalUniqueMembers): $TotalMembers\""
+        },
+        {
+          "line": 1021,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers] Using GC-resolved object for cross-domain member: $($BasicInfo.SAMAccountName)\"",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers] Используется объект другого домена, найденный через GC: $($BasicInfo.SAMAccountName)\""
+        },
+        {
+          "line": 1128,
+          "original": "                Write-Log \"[Get-PrivilegedGroupMembers] Primary-group query for the DC groups failed: $($_.Exception.Message)\" -Level Warning",
+          "target": "                Write-Log \"[Get-PrivilegedGroupMembers] Ошибка запроса первичных групп для групп DC: $($_.Exception.Message)\" -Level Warning"
+        },
+        {
+          "line": 1144,
+          "original": "                    Write-Log \"[Get-PrivilegedGroupMembers] Could not retrieve AdminSDHolder security descriptor\" -Level Error",
+          "target": "                    Write-Log \"[Get-PrivilegedGroupMembers] Не удалось получить дескриптор безопасности AdminSDHolder\" -Level Error"
+        },
+        {
+          "line": 1191,
+          "original": "                            Write-Log \"[Get-PrivilegedGroupMembers] Skipping inherit-only ACE on AdminSDHolder: Trustee=$TrusteeSID\"",
+          "target": "                            Write-Log \"[Get-PrivilegedGroupMembers] Пропущен ACE только для наследования в AdminSDHolder: субъект=$TrusteeSID\""
+        },
+        {
+          "line": 1343,
+          "original": "                            Write-Log \"[Get-PrivilegedGroupMembers] AdminSDHolder: $TrusteeSID holds only its default rights\"",
+          "target": "                            Write-Log \"[Get-PrivilegedGroupMembers] В AdminSDHolder у $TrusteeSID только права по умолчанию\""
+        },
+        {
+          "line": 1359,
+          "original": "                                Write-Log \"[Get-PrivilegedGroupMembers] AdminSDHolder expected: $TrusteeName - $($scopeResult.Reason)\"",
+          "target": "                                Write-Log \"[Get-PrivilegedGroupMembers] AdminSDHolder: ожидаемые права $TrusteeName — $($scopeResult.Reason)\""
+        },
+        {
+          "line": 1364,
+          "original": "                                Write-Log \"[Get-PrivilegedGroupMembers] AdminSDHolder attention: $TrusteeName - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)\"",
+          "target": "                                Write-Log \"[Get-PrivilegedGroupMembers] AdminSDHolder: требует внимания $TrusteeName — $($scopeResult.Reason); пропущено (для включения укажите -IncludePrivileged)\""
+        },
+        {
+          "line": 1373,
+          "original": "                            Write-Log \"[Get-PrivilegedGroupMembers] IncludePrivileged: Including AdminSDHolder $TrusteeName ($TrusteeSID) with severity $severity\"",
+          "target": "                            Write-Log \"[Get-PrivilegedGroupMembers] IncludePrivileged: участник AdminSDHolder $TrusteeName ($TrusteeSID) включён с критичностью $severity\""
+        },
+        {
+          "line": 1434,
+          "original": "                                Write-Log \"[Get-PrivilegedGroupMembers] Deny on AdminSDHolder that hides nothing: $aceSID $($ACE.ActiveDirectoryRights) $denyType\"",
+          "target": "                                Write-Log \"[Get-PrivilegedGroupMembers] Запрещающий ACE в AdminSDHolder, который ничего не скрывает: $aceSID $($ACE.ActiveDirectoryRights) $denyType\""
+        },
+        {
+          "line": 1474,
+          "original": "                        Write-Log \"[Get-PrivilegedGroupMembers] Could not read the AdminSDHolder owner: $_\"",
+          "target": "                        Write-Log \"[Get-PrivilegedGroupMembers] Не удалось прочитать владельца AdminSDHolder: $_\""
+        },
+        {
+          "line": 1509,
+          "original": "                Write-Log \"[Get-PrivilegedGroupMembers] Error checking AdminSDHolder: $_\" -Level Error",
+          "target": "                Write-Log \"[Get-PrivilegedGroupMembers] Ошибка проверки AdminSDHolder: $_\" -Level Error"
+        },
+        {
+          "line": 1531,
+          "original": "                Write-Log \"[Get-PrivilegedGroupMembers] Group ACL analysis failed: $_\" -Level Error",
+          "target": "                Write-Log \"[Get-PrivilegedGroupMembers] Ошибка анализа ACL групп: $_\" -Level Error"
+        },
+        {
+          "line": 1573,
+          "original": "                Write-Log \"[Get-PrivilegedGroupMembers] Account ACL analysis failed: $_\" -Level Error",
+          "target": "                Write-Log \"[Get-PrivilegedGroupMembers] Ошибка анализа ACL учётных записей: $_\" -Level Error"
+        },
+        {
+          "line": 1629,
+          "original": "                            Write-Log \"[Get-PrivilegedGroupMembers] Pre-Windows 2000 member could not be resolved to a SID: $MemberDN\" -Level Warning",
+          "target": "                            Write-Log \"[Get-PrivilegedGroupMembers] Не удалось определить SID участника Pre-Windows 2000 Compatible Access: $MemberDN\" -Level Warning"
+        },
+        {
+          "line": 1712,
+          "original": "                Write-Log \"[Get-PrivilegedGroupMembers] Error checking Pre-Windows 2000 Compatible Access: $_\" -Level Error",
+          "target": "                Write-Log \"[Get-PrivilegedGroupMembers] Ошибка проверки Pre-Windows 2000 Compatible Access: $_\" -Level Error"
+        },
+        {
+          "line": 1717,
+          "original": "            Write-Log \"[Get-PrivilegedGroupMembers] Error: $_\" -Level Error",
+          "target": "            Write-Log \"[Get-PrivilegedGroupMembers] Ошибка: $_\" -Level Error"
+        },
+        {
+          "line": 1723,
+          "original": "        Write-Log \"[Get-PrivilegedGroupMembers] Privileged group enumeration completed\"",
+          "target": "        Write-Log \"[Get-PrivilegedGroupMembers] Перечисление привилегированных групп завершено\""
+        },
+        {
+          "line": 1769,
+          "original": "        Write-Log \"[Get-PrivilegedGroupMembers] Could not read dsHeuristics for the AdminSDHolder exclusions: $_\"",
+          "target": "        Write-Log \"[Get-PrivilegedGroupMembers] Не удалось прочитать dsHeuristics для исключений AdminSDHolder: $_\""
+        },
+        {
+          "line": 1922,
+          "original": "            Write-Log \"[Get-PrivilegedGroupMembers] Could not read $($group.DistinguishedName): $_\"",
+          "target": "            Write-Log \"[Get-PrivilegedGroupMembers] Не удалось прочитать $($group.DistinguishedName): $_\""
+        },
+        {
+          "line": 1945,
+          "original": "            Write-Log \"[Get-PrivilegedGroupMembers] Could not parse the descriptor of $($group.DistinguishedName): $_\"",
+          "target": "            Write-Log \"[Get-PrivilegedGroupMembers] Не удалось разобрать дескриптор $($group.DistinguishedName): $_\""
+        },
+        {
+          "line": 2363,
+          "original": "            Write-Log \"[Get-PrivilegedGroupMembers] Could not read $($account.DistinguishedName): $_\"",
+          "target": "            Write-Log \"[Get-PrivilegedGroupMembers] Не удалось прочитать $($account.DistinguishedName): $_\""
+        },
+        {
+          "line": 2374,
+          "original": "            Write-Log \"[Get-PrivilegedGroupMembers] Could not parse the descriptor of $($account.DistinguishedName): $_\"",
+          "target": "            Write-Log \"[Get-PrivilegedGroupMembers] Не удалось разобрать дескриптор $($account.DistinguishedName): $_\""
+        }
+      ]
+    },
+    {
+      "path": "src/modules/Checks/Domain/Get-DomainInformation.ps1",
+      "entries": [
+        {
+          "line": 52,
+          "original": "        Write-Log \"[Get-DomainInformation] Starting domain enumeration\"",
+          "target": "        Write-Log \"[Get-DomainInformation] Начат сбор сведений о домене\""
+        },
+        {
+          "line": 86,
+          "original": "                Write-Log \"[Get-DomainInformation] NetBIOS name (from crossRef): $NetBIOSName\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Имя NetBIOS (из crossRef): $NetBIOSName\""
+        },
+        {
+          "line": 109,
+          "original": "                        Write-Log \"[Get-DomainInformation] NetBIOS name fallback (domain object name/DNS label): $NetBIOSName\"",
+          "target": "                        Write-Log \"[Get-DomainInformation] Резервное имя NetBIOS (имя объекта домена или метка DNS): $NetBIOSName\""
+        },
+        {
+          "line": 119,
+          "original": "                Write-Log \"[Get-DomainInformation] Error retrieving domain object: $_\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Ошибка получения объекта домена: $_\""
+        },
+        {
+          "line": 127,
+          "original": "                Write-Log \"[Get-DomainInformation] Checking for parent/child domains\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Проверка родительских и дочерних доменов\""
+        },
+        {
+          "line": 153,
+          "original": "                Write-Log \"[Get-DomainInformation] Error retrieving parent/child domains: $_\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Ошибка получения родительских и дочерних доменов: $_\""
+        },
+        {
+          "line": 159,
+          "original": "                Write-Log \"[Get-DomainInformation] Querying Domain Controllers with full details\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Запрос подробных сведений о контроллерах домена\""
+        },
+        {
+          "line": 170,
+          "original": "                Write-Log \"[Get-DomainInformation] Error retrieving domain controllers: $_\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Ошибка получения контроллеров домена: $_\""
+        },
+        {
+          "line": 179,
+          "original": "                Write-Log \"[Get-DomainInformation] Checking krbtgt account password age\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Проверка возраста пароля учётной записи krbtgt\""
+        },
+        {
+          "line": 192,
+          "original": "                    Write-Log \"[Get-DomainInformation] No domain SID in session - looking up krbtgt by name\"",
+          "target": "                    Write-Log \"[Get-DomainInformation] В сеансе отсутствует SID домена — поиск krbtgt по имени\""
+        },
+        {
+          "line": 231,
+          "original": "                Write-Log \"[Get-DomainInformation] Error retrieving krbtgt account: $_\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Ошибка получения учётной записи krbtgt: $_\""
+        },
+        {
+          "line": 239,
+          "original": "                Write-Log \"[Get-DomainInformation] Checking Guest account status\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Проверка состояния учётной записи Guest\""
+        },
+        {
+          "line": 243,
+          "original": "                Write-Log \"[Get-DomainInformation] Guest SID: $GuestSID\"",
+          "target": "                Write-Log \"[Get-DomainInformation] SID учётной записи Guest: $GuestSID\""
+        },
+        {
+          "line": 245,
+          "original": "                Write-Log \"[Get-DomainInformation] Found Guest accounts: $(@(Get-DomainUser -Identity $GuestSID @PSBoundParameters).Count)\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Найдено учётных записей Guest: $(@(Get-DomainUser -Identity $GuestSID @PSBoundParameters).Count)\""
+        },
+        {
+          "line": 264,
+          "original": "                    Write-Log \"[Get-DomainInformation] Guest IsPrivileged: $IsPrivileged\"",
+          "target": "                    Write-Log \"[Get-DomainInformation] Guest, статус IsPrivileged: $IsPrivileged\""
+        },
+        {
+          "line": 273,
+          "original": "                Write-Log \"[Get-DomainInformation] Error retrieving Guest account: $_\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Ошибка получения учётной записи Guest: $_\""
+        },
+        {
+          "line": 286,
+          "original": "                    Write-Log \"[Get-DomainInformation] Querying Sites and Subnets via LDAP from $sitesContainer\"",
+          "target": "                    Write-Log \"[Get-DomainInformation] Запрос сайтов и подсетей через LDAP из $sitesContainer\""
+        },
+        {
+          "line": 316,
+          "original": "                    Write-Log \"[Get-DomainInformation] Found $($Sites.Count) sites and $($Subnets.Count) subnets\"",
+          "target": "                    Write-Log \"[Get-DomainInformation] Найдено сайтов: $($Sites.Count), подсетей: $($Subnets.Count)\""
+        },
+        {
+          "line": 336,
+          "original": "                    Write-Log \"[Get-DomainInformation] DC-to-Site mapping completed\"",
+          "target": "                    Write-Log \"[Get-DomainInformation] Сопоставление контроллеров домена и сайтов завершено\""
+        },
+        {
+          "line": 338,
+          "original": "                    Write-Log \"[Get-DomainInformation] No ConfigurationNamingContext available - skipping Sites/Subnets\"",
+          "target": "                    Write-Log \"[Get-DomainInformation] Отсутствует ConfigurationNamingContext — проверка сайтов и подсетей пропущена\""
+        },
+        {
+          "line": 341,
+          "original": "                Write-Log \"[Get-DomainInformation] Error retrieving Sites/Subnets: $_\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Ошибка получения сайтов и подсетей: $_\""
+        },
+        {
+          "line": 599,
+          "original": "                Write-Log \"[Get-DomainInformation] Failed to query DC currentTime: $_\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Не удалось запросить currentTime контроллера домена: $_\""
+        },
+        {
+          "line": 659,
+          "original": "                        Write-Log \"[Get-DomainInformation] Guest severity: Finding (enabled + privileged)\"",
+          "target": "                        Write-Log \"[Get-DomainInformation] Критичность Guest: Finding (включён и привилегирован)\""
+        },
+        {
+          "line": 662,
+          "original": "                        Write-Log \"[Get-DomainInformation] Guest severity: Hint (enabled but not privileged)\"",
+          "target": "                        Write-Log \"[Get-DomainInformation] Критичность Guest: Hint (включён, но не привилегирован)\""
+        },
+        {
+          "line": 666,
+          "original": "                    Write-Log \"[Get-DomainInformation] Guest severity: Secure (disabled)\"",
+          "target": "                    Write-Log \"[Get-DomainInformation] Критичность Guest: Secure (отключён)\""
+        },
+        {
+          "line": 701,
+          "original": "                Write-Log \"[Get-DomainInformation] Querying FSMO role holders\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Запрос владельцев ролей FSMO\""
+        },
+        {
+          "line": 706,
+          "original": "                    Write-Log \"[Get-DomainInformation] PDC Emulator: $PdcFSMO\"",
+          "target": "                    Write-Log \"[Get-DomainInformation] Эмулятор PDC: $PdcFSMO\""
+        },
+        {
+          "line": 746,
+          "original": "                Write-Log \"[Get-DomainInformation] FSMO role mapping complete: $($FSMOByDC.Count) DCs have FSMO roles\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Сопоставление ролей FSMO завершено: контроллеров с ролями FSMO — $($FSMOByDC.Count)\""
+        },
+        {
+          "line": 748,
+          "original": "                Write-Log \"[Get-DomainInformation] Error querying FSMO roles: $_\"",
+          "target": "                Write-Log \"[Get-DomainInformation] Ошибка запроса ролей FSMO: $_\""
+        },
+        {
+          "line": 823,
+          "original": "            Write-Log \"[Get-DomainInformation] Error: $_\" -Level Error",
+          "target": "            Write-Log \"[Get-DomainInformation] Ошибка: $_\" -Level Error"
+        },
+        {
+          "line": 829,
+          "original": "        Write-Log \"[Get-DomainInformation] Domain enumeration completed\"",
+          "target": "        Write-Log \"[Get-DomainInformation] Сбор сведений о домене завершён\""
+        },
+        {
+          "line": 896,
+          "original": "        Write-Log \"[Get-DomainInformation] Could not read the tombstone lifetime: $_\"",
+          "target": "        Write-Log \"[Get-DomainInformation] Не удалось прочитать срок хранения удалённых объектов (tombstone lifetime): $_\""
+        },
+        {
+          "line": 907,
+          "original": "        Write-Log \"[Get-DomainInformation] Could not read the enabled optional features: $_\"",
+          "target": "        Write-Log \"[Get-DomainInformation] Не удалось прочитать включённые дополнительные возможности: $_\""
+        },
+        {
+          "line": 956,
+          "original": "        Write-Log \"[Get-DomainInformation] Could not read the FRS replica set of SYSVOL: $_\"",
+          "target": "        Write-Log \"[Get-DomainInformation] Не удалось прочитать набор реплик FRS для SYSVOL: $_\""
+        },
+        {
+          "line": 962,
+          "original": "        Write-Log \"[Get-DomainInformation] Could not read the DFSR replication group of SYSVOL: $_\"",
+          "target": "        Write-Log \"[Get-DomainInformation] Не удалось прочитать группу репликации DFSR для SYSVOL: $_\""
+        },
+        {
+          "line": 1020,
+          "original": "            Write-Log \"[Get-DomainKerberosPolicy] GPO linkage could not be resolved\"",
+          "target": "            Write-Log \"[Get-DomainKerberosPolicy] Не удалось определить привязку GPO\""
+        },
+        {
+          "line": 1064,
+          "original": "            Write-Log \"[Get-DomainKerberosPolicy] SYSVOL could not be read\"",
+          "target": "            Write-Log \"[Get-DomainKerberosPolicy] Не удалось прочитать SYSVOL\""
+        },
+        {
+          "line": 1082,
+          "original": "        Write-Log \"[Get-DomainKerberosPolicy] Error: $_\"",
+          "target": "        Write-Log \"[Get-DomainKerberosPolicy] Ошибка: $_\""
+        }
+      ]
+    },
+    {
+      "path": "src/modules/Checks/ADCS/Get-ADCSVulnerabilities.ps1",
+      "entries": [
+        {
+          "line": 119,
+          "original": "                Write-Log \"[Get-EnrollmentPrivilegeState] Checking: $principalName (SID: $principalSID, using: $identity)\"",
+          "target": "                Write-Log \"[Get-EnrollmentPrivilegeState] Проверка субъекта: $principalName (SID: $principalSID, используется: $identity)\""
+        },
+        {
+          "line": 127,
+          "original": "                    Write-Log \"[Get-EnrollmentPrivilegeState] Found non-privileged: $principalName (Category: $($result.Category), Reason: $($result.Reason))\"",
+          "target": "                    Write-Log \"[Get-EnrollmentPrivilegeState] Найден непривилегированный субъект: $principalName (категория: $($result.Category), причина: $($result.Reason))\""
+        },
+        {
+          "line": 131,
+          "original": "                Write-Log \"[Get-EnrollmentPrivilegeState] Privileged: $principalName (Category: $($result.Category))\"",
+          "target": "                Write-Log \"[Get-EnrollmentPrivilegeState] Привилегированный субъект: $principalName (категория: $($result.Category))\""
+        },
+        {
+          "line": 135,
+          "original": "            Write-Log \"[Get-EnrollmentPrivilegeState] All enrollment principals are truly privileged\"",
+          "target": "            Write-Log \"[Get-EnrollmentPrivilegeState] Все субъекты с правом регистрации сертификатов действительно привилегированы\""
+        },
+        {
+          "line": 205,
+          "original": "                Write-Log \"[Get-ADCSVulnerabilities] Error querying Root CAs: $_\" -Level Warning",
+          "target": "                Write-Log \"[Get-ADCSVulnerabilities] Ошибка запроса корневых УЦ: $_\" -Level Warning"
+        },
+        {
+          "line": 285,
+          "original": "                            Show-Line (\"$($ntAuthIssuers.Count) different CAs are trusted to issue a certificate that logs \" +",
+          "target": "                            Show-Line (\"$($ntAuthIssuers.Count) различных УЦ могут выдавать сертификаты для входа \" +"
+        },
+        {
+          "line": 286,
+          "original": "                                       \"on as any account - each one is a trust anchor for the whole forest\") -Class Hint",
+          "target": "                                       \"от имени любой учётной записи — каждый из них является якорем доверия всего леса\") -Class Hint"
+        },
+        {
+          "line": 289,
+          "original": "                            Show-Line (\"$foreignCount NTAuth certificate(s) belong to no Enterprise CA of this forest - \" +",
+          "target": "                            Show-Line (\"$foreignCount сертификатов NTAuth не относятся ни к одному корпоративному УЦ этого леса — \" +"
+        },
+        {
+          "line": 290,
+          "original": "                                       \"verify each was added on purpose, and who holds its key\") -Class Hint -FindingId 'NTAUTH_FOREIGN_ISSUER'",
+          "target": "                                       \"проверьте обоснованность их добавления и владельцев закрытых ключей\") -Class Hint -FindingId 'NTAUTH_FOREIGN_ISSUER'"
+        },
+        {
+          "line": 310,
+          "original": "                Write-Log \"[Get-ADCSVulnerabilities] Error querying NTAuth Store: $_\" -Level Warning",
+          "target": "                Write-Log \"[Get-ADCSVulnerabilities] Ошибка запроса хранилища NTAuth: $_\" -Level Warning"
+        },
+        {
+          "line": 346,
+          "original": "                Write-Log \"[Get-ADCSVulnerabilities] Error querying AIA CAs: $_\" -Level Warning",
+          "target": "                Write-Log \"[Get-ADCSVulnerabilities] Ошибка запроса УЦ AIA: $_\" -Level Warning"
+        },
+        {
+          "line": 355,
+          "original": "                Write-Log \"[Get-ADCSVulnerabilities] CA query failed: $($queryError.ErrorMessage)\"",
+          "target": "                Write-Log \"[Get-ADCSVulnerabilities] Не удалось запросить УЦ: $($queryError.ErrorMessage)\""
+        },
+        {
+          "line": 393,
+          "original": "                            Write-Log \"[Get-ADCSVulnerabilities] Skipping HTTP check for $($ca.DNSHostName) - CA server inactive\"",
+          "target": "                            Write-Log \"[Get-ADCSVulnerabilities] HTTP-проверка для $($ca.DNSHostName) пропущена — сервер УЦ неактивен\""
+        },
+        {
+          "line": 400,
+          "original": "                        Write-Log \"[Get-ADCSVulnerabilities] Checking web enrollment for $($ca.DNSHostName) (CA: $($ca.Name))...\"",
+          "target": "                        Write-Log \"[Get-ADCSVulnerabilities] Проверка веб-регистрации для $($ca.DNSHostName) (УЦ: $($ca.Name))...\""
+        },
+        {
+          "line": 407,
+          "original": "                                Write-Log \"[Get-ADCSVulnerabilities] Web enrollment check successful for $($ca.DNSHostName)\"",
+          "target": "                                Write-Log \"[Get-ADCSVulnerabilities] Проверка веб-регистрации для $($ca.DNSHostName) успешна\""
+        },
+        {
+          "line": 409,
+          "original": "                                    Write-Log \"[Get-ADCSVulnerabilities] EPA detection: Enabled=$($webEnrollmentResult.EPAEnabled), Confidence=$($webEnrollmentResult.EPAConfidence)\"",
+          "target": "                                    Write-Log \"[Get-ADCSVulnerabilities] Определение EPA: включено=$($webEnrollmentResult.EPAEnabled), достоверность=$($webEnrollmentResult.EPAConfidence)\""
+        },
+        {
+          "line": 414,
+          "original": "                            Write-Log \"[Get-ADCSVulnerabilities] Web enrollment check failed: $_\"",
+          "target": "                            Write-Log \"[Get-ADCSVulnerabilities] Не удалось проверить веб-регистрацию: $_\""
+        },
+        {
+          "line": 524,
+          "original": "                                Write-Log \"[Get-ADCSVulnerabilities] Expected identity $aceSID has $aceRights on CA $($ca.Name)\"",
+          "target": "                                Write-Log \"[Get-ADCSVulnerabilities] Ожидаемый субъект $aceSID имеет права $aceRights на УЦ $($ca.Name)\""
+        },
+        {
+          "line": 532,
+          "original": "                                Write-Log \"[Get-ADCSVulnerabilities] Privileged identity $identityName ($($privCheck.Category): $($privCheck.Reason)) has $aceRights on CA $($ca.Name) - expected\"",
+          "target": "                                Write-Log \"[Get-ADCSVulnerabilities] Привилегированный субъект $identityName ($($privCheck.Category): $($privCheck.Reason)) имеет ожидаемые права $aceRights на УЦ $($ca.Name)\""
+        },
+        {
+          "line": 541,
+          "original": "                                    Write-Log \"[Get-ADCSVulnerabilities] CA server $caComputerName has $aceRights on its own AD object - expected\"",
+          "target": "                                    Write-Log \"[Get-ADCSVulnerabilities] Сервер УЦ $caComputerName имеет ожидаемые права $aceRights на собственный объект AD\""
+        },
+        {
+          "line": 557,
+          "original": "                    Write-Log \"[Get-ADCSVulnerabilities] CA AD object ACL check failed for '$($ca.Name)': $_\"",
+          "target": "                    Write-Log \"[Get-ADCSVulnerabilities] Не удалось проверить ACL объекта УЦ '$($ca.Name)' в AD: $_\""
+        },
+        {
+          "line": 712,
+          "original": "                                Write-Log \"[Get-ADCSVulnerabilities] CA '$($ca.Name)' uses weak signature algorithm: $($caCert.SignatureAlgorithm)\"",
+          "target": "                                Write-Log \"[Get-ADCSVulnerabilities] УЦ '$($ca.Name)' использует слабый алгоритм подписи: $($caCert.SignatureAlgorithm)\""
+        },
+        {
+          "line": 719,
+          "original": "                                Write-Log \"[Get-ADCSVulnerabilities] CA '$($ca.Name)' uses short key: $($caCert.PublicKeyLength) bit\"",
+          "target": "                                Write-Log \"[Get-ADCSVulnerabilities] УЦ '$($ca.Name)' использует короткий ключ: $($caCert.PublicKeyLength) бит\""
+        },
+        {
+          "line": 726,
+          "original": "                                Write-Log \"[Get-ADCSVulnerabilities] CA '$($ca.Name)' certificate is EXPIRED\"",
+          "target": "                                Write-Log \"[Get-ADCSVulnerabilities] Срок сертификата УЦ '$($ca.Name)' ИСТЁК\""
+        },
+        {
+          "line": 754,
+          "original": "                        Write-Log \"[Get-ADCSVulnerabilities] CA computer '$($ca.DNSHostName)' not found in current domain - using Configuration Partition data\"",
+          "target": "                        Write-Log \"[Get-ADCSVulnerabilities] Компьютер УЦ '$($ca.DNSHostName)' не найден в текущем домене — используются данные Configuration\""
+        },
+        {
+          "line": 945,
+          "original": "                    Write-Log \"[Get-ADCSVulnerabilities] ESC5: Checking $($container.Name)...\"",
+          "target": "                    Write-Log \"[Get-ADCSVulnerabilities] ESC5: проверка $($container.Name)...\""
+        },
+        {
+          "line": 1038,
+          "original": "                                            Write-Log \"[Get-ADCSVulnerabilities] Expected identity $aceSID has $aceRights on $($container.Name)\"",
+          "target": "                                            Write-Log \"[Get-ADCSVulnerabilities] Ожидаемый субъект $aceSID имеет права $aceRights на $($container.Name)\""
+        },
+        {
+          "line": 1043,
+          "original": "                                            Write-Log \"[Get-ADCSVulnerabilities] Privileged identity $aceSID has $aceRights on $($container.Name) - skipped (use -IncludePrivileged to include)\"",
+          "target": "                                            Write-Log \"[Get-ADCSVulnerabilities] Привилегированный субъект $aceSID обладает правами $aceRights на $($container.Name) — пропущен (для включения укажите -IncludePrivileged)\""
+        },
+        {
+          "line": 1052,
+          "original": "                                        Write-Log \"[Get-ADCSVulnerabilities] IncludePrivileged: Including $aceSID with severity $severity\"",
+          "target": "                                        Write-Log \"[Get-ADCSVulnerabilities] IncludePrivileged: субъект $aceSID включён с критичностью $severity\""
+        },
+        {
+          "line": 1078,
+          "original": "                                Write-Log \"[Get-ADCSVulnerabilities] ESC5: Owner of $($container.Name) could not be read: $_\"",
+          "target": "                                Write-Log \"[Get-ADCSVulnerabilities] ESC5: не удалось прочитать владельца $($container.Name): $_\""
+        },
+        {
+          "line": 1094,
+          "original": "                                    Write-Log \"[Get-ADCSVulnerabilities] ESC5: $($container.Name) is owned by $containerOwnerSID, which the PKIContainer scope expects\"",
+          "target": "                                    Write-Log \"[Get-ADCSVulnerabilities] ESC5: владелец $($container.Name) — $containerOwnerSID, что соответствует правилам области PKIContainer\""
+        },
+        {
+          "line": 1100,
+          "original": "                        Write-Log \"[Get-ADCSVulnerabilities] Error checking $($container.Name): $_\" -Level Warning",
+          "target": "                        Write-Log \"[Get-ADCSVulnerabilities] Ошибка проверки $($container.Name): $_\" -Level Warning"
+        },
+        {
+          "line": 1160,
+          "original": "                Write-Log \"[Get-ADCSVulnerabilities] Error during ESC5 check: $_\" -Level Warning",
+          "target": "                Write-Log \"[Get-ADCSVulnerabilities] Ошибка проверки ESC5: $_\" -Level Warning"
+        },
+        {
+          "line": 1171,
+          "original": "                Write-Log \"[Get-ADCSVulnerabilities] Template query failed: $($templateQueryError.ErrorMessage)\"",
+          "target": "                Write-Log \"[Get-ADCSVulnerabilities] Не удалось запросить шаблоны: $($templateQueryError.ErrorMessage)\""
+        },
+        {
+          "line": 1218,
+          "original": "                    Write-Log \"[Get-ADCSVulnerabilities] ESC13 cache: Found $($oidToGroupLink.Count) issuance policy OID(s) with group links\"",
+          "target": "                    Write-Log \"[Get-ADCSVulnerabilities] Кэш ESC13: найдено политик выдачи с OID и привязкой к группам — $($oidToGroupLink.Count)\""
+        },
+        {
+          "line": 1222,
+          "original": "                Write-Log \"[Get-ADCSVulnerabilities] ESC13: Error loading issuance policy cache: $_\" -Level Warning",
+          "target": "                Write-Log \"[Get-ADCSVulnerabilities] ESC13: ошибка загрузки кэша политик выдачи: $_\" -Level Warning"
+        },
+        {
+          "line": 1257,
+          "original": "                Write-Log \"[Get-ADCSVulnerabilities] ESC3 chain: $(@($agentTemplateNames).Count) enrollment agent template(s) enrollable by non-privileged principals: $($agentTemplateNames -join ', ')\"",
+          "target": "                Write-Log \"[Get-ADCSVulnerabilities] Цепочка ESC3: шаблонов агента регистрации, доступных непривилегированным субъектам — $(@($agentTemplateNames).Count): $($agentTemplateNames -join ', ')\""
+        },
+        {
+          "line": 1277,
+          "original": "                Write-Log \"[Get-ADCSVulnerabilities] Prefetched $($templateDescriptors.Count) template security descriptor(s) in one query\"",
+          "target": "                Write-Log \"[Get-ADCSVulnerabilities] Дескрипторов безопасности шаблонов, предварительно полученных одним запросом: $($templateDescriptors.Count)\""
+        },
+        {
+          "line": 1280,
+          "original": "                Write-Log \"[Get-ADCSVulnerabilities] Template descriptor prefetch failed, falling back to one read per template: $_\" -Level Warning",
+          "target": "                Write-Log \"[Get-ADCSVulnerabilities] Не удалось предварительно получить дескрипторы шаблонов; переход к отдельным запросам: $_\" -Level Warning"
+        },
+        {
+          "line": 1309,
+          "original": "                    Write-Log \"[Get-ADCSVulnerabilities] Template '$($template.Name)': All enrollment principals are truly privileged - skipping ESC1/2/3/9/15\"",
+          "target": "                    Write-Log \"[Get-ADCSVulnerabilities] Шаблон '$($template.Name)': все субъекты регистрации привилегированы — ESC1/2/3/9/15 пропущены\""
+        },
+        {
+          "line": 1311,
+          "original": "                    Write-Log \"[Get-ADCSVulnerabilities] Template '$($template.Name)': no principal holds Certificate-Enrollment - skipping ESC1/2/3/9/15\"",
+          "target": "                    Write-Log \"[Get-ADCSVulnerabilities] Шаблон '$($template.Name)': нет субъекта с правом Certificate-Enrollment — ESC1/2/3/9/15 пропущены\""
+        },
+        {
+          "line": 1313,
+          "original": "                    Write-Log \"[Get-ADCSVulnerabilities] Template '$($template.Name)': enrollment rights could not be read - ESC1/2/3/9/15 cannot be decided\" -Level Warning",
+          "target": "                    Write-Log \"[Get-ADCSVulnerabilities] Шаблон '$($template.Name)': не удалось прочитать права регистрации — невозможно оценить ESC1/2/3/9/15\" -Level Warning"
+        },
+        {
+          "line": 1545,
+          "original": "                                    Write-Log \"[Get-ADCSVulnerabilities] Expected identity $aceSID has $aceRights on template $($template.Name)\"",
+          "target": "                                    Write-Log \"[Get-ADCSVulnerabilities] Ожидаемый субъект $aceSID имеет права $aceRights на шаблон $($template.Name)\""
+        },
+        {
+          "line": 1551,
+          "original": "                                    Write-Log \"[Get-ADCSVulnerabilities] Privileged identity $aceSID (member of admin group) has $aceRights on template $($template.Name) - skipped (use -IncludePrivileged to include)\"",
+          "target": "                                    Write-Log \"[Get-ADCSVulnerabilities] Привилегированный субъект $aceSID (участник группы администраторов) обладает правами $aceRights на шаблон $($template.Name) — пропущен (для включения укажите -IncludePrivileged)\""
+        },
+        {
+          "line": 1562,
+          "original": "                                Write-Log \"[Get-ADCSVulnerabilities] IncludePrivileged: Including $identityName ($aceSID) with severity $severity\"",
+          "target": "                                Write-Log \"[Get-ADCSVulnerabilities] IncludePrivileged: субъект $identityName ($aceSID) включён с критичностью $severity\""
+        },
+        {
+          "line": 1586,
+          "original": "                            Write-Log \"[Get-ADCSVulnerabilities] ESC4: Owner of template '$($template.Name)' could not be read: $_\"",
+          "target": "                            Write-Log \"[Get-ADCSVulnerabilities] ESC4: не удалось прочитать владельца шаблона '$($template.Name)': $_\""
+        },
+        {
+          "line": 1602,
+          "original": "                                Write-Log \"[Get-ADCSVulnerabilities] ESC4: Template '$($template.Name)' is owned by $templateOwnerSID, which the ADCSTemplateWrite scope expects\"",
+          "target": "                                Write-Log \"[Get-ADCSVulnerabilities] ESC4: владелец шаблона '$($template.Name)' — $templateOwnerSID, что соответствует правилам области ADCSTemplateWrite\""
+        },
+        {
+          "line": 1620,
+          "original": "                            Write-Log \"[Get-ADCSVulnerabilities] ESC4: Template '$($template.Name)' has dangerous permissions for: $identities\"",
+          "target": "                            Write-Log \"[Get-ADCSVulnerabilities] ESC4: обнаружены опасные права на шаблон '$($template.Name)' у субъектов: $identities\""
+        },
+        {
+          "line": 1625,
+          "original": "                    Write-Log \"[Get-ADCSVulnerabilities] ESC4 check failed for template '$($template.Name)': $_\"",
+          "target": "                    Write-Log \"[Get-ADCSVulnerabilities] Ошибка проверки ESC4 для шаблона '$($template.Name)': $_\""
+        },
+        {
+          "line": 1684,
+          "original": "                                Write-Log \"[Get-ADCSVulnerabilities] ESC13: Error resolving group '$($linkInfo.GroupLinkDN)': $_\" -Level Debug",
+          "target": "                                Write-Log \"[Get-ADCSVulnerabilities] ESC13: не удалось определить группу '$($linkInfo.GroupLinkDN)': $_\" -Level Debug"
+        },
+        {
+          "line": 1696,
+          "original": "                            Write-Log \"[Get-ADCSVulnerabilities] ESC13: Template '$($template.Name)' - Policy '$($linkInfo.PolicyName)' linked to group '$groupName'\"",
+          "target": "                            Write-Log \"[Get-ADCSVulnerabilities] ESC13: шаблон '$($template.Name)' — политика '$($linkInfo.PolicyName)' связана с группой '$groupName'\""
+        },
+        {
+          "line": 1828,
+          "original": "            Write-Log \"[Get-ADCSVulnerabilities] Error: $_\" -Level Error",
+          "target": "            Write-Log \"[Get-ADCSVulnerabilities] Ошибка: $_\" -Level Error"
+        },
+        {
+          "line": 1834,
+          "original": "        Write-Log \"[Get-ADCSVulnerabilities] AD CS vulnerability scan complete\"",
+          "target": "        Write-Log \"[Get-ADCSVulnerabilities] Проверка уязвимостей AD CS завершена\""
+        }
+      ]
+    }
+  ]
+}
