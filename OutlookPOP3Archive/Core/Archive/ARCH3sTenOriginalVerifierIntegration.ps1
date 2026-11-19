@@ -82,7 +82,9 @@ function Invoke-OPA265ARCH3sTen {
     $temp=[IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd([char]92,[char]47)+[IO.Path]::DirectorySeparatorChar
     $base=[IO.Path]::GetFullPath($SyntheticTempRoot)
     if(-not $base.EndsWith([IO.Path]::DirectorySeparatorChar)){$base += [IO.Path]::DirectorySeparatorChar}
-    if(-not $base.StartsWith($temp,[StringComparison]::OrdinalIgnoreCase) -or
+    $isOsTemp=([string]::Equals($base.TrimEnd([char]92,[char]47),
+        $temp.TrimEnd([char]92,[char]47),[StringComparison]::OrdinalIgnoreCase))
+    if(-not ($isOsTemp -or $base.StartsWith($temp,[StringComparison]::OrdinalIgnoreCase)) -or
        -not [IO.Directory]::Exists($base) -or
        (([IO.File]::GetAttributes($base) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
         throw 'ARCH3s requires pre-existing OS TEMP subdirectory, never real PST paths.'
