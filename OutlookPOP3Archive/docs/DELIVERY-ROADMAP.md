@@ -1,5 +1,9 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+
+> **ARCH3u (2026-11-19):** оператор подтвердил успешное ARCH3t восстановление 2→10/10 и повторный Recover без записи (оригинальный journal SHA неизменен). [Новый read-only реальный тестовый batch-10 preflight](2.6.5-arch3u-real-test-pst-ten-readonly-preflight.md): исходный POP3 Outlook Inbox, original selector и индекс, следующая свободная годовая часть PST, original ARCH3b MailMover контракт, точный повторный просмотр 10 EntryID/Parent/Date. Никакого full semantic seal/Intent/Claim, PST/Index/Journal writer или Move. Отдельный ARCH3v для evidence-only full witnesses/Intent; Archive/Resume/Auto и 90GB production закрыты.
+
+
 > **ARCH3t (2026-11-19):** [strict OS TEMP-only original DuplicateIndex index-only recovery after 10 Reconciled/2 Indexed](2.6.5-arch3t-synthetic-index-only-recovery.md). Original journal SHA and partial index SHA pinned from independent Audit; raw JSONL duplicates/conflicts/torn tail rejected, original fake Outlook ArchiveVerifier rerun, exclusive TEMP lease, only missing original Add-OPADuplicateEntry followed by readback, idempotent no-op. Partial 3/10 Reconciled rejected. No PST/COM/Move; next separate live TEST-PST batch-10. ProductionReady=False.
 
 
