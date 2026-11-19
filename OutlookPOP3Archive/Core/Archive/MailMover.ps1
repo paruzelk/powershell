@@ -434,7 +434,10 @@ function Get-OPAArchiveDestination {
         # API, accepted with an independently validated ARCH3d fake scope.
         [object]$ARCH3mSyntheticPart2Scope,
         [object]$ARCH3mSyntheticCandidate,
-        [object[]]$ARCH3mSyntheticExistingParts
+        [object[]]$ARCH3mSyntheticExistingParts,
+        # ARCH3n optional read-only ORIGINAL real Intent binding; only used
+        # after existing ARCH3m fake TEMP checks, NEVER grants a real writer.
+        [object]$ARCH3nSyntheticRealIntentBinding
     )
 
     $year = $ReceivedTime.Year
@@ -448,6 +451,10 @@ function Get-OPAArchiveDestination {
         # boundary. Revalidate here to reject direct unsafe callers.
         . (Join-Path $PSScriptRoot 'ARCH3mOriginalPart2PreAllocation.ps1')
         $plan=Assert-OPA265ARCH3mSyntheticPreAllocation -Namespace $Namespace -Transaction $Transaction -Scope $ARCH3mSyntheticPart2Scope -Candidate $ARCH3mSyntheticCandidate -ExistingArchiveParts @($ARCH3mSyntheticExistingParts) -SourcePst $SourcePst -ReceivedTime $ReceivedTime -SourceFolderName $SourceFolderName -SourceFolderPath $SourceFolderPath -AccountEmail $AccountEmail
+        if($null -ne $ARCH3nSyntheticRealIntentBinding){
+            . (Join-Path $PSScriptRoot 'ARCH3nPinnedRealIntentBridge.ps1')
+            [void](Assert-OPA265ARCH3nSyntheticRealIntentBridge -RealPlan $ARCH3nSyntheticRealIntentBinding -SyntheticPreAllocation $plan -SyntheticCandidate $ARCH3mSyntheticCandidate)
+        }
         $estimate=[double]$ItemSize * [double]$script:OPAArchiveGrowthRatioDefault
         if($estimate -gt [double]$safeBytes){
             throw 'ARCH3m original synthetic Part2 size would exceed safe capacity.'
@@ -468,6 +475,10 @@ function Get-OPAArchiveDestination {
         $dest=[pscustomobject]@{Store=$store;Folder=$folder;Path=$forcedPath;Year=2020;Part=2}
         [void](Assert-OPA265ARCH3lSyntheticPart2 -Scope $ARCH3mSyntheticPart2Scope -Transaction $Transaction -Candidate $ARCH3mSyntheticCandidate -ExistingArchiveParts @($ARCH3mSyntheticExistingParts) -Stage DestinationReady -Destination $dest)
         return $dest
+    }
+
+    if($null -ne $ARCH3nSyntheticRealIntentBinding){
+        throw 'ARCH3n real intent binding cannot reach the generic original live archive selection path.'
     }
 
     # A persisted transaction can reference an archive part that was moved or
