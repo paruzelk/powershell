@@ -47,10 +47,14 @@ jobs:
           $new = @(Get-ChildItem '_mig\new' -Directory)
           python adPEAS-RU/Migration/v2.11.0/Build-MIG2Preview.py --old $old[0].FullName --new $new[0].FullName --ru adPEAS-RU --candidate _mig/candidate --report _mig/2.11.0-mig2-coverage.json
           if ($LASTEXITCODE -ne 0) { throw 'MIG2 source-witness verification failed' }
-          $sourceHash = (Get-FileHash (Join-Path $new[0].FullName 'src\modules\Core\adPEAS-FindingDefinitions.ps1') -Algorithm SHA256).Hash
-          $candidateHash = (Get-FileHash '_mig\candidate\src\modules\Core\adPEAS-FindingDefinitions.ps1' -Algorithm SHA256).Hash
-          if ($sourceHash -ne $candidateHash) { throw 'Canonical finding definitions were modified!' }
-          Write-Host 'PASS: upstream finding definitions preserved byte for byte'
+          # MIG1 normalizes UTF-8 BOM and Windows newline endings. Compare logical source,
+          # not raw bytes, while forbidding any modifications to the PS definitions.
+          $sourceText = [IO.File]::ReadAllText((Join-Path $new[0].FullName 'src\modules\Core\adPEAS-FindingDefinitions.ps1'), [Text.Encoding]::UTF8)
+          $candidateText = [IO.File]::ReadAllText((Resolve-Path '_mig\candidate\src\modules\Core\adPEAS-FindingDefinitions.ps1'), [Text.Encoding]::UTF8)
+          $sourceNorm = ($sourceText.TrimStart([char]0xFEFF) -replace "`r`n", "`n")
+          $candidateNorm = ($candidateText.TrimStart([char]0xFEFF) -replace "`r`n", "`n")
+          if ($sourceNorm -cne $candidateNorm) { throw 'Canonical finding definitions were modified!' }
+          Write-Host 'PASS: upstream finding definitions preserved (normalizing BOM and line endings)'
       - name: Check generated JavaScript syntax
         shell: powershell
         run: |
