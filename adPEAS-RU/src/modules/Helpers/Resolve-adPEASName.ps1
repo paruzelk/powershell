@@ -175,7 +175,7 @@ function Invoke-RawDnsQuery {
             $labelBytes = [System.Text.Encoding]::ASCII.GetBytes($label)
             # RFC 1035: Each label is limited to 63 octets
             if ($labelBytes.Length -gt 63) {
-                Write-Log "[Invoke-RawDnsQuery] Label exceeds 63 bytes limit: $label"
+                Write-Log "[Invoke-RawDnsQuery] Метка DNS превышает предел 63 байта: $label"
                 return $null
             }
             $qname.Add([byte]$labelBytes.Length)
@@ -214,27 +214,27 @@ function Invoke-RawDnsQuery {
 
         # Parse response
         if ($response.Length -lt 12) {
-            Write-Log "[Invoke-RawDnsQuery] Response too short: $($response.Length) bytes"
+            Write-Log "[Invoke-RawDnsQuery] Слишком короткий ответ DNS: $($response.Length) байт"
             return $null
         }
 
         # Check transaction ID matches
         if ($response[0] -ne $transactionId[0] -or $response[1] -ne $transactionId[1]) {
-            Write-Log "[Invoke-RawDnsQuery] Transaction ID mismatch"
+            Write-Log "[Invoke-RawDnsQuery] Несовпадение идентификатора транзакции"
             return $null
         }
 
         # Check for errors (RCODE in lower 4 bits of byte 3)
         $rcode = $response[3] -band 0x0F
         if ($rcode -ne 0) {
-            Write-Log "[Invoke-RawDnsQuery] DNS error, RCODE: $rcode"
+            Write-Log "[Invoke-RawDnsQuery] Ошибка DNS, код RCODE: $rcode"
             return $null
         }
 
         # Get answer count (bytes 6-7, big-endian)
         $answerCount = ($response[6] -shl 8) -bor $response[7]
         if ($answerCount -eq 0) {
-            Write-Log "[Invoke-RawDnsQuery] No answers in response"
+            Write-Log "[Invoke-RawDnsQuery] Ответ DNS не содержит записей"
             return $null
         }
 
@@ -286,7 +286,7 @@ function Invoke-RawDnsQuery {
                     # Prevent infinite loop from cyclic pointers
                     $pointerDepth++
                     if ($pointerDepth -gt $MaxPointerDepth) {
-                        Write-Log "[Invoke-RawDnsQuery] Maximum pointer depth exceeded, possible malformed DNS response"
+                        Write-Log "[Invoke-RawDnsQuery] Превышена глубина указателей; возможен некорректный ответ DNS"
                         break
                     }
 
@@ -294,7 +294,7 @@ function Invoke-RawDnsQuery {
 
                     # Detect self-referencing or already-visited pointer (infinite loop prevention)
                     if ($pointer -eq $currentOffset -or $visitedOffsets.Contains($pointer)) {
-                        Write-Log "[Invoke-RawDnsQuery] Cyclic pointer detected at offset $pointer, malformed DNS response"
+                        Write-Log "[Invoke-RawDnsQuery] Зацикленный указатель по смещению $pointer; некорректный ответ DNS"
                         break
                     }
                     $null = $visitedOffsets.Add($currentOffset)
@@ -388,7 +388,7 @@ function Invoke-RawDnsQuery {
         if ($Type -eq 'SRV' -and $srvRecords.Count -gt 0) {
             # Sort by Priority (lower = preferred), then by Weight (higher = preferred)
             $sortedRecords = @($srvRecords | Sort-Object Priority, @{Expression={-$_.Weight}})
-            Write-Log "[Invoke-RawDnsQuery] Found $($srvRecords.Count) SRV record(s)"
+            Write-Log "[Invoke-RawDnsQuery] Найдено SRV-записей: $($srvRecords.Count)"
 
             if ($ReturnAllSRV) {
                 # Return ALL records sorted by priority/weight
@@ -397,16 +397,16 @@ function Invoke-RawDnsQuery {
             else {
                 # Return only the best record (legacy behavior)
                 $bestRecord = $sortedRecords[0]
-                Write-Log "[Invoke-RawDnsQuery] Returning best SRV: $($bestRecord.Target):$($bestRecord.Port) (Priority: $($bestRecord.Priority))"
+                Write-Log "[Invoke-RawDnsQuery] Возвращается предпочтительная SRV-запись: $($bestRecord.Target):$($bestRecord.Port) (приоритет: $($bestRecord.Priority))"
                 return $bestRecord
             }
         }
 
-        Write-Log "[Invoke-RawDnsQuery] No $Type record found in response"
+        Write-Log "[Invoke-RawDnsQuery] В ответе отсутствует запись типа $Type"
         return $null
     }
     catch {
-        Write-Log "[Invoke-RawDnsQuery] Error: $_"
+        Write-Log "[Invoke-RawDnsQuery] Ошибка: $_"
         return $null
     }
     finally {
@@ -438,7 +438,7 @@ function Resolve-HostnameToIP {
     # Check if input is already an IP address
     $ipAddress = $null
     if ([System.Net.IPAddress]::TryParse($Hostname, [ref]$ipAddress)) {
-        Write-Log "[Resolve-HostnameToIP] Input is already an IP address: $Hostname"
+        Write-Log "[Resolve-HostnameToIP] Исходное значение уже является IP-адресом: $Hostname"
         return $Hostname
     }
 
@@ -450,13 +450,13 @@ function Resolve-HostnameToIP {
     # Check cache first (unless NoCache specified)
     if (-not $NoCache -and $Script:LDAPContext -and $Script:LDAPContext['DnsCache'] -and $Script:LDAPContext['DnsCache'].ContainsKey($Hostname)) {
         $cachedIP = $Script:LDAPContext['DnsCache'][$Hostname]
-        Write-Log "[Resolve-HostnameToIP] Cache hit for $Hostname : $cachedIP"
+        Write-Log "[Resolve-HostnameToIP] Найдено в кэше для $Hostname : $cachedIP"
         return $cachedIP
     }
 
     # Try custom DNS server if specified
     if ($DnsServer) {
-        Write-Log "[Resolve-HostnameToIP] Resolving $Hostname using custom DNS: $DnsServer"
+        Write-Log "[Resolve-HostnameToIP] Разрешение $Hostname через указанный DNS-сервер: $DnsServer"
 
         # Method 1: Resolve-DnsName cmdlet (Windows 8+ / Server 2012+)
         try {
@@ -466,7 +466,7 @@ function Resolve-HostnameToIP {
                 $ResolvedIP = ($DnsResult | Where-Object { $_.Type -eq 'A' } | Select-Object -First 1).IPAddress
 
                 if ($ResolvedIP) {
-                    Write-Log "[Resolve-HostnameToIP] Resolved $Hostname to $ResolvedIP via Resolve-DnsName"
+                    Write-Log "[Resolve-HostnameToIP] Имя $Hostname разрешено в $ResolvedIP через Resolve-DnsName"
 
                     # Cache the result
                     if ($Script:LDAPContext -and $Script:LDAPContext['DnsCache']) {
@@ -478,10 +478,10 @@ function Resolve-HostnameToIP {
             }
         }
         catch [System.Management.Automation.CommandNotFoundException] {
-            Write-Log "[Resolve-HostnameToIP] Resolve-DnsName cmdlet not available, trying UDP fallback"
+            Write-Log "[Resolve-HostnameToIP] Resolve-DnsName недоступен; используется резервный запрос UDP"
         }
         catch {
-            Write-Log "[Resolve-HostnameToIP] Resolve-DnsName failed: $_"
+            Write-Log "[Resolve-HostnameToIP] Ошибка Resolve-DnsName: $_"
         }
 
         # Method 2: Raw UDP DNS query (fallback)
@@ -489,7 +489,7 @@ function Resolve-HostnameToIP {
             $UdpResult = Invoke-RawDnsQuery -Name $Hostname -DnsServer $DnsServer -Type A
 
             if ($UdpResult) {
-                Write-Log "[Resolve-HostnameToIP] Resolved $Hostname to $UdpResult via UDP DNS"
+                Write-Log "[Resolve-HostnameToIP] Имя $Hostname разрешено в $UdpResult через DNS-запрос UDP"
 
                 # Cache the result
                 if ($Script:LDAPContext -and $Script:LDAPContext['DnsCache']) {
@@ -500,12 +500,12 @@ function Resolve-HostnameToIP {
             }
         }
         catch {
-            Write-Log "[Resolve-HostnameToIP] UDP DNS query failed: $_"
+            Write-Log "[Resolve-HostnameToIP] Ошибка запроса UDP DNS: $_"
         }
     }
 
     # Fallback: System DNS
-    Write-Log "[Resolve-HostnameToIP] Resolving $Hostname using system DNS"
+    Write-Log "[Resolve-HostnameToIP] Разрешение $Hostname через системный DNS"
 
     try {
         $DnsResult = [System.Net.Dns]::GetHostEntry($Hostname)
@@ -520,7 +520,7 @@ function Resolve-HostnameToIP {
 
             if ($ResolvedAddr) {
                 $ResolvedIP = $ResolvedAddr.IPAddressToString
-                Write-Log "[Resolve-HostnameToIP] Resolved $Hostname to $ResolvedIP via system DNS"
+                Write-Log "[Resolve-HostnameToIP] Имя $Hostname разрешено в $ResolvedIP через системный DNS"
 
                 # Cache the result
                 if ($Script:LDAPContext -and $Script:LDAPContext['DnsCache']) {
@@ -532,11 +532,11 @@ function Resolve-HostnameToIP {
         }
     }
     catch {
-        Write-Log "[Resolve-HostnameToIP] System DNS resolution failed: $_"
+        Write-Log "[Resolve-HostnameToIP] Ошибка разрешения имени системным DNS: $_"
     }
 
     # Resolution failed
-    Write-Log "[Resolve-HostnameToIP] Failed to resolve $Hostname"
+    Write-Log "[Resolve-HostnameToIP] Не удалось разрешить имя $Hostname"
     return $null
 }
 
@@ -621,22 +621,22 @@ function Test-DCReachable {
     $kerberosReachable = & $TestPort $IP 88 $TimeoutMs
 
     if ($kerberosReachable) {
-        Write-Log "[Test-DCReachable] $DisplayName - Port 88 (Kerberos) OK"
+        Write-Log "[Test-DCReachable] $DisplayName — порт 88 (Kerberos) доступен"
 
         # Also verify LDAP port is open
         $ldapReachable = & $TestPort $IP $LdapPort $TimeoutMs
 
         if ($ldapReachable) {
-            Write-Log "[Test-DCReachable] $DisplayName - Port $LdapPort (LDAP) OK - DC is reachable"
+            Write-Log "[Test-DCReachable] $DisplayName — порт $LdapPort (LDAP) доступен; контроллер домена отвечает"
             return $true
         }
         else {
-            Write-Log "[Test-DCReachable] $DisplayName - Port $LdapPort (LDAP) FAILED"
+            Write-Log "[Test-DCReachable] $DisplayName — порт $LdapPort (LDAP) недоступен"
             return $false
         }
     }
     else {
-        Write-Log "[Test-DCReachable] $DisplayName - Port 88 (Kerberos) FAILED - not a reachable DC"
+        Write-Log "[Test-DCReachable] $DisplayName — порт 88 (Kerberos) недоступен; контроллер домена не отвечает"
         return $false
     }
 }
@@ -673,7 +673,7 @@ function Resolve-SrvRecord {
 
     # Try custom DNS server if specified
     if ($DnsServer) {
-        Write-Log "[Resolve-SrvRecord] Resolving SRV $Name using custom DNS: $DnsServer"
+        Write-Log "[Resolve-SrvRecord] Разрешение SRV $Name через указанный DNS-сервер: $DnsServer"
 
         # Method 1: Resolve-DnsName cmdlet
         try {
@@ -699,7 +699,7 @@ function Resolve-SrvRecord {
                     }
 
                     if ($AllRecords.Count -gt 0) {
-                        Write-Log "[Resolve-SrvRecord] Found $($AllRecords.Count) SRV record(s) via Resolve-DnsName"
+                        Write-Log "[Resolve-SrvRecord] Найдено SRV-записей через Resolve-DnsName: $($AllRecords.Count)"
                         if ($ReturnAll) { return $AllRecords.ToArray() }
                         return $AllRecords[0]
                     }
@@ -707,10 +707,10 @@ function Resolve-SrvRecord {
             }
         }
         catch [System.Management.Automation.CommandNotFoundException] {
-            Write-Log "[Resolve-SrvRecord] Resolve-DnsName cmdlet not available, trying UDP fallback"
+            Write-Log "[Resolve-SrvRecord] Resolve-DnsName недоступен; используется резервный запрос UDP"
         }
         catch {
-            Write-Log "[Resolve-SrvRecord] Resolve-DnsName failed: $_"
+            Write-Log "[Resolve-SrvRecord] Ошибка Resolve-DnsName: $_"
         }
 
         # Method 2: Raw UDP DNS query (fallback)
@@ -721,7 +721,7 @@ function Resolve-SrvRecord {
                 if ($UdpResult) {
                     # Handle both single record and array results
                     if ($UdpResult -is [System.Array]) {
-                        Write-Log "[Resolve-SrvRecord] Found $($UdpResult.Count) SRV record(s) via UDP DNS"
+                        Write-Log "[Resolve-SrvRecord] Найдено SRV-записей через UDP DNS: $($UdpResult.Count)"
                         foreach ($rec in $UdpResult) {
                             $AllRecords.Add($rec)
                         }
@@ -729,20 +729,20 @@ function Resolve-SrvRecord {
                         return $AllRecords[0]
                     }
                     elseif ($UdpResult.Target) {
-                        Write-Log "[Resolve-SrvRecord] Found SRV: $($UdpResult.Target):$($UdpResult.Port) via UDP DNS"
+                        Write-Log "[Resolve-SrvRecord] Найдена SRV-запись: $($UdpResult.Target):$($UdpResult.Port) через UDP DNS"
                         return $UdpResult
                     }
                 }
             }
             catch {
-                Write-Log "[Resolve-SrvRecord] UDP DNS query failed: $_"
+                Write-Log "[Resolve-SrvRecord] Ошибка запроса UDP DNS: $_"
             }
         }
     }
 
     # Fallback: System DNS
     if ($AllRecords.Count -eq 0) {
-        Write-Log "[Resolve-SrvRecord] Resolving SRV $Name using system DNS"
+        Write-Log "[Resolve-SrvRecord] Разрешение SRV $Name через системный DNS"
 
         # Method 1: Resolve-DnsName without custom server
         try {
@@ -767,7 +767,7 @@ function Resolve-SrvRecord {
                     }
 
                     if ($AllRecords.Count -gt 0) {
-                        Write-Log "[Resolve-SrvRecord] Found $($AllRecords.Count) SRV record(s) via system DNS"
+                        Write-Log "[Resolve-SrvRecord] Найдено SRV-записей через системный DNS: $($AllRecords.Count)"
                         if ($ReturnAll) { return $AllRecords.ToArray() }
                         return $AllRecords[0]
                     }
@@ -775,10 +775,10 @@ function Resolve-SrvRecord {
             }
         }
         catch [System.Management.Automation.CommandNotFoundException] {
-            Write-Log "[Resolve-SrvRecord] Resolve-DnsName not available for system SRV lookup"
+            Write-Log "[Resolve-SrvRecord] Resolve-DnsName недоступен для системного поиска SRV"
         }
         catch {
-            Write-Log "[Resolve-SrvRecord] System DNS SRV lookup failed: $_"
+            Write-Log "[Resolve-SrvRecord] Ошибка системного поиска SRV через DNS: $_"
         }
     }
 
@@ -800,29 +800,29 @@ function Resolve-SrvRecord {
             }
 
             if ($SystemDnsServer) {
-                Write-Log "[Resolve-SrvRecord] Trying UDP SRV query via system DNS: $SystemDnsServer"
+                Write-Log "[Resolve-SrvRecord] Резервный запрос SRV по UDP через системный DNS: $SystemDnsServer"
                 $UdpResult = Invoke-RawDnsQuery -Name $Name -DnsServer $SystemDnsServer -Type SRV -ReturnAllSRV:$ReturnAll
 
                 if ($UdpResult) {
                     # Handle both single record and array results
                     if ($UdpResult -is [System.Array]) {
-                        Write-Log "[Resolve-SrvRecord] Found $($UdpResult.Count) SRV record(s) via UDP system DNS"
+                        Write-Log "[Resolve-SrvRecord] Найдено SRV-записей через системный DNS по UDP: $($UdpResult.Count)"
                         if ($ReturnAll) { return $UdpResult }
                         return $UdpResult[0]
                     }
                     elseif ($UdpResult.Target) {
-                        Write-Log "[Resolve-SrvRecord] Found SRV: $($UdpResult.Target):$($UdpResult.Port) via UDP system DNS"
+                        Write-Log "[Resolve-SrvRecord] Найдена SRV-запись: $($UdpResult.Target):$($UdpResult.Port) через системный DNS по UDP"
                         return $UdpResult
                     }
                 }
             }
         }
         catch {
-            Write-Log "[Resolve-SrvRecord] UDP system DNS SRV query failed: $_"
+            Write-Log "[Resolve-SrvRecord] Ошибка системного запроса SRV по UDP: $_"
         }
     }
 
-    Write-Log "[Resolve-SrvRecord] Failed to resolve SRV record: $Name"
+    Write-Log "[Resolve-SrvRecord] Не удалось разрешить SRV-запись: $Name"
     return $null
 }
 
@@ -844,7 +844,7 @@ function Resolve-adPEASName {
             if ([string]::IsNullOrEmpty($_)) { return $true }
             $ip = $null
             if ([System.Net.IPAddress]::TryParse($_, [ref]$ip)) { return $true }
-            throw "DnsServer must be an IP address, not a hostname: $_"
+            throw "DnsServer должен быть IP-адресом, а не именем узла: $_"
         })]
         [string]$DnsServer,
 
@@ -875,47 +875,47 @@ function Resolve-adPEASName {
 
         # Domain Controller Discovery (-Domain parameter)
         $SrvRecordName = "_ldap._tcp.dc._msdcs.$Domain"
-        Write-Log "[Resolve-adPEASName] Querying SRV records: $SrvRecordName"
+        Write-Log "[Resolve-adPEASName] Запрос SRV-записей: $SrvRecordName"
 
         $SrvResults = Resolve-SrvRecord -Name $SrvRecordName -DnsServer $EffectiveDnsServer -ReturnAll
         if ($SrvResults) {
             if ($SrvResults -isnot [System.Array]) {
                 $SrvResults = @($SrvResults)
             }
-            Write-Log "[Resolve-adPEASName] Found $($SrvResults.Count) DC(s) via SRV records"
+            Write-Log "[Resolve-adPEASName] Найдено контроллеров домена по SRV: $($SrvResults.Count)"
 
             # Iterate through DCs in priority order, test reachability
             foreach ($SrvRecord in $SrvResults) {
                 $DcHostname = $SrvRecord.Target
-                Write-Log "[Resolve-adPEASName] Trying DC: $DcHostname (Priority: $($SrvRecord.Priority), Weight: $($SrvRecord.Weight))"
+                Write-Log "[Resolve-adPEASName] Проверка контроллера домена $DcHostname (приоритет: $($SrvRecord.Priority), вес: $($SrvRecord.Weight))"
 
                 # Resolve DC hostname to IP
                 $DcIP = Resolve-HostnameToIP -Hostname $DcHostname -DnsServer $EffectiveDnsServer -NoCache:$NoCache
 
                 if (-not $DcIP) {
-                    Write-Log "[Resolve-adPEASName] Could not resolve $DcHostname to IP, trying next DC"
+                    Write-Log "[Resolve-adPEASName] Не удалось определить IP узла $DcHostname; переход к следующему контроллеру"
                     continue
                 }
 
                 # Test if DC is actually reachable (Port 88 + 389/636)
                 if (Test-DCReachable -IP $DcIP -Hostname $DcHostname -UseLDAPS:$EffectiveUseLDAPS) {
-                    Write-Log "[Resolve-adPEASName] DC $DcHostname ($DcIP) is reachable - using this DC"
+                    Write-Log "[Resolve-adPEASName] Контроллер $DcHostname ($DcIP) доступен; используется этот узел"
                     return [PSCustomObject]@{
                         Hostname = $DcHostname
                         IP = $DcIP
                     }
                 }
                 else {
-                    Write-Log "[Resolve-adPEASName] DC $DcHostname ($DcIP) is NOT reachable (stale SRV record?), trying next DC"
+                    Write-Log "[Resolve-adPEASName] Контроллер $DcHostname ($DcIP) недоступен (устаревшая SRV-запись?); переход к следующему"
                 }
             }
 
-            Write-Log "[Resolve-adPEASName] All $($SrvResults.Count) DC(s) from SRV records are unreachable"
+            Write-Log "[Resolve-adPEASName] Все контроллеры домена по SRV недоступны: $($SrvResults.Count)"
         }
 
         # Fallback: Reverse DNS lookup (system DNS only)
         if (-not $EffectiveDnsServer) {
-            Write-Log "[Resolve-adPEASName] Attempting reverse DNS lookup for: $Domain"
+            Write-Log "[Resolve-adPEASName] Обратный DNS-поиск для: $Domain"
             try {
                 $DnsResult = [System.Net.Dns]::GetHostEntry($Domain)
                 if ($DnsResult -and $DnsResult.AddressList.Count -gt 0) {
@@ -930,7 +930,7 @@ function Resolve-adPEASName {
 
                     if ($DcIPAddr) {
                         $DcIPString = $DcIPAddr.IPAddressToString
-                        Write-Log "[Resolve-adPEASName] Domain resolved to IP: $DcIPString"
+                        Write-Log "[Resolve-adPEASName] Домен разрешён в IP-адрес: $DcIPString"
 
                         # Try reverse lookup to get actual DC hostname
                         $DcHostname = $Domain  # Default to domain name if reverse lookup fails
@@ -938,50 +938,50 @@ function Resolve-adPEASName {
                             $ReverseResult = [System.Net.Dns]::GetHostEntry($DcIPAddr)
                             if ($ReverseResult -and $ReverseResult.HostName -and $ReverseResult.HostName -ne $Domain) {
                                 $DcHostname = $ReverseResult.HostName
-                                Write-Log "[Resolve-adPEASName] Reverse DNS resolved: $DcHostname"
+                                Write-Log "[Resolve-adPEASName] Обратный DNS-поиск вернул: $DcHostname"
                             }
                         }
                         catch {
-                            Write-Log "[Resolve-adPEASName] Reverse DNS lookup failed, using domain name as hostname: $_"
+                            Write-Log "[Resolve-adPEASName] Ошибка обратного DNS; вместо имени узла используется домен: $_"
                         }
 
                         if (Test-DCReachable -IP $DcIPString -Hostname $DcHostname -UseLDAPS:$EffectiveUseLDAPS) {
-                            Write-Log "[Resolve-adPEASName] DC $DcHostname ($DcIPString) via reverse DNS is reachable"
+                            Write-Log "[Resolve-adPEASName] Контроллер $DcHostname ($DcIPString) доступен через обратный DNS"
                             return [PSCustomObject]@{
                                 Hostname = $DcHostname
                                 IP = $DcIPString
                             }
                         }
                         else {
-                            Write-Log "[Resolve-adPEASName] DC $DcHostname ($DcIPString) via reverse DNS is NOT reachable"
+                            Write-Log "[Resolve-adPEASName] Контроллер $DcHostname ($DcIPString) недоступен через обратный DNS"
                         }
                     }
                 }
             }
             catch {
-                Write-Log "[Resolve-adPEASName] System DNS resolution failed: $_"
+                Write-Log "[Resolve-adPEASName] Ошибка системного разрешения DNS: $_"
             }
         }
 
         # Last resort: Direct A record lookup for domain name
-        Write-Log "[Resolve-adPEASName] Falling back to direct domain resolution"
+        Write-Log "[Resolve-adPEASName] Резервный вариант: прямое разрешение имени домена"
         $DomainIP = Resolve-HostnameToIP -Hostname $Domain -DnsServer $EffectiveDnsServer -NoCache:$NoCache
 
         if ($DomainIP) {
             if (Test-DCReachable -IP $DomainIP -Hostname $Domain -UseLDAPS:$EffectiveUseLDAPS) {
-                Write-Log "[Resolve-adPEASName] DC $Domain ($DomainIP) via direct resolution is reachable"
+                Write-Log "[Resolve-adPEASName] Контроллер $Domain ($DomainIP) доступен через прямое разрешение"
                 return [PSCustomObject]@{
                     Hostname = $Domain
                     IP = $DomainIP
                 }
             }
             else {
-                Write-Log "[Resolve-adPEASName] DC $Domain ($DomainIP) via direct resolution is NOT reachable"
+                Write-Log "[Resolve-adPEASName] Контроллер $Domain ($DomainIP) недоступен через прямое разрешение"
             }
         }
 
         # Complete failure
-        Write-Log "[Resolve-adPEASName] Could not discover reachable DC for domain: $Domain"
+        Write-Log "[Resolve-adPEASName] Не удалось обнаружить доступный контроллер для домена: $Domain"
         return $null
     }
 }

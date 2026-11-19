@@ -40681,7 +40681,7 @@ function Test-IsExpectedInScope {
 	process {
 	    $scopeDef = $Script:SecurityScopes[$Scope]
 	    if (-not $scopeDef) {
-	        Write-Warning "[Test-IsExpectedInScope] Unknown scope: $Scope"
+	        Write-Warning "[Test-IsExpectedInScope] Неизвестная область проверки: $Scope"
 	        if ($ReturnDetails) {
 	            return [PSCustomObject]@{
 	                Severity = 'Finding'
@@ -42864,7 +42864,7 @@ function Get-adPEASSession {
 	                }
 	                else {
 	                    Show-KeyValue "TGT Valid Until:" "$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss')" -Class Finding
-	                    Write-Warning "[!] TGT EXPIRED - Re-authentication required!"
+	                    Write-Warning "[!] TGT ИСТЁК — требуется повторная аутентификация!"
 	                }
 	            }
 	            elseif ($LiveTicketStatus.TicketCount -eq 0) {
@@ -52707,7 +52707,7 @@ function Resolve-adPEASName {
 	        if ([string]::IsNullOrEmpty($_)) { return $true }
 	        $ip = $null
 	        if ([System.Net.IPAddress]::TryParse($_, [ref]$ip)) { return $true }
-	        throw "DnsServer must be an IP address, not a hostname: $_"
+	        throw "DnsServer должен быть IP-адресом, а не именем узла: $_"
 	    })]
 	    [string]$DnsServer,
 	    [Parameter(Mandatory = $false)]
@@ -98503,7 +98503,7 @@ function Collect-BHIssuancePolicies {
 	}
 	return $bhPolicies
 }
-$Script:adPEASVersion = "2.9.0+20261119-1028"
+$Script:adPEASVersion = "2.9.0+20261119-1032"
 if ($MyInvocation.MyCommand.Path) {
 	$Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {

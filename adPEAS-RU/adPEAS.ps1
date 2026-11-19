@@ -3,8 +3,8 @@
     adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
 
 .DESCRIPTION
-    Build: 2026-11-19 10:28:57
-    Version: 2.9.0+20261119-1028
+    Build: 2026-11-19 10:32:54
+    Version: 2.9.0+20261119-1032
 
     AUTHORIZED SECURITY TESTING ONLY!
 
@@ -60623,7 +60623,7 @@ function Clear-PrivilegedCheckCache {
     param()
 
     $Script:PrivilegedCheckCache = @{}
-    Write-Log "[Clear-PrivilegedCheckCache] Cache cleared"
+    Write-Log "[Clear-PrivilegedCheckCache] Кэш очищен"
 }
 
 <#
@@ -60639,7 +60639,7 @@ function Clear-GroupMembershipCache {
     param()
 
     $Script:GroupMembershipCache = @{}
-    Write-Log "[Clear-GroupMembershipCache] Cache cleared"
+    Write-Log "[Clear-GroupMembershipCache] Кэш очищен"
 }
 
 <#
@@ -60726,7 +60726,7 @@ function Test-IsExchangeServiceGroup {
                             $dn = $obj.distinguishedName
                         }
                     } catch {
-                        Write-Log "[Test-IsExchangeServiceGroup] Failed to resolve sAMAccountName: $Identity"
+                        Write-Log "[Test-IsExchangeServiceGroup] Не удалось определить sAMAccountName: $Identity"
                     }
                 }
             }
@@ -60754,7 +60754,7 @@ function Test-IsExchangeServiceGroup {
                     }
                 }
             } catch {
-                Write-Log "[Test-IsExchangeServiceGroup] Failed to resolve SID to DN: $sid"
+                Write-Log "[Test-IsExchangeServiceGroup] Не удалось преобразовать SID в DN: $sid"
             }
         }
 
@@ -60772,7 +60772,7 @@ function Test-IsExchangeServiceGroup {
         # Check if DN contains Exchange Security Groups OU (language-independent)
         # The OU name is always "Microsoft Exchange Security Groups" even in non-English installations
         if ($dn -match 'OU=Microsoft Exchange Security Groups') {
-            Write-Log "[Test-IsExchangeServiceGroup] Exchange service group detected: $dn"
+            Write-Log "[Test-IsExchangeServiceGroup] Обнаружена сервисная группа Exchange: $dn"
             $result = [PSCustomObject]@{
                 IsExchangeService = $true
                 Reason = "Member of Exchange Security Groups OU (by-design permissions)"
@@ -60929,7 +60929,7 @@ function Test-IsExchangeServer {
             $computerName = if ($obj.name) { $obj.name } elseif ($obj.sAMAccountName) { $obj.sAMAccountName -replace '\$$' } else { $null }
 
             if ($exchangeSPNs.Count -gt 0) {
-                Write-Log "[Test-IsExchangeServer] Exchange Server detected: $computerName (SPNs: $($exchangeSPNs -join ', '))"
+                Write-Log "[Test-IsExchangeServer] Обнаружен сервер Exchange: $computerName (SPN: $($exchangeSPNs -join ', '))"
                 return [PSCustomObject]@{
                     IsExchangeServer = $true
                     SPNs = $exchangeSPNs
@@ -60944,7 +60944,7 @@ function Test-IsExchangeServer {
             }
 
         } catch {
-            Write-Log "[Test-IsExchangeServer] Error checking $Identity`: $_"
+            Write-Log "[Test-IsExchangeServer] Ошибка проверки $Identity`: $_"
             return [PSCustomObject]@{
                 IsExchangeServer = $false
                 SPNs = @()
@@ -60997,13 +60997,13 @@ function Get-RecursiveGroupMembership {
 
     # Check cache first (unless NoCache is specified)
     if (-not $NoCache -and $Script:GroupMembershipCache.ContainsKey($IdentitySID)) {
-        Write-Log "[Get-RecursiveGroupMembership] Cache hit for $IdentitySID"
+        Write-Log "[Get-RecursiveGroupMembership] Результат найден в кэше для $IdentitySID"
         return $Script:GroupMembershipCache[$IdentitySID]
     }
 
     # Need LDAP connection
     if (-not $Script:LdapConnection) {
-        Write-Log "[Get-RecursiveGroupMembership] No LDAP connection available"
+        Write-Log "[Get-RecursiveGroupMembership] Подключение LDAP отсутствует"
         return @()
     }
 
@@ -61015,16 +61015,16 @@ function Get-RecursiveGroupMembership {
                 $obj = @(Get-DomainObject -LDAPFilter "(objectSid=$sidHex)" -Properties 'distinguishedName')[0]
                 if ($obj) {
                     $IdentityDN = $obj.distinguishedName
-                    Write-Log "[Get-RecursiveGroupMembership] Resolved SID to DN: $IdentityDN"
+                    Write-Log "[Get-RecursiveGroupMembership] SID преобразован в DN: $IdentityDN"
                 }
             }
         } catch {
-            Write-Log "[Get-RecursiveGroupMembership] Failed to resolve SID to DN: $_"
+            Write-Log "[Get-RecursiveGroupMembership] Не удалось преобразовать SID в DN: $_"
         }
 
         # Still no DN after resolution attempt (either exception or object not found)
         if (-not $IdentityDN) {
-            Write-Log "[Get-RecursiveGroupMembership] No DN available for $IdentitySID"
+            Write-Log "[Get-RecursiveGroupMembership] Не найден DN для $IdentitySID"
             $Script:GroupMembershipCache[$IdentitySID] = @()
             return @()
         }
@@ -61035,7 +61035,7 @@ function Get-RecursiveGroupMembership {
     $groupSIDs = @()
 
     try {
-        Write-Log "[Get-RecursiveGroupMembership] Querying all group memberships for: $IdentityDN"
+        Write-Log "[Get-RecursiveGroupMembership] Запрос всех групп пользователя: $IdentityDN"
 
         # Escape DN for LDAP filter (special characters in DN)
         $escapedDN = Escape-LDAPFilterValue -Value $IdentityDN
@@ -61047,20 +61047,20 @@ function Get-RecursiveGroupMembership {
             foreach ($group in $groups) {
                 if ($group.objectSid) {
                     $groupSIDs += $group.objectSid
-                    Write-Log "[Get-RecursiveGroupMembership] Found membership: $($group.sAMAccountName) ($($group.objectSid))"
+                    Write-Log "[Get-RecursiveGroupMembership] Найдено членство в группе: $($group.sAMAccountName) ($($group.objectSid))"
                 }
             }
         }
 
-        Write-Log "[Get-RecursiveGroupMembership] Found $($groupSIDs.Count) group membership(s) for $IdentitySID"
+        Write-Log "[Get-RecursiveGroupMembership] Найдено $($groupSIDs.Count) групп для $IdentitySID"
 
     } catch {
-        Write-Log "[Get-RecursiveGroupMembership] Error querying group memberships: $_"
+        Write-Log "[Get-RecursiveGroupMembership] Ошибка запроса членства в группах: $_"
     }
 
     # Cache the result
     $Script:GroupMembershipCache[$IdentitySID] = $groupSIDs
-    Write-Log "[Get-RecursiveGroupMembership] Cached result for $IdentitySID"
+    Write-Log "[Get-RecursiveGroupMembership] Результат сохранён в кэш для $IdentitySID"
 
     return $groupSIDs
 }
@@ -61124,7 +61124,7 @@ function Test-IsPrivileged {
         }
 
         if (-not $sid) {
-            Write-Log "[Test-IsPrivileged] Could not resolve identity to SID: $Identity"
+            Write-Log "[Test-IsPrivileged] Не удалось определить SID для учётной записи: $Identity"
             return [PSCustomObject]@{
                 IsPrivileged = $null
                 Category = 'Unknown'
@@ -61160,7 +61160,7 @@ function Test-IsPrivileged {
                 MatchedGroup = $null
                 Identity = $Identity
             }
-            Write-Log "[Test-IsPrivileged] Operator detected: $sid"
+            Write-Log "[Test-IsPrivileged] Обнаружен оператор: $sid"
             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
         }
 
@@ -61174,7 +61174,7 @@ function Test-IsPrivileged {
                 MatchedGroup = $null
                 Identity = $Identity
             }
-            Write-Log "[Test-IsPrivileged] Operator via RID suffix: $sid"
+            Write-Log "[Test-IsPrivileged] Оператор по суффиксу RID: $sid"
             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
         }
 
@@ -61188,7 +61188,7 @@ function Test-IsPrivileged {
                 MatchedGroup = $null
                 Identity = $Identity
             }
-            Write-Log "[Test-IsPrivileged] Privileged via static SID: $sid"
+            Write-Log "[Test-IsPrivileged] Привилегированный SID из статического списка: $sid"
             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
         }
 
@@ -61202,7 +61202,7 @@ function Test-IsPrivileged {
                 MatchedGroup = $null
                 Identity = $Identity
             }
-            Write-Log "[Test-IsPrivileged] Privileged via RID suffix: $sid"
+            Write-Log "[Test-IsPrivileged] Привилегированный SID по суффиксу RID: $sid"
             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
         }
 
@@ -61214,14 +61214,14 @@ function Test-IsPrivileged {
         if ($sid -in $Script:BroadGroupSIDs) {
             $isBroadGroup = $true
             $broadGroupReason = "Broad group (static SID)"
-            Write-Log "[Test-IsPrivileged] BroadGroup detected (static): $sid - checking for privileged membership..."
+            Write-Log "[Test-IsPrivileged] Обнаружена широкая группа BroadGroup (статическая): $sid; проверяется членство в привилегированных группах..."
         }
 
         # 3e. Check Broad Group RID suffixes (precise matching)
         if (-not $isBroadGroup -and $ridSuffix -in $Script:BroadGroupRIDSuffixes) {
             $isBroadGroup = $true
             $broadGroupReason = "Broad group (RID suffix $ridSuffix)"
-            Write-Log "[Test-IsPrivileged] BroadGroup detected (RID): $sid - checking for privileged membership..."
+            Write-Log "[Test-IsPrivileged] Обнаружена широкая группа BroadGroup (по RID): $sid; проверяется членство в привилегированных группах..."
         }
 
         # Resolve name from SID only if not already known (needed for logging)
@@ -61229,7 +61229,7 @@ function Test-IsPrivileged {
             $name = ConvertFrom-SID -SID $sid
         }
 
-        Write-Log "[Test-IsPrivileged] Checking SID: $sid (Name: $name)"
+        Write-Log "[Test-IsPrivileged] Проверка SID: $sid (имя: $name)"
 
         # ===== PHASE 4: sIDHistory Check (SID History Injection Detection) =====
         # Check if this identity has privileged SIDs in sIDHistory attribute.
@@ -61263,7 +61263,7 @@ function Test-IsPrivileged {
                             $sidHistoryValues = @($adObject.sIDHistory)
                         }
 
-                        Write-Log "[Test-IsPrivileged] Found $($sidHistoryValues.Count) sIDHistory entries for $sid"
+                        Write-Log "[Test-IsPrivileged] Найдено $($sidHistoryValues.Count) записей sIDHistory для $sid"
 
                         # Read every entry before deciding, and keep the highest tier
                         # found. Returning on the first entry that matched anything made
@@ -61285,7 +61285,7 @@ function Test-IsPrivileged {
                                     $secId = New-Object System.Security.Principal.SecurityIdentifier($historySID, 0)
                                     $historySIDString = $secId.Value
                                 } catch {
-                                    Write-Log "[Test-IsPrivileged] Failed to convert sIDHistory byte array: $_"
+                                    Write-Log "[Test-IsPrivileged] Не удалось преобразовать массив байтов sIDHistory: $_"
                                     continue
                                 }
                             } elseif ($historySID -is [string]) {
@@ -61294,7 +61294,7 @@ function Test-IsPrivileged {
                                 continue
                             }
 
-                            Write-Log "[Test-IsPrivileged] Checking sIDHistory entry: $historySIDString"
+                            Write-Log "[Test-IsPrivileged] Проверка записи sIDHistory: $historySIDString"
 
                             # Check if this sIDHistory SID is privileged
                             $historyRIDSuffix = Get-SIDRIDSuffix -SID $historySIDString
@@ -61303,7 +61303,7 @@ function Test-IsPrivileged {
                             if (-not $historyPrivilegedSID -and $historySIDString -in $Script:PrivilegedSIDs) {
                                 $historyPrivilegedSID = $historySIDString
                                 $historyPrivilegedReason = "sIDHistory contains privileged SID (SID History Injection risk)"
-                                Write-Log "[Test-IsPrivileged] CRITICAL: sIDHistory contains privileged SID: $historySIDString"
+                                Write-Log "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит привилегированный SID: $historySIDString"
                                 continue
                             }
 
@@ -61311,7 +61311,7 @@ function Test-IsPrivileged {
                             if (-not $historyPrivilegedSID -and $historyRIDSuffix -and $historyRIDSuffix -in $Script:PrivilegedRIDSuffixes) {
                                 $historyPrivilegedSID = $historySIDString
                                 $historyPrivilegedReason = "sIDHistory contains privileged RID $historyRIDSuffix (SID History Injection risk)"
-                                Write-Log "[Test-IsPrivileged] CRITICAL: sIDHistory contains privileged RID: $historySIDString"
+                                Write-Log "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит привилегированный RID: $historySIDString"
                                 continue
                             }
 
@@ -61319,7 +61319,7 @@ function Test-IsPrivileged {
                             if (-not $historyOperatorSID -and $historySIDString -in $Script:OperatorSIDs) {
                                 $historyOperatorSID = $historySIDString
                                 $historyOperatorReason = "sIDHistory contains Operator SID (SID History Injection risk)"
-                                Write-Log "[Test-IsPrivileged] CRITICAL: sIDHistory contains Operator SID: $historySIDString"
+                                Write-Log "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит SID оператора: $historySIDString"
                                 continue
                             }
 
@@ -61327,7 +61327,7 @@ function Test-IsPrivileged {
                             if (-not $historyOperatorSID -and $historyRIDSuffix -and $historyRIDSuffix -in $Script:OperatorRIDSuffixes) {
                                 $historyOperatorSID = $historySIDString
                                 $historyOperatorReason = "sIDHistory contains Operator RID $historyRIDSuffix (SID History Injection risk)"
-                                Write-Log "[Test-IsPrivileged] CRITICAL: sIDHistory contains Operator RID: $historySIDString"
+                                Write-Log "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит RID оператора: $historySIDString"
                                 continue
                             }
                         }
@@ -61358,7 +61358,7 @@ function Test-IsPrivileged {
                     }
                 }
             } catch {
-                Write-Log "[Test-IsPrivileged] Error checking sIDHistory: $_"
+                Write-Log "[Test-IsPrivileged] Ошибка проверки sIDHistory: $_"
             }
         }
 
@@ -61391,7 +61391,7 @@ function Test-IsPrivileged {
             }
 
             if ($tierMemberships.Count -gt 0) {
-                Write-Log "[Test-IsPrivileged] Found $($tierMemberships.Count) group membership(s) for $sid"
+                Write-Log "[Test-IsPrivileged] Найдено $($tierMemberships.Count) групп для $sid"
 
                 $domainSID = $null
                 if ($Script:LDAPContext -and $Script:LDAPContext.DomainSID) {
@@ -61429,7 +61429,7 @@ function Test-IsPrivileged {
                             MatchedGroup = $groupName
                             Identity = $Identity
                         }
-                        Write-Log "[Test-IsPrivileged] Privileged via membership: $groupName"
+                        Write-Log "[Test-IsPrivileged] Привилегированность получена через членство: $groupName"
                         return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
                     }
                 }
@@ -61449,7 +61449,7 @@ function Test-IsPrivileged {
                             MatchedGroup = $groupName
                             Identity = $Identity
                         }
-                        Write-Log "[Test-IsPrivileged] Operator via membership: $groupName"
+                        Write-Log "[Test-IsPrivileged] Статус оператора получен через членство: $groupName"
                         return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
                     }
                 }
@@ -61470,7 +61470,7 @@ function Test-IsPrivileged {
                                 MatchedGroup = $groupName
                                 Identity = $Identity
                             }
-                            Write-Log "[Test-IsPrivileged] Operator via membership (RID suffix): $groupName"
+                            Write-Log "[Test-IsPrivileged] Статус оператора через членство (суффикс RID): $groupName"
                             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
                         }
                     }
@@ -61492,16 +61492,16 @@ function Test-IsPrivileged {
                                 MatchedGroup = $groupName
                                 Identity = $Identity
                             }
-                            Write-Log "[Test-IsPrivileged] BroadGroup via membership: $groupName"
+                            Write-Log "[Test-IsPrivileged] Широкая группа BroadGroup через членство: $groupName"
                             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
                         }
                     }
                 }
             } else {
-                Write-Log "[Test-IsPrivileged] No group memberships found for $sid"
+                Write-Log "[Test-IsPrivileged] Для $sid группы не найдены"
             }
         } else {
-            Write-Log "[Test-IsPrivileged] No LDAP connection - group membership check skipped"
+            Write-Log "[Test-IsPrivileged] Нет подключения LDAP; проверка членства в группах пропущена"
         }
 
         # ===== PHASE 6: Final Category Determination =====
@@ -61516,7 +61516,7 @@ function Test-IsPrivileged {
                 MatchedGroup = $null
                 Identity = $Identity
             }
-            Write-Log "[Test-IsPrivileged] BroadGroup confirmed (no privileged membership found): $sid"
+            Write-Log "[Test-IsPrivileged] Подтверждена широкая группа BroadGroup (привилегированного членства нет): $sid"
             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
         }
 
@@ -61529,7 +61529,7 @@ function Test-IsPrivileged {
             MatchedGroup = $null
             Identity = $Identity
         }
-        Write-Log "[Test-IsPrivileged] Standard identity: $sid"
+        Write-Log "[Test-IsPrivileged] Обычная учётная запись: $sid"
         return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
     }
 }
@@ -61760,7 +61760,7 @@ function Test-IsExpectedInScope {
         # ===== Get Scope Definition =====
         $scopeDef = $Script:SecurityScopes[$Scope]
         if (-not $scopeDef) {
-            Write-Warning "[Test-IsExpectedInScope] Unknown scope: $Scope"
+            Write-Warning "[Test-IsExpectedInScope] Неизвестная область проверки: $Scope"
             if ($ReturnDetails) {
                 return [PSCustomObject]@{
                     Severity = 'Finding'
@@ -61830,7 +61830,7 @@ function Test-IsExpectedInScope {
                 $defaultRights = @($scopeDef.DefaultRightHolders[$holderKey])
                 $beyond = @(@($Rights) | Where-Object { $_ -and ($defaultRights -notcontains $_) })
                 if (@($beyond).Count -eq 0) {
-                    Write-Log "[Test-IsExpectedInScope] $sid holds only its default rights in scope '$Scope'"
+                    Write-Log "[Test-IsExpectedInScope] У $sid только права по умолчанию в области '$Scope'"
                     if ($ReturnDetails) {
                         return [PSCustomObject]@{
                             Severity = 'Expected'
@@ -61842,7 +61842,7 @@ function Test-IsExpectedInScope {
                     }
                     return 'Expected'
                 }
-                Write-Log "[Test-IsExpectedInScope] $sid holds $($beyond -join ', ') beyond its defaults in scope '$Scope'"
+                Write-Log "[Test-IsExpectedInScope] У $sid есть дополнительные права ($($beyond -join ', ')) в области '$Scope'"
             }
         }
 
@@ -61938,7 +61938,7 @@ function Test-IsExpectedInScope {
                         if (-not $groupName) { $groupName = $expectedGroupSID }
 
                         # Identity is member of an expected group -> Attention (not Finding), because the explicit ACE is redundant but not a new attack vector
-                        Write-Log "[Test-IsExpectedInScope] Identity $sid is member of expected group $groupName"
+                        Write-Log "[Test-IsExpectedInScope] Учётная запись $sid входит в ожидаемую группу $groupName"
                         if ($ReturnDetails) {
                             return [PSCustomObject]@{
                                 Severity = 'Attention'
@@ -61964,7 +61964,7 @@ function Test-IsExpectedInScope {
         if ($Script:LdapConnection) {
             $exchangeCheck = Test-IsExchangeServiceGroup -Identity $Identity
             if ($exchangeCheck.IsExchangeService) {
-                Write-Log "[Test-IsExpectedInScope] Exchange service group detected: $($exchangeCheck.DistinguishedName)"
+                Write-Log "[Test-IsExpectedInScope] Обнаружена сервисная группа Exchange: $($exchangeCheck.DistinguishedName)"
                 if ($ReturnDetails) {
                     return [PSCustomObject]@{
                         Severity = 'Attention'
@@ -65872,7 +65872,7 @@ function Get-adPEASSession {
                     }
                     else {
                         Show-KeyValue "TGT Valid Until:" "$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss')" -Class Finding
-                        Write-Warning "[!] TGT EXPIRED - Re-authentication required!"
+                        Write-Warning "[!] TGT ИСТЁК — требуется повторная аутентификация!"
                     }
 
                 }
@@ -82464,7 +82464,7 @@ function Invoke-RawDnsQuery {
             $labelBytes = [System.Text.Encoding]::ASCII.GetBytes($label)
             # RFC 1035: Each label is limited to 63 octets
             if ($labelBytes.Length -gt 63) {
-                Write-Log "[Invoke-RawDnsQuery] Label exceeds 63 bytes limit: $label"
+                Write-Log "[Invoke-RawDnsQuery] Метка DNS превышает предел 63 байта: $label"
                 return $null
             }
             $qname.Add([byte]$labelBytes.Length)
@@ -82503,27 +82503,27 @@ function Invoke-RawDnsQuery {
 
         # Parse response
         if ($response.Length -lt 12) {
-            Write-Log "[Invoke-RawDnsQuery] Response too short: $($response.Length) bytes"
+            Write-Log "[Invoke-RawDnsQuery] Слишком короткий ответ DNS: $($response.Length) байт"
             return $null
         }
 
         # Check transaction ID matches
         if ($response[0] -ne $transactionId[0] -or $response[1] -ne $transactionId[1]) {
-            Write-Log "[Invoke-RawDnsQuery] Transaction ID mismatch"
+            Write-Log "[Invoke-RawDnsQuery] Несовпадение идентификатора транзакции"
             return $null
         }
 
         # Check for errors (RCODE in lower 4 bits of byte 3)
         $rcode = $response[3] -band 0x0F
         if ($rcode -ne 0) {
-            Write-Log "[Invoke-RawDnsQuery] DNS error, RCODE: $rcode"
+            Write-Log "[Invoke-RawDnsQuery] Ошибка DNS, код RCODE: $rcode"
             return $null
         }
 
         # Get answer count (bytes 6-7, big-endian)
         $answerCount = ($response[6] -shl 8) -bor $response[7]
         if ($answerCount -eq 0) {
-            Write-Log "[Invoke-RawDnsQuery] No answers in response"
+            Write-Log "[Invoke-RawDnsQuery] Ответ DNS не содержит записей"
             return $null
         }
 
@@ -82575,7 +82575,7 @@ function Invoke-RawDnsQuery {
                     # Prevent infinite loop from cyclic pointers
                     $pointerDepth++
                     if ($pointerDepth -gt $MaxPointerDepth) {
-                        Write-Log "[Invoke-RawDnsQuery] Maximum pointer depth exceeded, possible malformed DNS response"
+                        Write-Log "[Invoke-RawDnsQuery] Превышена глубина указателей; возможен некорректный ответ DNS"
                         break
                     }
 
@@ -82583,7 +82583,7 @@ function Invoke-RawDnsQuery {
 
                     # Detect self-referencing or already-visited pointer (infinite loop prevention)
                     if ($pointer -eq $currentOffset -or $visitedOffsets.Contains($pointer)) {
-                        Write-Log "[Invoke-RawDnsQuery] Cyclic pointer detected at offset $pointer, malformed DNS response"
+                        Write-Log "[Invoke-RawDnsQuery] Зацикленный указатель по смещению $pointer; некорректный ответ DNS"
                         break
                     }
                     $null = $visitedOffsets.Add($currentOffset)
@@ -82677,7 +82677,7 @@ function Invoke-RawDnsQuery {
         if ($Type -eq 'SRV' -and $srvRecords.Count -gt 0) {
             # Sort by Priority (lower = preferred), then by Weight (higher = preferred)
             $sortedRecords = @($srvRecords | Sort-Object Priority, @{Expression={-$_.Weight}})
-            Write-Log "[Invoke-RawDnsQuery] Found $($srvRecords.Count) SRV record(s)"
+            Write-Log "[Invoke-RawDnsQuery] Найдено SRV-записей: $($srvRecords.Count)"
 
             if ($ReturnAllSRV) {
                 # Return ALL records sorted by priority/weight
@@ -82686,16 +82686,16 @@ function Invoke-RawDnsQuery {
             else {
                 # Return only the best record (legacy behavior)
                 $bestRecord = $sortedRecords[0]
-                Write-Log "[Invoke-RawDnsQuery] Returning best SRV: $($bestRecord.Target):$($bestRecord.Port) (Priority: $($bestRecord.Priority))"
+                Write-Log "[Invoke-RawDnsQuery] Возвращается предпочтительная SRV-запись: $($bestRecord.Target):$($bestRecord.Port) (приоритет: $($bestRecord.Priority))"
                 return $bestRecord
             }
         }
 
-        Write-Log "[Invoke-RawDnsQuery] No $Type record found in response"
+        Write-Log "[Invoke-RawDnsQuery] В ответе отсутствует запись типа $Type"
         return $null
     }
     catch {
-        Write-Log "[Invoke-RawDnsQuery] Error: $_"
+        Write-Log "[Invoke-RawDnsQuery] Ошибка: $_"
         return $null
     }
     finally {
@@ -82727,7 +82727,7 @@ function Resolve-HostnameToIP {
     # Check if input is already an IP address
     $ipAddress = $null
     if ([System.Net.IPAddress]::TryParse($Hostname, [ref]$ipAddress)) {
-        Write-Log "[Resolve-HostnameToIP] Input is already an IP address: $Hostname"
+        Write-Log "[Resolve-HostnameToIP] Исходное значение уже является IP-адресом: $Hostname"
         return $Hostname
     }
 
@@ -82739,13 +82739,13 @@ function Resolve-HostnameToIP {
     # Check cache first (unless NoCache specified)
     if (-not $NoCache -and $Script:LDAPContext -and $Script:LDAPContext['DnsCache'] -and $Script:LDAPContext['DnsCache'].ContainsKey($Hostname)) {
         $cachedIP = $Script:LDAPContext['DnsCache'][$Hostname]
-        Write-Log "[Resolve-HostnameToIP] Cache hit for $Hostname : $cachedIP"
+        Write-Log "[Resolve-HostnameToIP] Найдено в кэше для $Hostname : $cachedIP"
         return $cachedIP
     }
 
     # Try custom DNS server if specified
     if ($DnsServer) {
-        Write-Log "[Resolve-HostnameToIP] Resolving $Hostname using custom DNS: $DnsServer"
+        Write-Log "[Resolve-HostnameToIP] Разрешение $Hostname через указанный DNS-сервер: $DnsServer"
 
         # Method 1: Resolve-DnsName cmdlet (Windows 8+ / Server 2012+)
         try {
@@ -82755,7 +82755,7 @@ function Resolve-HostnameToIP {
                 $ResolvedIP = ($DnsResult | Where-Object { $_.Type -eq 'A' } | Select-Object -First 1).IPAddress
 
                 if ($ResolvedIP) {
-                    Write-Log "[Resolve-HostnameToIP] Resolved $Hostname to $ResolvedIP via Resolve-DnsName"
+                    Write-Log "[Resolve-HostnameToIP] Имя $Hostname разрешено в $ResolvedIP через Resolve-DnsName"
 
                     # Cache the result
                     if ($Script:LDAPContext -and $Script:LDAPContext['DnsCache']) {
@@ -82767,10 +82767,10 @@ function Resolve-HostnameToIP {
             }
         }
         catch [System.Management.Automation.CommandNotFoundException] {
-            Write-Log "[Resolve-HostnameToIP] Resolve-DnsName cmdlet not available, trying UDP fallback"
+            Write-Log "[Resolve-HostnameToIP] Resolve-DnsName недоступен; используется резервный запрос UDP"
         }
         catch {
-            Write-Log "[Resolve-HostnameToIP] Resolve-DnsName failed: $_"
+            Write-Log "[Resolve-HostnameToIP] Ошибка Resolve-DnsName: $_"
         }
 
         # Method 2: Raw UDP DNS query (fallback)
@@ -82778,7 +82778,7 @@ function Resolve-HostnameToIP {
             $UdpResult = Invoke-RawDnsQuery -Name $Hostname -DnsServer $DnsServer -Type A
 
             if ($UdpResult) {
-                Write-Log "[Resolve-HostnameToIP] Resolved $Hostname to $UdpResult via UDP DNS"
+                Write-Log "[Resolve-HostnameToIP] Имя $Hostname разрешено в $UdpResult через DNS-запрос UDP"
 
                 # Cache the result
                 if ($Script:LDAPContext -and $Script:LDAPContext['DnsCache']) {
@@ -82789,12 +82789,12 @@ function Resolve-HostnameToIP {
             }
         }
         catch {
-            Write-Log "[Resolve-HostnameToIP] UDP DNS query failed: $_"
+            Write-Log "[Resolve-HostnameToIP] Ошибка запроса UDP DNS: $_"
         }
     }
 
     # Fallback: System DNS
-    Write-Log "[Resolve-HostnameToIP] Resolving $Hostname using system DNS"
+    Write-Log "[Resolve-HostnameToIP] Разрешение $Hostname через системный DNS"
 
     try {
         $DnsResult = [System.Net.Dns]::GetHostEntry($Hostname)
@@ -82809,7 +82809,7 @@ function Resolve-HostnameToIP {
 
             if ($ResolvedAddr) {
                 $ResolvedIP = $ResolvedAddr.IPAddressToString
-                Write-Log "[Resolve-HostnameToIP] Resolved $Hostname to $ResolvedIP via system DNS"
+                Write-Log "[Resolve-HostnameToIP] Имя $Hostname разрешено в $ResolvedIP через системный DNS"
 
                 # Cache the result
                 if ($Script:LDAPContext -and $Script:LDAPContext['DnsCache']) {
@@ -82821,11 +82821,11 @@ function Resolve-HostnameToIP {
         }
     }
     catch {
-        Write-Log "[Resolve-HostnameToIP] System DNS resolution failed: $_"
+        Write-Log "[Resolve-HostnameToIP] Ошибка разрешения имени системным DNS: $_"
     }
 
     # Resolution failed
-    Write-Log "[Resolve-HostnameToIP] Failed to resolve $Hostname"
+    Write-Log "[Resolve-HostnameToIP] Не удалось разрешить имя $Hostname"
     return $null
 }
 
@@ -82910,22 +82910,22 @@ function Test-DCReachable {
     $kerberosReachable = & $TestPort $IP 88 $TimeoutMs
 
     if ($kerberosReachable) {
-        Write-Log "[Test-DCReachable] $DisplayName - Port 88 (Kerberos) OK"
+        Write-Log "[Test-DCReachable] $DisplayName — порт 88 (Kerberos) доступен"
 
         # Also verify LDAP port is open
         $ldapReachable = & $TestPort $IP $LdapPort $TimeoutMs
 
         if ($ldapReachable) {
-            Write-Log "[Test-DCReachable] $DisplayName - Port $LdapPort (LDAP) OK - DC is reachable"
+            Write-Log "[Test-DCReachable] $DisplayName — порт $LdapPort (LDAP) доступен; контроллер домена отвечает"
             return $true
         }
         else {
-            Write-Log "[Test-DCReachable] $DisplayName - Port $LdapPort (LDAP) FAILED"
+            Write-Log "[Test-DCReachable] $DisplayName — порт $LdapPort (LDAP) недоступен"
             return $false
         }
     }
     else {
-        Write-Log "[Test-DCReachable] $DisplayName - Port 88 (Kerberos) FAILED - not a reachable DC"
+        Write-Log "[Test-DCReachable] $DisplayName — порт 88 (Kerberos) недоступен; контроллер домена не отвечает"
         return $false
     }
 }
@@ -82962,7 +82962,7 @@ function Resolve-SrvRecord {
 
     # Try custom DNS server if specified
     if ($DnsServer) {
-        Write-Log "[Resolve-SrvRecord] Resolving SRV $Name using custom DNS: $DnsServer"
+        Write-Log "[Resolve-SrvRecord] Разрешение SRV $Name через указанный DNS-сервер: $DnsServer"
 
         # Method 1: Resolve-DnsName cmdlet
         try {
@@ -82988,7 +82988,7 @@ function Resolve-SrvRecord {
                     }
 
                     if ($AllRecords.Count -gt 0) {
-                        Write-Log "[Resolve-SrvRecord] Found $($AllRecords.Count) SRV record(s) via Resolve-DnsName"
+                        Write-Log "[Resolve-SrvRecord] Найдено SRV-записей через Resolve-DnsName: $($AllRecords.Count)"
                         if ($ReturnAll) { return $AllRecords.ToArray() }
                         return $AllRecords[0]
                     }
@@ -82996,10 +82996,10 @@ function Resolve-SrvRecord {
             }
         }
         catch [System.Management.Automation.CommandNotFoundException] {
-            Write-Log "[Resolve-SrvRecord] Resolve-DnsName cmdlet not available, trying UDP fallback"
+            Write-Log "[Resolve-SrvRecord] Resolve-DnsName недоступен; используется резервный запрос UDP"
         }
         catch {
-            Write-Log "[Resolve-SrvRecord] Resolve-DnsName failed: $_"
+            Write-Log "[Resolve-SrvRecord] Ошибка Resolve-DnsName: $_"
         }
 
         # Method 2: Raw UDP DNS query (fallback)
@@ -83010,7 +83010,7 @@ function Resolve-SrvRecord {
                 if ($UdpResult) {
                     # Handle both single record and array results
                     if ($UdpResult -is [System.Array]) {
-                        Write-Log "[Resolve-SrvRecord] Found $($UdpResult.Count) SRV record(s) via UDP DNS"
+                        Write-Log "[Resolve-SrvRecord] Найдено SRV-записей через UDP DNS: $($UdpResult.Count)"
                         foreach ($rec in $UdpResult) {
                             $AllRecords.Add($rec)
                         }
@@ -83018,20 +83018,20 @@ function Resolve-SrvRecord {
                         return $AllRecords[0]
                     }
                     elseif ($UdpResult.Target) {
-                        Write-Log "[Resolve-SrvRecord] Found SRV: $($UdpResult.Target):$($UdpResult.Port) via UDP DNS"
+                        Write-Log "[Resolve-SrvRecord] Найдена SRV-запись: $($UdpResult.Target):$($UdpResult.Port) через UDP DNS"
                         return $UdpResult
                     }
                 }
             }
             catch {
-                Write-Log "[Resolve-SrvRecord] UDP DNS query failed: $_"
+                Write-Log "[Resolve-SrvRecord] Ошибка запроса UDP DNS: $_"
             }
         }
     }
 
     # Fallback: System DNS
     if ($AllRecords.Count -eq 0) {
-        Write-Log "[Resolve-SrvRecord] Resolving SRV $Name using system DNS"
+        Write-Log "[Resolve-SrvRecord] Разрешение SRV $Name через системный DNS"
 
         # Method 1: Resolve-DnsName without custom server
         try {
@@ -83056,7 +83056,7 @@ function Resolve-SrvRecord {
                     }
 
                     if ($AllRecords.Count -gt 0) {
-                        Write-Log "[Resolve-SrvRecord] Found $($AllRecords.Count) SRV record(s) via system DNS"
+                        Write-Log "[Resolve-SrvRecord] Найдено SRV-записей через системный DNS: $($AllRecords.Count)"
                         if ($ReturnAll) { return $AllRecords.ToArray() }
                         return $AllRecords[0]
                     }
@@ -83064,10 +83064,10 @@ function Resolve-SrvRecord {
             }
         }
         catch [System.Management.Automation.CommandNotFoundException] {
-            Write-Log "[Resolve-SrvRecord] Resolve-DnsName not available for system SRV lookup"
+            Write-Log "[Resolve-SrvRecord] Resolve-DnsName недоступен для системного поиска SRV"
         }
         catch {
-            Write-Log "[Resolve-SrvRecord] System DNS SRV lookup failed: $_"
+            Write-Log "[Resolve-SrvRecord] Ошибка системного поиска SRV через DNS: $_"
         }
     }
 
@@ -83089,29 +83089,29 @@ function Resolve-SrvRecord {
             }
 
             if ($SystemDnsServer) {
-                Write-Log "[Resolve-SrvRecord] Trying UDP SRV query via system DNS: $SystemDnsServer"
+                Write-Log "[Resolve-SrvRecord] Резервный запрос SRV по UDP через системный DNS: $SystemDnsServer"
                 $UdpResult = Invoke-RawDnsQuery -Name $Name -DnsServer $SystemDnsServer -Type SRV -ReturnAllSRV:$ReturnAll
 
                 if ($UdpResult) {
                     # Handle both single record and array results
                     if ($UdpResult -is [System.Array]) {
-                        Write-Log "[Resolve-SrvRecord] Found $($UdpResult.Count) SRV record(s) via UDP system DNS"
+                        Write-Log "[Resolve-SrvRecord] Найдено SRV-записей через системный DNS по UDP: $($UdpResult.Count)"
                         if ($ReturnAll) { return $UdpResult }
                         return $UdpResult[0]
                     }
                     elseif ($UdpResult.Target) {
-                        Write-Log "[Resolve-SrvRecord] Found SRV: $($UdpResult.Target):$($UdpResult.Port) via UDP system DNS"
+                        Write-Log "[Resolve-SrvRecord] Найдена SRV-запись: $($UdpResult.Target):$($UdpResult.Port) через системный DNS по UDP"
                         return $UdpResult
                     }
                 }
             }
         }
         catch {
-            Write-Log "[Resolve-SrvRecord] UDP system DNS SRV query failed: $_"
+            Write-Log "[Resolve-SrvRecord] Ошибка системного запроса SRV по UDP: $_"
         }
     }
 
-    Write-Log "[Resolve-SrvRecord] Failed to resolve SRV record: $Name"
+    Write-Log "[Resolve-SrvRecord] Не удалось разрешить SRV-запись: $Name"
     return $null
 }
 
@@ -83133,7 +83133,7 @@ function Resolve-adPEASName {
             if ([string]::IsNullOrEmpty($_)) { return $true }
             $ip = $null
             if ([System.Net.IPAddress]::TryParse($_, [ref]$ip)) { return $true }
-            throw "DnsServer must be an IP address, not a hostname: $_"
+            throw "DnsServer должен быть IP-адресом, а не именем узла: $_"
         })]
         [string]$DnsServer,
 
@@ -83164,47 +83164,47 @@ function Resolve-adPEASName {
 
         # Domain Controller Discovery (-Domain parameter)
         $SrvRecordName = "_ldap._tcp.dc._msdcs.$Domain"
-        Write-Log "[Resolve-adPEASName] Querying SRV records: $SrvRecordName"
+        Write-Log "[Resolve-adPEASName] Запрос SRV-записей: $SrvRecordName"
 
         $SrvResults = Resolve-SrvRecord -Name $SrvRecordName -DnsServer $EffectiveDnsServer -ReturnAll
         if ($SrvResults) {
             if ($SrvResults -isnot [System.Array]) {
                 $SrvResults = @($SrvResults)
             }
-            Write-Log "[Resolve-adPEASName] Found $($SrvResults.Count) DC(s) via SRV records"
+            Write-Log "[Resolve-adPEASName] Найдено контроллеров домена по SRV: $($SrvResults.Count)"
 
             # Iterate through DCs in priority order, test reachability
             foreach ($SrvRecord in $SrvResults) {
                 $DcHostname = $SrvRecord.Target
-                Write-Log "[Resolve-adPEASName] Trying DC: $DcHostname (Priority: $($SrvRecord.Priority), Weight: $($SrvRecord.Weight))"
+                Write-Log "[Resolve-adPEASName] Проверка контроллера домена $DcHostname (приоритет: $($SrvRecord.Priority), вес: $($SrvRecord.Weight))"
 
                 # Resolve DC hostname to IP
                 $DcIP = Resolve-HostnameToIP -Hostname $DcHostname -DnsServer $EffectiveDnsServer -NoCache:$NoCache
 
                 if (-not $DcIP) {
-                    Write-Log "[Resolve-adPEASName] Could not resolve $DcHostname to IP, trying next DC"
+                    Write-Log "[Resolve-adPEASName] Не удалось определить IP узла $DcHostname; переход к следующему контроллеру"
                     continue
                 }
 
                 # Test if DC is actually reachable (Port 88 + 389/636)
                 if (Test-DCReachable -IP $DcIP -Hostname $DcHostname -UseLDAPS:$EffectiveUseLDAPS) {
-                    Write-Log "[Resolve-adPEASName] DC $DcHostname ($DcIP) is reachable - using this DC"
+                    Write-Log "[Resolve-adPEASName] Контроллер $DcHostname ($DcIP) доступен; используется этот узел"
                     return [PSCustomObject]@{
                         Hostname = $DcHostname
                         IP = $DcIP
                     }
                 }
                 else {
-                    Write-Log "[Resolve-adPEASName] DC $DcHostname ($DcIP) is NOT reachable (stale SRV record?), trying next DC"
+                    Write-Log "[Resolve-adPEASName] Контроллер $DcHostname ($DcIP) недоступен (устаревшая SRV-запись?); переход к следующему"
                 }
             }
 
-            Write-Log "[Resolve-adPEASName] All $($SrvResults.Count) DC(s) from SRV records are unreachable"
+            Write-Log "[Resolve-adPEASName] Все контроллеры домена по SRV недоступны: $($SrvResults.Count)"
         }
 
         # Fallback: Reverse DNS lookup (system DNS only)
         if (-not $EffectiveDnsServer) {
-            Write-Log "[Resolve-adPEASName] Attempting reverse DNS lookup for: $Domain"
+            Write-Log "[Resolve-adPEASName] Обратный DNS-поиск для: $Domain"
             try {
                 $DnsResult = [System.Net.Dns]::GetHostEntry($Domain)
                 if ($DnsResult -and $DnsResult.AddressList.Count -gt 0) {
@@ -83219,7 +83219,7 @@ function Resolve-adPEASName {
 
                     if ($DcIPAddr) {
                         $DcIPString = $DcIPAddr.IPAddressToString
-                        Write-Log "[Resolve-adPEASName] Domain resolved to IP: $DcIPString"
+                        Write-Log "[Resolve-adPEASName] Домен разрешён в IP-адрес: $DcIPString"
 
                         # Try reverse lookup to get actual DC hostname
                         $DcHostname = $Domain  # Default to domain name if reverse lookup fails
@@ -83227,50 +83227,50 @@ function Resolve-adPEASName {
                             $ReverseResult = [System.Net.Dns]::GetHostEntry($DcIPAddr)
                             if ($ReverseResult -and $ReverseResult.HostName -and $ReverseResult.HostName -ne $Domain) {
                                 $DcHostname = $ReverseResult.HostName
-                                Write-Log "[Resolve-adPEASName] Reverse DNS resolved: $DcHostname"
+                                Write-Log "[Resolve-adPEASName] Обратный DNS-поиск вернул: $DcHostname"
                             }
                         }
                         catch {
-                            Write-Log "[Resolve-adPEASName] Reverse DNS lookup failed, using domain name as hostname: $_"
+                            Write-Log "[Resolve-adPEASName] Ошибка обратного DNS; вместо имени узла используется домен: $_"
                         }
 
                         if (Test-DCReachable -IP $DcIPString -Hostname $DcHostname -UseLDAPS:$EffectiveUseLDAPS) {
-                            Write-Log "[Resolve-adPEASName] DC $DcHostname ($DcIPString) via reverse DNS is reachable"
+                            Write-Log "[Resolve-adPEASName] Контроллер $DcHostname ($DcIPString) доступен через обратный DNS"
                             return [PSCustomObject]@{
                                 Hostname = $DcHostname
                                 IP = $DcIPString
                             }
                         }
                         else {
-                            Write-Log "[Resolve-adPEASName] DC $DcHostname ($DcIPString) via reverse DNS is NOT reachable"
+                            Write-Log "[Resolve-adPEASName] Контроллер $DcHostname ($DcIPString) недоступен через обратный DNS"
                         }
                     }
                 }
             }
             catch {
-                Write-Log "[Resolve-adPEASName] System DNS resolution failed: $_"
+                Write-Log "[Resolve-adPEASName] Ошибка системного разрешения DNS: $_"
             }
         }
 
         # Last resort: Direct A record lookup for domain name
-        Write-Log "[Resolve-adPEASName] Falling back to direct domain resolution"
+        Write-Log "[Resolve-adPEASName] Резервный вариант: прямое разрешение имени домена"
         $DomainIP = Resolve-HostnameToIP -Hostname $Domain -DnsServer $EffectiveDnsServer -NoCache:$NoCache
 
         if ($DomainIP) {
             if (Test-DCReachable -IP $DomainIP -Hostname $Domain -UseLDAPS:$EffectiveUseLDAPS) {
-                Write-Log "[Resolve-adPEASName] DC $Domain ($DomainIP) via direct resolution is reachable"
+                Write-Log "[Resolve-adPEASName] Контроллер $Domain ($DomainIP) доступен через прямое разрешение"
                 return [PSCustomObject]@{
                     Hostname = $Domain
                     IP = $DomainIP
                 }
             }
             else {
-                Write-Log "[Resolve-adPEASName] DC $Domain ($DomainIP) via direct resolution is NOT reachable"
+                Write-Log "[Resolve-adPEASName] Контроллер $Domain ($DomainIP) недоступен через прямое разрешение"
             }
         }
 
         # Complete failure
-        Write-Log "[Resolve-adPEASName] Could not discover reachable DC for domain: $Domain"
+        Write-Log "[Resolve-adPEASName] Не удалось обнаружить доступный контроллер для домена: $Domain"
         return $null
     }
 }
@@ -158745,7 +158745,7 @@ function Collect-BHIssuancePolicies {
 #Requires -Version 5.1
 
 # ===== Script Variables =====
-$Script:adPEASVersion = "2.9.0+20261119-1028"
+$Script:adPEASVersion = "2.9.0+20261119-1032"
 
 # Handle ScriptPath for different execution contexts:
 # - Normal: $MyInvocation.MyCommand.Path is set

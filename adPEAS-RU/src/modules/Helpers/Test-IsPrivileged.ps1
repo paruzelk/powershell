@@ -199,7 +199,7 @@ function Clear-PrivilegedCheckCache {
     param()
 
     $Script:PrivilegedCheckCache = @{}
-    Write-Log "[Clear-PrivilegedCheckCache] Cache cleared"
+    Write-Log "[Clear-PrivilegedCheckCache] Кэш очищен"
 }
 
 <#
@@ -215,7 +215,7 @@ function Clear-GroupMembershipCache {
     param()
 
     $Script:GroupMembershipCache = @{}
-    Write-Log "[Clear-GroupMembershipCache] Cache cleared"
+    Write-Log "[Clear-GroupMembershipCache] Кэш очищен"
 }
 
 <#
@@ -302,7 +302,7 @@ function Test-IsExchangeServiceGroup {
                             $dn = $obj.distinguishedName
                         }
                     } catch {
-                        Write-Log "[Test-IsExchangeServiceGroup] Failed to resolve sAMAccountName: $Identity"
+                        Write-Log "[Test-IsExchangeServiceGroup] Не удалось определить sAMAccountName: $Identity"
                     }
                 }
             }
@@ -330,7 +330,7 @@ function Test-IsExchangeServiceGroup {
                     }
                 }
             } catch {
-                Write-Log "[Test-IsExchangeServiceGroup] Failed to resolve SID to DN: $sid"
+                Write-Log "[Test-IsExchangeServiceGroup] Не удалось преобразовать SID в DN: $sid"
             }
         }
 
@@ -348,7 +348,7 @@ function Test-IsExchangeServiceGroup {
         # Check if DN contains Exchange Security Groups OU (language-independent)
         # The OU name is always "Microsoft Exchange Security Groups" even in non-English installations
         if ($dn -match 'OU=Microsoft Exchange Security Groups') {
-            Write-Log "[Test-IsExchangeServiceGroup] Exchange service group detected: $dn"
+            Write-Log "[Test-IsExchangeServiceGroup] Обнаружена сервисная группа Exchange: $dn"
             $result = [PSCustomObject]@{
                 IsExchangeService = $true
                 Reason = "Member of Exchange Security Groups OU (by-design permissions)"
@@ -505,7 +505,7 @@ function Test-IsExchangeServer {
             $computerName = if ($obj.name) { $obj.name } elseif ($obj.sAMAccountName) { $obj.sAMAccountName -replace '\$$' } else { $null }
 
             if ($exchangeSPNs.Count -gt 0) {
-                Write-Log "[Test-IsExchangeServer] Exchange Server detected: $computerName (SPNs: $($exchangeSPNs -join ', '))"
+                Write-Log "[Test-IsExchangeServer] Обнаружен сервер Exchange: $computerName (SPN: $($exchangeSPNs -join ', '))"
                 return [PSCustomObject]@{
                     IsExchangeServer = $true
                     SPNs = $exchangeSPNs
@@ -520,7 +520,7 @@ function Test-IsExchangeServer {
             }
 
         } catch {
-            Write-Log "[Test-IsExchangeServer] Error checking $Identity`: $_"
+            Write-Log "[Test-IsExchangeServer] Ошибка проверки $Identity`: $_"
             return [PSCustomObject]@{
                 IsExchangeServer = $false
                 SPNs = @()
@@ -573,13 +573,13 @@ function Get-RecursiveGroupMembership {
 
     # Check cache first (unless NoCache is specified)
     if (-not $NoCache -and $Script:GroupMembershipCache.ContainsKey($IdentitySID)) {
-        Write-Log "[Get-RecursiveGroupMembership] Cache hit for $IdentitySID"
+        Write-Log "[Get-RecursiveGroupMembership] Результат найден в кэше для $IdentitySID"
         return $Script:GroupMembershipCache[$IdentitySID]
     }
 
     # Need LDAP connection
     if (-not $Script:LdapConnection) {
-        Write-Log "[Get-RecursiveGroupMembership] No LDAP connection available"
+        Write-Log "[Get-RecursiveGroupMembership] Подключение LDAP отсутствует"
         return @()
     }
 
@@ -591,16 +591,16 @@ function Get-RecursiveGroupMembership {
                 $obj = @(Get-DomainObject -LDAPFilter "(objectSid=$sidHex)" -Properties 'distinguishedName')[0]
                 if ($obj) {
                     $IdentityDN = $obj.distinguishedName
-                    Write-Log "[Get-RecursiveGroupMembership] Resolved SID to DN: $IdentityDN"
+                    Write-Log "[Get-RecursiveGroupMembership] SID преобразован в DN: $IdentityDN"
                 }
             }
         } catch {
-            Write-Log "[Get-RecursiveGroupMembership] Failed to resolve SID to DN: $_"
+            Write-Log "[Get-RecursiveGroupMembership] Не удалось преобразовать SID в DN: $_"
         }
 
         # Still no DN after resolution attempt (either exception or object not found)
         if (-not $IdentityDN) {
-            Write-Log "[Get-RecursiveGroupMembership] No DN available for $IdentitySID"
+            Write-Log "[Get-RecursiveGroupMembership] Не найден DN для $IdentitySID"
             $Script:GroupMembershipCache[$IdentitySID] = @()
             return @()
         }
@@ -611,7 +611,7 @@ function Get-RecursiveGroupMembership {
     $groupSIDs = @()
 
     try {
-        Write-Log "[Get-RecursiveGroupMembership] Querying all group memberships for: $IdentityDN"
+        Write-Log "[Get-RecursiveGroupMembership] Запрос всех групп пользователя: $IdentityDN"
 
         # Escape DN for LDAP filter (special characters in DN)
         $escapedDN = Escape-LDAPFilterValue -Value $IdentityDN
@@ -623,20 +623,20 @@ function Get-RecursiveGroupMembership {
             foreach ($group in $groups) {
                 if ($group.objectSid) {
                     $groupSIDs += $group.objectSid
-                    Write-Log "[Get-RecursiveGroupMembership] Found membership: $($group.sAMAccountName) ($($group.objectSid))"
+                    Write-Log "[Get-RecursiveGroupMembership] Найдено членство в группе: $($group.sAMAccountName) ($($group.objectSid))"
                 }
             }
         }
 
-        Write-Log "[Get-RecursiveGroupMembership] Found $($groupSIDs.Count) group membership(s) for $IdentitySID"
+        Write-Log "[Get-RecursiveGroupMembership] Найдено $($groupSIDs.Count) групп для $IdentitySID"
 
     } catch {
-        Write-Log "[Get-RecursiveGroupMembership] Error querying group memberships: $_"
+        Write-Log "[Get-RecursiveGroupMembership] Ошибка запроса членства в группах: $_"
     }
 
     # Cache the result
     $Script:GroupMembershipCache[$IdentitySID] = $groupSIDs
-    Write-Log "[Get-RecursiveGroupMembership] Cached result for $IdentitySID"
+    Write-Log "[Get-RecursiveGroupMembership] Результат сохранён в кэш для $IdentitySID"
 
     return $groupSIDs
 }
@@ -700,7 +700,7 @@ function Test-IsPrivileged {
         }
 
         if (-not $sid) {
-            Write-Log "[Test-IsPrivileged] Could not resolve identity to SID: $Identity"
+            Write-Log "[Test-IsPrivileged] Не удалось определить SID для учётной записи: $Identity"
             return [PSCustomObject]@{
                 IsPrivileged = $null
                 Category = 'Unknown'
@@ -736,7 +736,7 @@ function Test-IsPrivileged {
                 MatchedGroup = $null
                 Identity = $Identity
             }
-            Write-Log "[Test-IsPrivileged] Operator detected: $sid"
+            Write-Log "[Test-IsPrivileged] Обнаружен оператор: $sid"
             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
         }
 
@@ -750,7 +750,7 @@ function Test-IsPrivileged {
                 MatchedGroup = $null
                 Identity = $Identity
             }
-            Write-Log "[Test-IsPrivileged] Operator via RID suffix: $sid"
+            Write-Log "[Test-IsPrivileged] Оператор по суффиксу RID: $sid"
             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
         }
 
@@ -764,7 +764,7 @@ function Test-IsPrivileged {
                 MatchedGroup = $null
                 Identity = $Identity
             }
-            Write-Log "[Test-IsPrivileged] Privileged via static SID: $sid"
+            Write-Log "[Test-IsPrivileged] Привилегированный SID из статического списка: $sid"
             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
         }
 
@@ -778,7 +778,7 @@ function Test-IsPrivileged {
                 MatchedGroup = $null
                 Identity = $Identity
             }
-            Write-Log "[Test-IsPrivileged] Privileged via RID suffix: $sid"
+            Write-Log "[Test-IsPrivileged] Привилегированный SID по суффиксу RID: $sid"
             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
         }
 
@@ -790,14 +790,14 @@ function Test-IsPrivileged {
         if ($sid -in $Script:BroadGroupSIDs) {
             $isBroadGroup = $true
             $broadGroupReason = "Broad group (static SID)"
-            Write-Log "[Test-IsPrivileged] BroadGroup detected (static): $sid - checking for privileged membership..."
+            Write-Log "[Test-IsPrivileged] Обнаружена широкая группа BroadGroup (статическая): $sid; проверяется членство в привилегированных группах..."
         }
 
         # 3e. Check Broad Group RID suffixes (precise matching)
         if (-not $isBroadGroup -and $ridSuffix -in $Script:BroadGroupRIDSuffixes) {
             $isBroadGroup = $true
             $broadGroupReason = "Broad group (RID suffix $ridSuffix)"
-            Write-Log "[Test-IsPrivileged] BroadGroup detected (RID): $sid - checking for privileged membership..."
+            Write-Log "[Test-IsPrivileged] Обнаружена широкая группа BroadGroup (по RID): $sid; проверяется членство в привилегированных группах..."
         }
 
         # Resolve name from SID only if not already known (needed for logging)
@@ -805,7 +805,7 @@ function Test-IsPrivileged {
             $name = ConvertFrom-SID -SID $sid
         }
 
-        Write-Log "[Test-IsPrivileged] Checking SID: $sid (Name: $name)"
+        Write-Log "[Test-IsPrivileged] Проверка SID: $sid (имя: $name)"
 
         # ===== PHASE 4: sIDHistory Check (SID History Injection Detection) =====
         # Check if this identity has privileged SIDs in sIDHistory attribute.
@@ -839,7 +839,7 @@ function Test-IsPrivileged {
                             $sidHistoryValues = @($adObject.sIDHistory)
                         }
 
-                        Write-Log "[Test-IsPrivileged] Found $($sidHistoryValues.Count) sIDHistory entries for $sid"
+                        Write-Log "[Test-IsPrivileged] Найдено $($sidHistoryValues.Count) записей sIDHistory для $sid"
 
                         # Read every entry before deciding, and keep the highest tier
                         # found. Returning on the first entry that matched anything made
@@ -861,7 +861,7 @@ function Test-IsPrivileged {
                                     $secId = New-Object System.Security.Principal.SecurityIdentifier($historySID, 0)
                                     $historySIDString = $secId.Value
                                 } catch {
-                                    Write-Log "[Test-IsPrivileged] Failed to convert sIDHistory byte array: $_"
+                                    Write-Log "[Test-IsPrivileged] Не удалось преобразовать массив байтов sIDHistory: $_"
                                     continue
                                 }
                             } elseif ($historySID -is [string]) {
@@ -870,7 +870,7 @@ function Test-IsPrivileged {
                                 continue
                             }
 
-                            Write-Log "[Test-IsPrivileged] Checking sIDHistory entry: $historySIDString"
+                            Write-Log "[Test-IsPrivileged] Проверка записи sIDHistory: $historySIDString"
 
                             # Check if this sIDHistory SID is privileged
                             $historyRIDSuffix = Get-SIDRIDSuffix -SID $historySIDString
@@ -879,7 +879,7 @@ function Test-IsPrivileged {
                             if (-not $historyPrivilegedSID -and $historySIDString -in $Script:PrivilegedSIDs) {
                                 $historyPrivilegedSID = $historySIDString
                                 $historyPrivilegedReason = "sIDHistory contains privileged SID (SID History Injection risk)"
-                                Write-Log "[Test-IsPrivileged] CRITICAL: sIDHistory contains privileged SID: $historySIDString"
+                                Write-Log "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит привилегированный SID: $historySIDString"
                                 continue
                             }
 
@@ -887,7 +887,7 @@ function Test-IsPrivileged {
                             if (-not $historyPrivilegedSID -and $historyRIDSuffix -and $historyRIDSuffix -in $Script:PrivilegedRIDSuffixes) {
                                 $historyPrivilegedSID = $historySIDString
                                 $historyPrivilegedReason = "sIDHistory contains privileged RID $historyRIDSuffix (SID History Injection risk)"
-                                Write-Log "[Test-IsPrivileged] CRITICAL: sIDHistory contains privileged RID: $historySIDString"
+                                Write-Log "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит привилегированный RID: $historySIDString"
                                 continue
                             }
 
@@ -895,7 +895,7 @@ function Test-IsPrivileged {
                             if (-not $historyOperatorSID -and $historySIDString -in $Script:OperatorSIDs) {
                                 $historyOperatorSID = $historySIDString
                                 $historyOperatorReason = "sIDHistory contains Operator SID (SID History Injection risk)"
-                                Write-Log "[Test-IsPrivileged] CRITICAL: sIDHistory contains Operator SID: $historySIDString"
+                                Write-Log "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит SID оператора: $historySIDString"
                                 continue
                             }
 
@@ -903,7 +903,7 @@ function Test-IsPrivileged {
                             if (-not $historyOperatorSID -and $historyRIDSuffix -and $historyRIDSuffix -in $Script:OperatorRIDSuffixes) {
                                 $historyOperatorSID = $historySIDString
                                 $historyOperatorReason = "sIDHistory contains Operator RID $historyRIDSuffix (SID History Injection risk)"
-                                Write-Log "[Test-IsPrivileged] CRITICAL: sIDHistory contains Operator RID: $historySIDString"
+                                Write-Log "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит RID оператора: $historySIDString"
                                 continue
                             }
                         }
@@ -934,7 +934,7 @@ function Test-IsPrivileged {
                     }
                 }
             } catch {
-                Write-Log "[Test-IsPrivileged] Error checking sIDHistory: $_"
+                Write-Log "[Test-IsPrivileged] Ошибка проверки sIDHistory: $_"
             }
         }
 
@@ -967,7 +967,7 @@ function Test-IsPrivileged {
             }
 
             if ($tierMemberships.Count -gt 0) {
-                Write-Log "[Test-IsPrivileged] Found $($tierMemberships.Count) group membership(s) for $sid"
+                Write-Log "[Test-IsPrivileged] Найдено $($tierMemberships.Count) групп для $sid"
 
                 $domainSID = $null
                 if ($Script:LDAPContext -and $Script:LDAPContext.DomainSID) {
@@ -1005,7 +1005,7 @@ function Test-IsPrivileged {
                             MatchedGroup = $groupName
                             Identity = $Identity
                         }
-                        Write-Log "[Test-IsPrivileged] Privileged via membership: $groupName"
+                        Write-Log "[Test-IsPrivileged] Привилегированность получена через членство: $groupName"
                         return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
                     }
                 }
@@ -1025,7 +1025,7 @@ function Test-IsPrivileged {
                             MatchedGroup = $groupName
                             Identity = $Identity
                         }
-                        Write-Log "[Test-IsPrivileged] Operator via membership: $groupName"
+                        Write-Log "[Test-IsPrivileged] Статус оператора получен через членство: $groupName"
                         return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
                     }
                 }
@@ -1046,7 +1046,7 @@ function Test-IsPrivileged {
                                 MatchedGroup = $groupName
                                 Identity = $Identity
                             }
-                            Write-Log "[Test-IsPrivileged] Operator via membership (RID suffix): $groupName"
+                            Write-Log "[Test-IsPrivileged] Статус оператора через членство (суффикс RID): $groupName"
                             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
                         }
                     }
@@ -1068,16 +1068,16 @@ function Test-IsPrivileged {
                                 MatchedGroup = $groupName
                                 Identity = $Identity
                             }
-                            Write-Log "[Test-IsPrivileged] BroadGroup via membership: $groupName"
+                            Write-Log "[Test-IsPrivileged] Широкая группа BroadGroup через членство: $groupName"
                             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
                         }
                     }
                 }
             } else {
-                Write-Log "[Test-IsPrivileged] No group memberships found for $sid"
+                Write-Log "[Test-IsPrivileged] Для $sid группы не найдены"
             }
         } else {
-            Write-Log "[Test-IsPrivileged] No LDAP connection - group membership check skipped"
+            Write-Log "[Test-IsPrivileged] Нет подключения LDAP; проверка членства в группах пропущена"
         }
 
         # ===== PHASE 6: Final Category Determination =====
@@ -1092,7 +1092,7 @@ function Test-IsPrivileged {
                 MatchedGroup = $null
                 Identity = $Identity
             }
-            Write-Log "[Test-IsPrivileged] BroadGroup confirmed (no privileged membership found): $sid"
+            Write-Log "[Test-IsPrivileged] Подтверждена широкая группа BroadGroup (привилегированного членства нет): $sid"
             return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
         }
 
@@ -1105,7 +1105,7 @@ function Test-IsPrivileged {
             MatchedGroup = $null
             Identity = $Identity
         }
-        Write-Log "[Test-IsPrivileged] Standard identity: $sid"
+        Write-Log "[Test-IsPrivileged] Обычная учётная запись: $sid"
         return (Complete-PrivilegedCheck -Result $result -CacheKey $cacheKey -NoCache:$NoCache -IncludeOperators:$IncludeOperators)
     }
 }
@@ -1336,7 +1336,7 @@ function Test-IsExpectedInScope {
         # ===== Get Scope Definition =====
         $scopeDef = $Script:SecurityScopes[$Scope]
         if (-not $scopeDef) {
-            Write-Warning "[Test-IsExpectedInScope] Unknown scope: $Scope"
+            Write-Warning "[Test-IsExpectedInScope] Неизвестная область проверки: $Scope"
             if ($ReturnDetails) {
                 return [PSCustomObject]@{
                     Severity = 'Finding'
@@ -1406,7 +1406,7 @@ function Test-IsExpectedInScope {
                 $defaultRights = @($scopeDef.DefaultRightHolders[$holderKey])
                 $beyond = @(@($Rights) | Where-Object { $_ -and ($defaultRights -notcontains $_) })
                 if (@($beyond).Count -eq 0) {
-                    Write-Log "[Test-IsExpectedInScope] $sid holds only its default rights in scope '$Scope'"
+                    Write-Log "[Test-IsExpectedInScope] У $sid только права по умолчанию в области '$Scope'"
                     if ($ReturnDetails) {
                         return [PSCustomObject]@{
                             Severity = 'Expected'
@@ -1418,7 +1418,7 @@ function Test-IsExpectedInScope {
                     }
                     return 'Expected'
                 }
-                Write-Log "[Test-IsExpectedInScope] $sid holds $($beyond -join ', ') beyond its defaults in scope '$Scope'"
+                Write-Log "[Test-IsExpectedInScope] У $sid есть дополнительные права ($($beyond -join ', ')) в области '$Scope'"
             }
         }
 
@@ -1514,7 +1514,7 @@ function Test-IsExpectedInScope {
                         if (-not $groupName) { $groupName = $expectedGroupSID }
 
                         # Identity is member of an expected group -> Attention (not Finding), because the explicit ACE is redundant but not a new attack vector
-                        Write-Log "[Test-IsExpectedInScope] Identity $sid is member of expected group $groupName"
+                        Write-Log "[Test-IsExpectedInScope] Учётная запись $sid входит в ожидаемую группу $groupName"
                         if ($ReturnDetails) {
                             return [PSCustomObject]@{
                                 Severity = 'Attention'
@@ -1540,7 +1540,7 @@ function Test-IsExpectedInScope {
         if ($Script:LdapConnection) {
             $exchangeCheck = Test-IsExchangeServiceGroup -Identity $Identity
             if ($exchangeCheck.IsExchangeService) {
-                Write-Log "[Test-IsExpectedInScope] Exchange service group detected: $($exchangeCheck.DistinguishedName)"
+                Write-Log "[Test-IsExpectedInScope] Обнаружена сервисная группа Exchange: $($exchangeCheck.DistinguishedName)"
                 if ($ReturnDetails) {
                     return [PSCustomObject]@{
                         Severity = 'Attention'

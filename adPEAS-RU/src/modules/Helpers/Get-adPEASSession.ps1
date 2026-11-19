@@ -320,7 +320,7 @@
                     }
                     else {
                         Show-KeyValue "TGT Valid Until:" "$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss')" -Class Finding
-                        Write-Warning "[!] TGT EXPIRED - Re-authentication required!"
+                        Write-Warning "[!] TGT ИСТЁК — требуется повторная аутентификация!"
                     }
 
                 }
