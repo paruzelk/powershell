@@ -1,0 +1,81 @@
+{
+  "schema": "adPEAS-RU.DOC6i.SecurityLogs.1",
+  "path": "src/modules/Checks/Computer/Get-InfrastructureServers.ps1",
+  "entries": [
+    {
+      "line": 65,
+      "original": "        Write-Log \"[Get-InfrastructureServers] $ServiceName service account lookup failed: $_\" -Level Error",
+      "target": "        Write-Log \"[Get-InfrastructureServers] $ServiceName — ошибка поиска служебной учётной записи: $_\" -Level Error"
+    },
+    {
+      "line": 104,
+      "original": "                Write-Log \"[Get-InfrastructureServers] Could not evaluate privileges of $($account.sAMAccountName): $_\"",
+      "target": "                Write-Log \"[Get-InfrastructureServers] Не удалось проверить привилегии $($account.sAMAccountName): $_\""
+    },
+    {
+      "line": 227,
+      "original": "        Write-Log \"[Get-RegisteredDomainControllerDN] The configuration partition could not be read: $_\"",
+      "target": "        Write-Log \"[Get-RegisteredDomainControllerDN] Не удалось прочитать раздел Configuration: $_\""
+    },
+    {
+      "line": 300,
+      "original": "        Write-Log \"[Get-InfrastructureServers] Starting check\"",
+      "target": "        Write-Log \"[Get-InfrastructureServers] Начата проверка\""
+    },
+    {
+      "line": 366,
+      "original": "            Write-Log \"[Get-InfrastructureServers] Domain Controller enumeration failed: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-InfrastructureServers] Ошибка перечисления контроллеров домена: $_\" -Level Error"
+    },
+    {
+      "line": 401,
+      "original": "                Write-Log \"[Get-InfrastructureServers] No Configuration naming context - falling back to SPN detection for Exchange\"",
+      "target": "                Write-Log \"[Get-InfrastructureServers] Отсутствует контекст Configuration — для Exchange используется поиск по SPN\""
+    },
+    {
+      "line": 434,
+      "original": "            Write-Log \"[Get-InfrastructureServers] Exchange Server enumeration failed: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-InfrastructureServers] Ошибка перечисления серверов Exchange: $_\" -Level Error"
+    },
+    {
+      "line": 465,
+      "original": "            Write-Log \"[Get-InfrastructureServers] MSSQL Server enumeration failed: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-InfrastructureServers] Ошибка перечисления серверов MSSQL: $_\" -Level Error"
+    },
+    {
+      "line": 493,
+      "original": "            Write-Log \"[Get-InfrastructureServers] SCCM Server enumeration failed: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-InfrastructureServers] Ошибка перечисления серверов SCCM: $_\" -Level Error"
+    },
+    {
+      "line": 521,
+      "original": "            Write-Log \"[Get-InfrastructureServers] SCOM Server enumeration failed: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-InfrastructureServers] Ошибка перечисления серверов SCOM: $_\" -Level Error"
+    },
+    {
+      "line": 549,
+      "original": "                    Write-Log \"[Get-InfrastructureServers] No AD FS DKM container under $dkmBase : $_\"",
+      "target": "                    Write-Log \"[Get-InfrastructureServers] Контейнер DKM AD FS по пути $dkmBase не найден: $_\""
+    },
+    {
+      "line": 576,
+      "original": "                Write-Log \"[Get-InfrastructureServers] AD FS server lookup failed: $_\" -Level Error",
+      "target": "                Write-Log \"[Get-InfrastructureServers] Ошибка поиска серверов AD FS: $_\" -Level Error"
+    },
+    {
+      "line": 589,
+      "original": "            Write-Log \"[Get-InfrastructureServers] AD FS enumeration failed: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-InfrastructureServers] Ошибка перечисления AD FS: $_\" -Level Error"
+    },
+    {
+      "line": 647,
+      "original": "            Write-Log \"[Get-InfrastructureServers] Entra ID Connect enumeration failed: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-InfrastructureServers] Ошибка перечисления Entra ID Connect: $_\" -Level Error"
+    },
+    {
+      "line": 653,
+      "original": "        Write-Log \"[Get-InfrastructureServers] Check completed\"",
+      "target": "        Write-Log \"[Get-InfrastructureServers] Проверка завершена\""
+    }
+  ]
+}

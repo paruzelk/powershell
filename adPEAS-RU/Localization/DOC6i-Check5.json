@@ -1,0 +1,81 @@
+{
+  "schema": "adPEAS-RU.DOC6i.SecurityLogs.1",
+  "path": "src/modules/Checks/GPO/Get-GPOLocalGroupMembership.ps1",
+  "entries": [
+    {
+      "line": 51,
+      "original": "        Write-Log \"[Get-GPOLocalGroupMembership] Starting check\"",
+      "target": "        Write-Log \"[Get-GPOLocalGroupMembership] Начата проверка\""
+    },
+    {
+      "line": 172,
+      "original": "                    Write-Log \"[Get-GPOLocalGroupMembership] SYSVOL path not accessible: $sysvolPath\"",
+      "target": "                    Write-Log \"[Get-GPOLocalGroupMembership] Путь SYSVOL недоступен: $sysvolPath\""
+    },
+    {
+      "line": 192,
+      "original": "                            Write-Log \"[Get-GPOLocalGroupMembership] Reading: $($file.FullName)\"",
+      "target": "                            Write-Log \"[Get-GPOLocalGroupMembership] Чтение: $($file.FullName)\""
+    },
+    {
+      "line": 248,
+      "original": "                            Write-Log \"[Get-GPOLocalGroupMembership] Error parsing $($file.FullName): $_\"",
+      "target": "                            Write-Log \"[Get-GPOLocalGroupMembership] Ошибка разбора $($file.FullName): $_\""
+    },
+    {
+      "line": 269,
+      "original": "                            Write-Log \"[Get-GPOLocalGroupMembership] Reading: $($file.FullName)\"",
+      "target": "                            Write-Log \"[Get-GPOLocalGroupMembership] Чтение: $($file.FullName)\""
+    },
+    {
+      "line": 318,
+      "original": "                            Write-Log \"[Get-GPOLocalGroupMembership] Error parsing $($file.FullName): $_\"",
+      "target": "                            Write-Log \"[Get-GPOLocalGroupMembership] Ошибка разбора $($file.FullName): $_\""
+    },
+    {
+      "line": 428,
+      "original": "            Write-Log \"[Get-GPOLocalGroupMembership] Error: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-GPOLocalGroupMembership] Ошибка: $_\" -Level Error"
+    },
+    {
+      "line": 434,
+      "original": "        Write-Log \"[Get-GPOLocalGroupMembership] Check completed\"",
+      "target": "        Write-Log \"[Get-GPOLocalGroupMembership] Проверка завершена\""
+    },
+    {
+      "line": 483,
+      "original": "        Write-Log \"[Resolve-LocalGroupTargetName] Target group $trimmed is not in the table - reported as '$resolved'\"",
+      "target": "        Write-Log \"[Resolve-LocalGroupTargetName] Целевая группа $trimmed отсутствует в таблице — в отчёте используется '$resolved'\""
+    },
+    {
+      "line": 487,
+      "original": "    Write-Log \"[Resolve-LocalGroupTargetName] Target group $trimmed is not in the table and did not resolve to a name\"",
+      "target": "    Write-Log \"[Resolve-LocalGroupTargetName] Целевая группа $trimmed отсутствует в таблице, имя определить не удалось\""
+    },
+    {
+      "line": 603,
+      "original": "            Write-Log \"[Resolve-RestrictedGroupSID] Resolved name '$trimmed' to $resolved\"",
+      "target": "            Write-Log \"[Resolve-RestrictedGroupSID] Имя '$trimmed' преобразовано в $resolved\""
+    },
+    {
+      "line": 607,
+      "original": "        Write-Log \"[Resolve-RestrictedGroupSID] Could not resolve '$trimmed' to a SID: $_\"",
+      "target": "        Write-Log \"[Resolve-RestrictedGroupSID] Не удалось определить SID для '$trimmed': $_\""
+    },
+    {
+      "line": 847,
+      "original": "        Write-Log \"[Parse-RestrictedGroups] Error parsing $FilePath : $_\"",
+      "target": "        Write-Log \"[Parse-RestrictedGroups] Ошибка разбора $FilePath : $_\""
+    },
+    {
+      "line": 1042,
+      "original": "                Write-Log \"[Parse-GPPGroups] Item for '$canonicalGroupName' names no BUILTIN group and no broad principal - not reported\"",
+      "target": "                Write-Log \"[Parse-GPPGroups] Элемент для '$canonicalGroupName' не содержит ни группы BUILTIN, ни субъекта с широкими правами — в отчёт не включён\""
+    },
+    {
+      "line": 1087,
+      "original": "        Write-Log \"[Parse-GPPGroups] Error parsing $FilePath : $_\"",
+      "target": "        Write-Log \"[Parse-GPPGroups] Ошибка разбора $FilePath : $_\""
+    }
+  ]
+}

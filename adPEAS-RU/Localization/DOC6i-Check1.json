@@ -1,0 +1,91 @@
+{
+  "schema": "adPEAS-RU.DOC6i.SecurityLogs.1",
+  "path": "src/modules/Checks/Creds/Get-BitLockerRecoveryKeyAccess.ps1",
+  "entries": [
+    {
+      "line": 80,
+      "original": "        Write-Log \"[Get-BitLockerRecoveryKeyAccess] Starting check\"",
+      "target": "        Write-Log \"[Get-BitLockerRecoveryKeyAccess] Начата проверка\""
+    },
+    {
+      "line": 108,
+      "original": "                Write-Log \"[Get-BitLockerRecoveryKeyAccess] Using cached schema info: Present=$bitLockerPresent\"",
+      "target": "                Write-Log \"[Get-BitLockerRecoveryKeyAccess] Используются сведения о схеме из кэша: Present=$bitLockerPresent\""
+    },
+    {
+      "line": 119,
+      "original": "                            Write-Log \"[Get-BitLockerRecoveryKeyAccess] msFVE-RecoveryInformation schema class found\"",
+      "target": "                            Write-Log \"[Get-BitLockerRecoveryKeyAccess] В схеме найден класс msFVE-RecoveryInformation\""
+    },
+    {
+      "line": 122,
+      "original": "                        Write-Log \"[Get-BitLockerRecoveryKeyAccess] Schema query error: $($_.Exception.Message)\"",
+      "target": "                        Write-Log \"[Get-BitLockerRecoveryKeyAccess] Ошибка запроса схемы: $($_.Exception.Message)\""
+    },
+    {
+      "line": 131,
+      "original": "                        Write-Log \"[Get-BitLockerRecoveryKeyAccess] msFVE-RecoveryInformation objects detected\"",
+      "target": "                        Write-Log \"[Get-BitLockerRecoveryKeyAccess] Обнаружены объекты msFVE-RecoveryInformation\""
+    },
+    {
+      "line": 147,
+      "original": "            Write-Log \"[Get-BitLockerRecoveryKeyAccess] Querying for readable BitLocker recovery keys\"",
+      "target": "            Write-Log \"[Get-BitLockerRecoveryKeyAccess] Поиск доступных для чтения ключей восстановления BitLocker\""
+    },
+    {
+      "line": 158,
+      "original": "            Write-Log \"[Get-BitLockerRecoveryKeyAccess] Found $($recoveryObjects.Count) readable recovery key(s)\"",
+      "target": "            Write-Log \"[Get-BitLockerRecoveryKeyAccess] Найдено доступных для чтения ключей восстановления: $($recoveryObjects.Count)\""
+    },
+    {
+      "line": 174,
+      "original": "                Write-Log \"[Get-BitLockerRecoveryKeyAccess] $($withheldObjects.Count) recovery object(s) returned without a readable password\"",
+      "target": "                Write-Log \"[Get-BitLockerRecoveryKeyAccess] Объекты восстановления без читаемого пароля: $($withheldObjects.Count)\""
+    },
+    {
+      "line": 204,
+      "original": "                                Write-Log \"[Get-BitLockerRecoveryKeyAccess] Failed to convert $guidAttr for '$parentDN': $($_.Exception.Message)\"",
+      "target": "                                Write-Log \"[Get-BitLockerRecoveryKeyAccess] Не удалось преобразовать $guidAttr для '$parentDN': $($_.Exception.Message)\""
+    },
+    {
+      "line": 243,
+      "original": "                Write-Log \"[Get-BitLockerRecoveryKeyAccess] Delegation analysis failed: $_\" -Level Error",
+      "target": "                Write-Log \"[Get-BitLockerRecoveryKeyAccess] Ошибка анализа делегирования: $_\" -Level Error"
+    },
+    {
+      "line": 248,
+      "original": "            Write-Log \"[Get-BitLockerRecoveryKeyAccess] Error: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-BitLockerRecoveryKeyAccess] Ошибка: $_\" -Level Error"
+    },
+    {
+      "line": 254,
+      "original": "        Write-Log \"[Get-BitLockerRecoveryKeyAccess] Check completed\"",
+      "target": "        Write-Log \"[Get-BitLockerRecoveryKeyAccess] Проверка завершена\""
+    },
+    {
+      "line": 358,
+      "original": "            Write-Log \"[Get-BitLockerRecoveryKeyAccess] Failed to read permissions for '$containerDN': $($_.Exception.Message)\"",
+      "target": "            Write-Log \"[Get-BitLockerRecoveryKeyAccess] Не удалось прочитать разрешения для '$containerDN': $($_.Exception.Message)\""
+    },
+    {
+      "line": 451,
+      "original": "            Write-Log \"[Get-BitLockerRecoveryKeyAccess] $($entry.Principal) holds control access but no read of the recovery objects - not listed\"",
+      "target": "            Write-Log \"[Get-BitLockerRecoveryKeyAccess] У $($entry.Principal) есть право управления доступом, но нет права чтения объектов восстановления — в отчёт не включён\""
+    },
+    {
+      "line": 594,
+      "original": "        Write-Log \"[Get-BitLockerRecoveryConfidentiality] No SchemaNamingContext - answer stays unknown\"",
+      "target": "        Write-Log \"[Get-BitLockerRecoveryConfidentiality] Отсутствует SchemaNamingContext — результат остаётся неопределённым\""
+    },
+    {
+      "line": 608,
+      "original": "        Write-Log \"[Get-BitLockerRecoveryConfidentiality] Schema query failed: $($_.Exception.Message)\"",
+      "target": "        Write-Log \"[Get-BitLockerRecoveryConfidentiality] Ошибка запроса схемы: $($_.Exception.Message)\""
+    },
+    {
+      "line": 613,
+      "original": "        Write-Log \"[Get-BitLockerRecoveryConfidentiality] msFVE-RecoveryPassword not found in the schema\"",
+      "target": "        Write-Log \"[Get-BitLockerRecoveryConfidentiality] Атрибут msFVE-RecoveryPassword в схеме не найден\""
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "schema": "adPEAS-RU.DOC6i.SecurityLogs.1",
+  "path": "src/modules/Checks/Rights/Get-AddComputerRights.ps1",
+  "entries": [
+    {
+      "line": 57,
+      "original": "        Write-Log \"[Get-AddComputerRights] Starting check\"",
+      "target": "        Write-Log \"[Get-AddComputerRights] Начата проверка\""
+    },
+    {
+      "line": 121,
+      "original": "                Write-Log \"[Get-AddComputerRights] Could not read wellKnownObjects: $($_.Exception.Message)\"",
+      "target": "                Write-Log \"[Get-AddComputerRights] Не удалось прочитать wellKnownObjects: $($_.Exception.Message)\""
+    },
+    {
+      "line": 123,
+      "original": "            Write-Log \"[Get-AddComputerRights] Default computer container: $computersContainerDN\"",
+      "target": "            Write-Log \"[Get-AddComputerRights] Контейнер компьютеров по умолчанию: $computersContainerDN\""
+    },
+    {
+      "line": 143,
+      "original": "                        Write-Log \"[Get-AddComputerRights] Skipping ACE with empty SID\"",
+      "target": "                        Write-Log \"[Get-AddComputerRights] Пропущен ACE с пустым SID\""
+    },
+    {
+      "line": 166,
+      "original": "                        Write-Log \"[Get-AddComputerRights] Skipping descendants-only ACE: $($ace.Trustee) ($trusteeSID), PropagationFlags=$($ace.PropagationFlags)\"",
+      "target": "                        Write-Log \"[Get-AddComputerRights] Пропущен ACE только для дочерних объектов: $($ace.Trustee) ($trusteeSID), PropagationFlags=$($ace.PropagationFlags)\""
+    },
+    {
+      "line": 188,
+      "original": "                            Write-Log \"[Get-AddComputerRights] Skipping expected identity: $($ace.Trustee) ($trusteeSID) - $($expectedCheck.Reason)\"",
+      "target": "                            Write-Log \"[Get-AddComputerRights] Пропущен ожидаемый субъект: $($ace.Trustee) ($trusteeSID) — $($expectedCheck.Reason)\""
+    },
+    {
+      "line": 194,
+      "original": "                            Write-Log \"[Get-AddComputerRights] Skipping Authenticated Users ACL (already covered by quota)\"",
+      "target": "                            Write-Log \"[Get-AddComputerRights] Пропущен ACL Authenticated Users (уже учтён квотой)\""
+    },
+    {
+      "line": 206,
+      "original": "                                Write-Log \"[Get-AddComputerRights] CreateChild (expected): $($ace.Trustee) - $($scopeResult.Reason)\"",
+      "target": "                                Write-Log \"[Get-AddComputerRights] CreateChild (ожидаемое право): $($ace.Trustee) — $($scopeResult.Reason)\""
+    },
+    {
+      "line": 211,
+      "original": "                                Write-Log \"[Get-AddComputerRights] CreateChild (attention): $($ace.Trustee) - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)\"",
+      "target": "                                Write-Log \"[Get-AddComputerRights] CreateChild (требует внимания): $($ace.Trustee) — $($scopeResult.Reason); пропущено (для включения укажите -IncludePrivileged)\""
+    },
+    {
+      "line": 220,
+      "original": "                            Write-Log \"[Get-AddComputerRights] IncludePrivileged: Including $($ace.Trustee) ($trusteeSID) with severity $severity\"",
+      "target": "                            Write-Log \"[Get-AddComputerRights] IncludePrivileged: включён $($ace.Trustee) ($trusteeSID) с критичностью $severity\""
+    },
+    {
+      "line": 478,
+      "original": "            Write-Log \"[Get-AddComputerRights] Error: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-AddComputerRights] Ошибка: $_\" -Level Error"
+    },
+    {
+      "line": 484,
+      "original": "        Write-Log \"[Get-AddComputerRights] Check completed\"",
+      "target": "        Write-Log \"[Get-AddComputerRights] Проверка завершена\""
+    },
+    {
+      "line": 535,
+      "original": "        Write-Log \"[Check-GPOAddComputerRights] Building GPO precedence map from GPO linkage data\"",
+      "target": "        Write-Log \"[Check-GPOAddComputerRights] Построение карты приоритета GPO по данным привязок политик\""
+    },
+    {
+      "line": 566,
+      "original": "        Write-Log \"[Check-GPOAddComputerRights] Precedence map: $($Script:gpoAddComputerPrecedenceMap.Count) GPO(s) linked to DC OU or domain root\"",
+      "target": "        Write-Log \"[Check-GPOAddComputerRights] Карта приоритета: $($Script:gpoAddComputerPrecedenceMap.Count) GPO связаны с OU контроллеров домена или корнем домена\""
+    },
+    {
+      "line": 575,
+      "original": "                Write-Log \"[Check-GPOAddComputerRights] SYSVOL path not accessible: $sysvolPath\"",
+      "target": "                Write-Log \"[Check-GPOAddComputerRights] Путь SYSVOL недоступен: $sysvolPath\""
+    },
+    {
+      "line": 749,
+      "original": "                Write-Log \"[Check-GPOAddComputerRights] Effective GPO: '$($effectiveGPO.displayName)' (Scope=$($effectiveGPO._PrecedenceScope), LinkOrder=$($effectiveGPO._PrecedenceOrder))\"",
+      "target": "                Write-Log \"[Check-GPOAddComputerRights] Применяемая GPO: '$($effectiveGPO.displayName)' (Scope=$($effectiveGPO._PrecedenceScope), LinkOrder=$($effectiveGPO._PrecedenceOrder))\""
+    },
+    {
+      "line": 772,
+      "original": "        Write-Log \"[Check-GPOAddComputerRights] Error: $_\" -Level Error",
+      "target": "        Write-Log \"[Check-GPOAddComputerRights] Ошибка: $_\" -Level Error"
+    }
+  ]
+}

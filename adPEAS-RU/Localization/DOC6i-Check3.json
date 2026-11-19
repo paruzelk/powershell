@@ -1,0 +1,86 @@
+{
+  "schema": "adPEAS-RU.DOC6i.SecurityLogs.1",
+  "path": "src/modules/Checks/Creds/Get-LAPSCredentialAccess.ps1",
+  "entries": [
+    {
+      "line": 45,
+      "original": "            Write-Log \"[Resolve-LAPSEncryptedComputer] Could not convert $($property.Name): $_\"",
+      "target": "            Write-Log \"[Resolve-LAPSEncryptedComputer] Не удалось преобразовать $($property.Name): $_\""
+    },
+    {
+      "line": 119,
+      "original": "        Write-Log \"[Get-LAPSCredentialAccess] Starting check\"",
+      "target": "        Write-Log \"[Get-LAPSCredentialAccess] Начата проверка\""
+    },
+    {
+      "line": 159,
+      "original": "                Write-Log \"[Get-LAPSCredentialAccess] Querying for readable Legacy LAPS passwords\"",
+      "target": "                Write-Log \"[Get-LAPSCredentialAccess] Поиск доступных для чтения паролей Legacy LAPS\""
+    },
+    {
+      "line": 166,
+      "original": "                        Write-Log \"[Get-LAPSCredentialAccess] Legacy LAPS attribute withheld for '$($comp.distinguishedName)'\"",
+      "target": "                        Write-Log \"[Get-LAPSCredentialAccess] Атрибут Legacy LAPS недоступен для '$($comp.distinguishedName)'\""
+    },
+    {
+      "line": 173,
+      "original": "                Write-Log \"[Get-LAPSCredentialAccess] Querying for readable Windows LAPS plaintext passwords\"",
+      "target": "                Write-Log \"[Get-LAPSCredentialAccess] Поиск доступных для чтения паролей Windows LAPS в открытом виде\""
+    },
+    {
+      "line": 180,
+      "original": "                        Write-Log \"[Get-LAPSCredentialAccess] Windows LAPS attribute withheld for '$($comp.distinguishedName)'\"",
+      "target": "                        Write-Log \"[Get-LAPSCredentialAccess] Атрибут Windows LAPS недоступен для '$($comp.distinguishedName)'\""
+    },
+    {
+      "line": 192,
+      "original": "                Write-Log \"[Get-LAPSCredentialAccess] Checking encrypted LAPS passwords (optimized)\"",
+      "target": "                Write-Log \"[Get-LAPSCredentialAccess] Проверка зашифрованных паролей LAPS (оптимизированный метод)\""
+    },
+    {
+      "line": 197,
+      "original": "                    Write-Log \"[Get-LAPSCredentialAccess] Got $($myTokenGroups.Count) token groups for current user\"",
+      "target": "                    Write-Log \"[Get-LAPSCredentialAccess] Получено групп токена текущего пользователя: $($myTokenGroups.Count)\""
+    },
+    {
+      "line": 204,
+      "original": "                        Write-Log \"[Get-LAPSCredentialAccess] Found $($encryptedComputers.Count) computers with encrypted LAPS\"",
+      "target": "                        Write-Log \"[Get-LAPSCredentialAccess] Найдено компьютеров с зашифрованными паролями LAPS: $($encryptedComputers.Count)\""
+    },
+    {
+      "line": 231,
+      "original": "                                Write-Log \"[Get-LAPSCredentialAccess] Encrypted LAPS password not readable for '$($comp.distinguishedName)'\"",
+      "target": "                                Write-Log \"[Get-LAPSCredentialAccess] Зашифрованный пароль LAPS недоступен для чтения у '$($comp.distinguishedName)'\""
+    },
+    {
+      "line": 235,
+      "original": "                        Write-Log \"[Get-LAPSCredentialAccess] User is authorized for $authorizedCount of $($encryptedComputers.Count) encrypted LAPS computers\"",
+      "target": "                        Write-Log \"[Get-LAPSCredentialAccess] Пользователь имеет доступ к $authorizedCount из $($encryptedComputers.Count) компьютеров с зашифрованными паролями LAPS\""
+    },
+    {
+      "line": 251,
+      "original": "                    Write-Log \"[Get-LAPSCredentialAccess] No token groups - sampling decryption instead\"",
+      "target": "                    Write-Log \"[Get-LAPSCredentialAccess] Группы токена отсутствуют — используется пробная расшифровка\""
+    },
+    {
+      "line": 261,
+      "original": "                        Write-Log \"[Get-LAPSCredentialAccess] Fallback: decryption works, trying all $(@($encryptedComputers).Count)\"",
+      "target": "                        Write-Log \"[Get-LAPSCredentialAccess] Резервный метод: расшифровка работает, проверяются все $(@($encryptedComputers).Count) объектов\""
+    },
+    {
+      "line": 296,
+      "original": "                    Write-Log \"[Get-LAPSCredentialAccess] Privilege check failed for '$readerName': $_\"",
+      "target": "                    Write-Log \"[Get-LAPSCredentialAccess] Ошибка проверки привилегий для '$readerName': $_\""
+    },
+    {
+      "line": 338,
+      "original": "            Write-Log \"[Get-LAPSCredentialAccess] Error: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-LAPSCredentialAccess] Ошибка: $_\" -Level Error"
+    },
+    {
+      "line": 344,
+      "original": "        Write-Log \"[Get-LAPSCredentialAccess] Check completed\"",
+      "target": "        Write-Log \"[Get-LAPSCredentialAccess] Проверка завершена\""
+    }
+  ]
+}
