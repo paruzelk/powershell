@@ -93,6 +93,15 @@ def main():
         if en != row["EnglishTitle"] or field(new_find[key], "Risk") != row["RiskWitness"]:
             raise ValueError("New finding witness changed: " + key)
         titles[en] = row["RussianTitle"]
+    # An existing finding changed its English title in 2.11; review it separately.
+    changed_titles_ru = read_json(args.ru / "Migration/v2.11.0/ChangedFindingTitles.ru-RU.json")["Translations"]
+    if set(changed_titles_ru) != set(title_changed):
+        raise ValueError("Modified English title(s) not fully reviewed")
+    for key, row in changed_titles_ru.items():
+        new_title = field(new_find[key], "Title")
+        if new_title != row["EnglishTitle"]:
+            raise ValueError("Changed finding title drift: " + key)
+        titles[new_title] = row["RussianTitle"]
     if args.candidate.exists():
         raise ValueError("Candidate exists; refuse overwrite: " + str(args.candidate))
     shutil.copytree(args.new, args.candidate)
@@ -157,7 +166,7 @@ def main():
         "RUBase": "paruzelk/powershell@778d03e13c98bd357fe369b7300b1d59801e3f1e",
         "NewIds": added, "RemovedIds": removed, "ChangedIdsReview": modified,
         "ChangedEnglishTitlesReview": title_changed,
-        "OldTitlesReused": len(titles) - 16, "NewTitlesTranslated": 16,
+        "OldTitlesReused": len(titles) - 16 - len(changed_titles_ru), "NewTitlesTranslated": 16, "ChangedTitlesTranslated": len(changed_titles_ru),
         "NewObjectTypesTranslated": new_objects,
         "OldObjectFieldsReused": section_reused, "OldObjectFieldsReview": section_review,
         "Scope": "PREVIEW ONLY: finding titles, check sections, not full technical translations",
@@ -165,7 +174,7 @@ def main():
     }
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8-sig")
-    print("MIG1 PASS: 408 findings, 16 new titles, " + str(len(titles) - 16) +
+    print("MIG1 PASS: 408 findings, 16 new titles, 1 reviewed changed title, " + str(len(titles) - 16 - len(changed_titles_ru)) +
           " reused titles, " + str(len(modified)) + " altered definitions to review")
 if __name__ == "__main__":
     main()
