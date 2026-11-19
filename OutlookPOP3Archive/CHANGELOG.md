@@ -1,3 +1,8 @@
+## 2.6.5-ARCH3t DEV — 2026-11-19
+- Strict synthetic OS TEMP-only recovery of ORIGINAL append-only DuplicateIndex after 10/10 Reconciled with partial 2/10 index: immutable journal/index SHA pins, raw conflict/duplicate/truncated JSONL rejects, exact claim/provider SHA chains and original fake Outlook ArchiveVerifier on all ten.
+- Exclusive TEMP lease, only missing Add-OPADuplicateEntry records, Safe flush and independent readback; second Recover is idempotent and never replays Move or Reconciled.
+- 15 new Pester, expected full 4551 tests / 154 containers Windows PowerShell 5.1, project-only ZIP. Real PST, Outlook and production Archive/Resume/Auto remain closed.
+
 ## 2.6.5-ARCH3s DEV — 2026-11-19
 - User confirmed ARCH3r historical real one-mail completed checkpoint and ten fake original semantic/journal/index PASS; original shared 501-entry index unchanged.
 - NEW fake Outlook ten MailItems with actual namespace GetItemFromID, Store.GetRootFolder, real original full ARCH2b MailItem semantic builder, per-recipient and attachment SaveAsFile TEMP byte SHA; UNMODIFIED ORIGINAL ArchiveVerifier Test-OPAArchiveMoves validates exactly ten target and source zero.
