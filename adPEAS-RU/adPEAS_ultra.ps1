@@ -92301,15 +92301,19 @@ function Get-HTMLTemplate {
             const titleRu = ruFindingTitles[findingId] || finding.title;
             const isSecureRu = actualSeverity === 'secure' ||
                 (finding.risk && finding.risk.toLowerCase() === 'secure');
-            const descriptionRu = ruExtra.description ||
-                ('Краткое русское пояснение: ' + titleRu + '. Для оценки конкретных условий используйте данные карточки и полный технический оригинал EN.');
-            const impactRu = ruExtra.impact || (isSecureRu ?
+            const ruFull = ruFullFindingTechnical[findingId] || null;
+            const descriptionRu = ruExtra.description || (ruFull && ruFull.description) ||
+                ('Для проверки «' + titleRu + '» отсутствует локализованное описание. Смотрите данные карточки и документацию проверяемой настройки.');
+            const impactRu = (ruExtra.impact && ruExtra.impact.length ? ruExtra.impact : null) ||
+                (ruFull && ruFull.impact && ruFull.impact.length ? ruFull.impact : null) || (isSecureRu ?
                 ['Обнаруженный параметр соответствует ожидаемому безопасному состоянию.'] :
                 ['Последствия зависят от полномочий затронутого субъекта и области действия настройки.']);
-            const remediationRu = ruExtra.remediation || (isSecureRu ?
+            const remediationRu = (ruExtra.remediation && ruExtra.remediation.length ? ruExtra.remediation : null) ||
+                (ruFull && ruFull.remediation && ruFull.remediation.length ? ruFull.remediation : null) || (isSecureRu ?
                 ['Сохраните действующие защитные настройки и проверяйте их после изменений инфраструктуры.'] :
                 ['Проверьте необходимость настройки и соответствие принципу минимальных привилегий. Для исправления опирайтесь на документацию Microsoft и действующие политики организации.']);
-            const attackRu = ruExtra.attack || [];
+            const attackRu = (ruExtra.attack && ruExtra.attack.length ? ruExtra.attack : null) ||
+                (ruFull && ruFull.attack && ruFull.attack.length ? ruFull.attack : null) || [];
             // Map card severity to display label and CSS class
             // actualSeverity comes from parent card's data-severity attribute
             // If provided, it overrides the static finding.risk from definition
@@ -92475,7 +92479,7 @@ function Get-HTMLTemplate {
             // Curated Russian description, impact and remediation for every FindingId.
             // Attack is shown only when an individual RU explanation exists.
             // English originals remain available separately for comparison.
-            const ruFull = ruFullFindingTechnical[findingId] || null;
+
             if (ruFull) {
                 const addRuList = (label, values) =>
                     values && values.length > 0
@@ -92491,6 +92495,7 @@ function Get-HTMLTemplate {
                     addRuList('Рекомендации по устранению', ruFull.remediation) +
                     '</details>';
             }
+            if (window.adPEASShowOriginalEnglish === true) {
             html += '<details class="tooltip-section" lang="en">' +
                 '<summary>Сверить с исходным текстом на английском (EN)</summary>' +
                 '<p>' + escapeHtml(finding.description) + '</p>' +
@@ -92498,6 +92503,7 @@ function Get-HTMLTemplate {
                 (finding.attack ? '<p>Attack</p><ul>' + finding.attack.map(i => '<li>' + escapeHtml(i) + '</li>').join('') + '</ul>' : '') +
                 (finding.remediation ? '<p>Remediation</p><ul>' + finding.remediation.map(i => '<li>' + escapeHtml(i) + '</li>').join('') + '</ul>' : '') +
                 '</details>';
+            }
             // MITRE ATT&CK
             if (finding.mitre) {
                 const mitreUrl = `https://attack.mitre.org/techniques/${finding.mitre.replace('.', '/')}/`;
@@ -92773,7 +92779,7 @@ function Get-HTMLTemplate {
                 `;
             }
 
-            if (!check.ruDetailedCheckReady && check.originalEnglish && check.originalEnglish.whyItMatters) {
+            if (window.adPEASShowOriginalEnglish === true && !check.ruDetailedCheckReady && check.originalEnglish && check.originalEnglish.whyItMatters) {
                 html += '<details class="check-tooltip-section" lang="en">' +
                     '<summary>Подробные критерии проверки (оригинал EN)</summary>' +
                     '<p>' + escapeHtml(check.originalEnglish.whyItMatters) + '</p>' +
@@ -98503,7 +98509,7 @@ function Collect-BHIssuancePolicies {
 	}
 	return $bhPolicies
 }
-$Script:adPEASVersion = "2.9.0+20261119-1145"
+$Script:adPEASVersion = "2.9.0+20261119-1329"
 if ($MyInvocation.MyCommand.Path) {
 	$Script:ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {

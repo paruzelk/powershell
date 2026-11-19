@@ -6,7 +6,7 @@
     "powershell": 200,
     "javascript": 1,
     "html": 2,
-    "sourceLines": 156557,
+    "sourceLines": 156563,
     "totalCandidates": 3201,
     "byType": {
       "ps-diagnostic": 3041,
@@ -18475,751 +18475,751 @@
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1633,
+      "line": 1637,
       "type": "js-ui-candidate",
       "text": "tooltip-header"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1635,
+      "line": 1639,
       "type": "js-ui-candidate",
       "text": "tooltip-title"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1636,
+      "line": 1640,
       "type": "js-ui-candidate",
       "text": "tooltip-risk ${riskClass}"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1638,
+      "line": 1642,
       "type": "js-ui-candidate",
       "text": "tooltip-close"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1640,
+      "line": 1644,
       "type": "js-ui-candidate",
       "text": "tooltip-body"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1645,
+      "line": 1649,
       "type": "js-ui-candidate",
       "text": "tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1646,
+      "line": 1650,
       "type": "js-ui-candidate",
       "text": "tooltip-section-title"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1649,
+      "line": 1653,
       "type": "js-ui-candidate",
       "text": "tooltip-section-content"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1658,
-      "type": "js-ui-candidate",
-      "text": "tooltip-section"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1659,
-      "type": "js-ui-candidate",
-      "text": "tooltip-section-title collapsed"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 1662,
       "type": "js-ui-candidate",
-      "text": "tooltip-section-content collapsed"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1677,
-      "type": "js-ui-candidate",
       "text": "tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1678,
+      "line": 1663,
       "type": "js-ui-candidate",
       "text": "tooltip-section-title collapsed"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1666,
+      "type": "js-ui-candidate",
+      "text": "tooltip-section-content collapsed"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 1681,
       "type": "js-ui-candidate",
-      "text": "tooltip-section-content collapsed"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1696,
-      "type": "js-ui-candidate",
       "text": "tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1697,
+      "line": 1682,
       "type": "js-ui-candidate",
       "text": "tooltip-section-title collapsed"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1685,
+      "type": "js-ui-candidate",
+      "text": "tooltip-section-content collapsed"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 1700,
       "type": "js-ui-candidate",
-      "text": "tooltip-section-content collapsed"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1712,
-      "type": "js-ui-candidate",
       "text": "tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1713,
+      "line": 1701,
       "type": "js-ui-candidate",
       "text": "tooltip-section-title collapsed"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1704,
+      "type": "js-ui-candidate",
+      "text": "tooltip-section-content collapsed"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 1716,
       "type": "js-ui-candidate",
-      "text": "tooltip-section-content collapsed"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1735,
-      "type": "js-ui-candidate",
       "text": "tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1736,
+      "line": 1717,
       "type": "js-ui-candidate",
       "text": "tooltip-section-title collapsed"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1720,
+      "type": "js-ui-candidate",
+      "text": "tooltip-section-content collapsed"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 1739,
       "type": "js-ui-candidate",
-      "text": "tooltip-section-content collapsed tooltip-references"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1749,
-      "type": "js-ui-candidate",
       "text": "tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1750,
+      "line": 1740,
       "type": "js-ui-candidate",
       "text": "tooltip-section-title collapsed"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1743,
+      "type": "js-ui-candidate",
+      "text": "tooltip-section-content collapsed tooltip-references"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 1753,
+      "type": "js-ui-candidate",
+      "text": "tooltip-section"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1754,
+      "type": "js-ui-candidate",
+      "text": "tooltip-section-title collapsed"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1757,
       "type": "js-ui-candidate",
       "text": "tooltip-section-content collapsed tooltip-tools"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1758,
+      "line": 1762,
       "type": "js-ui-candidate",
       "text": "${escapeHtml(t.url)}"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1758,
+      "line": 1762,
       "type": "js-ui-candidate",
       "text": "tooltip-tool tooltip-tool-link"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1760,
+      "line": 1764,
       "type": "js-ui-candidate",
       "text": "tooltip-tool"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1763,
+      "line": 1767,
       "type": "js-ui-candidate",
       "text": "tooltip-tool"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1782,
+      "line": 1786,
       "type": "js-ui-candidate",
       "text": "tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1790,
+      "line": 1795,
       "type": "js-ui-candidate",
       "text": "tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1801,
+      "line": 1807,
       "type": "js-ui-candidate",
       "text": "tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1802,
+      "line": 1808,
       "type": "js-ui-candidate",
       "text": "tooltip-section-content"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1803,
+      "line": 1809,
       "type": "js-ui-candidate",
       "text": "tooltip-mitre"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1848,
+      "line": 1854,
       "type": "js-ui-candidate",
       "text": "check-tooltip"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1850,
-      "type": "js-ui-candidate",
-      "text": "aria-modal"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1851,
-      "type": "js-ui-candidate",
-      "text": "aria-label"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 1856,
       "type": "js-ui-candidate",
-      "text": "aria-haspopup"
+      "text": "aria-modal"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 1857,
       "type": "js-ui-candidate",
+      "text": "aria-label"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1862,
+      "type": "js-ui-candidate",
+      "text": "aria-haspopup"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1863,
+      "type": "js-ui-candidate",
       "text": "aria-expanded"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1858,
+      "line": 1864,
       "type": "js-ui-candidate",
       "text": "aria-label"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1882,
+      "line": 1888,
       "type": "js-ui-candidate",
       "text": ".check-help-btn"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1882,
+      "line": 1888,
       "type": "js-ui-candidate",
       "text": ".check-tooltip"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1927,
+      "line": 1933,
       "type": "js-ui-candidate",
       "text": "aria-expanded"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1930,
+      "line": 1936,
       "type": "js-ui-candidate",
       "text": "aria-expanded"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1939,
+      "line": 1945,
       "type": "js-ui-candidate",
       "text": "aria-expanded"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1964,
-      "type": "js-ui-candidate",
-      "text": ".tooltip-header, .check-tooltip-header"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 1968,
-      "type": "js-ui-candidate",
-      "text": ".tooltip-close, .check-tooltip-close"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 1970,
       "type": "js-ui-candidate",
+      "text": ".tooltip-header, .check-tooltip-header"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1974,
+      "type": "js-ui-candidate",
+      "text": ".tooltip-close, .check-tooltip-close"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 1976,
+      "type": "js-ui-candidate",
       "text": ".finding-tooltip, .check-tooltip"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2024,
+      "line": 2030,
       "type": "js-ui-candidate",
       "text": "check-tooltip-header"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2025,
+      "line": 2031,
       "type": "js-ui-candidate",
       "text": "check-tooltip-title"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2026,
+      "line": 2032,
       "type": "js-ui-candidate",
       "text": "check-tooltip-close"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2028,
+      "line": 2034,
       "type": "js-ui-candidate",
       "text": "check-tooltip-body"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2032,
+      "line": 2038,
       "type": "js-ui-candidate",
       "text": "check-tooltip-summary"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2037,
+      "line": 2043,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section check-tooltip-secure"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2038,
+      "line": 2044,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section-title"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2039,
+      "line": 2045,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section-content"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2049,
+      "line": 2055,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2050,
+      "line": 2056,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section-title"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2051,
+      "line": 2057,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section-content"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2061,
+      "line": 2067,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2062,
+      "line": 2068,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section-title"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2063,
+      "line": 2069,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section-content"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2073,
+      "line": 2079,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2083,
+      "line": 2089,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section check-tooltip-filtering"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2084,
+      "line": 2090,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section-title"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2085,
+      "line": 2091,
       "type": "js-ui-candidate",
       "text": "check-tooltip-section-content"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2341,
+      "line": 2347,
       "type": "js-ui-candidate",
       "text": "aria-label"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2342,
+      "line": 2348,
       "type": "js-ui-candidate",
       "text": "+ nameNode.textContent.trim() +"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2510,
+      "line": 2516,
       "type": "js-ui-candidate",
       "text": "aria-hidden"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2517,
+      "line": 2523,
       "type": "js-ui-candidate",
       "text": "aria-modal"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2518,
+      "line": 2524,
       "type": "js-ui-candidate",
       "text": "aria-labelledby"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2522,
+      "line": 2528,
       "type": "js-ui-candidate",
       "text": "help-close-btn"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 2654,
+      "line": 2660,
       "type": "js-ui-candidate",
       "text": "No adPEAS data found in browser storage."
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3177,
+      "line": 3183,
       "type": "js-ui-candidate",
       "text": ".finding-title"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3294,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-header"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3295,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-title"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3296,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-final info"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3298,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-body"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3299,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-row"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 3300,
       "type": "js-ui-candidate",
-      "text": "score-tooltip-label"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3315,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-row"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3316,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-label"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3317,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-value positive"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3324,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-row"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3325,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-label"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3326,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-value modifier"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3335,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-row"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3336,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-label"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3337,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-value modifier"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3346,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-row"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3347,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-label"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3348,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-value modifier"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3356,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-row"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3357,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-label"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3358,
-      "type": "js-ui-candidate",
-      "text": "score-tooltip-value positive"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3364,
-      "type": "js-ui-candidate",
       "text": "score-tooltip-header"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3365,
+      "line": 3301,
       "type": "js-ui-candidate",
       "text": "score-tooltip-title"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3366,
+      "line": 3302,
       "type": "js-ui-candidate",
-      "text": "score-tooltip-final ${scoreClass}"
+      "text": "score-tooltip-final info"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3368,
+      "line": 3304,
       "type": "js-ui-candidate",
       "text": "score-tooltip-body"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3382,
+      "line": 3305,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-row"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3306,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-label"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3321,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-row"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3322,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-label"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3323,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-value positive"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3330,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-row"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3331,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-label"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3332,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-value modifier"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3341,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-row"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3342,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-label"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3343,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-value modifier"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3352,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-row"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3353,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-label"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3354,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-value modifier"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3362,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-row"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3363,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-label"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3364,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-value positive"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3370,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-header"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3371,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-title"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3372,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-final ${scoreClass}"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3374,
+      "type": "js-ui-candidate",
+      "text": "score-tooltip-body"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3388,
       "type": "js-ui-candidate",
       "text": "score-tooltip"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3388,
+      "line": 3394,
       "type": "js-ui-candidate",
       "text": ".score-tooltip"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3388,
+      "line": 3394,
       "type": "js-ui-candidate",
       "text": "[data-score-breakdown]"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3681,
+      "line": 3687,
       "type": "js-ui-candidate",
       "text": ".finding-title"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3681,
+      "line": 3687,
       "type": "js-ui-candidate",
       "text": "Unknown Finding"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3891,
+      "line": 3897,
       "type": "js-ui-candidate",
       "text": "top-action-tooltip-content"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3892,
+      "line": 3898,
       "type": "js-ui-candidate",
       "text": "+ escapeHtml(checkTitle) +"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3892,
+      "line": 3898,
       "type": "js-ui-candidate",
       "text": "top-action-tooltip-header"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3895,
+      "line": 3901,
       "type": "js-ui-candidate",
       "text": "top-action-tooltip-section"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3896,
-      "type": "js-ui-candidate",
-      "text": "top-action-tooltip-label"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3897,
-      "type": "js-ui-candidate",
-      "text": "+ escapeHtml(checkInfo.summary) +"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3897,
-      "type": "js-ui-candidate",
-      "text": "top-action-tooltip-text"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 3902,
       "type": "js-ui-candidate",
-      "text": "top-action-tooltip-section"
+      "text": "top-action-tooltip-label"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 3903,
       "type": "js-ui-candidate",
-      "text": "top-action-tooltip-label"
+      "text": "+ escapeHtml(checkInfo.summary) +"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3904,
-      "type": "js-ui-candidate",
-      "text": "+ escapeHtml(checkInfo.whyItMatters) +"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3904,
+      "line": 3903,
       "type": "js-ui-candidate",
       "text": "top-action-tooltip-text"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3909,
+      "line": 3908,
       "type": "js-ui-candidate",
       "text": "top-action-tooltip-section"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3909,
+      "type": "js-ui-candidate",
+      "text": "top-action-tooltip-label"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
       "line": 3910,
       "type": "js-ui-candidate",
-      "text": "top-action-tooltip-label"
+      "text": "+ escapeHtml(checkInfo.whyItMatters) +"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3911,
-      "type": "js-ui-candidate",
-      "text": "top-action-tooltip-list"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3920,
-      "type": "js-ui-candidate",
-      "text": "top-action-tooltip-section top-action-tooltip-note"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3921,
-      "type": "js-ui-candidate",
-      "text": "top-action-tooltip-label"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3922,
-      "type": "js-ui-candidate",
-      "text": "+ escapeHtml(checkInfo.filteringNote) +"
-    },
-    {
-      "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3922,
+      "line": 3910,
       "type": "js-ui-candidate",
       "text": "top-action-tooltip-text"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 3949,
+      "line": 3915,
+      "type": "js-ui-candidate",
+      "text": "top-action-tooltip-section"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3916,
+      "type": "js-ui-candidate",
+      "text": "top-action-tooltip-label"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3917,
+      "type": "js-ui-candidate",
+      "text": "top-action-tooltip-list"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3926,
+      "type": "js-ui-candidate",
+      "text": "top-action-tooltip-section top-action-tooltip-note"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3927,
+      "type": "js-ui-candidate",
+      "text": "top-action-tooltip-label"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3928,
+      "type": "js-ui-candidate",
+      "text": "+ escapeHtml(checkInfo.filteringNote) +"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3928,
+      "type": "js-ui-candidate",
+      "text": "top-action-tooltip-text"
+    },
+    {
+      "path": "src/modules/Reporting/templates/report-scripts.js",
+      "line": 3955,
       "type": "js-ui-candidate",
       "text": "remediation-floating-tooltip"
     },
     {
       "path": "src/modules/Reporting/templates/report-scripts.js",
-      "line": 4410,
+      "line": 4416,
       "type": "js-ui-candidate",
       "text": "Table of Contents"
     }
