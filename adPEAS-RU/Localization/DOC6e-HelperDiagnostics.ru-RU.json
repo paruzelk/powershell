@@ -1,0 +1,681 @@
+{
+  "schema": "adPEAS-RU.DOC6e.HelperDiagnostics.1",
+  "description": "Only user-visible Write-Log, Write-Warning and throw string literals; preserve PowerShell interpolation and data model.",
+  "files": [
+    {
+      "path": "src/modules/Helpers/Resolve-adPEASName.ps1",
+      "messages": [
+        {
+          "line": 178,
+          "from": "[Invoke-RawDnsQuery] Label exceeds 63 bytes limit: $label",
+          "to": "[Invoke-RawDnsQuery] Метка DNS превышает предел 63 байта: $label",
+          "occurrences": 1
+        },
+        {
+          "line": 217,
+          "from": "[Invoke-RawDnsQuery] Response too short: $($response.Length) bytes",
+          "to": "[Invoke-RawDnsQuery] Слишком короткий ответ DNS: $($response.Length) байт",
+          "occurrences": 1
+        },
+        {
+          "line": 223,
+          "from": "[Invoke-RawDnsQuery] Transaction ID mismatch",
+          "to": "[Invoke-RawDnsQuery] Несовпадение идентификатора транзакции",
+          "occurrences": 1
+        },
+        {
+          "line": 230,
+          "from": "[Invoke-RawDnsQuery] DNS error, RCODE: $rcode",
+          "to": "[Invoke-RawDnsQuery] Ошибка DNS, код RCODE: $rcode",
+          "occurrences": 1
+        },
+        {
+          "line": 237,
+          "from": "[Invoke-RawDnsQuery] No answers in response",
+          "to": "[Invoke-RawDnsQuery] Ответ DNS не содержит записей",
+          "occurrences": 1
+        },
+        {
+          "line": 289,
+          "from": "[Invoke-RawDnsQuery] Maximum pointer depth exceeded, possible malformed DNS response",
+          "to": "[Invoke-RawDnsQuery] Превышена глубина указателей; возможен некорректный ответ DNS",
+          "occurrences": 1
+        },
+        {
+          "line": 297,
+          "from": "[Invoke-RawDnsQuery] Cyclic pointer detected at offset $pointer, malformed DNS response",
+          "to": "[Invoke-RawDnsQuery] Зацикленный указатель по смещению $pointer; некорректный ответ DNS",
+          "occurrences": 1
+        },
+        {
+          "line": 391,
+          "from": "[Invoke-RawDnsQuery] Found $($srvRecords.Count) SRV record(s)",
+          "to": "[Invoke-RawDnsQuery] Найдено SRV-записей: $($srvRecords.Count)",
+          "occurrences": 1
+        },
+        {
+          "line": 400,
+          "from": "[Invoke-RawDnsQuery] Returning best SRV: $($bestRecord.Target):$($bestRecord.Port) (Priority: $($bestRecord.Priority))",
+          "to": "[Invoke-RawDnsQuery] Возвращается предпочтительная SRV-запись: $($bestRecord.Target):$($bestRecord.Port) (приоритет: $($bestRecord.Priority))",
+          "occurrences": 1
+        },
+        {
+          "line": 405,
+          "from": "[Invoke-RawDnsQuery] No $Type record found in response",
+          "to": "[Invoke-RawDnsQuery] В ответе отсутствует запись типа $Type",
+          "occurrences": 1
+        },
+        {
+          "line": 409,
+          "from": "[Invoke-RawDnsQuery] Error: $_",
+          "to": "[Invoke-RawDnsQuery] Ошибка: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 441,
+          "from": "[Resolve-HostnameToIP] Input is already an IP address: $Hostname",
+          "to": "[Resolve-HostnameToIP] Исходное значение уже является IP-адресом: $Hostname",
+          "occurrences": 1
+        },
+        {
+          "line": 453,
+          "from": "[Resolve-HostnameToIP] Cache hit for $Hostname : $cachedIP",
+          "to": "[Resolve-HostnameToIP] Найдено в кэше для $Hostname : $cachedIP",
+          "occurrences": 1
+        },
+        {
+          "line": 459,
+          "from": "[Resolve-HostnameToIP] Resolving $Hostname using custom DNS: $DnsServer",
+          "to": "[Resolve-HostnameToIP] Разрешение $Hostname через указанный DNS-сервер: $DnsServer",
+          "occurrences": 1
+        },
+        {
+          "line": 469,
+          "from": "[Resolve-HostnameToIP] Resolved $Hostname to $ResolvedIP via Resolve-DnsName",
+          "to": "[Resolve-HostnameToIP] Имя $Hostname разрешено в $ResolvedIP через Resolve-DnsName",
+          "occurrences": 1
+        },
+        {
+          "line": 481,
+          "from": "[Resolve-HostnameToIP] Resolve-DnsName cmdlet not available, trying UDP fallback",
+          "to": "[Resolve-HostnameToIP] Resolve-DnsName недоступен; используется резервный запрос UDP",
+          "occurrences": 1
+        },
+        {
+          "line": 484,
+          "from": "[Resolve-HostnameToIP] Resolve-DnsName failed: $_",
+          "to": "[Resolve-HostnameToIP] Ошибка Resolve-DnsName: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 492,
+          "from": "[Resolve-HostnameToIP] Resolved $Hostname to $UdpResult via UDP DNS",
+          "to": "[Resolve-HostnameToIP] Имя $Hostname разрешено в $UdpResult через DNS-запрос UDP",
+          "occurrences": 1
+        },
+        {
+          "line": 503,
+          "from": "[Resolve-HostnameToIP] UDP DNS query failed: $_",
+          "to": "[Resolve-HostnameToIP] Ошибка запроса UDP DNS: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 508,
+          "from": "[Resolve-HostnameToIP] Resolving $Hostname using system DNS",
+          "to": "[Resolve-HostnameToIP] Разрешение $Hostname через системный DNS",
+          "occurrences": 1
+        },
+        {
+          "line": 523,
+          "from": "[Resolve-HostnameToIP] Resolved $Hostname to $ResolvedIP via system DNS",
+          "to": "[Resolve-HostnameToIP] Имя $Hostname разрешено в $ResolvedIP через системный DNS",
+          "occurrences": 1
+        },
+        {
+          "line": 535,
+          "from": "[Resolve-HostnameToIP] System DNS resolution failed: $_",
+          "to": "[Resolve-HostnameToIP] Ошибка разрешения имени системным DNS: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 539,
+          "from": "[Resolve-HostnameToIP] Failed to resolve $Hostname",
+          "to": "[Resolve-HostnameToIP] Не удалось разрешить имя $Hostname",
+          "occurrences": 1
+        },
+        {
+          "line": 624,
+          "from": "[Test-DCReachable] $DisplayName - Port 88 (Kerberos) OK",
+          "to": "[Test-DCReachable] $DisplayName — порт 88 (Kerberos) доступен",
+          "occurrences": 1
+        },
+        {
+          "line": 630,
+          "from": "[Test-DCReachable] $DisplayName - Port $LdapPort (LDAP) OK - DC is reachable",
+          "to": "[Test-DCReachable] $DisplayName — порт $LdapPort (LDAP) доступен; контроллер домена отвечает",
+          "occurrences": 1
+        },
+        {
+          "line": 634,
+          "from": "[Test-DCReachable] $DisplayName - Port $LdapPort (LDAP) FAILED",
+          "to": "[Test-DCReachable] $DisplayName — порт $LdapPort (LDAP) недоступен",
+          "occurrences": 1
+        },
+        {
+          "line": 639,
+          "from": "[Test-DCReachable] $DisplayName - Port 88 (Kerberos) FAILED - not a reachable DC",
+          "to": "[Test-DCReachable] $DisplayName — порт 88 (Kerberos) недоступен; контроллер домена не отвечает",
+          "occurrences": 1
+        },
+        {
+          "line": 676,
+          "from": "[Resolve-SrvRecord] Resolving SRV $Name using custom DNS: $DnsServer",
+          "to": "[Resolve-SrvRecord] Разрешение SRV $Name через указанный DNS-сервер: $DnsServer",
+          "occurrences": 1
+        },
+        {
+          "line": 702,
+          "from": "[Resolve-SrvRecord] Found $($AllRecords.Count) SRV record(s) via Resolve-DnsName",
+          "to": "[Resolve-SrvRecord] Найдено SRV-записей через Resolve-DnsName: $($AllRecords.Count)",
+          "occurrences": 1
+        },
+        {
+          "line": 710,
+          "from": "[Resolve-SrvRecord] Resolve-DnsName cmdlet not available, trying UDP fallback",
+          "to": "[Resolve-SrvRecord] Resolve-DnsName недоступен; используется резервный запрос UDP",
+          "occurrences": 1
+        },
+        {
+          "line": 713,
+          "from": "[Resolve-SrvRecord] Resolve-DnsName failed: $_",
+          "to": "[Resolve-SrvRecord] Ошибка Resolve-DnsName: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 724,
+          "from": "[Resolve-SrvRecord] Found $($UdpResult.Count) SRV record(s) via UDP DNS",
+          "to": "[Resolve-SrvRecord] Найдено SRV-записей через UDP DNS: $($UdpResult.Count)",
+          "occurrences": 1
+        },
+        {
+          "line": 732,
+          "from": "[Resolve-SrvRecord] Found SRV: $($UdpResult.Target):$($UdpResult.Port) via UDP DNS",
+          "to": "[Resolve-SrvRecord] Найдена SRV-запись: $($UdpResult.Target):$($UdpResult.Port) через UDP DNS",
+          "occurrences": 1
+        },
+        {
+          "line": 738,
+          "from": "[Resolve-SrvRecord] UDP DNS query failed: $_",
+          "to": "[Resolve-SrvRecord] Ошибка запроса UDP DNS: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 745,
+          "from": "[Resolve-SrvRecord] Resolving SRV $Name using system DNS",
+          "to": "[Resolve-SrvRecord] Разрешение SRV $Name через системный DNS",
+          "occurrences": 1
+        },
+        {
+          "line": 770,
+          "from": "[Resolve-SrvRecord] Found $($AllRecords.Count) SRV record(s) via system DNS",
+          "to": "[Resolve-SrvRecord] Найдено SRV-записей через системный DNS: $($AllRecords.Count)",
+          "occurrences": 1
+        },
+        {
+          "line": 778,
+          "from": "[Resolve-SrvRecord] Resolve-DnsName not available for system SRV lookup",
+          "to": "[Resolve-SrvRecord] Resolve-DnsName недоступен для системного поиска SRV",
+          "occurrences": 1
+        },
+        {
+          "line": 781,
+          "from": "[Resolve-SrvRecord] System DNS SRV lookup failed: $_",
+          "to": "[Resolve-SrvRecord] Ошибка системного поиска SRV через DNS: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 803,
+          "from": "[Resolve-SrvRecord] Trying UDP SRV query via system DNS: $SystemDnsServer",
+          "to": "[Resolve-SrvRecord] Резервный запрос SRV по UDP через системный DNS: $SystemDnsServer",
+          "occurrences": 1
+        },
+        {
+          "line": 809,
+          "from": "[Resolve-SrvRecord] Found $($UdpResult.Count) SRV record(s) via UDP system DNS",
+          "to": "[Resolve-SrvRecord] Найдено SRV-записей через системный DNS по UDP: $($UdpResult.Count)",
+          "occurrences": 1
+        },
+        {
+          "line": 814,
+          "from": "[Resolve-SrvRecord] Found SRV: $($UdpResult.Target):$($UdpResult.Port) via UDP system DNS",
+          "to": "[Resolve-SrvRecord] Найдена SRV-запись: $($UdpResult.Target):$($UdpResult.Port) через системный DNS по UDP",
+          "occurrences": 1
+        },
+        {
+          "line": 821,
+          "from": "[Resolve-SrvRecord] UDP system DNS SRV query failed: $_",
+          "to": "[Resolve-SrvRecord] Ошибка системного запроса SRV по UDP: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 825,
+          "from": "[Resolve-SrvRecord] Failed to resolve SRV record: $Name",
+          "to": "[Resolve-SrvRecord] Не удалось разрешить SRV-запись: $Name",
+          "occurrences": 1
+        },
+        {
+          "line": 847,
+          "from": "DnsServer must be an IP address, not a hostname: $_",
+          "to": "DnsServer должен быть IP-адресом, а не именем узла: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 878,
+          "from": "[Resolve-adPEASName] Querying SRV records: $SrvRecordName",
+          "to": "[Resolve-adPEASName] Запрос SRV-записей: $SrvRecordName",
+          "occurrences": 1
+        },
+        {
+          "line": 885,
+          "from": "[Resolve-adPEASName] Found $($SrvResults.Count) DC(s) via SRV records",
+          "to": "[Resolve-adPEASName] Найдено контроллеров домена по SRV: $($SrvResults.Count)",
+          "occurrences": 1
+        },
+        {
+          "line": 890,
+          "from": "[Resolve-adPEASName] Trying DC: $DcHostname (Priority: $($SrvRecord.Priority), Weight: $($SrvRecord.Weight))",
+          "to": "[Resolve-adPEASName] Проверка контроллера домена $DcHostname (приоритет: $($SrvRecord.Priority), вес: $($SrvRecord.Weight))",
+          "occurrences": 1
+        },
+        {
+          "line": 896,
+          "from": "[Resolve-adPEASName] Could not resolve $DcHostname to IP, trying next DC",
+          "to": "[Resolve-adPEASName] Не удалось определить IP узла $DcHostname; переход к следующему контроллеру",
+          "occurrences": 1
+        },
+        {
+          "line": 902,
+          "from": "[Resolve-adPEASName] DC $DcHostname ($DcIP) is reachable - using this DC",
+          "to": "[Resolve-adPEASName] Контроллер $DcHostname ($DcIP) доступен; используется этот узел",
+          "occurrences": 1
+        },
+        {
+          "line": 909,
+          "from": "[Resolve-adPEASName] DC $DcHostname ($DcIP) is NOT reachable (stale SRV record?), trying next DC",
+          "to": "[Resolve-adPEASName] Контроллер $DcHostname ($DcIP) недоступен (устаревшая SRV-запись?); переход к следующему",
+          "occurrences": 1
+        },
+        {
+          "line": 913,
+          "from": "[Resolve-adPEASName] All $($SrvResults.Count) DC(s) from SRV records are unreachable",
+          "to": "[Resolve-adPEASName] Все контроллеры домена по SRV недоступны: $($SrvResults.Count)",
+          "occurrences": 1
+        },
+        {
+          "line": 918,
+          "from": "[Resolve-adPEASName] Attempting reverse DNS lookup for: $Domain",
+          "to": "[Resolve-adPEASName] Обратный DNS-поиск для: $Domain",
+          "occurrences": 1
+        },
+        {
+          "line": 933,
+          "from": "[Resolve-adPEASName] Domain resolved to IP: $DcIPString",
+          "to": "[Resolve-adPEASName] Домен разрешён в IP-адрес: $DcIPString",
+          "occurrences": 1
+        },
+        {
+          "line": 941,
+          "from": "[Resolve-adPEASName] Reverse DNS resolved: $DcHostname",
+          "to": "[Resolve-adPEASName] Обратный DNS-поиск вернул: $DcHostname",
+          "occurrences": 1
+        },
+        {
+          "line": 945,
+          "from": "[Resolve-adPEASName] Reverse DNS lookup failed, using domain name as hostname: $_",
+          "to": "[Resolve-adPEASName] Ошибка обратного DNS; вместо имени узла используется домен: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 949,
+          "from": "[Resolve-adPEASName] DC $DcHostname ($DcIPString) via reverse DNS is reachable",
+          "to": "[Resolve-adPEASName] Контроллер $DcHostname ($DcIPString) доступен через обратный DNS",
+          "occurrences": 1
+        },
+        {
+          "line": 956,
+          "from": "[Resolve-adPEASName] DC $DcHostname ($DcIPString) via reverse DNS is NOT reachable",
+          "to": "[Resolve-adPEASName] Контроллер $DcHostname ($DcIPString) недоступен через обратный DNS",
+          "occurrences": 1
+        },
+        {
+          "line": 962,
+          "from": "[Resolve-adPEASName] System DNS resolution failed: $_",
+          "to": "[Resolve-adPEASName] Ошибка системного разрешения DNS: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 967,
+          "from": "[Resolve-adPEASName] Falling back to direct domain resolution",
+          "to": "[Resolve-adPEASName] Резервный вариант: прямое разрешение имени домена",
+          "occurrences": 1
+        },
+        {
+          "line": 972,
+          "from": "[Resolve-adPEASName] DC $Domain ($DomainIP) via direct resolution is reachable",
+          "to": "[Resolve-adPEASName] Контроллер $Domain ($DomainIP) доступен через прямое разрешение",
+          "occurrences": 1
+        },
+        {
+          "line": 979,
+          "from": "[Resolve-adPEASName] DC $Domain ($DomainIP) via direct resolution is NOT reachable",
+          "to": "[Resolve-adPEASName] Контроллер $Domain ($DomainIP) недоступен через прямое разрешение",
+          "occurrences": 1
+        },
+        {
+          "line": 984,
+          "from": "[Resolve-adPEASName] Could not discover reachable DC for domain: $Domain",
+          "to": "[Resolve-adPEASName] Не удалось обнаружить доступный контроллер для домена: $Domain",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "path": "src/modules/Helpers/Test-IsPrivileged.ps1",
+      "messages": [
+        {
+          "line": 202,
+          "from": "[Clear-PrivilegedCheckCache] Cache cleared",
+          "to": "[Clear-PrivilegedCheckCache] Кэш очищен",
+          "occurrences": 1
+        },
+        {
+          "line": 218,
+          "from": "[Clear-GroupMembershipCache] Cache cleared",
+          "to": "[Clear-GroupMembershipCache] Кэш очищен",
+          "occurrences": 1
+        },
+        {
+          "line": 305,
+          "from": "[Test-IsExchangeServiceGroup] Failed to resolve sAMAccountName: $Identity",
+          "to": "[Test-IsExchangeServiceGroup] Не удалось определить sAMAccountName: $Identity",
+          "occurrences": 1
+        },
+        {
+          "line": 333,
+          "from": "[Test-IsExchangeServiceGroup] Failed to resolve SID to DN: $sid",
+          "to": "[Test-IsExchangeServiceGroup] Не удалось преобразовать SID в DN: $sid",
+          "occurrences": 1
+        },
+        {
+          "line": 351,
+          "from": "[Test-IsExchangeServiceGroup] Exchange service group detected: $dn",
+          "to": "[Test-IsExchangeServiceGroup] Обнаружена сервисная группа Exchange: $dn",
+          "occurrences": 1
+        },
+        {
+          "line": 508,
+          "from": "[Test-IsExchangeServer] Exchange Server detected: $computerName (SPNs: $($exchangeSPNs -join ', '))",
+          "to": "[Test-IsExchangeServer] Обнаружен сервер Exchange: $computerName (SPN: $($exchangeSPNs -join ', '))",
+          "occurrences": 1
+        },
+        {
+          "line": 523,
+          "from": "[Test-IsExchangeServer] Error checking $Identity`: $_",
+          "to": "[Test-IsExchangeServer] Ошибка проверки $Identity`: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 576,
+          "from": "[Get-RecursiveGroupMembership] Cache hit for $IdentitySID",
+          "to": "[Get-RecursiveGroupMembership] Результат найден в кэше для $IdentitySID",
+          "occurrences": 1
+        },
+        {
+          "line": 582,
+          "from": "[Get-RecursiveGroupMembership] No LDAP connection available",
+          "to": "[Get-RecursiveGroupMembership] Подключение LDAP отсутствует",
+          "occurrences": 1
+        },
+        {
+          "line": 594,
+          "from": "[Get-RecursiveGroupMembership] Resolved SID to DN: $IdentityDN",
+          "to": "[Get-RecursiveGroupMembership] SID преобразован в DN: $IdentityDN",
+          "occurrences": 1
+        },
+        {
+          "line": 598,
+          "from": "[Get-RecursiveGroupMembership] Failed to resolve SID to DN: $_",
+          "to": "[Get-RecursiveGroupMembership] Не удалось преобразовать SID в DN: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 603,
+          "from": "[Get-RecursiveGroupMembership] No DN available for $IdentitySID",
+          "to": "[Get-RecursiveGroupMembership] Не найден DN для $IdentitySID",
+          "occurrences": 1
+        },
+        {
+          "line": 614,
+          "from": "[Get-RecursiveGroupMembership] Querying all group memberships for: $IdentityDN",
+          "to": "[Get-RecursiveGroupMembership] Запрос всех групп пользователя: $IdentityDN",
+          "occurrences": 1
+        },
+        {
+          "line": 626,
+          "from": "[Get-RecursiveGroupMembership] Found membership: $($group.sAMAccountName) ($($group.objectSid))",
+          "to": "[Get-RecursiveGroupMembership] Найдено членство в группе: $($group.sAMAccountName) ($($group.objectSid))",
+          "occurrences": 1
+        },
+        {
+          "line": 631,
+          "from": "[Get-RecursiveGroupMembership] Found $($groupSIDs.Count) group membership(s) for $IdentitySID",
+          "to": "[Get-RecursiveGroupMembership] Найдено $($groupSIDs.Count) групп для $IdentitySID",
+          "occurrences": 1
+        },
+        {
+          "line": 634,
+          "from": "[Get-RecursiveGroupMembership] Error querying group memberships: $_",
+          "to": "[Get-RecursiveGroupMembership] Ошибка запроса членства в группах: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 639,
+          "from": "[Get-RecursiveGroupMembership] Cached result for $IdentitySID",
+          "to": "[Get-RecursiveGroupMembership] Результат сохранён в кэш для $IdentitySID",
+          "occurrences": 1
+        },
+        {
+          "line": 703,
+          "from": "[Test-IsPrivileged] Could not resolve identity to SID: $Identity",
+          "to": "[Test-IsPrivileged] Не удалось определить SID для учётной записи: $Identity",
+          "occurrences": 1
+        },
+        {
+          "line": 739,
+          "from": "[Test-IsPrivileged] Operator detected: $sid",
+          "to": "[Test-IsPrivileged] Обнаружен оператор: $sid",
+          "occurrences": 1
+        },
+        {
+          "line": 753,
+          "from": "[Test-IsPrivileged] Operator via RID suffix: $sid",
+          "to": "[Test-IsPrivileged] Оператор по суффиксу RID: $sid",
+          "occurrences": 1
+        },
+        {
+          "line": 767,
+          "from": "[Test-IsPrivileged] Privileged via static SID: $sid",
+          "to": "[Test-IsPrivileged] Привилегированный SID из статического списка: $sid",
+          "occurrences": 1
+        },
+        {
+          "line": 781,
+          "from": "[Test-IsPrivileged] Privileged via RID suffix: $sid",
+          "to": "[Test-IsPrivileged] Привилегированный SID по суффиксу RID: $sid",
+          "occurrences": 1
+        },
+        {
+          "line": 793,
+          "from": "[Test-IsPrivileged] BroadGroup detected (static): $sid - checking for privileged membership...",
+          "to": "[Test-IsPrivileged] Обнаружена широкая группа BroadGroup (статическая): $sid; проверяется членство в привилегированных группах...",
+          "occurrences": 1
+        },
+        {
+          "line": 800,
+          "from": "[Test-IsPrivileged] BroadGroup detected (RID): $sid - checking for privileged membership...",
+          "to": "[Test-IsPrivileged] Обнаружена широкая группа BroadGroup (по RID): $sid; проверяется членство в привилегированных группах...",
+          "occurrences": 1
+        },
+        {
+          "line": 808,
+          "from": "[Test-IsPrivileged] Checking SID: $sid (Name: $name)",
+          "to": "[Test-IsPrivileged] Проверка SID: $sid (имя: $name)",
+          "occurrences": 1
+        },
+        {
+          "line": 842,
+          "from": "[Test-IsPrivileged] Found $($sidHistoryValues.Count) sIDHistory entries for $sid",
+          "to": "[Test-IsPrivileged] Найдено $($sidHistoryValues.Count) записей sIDHistory для $sid",
+          "occurrences": 1
+        },
+        {
+          "line": 864,
+          "from": "[Test-IsPrivileged] Failed to convert sIDHistory byte array: $_",
+          "to": "[Test-IsPrivileged] Не удалось преобразовать массив байтов sIDHistory: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 873,
+          "from": "[Test-IsPrivileged] Checking sIDHistory entry: $historySIDString",
+          "to": "[Test-IsPrivileged] Проверка записи sIDHistory: $historySIDString",
+          "occurrences": 1
+        },
+        {
+          "line": 882,
+          "from": "[Test-IsPrivileged] CRITICAL: sIDHistory contains privileged SID: $historySIDString",
+          "to": "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит привилегированный SID: $historySIDString",
+          "occurrences": 1
+        },
+        {
+          "line": 890,
+          "from": "[Test-IsPrivileged] CRITICAL: sIDHistory contains privileged RID: $historySIDString",
+          "to": "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит привилегированный RID: $historySIDString",
+          "occurrences": 1
+        },
+        {
+          "line": 898,
+          "from": "[Test-IsPrivileged] CRITICAL: sIDHistory contains Operator SID: $historySIDString",
+          "to": "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит SID оператора: $historySIDString",
+          "occurrences": 1
+        },
+        {
+          "line": 906,
+          "from": "[Test-IsPrivileged] CRITICAL: sIDHistory contains Operator RID: $historySIDString",
+          "to": "[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит RID оператора: $historySIDString",
+          "occurrences": 1
+        },
+        {
+          "line": 937,
+          "from": "[Test-IsPrivileged] Error checking sIDHistory: $_",
+          "to": "[Test-IsPrivileged] Ошибка проверки sIDHistory: $_",
+          "occurrences": 1
+        },
+        {
+          "line": 970,
+          "from": "[Test-IsPrivileged] Found $($tierMemberships.Count) group membership(s) for $sid",
+          "to": "[Test-IsPrivileged] Найдено $($tierMemberships.Count) групп для $sid",
+          "occurrences": 1
+        },
+        {
+          "line": 1008,
+          "from": "[Test-IsPrivileged] Privileged via membership: $groupName",
+          "to": "[Test-IsPrivileged] Привилегированность получена через членство: $groupName",
+          "occurrences": 1
+        },
+        {
+          "line": 1028,
+          "from": "[Test-IsPrivileged] Operator via membership: $groupName",
+          "to": "[Test-IsPrivileged] Статус оператора получен через членство: $groupName",
+          "occurrences": 1
+        },
+        {
+          "line": 1049,
+          "from": "[Test-IsPrivileged] Operator via membership (RID suffix): $groupName",
+          "to": "[Test-IsPrivileged] Статус оператора через членство (суффикс RID): $groupName",
+          "occurrences": 1
+        },
+        {
+          "line": 1071,
+          "from": "[Test-IsPrivileged] BroadGroup via membership: $groupName",
+          "to": "[Test-IsPrivileged] Широкая группа BroadGroup через членство: $groupName",
+          "occurrences": 1
+        },
+        {
+          "line": 1077,
+          "from": "[Test-IsPrivileged] No group memberships found for $sid",
+          "to": "[Test-IsPrivileged] Для $sid группы не найдены",
+          "occurrences": 1
+        },
+        {
+          "line": 1080,
+          "from": "[Test-IsPrivileged] No LDAP connection - group membership check skipped",
+          "to": "[Test-IsPrivileged] Нет подключения LDAP; проверка членства в группах пропущена",
+          "occurrences": 1
+        },
+        {
+          "line": 1095,
+          "from": "[Test-IsPrivileged] BroadGroup confirmed (no privileged membership found): $sid",
+          "to": "[Test-IsPrivileged] Подтверждена широкая группа BroadGroup (привилегированного членства нет): $sid",
+          "occurrences": 1
+        },
+        {
+          "line": 1108,
+          "from": "[Test-IsPrivileged] Standard identity: $sid",
+          "to": "[Test-IsPrivileged] Обычная учётная запись: $sid",
+          "occurrences": 1
+        },
+        {
+          "line": 1339,
+          "from": "[Test-IsExpectedInScope] Unknown scope: $Scope",
+          "to": "[Test-IsExpectedInScope] Неизвестная область проверки: $Scope",
+          "occurrences": 1
+        },
+        {
+          "line": 1409,
+          "from": "[Test-IsExpectedInScope] $sid holds only its default rights in scope '$Scope'",
+          "to": "[Test-IsExpectedInScope] У $sid только права по умолчанию в области '$Scope'",
+          "occurrences": 1
+        },
+        {
+          "line": 1421,
+          "from": "[Test-IsExpectedInScope] $sid holds $($beyond -join ', ') beyond its defaults in scope '$Scope'",
+          "to": "[Test-IsExpectedInScope] У $sid есть дополнительные права ($($beyond -join ', ')) в области '$Scope'",
+          "occurrences": 1
+        },
+        {
+          "line": 1517,
+          "from": "[Test-IsExpectedInScope] Identity $sid is member of expected group $groupName",
+          "to": "[Test-IsExpectedInScope] Учётная запись $sid входит в ожидаемую группу $groupName",
+          "occurrences": 1
+        },
+        {
+          "line": 1543,
+          "from": "[Test-IsExpectedInScope] Exchange service group detected: $($exchangeCheck.DistinguishedName)",
+          "to": "[Test-IsExpectedInScope] Обнаружена сервисная группа Exchange: $($exchangeCheck.DistinguishedName)",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
+      "messages": [
+        {
+          "line": 323,
+          "from": "[!] TGT EXPIRED - Re-authentication required!",
+          "to": "[!] TGT ИСТЁК — требуется повторная аутентификация!",
+          "occurrences": 1
+        }
+      ]
+    }
+  ]
+}
