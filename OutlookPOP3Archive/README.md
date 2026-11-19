@@ -1,6 +1,20 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3t — восстановление только частичного TEMP DuplicateIndex после original verifier (без Outlook)
+
+ARCH3s уже выполняет оригинальный `ArchiveVerifier` на 10 fake Outlook MailItems и затем создаёт original TEMP `OperationJournal` и `DuplicateIndex`. ARCH3t добавляет независимый `Audit` и явно разрешаемый `Recover` **только недостающих index entries** из состояния `10 Reconciled / 2 Indexed`. Требуются исходные SHA256 и повторный оригинальный fake-verifier; повреждённые, дублированные или незавершённые записи блокируются. **Нет Move, реального PST и разрешения на production.**
+
+```powershell
+$partial = .\Invoke-ARCH3s.ps1 -Mode Integration -JournalFault AfterIndexAppend -FaultAt 2
+$audit = .\Invoke-ARCH3t.ps1 -Mode Audit -Workspace $partial.OriginalJournalWorkspace
+.\Invoke-ARCH3t.ps1 -Mode Recover -Workspace $audit.Workspace -ExpectedJournalSha256 $audit.OriginalJournalSha256 -ExpectedIndexSha256 $audit.OriginalIndexSha256 -ConfirmSyntheticRecovery -WhatIf
+$done = .\Invoke-ARCH3t.ps1 -Mode Recover -Workspace $audit.Workspace -ExpectedJournalSha256 $audit.OriginalJournalSha256 -ExpectedIndexSha256 $audit.OriginalIndexSha256 -ConfirmSyntheticRecovery -Confirm:$false
+$done | Format-List
+```
+
+[Полный синтаксис и fail-closed правила ARCH3t](docs/2.6.5-arch3t-synthetic-index-only-recovery.md). `WriterPermit=False`, `ProductionReady=False`; отдельный реальный batch-10 пока не разрешён.
+
 ### ARCH3s — оригинальный `ArchiveVerifier` на десяти fake Outlook MailItems (без реальных PST)
 
 Развивает успешный ARCH3r: не модифицируя original `ArchiveVerifier.ps1`, запускает `Test-OPAArchiveMoves` на десяти fake MailItem с реальным оригинальным ARCH2b full semantic SHA (Body/HTML/Recipients/attachment `SaveAsFile`), source absent и exactly 10 destination objects. Только после полного PASS разрешена **TEMP-only** интеграция original OperationJournal / DuplicateIndex. Для следующего этапа остаётся восстановление частичного пакетного commit и затем отдельно авторизованный реальный тестовый batch; `WriterPermit=False`.
