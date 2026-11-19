@@ -8,7 +8,7 @@ const end=src.indexOf('        // DOC6a END: verified report display translation
 assert(begin>0&&end>begin,'DOC6a source block present once');
 assert.equal(src.indexOf('        // DOC6a BEGIN:',begin+5),-1,'injected only once');
 const T=s=>({nodeType:3,nodeValue:s});
-const E=(name,...kids)=>({nodeType:1,tagName:name,childNodes:kids});
+const E=(name,...kids)=>({nodeType:1,tagName:name,childNodes:kids,firstChild:kids.length?kids[0]:null});
 function row(key,...values){
  const content=E('DIV',...values),attrs={'data-attr-name':key};
  return {key,content,attrs,getAttribute:k=>attrs[k],querySelector:q=>{assert.equal(q,'.attr-value');return content}};
