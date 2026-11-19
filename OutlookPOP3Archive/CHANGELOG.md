@@ -1,3 +1,9 @@
+## 2.6.5-ARCH3p DEV — 2026-11-19
+- User actual ARCH3o Audit/WhatIf/Status PASS: no real MoveClaimed, no Part2, original protected RunId/Intent/Journal and full source witness unchanged.
+- New READ-ONLY independent real Outlook PostRestartReview: pins original ARCH3o durable WriterEntry/DestinationReady/MoveClaimed/ProviderInvocation/(optional MoveReturned) SHA chain, real process PID + start ticks greater, mounted Part2 exactly one source-matched mail.
+- ORIGINAL ArchiveVerifier Test-OPAArchiveMoves + original full ARCH2b witness required; verify source EntryID absent, unique destination, HTML/body/recipients/attachment digests; no premature original Journal Reconciled or shared DuplicateIndex appends.
+- Supports crash after real COM returned but before receipt persisted, with mandatory durable ProviderInvocation and NO automatic retry. 21 new Pester, full expected 4463 tests / 150 containers on Windows PS5.1. ProductionReady=False.
+
 ## 2.6.5-ARCH3o DEV — 2026-11-19
 - User live read-only ARCH3n Plan/Audit PASS; original protected ARCH3j Intent and Journal hashes plus full source semantic witness remain unchanged.
 - Added inside original MailMover optional -ARCH3oRequireNewUnusedPst to fail closed if old/mounted target PST exists, and one real MailItem.Move provider helper protected by second CreateNew+Flush(true) ProviderInvocation SHA fence.

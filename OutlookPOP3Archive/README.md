@@ -1,6 +1,19 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3p — независимый реальный Outlook restart + ORIGINAL ArchiveVerifier (READ ONLY)
+
+После подтверждения ARCH3o `Audit`, `WhatIf`, `Status` создан независимый **PostRestartReview**: сверка исходного защищённого ARCH3j Intent/Journal и ARCH3o `WriterEntry → DestinationReady → MoveClaimed → ProviderInvocation → (MoveReturned)`, обязательное подтверждение НОВОГО процесса Outlook, ровно одной записи в уже созданной Part2 и полного semantic witness оригинальным `Test-OPAArchiveMoves`. Если COM вернул результат, но `MoveReturned` не записался, можно расследовать исходный outcome **без повтора Move**. `DuplicateIndex` и original `OperationJournal` остаются без изменений.
+
+```powershell
+$pin=@{RunId='9d276dc4-a0e6-4e74-891f-81502fafe7db';IntentSha256='f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b';JournalSha256='a19f113a6454b1d17333c9a53fc22d065876754b9fbab3167087487d0b2b981e'}
+# Выполнять ПОСЛЕ единственного ARCH3o Move и настоящего restart Outlook:
+.\Invoke-ARCH3p.ps1 -Mode Plan @pin | Format-List
+.\Invoke-ARCH3p.ps1 -Mode Review @pin | Format-List
+```
+
+**Не выполняйте ARCH3p Review до реального Move**: ещё нет `MoveClaimed`, проверка остановится. [Контракт и полные параметры ARCH3p](docs/2.6.5-arch3p-independent-postrestart-original-verifier.md). `WriterPermit=False`, `ProductionReady=False`.
+
 ### ARCH3o — защищённый ровно один реальный Move ТЕСТОВОГО POP3 PST (DEV)
 
 Разработан новый ограниченный one-shot путь **внутри оригинального `MailMover.ps1`**: новый Year2020 Part2, без открытия Part1, неизменяемый `WriterEntry` до PST, `MoveClaimed` и `ProviderInvocation` до единственного Outlook COM `Move`, без записи в общий `DuplicateIndex` и без `OperationJournal Reconciled` до независимого настоящего Outlook restart. `Move` является **разрушительной тестовой операцией**, требует explicit `-ConfirmOneRealMove`, не допускает retry. `ProductionReady=False`.

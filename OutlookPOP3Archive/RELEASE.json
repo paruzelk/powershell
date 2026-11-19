@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3p DEV READ ONLY: independent REAL Outlook process restart and ORIGINAL ArchiveVerifier full semantic witness for exactly one archived POP3 item after ARCH3o. Pins all original durable claim/provider SHA stages, tolerates missing receipt only after provider invocation, no Move/Resume or premature Original Journal/Index mutation. 21 new Pester, expected full 4463/150 Windows PS5.1. NOT production certified.",
     "ARCH3o DEV: operator-only exact single real TEST-PST Outlook MailItem.Move through original MailMover. Immutable WriterEntry before original NEW Part2 PST, MoveClaimed and ProviderInvocation before COM, no replay, original Journal remains Intent, shared DuplicateIndex untouched until real restart + original ArchiveVerifier. 20 Pester new; expected 4442/149 Windows PS5.1; production writer remains closed.",
     "ARCH3n DEV: exact immutable operator ARCH3j RunId and original Intent/Journal SHA plus full ARCH3i witness linked to ORIGINAL Get-OPAArchiveDestination fake ARCH3m Year2020 Part2 preallocation. Plan/Audit real evidence read-only; 22 new Pester, expected 4422/148 Windows PS5.1; real Move remains CLOSED.",
     "ARCH3m DEV: original Get-OPAArchiveDestination forces Year2020 Part2 BEFORE any original PST allocation strictly under ARCH3d+ARCH3l synthetic TEMP fake Outlook scope. Original PST APIs mocked, original immutable ARCH3d Move chain stops pre-index; no real Move or production writer. 22 new Pester, expected 4400/147 Windows PowerShell 5.1 tests.",
@@ -93,8 +94,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 149,
-    "ExpectedPesterTests": 4442,
+    "ExpectedTestContainers": 150,
+    "ExpectedPesterTests": 4463,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
