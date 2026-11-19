@@ -207,7 +207,7 @@ def patch_js(candidate, tech, checks):
     # Replace only the render body, not the prelude. Preserve commands, references and scoring.
     pre, body = sub.split(prelude, 1)
     for before, after in replacements.items():
-        body = body.replace(before, after)
+        body = re.sub(r"\b" + re.escape(before) + r"\b", lambda _: after, body)
     if "finding.impact.map(" in body or "finding.attack.map(" in body:
         raise ValueError("Technical arrays not switched to display variables")
     sub = pre + prelude + body
