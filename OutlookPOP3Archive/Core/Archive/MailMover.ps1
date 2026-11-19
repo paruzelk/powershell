@@ -906,9 +906,9 @@ function Move-OPAItemsWithLimit {
             $dest = $null
             try {
                 if($ARCH3mSyntheticForcePart2){
-                    $dest=Get-OPAArchiveDestination -Namespace $Namespace -Transaction $Transaction -SourcePst $Transaction.State.SourcePst -ReceivedTime $dt -ItemSize $itemSize -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ArchiveGrouping $ArchiveGrouping -SourceFolderName ([string]$source.Name) -SourceFolderPath $folderPath -AccountEmail ([string]$Transaction.State.AccountEmail) -ARCH3mSyntheticPart2Scope $arch3dScope -ARCH3mSyntheticCandidate $candidate -ARCH3mSyntheticExistingParts @($existingArchivePaths)
+                    $dest = Get-OPAArchiveDestination -Namespace $Namespace -Transaction $Transaction -SourcePst $Transaction.State.SourcePst -ReceivedTime $dt -ItemSize $itemSize -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ArchiveGrouping $ArchiveGrouping -SourceFolderName ([string]$source.Name) -SourceFolderPath $folderPath -AccountEmail ([string]$Transaction.State.AccountEmail) -ARCH3mSyntheticPart2Scope $arch3dScope -ARCH3mSyntheticCandidate $candidate -ARCH3mSyntheticExistingParts @($existingArchivePaths)
                 }else{
-                    $dest=Get-OPAArchiveDestination -Namespace $Namespace -Transaction $Transaction -SourcePst $Transaction.State.SourcePst -ReceivedTime $dt -ItemSize $itemSize -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ArchiveGrouping $ArchiveGrouping -SourceFolderName ([string]$source.Name) -SourceFolderPath $folderPath -AccountEmail ([string]$Transaction.State.AccountEmail)
+                    $dest = Get-OPAArchiveDestination -Namespace $Namespace -Transaction $Transaction -SourcePst $Transaction.State.SourcePst -ReceivedTime $dt -ItemSize $itemSize -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ArchiveGrouping $ArchiveGrouping -SourceFolderName ([string]$source.Name) -SourceFolderPath $folderPath -AccountEmail ([string]$Transaction.State.AccountEmail)
                 }
             }
             catch {
