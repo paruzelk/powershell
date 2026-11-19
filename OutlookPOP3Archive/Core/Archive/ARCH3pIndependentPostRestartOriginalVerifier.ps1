@@ -135,6 +135,7 @@ function Get-OPA265ARCH3pMountedPart2 {
         try{
             $s=$Namespace.Stores.Item($i)
             if($null -ne $s -and
+               -not [string]::IsNullOrWhiteSpace([string]$s.FilePath) -and
                [string]::Equals([IO.Path]::GetFullPath([string]$s.FilePath),
                    [IO.Path]::GetFullPath($Part2),[StringComparison]::OrdinalIgnoreCase)){
                 $count++
