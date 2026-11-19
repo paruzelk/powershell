@@ -96,9 +96,9 @@ Describe 'ARCH3t independently recover missing ORIGINAL index rows in fake OS TE
             $bytes=[IO.File]::ReadAllBytes($full)
             (@($bytes[0..2]) -join ',') | Should -BeExactly '239,187,191'
             $c=Get-Content -LiteralPath $full -Raw -Encoding UTF8
-            $c | Should -Not -Match '\\.Move\\s*\\('
-            $c | Should -Not -Match 'GetActiveObject\\s*\\('
-            $c | Should -Not -Match 'AddStoreEx\\s*\\('
+            $c | Should -Not -Match '\.Move\s*\('
+            $c | Should -Not -Match 'GetActiveObject\s*\('
+            $c | Should -Not -Match 'AddStoreEx\s*\('
         }
     }
     It 'recovers after exactly one original index append at the first failpoint' {
