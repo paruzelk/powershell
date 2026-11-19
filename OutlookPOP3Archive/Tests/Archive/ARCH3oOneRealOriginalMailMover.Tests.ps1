@@ -77,6 +77,10 @@ Describe 'ARCH3o real Outlook facade with only one original MailMover call' {
     BeforeEach {
         $script:p=New-ARCH3oFakePlan -Root $TestDrive
         $script:base=Join-Path $TestDrive 'evidence'
+        # Pester TestDrive can persist across It blocks. Only clean this
+        # synthetic scratch fixture, NEVER an operator protected RunId.
+        if([IO.Directory]::Exists($script:base)){[IO.Directory]::Delete($script:base,$true)}
+        if([IO.File]::Exists($script:p.UnusedPart2)){[IO.File]::Delete($script:p.UnusedPart2)}
         [void][IO.Directory]::CreateDirectory($script:base)
         [IO.File]::WriteAllText((Join-Path $script:base 'original-prepare-intent.json'),'intent')
         [IO.File]::WriteAllText((Join-Path $script:base 'original-operation-journal.jsonl'),'journal')
@@ -194,6 +198,8 @@ Describe 'ARCH3o ORIGINAL MailMover provider atomic irreversible invocation fenc
         $script:oldLocalAppData=$env:LOCALAPPDATA
         $env:LOCALAPPDATA=$TestDrive
         $script:rootEvidence=Join-Path $TestDrive ('OPA265-ARCH3j-'+$script:run)
+        # Cleanup ONLY the isolated TestDrive fake evidence before each It.
+        if([IO.Directory]::Exists($script:rootEvidence)){[IO.Directory]::Delete($script:rootEvidence,$true)}
         [void][IO.Directory]::CreateDirectory($script:rootEvidence)
         $script:mail=[pscustomobject]@{EntryID=$script:id;Class=43;Calls=0}
         $script:mail | Add-Member -MemberType ScriptMethod -Name Move -Value {
@@ -246,6 +252,7 @@ Describe 'ARCH3o ORIGINAL MailMover provider atomic irreversible invocation fenc
 Describe 'ARCH3o forensic Status never retries or reconciles original journal' {
     BeforeEach {
         $script:statusDir=Join-Path $TestDrive 'OPA265-ARCH3j-real'
+        if([IO.Directory]::Exists($script:statusDir)){[IO.Directory]::Delete($script:statusDir,$true)}
         [void][IO.Directory]::CreateDirectory($script:statusDir)
         [IO.File]::WriteAllText((Join-Path $script:statusDir 'original-prepare-intent.json'),'fake')
         [IO.File]::WriteAllText((Join-Path $script:statusDir 'original-operation-journal.jsonl'),'fake')
