@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3n (2026-11-19):** [привязка ранее запечатанного реального ARCH3j оригинального Intent к синтетической исходной Part2 до PST allocation](2.6.5-arch3n-pinned-real-intent-bridge.md). Read-only `Plan/Audit` требует exact original SHA+full witness, неизменную Part1 и 500-entry shared index; при любом дрейфе fail-closed. Нет live writer и автоматического повтора. Дальше — один bounded реальный claim+Move с независимым real Outlook restart и оригинальным ArchiveVerifier, только после отдельного допуска.
+
+
 > **ARCH3m (2026-11-19):** [исходный Get-OPAArchiveDestination принудительно выбирает Part2 ДО PST allocation](2.6.5-arch3m-original-part2-preallocation-synthetic.md) под ARCH3d+ARCH3l fake TEMP. Пользователь ARCH3k подтвердил real read-only Plan/Audit; old ARCH3j Intent/Journal остаются нетронутыми. Для настоящего Move нужен отдельный операторский one-shot live gate и original verifier ПОСЛЕ реального Outlook restart. ProductionReady=False.
 
 

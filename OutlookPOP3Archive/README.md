@@ -1,6 +1,18 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3n — original ARCH3j Intent ↔ original synthetic Year Part2 (READ ONLY)
+
+Синтетическая принудительная Part2 из ARCH3m привязана к существующим *неизменным* реальным ARCH3j PrepareIntent, OperationJournal, ARCH3i full witness и original DuplicateIndex. Проверяются exact RunId, SHA, единственная Part1 271360 байт, свободная Part2 и 500 индексных записей. Реальный `Move` по-прежнему ЗАБЛОКИРОВАН.
+
+```powershell
+$pin=@{RunId='9d276dc4-a0e6-4e74-891f-81502fafe7db'; IntentSha256='f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b'; JournalSha256='a19f113a6454b1d17333c9a53fc22d065876754b9fbab3167087487d0b2b981e'}
+.\Invoke-ARCH3n.ps1 -Mode Plan @pin | Format-List
+.\Invoke-ARCH3n.ps1 -Mode Audit @pin | Format-List
+```
+
+[Подробные проверки и полный синтаксис ARCH3n](docs/2.6.5-arch3n-pinned-real-intent-bridge.md). `WriterPermit=False`, `ProductionReady=False`.
+
 ### ARCH3m — оригинальный Part2 ДО создания PST (только синтетика)
 
 Внутри исходного Get-OPAArchiveDestination под строгими ARCH3d+ARCH3l fake TEMP границами -ARCH3mSyntheticForcePart2 проверяет exact Year2020 Part2 ДО New-OPAArchivePst, не открывая Part1. Оригинальная синтетическая цепочка PrepareIntent → DestinationReady → SourceWitnessAnchored → MoveClaimed → MoveReturned не добавляет записи в shared DuplicateIndex и запрещает retry.

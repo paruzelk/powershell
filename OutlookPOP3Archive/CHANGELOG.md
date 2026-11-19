@@ -1,3 +1,9 @@
+## 2.6.5-ARCH3n DEV — 2026-11-19
+- New exact READ-ONLY operator ARCH3j pinned real Intent/Journal/ARCH3i source witness binding to original Get-OPAArchiveDestination ARCH3m fake preallocation, rejects forged SHA/contract/EntryID/Year/part/index and consumed real Part2.
+- New Invoke-ARCH3n Plan/Audit, Audit reuses original ARCH3k real source full witness and POP3 Inbox read-only, never authorizes Move/Resume/Auto.
+- No persistent evidence writes, no PST creation, no original DuplicateIndex writes; fake-only optional bridge inside original MailMover before New-OPAArchivePst; real claims and postrestart index commit stay CLOSED.
+- 22 new Pester tests; expected full 4422 tests in 148 containers, Windows PowerShell 5.1, BOM/PSSA gates.
+
 ## 2.6.5-ARCH3m DEV — 2026-11-19
 - User real ARCH3k Plan/Audit PASS: exact old POP3 witness, Part1 271360 bytes, original shared 500-entry index, protected ARCH3j PrepareIntent+Journal SHA remain unchanged.
 - Added original Get-OPAArchiveDestination forced Part2 preallocation branch guarded by original ARCH3d+ARCH3l fake TEMP scope. Original New-OPAArchivePst and Get-OPAArchiveFolder used under mocks; no real PST writes.
