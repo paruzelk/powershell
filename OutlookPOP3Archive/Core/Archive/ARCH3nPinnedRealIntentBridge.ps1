@@ -10,6 +10,11 @@ function Get-OPA265ARCH3nPinnedRealRoute {
         [Parameter(Mandatory=$true)][string]$IntentSha256,
         [Parameter(Mandatory=$true)][string]$JournalSha256
     )
+    if($RunId -cne '9d276dc4-a0e6-4e74-891f-81502fafe7db' -or
+       $IntentSha256 -cne 'f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b' -or
+       $JournalSha256 -cne 'a19f113a6454b1d17333c9a53fc22d065876754b9fbab3167087487d0b2b981e'){
+        throw 'ARCH3n refuses non-operator-pinned real test PST Intent/Journal identity.'
+    }
     # ARCH3k reads ORIGINAL ARCH3j PrepareIntent and original OperationJournal
     # with their externally pinned hashes AND independent full ARCH3i witness.
     $p=Assert-OPA265ARCH3kPinnedPreparation -RunId $RunId -IntentSha256 $IntentSha256 -JournalSha256 $JournalSha256
