@@ -1,0 +1,11 @@
+﻿{
+  "Schema": "adPEAS-RU.2.11.0.MIG1.ChangedFindingTitles.1",
+  "UpstreamCommit": "477696f48d6b486be5d9a99b598f72e3ccfcc0c0",
+  "Translations": {
+    "LAPS_ENCRYPTED_PASSWORD": {
+      "EnglishTitle": "Encrypted LAPS Password Readable",
+      "RussianTitle": "Зашифрованный блок пароля LAPS доступен для чтения",
+      "RussianSummary": "Сканирующая учётная запись может получить атрибут msLAPS-EncryptedPassword, но доступ к зашифрованным данным не означает возможность расшифровать сам пароль. Право расшифровки оценивается отдельной проверкой."
+    }
+  }
+}
