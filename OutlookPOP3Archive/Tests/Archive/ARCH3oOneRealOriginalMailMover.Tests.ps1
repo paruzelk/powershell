@@ -187,3 +187,106 @@ Describe 'ARCH3o real Outlook facade with only one original MailMover call' {
         $script:providerCalls | Should -Be 0
     }
 }
+
+
+Describe 'ARCH3o ORIGINAL MailMover provider atomic irreversible invocation fence' {
+    BeforeEach {
+        $script:oldLocalAppData=$env:LOCALAPPDATA
+        $env:LOCALAPPDATA=$TestDrive
+        $script:rootEvidence=Join-Path $TestDrive ('OPA265-ARCH3j-'+$script:run)
+        [void][IO.Directory]::CreateDirectory($script:rootEvidence)
+        $script:mail=[pscustomobject]@{EntryID=$script:id;Class=43;Calls=0}
+        $script:mail | Add-Member -MemberType ScriptMethod -Name Move -Value {
+            param($target)
+            $this.Calls++
+            return [pscustomobject]@{Class=43;EntryID='00000000DEADBEEFCAFEBABEDEADBEEF'}
+        }
+        $script:target=[pscustomobject]@{
+            EntryID='00000000CAFEBABEDEADBEEFCAFEBABE'
+            StoreID='ARCH3o-FAKE-STORE'
+        }
+        $claim=[pscustomobject]@{
+            Schema='2.6.5-ARCH3o.RealOneShotMoveClaim.1'
+            RunId=$script:run;IntentSha256=$script:intent;JournalSha256=$script:journal
+            SourceEntryId=$script:id;OriginalWitnessSha256=$script:sha
+            NewArchivePst='C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.Archive-2020-02.pst'
+            DestinationFolderEntryId=$script:target.EntryID
+            DestinationStoreId=$script:target.StoreID
+            OperatorApprovedOneRealMove=$true
+            AutomaticRetryAllowed=$false;ProductionReady=$false
+        }
+        $script:claimSha=Write-OPA265ARCH3cJsonOnce -Path (Join-Path $script:rootEvidence 'ARCH3o-MoveClaimed.json') -Record $claim
+        Mock Assert-OPA265ARCH2c2PrivateWorkspaceAcl {return $true}
+    }
+    AfterEach {
+        $env:LOCALAPPDATA=$script:oldLocalAppData
+    }
+    It 'calls original MailItem.Move exactly ONCE after durable provider invocation evidence' {
+        $r=Invoke-OPA265ARCH3oOneOriginalMailMoverProviderCall -Mail $script:mail -Folder $script:target -RunId $script:run -ClaimSha256 $script:claimSha
+        $r.OneMoveReturned | Should -BeTrue
+        $r.IndependentPostRestartVerified | Should -BeFalse
+        $script:mail.Calls | Should -Be 1
+        [IO.File]::Exists((Join-Path $script:rootEvidence 'ARCH3o-ProviderInvocation.json')) | Should -BeTrue
+    }
+    It 'refuses a second provider Move after first COM returned, even if receipt not written' {
+        [void](Invoke-OPA265ARCH3oOneOriginalMailMoverProviderCall -Mail $script:mail -Folder $script:target -RunId $script:run -ClaimSha256 $script:claimSha)
+        {Invoke-OPA265ARCH3oOneOriginalMailMoverProviderCall -Mail $script:mail -Folder $script:target -RunId $script:run -ClaimSha256 $script:claimSha} | Should -Throw
+        $script:mail.Calls | Should -Be 1
+    }
+    It 'rejects changed destination store/Folder before provider invocation' {
+        $script:target.StoreID='CHANGED-STORE'
+        {Invoke-OPA265ARCH3oOneOriginalMailMoverProviderCall -Mail $script:mail -Folder $script:target -RunId $script:run -ClaimSha256 $script:claimSha} | Should -Throw
+        $script:mail.Calls | Should -Be 0
+    }
+    It 'rejects altered externally pinned claim SHA, never reaching COM' {
+        {Invoke-OPA265ARCH3oOneOriginalMailMoverProviderCall -Mail $script:mail -Folder $script:target -RunId $script:run -ClaimSha256 ('f'*64)} | Should -Throw
+        $script:mail.Calls | Should -Be 0
+    }
+}
+Describe 'ARCH3o forensic Status never retries or reconciles original journal' {
+    BeforeEach {
+        $script:statusDir=Join-Path $TestDrive 'OPA265-ARCH3j-real'
+        [void][IO.Directory]::CreateDirectory($script:statusDir)
+        [IO.File]::WriteAllText((Join-Path $script:statusDir 'original-prepare-intent.json'),'fake')
+        [IO.File]::WriteAllText((Join-Path $script:statusDir 'original-operation-journal.jsonl'),'fake')
+        Mock Assert-OPA265ARCH2c2PrivateWorkspaceAcl {return $true}
+        Mock Get-OPA265ARCH3jLayout {
+            [pscustomobject]@{
+                RunId=$script:run;Root=$script:statusDir
+                IntentPath=(Join-Path $script:statusDir 'original-prepare-intent.json')
+                JournalPath=(Join-Path $script:statusDir 'original-operation-journal.jsonl')
+            }
+        }
+        Mock Read-OPA265ARCH3cPinnedJson {
+            [pscustomobject]@{RunId=$script:run;OperationId='ARCH3b-TEST';WriterPermit=$false}
+        }
+        Mock Read-OPAOperationJournal {
+            [pscustomobject]@{
+                Events=@([pscustomobject]@{Phase='Intent';OperationId='ARCH3b-TEST'})
+                TrailingPartial=$false
+            }
+        }
+        Mock Get-FileHash {
+            [pscustomobject]@{Hash=$script:journal}
+        }
+    }
+    It 'reports read-only protected journal Intent with no writer files' {
+        $r=Get-OPA265ARCH3oOneShotStatus -RunId $script:run -IntentSha256 $script:intent -JournalSha256 $script:journal
+        $r.WriterEntryExists | Should -BeFalse
+        $r.MoveClaimed | Should -BeFalse
+        $r.AutomaticRetryAllowed | Should -BeFalse
+        $r.OriginalJournalIntentPreserved | Should -BeTrue
+    }
+    It 'lists existing no-replay WriterEntry without allowing a fresh Move' {
+        [IO.File]::WriteAllText((Join-Path $script:statusDir 'ARCH3o-WriterEntry.json'),'sealed')
+        $r=Get-OPA265ARCH3oOneShotStatus -RunId $script:run -IntentSha256 $script:intent -JournalSha256 $script:journal
+        $r.WriterEntryExists | Should -BeTrue
+        $r.AutomaticRetryAllowed | Should -BeFalse
+        $r.IndependentPostRestartVerified | Should -BeFalse
+    }
+    It 'refuses unexpected operation evidence without any deletion' {
+        [IO.File]::WriteAllText((Join-Path $script:statusDir 'unexpected.txt'),'error')
+        {Get-OPA265ARCH3oOneShotStatus -RunId $script:run -IntentSha256 $script:intent -JournalSha256 $script:journal} | Should -Throw
+        [IO.File]::Exists((Join-Path $script:statusDir 'unexpected.txt')) | Should -BeTrue
+    }
+}
