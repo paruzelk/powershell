@@ -8,7 +8,7 @@
                           "src/modules/Reporting/templates/report-scripts.js",
                           "src/modules/Reporting/templates/diff-template.html"
                       ],
-    "candidateCount":  224,
+    "candidateCount":  223,
     "candidates":  [
                        {
                            "kind":  "DynamicSummary",
@@ -465,12 +465,6 @@
                            "source":  "src\\modules\\Core\\adPEAS-Messages.ps1",
                            "line":  1805,
                            "snippet":  "Show-Line \"Get-Help \u003cCommand\u003e -Detailed\""
-                       },
-                       {
-                           "kind":  "DirectShow",
-                           "source":  "src\\modules\\Core\\adPEAS-Messages.ps1",
-                           "line":  1815,
-                           "snippet":  "Show-Line \"Invoke-adPEAS (without -Module)\""
                        },
                        {
                            "kind":  "DirectShow",

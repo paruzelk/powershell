@@ -3,8 +3,8 @@
     adPEAS v2 - Active Directory Privilege Escalation Awesome Scripts
 
 .DESCRIPTION
-    Build: 2026-11-19 10:32:54
-    Version: 2.9.0+20261119-1032
+    Build: 2026-11-19 11:00:43
+    Version: 2.9.0+20261119-1100
 
     AUTHORIZED SECURITY TESTING ONLY!
 
@@ -32511,7 +32511,7 @@ function Initialize-FindingsCollection {
     $Script:adPEAS_FindingsCollection = [System.Collections.ArrayList]::new()
     $Script:adPEAS_FindingsCollectionEnabled = $true
     $Script:adPEAS_CurrentCheckContext = $null
-    Write-Log "[FindingsCollection] Initialized"
+    Write-Log "[FindingsCollection] Сбор результатов инициализирован"
 }
 
 <#
@@ -32707,7 +32707,7 @@ function Clear-FindingsCollection {
     $Script:adPEAS_FindingsCollection = $null
     $Script:adPEAS_FindingsCollectionEnabled = $false
     $Script:adPEAS_CurrentCheckContext = $null
-    Write-Log "[FindingsCollection] Cleared"
+    Write-Log "[FindingsCollection] Результаты очищены"
 }
 
 # ============================================================================
@@ -32733,7 +32733,7 @@ function Set-FindingsCollection {
     )
 
     $Script:adPEAS_FindingsCollection = [System.Collections.ArrayList]@($Findings)
-    Write-Log "[FindingsCollection] Set to $($Findings.Count) findings"
+    Write-Log "[FindingsCollection] Установлено находок: $($Findings.Count)"
 }
 
 <#
@@ -33023,14 +33023,14 @@ function Export-FindingsCache {
             [System.IO.File]::Move($tempPath, $resolvedPath)
         }
     } catch {
-        Write-Log "[FindingsCache] Atomic replace failed, writing directly: $($_.Exception.Message)" -Level Warning
+        Write-Log "[FindingsCache] Атомарная замена не удалась; выполняется прямая запись: $($_.Exception.Message)" -Level Warning
         [System.IO.File]::WriteAllText($resolvedPath, $json, $utf8NoBom)
         if ([System.IO.File]::Exists($tempPath)) {
             try { [System.IO.File]::Delete($tempPath) } catch { }
         }
     }
 
-    Write-Log "[FindingsCache] Exported $($serializable.Count) findings to '$Path' (complete: $(-not $Partial))"
+    Write-Log "[FindingsCache] Экспортировано находок: $($serializable.Count) в '$Path' (полный: $(-not $Partial))"
 }
 
 <#
@@ -33054,19 +33054,19 @@ function Import-FindingsCache {
 
     # Version check
     if ($cache.CacheVersion -ne 1) {
-        Write-Warning "[FindingsCache] Unsupported cache version $($cache.CacheVersion) - expected 1"
+        Write-Warning "[FindingsCache] Неподдерживаемая версия кэша $($cache.CacheVersion), ожидается 1"
         return @()
     }
 
     # Domain mismatch warning
     $currentDomain = if ($Script:LDAPContext) { $Script:LDAPContext.Domain } else { $null }
     if ($currentDomain -and $cache.Domain -and $cache.Domain -ne $currentDomain -and $cache.Domain -ne 'Unknown') {
-        Write-Warning "[FindingsCache] Cache domain '$($cache.Domain)' differs from current domain '$currentDomain'"
-        Write-Warning "[FindingsCache] Continuing with merge - findings may be from different domains"
+        Write-Warning "[FindingsCache] Домен кэша '$($cache.Domain)' отличается от текущего домена '$currentDomain'"
+        Write-Warning "[FindingsCache] Слияние продолжено; находки могут относиться к разным доменам"
     }
 
     $result = Import-FindingsFromCache -Cache $cache
-    Write-Log "[FindingsCache] Loaded $(@($result).Count) findings from '$Path'"
+    Write-Log "[FindingsCache] Загружено находок: $(@($result).Count) из '$Path'"
     return @($result)
 }
 
@@ -33121,7 +33121,7 @@ function Import-FindingsFromCache {
             try {
                 $timestamp = [datetime]::Parse($f.Timestamp, [System.Globalization.CultureInfo]::InvariantCulture)
             } catch {
-                Write-Log "[Import-FindingsFromCache] Unreadable timestamp, finding kept without one: $($f.Timestamp)"
+                Write-Log "[Import-FindingsFromCache] Не удалось прочитать метку времени; находка сохранена без даты: $($f.Timestamp)"
             }
         }
 
@@ -33192,7 +33192,7 @@ function Merge-FindingsCollection {
     [void]$merged.AddRange(@($CurrentFindings))
     $sorted = @(Sort-FindingsByCategory -Findings $merged)
 
-    Write-Log "[FindingsCache] Merge: kept $($kept.Count) previous, added $($CurrentFindings.Count) new, total $($sorted.Count)"
+    Write-Log "[FindingsCache] Слияние: сохранено прежних $($kept.Count), добавлено новых $($CurrentFindings.Count), всего $($sorted.Count)"
     return $sorted
 }
 
@@ -33952,7 +33952,7 @@ function Show-NoSessionError {
     }
 
     # Error details (NoCollect: session errors are not security findings)
-    Show-KeyValue "Session:" "Not connected" -Class Finding -NoCollect
+    Show-KeyValue "Сеанс:" "Нет подключения" -Class Finding -NoCollect
 
     # Help section
     Show-EmptyLine
@@ -34053,33 +34053,33 @@ function Show-Error {
     $errorTitle = switch ($Type) {
         'Permission' {
             if ($Target) {
-                "ERROR: Insufficient permissions to $Message '$Target'"
+                "ОШИБКА: недостаточно прав для $Message '$Target'"
             } else {
-                "ERROR: Insufficient permissions to $Message"
+                "ОШИБКА: недостаточно прав для $Message"
             }
         }
         'NotFound' {
-            "ERROR: $Message '$Target' not found"
+            "ОШИБКА: $Message '$Target' не найден"
         }
         'Operation' {
             if ($Target) {
-                "ERROR: $Message '$Target'"
+                "ОШИБКА: $Message '$Target'"
             } else {
-                "ERROR: $Message"
+                "ОШИБКА: $Message"
             }
         }
         'Connection' {
             if ($Message) {
-                "CONNECTION FAILED - $Message"
+                "ОШИБКА ПОДКЛЮЧЕНИЯ — $Message"
             } else {
-                "CONNECTION FAILED - see error messages above"
+                "ОШИБКА ПОДКЛЮЧЕНИЯ — подробности приведены выше"
             }
         }
         'HealthCheck' {
             if ($Message) {
-                "CONNECTION HEALTH CHECK FAILED - $Message"
+                "ПРОВЕРКА ПОДКЛЮЧЕНИЯ НЕ ПРОЙДЕНА — $Message"
             } else {
-                "CONNECTION HEALTH CHECK FAILED"
+                "ПРОВЕРКА ПОДКЛЮЧЕНИЯ НЕ ПРОЙДЕНА"
             }
         }
     }
@@ -34087,7 +34087,7 @@ function Show-Error {
     # Build details array
     $details = @()
     if ($Reason) {
-        $details += "Reason: $Reason"
+        $details += "Причина: $Reason"
     }
 
     # Connection and HealthCheck have different formatting
@@ -34120,13 +34120,13 @@ function Show-DisconnectError {
         [string]$ErrorMessage
     )
 
-    $details = @("Error: $ErrorMessage")
+    $details = @("Ошибка: $ErrorMessage")
     $hints = @(
-        "Use -Force to force disconnect despite errors",
-        "Check if session is already disconnected (Get-adPEASSession)"
+        "Используйте -Force для принудительного отключения несмотря на ошибки",
+        "Проверьте, не завершён ли уже сеанс (Get-adPEASSession)"
     )
 
-    Show-Message -Type Error -Title "DISCONNECT FAILED" -Details $details -Hints $hints -NoLeadingLine -NoTrailingLine
+    Show-Message -Type Error -Title "ОШИБКА ЗАВЕРШЕНИЯ СЕАНСА" -Details $details -Hints $hints -NoLeadingLine -NoTrailingLine
 }
 
 # ============================================================================
@@ -34154,9 +34154,9 @@ function Show-NoParametersError {
         [string]$FunctionName
     )
 
-    $hints = @("For more information, run: Get-Help $FunctionName -Examples")
+    $hints = @("Для примеров выполните: Get-Help $FunctionName -Examples")
 
-    Show-Message -Type Error -Title "${FunctionName}: No modification parameters specified" -Hints $hints
+    Show-Message -Type Error -Title "${FunctionName}: не указаны параметры изменения" -Hints $hints
 }
 
 # ============================================================================
@@ -34237,7 +34237,7 @@ function Get-adPEASHelp {
         Show-SubHeader "Модули проверок безопасности"
 
         Show-Line "Запустить все модули:" -Class Hint
-        Show-Line "Invoke-adPEAS (without -Module)"
+        Show-Line "Invoke-adPEAS (без -Module)"
         Show-EmptyLine
         Show-Line "Запустить только выбранные модули:" -Class Hint
         Show-Line "Invoke-adPEAS -Module 'Domain','Creds','ADCS'"
@@ -34293,59 +34293,59 @@ function Get-adPEASHelp {
 
         # --- Connection ---
         Show-Line "Подключение:" -Class Hint
-        Show-KeyValue "Connect-adPEAS" "Establish LDAP session"
-        Show-KeyValue "Disconnect-adPEAS" "Close LDAP session"
-        Show-KeyValue "Get-adPEASSession" "Show session status"
+        Show-KeyValue "Connect-adPEAS" "Установить сеанс LDAP"
+        Show-KeyValue "Disconnect-adPEAS" "Завершить сеанс LDAP"
+        Show-KeyValue "Get-adPEASSession" "Показать состояние сеанса"
         Show-EmptyLine
 
         # --- AD Queries ---
         Show-Line "Запросы AD:" -Class Hint
-        Show-KeyValue "Get-DomainUser" "Query AD users"
-        Show-KeyValue "Get-DomainComputer" "Query AD computers"
-        Show-KeyValue "Get-DomainGroup" "Query AD groups"
-        Show-KeyValue "Get-DomainGPO" "Query Group Policy Objects"
-        Show-KeyValue "Get-DomainObject" "Query any AD object"
-        Show-KeyValue "Get-ObjectACL" "Query object ACLs"
-        Show-KeyValue "Get-CertificateTemplate" "Query certificate templates"
-        Show-KeyValue "Get-CertificateAuthority" "Query certificate authorities"
+        Show-KeyValue "Get-DomainUser" "Запрос пользователей AD"
+        Show-KeyValue "Get-DomainComputer" "Запрос компьютеров AD"
+        Show-KeyValue "Get-DomainGroup" "Запрос групп AD"
+        Show-KeyValue "Get-DomainGPO" "Запрос объектов групповой политики"
+        Show-KeyValue "Get-DomainObject" "Запрос любого объекта AD"
+        Show-KeyValue "Get-ObjectACL" "Запрос ACL объекта"
+        Show-KeyValue "Get-CertificateTemplate" "Запрос шаблонов сертификатов"
+        Show-KeyValue "Get-CertificateAuthority" "Запрос центров сертификации"
         Show-EmptyLine
 
         # --- AD Modifications ---
         Show-Line "Изменения AD:" -Class Hint
-        Show-KeyValue "Set-DomainUser" "Modify user attributes"
-        Show-KeyValue "Set-DomainComputer" "Modify computer attributes"
-        Show-KeyValue "Set-DomainGroup" "Modify group attributes"
-        Show-KeyValue "Set-DomainObject" "Modify any AD object"
-        Show-KeyValue "Set-DomainGPO" "Modify Group Policy Objects"
-        Show-KeyValue "Set-CertificateTemplate" "Modify certificate templates"
-        Show-KeyValue "New-DomainUser" "Create AD user"
-        Show-KeyValue "New-DomainComputer" "Create AD computer"
-        Show-KeyValue "New-DomainGroup" "Create AD group"
-        Show-KeyValue "New-DomainGPO" "Create Group Policy Object"
+        Show-KeyValue "Set-DomainUser" "Изменить атрибуты пользователя"
+        Show-KeyValue "Set-DomainComputer" "Изменить атрибуты компьютера"
+        Show-KeyValue "Set-DomainGroup" "Изменить атрибуты группы"
+        Show-KeyValue "Set-DomainObject" "Изменить любой объект AD"
+        Show-KeyValue "Set-DomainGPO" "Изменить объекты групповой политики"
+        Show-KeyValue "Set-CertificateTemplate" "Изменить шаблоны сертификатов"
+        Show-KeyValue "New-DomainUser" "Создать пользователя AD"
+        Show-KeyValue "New-DomainComputer" "Создать компьютер AD"
+        Show-KeyValue "New-DomainGroup" "Создать группу AD"
+        Show-KeyValue "New-DomainGPO" "Создать объект групповой политики"
         Show-EmptyLine
 
         # --- Kerberos Authentication ---
         Show-Line "Аутентификация Kerberos:" -Class Hint
-        Show-KeyValue "Invoke-KerberosAuth" "Request TGT (Password/Hash/Key/Cert)"
-        Show-KeyValue "Request-ServiceTicket" "Request TGS for a service"
-        Show-KeyValue "Import-KerberosTicket" "Pass-the-Ticket (inject into session)"
+        Show-KeyValue "Invoke-KerberosAuth" "Запрос TGT (пароль/хеш/ключ/сертификат)"
+        Show-KeyValue "Request-ServiceTicket" "Запрос TGS для службы"
+        Show-KeyValue "Import-KerberosTicket" "Pass-the-Ticket (внедрить билет в сеанс)"
         Show-EmptyLine
 
         # --- Credential Attacks ---
         Show-Line "Атаки на учётные данные:" -Class Hint
-        Show-KeyValue "Invoke-Kerberoast" "Kerberoasting (request service tickets)"
-        Show-KeyValue "Invoke-ASREPRoast" "AS-REP Roasting (no preauth)"
-        Show-KeyValue "Invoke-DCSync" "DCSync (directory replication)"
-        Show-KeyValue "Invoke-PasswordSpray" "Password spraying"
+        Show-KeyValue "Invoke-Kerberoast" "Kerberoasting (запрос служебных билетов)"
+        Show-KeyValue "Invoke-ASREPRoast" "AS-REP Roasting (без предварительной аутентификации)"
+        Show-KeyValue "Invoke-DCSync" "DCSync (репликация каталога)"
+        Show-KeyValue "Invoke-PasswordSpray" "Перебор одного пароля по множеству учётных записей"
         Show-EmptyLine
 
         # --- Offensive Actions ---
         Show-Line "Активные операции:" -Class Hint
-        Show-KeyValue "Invoke-TicketForge" "Golden/Silver/Diamond Tickets"
-        Show-KeyValue "Invoke-S4U" "S4U delegation attacks"
-        Show-KeyValue "Invoke-RBCDOperation" "Resource-Based Constrained Delegation"
-        Show-KeyValue "Invoke-ShadowCredentialOperation" "Shadow Credentials"
-        Show-KeyValue "Request-ADCSCertificate" "Request ADCS certificate"
+        Show-KeyValue "Invoke-TicketForge" "Билеты Golden/Silver/Diamond"
+        Show-KeyValue "Invoke-S4U" "Атаки через делегирование S4U"
+        Show-KeyValue "Invoke-RBCDOperation" "Ограниченное делегирование на основе ресурсов (RBCD)"
+        Show-KeyValue "Invoke-ShadowCredentialOperation" "Теневые учётные данные (Shadow Credentials)"
+        Show-KeyValue "Request-ADCSCertificate" "Запрос сертификата ADCS"
         Show-EmptyLine
     }
 }
@@ -65617,7 +65617,7 @@ function Get-adPEASSession {
             if ($TestConnection) {
                 if (-not $Quiet) {
                     Show-SubHeader "Проверка состояния подключения..."
-                    Show-KeyValue "Session Variables:" "FAIL: No active session found" -Class Finding
+                    Show-KeyValue "Переменные сеанса:" "ОШИБКА: активный сеанс отсутствует" -Class Finding
                     return
                 }
                 return $false
@@ -65647,7 +65647,7 @@ function Get-adPEASSession {
 
                 # Test 1: Session variables (already checked above)
                 if (-not $Quiet) {
-                    Show-KeyValue "Session Variables:" "PASS" -Class Standard
+                    Show-KeyValue "Переменные сеанса:" "ПРОЙДЕНО" -Class Standard
                 }
 
                 # Test 2: Check if connection object is valid
@@ -65655,12 +65655,12 @@ function Get-adPEASSession {
                 if ($hasLdapConnection) {
                     $protocol = if ($Script:LDAPContext.UseLDAPS) { "LDAPS" } else { "LDAP" }
                     if (-not $Quiet) {
-                        Show-KeyValue "LDAP Connection Object:" "PASS (LdapConnection for $protocol)" -Class Standard
+                        Show-KeyValue "Объект подключения LDAP:" "ПРОЙДЕНО (LdapConnection для $protocol)" -Class Standard
                     }
                 }
                 else {
                     if (-not $Quiet) {
-                        Show-KeyValue "LDAP Connection Object:" "FAIL: No connection object found" -Class Finding
+                        Show-KeyValue "Объект подключения LDAP:" "ОШИБКА: объект подключения не найден" -Class Finding
                         return
                     }
                     return $false
@@ -65674,7 +65674,7 @@ function Get-adPEASSession {
 
                     if (-not $testQuery) {
                         if (-not $Quiet) {
-                            Show-KeyValue "LDAP Query Execution:" "FAIL: Test query returned no results" -Class Finding
+                            Show-KeyValue "Выполнение LDAP-запроса:" "ОШИБКА: тестовый запрос не вернул результатов" -Class Finding
                             return
                         }
                         return $false
@@ -65684,7 +65684,7 @@ function Get-adPEASSession {
                     $latency = ($queryEndTime - $queryStartTime).TotalMilliseconds
 
                     if (-not $Quiet) {
-                        Show-KeyValue "LDAP Query Execution:" "PASS (Latency: $([math]::Round($latency, 2)) ms)" -Class Standard
+                        Show-KeyValue "Выполнение LDAP-запроса:" "ПРОЙДЕНО (задержка: $([math]::Round($latency, 2)) мс)" -Class Standard
                     }
                     $testResults.QuerySuccessful = $true
                     $testResults.Latency = [math]::Round($latency, 2)
@@ -65692,7 +65692,7 @@ function Get-adPEASSession {
                 }
                 catch {
                     if (-not $Quiet) {
-                        Show-KeyValue "LDAP Query Execution:" "FAIL: $($_.Exception.Message)" -Class Finding
+                        Show-KeyValue "Выполнение LDAP-запроса:" "ОШИБКА: $($_.Exception.Message)" -Class Finding
                         return
                     }
                     return $false
@@ -65702,7 +65702,7 @@ function Get-adPEASSession {
                 $testResults.HealthStatus = "Healthy"
 
                 if (-not $Quiet) {
-                    Show-KeyValue "Result:" "PASS (All tests passed - Connection is healthy)" -Class Note
+                    Show-KeyValue "Результат:" "ПРОЙДЕНО (все проверки успешны — соединение исправно)" -Class Note
                     Show-EmptyLine
                     return
                 }
@@ -65711,7 +65711,7 @@ function Get-adPEASSession {
             }
             catch {
                 if (-not $Quiet) {
-                    Show-KeyValue "Unexpected Error:" "FAIL: $($_.Exception.Message)" -Class Finding
+                    Show-KeyValue "Непредвиденная ошибка:" "ОШИБКА: $($_.Exception.Message)" -Class Finding
                     Show-EmptyLine
                     return
                 }
@@ -65726,19 +65726,19 @@ function Get-adPEASSession {
 
             # Connection Details
             Show-Line "Подключение:" -Class Hint
-            Show-KeyValue "Domain:" $Script:LDAPContext.Domain
+            Show-KeyValue "Домен:" $Script:LDAPContext.Domain
 
             # Display Domain SID
             if ($Script:LDAPContext.DomainSID) {
-                Show-KeyValue "Domain SID:" $Script:LDAPContext.DomainSID
+                Show-KeyValue "SID домена:" $Script:LDAPContext.DomainSID
             }
 
-            Show-KeyValue "Server:" $Script:LDAPContext.Server
+            Show-KeyValue "Сервер:" $Script:LDAPContext.Server
             if ($Script:LDAPContext['ServerIP']) {
-                Show-KeyValue "Server IP:" $Script:LDAPContext['ServerIP']
+                Show-KeyValue "IP сервера:" $Script:LDAPContext['ServerIP']
             }
-            Show-KeyValue "Protocol:" "$($Script:LDAPContext.Protocol) (Port $($Script:LDAPContext.Port))"
-            Show-KeyValue "Domain DN:" $Script:LDAPContext.DomainDN
+            Show-KeyValue "Протокол:" "$($Script:LDAPContext.Protocol) (порт $($Script:LDAPContext.Port))"
+            Show-KeyValue "DN домена:" $Script:LDAPContext.DomainDN
 
             # Authentication Details
             Show-EmptyLine
@@ -65747,11 +65747,11 @@ function Get-adPEASSession {
             if ($Script:LDAPContext.KerberosUsed -and $Script:LDAPContext.TGTInfo -and $Script:LDAPContext.TGTInfo.UserName) {
                 # For Kerberos auth (Hash/Key/PKINIT), show TGT user
                 $TGTUser = "$($Script:LDAPContext.TGTInfo.UserName)@$($Script:LDAPContext.TGTInfo.Domain)"
-                Show-KeyValue "Authenticated as:" $TGTUser
+                Show-KeyValue "Подключение от имени:" $TGTUser
 
                 # Show User SID if available
                 if ($Script:LDAPContext.AuthenticatedUserSID) {
-                    Show-KeyValue "User SID:" $Script:LDAPContext.AuthenticatedUserSID
+                    Show-KeyValue "SID пользователя:" $Script:LDAPContext.AuthenticatedUserSID
                 }
 
                 # Show NT-Hash if recovered via UnPAC-the-hash (PKINIT only)
@@ -65760,32 +65760,32 @@ function Get-adPEASSession {
                 }
             }
             elseif ($Script:LDAPContext.AuthenticatedUser) {
-                Show-KeyValue "Authenticated as:" $Script:LDAPContext.AuthenticatedUser
+                Show-KeyValue "Подключение от имени:" $Script:LDAPContext.AuthenticatedUser
 
                 # Show User SID if available
                 if ($Script:LDAPContext.AuthenticatedUserSID) {
-                    Show-KeyValue "User SID:" $Script:LDAPContext.AuthenticatedUserSID
+                    Show-KeyValue "SID пользователя:" $Script:LDAPContext.AuthenticatedUserSID
                 }
 
                 if ($Script:LDAPContext.IdentityMismatch) {
-                    Show-KeyValue "Local Identity:" $Script:LDAPContext.LocalIdentity
+                    Show-KeyValue "Локальная учётная запись:" $Script:LDAPContext.LocalIdentity
                     Show-Line "  Несовпадение личности: ОБНАРУЖЕНО" -Class Hint
                 }
 
                 # Show DN and UPN if available
                 if ($Script:LDAPContext.AuthenticatedUserDN) {
-                    Show-KeyValue "Distinguished Name:" $Script:LDAPContext.AuthenticatedUserDN
+                    Show-KeyValue "Различающееся имя (DN):" $Script:LDAPContext.AuthenticatedUserDN
                 }
                 if ($Script:LDAPContext.AuthenticatedUserUPN) {
-                    Show-KeyValue "User Principal Name:" $Script:LDAPContext.AuthenticatedUserUPN
+                    Show-KeyValue "Основное имя пользователя (UPN):" $Script:LDAPContext.AuthenticatedUserUPN
                 }
             }
             # Fallback if LDAP verification not available
             elseif ($Script:LDAPContext.Credential) {
-                Show-KeyValue "Authenticated as:" $Script:LDAPContext.Credential.UserName
+                Show-KeyValue "Подключение от имени:" $Script:LDAPContext.Credential.UserName
             }
             else {
-                Show-KeyValue "Authenticated as:" "$env:USERDOMAIN\$env:USERNAME"
+                Show-KeyValue "Подключение от имени:" "$env:USERDOMAIN\$env:USERNAME"
             }
 
             # Authentication Method (Kerberos vs SimpleBind vs Schannel vs NTLM)
@@ -65806,7 +65806,7 @@ function Get-adPEASSession {
                 'NTLM Impersonation' { 'NTLM Impersonation (runas /netonly)' }
                 default { 'Unknown' }
             }
-            Show-KeyValue "Authentication Method:" $AuthMethodDisplay
+            Show-KeyValue "Метод аутентификации:" $AuthMethodDisplay
 
             # Show TGT details if Kerberos was used
             if ($Script:LDAPContext.KerberosUsed -and $Script:LDAPContext.TGTInfo) {
@@ -65819,16 +65819,16 @@ function Get-adPEASSession {
                     23 { 'RC4-HMAC (NTLM)' }
                     default { "etype $($TGT.EncryptionType)" }
                 }
-                Show-KeyValue "TGT Encryption:" $ETypeDisplay
+                Show-KeyValue "Шифрование TGT:" $ETypeDisplay
 
                 # Show TGT method (how the TGT was obtained)
                 if ($TGT.Method) {
-                    Show-KeyValue "TGT Method:" $TGT.Method
+                    Show-KeyValue "Способ получения TGT:" $TGT.Method
                 }
 
                 # Show TGT realm
                 if ($TGT.Domain) {
-                    Show-KeyValue "TGT Realm:" $TGT.Domain
+                    Show-KeyValue "Область Kerberos (TGT):" $TGT.Domain
                 }
 
                 # Show clock skew between local system and KDC
@@ -65845,14 +65845,14 @@ function Get-adPEASSession {
                     }
                     if ($skewAbs -gt 300) {
                         # >5 minutes - exceeds Kerberos tolerance
-                        Show-KeyValue "Clock Skew:" "$skewDisplay (WARNING: exceeds 5-minute Kerberos limit!)" -Class Finding
+                        Show-KeyValue "Расхождение времени:" "$skewDisplay (ПРЕДУПРЕЖДЕНИЕ: превышен допустимый для Kerberos предел в 5 минут!)" -Class Finding
                     } elseif ($skewAbs -gt 270) {
                         # 4.5-5 minutes - close to Kerberos tolerance
-                        Show-KeyValue "Clock Skew:" "$skewDisplay (WARNING: close to 5-minute Kerberos limit)" -Class Finding
+                        Show-KeyValue "Расхождение времени:" "$skewDisplay (ПРЕДУПРЕЖДЕНИЕ: приближение к пределу Kerberos в 5 минут)" -Class Finding
                     } elseif ($skewAbs -gt 60) {
-                        Show-KeyValue "Clock Skew:" $skewDisplay -Class Hint
+                        Show-KeyValue "Расхождение времени:" $skewDisplay -Class Hint
                     } else {
-                        Show-KeyValue "Clock Skew:" $skewDisplay
+                        Show-KeyValue "Расхождение времени:" $skewDisplay
                     }
                 }
 
@@ -65868,38 +65868,38 @@ function Get-adPEASSession {
 
                     if ($timeRemaining.TotalSeconds -gt 0) {
                         $remainingDisplay = "{0:hh\:mm\:ss}" -f $timeRemaining
-                        Show-KeyValue "TGT Valid Until:" "$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss') (in $remainingDisplay)"
+                        Show-KeyValue "TGT действителен до:" "$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss') (осталось $remainingDisplay)"
                     }
                     else {
-                        Show-KeyValue "TGT Valid Until:" "$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss')" -Class Finding
+                        Show-KeyValue "TGT действителен до:" "$(Format-adPEASDate $endTimeLocal 'yyyy-MM-dd HH:mm:ss')" -Class Finding
                         Write-Warning "[!] TGT ИСТЁК — требуется повторная аутентификация!"
                     }
 
                 }
                 elseif ($LiveTicketStatus.TicketCount -eq 0) {
                     # Tickets were purged (klist purge)
-                    Show-KeyValue "TGT Status:" "NO TICKETS IN CACHE - Re-authenticate with Connect-adPEAS" -Class Finding
+                    Show-KeyValue "Состояние TGT:" "В КЭШЕ НЕТ БИЛЕТОВ — повторите аутентификацию через Connect-adPEAS" -Class Finding
                 }
                 elseif (-not $LiveTicketStatus.TGTPresent) {
                     # Tickets exist but no TGT (only service tickets)
-                    Show-KeyValue "TGT Status:" "NO TGT FOUND ($($LiveTicketStatus.TicketCount) service tickets) - Re-authenticate with Connect-adPEAS" -Class Finding
+                    Show-KeyValue "Состояние TGT:" "TGT НЕ НАЙДЕН (служебных билетов: $($LiveTicketStatus.TicketCount)) — повторите аутентификацию через Connect-adPEAS" -Class Finding
                 }
                 elseif ($LiveTicketStatus.Expired) {
                     # TGT exists but is expired
                     $expiredTime = if ($LiveTicketStatus.EndTime) {
                         (Format-adPEASDate $LiveTicketStatus.EndTime.ToLocalTime() 'yyyy-MM-dd HH:mm:ss')
                     } else { "unknown" }
-                    Show-KeyValue "TGT Status:" "EXPIRED at $expiredTime - Re-authenticate with Connect-adPEAS" -Class Finding
+                    Show-KeyValue "Состояние TGT:" "ИСТЁК в $expiredTime — повторите аутентификацию через Connect-adPEAS" -Class Finding
                 }
                 elseif ($LiveTicketStatus.ClientMatch -eq $false) {
                     # TGT exists but for different user
                     $tgtClient = $LiveTicketStatus.ClientName
                     $expectedClient = $Script:LDAPContext.TGTInfo.UserName
-                    Show-KeyValue "TGT Status:" "CLIENT MISMATCH (TGT=$tgtClient, Expected=$expectedClient) - Re-authenticate with Connect-adPEAS" -Class Finding
+                    Show-KeyValue "Состояние TGT:" "НЕСОВПАДЕНИЕ ПОЛЬЗОВАТЕЛЯ (TGT=$tgtClient, ожидался=$expectedClient) — повторите аутентификацию через Connect-adPEAS" -Class Finding
                 }
                 else {
                     # Unknown issue with tickets
-                    Show-KeyValue "TGT Status:" "INVALID - Re-authenticate with Connect-adPEAS" -Class Finding
+                    Show-KeyValue "Состояние TGT:" "НЕДЕЙСТВИТЕЛЕН — повторите аутентификацию через Connect-adPEAS" -Class Finding
                 }
             }
 
@@ -65912,8 +65912,8 @@ function Get-adPEASSession {
                 # the start read "10/18/2026 14:55:10" - the invariant culture's month first.
                 # And the hours in full: 'hh' is the hour of the day, so a session of 26
                 # hours read "02:00:00".
-                Show-KeyValue "Session Started:" (Format-adPEASDate $Script:LDAPContext.SessionStartTime 'yyyy-MM-dd HH:mm:ss')
-                Show-KeyValue "Session Duration:" ('{0:00}:{1:mm\:ss}' -f [Math]::Floor($sessionDuration.TotalHours), $sessionDuration)
+                Show-KeyValue "Начало сеанса:" (Format-adPEASDate $Script:LDAPContext.SessionStartTime 'yyyy-MM-dd HH:mm:ss')
+                Show-KeyValue "Продолжительность сеанса:" ('{0:00}:{1:mm\:ss}' -f [Math]::Floor($sessionDuration.TotalHours), $sessionDuration)
             }
 
             # Connection State - check live TGT status for Kerberos sessions
@@ -65924,36 +65924,36 @@ function Get-adPEASSession {
                 }
 
                 if ($LiveTicketStatus.Valid) {
-                    Show-KeyValue "Connection State:" "Connected (Kerberos TGT valid)"
+                    Show-KeyValue "Состояние подключения:" "Подключено (Kerberos TGT действителен)"
                 }
                 elseif ($LiveTicketStatus.TicketCount -eq 0) {
-                    Show-KeyValue "Connection State:" "DEGRADED (No Kerberos tickets)" -Class Finding
+                    Show-KeyValue "Состояние подключения:" "НЕПОЛНОЕ ПОДКЛЮЧЕНИЕ (нет билетов Kerberos)" -Class Finding
                 }
                 elseif (-not $LiveTicketStatus.TGTPresent) {
-                    Show-KeyValue "Connection State:" "DEGRADED (No TGT, only service tickets)" -Class Finding
+                    Show-KeyValue "Состояние подключения:" "НЕПОЛНОЕ ПОДКЛЮЧЕНИЕ (нет TGT, есть только служебные билеты)" -Class Finding
                 }
                 elseif ($LiveTicketStatus.Expired) {
-                    Show-KeyValue "Connection State:" "DEGRADED (TGT expired)" -Class Finding
+                    Show-KeyValue "Состояние подключения:" "НЕПОЛНОЕ ПОДКЛЮЧЕНИЕ (срок TGT истёк)" -Class Finding
                 }
                 elseif ($LiveTicketStatus.ClientMatch -eq $false) {
-                    Show-KeyValue "Connection State:" "DEGRADED (TGT client mismatch)" -Class Finding
+                    Show-KeyValue "Состояние подключения:" "НЕПОЛНОЕ ПОДКЛЮЧЕНИЕ (пользователь TGT не совпадает)" -Class Finding
                 }
                 else {
-                    Show-KeyValue "Connection State:" "DEGRADED (TGT invalid)" -Class Finding
+                    Show-KeyValue "Состояние подключения:" "НЕПОЛНОЕ ПОДКЛЮЧЕНИЕ (TGT недействителен)" -Class Finding
                 }
             }
             elseif ($Script:LDAPContext.AuthMethod -eq 'Schannel') {
-                Show-KeyValue "Connection State:" "Connected (Schannel/TLS)"
+                Show-KeyValue "Состояние подключения:" "Подключено (Schannel/TLS)"
             }
             else {
-                Show-KeyValue "Connection State:" "Connected"
+                Show-KeyValue "Состояние подключения:" "Подключено"
             }
 
             # Hints
             Show-EmptyLine
             Show-Line "Справка:" -Class Hint
-            Show-KeyValue "Get-adPEASSession -TestConnection" "Test connection health"
-            Show-KeyValue "Disconnect-adPEAS" "End the session"
+            Show-KeyValue "Get-adPEASSession -TestConnection" "Проверить состояние подключения"
+            Show-KeyValue "Disconnect-adPEAS" "Завершить сеанс"
             Show-EmptyLine
         }
     }
@@ -158745,7 +158745,7 @@ function Collect-BHIssuancePolicies {
 #Requires -Version 5.1
 
 # ===== Script Variables =====
-$Script:adPEASVersion = "2.9.0+20261119-1032"
+$Script:adPEASVersion = "2.9.0+20261119-1100"
 
 # Handle ScriptPath for different execution contexts:
 # - Normal: $MyInvocation.MyCommand.Path is set

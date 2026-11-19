@@ -8,7 +8,7 @@
                                "report-scripts.js",
                                "report-styles.css"
                            ],
-    "UntranslatedCandidateCount":  27,
+    "UntranslatedCandidateCount":  26,
     "UntranslatedCandidates":  [
                                    {
                                        "File":  "src\\modules\\Core\\adPEAS-Messages.ps1",
@@ -74,11 +74,6 @@
                                        "File":  "src\\modules\\Core\\adPEAS-Messages.ps1",
                                        "Line":  1805,
                                        "Text":  "Get-Help \u003cCommand\u003e -Detailed"
-                                   },
-                                   {
-                                       "File":  "src\\modules\\Core\\adPEAS-Messages.ps1",
-                                       "Line":  1815,
-                                       "Text":  "Invoke-adPEAS (without -Module)"
                                    },
                                    {
                                        "File":  "src\\modules\\Core\\adPEAS-Messages.ps1",

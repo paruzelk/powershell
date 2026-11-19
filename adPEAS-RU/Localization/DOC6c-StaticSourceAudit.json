@@ -7,12 +7,12 @@
     "javascript": 1,
     "html": 2,
     "sourceLines": 156557,
-    "totalCandidates": 3657,
+    "totalCandidates": 3552,
     "byType": {
-      "ps-diagnostic": 3497,
+      "ps-diagnostic": 3392,
       "js-ui-candidate": 160
     },
-    "strongContextCandidates": 3497,
+    "strongContextCandidates": 3392,
     "jsContextCandidates": 160,
     "translatedPhrases": 54
   },
@@ -4459,75 +4459,9 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 89,
-      "type": "ps-diagnostic",
-      "text": "[FindingsCollection] Initialized"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 249,
       "type": "ps-diagnostic",
       "text": "[FindingsCollection] Added: $($finding.Type) - $($finding.Class) - $Text$Key$(if($ObjectType){"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 285,
-      "type": "ps-diagnostic",
-      "text": "[FindingsCollection] Cleared"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 311,
-      "type": "ps-diagnostic",
-      "text": "[FindingsCollection] Set to $($Findings.Count) findings"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 601,
-      "type": "ps-diagnostic",
-      "text": "[FindingsCache] Atomic replace failed, writing directly: $($_.Exception.Message)"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 608,
-      "type": "ps-diagnostic",
-      "text": "[FindingsCache] Exported $($serializable.Count) findings to '$Path' (complete: $(-not $Partial))"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 632,
-      "type": "ps-diagnostic",
-      "text": "[FindingsCache] Unsupported cache version $($cache.CacheVersion) - expected 1"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 639,
-      "type": "ps-diagnostic",
-      "text": "[FindingsCache] Cache domain '$($cache.Domain)' differs from current domain '$currentDomain'"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 640,
-      "type": "ps-diagnostic",
-      "text": "[FindingsCache] Continuing with merge - findings may be from different domains"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 644,
-      "type": "ps-diagnostic",
-      "text": "[FindingsCache] Loaded $(@($result).Count) findings from '$Path'"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 699,
-      "type": "ps-diagnostic",
-      "text": "[Import-FindingsFromCache] Unreadable timestamp, finding kept without one: $($f.Timestamp)"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 770,
-      "type": "ps-diagnostic",
-      "text": "[FindingsCache] Merge: kept $($kept.Count) previous, added $($CurrentFindings.Count) new, total $($sorted.Count)"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4597,12 +4531,6 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1530,
-      "type": "ps-diagnostic",
-      "text": "Not connected"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1535,
       "type": "ps-diagnostic",
       "text": "Connect-adPEAS -Domain 'contoso.com' -Credential (Get-Credential)"
@@ -4651,12 +4579,6 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1815,
-      "type": "ps-diagnostic",
-      "text": "Invoke-adPEAS (without -Module)"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1818,
       "type": "ps-diagnostic",
       "text": "Invoke-adPEAS -Module 'Domain','Creds','ADCS'"
@@ -4666,18 +4588,6 @@
       "line": 1871,
       "type": "ps-diagnostic",
       "text": "Connect-adPEAS"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1871,
-      "type": "ps-diagnostic",
-      "text": "Establish LDAP session"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1872,
-      "type": "ps-diagnostic",
-      "text": "Close LDAP session"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4693,21 +4603,9 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1873,
-      "type": "ps-diagnostic",
-      "text": "Show session status"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1878,
       "type": "ps-diagnostic",
       "text": "Get-DomainUser"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1878,
-      "type": "ps-diagnostic",
-      "text": "Query AD users"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4717,21 +4615,9 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1879,
-      "type": "ps-diagnostic",
-      "text": "Query AD computers"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1880,
       "type": "ps-diagnostic",
       "text": "Get-DomainGroup"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1880,
-      "type": "ps-diagnostic",
-      "text": "Query AD groups"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4741,21 +4627,9 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1881,
-      "type": "ps-diagnostic",
-      "text": "Query Group Policy Objects"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1882,
       "type": "ps-diagnostic",
       "text": "Get-DomainObject"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1882,
-      "type": "ps-diagnostic",
-      "text": "Query any AD object"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4765,39 +4639,15 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1883,
-      "type": "ps-diagnostic",
-      "text": "Query object ACLs"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1884,
       "type": "ps-diagnostic",
       "text": "Get-CertificateTemplate"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1884,
-      "type": "ps-diagnostic",
-      "text": "Query certificate templates"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1885,
       "type": "ps-diagnostic",
       "text": "Get-CertificateAuthority"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1885,
-      "type": "ps-diagnostic",
-      "text": "Query certificate authorities"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1890,
-      "type": "ps-diagnostic",
-      "text": "Modify user attributes"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4809,19 +4659,7 @@
       "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1891,
       "type": "ps-diagnostic",
-      "text": "Modify computer attributes"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1891,
-      "type": "ps-diagnostic",
       "text": "Set-DomainComputer"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1892,
-      "type": "ps-diagnostic",
-      "text": "Modify group attributes"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4833,19 +4671,7 @@
       "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1893,
       "type": "ps-diagnostic",
-      "text": "Modify any AD object"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1893,
-      "type": "ps-diagnostic",
       "text": "Set-DomainObject"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1894,
-      "type": "ps-diagnostic",
-      "text": "Modify Group Policy Objects"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4857,19 +4683,7 @@
       "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1895,
       "type": "ps-diagnostic",
-      "text": "Modify certificate templates"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1895,
-      "type": "ps-diagnostic",
       "text": "Set-CertificateTemplate"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1896,
-      "type": "ps-diagnostic",
-      "text": "Create AD user"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4881,31 +4695,13 @@
       "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1897,
       "type": "ps-diagnostic",
-      "text": "Create AD computer"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1897,
-      "type": "ps-diagnostic",
       "text": "New-DomainComputer"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1898,
       "type": "ps-diagnostic",
-      "text": "Create AD group"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1898,
-      "type": "ps-diagnostic",
       "text": "New-DomainGroup"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1899,
-      "type": "ps-diagnostic",
-      "text": "Create Group Policy Object"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4921,18 +4717,6 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1904,
-      "type": "ps-diagnostic",
-      "text": "Request TGT (Password/Hash/Key/Cert)"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1905,
-      "type": "ps-diagnostic",
-      "text": "Request TGS for a service"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1905,
       "type": "ps-diagnostic",
       "text": "Request-ServiceTicket"
@@ -4945,39 +4729,15 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1906,
-      "type": "ps-diagnostic",
-      "text": "Pass-the-Ticket (inject into session)"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1911,
       "type": "ps-diagnostic",
       "text": "Invoke-Kerberoast"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1911,
-      "type": "ps-diagnostic",
-      "text": "Kerberoasting (request service tickets)"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1912,
-      "type": "ps-diagnostic",
-      "text": "AS-REP Roasting (no preauth)"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1912,
       "type": "ps-diagnostic",
       "text": "Invoke-ASREPRoast"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1913,
-      "type": "ps-diagnostic",
-      "text": "DCSync (directory replication)"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -4993,27 +4753,9 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1914,
-      "type": "ps-diagnostic",
-      "text": "Password spraying"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1919,
-      "type": "ps-diagnostic",
-      "text": "Golden/Silver/Diamond Tickets"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1919,
       "type": "ps-diagnostic",
       "text": "Invoke-TicketForge"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1920,
-      "type": "ps-diagnostic",
-      "text": "S4U delegation attacks"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -5023,27 +4765,9 @@
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1921,
-      "type": "ps-diagnostic",
-      "text": "Resource-Based Constrained Delegation"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
       "line": 1922,
       "type": "ps-diagnostic",
       "text": "Invoke-ShadowCredentialOperation"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1922,
-      "type": "ps-diagnostic",
-      "text": "Shadow Credentials"
-    },
-    {
-      "path": "src/modules/Core/adPEAS-Messages.ps1",
-      "line": 1923,
-      "type": "ps-diagnostic",
-      "text": "Request ADCS certificate"
     },
     {
       "path": "src/modules/Core/adPEAS-Messages.ps1",
@@ -12325,369 +12049,15 @@
     },
     {
       "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 68,
-      "type": "ps-diagnostic",
-      "text": "FAIL: No active session found"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 68,
-      "type": "ps-diagnostic",
-      "text": "Session Variables:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 98,
-      "type": "ps-diagnostic",
-      "text": "Session Variables:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 106,
-      "type": "ps-diagnostic",
-      "text": "LDAP Connection Object:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 106,
-      "type": "ps-diagnostic",
-      "text": "PASS (LdapConnection for $protocol)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 111,
-      "type": "ps-diagnostic",
-      "text": "FAIL: No connection object found"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 111,
-      "type": "ps-diagnostic",
-      "text": "LDAP Connection Object:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 125,
-      "type": "ps-diagnostic",
-      "text": "FAIL: Test query returned no results"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 125,
-      "type": "ps-diagnostic",
-      "text": "LDAP Query Execution:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 135,
-      "type": "ps-diagnostic",
-      "text": "LDAP Query Execution:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 135,
-      "type": "ps-diagnostic",
-      "text": "PASS (Latency: $([math]::Round($latency, 2)) ms)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 143,
-      "type": "ps-diagnostic",
-      "text": "LDAP Query Execution:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 153,
-      "type": "ps-diagnostic",
-      "text": "PASS (All tests passed - Connection is healthy)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 162,
-      "type": "ps-diagnostic",
-      "text": "Unexpected Error:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 181,
-      "type": "ps-diagnostic",
-      "text": "Domain SID:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 219,
-      "type": "ps-diagnostic",
-      "text": "Local Identity:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 225,
-      "type": "ps-diagnostic",
-      "text": "Distinguished Name:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 228,
-      "type": "ps-diagnostic",
-      "text": "User Principal Name:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 257,
-      "type": "ps-diagnostic",
-      "text": "Authentication Method:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 270,
-      "type": "ps-diagnostic",
-      "text": "TGT Encryption:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 274,
-      "type": "ps-diagnostic",
-      "text": "TGT Method:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 279,
-      "type": "ps-diagnostic",
-      "text": "TGT Realm:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 296,
-      "type": "ps-diagnostic",
-      "text": "$skewDisplay (WARNING: exceeds 5-minute Kerberos limit!)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 296,
-      "type": "ps-diagnostic",
-      "text": "Clock Skew:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 299,
-      "type": "ps-diagnostic",
-      "text": "$skewDisplay (WARNING: close to 5-minute Kerberos limit)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 299,
-      "type": "ps-diagnostic",
-      "text": "Clock Skew:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 301,
-      "type": "ps-diagnostic",
-      "text": "Clock Skew:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 303,
-      "type": "ps-diagnostic",
-      "text": "Clock Skew:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 319,
-      "type": "ps-diagnostic",
-      "text": "TGT Valid Until:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 322,
-      "type": "ps-diagnostic",
-      "text": "TGT Valid Until:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 329,
-      "type": "ps-diagnostic",
-      "text": "NO TICKETS IN CACHE - Re-authenticate with Connect-adPEAS"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 329,
-      "type": "ps-diagnostic",
-      "text": "TGT Status:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 333,
-      "type": "ps-diagnostic",
-      "text": "NO TGT FOUND ($($LiveTicketStatus.TicketCount) service tickets) - Re-authenticate with Connect-adPEAS"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 333,
-      "type": "ps-diagnostic",
-      "text": "TGT Status:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 340,
-      "type": "ps-diagnostic",
-      "text": "EXPIRED at $expiredTime - Re-authenticate with Connect-adPEAS"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 340,
-      "type": "ps-diagnostic",
-      "text": "TGT Status:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 346,
-      "type": "ps-diagnostic",
-      "text": "CLIENT MISMATCH (TGT=$tgtClient, Expected=$expectedClient) - Re-authenticate with Connect-adPEAS"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 346,
-      "type": "ps-diagnostic",
-      "text": "TGT Status:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 350,
-      "type": "ps-diagnostic",
-      "text": "INVALID - Re-authenticate with Connect-adPEAS"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 350,
-      "type": "ps-diagnostic",
-      "text": "TGT Status:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 363,
-      "type": "ps-diagnostic",
-      "text": "Session Started:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 364,
-      "type": "ps-diagnostic",
-      "text": "Session Duration:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 375,
-      "type": "ps-diagnostic",
-      "text": "Connected (Kerberos TGT valid)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 375,
-      "type": "ps-diagnostic",
-      "text": "Connection State:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 378,
-      "type": "ps-diagnostic",
-      "text": "Connection State:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 378,
-      "type": "ps-diagnostic",
-      "text": "DEGRADED (No Kerberos tickets)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 381,
-      "type": "ps-diagnostic",
-      "text": "Connection State:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 381,
-      "type": "ps-diagnostic",
-      "text": "DEGRADED (No TGT, only service tickets)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 384,
-      "type": "ps-diagnostic",
-      "text": "Connection State:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 384,
-      "type": "ps-diagnostic",
-      "text": "DEGRADED (TGT expired)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 387,
-      "type": "ps-diagnostic",
-      "text": "Connection State:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 387,
-      "type": "ps-diagnostic",
-      "text": "DEGRADED (TGT client mismatch)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 390,
-      "type": "ps-diagnostic",
-      "text": "Connection State:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 390,
-      "type": "ps-diagnostic",
-      "text": "DEGRADED (TGT invalid)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 394,
-      "type": "ps-diagnostic",
-      "text": "Connected (Schannel/TLS)"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 394,
-      "type": "ps-diagnostic",
-      "text": "Connection State:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 397,
-      "type": "ps-diagnostic",
-      "text": "Connection State:"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
       "line": 403,
       "type": "ps-diagnostic",
       "text": "Get-adPEASSession -TestConnection"
     },
     {
       "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 403,
-      "type": "ps-diagnostic",
-      "text": "Test connection health"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
       "line": 404,
       "type": "ps-diagnostic",
       "text": "Disconnect-adPEAS"
-    },
-    {
-      "path": "src/modules/Helpers/Get-adPEASSession.ps1",
-      "line": 404,
-      "type": "ps-diagnostic",
-      "text": "End the session"
     },
     {
       "path": "src/modules/Helpers/Get-CertificateInfo.ps1",

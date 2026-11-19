@@ -86,7 +86,7 @@ function Initialize-FindingsCollection {
     $Script:adPEAS_FindingsCollection = [System.Collections.ArrayList]::new()
     $Script:adPEAS_FindingsCollectionEnabled = $true
     $Script:adPEAS_CurrentCheckContext = $null
-    Write-Log "[FindingsCollection] Initialized"
+    Write-Log "[FindingsCollection] Сбор результатов инициализирован"
 }
 
 <#
@@ -282,7 +282,7 @@ function Clear-FindingsCollection {
     $Script:adPEAS_FindingsCollection = $null
     $Script:adPEAS_FindingsCollectionEnabled = $false
     $Script:adPEAS_CurrentCheckContext = $null
-    Write-Log "[FindingsCollection] Cleared"
+    Write-Log "[FindingsCollection] Результаты очищены"
 }
 
 # ============================================================================
@@ -308,7 +308,7 @@ function Set-FindingsCollection {
     )
 
     $Script:adPEAS_FindingsCollection = [System.Collections.ArrayList]@($Findings)
-    Write-Log "[FindingsCollection] Set to $($Findings.Count) findings"
+    Write-Log "[FindingsCollection] Установлено находок: $($Findings.Count)"
 }
 
 <#
@@ -598,14 +598,14 @@ function Export-FindingsCache {
             [System.IO.File]::Move($tempPath, $resolvedPath)
         }
     } catch {
-        Write-Log "[FindingsCache] Atomic replace failed, writing directly: $($_.Exception.Message)" -Level Warning
+        Write-Log "[FindingsCache] Атомарная замена не удалась; выполняется прямая запись: $($_.Exception.Message)" -Level Warning
         [System.IO.File]::WriteAllText($resolvedPath, $json, $utf8NoBom)
         if ([System.IO.File]::Exists($tempPath)) {
             try { [System.IO.File]::Delete($tempPath) } catch { }
         }
     }
 
-    Write-Log "[FindingsCache] Exported $($serializable.Count) findings to '$Path' (complete: $(-not $Partial))"
+    Write-Log "[FindingsCache] Экспортировано находок: $($serializable.Count) в '$Path' (полный: $(-not $Partial))"
 }
 
 <#
@@ -629,19 +629,19 @@ function Import-FindingsCache {
 
     # Version check
     if ($cache.CacheVersion -ne 1) {
-        Write-Warning "[FindingsCache] Unsupported cache version $($cache.CacheVersion) - expected 1"
+        Write-Warning "[FindingsCache] Неподдерживаемая версия кэша $($cache.CacheVersion), ожидается 1"
         return @()
     }
 
     # Domain mismatch warning
     $currentDomain = if ($Script:LDAPContext) { $Script:LDAPContext.Domain } else { $null }
     if ($currentDomain -and $cache.Domain -and $cache.Domain -ne $currentDomain -and $cache.Domain -ne 'Unknown') {
-        Write-Warning "[FindingsCache] Cache domain '$($cache.Domain)' differs from current domain '$currentDomain'"
-        Write-Warning "[FindingsCache] Continuing with merge - findings may be from different domains"
+        Write-Warning "[FindingsCache] Домен кэша '$($cache.Domain)' отличается от текущего домена '$currentDomain'"
+        Write-Warning "[FindingsCache] Слияние продолжено; находки могут относиться к разным доменам"
     }
 
     $result = Import-FindingsFromCache -Cache $cache
-    Write-Log "[FindingsCache] Loaded $(@($result).Count) findings from '$Path'"
+    Write-Log "[FindingsCache] Загружено находок: $(@($result).Count) из '$Path'"
     return @($result)
 }
 
@@ -696,7 +696,7 @@ function Import-FindingsFromCache {
             try {
                 $timestamp = [datetime]::Parse($f.Timestamp, [System.Globalization.CultureInfo]::InvariantCulture)
             } catch {
-                Write-Log "[Import-FindingsFromCache] Unreadable timestamp, finding kept without one: $($f.Timestamp)"
+                Write-Log "[Import-FindingsFromCache] Не удалось прочитать метку времени; находка сохранена без даты: $($f.Timestamp)"
             }
         }
 
@@ -767,7 +767,7 @@ function Merge-FindingsCollection {
     [void]$merged.AddRange(@($CurrentFindings))
     $sorted = @(Sort-FindingsByCategory -Findings $merged)
 
-    Write-Log "[FindingsCache] Merge: kept $($kept.Count) previous, added $($CurrentFindings.Count) new, total $($sorted.Count)"
+    Write-Log "[FindingsCache] Слияние: сохранено прежних $($kept.Count), добавлено новых $($CurrentFindings.Count), всего $($sorted.Count)"
     return $sorted
 }
 
@@ -1527,7 +1527,7 @@ function Show-NoSessionError {
     }
 
     # Error details (NoCollect: session errors are not security findings)
-    Show-KeyValue "Session:" "Not connected" -Class Finding -NoCollect
+    Show-KeyValue "Сеанс:" "Нет подключения" -Class Finding -NoCollect
 
     # Help section
     Show-EmptyLine
@@ -1628,33 +1628,33 @@ function Show-Error {
     $errorTitle = switch ($Type) {
         'Permission' {
             if ($Target) {
-                "ERROR: Insufficient permissions to $Message '$Target'"
+                "ОШИБКА: недостаточно прав для $Message '$Target'"
             } else {
-                "ERROR: Insufficient permissions to $Message"
+                "ОШИБКА: недостаточно прав для $Message"
             }
         }
         'NotFound' {
-            "ERROR: $Message '$Target' not found"
+            "ОШИБКА: $Message '$Target' не найден"
         }
         'Operation' {
             if ($Target) {
-                "ERROR: $Message '$Target'"
+                "ОШИБКА: $Message '$Target'"
             } else {
-                "ERROR: $Message"
+                "ОШИБКА: $Message"
             }
         }
         'Connection' {
             if ($Message) {
-                "CONNECTION FAILED - $Message"
+                "ОШИБКА ПОДКЛЮЧЕНИЯ — $Message"
             } else {
-                "CONNECTION FAILED - see error messages above"
+                "ОШИБКА ПОДКЛЮЧЕНИЯ — подробности приведены выше"
             }
         }
         'HealthCheck' {
             if ($Message) {
-                "CONNECTION HEALTH CHECK FAILED - $Message"
+                "ПРОВЕРКА ПОДКЛЮЧЕНИЯ НЕ ПРОЙДЕНА — $Message"
             } else {
-                "CONNECTION HEALTH CHECK FAILED"
+                "ПРОВЕРКА ПОДКЛЮЧЕНИЯ НЕ ПРОЙДЕНА"
             }
         }
     }
@@ -1662,7 +1662,7 @@ function Show-Error {
     # Build details array
     $details = @()
     if ($Reason) {
-        $details += "Reason: $Reason"
+        $details += "Причина: $Reason"
     }
 
     # Connection and HealthCheck have different formatting
@@ -1695,13 +1695,13 @@ function Show-DisconnectError {
         [string]$ErrorMessage
     )
 
-    $details = @("Error: $ErrorMessage")
+    $details = @("Ошибка: $ErrorMessage")
     $hints = @(
-        "Use -Force to force disconnect despite errors",
-        "Check if session is already disconnected (Get-adPEASSession)"
+        "Используйте -Force для принудительного отключения несмотря на ошибки",
+        "Проверьте, не завершён ли уже сеанс (Get-adPEASSession)"
     )
 
-    Show-Message -Type Error -Title "DISCONNECT FAILED" -Details $details -Hints $hints -NoLeadingLine -NoTrailingLine
+    Show-Message -Type Error -Title "ОШИБКА ЗАВЕРШЕНИЯ СЕАНСА" -Details $details -Hints $hints -NoLeadingLine -NoTrailingLine
 }
 
 # ============================================================================
@@ -1729,9 +1729,9 @@ function Show-NoParametersError {
         [string]$FunctionName
     )
 
-    $hints = @("For more information, run: Get-Help $FunctionName -Examples")
+    $hints = @("Для примеров выполните: Get-Help $FunctionName -Examples")
 
-    Show-Message -Type Error -Title "${FunctionName}: No modification parameters specified" -Hints $hints
+    Show-Message -Type Error -Title "${FunctionName}: не указаны параметры изменения" -Hints $hints
 }
 
 # ============================================================================
@@ -1812,7 +1812,7 @@ function Get-adPEASHelp {
         Show-SubHeader "Модули проверок безопасности"
 
         Show-Line "Запустить все модули:" -Class Hint
-        Show-Line "Invoke-adPEAS (without -Module)"
+        Show-Line "Invoke-adPEAS (без -Module)"
         Show-EmptyLine
         Show-Line "Запустить только выбранные модули:" -Class Hint
         Show-Line "Invoke-adPEAS -Module 'Domain','Creds','ADCS'"
@@ -1868,59 +1868,59 @@ function Get-adPEASHelp {
 
         # --- Connection ---
         Show-Line "Подключение:" -Class Hint
-        Show-KeyValue "Connect-adPEAS" "Establish LDAP session"
-        Show-KeyValue "Disconnect-adPEAS" "Close LDAP session"
-        Show-KeyValue "Get-adPEASSession" "Show session status"
+        Show-KeyValue "Connect-adPEAS" "Установить сеанс LDAP"
+        Show-KeyValue "Disconnect-adPEAS" "Завершить сеанс LDAP"
+        Show-KeyValue "Get-adPEASSession" "Показать состояние сеанса"
         Show-EmptyLine
 
         # --- AD Queries ---
         Show-Line "Запросы AD:" -Class Hint
-        Show-KeyValue "Get-DomainUser" "Query AD users"
-        Show-KeyValue "Get-DomainComputer" "Query AD computers"
-        Show-KeyValue "Get-DomainGroup" "Query AD groups"
-        Show-KeyValue "Get-DomainGPO" "Query Group Policy Objects"
-        Show-KeyValue "Get-DomainObject" "Query any AD object"
-        Show-KeyValue "Get-ObjectACL" "Query object ACLs"
-        Show-KeyValue "Get-CertificateTemplate" "Query certificate templates"
-        Show-KeyValue "Get-CertificateAuthority" "Query certificate authorities"
+        Show-KeyValue "Get-DomainUser" "Запрос пользователей AD"
+        Show-KeyValue "Get-DomainComputer" "Запрос компьютеров AD"
+        Show-KeyValue "Get-DomainGroup" "Запрос групп AD"
+        Show-KeyValue "Get-DomainGPO" "Запрос объектов групповой политики"
+        Show-KeyValue "Get-DomainObject" "Запрос любого объекта AD"
+        Show-KeyValue "Get-ObjectACL" "Запрос ACL объекта"
+        Show-KeyValue "Get-CertificateTemplate" "Запрос шаблонов сертификатов"
+        Show-KeyValue "Get-CertificateAuthority" "Запрос центров сертификации"
         Show-EmptyLine
 
         # --- AD Modifications ---
         Show-Line "Изменения AD:" -Class Hint
-        Show-KeyValue "Set-DomainUser" "Modify user attributes"
-        Show-KeyValue "Set-DomainComputer" "Modify computer attributes"
-        Show-KeyValue "Set-DomainGroup" "Modify group attributes"
-        Show-KeyValue "Set-DomainObject" "Modify any AD object"
-        Show-KeyValue "Set-DomainGPO" "Modify Group Policy Objects"
-        Show-KeyValue "Set-CertificateTemplate" "Modify certificate templates"
-        Show-KeyValue "New-DomainUser" "Create AD user"
-        Show-KeyValue "New-DomainComputer" "Create AD computer"
-        Show-KeyValue "New-DomainGroup" "Create AD group"
-        Show-KeyValue "New-DomainGPO" "Create Group Policy Object"
+        Show-KeyValue "Set-DomainUser" "Изменить атрибуты пользователя"
+        Show-KeyValue "Set-DomainComputer" "Изменить атрибуты компьютера"
+        Show-KeyValue "Set-DomainGroup" "Изменить атрибуты группы"
+        Show-KeyValue "Set-DomainObject" "Изменить любой объект AD"
+        Show-KeyValue "Set-DomainGPO" "Изменить объекты групповой политики"
+        Show-KeyValue "Set-CertificateTemplate" "Изменить шаблоны сертификатов"
+        Show-KeyValue "New-DomainUser" "Создать пользователя AD"
+        Show-KeyValue "New-DomainComputer" "Создать компьютер AD"
+        Show-KeyValue "New-DomainGroup" "Создать группу AD"
+        Show-KeyValue "New-DomainGPO" "Создать объект групповой политики"
         Show-EmptyLine
 
         # --- Kerberos Authentication ---
         Show-Line "Аутентификация Kerberos:" -Class Hint
-        Show-KeyValue "Invoke-KerberosAuth" "Request TGT (Password/Hash/Key/Cert)"
-        Show-KeyValue "Request-ServiceTicket" "Request TGS for a service"
-        Show-KeyValue "Import-KerberosTicket" "Pass-the-Ticket (inject into session)"
+        Show-KeyValue "Invoke-KerberosAuth" "Запрос TGT (пароль/хеш/ключ/сертификат)"
+        Show-KeyValue "Request-ServiceTicket" "Запрос TGS для службы"
+        Show-KeyValue "Import-KerberosTicket" "Pass-the-Ticket (внедрить билет в сеанс)"
         Show-EmptyLine
 
         # --- Credential Attacks ---
         Show-Line "Атаки на учётные данные:" -Class Hint
-        Show-KeyValue "Invoke-Kerberoast" "Kerberoasting (request service tickets)"
-        Show-KeyValue "Invoke-ASREPRoast" "AS-REP Roasting (no preauth)"
-        Show-KeyValue "Invoke-DCSync" "DCSync (directory replication)"
-        Show-KeyValue "Invoke-PasswordSpray" "Password spraying"
+        Show-KeyValue "Invoke-Kerberoast" "Kerberoasting (запрос служебных билетов)"
+        Show-KeyValue "Invoke-ASREPRoast" "AS-REP Roasting (без предварительной аутентификации)"
+        Show-KeyValue "Invoke-DCSync" "DCSync (репликация каталога)"
+        Show-KeyValue "Invoke-PasswordSpray" "Перебор одного пароля по множеству учётных записей"
         Show-EmptyLine
 
         # --- Offensive Actions ---
         Show-Line "Активные операции:" -Class Hint
-        Show-KeyValue "Invoke-TicketForge" "Golden/Silver/Diamond Tickets"
-        Show-KeyValue "Invoke-S4U" "S4U delegation attacks"
-        Show-KeyValue "Invoke-RBCDOperation" "Resource-Based Constrained Delegation"
-        Show-KeyValue "Invoke-ShadowCredentialOperation" "Shadow Credentials"
-        Show-KeyValue "Request-ADCSCertificate" "Request ADCS certificate"
+        Show-KeyValue "Invoke-TicketForge" "Билеты Golden/Silver/Diamond"
+        Show-KeyValue "Invoke-S4U" "Атаки через делегирование S4U"
+        Show-KeyValue "Invoke-RBCDOperation" "Ограниченное делегирование на основе ресурсов (RBCD)"
+        Show-KeyValue "Invoke-ShadowCredentialOperation" "Теневые учётные данные (Shadow Credentials)"
+        Show-KeyValue "Request-ADCSCertificate" "Запрос сертификата ADCS"
         Show-EmptyLine
     }
 }
