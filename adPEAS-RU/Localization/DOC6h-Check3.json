@@ -1,0 +1,116 @@
+{
+  "schema": "adPEAS-RU.DOC6h.SecurityLog.1",
+  "path": "src/modules/Checks/GPO/Get-GPOPermissions.ps1",
+  "entries": [
+    {
+      "line": 50,
+      "original": "        Write-Log \"[Get-GPOPermissions] Starting check\"",
+      "target": "        Write-Log \"[Get-GPOPermissions] Начата проверка\""
+    },
+    {
+      "line": 150,
+      "original": "                Write-Log \"[Get-GPOPermissions] Prefetched $($descriptorLookup.Count) security descriptor(s) in one query\"",
+      "target": "                Write-Log \"[Get-GPOPermissions] Дескрипторов безопасности, полученных одним запросом: $($descriptorLookup.Count)\""
+    },
+    {
+      "line": 155,
+      "original": "                Write-Log \"[Get-GPOPermissions] Descriptor prefetch failed, falling back to one read per GPO: $_\" -Level Warning",
+      "target": "                Write-Log \"[Get-GPOPermissions] Не удалось предварительно получить дескрипторы — переход к отдельному чтению каждой GPO: $_\" -Level Warning"
+    },
+    {
+      "line": 202,
+      "original": "                Write-Log \"[Get-GPOPermissions] Analyzing GPO: $gpoDisplayName ($gpoGUID)\"",
+      "target": "                Write-Log \"[Get-GPOPermissions] Анализ GPO: $gpoDisplayName ($gpoGUID)\""
+    },
+    {
+      "line": 238,
+      "original": "                        Write-Log \"[Get-GPOPermissions] Security descriptor of GPO '$gpoDisplayName' could not be read or parsed - its permissions are unknown\" -Level Warning",
+      "target": "                        Write-Log \"[Get-GPOPermissions] Дескриптор безопасности GPO '$gpoDisplayName' нельзя прочитать или разобрать — права неизвестны\" -Level Warning"
+    },
+    {
+      "line": 254,
+      "original": "                        Write-Log \"[Get-GPOPermissions] GPO '$gpoDisplayName' is owned by $($ownerFinding.Owner), which is not a default owner\"",
+      "target": "                        Write-Log \"[Get-GPOPermissions] Владелец GPO '$gpoDisplayName' — $($ownerFinding.Owner), это не владелец по умолчанию\""
+    },
+    {
+      "line": 258,
+      "original": "                        Write-Log \"[Get-GPOPermissions] No dangerous ACEs found for GPO: $gpoDisplayName\"",
+      "target": "                        Write-Log \"[Get-GPOPermissions] Опасных ACE для GPO не найдено: $gpoDisplayName\""
+    },
+    {
+      "line": 285,
+      "original": "                    Write-Log \"[Get-GPOPermissions] Processing $($dangerousAces.Count) dangerous ACE(s) for GPO: $gpoDisplayName\"",
+      "target": "                    Write-Log \"[Get-GPOPermissions] Обработка $($dangerousAces.Count) опасных ACE для GPO: $gpoDisplayName\""
+    },
+    {
+      "line": 296,
+      "original": "                            Write-Log \"[Get-GPOPermissions] Skipping ACE with empty SID on GPO $gpoDisplayName (ACE object type: $($ace.GetType().FullName))\"",
+      "target": "                            Write-Log \"[Get-GPOPermissions] Пропуск ACE с пустым SID в GPO $gpoDisplayName (тип объекта ACE: $($ace.GetType().FullName))\""
+    },
+    {
+      "line": 306,
+      "original": "                            Write-Log \"[Get-GPOPermissions] Skipping descendants-only ACE on GPO $gpoDisplayName : $($ace.Trustee), PropagationFlags=$($ace.PropagationFlags)\"",
+      "target": "                            Write-Log \"[Get-GPOPermissions] Пропуск ACE только для потомков в GPO $gpoDisplayName : $($ace.Trustee), PropagationFlags=$($ace.PropagationFlags)\""
+    },
+    {
+      "line": 334,
+      "original": "                                Write-Log \"[Get-GPOPermissions] $aceSID holds $dangerousRight on GPO $gpoDisplayName but a Deny ACE takes it away\"",
+      "target": "                                Write-Log \"[Get-GPOPermissions] Субъект $aceSID имеет право $dangerousRight в GPO $gpoDisplayName, но оно отменено запрещающим ACE\""
+    },
+    {
+      "line": 399,
+      "original": "                                Write-Log \"[Get-GPOPermissions] $($ace.Trustee) holds $aceRights on GPO $gpoDisplayName scoped to the class $($resolvedScope.Name) - no right over the policy\"",
+      "target": "                                Write-Log \"[Get-GPOPermissions] Субъект $($ace.Trustee) имеет права $aceRights в GPO $gpoDisplayName для класса $($resolvedScope.Name) — прав на саму политику нет\""
+    },
+    {
+      "line": 438,
+      "original": "                            Write-Log \"[Get-GPOPermissions] Skipping expected identity $aceSID on GPO $gpoDisplayName : $($expectedCheck.Reason)\"",
+      "target": "                            Write-Log \"[Get-GPOPermissions] Пропущен ожидаемый субъект $aceSID в GPO $gpoDisplayName : $($expectedCheck.Reason)\""
+    },
+    {
+      "line": 453,
+      "original": "                                Write-Log \"[Get-GPOPermissions] Expected identity $aceSID has $aceRights on GPO $gpoDisplayName - $($scopeResult.Reason)\"",
+      "target": "                                Write-Log \"[Get-GPOPermissions] Ожидаемый субъект $aceSID имеет права $aceRights в GPO $gpoDisplayName — $($scopeResult.Reason)\""
+    },
+    {
+      "line": 458,
+      "original": "                                Write-Log \"[Get-GPOPermissions] Attention: $identityName has $aceRights on GPO $gpoDisplayName - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)\"",
+      "target": "                                Write-Log \"[Get-GPOPermissions] Требует внимания: $identityName имеет права $aceRights в GPO $gpoDisplayName — $($scopeResult.Reason); пропущен (для включения укажите -IncludePrivileged)\""
+    },
+    {
+      "line": 467,
+      "original": "                            Write-Log \"[Get-GPOPermissions] IncludePrivileged: Including $identityName ($aceSID) with severity $severity on GPO $gpoDisplayName\"",
+      "target": "                            Write-Log \"[Get-GPOPermissions] IncludePrivileged: субъект $identityName ($aceSID) включён с критичностью $severity в GPO $gpoDisplayName\""
+    },
+    {
+      "line": 478,
+      "original": "                        Write-Log \"[Get-GPOPermissions] FINDING: $identityName has $dangerousRightMatched on GPO $gpoDisplayName (inherited: $([bool]$ace.IsInherited))\"",
+      "target": "                        Write-Log \"[Get-GPOPermissions] НАХОДКА: субъект $identityName обладает опасным правом $dangerousRightMatched в GPO $gpoDisplayName (унаследовано: $([bool]$ace.IsInherited))\""
+    },
+    {
+      "line": 715,
+      "original": "                    Write-Log \"[Get-GPOPermissions] Error analyzing GPO $gpoDisplayName : $_\"",
+      "target": "                    Write-Log \"[Get-GPOPermissions] Ошибка анализа GPO $gpoDisplayName : $_\""
+    },
+    {
+      "line": 747,
+      "original": "                    Write-Log \"[Get-GPOPermissions] SYSVOL is not reachable at $policiesPath - the folder permissions were not examined\"",
+      "target": "                    Write-Log \"[Get-GPOPermissions] SYSVOL по пути $policiesPath недоступен — разрешения на папки не проверялись\""
+    },
+    {
+      "line": 762,
+      "original": "                    Write-Log \"[Get-GPOPermissions] Could not list $policiesPath - missing and orphaned policy folders are not told apart: $($folderListErrors[0])\"",
+      "target": "                    Write-Log \"[Get-GPOPermissions] Невозможно перечислить $policiesPath — нельзя отличить отсутствующие папки политик от осиротевших: $($folderListErrors[0])\""
+    },
+    {
+      "line": 1062,
+      "original": "            Write-Log \"[Get-GPOPermissions] Error: $_\" -Level Error",
+      "target": "            Write-Log \"[Get-GPOPermissions] Ошибка: $_\" -Level Error"
+    },
+    {
+      "line": 1068,
+      "original": "        Write-Log \"[Get-GPOPermissions] Check completed\"",
+      "target": "        Write-Log \"[Get-GPOPermissions] Проверка завершена\""
+    }
+  ]
+}
