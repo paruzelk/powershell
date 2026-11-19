@@ -275,3 +275,7 @@ if(-not $?){throw 'Ошибка локализации диагностичес�
 # DOC6e: пользовательские сообщения DNS/SRV, привилегий и TGT.
 & (Join-Path $PSScriptRoot 'Localization/Apply-DOC6eHelperDiagnostics.ps1') -ProjectRoot $ProjectRoot
 if(-not $?){throw 'Ошибка применения DOC6e'}
+
+# DOC6f: видимые статусы LDAP/Kerberos, ошибки, подсказки команд и справка.
+& (Join-Path $PSScriptRoot 'Localization/Apply-DOC6fVisibleOutputsAndHelp.ps1') -ProjectRoot $ProjectRoot
+if(-not $?){throw 'Ошибка локализации вывода DOC6f'}
