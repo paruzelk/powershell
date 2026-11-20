@@ -60,7 +60,7 @@ def patch_scoped(candidate, locale, stats):
     for name in ("AdditionalCheckMessages.ru-RU.json", "ReportSourceMessages.ru-RU.json"):
         count = 0
         for relative, mapping in load(locale / name)["files"].items():
-            if not re.fullmatch(r"src/modules/Checks/[A-Za-z0-9_./-]+\.ps1", relative):
+            if not re.fullmatch(r"src/modules/(?:Checks|Helpers)/[A-Za-z0-9_./-]+\.ps1", relative):
                 raise ValueError("Unsafe catalog path " + relative)
             path = candidate / relative
             if not path.is_file():
