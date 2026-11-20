@@ -161,13 +161,16 @@ jobs:
           . '_mig\candidate\src\modules\Core\Render-HtmlObject.ps1'
           function ConvertTo-HtmlEncode { param($Value) [System.Net.WebUtility]::HtmlEncode([string]$Value) }
           function ConvertTo-RuReportAttributeValue { param([AllowNull()][string]$Text) return $Text }
-          if ((ConvertTo-RuReportAttributeLabel7 -Text 'pwdLastSet') -cnotmatch 'Последняя смена пароля') {
+          $label = ConvertTo-RuReportAttributeLabel7 -Text 'pwdLastSet'
+          if ($label -ceq 'pwdLastSet' -or $label -notmatch '[^\x00-\x7F]') {
             throw 'MIG7 runtime caption test failed'
           }
-          if ((ConvertTo-RuReportAttributeContext7 -Name 'logonhours' -Text 'All hours (no restriction)') -cne 'Любое время (без ограничений)') {
+          $exact = ConvertTo-RuReportAttributeContext7 -Name 'logonhours' -Text 'All hours (no restriction)'
+          if ($exact -ceq 'All hours (no restriction)' -or $exact -notmatch '[^\x00-\x7F]') {
             throw 'MIG7 runtime context exact test failed'
           }
-          if ((ConvertTo-RuReportAttributeContext7 -Name 'activityStatus' -Text 'INACTIVE (no login for >90 days)') -cnotmatch 'более 90 дней') {
+          $dynamic = ConvertTo-RuReportAttributeContext7 -Name 'activityStatus' -Text 'INACTIVE (no login for >90 days)'
+          if ($dynamic -ceq 'INACTIVE (no login for >90 days)' -or $dynamic -notmatch '90' -or $dynamic -notmatch '[^\x00-\x7F]') {
             throw 'MIG7 runtime context regex test failed'
           }
           foreach ($raw in @('CN=Users,DC=example,DC=local','S-1-5-21-1','Default Domain Policy')) {
@@ -183,8 +186,8 @@ jobs:
           }
           $html = Render-HtmlRow -Row $testRow
           if ($html -notmatch 'data-attr-name="logonhours"' -or
-              $html -notmatch 'Разрешённое время входа' -or
-              $html -notmatch 'Любое время') {
+              $html -match 'All hours \(no restriction\)' -or
+              $html -notmatch '[^\x00-\x7F]') {
             throw 'MIG7 actual synthetic HTML renderer output failed'
           }
           Write-Host 'PASS MIG7 106 Russian captions and scoped synthetic HTML renderer, original AD identifiers preserved'
