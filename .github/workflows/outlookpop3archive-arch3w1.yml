@@ -860,7 +860,7 @@ jobs:
              $core -cnotmatch 'Test-OPAArchiveMoves -Namespace' -or
              $core -cnotmatch 'Test-OPA265ARCH3pOriginalVerifierResult -Verified' -or
              $core -cnotmatch "Part2.*exactly one" -or
-             $core -cnotmatch "Sha256=\$firstSha" -or
+             $core -cnotmatch 'Sha256=\$firstSha' -or
              $core -cnotmatch 'ProofKind=.OriginalArchiveVerifierFullSemanticSha256' -or
              $core -cnotmatch 'Get-OPA265ARCH3vFullReadOnlyAudit -RunId' -or
              $core -cnotmatch 'Write-OPAOperationJournalEvent -Path' -or
