@@ -1,6 +1,6 @@
-# adPEAS-RU 2.11.0 MIG5 — быстрый старт и все параметры
+# adPEAS-RU 2.11.0 MIG6 — быстрый старт и все параметры
 
-**MIG5 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
+**MIG6 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
 adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не входит.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
@@ -8,11 +8,11 @@ adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не �
 ~~~powershell
 cd 'C:\Tools\adPEAS-RU'
 Import-Module .\adPEAS.ps1 -Force
-Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG5' -Format All
+Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG6' -Format All
 Disconnect-adPEAS
 ~~~
 
-Создаются AD-Audit-MIG5.html, AD-Audit-MIG5.txt и AD-Audit-MIG5.json.
+Создаются AD-Audit-MIG6.html, AD-Audit-MIG6.txt и AD-Audit-MIG6.json.
 Outputfile принимает имя без расширения.
 
 **LDAPS с проверкой сертификата:**
@@ -135,13 +135,13 @@ Get-Command Invoke-adPEAS -Syntax
 Get-Help Invoke-adPEAS -Full
 Get-Command Connect-adPEAS -Syntax
 Get-adPEASSession -TestConnection
-Convert-adPEASReport -InputJson '.\AD-Audit-MIG5.json' -OutputPath '.\recreated' -Format HTML
+Convert-adPEASReport -InputJson '.\AD-Audit-MIG6.json' -OutputPath '.\recreated' -Format HTML
 ~~~
 
 **Статус:** миграция текстов DOC6j через сравнение оригинальных
 источников 2.11.0, плюс отдельный RU HTML-слой. Логика аудита, SID,
 LDAP-атрибуты, команды исправления и JSON-поля не переводятся.
-Полная проверка в живом AD и тесты браузера относятся к MIG5.
+Отчёт MIG5 уже проверен по фактическому HTML; проверка MIG6 в живом AD и полные браузерные тесты ещё не выполнялись.
 
 ## Что изменено в MIG5
 
@@ -155,3 +155,11 @@ LDAP-атрибуты, команды исправления и JSON-поля н
 Отчёты необходимо проверить после сборки MIG5 на тестовом домене.
 Проверки Windows PowerShell 5.1, синтаксиса и UI не доказывают безопасность
 или корректность аудита в реальной производственной среде.
+
+## Что изменено в MIG6
+
+По предоставленному HTML MIG5 обнаружено 16 полностью английских строк результатов и типовые английские значения в строках атрибутов. В MIG6 такие сообщения переводятся непосредственно при формировании HTML, до выполнения JavaScript. Строго зафиксированы 9 точных фраз, 10 динамических шаблонов, 12 отображаемых статусов и 11 числовых шаблонов. Отдельно переведены два смешанных сообщения о настройках LDAP и анонимных сеансах.
+
+Изменения ограничены `Export-HTMLReport.ps1` и текстовым отображением `Render-HtmlObject.ps1`: исходные объекты, значения в модели, результат JSON и логика аудита не изменяются. Встроенные имена схемы AD, SID, GUID, доменные имена, команды исправления и правовые уведомления сохраняются без изменений.
+
+**Статус:** Preview. Исходный отчёт пользователя не сохранялся в GitHub; сохранены только обобщённые строки интерфейса и синтетические примеры без данных домена.
