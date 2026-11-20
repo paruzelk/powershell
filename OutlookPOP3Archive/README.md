@@ -1,4 +1,4 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (текущий DEV-этап 2.6.5-ARCH3x)
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (текущий DEV-этап 2.6.5-ARCH3x1)
 
 
 ### ARCH3x1 — ограниченный однократный реальный TEST-PST batch-10 через ORIGINAL MailMover
