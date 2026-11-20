@@ -35,7 +35,7 @@ BeforeAll {
             RunId=$id;SourcePst=$source
             SealSha256=('d'*64)
             AuditSha256=('a'*64);PreviewSha256=('b'*64)
-            OriginalIndexSha256=('c'*64);SourceStoreIdSha256=('e'*64)
+            OriginalIndexSha256=('c'*64);SourceStoreIdSha256=(Get-OPA265ARCH2bTextSha256 -Text 'ARCH3w-FAKE-POP3-STORE')
             SourcePstLengthBytes=[long]7735903232
             TargetPstPreview=$target;BatchSize=10;TotalAttachmentCount=12
             Rows=@($rows.ToArray())
