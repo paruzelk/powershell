@@ -1,6 +1,10 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
 
+> **ARCH3w (2026-11-20):** пользователь завершил реальный ARCH3v `Seal → Review` PASS для десяти original full ARCH2b семантических SHA, 12 вложений; `SealSha256=d071afb...`, `AuditSha256=609e60e...`, индекс `5ada35e...`. [Новый evidence-only пакет из 10 ORIGINAL OperationJournal Intent, защищённый LOCALAPPDATA, original journal SHA/Flush(true), частичный crash-fail-closed, readback](2.6.5-arch3w-ten-original-intents.md): оригинальный ARCH3v sealed SHA и оригинальный ARCH3u/ARCH2b свежий source audit, original Year2020 Parts1/2 SHA, free Part3, shared index SHA. Запись только явно подтверждаемого protected manifest + ten original Intent; никаких MoveClaimed/ProviderInvocation/PST/Index/Move. Следующий ARCH3x — отдельно проверяемая original MailMover десятиписем one-shot claim/fence, затем настоящий restart+original verifier. ProductionReady=False.
+
+
+
 > **ARCH3v (2026-11-20):** пользователь подтвердил ARCH3u real read-only 10/10 Inbox original mail, 12 вложений, Year2020 Part3 preview, 501 shared index hash 5ada35e..., preview hash d9bc37c.... [ARCH3v полный original ARCH2b semantic Body/HTML/Recipients/State/attachment SaveAsFile byte SHA, сначала Audit без записи, затем отдельно разрешаемый evidence-only Seal/independent Review](2.6.5-arch3v-real-ten-full-semantic-witness.md). Исходный ARCH3u повторяется с прежним RunId и точным SHA/size, при дрейфе стоп. Постоянно сохраняются только SHA witness в отдельном защищённом LOCALAPPDATA, CreateNew/Flush(true), никакого оригинального Journal, Index, PST или Move. Следующий ARCH3w — отдельная подготовка durable pre-Move Intent/Claim с аварийной fence; production закрыт.
 
 
