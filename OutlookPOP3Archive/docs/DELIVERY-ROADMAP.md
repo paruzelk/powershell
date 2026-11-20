@@ -1,6 +1,10 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
 
+> **ARCH3v (2026-11-20):** пользователь подтвердил ARCH3u real read-only 10/10 Inbox original mail, 12 вложений, Year2020 Part3 preview, 501 shared index hash 5ada35e..., preview hash d9bc37c.... [ARCH3v полный original ARCH2b semantic Body/HTML/Recipients/State/attachment SaveAsFile byte SHA, сначала Audit без записи, затем отдельно разрешаемый evidence-only Seal/independent Review](2.6.5-arch3v-real-ten-full-semantic-witness.md). Исходный ARCH3u повторяется с прежним RunId и точным SHA/size, при дрейфе стоп. Постоянно сохраняются только SHA witness в отдельном защищённом LOCALAPPDATA, CreateNew/Flush(true), никакого оригинального Journal, Index, PST или Move. Следующий ARCH3w — отдельная подготовка durable pre-Move Intent/Claim с аварийной fence; production закрыт.
+
+
+
 > **ARCH3u (2026-11-19):** оператор подтвердил успешное ARCH3t восстановление 2→10/10 и повторный Recover без записи (оригинальный journal SHA неизменен). [Новый read-only реальный тестовый batch-10 preflight](2.6.5-arch3u-real-test-pst-ten-readonly-preflight.md): исходный POP3 Outlook Inbox, original selector и индекс, следующая свободная годовая часть PST, original ARCH3b MailMover контракт, точный повторный просмотр 10 EntryID/Parent/Date. Никакого full semantic seal/Intent/Claim, PST/Index/Journal writer или Move. Отдельный ARCH3v для evidence-only full witnesses/Intent; Archive/Resume/Auto и 90GB production закрыты.
 
 
