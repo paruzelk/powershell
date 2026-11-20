@@ -1,6 +1,6 @@
-# adPEAS-RU 2.11.0 MIG9 — быстрый старт и все параметры
+# adPEAS-RU 2.11.0 MIG10 — быстрый старт и все параметры
 
-**MIG9 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
+**MIG10 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
 adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не входит.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
@@ -8,11 +8,11 @@ adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не �
 ~~~powershell
 cd 'C:\Tools\adPEAS-RU'
 Import-Module .\adPEAS.ps1 -Force
-Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG9' -Format All
+Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG10' -Format All
 Disconnect-adPEAS
 ~~~
 
-Создаются AD-Audit-MIG9.html, AD-Audit-MIG9.txt и AD-Audit-MIG9.json.
+Создаются AD-Audit-MIG10.html, AD-Audit-MIG10.txt и AD-Audit-MIG10.json.
 Outputfile принимает имя без расширения.
 
 **LDAPS с проверкой сертификата:**
@@ -135,7 +135,7 @@ Get-Command Invoke-adPEAS -Syntax
 Get-Help Invoke-adPEAS -Full
 Get-Command Connect-adPEAS -Syntax
 Get-adPEASSession -TestConnection
-Convert-adPEASReport -InputJson '.\AD-Audit-MIG9.json' -OutputPath '.\recreated' -Format HTML
+Convert-adPEASReport -InputJson '.\AD-Audit-MIG10.json' -OutputPath '.\recreated' -Format HTML
 ~~~
 
 **Статус:** миграция текстов DOC6j через сравнение оригинальных
@@ -193,3 +193,19 @@ MIG9 использует оригинальные русские каталог
 **Не менялись:** формулы расчёта риска, находки, ID, запросы AD, исходные данные, юридические условия лицензии, JSON, команды исправления. Новые проверки CI выполняют генерацию трёх приоритетных карточек на синтетических данных и сверяют русские тексты с уже проверенными каталогами.
 
 **Статус:** PREVIEW до проверки нового реального HTML из MIG9.
+
+## MIG10 — проверка остаточных английских строк по HTML MIG9
+
+В проверенном отчёте MIG9 найдено 25 элементов вида Show N more attribute(s).
+Источник — Render-HtmlObject.ps1. Кроме того, при раскрытии/сворачивании
+JavaScript подменял слова Show и Hide. MIG10 переводит эти два состояния
+в «Показать дополнительные атрибуты: N» и «Скрыть дополнительные атрибуты: N».
+
+Числа, технические идентификаторы, data-attr-name, значения AD и JSON не
+меняются. Переведены альтернативные подписи двух логотипов и скрытые подписи
+переключателя темы Light/Dark. Условия лицензии сохранены.
+
+CI проверяет настоящий PowerShell-рендерер с тремя синтетическими атрибутами
+и исполняет JavaScript для четырёх чисел в обоих состояниях.
+Исходный отчёт пользователя не публикуется. Статус MIG10: PREVIEW,
+до повторной проверки HTML на реальном домене.
