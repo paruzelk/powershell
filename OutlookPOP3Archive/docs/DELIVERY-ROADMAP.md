@@ -1,6 +1,10 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
 
+> **ARCH3w1 (2026-11-20)**: [исправление обнаруженного изменения физического SHA архива Part2 при неизменном размере](2.6.5-arch3w1-semantic-part2-proof.md). ARCH3w Prepare **безопасно блокирован до записи**; старый Part2 raw SHA `43cbb...`, новый `468f...`. В ARCH3w1 строго проверяется Part1 физический SHA и размер, а Part2 — не raw SHA, а неизменяемая исходная postcommit `ARCH3q/ARCH3r` цепочка + 501 original index + живой оригинальный `Test-OPAArchiveMoves` / ARCH2b Body/HTML/attachment полный witness на одном архивном письме. Проходятся исходные 10 ARCH3v full witnesses и source SHA, Part3 свободен. Отдельный root ARCH3w1; `Prepare` writes only protected 10 ORIGINAL Intent, independent Review, no Move/claim/duplicate index/archive PST writes. Не переносить старый `ARCH3w PrepareDigest=7f4d...` в ARCH3w1. Следующий этап ARCH3x — отдельная разработка/сертификация однократного Move.
+
+
+
 > **ARCH3w (2026-11-20):** пользователь завершил реальный ARCH3v `Seal → Review` PASS для десяти original full ARCH2b семантических SHA, 12 вложений; `SealSha256=d071afb...`, `AuditSha256=609e60e...`, индекс `5ada35e...`. [Новый evidence-only пакет из 10 ORIGINAL OperationJournal Intent, защищённый LOCALAPPDATA, original journal SHA/Flush(true), частичный crash-fail-closed, readback](2.6.5-arch3w-ten-original-intents.md): оригинальный ARCH3v sealed SHA и оригинальный ARCH3u/ARCH2b свежий source audit, original Year2020 Parts1/2 SHA, free Part3, shared index SHA. Запись только явно подтверждаемого protected manifest + ten original Intent; никаких MoveClaimed/ProviderInvocation/PST/Index/Move. Следующий ARCH3x — отдельно проверяемая original MailMover десятиписем one-shot claim/fence, затем настоящий restart+original verifier. ProductionReady=False.
 
 
