@@ -1,6 +1,31 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3w1 — original ARCH3q/ARCH3r + живой original ArchiveVerifier Part2 вместо бинарного SHA (без Move)
+
+**ARCH3w физически корректно остановил Prepare до записи Intent**: старый SHA Part2 `43cbb...`, новый `468f...`, размер 525312 не изменился. ARCH3w1 сохраняет строгий raw SHA Part1, защищённый ARCH3v seal и 10 original source full semantic SHA; архив Part2 проверяется по immutable историческому ARCH3q `Reconciled`, индексу 501 и исходному ARCH3i witness плюс **текущему живому** оригинальному `Test-OPAArchiveMoves -RequireSemanticWitness` с полным сравнением Body/HTML/вложений. Исторический `ARCH3p` precommit reader после Reconciled **не вызывается**. Никакой физический SHA Part2 не используется для разрешения Intent, пока семантика полностью не проверена; размер Part2 строго 525312. Если хотя бы одна проверка не удалась — никаких записей.
+
+```powershell
+$pin=@{
+ RunId='093b5ce9-4a90-46fa-b6a5-7cdba61d2f15'
+ SealSha256='d071afbff028d4cbadcea69318a6d68009242ac401cd2a91abf08b5ffe9f6799'
+ ExpectedAuditSha256='609e60e01082860ec8dfd936510243c812ba2c99b1403685a3d96c3718000a21'
+ ExpectedPreviewSha256='d9bc37c5f87aace732adb122d89488eb44111b7333ebf3b5d33c087766a42e57'
+ ExpectedOriginalIndexSha256='5ada35eb30f34ff60dc4b89f23aa071b72cc0b98e5ff57299d61f1714b13d7ae'
+}
+.\Invoke-ARCH3w1.ps1 -Mode Plan @pin | Format-List
+$audit=.\Invoke-ARCH3w1.ps1 -Mode Audit @pin
+$audit | Format-List
+.\Invoke-ARCH3w1.ps1 -Mode Prepare @pin -ExpectedPrepareDigest $audit.PrepareDigest -ConfirmPrepareIntent -WhatIf | Format-List
+# Только после проверки Audit и WhatIf; новый digest ARCH3w1, НЕ старый 7f4d...:
+$prepared=.\Invoke-ARCH3w1.ps1 -Mode Prepare @pin -ExpectedPrepareDigest $audit.PrepareDigest -ConfirmPrepareIntent -Confirm:$false
+.\Invoke-ARCH3w1.ps1 -Mode Review -RunId $pin.RunId -SealSha256 $pin.SealSha256 -ManifestSha256 $prepared.ManifestSha256 -JournalSha256 $prepared.JournalSha256 | Format-List
+```
+
+[ARCH3w1: полный синтаксис, оригинальный архивный verifier Part2, строгие ограничения и история исходных SHA](docs/2.6.5-arch3w1-semantic-part2-proof.md). Сохранено `WriterPermit=False`, `ProductionReady=False`, `MoveClaimed=False`, `AutomaticMoveRetryAllowed=False`.
+
+
+
 ### ARCH3w — 10 REAL TEST-PST original OperationJournal Intent в защищённом LOCALAPPDATA (без Move)
 
 Оператор подтвердил реальный ARCH3v `Seal → independent Review`, десять полных исходных original ARCH2b semantic SHA, 12 вложений, `SealSha256=d071afb...`. ARCH3w повторно проверяет **все десять** исходных сообщений original ARCH3u + ARCH2b, SHA существующих частей `Archive-2020.pst` и `Archive-2020-02.pst`, неизменность общего `DuplicateIndex` и свободный `Archive-2020-03.pst`. Затем **только отдельно подтверждаемый** `Prepare` создаёт protected manifest + десять ORIGINAL `Write-OPAOperationJournalEvent -Phase Intent`; новый PST, общий индекс, COM Move и MoveClaimed остаются закрытыми. Повторять Prepare после любой частичной записи **запрещено**.
