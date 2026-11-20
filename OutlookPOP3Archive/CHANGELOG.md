@@ -1,3 +1,8 @@
+## 2.6.5-ARCH3w DEV — 2026-11-20
+- User confirmed real ARCH3v original 10 complete full semantic source witnesses + 12 byte-hashed attachments, explicit Seal and independent Review PASS; original AuditSha 609e60e..., SealSha d071afb... and shared original DuplicateIndex 5ada35e... immutable.
+- New ARCH3w protected evidence-only ORIGINAL journal ten Intent preparation: ARCH3v independent SHA seal readback, fresh ARCH3u source and original ARCH2b complete semantic comparison, strict original 2020 Part1+Part2 full file SHA, original shared index SHA, Part3 absent, exact full source StoreID proof and externally pinned PrepareDigest; then original protected ARCH3i ACL + original ARCH3c manifest CreateNew Flush(true) + ten ORIGINAL Write-OPAOperationJournalEvent Intent Flush(true); independent SHA-readback verifies full journal and original sealed ten.
+- Partial 1..9, truncated journal, unknown files, inconsistent full witness or already existing run directory all fail-closed, never retry Prepare/Move. 26 new Pester, full expected 4625 tests/157 containers Windows PowerShell 5.1; project-only ZIP, no real Outlook in CI, no PST/Index writer, ProductionReady=False.
+
 ## 2.6.5-ARCH3v DEV — 2026-11-20
 - Operator ARCH3u real Plan/Inventory PASS: same RunId 093b5ce9..., 26,872 Inbox, 128 sampled, 10 original unindexed 2020 Inbox letters and 12 attachment objects, original 501-entry DuplicateIndex sha 5ada35e..., existing Year part1/2; next part3 preview only.
 - Exact same ARCH3u SHA-pinned original Inbox ten re-selection, original ARCH2b full Body/HTML/recipient/user flags and actual SaveAsFile attachment byte SHA with original ARCH3d witness digest; zero durable writes during Audit.
