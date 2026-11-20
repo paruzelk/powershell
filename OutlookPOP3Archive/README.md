@@ -1,6 +1,32 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3v — полные оригинальные SHA256 для 10 РЕАЛЬНЫХ TEST-PST сообщений без Move (DEV)
+
+После успешного ARCH3u `Plan/Inventory`: **точно та же партия** 10 писем POP3 Inbox (2020), 12 вложений, исходный shared `DuplicateIndex` 501, `Archive-2020-03.pst` только preview. ARCH3v повторяет ARCH3u и использует ORIGINAL `Get-OPA265ARCH2bMailSemanticWitness` для Body/HTML/recipients/state и реального `SaveAsFile` attachment byte SHA; отдельная защищённая запись *только evidence* возможна после внешнего `AuditSha256`. Никакого `MailItem.Move`, new PST, OperationJournal или DuplicateIndex записи; `WriterPermit=False`, `ProductionReady=False`.
+
+```powershell
+$pin=@{
+ RunId='093b5ce9-4a90-46fa-b6a5-7cdba61d2f15'
+ SourcePst='C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.pst'
+ ExpectedPreviewSha256='d9bc37c5f87aace732adb122d89488eb44111b7333ebf3b5d33c087766a42e57'
+ ExpectedSourceStoreIdSha256='c6f1cb064a78b6d8c676ace07d6ae8202f2477046e48d17baeade82581837ca3'
+ ExpectedOriginalIndexSha256='5ada35eb30f34ff60dc4b89f23aa071b72cc0b98e5ff57299d61f1714b13d7ae'
+ ExpectedSourcePstLengthBytes=7735903232
+}
+.\Invoke-ARCH3v.ps1 -Mode Plan -RunId $pin.RunId -SourcePst $pin.SourcePst | Format-List
+$audit=.\Invoke-ARCH3v.ps1 -Mode Audit @pin
+$audit | Format-List
+.\Invoke-ARCH3v.ps1 -Mode Seal @pin -ExpectedAuditSha256 $audit.AuditSha256 -ConfirmEvidenceWrite -WhatIf | Format-List
+# ONLY after independent check:
+$sealed=.\Invoke-ARCH3v.ps1 -Mode Seal @pin -ExpectedAuditSha256 $audit.AuditSha256 -ConfirmEvidenceWrite -Confirm:$false
+.\Invoke-ARCH3v.ps1 -Mode Review -RunId $pin.RunId -SealSha256 $sealed.SealSha256 | Format-List
+```
+
+[Полный синтаксис, контрольные значения, риски и runbook ARCH3v](docs/2.6.5-arch3v-real-ten-full-semantic-witness.md). Review не подключается к Outlook; `Seal` **не разрешает** Move. На естественный дрейф PST/индекса/выборки — STOP. Отдельный ARCH3w понадобится для защищённого durable Intent до какого-либо Move.
+
+
+
 ### ARCH3u — реальный тестовый POP3 PST, предварительный batch-10 без Move
 
 Тестовый `info@stios.ru.pst` разрешён для **чтения**: новый ARCH3u находит 10 ещё не индексированных исходных Inbox MailItems одного года через ORIGINAL `ArchiveSelector`, проверяет исходный POP3 StoreID и повторно читает каждый EntryID, оригинальный `DuplicateIndex` и имеющиеся годовые части, строит оригинальные `ARCH3b` контракты на **следующую свободную часть архива**. `Plan` не подключается к Outlook; `Inventory` обращается к Outlook только для чтения. Без durable witness, Intent, PST/Journal/Index writer; `WriterPermit=False`, `ProductionReady=False`.
