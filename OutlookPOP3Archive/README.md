@@ -1,5 +1,15 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (текущий DEV-этап 2.6.5-ARCH3x)
 
+
+### ARCH3x — десять fake-only original MailMover provider fences, без реального Move
+
+Внутри оригинального MailMover добавлен только синтетический 10-item claim/provider boundary с CreateNew/Flush(true), SHA-цепочкой и остановкой на четырёх аварийных окнах. Исправлен путь dot-source в CLI ARCH3w1 на существующий исходный модуль. Испытания ARCH3s–ARCH3v повторять не нужно. Full interface: [ARCH3x runbook](docs/2.6.5-arch3x-original-ten-provider-fence.md). WriterPermit=False и ProductionReady=False, настоящие Move/PST/Index запрещены.
+
+~~~powershell
+.\Invoke-ARCH3x.ps1 -Mode Plan -RunId '093b5ce9-4a90-46fa-b6a5-7cdba61d2f15' | Format-List
+$fake = .\Invoke-ARCH3x.ps1 -Mode Synthetic -Fault AfterInvocation -FaultAt 4
+.\Invoke-ARCH3x.ps1 -Mode Inspect -Workspace $fake.Workspace | Format-List
+~~~
 
 ### ARCH3w1 — original ARCH3q/ARCH3r + живой original ArchiveVerifier Part2 вместо бинарного SHA (без Move)
 
