@@ -1,3 +1,10 @@
+## 2.6.5-ARCH3x1 DEV — 2026-11-20
+- New original real TEST-PST 10-item provider route with exact immutable original ARCH3v full witnesses and original ARCH3w1 sealed ten Intent. Requires external SHA and explicit one-time operator approval; no production Archive/Resume/Auto.
+- New original MailMover per-item protected Claim+Invocation/CreateNew/Flush(true) before exactly one real Outlook COM Move, then immutable Returned; 10-item prefix chained receipts, no replay after any writer-entry/claim/partial failure.
+- Audit pins full original ARCH3u/ARCH2b source, original ArchiveVerifier historical Part2 and Part1 byte SHA, shared index and unused Part3. Protected writer entry precedes original new Year2020 Part3 PST allocation; only original Get-OPAArchiveFolder.
+- Status forensic read-only, no Outlook contact; no original Journal Reconciled or shared DuplicateIndex write until independent real Outlook restart/verifier in separate ARCH3x2.
+- 24 new Pester tests; expected 4685 tests / 160 containers Windows PowerShell 5.1; project-only SHA256 DEV zip. Real Outlook not called by CI.
+
 ## 2.6.5-ARCH3x DEV — 2026-11-20
 - Ten synthetic-only original MailMover durable claim/provider/receipt stages with explicit OS TEMP scope and no real COM.
 - Fixed published Invoke-ARCH3w1.ps1 module loader path to real ARCH3w1SemanticPart2Intents.ps1; added runtime regression.
