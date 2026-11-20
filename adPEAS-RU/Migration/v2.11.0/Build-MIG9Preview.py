@@ -54,6 +54,34 @@ def patch_js(root,proof):
            "? '<span>&#9660;</span> Свернуть всё'","expand button state")
     s=once(s,": '<span>&#9654;</span> Expand All'",
            ": '<span>&#9654;</span> Развернуть всё'","collapse button state")
+    # A separate display formatter translates the known reasons without modifying
+    # any input to the scoring algorithm or the underlying score breakdown.
+    reason_helper="""function translateMIG9ScoreReason(raw) {
+            const names = {
+                'Standard': 'Обычные условия',
+                'Maximum (DCSync)': 'Максимальный риск (DCSync)',
+                'Tier 0 (Domain Admin)': 'Tier 0 (администратор домена)',
+                'Tier 1 (Server Admin)': 'Tier 1 (администратор сервера)',
+                'Tier 2 (Workstation Admin)': 'Tier 2 (администратор рабочей станции)',
+                'Non-Admin': 'Без административных прав',
+                'RC4 encryption': 'Шифрование RC4',
+                'Easier to exploit': 'Выше возможность эксплуатации',
+                'Harder to exploit': 'Ниже возможность эксплуатации',
+                'Disabled': 'Учётная запись отключена',
+                'Smartcard required': 'Требуется смарт-карта',
+                'Protected Users': 'Группа Protected Users',
+                'Mitigated': 'Риск снижен',
+                'Vulnerable': 'Уязвимо',
+                'Appears in multiple findings': 'Упоминается в нескольких находках'
+            };
+            const passwordAge = typeof raw === 'string' && raw.match(/^Old password \((\d+)y\)$/);
+            if (passwordAge) return 'Давно не менялся пароль (' + passwordAge[1] + ' г.)';
+            return names[raw] || raw;
+        }
+
+        """
+    s=once(s,"function formatScoreBreakdownHtml(breakdown) {",
+           reason_helper+"function formatScoreBreakdownHtml(breakdown) {","display-only reason translator")
     # Risk labels only, leaving unmodified the numeric score and source reason values.
     start=s.index("function formatScoreBreakdownHtml(")
     end=s.index("        // Active score tooltip reference",start)
@@ -69,8 +97,16 @@ def patch_js(root,proof):
     old=">Score Breakdown<"
     if segment.count(old)!=2:raise ValueError("MIG9 two score headers expected")
     segment=segment.replace(old,">Состав оценки риска<")
+    for original,localized in (
+        ("escapeHtml(breakdown.impactReason)","escapeHtml(translateMIG9ScoreReason(breakdown.impactReason))"),
+        ("breakdown.exploitReasons.join(', ')","breakdown.exploitReasons.map(translateMIG9ScoreReason).join(', ')"),
+        ("breakdown.securityReasons.join(', ')","breakdown.securityReasons.map(translateMIG9ScoreReason).join(', ')"),
+        ("escapeHtml(breakdown.correlationReason)","escapeHtml(translateMIG9ScoreReason(breakdown.correlationReason))")
+    ):
+        segment=once(segment,original,localized,"score reason rendering")
     s=s[:start]+segment+s[end:]
     proof["ScoreLabels"]=8
+    proof["ScoreReasonSourceTypes"]=16
     # Guide: exact translations of every displayed English paragraph and control label.
     guide=json.loads(read(HERE/"MIG9-ReportGuide.ru-RU.json"))["Translations"]
     backtick=chr(96)
