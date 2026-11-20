@@ -61,7 +61,7 @@ function Get-OPA265ARCH3w1HistoricalPart2Digest {
        [string]$Chain.OriginalIntent.OriginalContractSha256,
        [string]$Chain.Claim.DestinationStoreId,
        [string]$Chain.Claim.DestinationFolderEntryId,
-       [string]$Part2,'2020\\Входящие'
+       [string]$Part2,'2020\Входящие'
     ))
 }
 
@@ -76,7 +76,21 @@ function Get-OPA265ARCH3w1HistoricalEvidence {
        [int]$checkpoint.OriginalSharedIndexEntryCount -ne 501){
         throw 'ARCH3w1 historical post-restart original verifier / 501 index proof not valid.'
     }
-    $chain=Get-OPA265ARCH3pClaimChain -RunId $pins.RunId -IntentSha256 $pins.IntentSha256 -JournalSha256 $pins.JournalSha256
+    # ARCH3p's precommit reader accepts only an Intent-only journal.
+    # A Reconciled 501-index historical pilot must use ORIGINAL postcommit
+    # ARCH3q state and its exact immutable per-stage SHA-provenance instead.
+    $state=Get-OPA265ARCH3qState -RunId $pins.RunId -IntentSha256 $pins.IntentSha256 -JournalSha256 $pins.JournalSha256
+    if([string]$state.JournalPhase -cne 'Reconciled' -or
+       [int]$state.IndexCount -ne 501 -or -not [bool]$state.SealExists){
+        throw 'ARCH3w1 original Part2 real pilot must be journal Reconciled and indexed 501.'
+    }
+    $stages=Get-OPA265ARCH3qPinnedStages -State $state
+    $chain=[pscustomobject]@{
+        Claim=$stages.Claim
+        DestinationReady=$stages.Ready
+        OriginalIntent=$state.Intent
+        Sealed=$stages.Sealed
+    }
     $digest=Get-OPA265ARCH3w1HistoricalPart2Digest -Chain $chain -Checkpoint $checkpoint -Part2 $Part2
     return [pscustomobject]@{Chain=$chain;Checkpoint=$checkpoint;SemanticSha256=$digest}
 }
@@ -97,7 +111,7 @@ function Assert-OPA265ARCH3w1Part2SingleMailTree {
             $seen++
             if($seen -gt 128){throw 'ARCH3w1 original Part2 folder tree exceeded strict bound.'}
             $path=[string]$folder.FolderPath
-            $isTarget=$path.EndsWith('\\2020\\Входящие',[StringComparison]::OrdinalIgnoreCase)
+            $isTarget=$path.EndsWith('\2020\Входящие',[StringComparison]::OrdinalIgnoreCase)
             $items=$folder.Items
             $count=[int]$items.Count
             if($count -lt 0 -or $count -gt 100000){throw 'ARCH3w1 archive folder count invalid.'}
@@ -154,7 +168,7 @@ function Test-OPA265ARCH3w1LiveOriginalPart2 {
         }
         $root=$archive.GetRootFolder()
         [void](Assert-OPA265ARCH3w1Part2SingleMailTree -Root $root)
-        $folder=Get-OPAFolderByPath -Root $root -RelativePath '2020\\Входящие'
+        $folder=Get-OPAFolderByPath -Root $root -RelativePath '2020\Входящие'
         if($null -eq $folder -or
            [string]$folder.StoreID -cne [string]$archive.StoreID -or
            [string]$folder.EntryID -cne [string]$claim.DestinationFolderEntryId -or
