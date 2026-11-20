@@ -1318,6 +1318,13 @@ function Invoke-OPA265ARCH3x1OneOriginalMailMoverProviderCall {
     [void](Assert-OPA265ARCH2c2PrivateWorkspaceAcl -WorkspacePath $root)
     $writerPath=Join-Path $root 'writer-entry.json'
     if(-not [IO.File]::Exists($writerPath)){throw 'ARCH3x1 writer entry missing, no provider invocation.'}
+    $claimPath=Join-Path $root (('{0:00}' -f $Ordinal)+'-claim.json')
+    foreach($p in @($writerPath,$claimPath)){
+        if(-not [IO.File]::Exists($p) -or
+           (([IO.File]::GetAttributes($p) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
+            throw 'ARCH3x1 original provider protected claim/writer file is missing or redirected.'
+        }
+    }
     $writerSha=(Get-FileHash -LiteralPath $writerPath -Algorithm SHA256).Hash.ToLowerInvariant()
     $writer=Read-OPA265ARCH3cPinnedJson -Path $writerPath -ExpectedSha256 $writerSha
     $prefix=('{0:00}' -f $Ordinal)
@@ -1395,9 +1402,10 @@ function Invoke-OPA265ARCH3x1OneOriginalMailMoverProviderCall {
             AutomaticRetryAllowed=$false;ProductionReady=$false
         }
     }finally{
-        if($null -ne $parent -and $parent -is [__ComObject]){
-            [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($parent)
-        }
+        # Parent is also held by the caller's per-item scope. Never
+        # FinalRelease its shared RCW here; the caller owns that lifetime.
+        # A double FinalRelease after a successful Move would raise a false
+        # indeterminate exception and stop the remaining original batch.
         if($null -ne $moved -and $moved -is [__ComObject]){
             [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($moved)
         }
