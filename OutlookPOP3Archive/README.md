@@ -1,6 +1,14 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (текущий DEV-этап 2.6.5-ARCH3x)
 
 
+### ARCH3x1 — ограниченный однократный реальный TEST-PST batch-10 через ORIGINAL MailMover
+
+Использует десять immutable ARCH3v/ARCH3w1 оригинальных полных SHA и десять Intent; отдельный исходный живой Audit только для чтения возвращает PreflightDigest. После явного -ConfirmTenRealMoves оригинальный MailMover записывает per-item durable claim + ProviderInvocation до ровно одного COM Move, без автоматического повтора. После 10 MoveReturned **Reconciled и shared DuplicateIndex НЕ записываются до отдельного независимого Outlook restart + оригинального ArchiveVerifier**. При любом частичном результате сохранять evidence, не повторять Move. 24 новые Pester; [полный синтаксис и runbook](docs/2.6.5-arch3x1-real-ten-original-mailmover.md). ProductionReady=False.
+
+~~~powershell
+.\Invoke-ARCH3x1.ps1 -Mode Status -RunId '093b5ce9-4a90-46fa-b6a5-7cdba61d2f15' | Format-List
+~~~
+
 ### ARCH3x — десять fake-only original MailMover provider fences, без реального Move
 
 Внутри оригинального MailMover добавлен только синтетический 10-item claim/provider boundary с CreateNew/Flush(true), SHA-цепочкой и остановкой на четырёх аварийных окнах. Исправлен путь dot-source в CLI ARCH3w1 на существующий исходный модуль. Испытания ARCH3s–ARCH3v повторять не нужно. Full interface: [ARCH3x runbook](docs/2.6.5-arch3x-original-ten-provider-fence.md). WriterPermit=False и ProductionReady=False, настоящие Move/PST/Index запрещены.
