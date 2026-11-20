@@ -1289,3 +1289,117 @@ function Invoke-OPA265ARCH3xFakeOnlyOriginalProviderCall {
         AutomaticRetryAllowed=$false;ProductionReady=$false
     }
 }
+
+
+# ARCH3x1: exactly ten individually pinned REAL TEST-PST provider operations.
+# A separate, immutable ARCH3w1 prepared ten-Intent journal is REQUIRED.
+# This helper is invoked only AFTER the caller durably writes one claim.
+# Each provider-invocation record is CreateNew + Flush(true) BEFORE COM Move.
+# Never use this route from the production Archive/Resume/Auto dispatcher.
+function Invoke-OPA265ARCH3x1OneOriginalMailMoverProviderCall {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][object]$Mail,
+        [Parameter(Mandatory=$true)][object]$Folder,
+        [Parameter(Mandatory=$true)][string]$RunId,
+        [Parameter(Mandatory=$true)][ValidateRange(1,10)][int]$Ordinal,
+        [Parameter(Mandatory=$true)][string]$ClaimSha256
+    )
+    if($RunId -cne '093b5ce9-4a90-46fa-b6a5-7cdba61d2f15' -or
+       $ClaimSha256 -cnotmatch '^[a-f0-9]{64}$' -or
+       $Mail -isnot [__ComObject] -or $Folder -isnot [__ComObject]){
+        throw 'ARCH3x1 original real provider requires pinned operator RunId, SHA and actual Outlook COM.'
+    }
+    $root=Join-Path $env:LOCALAPPDATA ('OPA265-ARCH3x1-'+$RunId)
+    if(-not [IO.Directory]::Exists($root) -or
+       (([IO.File]::GetAttributes($root) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
+        throw 'ARCH3x1 protected one-shot provider workspace missing/redirected.'
+    }
+    [void](Assert-OPA265ARCH2c2PrivateWorkspaceAcl -WorkspacePath $root)
+    $writerPath=Join-Path $root 'writer-entry.json'
+    if(-not [IO.File]::Exists($writerPath)){throw 'ARCH3x1 writer entry missing, no provider invocation.'}
+    $writerSha=(Get-FileHash -LiteralPath $writerPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $writer=Read-OPA265ARCH3cPinnedJson -Path $writerPath -ExpectedSha256 $writerSha
+    $prefix=('{0:00}' -f $Ordinal)
+    $claim=Read-OPA265ARCH3cPinnedJson -Path (Join-Path $root ($prefix+'-claim.json')) -ExpectedSha256 $ClaimSha256
+    if([string]$writer.Schema -cne '2.6.5-ARCH3x1.RealTenWriterEntry.1' -or
+       [string]$writer.RunId -cne $RunId -or
+       [string]$writer.PreparedManifestSha256 -cnotmatch '^[a-f0-9]{64}$' -or
+       [string]$writer.PreparedJournalSha256 -cnotmatch '^[a-f0-9]{64}$' -or
+       [string]$writer.SourceStoreIdSha256 -cnotmatch '^[a-f0-9]{64}$' -or
+       [string]$claim.Schema -cne '2.6.5-ARCH3x1.RealTenMoveClaim.1' -or
+       [string]$claim.RunId -cne $RunId -or
+       [int]$claim.Ordinal -ne $Ordinal -or
+       [string]$claim.WriterEntrySha256 -cne $writerSha -or
+       [string]$claim.PreparedManifestSha256 -cne [string]$writer.PreparedManifestSha256 -or
+       [string]$claim.PreparedJournalSha256 -cne [string]$writer.PreparedJournalSha256 -or
+       [string]$claim.SourceStoreIdSha256 -cne [string]$writer.SourceStoreIdSha256 -or
+       [string]$claim.SourceEntryId -cne [string]$Mail.EntryID -or
+       [int]$Mail.Class -ne 43 -or
+       [string]$claim.TargetPst -cne [string]$writer.TargetPst -or
+       [string]$claim.DestinationStoreId -cne [string]$Folder.StoreID -or
+       [string]$claim.DestinationFolderEntryId -cne [string]$Folder.EntryID -or
+       -not ([string]$Folder.FolderPath).EndsWith('\2020\Входящие',[StringComparison]::OrdinalIgnoreCase) -or
+       [string]$claim.FullOriginalWitnessSha256 -cnotmatch '^[a-f0-9]{64}$' -or
+       -not [bool]$claim.OperatorApprovedTenRealMoves -or
+       [bool]$claim.AutomaticRetryAllowed -or [bool]$claim.ProductionReady){
+        throw 'ARCH3x1 real original MailMover source/destination/claim not pinned.'
+    }
+    $preparedLayout=Get-OPA265ARCH3w1Layout -RunId $RunId
+    $prepared=Read-OPA265ARCH3cPinnedJson -Path ([string]$preparedLayout.ManifestPath) -ExpectedSha256 ([string]$writer.PreparedManifestSha256)
+    $row=$prepared.Rows[$Ordinal-1]
+    if([string]$prepared.RunId -cne $RunId -or
+       [int]$prepared.BatchSize -ne 10 -or
+       [string]$prepared.TargetPstPreview -cne [string]$writer.TargetPst -or
+       [int]$row.Ordinal -ne $Ordinal -or
+       [string]$row.SourceEntryId -cne [string]$claim.SourceEntryId -or
+       [string]$row.FullOriginalWitnessSha256 -cne [string]$claim.FullOriginalWitnessSha256 -or
+       [string]$row.OriginalOperationId -cne [string]$claim.OriginalOperationId -or
+       [string]$row.OriginalContractSha256 -cne [string]$claim.OriginalContractSha256){
+        throw 'ARCH3x1 original provider does not match immutable ARCH3w1 ten Intent manifest.'
+    }
+    $parent=$null;$moved=$null
+    try{
+        $parent=$Mail.Parent
+        if($null -eq $parent -or
+           [string]$parent.EntryID -cne [string]$writer.SourceFolderEntryId -or
+           (Get-OPA265ARCH2bTextSha256 -Text ([string]$parent.StoreID)) -cne [string]$writer.SourceStoreIdSha256 -or
+           [string]$parent.FolderPath -cne '\\info@stios.ru\Входящие'){
+            throw 'ARCH3x1 original provider source parent drift before COM.'
+        }
+        $invocation=[pscustomobject][ordered]@{
+            Schema='2.6.5-ARCH3x1.RealTenProviderInvocation.1'
+            RunId=$RunId;Ordinal=$Ordinal
+            ClaimSha256=$ClaimSha256
+            WriterEntrySha256=$writerSha
+            SourceEntryId=[string]$claim.SourceEntryId
+            DestinationFolderEntryId=[string]$Folder.EntryID
+            DestinationStoreId=[string]$Folder.StoreID
+            TargetPst=[string]$writer.TargetPst
+            OneProviderCallOnly=$true
+            AutomaticRetryAllowed=$false;ProductionReady=$false
+        }
+        $invocationSha=Write-OPA265ARCH3cJsonOnce -Path (Join-Path $root ($prefix+'-invocation.json')) -Record $invocation
+        # No COM retry or catch-and-continue: throws have UNKNOWN outcome.
+        $moved=$Mail.Move($Folder)
+        if($null -eq $moved -or [int]$moved.Class -ne 43 -or
+           [string]$moved.EntryID -cnotmatch '^[a-fA-F0-9]{16,1024}$'){
+            throw 'ARCH3x1 actual COM Move result indeterminate. NEVER RETRY.'
+        }
+        return [pscustomobject][ordered]@{
+            Schema='2.6.5-ARCH3x1.RealOriginalProviderReturned.1'
+            RunId=$RunId;Ordinal=$Ordinal
+            DestinationEntryId=[string]$moved.EntryID
+            ProviderInvocationSha256=$invocationSha
+            OneMoveReturned=$true;IndependentPostRestartVerified=$false
+            AutomaticRetryAllowed=$false;ProductionReady=$false
+        }
+    }finally{
+        if($null -ne $parent -and $parent -is [__ComObject]){
+            [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($parent)
+        }
+        if($null -ne $moved -and $moved -is [__ComObject]){
+            [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($moved)
+        }
+    }
+}
