@@ -1,0 +1,138 @@
+{
+  "Schema": "adPEAS-RU.2.11.0.MIG6.ReportLinesAndStatus.1",
+  "Source": "Observed real MIG5 HTML; generic renderer-only strings. No domain-specific objects or results committed.",
+  "OriginalCommit": "477696f48d6b486be5d9a99b598f72e3ccfcc0c0",
+  "Exact": {
+    "No user object carries roamed credential material": "Ни один объект пользователя не содержит перемещаемых учётных данных.",
+    "OPSEC mode: Skipping password-in-description check (would check all users and computers)": "Режим OPSEC: проверка паролей в текстовых атрибутах пропущена (требовалось бы перечисление всех пользователей и компьютеров).",
+    "No kerberoastable accounts found": "Учётные записи, допускающие Kerberoasting, не обнаружены.",
+    "Who can add computers to the domain:": "Субъекты, которым разрешено добавлять компьютеры в домен:",
+    "No policy denies Domain Admins the local or Remote Desktop logon on member computers": "Не обнаружено политик, запрещающих группе Domain Admins локальный вход или вход через удалённый рабочий стол на рядовые компьютеры.",
+    "No policy denies local administrator accounts the network logon on member computers": "Не обнаружено политик, запрещающих локальным администраторам сетевой вход на рядовые компьютеры.",
+    "OPSEC mode: Skipping LAPS configuration check (would query every computer and walk SYSVOL)": "Режим OPSEC: проверка конфигурации LAPS пропущена (требовался бы опрос всех компьютеров и обход SYSVOL).",
+    "OPSEC mode: Skipping outdated computer check (would check all enabled computers)": "Режим OPSEC: проверка устаревших компьютеров пропущена (требовался бы опрос всех включённых компьютеров).",
+    "No enabled computer account still carries the password it was created with": "Ни одна включённая учётная запись компьютера не использует пароль, заданный при её создании."
+  },
+  "Patterns": [
+    {
+      "pattern": "^No non-privileged principal holds a delegated read of the BitLocker recovery passwords, but (\\d+) privileged one\\(s\\) hold a right on them - use -IncludePrivileged to see them$",
+      "ru": "Непривилегированные субъекты не имеют делегированного права чтения паролей восстановления BitLocker; привилегированных субъектов с таким правом: $1. Для просмотра используйте -IncludePrivileged."
+    },
+    {
+      "pattern": "^This account can read (\\d+) deleted object\\(s\\) - as a member of Administrators$",
+      "ru": "Текущая учётная запись может читать удалённые объекты ($1), поскольку входит в группу Administrators."
+    },
+    {
+      "pattern": "^None of the (\\d+) deleted object\\(s\\) holds a credential in a free-text or password attribute$",
+      "ru": "Ни один из $1 удалённых объектов не содержит учётных данных в текстовых или парольных атрибутах."
+    },
+    {
+      "pattern": "^(\\d+) further user right assignment\\(s\\) from (\\d+) polic(?:y|ies) are not on the list of this check - not judged$",
+      "ru": "Дополнительных назначений прав: $1 (политик: $2). Они не входят в область данной проверки и не оценивались."
+    },
+    {
+      "pattern": "^No principal beyond the expected ones can change the (\\d+) privileged group\\(s\\) AdminSDHolder does not protect - (\\d+) expected or privileged holder\\(s\\) hidden, use -IncludePrivileged to see them$",
+      "ru": "Посторонние субъекты не могут изменять $1 привилегированных групп вне защиты AdminSDHolder; скрыто ожидаемых или привилегированных субъектов: $2. Для просмотра используйте -IncludePrivileged."
+    },
+    {
+      "pattern": "^No principal beyond the expected ones can take over the (\\d+) privileged account\\(s\\) read - (\\d+) expected or privileged holder\\(s\\) hidden, use -IncludePrivileged to see them$",
+      "ru": "Посторонние субъекты не могут захватить $1 проверенных привилегированных учётных записей; скрыто ожидаемых или привилегированных субъектов: $2. Для просмотра используйте -IncludePrivileged."
+    },
+    {
+      "pattern": "^(\\d+) further registry value\\(s\\) from (\\d+) polic(?:y|ies) are not on the list of this check - not judged$",
+      "ru": "Дополнительных параметров реестра: $1 (политик: $2). Они не входят в область данной проверки и не оценивались."
+    },
+    {
+      "pattern": "^Обнаружены настройки LDAP security configuration в групповых политиках: (\\d+)$",
+      "ru": "В групповых политиках обнаружены параметры безопасности LDAP: $1."
+    },
+    {
+      "pattern": "^Обнаружены настройки null session configuration в групповых политиках: (\\d+)$",
+      "ru": "В групповых политиках обнаружены параметры анонимных сеансов: $1."
+    },
+    {
+      "pattern": "^Группа Account Operators \\(no members\\) по умолчанию имеет права управления: all (\\d+) группами, не защищёнными AdminSDHolder$",
+      "ru": "Группа Account Operators (без участников) по умолчанию имеет права управления всеми $1 группами вне защиты AdminSDHolder."
+    }
+  ],
+  "Statuses": {
+    "Enabled": "Включено",
+    "Disabled": "Отключено",
+    "Restricted": "Ограничено",
+    "Not Configured": "Не настроено",
+    "Not configured": "Не настроено",
+    "Not set": "Не задано",
+    "Optional": "Необязательно",
+    "Required": "Обязательно",
+    "Refused": "Отклонено",
+    "Checked": "Проверяется",
+    "None": "Отсутствует",
+    "Never": "Никогда"
+  },
+  "AttributePatterns": [
+    {
+      "pattern": "^(\\d+) characters$",
+      "ru": "$1 символов"
+    },
+    {
+      "pattern": "^(\\d+) passwords remembered$",
+      "ru": "Сохранено предыдущих паролей: $1"
+    },
+    {
+      "pattern": "^(\\d+) hours \\(default\\)$",
+      "ru": "$1 ч (по умолчанию)"
+    },
+    {
+      "pattern": "^(\\d+) days \\(default\\)$",
+      "ru": "$1 дн. (по умолчанию)"
+    },
+    {
+      "pattern": "^(\\d+) minutes \\(default\\)$",
+      "ru": "$1 мин (по умолчанию)"
+    },
+    {
+      "pattern": "^(\\d+) days$",
+      "ru": "$1 дн."
+    },
+    {
+      "pattern": "^(\\d+) minutes$",
+      "ru": "$1 мин"
+    },
+    {
+      "pattern": "^(\\d+) days \\(last changed: (\\d{4}-\\d{2}-\\d{2})\\)$",
+      "ru": "$1 дн. (последнее изменение: $2)"
+    },
+    {
+      "pattern": "^Not required \\(Windows default before Server 2025\\)$",
+      "ru": "Не требуется (стандартное поведение Windows до Server 2025)"
+    },
+    {
+      "pattern": "^Yes - in force on the domain controllers: (.+)$",
+      "ru": "Да — действует на контроллерах домена: $1"
+    },
+    {
+      "pattern": "^None \\(signing is set on the DC OU only\\)$",
+      "ru": "Отсутствует (подпись настроена только для OU контроллеров домена)"
+    }
+  ],
+  "RenderRestrictions": {
+    "Scope": "HTML presentation only, not AD data or PowerShell original findings",
+    "DoNotTranslate": [
+      "LDAP attribute identifiers",
+      "SID",
+      "GUID",
+      "distinguishedName",
+      "data-attr-name",
+      "finding IDs",
+      "original logs",
+      "raw value",
+      "passwords",
+      "hashes",
+      "computer names",
+      "Domain naming",
+      "remediation commands",
+      "embedded legal disclaimer"
+    ],
+    "Proof": "Synthetic examples, no domain fields; compare 408 finding definitions original canonical"
+  }
+}
