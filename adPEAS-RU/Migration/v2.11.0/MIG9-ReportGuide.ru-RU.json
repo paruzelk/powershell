@@ -17,9 +17,9 @@
     "Security vulnerability or misconfiguration requiring immediate attention.": "Уязвимость или небезопасная настройка, требующая внимания.",
     "Hint (Yellow)": "Предупреждение (жёлтый)",
     "Potentially interesting finding that may warrant investigation.": "Потенциально значимое наблюдение, которое может потребовать проверки.",
-    "Note (Blue)": "Сведения (синий)",
+    "Note (Blue)": "Сведения (зелёный)",
     "Informational finding providing context or general information.": "Информационный результат, дополняющий контекст проверки.",
-    "Secure (Green)": "Безопасно (зелёный)",
+    "Secure (Green)": "Безопасно (синий)",
     "Security configuration is properly set - no action needed.": "Настройка безопасности выполнена корректно; действий не требуется.",
     "Interactive Features": "Интерактивные возможности",
     "? Help Buttons": "Кнопки справки (?)",
@@ -49,5 +49,6 @@
     "Hide completed toggle state": "Состояние переключателя скрытия выполненных",
     "Data is stored only in this browser and is not sent anywhere. Each report has its own completion tracking.": "Данные хранятся только в этом браузере и никуда не отправляются. Для каждого отчёта отметки выполнения учитываются отдельно.",
     "Clear All Stored Data": "Очистить все сохранённые данные"
-  }
+  },
+  "Note": "Названия цветов в русском интерфейсе соответствуют фактической схеме 2.11.0: note green, secure blue."
 }
