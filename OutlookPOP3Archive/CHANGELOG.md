@@ -1,3 +1,10 @@
+## 2.6.5-ARCH3x DEV — 2026-11-20
+- Ten synthetic-only original MailMover durable claim/provider/receipt stages with explicit OS TEMP scope and no real COM.
+- Fixed published Invoke-ARCH3w1.ps1 module loader path to real ARCH3w1SemanticPart2Intents.ps1; added runtime regression.
+- Four synthetic fault windows with no replay; original ARCH3w1 ten sealed Intent readback remains unchanged.
+- 15 new Pester tests; expected 4661 in 159 containers Windows PowerShell 5.1, project-only SHA256 ZIP.
+- Production Archive/Resume/Auto and real batch-10 remain closed (WriterPermit=False).
+
 ## 2.6.5-ARCH3w1 DEV — 2026-11-20
 - Operator ARCH3w real Plan/Audit/WhatIf PASS, but Prepare FAIL CLOSED before any evidence: original 2020 Part2 binary SHA changed 43cbb392... to 468f2ef0... with exactly same 525312 bytes; original Part1 SHA and size unchanged; ARCH3w evidence folder absent. No original MailMover call.
 - ARCH3w1 introduces distinct evidence root and stage digest, preserving ARCH3w and immutable ARCH3v baseline. Original Part1 binary SHA strict 8bc491f7... and 271360 bytes; Part2 exact 525312 bytes but SHA used in digest is semantic proof (not raw PST hash), from immutable original ARCH3q postcommit Reconciled, original ARCH3r 501 index and full original ARCH3i witness, matched independently by a new ORIGINAL live ArchiveVerifier and ARCH2b full Body/HTML/attachment SHA on the sole archived Part2 MailItem. Do not use original ARCH3p precommit Intent-only forensic reader after journal is Reconciled.
