@@ -28,7 +28,14 @@ def psquote(value):
 
 def make_table(values, name, indent="    "):
     entries = [indent + "$" + name + " = @{"]
+    folded = {}
     for en, ru in values.items():
+        key = en.casefold()
+        if key in folded:
+            if folded[key] != ru:
+                raise ValueError("Conflicting case-insensitive translation " + en)
+            continue
+        folded[key] = ru
         entries.append(indent + "    " + psquote(en) + " = " + psquote(ru))
     entries.append(indent + "}")
     return "\n".join(entries)
