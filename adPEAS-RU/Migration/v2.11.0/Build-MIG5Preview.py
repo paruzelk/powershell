@@ -33,7 +33,7 @@ def ps_table(values):
     return "\n".join(lines)
 
 def section_function(d):
-    return """# MIG5: translate only visual section titles. Numbering is preserved.
+    return r"""# MIG5: translate only visual section titles. Numbering is preserved.
 function ConvertTo-RuReportSectionTitle {
     param([string]$Title)
 """ + ps_table(d["SectionTitles"]) + """
@@ -50,7 +50,7 @@ function ConvertTo-RuReportSectionTitle {
 """
 
 def object_function(d):
-    return """# MIG5: translate only a renderer-produced label, never the object name.
+    return r"""# MIG5: translate only a renderer-produced label, never the object name.
 function ConvertTo-RuReportObjectTitle {
     param([string]$Title)
 """ + ps_table(d["ObjectCardExact"]) + """
@@ -167,9 +167,12 @@ def test_candidate(candidate, report):
         raise ValueError("Unrecognized runtime localization helper")
     if "function ConvertTo-CategorySlug" not in source:
         raise ValueError("Category slug function unexpectedly missing")
-    for r in report:
-        if report[r] is False:
-            raise ValueError("MIG5 report gate " + r)
+    required_positive = ("ReportSourceLabelsLocalized", "LastPureEnglishCheckLineTranslated")
+    for key in required_positive:
+        if report.get(key) is not True:
+            raise ValueError("MIG5 report translation gate " + key)
+    if report.get("RealADTestPerformed") is not False or report.get("ProductionReady") is not False:
+        raise ValueError("MIG5 preview safety status drift")
 
 def main():
     ap = argparse.ArgumentParser()
