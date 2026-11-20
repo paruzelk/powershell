@@ -341,7 +341,7 @@ function Get-OPA265ARCH3w1PrepareDigest {
                         [string]$a.OriginalWitnessSha256 -cne '8782b410253f54cc5374661077cdfc9279bcfba12805f0dab42b461320cb999c' -or
                         [string]$a.ArchiveEntryId -cne '00000000CB201CE90F11EB4AB6F01B5E5BEF7CED24002000' -or
                         [long]$a.LengthBytes -ne 525312)) -or
-           [int]$a.Part -ne $n -or [string]$a.Sha256 -cnotmatch '^[a-f0-9]{64}
+           [int]$a.Part -ne $n -or [string]$a.Sha256 -cnotmatch '^[a-f0-9]{64}$' -or
            [long]$a.LengthBytes -le 0){
             throw 'ARCH3w1 original 2020 archive part immutable SHA or length invalid.'
         }
