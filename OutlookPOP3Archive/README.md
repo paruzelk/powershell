@@ -1,6 +1,31 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1
 
 
+### ARCH3w — 10 REAL TEST-PST original OperationJournal Intent в защищённом LOCALAPPDATA (без Move)
+
+Оператор подтвердил реальный ARCH3v `Seal → independent Review`, десять полных исходных original ARCH2b semantic SHA, 12 вложений, `SealSha256=d071afb...`. ARCH3w повторно проверяет **все десять** исходных сообщений original ARCH3u + ARCH2b, SHA существующих частей `Archive-2020.pst` и `Archive-2020-02.pst`, неизменность общего `DuplicateIndex` и свободный `Archive-2020-03.pst`. Затем **только отдельно подтверждаемый** `Prepare` создаёт protected manifest + десять ORIGINAL `Write-OPAOperationJournalEvent -Phase Intent`; новый PST, общий индекс, COM Move и MoveClaimed остаются закрытыми. Повторять Prepare после любой частичной записи **запрещено**.
+
+```powershell
+$pin=@{
+ RunId='093b5ce9-4a90-46fa-b6a5-7cdba61d2f15'
+ SealSha256='d071afbff028d4cbadcea69318a6d68009242ac401cd2a91abf08b5ffe9f6799'
+ ExpectedAuditSha256='609e60e01082860ec8dfd936510243c812ba2c99b1403685a3d96c3718000a21'
+ ExpectedPreviewSha256='d9bc37c5f87aace732adb122d89488eb44111b7333ebf3b5d33c087766a42e57'
+ ExpectedOriginalIndexSha256='5ada35eb30f34ff60dc4b89f23aa071b72cc0b98e5ff57299d61f1714b13d7ae'
+}
+.\Invoke-ARCH3w.ps1 -Mode Plan @pin | Format-List
+$audit=.\Invoke-ARCH3w.ps1 -Mode Audit @pin
+$audit | Format-List
+.\Invoke-ARCH3w.ps1 -Mode Prepare @pin -ExpectedPrepareDigest $audit.PrepareDigest -ConfirmPrepareIntent -WhatIf | Format-List
+# Только после проверки Plan/Audit/WhatIf:
+$prepared=.\Invoke-ARCH3w.ps1 -Mode Prepare @pin -ExpectedPrepareDigest $audit.PrepareDigest -ConfirmPrepareIntent -Confirm:$false
+.\Invoke-ARCH3w.ps1 -Mode Review -RunId $pin.RunId -SealSha256 $pin.SealSha256 -ManifestSha256 $prepared.ManifestSha256 -JournalSha256 $prepared.JournalSha256 | Format-List
+```
+
+[Полный синтаксис ARCH3w, аварийные ограничения, параметры и исходные SHA](docs/2.6.5-arch3w-ten-original-intents.md). `ProductionReady=False`, `WriterPermit=False`, `MoveClaimed=False`, `Archive/Resume/Auto` запрещены.
+
+
+
 ### ARCH3v — полные оригинальные SHA256 для 10 РЕАЛЬНЫХ TEST-PST сообщений без Move (DEV)
 
 После успешного ARCH3u `Plan/Inventory`: **точно та же партия** 10 писем POP3 Inbox (2020), 12 вложений, исходный shared `DuplicateIndex` 501, `Archive-2020-03.pst` только preview. ARCH3v повторяет ARCH3u и использует ORIGINAL `Get-OPA265ARCH2bMailSemanticWitness` для Body/HTML/recipients/state и реального `SaveAsFile` attachment byte SHA; отдельная защищённая запись *только evidence* возможна после внешнего `AuditSha256`. Никакого `MailItem.Move`, new PST, OperationJournal или DuplicateIndex записи; `WriterPermit=False`, `ProductionReady=False`.
