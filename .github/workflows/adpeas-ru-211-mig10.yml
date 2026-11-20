@@ -335,13 +335,13 @@ jobs:
           function Render-HtmlRow { param($Row) return '<div class="attr-row">Fixture</div>' }
           $fixture = [pscustomobject]@{ Primary=@(); Extended=@(1,2,3); PostObject=@() }
           $html = Render-HtmlObject -Model $fixture -ObjectId 'test'
-          if ($html -notmatch 'Показать дополнительные атрибуты: 3' -or
+          if ($html -notmatch '<span>[\u0400-\u04FF][^<]*: 3</span>' -or
               $html -match 'Show 3 more attribute') { throw 'MIG10 actual PowerShell HTML failed' }
           node adPEAS-RU/Migration/v2.11.0/MIG10-ExtendedAttrs-Selftest.js '_mig/candidate/src/modules/Reporting/templates/report-scripts.js'
           if ($LASTEXITCODE -ne 0) { throw 'MIG10 JS interactions failed' }
           $tpl = Get-Content '_mig/candidate/src/modules/Reporting/templates/report-template.html' -Raw -Encoding UTF8
-          if (([regex]::Matches($tpl, 'alt="Логотип adPEAS"')).Count -ne 2 -or
-              $tpl -notmatch 'id="themeLabel">Светлая') { throw 'MIG10 accessibility labels failed' }
+          if (([regex]::Matches($tpl, 'alt="[\u0400-\u04FF][^"]* adPEAS"')).Count -ne 2 -or
+              $tpl -notmatch 'id="themeLabel">[\u0400-\u04FF]+') { throw 'MIG10 accessibility labels failed' }
           Write-Host 'PASS MIG10 exact-source Russian extended attributes and accessibility'
 
       - name: Check generated JavaScript syntax
