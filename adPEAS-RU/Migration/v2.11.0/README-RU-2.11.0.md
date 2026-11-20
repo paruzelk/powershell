@@ -1,6 +1,6 @@
-# adPEAS-RU 2.11.0 MIG6 — быстрый старт и все параметры
+# adPEAS-RU 2.11.0 MIG7 — быстрый старт и все параметры
 
-**MIG6 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
+**MIG7 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
 adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не входит.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
@@ -8,11 +8,11 @@ adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не �
 ~~~powershell
 cd 'C:\Tools\adPEAS-RU'
 Import-Module .\adPEAS.ps1 -Force
-Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG6' -Format All
+Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG7' -Format All
 Disconnect-adPEAS
 ~~~
 
-Создаются AD-Audit-MIG6.html, AD-Audit-MIG6.txt и AD-Audit-MIG6.json.
+Создаются AD-Audit-MIG7.html, AD-Audit-MIG7.txt и AD-Audit-MIG7.json.
 Outputfile принимает имя без расширения.
 
 **LDAPS с проверкой сертификата:**
@@ -135,7 +135,7 @@ Get-Command Invoke-adPEAS -Syntax
 Get-Help Invoke-adPEAS -Full
 Get-Command Connect-adPEAS -Syntax
 Get-adPEASSession -TestConnection
-Convert-adPEASReport -InputJson '.\AD-Audit-MIG6.json' -OutputPath '.\recreated' -Format HTML
+Convert-adPEASReport -InputJson '.\AD-Audit-MIG7.json' -OutputPath '.\recreated' -Format HTML
 ~~~
 
 **Статус:** миграция текстов DOC6j через сравнение оригинальных
@@ -163,3 +163,11 @@ LDAP-атрибуты, команды исправления и JSON-поля н
 Изменения ограничены `Export-HTMLReport.ps1` и текстовым отображением `Render-HtmlObject.ps1`: исходные объекты, значения в модели, результат JSON и логика аудита не изменяются. Встроенные имена схемы AD, SID, GUID, доменные имена, команды исправления и правовые уведомления сохраняются без изменений.
 
 **Статус:** Preview. Исходный отчёт пользователя не сохранялся в GitHub; сохранены только обобщённые строки интерфейса и синтетические примеры без данных домена.
+
+## Что изменено в MIG7
+
+На основании реального отчёта MIG6 выполнена инвентаризация **106 уникальных подписей** атрибутов в 677 строках. При экспорте HTML подписи становятся русскими с сохранением исходных имён атрибутов в скобках. Идентификаторы `data-attr-name` и значения модели не меняются; HTML по-прежнему пригоден для анализа администратором.
+
+Добавлены строго контекстные переводы: 9 конкретных значений и 7 шаблонов для статуса активности, настроек GPO, прав добавления компьютеров, разрешённого времени входа, подсетей AD и расхождения времени контроллера домена. Имена реальных GPO, SID, DN, имена субъектов и технические права в выводе сохраняются без изменений.
+
+MIG7 остаётся Preview: CI использует закреплённый оригинал и синтетические данные, реальный AD-тест самой сборки выполняется отдельно.
