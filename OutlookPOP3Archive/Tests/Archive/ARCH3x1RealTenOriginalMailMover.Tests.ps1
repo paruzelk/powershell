@@ -58,6 +58,7 @@ Describe 'ARCH3x1 bounded original real ten provider Move, fail closed at every 
         $new=$s.Substring($start)
         $new | Should -Match '\$Mail -isnot \[__ComObject\]'
         $new.IndexOf('Write-OPA265ARCH3cJsonOnce -Path') | Should -BeLessThan $new.IndexOf('$moved=$Mail.Move($Folder)')
+        $new | Should -Not -Match 'FinalReleaseComObject\(\$parent\)'
     }
     It 'real provider refuses fake PSCustomObject before touching any operator evidence' {
         $fake=[pscustomobject]@{Class=43;EntryID='00000000DEADBEEFDEADBEEF'}
@@ -94,6 +95,8 @@ Describe 'ARCH3x1 bounded original real ten provider Move, fail closed at every 
         Mock Assert-OPA265ARCH2c2PrivateWorkspaceAcl {$true}
         $l=[pscustomobject]@{RunId=$script:run;Root=$folder;WriterEntryPath=(Join-Path $folder 'writer-entry.json')}
         {Get-OPA265ARCH3x1ReadOnlyStatus -Layout $l} | Should -Throw
+        $source=Get-Content -LiteralPath (Join-Path $script:root 'Core/Archive/ARCH3x1RealTenOriginalMailMover.ps1') -Raw -Encoding UTF8
+        $source | Should -Match '\[IO.FileAttributes\]::ReparsePoint'
     }
     It 'Status rejects directory present without a protected writer entry' {
         $folder=Join-Path $TestDrive 'empty-root'
