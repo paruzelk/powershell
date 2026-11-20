@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3v DEV: exact operator ARCH3u 10 original real TEST-PST Inbox letters pinned to RunId/PreviewSha/StoreSha/IndexSha/source PST size, original ARCH2b full Body HTML recipients user-state actual TEMP SaveAsFile attachment byte SHA, original per-mail ARCH3d witness SHA and canonical ten AuditSha; Audit zero persistent writes, one-shot externally approved Seal to protected original ARCH3i ACL + ARCH3c CreateNew Flush and SHA independent readback. No PST/Move/Journal/Index writer, no retry. 30 Pester, expected 4599 tests/156 containers PS5.1; production closed.",
     "ARCH3u DEV: READ ONLY original real TEST POP3 PST ten-message Inbox preflight using original ARCH2d scope, original selector, strict original shared index JSONL and importer, existing Year parts collision and original ARCH3b MailMover contracts for first unused annual part; exact source Inbox COM recheck; no full witness/intent/claim, no Move or PST writes. 18 Pester, expected 4569/155 full PS5.1; production closed.",
     "ARCH3t DEV: strict original synthetic OS TEMP index-only recovery from ten Reconciled / two indexed; pinned original journal and index SHA, raw JSONL duplicate/conflict/torn rejects, exact synthetic claim/provider SHA and original fake Outlook verifier recheck under exclusive lease, append only missing index entries, idempotent no-op, no COM/Move/PST. 15 new Pester; 4551/154 full PS5.1 expected; production closed.",
     "ARCH3s DEV: unmodified ORIGINAL Test-OPAArchiveMoves with ten fake Outlook MailItems, actual original ARCH2b semantic builder including private TEMP SaveAsFile attachment byte SHA, exact source absent/archive ten and stale-ID uniqueness; after PASS only original ARCH3r TEMP journal/index integration with crash faults. 23 new Pester; full expected 4536/153 Windows PS5.1. NO real Outlook batch or writer.",
@@ -99,8 +100,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 155,
-    "ExpectedPesterTests": 4569,
+    "ExpectedTestContainers": 156,
+    "ExpectedPesterTests": 4599,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
