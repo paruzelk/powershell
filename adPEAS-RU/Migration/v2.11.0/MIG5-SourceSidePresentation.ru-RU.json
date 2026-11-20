@@ -1,0 +1,70 @@
+{
+  "Schema": "adPEAS-RU.MIG5.SourceSidePresentation.1",
+  "UpstreamCommit": "477696f48d6b486be5d9a99b598f72e3ccfcc0c0",
+  "SectionTitles": {
+    "Analyzing Domain Configuration": "Анализ конфигурации домена",
+    "Analyzing Credential Exposure": "Проверка раскрытия учётных данных",
+    "Analyzing Access Permissions": "Анализ разрешений доступа",
+    "Analyzing Delegation Settings": "Анализ настроек делегирования",
+    "Analyzing Certificate Services": "Анализ служб сертификатов",
+    "Analyzing Privileged Accounts": "Проверка привилегированных учётных записей",
+    "Analyzing Group Policy Objects": "Анализ объектов групповой политики",
+    "Analyzing Computer Security": "Проверка безопасности компьютеров",
+    "Analyzing Application Infrastructure": "Анализ инфраструктуры приложений"
+  },
+  "SidebarCategories": {
+    "Accounts": "Учётные записи",
+    "ADCS": "AD CS",
+    "Application": "Приложения",
+    "Computer": "Компьютеры",
+    "Creds": "Учётные данные",
+    "Delegation": "Делегирование",
+    "Domain": "Домен",
+    "GPO": "Групповые политики",
+    "Rights": "Права"
+  },
+  "ObjectCardExact": {
+    "Kerberos Policy": "Политика Kerberos",
+    "Guest Account Status": "Состояние учётной записи «Гость»",
+    "Password Policy": "Политика паролей",
+    "Directory Service Heuristics": "Настройки службы каталогов (dsHeuristics)",
+    "In force on the domain controllers": "Действует на контроллерах домена",
+    "In force on member servers and clients": "Действует на рядовых серверах и клиентах",
+    "Machine Account Quota Configuration": "Настройка квоты создания компьютеров",
+    "Privileged Groups Outside AdminSDHolder": "Привилегированные группы вне защиты AdminSDHolder",
+    "Privileged Accounts Read": "Проверенные привилегированные учётные записи"
+  },
+  "ObjectCardPrefixes": {
+    "Domain: ": "Домен: ",
+    "Domain Controller: ": "Контроллер домена: ",
+    "Sites and Subnets: ": "Сайты и подсети: ",
+    "Null Session GPO: ": "GPO анонимного сеанса: ",
+    "Privileged Group Member: ": "Участник привилегированной группы: ",
+    "Tier-0 Account: ": "Учётная запись Tier 0: ",
+    "Password Never Expires: ": "Пароль без срока действия: ",
+    "MSSQL Server: ": "Сервер MSSQL: ",
+    "Network Subnet: ": "Сетевая подсеть: ",
+    "Operator Group: ": "Группа операторов: ",
+    "Add Computer Right: ": "Право добавления компьютера: ",
+    "SID History: ": "История SID: ",
+    "LAPS Config: ": "Конфигурация LAPS: "
+  },
+  "ObjectCardPatterns": {
+    "^Domain Controllers \\((\\d+)\\)$": "Контроллеры домена ($1)"
+  },
+  "SingleRemainingEnglishLine": {
+    "file": "src/modules/Checks/Creds/Get-DeletedObjectAccess.ps1",
+    "english": "The ACL of the deleted objects container is readable by administrators only - other readers not checked",
+    "russian": "ACL контейнера удалённых объектов доступен для чтения только администраторам; права остальных субъектов не проверялись."
+  },
+  "Preserve": [
+    "ObjectType",
+    "FindingId",
+    "data-category",
+    "PowerShell remediation commands",
+    "LDAP attribute names",
+    "SID",
+    "User-supplied object names",
+    "License disclaimer"
+  ]
+}
