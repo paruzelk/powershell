@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3x (20.11.2026):** [original MailMover fake-only batch-10 provider fence](2.6.5-arch3x-original-ten-provider-fence.md) подготовлен: original ARCH3c CreateNew/Flush(true) claim и invocation до synthetic Move, 10 returned только после fake provider, четыре аварийных окна, no replay. Read-only ReviewPrepared использует оригинальный ARCH3w1 ten Intent readback; исправлен ошибочный путь подключения CLI ARCH3w1. Отдельный реальный batch-10 с новым Outlook restart + full original verifier + original journal/index commit ещё не разрешён; production Archive/Resume/Auto закрыты.
+
+
 
 > **ARCH3w1 (2026-11-20)**: [исправление обнаруженного изменения физического SHA архива Part2 при неизменном размере](2.6.5-arch3w1-semantic-part2-proof.md). ARCH3w Prepare **безопасно блокирован до записи**; старый Part2 raw SHA `43cbb...`, новый `468f...`. В ARCH3w1 строго проверяется Part1 физический SHA и размер, а Part2 — не raw SHA, а неизменяемая исходная postcommit `ARCH3q/ARCH3r` цепочка + 501 original index + живой оригинальный `Test-OPAArchiveMoves` / ARCH2b Body/HTML/attachment полный witness на одном архивном письме. Проходятся исходные 10 ARCH3v full witnesses и source SHA, Part3 свободен. Отдельный root ARCH3w1; `Prepare` writes only protected 10 ORIGINAL Intent, independent Review, no Move/claim/duplicate index/archive PST writes. Не переносить старый `ARCH3w PrepareDigest=7f4d...` в ARCH3w1. Следующий этап ARCH3x — отдельная разработка/сертификация однократного Move.
 
