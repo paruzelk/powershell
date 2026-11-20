@@ -1,3 +1,8 @@
+## 2.6.5-ARCH3v DEV — 2026-11-20
+- Operator ARCH3u real Plan/Inventory PASS: same RunId 093b5ce9..., 26,872 Inbox, 128 sampled, 10 original unindexed 2020 Inbox letters and 12 attachment objects, original 501-entry DuplicateIndex sha 5ada35e..., existing Year part1/2; next part3 preview only.
+- Exact same ARCH3u SHA-pinned original Inbox ten re-selection, original ARCH2b full Body/HTML/recipient/user flags and actual SaveAsFile attachment byte SHA with original ARCH3d witness digest; zero durable writes during Audit.
+- Explicit evidence-only Seal requires externally pinned full ten AuditSha256 and second independent full real read, protected original ARCH3i NTFS ACL and original ARCH3c CreateNew+Flush(true) single file, original witness and source SHA rechecked after readback; Review SHA-pinned with no Outlook/PST contact. No Move or PST/Journal/Index writes. 30 new Pester, expected 4599 tests / 156 containers PS5.1; production Archive/Resume/Auto closed.
+
 ## 2.6.5-ARCH3u DEV — 2026-11-19
 - User ARCH3t local 2/10 -> 10/10 index-only recovery verified, original journal SHA preserved, second Recover no-op (no real Move). Historical ARCH3q real one-mail checkpoint unchanged.
 - ARCH3u read-only existing real TEST PST exactly ten original Inbox candidates from ONE year: original ARCH2d strict Outlook POP3 profile/store scope, original ArchiveSelector bounded 128 and second exact EntryID/parent/date readback, strict shared DuplicateIndex JSONL audit and original importer, existing year parts gate and original ARCH3b MailMover/Grouping contract for next UNUSED annual part; no new archive PST, no Intent/Claim/Journal/Index writes, no Move.
