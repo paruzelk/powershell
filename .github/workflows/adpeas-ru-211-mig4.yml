@@ -107,6 +107,13 @@ jobs:
           & node --check $check
           if ($LASTEXITCODE -ne 0) { throw 'JavaScript syntax check failed' }
           Write-Host 'PASS: report JS parses without syntax errors'
+      - name: MIG4 synthetic report DOM localization smoke test
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          node adPEAS-RU/Migration/v2.11.0/MIG4-ReportRuntime-Selftest.js
+          if ($LASTEXITCODE -ne 0) { throw 'MIG4 UI synthetic DOM regression failed' }
+
       - name: Check syntax (Windows PowerShell 5.1)
         shell: powershell
         run: |
