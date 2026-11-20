@@ -1,6 +1,6 @@
-# adPEAS-RU 2.11.0 MIG7 — быстрый старт и все параметры
+# adPEAS-RU 2.11.0 MIG8 — быстрый старт и все параметры
 
-**MIG7 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
+**MIG8 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
 adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не входит.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
@@ -8,11 +8,11 @@ adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не �
 ~~~powershell
 cd 'C:\Tools\adPEAS-RU'
 Import-Module .\adPEAS.ps1 -Force
-Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG7' -Format All
+Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG8' -Format All
 Disconnect-adPEAS
 ~~~
 
-Создаются AD-Audit-MIG7.html, AD-Audit-MIG7.txt и AD-Audit-MIG7.json.
+Создаются AD-Audit-MIG8.html, AD-Audit-MIG8.txt и AD-Audit-MIG8.json.
 Outputfile принимает имя без расширения.
 
 **LDAPS с проверкой сертификата:**
@@ -135,7 +135,7 @@ Get-Command Invoke-adPEAS -Syntax
 Get-Help Invoke-adPEAS -Full
 Get-Command Connect-adPEAS -Syntax
 Get-adPEASSession -TestConnection
-Convert-adPEASReport -InputJson '.\AD-Audit-MIG7.json' -OutputPath '.\recreated' -Format HTML
+Convert-adPEASReport -InputJson '.\AD-Audit-MIG8.json' -OutputPath '.\recreated' -Format HTML
 ~~~
 
 **Статус:** миграция текстов DOC6j через сравнение оригинальных
@@ -171,3 +171,9 @@ LDAP-атрибуты, команды исправления и JSON-поля н
 Добавлены строго контекстные переводы: 9 конкретных значений и 7 шаблонов для статуса активности, настроек GPO, прав добавления компьютеров, разрешённого времени входа, подсетей AD и расхождения времени контроллера домена. Имена реальных GPO, SID, DN, имена субъектов и технические права в выводе сохраняются без изменений.
 
 MIG7 остаётся Preview: CI использует закреплённый оригинал и синтетические данные, реальный AD-тест самой сборки выполняется отдельно.
+
+## Изменения MIG8
+
+На реальном HTML MIG7 подтверждён перевод всех 106 уникальных подписей атрибутов, исходные data-attr-name сохранены. Исходная сводка содержит 105 результатов, а интерактивное представление — 78 карточек. MIG8 показывает оба показателя отдельно и продолжает фильтровать невыполненные карточки.
+
+Добавлен перевод статических и динамических подписей доступности кнопок, контекстных значений типов компьютеров, ролей FSMO и логического признака isCriticalSystemObject. Правила аудита, объекты AD, JSON и идентификаторы не изменяются. Юридическое уведомление о лицензии сохранено. Статус MIG8 — Preview до реального теста.
