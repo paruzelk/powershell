@@ -1,0 +1,278 @@
+{
+  "Schema": "adPEAS-RU.MIG4.VisibleReportTexts.1",
+  "Locale": "ru-RU",
+  "Source": "Observed in MIG3 report; generic display strings only; no domain-specific data",
+  "Exact": {
+    "Categories": "Категории",
+    "All Categories": "Все категории",
+    "All": "Все",
+    "Finding": "Нарушения",
+    "Hint": "Предупреждения",
+    "Note": "Сведения",
+    "Secure": "Безопасно",
+    "Accounts": "Учётные записи",
+    "Application": "Приложения",
+    "Computer": "Компьютеры",
+    "Creds": "Учётные данные",
+    "Delegation": "Делегирование",
+    "Domain": "Домен",
+    "GPO": "Групповые политики",
+    "Rights": "Права доступа",
+    "Analyzing Domain Configuration": "Анализ настроек домена",
+    "Analyzing Credential Exposure": "Анализ раскрытия учётных данных",
+    "Analyzing Access Permissions": "Анализ разрешений доступа",
+    "Analyzing Delegation Settings": "Анализ параметров делегирования",
+    "Analyzing Certificate Services": "Анализ служб сертификации",
+    "Analyzing Privileged Accounts": "Анализ привилегированных учётных записей",
+    "Analyzing Group Policy Objects": "Анализ объектов групповой политики",
+    "Analyzing Computer Security": "Анализ безопасности компьютеров",
+    "Analyzing Application Infrastructure": "Анализ инфраструктуры приложений",
+    "Expand All": "Развернуть всё",
+    "Collapse All": "Свернуть всё",
+    "Found domain information:": "Получены сведения о домене:",
+    "Found Kerberos policy:": "Получены параметры политики Kerberos:",
+    "Found disabled Guest account": "Встроенная учётная запись «Гость» отключена",
+    "Found password policy:": "Обнаружена политика паролей:",
+    "Found directory service heuristics:": "Обнаружены параметры dsHeuristics службы каталогов:",
+    "In force on the domain controllers, by policy precedence:": "Действующие настройки контроллеров домена с учётом приоритета GPO:",
+    "In force on member servers and clients:": "Действующие настройки рядовых серверов и клиентов:",
+    "No LAPS schema found": "Атрибуты схемы LAPS не обнаружены",
+    "No readable BitLocker recovery keys found": "Доступных для чтения ключей восстановления BitLocker не обнаружено",
+    "No user object carries roamed credential material": "Перемещаемые учётные данные пользователей не обнаружены",
+    "No GPP credentials found in SYSVOL": "Учётные данные GPP в SYSVOL не найдены",
+    "No sensitive information found in SYSVOL/NETLOGON scripts": "Чувствительные сведения в сценариях SYSVOL/NETLOGON не найдены",
+    "No kerberoastable accounts found": "Учётные записи, доступные для Kerberoasting, не найдены",
+    "No AS-REP Roastable accounts found": "Учётные записи, допускающие AS-REP Roasting, не обнаружены",
+    "No accounts with readable password attributes found": "Учётные записи с доступными для чтения парольными атрибутами не обнаружены",
+    "No dangerous ACLs detected on domain root": "Опасные разрешения ACL корня домена не обнаружены",
+    "No principal outside Tier-0 controls the schema, the configuration, the partitions, a role object or a site": "Субъекты вне Tier 0 не управляют разделами схемы, конфигурации, разделами каталога, объектами ролей или сайтами.",
+    "No external domain trusts found (isolated domain)": "Внешние доверительные отношения не обнаружены (изолированный домен).",
+    "No Fine-Grained Password Policy found by name or by assignment": "Тонкие политики паролей (FGPP) не обнаружены ни по именам, ни по назначениям.",
+    "Who can add computers to the domain:": "Субъекты с правом добавления компьютеров в домен:",
+    "Every user right assigned via GPO matches the Windows default": "Все права пользователей, назначенные через GPO, соответствуют стандартным значениям Windows.",
+    "No policy denies Domain Admins the local or Remote Desktop logon on member computers": "Нет GPO, запрещающей Domain Admins локальный вход или вход через RDP на рядовые компьютеры.",
+    "No policy denies local administrator accounts the network logon on member computers": "Нет GPO, запрещающей сетевой вход локальных администраторов на рядовые компьютеры.",
+    "No accounts with Unconstrained Delegation found (excluding Domain Controllers)": "Учётные записи с неограниченным делегированием не обнаружены (кроме контроллеров домена).",
+    "No accounts with Constrained Delegation found": "Учётные записи с ограниченным делегированием не обнаружены.",
+    "No accounts with Resource-Based Constrained Delegation found": "Учётные записи с делегированием RBCD не обнаружены.",
+    "No trusted Root CAs found in AD configuration": "Доверенные корневые УЦ не обнаружены в конфигурации AD.",
+    "No NTAuth Store found - PKINIT certificate authentication may not be configured": "Хранилище NTAuth не обнаружено; аутентификация PKINIT по сертификатам может быть не настроена.",
+    "No Certificate Authorities found - AD CS not deployed": "Центры сертификации не обнаружены: AD CS не развернута.",
+    "No principal uses an explicit certificate mapping": "Явное сопоставление сертификатов не используется ни одним субъектом.",
+    "No non-privileged principal can write altSecurityIdentities on a privileged account": "Непривилегированные субъекты не могут изменять altSecurityIdentities привилегированных учётных записей.",
+    "AdminSDHolder ACLs are secure": "ACL объекта AdminSDHolder соответствует безопасной конфигурации.",
+    "Privileged groups outside AdminSDHolder's protection:": "Привилегированные группы, не защищённые AdminSDHolder:",
+    "Privileged accounts read:": "Проверенные привилегированные учётные записи:",
+    "No account holds a privileged SID in sIDHistory that did not come from a source domain": "Привилегированные SID без подтверждённого исходного домена в sIDHistory не обнаружены.",
+    "No gMSA accounts found in domain": "Учётные записи gMSA в домене не обнаружены.",
+    "No standalone MSAs found": "Автономные учётные записи MSA не обнаружены.",
+    "No authentication policy silo and no authentication policy is configured": "Хранилища политик аутентификации и сами политики не настроены.",
+    "No read-only Domain Controller in this domain - there is no password replication policy to check": "В домене нет контроллеров только для чтения (RODC): проверять политику репликации паролей не требуется.",
+    "No inactive privileged accounts found": "Неактивные привилегированные учётные записи не обнаружены.",
+    "No accounts with reversible password encryption found": "Учётные записи с обратимым шифрованием паролей не обнаружены.",
+    "No enabled accounts with 'Password Not Required' flag found": "Включённые записи с флагом PASSWD_NOTREQD не обнаружены.",
+    "No scripts distributed via GPO": "Сценарии, распространяемые через GPO, не обнаружены.",
+    "No known vulnerable registry setting is deployed via GPO": "Известные уязвимые параметры реестра через GPO не распространяются.",
+    "No GPO configures Point and Print or printer driver policies - the secure Windows default applies": "Параметры Point and Print и драйверов принтера через GPO не задаются; используются безопасные значения Windows по умолчанию.",
+    "No Exchange Servers found": "Серверы Exchange не обнаружены.",
+    "No SCCM Servers found via SPN": "Серверы SCCM по SPN не обнаружены.",
+    "No SCOM Servers found via SPN": "Серверы SCOM по SPN не обнаружены.",
+    "No AD FS deployment found": "Развёртывание AD FS не обнаружено.",
+    "No Entra ID Connect servers found": "Серверы Entra ID Connect не обнаружены.",
+    "No enabled computer account still carries the password it was created with": "Включённые компьютерные записи с первоначальным паролем не обнаружены.",
+    "No Exchange Organization detected": "Организация Exchange не обнаружена.",
+    "No Exchange Organization detected - no role assignments to analyze": "Организация Exchange не обнаружена — нет назначений ролей для проверки.",
+    "No SCCM/MECM infrastructure detected": "Инфраструктура SCCM/MECM не обнаружена.",
+    "No SCOM infrastructure detected": "Инфраструктура SCOM не обнаружена.",
+    "Guest Account Status": "Состояние учётной записи «Гость»",
+    "Kerberos Policy": "Политика Kerberos",
+    "Password Policy": "Политика паролей",
+    "Directory Service Heuristics": "Параметры dsHeuristics",
+    "In force on the domain controllers": "Действует на контроллерах домена",
+    "In force on member servers and clients": "Действует на рядовых серверах и клиентах",
+    "Machine Account Quota Configuration": "Квота создания компьютерных записей",
+    "Privileged Groups Outside AdminSDHolder": "Привилегированные группы вне защиты AdminSDHolder",
+    "Privileged Accounts Read": "Проверенные привилегированные записи",
+    "Checking for Fine-Grained Password Policies": "Проверка тонких парольных политик"
+  },
+  "Patterns": [
+    {
+      "pattern": "^(\\[\\d+/\\d+\\]) (Analyzing Domain Configuration|Analyzing Credential Exposure|Analyzing Access Permissions|Analyzing Delegation Settings|Analyzing Certificate Services|Analyzing Privileged Accounts|Analyzing Group Policy Objects|Analyzing Computer Security|Analyzing Application Infrastructure)$",
+      "replacement": "$1 $2"
+    },
+    {
+      "pattern": "^(\\d+) result(?:s)?$",
+      "replacement": "Результатов: $1"
+    },
+    {
+      "pattern": "^(\\d+) item\\(s\\)$",
+      "replacement": "Объектов: $1"
+    },
+    {
+      "pattern": "^Found (\\d+) domain controller\\(s\\):$",
+      "replacement": "Обнаружено контроллеров домена: $1"
+    },
+    {
+      "pattern": "^Found (\\d+) Domain Controller\\(s\\):$",
+      "replacement": "Обнаружено контроллеров домена: $1"
+    },
+    {
+      "pattern": "^Found (\\d+) site\\(s\\) and (\\d+) subnet\\(s\\):$",
+      "replacement": "Обнаружено сайтов AD: $1, подсетей: $2"
+    },
+    {
+      "pattern": "^Found (\\d+) GPO\\(s\\) configuring SeMachineAccountPrivilege:$",
+      "replacement": "Обнаружено GPO с назначением SeMachineAccountPrivilege: $1"
+    },
+    {
+      "pattern": "^Found (.+) configuration in (\\d+) GPO\\(s\\):$",
+      "replacement": "Обнаружена конфигурация $1 в GPO: $2"
+    },
+    {
+      "pattern": "^(\\d+) further user right assignment\\(s\\) from (\\d+) policy are not on the list of this check - not judged$",
+      "replacement": "Дополнительных назначений прав: $1, политик: $2 — отсутствуют в проверяемом перечне и не оценивались."
+    },
+    {
+      "pattern": "^No dangerous OU permissions detected in the (\\d+) OU\\(s\\) and (\\d+) container\\(s\\) analyzed$",
+      "replacement": "Опасные разрешения OU не обнаружены; проверено OU: $1, контейнеров: $2."
+    },
+    {
+      "pattern": "^(\\d+) privileged account\\(s\\) have inheritance disabled - a delegation on their OU does not reach them$",
+      "replacement": "У привилегированных учётных записей ($1) отключено наследование — делегирование на OU не действует на них."
+    },
+    {
+      "pattern": "^No other privileged account was found, so no OU or container was analyzed$",
+      "replacement": "Другие привилегированные записи не найдены; OU и контейнеры не анализировались."
+    },
+    {
+      "pattern": "^Found (\\d+) user\\(s\\) across (\\d+) privileged group\\(s\\):$",
+      "replacement": "Обнаружено пользователей: $1, привилегированных групп: $2."
+    },
+    {
+      "pattern": "^Account Operators \\(no members\\) control all (\\d+) - the default of every new group$",
+      "replacement": "Account Operators (без участников) управляют всеми $1 группами — стандартное разрешение новых групп."
+    },
+    {
+      "pattern": "^No principal beyond the expected ones can change the (\\d+) privileged group\\(s\\) AdminSDHolder does not protect - (\\d+) expected or privileged holder\\(s\\) hidden, use -IncludePrivileged to see them$",
+      "replacement": "Посторонние субъекты не могут изменять $1 привилегированных групп вне защиты AdminSDHolder; скрыто ожидаемых/привилегированных субъектов: $2. Используйте -IncludePrivileged для просмотра."
+    },
+    {
+      "pattern": "^No principal beyond the expected ones can take over the (\\d+) privileged account\\(s\\) read - (\\d+) expected or privileged holder\\(s\\) hidden, use -IncludePrivileged to see them$",
+      "replacement": "Посторонние субъекты не могут перехватить $1 проверенных привилегированных записей; скрыто ожидаемых/привилегированных субъектов: $2. Используйте -IncludePrivileged."
+    },
+    {
+      "pattern": "^Found (\\d+) broad member\\(s\\) in Pre-Windows 2000 Compatible Access:$",
+      "replacement": "В группе Pre-Windows 2000 Compatible Access обнаружено широких субъектов: $1."
+    },
+    {
+      "pattern": "^Found (\\d+) unprotected Tier-0 account\\(s\\) \\((\\d+) of (\\d+) in Protected Users, (\\d+)%\\):$",
+      "replacement": "Учётные записи Tier 0 вне Protected Users: $1; защищено $2 из $3 ($4%)."
+    },
+    {
+      "pattern": "^Found (\\d+) privileged account\\(s\\) with password never expires \\(password > (\\d+) days old\\):$",
+      "replacement": "Привилегированные записи с неограниченным сроком действия пароля (старше $2 дней): $1."
+    },
+    {
+      "pattern": "^(\\d+) further privileged account\\(s\\) carry the flag with a password newer than (\\d+) days:$",
+      "replacement": "Дополнительных привилегированных записей с этим флагом и паролем моложе $2 дней: $1."
+    },
+    {
+      "pattern": "^No dangerous permissions, no non-default owner and no unexpected SYSVOL write access on (\\d+) of (\\d+) GPO\\(s\\)$",
+      "replacement": "У $1 из $2 GPO нет опасных разрешений, нестандартных владельцев или неожиданного доступа на запись SYSVOL."
+    },
+    {
+      "pattern": "^No vulnerable GPO local group assignments found in (\\d+) analyzed GPO\\(s\\)$",
+      "replacement": "Уязвимые назначения локальных групп не обнаружены в $1 проверенных GPO."
+    },
+    {
+      "pattern": "^No scheduled tasks distributed via GPO in (\\d+) analyzed GPO\\(s\\)$",
+      "replacement": "Задания планировщика, распространяемые через GPO, не обнаружены в $1 проверенных GPO."
+    },
+    {
+      "pattern": "^(\\d+) further registry value\\(s\\) from (\\d+) policies are not on the list of this check - not judged$",
+      "replacement": "Дополнительных параметров реестра: $1, политик: $2 — не входят в область этой проверки и не оценивались."
+    },
+    {
+      "pattern": "^Found (\\d+) MSSQL Server\\(s\\):$",
+      "replacement": "Обнаружено серверов MSSQL: $1."
+    },
+    {
+      "pattern": "^No non-privileged principal holds a delegated read of the BitLocker recovery passwords, but (\\d+) privileged one\\(s\\) hold a right on them - use -IncludePrivileged to see them$",
+      "replacement": "Непривилегированные субъекты не имеют делегированного чтения паролей восстановления BitLocker; привилегированных с таким правом: $1. Для просмотра используйте -IncludePrivileged."
+    },
+    {
+      "pattern": "^This account can read (\\d+) deleted object\\(s\\) - as a member of Administrators$",
+      "replacement": "Текущая учётная запись может читать удалённые объекты ($1), поскольку входит в Administrators."
+    },
+    {
+      "pattern": "^None of the (\\d+) deleted object\\(s\\) holds a credential in a free-text or password attribute$",
+      "replacement": "Ни один из $1 удалённых объектов не содержит учётные данные в текстовом или парольном атрибуте."
+    },
+    {
+      "pattern": "^No readable (.+) found$",
+      "replacement": "Не обнаружено доступных для чтения: $1."
+    },
+    {
+      "pattern": "^Found (\\d+) /24 subnet\\(s\\) with (\\d+) computer\\(s\\) active in the last (\\d+) days:$",
+      "replacement": "Обнаружено подсетей /24: $1, активных компьютеров: $2 (за $3 дней)."
+    },
+    {
+      "pattern": "^Every computer that logged on in the last (\\d+) days has changed its machine account password within (\\d+) days$",
+      "replacement": "Все компьютеры, выполнявшие вход за последние $1 дней, меняли пароль компьютерной записи в пределах $2 дней."
+    },
+    {
+      "pattern": "^Domain: (.+)$",
+      "replacement": "Домен: $1"
+    },
+    {
+      "pattern": "^Domain Controllers \\((\\d+)\\)$",
+      "replacement": "Контроллеры домена ($1)"
+    },
+    {
+      "pattern": "^Sites and Subnets: (.+)$",
+      "replacement": "Сайты и подсети: $1"
+    },
+    {
+      "pattern": "^Privileged Group Member: (.+)$",
+      "replacement": "Участник привилегированной группы: $1"
+    },
+    {
+      "pattern": "^Tier-0 Account: (.+)$",
+      "replacement": "Учётная запись Tier 0: $1"
+    },
+    {
+      "pattern": "^Password Never Expires: (.+)$",
+      "replacement": "Пароль не имеет срока действия: $1"
+    },
+    {
+      "pattern": "^Pre-Windows 2000 Compatible Access: (.+)$",
+      "replacement": "Группа Pre-Windows 2000 Compatible Access: $1"
+    },
+    {
+      "pattern": "^GPO: (.+)$",
+      "replacement": "GPO: $1"
+    },
+    {
+      "pattern": "^Null Session GPO: (.+)$",
+      "replacement": "GPO анонимного доступа: $1"
+    },
+    {
+      "pattern": "^OPSEC mode: Skipping (.+)$",
+      "replacement": "Режим OPSEC: пропущено — $1"
+    }
+  ],
+  "StatusWords": {
+    "Disabled": "Отключено",
+    "Enabled": "Включено",
+    "Restricted": "Ограничено",
+    "Not Configured": "Не настроено",
+    "Not configured": "Не настроено",
+    "Not set": "Не задано",
+    "Optional": "Необязательно",
+    "Required": "Обязательно",
+    "Refused": "Отклонено",
+    "Checked": "Проверяется",
+    "None": "Отсутствует",
+    "Never": "Никогда"
+  }
+}
