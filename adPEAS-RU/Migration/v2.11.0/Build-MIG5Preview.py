@@ -139,6 +139,28 @@ def patch_template(candidate, report):
             "Поиск результатов... (нажмите /)",
         "Type to filter findings by text content":
             "Введите текст для поиска среди результатов",
+        'aria-label="Finding counts by severity"':
+            'aria-label="Количество результатов по категориям важности"',
+        'aria-label="Filter by Findings: {{FINDING_COUNT}} critical issues"':
+            'aria-label="Показать нарушения: {{FINDING_COUNT}}"',
+        'aria-label="Filter by Hints: {{HINT_COUNT}} items"':
+            'aria-label="Показать предупреждения: {{HINT_COUNT}}"',
+        'aria-label="Filter by Notes: {{NOTE_COUNT}} items"':
+            'aria-label="Показать сведения: {{NOTE_COUNT}}"',
+        'aria-label="Filter by Secure: {{SECURE_COUNT}} items"':
+            'aria-label="Показать безопасные результаты: {{SECURE_COUNT}}"',
+        'aria-label="Report navigation"':
+            'aria-label="Навигация по отчёту"',
+        'aria-label="Report content"':
+            'aria-label="Содержимое отчёта"',
+        'aria-label="Findings card view"':
+            'aria-label="Карточки результатов"',
+        'aria-label="View controls"':
+            'aria-label="Управление отображением"',
+        'aria-label="Card expansion controls"':
+            'aria-label="Управление раскрытием карточек"',
+        "Toggle to show or hide findings marked as completed":
+            "Показать или скрыть результаты, отмеченные выполненными",
     }
     for old, new in translations.items():
         s = replace_one(s, old, new, "HTML static " + old[:45])
