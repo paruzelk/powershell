@@ -1220,3 +1220,72 @@ function Invoke-OPA265ARCH3oOneOriginalMailMoverProviderCall {
         }
     }
 }
+
+
+# ARCH3x: fake-only ten-message provider boundary in ORIGINAL MailMover.
+# Real COM, PST and main Archive/Resume/Auto are forbidden here.
+function Invoke-OPA265ARCH3xFakeOnlyOriginalProviderCall {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][object]$Mail,
+        [Parameter(Mandatory=$true)][object]$Folder,
+        [Parameter(Mandatory=$true)][string]$ClaimPath,
+        [Parameter(Mandatory=$true)][string]$ExpectedClaimSha256,
+        [Parameter(Mandatory=$true)][string]$InvocationPath,
+        [switch]$FaultAfterInvocation
+    )
+    if($Mail -is [__ComObject] -or $Folder -is [__ComObject] -or
+       -not [bool]$Mail.SyntheticOnly -or -not [bool]$Folder.SyntheticOnly -or
+       [int]$Mail.Class -ne 43 -or
+       $ExpectedClaimSha256 -cnotmatch '^[a-f0-9]{64}$'){
+        throw 'ARCH3x original MailMover rejects real Outlook COM or unpinned fake inputs.'
+    }
+    $root=[IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($ClaimPath))
+    $temp=[IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd([char]92,[char]47)+[IO.Path]::DirectorySeparatorChar
+    if(-not $root.StartsWith($temp,[StringComparison]::OrdinalIgnoreCase) -or
+       [IO.Path]::GetFileName($root) -cnotmatch '^OPA265-ARCH3x-SYNTH-[a-f0-9]{32}$' -or
+       -not [IO.Directory]::Exists($root) -or
+       (([IO.File]::GetAttributes($root) -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or
+       [IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($InvocationPath)) -cne $root){
+        throw 'ARCH3x original fake provider must use a private OS TEMP synthetic directory.'
+    }
+    $claim=Read-OPA265ARCH3cPinnedJson -Path $ClaimPath -ExpectedSha256 $ExpectedClaimSha256
+    if([string]$claim.Schema -cne '2.6.5-ARCH3x.SyntheticMoveClaim.1' -or
+       -not [bool]$claim.SyntheticOnly -or [bool]$claim.AutomaticRetryAllowed -or
+       [string]$claim.SourceEntryId -cne [string]$Mail.EntryID -or
+       [string]$claim.DestinationEntryId -cne [string]$Mail.TargetEntryId -or
+       [string]$claim.DestinationFolderEntryId -cne [string]$Folder.EntryID -or
+       [string]$claim.WitnessSha256 -cnotmatch '^[a-f0-9]{64}$' -or
+       [int]$claim.Ordinal -lt 1 -or [int]$claim.Ordinal -gt 10){
+        throw 'ARCH3x original provider rejected mismatched or incomplete synthetic claim.'
+    }
+    if([IO.Path]::GetFileName($InvocationPath) -cne ('{0:00}-Invocation.json' -f [int]$claim.Ordinal)){
+        throw 'ARCH3x original fake invocation ordinal does not match claim.'
+    }
+    $record=[pscustomobject][ordered]@{
+        Schema='2.6.5-ARCH3x.SyntheticProviderInvocation.1'
+        RunId=[string]$claim.RunId;Ordinal=[int]$claim.Ordinal
+        ClaimSha256=$ExpectedClaimSha256
+        SourceEntryId=[string]$Mail.EntryID
+        DestinationEntryId=[string]$Mail.TargetEntryId
+        DestinationFolderEntryId=[string]$Folder.EntryID
+        SyntheticOnly=$true;AutomaticRetryAllowed=$false;ProductionReady=$false
+    }
+    # Existing immutable original ARCH3c CreateNew/Flush(true) writer BEFORE fake Move.
+    $invocationSha=Write-OPA265ARCH3cJsonOnce -Path $InvocationPath -Record $record
+    if($FaultAfterInvocation){throw 'ARCH3x fault after durable provider invocation, before fake Move.'}
+    $moved=$Mail.Move($Folder)
+    if($null -eq $moved -or [int]$moved.Class -ne 43 -or
+       [string]$moved.EntryID -cne [string]$claim.DestinationEntryId){
+        throw 'ARCH3x synthetic provider unknown; automatic replay forbidden.'
+    }
+    return [pscustomobject][ordered]@{
+        Schema='2.6.5-ARCH3x.SyntheticProviderReturned.1'
+        RunId=[string]$claim.RunId;Ordinal=[int]$claim.Ordinal
+        DestinationEntryId=[string]$moved.EntryID
+        ClaimSha256=$ExpectedClaimSha256
+        ProviderInvocationSha256=$invocationSha
+        FakeMoveReturned=$true;RealOutlookContacted=$false
+        AutomaticRetryAllowed=$false;ProductionReady=$false
+    }
+}
