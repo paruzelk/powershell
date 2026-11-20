@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH3x1 (20.11.2026)**: [original MailMover real TEST-PST batch-10 one-shot with protected per-item claim/invocation](2.6.5-arch3x1-real-ten-original-mailmover.md) разрабатывается поверх подтверждённых ARCH3v/w1 и ARCH3x. Режимы Plan/Audit/Move/Status, только новый Year2020 Part3, raw Part1 SHA и semantic Part2 full original ArchiveVerifier; exact десять оригинальных full witnesses и 12 вложений до Move. После irreversible writer-entry любые неизвестные исходы STOP/no replay. Даже 10 реальных MoveReturned НЕ дают Reconciled или DuplicateIndex: следующий этап ARCH3x2 — настоящий restart Outlook, оригинальный ten ArchiveVerifier, затем original journal/index commit. CI не осуществляет реальный Move; production Archive/Resume/Auto и ~90GB остаются закрытыми.
+
+
 > **ARCH3x (20.11.2026):** [original MailMover fake-only batch-10 provider fence](2.6.5-arch3x-original-ten-provider-fence.md) подготовлен: original ARCH3c CreateNew/Flush(true) claim и invocation до synthetic Move, 10 returned только после fake provider, четыре аварийных окна, no replay. Read-only ReviewPrepared использует оригинальный ARCH3w1 ten Intent readback; исправлен ошибочный путь подключения CLI ARCH3w1. Отдельный реальный batch-10 с новым Outlook restart + full original verifier + original journal/index commit ещё не разрешён; production Archive/Resume/Auto закрыты.
 
 
