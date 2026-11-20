@@ -20,7 +20,7 @@ $ErrorActionPreference='Stop'
 if($PSVersionTable.PSEdition -cne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5){
     throw 'ARCH3w1 requires Windows PowerShell 5.1.'
 }
-. (Join-Path $PSScriptRoot 'Core/Archive/ARCH3w1TenOriginalIntents.ps1')
+. (Join-Path $PSScriptRoot 'Core/Archive/ARCH3w1SemanticPart2Intents.ps1')
 $parameters=@{
     Mode=$Mode;RunId=$RunId;SealSha256=$SealSha256
     ExpectedAuditSha256=$ExpectedAuditSha256
