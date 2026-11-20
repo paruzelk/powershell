@@ -1,6 +1,6 @@
-# adPEAS-RU 2.11.0 MIG4 — быстрый старт и все параметры
+# adPEAS-RU 2.11.0 MIG5 — быстрый старт и все параметры
 
-**MIG4 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
+**MIG5 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
 adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не входит.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
@@ -8,11 +8,11 @@ adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не �
 ~~~powershell
 cd 'C:\Tools\adPEAS-RU'
 Import-Module .\adPEAS.ps1 -Force
-Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG4' -Format All
+Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG5' -Format All
 Disconnect-adPEAS
 ~~~
 
-Создаются AD-Audit-MIG4.html, AD-Audit-MIG4.txt и AD-Audit-MIG4.json.
+Создаются AD-Audit-MIG5.html, AD-Audit-MIG5.txt и AD-Audit-MIG5.json.
 Outputfile принимает имя без расширения.
 
 **LDAPS с проверкой сертификата:**
@@ -135,10 +135,23 @@ Get-Command Invoke-adPEAS -Syntax
 Get-Help Invoke-adPEAS -Full
 Get-Command Connect-adPEAS -Syntax
 Get-adPEASSession -TestConnection
-Convert-adPEASReport -InputJson '.\AD-Audit-MIG4.json' -OutputPath '.\recreated' -Format HTML
+Convert-adPEASReport -InputJson '.\AD-Audit-MIG5.json' -OutputPath '.\recreated' -Format HTML
 ~~~
 
 **Статус:** миграция текстов DOC6j через сравнение оригинальных
 источников 2.11.0, плюс отдельный RU HTML-слой. Логика аудита, SID,
 LDAP-атрибуты, команды исправления и JSON-поля не переводятся.
 Полная проверка в живом AD и тесты браузера относятся к MIG5.
+
+## Что изменено в MIG5
+
+Вместо перевода только после открытия HTML в браузере ключевые подписи
+записываются в HTML уже во время экспорта: девять разделов, категории,
+счётчики карточек, типовые названия объектов и подзаголовок проверки RODC.
+Динамический слой MIG4 оставлен для остальных сообщений интерфейса.
+Оригинальные правила аудита, категории и поля JSON не изменены.
+Исходный загруженный отчёт не включается в репозиторий.
+
+Отчёты необходимо проверить после сборки MIG5 на тестовом домене.
+Проверки Windows PowerShell 5.1, синтаксиса и UI не доказывают безопасность
+или корректность аудита в реальной производственной среде.
