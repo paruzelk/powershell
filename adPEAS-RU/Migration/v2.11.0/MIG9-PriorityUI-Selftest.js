@@ -62,7 +62,7 @@ for(const t of ['Почему это важно','Что проверяется'
     assert(captured.includes(t),'popup text '+t.slice(0,30));
 }
 assert(!captured.includes('English impact')&&!captured.includes('Why It Matters'),'untranslated popup');
-vm.runInContext(fn('function formatScoreBreakdownHtml(', '        // Active score tooltip reference'),context);
+vm.runInContext(fn('function translateMIG9ScoreReason(', '        // Active score tooltip reference'),context);
 const score=context.formatScoreBreakdownHtml({
     finalScore:85,baseScore:40,matchedPattern:'PRIVILEGED_GROUP_MEMBERSHIP',
     impactMod:1.2,impactReason:'Tier 0',exploitMod:1.1,exploitReasons:['Old password'],
