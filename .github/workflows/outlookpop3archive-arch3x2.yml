@@ -1,0 +1,1028 @@
+name: OutlookPOP3Archive ARCH3x2 unified source-backed live ten postrestart verified PS5.1 CI
+on:
+  push:
+    branches: [feature/outlookpop3archive-2.6.5-arch3x2-unified-live-ten]
+    paths: ['OutlookPOP3Archive/**', '.github/workflows/outlookpop3archive-arch3x2.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  full-ci:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+        working-directory: OutlookPOP3Archive
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pester and PSScriptAnalyzer
+        run: |
+          $ErrorActionPreference='Stop'
+          [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -AllowClobber
+      - name: Focused ARCH2d3 fault scenarios and original semantic witnesses
+        run: |
+          $ErrorActionPreference='Stop'
+          $paths=@(
+            'Tests/Archive/ARCH2c4RealPop3OneShot.Tests.ps1',
+            'Tests/Archive/ARCH2c4aRuntimeDependencies.Tests.ps1',
+            'Tests/Archive/ARCH2dBoundedRealBatch10.Tests.ps1',
+            'Tests/Archive/ARCH2d3FaultMatrix.Tests.ps1',
+            'Tests/Archive/ARCH2d4ReadOnlyForensics.Tests.ps1',
+            'Tests/Archive/ARCH2d5RealBatch100.Tests.ps1',
+            'Tests/Archive/ARCH3aReuseExistingArchiver.Tests.ps1',
+            'Tests/Archive/ARCH3bOriginalMoverContract.Tests.ps1',
+            'Tests/Archive/ARCH3cDurableOriginalOperationJournal.Tests.ps1',
+            'Tests/Archive/ARCH3dOriginalMoverBoundary.Tests.ps1',
+            'Tests/Archive/ARCH3eOriginalPostRestartIndexGate.Tests.ps1',
+            'Tests/Archive/ARCH3fRealTestPstPreflight.Tests.ps1',
+            'Tests/Archive/ARCH3gExistingArchiveCollisionGate.Tests.ps1',
+            'Tests/Archive/ARCH3hRealSourceSemanticWitnessGate.Tests.ps1',
+            'Tests/Archive/ARCH3iSealedFullOriginalWitness.Tests.ps1',
+            'Tests/Archive/ARCH3jRealOneShotPrepareIntent.Tests.ps1',
+            'Tests/Archive/ARCH3kOriginalMoverLiveBarrier.Tests.ps1',
+            'Tests/Archive/ARCH3lOriginalPart2SyntheticGate.Tests.ps1',
+            'Tests/Archive/ARCH3mOriginalPart2PreAllocation.Tests.ps1',
+            'Tests/Archive/ARCH3nPinnedRealIntentBridge.Tests.ps1',
+            'Tests/Archive/ARCH3oOneRealOriginalMailMover.Tests.ps1',
+            'Tests/Archive/ARCH3pIndependentPostRestartOriginalVerifier.Tests.ps1',
+            'Tests/Archive/ARCH3qVerifiedJournalIndexCommit.Tests.ps1',
+            'Tests/Archive/ARCH3rCompletedCheckpointSynthetic10.Tests.ps1',
+            'Tests/Archive/ARCH3sTenOriginalVerifierIntegration.Tests.ps1',
+            'Tests/Archive/ARCH3tSyntheticIndexOnlyRecovery.Tests.ps1',
+            'Tests/Archive/ARCH3uRealBatchTenPreflight.Tests.ps1',
+            'Tests/Archive/ARCH3vRealTenFullWitness.Tests.ps1',
+            'Tests/Archive/ARCH3wTenOriginalIntents.Tests.ps1',
+            'Tests/Archive/ARCH3w1SemanticPart2Intents.Tests.ps1',
+            'Tests/Archive/ARCH2bSemanticWitness.Tests.ps1',
+            'Tests/Archive/ARCH2c1TempIsolation.Tests.ps1',
+            'Tests/Archive/ARCH2c2TempSafety.Tests.ps1'
+          )
+          $result=Invoke-Pester -Path $paths -Output Detailed -PassThru
+          if($result.Result -ne 'Passed' -or $result.FailedCount -ne 0 -or $result.SkippedCount -ne 0){
+            throw ('ARCH3f focused Pester gate failed: '+$result.Result)
+          }
+          Write-Host ('PASS ARCH3f focused Pester '+$result.PassedCount+' tests.')
+      - name: Mandatory original Windows PowerShell 5.1 CI gates
+        run: |
+          $ErrorActionPreference='Stop'
+          .\Invoke-CI.ps1 -ExpectedBuild '2.6.3-PREVIEW1'
+          if($LASTEXITCODE -ne 0){throw 'Original CI gates failed.'}
+      - name: ARCH2d exactly ten immutable semantic claims before real COM Move and independent restart fence
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH2dBatchCore.ps1' -Raw -Encoding UTF8
+          $policy=Get-Content -LiteralPath 'Core/Archive/ARCH2dBatchPolicy.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH2d.ps1' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch2d-bounded-real-batch10.md' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH2dBoundedRealBatch10.Tests.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $globalIdx=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path $layout.GlobalClaimPath')
+          $itemIdx=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path (Get-OPA265ARCH2dItemClaimPath')
+          $moveIdx=$core.IndexOf('$item.Move($target)')
+          if(([regex]::Matches($core,'\$item\.Move\(\$target\)')).Count -ne 1 -or
+             $globalIdx -lt 0 -or $itemIdx -le $globalIdx -or $moveIdx -le $itemIdx -or
+             $core -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness' -or
+             $core -cnotmatch 'Compare-OPA265ARCH2bMailSemanticWitness' -or
+             $core -cnotmatch 'Get-OPA265ARCH2dTargetFolder' -or
+             $core -cmatch '\.(Delete|Copy|Send)\s*\(' -or
+             $policy -cnotmatch 'Get-OPA265ARCH2dReconcileDecision' -or
+             $policy -cnotmatch 'ARCH2c4OneShotCore\.ps1' -or
+             $policy -cnotmatch 'AutomaticRetryAllowed=\$false' -or
+             $entry -cnotmatch 'Invoke-OPA265ARCH2dBatch' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed' -or
+             $docs -cnotmatch 'ARCH2d' -or
+             $tests -cnotmatch 'independently approves exact ten semantic matches' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+              throw 'ARCH2d real batch10 fail-closed, SHA witness, claim order or inventory gate incomplete.'
+          }
+          Write-Host 'PASS ARCH2d batch10 SHA256-original, global then per-item claim before Move, no retry, original CLI closed.'
+      - name: ARCH2d3 bounded synthetic-only failpoint model and no historical PST access gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $sim=Get-Content -LiteralPath 'Core/Diagnostics/ARCH2d3FaultSimulator.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH2d3.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH2d3FaultMatrix.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch2d3-fault-injection.md' -Raw -Encoding UTF8
+          $realCore=Get-Content -LiteralPath 'Core/Archive/ARCH2dBatchCore.ps1' -Raw -Encoding UTF8
+          $realEntry=Get-Content -LiteralPath 'Invoke-ARCH2d.ps1' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($sim -cnotmatch 'Write-OPA265ARCH2c4JsonOnce -Path \$globalPath' -or
+             $sim -cnotmatch 'Write-OPA265ARCH2c4JsonOnce -Path \$row\.ClaimPath' -or
+             $sim -cnotmatch 'Get-OPA265ARCH2dReconcileDecision -ItemResults' -or
+             $sim -cnotmatch 'foreach\(\$ord in @\(1,5,10\)\)' -or
+             $sim -cnotmatch 'Cases=\$all.Count' -or
+             $sim -cmatch 'GetActiveObject\s*\(' -or
+             $sim -cmatch '\.Move\s*\(' -or
+             $sim -cmatch '\.AddStoreEx\s*\(' -or
+             $sim -cmatch '\.SaveAsFile\s*\(' -or
+             $entry -cnotmatch 'Invoke-OPA265ARCH2d3SyntheticMatrix' -or
+             $entry -cmatch 'GetActiveObject\s*\(' -or
+             $tests -cnotmatch '57-case 1/5/10 failure injection' -or
+             $tests -cnotmatch 'ComAppliesThenThrows' -or
+             $doc -cnotmatch '57' -or
+             $realCore -cnotmatch 'GlobalClaimPath' -or
+             $realEntry -cnotmatch 'Invoke-OPA265ARCH2dBatch' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+             throw 'ARCH2d3 synthetic fault matrix/no Outlook/real writer compatibility gate failed.'
+          }
+          Write-Host 'PASS ARCH2d3 57-case 1/5/10 no-retry, actual force-flushed JSON writer, no COM/PST, original ARCH2d untouched.'
+      - name: ARCH2d4 exact historical pinned evidence and read-only semantic forensic gates
+        run: |
+          $ErrorActionPreference='Stop'
+          $evidence=Get-Content -LiteralPath 'Core/Diagnostics/ARCH2d4EvidencePolicy.ps1' -Raw -Encoding UTF8
+          $audit=Get-Content -LiteralPath 'Core/Diagnostics/ARCH2d4LiveAudit.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH2d4.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch2d4-readonly-forensics.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($evidence -cnotmatch 'Read-OPA265ARCH2c4JsonSealed -Path \(\[string\]\$Layout.ManifestPath\)' -or
+             $evidence -cnotmatch 'Read-OPA265ARCH2c4JsonSealed -Path \(\[string\]\$Layout.GlobalClaimPath\)' -or
+             $evidence -cnotmatch 'Read-OPA265ARCH2d4UnanchoredJson' -or
+             $evidence -cnotmatch 'MovedContentMatchedReceiptMissingManualReview' -or
+             $evidence -cnotmatch 'PartialBatchReadOnlyClassifiedNoResumePermit' -or
+             $audit -cnotmatch 'Open-OPA265ARCH2dSession' -or
+             $audit -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness' -or
+             $audit -cnotmatch 'Get-OPA265ARCH2dSourcePresence' -or
+             $audit -cnotmatch 'Get-OPA265ARCH2d4BatchDecision' -or
+             $audit -cmatch '\.(Move|Copy|Save|Delete|AddStoreEx|RemoveStore)\s*\(' -or
+             $audit -cmatch 'Write-OPA265ARCH2c4JsonOnce' -or
+             $evidence -cmatch 'Write-OPA265ARCH2c4JsonOnce' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Evidence','LiveAudit'\)" -or
+             $entry -cmatch 'MoveBatch' -or
+             $docs -cnotmatch 'PerItemReceiptsExternallyHashPinned' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+             throw 'ARCH2d4 forensic pinned claims/return check and zero real write permissions gate failed.'
+          }
+          Write-Host 'PASS ARCH2d4 operator hashes anchored, 10 receipts validated, no journal/PST writes or any COM Move.'
+      - name: ARCH2d5 exact 100 originals and externally anchored SHA256 receipt chain safety
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH2d5Batch100Core.ps1' -Raw -Encoding UTF8
+          $policy=Get-Content -LiteralPath 'Core/Archive/ARCH2d5Batch100Policy.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH2d5.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch2d5-real-batch100.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $global=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path $layout.GlobalClaimPath')
+          $item=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path (Get-OPA265ARCH2d5ItemPath -Layout $layout -Ordinal $ordinal)')
+          $move=$core.IndexOf('$moved=$mail.Move($target)')
+          $return=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path (Get-OPA265ARCH2d5ItemPath -Layout $layout -Ordinal $ordinal -Kind Return)')
+          $checkpoint=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path (Get-OPA265ARCH2d5CheckpointPath')
+          $final=$core.IndexOf('Write-OPA265ARCH2c4JsonOnce -Path $layout.FinalSealPath')
+          if(([regex]::Matches($core,'\$moved=\$mail\.Move\(\$target\)')).Count -ne 1 -or
+             $global -lt 0 -or $item -le $global -or $move -le $item -or
+             $return -le $move -or $checkpoint -le $return -or $final -le $checkpoint -or
+             $core -cmatch '\.(Copy|Delete|Save|Send)\s*\(' -or
+             $core -cnotmatch 'for\(\$i=0;\$i -lt 100;\$i\+\+\)' -or
+             $core -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness' -or
+             $core -cnotmatch 'PreviousReceiptSha256=\$lastReturnSha' -or
+             $policy -cnotmatch 'AllHundredChainVerified' -or
+             $policy -cnotmatch 'FinalSealExternallyPinned' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Inventory','Prepare','MoveBatch','Evidence','Reconcile'\)" -or
+             $docs -cnotmatch 'FinalSealSha256' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+              throw 'ARCH2d5 batch100 sealed receipt chain static safety gate failed.'
+          }
+          Write-Host 'PASS ARCH2d5 100 originals, per-item claim before COM Move, ten receipt checkpoints and final operator-pinned SHA.'
+      - name: ARCH3a reuse-only original Year/PST/Sent/POP3 contracts, no new writer gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $audit=Get-Content -LiteralPath 'Core/Diagnostics/ARCH3aLegacyIntegrationAudit.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3a.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3aReuseExistingArchiver.Tests.ps1' -Raw -Encoding UTF8
+          $adr=Get-Content -LiteralPath 'docs/ADR-ARCH3-001-reuse-existing-archiver.md' -Raw -Encoding UTF8
+          $map=Get-Content -LiteralPath 'docs/2.6.5-arch3a-existing-pipeline-audit.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($audit -cnotmatch 'function Get-OPA265ARCH3aIntegrationAudit' -or
+             $audit -cnotmatch 'function Get-OPA265ARCH3aExistingRoutingExamples' -or
+             $audit -cnotmatch 'Get-OPAArchivePartPath -SourcePst' -or
+             $audit -cnotmatch 'Get-OPAArchiveTargetPath -ReceivedTime' -or
+             $audit -cnotmatch 'Get-OPAArchiveItemDate -Item' -or
+             $audit -cnotmatch 'Test-OPAExcludedSystemFolder' -or
+             $audit -cnotmatch 'SourceMarkerEvidenceIsNotRuntimeCertification' -or
+             $audit -cmatch 'GetActiveObject\s*\(' -or
+             $audit -cmatch '\.(Move|AddStoreEx|Save|Copy|Delete)\s*\(' -or
+             $audit -cmatch 'Write-OPA265ARCH2c4JsonOnce' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Audit','RoutingExamples'\)" -or
+             $entry -cmatch "ValidateSet\('Prepare','MoveBatch'" -or
+             $tests -cnotmatch 'the original archive verifier already contains full semantic comparison' -or
+             $adr -cnotmatch 'ARCH3b' -or
+             $adr -cnotmatch 'ArchiveVerifier.ps1' -or
+             $map -cnotmatch 'ARCH3a' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3a exact original-code reuse/explicit open gaps/writer-closed safety contract missing.'
+          }
+          Write-Host 'PASS ARCH3a single existing archiver, original Year/POP3/SentOn/PST routing, semantic verifier preserved; no duplicate writer, production closed.'
+      - name: ARCH3b original candidate SHA operation identity and synthetic fail closed sequence
+        run: |
+          $ErrorActionPreference='Stop'
+          $bridge=Get-Content -LiteralPath 'Core/Archive/ARCH3bOriginalMoverContract.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3b.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3bOriginalMoverContract.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3b-original-mover-contract.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($bridge -cnotmatch 'function New-OPA265ARCH3bOperationContract' -or
+             $bridge -cnotmatch 'function Test-OPA265ARCH3bPhaseEvidence' -or
+             $bridge -cnotmatch 'function New-OPA265ARCH3bBatchPreview' -or
+             $bridge -cnotmatch 'Get-OPAArchivePartPath -SourcePst' -or
+             $bridge -cnotmatch 'Get-OPAArchiveTargetPath -ReceivedTime' -or
+             $bridge -cnotmatch 'Get-OPA265ARCH3bDigest -Parts' -or
+             $bridge -cnotmatch 'MoveIndeterminate' -or
+             $bridge -cnotmatch 'PrepareIntent' -or
+             $bridge -cnotmatch 'IndependentContentVerified' -or
+             $bridge -cnotmatch 'IndexCommitted' -or
+             $bridge -cnotmatch 'DurablyFlushedBeforeMove' -or
+             $bridge -cnotmatch 'OutlookRestartConfirmed' -or
+             $bridge -cmatch '\.(Move|AddStoreEx|Save|Delete|Copy)\s*\(' -or
+             $bridge -cmatch 'Write-OPA265ARCH2c4JsonOnce' -or
+             $entry -cnotmatch "ValidateSet\('Plan','SyntheticPreview','SyntheticCrashReview'\)" -or
+             $tests -cnotmatch 'durable Prepare intent MUST precede destination PST creation' -or
+             $docs -cnotmatch 'ARCH3c' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3b original MailMover source-backed identity and fail-closed no-write gate missing.'
+          }
+          Write-Host 'PASS ARCH3b original Year/part/folder functions and SHA operation identity, PrepareIntent-before-PST phase order, no live writer.'
+      - name: ARCH3c original OperationJournal durable synthetic seal and production safety gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $a=Get-Content -LiteralPath 'Core/Archive/ARCH3cDurableOperationLedger.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3c.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3cDurableOriginalOperationJournal.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3c-durable-original-operation-journal.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($a -cnotmatch 'function Invoke-OPA265ARCH3cSyntheticWrite' -or
+             $a -cnotmatch 'function Test-OPA265ARCH3cSyntheticEvidence' -or
+             $a -cnotmatch 'FileMode]::CreateNew' -or
+             $a -cnotmatch '\$fs.Flush\(\$true\)' -or
+             $a -cnotmatch 'ARCH3C-SYNTHETIC' -or
+             $a -cnotmatch 'Write-OPAOperationJournalEvent -Path' -or
+             $a -cnotmatch 'Read-OPAOperationJournal -Path' -or
+             $a -cnotmatch 'Resolve-OPAOperationRecovery -Journal' -or
+             $a -cnotmatch 'FinalSealSha256' -or
+             $a -cnotmatch 'PreviousStageSha256' -or
+             $a -cnotmatch 'IndependentLivePstVerified=\$false' -or
+             $a -cmatch '\.(Move|AddStoreEx|Delete|Save|Copy)\s*\(' -or
+             $a -cmatch 'Save-OPAArchiveTransaction|Add-OPADuplicateEntry' -or
+             $entry -cnotmatch "ValidateSet\('Plan','SyntheticWrite','Evidence'\)" -or
+             $tests -cnotmatch 'indeterminate synthetic crash after claim remains permanently unrepeatable' -or
+             $docs -cnotmatch 'ARCH3c' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3c synthetic ONLY original OperationJournal / SHA-anchored immutable evidence contract failed.'
+          }
+          Write-Host 'PASS ARCH3c synthetic immutable SHA-chain, original OperationJournal, no Outlook/PST/Move or production permit.'
+      - name: ARCH3d ORIGINAL MailMover synthetic-only hook ordering and no real writer gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content -LiteralPath 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $h=Get-Content -LiteralPath 'Core/Archive/ARCH3dOriginalMoverBoundary.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3d.ps1' -Raw -Encoding UTF8
+          $t=Get-Content -LiteralPath 'Tests/Archive/ARCH3dOriginalMoverBoundary.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3d-original-mover-boundary-hooks.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $start=$m.IndexOf('function Move-OPAItemsWithLimit')
+          if($start -lt 0){throw 'Original MailMover missing'}
+          $body=$m.Substring($start)
+          $prepare=$body.IndexOf('Stage PrepareIntent')
+          $getDest=$body.IndexOf('$dest = Get-OPAArchiveDestination')
+          $witness=$body.IndexOf('Get-OPA265ARCH2bMailSemanticWitness -Mail $item')
+          $claim=$body.IndexOf('Stage MoveClaimed')
+          $com=$body.IndexOf('$moved = $item.Move($dest.Folder)')
+          $receipt=$body.IndexOf('Stage MoveReturned')
+          $index=$body.IndexOf('Add-OPADuplicateEntry -Index $index -SourceEntryId $candidate.EntryId -ArchiveEntryId $archiveId -SourceFolderPath $folderPath -TargetFolderPath $dest.Folder.FolderPath')
+          if($m -cnotmatch '\[switch\]\$ARCH3dSyntheticBoundary' -or
+             $prepare -lt 0 -or $getDest -le $prepare -or
+             $witness -le $getDest -or $claim -le $witness -or
+             $com -le $claim -or $receipt -le $com -or
+             $index -le $receipt -or
+             $body -cnotmatch 'ARCH3d SYNTHETIC STOP after immutable MoveReturned' -or
+             $h -cnotmatch 'ARCH3D-SYNTHETIC-' -or
+             $h -cnotmatch 'Write-OPA265ARCH3cJsonOnce -Path' -or
+             $h -cnotmatch 'Write-OPAOperationJournalEvent -Path' -or
+             $h -cnotmatch 'OriginalOperationJournalSha256' -or
+             $h -cmatch 'GetActiveObject|AddStoreEx|New-Object -ComObject|Save-OPAArchiveTransaction' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Audit'\)" -or
+             $t -cnotmatch 'executes original GetDestination AND exactly one mock Move' -or
+             $docs -cnotmatch 'ARCH3d' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3d original mover linked pre-PST claim, post-COM stop-before-index or no-real-PST safety contract invalid.'
+          }
+          Write-Host 'PASS ARCH3d existing original Move-OPAItemsWithLimit hooked at all true COM boundaries; only fake COM/TEMP, no production writer.'
+      - name: ARCH3e original ArchiveVerifier and DuplicateIndex post-restart synthetic-only integration gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $a=Get-Content -LiteralPath 'Core/Archive/ARCH3ePostRestartIndexGate.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3e.ps1' -Raw -Encoding UTF8
+          $t=Get-Content -LiteralPath 'Tests/Archive/ARCH3eOriginalPostRestartIndexGate.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3e-original-verifier-index-gate.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $verify=$a.IndexOf('Test-OPAArchiveMoves -Namespace')
+          $proof=$a.IndexOf('$proofSha=Write-OPA265ARCH3cJsonOnce -Path $proofFile')
+          $journal=$a.IndexOf('Write-OPAOperationJournalEvent @journalParams')
+          $index=$a.IndexOf('Add-OPADuplicateEntry @indexParams')
+          $sync=$a.IndexOf('Sync-OPADuplicateJournalStreams')
+          $seal=$a.IndexOf('Write-OPA265ARCH3cJsonOnce -Path $indexSealFile')
+          if($verify -lt 0 -or $proof -lt $verify -or $journal -lt $proof -or
+             $index -lt $journal -or $sync -lt $index -or $seal -lt $sync -or
+             $a -cnotmatch 'Test-OPAArchiveMoves -Namespace' -or
+             $a -cnotmatch '\-RequireSemanticWitness' -or
+             $a -cnotmatch '\[int\]\$verified.TargetCount -eq 1' -or
+             $a -cnotmatch '\[int\]\$verified.ObservedSourceCount -eq 0' -or
+             $a -cnotmatch 'OriginalDuplicateIndexJournalSha256' -or
+             $a -cnotmatch 'Get-OPA265ARCH3ePinnedReceipt' -or
+             $a -cmatch 'GetActiveObject|New-Object -ComObject|AddStoreEx|\.Move\(' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Audit'\)" -or
+             $t -cnotmatch 'original post-restart fake verifier PASS allows original OperationJournal Reconciled then DuplicateIndex' -or
+             $docs -cnotmatch 'ARCH3e' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3e source-backed original full semantic verification or original journal/index post-restart synthetic gate missing.'
+          }
+          Write-Host 'PASS ARCH3e full original semantic verifier before original Reconciled + DuplicateIndex durable index, only fake restart and missing TEMP PST; production blocked.'
+      - name: ARCH3f original test-PST live preflight is strictly read-only and original routed
+        run: |
+          $ErrorActionPreference='Stop'
+          $p=Get-Content -LiteralPath 'Core/Archive/ARCH3fRealTestPstPreflight.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3f.ps1' -Raw -Encoding UTF8
+          $t=Get-Content -LiteralPath 'Tests/Archive/ARCH3fRealTestPstPreflight.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3f-real-test-pst-preflight.md' -Raw -Encoding UTF8
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($entry -cnotmatch "ValidateSet\('Plan','Inventory'\)" -or
+             $p -cnotmatch 'Open-OPA265ARCH2dSession -Layout' -or
+             $p -cnotmatch 'Get-OPAEligiblePop3MailFolders -RootFolder' -or
+             $p -cnotmatch 'Get-OPAArchiveCandidates -SourceFolder' -or
+             $p -cnotmatch 'Get-OPAArchivePartPath -SourcePst' -or
+             $p -cnotmatch 'Get-OPAArchiveTargetPath -ReceivedTime' -or
+             $p -cnotmatch 'Get-OPAWellKnownFolderEntryIds -Store' -or
+             $p -cnotmatch 'YearCountsAreFullInventory=\$false' -or
+             $p -cnotmatch 'OperatorDesignatedTestPstWithRealMailboxContent' -or
+             $p -cnotmatch 'Close-OPA265ARCH2dSession -Session' -or
+             $p -cmatch '\.Move\(|\.AddStoreEx\(|\.Save\(|\.Delete\(' -or
+             $p -cmatch 'Add-OPADuplicateEntry|Save-OPAArchiveTransaction|Write-OPA265ARCH2c4JsonOnce' -or
+             $t -cnotmatch 'user-created folder named Drafts' -or
+             $docs -cnotmatch 'info@stios.ru.pst' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+              throw 'ARCH3f read-only real source scope or original Year/Sent/Folder reuse gate missing.'
+          }
+          Write-Host 'PASS ARCH3f real TEST PST read-only Outlook preflight using original POP3 scope/Year/Sent/custom folder logic, no live writer.'
+      - name: ARCH3g source backed original Year collision and exact Inbox read-only audit gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $s=Get-Content -LiteralPath 'Core/Archive/ARCH3gExistingArchiveCollisionGate.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3g.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3gExistingArchiveCollisionGate.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3g-existing-year-pst-collision-gate.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $main=Get-Content -LiteralPath 'OutlookPOP3Archive.ps1' -Raw -Encoding UTF8
+          if($entry -cnotmatch "ValidateSet\('Plan','Audit'\)" -or
+             $s -cnotmatch 'Get-OPAArchivePstPartsOnDisk -SourcePst' -or
+             $s -cnotmatch 'Open-OPA265ARCH2dSession -Layout' -or
+             $s -cnotmatch 'GetItemFromID\(' -or
+             $s -cnotmatch 'Get-OPAArchiveItemDate -Item' -or
+             $s -cnotmatch 'Get-OPAArchiveTargetPath -ReceivedTime' -or
+             $s -cnotmatch 'ExistingYearArchiveCollision' -or
+             $s -cnotmatch 'FullSemanticWitnessCaptured=\$false' -or
+             $s -cnotmatch 'WriterPermit=\$false' -or
+             $s -cmatch '\.Move\(|\.AddStoreEx\(|Add-OPADuplicateEntry|Write-OPAOperationJournalEvent' -or
+             $test -cnotmatch 'flags pre-existing original Archive-2020' -or
+             $doc -cnotmatch 'ARCH3g' -or
+             $main -cnotmatch 'Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode \$Mode' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3g exact-source Year PST collision gate invalid or a writer was exposed.'
+          }
+          Write-Host 'PASS ARCH3g read-only existing annual PST collision / exact Inbox EntryID gate, real Move disabled.'
+      - name: ARCH3h pinned full original semantic witness source-backed no COM move gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3hRealSourceSemanticWitnessGate.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3h.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3hRealSourceSemanticWitnessGate.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3h-real-original-semantic-witness.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($entry -cnotmatch "ValidateSet\('Plan','Witness'\)" -or
+             $core -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness -Mail' -or
+             $core -cnotmatch 'Test-OPA265ARCH2bWitnessSchema -Witness' -or
+             $core -cnotmatch 'Get-OPA265ARCH3dOriginalWitnessHash -Witness' -or
+             $core -cnotmatch 'SourceStoreIdSha256' -or
+             $core -cnotmatch 'ExpectedExistingArchiveLengthBytes' -or
+             $core -cnotmatch 'OutlookProcessStartUtcTicks' -or
+             $core -cmatch '\.Move\(|\.AddStoreEx\(|Add-OPADuplicateEntry|Write-OPAOperationJournalEvent' -or
+             $doc -cnotmatch 'ARCH3h' -or
+             $test -cnotmatch 'refuses Outlook restart between preflight' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3h original semantic witness gate invalid / writer accidentally exposed.'
+          }
+          Write-Host 'PASS ARCH3h original pinned real Outlook source semantic witness only; archive writer blocked.'
+      - name: ARCH3i source backed original full semantic witness protected file anti replay and sha readback gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3iSealedFullOriginalWitness.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3i.ps1' -Raw -Encoding UTF8
+          $old=Get-Content -LiteralPath 'Core/Archive/ARCH3hRealSourceSemanticWitnessGate.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3iSealedFullOriginalWitness.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3i-sealed-full-original-witness.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($entry -cnotmatch "ValidateSet\('Plan','Seal','Review'\)" -or
+             $core -cnotmatch 'Invoke-OPA265ARCH3hPinnedSemanticWitness -Mode Witness -IncludeFullWitness' -or
+             $old -cnotmatch '\[switch\]\$IncludeFullWitness' -or
+             $core -cnotmatch 'Assert-OPA265ARCH2c2PrivateWorkspaceAcl' -or
+             $core -cnotmatch 'Write-OPA265ARCH3cJsonOnce -Path' -or
+             $core -cnotmatch 'Read-OPA265ARCH3cPinnedJson -Path' -or
+             $core -cnotmatch 'Get-OPA265ARCH3dOriginalWitnessHash -Witness' -or
+             $core -cnotmatch 'ConfirmEvidenceWrite' -or
+             $core -cmatch '\.Move\(|\.AddStoreEx\(|Add-OPADuplicateEntry|Write-OPAOperationJournalEvent' -or
+             $test -cnotmatch 'rejects sealed witness tampering' -or
+             $doc -cnotmatch '8782b410253f54cc5374661077cdfc9279bcfba12805f0dab42b461320cb999c' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3i original complete semantic witness sealing/sha/ACL/anti-replay gate invalid.'
+          }
+          Write-Host 'PASS ARCH3i full original ARCH2b witness immutable evidence with independent sha readback; no PST writer.'
+      - name: ARCH3i1 real public Review DateTime-null regression and one-shot sealed evidence readback gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3i.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3iSealedFullOriginalWitness.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3i1-review-date-binding-fix.md' -Raw -Encoding UTF8
+          $release=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($entry -cnotmatch 'if\(\$Mode -ceq' -or
+             $entry -cnotmatch 'SealSha256=\$SealSha256' -or
+             $entry -cnotmatch 'ExpectedArchiveDate=\$ExpectedArchiveDate' -or
+             $tests -cnotmatch 'public Invoke-ARCH3i Review accepts only RunId and SealSha256' -or
+             $tests -cnotmatch 'public Invoke-ARCH3i Review rejects wrong SHA' -or
+             $doc -cnotmatch '3773bcd7-5a07-4c31-8ce5-dfb16ddd30bf' -or
+             [int]$release.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$release.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3i1 public read-only Review regression gate failed.'
+          }
+          Write-Host 'PASS ARCH3i1 Review only accepts RunId and SealSha256; no source COM or DateTime binding.'
+      - name: ARCH3j real test POP3 exact sealed SHA original Year part2 duplicate-index read-only PrepareIntent gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3jRealOneShotPrepareIntent.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3j.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3jRealOneShotPrepareIntent.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3j-real-oneshot-prepare-intent.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($entry -cnotmatch "ValidateSet\('Plan','Audit','Prepare','Review'\)" -or
+             $core -cnotmatch 'Test-OPA265ARCH3iReadback' -or
+             $core -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness -Mail' -or
+             $core -cnotmatch 'New-OPA265ARCH3bOperationContract' -or
+             $core -cnotmatch 'Get-OPA265ARCH3jIndexSafety' -or
+             $core -cnotmatch 'Write-OPAOperationJournalEvent -Path' -or
+             $core -cnotmatch 'Write-OPA265ARCH3cJsonOnce -Path' -or
+             $core -cnotmatch 'Read-OPAOperationJournal -Path' -or
+             $core -cmatch '\.Move\(|\.AddStoreEx\(|Add-OPADuplicateEntry|Sync-OPADuplicateIndexFromJournal' -or
+             $test -cnotmatch 'never retries Prepare for the same RunId' -or
+             $doc -cnotmatch '5f5a86b6c1aba8a3d2ee328a36a5632f8edf1e89fdda8e7fd728688fe881b2a4' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3j original real one-shot PrepareIntent source-backed gate invalid or writer exposed.'
+          }
+          Write-Host 'PASS ARCH3j exact original one-shot sealed source, Year part2, original index read-only, protected real Intent; no Move.'
+      - name: ARCH3k original MailMover source-backed live barrier is read-only with original PST/index writer locked
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3kOriginalMoverLiveBarrier.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3k.ps1' -Raw -Encoding UTF8
+          $mover=Get-Content -LiteralPath 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3kOriginalMoverLiveBarrier.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3k-original-mover-live-boundary.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($entry -cnotmatch "ValidateSet\('Plan','Audit'\)" -or
+             $core -cnotmatch 'Get-OPA265ARCH3kOriginalMoverUnsafeDefaultMarkers' -or
+             $core -cnotmatch 'Test-OPA265ARCH3jPreparedIntent -Layout' -or
+             $core -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness -Mail' -or
+             $core -cnotmatch 'Get-OPA265ARCH3jOriginalRoutePlan -Sealed' -or
+             $core -cnotmatch 'Get-OPA265ARCH3jIndexSafety -Part1' -or
+             $core -cmatch '\.Move\(|\.AddStoreEx\(|Write-OPA265ARCH3cJsonOnce|Write-OPAOperationJournalEvent|(?m)^\s*Add-OPADuplicateEntry\s+-Index' -or
+             $mover -cmatch 'Invoke-OPA265ARCH3kOneOriginalMailMoverCall' -or
+             $test -cnotmatch 'rejects a late duplicate index collision' -or
+             $doc -cnotmatch 'f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3k real original source-backed risk gate violated or unsafe writer exposed.'
+          }
+          Write-Host 'PASS ARCH3k read-only original MailMover Part1/index risk model, 0 real writes.'
+      - name: ARCH3l guarded original MailMover Part2 is fake TEMP-only and skips shared index sync before provider
+        run: |
+          $ErrorActionPreference='Stop'
+          $mover=Get-Content -LiteralPath 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $gate=Get-Content -LiteralPath 'Core/Archive/ARCH3lOriginalPart2SyntheticGate.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3lOriginalPart2SyntheticGate.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3l-original-part2-synthetic-gate.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($mover -cnotmatch '\[switch\]\$ARCH3lSyntheticPart2Boundary' -or
+             $mover -cnotmatch 'if\(-not \$ARCH3dSyntheticBoundary -or \$Resume' -or
+             $mover -cnotmatch 'Assert-OPA265ARCH3lSyntheticPart2 -Scope' -or
+             $mover -cnotmatch 'if\(-not \$ARCH3lSyntheticPart2Boundary\)' -or
+             $mover -cnotmatch 'ARCH3d SYNTHETIC STOP' -or
+             $gate -cnotmatch 'Get-OPAArchivePartPath -SourcePst \$src -Year 2020 -Part 2' -or
+             $gate -cnotmatch 'Get-OPAArchiveTargetPath -ReceivedTime' -or
+             $gate -cnotmatch 'ARCH3l refuses real source PST' -or
+             $tests -cnotmatch 'refuses classic Part1 selection before any fake provider Move' -or
+             $tests -cnotmatch 'refuses after first fake provider outcome' -or
+             $doc -cnotmatch 'e3d5f0f388b9c8f9bb445810599686f4c192e92ed33bb9769fcc31a9beb2c506' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3l original fake-only Part2 boundary/index safety gate invalid.'
+          }
+          Write-Host 'PASS ARCH3l original MailMover fake Part2 boundary, no real Outlook/PST/Index.'
+      - name: ARCH3m original GetDestination forced Part2 preallocation is fake-only, never real Outlook
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content -LiteralPath 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $g=Get-Content -LiteralPath 'Core/Archive/ARCH3mOriginalPart2PreAllocation.ps1' -Raw -Encoding UTF8
+          $t=Get-Content -LiteralPath 'Tests/Archive/ARCH3mOriginalPart2PreAllocation.Tests.ps1' -Raw -Encoding UTF8
+          $d=Get-Content -LiteralPath 'docs/2.6.5-arch3m-original-part2-preallocation-synthetic.md' -Raw -Encoding UTF8
+          $r=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($m -cnotmatch '\[switch\]\$ARCH3mSyntheticForcePart2' -or
+             $m -cnotmatch 'Get-OPAArchiveDestination -Namespace \$Namespace -Transaction \$Transaction.*-ARCH3mSyntheticPart2Scope \$arch3dScope' -or
+             $m -cnotmatch 'Assert-OPA265ARCH3mSyntheticPreAllocation -Namespace' -or
+             $m -cnotmatch 'New-OPAArchivePst -Namespace \$Namespace -ArchivePst \$forcedPath' -or
+             $g -cnotmatch 'ARCH3m refuses real Outlook COM' -or
+             $g -cnotmatch 'Assert-OPA265ARCH3lSyntheticPart2 -Scope' -or
+             $t -cnotmatch 'forces original Part2 before synthetic one-time Move' -or
+             $t -cnotmatch 'rejects replay after first fake MoveReturned' -or
+             $d -cnotmatch '9d276dc4-a0e6-4e74-891f-81502fafe7db' -or
+             [int]$r.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$r.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3m source-backed fake-only preallocation safety gate invalid.'
+          }
+          Write-Host 'PASS ARCH3m original Part2 forced before PST allocation, fake-only; writer closed.'
+      - name: ARCH3n original pinned protected real intent and fake-only Part2 bridge never allow real Move
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3nPinnedRealIntentBridge.ps1' -Raw -Encoding UTF8
+          $mover=Get-Content -LiteralPath 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $cli=Get-Content -LiteralPath 'Invoke-ARCH3n.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3nPinnedRealIntentBridge.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3n-pinned-real-intent-bridge.md' -Raw -Encoding UTF8
+          $r=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($cli -cnotmatch "ValidateSet\('Plan','Audit'\)" -or
+             $core -cnotmatch 'Assert-OPA265ARCH3kPinnedPreparation -RunId' -or
+             $core -cnotmatch 'Get-OPA265ARCH3jIndexSafety -Part1' -or
+             $core -cnotmatch 'Invoke-OPA265ARCH3kLiveReadOnlyBoundary -Mode Audit' -or
+             $core -cnotmatch 'Assert-OPA265ARCH3nSyntheticRealIntentBridge' -or
+             $mover -cnotmatch 'ARCH3nSyntheticRealIntentBinding' -or
+             $mover -cnotmatch 'ARCH3n real intent binding cannot reach the generic original live archive selection path' -or
+             $mover -cnotmatch 'Assert-OPA265ARCH3mSyntheticPreAllocation' -or
+             $test -cnotmatch 'rejects fake Part2 with matching real path' -or
+             $doc -cnotmatch 'f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b' -or
+             [int]$r.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$r.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3n original protected real Intent / fake Part2 bridge safety gate violated.'
+          }
+          Write-Host 'PASS ARCH3n original real sealed Intent, original duplicate-index and fake Part2 mapping; no writer.'
+      - name: ARCH3o exact one real TEST POP3 Move must be in original MailMover behind two durable fences
+        run: |
+          $ErrorActionPreference='Stop'
+          $mover=Get-Content -LiteralPath 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3oOneRealOriginalMailMover.ps1' -Raw -Encoding UTF8
+          $cli=Get-Content -LiteralPath 'Invoke-ARCH3o.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3oOneRealOriginalMailMover.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3o-one-real-original-mover.md' -Raw -Encoding UTF8
+          $release=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($mover -cnotmatch 'ARCH3oRequireNewUnusedPst' -or
+             $mover -cnotmatch 'function Invoke-OPA265ARCH3oOneOriginalMailMoverProviderCall' -or
+             $mover -cnotmatch 'ARCH3o-ProviderInvocation.json' -or
+             $mover -cnotmatch '\$moved=\$Mail.Move\(\$Folder\)' -or
+             $core -cnotmatch 'Get-OPA265ARCH3nPinnedRealRoute -RunId' -or
+             $core -cnotmatch 'ARCH3o-WriterEntry.json' -or
+             $core -cnotmatch 'ARCH3o-DestinationReady.json' -or
+             $core -cnotmatch 'ARCH3o-MoveClaimed.json' -or
+             $core -cnotmatch 'ARCH3o-MoveReturned.json' -or
+             $core -cnotmatch 'Invoke-OPA265ARCH3oOneOriginalMailMoverProviderCall' -or
+             $core -cnotmatch 'ARCH3oRequireNewUnusedPst' -or
+             $cli -cnotmatch 'ConfirmOneRealMove' -or
+             $test -cnotmatch 'refuses a second provider Move' -or
+             $doc -cnotmatch 'f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b' -or
+             [int]$release.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$release.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3o exact original real TEST PST provider and dual irreversible one-shot fences missing.'
+          }
+          Write-Host 'PASS ARCH3o original mover, protected double provider claim, no production writer.'
+      - name: ARCH3p original ArchiveVerifier REAL restart safety gate is READ-ONLY and never retries Move
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3pIndependentPostRestartOriginalVerifier.ps1' -Raw -Encoding UTF8
+          $cli=Get-Content -LiteralPath 'Invoke-ARCH3p.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3pIndependentPostRestartOriginalVerifier.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3p-independent-postrestart-original-verifier.md' -Raw -Encoding UTF8
+          $release=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($cli -cnotmatch "ValidateSet\('Plan','Review','Status'\)" -or
+             $core -cnotmatch '\. \(Join-Path \$PSScriptRoot ''ArchiveVerifier.ps1''\)' -or
+             $core -cnotmatch 'Test-OPAArchiveMoves -Namespace \$session.Namespace' -or
+             $core -cnotmatch 'Compare-OPA265ARCH2bMailSemanticWitness -Source' -or
+             $core -cnotmatch 'ReopenedOutlookProcessId' -or
+             $core -cnotmatch 'ARCH3o-ProviderInvocation.json' -or
+             $core -cnotmatch 'Get-OPA265ARCH3jIndexSafety -Part1' -or
+             $core -cmatch '(?m)^\s*Add-OPADuplicateEntry\s+-Index' -or
+             $core -cmatch '(?m)^\s*Write-OPAOperationJournalEvent\s+-Path' -or
+             $core -cmatch '\$Mail\.Move\(' -or
+             $test -cnotmatch 'rejects SAME Outlook PID' -or
+             $test -cnotmatch 'allows missing MoveReturned only with durable claim' -or
+             $doc -cnotmatch 'f0860d55c5939498094832a8b924dbca9b65532cf53f8234f4aeda97ab631a2b' -or
+             [int]$release.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$release.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3p postrestart original ArchiveVerifier read-only safety gate failed.'
+          }
+          Write-Host 'PASS ARCH3p original full ArchiveVerifier after real restart, no Move/journal/index mutation.'
+      - name: ARCH3q original real verifier then original journal and shared index 501 protected commit no Move
+        run: |
+          $ErrorActionPreference='Stop'
+          $main=Get-Content -LiteralPath 'Core/Archive/ARCH3qVerifiedJournalIndexCommit.ps1' -Raw -Encoding UTF8
+          $state=Get-Content -LiteralPath 'Core/Archive/ARCH3qState.ps1' -Raw -Encoding UTF8
+          $evidence=Get-Content -LiteralPath 'Core/Archive/ARCH3qEvidence.ps1' -Raw -Encoding UTF8
+          $cli=Get-Content -LiteralPath 'Invoke-ARCH3q.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3qVerifiedJournalIndexCommit.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3q-original-postrestart-journal-index-commit.md' -Raw -Encoding UTF8
+          $r=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($cli -cnotmatch "ValidateSet\('Plan','Seal','Commit','Recover','Status','Review'\)" -or
+             $main -cnotmatch 'Write-OPAOperationJournalEvent @args' -or
+             $main -cnotmatch 'Add-OPADuplicateEntry @params' -or
+             $main -cnotmatch 'Sync-OPADuplicateJournalStreams' -or
+             $main -cnotmatch 'Close-OPADuplicateJournalStreams' -or
+             $main -cnotmatch 'Write-OPA265ARCH3cJsonOnce -Path \$s.ClaimPath' -or
+             $main -cnotmatch 'Invoke-OPA265ARCH3pIndependentRestartReview -Chain' -or
+             $state -cnotmatch 'Get-OPAOperationJournalSha256 -Bytes \$prefix' -or
+             $evidence -cnotmatch 'Read-OPA265ARCH3cPinnedJson -Path' -or
+             $test -cnotmatch 'Recover only from prior Reconciled' -or
+             $doc -cnotmatch '00000000CB201CE90F11EB4AB6F01B5E5BEF7CED24002000' -or
+             [int]$r.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$r.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3q original postrestart journal/index commitment safety gate failed.'
+          }
+          Write-Host 'PASS ARCH3q original real verifier -> original Reconciled -> original shared index 501; no Move.'
+      - name: ARCH3r real completed checkpoint SHA pinned and 10 TEMP-only semantic/journal/index synthetic tests
+        run: |
+          $ErrorActionPreference='Stop'
+          $checkpoint=Get-Content -LiteralPath 'Core/Archive/ARCH3rCompletedPilotCheckpoint.ps1' -Raw -Encoding UTF8
+          $synthetic=Get-Content -LiteralPath 'Core/Archive/ARCH3rTenItemSyntheticIntegration.ps1' -Raw -Encoding UTF8
+          $cli=Get-Content -LiteralPath 'Invoke-ARCH3r.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3rCompletedCheckpointSynthetic10.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3r-completed-checkpoint-and-synthetic-ten.md' -Raw -Encoding UTF8
+          $r=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($cli -cnotmatch "ValidateSet\('Plan','Audit','Synthetic10'\)" -or
+             $checkpoint -cnotmatch '6c0a0fc58935fe2bb1b5350b1e9d21400cbaccebcdfe40722aa95a3fa08d7d58' -or
+             $checkpoint -cnotmatch '5ada35eb30f34ff60dc4b89f23aa071b72cc0b98e5ff57299d61f1714b13d7ae' -or
+             $checkpoint -cnotmatch 'Invoke-OPA265ARCH3qCommit -Mode Review' -or
+             $synthetic -cnotmatch 'New-OPA265ARCH3rTenSyntheticPlan' -or
+             $synthetic -cnotmatch 'Write-OPAOperationJournalEvent -Path' -or
+             $synthetic -cnotmatch 'Compare-OPA265ARCH2bMailSemanticWitness -Source' -or
+             $synthetic -cnotmatch 'Write-OPA265ARCH3cJsonOnce -Path' -or
+             $synthetic -cnotmatch 'Add-OPADuplicateEntry -Index' -or
+             $synthetic -cnotmatch 'AfterIndexAppend' -or
+             $synthetic -cmatch '\.Move\(' -or
+             $tests -cnotmatch 'successfully reconciles ten simulated original journal operations' -or
+             $doc -cnotmatch 'OriginalArchiveVerifierOutlookCOMExecuted=False' -or
+             [int]$r.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$r.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3r immutable historical real checkpoint or synthetic ten original journal/index no-writer gates missing.'
+          }
+          Write-Host 'PASS ARCH3r immutable real original journal/index and TEMP-only 10 synthetic full semantic safety gates.'
+      - name: ARCH3s unmodified ORIGINAL ArchiveVerifier ten fake Outlook MailItems and ORIGINAL full ARCH2b attachment SHA
+        run: |
+          $ErrorActionPreference='Stop'
+          $fake=Get-Content -LiteralPath 'Core/Archive/ARCH3sFakeOutlookTenObjects.ps1' -Raw -Encoding UTF8
+          $engine=Get-Content -LiteralPath 'Core/Archive/ARCH3sTenOriginalVerifierIntegration.ps1' -Raw -Encoding UTF8
+          $cli=Get-Content -LiteralPath 'Invoke-ARCH3s.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3sTenOriginalVerifierIntegration.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3s-original-verifier-fake-ten.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($cli -cnotmatch "ValidateSet\('VerifierOnly','Integration'\)" -or
+             $fake -cnotmatch 'New-OPA265ARCH3sFakeMail' -or
+             $fake -cnotmatch 'SaveAsFile' -or
+             $fake -cnotmatch 'GetItemFromID' -or
+             $engine -cnotmatch 'Test-OPAArchiveMoves @args' -or
+             $engine -cnotmatch 'Invoke-OPA265ARCH3rSyntheticTen -InjectFault' -or
+             $engine -cnotmatch 'ObservedArchiveFolderCount' -or
+             $engine -cmatch '(?m)^\s*Mock\s+Test-OPAArchiveMoves' -or
+             $engine -cmatch '\.Move\(' -or
+             $tests -cnotmatch 'genuine ORIGINAL full ARCH2b MailItem witness hashes' -or
+             $tests -cnotmatch 'partial original index after two verified fake items' -or
+             $doc -cnotmatch 'WriterPermit=False' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+            throw 'ARCH3s ORIGINAL ArchiveVerifier fake Outlook 10-item full semantic and no real writer CI gate failed.'
+          }
+          Write-Host 'PASS ARCH3s ten original ArchiveVerifier fake MailItems original full ARCH2b sha and TEMP-only journal/index.'
+      - name: ARCH3t original journal 10 Reconciled and partial index only safe recovery
+        run: |
+          $ErrorActionPreference='Stop'
+          $source=Get-Content -LiteralPath 'Core/Archive/ARCH3tSyntheticIndexOnlyRecovery.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3t.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3tSyntheticIndexOnlyRecovery.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3t-synthetic-index-only-recovery.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($source -cnotmatch 'Get-OPA265ARCH3tSyntheticIndexAudit' -or
+             $source -cnotmatch 'Read-OPAOperationJournal -Path' -or
+             $source -cnotmatch 'Invoke-OPA265ARCH3sOriginalVerifierTen -Fixture' -or
+             $source -cnotmatch 'Add-OPADuplicateEntry -Index' -or
+             $source -cnotmatch 'ConfirmSyntheticRecovery' -or
+             $source -cmatch '\.Move\s*\(' -or
+             $source -cmatch 'GetActiveObject\s*\(' -or
+             $entry -cnotmatch 'Invoke-OPA265ARCH3tIndexOnlyRecovery' -or
+             $test -cnotmatch 'recovers precisely eight original missing index rows' -or
+             $doc -cnotmatch 'WriterPermit=False' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+             throw 'ARCH3t synthetic index-only strict recovery gate failed.'
+          }
+          Write-Host 'PASS ARCH3t strict original TEMP journal/index recovery only with 15 new Pester.'
+      - name: ARCH3u actual real TEST-PST read-only ten original Inbox/index/Year route preflight static gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3uRealBatchTenPreflight.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3u.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3uRealBatchTenPreflight.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3u-real-test-pst-ten-readonly-preflight.md' -Raw -Encoding UTF8
+          $r=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($core -cnotmatch 'Open-OPA265ARCH2dSession -Layout' -or
+             $core -cnotmatch 'Get-OPAArchiveCandidates -SourceFolder' -or
+             $core -cnotmatch 'Import-OPADuplicateIndex -ArchivePst' -or
+             $core -cnotmatch 'Get-OPAArchivePstPartsOnDiskAll -SourcePst' -or
+             $core -cnotmatch 'New-OPA265ARCH3bBatchPreview -Candidates' -or
+             $core -cnotmatch 'GetItemFromID' -or
+             $core -cmatch '\.Move\s*\(' -or
+             $core -cmatch '\.AddStoreEx\s*\(' -or
+             $core -cmatch '\.Delete\s*\(' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Inventory'\)" -or
+             $tests -cnotmatch 'selects ten unindexed oldest' -or
+             $docs -cnotmatch 'FullOriginalSemanticWitnessesCaptured=False' -or
+             [int]$r.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$r.Verification.ExpectedTestContainers -ne 162){
+             throw 'ARCH3u bounded read-only original Inbox/Index/MailMover route gate missing.'
+          }
+          Write-Host 'PASS ARCH3u real TEST-PST READ ONLY original ten-message Inbox/index/year-part preflight.'
+      - name: ARCH3v original ten real full semantic SHA and protected evidence-only readback static safety gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3vRealTenFullWitness.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3v.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3vRealTenFullWitness.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3v-real-ten-full-semantic-witness.md' -Raw -Encoding UTF8
+          $r=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($core -cnotmatch 'Invoke-OPA265ARCH3uRealBatchTenPreflight -Mode Inventory' -or
+             $core -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness -Mail' -or
+             $core -cnotmatch 'Get-OPA265ARCH3dOriginalWitnessHash -Witness' -or
+             $core -cnotmatch 'New-OPA265ARCH3iPrivateEvidenceDirectory -Layout' -or
+             $core -cnotmatch 'Write-OPA265ARCH3cJsonOnce -Path' -or
+             $core -cnotmatch 'Read-OPA265ARCH3cPinnedJson -Path' -or
+             $core -cnotmatch 'Get-OPA265ARCH3vAuditDigest -Envelope' -or
+             $core -cnotmatch 'ConfirmEvidenceWrite' -or
+             $core -cnotmatch 'ExpectedAuditSha256' -or
+             $core -cmatch '\.Move\s*\(' -or
+             $core -cmatch '\.AddStoreEx\s*\(' -or
+             $core -cmatch 'Write-OPAOperationJournalEvent\s' -or
+             $core -cmatch 'Add-OPADuplicateEntry\s' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Audit','Seal','Review'\)" -or
+             $tests -cnotmatch 'actual attachment payload SHA' -or
+             $tests -cnotmatch 'private directory and immutable CreateNew' -or
+             $doc -cnotmatch 'WriterPermit=False' -or
+             [int]$r.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$r.Verification.ExpectedTestContainers -ne 162){
+             throw 'ARCH3v full original source semantic read-only Audit and protected evidence-only Seal gate incomplete.'
+          }
+          Write-Host 'PASS ARCH3v original ten full semantic and protected single sealed evidence SHA; no PST Move writer.'
+      - name: ARCH3w EXACT ten ORIGINAL OperationJournal Intent protected evidence-only gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3wTenOriginalIntents.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3w.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3wTenOriginalIntents.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3w-ten-original-intents.md' -Raw -Encoding UTF8
+          $r=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($core -cnotmatch 'Test-OPA265ARCH3vFullTenReadback -Layout' -or
+             $core -cnotmatch 'Get-OPA265ARCH3vFullReadOnlyAudit -RunId' -or
+             $core -cnotmatch 'Get-OPA265ARCH3wOriginalYearParts -SourcePst' -or
+             $core -cnotmatch 'Get-OPA265ARCH3uSharedIndexReadOnly -SourcePst' -or
+             $core -cnotmatch 'New-OPA265ARCH3iPrivateEvidenceDirectory -Layout' -or
+             $core -cnotmatch 'Write-OPA265ARCH3cJsonOnce -Path' -or
+             $core -cnotmatch 'Write-OPAOperationJournalEvent -Path' -or
+             $core -cnotmatch 'Read-OPAOperationJournal -Path' -or
+             $core -cnotmatch 'ConfirmPrepareIntent' -or
+             $core -cnotmatch 'ExpectedPrepareDigest' -or
+             $core -cmatch '\.Move\s*\(' -or
+             $core -cmatch '\.AddStoreEx\s*\(' -or
+             $core -cmatch 'Add-OPADuplicateEntry\s' -or
+             $core -cmatch '\bMoveClaimed\s*=\s*\$true' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Audit','Prepare','Review'\)" -or
+             $tests -cnotmatch 'original journal writer persists 10 exact original Intent' -or
+             $tests -cnotmatch 'protected journal cannot be automatically replayed' -or
+             $docs -cnotmatch 'WriterPermit=False' -or
+             [int]$r.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$r.Verification.ExpectedTestContainers -ne 162){
+             throw 'ARCH3w exact ten real source pre-move ORIGINAL Intent journal only, no Move, protected SHA gate missing.'
+          }
+          Write-Host 'PASS ARCH3w original protected full ten Intent journal SHA independent readback no provider writer.'
+      - name: ARCH3w1 ORIGINAL Part2 semantic ArchiveVerifier before protected ten Intent
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3w1SemanticPart2Intents.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3w1.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3w1SemanticPart2Intents.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3w1-semantic-part2-proof.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($core -cnotmatch 'Get-OPA265ARCH3qState -RunId' -or
+             $core -cnotmatch 'Get-OPA265ARCH3qPinnedStages -State' -or
+             $core -cnotmatch 'Get-OPA265ARCH3rCompletedRealCheckpoint -Mode Audit' -or
+             $core -cnotmatch 'Assert-OPA265ARCH3w1Part2SingleMailTree -Root' -or
+             $core -cnotmatch 'Compare-OPA265ARCH2bMailSemanticWitness -Source' -or
+             $core -cnotmatch 'Test-OPAArchiveMoves -Namespace' -or
+             $core -cnotmatch 'Test-OPA265ARCH3pOriginalVerifierResult -Verified' -or
+             $core -cnotmatch "Part2.*exactly one" -or
+             $core -cnotmatch 'Sha256=\$firstSha' -or
+             $core -cnotmatch 'ProofKind=.OriginalArchiveVerifierFullSemanticSha256' -or
+             $core -cnotmatch 'Get-OPA265ARCH3vFullReadOnlyAudit -RunId' -or
+             $core -cnotmatch 'Write-OPAOperationJournalEvent -Path' -or
+             $core -cnotmatch 'New-OPA265ARCH3iPrivateEvidenceDirectory -Layout' -or
+             $core -cnotmatch 'Read-OPAOperationJournal -Path' -or
+             $core -cmatch 'Get-OPA265ARCH3pClaimChain\s+-RunId' -or
+             $core -cmatch '\.Move\s*\(' -or
+             $core -cmatch '\.AddStoreEx\s*\(' -or
+             $core -cmatch 'Add-OPADuplicateEntry\s' -or
+             $core -cmatch '\bMoveClaimed\s*=\s*\$true' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Audit','Prepare','Review'\)" -or
+             $tests -cnotmatch 'does not include untrusted raw Part2' -or
+             $tests -cnotmatch 'stage module loads original ARCH3q postcommit' -or
+             $doc -cnotmatch 'WriterPermit=False' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+             throw 'ARCH3w1 original full semantic Part2 / strict Part1 / protected Intent only gate incomplete.'
+          }
+          Write-Host 'PASS ARCH3w1 historical postcommit ORIGINAL Part2 original full semantic ArchiveVerifier before evidence-only ten journal Intent.'
+      - name: ARCH3x original fake-only ten claim provider and ARCH3w1 runtime dependency gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $module=Get-Content -LiteralPath 'Core/Archive/ARCH3xOriginalBatchTenFence.ps1' -Raw -Encoding UTF8
+          $mover=Get-Content -LiteralPath 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $w1=Get-Content -LiteralPath 'Invoke-ARCH3w1.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3xOriginalBatchTenFence.Tests.ps1' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($module -cnotmatch 'Test-OPA265ARCH3w1PreparedReadback -Layout' -or
+             $module -cnotmatch 'Write-OPA265ARCH3cJsonOnce -Path' -or
+             $module -cnotmatch 'Invoke-OPA265ARCH3xFakeOnlyOriginalProviderCall -Mail' -or
+             $module -cmatch 'Add-OPADuplicateEntry\s' -or
+             $module -cmatch '\.AddStoreEx\s*\(' -or
+             $mover -cnotmatch 'function Invoke-OPA265ARCH3xFakeOnlyOriginalProviderCall' -or
+             $mover -cnotmatch '\$moved=\$Mail\.Move\(\$Folder\)' -or
+             $w1 -cnotmatch 'Core/Archive/ARCH3w1SemanticPart2Intents.ps1' -or
+             -not (Test-Path -LiteralPath 'Core/Archive/ARCH3w1SemanticPart2Intents.ps1') -or
+             $tests -cnotmatch 'AfterInvocation stops before fake Move' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+              throw 'ARCH3x original fake-only provider and corrected ARCH3w1 entry safety gate incomplete.'
+          }
+          Write-Host 'PASS ARCH3x original fake-only MailMover ten claim/provider gate and corrected dependency.'
+      - name: ARCH3x1 strict source-backed exact ten real original MailMover route - no CI COM calls
+        run: |
+          $ErrorActionPreference='Stop'
+          $core=Get-Content -LiteralPath 'Core/Archive/ARCH3x1RealTenOriginalMailMover.ps1' -Raw -Encoding UTF8
+          $mover=Get-Content -LiteralPath 'Core/Archive/MailMover.ps1' -Raw -Encoding UTF8
+          $entry=Get-Content -LiteralPath 'Invoke-ARCH3x1.ps1' -Raw -Encoding UTF8
+          $test=Get-Content -LiteralPath 'Tests/Archive/ARCH3x1RealTenOriginalMailMover.Tests.ps1' -Raw -Encoding UTF8
+          $doc=Get-Content -LiteralPath 'docs/2.6.5-arch3x1-real-ten-original-mailmover.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($core -cnotmatch 'Test-OPA265ARCH3w1PreparedReadback -Layout' -or
+             $core -cnotmatch 'Get-OPA265ARCH3x1bPinnedTenLiveAudit -Manifest' -or
+             $core -cnotmatch 'Get-OPA265ARCH3x1bPartsProof -Manifest' -or
+             $core -cnotmatch 'Get-OPA265ARCH3uSharedIndexReadOnly -SourcePst' -or
+             $core -cnotmatch 'Assert-OPA265ARCH3iFullWitnessPinned -Witness' -or
+             $core -cnotmatch 'New-OPA265ARCH3iPrivateEvidenceDirectory -Layout' -or
+             $core -cnotmatch 'ARCH3oRequireNewUnusedPst' -or
+             $core -cnotmatch 'Invoke-OPA265ARCH3x1OneOriginalMailMoverProviderCall -Mail' -or
+             $core -cmatch '(?m)^\s*Add-OPADuplicateEntry\s' -or
+             $core -cmatch '(?m)^\s*Write-OPAOperationJournalEvent\s' -or
+             $mover -cnotmatch 'function Invoke-OPA265ARCH3x1OneOriginalMailMoverProviderCall' -or
+             $mover -cnotmatch '\$moved=\$Mail.Move\(\$Folder\)' -or
+             $entry -cnotmatch "ValidateSet\('Plan','Audit','Move','Status'\)" -or
+             $test -cnotmatch 'Move -WhatIf prevents Outlook access' -or
+             $doc -cnotmatch 'ProductionReady=False' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+              throw 'ARCH3x1 original real batch-ten protected Move safety gates missing.'
+          }
+          Write-Host 'PASS ARCH3x1 exact ten original real test-PST protected provider route, no CI Outlook/PST.'
+      - name: ARCH3x2 unified pinned ten live semantic source and ORIGINAL postrestart ArchiveVerifier index commit gate
+        run: |
+          $ErrorActionPreference='Stop'
+          $b=Get-Content -LiteralPath 'Core/Archive/ARCH3x1bPinnedLiveTen.ps1' -Raw -Encoding UTF8
+          $x=Get-Content -LiteralPath 'Core/Archive/ARCH3x1RealTenOriginalMailMover.ps1' -Raw -Encoding UTF8
+          $p=Get-Content -LiteralPath 'Core/Archive/ARCH3x2TenIndependentReviewCommit.ps1' -Raw -Encoding UTF8
+          $cli=Get-Content -LiteralPath 'Invoke-ARCH3x2.ps1' -Raw -Encoding UTF8
+          $tests=Get-Content -LiteralPath 'Tests/Archive/ARCH3x2UnifiedLiveTen.Tests.ps1' -Raw -Encoding UTF8
+          $docs=Get-Content -LiteralPath 'docs/2.6.5-arch3x2-unified-live-ten.md' -Raw -Encoding UTF8
+          $rel=Get-Content -LiteralPath 'RELEASE.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if($b -cnotmatch 'Get-OPA265ARCH2bMailSemanticWitness -Mail' -or
+             $b -cnotmatch 'Compare-OPA265ARCH2bMailSemanticWitness -Source' -or
+             $b -cnotmatch 'Test-OPA265ARCH3w1LiveOriginalPart2 -SourcePst' -or
+             $b -cmatch 'Get-OPAArchiveCandidates|New-OPA265ARCH3uTenPreview|SourcePstLengthBytes -ne' -or
+             $x -cnotmatch 'Get-OPA265ARCH3x1bPinnedTenLiveAudit -Manifest' -or
+             $x -cnotmatch 'Get-OPA265ARCH3x1bPartsProof -Manifest' -or
+             $x -cnotmatch 'PhysicalSourcePstSizeFence=\$false' -or
+             $x -cmatch 'ObservedSourcePstLengthBytes -or' -or
+             $p -cnotmatch 'Invoke-OPA265ARCH3x2IndependentTenReview' -or
+             $p -cnotmatch 'Test-OPAArchiveMoves -Namespace' -or
+             $p -cnotmatch '-ExpectedMoved 10 -ExpectedMoves' -or
+             $p -cnotmatch '-RequireSemanticWitness' -or
+             $p -cnotmatch 'Write-OPAOperationJournalEvent -Path \$Layout.CommitJournalPath' -or
+             $p -cnotmatch 'Add-OPADuplicateEntry -Index \$index.Index' -or
+             $p -cnotmatch 'Sync-OPADuplicateJournalStreams' -or
+             $p -cmatch '\$mail\.Move\(|\$item\.Move\(' -or
+             $cli -cnotmatch "ValidateSet\('Status','Plan','Review','Seal','Commit','Recover'\)" -or
+             $tests -cnotmatch 'ARCH3x2 journal-state refuses Reconciled before all ten Intent' -or
+             $docs -cnotmatch 'PreflightDigest' -or
+             [int]$rel.Verification.ExpectedPesterTests -ne 4726 -or
+             [int]$rel.Verification.ExpectedTestContainers -ne 162){
+             throw 'ARCH3x2 unified original ten semantic/postrestart verified journal+index source-backed barrier failed.'
+          }
+          Write-Host 'PASS ARCH3x2 original ten source-specific witness, postrestart ArchiveVerifier, original verified journal/index commit and NO COM Move during CI.'
+      - name: Package only OutlookPOP3Archive from tested commit and calculate SHA-256
+        run: |
+          $ErrorActionPreference='Stop'
+          $project=(Get-Location).Path
+          $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
+          $base='OutlookPOP3Archive-2.6.5-ARCH3x2-dev-g'+$short
+          $out=Join-Path $env:RUNNER_TEMP 'OPA-ARCH3x2-Package'
+          $stageParent=Join-Path $env:RUNNER_TEMP 'OPA-ARCH3x2-Stage'
+          $staged=Join-Path $stageParent $base
+          [void][IO.Directory]::CreateDirectory($out)
+          [void][IO.Directory]::CreateDirectory($staged)
+          foreach($f in @('.editorconfig','.gitignore','.psscriptanalyzer.psd1','RELEASE.json','MANIFEST.txt','README.md','CHANGELOG.md','OutlookPOP3Archive.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-ARCH2c4.ps1','Invoke-ARCH2d.ps1','Invoke-ARCH2d3.ps1','Invoke-ARCH2d4.ps1','Invoke-ARCH2d5.ps1','Invoke-ARCH3a.ps1','Invoke-ARCH3b.ps1','Invoke-ARCH3c.ps1','Invoke-ARCH3d.ps1','Invoke-ARCH3e.ps1','Invoke-ARCH3f.ps1','Invoke-ARCH3g.ps1','Invoke-ARCH3h.ps1','Invoke-ARCH3i.ps1','Invoke-ARCH3j.ps1','Invoke-ARCH3k.ps1','Invoke-ARCH3n.ps1','Invoke-ARCH3o.ps1','Invoke-ARCH3p.ps1','Invoke-ARCH3q.ps1','Invoke-ARCH3r.ps1','Invoke-ARCH3t.ps1','Invoke-ARCH3u.ps1','Invoke-ARCH3v.ps1','Invoke-ARCH3w.ps1','Invoke-ARCH3w1.ps1','Invoke-ARCH3x.ps1','Invoke-ARCH3x1.ps1','Invoke-ARCH3x2.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')){
+            $src=Join-Path $project $f
+            if(-not (Test-Path -LiteralPath $src -PathType Leaf)){throw ('Required project file absent: '+$f)}
+            Copy-Item -LiteralPath $src -Destination (Join-Path $staged $f)
+          }
+          foreach($dir in @('Core','Tests','docs')){
+            $dirPath=Join-Path $project $dir
+            foreach($f in @(Get-ChildItem -LiteralPath $dirPath -Recurse -File -Force)){
+              $extension=if($dir -eq 'docs'){'.md'}else{'.ps1'}
+              if($f.Extension -cne $extension -or
+                 ($dir -eq 'Tests' -and $f.Name -notmatch '\.Tests\.ps1$') -or
+                 (($f.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)){throw ('Unallowlisted file: '+$f.FullName)}
+              $relative=$f.FullName.Substring($project.Length).TrimStart([char[]]@('\','/'))
+              $dst=Join-Path $staged $relative
+              [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($dst))
+              Copy-Item -LiteralPath $f.FullName -Destination $dst
+            }
+          }
+          $info=[ordered]@{Schema='OPA265.ARCH3x2.BuildInfo.1';DevelopmentGate='2.6.5-ARCH3x2';SourceCommit=$env:GITHUB_SHA;WindowsPowerShell51CiPassed=$true;PesterAndPSScriptAnalyzerRequired=$true;LiveOutlookTestInCi=$false;ArchiveResumeAutoClosed=$true;ProductionReady=$false}
+          [IO.File]::WriteAllText((Join-Path $staged 'BUILD-INFO.json'),(ConvertTo-Json -InputObject $info -Depth 4),(New-Object Text.UTF8Encoding($false)))
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip=Join-Path $out ($base+'.zip')
+          [IO.Compression.ZipFile]::CreateFromDirectory($stageParent,$zip,[IO.Compression.CompressionLevel]::Optimal,$false)
+          $hash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          [IO.File]::WriteAllText((Join-Path $out ($base+'.sha256')),($hash+'  '+[IO.Path]::GetFileName($zip)+[char]10),(New-Object Text.UTF8Encoding($false)))
+          Write-Host ('ARCH3x2 ZIP SHA256: '+$hash)
+      - name: Upload tested project-only ARCH3x2 DEV ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutlookPOP3Archive-2.6.5-ARCH3x2-dev
+          path: |
+            ${{ runner.temp }}/OPA-ARCH3x2-Package/*.zip
+            ${{ runner.temp }}/OPA-ARCH3x2-Package/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+      - name: Publish public test-only ARCH3x2 prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
+          $base='OutlookPOP3Archive-2.6.5-ARCH3x2-dev-g'+$short
+          $dir=Join-Path $env:RUNNER_TEMP 'OPA-ARCH3x2-Package'
+          $zip=Join-Path $dir ($base+'.zip')
+          $sha=Join-Path $dir ($base+'.sha256')
+          if(-not (Test-Path -LiteralPath $zip -PathType Leaf) -or -not (Test-Path -LiteralPath $sha -PathType Leaf)){throw 'ZIP/checksum absent'}
+          $tag='outlookpop3archive-2.6.5-arch3x2-dev-g'+$short
+          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH3x2 DEV '+$short) --notes 'ARCH3x2 unified DEV: ARCH3x1b source PST size and changing first-ten sampling REMOVED, exact ten original full semantic witnesses before real bounded ten COM Move; independent Outlook restart, original ArchiveVerifier all ten, separately protected Seal and original ten Reconciled+shared DuplicateIndex commit, index/journal only recovery, no automatic COM replay. 4726 Pester/162 containers Windows PS5.1. Only project ZIP/SHA256. No live Outlook CI or production Archive/Resume/Auto.' --prerelease
+          if($LASTEXITCODE -ne 0){throw 'GitHub prerelease publication failed'}
