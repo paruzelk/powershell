@@ -252,7 +252,7 @@ function Get-OPA265ARCH3x2CommitJournalState {
     if(-not [IO.File]::Exists([string]$Layout.CommitJournalPath)){
         return [pscustomobject]@{Intents=0;Reconciled=0}
     }
-    if((([IO.File]::GetAttributes([string]$Layout.CommitJournalPath) -band [IO.FileAttributes]::ReparsePoint) -ne 0){
+    if((([IO.File]::GetAttributes([string]$Layout.CommitJournalPath) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
         throw 'ARCH3x2 commit journal is redirected.'
     }
     $j=Read-OPAOperationJournal -Path $Layout.CommitJournalPath
