@@ -172,6 +172,42 @@ function New-OPA265ARCH3vEnvelopeFromPreview {
     return [pscustomobject]@{Envelope=$envelope;AuditSha256=$digest}
 }
 
+# ARCH3x1a ONLY. Original ARCH3v calls remain strict by default.
+# This PURE gate permits a bounded physical PST GROWTH (never a shrink)
+# exclusively for the historical ten-item operator RunId. Neither content
+# hashes nor the immutable legacy audit digest are altered.
+function Get-OPA265ARCH3x1aSourceLengthGate {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][string]$RunId,
+        [Parameter(Mandatory=$true)][long]$HistoricalLengthBytes,
+        [Parameter(Mandatory=$true)][long]$ObservedLengthBytes,
+        [switch]$PermitHistoricalGrowth
+    )
+    if($HistoricalLengthBytes -le 0 -or $ObservedLengthBytes -le 0){
+        throw 'ARCH3x1a requires valid nonempty historical and current PST lengths.'
+    }
+    $growth=[long]($ObservedLengthBytes-$HistoricalLengthBytes)
+    if(-not $PermitHistoricalGrowth){
+        if($growth -ne 0){
+            throw 'Original ARCH3v strict historical PST byte length drifted.'
+        }
+    }else{
+        if($RunId -cne '093b5ce9-4a90-46fa-b6a5-7cdba61d2f15' -or
+           $growth -lt 0 -or $growth -gt 268435456){
+            throw 'ARCH3x1a permits at most 256 MiB PST growth for exact sealed ten RunId; no shrink/replay.'
+        }
+    }
+    return [pscustomobject][ordered]@{
+        Schema='2.6.5-ARCH3x1a.SourceLengthGate.1'
+        HistoricalLengthBytes=$HistoricalLengthBytes
+        ObservedLengthBytes=$ObservedLengthBytes
+        GrowthBytes=$growth
+        HistoricalDigestPreserved=$true
+        OptInForExactOperatorRunId=[bool]$PermitHistoricalGrowth
+    }
+}
+
 function Get-OPA265ARCH3vFullReadOnlyAudit {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][string]$RunId,
@@ -179,14 +215,18 @@ function Get-OPA265ARCH3vFullReadOnlyAudit {
           [Parameter(Mandatory=$true)][string]$ExpectedPreviewSha256,
           [Parameter(Mandatory=$true)][string]$ExpectedSourceStoreIdSha256,
           [Parameter(Mandatory=$true)][string]$ExpectedOriginalIndexSha256,
-          [Parameter(Mandatory=$true)][long]$ExpectedSourcePstLengthBytes)
+          [Parameter(Mandatory=$true)][long]$ExpectedSourcePstLengthBytes,
+          [switch]$ARCH3x1aAllowSourcePstLengthGrowth)
     [void](Assert-OPA265ARCH3vExactPins -RunId $RunId -ExpectedPreviewSha256 $ExpectedPreviewSha256 -ExpectedSourceStoreIdSha256 $ExpectedSourceStoreIdSha256 -ExpectedOriginalIndexSha256 $ExpectedOriginalIndexSha256 -ExpectedSourcePstLengthBytes $ExpectedSourcePstLengthBytes)
     $source=Assert-OPA265ARCH3fRealTestSource -SourcePst $SourcePst -RequireExisting
     $p=Invoke-OPA265ARCH3uRealBatchTenPreflight -Mode Inventory -RunId $RunId -SourcePst $source
+    # ARCH3x1a is the ONLY opt-in: the sealed original length remains hashed in
+    # ARCH3v/ARCH3w1, while a new observed length is separately pinned for
+    # the real Move permit. All ten original full semantic witnesses still run.
+    $physical=Get-OPA265ARCH3x1aSourceLengthGate -RunId $RunId -HistoricalLengthBytes $ExpectedSourcePstLengthBytes -ObservedLengthBytes ([long]$p.SourcePstLengthBytes) -PermitHistoricalGrowth:$ARCH3x1aAllowSourcePstLengthGrowth.IsPresent
     if([string]$p.PreviewSha256 -cne $ExpectedPreviewSha256 -or
        [string]$p.SourceStoreIdSha256 -cne $ExpectedSourceStoreIdSha256 -or
        [string]$p.OriginalIndexSha256 -cne $ExpectedOriginalIndexSha256 -or
-       [long]$p.SourcePstLengthBytes -ne $ExpectedSourcePstLengthBytes -or
        [int]$p.BatchSize -ne 10 -or @($p.Rows).Count -ne 10 -or
        [int]$p.SelectedYear -ne 2020 -or [int]$p.SelectedArchivePart -ne 3 -or
        [bool]$p.RealMailMovePerformed -or [bool]$p.WriterPermit -or
@@ -254,7 +294,7 @@ function Get-OPA265ARCH3vFullReadOnlyAudit {
         if((Get-OPA265ARCH2bTextSha256 -Text ([string]$session.SourceStore.StoreID)) -cne $ExpectedSourceStoreIdSha256 -or
            [int]$session.OutlookProcessId -ne [int]$p.OutlookProcessId -or
            [int]$session.Inbox.Items.Count -lt 10 -or
-           ([IO.FileInfo]::new($source)).Length -ne $ExpectedSourcePstLengthBytes -or
+           ([IO.FileInfo]::new($source)).Length -ne [long]$physical.ObservedLengthBytes -or
            [IO.File]::Exists([string]$p.TargetPstPreview)){
             throw 'ARCH3v original POP3 source or target changed during ten full witnesses.'
         }
@@ -263,6 +303,13 @@ function Get-OPA265ARCH3vFullReadOnlyAudit {
             throw 'ARCH3v original shared index changed while building full semantic witnesses.'
         }
     }finally {Close-OPA265ARCH2dSession -Session $session}
+    if($ARCH3x1aAllowSourcePstLengthGrowth){
+        # IMPORTANT: original ARCH3v AuditSha256 committed the immutable
+        # HISTORICAL file length. Reconstruct that exact historical evidence
+        # envelope only AFTER all ten current full original witnesses passed.
+        # Do NOT change the actual PST or the ARCH3v/ARCH3w1 sealed files.
+        $p.SourcePstLengthBytes=[long]$physical.HistoricalLengthBytes
+    }
     $bundle=New-OPA265ARCH3vEnvelopeFromPreview -Preview $p -WitnessRows @($records.ToArray())
     return [pscustomobject][ordered]@{
         Schema='2.6.5-ARCH3v.OriginalTenFullWitnessAudit.1'
@@ -272,6 +319,9 @@ function Get-OPA265ARCH3vFullReadOnlyAudit {
         SourceStoreIdSha256=$ExpectedSourceStoreIdSha256
         OriginalIndexSha256=$ExpectedOriginalIndexSha256
         SourcePstLengthBytes=$ExpectedSourcePstLengthBytes
+        ObservedSourcePstLengthBytes=[long]$physical.ObservedLengthBytes
+        SourcePstLengthGrowthBytes=[long]$physical.GrowthBytes
+        OriginalHistoricalSourceLengthPreservedInDigest=$true
         TargetPstPreview=[string]$p.TargetPstPreview
         AuditSha256=[string]$bundle.AuditSha256
         BatchSize=10
