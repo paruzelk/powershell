@@ -5,6 +5,7 @@
 # NO Resume, NO automatic retry, NO Reconciled/Index before real postrestart verification.
 . (Join-Path $PSScriptRoot 'ARCH3w1SemanticPart2Intents.ps1')
 . (Join-Path $PSScriptRoot 'ARCH3xOriginalBatchTenFence.ps1')
+. (Join-Path $PSScriptRoot 'ARCH3x1bPinnedLiveTen.ps1')
 
 function Get-OPA265ARCH3x1Layout {
     [CmdletBinding()]
@@ -64,37 +65,30 @@ function Get-OPA265ARCH3x1RealPreflight {
        [IO.Directory]::Exists([string]$m.TargetPstPreview)){
         throw 'ARCH3x1 new Part3 already exists: no archive writer.'
     }
-    $parts=@(Get-OPA265ARCH3w1OriginalYearParts -SourcePst $source)
-    if($parts.Count -ne 2){throw 'ARCH3x1 original Year parts readback missing.'}
-    for($i=0;$i -lt 2;$i++){
-        if([int]$parts[$i].Part -ne ($i+1) -or
-           [string]$parts[$i].Path -cne [string]$m.ExistingArchiveParts[$i].Path -or
-           [string]$parts[$i].Sha256 -cne [string]$m.ExistingArchiveParts[$i].Sha256 -or
-           [long]$parts[$i].LengthBytes -ne [long]$m.ExistingArchiveParts[$i].LengthBytes){
-            throw 'ARCH3x1 original Part1 binary or Part2 full semantic proof changed.'
-        }
-    }
-    $full=Get-OPA265ARCH3vFullReadOnlyAudit -RunId ([string]$m.RunId) -SourcePst $source -ExpectedPreviewSha256 ([string]$m.PreviewSha256) -ExpectedSourceStoreIdSha256 ([string]$m.SourceStoreIdSha256) -ExpectedOriginalIndexSha256 ([string]$m.OriginalIndexSha256) -ExpectedSourcePstLengthBytes ([long]$m.SourcePstLengthBytes) -ARCH3x1aAllowSourcePstLengthGrowth
+    # Original historical Part2 full semantic ArchiveVerifier remains mandatory,
+    # but raw original PST and archive-part byte sizes are NEVER move permits.
+    $parts=Get-OPA265ARCH3x1bPartsProof -Manifest $m
+    # Re-read precisely the SEALED ten original messages; do not reselect a
+    # changing chronological sample of the live Inbox.
+    $full=Get-OPA265ARCH3x1bPinnedTenLiveAudit -Manifest $m -Seal $v
     if([string]$full.AuditSha256 -cne [string]$m.AuditSha256 -or
-       @($full._Envelope.Rows).Count -ne 10 -or [int]$full.TotalAttachmentCount -ne 12 -or
-       [long]$full.SourcePstLengthBytes -ne [long]$m.SourcePstLengthBytes -or
-       [long]$full.ObservedSourcePstLengthBytes -lt [long]$m.SourcePstLengthBytes -or
-       [long]$full.SourcePstLengthGrowthBytes -ne ([long]$full.ObservedSourcePstLengthBytes-[long]$m.SourcePstLengthBytes) -or
-       -not [bool]$full.OriginalHistoricalSourceLengthPreservedInDigest){
-        throw 'ARCH3x1 original preflight source 10 full Body/HTML/attachment witnesses changed.'
+       [int]$full.FullOriginalWitnessCount -ne 10 -or
+       [int]$full.TotalAttachmentCount -ne 12 -or
+       [bool]$full.ReSelectedInboxCandidates -or [bool]$full.PhysicalPstSizeCompared){
+        throw 'ARCH3x1b all ten specifically sealed original full semantic witnesses required.'
     }
     $digestParts=New-Object 'System.Collections.Generic.List[string]'
     foreach($x in @('ARCH3x1 REAL TEN ORIGINAL PREFLIGHT', [string]$m.RunId,
         $ManifestSha256,$JournalSha256,[string]$m.SealSha256,[string]$full.AuditSha256,
         [string]$m.OriginalIndexSha256,[string]$m.SourceStoreIdSha256,
-        [string]$m.SourcePstLengthBytes,[string]$full.ObservedSourcePstLengthBytes,
-        [string]$full.SourcePstLengthGrowthBytes,[string]$m.TargetPstPreview,
-        [string]$parts[0].Sha256,[string]$parts[0].LengthBytes,
-        [string]$parts[1].Sha256,[string]$parts[1].LengthBytes)){
+        [string]$m.TargetPstPreview,
+        [string]$parts.OriginalPart1Path,
+        [string]$parts.OriginalPart2Path,
+        [string]$parts.OriginalPart2SemanticSha256)){
         [void]$digestParts.Add($x)
     }
     for($i=0;$i -lt 10;$i++){
-        $row=$full._Envelope.Rows[$i];$saved=$v.Rows[$i];$intent=$m.Rows[$i]
+        $row=$full.Rows[$i];$saved=$v.Rows[$i];$intent=$m.Rows[$i]
         if([int]$row.Ordinal -ne ($i+1) -or
            [string]$row.SourceEntryId -cne [string]$saved.SourceEntryId -or
            [string]$row.FullOriginalWitnessSha256 -cne [string]$saved.FullOriginalWitnessSha256 -or
@@ -111,7 +105,6 @@ function Get-OPA265ARCH3x1RealPreflight {
         }
     }
     if((Get-OPA265ARCH3uSharedIndexReadOnly -SourcePst $source).OriginalIndexSha256 -cne [string]$m.OriginalIndexSha256 -or
-       [long]([IO.FileInfo]::new($source)).Length -ne [long]$full.ObservedSourcePstLengthBytes -or
        [IO.File]::Exists([string]$m.TargetPstPreview)){
         throw 'ARCH3x1 original shared index, source PST or Part3 changed while preflighting.'
     }
@@ -126,10 +119,10 @@ function Get-OPA265ARCH3x1RealPreflight {
         OriginalArchiveVerifierPart2Passed=$true
         OriginalSharedIndexSha256=[string]$m.OriginalIndexSha256
         OriginalJournalIntents=10
-        HistoricalSourcePstLengthBytes=[long]$m.SourcePstLengthBytes
-        ObservedSourcePstLengthBytes=[long]$full.ObservedSourcePstLengthBytes
-        SourcePstLengthGrowthBytes=[long]$full.SourcePstLengthGrowthBytes
         HistoricalAuditShaPreserved=$true
+        OriginalTenSpecificFullWitnessesChecked=$true
+        PhysicalSourcePstSizeFence=$false
+        ReSelectedInboxCandidates=$false
         RealMailMovePerformed=$false;ArchivePstCreated=$false
         WriterPermit=$false;ProductionReady=$false;AutomaticMoveRetryAllowed=$false
     }
@@ -294,7 +287,6 @@ function Invoke-OPA265ARCH3x1RealTen {
             throw 'ARCH3x1 exact original POP3/Outlook/Inbox scope changed.'
         }
         if((Get-OPA265ARCH3uSharedIndexReadOnly -SourcePst ([string]$m.SourcePst)).OriginalIndexSha256 -cne [string]$m.OriginalIndexSha256 -or
-           [long]([IO.FileInfo]::new([string]$m.SourcePst)).Length -ne [long]$audit.ObservedSourcePstLengthBytes -or
            [IO.File]::Exists([string]$m.TargetPstPreview) -or
            $null -ne (Get-OpaStoreByPathCached -Namespace $session.Namespace -Path ([string]$m.TargetPstPreview))){
             throw 'ARCH3x1 original index/source Part3 changed before protected writer entry.'
@@ -305,9 +297,6 @@ function Invoke-OPA265ARCH3x1RealTen {
             PreparedManifestSha256=$ManifestSha256;PreparedJournalSha256=$JournalSha256
             SealSha256=$SealSha256
             PreflightDigest=$ExpectedPreflightDigest
-            HistoricalSourcePstLengthBytes=[long]$m.SourcePstLengthBytes
-            ObservedSourcePstLengthBytes=[long]$audit.ObservedSourcePstLengthBytes
-            SourcePstLengthGrowthBytes=[long]$audit.SourcePstLengthGrowthBytes
             SourcePst=[string]$m.SourcePst;TargetPst=[string]$m.TargetPstPreview
             SourceStoreIdSha256=[string]$m.SourceStoreIdSha256
             SourceFolderEntryId=[string]$session.Inbox.EntryID
