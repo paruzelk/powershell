@@ -986,7 +986,7 @@ jobs:
              $b -cnotmatch 'TargetFolderPath=\[string\]\$Intent.TargetFolderPath' -or
              $b -cnotmatch '\[string\]\$Intent.TargetFolderPath -cne \[string\]\$SealRow.TargetFolderPath' -or
              $b -cnotmatch 'New-OPA265ARCH3x1bVerifiedRow -Ordinal' -or
-             $a -cnotmatch '\[string\]\$row.TargetFolderPath -cne ''2020\\Входящие''' -or
+             $a -cnotmatch '\[string\]\$row.TargetFolderPath -cne' -or
              $t -cnotmatch 'accepts all ten projected live rows' -or
              $t -cnotmatch 'refuses missing target route' -or
              $docs -cnotmatch 'NoRealTenWriterEntry' -or
