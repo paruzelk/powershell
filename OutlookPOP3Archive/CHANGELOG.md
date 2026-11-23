@@ -1,3 +1,10 @@
+## 2.6.5-ARCH3x2c DEV — 2026-11-23
+
+- User ARCH3x2 unified read-only Status PASS: NoRealTenWriterEntry, zero claims, invocations and returns. Original live Audit stopped at `ARCH3x1 full original preflight row drift at ordinal 1` before any PST or COM Move.
+- Root cause: new ARCH3x1b live semantic audit row projection omitted `TargetFolderPath` despite exact verified archived route in ARCH3w1 Intent/ARCH3v Seal.
+- Canonical `TargetFolderPath` is restored from ORIGINAL Intent only after equality to ARCH3v Seal, original per-item full semantic witness SHA, contract, SourceEntryId and actual attachment count. No historical witness rewrite, no physical PST size fence.
+- Six new Pester tests (expected **4732 tests in 162 containers** on Windows PowerShell 5.1), including a full mocked 10-row `Get-OPA265ARCH3x1RealPreflight` and rejection of missing/changed route, source and attachment identity. Real Outlook Move remains operator-only and was not performed in CI.
+
 ## 2.6.5-ARCH3x2 unified DEV — 2026-11-23
 
 - ARCH3x1b: eliminate source PST physical-length, whole-PST SHA and changing Inbox first-ten reselection from exact ten Move permit. Read precisely ten already sealed original POP3 messages and compare original ARCH2b full Body/HTML/recipients/user state/attachment byte SHA, original contract/parent/date/StoreID. No global Inbox-count equality; preserve strict per-message invariant.
