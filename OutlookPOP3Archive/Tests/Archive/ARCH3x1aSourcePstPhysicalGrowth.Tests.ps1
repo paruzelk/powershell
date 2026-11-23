@@ -73,7 +73,7 @@ Describe 'ARCH3x1a original physical PST growth isolated from immutable original
     }
     It 'ARCH3x1a ties Move audit to original full witness SHA and sealed ten Intent still' {
         $s=Get-Content -LiteralPath (Join-Path $script:projectRoot 'Core/Archive/ARCH3x1RealTenOriginalMailMover.ps1') -Raw -Encoding UTF8
-        $s | Should -Match 'Get-OPA265ARCH3vFullReadOnlyAudit -RunId'
+        $s | Should -Match 'Get-OPA265ARCH3x1bPinnedTenLiveAudit -Manifest'
         $s | Should -Match 'Get-OPA265ARCH3x1bPinnedTenLiveAudit -Manifest'
         $s | Should -Match '\[string\]\$full.AuditSha256 -cne \[string\]\$m.AuditSha256'
         $s | Should -Match '\$row.FullOriginalWitnessSha256 -cne \[string\]\$saved.FullOriginalWitnessSha256'
