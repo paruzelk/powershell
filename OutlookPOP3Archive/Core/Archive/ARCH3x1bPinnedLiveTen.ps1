@@ -121,7 +121,8 @@ function Get-OPA265ARCH3x1bPinnedTenLiveAudit {
             throw 'ARCH3x1b POP3 source StoreID changed during ten full semantic witnesses.'
         }
     }finally {Close-OPA265ARCH2dSession -Session $session}
-    if(@($rows.ToArray() | Measure-Object -Property AttachmentCount -Sum)[0].Sum -ne 12){
+    $totalAttachments=($rows.ToArray() | Measure-Object -Property AttachmentCount -Sum).Sum
+    if([int]$totalAttachments -ne 12){
         throw 'ARCH3x1b ten original attachments no longer total twelve.'
     }
     return [pscustomobject][ordered]@{
