@@ -31,8 +31,8 @@ Describe 'ARCH3x1 bounded original real ten provider Move, fail closed at every 
     It 'batch core reuses historical ARCH3w1/ARCH3v without replacing original verifiers' {
         $s=Get-Content -LiteralPath (Join-Path $script:root 'Core/Archive/ARCH3x1RealTenOriginalMailMover.ps1') -Raw -Encoding UTF8
         $s | Should -Match 'Test-OPA265ARCH3w1PreparedReadback -Layout'
-        $s | Should -Match 'Get-OPA265ARCH3w1OriginalYearParts -SourcePst'
-        $s | Should -Match 'Get-OPA265ARCH3vFullReadOnlyAudit -RunId'
+        $s | Should -Match 'Get-OPA265ARCH3x1bPartsProof -Manifest'
+        $s | Should -Match 'Get-OPA265ARCH3x1bPinnedTenLiveAudit -Manifest'
         $s | Should -Match 'Assert-OPA265ARCH3iFullWitnessPinned -Witness'
     }
     It 'batch core calls original Year and archive PST creator only after durable writer entry' {
@@ -140,9 +140,9 @@ Describe 'ARCH3x1 bounded original real ten provider Move, fail closed at every 
             Seal=[pscustomobject]@{}
         }
         Mock Assert-OPA265ARCH3fRealTestSource {return (Join-Path $TestDrive 'info@stios.ru.pst')}
-        Mock Get-OPA265ARCH3w1OriginalYearParts {throw 'Must not reach Outlook'}
+        Mock Get-OPA265ARCH3x1bPartsProof {throw 'Must not reach Outlook'}
         {Get-OPA265ARCH3x1RealPreflight -Prepared $pre -ManifestSha256 ('a'*64) -JournalSha256 ('b'*64)} | Should -Throw
-        Should -Invoke Get-OPA265ARCH3w1OriginalYearParts -Exactly -Times 0
+        Should -Invoke Get-OPA265ARCH3x1bPartsProof -Exactly -Times 0
     }
     It 'Preflight checks original shared index and full source semantic witnesses' {
         $s=Get-Content -LiteralPath (Join-Path $script:root 'Core/Archive/ARCH3x1RealTenOriginalMailMover.ps1') -Raw -Encoding UTF8
