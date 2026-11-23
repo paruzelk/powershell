@@ -948,7 +948,7 @@ jobs:
           $public=$v.Substring($v.IndexOf('function Invoke-OPA265ARCH3vRealTenFullWitness'))
           if($g -lt 0 -or $read -lt $g -or $witness -lt $read -or
              $reproject -le $witness -or $digest -le $reproject -or
-             $v -cnotmatch '\-ARCH3x1aAllowSourcePstLengthGrowth' -or
+             $v -cnotmatch '\[switch\]\$ARCH3x1aAllowSourcePstLengthGrowth' -or
              $v -cnotmatch '\[IO.FileInfo\]::new\(\$source\)\)\.Length -ne \[long\]\$physical.ObservedLengthBytes' -or
              $v -cnotmatch '268435456' -or
              $public -cmatch 'ARCH3x1aAllowSourcePstLengthGrowth' -or
