@@ -12,6 +12,8 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3x2c DEV: real operator test PST x2 Audit stopped before Move because ARCH3x1b verified row omitted original TargetFolderPath; fixed via pure canonical original ARCH3w1 Intent and ARCH3v Seal cross-checked row projection. User Status NoRealTenWriterEntry, zero claim/invoke/return. No historical SHA altered or PST binary-size checks; six Pester regressions including full 10-row preflight (4732 tests/162 containers expected). No real Outlook COM in CI.",
+
     "ARCH3x2 unified DEV: exact 10 original POP3 message witnesses rather than mutable PST binary length or changing first-ten candidates; live original per-mail Body/HTML/attachment byte SHA before guarded 10 COM Move, independent new Outlook process original ArchiveVerifier for ten after Move, explicit ReviewSeal/Commit + original Reconciled journal/append-only shared DuplicateIndex 10 and index/journal-only recovery. Historical ARCH3v/w1 SHA intact. Expected full 4726 Pester/162 Windows PS5.1. No real Outlook in CI.",
     "ARCH3x1a DEV: operator ten original ARCH3w1 Intent Prepare and Review PASS (ManifestSha 7568fb8..., JournalSha a70fc0a...). Original ARCH3x1 Plan PASS, but Audit blocked only by physical source PST size growth 7735903232->7756473344 (+20570112). Explicit internal historical full witness Audit gate allows only <=256 MiB growth for exact RunId; original ARCH3v public Seal/Review strict, all 10 original complete semantic witnesses and historical Audit SHA retained, current source PST size pinned into new PreflightDigest and real pre-writer guard. 16 Pester new, 4701/161 Windows PS5.1; no real Outlook in CI or journal/index commit.",
     "ARCH3w1 DEV: ARCH3w real Prepare correctly STOPPED before Intent when Part2 PST byte SHA changed with same 525312 bytes (43cbb... to 468f...); new distinct protected Intent stage. Keep Part1 strict binary SHA 8bc491.../271360, original ARCH3v sealed 10 source full witnesses and shared index SHA; bind Part2 to historical ARCH3q Reconciled/ARCH3r completed pilot 501 + original ARCH3i full SHA and fresh original Test-OPAArchiveMoves + full ARCH2b Body HTML attachment SHA of only archived Part2 MailItem. Stable digest excludes mutable raw Part2 bytes but requires Part2 525312 and exact one item; no Move, claim, PST/index writes. 21 new tests, expected 4646 Pester/158 containers Windows PS5.1, production closed.",
@@ -96,7 +98,7 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "ARCH3x2 unified DEV: ARCH3x1b source PST length and first-ten reselection gates removed; only pinned ten original full semantic witnesses before one-shot Move. Postrestart ORIGINAL ArchiveVerifier all ten, explicit sealed Review then original protected Reconciled journal and DuplicateIndex commit/recover (no Move retry). Windows PS5.1 4726/162 Pester expected; production closed.",
+    "Status": "ARCH3x2 unified DEV: ARCH3x1b source PST length and first-ten reselection gates removed; only pinned ten original full semantic witnesses before one-shot Move. Postrestart ORIGINAL ArchiveVerifier all ten, explicit sealed Review then original protected Reconciled journal and DuplicateIndex commit/recover (no Move retry). Windows PS5.1 4732/162 Pester expected; ARCH3x2c sealed TargetFolderPath row contract restored; production closed.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
     "BW4k7v2aReadOnlyPristineFolderInventoryGate": true,
@@ -105,7 +107,7 @@
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
     "ExpectedTestContainers": 162,
-    "ExpectedPesterTests": 4726,
+    "ExpectedPesterTests": 4732,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
