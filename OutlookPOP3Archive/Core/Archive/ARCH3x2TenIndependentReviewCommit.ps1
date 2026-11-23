@@ -194,6 +194,7 @@ function Invoke-OPA265ARCH3x2IndependentTenReview {
             TotalOriginalAttachments=12
             OriginalSourceEntryIdsAbsent=$true
             OriginalDestinationCount=10
+            ArchiveFolderPath=[string]$folder.FolderPath
             CurrentInboxCount=[long]$verified.ObservedSourceCount
             ReopenedOutlookProcessId=[int]$session.OutlookProcessId
             ReopenedOutlookProcessStartUtcTicks=[long]$session.OutlookProcessStartUtcTicks
@@ -304,6 +305,11 @@ function Invoke-OPA265ARCH3x2FinishIndexAndJournal {
         throw 'ARCH3x2 original immutable ARCH3w1 ten Intent evidence corrupted.'
     }
     $indexBefore=Get-OPA265ARCH3x2IndexState -Bundle $Bundle -AllowPreviouslyCommitted:$Recovery.IsPresent
+    $review=Read-OPA265ARCH3cPinnedJson -Path $Layout.ReviewSealPath -ExpectedSha256 $ReviewSha256
+    if([string]$review.Review.ArchiveFolderPath -cnotmatch '\\2020\\Входящие$' -or
+       [int]$review.Review.OriginalTenFullSemanticMatches -ne 10){
+        throw 'ARCH3x2 sealed independent verified target folder invalid.'
+    }
     # At first COMMIT there can be no x2 index entries. During Recovery,
     # only the *previously verified same* source/target entries are accepted.
     for($i=$state.Intents;$i -lt 10;$i++){
@@ -325,7 +331,7 @@ function Invoke-OPA265ARCH3x2FinishIndexAndJournal {
         for($i=0;$i -lt 10;$i++){
             $intent=$m.Rows[$i];$r=$Bundle.Receipts[$i]
             if($null -ne (Test-OPADuplicateEntry -Index $index.Index -SourceEntryId ([string]$intent.SourceEntryId))){continue}
-            Add-OPADuplicateEntry -Index $index.Index -SourceEntryId ([string]$intent.SourceEntryId) -ArchiveEntryId ([string]$r.ArchiveEntryId) -SourceFolderPath '\\info@stios.ru\Входящие' -TargetFolderPath ([string]$intent.TargetFolderPath) -ReceivedTime ([datetime]::new([long]$v.Rows[$i].ArchiveDateLocalTicks)) -Subject '' -TransactionId $transaction -TransactionLimit 10 -ArchiveGrouping Year -SourcePst ([string]$m.SourcePst) -ArchivePst ([string]$m.TargetPstPreview)
+            Add-OPADuplicateEntry -Index $index.Index -SourceEntryId ([string]$intent.SourceEntryId) -ArchiveEntryId ([string]$r.ArchiveEntryId) -SourceFolderPath '\\info@stios.ru\Входящие' -TargetFolderPath ([string]$review.Review.ArchiveFolderPath) -ReceivedTime ([datetime]::new([long]$v.Rows[$i].ArchiveDateLocalTicks)) -Subject '' -TransactionId $transaction -TransactionLimit 10 -ArchiveGrouping Year -SourcePst ([string]$m.SourcePst) -ArchivePst ([string]$m.TargetPstPreview)
             Sync-OPADuplicateJournalStreams
         }
     }finally{
@@ -377,6 +383,12 @@ function Invoke-OPA265ARCH3x2RealTen {
     )
     $l=Get-OPA265ARCH3x2Layout -RunId $RunId
     if($Mode -ceq 'Status'){
+        if([IO.Directory]::Exists($l.Root)){
+            if((([IO.File]::GetAttributes($l.Root) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
+                throw 'ARCH3x2 protected review directory redirected.'
+            }
+            [void](Assert-OPA265ARCH2c2PrivateWorkspaceAcl -WorkspacePath $l.Root)
+        }
         return [pscustomobject][ordered]@{
             Schema='2.6.5-ARCH3x2.Status.1';RunId=$RunId
             ReviewSealed=[IO.File]::Exists($l.ReviewSealPath)
