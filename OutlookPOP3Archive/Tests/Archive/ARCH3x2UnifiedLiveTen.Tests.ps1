@@ -247,6 +247,10 @@ Describe 'ARCH3x2c live ten row contract regression for original Year2020 Inbox'
             $t=New-ARCH3x2cRowTriplet
             $t.Intent.Ordinal=$i
             $t.SealRow.Ordinal=$i
+            $n=if($i -le 2){2}else{1}
+            $t.Intent.AttachmentCount=$n
+            $t.SealRow.AttachmentCount=$n
+            $t.Witness.AttachmentCount=$n
             $id=('00000000{0:X8}{0:X8}' -f $i)
             $t.Intent.SourceEntryId=$id
             $t.SealRow.SourceEntryId=$id
