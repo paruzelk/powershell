@@ -47,6 +47,37 @@ function Get-OPA265ARCH3x1bPartsProof {
     }
 }
 
+# Canonical read-only projection of ONE already-verified live mail into the
+# ARCH3x1 preflight contract. The sealed route is part of message identity.
+# Never derive the target from current changing Inbox enumeration.
+function New-OPA265ARCH3x1bVerifiedRow {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][ValidateRange(1,10)][int]$Ordinal,
+          [Parameter(Mandatory=$true)][object]$Intent,
+          [Parameter(Mandatory=$true)][object]$SealRow,
+          [Parameter(Mandatory=$true)][object]$Witness)
+    if([int]$Intent.Ordinal -ne $Ordinal -or
+       [int]$SealRow.Ordinal -ne $Ordinal -or
+       [string]$Intent.SourceEntryId -cne [string]$SealRow.SourceEntryId -or
+       [string]$Intent.OriginalOperationId -cne [string]$SealRow.OriginalOperationId -or
+       [string]$Intent.OriginalContractSha256 -cne [string]$SealRow.OriginalContractSha256 -or
+       [string]$Intent.FullOriginalWitnessSha256 -cne [string]$SealRow.FullOriginalWitnessSha256 -or
+       [string]$Intent.TargetFolderPath -cne '2020\Входящие' -or
+       [string]$Intent.TargetFolderPath -cne [string]$SealRow.TargetFolderPath -or
+       [int]$Intent.AttachmentCount -ne [int]$Witness.AttachmentCount){
+        throw ('ARCH3x1b sealed ten preflight row contract invalid at ordinal '+$Ordinal)
+    }
+    return [pscustomobject][ordered]@{
+        Ordinal=$Ordinal
+        SourceEntryId=[string]$Intent.SourceEntryId
+        OriginalOperationId=[string]$Intent.OriginalOperationId
+        OriginalContractSha256=[string]$Intent.OriginalContractSha256
+        FullOriginalWitnessSha256=[string]$Intent.FullOriginalWitnessSha256
+        TargetFolderPath=[string]$Intent.TargetFolderPath
+        AttachmentCount=[int]$Witness.AttachmentCount
+    }
+}
+
 function Get-OPA265ARCH3x1bPinnedTenLiveAudit {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Manifest,
@@ -104,14 +135,7 @@ function Get-OPA265ARCH3x1bPinnedTenLiveAudit {
                    [int]$w.AttachmentCount -ne [int]$r.AttachmentCount){
                     throw ('ARCH3x1b original full Body/HTML/attachment witness changed at '+($i+1))
                 }
-                [void]$rows.Add([pscustomobject][ordered]@{
-                    Ordinal=$i+1
-                    SourceEntryId=[string]$r.SourceEntryId
-                    OriginalOperationId=[string]$r.OriginalOperationId
-                    OriginalContractSha256=[string]$r.OriginalContractSha256
-                    FullOriginalWitnessSha256=[string]$r.FullOriginalWitnessSha256
-                    AttachmentCount=[int]$w.AttachmentCount
-                })
+                [void]$rows.Add((New-OPA265ARCH3x1bVerifiedRow -Ordinal ($i+1) -Intent $r -SealRow $v -Witness $w))
             }finally{
                 Release-OPA265ARCH2c4Com -Object $parent
                 Release-OPA265ARCH2c4Com -Object $mail
