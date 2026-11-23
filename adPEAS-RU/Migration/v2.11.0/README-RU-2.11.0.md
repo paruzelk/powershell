@@ -1,6 +1,6 @@
-# adPEAS-RU 2.11.0 MIG10 — быстрый старт и все параметры
+# adPEAS-RU 2.11.0 MIG11 — быстрый старт и все параметры
 
-**MIG10 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
+**MIG11 PREVIEW.** ZIP содержит четыре автономных PowerShell-скрипта и
 adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не входит.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
@@ -8,11 +8,11 @@ adPEAS.exe; старая обёртка Run-AD-Audit-RU.ps1 в архив не �
 ~~~powershell
 cd 'C:\Tools\adPEAS-RU'
 Import-Module .\adPEAS.ps1 -Force
-Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG10' -Format All
+Invoke-adPEAS -Domain stios.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG11' -Format All
 Disconnect-adPEAS
 ~~~
 
-Создаются AD-Audit-MIG10.html, AD-Audit-MIG10.txt и AD-Audit-MIG10.json.
+Создаются AD-Audit-MIG11.html, AD-Audit-MIG11.txt и AD-Audit-MIG11.json.
 Outputfile принимает имя без расширения.
 
 **LDAPS с проверкой сертификата:**
@@ -135,7 +135,7 @@ Get-Command Invoke-adPEAS -Syntax
 Get-Help Invoke-adPEAS -Full
 Get-Command Connect-adPEAS -Syntax
 Get-adPEASSession -TestConnection
-Convert-adPEASReport -InputJson '.\AD-Audit-MIG10.json' -OutputPath '.\recreated' -Format HTML
+Convert-adPEASReport -InputJson '.\AD-Audit-MIG11.json' -OutputPath '.\recreated' -Format HTML
 ~~~
 
 **Статус:** миграция текстов DOC6j через сравнение оригинальных
@@ -209,3 +209,28 @@ CI проверяет настоящий PowerShell-рендерер с трем
 и исполняет JavaScript для четырёх чисел в обоих состояниях.
 Исходный отчёт пользователя не публикуется. Статус MIG10: PREVIEW,
 до повторной проверки HTML на реальном домене.
+
+## MIG11 — оставшиеся динамические надписи по HTML MIG10
+
+Проверен реальный AD-Audit-MIG10.html от 23 ноября 2026 года. В отчёте:
+9 разделов, 78 карточек проверок, 105 результатов в исходной сводке.
+Все 25 кнопок дополнительных атрибутов формируются на русском; переводы
+лицензионного предупреждения, логотипа и переключателя темы подтверждены.
+
+В JavaScript остаются английские сообщения, проявляющиеся после действий
+пользователя: пересчёт дополнительных атрибутов после перетаскивания,
+команды исправления и кнопка копирования, всплывающие подтверждения очистки
+хранилища браузера, сообщения экранного диктора, печатное оглавление и
+резервный текстовый вывод оценки риска.
+
+MIG11 переводит перечисленные строки в слое отображения. Подсчёт атрибутов,
+фильтры, идентификаторы и значения Active Directory, оценка риска, исходные
+находки, экспорт JSON и лицензирование остаются без изменений.
+Пользовательский отчёт с данными домена не хранится в GitHub.
+
+GitHub Actions проверяет настоящий JavaScript на шести сценариях
+перетаскивания и пересчёта количества атрибутов, отказ от очистки данных
+браузера, заголовки печати, русский текст оценки риска и подписи кнопок
+копирования. Выполняются все существующие этапы MIG1–MIG10.
+
+**Статус: PREVIEW**, до повторного запуска на реальном домене.
