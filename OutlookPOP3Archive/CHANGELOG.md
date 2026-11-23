@@ -1,3 +1,10 @@
+## 2.6.5-ARCH3x1a DEV — 2026-11-23
+- Operator ARCH3w1 original real test PST ten Intent Prepare and independent Review passed: 10/10, 12 attachments, protected Manifest SHA 7568fb8..., Journal SHA a70fc0a...; ARCH3x1 Plan PASS.
+- ARCH3x1 Audit failed closed because physical source PST length grew from 7735903232 to 7756473344 bytes (+20570112), although all original ten EntryID, Preview, StoreID, shared Index and Year2020 Part3 routing were unchanged, Part3 absent.
+- Add opt-in bounded <=256 MiB growth exception **only** to internal ARCH3x1a historical full semantic read-only audit; original ARCH3v default strict / public Audit/Seal/Review, immutable original Seal/Manifest/Journal and original AuditSha remain unchanged.
+- Original ARCH2b all-ten full Body/HTML/recipient/state/actual attachment bytes re-captured and compared before historical Audit digest projection; current source length separately pinned into new PreflightDigest, rechecked before real irreversible writer entry.
+- 16 new Pester (full expected 4701/161 Windows PowerShell 5.1); original Archive/Resume/Auto production writer, journal Reconciled, shared index and auto-retry remain closed; no actual Outlook COM Move in CI.
+
 ## 2.6.5-ARCH3x1 DEV — 2026-11-20
 - New original real TEST-PST 10-item provider route with exact immutable original ARCH3v full witnesses and original ARCH3w1 sealed ten Intent. Requires external SHA and explicit one-time operator approval; no production Archive/Resume/Auto.
 - New original MailMover per-item protected Claim+Invocation/CreateNew/Flush(true) before exactly one real Outlook COM Move, then immutable Returned; 10-item prefix chained receipts, no replay after any writer-entry/claim/partial failure.
