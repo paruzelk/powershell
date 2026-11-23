@@ -186,3 +186,108 @@ Describe 'ARCH3x1b+ARCH3x2 unified bounded live ten and original independent pos
         $main | Should -Match 'Assert-OPA265ARCH2aDevelopmentWriterClosed'
     }
 }
+
+Describe 'ARCH3x2c live ten row contract regression for original Year2020 Inbox' {
+    BeforeAll {
+        function New-ARCH3x2cRowTriplet {
+            $intent=[pscustomobject]@{
+                Ordinal=1;SourceEntryId='00000000AA000001AA000001'
+                OriginalOperationId=('ARCH3b-'+('a'*64))
+                OriginalContractSha256=('a'*64)
+                FullOriginalWitnessSha256=('b'*64)
+                TargetFolderPath='2020\Входящие'
+                AttachmentCount=2
+            }
+            $seal=[pscustomobject]@{
+                Ordinal=1;SourceEntryId=$intent.SourceEntryId
+                OriginalOperationId=$intent.OriginalOperationId
+                OriginalContractSha256=$intent.OriginalContractSha256
+                FullOriginalWitnessSha256=$intent.FullOriginalWitnessSha256
+                TargetFolderPath=$intent.TargetFolderPath
+                AttachmentCount=2
+            }
+            return [pscustomobject]@{
+                Intent=$intent;SealRow=$seal;Witness=([pscustomobject]@{AttachmentCount=2})
+            }
+        }
+    }
+    It 'maps the original sealed target path to the EXACT live preflight row' {
+        $t=New-ARCH3x2cRowTriplet
+        $r=New-OPA265ARCH3x1bVerifiedRow -Ordinal 1 -Intent $t.Intent -SealRow $t.SealRow -Witness $t.Witness
+        $r.PSObject.Properties.Name | Should -Contain 'TargetFolderPath'
+        $r.TargetFolderPath | Should -BeExactly '2020\Входящие'
+        $r.SourceEntryId | Should -BeExactly $t.Intent.SourceEntryId
+        $r.FullOriginalWitnessSha256 | Should -BeExactly $t.Intent.FullOriginalWitnessSha256
+    }
+    It 'refuses mismatched sealed target route before claiming Move' {
+        $t=New-ARCH3x2cRowTriplet
+        $t.SealRow.TargetFolderPath='2020\Other'
+        {New-OPA265ARCH3x1bVerifiedRow -Ordinal 1 -Intent $t.Intent -SealRow $t.SealRow -Witness $t.Witness} | Should -Throw
+    }
+    It 'refuses missing target route instead of silently producing an empty preflight property' {
+        $t=New-ARCH3x2cRowTriplet
+        $t.Intent.TargetFolderPath=''
+        {New-OPA265ARCH3x1bVerifiedRow -Ordinal 1 -Intent $t.Intent -SealRow $t.SealRow -Witness $t.Witness} | Should -Throw
+    }
+    It 'refuses source identity drift before any Outlook Move' {
+        $t=New-ARCH3x2cRowTriplet
+        $t.SealRow.SourceEntryId='00000000BB000002BB000002'
+        {New-OPA265ARCH3x1bVerifiedRow -Ordinal 1 -Intent $t.Intent -SealRow $t.SealRow -Witness $t.Witness} | Should -Throw
+    }
+    It 'refuses semantic attachment count drift at row projection' {
+        $t=New-ARCH3x2cRowTriplet
+        $t.Witness.AttachmentCount=1
+        {New-OPA265ARCH3x1bVerifiedRow -Ordinal 1 -Intent $t.Intent -SealRow $t.SealRow -Witness $t.Witness} | Should -Throw
+    }
+    It 'accepts all ten projected live rows in the real original preflight without PST writes' {
+        $manifestRows=New-Object 'System.Collections.Generic.List[object]'
+        $sealedRows=New-Object 'System.Collections.Generic.List[object]'
+        $auditedRows=New-Object 'System.Collections.Generic.List[object]'
+        for($i=1;$i -le 10;$i++){
+            $t=New-ARCH3x2cRowTriplet
+            $t.Intent.Ordinal=$i
+            $t.SealRow.Ordinal=$i
+            $id=('00000000{0:X8}{0:X8}' -f $i)
+            $t.Intent.SourceEntryId=$id
+            $t.SealRow.SourceEntryId=$id
+            [void]$manifestRows.Add($t.Intent)
+            [void]$sealedRows.Add($t.SealRow)
+            [void]$auditedRows.Add((New-OPA265ARCH3x1bVerifiedRow -Ordinal $i -Intent $t.Intent -SealRow $t.SealRow -Witness $t.Witness))
+        }
+        $root=Join-Path $TestDrive 'ARCH3x2c-NoLivePst'
+        $script:x2cSource=Join-Path $root 'info@stios.ru.pst'
+        $script:x2cTarget=Join-Path $root 'info@stios.ru.Archive-2020-03.pst'
+        $script:x2cIndexSha='c'*64
+        $script:x2cAudit=[pscustomobject]@{
+            AuditSha256=('d'*64)
+            FullOriginalWitnessCount=10
+            TotalAttachmentCount=12
+            ReSelectedInboxCandidates=$false
+            PhysicalPstSizeCompared=$false
+            Rows=@($auditedRows.ToArray())
+        }
+        $prepared=[pscustomobject]@{
+            Manifest=[pscustomobject]@{
+                RunId=$script:run;SourcePst=$script:x2cSource
+                TargetPstPreview=$script:x2cTarget
+                SealSha256=('e'*64);OriginalIndexSha256=$script:x2cIndexSha
+                SourceStoreIdSha256=('f'*64);AuditSha256=('d'*64)
+                Rows=@($manifestRows.ToArray())
+            }
+            Seal=[pscustomobject]@{Rows=@($sealedRows.ToArray())}
+        }
+        Mock Assert-OPA265ARCH3fRealTestSource {return $script:x2cSource}
+        Mock Get-OPA265ARCH3x1bPartsProof {return [pscustomobject]@{OriginalPart1Path='historical1';OriginalPart2Path='historical2';OriginalPart2SemanticSha256=('a'*64)}}
+        Mock Get-OPA265ARCH3x1bPinnedTenLiveAudit {return $script:x2cAudit}
+        Mock Get-OPA265ARCH3uSharedIndexReadOnly {return [pscustomobject]@{OriginalIndexSha256=$script:x2cIndexSha}}
+        Mock Write-OPA265ARCH3cJsonOnce {throw 'NO writes in read-only preflight'}
+        Mock New-OPAArchivePst {throw 'NO PST creation in read-only preflight'}
+        $r=Get-OPA265ARCH3x1RealPreflight -Prepared $prepared -ManifestSha256 ('9'*64) -JournalSha256 ('8'*64)
+        $r.Status | Should -BeExactly 'TenOriginalRealSourceFullWitnessAndHistoricalYearPartsReadOnlyReady'
+        $r.OriginalFullWitnessCount | Should -Be 10
+        $r.PreflightDigest | Should -Match '^[a-f0-9]{64}$'
+        Test-Path -LiteralPath $script:x2cTarget | Should -BeFalse
+        Should -Invoke Write-OPA265ARCH3cJsonOnce -Exactly -Times 0
+        Should -Invoke New-OPAArchivePst -Exactly -Times 0
+    }
+}
