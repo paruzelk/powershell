@@ -1,3 +1,11 @@
+## 2.6.5-ARCH3x2 unified DEV — 2026-11-23
+
+- ARCH3x1b: eliminate source PST physical-length, whole-PST SHA and changing Inbox first-ten reselection from exact ten Move permit. Read precisely ten already sealed original POP3 messages and compare original ARCH2b full Body/HTML/recipients/user state/attachment byte SHA, original contract/parent/date/StoreID. No global Inbox-count equality; preserve strict per-message invariant.
+- Historical archived Part2 validated by ORIGINAL live semantic ArchiveVerifier; original Year part paths and shared original DuplicateIndex guarded, not physical Part1/Part2 PST byte lengths.
+- ARCH3x2: independent new Outlook-process original Test-OPAArchiveMoves verifies all ten source IDs absent, all ten archive destinations full semantic, preserved 12 attachments; no original journal/index writes during Review.
+- Explicit protected Seal -> separately confirmed Commit, rechecks live ArchiveVerifier then ORIGINAL journal writer 10 Intent+10 Reconciled in distinct protected postrestart journal and ORIGINAL append-only shared DuplicateIndex 10 with sync/readback. Immutable historical ARCH3w1 10-Intent file untouched. Recovery mode can only finish journal/index after verified restart, never retry Move.
+- 25 new Pester, expected 4726 tests/162 containers Windows PowerShell 5.1. CI never calls Outlook COM; project-only SHA256 ZIP; production Archive/Resume/Auto closed.
+
 ## 2.6.5-ARCH3x1a DEV — 2026-11-23
 - Operator ARCH3w1 original real test PST ten Intent Prepare and independent Review passed: 10/10, 12 attachments, protected Manifest SHA 7568fb8..., Journal SHA a70fc0a...; ARCH3x1 Plan PASS.
 - ARCH3x1 Audit failed closed because physical source PST length grew from 7735903232 to 7756473344 bytes (+20570112), although all original ten EntryID, Preview, StoreID, shared Index and Year2020 Part3 routing were unchanged, Part3 absent.
