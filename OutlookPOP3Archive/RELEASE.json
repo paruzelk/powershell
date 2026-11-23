@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH3x1a DEV: operator ten original ARCH3w1 Intent Prepare and Review PASS (ManifestSha 7568fb8..., JournalSha a70fc0a...). Original ARCH3x1 Plan PASS, but Audit blocked only by physical source PST size growth 7735903232->7756473344 (+20570112). Explicit internal historical full witness Audit gate allows only <=256 MiB growth for exact RunId; original ARCH3v public Seal/Review strict, all 10 original complete semantic witnesses and historical Audit SHA retained, current source PST size pinned into new PreflightDigest and real pre-writer guard. 16 Pester new, 4701/161 Windows PS5.1; no real Outlook in CI or journal/index commit.",
     "ARCH3w1 DEV: ARCH3w real Prepare correctly STOPPED before Intent when Part2 PST byte SHA changed with same 525312 bytes (43cbb... to 468f...); new distinct protected Intent stage. Keep Part1 strict binary SHA 8bc491.../271360, original ARCH3v sealed 10 source full witnesses and shared index SHA; bind Part2 to historical ARCH3q Reconciled/ARCH3r completed pilot 501 + original ARCH3i full SHA and fresh original Test-OPAArchiveMoves + full ARCH2b Body HTML attachment SHA of only archived Part2 MailItem. Stable digest excludes mutable raw Part2 bytes but requires Part2 525312 and exact one item; no Move, claim, PST/index writes. 21 new tests, expected 4646 Pester/158 containers Windows PS5.1, production closed.",
     "ARCH3w DEV: operator confirmed ARCH3v real test PST 10 complete original semantic SHA+12 attachment byte SHA and Seal/Review PASS. New protected evidence-only ten ORIGINAL OperationJournal Intent: exact original ARCH3v immutable SHA readback, repeat original ARCH3u+ARCH2b ten real Inbox content with original index SHA, SHA both original Year2020 archive Parts1/2 and ensure Part3 absent; external PrepareDigest, single protected ARCH3i ACL/ARCH3c CreateNew manifest and 10 original Write-OPAOperationJournalEvent SHA envelopes Flush(true), independent readback. Fail closed if partial, never retry or Move, no original shared index writes. 26 Pester new, 4625/157 full Windows PS5.1; production closed.",
     "ARCH3v DEV: exact operator ARCH3u 10 original real TEST-PST Inbox letters pinned to RunId/PreviewSha/StoreSha/IndexSha/source PST size, original ARCH2b full Body HTML recipients user-state actual TEMP SaveAsFile attachment byte SHA, original per-mail ARCH3d witness SHA and canonical ten AuditSha; Audit zero persistent writes, one-shot externally approved Seal to protected original ARCH3i ACL + ARCH3c CreateNew Flush and SHA independent readback. No PST/Move/Journal/Index writer, no retry. 30 Pester, expected 4599 tests/156 containers PS5.1; production closed.",
@@ -94,7 +95,7 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "ARCH3x1 DEV: bounded real TEST-PST ten one-shot original MailMover route, protected per-item claim/provider/return, no automatic retry or shared index commit. Full Pester 4685/160 Windows PS5.1 expected; real Outlook only by explicit operator action.",
+    "Status": "ARCH3x1a DEV: original ten immutable full semantic witness Audit now tolerates only bounded <=256MiB physical source PST growth for pinned test RunId, historical AuditSHA preserved, current size bound into real PreflightDigest; archive Move unchanged, no automatic retry or journal/index commit. Full 4701/161 Pester expected Windows PS5.1.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
     "BW4k7v2aReadOnlyPristineFolderInventoryGate": true,
@@ -102,8 +103,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 160,
-    "ExpectedPesterTests": 4685,
+    "ExpectedTestContainers": 161,
+    "ExpectedPesterTests": 4701,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
