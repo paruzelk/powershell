@@ -1,5 +1,14 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (текущий DEV-этап 2.6.5-ARCH3x1a)
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (текущий DEV-этап 2.6.5-ARCH3x2 unified)
 
+
+### ARCH3x2 unified — исправление ARCH3x1b и независимая проверка после реального batch-10
+
+**Настоящий алгоритм:** никаких сравнений исходного/архивного PST по размеру или полному SHA для допуска переноса; без повторного выбора первых десяти сообщений. Открываем ровно 10 исторически подготовленных конкретных EntryID, проверяем полный оригинальный Body/HTML/recipients/user state/реальные SHA-256 байтов вложений, затем однократный original MailMover. После нового процесса Outlook отдельный `Invoke-ARCH3x2.ps1 -Mode Review` вызывает ORIGINAL `Test-OPAArchiveMoves -ExpectedMoved 10 -RequireSemanticWitness` без требования к общему числу Inbox; `Seal` создаёт защищённое доказательство, `Commit` только по новому разрешению дописывает 10 original Reconciled и индекс, `Recover` — только index/journal, без повторного Move. Исходный ARCH3w1 манифест/журнал **не изменяются**. Все команды и ограничения: [ARCH3x2 unified runbook](docs/2.6.5-arch3x2-unified-live-ten.md).
+
+~~~powershell
+.\Invoke-ARCH3x1.ps1 -Mode Status -RunId '093b5ce9-4a90-46fa-b6a5-7cdba61d2f15'
+.\Invoke-ARCH3x2.ps1 -Mode Status -RunId '093b5ce9-4a90-46fa-b6a5-7cdba61d2f15'
+~~~
 
 ### ARCH3x1a — исправлена избыточная блокировка при физическом росте тестового PST
 
