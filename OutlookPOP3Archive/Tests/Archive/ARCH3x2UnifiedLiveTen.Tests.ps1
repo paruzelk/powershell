@@ -173,7 +173,7 @@ Describe 'ARCH3x1b+ARCH3x2 unified bounded live ten and original independent pos
     }
     It 'ARCH3x2 recovery has explicit approval and can only finish index/journal' {
         $s=Get-Content (Join-Path $script:root 'Core/Archive/ARCH3x2TenIndependentReviewCommit.ps1') -Raw -Encoding UTF8
-        $s | Should -Match "if\(\$Mode -ceq 'Commit'\)"
+        $s | Should -Match 'if\(\$Mode -ceq ''Commit''\)'
         $s | Should -Match 'ConfirmRecovery'
         $s | Should -Match 'OnlyJournalAndIndexNoMove'
     }
