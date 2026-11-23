@@ -74,18 +74,18 @@ Describe 'ARCH3x1a original physical PST growth isolated from immutable original
     It 'ARCH3x1a ties Move audit to original full witness SHA and sealed ten Intent still' {
         $s=Get-Content -LiteralPath (Join-Path $script:projectRoot 'Core/Archive/ARCH3x1RealTenOriginalMailMover.ps1') -Raw -Encoding UTF8
         $s | Should -Match 'Get-OPA265ARCH3vFullReadOnlyAudit -RunId'
-        $s | Should -Match '-ARCH3x1aAllowSourcePstLengthGrowth'
+        $s | Should -Match 'Get-OPA265ARCH3x1bPinnedTenLiveAudit -Manifest'
         $s | Should -Match '\[string\]\$full.AuditSha256 -cne \[string\]\$m.AuditSha256'
         $s | Should -Match '\$row.FullOriginalWitnessSha256 -cne \[string\]\$saved.FullOriginalWitnessSha256'
         $s | Should -Match 'Assert-OPA265ARCH3iFullWitnessPinned -Witness'
     }
     It 'observed size is signed into preflight digest and rechecked before writer entry' {
         $s=Get-Content -LiteralPath (Join-Path $script:projectRoot 'Core/Archive/ARCH3x1RealTenOriginalMailMover.ps1') -Raw -Encoding UTF8
-        $s | Should -Match '\[string\]\$full.ObservedSourcePstLengthBytes'
-        $s | Should -Match '\[long\]\$audit.ObservedSourcePstLengthBytes'
-        $s | Should -Match 'SourcePstLengthGrowthBytes=\[long\]\$audit.SourcePstLengthGrowthBytes'
+        $s | Should -Not -Match 'SourcePstLengthGrowthBytes=\[long\]\$audit.SourcePstLengthGrowthBytes'
+        $s | Should -Not -Match '\[long\]\$audit.ObservedSourcePstLengthBytes'
+        $s | Should -Match 'Get-OPA265ARCH3x1bPinnedTenLiveAudit -Manifest'
         $i=$s.IndexOf('$writerSha=Write-OPA265ARCH3cJsonOnce')
-        $guard=$s.IndexOf('[long]$audit.ObservedSourcePstLengthBytes -or')
+        $guard=$s.IndexOf('Get-OPA265ARCH3x1bPinnedTenLiveAudit -Manifest')
         $i | Should -BeGreaterThan $guard
     }
     It 'all changed PowerShell files retain UTF8 BOM; shared original journal/index writer remain closed' {
