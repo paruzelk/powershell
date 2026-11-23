@@ -1,5 +1,9 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (текущий DEV-этап 2.6.5-ARCH3x1)
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (текущий DEV-этап 2.6.5-ARCH3x1a)
 
+
+### ARCH3x1a — исправлена избыточная блокировка при физическом росте тестового PST
+
+Оператор успешно выполнил ARCH3w1 Prepare/Review: 10/10 исходных Intent, 12 вложений, запечатанные ManifestSha256 `7568fb8...` и JournalSha256 `a70fc0a...`. ARCH3x1 Plan прошёл; Audit был блокирован только потому, что исходный PST увеличился с 7735903232 до 7756473344 байт. Все original Preview/StoreID/Index SHA и EntryID десяти писем остались прежними. В ARCH3x1a только явный внутренний флаг позволяет рост файла до 256 МиБ; ORIGINAL ARCH3v по умолчанию строго проверяет размер, все десять full semantic witnesses/ARCH3w1 исторический Audit SHA и оригинальный ArchiveVerifier остаются обязательными. Исторический Audit digest по исходной длине сохраняется, новый PreflightDigest отдельно привязан к наблюдаемому размеру PST. Никаких архиваций в CI, нет повторного Prepare, нет Resume/Auto; [ARCH3x1a команды и защитные ограничения](docs/2.6.5-arch3x1a-source-pst-physical-growth.md).
 
 ### ARCH3x1 — ограниченный однократный реальный TEST-PST batch-10 через ORIGINAL MailMover
 
