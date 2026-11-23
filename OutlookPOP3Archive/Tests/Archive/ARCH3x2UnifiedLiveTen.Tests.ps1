@@ -114,7 +114,7 @@ Describe 'ARCH3x1b+ARCH3x2 unified bounded live ten and original independent pos
         $s | Should -Match 'ConfirmReviewSeal'
         $s | Should -Match 'ConfirmVerifiedCommit'
         $s | Should -Match 'Get-OPA265ARCH3x2IndexState'
-        $s | Should -Match 'Get-OPA265ARCH3x2FinishIndexAndJournal'
+        $s | Should -Match 'Invoke-OPA265ARCH3x2FinishIndexAndJournal'
     }
     It 'ARCH3x2 writes original shared index only after ten verified journal reconciled' {
         $s=Get-Content (Join-Path $script:root 'Core/Archive/ARCH3x2TenIndependentReviewCommit.ps1') -Raw -Encoding UTF8
