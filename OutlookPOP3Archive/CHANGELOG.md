@@ -1,3 +1,9 @@
+## ARCH3 real pilot completed — 2026-11-24
+
+- Operator confirmed real ARCH3x2c ten-message Move, ten durable claims/invocations/returns, independent Outlook restart, full original semantic verification of 10 messages and 12 attachments, all original SourceEntryIDs absent, 10 destination messages, Review Seal and final journal/index Commit PASS. Verified=10, Reconciled=10, Indexed=10, CommitComplete=True, Recovered=False.
+- Preserve tested release `ARCH3x2c-dev-g2955cc8a` as rollback checkpoint. No replay of historical ARCH3 operation. ProductionReady=False.
+- Start ARCH4 on a separate development branch; reuse the general original MailMover and ArchiveVerifier instead of another fixed RunId pilot. See `docs/ARCH3-COMPLETED-ARCH4.md`. No new writer permission or ARCH4 package in this documentation-only checkpoint.
+
 ## 2.6.5-ARCH3x2c DEV — 2026-11-23
 
 - User ARCH3x2 unified read-only Status PASS: NoRealTenWriterEntry, zero claims, invocations and returns. Original live Audit stopped at `ARCH3x1 full original preflight row drift at ordinal 1` before any PST or COM Move.
