@@ -403,6 +403,7 @@ function Test-OPAArchiveMoves {
         }
     }
     finally {
+        if($arch5Progress){Write-Progress -Id 51 -Activity 'Проверка архива' -Completed}
         foreach ($key in @($targetFolders.Keys)) { Release-OPAComObject -Object $targetFolders[$key] }
         foreach ($r in $targetRoots.ToArray()) { Release-OPAComObject -Object $r }
     }
