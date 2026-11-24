@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH5b DEV:** ARCH5a zero-Move completion confirmed, 18 KiB private MSG residue later unlocked. [Cleanup fix and live checkpoint](2.6.5-arch5b-msg-cleanup.md). 4 new tests, 4790/164 expected; same one-item live retry after CI.
+
+
 > **ARCH5a DEV:** [MSG recursive semantic witness and zero-Move completion](2.6.5-arch5a-embedded-message-witness.md). ARCH5 live type 5 two exports differ, 0 moves/0 indexed and Resume completed. ARCH5a replaces binary comparison of type 5; no new restart when no claim/Move. 13 additional tests, 4786/164 expected. Real complex attachment and folder checks pending.
 
 
