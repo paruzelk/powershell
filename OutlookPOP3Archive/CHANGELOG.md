@@ -1,3 +1,11 @@
+## 2.6.5-ARCH6ae DEV
+
+- ARCH6a: empty source folders on Resume; root read-only inventory and absence observation, no root Move.
+- ARCH6b/d: bounded automatic controller, explicit graceful restart, exact pending recovery only, stops on skips or incomplete verification, durable controller log.
+- ARCH6c: reduce candidate pool, bounded source ID memory while retaining complete scan.
+- ARCH6e: explicit application cap disable, early validation, full controller syntax; provider limits remain.
+- 25 tests added, 4815/165 expected. ARCH6f real validation pending.
+
 ## 2.6.5-ARCH5a DEV — 2026-11-24
 
 ## 2.6.5-ARCH5b DEV
