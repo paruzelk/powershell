@@ -818,11 +818,21 @@ function Move-OPAItemsWithLimit {
         foreach ($folder in $sourceFolders) {
             try {
                 $folderLimit=if($ARCH4Batch){$Limit}else{[Math]::Max($Limit * 3, $Limit + 20)}
-                foreach ($candidate in @(Get-OPAArchiveCandidates -SourceFolder $folder -Limit $folderLimit -ExcludeEntryIds $duplicateIds -OlderThanCutoff $OlderThanCutoff)) {
+                if($ARCH5Batch){
+                    $selection=Get-OPAArchiveCandidates -SourceFolder $folder -Limit $folderLimit -ExcludeEntryIds $duplicateIds -OlderThanCutoff $OlderThanCutoff -Diagnostics
+                    if($null -eq $selection -or [int]$selection.SelectionErrors -gt 0 -or [int]$selection.MissingArchiveDate -gt 0){
+                        throw 'ARCH6 candidate selection incomplete; no automatic exhaustion or new Move.'
+                    }
+                    $folderCandidates=@($selection.Candidates)
+                }else{
+                    $folderCandidates=@(Get-OPAArchiveCandidates -SourceFolder $folder -Limit $folderLimit -ExcludeEntryIds $duplicateIds -OlderThanCutoff $OlderThanCutoff)
+                }
+                foreach ($candidate in $folderCandidates) {
                     $candidateRows.Add($candidate) | Out-Null
                 }
             }
             catch {
+                if($ARCH5Batch){throw}
                 Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'FolderSelectionSkipped' -Message ("Folder selection failed and was skipped: {0} | {1}" -f [string]$folder.FolderPath,$_.Exception.Message) -TargetFolderPath $null
             }
         }
