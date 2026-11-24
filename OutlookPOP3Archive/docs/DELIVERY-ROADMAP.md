@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH5a DEV:** [MSG recursive semantic witness and zero-Move completion](2.6.5-arch5a-embedded-message-witness.md). ARCH5 live type 5 two exports differ, 0 moves/0 indexed and Resume completed. ARCH5a replaces binary comparison of type 5; no new restart when no claim/Move. 13 additional tests, 4786/164 expected. Real complex attachment and folder checks pending.
+
+
 > **ARCH5 DEV:** [папки, вложения и интерфейс](2.6.5-arch5-folder-grouping-attachments.md): точные eligible folders, независимая проверка маршрута, новый witness 1 GiB и explicit экспериментальная проверка стабильных MSG/OLE экспортов, корректный вывод версии и Resume, прогресс. 21 новый Pester, ожидается 4773/164. Реальные тесты после CI: отдельное пропущенное письмо, затем YearQuarter + Sent/user folders. ARCH4 не повторять.
 
 
