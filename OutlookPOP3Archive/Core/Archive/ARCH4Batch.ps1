@@ -281,6 +281,7 @@ function Complete-OPAARCH4VerifiedBatch {
         NotMoved=($State.Planned-$State.Returned);LogicalBytes=$logical
         SkipReasons=@($Transaction.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}})
         SkippedItems=@($Transaction.State.SkippedItems)
+        SkipDetailsTruncated=([int]$Transaction.State.Skipped -gt @($Transaction.State.SkippedItems).Count)
         AutomaticMoveRetryAllowed=$false;ProductionReady=$false
     }
 }
@@ -343,7 +344,7 @@ function Invoke-OPAARCH4Batch {
             Sync-OPAStepJournalStreams
             $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
             if($state.Returned -ne [int]$moved){throw 'ARCH4 batch receipt count mismatch.'}
-            return [pscustomobject]@{Schema='2.6.5-ARCH4.Returned.1';Status='BatchReturnedRestartAndResumeRequired';TransactionId=$tx.TransactionId;Planned=$state.Planned;Returned=$state.Returned;NotMoved=($state.Planned-$state.Returned);OutlookProcessId=$proc.Id;SkipReasons=@($tx.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}});SkippedItems=@($tx.State.SkippedItems);OriginalIndexWritten=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
+            return [pscustomobject]@{Schema='2.6.5-ARCH4.Returned.1';Status='BatchReturnedRestartAndResumeRequired';TransactionId=$tx.TransactionId;Planned=$state.Planned;Returned=$state.Returned;NotMoved=($state.Planned-$state.Returned);OutlookProcessId=$proc.Id;SkipReasons=@($tx.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}});SkippedItems=@($tx.State.SkippedItems);SkipDetailsTruncated=([int]$tx.State.Skipped -gt @($tx.State.SkippedItems).Count);OriginalIndexWritten=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
         }
         if(-not [IO.File]::Exists($pending)){throw 'ARCH4 no pending batch; no Move or Resume required.'}
         $p=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($pending,[Text.Encoding]::UTF8)) -ErrorAction Stop
