@@ -1,5 +1,10 @@
 ﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (DEV: ARCH4; ARCH3 завершён 24.11.2026)
 
+## ARCH5 DEV — новый синтаксис
+
+[Полный запуск, папки, кварталы, MSG/OLE и ограничения](docs/2.6.5-arch5-folder-grouping-attachments.md). ARCH4 подтверждён реальными 598 письмами. ARCH5 использует исходный безопасный Archive/Resume; `-IncludeFolderPath` выбирает точные разрешённые POP3 папки, `-ConfirmComplexAttachments` разрешает экспериментальный побайтовый экспорт MSG/OLE только в партиях 1–10. Обычные вложения до 1 ГиБ; unsupported/unstable экспорт пропускается, после Move несовпадение блокирует commit. Новый русский вывод версии, параметров и прогресса. Production/Auto закрыты.
+
+
 **Подтверждённый реальный контрольный тест ARCH3:** 10 писем, 12 вложений, независимая проверка после перезапуска Outlook, 10 Reconciled + 10 записей DuplicateIndex, финальный CommitComplete=True. Контрольный релиз `ARCH3x2c-dev-g2955cc8a` сохранён. [Результаты и план интеграции ARCH4 в основной архиватор](docs/ARCH3-COMPLETED-ARCH4.md). Источник `info@stios.ru.pst` является тестовым. Реальные ARCH3 Prepare/Move/Seal/Commit повторять не нужно. Производственный writer пока закрыт.
 
 
