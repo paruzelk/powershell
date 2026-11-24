@@ -185,7 +185,7 @@ function Get-OPAARCH4ReturnedState {
         }
     }
     if($seq -lt $count){throw 'ARCH4 original OperationJournal Intent missing.'}
-    return [pscustomobject]@{Rows=@($ordered.ToArray());Claimed=$count;Returned=$count;Reconciled=$done.Count;Planned=$planned.Count}
+    return [pscustomobject]@{Rows=@($ordered.ToArray());Claimed=$count;Returned=$count;Reconciled=$done.Count;Planned=$planned.Count;AwaitingRestart=(@($Steps | Where-Object {$_.Step -ceq 'ARCH4 Awaiting Restart'}).Count -eq 1);OperationEventCount=$Events.Count}
 }
 
 function Get-OPAARCH4OutlookProcess {
@@ -286,6 +286,25 @@ function Complete-OPAARCH4VerifiedBatch {
     }
 }
 
+function Complete-OPAARCH5aZeroMoveBatch {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Transaction,
+          [Parameter(Mandatory=$true)][object]$State,
+          [Parameter(Mandatory=$true)][string]$SourceStoreId)
+    if($State.Claimed -ne 0 -or $State.Returned -ne 0 -or $State.Reconciled -ne 0 -or
+       $State.OperationEventCount -ne 0 -or -not $State.AwaitingRestart -or
+       @($State.Rows).Count -ne 0 -or [int]$Transaction.State.Executed -ne 0){
+        throw 'ARCH5a no-Move completion requires a durable finished selection and zero claims, returns and operation events.'
+    }
+    # Vacuous verification: there is no destination item to verify and no
+    # journal/index row to append. The original replay has checked the journal.
+    $verification=[pscustomobject]@{Verified=$true;EntryIdsVerified=$true;SemanticWitnessRequired=$true;AllRequiredOriginalSemanticWitnessesPresent=$true;ExpectedMoved=0;ExpectedEntryIdsChecked=0;MissingEntryIds=@();WarningEntryIds=@()}
+    $result=Complete-OPAARCH4VerifiedBatch -Transaction $Transaction -State $State -Verification $verification -SourceStoreId $SourceStoreId
+    $result.Status='BatchCompletedNoMoves'
+    $result | Add-Member -NotePropertyName RestartRequired -NotePropertyValue $false
+    return $result
+}
+
 function Invoke-OPAARCH4Batch {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][ValidateSet('Archive','Resume')][string]$Mode,
@@ -344,6 +363,11 @@ function Invoke-OPAARCH4Batch {
             Sync-OPAStepJournalStreams
             $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
             if($state.Returned -ne [int]$moved){throw 'ARCH4 batch receipt count mismatch.'}
+            if($ARCH5Batch -and $state.Returned -eq 0){
+                $completed=Complete-OPAARCH5aZeroMoveBatch -Transaction $tx -State $state -SourceStoreId $storeId
+                [IO.File]::Delete($pending)
+                return $completed
+            }
             return [pscustomobject]@{Schema='2.6.5-ARCH4.Returned.1';Status='BatchReturnedRestartAndResumeRequired';TransactionId=$tx.TransactionId;Planned=$state.Planned;Returned=$state.Returned;NotMoved=($state.Planned-$state.Returned);OutlookProcessId=$proc.Id;SkipReasons=@($tx.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}});SkippedItems=@($tx.State.SkippedItems);SkipDetailsTruncated=([int]$tx.State.Skipped -gt @($tx.State.SkippedItems).Count);OriginalIndexWritten=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
         }
         if(-not [IO.File]::Exists($pending)){throw 'ARCH4 no pending batch; no Move or Resume required.'}
@@ -353,7 +377,6 @@ function Invoke-OPAARCH4Batch {
            ($TransactionId -and $TransactionId -cne [string]$p.TransactionId)){
             throw 'ARCH4 pending transaction identity mismatch.'
         }
-        if($proc.StartUtcTicks -le [long]$p.MoveProcessStartUtcTicks){throw 'ARCH4 fully restart Outlook before Resume.'}
         $tx=Get-OPAArchiveTransaction -SourcePst $source -TransactionId ([string]$p.TransactionId)
         if([string]$tx.State.SourcePst -ine $source -or [string]$tx.TransactionId -cne [string]$p.TransactionId){throw 'ARCH4 transaction identity changed.'}
         if($ARCH5Batch){
@@ -361,6 +384,12 @@ function Invoke-OPAARCH4Batch {
             Write-Host ('Размер партии: '+$tx.State.Limit+'; группировка: '+$tx.State.ArchiveGrouping+'; возраст: '+$tx.State.OlderThanMonths+' мес.; режим записи: Safe')
         }
         $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
+        if($ARCH5Batch -and $state.Returned -eq 0){
+            $completed=Complete-OPAARCH5aZeroMoveBatch -Transaction $tx -State $state -SourceStoreId $storeId
+            [IO.File]::Delete($pending)
+            return $completed
+        }
+        if($proc.StartUtcTicks -le [long]$p.MoveProcessStartUtcTicks){throw 'ARCH4 fully restart Outlook before Resume.'}
         $stores=@()
         foreach($path in @($state.Rows | ForEach-Object {$_.ArchivePst} | Sort-Object -Unique)){
             if(-not [IO.File]::Exists($path)){throw 'ARCH4 archive PST missing; never recreate on Resume.'}
@@ -375,7 +404,7 @@ function Invoke-OPAARCH4Batch {
         $result=Test-OPAArchiveMoves -Namespace $Session.Namespace -SourceFolder $folders -ArchiveStores $stores -ExpectedMoved $state.Returned -ExpectedMoves @($state.Rows) -RequireSemanticWitness -RequireSourceAbsentAcrossFolders
         if($ARCH5Batch){
             foreach($r in @($state.Rows)){
-                if([string]$r.SourceSemanticWitness.Schema -ceq '2.6.5-ARCH5.MailSemanticWitness.2'){
+                if([string]$r.SourceSemanticWitness.Schema -cin @('2.6.5-ARCH5.MailSemanticWitness.2','2.6.5-ARCH5a.MailSemanticWitness.3')){
                     Assert-OPAARCH5Route -SourcePst $source -ArchiveDate ([datetime]$r.ReceivedTime) -SourceFolderPath $r.SourceFolderPath -TargetFolderPath $r.TargetFolderPath -ArchivePst $r.ArchivePst -Grouping ([string]$tx.State.ArchiveGrouping)
                 }
             }
