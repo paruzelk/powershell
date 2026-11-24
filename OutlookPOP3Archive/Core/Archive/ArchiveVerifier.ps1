@@ -215,6 +215,7 @@ function Test-OPAArchiveMoves {
         [int]$SourceItemsBefore = -1,
         [object[]]$ExpectedMoves=@(),
         [switch]$RequireSemanticWitness,
+        [switch]$RequireSourceAbsentAcrossFolders,
         # Kept as optional legacy parameters; FIX9 callers must pass ExpectedMoves.
         [string[]]$ExpectedEntryIds=@(),
         [string[]]$ExpectedArchiveEntryIds=@(),
@@ -277,7 +278,13 @@ function Test-OPAArchiveMoves {
     foreach ($m in $expectedRows) {
         $sourcePath = [string]$m.SourceFolderPath
         if (-not $sourceIdsByFolder.ContainsKey($sourcePath)) { $missing.Add("SOURCE_FOLDER_UNKNOWN:$sourcePath"); continue }
-        if ($sourceIdsByFolder[$sourcePath].Contains([string]$m.SourceEntryId)) {
+        $stillPresent=$sourceIdsByFolder[$sourcePath].Contains([string]$m.SourceEntryId)
+        if($RequireSourceAbsentAcrossFolders -and -not $stillPresent){
+            foreach($ids in $sourceIdsByFolder.Values){
+                if($ids.Contains([string]$m.SourceEntryId)){$stillPresent=$true;break}
+            }
+        }
+        if ($stillPresent) {
             $missing.Add("STILL_IN_SOURCE:$([string]$m.SourceEntryId)")
         }
     }
