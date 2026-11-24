@@ -25,12 +25,62 @@ function Get-OPA265ARCH2bFileSha256 {
         if($null -ne $stream){$stream.Dispose()}
     }
 }
+# ARCH5 conservative complex-attachment export: never open, execute or activate
+# an embedded object. Accept only a complete compound-storage export with two
+# identical byte-for-byte reads. This is experimental, not OLE certification.
+function Get-OPAARCH5ComplexExportProof {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Attachment,
+          [Parameter(Mandatory=$true)][string]$Workspace,
+          [Parameter(Mandatory=$true)][int]$Type,
+          [Parameter(Mandatory=$true)][int64]$MaxBytes,
+          [Parameter(Mandatory=$true)][int]$Index)
+    $ext=if($Type -eq 5){'.msg'}else{'.bin'}
+    $paths=@()
+    try{
+        $proofs=@()
+        for($attempt=0;$attempt -lt 2;$attempt++){
+            $path=Join-Path $Workspace ('OPA-ARCH5-'+[guid]::NewGuid().ToString('N')+$ext)
+            if([IO.File]::Exists($path)){throw 'ARCH5 temporary export collision.'}
+            $paths+= $path
+            $Attachment.SaveAsFile($path)
+            if(-not [IO.File]::Exists($path)){throw 'ARCH5 complex export missing.'}
+            $file=Get-Item -LiteralPath $path -Force
+            if(($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+               $file.Length -lt 512 -or $file.Length -gt $MaxBytes){
+                throw 'ARCH5 complex export unsafe or outside bounds.'
+            }
+            $stream=[IO.File]::OpenRead($path)
+            try{
+                $header=New-Object byte[] 8
+                if($stream.Read($header,0,8) -ne 8 -or
+                   [BitConverter]::ToString($header) -cne 'D0-CF-11-E0-A1-B1-1A-E1'){
+                    throw 'ARCH5 complex export is not compound storage.'
+                }
+            }finally{$stream.Dispose()}
+            $proofs+= [pscustomobject]@{Length=[int64]$file.Length;Sha=(Get-OPA265ARCH2bFileSha256 -Path $path)}
+        }
+        if($proofs[0].Length -ne $proofs[1].Length -or $proofs[0].Sha -cne $proofs[1].Sha){
+            throw 'ARCH5 complex export bytes are not stable between two reads.'
+        }
+        return $proofs[0]
+    }catch{
+        throw ('ARCH5 AttachmentExportUnverified: index='+$Index+' type='+$Type+'; '+$_.Exception.Message)
+    }finally{
+        foreach($path in $paths){
+            if([IO.File]::Exists($path)){[IO.File]::Delete($path)}
+        }
+    }
+}
+
 function Get-OPA265ARCH2bAttachmentWitnesses {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)][object]$Mail,
         [ValidateRange(1024,1073741824)][int64]$MaxAttachmentBytes=268435456,
         [ValidateRange(1,256)][int]$MaxAttachmentCount=128,
+        [switch]$AllowComplexAttachments,
+        [switch]$ExtendedAttachmentWitness,
         [string]$TemporaryDirectory=[IO.Path]::GetTempPath()
     )
     # Private ACL must be applied atomically at creation. The exclusive lease
@@ -52,12 +102,31 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
             if($null -eq $attachment){throw 'ARCH2b attachment collection returned null.'}
             $type=[int]$attachment.Type
             $reportedSize=[int64]$attachment.Size
-            if($type -ne 1 -or $reportedSize -lt 0 -or $reportedSize -gt $MaxAttachmentBytes){
-                throw ('ARCH2b unsupported attachment type/size at index '+$i+
-                    '; embedded/OLE attachments not yet certified.')
+            if(-not $ExtendedAttachmentWitness){
+                if($type -ne 1 -or $reportedSize -lt 0 -or $reportedSize -gt $MaxAttachmentBytes){
+                    throw ('ARCH2b unsupported attachment type/size at index '+$i+
+                        '; embedded/OLE attachments not yet certified.')
+                }
+            }else{
+                if($reportedSize -lt 0 -or $reportedSize -gt $MaxAttachmentBytes){
+                    throw ('ARCH5 AttachmentSizeUnsupported: index='+$i+' type='+$type+' bytes='+$reportedSize+' limit='+$MaxAttachmentBytes)
+                }
+                if($type -ne 1 -and (-not $AllowComplexAttachments -or $type -notin @(5,6))){
+                    throw ('ARCH5 AttachmentTypeUnsupported: index='+$i+' type='+$type+' bytes='+$reportedSize)
+                }
             }
             $filename=[string]$attachment.FileName
             if($filename.Length -gt 1024){throw 'ARCH2b attachment name exceeds bound.'}
+            if($ExtendedAttachmentWitness -and $type -in @(5,6)){
+                $proof=Get-OPAARCH5ComplexExportProof -Attachment $attachment -Workspace $workspace -Type $type -MaxBytes $MaxAttachmentBytes -Index $i
+                [void]$result.Add([pscustomobject][ordered]@{
+                    Index=[int]$i;Type=$type
+                    NameUtf8Sha256=(Get-OPA265ARCH2bTextSha256 -Text $filename)
+                    PayloadByteCount=[int64]$proof.Length
+                    PayloadSha256=[string]$proof.Sha
+                })
+                continue
+            }
             # No original attachment filename in temp path or journal.
             $tempPath=Join-Path $workspace ('OPA-ARCH2b-'+[guid]::NewGuid().ToString('N')+'.bin')
             if([IO.File]::Exists($tempPath)){throw 'ARCH2b temp collision; stop.'}
@@ -131,6 +200,8 @@ function Get-OPA265ARCH2bMailSemanticWitness {
         [Parameter(Mandatory=$true)][object]$Mail,
         [int64]$MaxAttachmentBytes=268435456,
         [int]$MaxAttachmentCount=128,
+        [switch]$ExtendedAttachmentWitness,
+        [switch]$AllowComplexAttachments,
         [string]$TemporaryDirectory=[IO.Path]::GetTempPath()
     )
     if([int]$Mail.Class -ne 43){throw 'ARCH2b only Outlook MailItem class 43 supported.'}
@@ -166,11 +237,16 @@ function Get-OPA265ARCH2bMailSemanticWitness {
             }
         }
     }
+    if($ExtendedAttachmentWitness){$MaxAttachmentBytes=1073741824}
     $attachmentArgs=@{
         Mail=$Mail
         MaxAttachmentBytes=$MaxAttachmentBytes
         MaxAttachmentCount=$MaxAttachmentCount
         TemporaryDirectory=$TemporaryDirectory
+    }
+    if($ExtendedAttachmentWitness){
+        $attachmentArgs.ExtendedAttachmentWitness=$true
+        $attachmentArgs.AllowComplexAttachments=[bool]$AllowComplexAttachments
     }
     $att=@(Get-OPA265ARCH2bAttachmentWitnesses @attachmentArgs)
     $witness=[pscustomobject][ordered]@{
@@ -198,6 +274,9 @@ function Get-OPA265ARCH2bMailSemanticWitness {
         Attachments=@($att)
         MailItemSizeDiagnosticBytes=[int64]$Mail.Size
     }
+    if($ExtendedAttachmentWitness){
+        $witness.Schema='2.6.5-ARCH5.MailSemanticWitness.2'
+    }
     if(-not (Test-OPA265ARCH2bWitnessSchema -Witness $witness)){
         throw 'ARCH2b incomplete source semantic witness; no Move authorized.'
     }
@@ -207,7 +286,7 @@ function Test-OPA265ARCH2bWitnessSchema {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Witness)
     if($null -eq $Witness -or
-       [string]$Witness.Schema -cne '2.6.5-ARCH2b.MailSemanticWitness.1' -or
+       [string]$Witness.Schema -cnotin @('2.6.5-ARCH2b.MailSemanticWitness.1','2.6.5-ARCH5.MailSemanticWitness.2') -or
        [int]$Witness.ItemClass -ne 43){return $false}
     foreach($name in @('InternetMessageIdSha256','SubjectSha256','SenderSha256',
         'ToSha256','CcSha256','BccSha256','OrderedRecipientDigestSha256',
@@ -220,16 +299,22 @@ function Test-OPA265ARCH2bWitnessSchema {
         try{if([int64]$Witness.$name -lt 0){return $false}}catch{return $false}
     }
     if($Witness.UnRead -isnot [bool]){return $false}
+    $extended=[string]$Witness.Schema -ceq '2.6.5-ARCH5.MailSemanticWitness.2'
     $att=@($Witness.Attachments)
     if($att.Count -ne [int]$Witness.AttachmentCount){return $false}
     for($i=0;$i -lt $att.Count;$i++){
         $a=$att[$i]
         if($null -eq $a -or [int]$a.Index -ne ($i+1) -or
-           [int]$a.Type -ne 1 -or
+           ((-not $extended -and [int]$a.Type -ne 1) -or
+            ($extended -and [int]$a.Type -notin @(1,5,6))) -or
            [string]$a.NameUtf8Sha256 -cnotmatch '^[a-f0-9]{64}$' -or
            [string]$a.PayloadSha256 -cnotmatch '^[a-f0-9]{64}$' -or
            $null -eq $a.PayloadByteCount){return $false}
-        try{if([int64]$a.PayloadByteCount -lt 0){return $false}}catch{return $false}
+        try{
+            if([int64]$a.PayloadByteCount -lt 0){return $false}
+            if($extended -and ([int64]$a.PayloadByteCount -gt 1073741824 -or
+                ([int]$a.Type -in @(5,6) -and [int64]$a.PayloadByteCount -lt 512))){return $false}
+        }catch{return $false}
     }
     return $true
 }
@@ -242,6 +327,7 @@ function Compare-OPA265ARCH2bMailSemanticWitness {
        -not (Test-OPA265ARCH2bWitnessSchema -Witness $Destination)){
         $issues.Add('SourceOrDestinationWitnessIncomplete') | Out-Null
     } else {
+        if([string]$Source.Schema -cne [string]$Destination.Schema){[void]$issues.Add('DifferentWitnessSchema')}
         foreach($name in @('InternetMessageIdSha256','SubjectSha256','SenderSha256',
             'ToSha256','CcSha256','BccSha256','RecipientCount','OrderedRecipientDigestSha256',
             'BodySha256','BodyUtf16Length','HtmlBodySha256','HtmlBodyUtf16Length',
