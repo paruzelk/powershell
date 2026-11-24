@@ -5,6 +5,10 @@ param(
 
     [string]$ProfileName,
     [string]$Transaction,
+
+    # ARCH4 DEV: explicitly selected test POP3 PST; Archive + reconciliation-only Resume.
+    [string]$SourcePst,
+    [switch]$ConfirmTestArchive,
     [switch]$WhatIf,
     [switch]$VerboseItems,
 
@@ -119,7 +123,29 @@ $ErrorActionPreference = 'Stop'
 # worker integration flags do not disable the direct legacy COM writer.
 # Read-only Analyze and Plan remain available, but no production permit.
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH2aMoveOutcomeFence.ps1')
-[void](Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode $Mode)
+$arch4Requested = [bool]$ConfirmTestArchive -or $PSBoundParameters.ContainsKey('SourcePst')
+if ($arch4Requested) {
+    if (-not $ConfirmTestArchive -or [string]::IsNullOrWhiteSpace($SourcePst) -or
+        [string]::IsNullOrWhiteSpace($ProfileName) -or $Mode -notin @('Archive','Resume') -or
+        $WorkerPilot -or $ArchiveDeletedItems -or $ArchiveDrafts -or $ArchiveJunk -or
+        ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt 500)) -or
+        ($Mode -eq 'Archive' -and -not [string]::IsNullOrWhiteSpace($Transaction))) {
+        throw 'ARCH4 requires Archive/Resume, explicit test PST, profile and -ConfirmTestArchive; Archive limit 1..500, excluded system folders stay excluded.'
+    }
+    if ($PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5 -or
+        [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -ne 'STA') {
+        throw 'ARCH4 requires Windows PowerShell 5.1 STA.'
+    }
+    if ($Mode -eq 'Archive' -and $OlderThanMonths -eq 0 -and -not $IgnoreAge) {
+        throw 'ARCH4 no-age archive requires explicit -IgnoreAge.'
+    }
+    if ($WhatIf) {
+        [pscustomobject]@{Schema='2.6.5-ARCH4.WhatIf.1';Status='NoOutlookOrPersistentWrites';Mode=$Mode;SourcePst=$SourcePst;Limit=$Limit;ProductionReady=$false}
+        return
+    }
+} else {
+    [void](Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode $Mode)
+}
 
 if (-not [string]::IsNullOrWhiteSpace($Transaction) -and $Mode -ne 'Resume') {
     throw '-Transaction can only be used with -Mode Resume. Specify -Mode Resume explicitly.'
@@ -158,6 +184,7 @@ if ($Mode -in @('Archive','Plan','Auto') -and $OlderThanMonths -eq 0 -and -not $
 . "$PSScriptRoot\Core\Archive\MailMover.ps1"
 . "$PSScriptRoot\Core\Archive\ArchiveVerifier.ps1"
 . "$PSScriptRoot\Core\Archive\ArchiveReport.ps1"
+if ($arch4Requested) { . "$PSScriptRoot\Core\Archive\ARCH4Batch.ps1" }
 
 . "$PSScriptRoot\Core\Worker\BoundedWorkerCanary265.ps1"
 # Guard BEFORE New-OPAComSession, transaction creation, MailMover or any PST changes.
@@ -682,6 +709,11 @@ try {
     $discovery = Get-OutlookDiscovery -ComSession $session -ProfileName $ProfileName
 
     Write-OPADiscoverySummary -Discovery $discovery
+
+    if ($arch4Requested) {
+        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB
+        return
+    }
 
     # Auto mode prunes stale transaction files before selection.
     # Active statuses (Running/Planned/Created/Recovered) are kept;
