@@ -226,6 +226,7 @@ function Test-OPAArchiveMoves {
         [object[]]$ExpectedMoves=@(),
         [switch]$RequireSemanticWitness,
         [switch]$RequireSourceAbsentAcrossFolders,
+        [switch]$BoundedSourceIdMemory,
         # Kept as optional legacy parameters; FIX9 callers must pass ExpectedMoves.
         [string[]]$ExpectedEntryIds=@(),
         [string[]]$ExpectedArchiveEntryIds=@(),
@@ -261,6 +262,8 @@ function Test-OPAArchiveMoves {
         }
     }
 
+    # Keep only IDs relevant to the sealed batch when explicitly requested.
+    # Still enumerate every item in every observed folder; no negative lookup shortcut.
     # Observe the source folders, rather than deriving remaining count as
     # 'SourceItemsBefore - ExpectedMoved'. One source folder is traversed once.
     foreach ($sf in @($SourceFolder)) {
@@ -279,10 +282,14 @@ function Test-OPAArchiveMoves {
                 $probe = $null
                 try {
                     $probe = $items.Item($i)
-                    if ($null -ne $probe -and $probe.EntryID) { [void]$ids.Add([string]$probe.EntryID) }
+                    if ($null -ne $probe -and $probe.EntryID) {
+                        $probeId=[string]$probe.EntryID
+                        if(-not $BoundedSourceIdMemory -or $seenSource.Contains($probeId)){[void]$ids.Add($probeId)}
+                    }elseif($BoundedSourceIdMemory){throw 'ARCH6 source item identity unavailable; absence not proven.'}
                 }
                 finally { Release-OPAComObject -Object $probe }
             }
+            if($BoundedSourceIdMemory -and [int]$items.Count -ne $count){throw 'ARCH6 source folder count changed during verification.'}
             $sourceIdsByFolder[$path] = $ids
         }
         catch { $missing.Add("SOURCE_FOLDER_UNREADABLE:${path}:$($_.Exception.Message)") }
