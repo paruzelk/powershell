@@ -187,3 +187,104 @@ Describe 'ARCH5 main CLI experimental guard' {
         {& (Join-Path $script:root 'OutlookPOP3Archive.ps1') -Mode Resume -ProfileName Outlook -SourcePst (Join-Path $TestDrive 'not-created.pst') -ConfirmTestArchive -IncludeFolderPath '\\POP3\Inbox' -WhatIf} | Should -Throw
     }
 }
+
+Describe 'ARCH5a recursive embedded message witness' {
+    BeforeAll {
+        function New-ARCH5aFakeEmbeddedParent {
+            param([object[]]$ChildReads)
+            $a=New-ARCH5FakeCompoundAttachment
+            $a | Add-Member -NotePropertyName Counter -NotePropertyValue 0
+            $a | Add-Member -Force -MemberType ScriptMethod -Name SaveAsFile -Value {
+                param($file)
+                $this.Counter++
+                # Every export container differs; child MailItem is provided by
+                # the fake OpenSharedItem reader, not by a real MSG parser.
+                $this.Content[1023]=[byte]$this.Counter
+                [IO.File]::WriteAllBytes($file,[byte[]]$this.Content)
+            }
+            $ns=[pscustomobject]@{Reads=$ChildReads;Count=0;Paths=@()}
+            $ns | Add-Member -MemberType ScriptMethod -Name OpenSharedItem -Value {
+                param($file)
+                $this.Paths+= $file
+                $i=$this.Count % $this.Reads.Count
+                $this.Count++
+                return $this.Reads[$i]
+            }
+            $mail=New-ARCH2bFakeMail -Attachments @($a)
+            $mail | Add-Member -NotePropertyName Application -NotePropertyValue ([pscustomobject]@{Session=$ns})
+            $mail | Add-Member -NotePropertyName CloseCount -NotePropertyValue 0
+            $mail | Add-Member -MemberType ScriptMethod -Name Close -Value {param([int]$mode) if($mode -ne 1){throw 'Must discard'};$this.CloseCount++}
+            return $mail
+        }
+        function New-ARCH5aFakeChild {
+            param([string]$Body='embedded body',[int64]$Size=1000,[object[]]$Attachments=@())
+            $m=New-ARCH2bFakeMail -Body $Body -Size $Size -Attachments $Attachments
+            $m | Add-Member -NotePropertyName CloseCount -NotePropertyValue 0
+            $m | Add-Member -MemberType ScriptMethod -Name Close -Value {param([int]$mode) if($mode -ne 1){throw 'Must discard'};$this.CloseCount++}
+            return $m
+        }
+    }
+    It 'accepts different exported containers with identical embedded content and discards private copies' {
+        $c1=New-ARCH5aFakeChild -Size 1000
+        $c2=New-ARCH5aFakeChild -Size 1100
+        $mail=New-ARCH5aFakeEmbeddedParent -ChildReads @($c1,$c2)
+        $w=Get-OPA265ARCH2bMailSemanticWitness -Mail $mail -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments
+        $w.Schema | Should -BeExactly '2.6.5-ARCH5a.MailSemanticWitness.3'
+        $w.Attachments[0].PayloadKind | Should -BeExactly 'EmbeddedMailSemanticSha256'
+        $w.Attachments[0].PayloadByteCount | Should -Be 0
+        $mail.Application.Session.Count | Should -Be 2
+        $c1.CloseCount | Should -Be 1
+        $c2.CloseCount | Should -Be 1
+        foreach($p in $mail.Application.Session.Paths){Test-Path -LiteralPath $p | Should -BeFalse}
+    }
+    It 'rejects differing embedded body on independent pre-Move reads' {
+        $m=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild -Body 'a'),(New-ARCH5aFakeChild -Body 'b'))
+        {Get-OPA265ARCH2bMailSemanticWitness -Mail $m -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments} | Should -Throw '*semantic content differs*'
+    }
+    It 'original verifier accepts same embedded message on destination without matching MSG file bytes' {
+        $s=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild -Size 1000))
+        $d=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild -Size 2000))
+        $w=Get-OPA265ARCH2bMailSemanticWitness -Mail $s -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments
+        Test-OPAArchiveItemFingerprint -Item $d -Expected ([pscustomobject]@{Subject=$s.Subject;Sender=$s.SenderEmailAddress;InternetMessageId=$s.MessageId;SourceSemanticWitness=$w}) | Should -BeTrue
+    }
+    It 'original verifier rejects changes to nested ordinary attachment bytes' {
+        $s=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild -Attachments @((New-ARCH2bFakeAttachment -Payload ([byte[]]@(1,2,3))))))
+        $d=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild -Attachments @((New-ARCH2bFakeAttachment -Payload ([byte[]]@(1,2,4))))))
+        $w=Get-OPA265ARCH2bMailSemanticWitness -Mail $s -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments
+        Test-OPAArchiveItemFingerprint -Item $d -Expected ([pscustomobject]@{Subject=$s.Subject;Sender=$s.SenderEmailAddress;InternetMessageId=$s.MessageId;SourceSemanticWitness=$w}) | Should -BeFalse
+    }
+    It 'recurses through two levels and rejects a deeper changed payload' {
+        $sInner=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild -Body 'deep original'))
+        $dInner=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild -Body 'deep changed'))
+        $s=New-ARCH5aFakeEmbeddedParent -ChildReads @($sInner)
+        $d=New-ARCH5aFakeEmbeddedParent -ChildReads @($dInner)
+        $a=Get-OPA265ARCH2bMailSemanticWitness -Mail $s -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments
+        $b=Get-OPA265ARCH2bMailSemanticWitness -Mail $d -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments
+        (Compare-OPA265ARCH2bMailSemanticWitness -Source $a -Destination $b).CriticalContentMatches | Should -BeFalse
+    }
+    It 'refuses embedded non-MailItem instead of treating it as empty' {
+        $m=New-ARCH5aFakeEmbeddedParent -ChildReads @([pscustomobject]@{Class=26})
+        {Get-OPA265ARCH2bMailSemanticWitness -Mail $m -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments} | Should -Throw '*not a readable MailItem*'
+    }
+    It 'enforces depth bound before opening deeper MSG' {
+        $m=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild))
+        {Get-OPA265ARCH2bMailSemanticWitness -Mail $m -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments -EmbeddedDepth 4} | Should -Throw '*depth limit*'
+        $m.Application.Session.Count | Should -Be 0
+    }
+    It 'enforces shared read budget before opening MSG' {
+        $m=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild))
+        {Get-OPA265ARCH2bMailSemanticWitness -Mail $m -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments -EmbeddedBudget @{Remaining=0}} | Should -Throw '*read budget*'
+        $m.Application.Session.Count | Should -Be 0
+    }
+    It 'requires the exact version 3 payload-kind marker' {
+        $m=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild))
+        $w=Get-OPA265ARCH2bMailSemanticWitness -Mail $m -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments
+        $w.Attachments[0].PayloadKind='Unverified'
+        Test-OPA265ARCH2bWitnessSchema -Witness $w | Should -BeFalse
+    }
+    It 'retains explicit consent requirement and does not open MSG by default' {
+        $m=New-ARCH5aFakeEmbeddedParent -ChildReads @((New-ARCH5aFakeChild))
+        {Get-OPA265ARCH2bMailSemanticWitness -Mail $m -ExtendedAttachmentWitness -RecursiveEmbeddedWitness} | Should -Throw '*AttachmentTypeUnsupported*'
+        $m.Application.Session.Count | Should -Be 0
+    }
+}
