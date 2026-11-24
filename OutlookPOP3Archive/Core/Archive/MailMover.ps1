@@ -1002,7 +1002,7 @@ function Move-OPAItemsWithLimit {
             }
             if($ARCH5Batch){
                 Assert-OPAARCH5Route -SourcePst ([string]$Transaction.State.SourcePst) -ArchiveDate $dt -SourceFolderPath $folderPath -TargetFolderPath ([string]$dest.Folder.FolderPath) -ArchivePst ([string]$dest.Path) -Grouping $ArchiveGrouping
-                $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item -ExtendedAttachmentWitness -AllowComplexAttachments:$ConfirmComplexAttachments
+                $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments:$ConfirmComplexAttachments
             }else{
                 $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item
             }
