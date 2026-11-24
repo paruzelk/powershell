@@ -9,6 +9,8 @@ param(
     # ARCH4 DEV: explicitly selected test POP3 PST; Archive + reconciliation-only Resume.
     [string]$SourcePst,
     [switch]$ConfirmTestArchive,
+    [switch]$ConfirmComplexAttachments,
+    [string[]]$IncludeFolderPath,
     [switch]$WhatIf,
     [switch]$VerboseItems,
 
@@ -123,11 +125,13 @@ $ErrorActionPreference = 'Stop'
 # worker integration flags do not disable the direct legacy COM writer.
 # Read-only Analyze and Plan remain available, but no production permit.
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH2aMoveOutcomeFence.ps1')
-$arch4Requested = [bool]$ConfirmTestArchive -or $PSBoundParameters.ContainsKey('SourcePst')
+$arch4Requested = [bool]$ConfirmTestArchive -or $PSBoundParameters.ContainsKey('SourcePst') -or $ConfirmComplexAttachments -or $PSBoundParameters.ContainsKey('IncludeFolderPath')
 if ($arch4Requested) {
     if (-not $ConfirmTestArchive -or [string]::IsNullOrWhiteSpace($SourcePst) -or
         [string]::IsNullOrWhiteSpace($ProfileName) -or $Mode -notin @('Archive','Resume') -or
         $WorkerPilot -or $ArchiveDeletedItems -or $ArchiveDrafts -or $ArchiveJunk -or
+        ($ConfirmComplexAttachments -and ($Mode -ne 'Archive' -or $Limit -gt 10)) -or
+        ($PSBoundParameters.ContainsKey('IncludeFolderPath') -and $Mode -ne 'Archive') -or
         ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt 500)) -or
         ($Mode -eq 'Archive' -and -not [string]::IsNullOrWhiteSpace($Transaction))) {
         throw 'ARCH4 requires Archive/Resume, explicit test PST, profile and -ConfirmTestArchive; Archive limit 1..500, excluded system folders stay excluded.'
@@ -156,6 +160,7 @@ if (-not [string]::IsNullOrWhiteSpace($Transaction) -and $Mode -ne 'Resume') {
 # remembered so Resume can honor the transaction's stored mode by default.
 $script:OPADurabilityModeExplicit = $PSBoundParameters.ContainsKey('DurabilityMode')
 $global:OPADurabilityMode = $DurabilityMode
+if($arch4Requested){$global:OPADurabilityMode='Safe'}
 
 $script:OPAAutoDefaultLimit = 500
 $script:OPAAutoTargetMinimum = $AutoTargetMinimum
@@ -354,6 +359,28 @@ if ($WorkerPilot) {
 
 
 
+if($arch4Requested){
+    $build='2.6.5-ARCH5 DEV'
+    $buildPath=Join-Path $PSScriptRoot 'BUILD-INFO.json'
+    if(Test-Path -LiteralPath $buildPath -PathType Leaf){
+        try{
+            $info=ConvertFrom-Json -InputObject (Get-Content -LiteralPath $buildPath -Raw -Encoding UTF8)
+            if([string]$info.SourceCommit -match '^[a-fA-F0-9]{40}$'){$build+=' g'+$info.SourceCommit.Substring(0,8)}
+        }catch{}
+    }
+    Write-Host ('OutlookPOP3Archive '+$build)
+    Write-Host ('Компьютер: '+$env:COMPUTERNAME+'; пользователь: '+$env:USERNAME)
+    Write-Host ('Режим: '+$Mode+'; профиль: '+$ProfileName)
+    Write-Host ('Источник: '+$SourcePst)
+    Write-Host 'Запись журнала: Safe; Outbox, удалённые, черновики и спам исключены.'
+    if($Mode -eq 'Archive'){
+        Write-Host ('Размер партии: '+$Limit+'; группировка: '+$ArchiveGrouping+'; возраст: '+$OlderThanMonths+' мес.')
+        Write-Host ('Макс. архивный PST: '+$MaxArchivePstSizeGB+' ГБ; резерв: '+$SafetyMarginGB+' ГБ')
+        Write-Host ('Экспериментальные MSG/OLE: '+[bool]$ConfirmComplexAttachments)
+    }else{
+        Write-Host 'Параметры будут загружены из сохранённой транзакции; новые письма не переносятся.'
+    }
+}else{
 Write-Host "OutlookPOP3Archive $($script:OPAApplicationVersion)"
 Write-Host ("Computer : {0}" -f $env:COMPUTERNAME)
 Write-Host ("User     : {0}" -f $env:USERNAME)
@@ -372,6 +399,8 @@ if ($archiveSafeLimitGB -le 0) {
 Write-Host ("Archive  : Max={0} GB / Safety={1} GB / Safe={2} GB" -f $MaxArchivePstSizeGB,$SafetyMarginGB,[math]::Round($archiveSafeLimitGB,4))
 Write-Host ("Folders  : DeletedItems={0} / Drafts={1} / Junk={2} / Outbox=Never" -f [bool]$ArchiveDeletedItems,[bool]$ArchiveDrafts,[bool]$ArchiveJunk)
 Write-Host ("Durability: {0}" -f $global:OPADurabilityMode)
+}
+
 
 function Get-OPAAutoTransactionCandidates {
     [CmdletBinding()]
@@ -711,7 +740,7 @@ try {
     Write-OPADiscoverySummary -Discovery $discovery
 
     if ($arch4Requested) {
-        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB
+        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath
         return
     }
 
