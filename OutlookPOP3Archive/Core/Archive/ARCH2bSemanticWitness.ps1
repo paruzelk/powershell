@@ -73,6 +73,102 @@ function Get-OPAARCH5ComplexExportProof {
     }
 }
 
+# Version 3 uses a flat semantic digest for each embedded message. No MSG
+# container hash, provider Size, executable activation or Inspector is used.
+function Get-OPAARCH5aEmbeddedDigest {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Witness)
+    if(-not (Test-OPA265ARCH2bWitnessSchema -Witness $Witness) -or
+       [string]$Witness.Schema -cne '2.6.5-ARCH5a.MailSemanticWitness.3'){
+        throw 'ARCH5a embedded witness is incomplete.'
+    }
+    $canonical=[ordered]@{}
+    foreach($name in @('Schema','ItemClass','InternetMessageIdSha256','SubjectSha256','SenderSha256',
+        'ToSha256','CcSha256','BccSha256','RecipientCount','OrderedRecipientDigestSha256',
+        'BodySha256','BodyUtf16Length','HtmlBodySha256','HtmlBodyUtf16Length',
+        'ReceivedUtcTicks','SentUtcTicks','UnRead','Importance','Sensitivity','CategoriesSha256','AttachmentCount')){
+        $canonical[$name]=[string]$Witness.$name
+    }
+    $rows=New-Object 'System.Collections.Generic.List[object]'
+    foreach($a in @($Witness.Attachments)){
+        $row=[ordered]@{}
+        foreach($name in @('Index','Type','NameUtf8Sha256','PayloadByteCount','PayloadSha256')){
+            $row[$name]=[string]$a.$name
+        }
+        if([int]$a.Type -eq 5){$row['PayloadKind']=[string]$a.PayloadKind}
+        [void]$rows.Add($row)
+    }
+    $canonical['Attachments']=$rows.ToArray()
+    return (Get-OPA265ARCH2bTextSha256 -Text (ConvertTo-Json -InputObject $canonical -Depth 8 -Compress))
+}
+
+function Get-OPAARCH5aEmbeddedProof {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Attachment,
+          [Parameter(Mandatory=$true)][object]$Mail,
+          [Parameter(Mandatory=$true)][string]$Workspace,
+          [Parameter(Mandatory=$true)][string]$TemporaryDirectory,
+          [Parameter(Mandatory=$true)][int64]$MaxBytes,
+          [Parameter(Mandatory=$true)][int]$MaxAttachmentCount,
+          [Parameter(Mandatory=$true)][int]$Index,
+          [Parameter(Mandatory=$true)][int]$Depth,
+          [Parameter(Mandatory=$true)][hashtable]$Budget)
+    try{
+        if($Depth -ge 4){throw 'Embedded message depth limit (4) exceeded.'}
+        $session=$Mail.Application.Session
+        if($null -eq $session){throw 'Outlook namespace unavailable for embedded MSG.'}
+        $digests=@()
+        for($attempt=0;$attempt -lt 2;$attempt++){
+            if([int]$Budget.Remaining -le 0){throw 'Embedded message read budget (128) exceeded.'}
+            $Budget.Remaining=[int]$Budget.Remaining-1
+            $path=Join-Path $Workspace ('OPA-ARCH5a-'+[guid]::NewGuid().ToString('N')+'.msg')
+            $child=$null
+            if([IO.File]::Exists($path)){throw 'Embedded export path collision.'}
+            try{
+                $Attachment.SaveAsFile($path)
+                if(-not [IO.File]::Exists($path)){throw 'Embedded MSG export missing.'}
+                $file=Get-Item -LiteralPath $path -Force
+                if(($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+                   $file.Length -lt 512 -or $file.Length -gt $MaxBytes){
+                    throw 'Embedded MSG export unsafe or outside bounds.'
+                }
+                $stream=[IO.File]::OpenRead($path)
+                try{
+                    $head=New-Object byte[] 8
+                    if($stream.Read($head,0,8) -ne 8 -or [BitConverter]::ToString($head) -cne 'D0-CF-11-E0-A1-B1-1A-E1'){
+                        throw 'Embedded MSG is not compound storage.'
+                    }
+                }finally{$stream.Dispose()}
+                # Open the private COPY using Outlook's documented MSG reader.
+                # Do not Display, Save, Send, Move or activate attachments.
+                $child=$session.OpenSharedItem($path)
+                if($null -eq $child -or [int]$child.Class -ne 43){
+                    throw 'Embedded item is not a readable MailItem.'
+                }
+                $w=Get-OPA265ARCH2bMailSemanticWitness -Mail $child -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments -MaxAttachmentBytes $MaxBytes -MaxAttachmentCount $MaxAttachmentCount -TemporaryDirectory $TemporaryDirectory -EmbeddedDepth ($Depth+1) -EmbeddedBudget $Budget
+                $digests+= Get-OPAARCH5aEmbeddedDigest -Witness $w
+            }finally{
+                try{
+                    if($null -ne $child){
+                        if([int]$child.Class -eq 43){[void]$child.Close(1)}
+                    }
+                }finally{
+                    if($null -ne $child -and [Runtime.InteropServices.Marshal]::IsComObject($child)){
+                        [void][Runtime.InteropServices.Marshal]::ReleaseComObject($child)
+                    }
+                    if([IO.File]::Exists($path)){[IO.File]::Delete($path)}
+                }
+            }
+        }
+        if($digests.Count -ne 2 -or $digests[0] -cne $digests[1]){
+            throw 'Embedded MSG semantic content differs between independent reads.'
+        }
+        return [pscustomobject]@{Sha=[string]$digests[0]}
+    }catch{
+        throw ('ARCH5 AttachmentExportUnverified: index='+$Index+' type=5; ARCH5a '+$_.Exception.Message)
+    }
+}
+
 function Get-OPA265ARCH2bAttachmentWitnesses {
     [CmdletBinding()]
     param(
@@ -81,6 +177,9 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
         [ValidateRange(1,256)][int]$MaxAttachmentCount=128,
         [switch]$AllowComplexAttachments,
         [switch]$ExtendedAttachmentWitness,
+        [switch]$RecursiveEmbeddedWitness,
+        [int]$EmbeddedDepth=0,
+        [hashtable]$EmbeddedBudget,
         [string]$TemporaryDirectory=[IO.Path]::GetTempPath()
     )
     # Private ACL must be applied atomically at creation. The exclusive lease
@@ -117,6 +216,17 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
             }
             $filename=[string]$attachment.FileName
             if($filename.Length -gt 1024){throw 'ARCH2b attachment name exceeds bound.'}
+            if($RecursiveEmbeddedWitness -and $type -eq 5){
+                $proof=Get-OPAARCH5aEmbeddedProof -Attachment $attachment -Mail $Mail -Workspace $workspace -TemporaryDirectory $TemporaryDirectory -MaxBytes $MaxAttachmentBytes -MaxAttachmentCount $MaxAttachmentCount -Index $i -Depth $EmbeddedDepth -Budget $EmbeddedBudget
+                [void]$result.Add([pscustomobject][ordered]@{
+                    Index=[int]$i;Type=$type
+                    NameUtf8Sha256=(Get-OPA265ARCH2bTextSha256 -Text $filename)
+                    PayloadByteCount=[int64]0
+                    PayloadSha256=[string]$proof.Sha
+                    PayloadKind='EmbeddedMailSemanticSha256'
+                })
+                continue
+            }
             if($ExtendedAttachmentWitness -and $type -in @(5,6)){
                 $proof=Get-OPAARCH5ComplexExportProof -Attachment $attachment -Workspace $workspace -Type $type -MaxBytes $MaxAttachmentBytes -Index $i
                 [void]$result.Add([pscustomobject][ordered]@{
@@ -205,6 +315,9 @@ function Get-OPA265ARCH2bMailSemanticWitness {
         [int]$MaxAttachmentCount=128,
         [switch]$ExtendedAttachmentWitness,
         [switch]$AllowComplexAttachments,
+        [switch]$RecursiveEmbeddedWitness,
+        [int]$EmbeddedDepth=0,
+        [hashtable]$EmbeddedBudget,
         [string]$TemporaryDirectory=[IO.Path]::GetTempPath()
     )
     if([int]$Mail.Class -ne 43){throw 'ARCH2b only Outlook MailItem class 43 supported.'}
@@ -240,6 +353,8 @@ function Get-OPA265ARCH2bMailSemanticWitness {
             }
         }
     }
+    if($RecursiveEmbeddedWitness -and -not $ExtendedAttachmentWitness){throw 'ARCH5a requires extended witness policy.'}
+    if($RecursiveEmbeddedWitness -and $null -eq $EmbeddedBudget){$EmbeddedBudget=@{Remaining=128}}
     if($ExtendedAttachmentWitness){$MaxAttachmentBytes=1073741824}
     $attachmentArgs=@{
         Mail=$Mail
@@ -250,6 +365,11 @@ function Get-OPA265ARCH2bMailSemanticWitness {
     if($ExtendedAttachmentWitness){
         $attachmentArgs.ExtendedAttachmentWitness=$true
         $attachmentArgs.AllowComplexAttachments=[bool]$AllowComplexAttachments
+        if($RecursiveEmbeddedWitness){
+            $attachmentArgs.RecursiveEmbeddedWitness=$true
+            $attachmentArgs.EmbeddedDepth=$EmbeddedDepth
+            $attachmentArgs.EmbeddedBudget=$EmbeddedBudget
+        }
     }
     $att=@(Get-OPA265ARCH2bAttachmentWitnesses @attachmentArgs)
     $witness=[pscustomobject][ordered]@{
@@ -280,6 +400,7 @@ function Get-OPA265ARCH2bMailSemanticWitness {
     if($ExtendedAttachmentWitness){
         $witness.Schema='2.6.5-ARCH5.MailSemanticWitness.2'
     }
+    if($RecursiveEmbeddedWitness){$witness.Schema='2.6.5-ARCH5a.MailSemanticWitness.3'}
     if(-not (Test-OPA265ARCH2bWitnessSchema -Witness $witness)){
         throw 'ARCH2b incomplete source semantic witness; no Move authorized.'
     }
@@ -289,7 +410,7 @@ function Test-OPA265ARCH2bWitnessSchema {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Witness)
     if($null -eq $Witness -or
-       [string]$Witness.Schema -cnotin @('2.6.5-ARCH2b.MailSemanticWitness.1','2.6.5-ARCH5.MailSemanticWitness.2') -or
+       [string]$Witness.Schema -cnotin @('2.6.5-ARCH2b.MailSemanticWitness.1','2.6.5-ARCH5.MailSemanticWitness.2','2.6.5-ARCH5a.MailSemanticWitness.3') -or
        [int]$Witness.ItemClass -ne 43){return $false}
     foreach($name in @('InternetMessageIdSha256','SubjectSha256','SenderSha256',
         'ToSha256','CcSha256','BccSha256','OrderedRecipientDigestSha256',
@@ -302,7 +423,8 @@ function Test-OPA265ARCH2bWitnessSchema {
         try{if([int64]$Witness.$name -lt 0){return $false}}catch{return $false}
     }
     if($Witness.UnRead -isnot [bool]){return $false}
-    $extended=[string]$Witness.Schema -ceq '2.6.5-ARCH5.MailSemanticWitness.2'
+    $recursive=[string]$Witness.Schema -ceq '2.6.5-ARCH5a.MailSemanticWitness.3'
+    $extended=$recursive -or [string]$Witness.Schema -ceq '2.6.5-ARCH5.MailSemanticWitness.2'
     $att=@($Witness.Attachments)
     if($att.Count -ne [int]$Witness.AttachmentCount){return $false}
     for($i=0;$i -lt $att.Count;$i++){
@@ -315,7 +437,9 @@ function Test-OPA265ARCH2bWitnessSchema {
            $null -eq $a.PayloadByteCount){return $false}
         try{
             if([int64]$a.PayloadByteCount -lt 0){return $false}
-            if($extended -and ([int64]$a.PayloadByteCount -gt 1073741824 -or
+            if($recursive -and [int]$a.Type -eq 5){
+                if([int64]$a.PayloadByteCount -ne 0 -or [string]$a.PayloadKind -cne 'EmbeddedMailSemanticSha256'){return $false}
+            }elseif($extended -and ([int64]$a.PayloadByteCount -gt 1073741824 -or
                 ([int]$a.Type -in @(5,6) -and [int64]$a.PayloadByteCount -lt 512))){return $false}
         }catch{return $false}
     }
