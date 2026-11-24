@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH4 DEV (24.11.2026):** [обычный Archive/Resume в основном архиваторе](2.6.5-arch4-batch-archive.md), оригинальный MailMover/Selector/ArchiveVerifier, новый произвольный пакет 1–500, проверка конкретного сообщения до claim и независимая пакетная проверка после Outlook restart. Durable Intent и return раздельны; Reconciled/Index только после полного verifier, Resume не повторяет Move. 20 новых исполняемых Pester; 4752/163 ожидается. Реальный тест 100, затем 500 после успешного CI. Production и Auto закрыты.
+
 > **ARCH3 COMPLETED — 24.11.2026:** оператор подтвердил реальный Move 10/10, сохранность всех 12 вложений после нового процесса Outlook (9840 → 13028), OriginalSourceEntryIdsAbsent=True, оригинальный ArchiveVerifier PASS, Seal и Commit PASS: Verified=10, Reconciled=10, Indexed=10, CommitComplete=True. Контрольная точка `ARCH3x2c-dev-g2955cc8a`. [Полный протокол и единый план ARCH4](ARCH3-COMPLETED-ARCH4.md). Никакого повторения ARCH3, никаких новых обязательных исторических SHA, никаких привязок к длине PST, исходному числу писем или глобальному SHA индекса в новом маршруте. ARCH4 — основной универсальный цикл архивации с проверкой до подтверждения индекса и безопасным восстановлением; реальные партии 100 и 500 на тестовом PST после готовности. ProductionReady=False.
 
 
