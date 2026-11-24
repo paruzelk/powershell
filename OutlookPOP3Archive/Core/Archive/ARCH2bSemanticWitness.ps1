@@ -137,6 +137,9 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
             $file=Get-Item -LiteralPath $tempPath -Force
             if(($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
                 [int64]$file.Length -gt $MaxAttachmentBytes){
+                if($ExtendedAttachmentWitness){
+                    throw ('ARCH5 AttachmentExportUnverified: index='+$i+' type='+$type+' bytes='+$file.Length+' limit='+$MaxAttachmentBytes)
+                }
                 throw 'ARCH2b attachment output unsafe/oversized.'
             }
             $result.Add([pscustomobject][ordered]@{
