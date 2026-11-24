@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH5b DEV: ARCH5a real zero-Move completion confirmed; temporary MSG remained in private workspace, unlocked at later observation. Explicit private child/collection RCW release, bounded exact-file cleanup retries and original error preservation; NoPendingBatch is a normal status. Four new cleanup tests, 4790/164 expected; live MSG retry pending.",
     "ARCH5a DEV: operator confirmed ARCH5 unstable type 5 MSG exports, zero moves/index and completed Resume. Recursive semantic embedded MailItem digest, two private MSG reads, bounded depth/read count and original byte hashes for ordinary and stable OLE payloads; zero-claim completion without restart. 13 executable tests, 4786/164 expected. Live MSG validation pending.",
     "ARCH5 DEV: actual ARCH4 598 verified/indexed; exact eligible folder selection, year and nested grouping path preclaim/restart checks; versioned 1 GiB witness, experimental stable compound byte exports type 5/6 with explicit 1..10 test consent; precise skip details, localized banner and progress. 21 executable new tests, 4773/164 expected. Live complex attachment/folder validation pending.",
     "ARCH4 DEV: operator ARCH3 real 10/12 full semantic restart and verified journal/index commit complete. Main Archive/Resume explicit test PST 1..500 bounded selection and original MailMover durable witness/Intent/returned, no index before independent new Outlook process original ArchiveVerifier. Reconciliation-only Resume and shared-directory pending fence; never blind COM replay. No physical source PST size or frozen Inbox/Index SHA. 20 executable Pester (4752/163 expected); real ARCH4 pilot pending; production closed.",
@@ -101,7 +102,7 @@
     "BW4g: standalone explicit operator-approved one-shot synthetic cross-PST Move after strict BW4f audit and durable CreateNew one-attempt claim; never a production Worker"
   ],
   "Verification": {
-    "Status": "ARCH3x2 unified DEV: ARCH3x1b source PST length and first-ten reselection gates removed; only pinned ten original full semantic witnesses before one-shot Move. Postrestart ORIGINAL ArchiveVerifier all ten, explicit sealed Review then original protected Reconciled journal and DuplicateIndex commit/recover (no Move retry). Windows PS5.1 4786/164 Pester expected; ARCH4 real verified 598 messages complete; ARCH5 versioned attachment witness and exact folder routes, experimental complex exports, progress and correct runtime settings, production closed.",
+    "Status": "ARCH3x2 unified DEV: ARCH3x1b source PST length and first-ten reselection gates removed; only pinned ten original full semantic witnesses before one-shot Move. Postrestart ORIGINAL ArchiveVerifier all ten, explicit sealed Review then original protected Reconciled journal and DuplicateIndex commit/recover (no Move retry). Windows PS5.1 4790/164 Pester expected; ARCH4 real verified 598 messages complete; ARCH5 versioned attachment witness and exact folder routes, experimental complex exports, progress and correct runtime settings, production closed.",
     "RealMailMoveViaWorker": false,
     "ReadOnlyReconciliationOnly": false,
     "BW4k7v2aReadOnlyPristineFolderInventoryGate": true,
@@ -110,7 +111,7 @@
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
     "ExpectedTestContainers": 164,
-    "ExpectedPesterTests": 4786,
+    "ExpectedPesterTests": 4790,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
