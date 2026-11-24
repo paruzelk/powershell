@@ -1,5 +1,11 @@
 ## 2.6.5-ARCH5a DEV — 2026-11-24
 
+## 2.6.5-ARCH5b DEV
+
+- Release private MSG/collection COM wrappers, bounded cleanup retries, preserve original capture and cleanup errors, NoPendingBatch status.
+- Four new Pester tests; 4790/164 expected. Real Outlook validation pending.
+
+
 - Operator confirmed ARCH5 type 5 embedded MSG export bytes unstable; zero moves, zero indexed, Resume completed safely. Replace type 5 binary comparison with bounded recursive MailItem semantic digest from two independent private MSG reads. v3 witness, compatibility with v1/v2, preserve type 1/6 byte comparison.
 - Terminal zero-Move completion with original durable replay, no restart or index mutation; uncertain claims remain blocked.
 - 13 new executable tests; 4786/164 expected. Actual Outlook MSG validation pending.
