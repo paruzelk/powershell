@@ -1,3 +1,9 @@
+## 2.6.5-ARCH4 DEV — 2026-11-24
+
+- Explicit main Archive/Resume test-PST route with 1..500 planned items, default eligible POP3 folders and original date/grouping/part planner; no physical source PST size fence, no pinned historical IDs.
+- Original MailMover stores durable full semantic witness and original OperationJournal Intent before COM, separate returned receipt and no index/completion prior to independent restart verifier. Pending shared-directory lock prevents new batches before reconciliation. Resume never moves; verifies known returned messages and finishes append-only Reconciled/Index idempotently, stops on unknown COM outcome or malformed journal.
+- 20 new executable Pester tests (4752 in 163 containers expected); no real Outlook test in CI. Production Archive/Resume/Auto remain closed except explicit bounded test route.
+
 ## ARCH3 real pilot completed — 2026-11-24
 
 - Operator confirmed real ARCH3x2c ten-message Move, ten durable claims/invocations/returns, independent Outlook restart, full original semantic verification of 10 messages and 12 attachments, all original SourceEntryIDs absent, 10 destination messages, Review Seal and final journal/index Commit PASS. Verified=10, Reconciled=10, Indexed=10, CommitComplete=True, Recovered=False.
