@@ -257,7 +257,7 @@ function Invoke-OPAARCH4Batch {
           [int]$Limit=100,[int]$OlderThanMonths=12,[string]$ArchiveGrouping='Year',
           [double]$MaxArchivePstSizeGB=10,[double]$SafetyMarginGB=0.5)
     $source=[IO.Path]::GetFullPath($SourcePst)
-    if(-not [IO.File]::Exists($source) -or [IO.Path]::GetExtension($source) -ine '.pst' -or
+    if($source.StartsWith('\\') -or -not [IO.File]::Exists($source) -or [IO.Path]::GetExtension($source) -ine '.pst' -or
        (([IO.File]::GetAttributes($source) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
         throw 'ARCH4 explicit existing non-reparse local test PST required.'
     }
@@ -323,7 +323,7 @@ function Invoke-OPAARCH4Batch {
             $stores+=$found[0]
         }
         # Check absence across all eligible source folders, not a fixed inbox count.
-        $result=Test-OPAArchiveMoves -Namespace $Session.Namespace -SourceFolder $folders -ArchiveStores $stores -ExpectedMoved $state.Returned -ExpectedMoves @($state.Rows) -RequireSemanticWitness
+        $result=Test-OPAArchiveMoves -Namespace $Session.Namespace -SourceFolder $folders -ArchiveStores $stores -ExpectedMoved $state.Returned -ExpectedMoves @($state.Rows) -RequireSemanticWitness -RequireSourceAbsentAcrossFolders
         $completed=Complete-OPAARCH4VerifiedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId
         [IO.File]::Delete($pending)
         return $completed
