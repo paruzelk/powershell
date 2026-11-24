@@ -143,6 +143,9 @@ if ($arch4Requested) {
     if ($Mode -eq 'Archive' -and $OlderThanMonths -eq 0 -and -not $IgnoreAge) {
         throw 'ARCH4 no-age archive requires explicit -IgnoreAge.'
     }
+    if ($Mode -eq 'Archive' -and ($MaxArchivePstSizeGB -le $SafetyMarginGB -or [double]::IsNaN($MaxArchivePstSizeGB) -or [double]::IsNaN($SafetyMarginGB))) {
+        throw 'ARCH6 archive PST maximum must exceed its safety margin.'
+    }
     if ($WhatIf) {
         [pscustomobject]@{Schema='2.6.5-ARCH4.WhatIf.1';Status='NoOutlookOrPersistentWrites';Mode=$Mode;SourcePst=$SourcePst;Limit=$Limit;ProductionReady=$false}
         return
@@ -360,7 +363,7 @@ if ($WorkerPilot) {
 
 
 if($arch4Requested){
-    $build='2.6.5-ARCH5b DEV'
+    $build='2.6.5-ARCH6ae DEV'
     $buildPath=Join-Path $PSScriptRoot 'BUILD-INFO.json'
     if(Test-Path -LiteralPath $buildPath -PathType Leaf){
         try{
@@ -541,7 +544,9 @@ function Get-OPAPop3SourceFolders {
         [Parameter(Mandatory=$true)][object]$StoreHandle,
         [switch]$ArchiveDeletedItems,
         [switch]$ArchiveDrafts,
-        [switch]$ArchiveJunk
+        [switch]$ArchiveJunk,
+        [switch]$IncludeEmptyFolders,
+        [switch]$IncludeRootForVerification
     )
     $root = $null
     try { $root = $StoreHandle.GetRootFolder() }
@@ -558,7 +563,8 @@ function Get-OPAPop3SourceFolders {
     @(Get-OPAEligiblePop3MailFolders -RootFolder $root `
         -WellKnownEntryIdMap $wellKnownMap `
         -ArchiveDeletedItems:$ArchiveDeletedItems `
-        -ArchiveDrafts:$ArchiveDrafts -ArchiveJunk:$ArchiveJunk)
+        -ArchiveDrafts:$ArchiveDrafts -ArchiveJunk:$ArchiveJunk `
+        -IncludeEmptyFolders:$IncludeEmptyFolders -IncludeRootForVerification:$IncludeRootForVerification)
 }
 
 function Get-OPASourceByPst {
