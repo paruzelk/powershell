@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH6ae DEV: empty eligible source folders on Resume, root read-only inventory and absence verification, bounded automatic sequence above 500 total with graceful Outlook restart, reconciliation-only recovery, stop on skips or unknown outcomes, memory/candidate optimization, explicit application cap disable, 25 executable tests; 4815/165 expected. Real ARCH6f pending.",
     "ARCH5b DEV: ARCH5a real zero-Move completion confirmed; temporary MSG remained in private workspace, unlocked at later observation. Explicit private child/collection RCW release, bounded exact-file cleanup retries and original error preservation; NoPendingBatch is a normal status. Four new cleanup tests, 4790/164 expected; live MSG retry pending.",
     "ARCH5a DEV: operator confirmed ARCH5 unstable type 5 MSG exports, zero moves/index and completed Resume. Recursive semantic embedded MailItem digest, two private MSG reads, bounded depth/read count and original byte hashes for ordinary and stable OLE payloads; zero-claim completion without restart. 13 executable tests, 4786/164 expected. Live MSG validation pending.",
     "ARCH5 DEV: actual ARCH4 598 verified/indexed; exact eligible folder selection, year and nested grouping path preclaim/restart checks; versioned 1 GiB witness, experimental stable compound byte exports type 5/6 with explicit 1..10 test consent; precise skip details, localized banner and progress. 21 executable new tests, 4773/164 expected. Live complex attachment/folder validation pending.",
@@ -110,8 +111,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 164,
-    "ExpectedPesterTests": 4790,
+    "ExpectedTestContainers": 165,
+    "ExpectedPesterTests": 4815,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,
