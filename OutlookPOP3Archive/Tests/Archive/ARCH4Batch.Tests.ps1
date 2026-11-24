@@ -57,6 +57,7 @@ BeforeAll {
         return [pscustomobject]@{Verified=$true;EntryIdsVerified=$true;SemanticWitnessRequired=$true;AllRequiredOriginalSemanticWitnessesPresent=$true;ExpectedMoved=$Count;ExpectedEntryIdsChecked=$Count;MissingEntryIds=@();WarningEntryIds=@()}
     }
 }
+Describe 'ARCH4 controlled original batch development integration' {
 BeforeEach {
     $global:OPADurabilityMode='Safe'
     Mock Test-OPA265ARCH2bWitnessSchema {$true}
@@ -227,4 +228,5 @@ Describe 'ARCH4 main command safety before discovery' {
     It 'does not allow an unbounded controlled test batch' {
         {& (Join-Path $script:root 'OutlookPOP3Archive.ps1') -Mode Archive -ProfileName Outlook -SourcePst (Join-Path $TestDrive 'test.pst') -ConfirmTestArchive -Limit 501 -WhatIf} | Should -Throw
     }
+}
 }
