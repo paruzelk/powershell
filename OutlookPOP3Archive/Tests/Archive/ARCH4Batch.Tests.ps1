@@ -212,3 +212,19 @@ Describe 'ARCH4 original MailMover integration without real Outlook' {
         Should -Invoke Add-OPADuplicateEntry -Exactly -Times 0
     }
 }
+
+Describe 'ARCH4 main command safety before discovery' {
+    It 'main Archive WhatIf returns without source PST or Outlook changes' {
+        $source=Join-Path $TestDrive 'not-created.pst'
+        $r=& (Join-Path $script:root 'OutlookPOP3Archive.ps1') -Mode Archive -ProfileName Outlook -SourcePst $source -ConfirmTestArchive -Limit 100 -WhatIf
+        $r.Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
+        Test-Path -LiteralPath $source | Should -BeFalse
+    }
+    It 'requires explicit test consent for the selected PST' {
+        $source=Join-Path $TestDrive 'not-created.pst'
+        {& (Join-Path $script:root 'OutlookPOP3Archive.ps1') -Mode Archive -ProfileName Outlook -SourcePst $source -Limit 100 -WhatIf} | Should -Throw
+    }
+    It 'does not allow an unbounded controlled test batch' {
+        {& (Join-Path $script:root 'OutlookPOP3Archive.ps1') -Mode Archive -ProfileName Outlook -SourcePst (Join-Path $TestDrive 'test.pst') -ConfirmTestArchive -Limit 501 -WhatIf} | Should -Throw
+    }
+}
