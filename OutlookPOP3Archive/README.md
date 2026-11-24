@@ -1,4 +1,7 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (текущий DEV-этап 2.6.5-ARCH3x2 unified)
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (DEV: ARCH4; ARCH3 завершён 24.11.2026)
+
+**Подтверждённый реальный контрольный тест ARCH3:** 10 писем, 12 вложений, независимая проверка после перезапуска Outlook, 10 Reconciled + 10 записей DuplicateIndex, финальный CommitComplete=True. Контрольный релиз `ARCH3x2c-dev-g2955cc8a` сохранён. [Результаты и план интеграции ARCH4 в основной архиватор](docs/ARCH3-COMPLETED-ARCH4.md). Источник `info@stios.ru.pst` является тестовым. Реальные ARCH3 Prepare/Move/Seal/Commit повторять не нужно. Производственный writer пока закрыт.
+
 
 
 ### ARCH3x2c — исправление реального preflight (ошибка первого письма)
