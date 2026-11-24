@@ -1,3 +1,9 @@
+## 2.6.5-ARCH5 DEV — 2026-11-24
+
+- ARCH4 real 598 verified/indexed completed. ARCH5 versioned witness supports ordinary by-value attachment exports up to 1 GiB and explicitly opted-in, stable byte-identical compound exports for type 5/6 in bounded test batches 1..10. Real Outlook MSG/OLE support remains experimental; no by-reference or unverified content.
+- Exact eligible folder filter, route verification for annual PST and nested year/quarter folder structure before claim and at Resume. SentOn selection unchanged. Russian controlled-batch banner, actual Safe, saved Resume settings, progress, skip diagnostics and details.
+- 21 additional executable Pester (4773/164 expected). No actual Outlook in CI. ARCH5 mixed folders and complex attachments live testing pending; production closed.
+
 ## 2.6.5-ARCH4 DEV — 2026-11-24
 
 - Explicit main Archive/Resume test-PST route with 1..500 planned items, default eligible POP3 folders and original date/grouping/part planner; no physical source PST size fence, no pinned historical IDs.
