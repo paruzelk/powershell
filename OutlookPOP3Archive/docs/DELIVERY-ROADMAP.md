@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH5 DEV:** [папки, вложения и интерфейс](2.6.5-arch5-folder-grouping-attachments.md): точные eligible folders, независимая проверка маршрута, новый witness 1 GiB и explicit экспериментальная проверка стабильных MSG/OLE экспортов, корректный вывод версии и Resume, прогресс. 21 новый Pester, ожидается 4773/164. Реальные тесты после CI: отдельное пропущенное письмо, затем YearQuarter + Sent/user folders. ARCH4 не повторять.
+
+
 > **ARCH4 COMPLETED — 24.11.2026:** real batch 100: 99/99 verified/reconciled/indexed; batch 500: 499/499, both independent restart Resume PASS. Total 598 archived, two skip occurrences (distinct identity not confirmed). [Checkpoint and ARCH5 scope](ARCH4-COMPLETED-ARCH5.md). No repetition of completed ARCH4. ProductionReady=False.
 
 
