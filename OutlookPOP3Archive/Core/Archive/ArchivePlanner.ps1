@@ -45,13 +45,15 @@ function Get-OPAEligiblePop3MailFolders {
         [object]$WellKnownEntryIdMap = $null,
         [switch]$ArchiveDeletedItems,
         [switch]$ArchiveDrafts,
-        [switch]$ArchiveJunk
+        [switch]$ArchiveJunk,
+        [switch]$IncludeEmptyFolders,
+        [switch]$IncludeRootForVerification
     )
     $result = New-Object System.Collections.Generic.List[object]
     Add-OPAEligiblePop3MailFolders -Folder $RootFolder -Accumulator $result `
         -WellKnownEntryIdMap $WellKnownEntryIdMap `
         -ArchiveDeletedItems:$ArchiveDeletedItems -ArchiveDrafts:$ArchiveDrafts `
-        -ArchiveJunk:$ArchiveJunk -IsRoot
+        -ArchiveJunk:$ArchiveJunk -IncludeEmptyFolders:$IncludeEmptyFolders -IncludeRootForVerification:$IncludeRootForVerification -IsRoot
     # Return individual objects through the pipeline; callers wrap with @().
     return $result.ToArray()
 }
@@ -65,10 +67,16 @@ function Add-OPAEligiblePop3MailFolders {
         [switch]$ArchiveDeletedItems,
         [switch]$ArchiveDrafts,
         [switch]$ArchiveJunk,
+        [switch]$IncludeEmptyFolders,
+        [switch]$IncludeRootForVerification,
         [switch]$IsRoot
     )
     $path = ''
     try { $path = [string]$Folder.FolderPath } catch { throw "Unable to read folder path while enumerating POP3 PST: $($_.Exception.Message)" }
+    if ($IsRoot -and $IncludeRootForVerification) {
+        # Root is observation-only; no archive writer selects it.
+        [void]$Accumulator.Add($Folder)
+    }
     if (-not $IsRoot) {
         $name = ''
         $entryId = ''
@@ -86,7 +94,7 @@ function Add-OPAEligiblePop3MailFolders {
             $count = 0
             try { $count = [int]$Folder.Items.Count }
             catch { throw "Unable to count POP3 mail items in '$path': $($_.Exception.Message)" }
-            if ($count -gt 0) { [void]$Accumulator.Add($Folder) }
+            if ($count -gt 0 -or $IncludeEmptyFolders) { [void]$Accumulator.Add($Folder) }
         }
     }
     try {
@@ -94,7 +102,7 @@ function Add-OPAEligiblePop3MailFolders {
             Add-OPAEligiblePop3MailFolders -Folder $child -Accumulator $Accumulator `
                 -WellKnownEntryIdMap $WellKnownEntryIdMap `
                 -ArchiveDeletedItems:$ArchiveDeletedItems -ArchiveDrafts:$ArchiveDrafts `
-                -ArchiveJunk:$ArchiveJunk
+                -ArchiveJunk:$ArchiveJunk -IncludeEmptyFolders:$IncludeEmptyFolders
         }
     }
     catch { throw "Unable to traverse nested POP3 folders under '$path': $($_.Exception.Message)" }
