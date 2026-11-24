@@ -229,4 +229,32 @@ Describe 'ARCH4 main command safety before discovery' {
         {& (Join-Path $script:root 'OutlookPOP3Archive.ps1') -Mode Archive -ProfileName Outlook -SourcePst (Join-Path $TestDrive 'test.pst') -ConfirmTestArchive -Limit 501 -WhatIf} | Should -Throw
     }
 }
+
+Describe 'ARCH5a zero-Move terminal completion' {
+    It 'closes a real durable zero-claim transaction without writing a duplicate entry or operation event' {
+        $f=New-ARCH4Fixture -Count 1 -Returned 0
+        Save-ARCH4Fixture -Fixture $f
+        $s=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $s.AwaitingRestart | Should -BeTrue
+        Mock Add-OPADuplicateEntry {throw 'must never write index for zero returns'}
+        Mock Write-OPAOperationJournalEvent {throw 'must never append reconciliation without Move'}
+        $r=Complete-OPAARCH5aZeroMoveBatch -Transaction $f.Transaction -State $s -SourceStoreId STORE
+        $r.Status | Should -BeExactly 'BatchCompletedNoMoves'
+        $r.Verified | Should -Be 0
+        $r.Indexed | Should -Be 0
+        $r.RestartRequired | Should -BeFalse
+        $f.Transaction.State.Status | Should -BeExactly 'Completed'
+        Should -Invoke Add-OPADuplicateEntry -Exactly -Times 0
+        Should -Invoke Write-OPAOperationJournalEvent -Exactly -Times 0
+    }
+    It 'refuses zero-return completion before durable selection termination' {
+        $f=New-ARCH4Fixture -Count 1 -Returned 0
+        $s=Get-OPAARCH4ReturnedState -Transaction $f.Transaction -Steps @() -Events @() -SourceStoreId STORE
+        {Complete-OPAARCH5aZeroMoveBatch -Transaction $f.Transaction -State $s -SourceStoreId STORE} | Should -Throw '*durable finished selection*'
+    }
+    It 'refuses zero-Move completion when a claim exists' {
+        $f=New-ARCH4Fixture -Count 1 -Returned 1
+        {Get-OPAARCH4ReturnedState -Transaction $f.Transaction -Steps @($f.Steps[0]) -Events $f.Events -SourceStoreId STORE} | Should -Throw '*unresolved claim*'
+    }
+}
 }
