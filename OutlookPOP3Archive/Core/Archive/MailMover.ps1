@@ -747,8 +747,10 @@ function Move-OPAItemsWithLimit {
         $sharedIndex = Import-OPADuplicateIndex -ArchivePst ([string]$existingArchivePaths[0].Path)
         # Heal from the durable step journal before selecting candidates: any
         # move journaled but not yet index-flushed (crashed run) is re-added.
-        if(-not $ARCH3lSyntheticPart2Boundary -and -not $ARCH4Batch){
-            [void](Sync-OPADuplicateIndexFromJournal -Transaction $Transaction -Index $sharedIndex -ArchivePst ([string]$existingArchivePaths[0].Path))
+        if(-not $ARCH3lSyntheticPart2Boundary){
+            if(-not $ARCH4Batch){
+                [void](Sync-OPADuplicateIndexFromJournal -Transaction $Transaction -Index $sharedIndex -ArchivePst ([string]$existingArchivePaths[0].Path))
+            }
         }
         # ARCH3l reads the original shared DuplicateIndex but deliberately
         # NEVER invokes the legacy pre-verification sync/write path.
