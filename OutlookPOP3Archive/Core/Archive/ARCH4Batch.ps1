@@ -73,7 +73,7 @@ function Assert-OPAARCH5Route {
 
 function Select-OPAARCH5SourceFolders {
     [CmdletBinding()]
-    param([Parameter(Mandatory=$true)][object[]]$EligibleFolders,[string[]]$IncludeFolderPath)
+    param([Parameter(Mandatory=$true)][AllowEmptyCollection()][object[]]$EligibleFolders,[string[]]$IncludeFolderPath)
     if(@($IncludeFolderPath | Where-Object {$_}).Count -eq 0){return $EligibleFolders}
     foreach($path in $IncludeFolderPath){
         if([string]::IsNullOrWhiteSpace($path) -or @($EligibleFolders | Where-Object {[string]$_.FolderPath -ieq $path}).Count -ne 1){
@@ -327,8 +327,13 @@ function Invoke-OPAARCH4Batch {
     if(-not $storeId -or $accounts.Count -ne 1 -or [string]$Session.Namespace.CurrentProfileName -ne [string]$Discovery.Profile){
         throw 'ARCH4 live POP3 account/profile/store identity failed.'
     }
-    $folders=@(Get-OPAPop3SourceFolders -StoreHandle $s.StoreHandle)
-    if($folders.Count -eq 0){throw 'ARCH4 no eligible POP3 folders.'}
+    $folders=@(Get-OPAPop3SourceFolders -StoreHandle $s.StoreHandle -IncludeEmptyFolders:($Mode -eq 'Resume' -or @($IncludeFolderPath | Where-Object {$_}).Count -gt 0) -IncludeRootForVerification:($Mode -eq 'Resume'))
+    if($folders.Count -eq 0){
+        if($Mode -eq 'Archive' -and $ARCH5Batch -and @($IncludeFolderPath | Where-Object {$_}).Count -eq 0){
+            # Still go through the pending lease before returning exhaustion.
+            $folders=@()
+        }else{throw 'ARCH4 no eligible POP3 folders.'}
+    }
     if($Mode -eq 'Archive' -and $ARCH5Batch){
         $folders=@(Select-OPAARCH5SourceFolders -EligibleFolders $folders -IncludeFolderPath $IncludeFolderPath)
         Write-Host ('Выбрано папок POP3: '+$folders.Count)
@@ -345,6 +350,7 @@ function Invoke-OPAARCH4Batch {
         $global:OPADurabilityMode='Safe'
         if($Mode -eq 'Archive'){
             if([IO.File]::Exists($pending)){throw 'ARCH4 unfinished batch exists. Use Resume, never a new Archive.'}
+            if($folders.Count -eq 0){return [pscustomobject]@{Schema='2.6.5-ARCH4.Status.1';Status='NoEligibleFolders';SourcePst=$source;RestartRequired=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}}
             # Check existing archive paths before the original destination planner can mount one.
             foreach($part in @(Get-OPAArchivePstPartsOnDiskAll -SourcePst $source)){
                 $path=[string]$part.Path
@@ -403,7 +409,7 @@ function Invoke-OPAARCH4Batch {
             $stores+=$found[0]
         }
         # Check absence across all eligible source folders, not a fixed inbox count.
-        $result=Test-OPAArchiveMoves -Namespace $Session.Namespace -SourceFolder $folders -ArchiveStores $stores -ExpectedMoved $state.Returned -ExpectedMoves @($state.Rows) -RequireSemanticWitness -RequireSourceAbsentAcrossFolders
+        $result=Test-OPAArchiveMoves -Namespace $Session.Namespace -SourceFolder $folders -ArchiveStores $stores -ExpectedMoved $state.Returned -ExpectedMoves @($state.Rows) -RequireSemanticWitness -RequireSourceAbsentAcrossFolders -BoundedSourceIdMemory:$ARCH5Batch
         if($ARCH5Batch){
             foreach($r in @($state.Rows)){
                 if([string]$r.SourceSemanticWitness.Schema -cin @('2.6.5-ARCH5.MailSemanticWitness.2','2.6.5-ARCH5a.MailSemanticWitness.3')){
