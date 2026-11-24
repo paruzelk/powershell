@@ -288,3 +288,54 @@ Describe 'ARCH5a recursive embedded message witness' {
         $m.Application.Session.Count | Should -Be 0
     }
 }
+
+Describe 'ARCH5b private MSG cleanup and error preservation' {
+    It 'deletes only the specifically created private MSG export' {
+        $w=New-OPA265ARCH2c2PrivateWorkspace -TemporaryDirectory $TestDrive
+        try{
+            $p=Join-Path $w.WorkspacePath ('OPA-ARCH5a-'+[guid]::NewGuid().ToString('N')+'.msg')
+            [IO.File]::WriteAllBytes($p,[byte[]]@(1,2,3))
+            Remove-OPAARCH5bPrivateMsgExport -Path $p -Workspace $w.WorkspacePath -Attempts 1
+            Test-Path -LiteralPath $p | Should -BeFalse
+            Test-Path -LiteralPath $w.LeasePath | Should -BeTrue
+        }finally{Close-OPA265ARCH2c2PrivateWorkspace -Workspace $w}
+    }
+    It 'refuses a foreign file name in a private workspace' {
+        $w=New-OPA265ARCH2c2PrivateWorkspace -TemporaryDirectory $TestDrive
+        $p=Join-Path $w.WorkspacePath 'foreign.msg'
+        try{
+            [IO.File]::WriteAllBytes($p,[byte[]]@(1))
+            {Remove-OPAARCH5bPrivateMsgExport -Path $p -Workspace $w.WorkspacePath -Attempts 1} | Should -Throw '*path mismatch*'
+            Test-Path -LiteralPath $p | Should -BeTrue
+        }finally{
+            [IO.File]::Delete($p)
+            Close-OPA265ARCH2c2PrivateWorkspace -Workspace $w
+        }
+    }
+    It 'retains a held MSG rather than deleting an unrelated export' {
+        $w=New-OPA265ARCH2c2PrivateWorkspace -TemporaryDirectory $TestDrive
+        $p=Join-Path $w.WorkspacePath ('OPA-ARCH5a-'+[guid]::NewGuid().ToString('N')+'.msg')
+        $h=$null
+        try{
+            $h=[IO.File]::Open($p,[IO.FileMode]::CreateNew,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+            {Remove-OPAARCH5bPrivateMsgExport -Path $p -Workspace $w.WorkspacePath -Attempts 2 -DelayMilliseconds 0} | Should -Throw
+            Test-Path -LiteralPath $p | Should -BeTrue
+        }finally{
+            if($null -ne $h){$h.Dispose()}
+            Remove-OPAARCH5bPrivateMsgExport -Path $p -Workspace $w.WorkspacePath -Attempts 1
+            Close-OPA265ARCH2c2PrivateWorkspace -Workspace $w
+        }
+    }
+    It 'retains original capture exception when workspace cleanup fails too' {
+        $a=New-ARCH2bFakeAttachment
+        $a | Add-Member -Force -MemberType ScriptMethod -Name SaveAsFile -Value {param($file) throw 'original-capture-error'}
+        $mail=New-ARCH2bFakeMail -Attachments @($a)
+        Mock Close-OPA265ARCH2c2PrivateWorkspace {
+            $Workspace.LeaseStream.Dispose()
+            [IO.File]::Delete($Workspace.LeasePath)
+            [IO.Directory]::Delete($Workspace.WorkspacePath,$false)
+            throw 'secondary-cleanup-error'
+        }
+        {Get-OPA265ARCH2bMailSemanticWitness -Mail $mail -ExtendedAttachmentWitness} | Should -Throw '*AttachmentCleanupFailed*capture=*original-capture-error*workspace cleanup=*secondary-cleanup-error*'
+    }
+}
