@@ -4,6 +4,20 @@
 
 
 
+## ARCH4 — основной архиватор, пакетный режим (DEV)
+
+**Параметры и примеры:** [полный синтаксис и порядок работы ARCH4](docs/2.6.5-arch4-batch-archive.md). Новый явный `-ConfirmTestArchive` + `-SourcePst` + профиль разрешает только контролируемый тестовый `Archive` (1–500 писем) и `Resume` (только независимая проверка и фиксация). Production и Auto закрыты.
+
+~~~powershell
+$common = @{ ProfileName='Outlook'; SourcePst='C:\Users\bogoderov_e\Documents\Файлы Outlook\info@stios.ru.pst'; ConfirmTestArchive=$true }
+.\OutlookPOP3Archive.ps1 -Mode Archive @common -Limit 100 -OlderThanMonths 60 -ArchiveGrouping Year -WhatIf
+.\OutlookPOP3Archive.ps1 -Mode Archive @common -Limit 100 -OlderThanMonths 60 -ArchiveGrouping Year
+# Полностью перезапустить Outlook, затем:
+.\OutlookPOP3Archive.ps1 -Mode Resume @common
+~~~
+
+Новый пакет не может обойти незавершённый старый; `ARCH4.pending` сохраняется до независимой проверки и фиксации. Повтор неизвестного Move запрещён. Нет зависимости от длины/хэша исходного PST, исходного числа писем или исторического SHA индекса. Целевые партии 100/500; первый реальный пакет ещё предстоит проверить на тестовом PST.
+
 ### ARCH3x2c — исправление реального preflight (ошибка первого письма)
 
 Пользовательский ARCH3x1b `Status` PASS (`NoRealTenWriterEntry`), но реальный `Audit` остановился с `full original preflight row drift at ordinal 1`: новая live row не возвращала `TargetFolderPath` из проверенных ARCH3w1 Intent и ARCH3v Seal. Исправлена ровно одна проекция: оригинальный маршрут `2020\Входящие` теперь присутствует и сверяется с обоими sealed источниками; полный semantic SHA Body/HTML/вложений и отсутствие проверки размера PST сохраняются. Шесть новых тестов, включая десятистрочный preflight без Outlook. **Никакой Move не выполнялся.** [Команды проверки ARCH3x2c](docs/2.6.5-arch3x2c-preflight-row-contract.md).
