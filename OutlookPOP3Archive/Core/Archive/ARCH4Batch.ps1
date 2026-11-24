@@ -176,6 +176,10 @@ function Write-OPAARCH4Pending {
 
 function Get-OPAARCH4ReturnedFromDisk {
     param([Parameter(Mandatory=$true)][object]$Transaction,[Parameter(Mandatory=$true)][string]$SourceStoreId)
+    # ReadAllBytes opens a new Windows handle; flush and close the original
+    # append stream first, then re-open on the next append if necessary.
+    Sync-OPAStepJournalStreams
+    Close-OPAStepJournalStreams
     $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $Transaction))
     $events=@();$op=Get-OPAARCH4OperationPath -Transaction $Transaction
     if([IO.File]::Exists($op)){
