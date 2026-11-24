@@ -34,6 +34,8 @@ param(
     [ValidateRange(0.01,1000)]
     [double]$MaxArchivePstSizeGB = 10,
 
+    [switch]$DisableArchivePstSizeLimit,
+
     [ValidateRange(0,100)]
     [double]$SafetyMarginGB = 0.5,
 
@@ -143,6 +145,11 @@ if ($arch4Requested) {
     if ($Mode -eq 'Archive' -and $OlderThanMonths -eq 0 -and -not $IgnoreAge) {
         throw 'ARCH4 no-age archive requires explicit -IgnoreAge.'
     }
+    if($DisableArchivePstSizeLimit){
+        if($Mode -ne 'Archive' -or $PSBoundParameters.ContainsKey('MaxArchivePstSizeGB') -or $PSBoundParameters.ContainsKey('SafetyMarginGB')){throw 'ARCH6 disable archive size limit is Archive-only and mutually exclusive with explicit capacity options.'}
+        $MaxArchivePstSizeGB=[double]::PositiveInfinity
+        $SafetyMarginGB=0
+    }
     if ($Mode -eq 'Archive' -and ($MaxArchivePstSizeGB -le $SafetyMarginGB -or [double]::IsNaN($MaxArchivePstSizeGB) -or [double]::IsNaN($SafetyMarginGB))) {
         throw 'ARCH6 archive PST maximum must exceed its safety margin.'
     }
@@ -151,6 +158,7 @@ if ($arch4Requested) {
         return
     }
 } else {
+    if($DisableArchivePstSizeLimit){throw 'ARCH6 disable archive size limit requires explicit test archive.'}
     [void](Assert-OPA265ARCH2aDevelopmentWriterClosed -Mode $Mode)
 }
 
@@ -378,7 +386,8 @@ if($arch4Requested){
     Write-Host 'Запись журнала: Safe; Outbox, удалённые, черновики и спам исключены.'
     if($Mode -eq 'Archive'){
         Write-Host ('Размер партии: '+$Limit+'; группировка: '+$ArchiveGrouping+'; возраст: '+$OlderThanMonths+' мес.')
-        Write-Host ('Макс. архивный PST: '+$MaxArchivePstSizeGB+' ГБ; резерв: '+$SafetyMarginGB+' ГБ')
+        if($DisableArchivePstSizeLimit){Write-Host 'Лимит PST утилиты: отключен; ограничения Outlook/файловой системы сохраняются.'}
+        else{Write-Host ('Макс. архивный PST: '+$MaxArchivePstSizeGB+' ГБ; резерв: '+$SafetyMarginGB+' ГБ')}
         Write-Host ('Экспериментальные MSG/OLE: '+[bool]$ConfirmComplexAttachments)
     }else{
         Write-Host 'Параметры будут загружены из сохранённой транзакции; новые письма не переносятся.'
