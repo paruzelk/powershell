@@ -370,7 +370,9 @@ function Invoke-OPAARCH4Batch {
             }
             return [pscustomobject]@{Schema='2.6.5-ARCH4.Returned.1';Status='BatchReturnedRestartAndResumeRequired';TransactionId=$tx.TransactionId;Planned=$state.Planned;Returned=$state.Returned;NotMoved=($state.Planned-$state.Returned);OutlookProcessId=$proc.Id;SkipReasons=@($tx.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}});SkippedItems=@($tx.State.SkippedItems);SkipDetailsTruncated=([int]$tx.State.Skipped -gt @($tx.State.SkippedItems).Count);OriginalIndexWritten=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
         }
-        if(-not [IO.File]::Exists($pending)){throw 'ARCH4 no pending batch; no Move or Resume required.'}
+        if(-not [IO.File]::Exists($pending)){
+            return [pscustomobject]@{Schema='2.6.5-ARCH4.Status.1';Status='NoPendingBatch';SourcePst=$source;RestartRequired=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
+        }
         $p=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($pending,[Text.Encoding]::UTF8)) -ErrorAction Stop
         if($p.Schema -cne '2.6.5-ARCH4.Pending.1' -or [string]$p.SourcePst -ine $source -or [string]$p.SourceStoreId -ine $storeId -or
            [string]$p.Profile -ine [string]$Discovery.Profile -or [string]$p.TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$' -or
