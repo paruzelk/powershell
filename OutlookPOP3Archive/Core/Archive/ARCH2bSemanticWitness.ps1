@@ -102,6 +102,37 @@ function Get-OPAARCH5aEmbeddedDigest {
     return (Get-OPA265ARCH2bTextSha256 -Text (ConvertTo-Json -InputObject $canonical -Depth 8 -Compress))
 }
 
+# Only the exact randomly named export created by this invocation may be
+# deleted here. Never scan or recursively delete unknown workspace entries.
+function Remove-OPAARCH5bPrivateMsgExport {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][string]$Path,
+          [Parameter(Mandatory=$true)][string]$Workspace,
+          [ValidateRange(1,40)][int]$Attempts=20,
+          [ValidateRange(0,1000)][int]$DelayMilliseconds=100)
+    $full=[IO.Path]::GetFullPath($Path)
+    $root=[IO.Path]::GetFullPath($Workspace)
+    if([IO.Path]::GetDirectoryName($full) -ine $root -or
+       [IO.Path]::GetFileName($full) -cnotmatch '^OPA-ARCH5a-[0-9a-f]{32}\.msg$'){
+        throw 'ARCH5b private MSG cleanup path mismatch.'
+    }
+    [void](Assert-OPA265ARCH2c2PrivateWorkspaceAcl -WorkspacePath $root)
+    for($i=1;$i -le $Attempts;$i++){
+        if(-not [IO.File]::Exists($full)){return}
+        if(([IO.File]::GetAttributes($full) -band [IO.FileAttributes]::ReparsePoint) -ne 0){
+            throw 'ARCH5b private MSG cleanup refused reparse point.'
+        }
+        try{
+            [IO.File]::Delete($full)
+            if(-not [IO.File]::Exists($full)){return}
+        }catch [IO.IOException]{
+            if($i -eq $Attempts){throw}
+        }
+        if($i -lt $Attempts -and $DelayMilliseconds -gt 0){Start-Sleep -Milliseconds $DelayMilliseconds}
+    }
+    throw 'ARCH5b private MSG remains after bounded cleanup.'
+}
+
 function Get-OPAARCH5aEmbeddedProof {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Attachment,
@@ -122,7 +153,7 @@ function Get-OPAARCH5aEmbeddedProof {
             if([int]$Budget.Remaining -le 0){throw 'Embedded message read budget (128) exceeded.'}
             $Budget.Remaining=[int]$Budget.Remaining-1
             $path=Join-Path $Workspace ('OPA-ARCH5a-'+[guid]::NewGuid().ToString('N')+'.msg')
-            $child=$null
+            $child=$null;$readError=$null;$closeError=$null
             if([IO.File]::Exists($path)){throw 'Embedded export path collision.'}
             try{
                 $Attachment.SaveAsFile($path)
@@ -147,24 +178,39 @@ function Get-OPAARCH5aEmbeddedProof {
                 }
                 $w=Get-OPA265ARCH2bMailSemanticWitness -Mail $child -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments -MaxAttachmentBytes $MaxBytes -MaxAttachmentCount $MaxAttachmentCount -TemporaryDirectory $TemporaryDirectory -EmbeddedDepth ($Depth+1) -EmbeddedBudget $Budget
                 $digests+= Get-OPAARCH5aEmbeddedDigest -Witness $w
+            }catch{
+                $readError=$_
             }finally{
                 try{
-                    if($null -ne $child){
-                        if([int]$child.Class -eq 43){[void]$child.Close(1)}
-                    }
-                }finally{
-                    if($null -ne $child -and [Runtime.InteropServices.Marshal]::IsComObject($child)){
-                        [void][Runtime.InteropServices.Marshal]::ReleaseComObject($child)
-                    }
-                    if([IO.File]::Exists($path)){[IO.File]::Delete($path)}
+                    if($null -ne $child -and [int]$child.Class -eq 43){[void]$child.Close(1)}
+                }catch{$closeError=$_}
+                finally{
+                    try{
+                        # OpenSharedItem on our unique private path returns a
+                        # transient child, not the live source or shared session.
+                        if($null -ne $child -and [Runtime.InteropServices.Marshal]::IsComObject($child)){
+                            [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($child)
+                        }
+                    }catch{if($null -eq $closeError){$closeError=$_}}
+                    finally{$child=$null}
+                }
+                try{
+                    Remove-OPAARCH5bPrivateMsgExport -Path $path -Workspace $Workspace
+                }catch{
+                    $detail=if($null -ne $readError){'Read: '+$readError.Exception.Message+'; '}else{''}
+                    if($null -ne $closeError){$detail+='Close: '+$closeError.Exception.Message+'; '}
+                    throw ('ARCH5b AttachmentCleanupFailed: '+$detail+'Cleanup: '+$_.Exception.Message)
                 }
             }
+            if($null -ne $readError){throw $readError}
+            if($null -ne $closeError){throw $closeError}
         }
         if($digests.Count -ne 2 -or $digests[0] -cne $digests[1]){
             throw 'Embedded MSG semantic content differs between independent reads.'
         }
         return [pscustomobject]@{Sha=[string]$digests[0]}
     }catch{
+        if($_.Exception.Message -like 'ARCH5b AttachmentCleanupFailed:*'){throw}
         throw ('ARCH5 AttachmentExportUnverified: index='+$Index+' type=5; ARCH5a '+$_.Exception.Message)
     }
 }
@@ -184,7 +230,7 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
     )
     # Private ACL must be applied atomically at creation. The exclusive lease
     # stays open throughout SaveAsFile / SHA256 / per-file cleanup.
-    $workspaceLease=$null
+    $workspaceLease=$null;$collection=$null;$captureError=$null
     try {
         $workspaceLease=New-OPA265ARCH2c2PrivateWorkspace -TemporaryDirectory $TemporaryDirectory
         $workspace=[string]$workspaceLease.WorkspacePath
@@ -272,12 +318,27 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
         }
     }
         return $result.ToArray()
+    }catch{
+        $captureError=$_
+        throw
     }
     finally {
-        # Close releases the exclusive lease only after all payload copies have
-        # been handled. Unknown residue is never recursively deleted.
-        if($null -ne $workspaceLease){
-            Close-OPA265ARCH2c2PrivateWorkspace -Workspace $workspaceLease
+        try{
+            if($null -ne $collection -and [Runtime.InteropServices.Marshal]::IsComObject($collection)){
+                [void][Runtime.InteropServices.Marshal]::ReleaseComObject($collection)
+            }
+        }finally{
+            # Unknown residue is never recursively deleted. Keep the initial
+            # failure visible instead of replacing it with the cleanup error.
+            if($null -ne $workspaceLease){
+                try{Close-OPA265ARCH2c2PrivateWorkspace -Workspace $workspaceLease}
+                catch{
+                    if($null -ne $captureError){
+                        throw ('ARCH5b AttachmentCleanupFailed: capture='+$captureError.Exception.Message+'; workspace cleanup='+$_.Exception.Message)
+                    }
+                    throw ('ARCH5b AttachmentCleanupFailed: '+$_.Exception.Message)
+                }
+            }
         }
     }
 }
@@ -333,6 +394,8 @@ function Get-OPA265ARCH2bMailSemanticWitness {
     $importance=[int]$Mail.Importance
     $sensitivity=[int]$Mail.Sensitivity
     $categories=[string]$Mail.Categories
+    $recipients=$null
+    try{
     $recipients=$Mail.Recipients
     $recCount=[int]$recipients.Count
     if($recCount -lt 0 -or $recCount -gt 2048){throw 'ARCH2b recipient count exceeds witness bound.'}
@@ -352,6 +415,12 @@ function Get-OPA265ARCH2bMailSemanticWitness {
                 Release-OPAComObject -Object $r
             }
         }
+    }
+    }finally{
+        if($null -ne $recipients -and [Runtime.InteropServices.Marshal]::IsComObject($recipients)){
+            [void][Runtime.InteropServices.Marshal]::ReleaseComObject($recipients)
+        }
+        $recipients=$null
     }
     if($RecursiveEmbeddedWitness -and -not $ExtendedAttachmentWitness){throw 'ARCH5a requires extended witness policy.'}
     if($RecursiveEmbeddedWitness -and $null -eq $EmbeddedBudget){$EmbeddedBudget=@{Remaining=128}}
