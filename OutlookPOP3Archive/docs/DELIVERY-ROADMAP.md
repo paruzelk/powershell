@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH5 folder checkpoint:** Sent Items 4 returned, prior pending cleared before next Archive (individual Resume output not supplied); nested custom folder 4/4 independently verified, reconciled and indexed, subsequent NoPendingBatch. [Recorded evidence](2.6.5-arch5b-msg-cleanup.md). No repeat. Next ARCH6a: empty-source-folder Resume fix, explicit root scope review, durable bounded batch orchestration; distinguish live OLE and date precedence limitations. ProductionReady=False.
+
+
 > **ARCH5b live acceptance:** original skipped Type 5 embedded MSG independently verified/indexed in transaction `20261124-171541-04f35722`, original EntryID and v3 semantic attachment digest confirmed by operator; actual YearQuarter Inbox path `2020\Q1\Входящие` in 2020 part 3 confirmed. [Evidence](2.6.5-arch5b-msg-cleanup.md). No repeat. Remaining live scope: POP3 Sent and nested user folders; OLE unconfirmed; then ARCH6. ProductionReady=False.
 
 
