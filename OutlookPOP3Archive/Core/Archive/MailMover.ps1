@@ -656,8 +656,12 @@ function Move-OPAItemsWithLimit {
         [switch]$ARCH3lSyntheticPart2Boundary,
         # ARCH3m: fake-only forced Part2 INSIDE original destination API.
         [switch]$ARCH3mSyntheticForcePart2,
-        [switch]$ARCH4Batch
+        [switch]$ARCH4Batch,
+        [switch]$ARCH5Batch,
+        [switch]$ConfirmComplexAttachments
     )
+
+    if(($ARCH5Batch -and -not $ARCH4Batch) -or ($ConfirmComplexAttachments -and (-not $ARCH5Batch -or $Limit -gt 10))){throw 'ARCH5 complex attachments require explicit bounded test batch (1..10).'}
 
     if($ARCH4Batch -and ($Resume -or $ARCH3dSyntheticBoundary -or $Limit -gt 500 -or $Limit -lt 1)){
         throw 'ARCH4 only allows a fresh bounded batch of 1..500; never legacy Resume.'
@@ -856,9 +860,15 @@ function Move-OPAItemsWithLimit {
     $safeCapacityBytes = Get-OPAArchiveSafeCapacityBytes -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB
 
     $candidateIndex = 0
+    $batchClock=[Diagnostics.Stopwatch]::StartNew()
     while ($candidateIndex -lt $candidatePool.Count -and $executed -lt $Limit) {
         $candidate = $candidatePool[$candidateIndex]
         $candidateIndex++
+        if($ARCH5Batch){
+            $rate=if($batchClock.Elapsed.TotalSeconds -gt 0){($candidateIndex-1)/$batchClock.Elapsed.TotalSeconds}else{0}
+            $eta=if($rate -gt 0){[int][math]::Ceiling(($candidatePool.Count-$candidateIndex+1)/$rate)}else{-1}
+            Write-Progress -Id 50 -Activity 'Архивация почты' -Status ('{0}/{1}; перенесено {2}; {3:N1} писем/с' -f $candidateIndex,$candidatePool.Count,$executed,$rate) -PercentComplete ([int](100*$candidateIndex/$candidatePool.Count)) -SecondsRemaining $eta
+        }
 
         $folderPath = [string]$candidate.SourceFolderPath
         if ([string]::IsNullOrWhiteSpace($folderPath) -and $candidate.FolderPath) { $folderPath = [string]$candidate.FolderPath }
@@ -990,7 +1000,11 @@ function Move-OPAItemsWithLimit {
                 Assert-OPAARCH4Destination -Namespace $Namespace -SourceFolder $source -Destination $dest
                 Assert-OPAARCH4Candidate -Item $item -SourceFolder $source -Candidate $candidate -Cutoff $OlderThanCutoff
             }
-            $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item
+            if($ARCH5Batch){
+                $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item -ExtendedAttachmentWitness -AllowComplexAttachments:$ConfirmComplexAttachments
+            }else{
+                $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item
+            }
             if($ARCH4Batch -and -not (Test-OPA265ARCH2bWitnessSchema -Witness $sourceSemanticWitness)){
                 throw 'ARCH4 source semantic witness unavailable before claim.'
             }
@@ -1151,7 +1165,9 @@ function Move-OPAItemsWithLimit {
 
             # Pre-move errors are isolated to the current item. The transaction
             # remains resumable and the next candidate can continue.
-            $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason='Unexpected'; Message=$_.Exception.Message; Time=(Get-Date).ToString('o')}) | Out-Null
+            $reason='Unexpected'
+            if($ARCH5Batch -and $_.Exception.Message -match '^ARCH5 (AttachmentTypeUnsupported|AttachmentSizeUnsupported|AttachmentExportUnverified):'){$reason=$Matches[1]}
+            $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason=$reason; Message=$_.Exception.Message; Time=(Get-Date).ToString('o')}) | Out-Null
             Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message ("Item skipped after unexpected error: {0} | {1}" -f [string]$candidate.Subject,$_.Exception.Message) -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
         }
         finally {
@@ -1160,6 +1176,7 @@ function Move-OPAItemsWithLimit {
         }
     }
 
+    if($ARCH5Batch){Write-Progress -Id 50 -Activity 'Архивация почты' -Completed}
     # Final durability boundary before verification.
     Sync-OPAStepJournalStreams
 
