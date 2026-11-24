@@ -194,7 +194,12 @@ function Test-OPAArchiveItemFingerprint {
     if ($null -ne $Expected.SourceSemanticWitness) {
         if (-not (Test-OPA265ARCH2bWitnessSchema -Witness $Expected.SourceSemanticWitness)) { return $false }
         try {
-            $destinationWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $Item
+            if([string]$Expected.SourceSemanticWitness.Schema -ceq '2.6.5-ARCH5.MailSemanticWitness.2'){
+                $allowComplex=@($Expected.SourceSemanticWitness.Attachments | Where-Object {[int]$_.Type -in @(5,6)}).Count -gt 0
+                $destinationWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $Item -ExtendedAttachmentWitness -AllowComplexAttachments:$allowComplex
+            }else{
+                $destinationWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $Item
+            }
             $semanticComparison = Compare-OPA265ARCH2bMailSemanticWitness -Source $Expected.SourceSemanticWitness -Destination $destinationWitness
             if (-not $semanticComparison.CriticalContentMatches) { return $false }
         }
@@ -229,6 +234,9 @@ function Test-OPAArchiveMoves {
     $sourceFoldersByPath = @{}
 
     $expectedRows = @($ExpectedMoves)
+    $arch5Progress = @($expectedRows | Where-Object { $_.SourceSemanticWitness.Schema -eq '2.6.5-ARCH5.MailSemanticWitness.2' }).Count -gt 0
+    $verifyClock=[Diagnostics.Stopwatch]::StartNew()
+    $verifyOrdinal=0
     if ($ExpectedMoved -ne $expectedRows.Count) {
         $missing.Add("COUNT:ExpectedMoved=$ExpectedMoved;ExpectedMoves=$($expectedRows.Count)")
     }
@@ -303,6 +311,12 @@ function Test-OPAArchiveMoves {
     $targetRoots = New-Object System.Collections.Generic.List[object]
     try {
         foreach ($m in $expectedRows) {
+            if($arch5Progress){
+                $verifyOrdinal++
+                $rate=if($verifyClock.Elapsed.TotalSeconds -gt 0){$verifyOrdinal/$verifyClock.Elapsed.TotalSeconds}else{0}
+                $eta=if($rate -gt 0){[int][math]::Ceiling(($expectedRows.Count-$verifyOrdinal)/$rate)}else{-1}
+                Write-Progress -Id 51 -Activity 'Проверка архива' -Status ('{0}/{1}; {2:N1} писем/с' -f $verifyOrdinal,$expectedRows.Count,$rate) -PercentComplete ([int](100*$verifyOrdinal/$expectedRows.Count)) -SecondsRemaining $eta
+            }
             # An existing archive without a durable ORIGINAL pre-Move witness
             # must NEVER be promoted to verified by subject/Size/index alone.
             if ($RequireSemanticWitness -and
