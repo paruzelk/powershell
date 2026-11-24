@@ -51,6 +51,38 @@ function Assert-OPAARCH4Destination {
     }
 }
 
+function Assert-OPAARCH5Route {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][string]$SourcePst,
+          [Parameter(Mandatory=$true)][datetime]$ArchiveDate,
+          [Parameter(Mandatory=$true)][string]$SourceFolderPath,
+          [Parameter(Mandatory=$true)][string]$TargetFolderPath,
+          [Parameter(Mandatory=$true)][string]$ArchivePst,
+          [Parameter(Mandatory=$true)][string]$Grouping)
+    $parts=@($TargetFolderPath -split '\\' | Where-Object {$_})
+    $relative=($parts | Select-Object -Skip 1) -join '\'
+    $expected=Get-OPAArchiveTargetPath -ReceivedTime $ArchiveDate -SourceFolderPath $SourceFolderPath -Grouping $Grouping
+    $base=[regex]::Escape([IO.Path]::GetFileNameWithoutExtension($SourcePst))
+    $year=$ArchiveDate.Year
+    if($parts.Count -lt 2 -or $relative -ine $expected -or
+       [IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($ArchivePst)) -ine [IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($SourcePst)) -or
+       [IO.Path]::GetFileName($ArchivePst) -inotmatch ('^'+$base+'\.Archive-'+$year+'(?:-\d{2,})?\.pst$')){
+        throw 'ARCH5 ArchiveRouteMismatch: destination year/part or folder hierarchy differs from selected source.'
+    }
+}
+
+function Select-OPAARCH5SourceFolders {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object[]]$EligibleFolders,[string[]]$IncludeFolderPath)
+    if(@($IncludeFolderPath | Where-Object {$_}).Count -eq 0){return $EligibleFolders}
+    foreach($path in $IncludeFolderPath){
+        if([string]::IsNullOrWhiteSpace($path) -or @($EligibleFolders | Where-Object {[string]$_.FolderPath -ieq $path}).Count -ne 1){
+            throw ('ARCH5 source folder not uniquely eligible: '+$path)
+        }
+    }
+    return @($EligibleFolders | Where-Object {$IncludeFolderPath -icontains [string]$_.FolderPath})
+}
+
 function Get-OPAARCH4OperationPath {
     param([Parameter(Mandatory=$true)][object]$Transaction)
     return ([string]$Transaction.Path -replace '\.json$','.arch4.operations.jsonl')
@@ -247,6 +279,8 @@ function Complete-OPAARCH4VerifiedBatch {
         Schema='2.6.5-ARCH4.Completed.1';Status='BatchVerifiedReconciledAndIndexed';TransactionId=[string]$Transaction.TransactionId
         Planned=$State.Planned;Verified=$State.Returned;Reconciled=$State.Returned;Indexed=$State.Returned
         NotMoved=($State.Planned-$State.Returned);LogicalBytes=$logical
+        SkipReasons=@($Transaction.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}})
+        SkippedItems=@($Transaction.State.SkippedItems)
         AutomaticMoveRetryAllowed=$false;ProductionReady=$false
     }
 }
@@ -259,7 +293,8 @@ function Invoke-OPAARCH4Batch {
           [Parameter(Mandatory=$true)][string]$SourcePst,
           [string]$TransactionId,
           [int]$Limit=100,[int]$OlderThanMonths=12,[string]$ArchiveGrouping='Year',
-          [double]$MaxArchivePstSizeGB=10,[double]$SafetyMarginGB=0.5)
+          [double]$MaxArchivePstSizeGB=10,[double]$SafetyMarginGB=0.5,
+          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath)
     $source=[IO.Path]::GetFullPath($SourcePst)
     if($source.StartsWith('\\') -or -not [IO.File]::Exists($source) -or [IO.Path]::GetExtension($source) -ine '.pst' -or
        (([IO.File]::GetAttributes($source) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
@@ -274,6 +309,11 @@ function Invoke-OPAARCH4Batch {
     }
     $folders=@(Get-OPAPop3SourceFolders -StoreHandle $s.StoreHandle)
     if($folders.Count -eq 0){throw 'ARCH4 no eligible POP3 folders.'}
+    if($Mode -eq 'Archive' -and $ARCH5Batch){
+        $folders=@(Select-OPAARCH5SourceFolders -EligibleFolders $folders -IncludeFolderPath $IncludeFolderPath)
+        Write-Host ('Выбрано папок POP3: '+$folders.Count)
+        foreach($f in $folders){Write-Host ('  '+[string]$f.FolderPath)}
+    }
     foreach($f in $folders){if([string]$f.StoreID -ine $storeId){throw 'ARCH4 foreign source folder.'}}
     $dir=Join-Path ([IO.Path]::GetDirectoryName($source)) 'OutlookPOP3Archive-Transactions'
     [void][IO.Directory]::CreateDirectory($dir)
@@ -298,12 +338,12 @@ function Invoke-OPAARCH4Batch {
             $tx=New-OPAArchiveTransaction -SourcePst $source -ArchivePst '' -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanMonths $OlderThanMonths -ArchiveCutoff $cutoff -AccountEmail ([string]$s.AccountEmail) -DurabilityMode Safe
             Write-OPAARCH4Pending -Path $pending -Record ([pscustomobject]@{Schema='2.6.5-ARCH4.Pending.1';TransactionId=$tx.TransactionId;SourcePst=$source;SourceStoreId=$storeId;Profile=[string]$Discovery.Profile;MoveProcessId=$proc.Id;MoveProcessStartUtcTicks=$proc.StartUtcTicks})
             Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Batch Started' -WriteCheckpoint
-            $moved=Move-OPAItemsWithLimit -Namespace $Session.Namespace -SourceFolders $folders -Transaction $tx -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanCutoff $cutoff -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH4Batch
+            $moved=Move-OPAItemsWithLimit -Namespace $Session.Namespace -SourceFolders $folders -Transaction $tx -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanCutoff $cutoff -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH4Batch -ARCH5Batch:$ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments
             Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Awaiting Restart' -WriteCheckpoint
             Sync-OPAStepJournalStreams
             $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
             if($state.Returned -ne [int]$moved){throw 'ARCH4 batch receipt count mismatch.'}
-            return [pscustomobject]@{Schema='2.6.5-ARCH4.Returned.1';Status='BatchReturnedRestartAndResumeRequired';TransactionId=$tx.TransactionId;Planned=$state.Planned;Returned=$state.Returned;NotMoved=($state.Planned-$state.Returned);OutlookProcessId=$proc.Id;OriginalIndexWritten=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
+            return [pscustomobject]@{Schema='2.6.5-ARCH4.Returned.1';Status='BatchReturnedRestartAndResumeRequired';TransactionId=$tx.TransactionId;Planned=$state.Planned;Returned=$state.Returned;NotMoved=($state.Planned-$state.Returned);OutlookProcessId=$proc.Id;SkipReasons=@($tx.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}});SkippedItems=@($tx.State.SkippedItems);OriginalIndexWritten=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
         }
         if(-not [IO.File]::Exists($pending)){throw 'ARCH4 no pending batch; no Move or Resume required.'}
         $p=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($pending,[Text.Encoding]::UTF8)) -ErrorAction Stop
@@ -315,6 +355,10 @@ function Invoke-OPAARCH4Batch {
         if($proc.StartUtcTicks -le [long]$p.MoveProcessStartUtcTicks){throw 'ARCH4 fully restart Outlook before Resume.'}
         $tx=Get-OPAArchiveTransaction -SourcePst $source -TransactionId ([string]$p.TransactionId)
         if([string]$tx.State.SourcePst -ine $source -or [string]$tx.TransactionId -cne [string]$p.TransactionId){throw 'ARCH4 transaction identity changed.'}
+        if($ARCH5Batch){
+            Write-Host ('Транзакция: '+$tx.TransactionId)
+            Write-Host ('Размер партии: '+$tx.State.Limit+'; группировка: '+$tx.State.ArchiveGrouping+'; возраст: '+$tx.State.OlderThanMonths+' мес.; режим записи: Safe')
+        }
         $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
         $stores=@()
         foreach($path in @($state.Rows | ForEach-Object {$_.ArchivePst} | Sort-Object -Unique)){
@@ -328,6 +372,13 @@ function Invoke-OPAARCH4Batch {
         }
         # Check absence across all eligible source folders, not a fixed inbox count.
         $result=Test-OPAArchiveMoves -Namespace $Session.Namespace -SourceFolder $folders -ArchiveStores $stores -ExpectedMoved $state.Returned -ExpectedMoves @($state.Rows) -RequireSemanticWitness -RequireSourceAbsentAcrossFolders
+        if($ARCH5Batch){
+            foreach($r in @($state.Rows)){
+                if([string]$r.SourceSemanticWitness.Schema -ceq '2.6.5-ARCH5.MailSemanticWitness.2'){
+                    Assert-OPAARCH5Route -SourcePst $source -ArchiveDate ([datetime]$r.ReceivedTime) -SourceFolderPath $r.SourceFolderPath -TargetFolderPath $r.TargetFolderPath -ArchivePst $r.ArchivePst -Grouping ([string]$tx.State.ArchiveGrouping)
+                }
+            }
+        }
         $completed=Complete-OPAARCH4VerifiedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId
         [IO.File]::Delete($pending)
         return $completed
