@@ -1,3 +1,9 @@
+## 2.6.5-ARCH5a DEV — 2026-11-24
+
+- Operator confirmed ARCH5 type 5 embedded MSG export bytes unstable; zero moves, zero indexed, Resume completed safely. Replace type 5 binary comparison with bounded recursive MailItem semantic digest from two independent private MSG reads. v3 witness, compatibility with v1/v2, preserve type 1/6 byte comparison.
+- Terminal zero-Move completion with original durable replay, no restart or index mutation; uncertain claims remain blocked.
+- 13 new executable tests; 4786/164 expected. Actual Outlook MSG validation pending.
+
 ## 2.6.5-ARCH5 DEV — 2026-11-24
 
 - ARCH4 real 598 verified/indexed completed. ARCH5 versioned witness supports ordinary by-value attachment exports up to 1 GiB and explicitly opted-in, stable byte-identical compound exports for type 5/6 in bounded test batches 1..10. Real Outlook MSG/OLE support remains experimental; no by-reference or unverified content.
