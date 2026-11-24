@@ -194,9 +194,14 @@ function Test-OPAArchiveItemFingerprint {
     if ($null -ne $Expected.SourceSemanticWitness) {
         if (-not (Test-OPA265ARCH2bWitnessSchema -Witness $Expected.SourceSemanticWitness)) { return $false }
         try {
-            if([string]$Expected.SourceSemanticWitness.Schema -ceq '2.6.5-ARCH5.MailSemanticWitness.2'){
+            if([string]$Expected.SourceSemanticWitness.Schema -cin @('2.6.5-ARCH5.MailSemanticWitness.2','2.6.5-ARCH5a.MailSemanticWitness.3')){
+                $recursive=[string]$Expected.SourceSemanticWitness.Schema -ceq '2.6.5-ARCH5a.MailSemanticWitness.3'
                 $allowComplex=@($Expected.SourceSemanticWitness.Attachments | Where-Object {[int]$_.Type -in @(5,6)}).Count -gt 0
-                $destinationWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $Item -ExtendedAttachmentWitness -AllowComplexAttachments:$allowComplex
+                if($recursive){
+                    $destinationWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $Item -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments:$allowComplex
+                }else{
+                    $destinationWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $Item -ExtendedAttachmentWitness -AllowComplexAttachments:$allowComplex
+                }
             }else{
                 $destinationWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $Item
             }
@@ -234,7 +239,7 @@ function Test-OPAArchiveMoves {
     $sourceFoldersByPath = @{}
 
     $expectedRows = @($ExpectedMoves)
-    $arch5Progress = @($expectedRows | Where-Object { $_.SourceSemanticWitness.Schema -eq '2.6.5-ARCH5.MailSemanticWitness.2' }).Count -gt 0
+    $arch5Progress = @($expectedRows | Where-Object { $_.SourceSemanticWitness.Schema -in @('2.6.5-ARCH5.MailSemanticWitness.2','2.6.5-ARCH5a.MailSemanticWitness.3') }).Count -gt 0
     $verifyClock=[Diagnostics.Stopwatch]::StartNew()
     $verifyOrdinal=0
     if ($ExpectedMoved -ne $expectedRows.Count) {
