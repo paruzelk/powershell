@@ -655,9 +655,13 @@ function Move-OPAItemsWithLimit {
         # never authorizes an existing Outlook COM/PST writer.
         [switch]$ARCH3lSyntheticPart2Boundary,
         # ARCH3m: fake-only forced Part2 INSIDE original destination API.
-        [switch]$ARCH3mSyntheticForcePart2
+        [switch]$ARCH3mSyntheticForcePart2,
+        [switch]$ARCH4Batch
     )
 
+    if($ARCH4Batch -and ($Resume -or $ARCH3dSyntheticBoundary -or $Limit -gt 500 -or $Limit -lt 1)){
+        throw 'ARCH4 only allows a fresh bounded batch of 1..500; never legacy Resume.'
+    }
     if($ARCH3mSyntheticForcePart2 -and -not $ARCH3lSyntheticPart2Boundary){
         throw 'ARCH3m requires original ARCH3d+ARCH3l synthetic boundaries and is not a real Outlook writer.'
     }
@@ -743,7 +747,7 @@ function Move-OPAItemsWithLimit {
         $sharedIndex = Import-OPADuplicateIndex -ArchivePst ([string]$existingArchivePaths[0].Path)
         # Heal from the durable step journal before selecting candidates: any
         # move journaled but not yet index-flushed (crashed run) is re-added.
-        if(-not $ARCH3lSyntheticPart2Boundary){
+        if(-not $ARCH3lSyntheticPart2Boundary -and -not $ARCH4Batch){
             [void](Sync-OPADuplicateIndexFromJournal -Transaction $Transaction -Index $sharedIndex -ArchivePst ([string]$existingArchivePaths[0].Path))
         }
         # ARCH3l reads the original shared DuplicateIndex but deliberately
@@ -818,6 +822,10 @@ function Move-OPAItemsWithLimit {
         # consume the requested move limit. The transaction checkpoint itself
         # stores only the controlled batch; the pool is used during this run.
         $candidatePool = @($candidateRows | Sort-Object ArchiveDate,EntryID)
+        if($ARCH4Batch){
+            $seen=New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+            $candidatePool=@($candidatePool | Where-Object { $_.EntryID -and $seen.Add([string]$_.EntryID) } | Select-Object -First $Limit)
+        }
         $candidates = @($candidatePool | Select-Object -First $Limit)
         $Transaction.State.PlannedItems = @($candidates | ForEach-Object {
             [pscustomobject]@{
@@ -908,6 +916,7 @@ function Move-OPAItemsWithLimit {
             }
 
             if ($null -eq $item) {
+                if($ARCH4Batch){throw 'ARCH4 source item disappeared before claim.'}
                 if ($Resume) {
                     throw ("Resume safety: planned source item '{0}' not found. Check whether an interrupted Move reached the archive before proceeding." -f [string]$candidate.EntryId)
                 }
@@ -920,6 +929,10 @@ function Move-OPAItemsWithLimit {
             }
 
             $dt = [datetime]$candidate.ReceivedTime
+            if($ARCH4Batch){
+                Assert-OPAARCH4Candidate -Item $item -SourceFolder $source -Candidate $candidate -Cutoff $OlderThanCutoff
+                $itemSize=[long]$item.Size
+            }
             if($ARCH3lSyntheticPart2Boundary){
                 [void](Assert-OPA265ARCH3lSyntheticPart2 -Scope $arch3dScope -Transaction $Transaction -Candidate $candidate -ExistingArchiveParts @($existingArchivePaths) -Stage BeforeDestination)
             }
@@ -970,8 +983,15 @@ function Move-OPAItemsWithLimit {
             # content (including by-value attachment BYTE SHA256) before
             # the one-shot COM call. An inability to capture is a hard stop.
             # The captured witness is never rebaselined after the Move.
-            $semanticPreflightBlocked = $true
+            $semanticPreflightBlocked = -not $ARCH4Batch
+            if($ARCH4Batch){
+                Assert-OPAARCH4Destination -Namespace $Namespace -SourceFolder $source -Destination $dest
+                Assert-OPAARCH4Candidate -Item $item -SourceFolder $source -Candidate $candidate -Cutoff $OlderThanCutoff
+            }
             $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item
+            if($ARCH4Batch -and -not (Test-OPA265ARCH2bWitnessSchema -Witness $sourceSemanticWitness)){
+                throw 'ARCH4 source semantic witness unavailable before claim.'
+            }
             if($ARCH3dSyntheticBoundary){
                 $arch3dWitnessSha=Get-OPA265ARCH3dOriginalWitnessHash -Witness $sourceSemanticWitness
                 [void](Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage SourceWitnessAnchored -ArchivePst $arch3dDestinationPath -TargetFolderPath $arch3dTargetFolder -WitnessSha256 $arch3dWitnessSha)
@@ -984,6 +1004,9 @@ function Move-OPAItemsWithLimit {
             $moveAttemptClaimed = $true
             Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Move Started' -Message ("Starting Move: {0}" -f [string]$candidate.Subject) -EntryId $candidate.EntryId -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -ReceivedTime $dt -SemanticWitness $sourceSemanticWitness -WriteCheckpoint
             Sync-OPAStepJournalStreams
+            if($ARCH4Batch){
+                [void](Write-OPAOperationJournalEvent -Path (Get-OPAARCH4OperationPath -Transaction $Transaction) -TransactionId $Transaction.TransactionId -OperationId ([string]$candidate.EntryId) -Sequence ([long]($executed+1)) -Phase Intent -SourceEntryId ([string]$candidate.EntryId) -SourceStoreId ([string]$source.StoreID) -SourceFolderPath $folderPath -TargetFolderPath ([string]$dest.Folder.FolderPath) -ArchivePst ([string]$dest.Path))
+            }
             if($ARCH3dSyntheticBoundary){
                 # The real legacy step claim is already force-flushed.
                 # This second linked claim is immutable and must precede Move.
@@ -1028,6 +1051,22 @@ function Move-OPAItemsWithLimit {
                 # post-restart verification, index/transaction completion blocked.
                 $arch3dReceipt=Write-OPA265ARCH3dSyntheticBoundary -Operation $arch3dOperation -Stage MoveReturned -ArchivePst $arch3dDestinationPath -TargetFolderPath $arch3dTargetFolder -WitnessSha256 $arch3dWitnessSha -ArchiveEntryId $archiveId
                 throw ('ARCH3d SYNTHETIC STOP after immutable MoveReturned receipt SHA256='+[string]$arch3dReceipt.Sha256+'; no DuplicateIndex until independent Outlook restart reconciliation; NEVER retry.')
+            }
+            if($ARCH4Batch){
+                # Return is not verification. Preserve original source witness
+                # and destination before any index or completion is written.
+                Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'ARCH4 Move Returned' -Message 'Provider returned; independent postrestart verification pending' -EntryId ([string]$candidate.EntryId) -ArchiveEntryId $archiveId -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -ReceivedTime $dt
+                Sync-OPAStepJournalStreams
+                $executed++
+                $logical=[long]$Transaction.State.LogicalFreedBytes+[long]$itemSize
+                Set-OPAArchiveTransactionCount -Transaction $Transaction -Planned ([int]$Transaction.State.Planned) -Executed $executed -Verified 0
+                Set-OPAArchiveTransactionStorageStats -Transaction $Transaction -LogicalFreedBytes $logical
+                $physical=Get-OPAArchivePstSizeBytes -Path $dest.Path
+                Update-OPAArchivePstTelemetry -Transaction $Transaction -ArchivePst $dest.Path -PhysicalSizeBytes $physical -LogicalAddedBytes $itemSize
+                if((Get-OPAArchivePostMoveCapacityAction -PhysicalSizeBytes $physical -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB) -eq 'HardLimitExceeded'){
+                    throw 'ARCH4 archive hard limit exceeded after returned Move; reconcile before new batch.'
+                }
+                continue
             }
             Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Move Completed' -Message ("Move completed: {0}" -f [string]$candidate.Subject) -EntryId $candidate.EntryId -ArchiveEntryId $archiveId -ArchivePst $dest.Path -TargetFolderPath $dest.Folder.FolderPath -SourceFolderPath $folderPath -ReceivedTime $dt
 
