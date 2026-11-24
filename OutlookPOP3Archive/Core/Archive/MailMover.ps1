@@ -363,6 +363,7 @@ function Get-OPAArchiveSafeCapacityBytes {
         [Parameter(Mandatory=$true)][double]$MaxArchivePstSizeGB,
         [Parameter(Mandatory=$true)][double]$SafetyMarginGB
     )
+    if([double]::IsPositiveInfinity($MaxArchivePstSizeGB)){return [int64]::MaxValue}
     $safeBytes = [int64](($MaxArchivePstSizeGB - $SafetyMarginGB) * 1GB)
     if ($safeBytes -le 0) { throw 'MaxArchivePstSizeGB minus SafetyMarginGB must be greater than zero.' }
     return $safeBytes
@@ -380,6 +381,7 @@ function Get-OPAArchivePostMoveCapacityAction {
     )
 
     $safeBytes = Get-OPAArchiveSafeCapacityBytes -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB
+    if([double]::IsPositiveInfinity($MaxArchivePstSizeGB)){return 'WithinSafe'}
     $hardBytes = [int64]($MaxArchivePstSizeGB * 1GB)
     if ($PhysicalSizeBytes -gt $hardBytes) { return 'HardLimitExceeded' }
     if ($PhysicalSizeBytes -gt $safeBytes) { return 'RolloverNext' }
@@ -815,7 +817,8 @@ function Move-OPAItemsWithLimit {
         $candidateRows = New-Object System.Collections.Generic.List[object]
         foreach ($folder in $sourceFolders) {
             try {
-                foreach ($candidate in @(Get-OPAArchiveCandidates -SourceFolder $folder -Limit ([Math]::Max($Limit * 3, $Limit + 20)) -ExcludeEntryIds $duplicateIds -OlderThanCutoff $OlderThanCutoff)) {
+                $folderLimit=if($ARCH4Batch){$Limit}else{[Math]::Max($Limit * 3, $Limit + 20)}
+                foreach ($candidate in @(Get-OPAArchiveCandidates -SourceFolder $folder -Limit $folderLimit -ExcludeEntryIds $duplicateIds -OlderThanCutoff $OlderThanCutoff)) {
                     $candidateRows.Add($candidate) | Out-Null
                 }
             }
@@ -1167,7 +1170,7 @@ function Move-OPAItemsWithLimit {
             # Pre-move errors are isolated to the current item. The transaction
             # remains resumable and the next candidate can continue.
             $reason='Unexpected'
-            if($ARCH5Batch -and $_.Exception.Message -match '^ARCH5 (AttachmentTypeUnsupported|AttachmentSizeUnsupported|AttachmentExportUnverified|AttachmentCleanupFailed|ArchiveRouteMismatch):'){$reason=$Matches[1]}
+            if($ARCH5Batch -and $_.Exception.Message -match '^ARCH5(?:b)? (AttachmentTypeUnsupported|AttachmentSizeUnsupported|AttachmentExportUnverified|AttachmentCleanupFailed|ArchiveRouteMismatch):'){$reason=$Matches[1]}
             $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason=$reason; Message=$_.Exception.Message; Time=(Get-Date).ToString('o')}) | Out-Null
             Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message ("Item skipped after unexpected error: {0} | {1}" -f [string]$candidate.Subject,$_.Exception.Message) -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
         }
