@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH6ae combined DEV:** [Implementation, syntax and constraints](2.6.5-arch6ae.md). ARCH6a–e combined into one branch and CI. Empty-folder Resume fix, read-only root inventory, bounded automatic sequence, no blind replay, bounded ID memory/candidate pool, optional application cap disable. 25 new tests (4815/165 expected). ARCH6f validates actual COM restart/empty-folder/90 GB behavior; OLE and root writer remain unconfirmed/closed. ProductionReady=False.
+
+
 > **ARCH5 folder checkpoint:** Sent Items 4 returned, prior pending cleared before next Archive (individual Resume output not supplied); nested custom folder 4/4 independently verified, reconciled and indexed, subsequent NoPendingBatch. [Recorded evidence](2.6.5-arch5b-msg-cleanup.md). No repeat. Next ARCH6a: empty-source-folder Resume fix, explicit root scope review, durable bounded batch orchestration; distinguish live OLE and date precedence limitations. ProductionReady=False.
 
 
