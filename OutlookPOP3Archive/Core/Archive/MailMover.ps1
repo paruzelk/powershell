@@ -1001,6 +1001,7 @@ function Move-OPAItemsWithLimit {
                 Assert-OPAARCH4Candidate -Item $item -SourceFolder $source -Candidate $candidate -Cutoff $OlderThanCutoff
             }
             if($ARCH5Batch){
+                Assert-OPAARCH5Route -SourcePst ([string]$Transaction.State.SourcePst) -ArchiveDate $dt -SourceFolderPath $folderPath -TargetFolderPath ([string]$dest.Folder.FolderPath) -ArchivePst ([string]$dest.Path) -Grouping $ArchiveGrouping
                 $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item -ExtendedAttachmentWitness -AllowComplexAttachments:$ConfirmComplexAttachments
             }else{
                 $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item
@@ -1166,7 +1167,7 @@ function Move-OPAItemsWithLimit {
             # Pre-move errors are isolated to the current item. The transaction
             # remains resumable and the next candidate can continue.
             $reason='Unexpected'
-            if($ARCH5Batch -and $_.Exception.Message -match '^ARCH5 (AttachmentTypeUnsupported|AttachmentSizeUnsupported|AttachmentExportUnverified):'){$reason=$Matches[1]}
+            if($ARCH5Batch -and $_.Exception.Message -match '^ARCH5 (AttachmentTypeUnsupported|AttachmentSizeUnsupported|AttachmentExportUnverified|ArchiveRouteMismatch):'){$reason=$Matches[1]}
             $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason=$reason; Message=$_.Exception.Message; Time=(Get-Date).ToString('o')}) | Out-Null
             Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message ("Item skipped after unexpected error: {0} | {1}" -f [string]$candidate.Subject,$_.Exception.Message) -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
         }
