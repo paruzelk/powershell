@@ -4,6 +4,7 @@
 . (Join-Path $PSScriptRoot 'OperationJournal.ps1')
 . (Join-Path $PSScriptRoot 'ARCH6Deferred.ps1')
 . (Join-Path $PSScriptRoot 'ARCH7bLiveVerification.ps1')
+. (Join-Path $PSScriptRoot 'ARCH7cRecovery.ps1')
 
 function Assert-OPAARCH4Candidate {
     [CmdletBinding()]
@@ -401,7 +402,8 @@ function Invoke-OPAARCH4Batch {
           [string]$TransactionId,
           [int]$Limit=100,[int]$OlderThanMonths=12,[string]$ArchiveGrouping='Year',
           [double]$MaxArchivePstSizeGB=10,[double]$SafetyMarginGB=0.5,
-          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned,[string]$HistoricalThreatEntryId,[string]$HistoricalDetectionId,[string]$HistoricalAttachmentName,[switch]$ConfirmLiveOutlookVerification)
+          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned,[string]$HistoricalThreatEntryId,[string]$HistoricalDetectionId,[string]$HistoricalAttachmentName,[switch]$ConfirmLiveOutlookVerification,[switch]$RecoverLiveInterrupted)
+    if($RecoverLiveInterrupted -and (-not $ConfirmLiveOutlookVerification -or $Mode -ne 'Resume')){throw 'ARCH7c requires explicit live Resume.'}
     if($ConfirmLiveOutlookVerification -and (-not $ARCH5Batch -or -not $Session.Attached -or $RecoverInterrupted -or $ImportDeferredTransaction -or ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt 10)) -or ($Mode -eq 'Resume' -and $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$'))){throw 'ARCH7b requires attached Outlook, exact Resume or bounded 1..10 test Archive; no historical import/recovery.'}
     if($RecoverInterrupted -and ($Mode -ne 'Resume' -or -not $ARCH5Batch -or $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$' -or $ExpectedInterruptedReturned -lt 1 -or $ExpectedInterruptedPlanned -gt 500 -or $ExpectedInterruptedReturned -ge $ExpectedInterruptedPlanned)){throw 'ARCH6f3c1 explicit interrupted Resume identity/counts required.'}
     if($IncludeRootMail -and ($Mode -ne 'Archive' -or -not $ARCH5Batch)){throw 'ARCH6f2 root mail requires explicit controlled Archive.'}
@@ -509,7 +511,7 @@ function Invoke-OPAARCH4Batch {
             throw 'ARCH4 pending transaction identity mismatch.'
         }
         Assert-OPAARCH7bPendingPolicy -Pending $p -ConfirmLiveOutlookVerification:$ConfirmLiveOutlookVerification
-        if($ConfirmLiveOutlookVerification){Assert-OPAARCH7bLiveFence -Pending $p -Outlook $proc -Worker $worker}
+        if($ConfirmLiveOutlookVerification){Assert-OPAARCH7bLiveFence -Pending $p -Outlook $proc -Worker $worker -AllowNaturalOutlookRestart:$RecoverLiveInterrupted}
         $tx=Get-OPAArchiveTransaction -SourcePst $source -TransactionId ([string]$p.TransactionId)
         if([string]$tx.State.SourcePst -ine $source -or [string]$tx.TransactionId -cne [string]$p.TransactionId){throw 'ARCH4 transaction identity changed.'}
         if($ARCH5Batch){
@@ -517,11 +519,15 @@ function Invoke-OPAARCH4Batch {
             Write-Host ('Размер партии: '+$tx.State.Limit+'; группировка: '+$tx.State.ArchiveGrouping+'; возраст: '+$tx.State.OlderThanMonths+' мес.; режим записи: Safe')
         }
         $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
-        if($RecoverInterrupted){
+        if($RecoverLiveInterrupted){
+            if($p.PSObject.Properties.Name -notcontains 'DeferredPolicy' -or $p.DeferredPolicy -ne $true){throw 'ARCH7c requires original deferred-policy batch.'}
+            $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx))
+            [void](Get-OPAARCH7cInterruptedReview -Transaction $tx -State $state -Steps $steps)
+        }elseif($RecoverInterrupted){
             $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx))
             [void](Assert-OPAARCH6InterruptedState -Transaction $tx -State $state -Steps $steps -ExpectedPlanned $ExpectedInterruptedPlanned -ExpectedReturned $ExpectedInterruptedReturned)
         }elseif(-not $state.AwaitingRestart){throw 'ARCH6f3c1 unfinished selection requires explicit interrupted recovery; no normal Resume.'}
-        if($ARCH5Batch -and $state.Returned -eq 0){
+        if(-not $RecoverLiveInterrupted -and $ARCH5Batch -and $state.Returned -eq 0){
             $completed=Complete-OPAARCH5aZeroMoveBatch -Transaction $tx -State $state -SourceStoreId $storeId
             if($p.PSObject.Properties.Name -contains 'DeferredPolicy' -and $p.DeferredPolicy -eq $true){$n=Save-OPAARCH6DeferredEvidence -Transaction $tx -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile);$completed | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue ([int]$n)}
             [IO.File]::Delete($pending)
@@ -541,13 +547,39 @@ function Invoke-OPAARCH4Batch {
             $stores+=$found[0]
         }
         # Check absence across all eligible source folders, not a fixed inbox count.
+        if($RecoverLiveInterrupted -and $state.Returned -eq 0){
+            $result=[pscustomobject]@{Verified=$true;EntryIdsVerified=$true;SemanticWitnessRequired=$true;AllRequiredOriginalSemanticWitnessesPresent=$true;ExpectedMoved=0;ExpectedEntryIdsChecked=0;MissingEntryIds=@();WarningEntryIds=@()}
+        }else{
         $result=Test-OPAArchiveMoves -Namespace $Session.Namespace -SourceFolder $folders -ArchiveStores $stores -ExpectedMoved $state.Returned -ExpectedMoves @($state.Rows) -RequireSemanticWitness -RequireSourceAbsentAcrossFolders -BoundedSourceIdMemory:$ARCH5Batch
+        }
         if($ARCH5Batch){
             foreach($r in @($state.Rows)){
                 if([string]$r.SourceSemanticWitness.Schema -cin @('2.6.5-ARCH5.MailSemanticWitness.2','2.6.5-ARCH5a.MailSemanticWitness.3')){
                     Assert-OPAARCH5Route -SourcePst $source -ArchiveDate ([datetime]$r.ReceivedTime) -SourceFolderPath $r.SourceFolderPath -TargetFolderPath $r.TargetFolderPath -ArchivePst $r.ArchivePst -Grouping ([string]$tx.State.ArchiveGrouping)
                 }
             }
+        }
+        if($RecoverLiveInterrupted){
+            # The Outlook process may have changed naturally BEFORE this worker,
+            # but must remain identical throughout this verification.
+            $verificationProcess=[pscustomobject]@{MoveProcessId=$proc.Id;MoveProcessStartUtcTicks=$proc.StartUtcTicks}
+            Assert-OPAARCH7bOutlookIdentity -Pending $verificationProcess -Outlook (Get-OPAARCH4OutlookProcess)
+            $completed=Complete-OPAARCH7cInterruptedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile)
+            Assert-OPAARCH7bOutlookIdentity -Pending $verificationProcess -Outlook (Get-OPAARCH4OutlookProcess)
+            $proof='OutlookPID='+$proc.Id+'; OutlookStartTicks='+$proc.StartUtcTicks+'; VerifyWorkerPID='+$worker.Id+'; VerifyWorkerStartTicks='+$worker.StartUtcTicks
+            $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx))
+            if(@($steps | Where-Object {$_.Step -ceq 'ARCH7c Recovery Worker Verified' -and $_.Message -ceq $proof}).Count -eq 0){
+                Save-OPAArchiveTransaction -Transaction $tx -Status Completed -Step 'ARCH7c Recovery Worker Verified' -Message $proof -WriteCheckpoint
+            }
+            Sync-OPAStepJournalStreams
+            Close-OPAStepJournalStreams
+            $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx))
+            if(@($steps | Where-Object {$_.Step -ceq 'ARCH7c Recovery Worker Verified' -and $_.Message -ceq $proof}).Count -ne 1){throw 'ARCH7c worker proof readback failed.'}
+            Assert-OPAARCH7bOutlookIdentity -Pending $verificationProcess -Outlook (Get-OPAARCH4OutlookProcess)
+            [IO.File]::Delete($pending)
+            if([IO.File]::Exists($pending)){throw 'ARCH7c pending marker remains.'}
+            $completed | Add-Member -NotePropertyMembers @{PendingCleared=$true;OriginalOutlookProcessId=$p.MoveProcessId;OutlookProcessId=$proc.Id;OutlookProcessStartUtcTicks=$proc.StartUtcTicks;MoveWorkerId=$p.MoveWorkerId;VerifyWorkerId=$worker.Id;OutlookRestartRequired=$false;NaturalOutlookRestart=([long]$proc.StartUtcTicks -ne [long]$p.MoveProcessStartUtcTicks)}
+            return $completed
         }
         if($RecoverInterrupted){
             $completed=Complete-OPAARCH6InterruptedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId -ExpectedPlanned $ExpectedInterruptedPlanned -ExpectedReturned $ExpectedInterruptedReturned

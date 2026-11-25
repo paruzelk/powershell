@@ -16,9 +16,21 @@ function Get-OPAARCH6DeferredProof {
     param([object]$Transaction,[string]$SourceStoreId)
     if($Transaction.State.Status -cne 'Completed'){throw 'ARCH6f3a deferred proof requires completed checkpoint.'}
     $state=Get-OPAARCH4ReturnedFromDisk -Transaction $Transaction -SourceStoreId $SourceStoreId
-    if(-not $state.AwaitingRestart -or $state.Reconciled -ne $state.Returned -or $state.OperationEventCount -ne (2*$state.Returned) -or [int]$Transaction.State.Verified -ne $state.Returned -or [int]$Transaction.State.Executed -ne $state.Returned){throw 'ARCH6f3a incomplete reconciliation evidence.'}
     $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $Transaction))
+    if(@($steps | Where-Object {$_.Step -ceq 'ARCH7c Recovery Verified'}).Count -gt 0){
+        $review=Get-OPAARCH7cInterruptedReview -Transaction $Transaction -State $state -Steps $steps
+        if(-not $review.RecoveryMarkerPresent -or $state.Reconciled -ne $state.Returned -or [int]$Transaction.State.Verified -ne $state.Returned -or [int]$Transaction.State.Executed -ne $state.Returned -or [int]$Transaction.State.Skipped -ne $review.Deferred){throw 'ARCH7c incomplete deferred recovery proof.'}
+        return $review.DeferredRows
+    }
+    if(-not $state.AwaitingRestart -or $state.Reconciled -ne $state.Returned -or $state.OperationEventCount -ne (2*$state.Returned) -or [int]$Transaction.State.Verified -ne $state.Returned -or [int]$Transaction.State.Executed -ne $state.Returned){throw 'ARCH6f3a incomplete reconciliation evidence.'}
     if(@($steps | Where-Object {$_.Step -ceq 'ARCH4 Batch Verified'}).Count -lt 1){throw 'ARCH6f3a missing completed step.'}
+    $rows=@(Get-OPAARCH6DeferredRows -Transaction $Transaction -State $state -Steps $steps)
+    if($rows.Count -ne ($state.Planned-$state.Returned) -or $rows.Count -ne [int]$Transaction.State.Skipped){throw 'ARCH6f3a incomplete skip coverage.'}
+    foreach($id in @($Transaction.State.SkippedEntryIds)){if(@($rows | Where-Object {$_.EntryId -ieq $id}).Count -ne 1){throw 'ARCH6f3a checkpoint skip identity mismatch.'}}
+    $rows
+}
+function Get-OPAARCH6DeferredRows {
+    param([object]$Transaction,[object]$State,[object[]]$Steps)
     $moved=@{};foreach($r in @($state.Rows)){$moved[[string]$r.SourceEntryId]=$true}
     $plan=@{};foreach($p in @($Transaction.State.PlannedItems)){$plan[[string]$p.EntryId]=$p}
     $seen=@{}
@@ -39,8 +51,6 @@ function Get-OPAARCH6DeferredProof {
         }else{throw 'ARCH6f3a unknown or unsafe skipped item.'}
         $seen[$id]=[pscustomobject][ordered]@{EntryId=$id;SourceFolderPath=[string]$p.SourceFolderPath;Reason=$reason;Message=$detail;Subject=[string]$p.Subject;Sender=[string]$p.Sender;ArchiveDate=[string]$p.ArchiveDate;Size=$p.Size;Time=[string]$s.Time}
     }
-    if($seen.Count -ne ($state.Planned-$state.Returned) -or $seen.Count -ne [int]$Transaction.State.Skipped){throw 'ARCH6f3a incomplete skip coverage.'}
-    foreach($id in @($Transaction.State.SkippedEntryIds)){if(-not $seen.ContainsKey([string]$id)){throw 'ARCH6f3a checkpoint skip identity mismatch.'}}
     foreach($id in @($seen.Keys | Sort-Object)){ $seen[$id] }
 }
 function Save-OPAARCH6DeferredEvidence {

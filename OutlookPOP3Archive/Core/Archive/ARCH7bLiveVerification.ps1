@@ -28,7 +28,7 @@ function Assert-OPAARCH7bLiveFence {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Pending,
           [Parameter(Mandatory=$true)][object]$Outlook,
-          [Parameter(Mandatory=$true)][object]$Worker)
+          [Parameter(Mandatory=$true)][object]$Worker,[switch]$AllowNaturalOutlookRestart)
     foreach($name in @('VerificationPolicy','MoveWorkerId','MoveWorkerStartUtcTicks','MoveWorkerSessionId')){
         if($Pending.PSObject.Properties.Name -notcontains $name){throw 'ARCH7b pending has no live verification identity.'}
     }
@@ -36,10 +36,14 @@ function Assert-OPAARCH7bLiveFence {
        [long]$Pending.MoveWorkerStartUtcTicks -le 0 -or [int]$Pending.MoveWorkerSessionId -lt 0){
         throw 'ARCH7b invalid live verification pending identity.'
     }
-    Assert-OPAARCH7bOutlookIdentity -Pending $Pending -Outlook $Outlook
+    $same=([int]$Outlook.Id -eq [int]$Pending.MoveProcessId -and [long]$Outlook.StartUtcTicks -eq [long]$Pending.MoveProcessStartUtcTicks)
+    if(-not $same){
+        if(-not $AllowNaturalOutlookRestart -or [int]$Outlook.Id -le 0 -or [int]$Pending.MoveProcessId -le 0 -or [long]$Pending.MoveProcessStartUtcTicks -le 0 -or [long]$Outlook.StartUtcTicks -le [long]$Pending.MoveProcessStartUtcTicks){throw 'ARCH7b Outlook process identity changed; preserve pending, never restart Outlook.'}
+        if(Test-OPAARCH7bMoveWorkerAlive -ProcessId ([int]$Pending.MoveProcessId) -StartUtcTicks ([long]$Pending.MoveProcessStartUtcTicks)){throw 'ARCH7c original Outlook process still running.'}
+    }else{Assert-OPAARCH7bOutlookIdentity -Pending $Pending -Outlook $Outlook}
     if([int]$Worker.Id -le 0 -or [int]$Worker.Id -eq [int]$Pending.MoveWorkerId -or
        [long]$Worker.StartUtcTicks -le [long]$Pending.MoveWorkerStartUtcTicks -or
-       [int]$Worker.SessionId -ne [int]$Pending.MoveWorkerSessionId){
+       ($same -and [int]$Worker.SessionId -ne [int]$Pending.MoveWorkerSessionId)){
         throw 'ARCH7b requires a new PowerShell worker in the original session.'
     }
     if(Test-OPAARCH7bMoveWorkerAlive -ProcessId ([int]$Pending.MoveWorkerId) -StartUtcTicks ([long]$Pending.MoveWorkerStartUtcTicks)){

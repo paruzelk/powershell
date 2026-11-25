@@ -10,6 +10,7 @@ param(
     [string]$SourcePst,
     [switch]$ConfirmTestArchive,
     [switch]$ConfirmLiveOutlookVerification,
+    [switch]$RecoverLiveInterrupted,
     [switch]$ConfirmComplexAttachments,
     [string[]]$IncludeFolderPath,
     [switch]$IncludeRootMail,
@@ -140,6 +141,7 @@ if($HistoricalThreatEntryId -or $HistoricalDetectionId -or $HistoricalAttachment
     if(-not $ImportDeferredTransaction -or $HistoricalThreatEntryId -notmatch '^[0-9a-fA-F]{16,2048}$' -or $HistoricalDetectionId -notmatch '^\{?[0-9a-fA-F-]{36}\}?$' -or -not $HistoricalAttachmentName -or $HistoricalAttachmentName.Length -gt 1024){throw 'ARCH6f3c2 requires historical transaction, exact EntryID, DetectionID and attachment name.'}
     [void][guid]::Parse($HistoricalDetectionId)
 }
+if($RecoverLiveInterrupted -and (-not $ConfirmLiveOutlookVerification -or $Mode -ne 'Resume')){throw 'ARCH7c requires explicit live Resume.'}
 if($ConfirmLiveOutlookVerification -and (-not $ConfirmTestArchive -or $Mode -notin @('Archive','Resume') -or $RecoverInterrupted -or $ImportDeferredTransaction -or $WorkerPilot -or ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt 10)) -or ($Mode -eq 'Resume' -and $Transaction -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$'))){throw 'ARCH7b explicit test live verification requires Archive 1..10 or exact Resume; no Auto or historical import.'}
 $arch4Requested = [bool]$ConfirmTestArchive -or $PSBoundParameters.ContainsKey('SourcePst') -or $ConfirmComplexAttachments -or $PSBoundParameters.ContainsKey('IncludeFolderPath') -or $IncludeRootMail -or $ImportDeferredTransaction -or $RecoverInterrupted -or $PSBoundParameters.ContainsKey('ExpectedInterruptedPlanned') -or $PSBoundParameters.ContainsKey('ExpectedInterruptedReturned')
 if ($arch4Requested) {
@@ -389,7 +391,7 @@ if ($WorkerPilot) {
 
 
 if($arch4Requested){
-    $build='2.6.5-ARCH7b3 DEV'
+    $build='2.6.5-ARCH7c DEV'
     $buildPath=Join-Path $PSScriptRoot 'BUILD-INFO.json'
     if(Test-Path -LiteralPath $buildPath -PathType Leaf){
         try{
@@ -775,7 +777,7 @@ try {
     Write-OPADiscoverySummary -Discovery $discovery
 
     if ($arch4Requested) {
-        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath -IncludeRootMail:$IncludeRootMail -ARCH6DeferredPolicy -ImportDeferredTransaction $ImportDeferredTransaction -RecoverInterrupted:$RecoverInterrupted -ExpectedInterruptedPlanned $ExpectedInterruptedPlanned -ExpectedInterruptedReturned $ExpectedInterruptedReturned -HistoricalThreatEntryId $HistoricalThreatEntryId -HistoricalDetectionId $HistoricalDetectionId -HistoricalAttachmentName $HistoricalAttachmentName -ConfirmLiveOutlookVerification:$ConfirmLiveOutlookVerification
+        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath -IncludeRootMail:$IncludeRootMail -ARCH6DeferredPolicy -ImportDeferredTransaction $ImportDeferredTransaction -RecoverInterrupted:$RecoverInterrupted -ExpectedInterruptedPlanned $ExpectedInterruptedPlanned -ExpectedInterruptedReturned $ExpectedInterruptedReturned -HistoricalThreatEntryId $HistoricalThreatEntryId -HistoricalDetectionId $HistoricalDetectionId -HistoricalAttachmentName $HistoricalAttachmentName -ConfirmLiveOutlookVerification:$ConfirmLiveOutlookVerification -RecoverLiveInterrupted:$RecoverLiveInterrupted
         return
     }
 
