@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH6f3a1 DEV
+
+- CI-only: restore four original SHA-256 literals accidentally changed while updating the expected Pester count. All nine historical SHA-256 occurrences match ARCH6f2. ARCH6f3a's 4837 tests in 165 containers, BOM and PSScriptAnalyzer passed on 57ac6ea8, but the subsequent ARCH3k source gate failed. No PowerShell source changes. Full CI and live acceptance pending.
+
 ## ARCH6f3a DEV
 
 - Continue по умолчанию; отдельный долговременный журнал подтверждённых пропусков и исключение повторного отбора; явный импорт завершённой исторической транзакции.
