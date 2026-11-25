@@ -1,8 +1,10 @@
-﻿# OutlookPOP3Archive — ARCH7b2 DEV
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7b3 DEV
 
 ## Актуальный запуск и документация
 
-25.11.2026: предыдущий ARCH6f3c3, 8910499e, CI 4862/165 PASS. ARCH7b2 — [тест свежего worker без перезапуска Outlook](docs/2.6.5-arch7b.md); явный тестовый Pending, проверка JSON и запрет legacy restart для live pending; CI/live acceptance pending. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
+Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7b3 — идентификатор DEV-сборки.
+
+25.11.2026: предыдущий ARCH6f3c3, 8910499e, CI 4862/165 PASS. ARCH7b3 — [тест свежего worker без перезапуска Outlook](docs/2.6.5-arch7b.md); ARCH7b2: 58/58 целевых тестов PASS, CI остановлен на заголовке CONFIGURATION.md. Заголовок исправлен; полный CI/live acceptance pending. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
 
 - [Целевой Auto и аудит](docs/ARCH7a-AUTO-REQUIREMENTS.md)
 - [Установка на RDS, планировщик вручную, PowerShell, GPO](docs/RDS-DEPLOYMENT.md)

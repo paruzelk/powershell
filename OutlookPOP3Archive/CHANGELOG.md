@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7b3 DEV
+
+- Restore required base-build identifier in CONFIGURATION.md and README header; ARCH7b2 all 58 focused tests passed, CI 45615916753 stopped at documentation header. No archive algorithm or test changes. 4872/165 expected.
+
 ## ARCH7b2 DEV
 
 - Explicit synthetic Pending record with JSON roundtrip, legacy restart rejects tagged pending before Outlook access. One additional regression, 4872/165 expected, 58 focused. Identity checks unchanged.

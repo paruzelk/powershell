@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH7b3 DEV: CI 45615916753 ARCH7b2 58/58 focused PASS, other focused 47/35/31/911 PASS, BOM PASS; full CI stopped at CONFIGURATION.md header. Restore base build documentation marker, no test/algorithm changes. Full CI and live acceptance pending.
+
 > ARCH7b2 DEV: CI 45615251882 reached pending identity gate (55/57); explicit fixture fields and JSON readback, extra legacy restart prohibition for tagged pending. 58 focused / 4872 total expected. Live acceptance pending.
 
 > ARCH7b1 DEV: ARCH7b CI 45613631882 failed 55/57 focused due to missing Get-OPAPop3SourceFolders in test setup. Import exact original AST function only; repeat 57 focused and full 4871/165. Live acceptance still pending; no repeat of completed archive tests.
