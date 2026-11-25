@@ -359,7 +359,15 @@ function Invoke-OPAARCH4Batch {
         if($Mode -eq 'Archive'){
             if([IO.File]::Exists($pending)){throw 'ARCH4 unfinished batch exists. Use Resume, never a new Archive.'}
             if($ImportDeferredTransaction){
-                if($ImportDeferredTransaction -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8} [pscustomobject]@{Schema='2.6.5-ARCH4.Status.1';Status='NoEligibleFolders';SourcePst=$source;RestartRequired=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}}
+                if($ImportDeferredTransaction -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$'){throw 'ARCH6f3a invalid historical transaction ID.'}
+                $old=Get-OPAArchiveTransaction -SourcePst $source -TransactionId $ImportDeferredTransaction
+                if([string]$old.State.SourcePst -ine $source -or [int]$old.State.Verified -lt 1){throw 'ARCH6f3a historical import requires completed same-source reconciled moves.'}
+                $n=Save-OPAARCH6DeferredEvidence -Transaction $old -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile)
+                return [pscustomobject]@{Status='DeferredImportCompleted';TransactionId=$ImportDeferredTransaction;Deferred=[int]$n;ProductionReady=$false}
+            }
+            $deferredIds=@()
+            if($ARCH6DeferredPolicy){$deferredIds=@(Get-OPAARCH6DeferredIds -SourcePst $source -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile) -Directory $dir)}
+            if($folders.Count -eq 0){return [pscustomobject]@{Schema='2.6.5-ARCH4.Status.1';Status='NoEligibleFolders';SourcePst=$source;RestartRequired=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}}
             # Check existing archive paths before the original destination planner can mount one.
             foreach($part in @(Get-OPAArchivePstPartsOnDiskAll -SourcePst $source)){
                 $path=[string]$part.Path
@@ -430,86 +438,6 @@ function Invoke-OPAARCH4Batch {
         }
         $completed=Complete-OPAARCH4VerifiedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId
         if($p.PSObject.Properties.Name -contains 'DeferredPolicy' -and $p.DeferredPolicy -eq $true){$n=Save-OPAARCH6DeferredEvidence -Transaction $tx -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile);$completed | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue ([int]$n)}
-        [IO.File]::Delete($pending)
-        return $completed
-    } finally { $lease.Dispose() }
-}
-){throw 'ARCH6f3a invalid historical transaction ID.'}
-                $old=Get-OPAArchiveTransaction -SourcePst $source -TransactionId $ImportDeferredTransaction
-                if([string]$old.State.SourcePst -ine $source -or [int]$old.State.Verified -lt 1){throw 'ARCH6f3a historical import requires completed same-source reconciled moves.'}
-                $n=Save-OPAARCH6DeferredEvidence -Transaction $old -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile)
-                return [pscustomobject]@{Status='DeferredImportCompleted';TransactionId=$ImportDeferredTransaction;Deferred=[int]$n;ProductionReady=$false}
-            }
-            $deferredIds=@()
-            if($ARCH6DeferredPolicy){$deferredIds=@(Get-OPAARCH6DeferredIds -SourcePst $source -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile) -Directory $dir)}
-            if($folders.Count -eq 0){return [pscustomobject]@{Schema='2.6.5-ARCH4.Status.1';Status='NoEligibleFolders';SourcePst=$source;RestartRequired=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}}
-            # Check existing archive paths before the original destination planner can mount one.
-            foreach($part in @(Get-OPAArchivePstPartsOnDiskAll -SourcePst $source)){
-                $path=[string]$part.Path
-                if(([IO.File]::GetAttributes($path) -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'ARCH4 archive part redirected.'}
-                foreach($account in @($Session.Namespace.Accounts)){
-                    $ds=$account.DeliveryStore
-                    if($null -ne $ds -and [string]$ds.FilePath -ieq $path){throw 'ARCH4 archive path is already an account delivery PST.'}
-                }
-            }
-            $cutoff=Get-OPAArchiveCutoff -OlderThanMonths $OlderThanMonths
-            $tx=New-OPAArchiveTransaction -SourcePst $source -ArchivePst '' -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanMonths $OlderThanMonths -ArchiveCutoff $cutoff -AccountEmail ([string]$s.AccountEmail) -DurabilityMode Safe
-            Write-OPAARCH4Pending -Path $pending -Record ([pscustomobject]@{Schema='2.6.5-ARCH4.Pending.1';TransactionId=$tx.TransactionId;SourcePst=$source;SourceStoreId=$storeId;Profile=[string]$Discovery.Profile;MoveProcessId=$proc.Id;MoveProcessStartUtcTicks=$proc.StartUtcTicks})
-            Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Batch Started' -WriteCheckpoint
-            $moved=Move-OPAItemsWithLimit -Namespace $Session.Namespace -SourceFolders $folders -Transaction $tx -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanCutoff $cutoff -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH4Batch -ARCH5Batch:$ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments
-            Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Awaiting Restart' -WriteCheckpoint
-            Sync-OPAStepJournalStreams
-            $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
-            if($state.Returned -ne [int]$moved){throw 'ARCH4 batch receipt count mismatch.'}
-            if($ARCH5Batch -and $state.Returned -eq 0){
-                $completed=Complete-OPAARCH5aZeroMoveBatch -Transaction $tx -State $state -SourceStoreId $storeId
-                [IO.File]::Delete($pending)
-                return $completed
-            }
-            return [pscustomobject]@{Schema='2.6.5-ARCH4.Returned.1';Status='BatchReturnedRestartAndResumeRequired';TransactionId=$tx.TransactionId;Planned=$state.Planned;Returned=$state.Returned;NotMoved=($state.Planned-$state.Returned);OutlookProcessId=$proc.Id;SkipReasons=@($tx.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}});SkippedItems=@($tx.State.SkippedItems);SkipDetailsTruncated=([int]$tx.State.Skipped -gt @($tx.State.SkippedItems).Count);OriginalIndexWritten=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
-        }
-        if(-not [IO.File]::Exists($pending)){
-            return [pscustomobject]@{Schema='2.6.5-ARCH4.Status.1';Status='NoPendingBatch';SourcePst=$source;RestartRequired=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
-        }
-        $p=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($pending,[Text.Encoding]::UTF8)) -ErrorAction Stop
-        if($p.Schema -cne '2.6.5-ARCH4.Pending.1' -or [string]$p.SourcePst -ine $source -or [string]$p.SourceStoreId -ine $storeId -or
-           [string]$p.Profile -ine [string]$Discovery.Profile -or [string]$p.TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$' -or
-           ($TransactionId -and $TransactionId -cne [string]$p.TransactionId)){
-            throw 'ARCH4 pending transaction identity mismatch.'
-        }
-        $tx=Get-OPAArchiveTransaction -SourcePst $source -TransactionId ([string]$p.TransactionId)
-        if([string]$tx.State.SourcePst -ine $source -or [string]$tx.TransactionId -cne [string]$p.TransactionId){throw 'ARCH4 transaction identity changed.'}
-        if($ARCH5Batch){
-            Write-Host ('Транзакция: '+$tx.TransactionId)
-            Write-Host ('Размер партии: '+$tx.State.Limit+'; группировка: '+$tx.State.ArchiveGrouping+'; возраст: '+$tx.State.OlderThanMonths+' мес.; режим записи: Safe')
-        }
-        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
-        if($ARCH5Batch -and $state.Returned -eq 0){
-            $completed=Complete-OPAARCH5aZeroMoveBatch -Transaction $tx -State $state -SourceStoreId $storeId
-            [IO.File]::Delete($pending)
-            return $completed
-        }
-        if($proc.StartUtcTicks -le [long]$p.MoveProcessStartUtcTicks){throw 'ARCH4 fully restart Outlook before Resume.'}
-        $stores=@()
-        foreach($path in @($state.Rows | ForEach-Object {$_.ArchivePst} | Sort-Object -Unique)){
-            if(-not [IO.File]::Exists($path)){throw 'ARCH4 archive PST missing; never recreate on Resume.'}
-            $found=@($Session.Namespace.Stores | Where-Object {[string]$_.FilePath -ieq $path})
-            if($found.Count -ne 1 -or [string]$found[0].StoreID -ieq $storeId){throw 'ARCH4 reconnect the existing archive PST to Outlook before Resume.'}
-            foreach($account in @($Session.Namespace.Accounts)){
-                if([string]$account.DeliveryStore.StoreID -ieq [string]$found[0].StoreID){throw 'ARCH4 archive store is an account delivery store.'}
-            }
-            $stores+=$found[0]
-        }
-        # Check absence across all eligible source folders, not a fixed inbox count.
-        $result=Test-OPAArchiveMoves -Namespace $Session.Namespace -SourceFolder $folders -ArchiveStores $stores -ExpectedMoved $state.Returned -ExpectedMoves @($state.Rows) -RequireSemanticWitness -RequireSourceAbsentAcrossFolders -BoundedSourceIdMemory:$ARCH5Batch
-        if($ARCH5Batch){
-            foreach($r in @($state.Rows)){
-                if([string]$r.SourceSemanticWitness.Schema -cin @('2.6.5-ARCH5.MailSemanticWitness.2','2.6.5-ARCH5a.MailSemanticWitness.3')){
-                    Assert-OPAARCH5Route -SourcePst $source -ArchiveDate ([datetime]$r.ReceivedTime) -SourceFolderPath $r.SourceFolderPath -TargetFolderPath $r.TargetFolderPath -ArchivePst $r.ArchivePst -Grouping ([string]$tx.State.ArchiveGrouping)
-                }
-            }
-        }
-        $completed=Complete-OPAARCH4VerifiedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId
         [IO.File]::Delete($pending)
         return $completed
     } finally { $lease.Dispose() }
