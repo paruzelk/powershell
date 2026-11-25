@@ -109,7 +109,7 @@ function Save-OPAARCH6HistoricalThreat {
         if($indices.Count -ne 1){throw 'ARCH6f3c2 historical attachment metadata not unique; no export attempted.'}
         $matches=@(Get-OPAARCH6DefenderMatches -AttachmentName $AttachmentName -From $review.LastReturn.AddSeconds(-1) -To $review.LastReturn.AddSeconds(10) -DetectionId $DetectionId)
         if($matches.Count -ne 1){throw 'ARCH6f3c2 historical Defender evidence unavailable or ambiguous.'}
-        $e=[pscustomobject][ordered]@{EntryId=$EntryId;AttachmentName=$AttachmentName;AttachmentIndex=[int]$indices[0];HResult=$null;Reason='AttachmentBlockedByAntivirus';Defender=$matches[0];MoveAttempted=$false}
+        $e=[pscustomobject][ordered]@{EntryId=$EntryId;AttachmentName=$AttachmentName;AttachmentIndex=[int]$indices[0];HResult=$null;ObservedHResult='';Reason='AttachmentBlockedByAntivirus';Defender=$matches[0];MoveAttempted=$false}
         $message=ConvertTo-OPAARCH6AntivirusMessage -Evidence $e
         $row=[ordered]@{EntryId=$EntryId;SourceFolderPath=[string]$p.SourceFolderPath;Reason=$e.Reason;Message=$message;Subject=[string]$p.Subject;Sender=[string]$p.Sender;ArchiveDate=[string]$p.ReceivedTime;Size=$p.Size;Time=[string]$e.Defender.DetectionTime}
         $data=[ordered]@{Schema='2.6.5-ARCH6f3c2.HistoricalThreat.1';SourcePst=[string]$Transaction.State.SourcePst;StoreId=$SourceStoreId;Profile=$ProfileName;TransactionId=[string]$Transaction.TransactionId;Rows=@($row)}

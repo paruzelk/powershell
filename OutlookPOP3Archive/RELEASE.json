@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH6f3c2 DEV: real ARCH6f3c1 interrupted recovery accepted (311 verified/indexed, zero Move, 189 unprocessed). Narrow antivirus export classification and explicit metadata-only historical hold. 4854/165 expected. Production closed.",
     "ARCH6f3c1 DEV: explicit recovery of skip-free interrupted journal prefix (operator observed 500 planned, 311 paired receipts/Intents, 189 unprocessed); independent restart and original verifier/index, no Move replay. 4846/165 expected. Production closed.",
     "ARCH6f3a DEV: Continue default; strict preclaim deferred evidence, separate durable ledger and historical import, five focused tests; 4837/165 expected. Production closed.",
     "ARCH6f2 DEV: actual ARCH6f1 30/30 three automatic batches verified/indexed, no skipped; explicit IncludeRootMail for exact POP3 root, reserved destination route, existing semantic and restart verification. 11 new tests, 4832/165 expected. Live root archival pending.",
@@ -116,7 +117,7 @@
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
     "ExpectedTestContainers": 165,
-    "ExpectedPesterTests": 4846,
+    "ExpectedPesterTests": 4854,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

@@ -50,11 +50,12 @@ function New-OPAARCH6AntivirusEvidence {
           [string]$TemporaryPath,[Exception]$Exception)
     if($EntryId -notmatch '^[0-9a-fA-F]{16,2048}$' -or -not $AttachmentName -or $AttachmentName.Length -gt 1024 -or $Index -lt 1){return}
     $hex=Get-OPAARCH6VirusHResult -Exception $Exception
+    $observed=if($null -ne $Exception){'{0:X8}' -f [int]$Exception.HResult}else{''}
     $matches=@(Get-OPAARCH6DefenderMatches -AttachmentName $AttachmentName -From $From -To $To -TemporaryPath $TemporaryPath)
     if(-not $hex -and $matches.Count -ne 1){return}
     $d=if($matches.Count -eq 1){$matches[0]}else{$null}
     $reason=if($hex -ceq '800700E2'){'AttachmentQuarantined'}else{'AttachmentBlockedByAntivirus'}
-    [pscustomobject][ordered]@{EntryId=$EntryId;AttachmentName=$AttachmentName;AttachmentIndex=$Index;HResult=$hex;Reason=$reason;Defender=$d;MoveAttempted=$false}
+    [pscustomobject][ordered]@{EntryId=$EntryId;AttachmentName=$AttachmentName;AttachmentIndex=$Index;HResult=$hex;ObservedHResult=$observed;Reason=$reason;Defender=$d;MoveAttempted=$false}
 }
 function ConvertFrom-OPAARCH6AntivirusMessage {
     param([string]$Message,[string]$ExpectedEntryId)

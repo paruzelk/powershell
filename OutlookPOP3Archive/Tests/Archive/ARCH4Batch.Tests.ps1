@@ -366,4 +366,96 @@ Describe 'ARCH6f3c1 interrupted recovery with exact skip-free journal prefix' {
     }
 }
 
+
+Describe 'ARCH6f3c2 antivirus evidence and historical hold' {
+    It 'recognizes only the two explicit Windows antivirus HRESULTs through exception wrappers' {
+        $a=[Runtime.InteropServices.COMException]::new('blocked',-2147024671)
+        $b=[Runtime.InteropServices.COMException]::new('deleted',-2147024670)
+        Get-OPAARCH6VirusHResult -Exception ([Exception]::new('wrapper',$a)) | Should -BeExactly '800700E1'
+        Get-OPAARCH6VirusHResult -Exception $b | Should -BeExactly '800700E2'
+        Get-OPAARCH6VirusHResult -Exception ([UnauthorizedAccessException]::new('denied')) | Should -BeNullOrEmpty
+    }
+    It 'defers exact antivirus HRESULT even if Defender history is unavailable' {
+        Mock Get-OPAARCH6DefenderMatches {}
+        $now=Get-Date
+        $e=New-OPAARCH6AntivirusEvidence -EntryId '0011223344556677' -AttachmentName 'fake.doc' -Index 2 -From $now -To $now -Exception ([Runtime.InteropServices.COMException]::new('blocked',-2147024671))
+        $e.Reason | Should -BeExactly 'AttachmentBlockedByAntivirus'
+        $e.MoveAttempted | Should -BeFalse
+        $msg=ConvertTo-OPAARCH6AntivirusMessage -Evidence $e
+        Get-OPAARCH6DeferredReason -Message $msg | Should -BeExactly 'AttachmentBlockedByAntivirus'
+        (ConvertFrom-OPAARCH6AntivirusMessage -Message $msg -ExpectedEntryId '0011223344556677').AttachmentIndex | Should -Be 2
+        ConvertFrom-OPAARCH6AntivirusMessage -Message $msg -ExpectedEntryId '0011223344556688' | Should -BeNullOrEmpty
+    }
+    It 'classifies explicit virus deletion without retry' {
+        Mock Get-OPAARCH6DefenderMatches {}
+        $now=Get-Date
+        $e=New-OPAARCH6AntivirusEvidence -EntryId '0011223344556677' -AttachmentName 'fake.doc' -Index 1 -From $now -To $now -Exception ([Runtime.InteropServices.COMException]::new('deleted',-2147024670))
+        $e.Reason | Should -BeExactly 'AttachmentQuarantined'
+        Get-OPAARCH6DeferredReason -Message (ConvertTo-OPAARCH6AntivirusMessage -Evidence $e) | Should -BeExactly 'AttachmentQuarantined'
+    }
+    It 'does not classify generic save failure or missing file without matching evidence' {
+        Mock Get-OPAARCH6DefenderMatches {}
+        $now=Get-Date
+        New-OPAARCH6AntivirusEvidence -EntryId '0011223344556677' -AttachmentName 'fake.doc' -Index 1 -From $now -To $now -Exception ([Exception]::new('save failed')) | Should -BeNullOrEmpty
+        New-OPAARCH6AntivirusEvidence -EntryId '0011223344556677' -AttachmentName 'fake.doc' -Index 1 -From $now -To $now -Exception ([IO.FileNotFoundException]::new('missing')) | Should -BeNullOrEmpty
+        Get-OPAARCH6DeferredReason -Message 'ARCH5 AttachmentExportUnverified: unknown' | Should -BeNullOrEmpty
+    }
+    It 'accepts a unique correlated Defender event for generic save failure' {
+        Mock Get-OPAARCH6DefenderMatches {[pscustomobject]@{DetectionId='9870e0c5-6cbd-4b8b-be43-3590a6c861ba';ThreatId=42;ThreatName='Synthetic';ActionSuccess=$true}}
+        $now=Get-Date
+        $e=New-OPAARCH6AntivirusEvidence -EntryId '0011223344556677' -AttachmentName 'fake.doc' -Index 1 -From $now -To $now -Exception ([Exception]::new('save failed'))
+        $e.Defender.ThreatId | Should -Be 42
+        Get-OPAARCH6DeferredReason -Message (ConvertTo-OPAARCH6AntivirusMessage -Evidence $e) | Should -BeExactly 'AttachmentBlockedByAntivirus'
+    }
+    It 'rejects ambiguous Defender events and forged plain marker' {
+        Mock Get-OPAARCH6DefenderMatches {[pscustomobject]@{ThreatId=1};[pscustomobject]@{ThreatId=2}}
+        $now=Get-Date
+        New-OPAARCH6AntivirusEvidence -EntryId '0011223344556677' -AttachmentName 'fake.doc' -Index 1 -From $now -To $now -Exception ([Exception]::new('save failed')) | Should -BeNullOrEmpty
+        Get-OPAARCH6DeferredReason -Message 'ARCH6f3c2 AttachmentBlockedByAntivirus: invalid' | Should -BeNullOrEmpty
+    }
+    It 'registers historical first unprocessed mail from metadata and reads back hold without exporting or moving' {
+        $f=New-ARCH4Fixture -Count 3 -Returned 2
+        $id='0011223344556677'
+        $f.Transaction.State.PlannedItems[2].EntryId=$id
+        Save-ARCH4Fixture -Fixture $f -Interrupted
+        $tx=$f.Transaction
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE
+        [void](Complete-OPAARCH6InterruptedBatch -Transaction $tx -State $state -Verification (New-ARCH4Verification -Count 2) -SourceStoreId STORE -ExpectedPlanned 3 -ExpectedReturned 2)
+        $a=[pscustomobject]@{Type=1;FileName='fake.doc'}
+        $a | Add-Member ScriptMethod SaveAsFile {throw 'must never export historical attachment'}
+        $collection=[pscustomobject]@{Count=1;FakeAttachment=$a}
+        $collection | Add-Member ScriptMethod Item {param($i) $this.FakeAttachment}
+        $mail=[pscustomobject]@{Attachments=$collection}
+        $mail | Add-Member ScriptMethod Move {throw 'must never move historical mail'}
+        $ns=[pscustomobject]@{FakeMail=$mail}
+        $ns | Add-Member ScriptMethod GetItemFromID {param($id,$store) $this.FakeMail}
+        $folder=[pscustomobject]@{FolderPath=$script:sourceFolder}
+        Mock Assert-OPAARCH4Candidate {}
+        Mock Get-OPAARCH6DefenderMatches {
+            [pscustomobject][ordered]@{DetectionId='9870e0c5-6cbd-4b8b-be43-3590a6c861ba';ThreatId=42;ThreatName='Synthetic';DetectionTime=$From.AddSeconds(1).ToString('o');Resource='file:_fake.doc';ProcessName='C:\OUTLOOK.EXE';ActionSuccess=$true}
+        }
+        $params=@{Transaction=$tx;SourceStoreId='STORE';ProfileName='Outlook';Namespace=$ns;Folders=@($folder);EntryId=$id;DetectionId='9870e0c5-6cbd-4b8b-be43-3590a6c861ba';AttachmentName='fake.doc'}
+        $r=Save-OPAARCH6HistoricalThreat @params
+        $r.Status | Should -BeExactly 'HistoricalThreatDeferred'
+        $r.MoveInvocations | Should -Be 0
+        $r.AttachmentExports | Should -Be 0
+        $dir=[IO.Path]::GetDirectoryName($tx.Path)
+        @(Get-OPAARCH6DeferredIds -SourcePst $tx.State.SourcePst -SourceStoreId STORE -ProfileName Outlook -Directory $dir) | Should -Contain $id
+        (Save-OPAARCH6HistoricalThreat @params).Deferred | Should -Be 1
+        $params.EntryId='0011223344556688'
+        {Save-OPAARCH6HistoricalThreat @params} | Should -Throw '*first unprocessed identity*'
+        $params.EntryId=$id;$params.AttachmentName='other.doc'
+        {Save-OPAARCH6HistoricalThreat @params} | Should -Throw '*metadata not unique*'
+    }
+    It 'requires all historical import arguments before any Outlook access' {
+        $src=Join-Path $TestDrive 'not-created.pst'
+        $common=@{SourcePst=$src;ProfileName='Outlook';ConfirmTestArchive=$true;ConfirmOutlookRestart=$true;ImportDeferredTransaction='20261125-135508-913b789a';HistoricalThreatEntryId='0011223344556677';HistoricalDetectionId='9870e0c5-6cbd-4b8b-be43-3590a6c861ba';HistoricalAttachmentName='fake.doc';WhatIf=$true}
+        $r=& (Join-Path $script:root 'Invoke-OPAArchiveBatches.ps1') @common
+        $r.Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
+        Test-Path -LiteralPath $src | Should -BeFalse
+        $common.Remove('HistoricalDetectionId')
+        {& (Join-Path $script:root 'Invoke-OPAArchiveBatches.ps1') @common} | Should -Throw '*exact EntryID*'
+    }
+}
+
 }

@@ -1,5 +1,10 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH6f3c2 DEV
+
+- ARCH6f3c1 real acceptance: 311 verified/reconciled/indexed, 189 unprocessed, zero Move, pending cleared.
+- Narrow pre-Move antivirus classification and metadata-only historical hold; CSV/HTML fields. 8 new synthetic tests, 4854/165 expected.
+
 ## ARCH6f3c1 DEV
 
 - Явное восстановление прерванного префикса исходной партии без повторного Move; оригинальные verifier, reconciliation, DuplicateIndex; разделение Unprocessed/Deferred, строгий журнал и readback. 9 новых тестов; 4846/165 expected. Антивирусную политику не меняли.

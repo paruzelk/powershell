@@ -15,7 +15,7 @@ $rows=@(foreach($f in $ledgers){
     if($d.SourcePst -ine $source -or $d.Profile -ine $ProfileName){continue}
     foreach($r in @($d.Rows)){
         $e=ConvertFrom-OPAARCH6AntivirusMessage -Message $r.Message -ExpectedEntryId $r.EntryId
-        [pscustomobject]@{TransactionId=$d.TransactionId;Folder=$r.SourceFolderPath;Date=$r.ArchiveDate;Subject=$r.Subject;Sender=$r.Sender;Size=$r.Size;Reason=$r.Reason;EntryId=$r.EntryId;AttachmentName=$e.AttachmentName;AttachmentIndex=$e.AttachmentIndex;HResult=$e.HResult;ThreatName=$e.Defender.ThreatName;ThreatId=$e.Defender.ThreatId;DetectionId=$e.Defender.DetectionId;DetectionTime=$e.Defender.DetectionTime;Message=$r.Message}
+        [pscustomobject]@{TransactionId=$d.TransactionId;Folder=$r.SourceFolderPath;Date=$r.ArchiveDate;Subject=$r.Subject;Sender=$r.Sender;Size=$r.Size;Reason=$r.Reason;EntryId=$r.EntryId;AttachmentName=$e.AttachmentName;AttachmentIndex=$e.AttachmentIndex;HResult=$e.HResult;ObservedHResult=$e.ObservedHResult;ThreatName=$e.Defender.ThreatName;ThreatId=$e.Defender.ThreatId;DetectionId=$e.Defender.DetectionId;DetectionTime=$e.Defender.DetectionTime;Message=$r.Message}
     }
 })
 $out=[IO.Path]::GetFullPath($OutputDirectory)

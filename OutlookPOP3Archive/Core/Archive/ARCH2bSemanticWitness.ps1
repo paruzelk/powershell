@@ -290,12 +290,14 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
             # SaveAsFile writes only an ephemeral attachment COPY, not a PST.
             # A process crash can leave sensitive temp data (documented risk).
             $exportStarted=Get-Date
+            $exportEntryId=''
+            if($ExtendedAttachmentWitness -and $type -eq 1 -and $Mail.PSObject.Properties.Name -contains 'EntryID'){$exportEntryId=[string]$Mail.EntryID}
             try {
                 $attachment.SaveAsFile($tempPath)
                 if(-not [IO.File]::Exists($tempPath)){throw 'ARCH2b SaveAsFile did not create a file.'}
             }catch{
-                if($ExtendedAttachmentWitness -and $type -eq 1){
-                    $e=New-OPAARCH6AntivirusEvidence -EntryId ([string]$Mail.EntryID) -AttachmentName $filename -Index $i -From $exportStarted.AddSeconds(-1) -To (Get-Date) -TemporaryPath $tempPath -Exception $_.Exception
+                if($ExtendedAttachmentWitness -and $type -eq 1 -and $exportEntryId -and $filename){
+                    $e=New-OPAARCH6AntivirusEvidence -EntryId $exportEntryId -AttachmentName $filename -Index $i -From $exportStarted.AddSeconds(-1) -To (Get-Date) -TemporaryPath $tempPath -Exception $_.Exception
                     if($null -ne $e){throw (ConvertTo-OPAARCH6AntivirusMessage -Evidence $e)}
                 }
                 throw
