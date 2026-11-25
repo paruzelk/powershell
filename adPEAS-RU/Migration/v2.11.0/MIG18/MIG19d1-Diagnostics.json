@@ -1,0 +1,1090 @@
+{
+  "src/adPEAS.ps1": [
+    [
+      "\"[adPEAS] -OutputAppend requires -Outputfile. Ignoring -OutputAppend.\"",
+      "\"[adPEAS] Для -OutputAppend необходим -Outputfile. Параметр -OutputAppend игнорируется.\""
+    ],
+    [
+      "\"[adPEAS] -OutputAppend requires JSON findings cache. Use -Format All or -Format JSON. Ignoring -OutputAppend.\"",
+      "\"[adPEAS] Для -OutputAppend необходим JSON-кэш находок. Укажите -Format All или -Format JSON. Параметр игнорируется.\""
+    ],
+    [
+      "\"[adPEAS] -ExcludeModule leaves no module to run. Nothing to do.\"",
+      "\"[adPEAS] После исключения модулей через -ExcludeModule не осталось заданий. Выполнение завершено.\""
+    ],
+    [
+      "\"[adPEAS] Findings collection enabled (Format: $Format)\"",
+      "\"[adPEAS] Сбор результатов включён (формат: $Format)\""
+    ],
+    [
+      "\"[adPEAS] Directory '$OutputDir' did not exist and was created\"",
+      "\"[adPEAS] Каталог '$OutputDir' отсутствовал и был создан\""
+    ],
+    [
+      "\"[adPEAS] Could not create directory '$OutputDir': $_\"",
+      "\"[adPEAS] Не удалось создать каталог '$OutputDir': $_\""
+    ],
+    [
+      "\"[adPEAS] Unable to write text output to '$textPath', please check path and permissions!\"",
+      "\"[adPEAS] Невозможно записать текстовый отчёт в '$textPath'; проверьте путь и права доступа.\""
+    ],
+    [
+      "\"[adPEAS] -VerboseLogging: File logging requires -Outputfile with Text format. Verbose messages will be shown in console only.\"",
+      "\"[adPEAS] -VerboseLogging: для журнала в файл необходимы -Outputfile и формат Text. Подробности будут выводиться только в консоль.\""
+    ],
+    [
+      "\"[adPEAS] Script started: $StartTime\"",
+      "\"[adPEAS] Время начала: $StartTime\""
+    ],
+    [
+      "\"[adPEAS] Version: $Script:adPEASVersion\"",
+      "\"[adPEAS] Версия: $Script:adPEASVersion\""
+    ],
+    [
+      "\"[adPEAS] OPSEC mode enabled: No ASREPRoast/Kerberoast/BloodHound\"",
+      "\"[adPEAS] Включён OPSEC: ASREPRoast/Kerberoast/BloodHound отключены\""
+    ],
+    [
+      "\"[adPEAS] Reusing existing LDAP session\"",
+      "\"[adPEAS] Повторное использование действующей LDAP-сессии\""
+    ],
+    [
+      "\"[adPEAS] Reusing credentials from existing session\"",
+      "\"[adPEAS] Повторно используются учётные данные действующей сессии\""
+    ],
+    [
+      "\"[adPEAS] Reusing certificate authentication from existing session\"",
+      "\"[adPEAS] Повторно используется аутентификация по сертификату действующей сессии\""
+    ],
+    [
+      "\"[adPEAS] No authentication method specified - defaulting to Windows Authentication\"",
+      "\"[adPEAS] Метод аутентификации не указан — используется аутентификация Windows\""
+    ],
+    [
+      "\"[adPEAS] Verifying Domain Controller connectivity...\"",
+      "\"[adPEAS] Проверка доступности контроллера домена...\""
+    ],
+    [
+      "\"[adPEAS] Connection health check passed - DC is reachable\"",
+      "\"[adPEAS] Проверка соединения пройдена — контроллер домена доступен\""
+    ],
+    [
+      "\"[adPEAS] Cleared SessionInvalid flag from previous run\"",
+      "\"[adPEAS] Сброшен флаг SessionInvalid предыдущего запуска\""
+    ],
+    [
+      "\"[adPEAS] -OPSEC excludes BloodHound collection, which was the only module selected. Nothing to do.\"",
+      "\"[adPEAS] Режим -OPSEC исключает BloodHound — единственный выбранный модуль. Заданий нет.\""
+    ],
+    [
+      "\"[adPEAS] Executing Modules: $($Module -join ', ')\"",
+      "\"[adPEAS] Запускаемые модули: $($Module -join ', ')\""
+    ],
+    [
+      "\"[adPEAS] Could not load previous findings from '$appendCachePath': $_\"",
+      "\"[adPEAS] Не удалось прочитать прежние находки из '$appendCachePath': $_\""
+    ],
+    [
+      "\"[adPEAS] Continuing without append - creating fresh report\"",
+      "\"[adPEAS] Продолжение без добавления — создаётся новый отчёт\""
+    ],
+    [
+      "\"[adPEAS] No previous cache found at '$appendCachePath' - first append run\"",
+      "\"[adPEAS] Прежний кэш '$appendCachePath' не найден — первый запуск в режиме добавления\""
+    ],
+    [
+      "\"[adPEAS] Skipping checkpoint after module '$ModuleName' - session invalid\"",
+      "\"[adPEAS] Пропущена контрольная точка после '$ModuleName' — сессия недействительна\""
+    ],
+    [
+      "\"[adPEAS] Checkpoint after module '$ModuleName' failed: $_\"",
+      "\"[adPEAS] Ошибка контрольной точки после '$ModuleName': $_\""
+    ],
+    [
+      "\"[adPEAS] Skipping check '$CheckName' - session invalid\"",
+      "\"[adPEAS] Проверка '$CheckName' пропущена — сессия недействительна\""
+    ],
+    [
+      "\"[adPEAS] HTML report generated: $($Script:HTMLOutputPath)\"",
+      "\"[adPEAS] HTML-отчёт создан: $($Script:HTMLOutputPath)\""
+    ],
+    [
+      "\"[adPEAS] Error generating HTML report: $_\"",
+      "\"[adPEAS] Ошибка формирования HTML-отчёта: $_\""
+    ],
+    [
+      "\"[adPEAS] Findings JSON saved to: $jsonPath\"",
+      "\"[adPEAS] JSON с результатами сохранён: $jsonPath\""
+    ],
+    [
+      "\"[adPEAS] Could not save JSON export to '$jsonPath': $_\"",
+      "\"[adPEAS] Не удалось записать JSON в '$jsonPath': $_\""
+    ],
+    [
+      "\"[adPEAS] Session kept alive - use Disconnect-adPEAS to close\"",
+      "\"[adPEAS] Сессия оставлена активной — завершите её командой Disconnect-adPEAS\""
+    ],
+    [
+      "\"[adPEAS] adPEAS v2 completed\"",
+      "\"[adPEAS] Работа adPEAS v2 завершена\""
+    ]
+  ],
+  "src/modules/Core/Connect-adPEAS.ps1": [
+    [
+      "\"[Connect-adPEAS] Starting authentication process...\"",
+      "\"[Connect-adPEAS] Начало аутентификации...\""
+    ],
+    [
+      "\"[Connect-adPEAS] Existing session state detected - performing automatic cleanup...\"",
+      "\"[Connect-adPEAS] Обнаружена прежняя сессия — выполняется автоматическая очистка...\""
+    ],
+    [
+      "\"[Connect-adPEAS] Reverting existing NTLM impersonation...\"",
+      "\"[Connect-adPEAS] Отмена действующего олицетворения NTLM...\""
+    ],
+    [
+      "\"[Connect-adPEAS] NTLM impersonation reverted successfully\"",
+      "\"[Connect-adPEAS] Олицетворение NTLM успешно отменено\""
+    ],
+    [
+      "\"[Connect-adPEAS] Warning: Failed to revert NTLM impersonation: $_\"",
+      "\"[Connect-adPEAS] Не удалось отменить олицетворение NTLM: $_\""
+    ],
+    [
+      "\"[Connect-adPEAS] Previous LdapConnection disposed\"",
+      "\"[Connect-adPEAS] Предыдущее соединение LdapConnection закрыто\""
+    ],
+    [
+      "\"[Connect-adPEAS] Note: LdapConnection disposal: $_\"",
+      "\"[Connect-adPEAS] Примечание при закрытии LdapConnection: $_\""
+    ],
+    [
+      "\"[Connect-adPEAS] Cleaned up $($hostsResult.RemovedCount) hosts file entries from previous session\"",
+      "\"[Connect-adPEAS] Удалено записей hosts предыдущей сессии: $($hostsResult.RemovedCount)\""
+    ],
+    [
+      "\"[Connect-adPEAS] Warning: Hosts file cleanup failed: $_\"",
+      "\"[Connect-adPEAS] Не удалось очистить файл hosts: $_\""
+    ],
+    [
+      "\"[Connect-adPEAS] Session state cleanup completed\"",
+      "\"[Connect-adPEAS] Состояние прежней сессии очищено\""
+    ],
+    [
+      "\"[Connect-adPEAS] Loaded runtime license from: $License\"",
+      "\"[Connect-adPEAS] Лицензия выполнения загружена из: $License\""
+    ],
+    [
+      "\"[Connect-adPEAS] License file not found: $License\"",
+      "\"[Connect-adPEAS] Файл лицензии не найден: $License\""
+    ],
+    [
+      "\"[Connect-adPEAS] Parameter Set: $ParamSetDisplay\"",
+      "\"[Connect-adPEAS] Набор параметров: $ParamSetDisplay\""
+    ],
+    [
+      "\"PowerShell ISE is deprecated and not supported by adPEAS. Console output may be garbled. Use powershell.exe or VS Code instead.\"",
+      "\"PowerShell ISE устарела и не поддерживается adPEAS. Консольный вывод может отображаться некорректно. Используйте powershell.exe или VS Code.\""
+    ],
+    [
+      "\"[Connect-adPEAS] LDAPS mode enabled - DC reachability will check port 636\"",
+      "\"[Connect-adPEAS] Включён LDAPS — доступность контроллера домена проверяется по порту 636\""
+    ],
+    [
+      "\"[Connect-adPEAS] Custom DNS server specified: $DnsServer\"",
+      "\"[Connect-adPEAS] Указан собственный DNS-сервер: $DnsServer\""
+    ],
+    [
+      "\"[Connect-adPEAS] Custom DNS server can resolve $Domain\"",
+      "\"[Connect-adPEAS] Собственный DNS-сервер разрешает имя $Domain\""
+    ],
+    [
+      "\"[Connect-adPEAS] DNS server $DnsServer not reachable or cannot resolve '$Domain'\"",
+      "\"[Connect-adPEAS] DNS-сервер $DnsServer недоступен либо не разрешает имя '$Domain'\""
+    ],
+    [
+      "\"[Connect-adPEAS] -PatchHostsFile requires Administrator privileges!\"",
+      "\"[Connect-adPEAS] Параметру -PatchHostsFile нужны права администратора!\""
+    ],
+    [
+      "\"[Connect-adPEAS] Hosts file patching will be skipped. Run as Administrator for full functionality.\"",
+      "\"[Connect-adPEAS] Изменение файла hosts пропущено. Для полной функциональности запустите от имени администратора.\""
+    ],
+    [
+      "\"[Connect-adPEAS] Administrator privileges confirmed for hosts file patching\"",
+      "\"[Connect-adPEAS] Права администратора на изменение hosts подтверждены\""
+    ],
+    [
+      "\"[Connect-adPEAS] Early hosts file patching for Kerberos authentication...\"",
+      "\"[Connect-adPEAS] Предварительное изменение hosts для Kerberos...\""
+    ],
+    [
+      "\"[Connect-adPEAS] Could not resolve $earlyResolveTarget via custom DNS - hosts patching skipped\"",
+      "\"[Connect-adPEAS] Не удалось разрешить $earlyResolveTarget через собственный DNS — изменение hosts пропущено\""
+    ],
+    [
+      "\"[Connect-adPEAS] No domain specified, using current domain: $Domain\"",
+      "\"[Connect-adPEAS] Домен не указан — используется текущий: $Domain\""
+    ],
+    [
+      "\"[Connect-adPEAS] Establishing connection...\"",
+      "\"[Connect-adPEAS] Установка соединения...\""
+    ],
+    [
+      "\"[Connect-adPEAS] Authentication Method: $AuthMethodDisplay\"",
+      "\"[Connect-adPEAS] Метод аутентификации: $AuthMethodDisplay\""
+    ],
+    [
+      "\"[Connect-adPEAS] Username: $($Credential.UserName)\"",
+      "\"[Connect-adPEAS] Имя пользователя: $($Credential.UserName)\""
+    ],
+    [
+      "\"[Connect-adPEAS] Empty password provided (PASSWD_NOTREQD account)\"",
+      "\"[Connect-adPEAS] Получен пустой пароль (учётная запись PASSWD_NOTREQD)\""
+    ],
+    [
+      "\"[Connect-adPEAS] Password was numeric, converted to string\"",
+      "\"[Connect-adPEAS] Числовой пароль преобразован в строку\""
+    ],
+    [
+      "\"[Connect-adPEAS] Username normalized for SMB: $Username -> $CredentialUsername\"",
+      "\"[Connect-adPEAS] Имя пользователя нормализовано для SMB: $Username -> $CredentialUsername\""
+    ],
+    [
+      "\"[Connect-adPEAS] Using explicit NTLM authentication (AuthType::Ntlm)...\"",
+      "\"[Connect-adPEAS] Используется явная аутентификация NTLM (AuthType::Ntlm)...\""
+    ],
+    [
+      "\"[Connect-adPEAS] ForceNTLM: Using discovered DC: $($DCResolution.Hostname)\"",
+      "\"[Connect-adPEAS] ForceNTLM: обнаружен контроллер домена $($DCResolution.Hostname)\""
+    ],
+    [
+      "\"[Connect-adPEAS] Attempting Kerberos authentication...\"",
+      "\"[Connect-adPEAS] Попытка аутентификации Kerberos...\""
+    ],
+    [
+      "\"[Connect-adPEAS] Kerberos authentication failed: $ErrorMessage (ErrorCode: $KdcErrorCode)\"",
+      "\"[Connect-adPEAS] Ошибка аутентификации Kerberos: $ErrorMessage (код $KdcErrorCode)\""
+    ],
+    [
+      "\"[Connect-adPEAS] Cross-domain: Kerberos failed, allowing NTLM/SimpleBind fallback\"",
+      "\"[Connect-adPEAS] Междоменное подключение: ошибка Kerberos, возможен переход на NTLM/SimpleBind\""
+    ],
+    [
+      "\"[Connect-adPEAS] Custom DNS active without hosts patching - SimpleBind fallback\"",
+      "\"[Connect-adPEAS] Используется собственный DNS без изменения hosts — переход на SimpleBind\""
+    ],
+    [
+      "\"[Connect-adPEAS] LDAPS transport failed ($Script:ConnectionState) - no authentication fallback can help\"",
+      "\"[Connect-adPEAS] Ошибка транспорта LDAPS ($Script:ConnectionState) — смена метода аутентификации не поможет\""
+    ],
+    [
+      "\"[Connect-adPEAS] Attempting explicit NTLM fallback (AuthType::Ntlm)...\"",
+      "\"[Connect-adPEAS] Резервная попытка явной аутентификации NTLM (AuthType::Ntlm)...\""
+    ],
+    [
+      "\"[Connect-adPEAS] LDAPS transport failed ($Script:ConnectionState) - not attempting SimpleBind\"",
+      "\"[Connect-adPEAS] Ошибка транспорта LDAPS ($Script:ConnectionState) — SimpleBind не выполняется\""
+    ],
+    [
+      "\"[Connect-adPEAS] LDAP connection failed with explicit NTLM - trying SimpleBind...\"",
+      "\"[Connect-adPEAS] Соединение LDAP через явный NTLM не удалось — попытка SimpleBind...\""
+    ],
+    [
+      "\"[Connect-adPEAS] Using SimpleBind authentication...\"",
+      "\"[Connect-adPEAS] Используется аутентификация SimpleBind...\""
+    ],
+    [
+      "\"[Connect-adPEAS] SimpleBind failed with LDAP_STRONG_AUTH_REQUIRED - auto-upgrading to LDAPS...\"",
+      "\"[Connect-adPEAS] SimpleBind отклонён (LDAP_STRONG_AUTH_REQUIRED) — автоматический переход на LDAPS...\""
+    ],
+    [
+      "\"[!] -ForceKerberos has no effect with -ForcePassTheCert\"",
+      "\"[!] -ForceKerberos не действует при -ForcePassTheCert\""
+    ],
+    [
+      "\"[!] Pass-the-Cert always uses Schannel (TLS client cert), never Kerberos\"",
+      "\"[!] Pass-the-Cert использует Schannel (клиентский TLS-сертификат), а не Kerberos\""
+    ],
+    [
+      "\"[Connect-adPEAS] Using Pass-the-Cert (Schannel) - bypassing Kerberos\"",
+      "\"[Connect-adPEAS] Используется Pass-the-Cert (Schannel), Kerberos пропускается\""
+    ],
+    [
+      "\"[Connect-adPEAS] LDAPS automatically enabled for Pass-the-Cert\"",
+      "\"[Connect-adPEAS] LDAPS автоматически включён для Pass-the-Cert\""
+    ]
+  ],
+  "src/modules/Core/Connect-LDAP.ps1": [
+    [
+      "\"[Connect-LDAP] Starting LDAP connection...\"",
+      "\"[Connect-LDAP] Начало подключения LDAP...\""
+    ],
+    [
+      "\"[Connect-LDAP] AsGlobalCatalog requires -Domain and -Server parameters\"",
+      "\"[Connect-LDAP] Для AsGlobalCatalog необходимы -Domain и -Server\""
+    ],
+    [
+      "\"[Connect-LDAP] GC mode: Server=$Server, Domain=$Domain\"",
+      "\"[Connect-LDAP] Режим GC: сервер=$Server, домен=$Domain\""
+    ],
+    [
+      "\"[Connect-LDAP] No domain specified, attempting automatic discovery...\"",
+      "\"[Connect-LDAP] Домен не указан, запускается автообнаружение...\""
+    ],
+    [
+      "\"[Connect-LDAP] Automatically detected domain: $Domain\"",
+      "\"[Connect-LDAP] Автоматически обнаружен домен: $Domain\""
+    ],
+    [
+      "\"[Connect-LDAP] No server specified, using domain name: $Domain\"",
+      "\"[Connect-LDAP] Сервер не указан — используется имя домена: $Domain\""
+    ],
+    [
+      "\"[Connect-LDAP] Domain DN: $DomainDN\"",
+      "\"[Connect-LDAP] DN домена: $DomainDN\""
+    ],
+    [
+      "\"[Connect-LDAP] Testing DNS resolution for: $Server\"",
+      "\"[Connect-LDAP] Проверка DNS для: $Server\""
+    ],
+    [
+      "\"[Connect-LDAP] Using custom DNS server: $CustomDnsServer\"",
+      "\"[Connect-LDAP] Используется собственный DNS-сервер: $CustomDnsServer\""
+    ],
+    [
+      "\"[Connect-LDAP] DNS resolution via custom DNS successful: $ResolvedIPString\"",
+      "\"[Connect-LDAP] Разрешение имени через собственный DNS успешно: $ResolvedIPString\""
+    ],
+    [
+      "\"[Connect-LDAP] DNS resolution successful: $ResolvedIPString\"",
+      "\"[Connect-LDAP] Разрешение DNS успешно: $ResolvedIPString\""
+    ],
+    [
+      "\"[Connect-LDAP] Testing port reachability to: $ConnectTarget\"",
+      "\"[Connect-LDAP] Проверка доступности порта узла: $ConnectTarget\""
+    ],
+    [
+      "\"[Connect-LDAP] Server is reachable on port $TestPort\"",
+      "\"[Connect-LDAP] Сервер доступен на порту $TestPort\""
+    ],
+    [
+      "\"[Connect-LDAP] Port test failed: $_\"",
+      "\"[Connect-LDAP] Ошибка проверки порта: $_\""
+    ],
+    [
+      "\"[Connect-LDAP] Testing SSL/TLS handshake on port $SSLPort...\"",
+      "\"[Connect-LDAP] Проверка согласования SSL/TLS на порту $SSLPort...\""
+    ],
+    [
+      "\"[Connect-LDAP] SSL/TLS handshake successful\"",
+      "\"[Connect-LDAP] Согласование SSL/TLS успешно\""
+    ],
+    [
+      "\"[Connect-LDAP] SSL Protocol: $($SslStream.SslProtocol)\"",
+      "\"[Connect-LDAP] Протокол SSL: $($SslStream.SslProtocol)\""
+    ],
+    [
+      "\"[Connect-LDAP] Cipher: $($SslStream.CipherAlgorithm)\"",
+      "\"[Connect-LDAP] Алгоритм шифрования: $($SslStream.CipherAlgorithm)\""
+    ],
+    [
+      "\"[Connect-LDAP] Certificate Subject: $($SslStream.RemoteCertificate.Subject)\"",
+      "\"[Connect-LDAP] Субъект сертификата: $($SslStream.RemoteCertificate.Subject)\""
+    ],
+    [
+      "\"[Connect-LDAP] Certificate Issuer: $($SslStream.RemoteCertificate.Issuer)\"",
+      "\"[Connect-LDAP] Издатель сертификата: $($SslStream.RemoteCertificate.Issuer)\""
+    ],
+    [
+      "\"[Connect-LDAP] Certificate chain pre-cached (CRL check disabled)\"",
+      "\"[Connect-LDAP] Цепочка сертификатов закэширована (CRL не проверяется)\""
+    ],
+    [
+      "\"[Connect-LDAP] Certificate chain pre-cache failed (non-critical): $_\"",
+      "\"[Connect-LDAP] Не удалось закэшировать цепочку сертификатов (некритично): $_\""
+    ],
+    [
+      "\"[Connect-LDAP] SSL/TLS handshake FAILED: $($sslErrorInfo.Message)\"",
+      "\"[Connect-LDAP] ОШИБКА согласования SSL/TLS: $($sslErrorInfo.Message)\""
+    ],
+    [
+      "\"[Connect-LDAP] Consider using -IgnoreSSLErrors parameter\"",
+      "\"[Connect-LDAP] При необходимости используйте параметр -IgnoreSSLErrors\""
+    ],
+    [
+      "\"[Connect-LDAP] Skipping anonymous access check for GC mode\"",
+      "\"[Connect-LDAP] Проверка анонимного доступа пропущена для GC\""
+    ],
+    [
+      "\"[Connect-LDAP] Skipping anonymous access check for LDAPS (rarely enabled over SSL)\"",
+      "\"[Connect-LDAP] Проверка анонимного доступа пропущена для LDAPS (редко разрешена поверх SSL)\""
+    ],
+    [
+      "\"[Connect-LDAP] Using hostname for LDAP connection: $LDAPTarget\"",
+      "\"[Connect-LDAP] Для LDAP используется имя узла: $LDAPTarget\""
+    ],
+    [
+      "\"[Connect-LDAP] Attempting $ProtocolDisplay connection to ${LDAPTarget}:${LDAPPort}...\"",
+      "\"[Connect-LDAP] Попытка соединения $ProtocolDisplay с ${LDAPTarget}:${LDAPPort}...\""
+    ],
+    [
+      "\"[Connect-LDAP] Using System.DirectoryServices.Protocols.LdapConnection for $ProtocolDisplay...\"",
+      "\"[Connect-LDAP] Используется System.DirectoryServices.Protocols.LdapConnection для $ProtocolDisplay...\""
+    ],
+    [
+      "\"[Connect-LDAP] Configured timeouts: Operation=${TimeoutSeconds}s, Send=${SendTimeoutSeconds}s\"",
+      "\"[Connect-LDAP] Таймауты: операция=${TimeoutSeconds}с, отправка=${SendTimeoutSeconds}с\""
+    ],
+    [
+      "\"[Connect-LDAP] Referral chasing disabled (domain-local queries only)\"",
+      "\"[Connect-LDAP] Переадресация LDAP отключена (запросы только внутри домена)\""
+    ],
+    [
+      "\"[Connect-LDAP] SSL certificate validation disabled (IgnoreSSLErrors)\"",
+      "\"[Connect-LDAP] Проверка сертификата SSL отключена (IgnoreSSLErrors)\""
+    ],
+    [
+      "\"[Connect-LDAP] Configuring explicit NTLM authentication (Sicily): $NtlmDomain\\$NtlmUser\"",
+      "\"[Connect-LDAP] Явная NTLM-аутентификация (Sicily): $NtlmDomain\\$NtlmUser\""
+    ],
+    [
+      "\"[Connect-LDAP] Username from credential (NETBIOS format): $UserName\"",
+      "\"[Connect-LDAP] Имя пользователя из учётных данных (формат NETBIOS): $UserName\""
+    ],
+    [
+      "\"[Connect-LDAP] Username from credential (UPN format): $UserName\"",
+      "\"[Connect-LDAP] Имя пользователя из учётных данных (формат UPN): $UserName\""
+    ],
+    [
+      "\"[Connect-LDAP] Username qualified for SimpleBind (UPN): $UserName\"",
+      "\"[Connect-LDAP] Уточнено имя пользователя SimpleBind (UPN): $UserName\""
+    ],
+    [
+      "\"[Connect-LDAP] WARNING: Username '$UserName' is not domain-qualified and no domain available\"",
+      "\"[Connect-LDAP] ПРЕДУПРЕЖДЕНИЕ: в '$UserName' не указан домен; данные о домене отсутствуют\""
+    ],
+    [
+      "\"[Connect-LDAP] Configuring SimpleBind with credentials: $UserName\"",
+      "\"[Connect-LDAP] Настройка SimpleBind для $UserName\""
+    ],
+    [
+      "\"[Connect-LDAP] Configuring Negotiate (Kerberos/NTLM) authentication\"",
+      "\"[Connect-LDAP] Настройка аутентификации Negotiate (Kerberos/NTLM)\""
+    ],
+    [
+      "\"[Connect-LDAP] Binding to $ProtocolDisplay server...\"",
+      "\"[Connect-LDAP] Привязка к серверу $ProtocolDisplay...\""
+    ],
+    [
+      "\"[Connect-LDAP] $ProtocolDisplay bind successful! ($($bindStopwatch.ElapsedMilliseconds)ms)\"",
+      "\"[Connect-LDAP] Привязка $ProtocolDisplay успешна! ($($bindStopwatch.ElapsedMilliseconds) мс)\""
+    ],
+    [
+      "\"[Connect-LDAP] GC mode: ${LDAPTarget}:${LDAPPort} is NOT a Global Catalog (isGlobalCatalogReady != TRUE)\"",
+      "\"[Connect-LDAP] Режим GC: ${LDAPTarget}:${LDAPPort} НЕ является глобальным каталогом (isGlobalCatalogReady != TRUE)\""
+    ],
+    [
+      "\"[Connect-LDAP] GC mode: Could not verify GC status on ${LDAPTarget}:${LDAPPort}: $($_.Exception.Message)\"",
+      "\"[Connect-LDAP] Режим GC: состояние GC на ${LDAPTarget}:${LDAPPort} проверить не удалось: $($_.Exception.Message)\""
+    ],
+    [
+      "\"[Connect-LDAP] GC mode: Connection to ${LDAPTarget}:${LDAPPort} established and verified as Global Catalog\"",
+      "\"[Connect-LDAP] Режим GC: соединение с ${LDAPTarget}:${LDAPPort} установлено и подтверждено как глобальный каталог\""
+    ],
+    [
+      "\"[Connect-LDAP] Testing $ProtocolDisplay connection with search query...\"",
+      "\"[Connect-LDAP] Проверка соединения $ProtocolDisplay поисковым запросом...\""
+    ],
+    [
+      "\"[Connect-LDAP] Connection state: AuthType=$($LdapProtocolConn.AuthType), AutoBind=$($LdapProtocolConn.AutoBind)\"",
+      "\"[Connect-LDAP] Состояние соединения: AuthType=$($LdapProtocolConn.AuthType), AutoBind=$($LdapProtocolConn.AutoBind)\""
+    ],
+    [
+      "\"[Connect-LDAP] Client certificates count: $($LdapProtocolConn.ClientCertificates.Count)\"",
+      "\"[Connect-LDAP] Клиентских сертификатов: $($LdapProtocolConn.ClientCertificates.Count)\""
+    ],
+    [
+      "\"[Connect-LDAP] $ProtocolDisplay search successful! DN: $TestDN\"",
+      "\"[Connect-LDAP] Поиск $ProtocolDisplay успешен! DN: $TestDN\""
+    ],
+    [
+      "\"[Connect-LDAP] LdapConnection stored for all LDAP operations\"",
+      "\"[Connect-LDAP] LdapConnection сохранён для операций LDAP\""
+    ],
+    [
+      "\"[Connect-LDAP] Retrieving RootDSE via LdapConnection...\"",
+      "\"[Connect-LDAP] Получение RootDSE через LdapConnection...\""
+    ],
+    [
+      "\"[Connect-LDAP] Sending RootDSE request for attributes: $($attributesToExtract -join ', ')\"",
+      "\"[Connect-LDAP] Запрос RootDSE для атрибутов: $($attributesToExtract -join ', ')\""
+    ],
+    [
+      "\"[Connect-LDAP] RootDSE entry returned, Attributes.Count = $($RootDSEEntry.Attributes.Count)\"",
+      "\"[Connect-LDAP] Получена запись RootDSE; атрибутов: $($RootDSEEntry.Attributes.Count)\""
+    ],
+    [
+      "\"[Connect-LDAP] RootDSE attribute $attrName = $value\"",
+      "\"[Connect-LDAP] Атрибут RootDSE $attrName = $value\""
+    ],
+    [
+      "\"[Connect-LDAP] RootDSE attribute $attrName not found in server response\"",
+      "\"[Connect-LDAP] Атрибут RootDSE $attrName не найден в ответе сервера\""
+    ],
+    [
+      "\"[Connect-LDAP] RootDSE retrieved successfully with $($RootDSEData.Count) attributes\"",
+      "\"[Connect-LDAP] RootDSE получен; атрибутов: $($RootDSEData.Count)\""
+    ],
+    [
+      "\"[Connect-LDAP] Retrieving Domain SID via LdapConnection...\"",
+      "\"[Connect-LDAP] Чтение SID домена через LdapConnection...\""
+    ],
+    [
+      "\"[Connect-LDAP] Domain SID: $DomainSID\"",
+      "\"[Connect-LDAP] SID домена: $DomainSID\""
+    ],
+    [
+      "\"[Connect-LDAP] Could not retrieve Domain SID: $_\"",
+      "\"[Connect-LDAP] Не удалось получить SID домена: $_\""
+    ],
+    [
+      "\"[Connect-LDAP] Domain NetBIOS name (from crossRef): $DomainNetBIOS\"",
+      "\"[Connect-LDAP] Имя NetBIOS домена из crossRef: $DomainNetBIOS\""
+    ],
+    [
+      "\"[Connect-LDAP] Could not resolve NetBIOS name from crossRef: $_\"",
+      "\"[Connect-LDAP] Не удалось определить NetBIOS через crossRef: $_\""
+    ],
+    [
+      "\"[Connect-LDAP] NetBIOS name not resolved via crossRef - falling back to DNS label guess: $DomainNetBIOS\"",
+      "\"[Connect-LDAP] NetBIOS не определён через crossRef — предполагается метка DNS: $DomainNetBIOS\""
+    ],
+    [
+      "\"[Connect-LDAP] Verifying authenticated user context via LDAP...\"",
+      "\"[Connect-LDAP] Проверка пользователя через LDAP...\""
+    ],
+    [
+      "\"[Connect-LDAP] Using explicit credential: $AuthenticatedUser\"",
+      "\"[Connect-LDAP] Используются явные учётные данные: $AuthenticatedUser\""
+    ],
+    [
+      "\"[Connect-LDAP] Verified user: $AuthenticatedUserDN\"",
+      "\"[Connect-LDAP] Пользователь проверен: $AuthenticatedUserDN\""
+    ],
+    [
+      "\"[Connect-LDAP] Could not verify user via LDAP: $_\"",
+      "\"[Connect-LDAP] Не удалось проверить пользователя через LDAP: $_\""
+    ],
+    [
+      "\"[Connect-LDAP] Using LDAP Who Am I? Extended Operation...\"",
+      "\"[Connect-LDAP] Выполняется расширенная операция LDAP Who Am I?...\""
+    ],
+    [
+      "\"[Connect-LDAP] LDAP Who Am I? response: $WhoAmIResult\"",
+      "\"[Connect-LDAP] Ответ LDAP Who Am I?: $WhoAmIResult\""
+    ],
+    [
+      "\"[Connect-LDAP] Authenticated user from LDAP: $AuthenticatedUser\"",
+      "\"[Connect-LDAP] Аутентифицированный пользователь LDAP: $AuthenticatedUser\""
+    ],
+    [
+      "\"[Connect-LDAP] LDAP Who Am I? failed: $_ - falling back to LSA ticket cache\"",
+      "\"[Connect-LDAP] Ошибка LDAP Who Am I?: $_; переход к кэшу билетов LSA\""
+    ],
+    [
+      "\"[Connect-LDAP] Found user via LSA ticket cache: $AuthenticatedUser\"",
+      "\"[Connect-LDAP] Пользователь определён по кэшу билетов LSA: $AuthenticatedUser\""
+    ],
+    [
+      "\"[Connect-LDAP] Kerberos authenticated but no valid TGT in cache\"",
+      "\"[Connect-LDAP] Kerberos выполнен, но действующий TGT в кэше отсутствует\""
+    ],
+    [
+      "\"[Connect-LDAP] LSA ticket cache query failed: $_\"",
+      "\"[Connect-LDAP] Ошибка чтения кэша билетов LSA: $_\""
+    ],
+    [
+      "\"[Connect-LDAP] '$AuthenticatedUser' is not an account name of $DomainNetBIOS - not looked up\"",
+      "\"[Connect-LDAP] '$AuthenticatedUser' не является именем учётной записи домена $DomainNetBIOS — поиск пропущен\""
+    ],
+    [
+      "\"[Connect-LDAP] Bound account: $AuthenticatedUserDN ($AuthenticatedUserSID)\"",
+      "\"[Connect-LDAP] Привязанная учётная запись: $AuthenticatedUserDN ($AuthenticatedUserSID)\""
+    ],
+    [
+      "\"[Connect-LDAP] Could not read the bound account $AuthenticatedUser : $_\"",
+      "\"[Connect-LDAP] Не удалось прочитать привязанную учётную запись $AuthenticatedUser — $_\""
+    ],
+    [
+      "\"[Connect-LDAP] Final Authenticated User: $AuthenticatedUser\"",
+      "\"[Connect-LDAP] Итоговый аутентифицированный пользователь: $AuthenticatedUser\""
+    ],
+    [
+      "\"[Connect-LDAP] Kerberos authentication detected (Who Am I? returned domain user)\"",
+      "\"[Connect-LDAP] Обнаружен Kerberos (Who Am I? вернул доменного пользователя)\""
+    ],
+    [
+      "\"[Connect-LDAP] User verification failed (non-critical): $_\"",
+      "\"[Connect-LDAP] Ошибка проверки пользователя (некритично): $_\""
+    ],
+    [
+      "\"[Connect-LDAP] Set AuthMethod: $($Script:LDAPContext['AuthMethod'])\"",
+      "\"[Connect-LDAP] Установлен AuthMethod: $($Script:LDAPContext['AuthMethod'])\""
+    ],
+    [
+      "\"[Connect-LDAP] Connection established successfully\"",
+      "\"[Connect-LDAP] Соединение успешно установлено\""
+    ],
+    [
+      "\"[Connect-LDAP] Domain: $Domain, Server: $ActualDCName, Protocol: $ProtocolDisplay\"",
+      "\"[Connect-LDAP] Домен: $Domain, сервер: $ActualDCName, протокол: $ProtocolDisplay\""
+    ],
+    [
+      "\"[Connect-LDAP] LDAP connection setup completed\"",
+      "\"[Connect-LDAP] Настройка LDAP-соединения завершена\""
+    ]
+  ],
+  "src/modules/Helpers/Resolve-adPEASName.ps1": [
+    [
+      "\"[Invoke-RawDnsQuery] Label exceeds 63 bytes limit: $label\"",
+      "\"[Invoke-RawDnsQuery] Метка DNS превышает предел 63 байта: $label\""
+    ],
+    [
+      "\"[Invoke-RawDnsQuery] Response too short: $($response.Length) bytes\"",
+      "\"[Invoke-RawDnsQuery] Слишком короткий ответ DNS: $($response.Length) байт\""
+    ],
+    [
+      "\"[Invoke-RawDnsQuery] Transaction ID mismatch\"",
+      "\"[Invoke-RawDnsQuery] Несовпадение идентификатора транзакции\""
+    ],
+    [
+      "\"[Invoke-RawDnsQuery] DNS error, RCODE: $rcode\"",
+      "\"[Invoke-RawDnsQuery] Ошибка DNS, код RCODE: $rcode\""
+    ],
+    [
+      "\"[Invoke-RawDnsQuery] No answers in response\"",
+      "\"[Invoke-RawDnsQuery] Ответ DNS не содержит записей\""
+    ],
+    [
+      "\"[Invoke-RawDnsQuery] Maximum pointer depth exceeded, possible malformed DNS response\"",
+      "\"[Invoke-RawDnsQuery] Превышена глубина указателей; возможен некорректный ответ DNS\""
+    ],
+    [
+      "\"[Invoke-RawDnsQuery] Cyclic pointer detected at offset $pointer, malformed DNS response\"",
+      "\"[Invoke-RawDnsQuery] Зацикленный указатель по смещению $pointer; некорректный ответ DNS\""
+    ],
+    [
+      "\"[Invoke-RawDnsQuery] Found $($srvRecords.Count) SRV record(s)\"",
+      "\"[Invoke-RawDnsQuery] Найдено SRV-записей: $($srvRecords.Count)\""
+    ],
+    [
+      "\"[Invoke-RawDnsQuery] Returning best SRV: $($bestRecord.Target):$($bestRecord.Port) (Priority: $($bestRecord.Priority))\"",
+      "\"[Invoke-RawDnsQuery] Возвращается предпочтительная SRV-запись: $($bestRecord.Target):$($bestRecord.Port) (приоритет: $($bestRecord.Priority))\""
+    ],
+    [
+      "\"[Invoke-RawDnsQuery] No $Type record found in response\"",
+      "\"[Invoke-RawDnsQuery] В ответе отсутствует запись типа $Type\""
+    ],
+    [
+      "\"[Invoke-RawDnsQuery] Error: $_\"",
+      "\"[Invoke-RawDnsQuery] Ошибка: $_\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] Input is already an IP address: $Hostname\"",
+      "\"[Resolve-HostnameToIP] Исходное значение уже является IP-адресом: $Hostname\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] Cache hit for $Hostname : $cachedIP\"",
+      "\"[Resolve-HostnameToIP] Найдено в кэше для $Hostname : $cachedIP\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] Resolving $Hostname using custom DNS: $DnsServer\"",
+      "\"[Resolve-HostnameToIP] Разрешение $Hostname через указанный DNS-сервер: $DnsServer\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] Resolved $Hostname to $ResolvedIP via Resolve-DnsName\"",
+      "\"[Resolve-HostnameToIP] Имя $Hostname разрешено в $ResolvedIP через Resolve-DnsName\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] Resolve-DnsName cmdlet not available, trying UDP fallback\"",
+      "\"[Resolve-HostnameToIP] Resolve-DnsName недоступен; используется резервный запрос UDP\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] Resolve-DnsName failed: $_\"",
+      "\"[Resolve-HostnameToIP] Ошибка Resolve-DnsName: $_\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] Resolved $Hostname to $UdpResult via UDP DNS\"",
+      "\"[Resolve-HostnameToIP] Имя $Hostname разрешено в $UdpResult через DNS-запрос UDP\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] UDP DNS query failed: $_\"",
+      "\"[Resolve-HostnameToIP] Ошибка запроса UDP DNS: $_\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] Resolving $Hostname using system DNS\"",
+      "\"[Resolve-HostnameToIP] Разрешение $Hostname через системный DNS\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] Resolved $Hostname to $ResolvedIP via system DNS\"",
+      "\"[Resolve-HostnameToIP] Имя $Hostname разрешено в $ResolvedIP через системный DNS\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] System DNS resolution failed: $_\"",
+      "\"[Resolve-HostnameToIP] Ошибка разрешения имени системным DNS: $_\""
+    ],
+    [
+      "\"[Resolve-HostnameToIP] Failed to resolve $Hostname\"",
+      "\"[Resolve-HostnameToIP] Не удалось разрешить имя $Hostname\""
+    ],
+    [
+      "\"[Test-DCReachable] $DisplayName - Port 88 (Kerberos) OK\"",
+      "\"[Test-DCReachable] $DisplayName — порт 88 (Kerberos) доступен\""
+    ],
+    [
+      "\"[Test-DCReachable] $DisplayName - Port $LdapPort (LDAP) OK - DC is reachable\"",
+      "\"[Test-DCReachable] $DisplayName — порт $LdapPort (LDAP) доступен; контроллер домена отвечает\""
+    ],
+    [
+      "\"[Test-DCReachable] $DisplayName - Port $LdapPort (LDAP) FAILED\"",
+      "\"[Test-DCReachable] $DisplayName — порт $LdapPort (LDAP) недоступен\""
+    ],
+    [
+      "\"[Test-DCReachable] $DisplayName - Port 88 (Kerberos) FAILED - not a reachable DC\"",
+      "\"[Test-DCReachable] $DisplayName — порт 88 (Kerberos) недоступен; контроллер домена не отвечает\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Resolving SRV $Name using custom DNS: $DnsServer\"",
+      "\"[Resolve-SrvRecord] Разрешение SRV $Name через указанный DNS-сервер: $DnsServer\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Found $($AllRecords.Count) SRV record(s) via Resolve-DnsName\"",
+      "\"[Resolve-SrvRecord] Найдено SRV-записей через Resolve-DnsName: $($AllRecords.Count)\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Resolve-DnsName cmdlet not available, trying UDP fallback\"",
+      "\"[Resolve-SrvRecord] Resolve-DnsName недоступен; используется резервный запрос UDP\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Resolve-DnsName failed: $_\"",
+      "\"[Resolve-SrvRecord] Ошибка Resolve-DnsName: $_\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Found $($UdpResult.Count) SRV record(s) via UDP DNS\"",
+      "\"[Resolve-SrvRecord] Найдено SRV-записей через UDP DNS: $($UdpResult.Count)\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Found SRV: $($UdpResult.Target):$($UdpResult.Port) via UDP DNS\"",
+      "\"[Resolve-SrvRecord] Найдена SRV-запись: $($UdpResult.Target):$($UdpResult.Port) через UDP DNS\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] UDP DNS query failed: $_\"",
+      "\"[Resolve-SrvRecord] Ошибка запроса UDP DNS: $_\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Resolving SRV $Name using system DNS\"",
+      "\"[Resolve-SrvRecord] Разрешение SRV $Name через системный DNS\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Found $($AllRecords.Count) SRV record(s) via system DNS\"",
+      "\"[Resolve-SrvRecord] Найдено SRV-записей через системный DNS: $($AllRecords.Count)\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Resolve-DnsName not available for system SRV lookup\"",
+      "\"[Resolve-SrvRecord] Resolve-DnsName недоступен для системного поиска SRV\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] System DNS SRV lookup failed: $_\"",
+      "\"[Resolve-SrvRecord] Ошибка системного поиска SRV через DNS: $_\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Trying UDP SRV query via system DNS: $SystemDnsServer\"",
+      "\"[Resolve-SrvRecord] Резервный запрос SRV по UDP через системный DNS: $SystemDnsServer\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Found $($UdpResult.Count) SRV record(s) via UDP system DNS\"",
+      "\"[Resolve-SrvRecord] Найдено SRV-записей через системный DNS по UDP: $($UdpResult.Count)\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Found SRV: $($UdpResult.Target):$($UdpResult.Port) via UDP system DNS\"",
+      "\"[Resolve-SrvRecord] Найдена SRV-запись: $($UdpResult.Target):$($UdpResult.Port) через системный DNS по UDP\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] UDP system DNS SRV query failed: $_\"",
+      "\"[Resolve-SrvRecord] Ошибка системного запроса SRV по UDP: $_\""
+    ],
+    [
+      "\"[Resolve-SrvRecord] Failed to resolve SRV record: $Name\"",
+      "\"[Resolve-SrvRecord] Не удалось разрешить SRV-запись: $Name\""
+    ],
+    [
+      "\"[Resolve-adPEASName] Querying SRV records: $SrvRecordName\"",
+      "\"[Resolve-adPEASName] Запрос SRV-записей: $SrvRecordName\""
+    ],
+    [
+      "\"[Resolve-adPEASName] Found $($SrvResults.Count) DC(s) via SRV records\"",
+      "\"[Resolve-adPEASName] Найдено контроллеров домена по SRV: $($SrvResults.Count)\""
+    ],
+    [
+      "\"[Resolve-adPEASName] Trying DC: $DcHostname (Priority: $($SrvRecord.Priority), Weight: $($SrvRecord.Weight))\"",
+      "\"[Resolve-adPEASName] Проверка контроллера домена $DcHostname (приоритет: $($SrvRecord.Priority), вес: $($SrvRecord.Weight))\""
+    ],
+    [
+      "\"[Resolve-adPEASName] Could not resolve $DcHostname to IP, trying next DC\"",
+      "\"[Resolve-adPEASName] Не удалось определить IP узла $DcHostname; переход к следующему контроллеру\""
+    ],
+    [
+      "\"[Resolve-adPEASName] DC $DcHostname ($DcIP) is reachable - using this DC\"",
+      "\"[Resolve-adPEASName] Контроллер $DcHostname ($DcIP) доступен; используется этот узел\""
+    ],
+    [
+      "\"[Resolve-adPEASName] DC $DcHostname ($DcIP) is NOT reachable (stale SRV record?), trying next DC\"",
+      "\"[Resolve-adPEASName] Контроллер $DcHostname ($DcIP) недоступен (устаревшая SRV-запись?); переход к следующему\""
+    ],
+    [
+      "\"[Resolve-adPEASName] All $($SrvResults.Count) DC(s) from SRV records are unreachable\"",
+      "\"[Resolve-adPEASName] Все контроллеры домена по SRV недоступны: $($SrvResults.Count)\""
+    ],
+    [
+      "\"[Resolve-adPEASName] Attempting reverse DNS lookup for: $Domain\"",
+      "\"[Resolve-adPEASName] Обратный DNS-поиск для: $Domain\""
+    ],
+    [
+      "\"[Resolve-adPEASName] Domain resolved to IP: $DcIPString\"",
+      "\"[Resolve-adPEASName] Домен разрешён в IP-адрес: $DcIPString\""
+    ],
+    [
+      "\"[Resolve-adPEASName] Reverse DNS resolved: $DcHostname\"",
+      "\"[Resolve-adPEASName] Обратный DNS-поиск вернул: $DcHostname\""
+    ],
+    [
+      "\"[Resolve-adPEASName] Reverse DNS lookup failed, using domain name as hostname: $_\"",
+      "\"[Resolve-adPEASName] Ошибка обратного DNS; вместо имени узла используется домен: $_\""
+    ],
+    [
+      "\"[Resolve-adPEASName] DC $DcHostname ($DcIPString) via reverse DNS is reachable\"",
+      "\"[Resolve-adPEASName] Контроллер $DcHostname ($DcIPString) доступен через обратный DNS\""
+    ],
+    [
+      "\"[Resolve-adPEASName] DC $DcHostname ($DcIPString) via reverse DNS is NOT reachable\"",
+      "\"[Resolve-adPEASName] Контроллер $DcHostname ($DcIPString) недоступен через обратный DNS\""
+    ],
+    [
+      "\"[Resolve-adPEASName] System DNS resolution failed: $_\"",
+      "\"[Resolve-adPEASName] Ошибка системного разрешения DNS: $_\""
+    ],
+    [
+      "\"[Resolve-adPEASName] Falling back to direct domain resolution\"",
+      "\"[Resolve-adPEASName] Резервный вариант: прямое разрешение имени домена\""
+    ],
+    [
+      "\"[Resolve-adPEASName] DC $Domain ($DomainIP) via direct resolution is reachable\"",
+      "\"[Resolve-adPEASName] Контроллер $Domain ($DomainIP) доступен через прямое разрешение\""
+    ],
+    [
+      "\"[Resolve-adPEASName] DC $Domain ($DomainIP) via direct resolution is NOT reachable\"",
+      "\"[Resolve-adPEASName] Контроллер $Domain ($DomainIP) недоступен через прямое разрешение\""
+    ],
+    [
+      "\"[Resolve-adPEASName] Could not discover reachable DC for domain: $Domain\"",
+      "\"[Resolve-adPEASName] Не удалось обнаружить доступный контроллер для домена: $Domain\""
+    ]
+  ],
+  "src/modules/Helpers/Test-IsPrivileged.ps1": [
+    [
+      "\"[Clear-PrivilegedCheckCache] Cache cleared\"",
+      "\"[Clear-PrivilegedCheckCache] Кэш очищен\""
+    ],
+    [
+      "\"[Clear-GroupMembershipCache] Cache cleared\"",
+      "\"[Clear-GroupMembershipCache] Кэш очищен\""
+    ],
+    [
+      "\"[Test-IsExchangeServiceGroup] Failed to resolve sAMAccountName: $Identity\"",
+      "\"[Test-IsExchangeServiceGroup] Не удалось определить sAMAccountName: $Identity\""
+    ],
+    [
+      "\"[Test-IsExchangeServiceGroup] Failed to resolve SID to DN: $sid\"",
+      "\"[Test-IsExchangeServiceGroup] Не удалось преобразовать SID в DN: $sid\""
+    ],
+    [
+      "\"[Test-IsExchangeServiceGroup] Exchange service group detected: $dn\"",
+      "\"[Test-IsExchangeServiceGroup] Обнаружена сервисная группа Exchange: $dn\""
+    ],
+    [
+      "\"[Test-IsExchangeServer] Exchange Server detected: $computerName (SPNs: $($exchangeSPNs -join ', '))\"",
+      "\"[Test-IsExchangeServer] Обнаружен сервер Exchange: $computerName (SPN: $($exchangeSPNs -join ', '))\""
+    ],
+    [
+      "\"[Test-IsExchangeServer] Error checking $Identity`: $_\"",
+      "\"[Test-IsExchangeServer] Ошибка проверки $Identity`: $_\""
+    ],
+    [
+      "\"[Get-RecursiveGroupMembership] Cache hit for $IdentitySID\"",
+      "\"[Get-RecursiveGroupMembership] Результат найден в кэше для $IdentitySID\""
+    ],
+    [
+      "\"[Get-RecursiveGroupMembership] No LDAP connection available\"",
+      "\"[Get-RecursiveGroupMembership] Подключение LDAP отсутствует\""
+    ],
+    [
+      "\"[Get-RecursiveGroupMembership] Resolved SID to DN: $IdentityDN\"",
+      "\"[Get-RecursiveGroupMembership] SID преобразован в DN: $IdentityDN\""
+    ],
+    [
+      "\"[Get-RecursiveGroupMembership] Failed to resolve SID to DN: $_\"",
+      "\"[Get-RecursiveGroupMembership] Не удалось преобразовать SID в DN: $_\""
+    ],
+    [
+      "\"[Get-RecursiveGroupMembership] No DN available for $IdentitySID\"",
+      "\"[Get-RecursiveGroupMembership] Не найден DN для $IdentitySID\""
+    ],
+    [
+      "\"[Get-RecursiveGroupMembership] Querying all group memberships for: $IdentityDN\"",
+      "\"[Get-RecursiveGroupMembership] Запрос всех групп пользователя: $IdentityDN\""
+    ],
+    [
+      "\"[Get-RecursiveGroupMembership] Found membership: $($group.sAMAccountName) ($($group.objectSid))\"",
+      "\"[Get-RecursiveGroupMembership] Найдено членство в группе: $($group.sAMAccountName) ($($group.objectSid))\""
+    ],
+    [
+      "\"[Get-RecursiveGroupMembership] Found $($groupSIDs.Count) group membership(s) for $IdentitySID\"",
+      "\"[Get-RecursiveGroupMembership] Найдено $($groupSIDs.Count) групп для $IdentitySID\""
+    ],
+    [
+      "\"[Get-RecursiveGroupMembership] Error querying group memberships: $_\"",
+      "\"[Get-RecursiveGroupMembership] Ошибка запроса членства в группах: $_\""
+    ],
+    [
+      "\"[Get-RecursiveGroupMembership] Cached result for $IdentitySID\"",
+      "\"[Get-RecursiveGroupMembership] Результат сохранён в кэш для $IdentitySID\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Could not resolve identity to SID: $Identity\"",
+      "\"[Test-IsPrivileged] Не удалось определить SID для учётной записи: $Identity\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Operator detected: $sid\"",
+      "\"[Test-IsPrivileged] Обнаружен оператор: $sid\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Operator via RID suffix: $sid\"",
+      "\"[Test-IsPrivileged] Оператор по суффиксу RID: $sid\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Privileged via static SID: $sid\"",
+      "\"[Test-IsPrivileged] Привилегированный SID из статического списка: $sid\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Privileged via RID suffix: $sid\"",
+      "\"[Test-IsPrivileged] Привилегированный SID по суффиксу RID: $sid\""
+    ],
+    [
+      "\"[Test-IsPrivileged] BroadGroup detected (static): $sid - checking for privileged membership...\"",
+      "\"[Test-IsPrivileged] Обнаружена широкая группа BroadGroup (статическая): $sid; проверяется членство в привилегированных группах...\""
+    ],
+    [
+      "\"[Test-IsPrivileged] BroadGroup detected (RID): $sid - checking for privileged membership...\"",
+      "\"[Test-IsPrivileged] Обнаружена широкая группа BroadGroup (по RID): $sid; проверяется членство в привилегированных группах...\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Checking SID: $sid (Name: $name)\"",
+      "\"[Test-IsPrivileged] Проверка SID: $sid (имя: $name)\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Found $($sidHistoryValues.Count) sIDHistory entries for $sid\"",
+      "\"[Test-IsPrivileged] Найдено $($sidHistoryValues.Count) записей sIDHistory для $sid\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Failed to convert sIDHistory byte array: $_\"",
+      "\"[Test-IsPrivileged] Не удалось преобразовать массив байтов sIDHistory: $_\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Checking sIDHistory entry: $historySIDString\"",
+      "\"[Test-IsPrivileged] Проверка записи sIDHistory: $historySIDString\""
+    ],
+    [
+      "\"[Test-IsPrivileged] CRITICAL: sIDHistory contains privileged SID: $historySIDString\"",
+      "\"[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит привилегированный SID: $historySIDString\""
+    ],
+    [
+      "\"[Test-IsPrivileged] CRITICAL: sIDHistory contains privileged RID: $historySIDString\"",
+      "\"[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит привилегированный RID: $historySIDString\""
+    ],
+    [
+      "\"[Test-IsPrivileged] CRITICAL: sIDHistory contains Operator SID: $historySIDString\"",
+      "\"[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит SID оператора: $historySIDString\""
+    ],
+    [
+      "\"[Test-IsPrivileged] CRITICAL: sIDHistory contains Operator RID: $historySIDString\"",
+      "\"[Test-IsPrivileged] КРИТИЧНО: sIDHistory содержит RID оператора: $historySIDString\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Error checking sIDHistory: $_\"",
+      "\"[Test-IsPrivileged] Ошибка проверки sIDHistory: $_\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Found $($tierMemberships.Count) group membership(s) for $sid\"",
+      "\"[Test-IsPrivileged] Найдено $($tierMemberships.Count) групп для $sid\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Privileged via membership: $groupName\"",
+      "\"[Test-IsPrivileged] Привилегированность получена через членство: $groupName\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Operator via membership: $groupName\"",
+      "\"[Test-IsPrivileged] Статус оператора получен через членство: $groupName\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Operator via membership (RID suffix): $groupName\"",
+      "\"[Test-IsPrivileged] Статус оператора через членство (суффикс RID): $groupName\""
+    ],
+    [
+      "\"[Test-IsPrivileged] BroadGroup via membership: $groupName\"",
+      "\"[Test-IsPrivileged] Широкая группа BroadGroup через членство: $groupName\""
+    ],
+    [
+      "\"[Test-IsPrivileged] No group memberships found for $sid\"",
+      "\"[Test-IsPrivileged] Для $sid группы не найдены\""
+    ],
+    [
+      "\"[Test-IsPrivileged] No LDAP connection - group membership check skipped\"",
+      "\"[Test-IsPrivileged] Нет подключения LDAP; проверка членства в группах пропущена\""
+    ],
+    [
+      "\"[Test-IsPrivileged] BroadGroup confirmed (no privileged membership found): $sid\"",
+      "\"[Test-IsPrivileged] Подтверждена широкая группа BroadGroup (привилегированного членства нет): $sid\""
+    ],
+    [
+      "\"[Test-IsPrivileged] Standard identity: $sid\"",
+      "\"[Test-IsPrivileged] Обычная учётная запись: $sid\""
+    ],
+    [
+      "\"[Test-IsExpectedInScope] Unknown scope: $Scope\"",
+      "\"[Test-IsExpectedInScope] Неизвестная область проверки: $Scope\""
+    ],
+    [
+      "\"[Test-IsExpectedInScope] $sid holds only its default rights in scope '$Scope'\"",
+      "\"[Test-IsExpectedInScope] У $sid только права по умолчанию в области '$Scope'\""
+    ],
+    [
+      "\"[Test-IsExpectedInScope] $sid holds $($beyond -join ', ') beyond its defaults in scope '$Scope'\"",
+      "\"[Test-IsExpectedInScope] У $sid есть дополнительные права ($($beyond -join ', ')) в области '$Scope'\""
+    ],
+    [
+      "\"[Test-IsExpectedInScope] Identity $sid is member of expected group $groupName\"",
+      "\"[Test-IsExpectedInScope] Учётная запись $sid входит в ожидаемую группу $groupName\""
+    ],
+    [
+      "\"[Test-IsExpectedInScope] Exchange service group detected: $($exchangeCheck.DistinguishedName)\"",
+      "\"[Test-IsExpectedInScope] Обнаружена сервисная группа Exchange: $($exchangeCheck.DistinguishedName)\""
+    ]
+  ],
+  "src/modules/Helpers/Get-adPEASSession.ps1": [
+    [
+      "\"[!] TGT EXPIRED - Re-authentication required!\"",
+      "\"[!] TGT ИСТЁК — требуется повторная аутентификация!\""
+    ]
+  ]
+}
