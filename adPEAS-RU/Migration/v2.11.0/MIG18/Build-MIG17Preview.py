@@ -6,6 +6,7 @@ from pathlib import Path
 PIN = '477696f48d6b486be5d9a99b598f72e3ccfcc0c0'
 FILES = {
  'Build-Engine.ps1': ('3ab7377420ed6a969b95c8cc35775578e47c9c58', [
+  ('[assembly: AssemblyTitle("{TITLE}")]', '[assembly: AssemblyTitle("{DESCRIPTION}")]'), # MIG18a: Win32 FileDescription
   ('[Build] Script to embed not found: $ScriptPath', '[Сборка] Встраиваемый скрипт не найден: $ScriptPath'),
   ('[Build] Icon not found: $IconPath', '[Сборка] Иконка не найдена: $IconPath'),
   ('[Build] Windows PowerShell 5.1 not found ($windowsPowerShell) - it compiles the executable', '[Сборка] Windows PowerShell 5.1 не найден ($windowsPowerShell) — он необходим для компиляции EXE'),

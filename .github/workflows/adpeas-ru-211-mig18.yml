@@ -1,4 +1,4 @@
-name: "adPEAS RU 2.11.0 MIG18 - integrated Russian build"
+name: "adPEAS RU 2.11.0 MIG18a - Russian EXE metadata"
 on:
   push:
     branches:
@@ -441,13 +441,20 @@ jobs:
           finally { $stream.Dispose(); $sha.Dispose() }
           $expected = (Get-FileHash '_mig/candidate/adPEAS.ps1' -Algorithm SHA256).Hash
           if ($embedded -cne $expected) { throw 'EXE payload mismatch' }
-          if ((Get-Item $exe).VersionInfo.FileDescription -notmatch '[\u0400-\u04FF]') { throw 'Missing Cyrillic EXE metadata' }
+          $vi = (Get-Item $exe).VersionInfo
+          $ru = -join (@(0x430,0x443,0x434,0x438,0x442,0x20,0x431,0x435,0x437,0x43e,0x43f,0x430,0x441,0x43d,0x43e,0x441,0x442,0x438) | ForEach-Object { [char]$_ })
+          $expectedDescription = 'adPEAS 2.11.0 ' + [char]0x2014 + ' ' + $ru + ' Active Directory'
+          Write-Host ('EXE FileDescription: ' + $vi.FileDescription)
+          Write-Host ('EXE ProductName: ' + $vi.ProductName)
+          if ($vi.FileDescription -notmatch '[\u0400-\u04FF]' -or $vi.FileDescription -cne $expectedDescription) { throw 'Wrong Russian EXE FileDescription' }
+          if ($vi.ProductName -cne 'adPEAS') { throw 'EXE product name changed' }
+          Write-Host 'PASS: exact Russian Win32 FileDescription and original product name'
           Write-Host 'PASS: all scripts parse; EXE resource matches readable PS1 byte for byte; no AD access'
       - name: Publish gated preview, not a production release
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG18-PREVIEW
+          name: adPEAS-RU-2.11.0-MIG18a-PREVIEW
           path: |
             _mig/2.11.0-parity.json
             _mig/2.11.0-mig2-coverage.json
