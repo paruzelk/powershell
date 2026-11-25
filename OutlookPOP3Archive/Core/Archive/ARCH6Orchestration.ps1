@@ -76,6 +76,40 @@ function Get-OPAARCH6PendingRecord {
     }
     return $p
 }
+# Outlook started by COM can exist without registration in the ROT.
+# Only MK_E_UNAVAILABLE permits one COM activation. All other failures
+# remain fail-closed. The caller revalidates the exact process before Quit.
+function Get-OPAARCH6RestartApplication {
+    [CmdletBinding()]
+    param([scriptblock]$GetActive={ [Runtime.InteropServices.Marshal]::GetActiveObject('Outlook.Application') },
+          [scriptblock]$Activate={ New-Object -ComObject Outlook.Application -ErrorAction Stop })
+    try {
+        $app=& $GetActive
+    }catch{
+        $ex=$_.Exception
+        $unavailable=$false
+        while($null -ne $ex){
+            if($ex -is [Runtime.InteropServices.COMException] -and $ex.HResult -eq -2147221021){$unavailable=$true;break}
+            $ex=$ex.InnerException
+        }
+        if(-not $unavailable){throw}
+        $app=& $Activate
+    }
+    if($null -eq $app -or @($app).Count -ne 1){throw 'ARCH6 no unique Outlook application for restart.'}
+    return $app
+}
+
+function Assert-OPAARCH6RestartProcess {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Pending,
+          [Parameter(Mandatory=$true)][AllowEmptyCollection()][object[]]$Processes)
+    if($Processes.Count -ne 1 -or
+       [int]$Processes[0].Id -ne [int]$Pending.MoveProcessId -or
+       [long]$Processes[0].StartTime.ToUniversalTime().Ticks -ne [long]$Pending.MoveProcessStartUtcTicks){
+        throw 'ARCH6 exact Move process no longer identifiable; never Quit a replacement Outlook process.'
+    }
+}
+
 function Restart-OPAARCH6OutlookForResume {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Pending,
@@ -92,28 +126,38 @@ function Restart-OPAARCH6OutlookForResume {
     }
     $app=$null;$ns=$null;$inspectors=$null
     try{
-        $app=[Runtime.InteropServices.Marshal]::GetActiveObject('Outlook.Application')
+        $app=Get-OPAARCH6RestartApplication
+        Assert-OPAARCH6RestartProcess -Pending $Pending -Processes @(Get-Process -Name OUTLOOK -ErrorAction SilentlyContinue | Where-Object {$_.SessionId -eq $sessionId})
         $ns=$app.GetNamespace('MAPI')
         if([string]$ns.CurrentProfileName -ine [string]$Pending.Profile){throw 'ARCH6 active Outlook profile differs.'}
         $inspectors=$app.Inspectors
         if([int]$inspectors.Count -ne 0){throw 'ARCH6 close all open Outlook messages before automatic restart.'}
         # Refuse shutdown with unsent mail in any accessible delivery Outbox.
         foreach($account in @($ns.Accounts)){
-            $store=$null;$outbox=$null
+            $store=$null;$outbox=$null;$outboxItems=$null
             try{
                 $store=$account.DeliveryStore
                 if($null -ne $store){
                     $outbox=$store.GetDefaultFolder(4)
-                    if($null -eq $outbox -or [int]$outbox.Items.Count -ne 0){throw 'ARCH6 Outbox not empty or unavailable; manual restart required.'}
+                    if($null -eq $outbox){throw 'ARCH6 Outbox unavailable; manual restart required.'}
+                    $outboxItems=$outbox.Items
+                    if($null -eq $outboxItems -or [int]$outboxItems.Count -ne 0){throw 'ARCH6 Outbox not empty or unavailable; manual restart required.'}
                 }
             }finally{
-                foreach($o in @($outbox,$store,$account)){if($null -ne $o -and [Runtime.InteropServices.Marshal]::IsComObject($o)){[void][Runtime.InteropServices.Marshal]::ReleaseComObject($o)}}
+                foreach($o in @($outboxItems,$outbox,$store,$account)){if($null -ne $o -and [Runtime.InteropServices.Marshal]::IsComObject($o)){[void][Runtime.InteropServices.Marshal]::ReleaseComObject($o)}}
             }
         }
+        Assert-OPAARCH6RestartProcess -Pending $Pending -Processes @(Get-Process -Name OUTLOOK -ErrorAction SilentlyContinue | Where-Object {$_.SessionId -eq $sessionId})
         $app.Quit()
     }finally{
         foreach($o in @($inspectors,$ns,$app)){if($null -ne $o -and [Runtime.InteropServices.Marshal]::IsComObject($o)){[void][Runtime.InteropServices.Marshal]::ReleaseComObject($o)}}
     }
+    # Original phase-local references may remain as unreachable RCWs in ISE.
+    # Collect unreachable wrappers only; never FinalRelease arbitrary shared objects.
+    [GC]::Collect()
+    [GC]::WaitForPendingFinalizers()
+    [GC]::Collect()
+    [GC]::WaitForPendingFinalizers()
     if(-not $proc.WaitForExit($TimeoutSeconds*1000)){throw 'ARCH6 graceful Outlook shutdown timed out; never kill; use manual restart and Resume.'}
     $remaining=@(Get-Process -Name OUTLOOK -ErrorAction SilentlyContinue | Where-Object {$_.SessionId -eq $sessionId})
     if($remaining.Count -ne 0){throw 'ARCH6 Outlook still running or relaunched; manual review required.'}
