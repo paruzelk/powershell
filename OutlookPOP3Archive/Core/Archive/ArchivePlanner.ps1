@@ -47,13 +47,14 @@ function Get-OPAEligiblePop3MailFolders {
         [switch]$ArchiveDrafts,
         [switch]$ArchiveJunk,
         [switch]$IncludeEmptyFolders,
-        [switch]$IncludeRootForVerification
+        [switch]$IncludeRootForVerification,
+        [switch]$IncludeRootMail
     )
     $result = New-Object System.Collections.Generic.List[object]
     Add-OPAEligiblePop3MailFolders -Folder $RootFolder -Accumulator $result `
         -WellKnownEntryIdMap $WellKnownEntryIdMap `
         -ArchiveDeletedItems:$ArchiveDeletedItems -ArchiveDrafts:$ArchiveDrafts `
-        -ArchiveJunk:$ArchiveJunk -IncludeEmptyFolders:$IncludeEmptyFolders -IncludeRootForVerification:$IncludeRootForVerification -IsRoot
+        -ArchiveJunk:$ArchiveJunk -IncludeEmptyFolders:$IncludeEmptyFolders -IncludeRootForVerification:$IncludeRootForVerification -IncludeRootMail:$IncludeRootMail -IsRoot
     # Return individual objects through the pipeline; callers wrap with @().
     return $result.ToArray()
 }
@@ -69,13 +70,17 @@ function Add-OPAEligiblePop3MailFolders {
         [switch]$ArchiveJunk,
         [switch]$IncludeEmptyFolders,
         [switch]$IncludeRootForVerification,
+        [switch]$IncludeRootMail,
         [switch]$IsRoot
     )
     $path = ''
     try { $path = [string]$Folder.FolderPath } catch { throw "Unable to read folder path while enumerating POP3 PST: $($_.Exception.Message)" }
-    if ($IsRoot -and $IncludeRootForVerification) {
-        # Root is observation-only; no archive writer selects it.
-        [void]$Accumulator.Add($Folder)
+    if ($IsRoot -and ($IncludeRootForVerification -or $IncludeRootMail)) {
+        if($IncludeRootMail -and $path -notmatch '^\\\\[^\\]+$'){throw 'ARCH6f2 invalid canonical POP3 root path.'}
+        # Root inclusion requires independent verification or explicit test consent.
+        if($IncludeRootForVerification -or $IncludeEmptyFolders -or [int]$Folder.Items.Count -gt 0){
+            [void]$Accumulator.Add($Folder)
+        }
     }
     if (-not $IsRoot) {
         $name = ''

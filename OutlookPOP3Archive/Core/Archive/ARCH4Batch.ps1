@@ -314,7 +314,8 @@ function Invoke-OPAARCH4Batch {
           [string]$TransactionId,
           [int]$Limit=100,[int]$OlderThanMonths=12,[string]$ArchiveGrouping='Year',
           [double]$MaxArchivePstSizeGB=10,[double]$SafetyMarginGB=0.5,
-          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath)
+          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail)
+    if($IncludeRootMail -and ($Mode -ne 'Archive' -or -not $ARCH5Batch)){throw 'ARCH6f2 root mail requires explicit controlled Archive.'}
     $source=[IO.Path]::GetFullPath($SourcePst)
     if($source.StartsWith('\\') -or -not [IO.File]::Exists($source) -or [IO.Path]::GetExtension($source) -ine '.pst' -or
        (([IO.File]::GetAttributes($source) -band [IO.FileAttributes]::ReparsePoint) -ne 0)){
@@ -327,7 +328,7 @@ function Invoke-OPAARCH4Batch {
     if(-not $storeId -or $accounts.Count -ne 1 -or [string]$Session.Namespace.CurrentProfileName -ne [string]$Discovery.Profile){
         throw 'ARCH4 live POP3 account/profile/store identity failed.'
     }
-    $folders=@(Get-OPAPop3SourceFolders -StoreHandle $s.StoreHandle -IncludeEmptyFolders:($Mode -eq 'Resume' -or @($IncludeFolderPath | Where-Object {$_}).Count -gt 0) -IncludeRootForVerification:($Mode -eq 'Resume'))
+    $folders=@(Get-OPAPop3SourceFolders -StoreHandle $s.StoreHandle -IncludeEmptyFolders:($Mode -eq 'Resume' -or @($IncludeFolderPath | Where-Object {$_}).Count -gt 0) -IncludeRootForVerification:($Mode -eq 'Resume') -IncludeRootMail:$IncludeRootMail)
     if($folders.Count -eq 0){
         if($Mode -eq 'Archive' -and $ARCH5Batch -and @($IncludeFolderPath | Where-Object {$_}).Count -eq 0){
             # Still go through the pending lease before returning exhaustion.
@@ -336,6 +337,12 @@ function Invoke-OPAARCH4Batch {
     }
     if($Mode -eq 'Archive' -and $ARCH5Batch){
         $folders=@(Select-OPAARCH5SourceFolders -EligibleFolders $folders -IncludeFolderPath $IncludeFolderPath)
+        foreach($folder in $folders){
+            $path=[string]$folder.FolderPath
+            if($path -match '^\\\\[^\\]+$' -and -not $IncludeRootMail){throw 'ARCH6f2 root selection requires -IncludeRootMail.'}
+            # Reject reserved route collisions before creating a transaction.
+            [void](Get-OPAArchiveTargetPath -ReceivedTime ([datetime]'2020-01-01') -SourceFolderPath $path -SourceFolderName ([string]$folder.Name) -Grouping $ArchiveGrouping)
+        }
         Write-Host ('Выбрано папок POP3: '+$folders.Count)
         foreach($f in $folders){Write-Host ('  '+[string]$f.FolderPath)}
     }

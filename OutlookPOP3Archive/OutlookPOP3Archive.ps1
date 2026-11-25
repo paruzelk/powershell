@@ -11,6 +11,7 @@ param(
     [switch]$ConfirmTestArchive,
     [switch]$ConfirmComplexAttachments,
     [string[]]$IncludeFolderPath,
+    [switch]$IncludeRootMail,
     [switch]$WhatIf,
     [switch]$VerboseItems,
 
@@ -127,13 +128,13 @@ $ErrorActionPreference = 'Stop'
 # worker integration flags do not disable the direct legacy COM writer.
 # Read-only Analyze and Plan remain available, but no production permit.
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH2aMoveOutcomeFence.ps1')
-$arch4Requested = [bool]$ConfirmTestArchive -or $PSBoundParameters.ContainsKey('SourcePst') -or $ConfirmComplexAttachments -or $PSBoundParameters.ContainsKey('IncludeFolderPath')
+$arch4Requested = [bool]$ConfirmTestArchive -or $PSBoundParameters.ContainsKey('SourcePst') -or $ConfirmComplexAttachments -or $PSBoundParameters.ContainsKey('IncludeFolderPath') -or $IncludeRootMail
 if ($arch4Requested) {
     if (-not $ConfirmTestArchive -or [string]::IsNullOrWhiteSpace($SourcePst) -or
         [string]::IsNullOrWhiteSpace($ProfileName) -or $Mode -notin @('Archive','Resume') -or
         $WorkerPilot -or $ArchiveDeletedItems -or $ArchiveDrafts -or $ArchiveJunk -or
         ($ConfirmComplexAttachments -and ($Mode -ne 'Archive' -or $Limit -gt 10)) -or
-        ($PSBoundParameters.ContainsKey('IncludeFolderPath') -and $Mode -ne 'Archive') -or
+        (($PSBoundParameters.ContainsKey('IncludeFolderPath') -or $IncludeRootMail) -and $Mode -ne 'Archive') -or
         ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt 500)) -or
         ($Mode -eq 'Archive' -and -not [string]::IsNullOrWhiteSpace($Transaction))) {
         throw 'ARCH4 requires Archive/Resume, explicit test PST, profile and -ConfirmTestArchive; Archive limit 1..500, excluded system folders stay excluded.'
@@ -372,7 +373,7 @@ if ($WorkerPilot) {
 
 
 if($arch4Requested){
-    $build='2.6.5-ARCH6f1 DEV'
+    $build='2.6.5-ARCH6f2 DEV'
     $buildPath=Join-Path $PSScriptRoot 'BUILD-INFO.json'
     if(Test-Path -LiteralPath $buildPath -PathType Leaf){
         try{
@@ -556,7 +557,8 @@ function Get-OPAPop3SourceFolders {
         [switch]$ArchiveDrafts,
         [switch]$ArchiveJunk,
         [switch]$IncludeEmptyFolders,
-        [switch]$IncludeRootForVerification
+        [switch]$IncludeRootForVerification,
+        [switch]$IncludeRootMail
     )
     $root = $null
     try { $root = $StoreHandle.GetRootFolder() }
@@ -574,7 +576,7 @@ function Get-OPAPop3SourceFolders {
         -WellKnownEntryIdMap $wellKnownMap `
         -ArchiveDeletedItems:$ArchiveDeletedItems `
         -ArchiveDrafts:$ArchiveDrafts -ArchiveJunk:$ArchiveJunk `
-        -IncludeEmptyFolders:$IncludeEmptyFolders -IncludeRootForVerification:$IncludeRootForVerification)
+        -IncludeEmptyFolders:$IncludeEmptyFolders -IncludeRootForVerification:$IncludeRootForVerification -IncludeRootMail:$IncludeRootMail)
 }
 
 function Get-OPASourceByPst {
@@ -756,7 +758,7 @@ try {
     Write-OPADiscoverySummary -Discovery $discovery
 
     if ($arch4Requested) {
-        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath
+        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath -IncludeRootMail:$IncludeRootMail
         return
     }
 

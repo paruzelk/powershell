@@ -29,7 +29,7 @@ try{
         }
     }
     if([int]$items.Count -ne $count){throw 'Root count changed during read-only observation.'}
-    [pscustomobject]@{Schema='2.6.5-ARCH6.RootInventory.1';SourcePst=$source;RootPath=[string]$root.FolderPath;TotalItems=$count;MailItems=[int]$classes[43];Classes=@($classes.GetEnumerator() | Sort-Object Name | ForEach-Object {[pscustomobject]@{Class=$_.Key;Count=$_.Value}});RootArchiveEnabled=$false;ReadOnly=$true}
+    [pscustomobject]@{Schema='2.6.5-ARCH6.RootInventory.1';SourcePst=$source;RootPath=[string]$root.FolderPath;TotalItems=$count;MailItems=[int]$classes[43];Classes=@($classes.GetEnumerator() | Sort-Object Name | ForEach-Object {[pscustomobject]@{Class=$_.Key;Count=$_.Value}});RootArchiveEnabled=$false;RootArchiveSupported=$true;ReadOnly=$true}
 }finally{
     foreach($o in @($items,$root,$ns,$app)){if($null -ne $o -and [Runtime.InteropServices.Marshal]::IsComObject($o)){[void][Runtime.InteropServices.Marshal]::ReleaseComObject($o)}}
 }

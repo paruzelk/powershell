@@ -11,6 +11,7 @@ param(
     [ValidateRange(0,1200)][int]$OlderThanMonths=12,
     [ValidateSet('None','Year','YearQuarter','YearMonth')][string]$ArchiveGrouping='YearQuarter',
     [string[]]$IncludeFolderPath,
+    [switch]$IncludeRootMail,
     [switch]$IgnoreAge,
     [switch]$ConfirmComplexAttachments,
     [ValidateRange(0.01,1000)][double]$MaxArchivePstSizeGB=10,
@@ -31,7 +32,7 @@ if(-not $ConfirmTestArchive -or -not $ConfirmOutlookRestart -or [string]::IsNull
 if($PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5 -or
    [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -ne 'STA'){throw 'ARCH6 requires Windows PowerShell 5.1 STA.'}
 if($RecoverTransaction){
-    foreach($key in @('BatchSize','MaxMessages','MaxBatches','OlderThanMonths','ArchiveGrouping','IncludeFolderPath','IgnoreAge','ConfirmComplexAttachments','MaxArchivePstSizeGB','SafetyMarginGB','DisableArchivePstSizeLimit')){
+    foreach($key in @('BatchSize','MaxMessages','MaxBatches','OlderThanMonths','ArchiveGrouping','IncludeFolderPath','IncludeRootMail','IgnoreAge','ConfirmComplexAttachments','MaxArchivePstSizeGB','SafetyMarginGB','DisableArchivePstSizeLimit')){
         if($PSBoundParameters.ContainsKey($key)){throw 'ARCH6 recovery-only mode cannot accept new Archive options.'}
     }
 }
@@ -64,6 +65,7 @@ try{
     $common=@{SourcePst=$source;ProfileName=$ProfileName;ConfirmTestArchive=$true}
     $archiveOptions=@{OlderThanMonths=$OlderThanMonths;ArchiveGrouping=$ArchiveGrouping;IgnoreAge=[bool]$IgnoreAge;ConfirmComplexAttachments=[bool]$ConfirmComplexAttachments}
     if($IncludeFolderPath){$archiveOptions.IncludeFolderPath=$IncludeFolderPath}
+    if($IncludeRootMail){$archiveOptions.IncludeRootMail=$true}
     if($DisableArchivePstSizeLimit){$archiveOptions.DisableArchivePstSizeLimit=$true}
     else{$archiveOptions.MaxArchivePstSizeGB=$MaxArchivePstSizeGB;$archiveOptions.SafetyMarginGB=$SafetyMarginGB}
     Write-OPAARCH6RunEvent -Path $logPath -Phase RunStarted -Data ([pscustomobject]@{RunId=$runId;SourcePst=$source;Profile=$ProfileName;BatchSize=$BatchSize;MaxMessages=$MaxMessages;MaxBatches=$MaxBatches;Recovery=$RecoverTransaction;ArchiveOptions=$archiveOptions})

@@ -28,8 +28,14 @@ function Get-OPAArchiveTargetPath {
             # hierarchy below that store root.
             try {
                 if ($sourceParts.Count -gt 1) { $sourceParts = @($sourceParts | Select-Object -Skip 1) }
+                elseif ($SourceFolderPath -match '^\\\\[^\\]+$') { $sourceParts = @('__OPA_ROOT_MAIL__') }
             } catch {}
         }
+    }
+    # Prevent a user folder from aliasing the reserved root-mail destination.
+    if ($SourceFolderPath -and @($SourceFolderPath -split '\\' | Where-Object {$_}).Count -gt 1 -and
+        $sourceParts.Count -gt 0 -and $sourceParts[0] -ieq '__OPA_ROOT_MAIL__') {
+        throw 'ARCH5 ArchiveRouteMismatch: source folder collides with reserved root mail route.'
     }
     if ($sourceParts.Count -eq 0 -and $SourceFolderName) { $sourceParts = @($SourceFolderName) }
     $parts += $sourceParts
