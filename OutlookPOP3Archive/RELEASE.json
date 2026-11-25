@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH6f3a DEV: Continue default; strict preclaim deferred evidence, separate durable ledger and historical import, five focused tests; 4837/165 expected. Production closed.",
     "ARCH6f2 DEV: actual ARCH6f1 30/30 three automatic batches verified/indexed, no skipped; explicit IncludeRootMail for exact POP3 root, reserved destination route, existing semantic and restart verification. 11 new tests, 4832/165 expected. Live root archival pending.",
     "ARCH6f1 DEV: real ARCH6f first automatic batch 3/3 verified, second automatic Archive 2/2 verified by manual Resume after MK_E_UNAVAILABLE at restart; guarded exact-process COM activation fallback and RCW cleanup, six regression tests, 4821/165 expected. Root inventory 500/500 MailItems; root writer still closed.",
     "ARCH6ae DEV: empty eligible source folders on Resume, root read-only inventory and absence verification, bounded automatic sequence above 500 total with graceful Outlook restart, reconciliation-only recovery, stop on skips or unknown outcomes, memory/candidate optimization, explicit application cap disable, 25 executable tests; 4815/165 expected. Real ARCH6f pending.",
@@ -114,7 +115,7 @@
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
     "ExpectedTestContainers": 165,
-    "ExpectedPesterTests": 4832,
+    "ExpectedPesterTests": 4837,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

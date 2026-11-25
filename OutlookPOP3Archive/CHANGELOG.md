@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH6f3a DEV
+
+- Continue по умолчанию; отдельный долговременный журнал подтверждённых пропусков и исключение повторного отбора; явный импорт завершённой исторической транзакции.
+
 - ARCH6f1 actual 30/30, three automatic restart cycles passed.
 - Explicit root MailItem selection, reserved archive folder route, original verification gates retained.
 - 11 new tests; 4832/165 expected. Live root validation pending.

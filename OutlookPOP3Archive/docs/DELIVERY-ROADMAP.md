@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH6f3a DEV: [политика пропусков и импорт](2.6.5-arch6f3a.md); CI и live acceptance pending.
+
 > **Real ARCH6f2 PASS (2026-11-25):** released `f0626c77`, 20/20 root-only messages verified over two automatic batches, MessageLimitReached; independent root inventory 500 -> 480 MailItems; LogicalBytes=34700759. No repeated test required. Next ARCH6f3 three batches up to 500 each on the same released build; stop on skip or uncertainty. [Evidence](2.6.5-arch6f2.md). ProductionReady=False.
 
 

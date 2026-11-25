@@ -7,6 +7,7 @@ BeforeAll {
     . (Join-Path $script:root 'Core/Archive/ArchiveVerifier.ps1')
     . (Join-Path $script:root 'Core/Archive/MailMover.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH6Orchestration.ps1')
+    . (Join-Path $script:root 'Core/Archive/ARCH6Deferred.ps1')
     function New-ARCH6Folder {
         param([string]$Name,[string]$Path,[object[]]$Entries=@(),[object[]]$Children=@())
         $items=[pscustomobject]@{Count=$Entries.Count;Entries=$Entries}
@@ -90,14 +91,14 @@ Describe 'ARCH6b/d bounded automatic sequence' {
     }
     It 'stops after a skipped message rather than retrying it' {
         $a={param($limit) [void]$script:limits.Add($limit);New-ARCH6Returned -Limit $limit -NotMoved 1}
-        $r=Invoke-OPAARCH6Sequence -Archive $a -Restart $script:restart -Resume {param($id) New-ARCH6Verified -Count 9 -Skipped 1 -Id $id} -Record $script:record -BatchSize 10 -MaxMessages 100 -MaxBatches 10
+        $r=Invoke-OPAARCH6Sequence -Archive $a -Restart $script:restart -Resume {param($id) New-ARCH6Verified -Count 9 -Skipped 1 -Id $id} -Record $script:record -BatchSize 10 -MaxMessages 100 -MaxBatches 10 -SkipPolicy Stop
         $r.Status | Should -BeExactly 'StoppedOnSkippedItems'
         $r.Verified | Should -Be 9
         $script:limits.Count | Should -Be 1
     }
     It 'does not restart a zero-Move completed batch' {
         $a={param($limit) [pscustomobject]@{Status='BatchCompletedNoMoves';TransactionId='20261124-120000-01234567';Planned=1;Verified=0;Indexed=0;RestartRequired=$false}}
-        $r=Invoke-OPAARCH6Sequence -Archive $a -Restart $script:restart -Resume $script:resume -Record $script:record -BatchSize 10 -MaxMessages 100 -MaxBatches 10
+        $r=Invoke-OPAARCH6Sequence -Archive $a -Restart $script:restart -Resume $script:resume -Record $script:record -BatchSize 10 -MaxMessages 100 -MaxBatches 10 -SkipPolicy Stop
         $r.Status | Should -BeExactly 'StoppedOnSkippedItems'
         $script:restarts | Should -Be 0
     }
@@ -285,5 +286,36 @@ Describe 'ARCH6f2 explicit root mail selection and reserved route' {
         $r=& (Join-Path $script:root 'Invoke-OPAArchiveBatches.ps1') -ProfileName Outlook -SourcePst $src -ConfirmTestArchive -ConfirmOutlookRestart -IncludeRootMail -IncludeFolderPath '\\PST' -WhatIf
         $r.Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
         {& (Join-Path $script:root 'Invoke-OPAArchiveBatches.ps1') -ProfileName Outlook -SourcePst $src -ConfirmTestArchive -ConfirmOutlookRestart -IncludeRootMail -RecoverTransaction '20261125-102130-ef2c9ada' -WhatIf} | Should -Throw
+    }
+}
+
+Describe 'ARCH6f3a conservative continuation' {
+    It 'allows only known bounded metadata errors' {
+        Get-OPAARCH6DeferredReason -Message 'ARCH5 AttachmentTypeUnsupported: index=3 type=5 bytes=1' | Should -BeExactly 'AttachmentTypeUnsupported'
+        Get-OPAARCH6DeferredReason -Message 'ARCH2b attachment count exceeds bounded witness limit; no Move authorized.' | Should -BeExactly 'AttachmentCountUnsupported'
+        Get-OPAARCH6DeferredReason -Message 'ARCH5b AttachmentCleanupFailed: locked' | Should -BeNullOrEmpty
+        Get-OPAARCH6DeferredReason -Message 'ARCH5 AttachmentExportUnverified: disk failed' | Should -BeNullOrEmpty
+    }
+    It 'continues by default after durable mixed batch and reaches verified limit' {
+        $script:n=0
+        $a={param($limit) $script:n++;if($script:n -eq 1){New-ARCH6Returned -Limit $limit -NotMoved 1}else{New-ARCH6Returned -Limit $limit}}
+        $r={param($id) if($script:n -eq 1){$v=New-ARCH6Verified -Count 9 -Skipped 1 -Id $id;$v | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue 1;$v}else{New-ARCH6Verified -Count 1 -Id $id}}
+        $v=Invoke-OPAARCH6Sequence -Archive $a -Resume $r -Restart {param($id)} -Record {param($phase,$data)} -BatchSize 10 -MaxMessages 10 -MaxBatches 2
+        $v.Verified | Should -Be 10
+        $v.Deferred | Should -Be 1
+        $v.SkipPolicy | Should -BeExactly 'Continue'
+    }
+    It 'refuses a mixed batch without durable deferred count' {
+        {Invoke-OPAARCH6Sequence -Archive {param($limit) New-ARCH6Returned -Limit $limit -NotMoved 1} -Resume {param($id) New-ARCH6Verified -Count 9 -Skipped 1 -Id $id} -Restart {param($id)} -Record {param($phase,$data)} -BatchSize 10 -MaxMessages 10 -MaxBatches 2} | Should -Throw '*deferred evidence incomplete*'
+    }
+    It 'continues after an all-deferred batch without restarting Outlook' {
+        $script:n=0
+        $a={param($limit) $script:n++;if($script:n -eq 1){[pscustomobject]@{Status='BatchCompletedNoMoves';TransactionId='20261124-120000-01234567';Planned=10;Verified=0;Indexed=0;RestartRequired=$false;DeferredRecorded=10}}else{[pscustomobject]@{Status='NoEligibleFolders'}}}
+        $v=Invoke-OPAARCH6Sequence -Archive $a -Resume {throw 'unexpected Resume'} -Restart {throw 'unexpected restart'} -Record {param($phase,$data)} -BatchSize 10 -MaxMessages 10 -MaxBatches 2
+        $v.Deferred | Should -Be 10
+        $v.Status | Should -BeExactly 'NoEligibleFolders'
+    }
+    It 'rejects all-deferred batch without complete coverage' {
+        {Invoke-OPAARCH6Sequence -Archive {param($limit) [pscustomobject]@{Status='BatchCompletedNoMoves';TransactionId='20261124-120000-01234567';Planned=10;Verified=0;Indexed=0;RestartRequired=$false;DeferredRecorded=9}} -Resume {throw 'unexpected Resume'} -Restart {throw 'unexpected restart'} -Record {param($phase,$data)} -BatchSize 10 -MaxMessages 10 -MaxBatches 2} | Should -Throw '*zero-Move deferred evidence incomplete*'
     }
 }
