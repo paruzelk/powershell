@@ -1,11 +1,14 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7c1 DEV
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7d DEV
 
 ## Актуальный запуск и документация
 
-Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7c1 — идентификатор DEV-сборки.
+Новый тестовый контроллер `Invoke-OPALiveArchiveBatches.ps1` запускает Archive и Resume в отдельных процессах Windows PowerShell 5.1 STA, без перезапуска Outlook. Полный синтаксис и примеры — [ARCH7d](docs/2.6.5-arch7d.md).
 
-25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — [восстановление прерванной партии](docs/2.6.5-arch7c.md): ARCH7c 66/67 focused PASS, исправлено закрытие потока тестового журнала, повторный CI/live acceptance pending. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
+Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7d — идентификатор DEV-сборки.
 
+25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — CI 4881/165 PASS, [восстановление](docs/2.6.5-arch7c.md). ARCH7d — [контроллер отдельных worker](docs/2.6.5-arch7d.md), CI/live acceptance pending. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
+
+- [ARCH7d — контроллер worker, все ключи и реальный тест прерывания](docs/2.6.5-arch7d.md)
 - [ARCH7c — восстановление и точный пример Resume](docs/2.6.5-arch7c.md)
 - [Целевой Auto и аудит](docs/ARCH7a-AUTO-REQUIREMENTS.md)
 - [Установка на RDS, планировщик вручную, PowerShell, GPO](docs/RDS-DEPLOYMENT.md)
@@ -44,6 +47,7 @@ $test = @{ProfileName='Outlook';SourcePst='C:\Test\mail.pst';ConfirmTestArchive=
 | `-ConfirmTestArchive` | switch | False | Явное согласие на тестовый PST. |
 | `-ConfirmLiveOutlookVerification` | switch | False | ARCH7b: тест Archive 1–10 или точный Resume в новом worker; attach-only. Без RecoverLiveInterrupted требуется неизменный Outlook. Не Auto, не контроллер. |
 | `-RecoverLiveInterrupted` | switch | False | ARCH7c: только Resume + ConfirmTestArchive + ConfirmLiveOutlookVerification + точный Transaction. Проверка подтверждённого префикса (Move/skip), без новых Move. Разрешён уже естественно перезапущенный Outlook при строгой проверке процессов. |
+| `-ARCH7dInterruptAfterReturned` | int (0–9) | 0 | DEV fault point: только подтверждённый live Archive 1–10, значение строго меньше Limit. Завершить worker ошибкой после указанного числа durable Move receipts; не повторять Archive. |
 | `-ConfirmComplexAttachments` | switch | False | Экспериментальные MSG/OLE; Archive, Limit/BatchSize ≤10. |
 | `-IncludeFolderPath` | string[] | не задан | Массив точных разрешённых путей папок. |
 | `-IncludeRootMail` | switch | False | Включить письма непосредственно в корне PST. |

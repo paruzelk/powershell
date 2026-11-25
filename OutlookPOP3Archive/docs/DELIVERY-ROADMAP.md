@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH7d DEV: ARCH7c1 CI 45624454936 PASS 4881/165, ZIP SHA256 2faac947217b66e09e70d785ba4c78395653ec00d96bdf3cb4209c9a486c5d24. New bounded separate STA worker supervisor, exact pending recovery, no repeated Archive after interruption, explicit safe post-receipt failpoint. 4893/165 expected. Combined ARCH7c/d real acceptance pending; Auto remains closed. [Runbook](2.6.5-arch7d.md).
+
 > ARCH7c1 DEV: ARCH7c CI 45623183810 66/67 focused; one fixture locked-file failure before safety assertions. Flush/close test stream, strengthen exact unresolved claim and torn tail checks and add malformed JSON assertion within same test. 67 focused / 4881 total unchanged. Full CI/live pending.
 
 > ARCH7c DEV: ARCH7b3 CI 45618265278 PASS 4872/165 and operator real transaction 20261125-161734-1d203d2f Verified=Reconciled=Indexed=4, Outlook PID 7660 unchanged, distinct workers 13876/8396, PendingCleared=True. ARCH7b accepted; no repeat. ARCH7c explicit recovery of mixed durable prefix, no blind replay, CI/live pending. Unknown claims remain manual hold, automated supervisor ARCH7d, output defects ARCH7f. [Runbook](2.6.5-arch7c.md).

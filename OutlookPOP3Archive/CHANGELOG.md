@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7d DEV
+
+- ARCH7c1 CI 45624454936 PASS 4881/165. Add bounded separate worker supervisor, UTF-16 encoded command and UTF-8 JSON result, independent leases, recovery-first with bounded Resume attempts, no process kill/Outlook restart. Explicit controlled stop after durable paired receipt for combined real ARCH7c/d acceptance. Twelve new tests (4893/165 expected, 79 focused). Auto remains closed.
+
 ## ARCH7c1 DEV
 
 - ARCH7c CI 45623183810 passed 66/67 focused; unresolved-claim/torn-journal test failed on an open fixture stream before assertions. Flush and close the stream, assert baseline disk replay, require exact unresolved-claim and incomplete-tail errors, also exercise malformed complete-line JSON. No runtime recovery algorithm changes. 4881/165 expected, 67 focused.
