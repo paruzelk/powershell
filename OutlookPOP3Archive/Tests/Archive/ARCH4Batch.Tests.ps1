@@ -596,6 +596,14 @@ Describe 'ARCH7b independent worker live Outlook verification fences' {
         $livePending.VerificationPolicy='unknown'
         {Assert-OPAARCH7bPendingPolicy -Pending $livePending -ConfirmLiveOutlookVerification} | Should -Throw '*unknown pending*'
     }
+    It 'legacy restart helper refuses tagged pending before inspecting or quitting Outlook' {
+        Mock Get-Process {throw 'unexpected process access'}
+        Mock Get-OPAARCH6RestartApplication {throw 'unexpected Outlook access'}
+        {Restart-OPAARCH6OutlookForResume -Pending $livePending} | Should -Throw '*live verification pending*'
+        Should -Invoke Get-Process -Exactly -Times 0
+        Should -Invoke Get-OPAARCH6RestartApplication -Exactly -Times 0
+    }
+
     It 'validates the explicit DEV CLI without COM or persistent writes and leaves Auto closed' {
         $src=Join-Path $TestDrive 'arch7b-not-created.pst'
         $main=Join-Path $script:root 'OutlookPOP3Archive.ps1'
@@ -636,8 +644,23 @@ Describe 'ARCH7b independent worker live Outlook verification fences' {
         Mock Test-OPAArchiveMoves {New-ARCH4Verification -Count 3}
         Mock Move-OPAItemsWithLimit {throw 'Resume must not call Move'}
         $pending=Join-Path ([IO.Path]::GetDirectoryName($tx.Path)) 'ARCH4.pending'
-        $livePending | Add-Member NotePropertyMembers @{Schema='2.6.5-ARCH4.Pending.1';TransactionId=$tx.TransactionId;SourcePst=$source;SourceStoreId='STORE';Profile='Outlook';DeferredPolicy=$false}
+        # Explicit full fixture; read back every field before Resume.
+        $livePending=[pscustomobject]@{
+            Schema='2.6.5-ARCH4.Pending.1';TransactionId=[string]$tx.TransactionId
+            SourcePst=[IO.Path]::GetFullPath($source);SourceStoreId='STORE';Profile='Outlook'
+            MoveProcessId=100;MoveProcessStartUtcTicks=1000L;DeferredPolicy=$false
+            VerificationPolicy='ARCH7bFreshWorkerSameOutlook';MoveWorkerId=200
+            MoveWorkerStartUtcTicks=2000L;MoveWorkerSessionId=3
+        }
         Write-OPAARCH4Pending -Path $pending -Record $livePending
+        $disk=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($pending,[Text.Encoding]::UTF8))
+        foreach($prop in $livePending.PSObject.Properties){
+            $disk.PSObject.Properties.Name | Should -Contain $prop.Name
+            $disk.($prop.Name) | Should -Be $prop.Value
+        }
+        $disk.TransactionId | Should -Match '^\d{8}-\d{6}-[a-f0-9]{8}$'
+        $disk.SourcePst | Should -BeExactly ([IO.Path]::GetFullPath($source))
+        Assert-OPAARCH7bPendingPolicy -Pending $disk -ConfirmLiveOutlookVerification
         $params=@{Mode='Resume';Session=$session;Discovery=$discovery;SourcePst=$source;TransactionId=$tx.TransactionId;ARCH5Batch=$true;ConfirmLiveOutlookVerification=$true}
         $r=Invoke-OPAARCH4Batch @params
         $r.Status | Should -BeExactly 'BatchVerifiedReconciledAndIndexed'
@@ -671,8 +694,23 @@ Describe 'ARCH7b independent worker live Outlook verification fences' {
         Mock Test-OPAArchiveMoves {$v=New-ARCH4Verification -Count 3;$v.Verified=$false;$v}
         Mock Move-OPAItemsWithLimit {throw 'Resume must not call Move'}
         $pending=Join-Path ([IO.Path]::GetDirectoryName($tx.Path)) 'ARCH4.pending'
-        $livePending | Add-Member NotePropertyMembers @{Schema='2.6.5-ARCH4.Pending.1';TransactionId=$tx.TransactionId;SourcePst=$source;SourceStoreId='STORE';Profile='Outlook';DeferredPolicy=$false}
+        # Explicit full fixture; read back every field before Resume.
+        $livePending=[pscustomobject]@{
+            Schema='2.6.5-ARCH4.Pending.1';TransactionId=[string]$tx.TransactionId
+            SourcePst=[IO.Path]::GetFullPath($source);SourceStoreId='STORE';Profile='Outlook'
+            MoveProcessId=100;MoveProcessStartUtcTicks=1000L;DeferredPolicy=$false
+            VerificationPolicy='ARCH7bFreshWorkerSameOutlook';MoveWorkerId=200
+            MoveWorkerStartUtcTicks=2000L;MoveWorkerSessionId=3
+        }
         Write-OPAARCH4Pending -Path $pending -Record $livePending
+        $disk=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($pending,[Text.Encoding]::UTF8))
+        foreach($prop in $livePending.PSObject.Properties){
+            $disk.PSObject.Properties.Name | Should -Contain $prop.Name
+            $disk.($prop.Name) | Should -Be $prop.Value
+        }
+        $disk.TransactionId | Should -Match '^\d{8}-\d{6}-[a-f0-9]{8}$'
+        $disk.SourcePst | Should -BeExactly ([IO.Path]::GetFullPath($source))
+        Assert-OPAARCH7bPendingPolicy -Pending $disk -ConfirmLiveOutlookVerification
         $params=@{Mode='Resume';Session=$session;Discovery=$discovery;SourcePst=$source;TransactionId=$tx.TransactionId;ARCH5Batch=$true;ConfirmLiveOutlookVerification=$true}
         {Invoke-OPAARCH4Batch @params} | Should -Throw '*independent full verification failed*'
         Test-Path -LiteralPath $pending | Should -BeTrue

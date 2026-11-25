@@ -138,6 +138,7 @@ function Restart-OPAARCH6OutlookForResume {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Pending,
           [ValidateRange(5,300)][int]$TimeoutSeconds=60)
+    if($Pending.PSObject.Properties.Name -contains 'VerificationPolicy'){throw 'ARCH7b live verification pending: legacy Outlook restart prohibited.'}
     $sessionId=[Diagnostics.Process]::GetCurrentProcess().SessionId
     $processes=@(Get-Process -Name OUTLOOK -ErrorAction SilentlyContinue | Where-Object {$_.SessionId -eq $sessionId})
     if($processes.Count -eq 0){return}
