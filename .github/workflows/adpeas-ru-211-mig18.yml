@@ -1,4 +1,4 @@
-name: "adPEAS RU 2.11.0 MIG19d2b - false help directive repair"
+name: "adPEAS RU 2.11.0 MIG19d3 - HTTP and session diagnostics"
 on:
   push:
     branches:
@@ -410,6 +410,11 @@ jobs:
           $ErrorActionPreference = 'Stop'
           & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File 'adPEAS-RU/Migration/v2.11.0/MIG18/Probe-MIG19d2bHelper.ps1' -Candidate '_mig/candidate' -Report '_mig/2.11.0-mig19d2b-help.json'
           if ($LASTEXITCODE -ne 0) { throw 'MIG19d2b isolated help gate failed' }
+      - name: MIG19d3 HTTP, TLS, Exchange, AD CS and session diagnostics
+        shell: powershell
+        run: |
+          python adPEAS-RU/Migration/v2.11.0/MIG18/Build-MIG19d3.py --candidate '_mig/candidate' --report '_mig/2.11.0-mig19d3-source.json' --inventory '_mig/2.11.0-mig19d3-residual.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG19d3 source witness gate failed' }
       - name: Check generated JavaScript syntax
         shell: powershell
         run: |
@@ -521,29 +526,31 @@ jobs:
           $errors = $null
           [void][System.Management.Automation.Language.Parser]::ParseFile($f,[ref]$tokens,[ref]$errors)
           if ($errors.Count -gt 0) { throw $errors[0].Message }
-          python adPEAS-RU/Migration/v2.11.0/MIG18/Test-MIG19d2a.py --candidate '_mig/candidate' --diagnostics '_mig/mig19d2b-diagnostics' --report '_mig/2.11.0-mig19d2b-report.json'
+          python adPEAS-RU/Migration/v2.11.0/MIG18/Test-MIG19d2a.py --candidate '_mig/candidate' --diagnostics '_mig/mig19d3-diagnostics' --report '_mig/2.11.0-mig19d3-report.json'
           if ($LASTEXITCODE -ne 0) { throw 'MIG19bc offline report parity failed' }
       - name: Publish synthetic report diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG19d2b-DIAGNOSTICS
+          name: adPEAS-RU-2.11.0-MIG19d3-DIAGNOSTICS
           path: |
-            _mig/mig19d2b-diagnostics/
-            _mig/2.11.0-mig19d2b-report.json
+            _mig/mig19d3-diagnostics/
+            _mig/2.11.0-mig19d3-report.json
           retention-days: 14
           if-no-files-found: warn
       - name: Publish source coverage and residual inventory regardless of runtime result
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG19d2b-COVERAGE
+          name: adPEAS-RU-2.11.0-MIG19d3-COVERAGE
           path: |
             _mig/2.11.0-mig19d2-source.json
             _mig/2.11.0-mig19d2-residual.json
             _mig/2.11.0-mig19d2a-source.json
             _mig/2.11.0-mig19d2b-source.json
             _mig/2.11.0-mig19d2b-help.json
+            _mig/2.11.0-mig19d3-source.json
+            _mig/2.11.0-mig19d3-residual.json
           retention-days: 14
           if-no-files-found: warn
       - name: Publish runtime diagnostic evidence
@@ -560,7 +567,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG19d2b-PREVIEW
+          name: adPEAS-RU-2.11.0-MIG19d3-PREVIEW
           path: |
             _mig/2.11.0-parity.json
             _mig/2.11.0-mig2-coverage.json
@@ -582,7 +589,7 @@ jobs:
             _mig/2.11.0-mig19a2-source.json
             _mig/2.11.0-mig19a4-exe-scope.json
             _mig/2.11.0-mig19a4-runtime.json
-            _mig/2.11.0-mig19d2b-report.json
+            _mig/2.11.0-mig19d3-report.json
             _mig/2.11.0-mig19d-source.json
             _mig/2.11.0-mig19d1-source.json
             _mig/2.11.0-mig19d2-source.json
@@ -590,6 +597,8 @@ jobs:
             _mig/2.11.0-mig19d2a-source.json
             _mig/2.11.0-mig19d2b-source.json
             _mig/2.11.0-mig19d2b-help.json
+            _mig/2.11.0-mig19d3-source.json
+            _mig/2.11.0-mig19d3-residual.json
             _mig/candidate/README-RU-2.11.0.md
             _mig/candidate/adPEAS.ps1
             _mig/candidate/adPEAS_min.ps1

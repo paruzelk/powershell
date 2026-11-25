@@ -1,0 +1,738 @@
+{
+  "src/modules/Helpers/Invoke-HTTPRequest.ps1": [
+    [
+      "Write-Log \"[Set-TLSConfiguration] TLS 1.1 not available\"",
+      "Write-Log \"[Set-TLSConfiguration] TLS 1.1 недоступен\"",
+      1
+    ],
+    [
+      "Write-Log \"[Set-TLSConfiguration] TLS 1.0 not available\"",
+      "Write-Log \"[Set-TLSConfiguration] TLS 1.0 недоступен\"",
+      1
+    ],
+    [
+      "Write-Log \"[Set-TLSConfiguration] TLS 1.3 enabled\"",
+      "Write-Log \"[Set-TLSConfiguration] TLS 1.3 включён\"",
+      1
+    ],
+    [
+      "Write-Log \"[Set-TLSConfiguration] TLS 1.3 not available on this system\"",
+      "Write-Log \"[Set-TLSConfiguration] TLS 1.3 недоступен в этой системе\"",
+      1
+    ],
+    [
+      "Write-Log \"[Set-TLSConfiguration] Error configuring TLS: $_\"",
+      "Write-Log \"[Set-TLSConfiguration] Ошибка настройки TLS: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Set-TLSConfiguration] SSL certificate validation disabled\"",
+      "Write-Log \"[Set-TLSConfiguration] Проверка сертификатов SSL отключена\"",
+      1
+    ],
+    [
+      "Write-Log \"[Restore-TLSConfiguration] TLS settings restored\"",
+      "Write-Log \"[Restore-TLSConfiguration] Настройки TLS восстановлены\"",
+      1
+    ],
+    [
+      "Write-Log \"[Restore-TLSConfiguration] Error restoring TLS settings: $_\"",
+      "Write-Log \"[Restore-TLSConfiguration] Ошибка восстановления настроек TLS: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Invoke-HTTPRequest] Added https:// prefix: $targetUri\"",
+      "Write-Log \"[Invoke-HTTPRequest] Добавлен префикс https://: $targetUri\"",
+      1
+    ],
+    [
+      "Write-Log \"[Invoke-HTTPRequest] Could not add header ${key}: $_\"",
+      "Write-Log \"[Invoke-HTTPRequest] Не удалось добавить заголовок ${key}: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Invoke-HTTPRequest] Success: HTTP $($result.StatusCode)\"",
+      "Write-Log \"[Invoke-HTTPRequest] Успешно: HTTP $($result.StatusCode)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Invoke-HTTPRequest] WebException: $($result.Error)\"",
+      "Write-Log \"[Invoke-HTTPRequest] Исключение WebException: $($result.Error)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Invoke-HTTPRequest] Error: $($result.Error)\"",
+      "Write-Log \"[Invoke-HTTPRequest] Ошибка: $($result.Error)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Detecting Exchange configuration for: $targetHost\"",
+      "Write-Log \"[ScanExchange] Определение конфигурации Exchange для: $targetHost\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Method 1: Trying $exportToolUrl\"",
+      "Write-Log \"[ScanExchange] Метод 1: проверяется $exportToolUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Method 1: Response is HTML (proxy/load balancer page), not Exchange XML\"",
+      "Write-Log \"[ScanExchange] Метод 1: получен HTML (страница прокси или балансировщика), а не XML Exchange\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Method 1 SUCCESS: $buildNumber\"",
+      "Write-Log \"[ScanExchange] Метод 1 выполнен успешно: $buildNumber\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Method 1: XML parse failed - $errorMsg\"",
+      "Write-Log \"[ScanExchange] Метод 1: ошибка разбора XML — $errorMsg\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Method 1 failed (HTTP $statusCode): $($_.Exception.Message)\"",
+      "Write-Log \"[ScanExchange] Ошибка метода 1 (HTTP $statusCode): $($_.Exception.Message)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Method 1 failed: $_\"",
+      "Write-Log \"[ScanExchange] Ошибка метода 1: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing OWA endpoint: $owaUrl\"",
+      "Write-Log \"[ScanExchange] Проверка конечной точки OWA: $owaUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] OWA version detected: $($owaResult.OWAVersion)\"",
+      "Write-Log \"[ScanExchange] Определена версия OWA: $($owaResult.OWAVersion)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] OWA available (HTTP $($owaResult.StatusCode)), Auth: $($owaResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanExchange] OWA доступен (HTTP $($owaResult.StatusCode)), аутентификация: $($owaResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] OWA endpoint responded but is not Exchange (likely load balancer redirect)\"",
+      "Write-Log \"[ScanExchange] Конечная точка OWA ответила, но не относится к Exchange (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing Autodiscover endpoint: $autodiscoverUrl\"",
+      "Write-Log \"[ScanExchange] Проверка конечной точки Autodiscover: $autodiscoverUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Autodiscover version detected: $($autodiscoverResult.OWAVersion)\"",
+      "Write-Log \"[ScanExchange] Определена версия Autodiscover: $($autodiscoverResult.OWAVersion)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Autodiscover available (HTTP $($autodiscoverResult.StatusCode)), Auth: $($autodiscoverResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanExchange] Autodiscover доступен (HTTP $($autodiscoverResult.StatusCode)), аутентификация: $($autodiscoverResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Autodiscover endpoint responded but is not Exchange (likely load balancer redirect)\"",
+      "Write-Log \"[ScanExchange] Конечная точка Autodiscover ответила, но не относится к Exchange (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing EWS endpoint: $ewsUrl\"",
+      "Write-Log \"[ScanExchange] Проверка конечной точки EWS: $ewsUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] EWS version detected: $($ewsResult.OWAVersion)\"",
+      "Write-Log \"[ScanExchange] Определена версия EWS: $($ewsResult.OWAVersion)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] EWS available (HTTP $($ewsResult.StatusCode)), Auth: $($ewsResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanExchange] EWS доступен (HTTP $($ewsResult.StatusCode)), аутентификация: $($ewsResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] EWS endpoint responded but is not Exchange (likely load balancer redirect)\"",
+      "Write-Log \"[ScanExchange] Конечная точка EWS ответила, но не относится к Exchange (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing MRSProxy endpoint: $mrsUrl\"",
+      "Write-Log \"[ScanExchange] Проверка конечной точки MRSProxy: $mrsUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] MRSProxy available (HTTP $($mrsResult.StatusCode)), Auth: $($mrsResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanExchange] MRSProxy доступен (HTTP $($mrsResult.StatusCode)), аутентификация: $($mrsResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing ECP endpoint: $ecpUrl\"",
+      "Write-Log \"[ScanExchange] Проверка конечной точки ECP: $ecpUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] ECP available (HTTP $($ecpResult.StatusCode)), Auth: $($ecpResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanExchange] ECP доступен (HTTP $($ecpResult.StatusCode)), аутентификация: $($ecpResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] ECP endpoint responded but is not Exchange (likely load balancer redirect)\"",
+      "Write-Log \"[ScanExchange] Конечная точка ECP ответила, но не относится к Exchange (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing MAPI endpoint: $mapiUrl\"",
+      "Write-Log \"[ScanExchange] Проверка конечной точки MAPI: $mapiUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] MAPI available (HTTP $($mapiResult.StatusCode)), Auth: $($mapiResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanExchange] MAPI доступен (HTTP $($mapiResult.StatusCode)), аутентификация: $($mapiResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] MAPI endpoint responded but is not Exchange (likely load balancer redirect)\"",
+      "Write-Log \"[ScanExchange] Конечная точка MAPI ответила, но не относится к Exchange (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing RPC endpoint: $rpcUrl\"",
+      "Write-Log \"[ScanExchange] Проверка конечной точки RPC: $rpcUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] RPC available (HTTP $($rpcResult.StatusCode)), Auth: $($rpcResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanExchange] RPC доступен (HTTP $($rpcResult.StatusCode)), аутентификация: $($rpcResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] RPC endpoint responded but is not Exchange (likely load balancer redirect)\"",
+      "Write-Log \"[ScanExchange] Конечная точка RPC ответила, но не относится к Exchange (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing PowerShell endpoint: $psUrl\"",
+      "Write-Log \"[ScanExchange] Проверка конечной точки PowerShell: $psUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] PowerShell available (HTTP $($psResult.StatusCode)), Auth: $($psResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanExchange] PowerShell доступен (HTTP $($psResult.StatusCode)), аутентификация: $($psResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] PowerShell endpoint responded but is not Exchange (likely load balancer redirect)\"",
+      "Write-Log \"[ScanExchange] Конечная точка PowerShell ответила, но не относится к Exchange (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing ActiveSync endpoint: $asUrl\"",
+      "Write-Log \"[ScanExchange] Проверка конечной точки ActiveSync: $asUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] ActiveSync available (HTTP $($asResult.StatusCode)), Auth: $($asResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanExchange] ActiveSync доступен (HTTP $($asResult.StatusCode)), аутентификация: $($asResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] ActiveSync endpoint responded but is not Exchange (likely load balancer redirect)\"",
+      "Write-Log \"[ScanExchange] Конечная точка ActiveSync ответила, но не относится к Exchange (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing $($extra.Name) endpoint: $($extra.Url)\"",
+      "Write-Log \"[ScanExchange] Проверка конечной точки $($extra.Name): $($extra.Url)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] $($extra.Name) available (HTTP $($extraResult.StatusCode)), Auth: $($extraResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanExchange] $($extra.Name) доступен (HTTP $($extraResult.StatusCode)), аутентификация: $($extraResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing HTTP (non-SSL) for version\"",
+      "Write-Log \"[ScanExchange] Определение версии через HTTP без SSL\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] HTTP version detected: $($httpResult.OWAVersion)\"",
+      "Write-Log \"[ScanExchange] Определена версия через HTTP: $($httpResult.OWAVersion)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Endpoints found but version detection failed\"",
+      "Write-Log \"[ScanExchange] Конечные точки найдены, но определить версию не удалось\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] No endpoints found for $targetHost\"",
+      "Write-Log \"[ScanExchange] Не найдены конечные точки для $targetHost\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Detection complete - Available endpoints: $($availableEndpoints -join ', ')\"",
+      "Write-Log \"[ScanExchange] Обнаружение завершено — доступные конечные точки: $($availableEndpoints -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Detection complete - No Exchange endpoints found\"",
+      "Write-Log \"[ScanExchange] Обнаружение завершено — конечные точки Exchange не найдены\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing Extended Protection for Authentication (EPA) per endpoint...\"",
+      "Write-Log \"[ScanExchange] Проверка расширенной защиты аутентификации (EPA) для каждой конечной точки...\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] EPA probe has no identity to log on with: $($epaIdentity.Reason)\"",
+      "Write-Log \"[ScanExchange] Для проверки EPA отсутствуют учётные данные: $($epaIdentity.Reason)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] EPA probe logs on as $($epaIdentity.Name) ($($epaIdentity.Source))\"",
+      "Write-Log \"[ScanExchange] Проверка EPA выполняет вход от имени $($epaIdentity.Name) ($($epaIdentity.Source))\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] Testing EPA for $ep at $epaTestUrl\"",
+      "Write-Log \"[ScanExchange] Проверка EPA для $ep at $epaTestUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] EPA not applicable - HTTP only (no TLS)\"",
+      "Write-Log \"[ScanExchange] EPA неприменима — только HTTP (без TLS)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanExchange] EPA test skipped - no NTLM over HTTPS\"",
+      "Write-Log \"[ScanExchange] Проверка EPA пропущена — нет NTLM через HTTPS\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Empty URL provided\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Указан пустой URL\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Got redirect (HTTP $statusCode), checking location: $location\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Получено перенаправление (HTTP $statusCode), проверяется адрес: $location\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Redirect to Exchange path (matched $pattern)\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Перенаправление на путь Exchange (совпадение с $pattern)\"",
+      2
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Redirect to non-Exchange path: $location\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Перенаправление на путь вне Exchange: $location\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Redirect target returns 200 OK with auth header: $($endpointResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Целевой адрес перенаправления возвращает 200 OK с заголовком аутентификации: $($endpointResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Redirect target returns 200 OK (Forms-based auth)\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Целевой адрес перенаправления возвращает 200 OK (аутентификация через форму)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: OWA version from redirect: $redirectOWAVersion\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Версия OWA из перенаправления: $redirectOWAVersion\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Got auth methods from redirect target: $($endpointResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Получены способы аутентификации целевого адреса перенаправления: $($endpointResult.AuthMethods -join ', ')\"",
+      2
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: OWA version from redirect error response: $redirectOWAVersion\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Версия OWA из ответа с ошибкой перенаправления: $redirectOWAVersion\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Could not follow redirect: $_\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Не удалось перейти по перенаправлению: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: 200 OK with WWW-Authenticate: $($endpointResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: 200 OK с WWW-Authenticate: $($endpointResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: HTTP 404 - endpoint not found (server reachable)\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: HTTP 404 — конечная точка не найдена (сервер доступен)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Server error (HTTP $statusCode) - endpoint may exist but has issues\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Ошибка сервера (HTTP $statusCode) — конечная точка может существовать, но работает некорректно\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Checking redirect location: $location\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Проверяется адрес перенаправления: $location\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Redirect to non-Exchange path (load balancer?): $location\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Перенаправление на путь вне Exchange (возможно, балансировщик): $location\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Redirect without Location header\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Перенаправление без заголовка Location\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Could not follow redirect to get auth methods: $_\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Не удалось перейти по перенаправлению для определения способов аутентификации: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Connection failed - $($_.Exception.Message)\"",
+      "Write-Log \"[Test-ExchangeEndpoint] ${EndpointName}: Ошибка соединения — $($_.Exception.Message)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] WARNING: Invalid CAName '$CAName' - contains forbidden characters, skipping CES tests\"",
+      "Write-Log \"[ScanADCS] ПРЕДУПРЕЖДЕНИЕ: недопустимое CAName '$CAName' — содержит запрещённые символы, проверки CES пропущены\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Using CA name: $CAName (encoded: $sanitizedCAName)\"",
+      "Write-Log \"[ScanADCS] Используется имя CA: $CAName (закодированное: $sanitizedCAName)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Testing ADCS Web Enrollment for: $targetHost\"",
+      "Write-Log \"[ScanADCS] Проверка веб-регистрации AD CS для: $targetHost\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Testing HTTPS CertSrv: $httpsUrl\"",
+      "Write-Log \"[ScanADCS] Проверка HTTPS CertSrv: $httpsUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] CertSrv HTTPS available (HTTP $($httpsResult.StatusCode)), Auth: $($httpsResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanADCS] CertSrv HTTPS доступен (HTTP $($httpsResult.StatusCode)), аутентификация: $($httpsResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] CertSrv HTTPS responded but is not ADCS (likely load balancer redirect)\"",
+      "Write-Log \"[ScanADCS] CertSrv HTTPS ответил, но не относится к AD CS (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Testing HTTP CertSrv: $httpUrl\"",
+      "Write-Log \"[ScanADCS] Проверка HTTP CertSrv: $httpUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] CertSrv HTTP available (HTTP $($httpResult.StatusCode)), Auth: $($httpResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanADCS] CertSrv HTTP доступен (HTTP $($httpResult.StatusCode)), аутентификация: $($httpResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] CertSrv HTTP responded but is not ADCS (likely load balancer redirect)\"",
+      "Write-Log \"[ScanADCS] CertSrv HTTP ответил, но не относится к AD CS (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Testing CEP: $cepUrl\"",
+      "Write-Log \"[ScanADCS] Проверка CEP: $cepUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] CEP available (HTTP $($cepResult.StatusCode)), Auth: $($cepResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanADCS] CEP доступен (HTTP $($cepResult.StatusCode)), аутентификация: $($cepResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] CEP responded but is not ADCS (likely load balancer redirect)\"",
+      "Write-Log \"[ScanADCS] CEP ответил, но не относится к AD CS (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Testing CES: $cesUrl\"",
+      "Write-Log \"[ScanADCS] Проверка CES: $cesUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] CES available (HTTP $($cesResult.StatusCode)), Auth: $($cesResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanADCS] CES доступен (HTTP $($cesResult.StatusCode)), аутентификация: $($cesResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] CES responded but is not ADCS (likely load balancer redirect)\"",
+      "Write-Log \"[ScanADCS] CES ответил, но не относится к AD CS (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Skipping CES test - CAName parameter not provided\"",
+      "Write-Log \"[ScanADCS] Проверка CES пропущена — параметр CAName не задан\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Testing NDES HTTPS: $ndesUrl\"",
+      "Write-Log \"[ScanADCS] Проверка NDES HTTPS: $ndesUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] NDES HTTPS available (HTTP $($ndesResult.StatusCode)), Auth: $($ndesResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanADCS] NDES HTTPS доступен (HTTP $($ndesResult.StatusCode)), аутентификация: $($ndesResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] NDES HTTPS responded but is not ADCS (likely load balancer redirect)\"",
+      "Write-Log \"[ScanADCS] NDES HTTPS ответил, но не относится к AD CS (вероятно, перенаправление балансировщика)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Testing NDES HTTP fallback: $ndesHttpUrl\"",
+      "Write-Log \"[ScanADCS] Проверка NDES HTTP fallback: $ndesHttpUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] NDES HTTP available (HTTP $($ndesHttpResult.StatusCode)), Auth: $($ndesHttpResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[ScanADCS] NDES HTTP доступен (HTTP $($ndesHttpResult.StatusCode)), аутентификация: $($ndesHttpResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Skipping CEP/CES/NDES tests - server not reachable\"",
+      "Write-Log \"[ScanADCS] Проверки CEP/CES/NDES пропущены — сервер недоступен\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Detection complete - Available endpoints: $($availableEndpoints -join ', ')\"",
+      "Write-Log \"[ScanADCS] Обнаружение завершено — доступные конечные точки: $($availableEndpoints -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Detection complete - No ADCS endpoints found\"",
+      "Write-Log \"[ScanADCS] Обнаружение завершено — конечные точки AD CS не найдены\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Testing Extended Protection for Authentication (EPA) per endpoint...\"",
+      "Write-Log \"[ScanADCS] Проверка расширенной защиты аутентификации (EPA) для каждой конечной точки...\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] EPA probe has no identity to log on with: $($epaIdentity.Reason)\"",
+      "Write-Log \"[ScanADCS] Для проверки EPA отсутствуют учётные данные: $($epaIdentity.Reason)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] EPA probe logs on as $($epaIdentity.Name) ($($epaIdentity.Source))\"",
+      "Write-Log \"[ScanADCS] Проверка EPA выполняет вход от имени $($epaIdentity.Name) ($($epaIdentity.Source))\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Skipping EPA test for $ep - URL cannot be determined without CA name parameter\"",
+      "Write-Log \"[ScanADCS] Проверка EPA для $ep пропущена — URL невозможно определить без имени CA\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] Testing EPA for $ep at $epaTestUrl\"",
+      "Write-Log \"[ScanADCS] Проверка EPA для $ep at $epaTestUrl\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] EPA not applicable - HTTP only (no TLS)\"",
+      "Write-Log \"[ScanADCS] EPA неприменима — только HTTP (без TLS)\"",
+      1
+    ],
+    [
+      "Write-Log \"[ScanADCS] EPA test skipped - no NTLM over HTTPS\"",
+      "Write-Log \"[ScanADCS] Проверка EPA пропущена — нет NTLM через HTTPS\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Empty URL provided\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Указан пустой URL\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Got redirect (HTTP $statusCode), checking location: $location\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Получено перенаправление (HTTP $statusCode), проверяется адрес: $location\"",
+      2
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Redirect to ADCS path (matched $pattern)\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Перенаправление на путь AD CS (совпадение с $pattern)\"",
+      2
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Redirect to non-ADCS path: $location\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Перенаправление на путь вне AD CS: $location\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: 200 OK with WWW-Authenticate: $($endpointResult.AuthMethods -join ', ')\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: 200 OK с WWW-Authenticate: $($endpointResult.AuthMethods -join ', ')\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: HTTP 403 without WWW-Authenticate on plain HTTP - likely IIS 403.4 (SSL Required), not counting as HTTP-available\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: HTTP 403 без WWW-Authenticate через обычный HTTP — вероятно, IIS 403.4 (требуется SSL); не считается доступным через HTTP\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: HTTP $statusCode without WWW-Authenticate (HTTPS or unknown context)\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: HTTP $statusCode без WWW-Authenticate (HTTPS или неизвестный контекст)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: HTTP 404 - endpoint not found (server reachable)\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: HTTP 404 — конечная точка не найдена (сервер доступен)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Server error (HTTP $statusCode) - endpoint may exist but has issues\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Ошибка сервера (HTTP $statusCode) — конечная точка может существовать, но работает некорректно\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Redirect to non-ADCS path (load balancer?): $location\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Перенаправление на путь вне AD CS (возможно, балансировщик): $location\"",
+      1
+    ],
+    [
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Error testing ${Url}: $_\"",
+      "Write-Log \"[Test-ADCSEndpoint] ${EndpointName}: Ошибка проверки ${Url}: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Parse-WWWAuthenticateHeader] Unknown auth header format: $($HeaderValue.Substring(0, [Math]::Min(50, $HeaderValue.Length)))...\"",
+      "Write-Log \"[Parse-WWWAuthenticateHeader] Неизвестный формат заголовка аутентификации: $($HeaderValue.Substring(0, [Math]::Min(50, $HeaderValue.Length)))...\"",
+      1
+    ]
+  ],
+  "src/modules/Core/Connect-adPEAS.ps1": [
+    [
+      "Show-Line \"Patched hosts file with $($hostsPatched.Count) entries (cleanup on Disconnect-adPEAS)\" -Class Info",
+      "Show-Line \"В файл hosts добавлено записей: $($hostsPatched.Count) (удаление при Disconnect-adPEAS)\" -Class Info",
+      2
+    ],
+    [
+      "Show-Line \"Cross-domain authentication (NetBIOS): using NTLM/SimpleBind\" -Class Hint",
+      "Show-Line \"Междоменная аутентификация (NetBIOS): используется NTLM/SimpleBind\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"Cross-domain: could not find KDC for '$UserRealm' - using NTLM/SimpleBind\" -Class Hint",
+      "Show-Line \"Междоменное подключение: не найден KDC для '$UserRealm' — используется NTLM/SimpleBind\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"Cross-domain authentication: falling back to NTLM/SimpleBind\" -Class Hint",
+      "Show-Line \"Междоменная аутентификация: переход к NTLM/SimpleBind\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"Kerberos TGT/TGS acquired successfully, but LDAP requires hostname resolution\" -Class Note",
+      "Show-Line \"Билеты Kerberos TGT/TGS успешно получены, но LDAP требует разрешения имён узлов\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"Use -PatchHostsFile for full Kerberos authentication\" -Class Note",
+      "Show-Line \"Для полноценной аутентификации Kerberos используйте -PatchHostsFile\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"Kerberos failed - trying NTLM\" -Class Info",
+      "Show-Line \"Ошибка Kerberos — попытка NTLM\" -Class Info",
+      1
+    ],
+    [
+      "Show-Line \"NTLM failed - falling back to SimpleBind\" -Class Hint",
+      "Show-Line \"Ошибка NTLM — переход к SimpleBind\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"Connected via NTLM (supports LDAP signing)\" -Class Hint",
+      "Show-Line \"Подключение через NTLM (поддерживает подпись LDAP)\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"LDAP signing required - the simple bind was refused on port 389, auto-upgrading to LDAPS\" -Class Hint",
+      "Show-Line \"Требуется подпись LDAP — SimpleBind на порту 389 отклонён, автоматический переход к LDAPS\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"Certificate contains multiple identities\" -Class Note",
+      "Show-Line \"Сертификат содержит несколько идентификаторов\" -Class Note",
+      2
+    ],
+    [
+      "Show-Line \"To select a different identity, use: -Username <name>\" -Class Note",
+      "Show-Line \"Чтобы выбрать другой идентификатор, используйте: -Username <name>\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"Building tab-completion cache...\" -Class Info",
+      "Show-Line \"Построение кэша автодополнения...\" -Class Info",
+      1
+    ],
+    [
+      "Show-Line \"Cached: $($stats.Users) users, $($stats.Computers) computers, $($stats.Groups) groups, $($stats.GPOs) GPOs\" -Class Hint",
+      "Show-Line \"В кэше: пользователей — $($stats.Users), компьютеров — $($stats.Computers), групп — $($stats.Groups), GPO — $($stats.GPOs)\" -Class Hint",
+      1
+    ]
+  ],
+  "src/modules/Helpers/Get-adPEASSession.ps1": [
+    [
+      "Show-SubHeader \"Checking connection health...\"",
+      "Show-SubHeader \"Проверка состояния соединения...\"",
+      2
+    ],
+    [
+      "Show-Line \"Health:\" -Class Hint",
+      "Show-Line \"Состояние:\" -Class Hint",
+      1
+    ],
+    [
+      "Show-SubHeader \"Displaying active session information...\"",
+      "Show-SubHeader \"Сведения об активном сеансе...\"",
+      1
+    ],
+    [
+      "Show-Line \"Connection:\" -Class Hint",
+      "Show-Line \"Подключение:\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"Authentication:\" -Class Hint",
+      "Show-Line \"Аутентификация:\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"  Identity Mismatch: DETECTED\" -Class Hint",
+      "Show-Line \"  Несовпадение идентификаторов: ОБНАРУЖЕНО\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"Session:\" -Class Hint",
+      "Show-Line \"Сеанс:\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"Help:\" -Class Hint",
+      "Show-Line \"Справка:\" -Class Hint",
+      1
+    ]
+  ]
+}
