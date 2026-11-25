@@ -18,8 +18,9 @@ function Assert-OPAARCH7bOutlookIdentity {
 }
 function Test-OPAARCH7bMoveWorkerAlive {
     param([int]$ProcessId,[long]$StartUtcTicks)
-    $p=Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
-    if($null -eq $p){return $false}
+    try{$p=Get-Process -Id $ProcessId -ErrorAction Stop}
+    catch{if($_.FullyQualifiedErrorId -like 'NoProcessFoundForGivenId,*'){return $false};throw}
+    if($null -eq $p){throw 'ARCH7b former worker lookup returned no reliable result.'}
     try{return ([long]$p.StartTime.ToUniversalTime().Ticks -eq $StartUtcTicks)}
     finally{$p.Dispose()}
 }

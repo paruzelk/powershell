@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7b DEV
+
+- Explicit fresh-worker same-Outlook verification, attach-only, bounded 1–10, original semantic verification, durable proof; 9 new synthetic tests, 4871/165 expected. Production closed.
+
 ## ARCH6f3c3 DEV
 
 - ARCH6f3c2 CI PASS; автоматическая ветвь пропуска не зависит от антивируса. Контроль локальности, проверка TEMP и метаданных, предохранитель по завершённой партии. 8 new synthetic tests, 4862/165 expected.

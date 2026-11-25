@@ -544,4 +544,126 @@ Describe 'ARCH6f3c3 vendor-independent attachment export failure deferral' {
     }
 }
 
+
+Describe 'ARCH7b independent worker live Outlook verification fences' {
+    BeforeEach {
+        $livePending=[pscustomobject]@{VerificationPolicy='ARCH7bFreshWorkerSameOutlook';MoveProcessId=100;MoveProcessStartUtcTicks=1000L;MoveWorkerId=200;MoveWorkerStartUtcTicks=2000L;MoveWorkerSessionId=3}
+        $liveOutlook=[pscustomobject]@{Id=100;StartUtcTicks=1000L}
+        $liveWorker=[pscustomobject]@{Id=201;StartUtcTicks=3000L;SessionId=3}
+        Mock Test-OPAARCH7bMoveWorkerAlive {$false}
+    }
+    It 'accepts fresh worker only with exactly the original Outlook identity and dead Move worker' {
+        {Assert-OPAARCH7bLiveFence -Pending $livePending -Outlook $liveOutlook -Worker $liveWorker} | Should -Not -Throw
+        Should -Invoke Test-OPAARCH7bMoveWorkerAlive -Exactly -Times 1
+    }
+    It 'rejects any different Outlook PID or start time before verification' {
+        $liveOutlook.Id=101
+        {Assert-OPAARCH7bLiveFence -Pending $livePending -Outlook $liveOutlook -Worker $liveWorker} | Should -Throw '*Outlook process identity changed*'
+        $liveOutlook.Id=100;$liveOutlook.StartUtcTicks=1001
+        {Assert-OPAARCH7bLiveFence -Pending $livePending -Outlook $liveOutlook -Worker $liveWorker} | Should -Throw '*Outlook process identity changed*'
+        Should -Invoke Test-OPAARCH7bMoveWorkerAlive -Exactly -Times 0
+    }
+    It 'rejects same old worker, earlier worker and different Windows session' {
+        $liveWorker.Id=200
+        {Assert-OPAARCH7bLiveFence -Pending $livePending -Outlook $liveOutlook -Worker $liveWorker} | Should -Throw '*new PowerShell worker*'
+        $liveWorker.Id=201;$liveWorker.StartUtcTicks=1999
+        {Assert-OPAARCH7bLiveFence -Pending $livePending -Outlook $liveOutlook -Worker $liveWorker} | Should -Throw '*new PowerShell worker*'
+        $liveWorker.StartUtcTicks=3000;$liveWorker.SessionId=4
+        {Assert-OPAARCH7bLiveFence -Pending $livePending -Outlook $liveOutlook -Worker $liveWorker} | Should -Throw '*new PowerShell worker*'
+    }
+    It 'refuses verification if original Move worker still lives' {
+        Mock Test-OPAARCH7bMoveWorkerAlive {$true}
+        {Assert-OPAARCH7bLiveFence -Pending $livePending -Outlook $liveOutlook -Worker $liveWorker} | Should -Throw '*still running*'
+    }
+    It 'does not allow switching between legacy restart policy and live verification policy' {
+        {Assert-OPAARCH7bPendingPolicy -Pending $livePending} | Should -Throw '*policy mismatch*'
+        {Assert-OPAARCH7bPendingPolicy -Pending ([pscustomobject]@{MoveProcessId=100}) -ConfirmLiveOutlookVerification} | Should -Throw '*policy mismatch*'
+        {Assert-OPAARCH7bPendingPolicy -Pending $livePending -ConfirmLiveOutlookVerification} | Should -Not -Throw
+        $livePending.VerificationPolicy='unknown'
+        {Assert-OPAARCH7bPendingPolicy -Pending $livePending -ConfirmLiveOutlookVerification} | Should -Throw '*unknown pending*'
+    }
+    It 'validates the explicit DEV CLI without COM or persistent writes and leaves Auto closed' {
+        $src=Join-Path $TestDrive 'arch7b-not-created.pst'
+        $main=Join-Path $script:root 'OutlookPOP3Archive.ps1'
+        $params=@{ProfileName='Outlook';SourcePst=$src;ConfirmTestArchive=$true;ConfirmLiveOutlookVerification=$true;WhatIf=$true}
+        (& $main -Mode Archive @params -Limit 10).Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
+        (& $main -Mode Resume @params -Transaction '20261125-135508-913b789a').Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
+        {& $main -Mode Archive @params -Limit 11} | Should -Throw '*ARCH7b*'
+        {& $main -Mode Resume @params} | Should -Throw '*ARCH7b*'
+        {& $main -Mode Auto @params} | Should -Throw '*ARCH7b*'
+        Test-Path -LiteralPath $src | Should -BeFalse
+    }
+    It 'keeps original legacy no-restart gate and attach-only no activation branch in source' {
+        $main=[IO.File]::ReadAllText((Join-Path $script:root 'OutlookPOP3Archive.ps1'))
+        $com=[IO.File]::ReadAllText((Join-Path $script:root 'Core/Runtime/ComManager.ps1'))
+        $batch=[IO.File]::ReadAllText((Join-Path $script:root 'Core/Archive/ARCH4Batch.ps1'))
+        $main | Should -Match 'New-OPAComSession -ProfileName \$ProfileName -AttachOnly'
+        $com.Contains("if("+'$AttachOnly'+"){throw 'ARCH7b running Outlook is not registered in ROT") | Should -BeTrue
+        $batch | Should -Match 'ARCH4 fully restart Outlook before Resume'
+        $batch | Should -Not -Match '\.Quit\('
+    }
+    It 'commits original journal/index in the same Outlook from a fresh worker and clears pending' {
+        $f=New-ARCH4Fixture -Count 3
+        foreach($step in @($f.Steps | Where-Object {$_.Step -eq 'Move Started'})){$step.SourceSemanticWitness | Add-Member NoteProperty Schema 'Synthetic'}
+        Save-ARCH4Fixture -Fixture $f
+        $tx=$f.Transaction
+        $source=[string]$tx.State.SourcePst
+        [IO.File]::WriteAllBytes($source,[byte[]]@(1))
+        [IO.File]::WriteAllBytes($f.Archive,[byte[]]@(1))
+        $store=[pscustomobject]@{StoreID='STORE';FilePath=$source}
+        $dest=[pscustomobject]@{StoreID='ARCHIVE';FilePath=$f.Archive}
+        $account=[pscustomobject]@{AccountType=2;DeliveryStore=$store}
+        $session=[pscustomobject]@{Attached=$true;Namespace=[pscustomobject]@{CurrentProfileName='Outlook';Accounts=@($account);Stores=@($store,$dest)}}
+        $discovery=[pscustomobject]@{Profile='Outlook';Pop3Sources=@([pscustomobject]@{FilePath=$source;Protocol='POP3';StoreHandle=$store})}
+        $script:liveFolder=[pscustomobject]@{StoreID='STORE';FolderPath=$script:sourceFolder}
+        Mock Get-OPAPop3SourceFolders {$script:liveFolder}
+        Mock Get-OPAARCH4OutlookProcess {[pscustomobject]@{Id=100;StartUtcTicks=1000L}}
+        Mock Get-OPAARCH7bWorkerIdentity {[pscustomobject]@{Id=201;StartUtcTicks=3000L;SessionId=3}}
+        Mock Test-OPAArchiveMoves {New-ARCH4Verification -Count 3}
+        Mock Move-OPAItemsWithLimit {throw 'Resume must not call Move'}
+        $pending=Join-Path ([IO.Path]::GetDirectoryName($tx.Path)) 'ARCH4.pending'
+        $livePending | Add-Member NotePropertyMembers @{Schema='2.6.5-ARCH4.Pending.1';TransactionId=$tx.TransactionId;SourcePst=$source;SourceStoreId='STORE';Profile='Outlook';DeferredPolicy=$false}
+        Write-OPAARCH4Pending -Path $pending -Record $livePending
+        $params=@{Mode='Resume';Session=$session;Discovery=$discovery;SourcePst=$source;TransactionId=$tx.TransactionId;ARCH5Batch=$true;ConfirmLiveOutlookVerification=$true}
+        $r=Invoke-OPAARCH4Batch @params
+        $r.Status | Should -BeExactly 'BatchVerifiedReconciledAndIndexed'
+        $r.Verified | Should -Be 3
+        $r.Indexed | Should -Be 3
+        $r.MoveInvocations | Should -Be 0
+        $r.OutlookProcessId | Should -Be 100
+        $r.MoveWorkerId | Should -Be 200
+        $r.VerifyWorkerId | Should -Be 201
+        $r.PendingCleared | Should -BeTrue
+        Test-Path -LiteralPath $pending | Should -BeFalse
+        @(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx) | Where-Object {$_.Step -ceq 'ARCH7b Fresh Worker Verified'}).Count | Should -Be 1
+        Should -Invoke Test-OPAArchiveMoves -Exactly -Times 1
+        Should -Invoke Move-OPAItemsWithLimit -Exactly -Times 0
+    }
+    It 'fails original verifier before commit and preserves pending in live worker mode' {
+        $f=New-ARCH4Fixture -Count 3
+        foreach($step in @($f.Steps | Where-Object {$_.Step -eq 'Move Started'})){$step.SourceSemanticWitness | Add-Member NoteProperty Schema 'Synthetic'}
+        Save-ARCH4Fixture -Fixture $f
+        $tx=$f.Transaction;$source=[string]$tx.State.SourcePst
+        [IO.File]::WriteAllBytes($source,[byte[]]@(1));[IO.File]::WriteAllBytes($f.Archive,[byte[]]@(1))
+        $store=[pscustomobject]@{StoreID='STORE';FilePath=$source}
+        $dest=[pscustomobject]@{StoreID='ARCHIVE';FilePath=$f.Archive}
+        $session=[pscustomobject]@{Attached=$true;Namespace=[pscustomobject]@{CurrentProfileName='Outlook';Accounts=@([pscustomobject]@{AccountType=2;DeliveryStore=$store});Stores=@($store,$dest)}}
+        $discovery=[pscustomobject]@{Profile='Outlook';Pop3Sources=@([pscustomobject]@{FilePath=$source;Protocol='POP3';StoreHandle=$store})}
+        $script:liveFolder=[pscustomobject]@{StoreID='STORE';FolderPath=$script:sourceFolder}
+        Mock Get-OPAPop3SourceFolders {$script:liveFolder}
+        Mock Get-OPAARCH4OutlookProcess {[pscustomobject]@{Id=100;StartUtcTicks=1000L}}
+        Mock Get-OPAARCH7bWorkerIdentity {[pscustomobject]@{Id=201;StartUtcTicks=3000L;SessionId=3}}
+        Mock Test-OPAArchiveMoves {$v=New-ARCH4Verification -Count 3;$v.Verified=$false;$v}
+        Mock Move-OPAItemsWithLimit {throw 'Resume must not call Move'}
+        $pending=Join-Path ([IO.Path]::GetDirectoryName($tx.Path)) 'ARCH4.pending'
+        $livePending | Add-Member NotePropertyMembers @{Schema='2.6.5-ARCH4.Pending.1';TransactionId=$tx.TransactionId;SourcePst=$source;SourceStoreId='STORE';Profile='Outlook';DeferredPolicy=$false}
+        Write-OPAARCH4Pending -Path $pending -Record $livePending
+        $params=@{Mode='Resume';Session=$session;Discovery=$discovery;SourcePst=$source;TransactionId=$tx.TransactionId;ARCH5Batch=$true;ConfirmLiveOutlookVerification=$true}
+        {Invoke-OPAARCH4Batch @params} | Should -Throw '*independent full verification failed*'
+        Test-Path -LiteralPath $pending | Should -BeTrue
+        (Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE).Reconciled | Should -Be 0
+        Should -Invoke Move-OPAItemsWithLimit -Exactly -Times 0
+    }
+}
+
 }

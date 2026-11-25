@@ -1,8 +1,8 @@
-﻿# OutlookPOP3Archive — ARCH7a (документация; исполняемый билд ARCH6f3c3)
+﻿# OutlookPOP3Archive — ARCH7b DEV
 
 ## Актуальный запуск и документация
 
-25.11.2026: ARCH6f3c3, 8910499e, CI 4862/165 PASS. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
+25.11.2026: предыдущий ARCH6f3c3, 8910499e, CI 4862/165 PASS. ARCH7b — новый DEV [тест свежего worker без перезапуска Outlook](docs/2.6.5-arch7b.md); CI/live acceptance pending. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
 
 - [Целевой Auto и аудит](docs/ARCH7a-AUTO-REQUIREMENTS.md)
 - [Установка на RDS, планировщик вручную, PowerShell, GPO](docs/RDS-DEPLOYMENT.md)
@@ -30,7 +30,7 @@ $test = @{ProfileName='Outlook';SourcePst='C:\Test\mail.pst';ConfirmTestArchive=
 
 ## Полный справочник параметров OutlookPOP3Archive.ps1
 
-Таблица отражает фактический param() коммита 8910499e, а не будущие defaults. Условия совместимости проверяются кодом. Common parameters PowerShell предоставляются CmdletBinding. WorkerPilot* — исторические DEV диагностики, не для планировщика.
+Таблица отражает фактический param() ARCH7b, а не будущие defaults. Условия совместимости проверяются кодом. Common parameters PowerShell предоставляются CmdletBinding. WorkerPilot* — исторические DEV диагностики, не для планировщика.
 
 | Ключ | Тип / диапазон | Default DEV | Назначение |
 |---|---|---|---|
@@ -39,6 +39,7 @@ $test = @{ProfileName='Outlook';SourcePst='C:\Test\mail.pst';ConfirmTestArchive=
 | `-Transaction` | string | не задан | ID транзакции Resume. |
 | `-SourcePst` | string | не задан | Точный локальный исходный POP3 PST; обязателен для writer DEV. |
 | `-ConfirmTestArchive` | switch | False | Явное согласие на тестовый PST. |
+| `-ConfirmLiveOutlookVerification` | switch | False | ARCH7b: тест Archive 1–10 или точный Resume в новом worker; неизменный Outlook, attach-only. Не Auto, не контроллер. |
 | `-ConfirmComplexAttachments` | switch | False | Экспериментальные MSG/OLE; Archive, Limit/BatchSize ≤10. |
 | `-IncludeFolderPath` | string[] | не задан | Массив точных разрешённых путей папок. |
 | `-IncludeRootMail` | switch | False | Включить письма непосредственно в корне PST. |

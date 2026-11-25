@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH7b DEV: [fresh worker without Outlook restart](2.6.5-arch7b.md), CI/live pending. Next ARCH7c mixed recovery, ARCH7d supervisor. Production closed.
+
 > **ARCH7a 25.11.2026:** [Auto age-only, аудит и требования](ARCH7a-AUTO-REQUIREMENTS.md), [CLI](../README.md), [RDS](RDS-DEPLOYMENT.md). 4862/165 CI PASS ARCH6f3c3, live pending, historical hold failed, 1310/1500 verified. Production closed. Далее ARCH7b–g, ARCH8a/b, RC. Отдельный конфиг и обязательная size-driven policy исключены. Ниже история.
 
 > ARCH6f3c3: [независимый от антивируса пропуск](2.6.5-arch6f3c3.md), CI/live acceptance pending. ARCH6f3d: remaining 190.

@@ -1,5 +1,7 @@
 # ARCH7a — эксплуатационный контракт Auto
 
+> ARCH7b implementation: [bounded same-Outlook verification](2.6.5-arch7b.md); CI and real acceptance pending. Target requirements unchanged.
+
 25.11.2026. Последний исполняемый релиз ARCH6f3c3, 8910499e, 4862 Pester / 165 контейнеров PASS. Документационный этап. ProductionReady=False, Auto закрыт.
 
 ## Требования
