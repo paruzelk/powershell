@@ -306,6 +306,91 @@ function Complete-OPAARCH5aZeroMoveBatch {
     return $result
 }
 
+# ARCH6f3c1: narrow recovery of a completely paired, skip-free prefix.
+# All original claims, receipts and operation envelopes must already pass ARCH4 replay.
+function Assert-OPAARCH6InterruptedState {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Transaction,
+          [Parameter(Mandatory=$true)][object]$State,
+          [Parameter(Mandatory=$true)][AllowEmptyCollection()][object[]]$Steps,
+          [ValidateRange(1,500)][int]$ExpectedPlanned,
+          [ValidateRange(1,500)][int]$ExpectedReturned)
+    if($ExpectedPlanned -lt 1 -or $ExpectedReturned -lt 1 -or $ExpectedReturned -ge $ExpectedPlanned -or
+       $State.Planned -ne $ExpectedPlanned -or $State.Returned -ne $ExpectedReturned -or $State.Claimed -ne $ExpectedReturned -or
+       $State.AwaitingRestart -or $State.Reconciled -lt 0 -or $State.Reconciled -gt $ExpectedReturned -or
+       $State.OperationEventCount -ne ($ExpectedReturned+$State.Reconciled)){
+        throw 'ARCH6f3c1 interrupted counts or termination evidence mismatch.'
+    }
+    $checkpoint=$Transaction.State
+    if($checkpoint.Status -cnotin @('Running','Completed') -or [int]$checkpoint.Skipped -ne 0 -or
+       @($checkpoint.SkippedItems | Where-Object {$_}).Count -ne 0 -or
+       @($checkpoint.SkippedEntryIds | Where-Object {$_}).Count -ne 0 -or
+       [int]$checkpoint.Executed -lt 0 -or [int]$checkpoint.Executed -gt $ExpectedReturned){
+        throw 'ARCH6f3c1 requires a skip-free interrupted checkpoint.'
+    }
+    if($checkpoint.Status -ceq 'Running' -and [int]$checkpoint.Verified -ne 0){throw 'ARCH6f3c1 inconsistent running verification.'}
+    if($checkpoint.Status -ceq 'Completed' -and ([int]$checkpoint.Executed -ne $ExpectedReturned -or
+       [int]$checkpoint.Verified -ne $ExpectedReturned -or $State.Reconciled -ne $ExpectedReturned)){
+        throw 'ARCH6f3c1 inconsistent completed recovery checkpoint.'
+    }
+    $prefixLength=2+2*$ExpectedReturned
+    if($Steps.Count -lt $prefixLength -or $Steps[0].Step -cne 'ARCH4 Batch Started' -or $Steps[1].Step -cne 'Candidates'){
+        throw 'ARCH6f3c1 missing exact batch/selection prefix.'
+    }
+    $plan=@($checkpoint.PlannedItems)
+    $rows=@($State.Rows)
+    if($plan.Count -ne $ExpectedPlanned -or $rows.Count -ne $ExpectedReturned){throw 'ARCH6f3c1 invalid plan/receipt coverage.'}
+    for($i=0;$i -lt $ExpectedReturned;$i++){
+        $claim=$Steps[2+2*$i];$receipt=$Steps[3+2*$i]
+        $id=[string]$plan[$i].EntryId
+        if($claim.Step -cne 'Move Started' -or $receipt.Step -cne 'ARCH4 Move Returned' -or
+           [string]$claim.EntryId -ine $id -or [string]$receipt.EntryId -ine $id -or
+           [string]$rows[$i].SourceEntryId -ine $id){
+            throw 'ARCH6f3c1 returned items are not an exact planned prefix.'
+        }
+    }
+    # A crash during reconciliation can leave a verified terminal marker.
+    # Permit only original completion and the explicit recovery marker, never
+    # a skipped item, an extra claim, a synthetic Awaiting Restart, or an unknown step.
+    $markerCount=0
+    for($i=$prefixLength;$i -lt $Steps.Count;$i++){
+        if($State.Reconciled -ne $ExpectedReturned -or $Steps[$i].Step -cnotin @('ARCH4 Batch Verified','ARCH6f3c1 Interrupted Batch Verified')){
+            throw 'ARCH6f3c1 unexpected interrupted journal suffix.'
+        }
+        if($Steps[$i].Step -ceq 'ARCH6f3c1 Interrupted Batch Verified'){$markerCount++}
+    }
+    if($markerCount -gt 1){throw 'ARCH6f3c1 repeated recovery marker.'}
+    return [pscustomobject]@{Unprocessed=($ExpectedPlanned-$ExpectedReturned);RecoveryMarkerPresent=($markerCount -eq 1)}
+}
+function Complete-OPAARCH6InterruptedBatch {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][object]$Transaction,
+          [Parameter(Mandatory=$true)][object]$State,
+          [Parameter(Mandatory=$true)][object]$Verification,
+          [Parameter(Mandatory=$true)][string]$SourceStoreId,
+          [ValidateRange(1,500)][int]$ExpectedPlanned,
+          [ValidateRange(1,500)][int]$ExpectedReturned)
+    $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $Transaction))
+    $review=Assert-OPAARCH6InterruptedState -Transaction $Transaction -State $State -Steps $steps -ExpectedPlanned $ExpectedPlanned -ExpectedReturned $ExpectedReturned
+    # The original completion requires independent semantic verification,
+    # checks conflicts, appends only missing Reconciled/index rows and reads back.
+    $r=Complete-OPAARCH4VerifiedBatch -Transaction $Transaction -State $State -Verification $Verification -SourceStoreId $SourceStoreId
+    if(-not $review.RecoveryMarkerPresent){
+        Save-OPAArchiveTransaction -Transaction $Transaction -Status Completed -Step 'ARCH6f3c1 Interrupted Batch Verified' -Message ('Verified='+$ExpectedReturned+'; Unprocessed='+$review.Unprocessed+'; MoveInvocations=0') -WriteCheckpoint
+        Sync-OPAStepJournalStreams
+    }
+    Close-OPAStepJournalStreams
+    $final=Get-OPAARCH4ReturnedFromDisk -Transaction $Transaction -SourceStoreId $SourceStoreId
+    $finalSteps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $Transaction))
+    $readback=Assert-OPAARCH6InterruptedState -Transaction $Transaction -State $final -Steps $finalSteps -ExpectedPlanned $ExpectedPlanned -ExpectedReturned $ExpectedReturned
+    if(-not $readback.RecoveryMarkerPresent -or $final.Reconciled -ne $ExpectedReturned){throw 'ARCH6f3c1 recovery readback incomplete.'}
+    $r.Status='InterruptedBatchRecovered'
+    $r | Add-Member -NotePropertyName Unprocessed -NotePropertyValue $review.Unprocessed
+    $r | Add-Member -NotePropertyName Deferred -NotePropertyValue 0
+    $r | Add-Member -NotePropertyName MoveInvocations -NotePropertyValue 0
+    return $r
+}
+
 function Invoke-OPAARCH4Batch {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][ValidateSet('Archive','Resume')][string]$Mode,
@@ -315,7 +400,8 @@ function Invoke-OPAARCH4Batch {
           [string]$TransactionId,
           [int]$Limit=100,[int]$OlderThanMonths=12,[string]$ArchiveGrouping='Year',
           [double]$MaxArchivePstSizeGB=10,[double]$SafetyMarginGB=0.5,
-          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction)
+          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned)
+    if($RecoverInterrupted -and ($Mode -ne 'Resume' -or -not $ARCH5Batch -or $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$' -or $ExpectedInterruptedReturned -lt 1 -or $ExpectedInterruptedPlanned -gt 500 -or $ExpectedInterruptedReturned -ge $ExpectedInterruptedPlanned)){throw 'ARCH6f3c1 explicit interrupted Resume identity/counts required.'}
     if($IncludeRootMail -and ($Mode -ne 'Archive' -or -not $ARCH5Batch)){throw 'ARCH6f2 root mail requires explicit controlled Archive.'}
     $source=[IO.Path]::GetFullPath($SourcePst)
     if($source.StartsWith('\\') -or -not [IO.File]::Exists($source) -or [IO.Path]::GetExtension($source) -ine '.pst' -or
@@ -410,6 +496,10 @@ function Invoke-OPAARCH4Batch {
             Write-Host ('Размер партии: '+$tx.State.Limit+'; группировка: '+$tx.State.ArchiveGrouping+'; возраст: '+$tx.State.OlderThanMonths+' мес.; режим записи: Safe')
         }
         $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
+        if($RecoverInterrupted){
+            $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx))
+            [void](Assert-OPAARCH6InterruptedState -Transaction $tx -State $state -Steps $steps -ExpectedPlanned $ExpectedInterruptedPlanned -ExpectedReturned $ExpectedInterruptedReturned)
+        }elseif(-not $state.AwaitingRestart){throw 'ARCH6f3c1 unfinished selection requires explicit interrupted recovery; no normal Resume.'}
         if($ARCH5Batch -and $state.Returned -eq 0){
             $completed=Complete-OPAARCH5aZeroMoveBatch -Transaction $tx -State $state -SourceStoreId $storeId
             if($p.PSObject.Properties.Name -contains 'DeferredPolicy' -and $p.DeferredPolicy -eq $true){$n=Save-OPAARCH6DeferredEvidence -Transaction $tx -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile);$completed | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue ([int]$n)}
@@ -435,6 +525,13 @@ function Invoke-OPAARCH4Batch {
                     Assert-OPAARCH5Route -SourcePst $source -ArchiveDate ([datetime]$r.ReceivedTime) -SourceFolderPath $r.SourceFolderPath -TargetFolderPath $r.TargetFolderPath -ArchivePst $r.ArchivePst -Grouping ([string]$tx.State.ArchiveGrouping)
                 }
             }
+        }
+        if($RecoverInterrupted){
+            $completed=Complete-OPAARCH6InterruptedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId -ExpectedPlanned $ExpectedInterruptedPlanned -ExpectedReturned $ExpectedInterruptedReturned
+            [IO.File]::Delete($pending)
+            if([IO.File]::Exists($pending)){throw 'ARCH6f3c1 pending marker remains.'}
+            $completed | Add-Member -NotePropertyName PendingCleared -NotePropertyValue $true
+            return $completed
         }
         $completed=Complete-OPAARCH4VerifiedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId
         if($p.PSObject.Properties.Name -contains 'DeferredPolicy' -and $p.DeferredPolicy -eq $true){$n=Save-OPAARCH6DeferredEvidence -Transaction $tx -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile);$completed | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue ([int]$n)}

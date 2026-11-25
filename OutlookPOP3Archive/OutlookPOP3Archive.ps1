@@ -13,6 +13,9 @@ param(
     [string[]]$IncludeFolderPath,
     [switch]$IncludeRootMail,
     [string]$ImportDeferredTransaction,
+    [switch]$RecoverInterrupted,
+    [ValidateRange(1,500)][int]$ExpectedInterruptedPlanned,
+    [ValidateRange(1,500)][int]$ExpectedInterruptedReturned,
     [switch]$WhatIf,
     [switch]$VerboseItems,
 
@@ -129,13 +132,15 @@ $ErrorActionPreference = 'Stop'
 # worker integration flags do not disable the direct legacy COM writer.
 # Read-only Analyze and Plan remain available, but no production permit.
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH2aMoveOutcomeFence.ps1')
-$arch4Requested = [bool]$ConfirmTestArchive -or $PSBoundParameters.ContainsKey('SourcePst') -or $ConfirmComplexAttachments -or $PSBoundParameters.ContainsKey('IncludeFolderPath') -or $IncludeRootMail -or $ImportDeferredTransaction
+$arch4Requested = [bool]$ConfirmTestArchive -or $PSBoundParameters.ContainsKey('SourcePst') -or $ConfirmComplexAttachments -or $PSBoundParameters.ContainsKey('IncludeFolderPath') -or $IncludeRootMail -or $ImportDeferredTransaction -or $RecoverInterrupted -or $PSBoundParameters.ContainsKey('ExpectedInterruptedPlanned') -or $PSBoundParameters.ContainsKey('ExpectedInterruptedReturned')
 if ($arch4Requested) {
     if (-not $ConfirmTestArchive -or [string]::IsNullOrWhiteSpace($SourcePst) -or
         [string]::IsNullOrWhiteSpace($ProfileName) -or $Mode -notin @('Archive','Resume') -or
         $WorkerPilot -or $ArchiveDeletedItems -or $ArchiveDrafts -or $ArchiveJunk -or
         ($ConfirmComplexAttachments -and ($Mode -ne 'Archive' -or $Limit -gt 10)) -or
         (($PSBoundParameters.ContainsKey('IncludeFolderPath') -or $IncludeRootMail) -and $Mode -ne 'Archive') -or
+        ($RecoverInterrupted -and ($Mode -ne 'Resume' -or $Transaction -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$' -or $ExpectedInterruptedReturned -lt 1 -or $ExpectedInterruptedReturned -ge $ExpectedInterruptedPlanned)) -or
+        (-not $RecoverInterrupted -and ($PSBoundParameters.ContainsKey('ExpectedInterruptedPlanned') -or $PSBoundParameters.ContainsKey('ExpectedInterruptedReturned'))) -or
         ($ImportDeferredTransaction -and ($Mode -ne 'Archive' -or $ImportDeferredTransaction -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$')) -or
         ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt 500)) -or
         ($Mode -eq 'Archive' -and -not [string]::IsNullOrWhiteSpace($Transaction))) {
@@ -375,7 +380,7 @@ if ($WorkerPilot) {
 
 
 if($arch4Requested){
-    $build='2.6.5-ARCH6f3a DEV'
+    $build='2.6.5-ARCH6f3c1 DEV'
     $buildPath=Join-Path $PSScriptRoot 'BUILD-INFO.json'
     if(Test-Path -LiteralPath $buildPath -PathType Leaf){
         try{
@@ -760,7 +765,7 @@ try {
     Write-OPADiscoverySummary -Discovery $discovery
 
     if ($arch4Requested) {
-        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath -IncludeRootMail:$IncludeRootMail -ARCH6DeferredPolicy -ImportDeferredTransaction $ImportDeferredTransaction
+        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath -IncludeRootMail:$IncludeRootMail -ARCH6DeferredPolicy -ImportDeferredTransaction $ImportDeferredTransaction -RecoverInterrupted:$RecoverInterrupted -ExpectedInterruptedPlanned $ExpectedInterruptedPlanned -ExpectedInterruptedReturned $ExpectedInterruptedReturned
         return
     }
 

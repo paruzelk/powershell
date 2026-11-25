@@ -21,6 +21,9 @@ param(
     [ValidateSet('Continue','Stop')][string]$SkipPolicy='Continue',
     [string]$ImportDeferredTransaction,
     [string]$RecoverTransaction,
+    [switch]$RecoverInterrupted,
+    [ValidateRange(1,500)][int]$ExpectedInterruptedPlanned,
+    [ValidateRange(1,500)][int]$ExpectedInterruptedReturned,
     [switch]$WhatIf
 )
 $ErrorActionPreference='Stop'
@@ -34,13 +37,15 @@ if(-not $ConfirmTestArchive -or -not $ConfirmOutlookRestart -or [string]::IsNull
 if($PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5 -or
    [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -ne 'STA'){throw 'ARCH6 requires Windows PowerShell 5.1 STA.'}
 if($ImportDeferredTransaction -and ($RecoverTransaction -or $ImportDeferredTransaction -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$')){throw 'ARCH6f3a invalid import options.'}
+if($RecoverInterrupted -and (-not $RecoverTransaction -or $ExpectedInterruptedReturned -lt 1 -or $ExpectedInterruptedReturned -ge $ExpectedInterruptedPlanned)){throw 'ARCH6f3c1 interrupted recovery requires exact transaction and expected planned/returned counts.'}
+if(-not $RecoverInterrupted -and ($PSBoundParameters.ContainsKey('ExpectedInterruptedPlanned') -or $PSBoundParameters.ContainsKey('ExpectedInterruptedReturned'))){throw 'ARCH6f3c1 expected counts require -RecoverInterrupted.'}
 if($RecoverTransaction){
     foreach($key in @('BatchSize','MaxMessages','MaxBatches','OlderThanMonths','ArchiveGrouping','IncludeFolderPath','IncludeRootMail','IgnoreAge','ConfirmComplexAttachments','MaxArchivePstSizeGB','SafetyMarginGB','DisableArchivePstSizeLimit','SkipPolicy','ImportDeferredTransaction')){
         if($PSBoundParameters.ContainsKey($key)){throw 'ARCH6 recovery-only mode cannot accept new Archive options.'}
     }
 }
 if($WhatIf){
-    [pscustomobject]@{Schema='2.6.5-ARCH6.WhatIf.1';Status='NoOutlookOrPersistentWrites';SourcePst=$SourcePst;BatchSize=$BatchSize;MaxMessages=$MaxMessages;MaxBatches=$MaxBatches;RecoverTransaction=$RecoverTransaction;ImportDeferredTransaction=$ImportDeferredTransaction;SkipPolicy=$SkipPolicy;ProductionReady=$false}
+    [pscustomobject]@{Schema='2.6.5-ARCH6.WhatIf.1';Status='NoOutlookOrPersistentWrites';SourcePst=$SourcePst;BatchSize=$BatchSize;MaxMessages=$MaxMessages;MaxBatches=$MaxBatches;RecoverTransaction=$RecoverTransaction;RecoverInterrupted=[bool]$RecoverInterrupted;ExpectedInterruptedPlanned=$ExpectedInterruptedPlanned;ExpectedInterruptedReturned=$ExpectedInterruptedReturned;ImportDeferredTransaction=$ImportDeferredTransaction;SkipPolicy=$SkipPolicy;ProductionReady=$false}
     return
 }
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH6Orchestration.ps1')
@@ -80,7 +85,8 @@ try{
     $resume={
         param($id)
         $global:LASTEXITCODE=0
-        $r=& $main -Mode Resume @common -Transaction $id
+        if($RecoverInterrupted){$r=& $main -Mode Resume @common -Transaction $id -RecoverInterrupted -ExpectedInterruptedPlanned $ExpectedInterruptedPlanned -ExpectedInterruptedReturned $ExpectedInterruptedReturned}
+        else{$r=& $main -Mode Resume @common -Transaction $id}
         if($LASTEXITCODE -ne 0){throw 'ARCH6 original Resume failed; preserve pending, no new Archive.'}
         $r
     }
@@ -88,10 +94,13 @@ try{
         & $restart $RecoverTransaction
         $r=& $resume $RecoverTransaction
         if($null -eq $r -or @($r).Count -ne 1 -or [string]$r.TransactionId -cne $RecoverTransaction -or
-           $r.Status -cnotin @('BatchVerifiedReconciledAndIndexed','BatchCompletedNoMoves') -or
+           $r.Status -cnotin @('BatchVerifiedReconciledAndIndexed','BatchCompletedNoMoves','InterruptedBatchRecovered') -or
            [int]$r.Verified -ne [int]$r.Indexed -or [int]$r.Verified -ne [int]$r.Reconciled){
             throw 'ARCH6 recovery did not return exact verified completion.'
         }
+        if($RecoverInterrupted){
+            if($r.Status -cne 'InterruptedBatchRecovered' -or [int]$r.Planned -ne $ExpectedInterruptedPlanned -or [int]$r.Verified -ne $ExpectedInterruptedReturned -or [int]$r.Unprocessed -ne ($ExpectedInterruptedPlanned-$ExpectedInterruptedReturned) -or $r.PendingCleared -ne $true -or [int]$r.MoveInvocations -ne 0){throw 'ARCH6f3c1 interrupted recovery receipt mismatch.'}
+        }elseif($r.Status -ceq 'InterruptedBatchRecovered'){throw 'ARCH6f3c1 unexpected recovery receipt.'}
         Write-OPAARCH6RunEvent -Path $logPath -Phase Recovered -Data $r
         $r
         return
