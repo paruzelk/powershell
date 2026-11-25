@@ -1,0 +1,486 @@
+{
+  "src/modules/Checks/Creds/Get-CredentialRoaming.ps1": [
+    [
+      "Write-Log \"[Get-CredentialRoaming] Starting check\"",
+      "Write-Log \"[Get-CredentialRoaming] Начата проверка\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-CredentialRoaming] Query $($pair.Filter) failed: $($_.Exception.Message)\"",
+      "Write-Log \"[Get-CredentialRoaming] Ошибка запроса $($pair.Filter): $($_.Exception.Message)\"",
+      1
+    ],
+    [
+      "Show-Line \"No user object carries roamed credential material\" -Class Secure",
+      "Show-Line \"Ни один объект пользователя не содержит перемещаемых учётных данных\" -Class Secure",
+      1
+    ],
+    [
+      "Write-Log \"[Get-CredentialRoaming] Privilege check failed for '$($user.sAMAccountName)': $_\"",
+      "Write-Log \"[Get-CredentialRoaming] Не удалось проверить привилегии '$($user.sAMAccountName)': $_\"",
+      1
+    ],
+    [
+      "Show-Line \"Found $countText\" -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'",
+      "Show-Line \"Найдено: $countText\" -Class Finding -FindingId 'CREDENTIAL_ROAMING_READABLE'",
+      1
+    ],
+    [
+      "Show-Line \"Found $countText\" -Class Hint -FindingId 'CREDENTIAL_ROAMING_PRESENT'",
+      "Show-Line \"Найдено: $countText\" -Class Hint -FindingId 'CREDENTIAL_ROAMING_PRESENT'",
+      1
+    ],
+    [
+      "Write-Log \"[Get-CredentialRoaming] Error: $_\" -Level Error",
+      "Write-Log \"[Get-CredentialRoaming] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Show-Line \"Error during check: $_\" -Class Finding",
+      "Show-Line \"Ошибка во время проверки: $_\" -Class Finding",
+      1
+    ],
+    [
+      "Write-Log \"[Get-CredentialRoaming] Check completed\"",
+      "Write-Log \"[Get-CredentialRoaming] Проверка завершена\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-CredentialRoaming] No container could be derived from the affected users\"",
+      "Write-Log \"[Get-CredentialRoaming] Не удалось определить контейнер по затронутым пользователям\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-CredentialRoaming] Failed to read permissions for '$containerDN': $($_.Exception.Message)\"",
+      "Write-Log \"[Get-CredentialRoaming] Не удалось прочитать разрешения '$containerDN': $($_.Exception.Message)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-CredentialRoamingConfidentiality] No SchemaNamingContext - answer stays unknown\"",
+      "Write-Log \"[Get-CredentialRoamingConfidentiality] SchemaNamingContext отсутствует — результат остаётся неизвестным\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-CredentialRoamingConfidentiality] Schema query failed: $($_.Exception.Message)\"",
+      "Write-Log \"[Get-CredentialRoamingConfidentiality] Ошибка запроса схемы: $($_.Exception.Message)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-CredentialRoamingConfidentiality] Neither attribute found in the schema\"",
+      "Write-Log \"[Get-CredentialRoamingConfidentiality] Ни один из двух атрибутов не найден в схеме\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Creds/Get-DeletedObjectAccess.ps1": [
+    [
+      "Write-Log \"[Get-DeletedObjectAccess] Starting check\"",
+      "Write-Log \"[Get-DeletedObjectAccess] Начата проверка\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DeletedObjectAccess] The deleted objects container could not be read: $_\"",
+      "Write-Log \"[Get-DeletedObjectAccess] Не удалось прочитать контейнер удалённых объектов: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DeletedObjectAccess] $($deletedObjects.Count) deleted object(s) visible\"",
+      "Write-Log \"[Get-DeletedObjectAccess] Видимых удалённых объектов: $($deletedObjects.Count)\"",
+      1
+    ],
+    [
+      "Show-Line \"No deleted object exists in the domain\" -Class Note",
+      "Show-Line \"В домене нет удалённых объектов\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"No deleted object is visible to this account - it may not list them, or there is none\" -Class Note",
+      "Show-Line \"Этой учётной записи не видны удалённые объекты — возможно, отсутствует право перечисления либо объектов нет\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"This account can read $($deletedObjects.Count) deleted object(s) - as a member of Administrators\" -Class Note",
+      "Show-Line \"Эта учётная запись может прочитать удалённых объектов: $($deletedObjects.Count) — как участник Administrators\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"This account can read $($deletedObjects.Count) deleted object(s) through a delegation on the deleted objects container\" -Class Hint -FindingId 'DELETED_OBJECTS_READ_DELEGATED'",
+      "Show-Line \"Эта учётная запись может прочитать удалённых объектов: $($deletedObjects.Count) — через делегирование прав на контейнер удалённых объектов\" -Class Hint -FindingId 'DELETED_OBJECTS_READ_DELEGATED'",
+      1
+    ],
+    [
+      "Show-Line \"Password attribute $passwordAttribute set on deleted $($display.Kind) '$($display.Name)'\" -Class Finding",
+      "Show-Line \"В удалённом объекте $($display.Kind) '$($display.Name)' задан атрибут пароля $passwordAttribute\" -Class Finding",
+      1
+    ],
+    [
+      "Show-Line \"Probable credential found in $($credentialMatch.Attribute) of deleted $($display.Kind) '$($display.Name)'\" -Class Finding",
+      "Show-Line \"Вероятные учётные данные обнаружены в атрибуте $($credentialMatch.Attribute) удалённого объекта $($display.Kind) '$($display.Name)'\" -Class Finding",
+      1
+    ],
+    [
+      "Show-Line \"Possible credential mention in $($credentialMatch.Attribute) of deleted $($display.Kind) '$($display.Name)'\" -Class Hint",
+      "Show-Line \"Возможное упоминание учётных данных в атрибуте $($credentialMatch.Attribute) удалённого объекта $($display.Kind) '$($display.Name)'\" -Class Hint",
+      1
+    ],
+    [
+      "Show-Line \"None of the $($deletedObjects.Count) deleted object(s) holds a credential in a free-text or password attribute\" -Class Secure",
+      "Show-Line \"Ни один из удалённых объектов (всего $($deletedObjects.Count)) не содержит учётных данных в текстовом атрибуте или атрибуте пароля\" -Class Secure",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DeletedObjectAccess] ACL analysis failed: $_\" -Level Error",
+      "Write-Log \"[Get-DeletedObjectAccess] Ошибка анализа ACL: $_\" -Level Error",
+      1
+    ],
+    [
+      "Show-Line \"Error during the ACL analysis - who may list deleted objects could not be evaluated: $_\" -Class Finding",
+      "Show-Line \"Ошибка анализа ACL — не удалось определить, кто может перечислять удалённые объекты: $_\" -Class Finding",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DeletedObjectAccess] Error: $_\" -Level Error",
+      "Write-Log \"[Get-DeletedObjectAccess] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Show-Line \"Error during check - deleted object access could not be evaluated: $_\" -Class Finding",
+      "Show-Line \"Ошибка проверки — не удалось оценить доступ к удалённым объектам: $_\" -Class Finding",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DeletedObjectAccess] Check completed\"",
+      "Write-Log \"[Get-DeletedObjectAccess] Проверка завершена\"",
+      1
+    ],
+    [
+      "Show-Line \"The ACL of the deleted objects container could not be parsed - who may list deleted objects was not checked\" -Class Note",
+      "Show-Line \"Не удалось разобрать ACL контейнера удалённых объектов — права перечисления удалённых объектов не проверены\" -Class Note",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DeletedObjectAccess] Expected reader hidden: $($nameBySID[$sid]) ($sid) - $rightsText - $expectedAs\"",
+      "Write-Log \"[Get-DeletedObjectAccess] Ожидаемый субъект с правом чтения скрыт: $($nameBySID[$sid]) ($sid) — $rightsText — $expectedAs\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Creds/Get-PasswordInDescription.ps1": [
+    [
+      "Write-Log \"[Get-PasswordInDescription] Starting check\"",
+      "Write-Log \"[Get-PasswordInDescription] Начата проверка\"",
+      1
+    ],
+    [
+      "Show-Line \"OPSEC mode: Skipping password-in-description check (would check all users and computers)\" -Class \"Hint\"",
+      "Show-Line \"Режим OPSEC: проверка паролей в описаниях пропущена (требует проверки всех пользователей и компьютеров)\" -Class \"Hint\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordInDescription] Optional attribute query failed, schema may not define $($set.Label): $_\"",
+      "Write-Log \"[Get-PasswordInDescription] Ошибка запроса необязательного атрибута; возможно, в схеме не определён $($set.Label): $_\"",
+      1
+    ],
+    [
+      "Show-Line \"Probable credential found in $bestAttrName of $objectType '$shownName'\" -Class Finding",
+      "Show-Line \"Вероятные учётные данные обнаружены в атрибуте $bestAttrName объекта $objectType '$shownName'\" -Class Finding",
+      1
+    ],
+    [
+      "Show-Line \"Possible credential mention in $bestAttrName of $objectType '$shownName'\" -Class Hint",
+      "Show-Line \"Возможное упоминание учётных данных в атрибуте $bestAttrName объекта $objectType '$shownName'\" -Class Hint",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordInDescription] Candidate could not be re-read: $accountName\"",
+      "Write-Log \"[Get-PasswordInDescription] Не удалось повторно прочитать объект-кандидат: $accountName\"",
+      1
+    ],
+    [
+      "Show-Line \"Matched but could not be read again: $accountName\" -Class Note",
+      "Show-Line \"Найдено совпадение, но повторное чтение не удалось: $accountName\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"Nothing could be reported - every match could not be read again\" -Class Note",
+      "Show-Line \"Нет результатов для отчёта — ни одно совпадение не удалось прочитать повторно\" -Class Note",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordInDescription] Total: $findingCount finding(s), $hintCount hint(s)\"",
+      "Write-Log \"[Get-PasswordInDescription] Всего: находок — $findingCount, замечаний — $hintCount\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordInDescription] Error: $_\" -Level Error",
+      "Write-Log \"[Get-PasswordInDescription] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Show-Line \"Error during check - credentials in free-text attributes could not be evaluated: $_\" -Class Finding",
+      "Show-Line \"Ошибка проверки — не удалось оценить наличие учётных данных в текстовых атрибутах: $_\" -Class Finding",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordInDescription] Check completed\"",
+      "Write-Log \"[Get-PasswordInDescription] Проверка завершена\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/GPO/Get-GPOScriptPaths.ps1": [
+    [
+      "Write-Log \"[Get-GPOScriptPaths] Starting check\"",
+      "Write-Log \"[Get-GPOScriptPaths] Начата проверка\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-GPOScriptPaths] No script configuration files found in SYSVOL\"",
+      "Write-Log \"[Get-GPOScriptPaths] В SYSVOL не найдены файлы конфигурации сценариев\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-GPOScriptPaths] Found $($scriptFiles.Count) script configuration file(s)\"",
+      "Write-Log \"[Get-GPOScriptPaths] Найдено файлов конфигурации сценариев: $($scriptFiles.Count)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-GPOScriptPaths] Reading: $($file.FullName)\"",
+      "Write-Log \"[Get-GPOScriptPaths] Чтение: $($file.FullName)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-GPOScriptPaths] Error parsing $($file.FullName): $_\"",
+      "Write-Log \"[Get-GPOScriptPaths] Ошибка разбора $($file.FullName): $_\"",
+      1
+    ],
+    [
+      "Show-Line \"SYSVOL access failed - cannot analyze GPO scripts - SMB access failed (authentication/network issue)\" -Class Finding",
+      "Show-Line \"Не удалось получить доступ к SYSVOL и проанализировать сценарии GPO — ошибка доступа SMB (аутентификация или сеть)\" -Class Finding",
+      1
+    ],
+    [
+      "Write-Log \"[Get-GPOScriptPaths] Error: $_\" -Level Error",
+      "Write-Log \"[Get-GPOScriptPaths] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Show-Line \"Error during check - scripts deployed via GPO could not be evaluated: $_\" -Class Finding",
+      "Show-Line \"Ошибка проверки — не удалось оценить сценарии, развёрнутые через GPO: $_\" -Class Finding",
+      1
+    ],
+    [
+      "Write-Log \"[Get-GPOScriptPaths] Check completed\"",
+      "Write-Log \"[Get-GPOScriptPaths] Проверка завершена\"",
+      1
+    ],
+    [
+      "Write-Log \"[Parse-ScriptIni] Error parsing $FilePath : $_\"",
+      "Write-Log \"[Parse-ScriptIni] Ошибка разбора $FilePath : $_\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Rights/Get-PasswordResetRights.ps1": [
+    [
+      "Write-Log \"[Get-PasswordResetRights] Starting check\"",
+      "Write-Log \"[Get-PasswordResetRights] Начата проверка\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] Analyzing all $($privilegedOUs.Keys.Count) OUs\"",
+      "Write-Log \"[Get-PasswordResetRights] Анализ всех OU (количество: $($privilegedOUs.Keys.Count))\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] Analyzing members of $groupName ($groupSID) (recursive)\"",
+      "Write-Log \"[Get-PasswordResetRights] Анализ участников $groupName ($groupSID) (рекурсивно)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] Group $groupName not found\"",
+      "Write-Log \"[Get-PasswordResetRights] Группа $groupName не найдена\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] Could not read the descriptor of '$memberDN': $_\"",
+      "Write-Log \"[Get-PasswordResetRights] Не удалось прочитать дескриптор '$memberDN': $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] Inheritance is disabled on '$memberDN' - an OU delegation does not reach it\"",
+      "Write-Log \"[Get-PasswordResetRights] Для '$memberDN' отключено наследование — делегирование на OU не распространяется на объект\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] Found $($privilegedOUs.Keys.Count) OU(s)/Container(s) with privileged users\"",
+      "Write-Log \"[Get-PasswordResetRights] Найдено OU и контейнеров с привилегированными пользователями: $($privilegedOUs.Keys.Count)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] No OUs with privileged users found\"",
+      "Write-Log \"[Get-PasswordResetRights] OU с привилегированными пользователями не найдены\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] Analyzing: $($ouInfo.Name) ($ouDN)\"",
+      "Write-Log \"[Get-PasswordResetRights] Анализ: $($ouInfo.Name) ($ouDN)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] Exchange service group detected: $($finding.Principal)\"",
+      "Write-Log \"[Get-PasswordResetRights] Обнаружена служебная группа Exchange: $($finding.Principal)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] Error: $_\" -Level Error",
+      "Write-Log \"[Get-PasswordResetRights] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Log \"[Get-PasswordResetRights] Analysis completed\"",
+      "Write-Log \"[Get-PasswordResetRights] Анализ завершён\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Accounts/Get-RODCPasswordReplication.ps1": [
+    [
+      "Write-Log \"[Get-RODCPasswordReplication] Starting check\"",
+      "Write-Log \"[Get-RODCPasswordReplication] Начата проверка\"",
+      1
+    ],
+    [
+      "Show-SubHeader \"Checking the password replication policy and the administrators of read-only Domain Controllers...\" -ObjectType \"RODCPasswordReplication\"",
+      "Show-SubHeader \"Проверка политики репликации паролей и администраторов контроллеров домена только для чтения...\" -ObjectType \"RODCPasswordReplication\"",
+      1
+    ],
+    [
+      "Show-Line \"$rodcName - its managedBy could not be resolved, so its administrator was not checked: $managedByDN\" -Class Note",
+      "Show-Line \"$rodcName — не удалось разрешить managedBy, поэтому администратор не проверен: $managedByDN\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"$rodcName - managedBy makes $adminName, a broad group, an administrator of it\" -Class Finding -FindingId 'RODC_ADMIN_BROAD_GROUP'",
+      "Show-Line \"$rodcName — через managedBy администратором назначена группа с широким составом $adminName\" -Class Finding -FindingId 'RODC_ADMIN_BROAD_GROUP'",
+      1
+    ],
+    [
+      "Show-Line \"$rodcName - managedBy makes $adminName an administrator of it\" -Class Finding -FindingId 'RODC_DELEGATED_ADMIN'",
+      "Show-Line \"$rodcName — через managedBy администратором назначен $adminName\" -Class Finding -FindingId 'RODC_DELEGATED_ADMIN'",
+      1
+    ],
+    [
+      "Write-Log \"[Get-RODCPasswordReplication] The ACL of '$($rodc.distinguishedName)' could not be read: $_\"",
+      "Write-Log \"[Get-RODCPasswordReplication] Не удалось прочитать ACL '$($rodc.distinguishedName)': $_\"",
+      1
+    ],
+    [
+      "Show-Line \"$rodcName - its ACL could not be read, so who may write its managedBy was not checked\" -Class Note",
+      "Show-Line \"$rodcName — не удалось прочитать ACL, поэтому права записи managedBy не проверены\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"$rodcName - $($writerEntries.Count) principal(s) outside Tier-0 may write its managedBy and make themselves its administrator: $(Format-RODCAccountList $writerEntries)\" -Class Finding -FindingId 'RODC_MANAGEDBY_WRITE'",
+      "Show-Line \"$rodcName — субъектов вне Tier-0, способных записать managedBy и назначить себя администраторами: $($writerEntries.Count): $(Format-RODCAccountList $writerEntries)\" -Class Finding -FindingId 'RODC_MANAGEDBY_WRITE'",
+      1
+    ],
+    [
+      "Show-Line \"$rodcName - no privileged account may have its password cached, none has, and only Tier-0 controls who administers it\" -Class Secure",
+      "Show-Line \"$rodcName — кэширование паролей привилегированных учётных записей не разрешено, таких паролей в кэше нет, и только Tier-0 определяет состав администраторов\" -Class Secure",
+      1
+    ],
+    [
+      "Write-Log \"[Get-RODCPasswordReplication] Error: $_\" -Level Error",
+      "Write-Log \"[Get-RODCPasswordReplication] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Log \"[Get-RODCPasswordReplication] Check completed\"",
+      "Write-Log \"[Get-RODCPasswordReplication] Проверка завершена\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Rights/Get-DangerousACLs.ps1": [
+    [
+      "Write-Log \"[Get-DangerousACLs] Starting check\"",
+      "Write-Log \"[Get-DangerousACLs] Начата проверка\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] Domain DN: $domainDN\"",
+      "Write-Log \"[Get-DangerousACLs] DN домена: $domainDN\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] Retrieved $($aclResult.ACECount) dangerous ACEs\"",
+      "Write-Log \"[Get-DangerousACLs] Получено опасных ACE: $($aclResult.ACECount)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] Domain object owner: $($aclResult.Owner) ($($aclResult.OwnerSID)) - the scope check below decides\"",
+      "Write-Log \"[Get-DangerousACLs] Владелец объекта домена: $($aclResult.Owner) ($($aclResult.OwnerSID)) — результат определяется последующей проверкой области действия\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] Skipping descendants-only ACE: Trustee=$trusteeName, PropagationFlags=$($ace.PropagationFlags)\"",
+      "Write-Log \"[Get-DangerousACLs] Пропущена ACE только для дочерних объектов: Trustee=$trusteeName, PropagationFlags=$($ace.PropagationFlags)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] Skipping object-specific ACE: Trustee=$trusteeName, ObjectType=$objectType ($($ace.ObjectTypeName))\"",
+      "Write-Log \"[Get-DangerousACLs] Пропущена ACE для конкретного типа объекта: Trustee=$trusteeName, ObjectType=$objectType ($($ace.ObjectTypeName))\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] DCSync rights (expected): $accountName - $($scopeResult.Reason)\"",
+      "Write-Log \"[Get-DangerousACLs] Права DCSync (ожидаемые): $accountName — $($scopeResult.Reason)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] DCSync rights (attention): $accountName - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)\"",
+      "Write-Log \"[Get-DangerousACLs] Права DCSync (требуют внимания): $accountName — $($scopeResult.Reason) — пропущено (для включения используйте -IncludePrivileged)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] IncludePrivileged: Including DCSync $accountName ($sid) with severity $severity\"",
+      "Write-Log \"[Get-DangerousACLs] IncludePrivileged: включены права DCSync для $accountName ($sid) с критичностью $severity\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] Dangerous rights (expected): $accountName - $rightsDisplay - $($scopeResult.Reason)\"",
+      "Write-Log \"[Get-DangerousACLs] Опасные права (ожидаемые): $accountName — $rightsDisplay — $($scopeResult.Reason)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] Dangerous rights (attention): $accountName - $rightsDisplay - $($scopeResult.Reason) - skipped (use -IncludePrivileged to include)\"",
+      "Write-Log \"[Get-DangerousACLs] Опасные права (требуют внимания): $accountName — $rightsDisplay — $($scopeResult.Reason) — пропущено (для включения используйте -IncludePrivileged)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] IncludePrivileged: Including $accountName ($sid) with severity $severity\"",
+      "Write-Log \"[Get-DangerousACLs] IncludePrivileged: включён $accountName ($sid) с критичностью $severity\"",
+      1
+    ],
+    [
+      "Show-Line \"Found $countText with DCSync rights\" -Class Finding",
+      "Show-Line \"С правами DCSync найдено: $countText\" -Class Finding",
+      1
+    ],
+    [
+      "Show-Line \"Found $countText with dangerous rights on domain root\" -Class Finding",
+      "Show-Line \"С опасными правами на корневой объект домена найдено: $countText\" -Class Finding",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] Error: $_\" -Level Error",
+      "Write-Log \"[Get-DangerousACLs] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Show-Line \"Error during check - domain root ACLs could not be evaluated: $_\" -Class Finding",
+      "Show-Line \"Ошибка проверки — не удалось оценить ACL корневого объекта домена: $_\" -Class Finding",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DangerousACLs] Check completed\"",
+      "Write-Log \"[Get-DangerousACLs] Проверка завершена\"",
+      1
+    ]
+  ]
+}

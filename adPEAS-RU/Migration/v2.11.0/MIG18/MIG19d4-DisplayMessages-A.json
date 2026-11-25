@@ -1,0 +1,442 @@
+{
+  "src/modules/Checks/Accounts/Get-ProtectedUsersStatus.ps1": [
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] Starting check\"",
+      "Write-Log \"[Get-ProtectedUsersStatus] Начата проверка\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] Looking for Protected Users group with SID: $protectedUsersSID\"",
+      "Write-Log \"[Get-ProtectedUsersStatus] Поиск группы Protected Users с SID: $protectedUsersSID\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] Found $($protectedMemberSIDs.Count) members in Protected Users group\"",
+      "Write-Log \"[Get-ProtectedUsersStatus] Найдено участников группы Protected Users: $($protectedMemberSIDs.Count)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] Group not found: $groupSID\"",
+      "Write-Log \"[Get-ProtectedUsersStatus] Группа не найдена: $groupSID\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] Processing Tier-0 group: $groupName ($groupSID)\"",
+      "Write-Log \"[Get-ProtectedUsersStatus] Обработка группы Tier-0: $groupName ($groupSID)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] Found $($tier0Accounts.Count) unique Tier-0 accounts\"",
+      "Write-Log \"[Get-ProtectedUsersStatus] Найдено уникальных учётных записей Tier-0: $($tier0Accounts.Count)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] Excluded: $($account.sAMAccountName) - $($exclusionCheck.Reason)\"",
+      "Write-Log \"[Get-ProtectedUsersStatus] Исключено: $($account.sAMAccountName) — $($exclusionCheck.Reason)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] Eligible for protection: $($eligibleAccounts.Count), Excluded: $($excludedAccounts.Count)\"",
+      "Write-Log \"[Get-ProtectedUsersStatus] Подлежат защите: $($eligibleAccounts.Count), исключены: $($excludedAccounts.Count)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] Error: $_\" -Level Error",
+      "Write-Log \"[Get-ProtectedUsersStatus] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] Check completed\"",
+      "Write-Log \"[Get-ProtectedUsersStatus] Проверка завершена\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ProtectedUsersStatus] The authentication policy silos could not be read: $_\"",
+      "Write-Log \"[Get-ProtectedUsersStatus] Не удалось прочитать изолированные области политик аутентификации: $_\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Accounts/Get-SIDHistoryInjection.ps1": [
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] Starting check\"",
+      "Write-Log \"[Get-SIDHistoryInjection] Начата проверка\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] Domain SID unknown - sIDHistory entries cannot be sorted by source domain\" -Level Warning",
+      "Write-Log \"[Get-SIDHistoryInjection] SID домена неизвестен — записи sIDHistory нельзя классифицировать по исходному домену\" -Level Warning",
+      1
+    ],
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] Could not read the trusts: $_\"",
+      "Write-Log \"[Get-SIDHistoryInjection] Не удалось прочитать сведения о доверительных отношениях: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] Found $(@($objectsWithSIDHistory).Count) object(s) with sIDHistory\"",
+      "Write-Log \"[Get-SIDHistoryInjection] Найдено объектов с sIDHistory: $(@($objectsWithSIDHistory).Count)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] Failed to convert sIDHistory byte array: $_\"",
+      "Write-Log \"[Get-SIDHistoryInjection] Не удалось преобразовать массив байтов sIDHistory: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] $($obj.sAMAccountName) has a privileged SID that is not from a source domain in sIDHistory: $sidString ($resolvedName)\"",
+      "Write-Log \"[Get-SIDHistoryInjection] У $($obj.sAMAccountName) в sIDHistory имеется привилегированный SID не из исходного домена: $sidString ($resolvedName)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] $($obj.sAMAccountName) has a privileged SID of another domain in sIDHistory: $sidString ($resolvedName)\"",
+      "Write-Log \"[Get-SIDHistoryInjection] У $($obj.sAMAccountName) в sIDHistory имеется привилегированный SID другого домена: $sidString ($resolvedName)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] $($obj.sAMAccountName) has a SID of this domain in sIDHistory: $sidString ($resolvedName)\"",
+      "Write-Log \"[Get-SIDHistoryInjection] У $($obj.sAMAccountName) в sIDHistory имеется SID текущего домена: $sidString ($resolvedName)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] $($obj.sAMAccountName) has non-privileged SID in sIDHistory: $sidString\"",
+      "Write-Log \"[Get-SIDHistoryInjection] У $($obj.sAMAccountName) в sIDHistory имеется непривилегированный SID: $sidString\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] Error: $_\" -Level Error",
+      "Write-Log \"[Get-SIDHistoryInjection] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Log \"[Get-SIDHistoryInjection] Check completed\"",
+      "Write-Log \"[Get-SIDHistoryInjection] Проверка завершена\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/ADCS/Get-ADCSTemplate.ps1": [
+    [
+      "Write-Log \"[Get-ADCSTemplate] Starting certificate template enumeration via Get-CertificateTemplate\"",
+      "Write-Log \"[Get-ADCSTemplate] Начато перечисление шаблонов сертификатов через Get-CertificateTemplate\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ADCSTemplate] Get-CertificateTemplate returned error: $($queryError.ErrorMessage)\"",
+      "Write-Log \"[Get-ADCSTemplate] Get-CertificateTemplate вернул ошибку: $($queryError.ErrorMessage)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ADCSTemplate] No templates returned from Get-CertificateTemplate\"",
+      "Write-Log \"[Get-ADCSTemplate] Get-CertificateTemplate не вернул шаблонов\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ADCSTemplate] Processing $($templates.Count) template(s) for security analysis\"",
+      "Write-Log \"[Get-ADCSTemplate] Обрабатывается шаблонов для анализа безопасности: $($templates.Count)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ADCSTemplate] Error: $_\" -Level Error",
+      "Write-Log \"[Get-ADCSTemplate] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ADCSTemplate] Enumeration complete\"",
+      "Write-Log \"[Get-ADCSTemplate] Перечисление завершено\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Computer/Get-ComputerPasswordAge.ps1": [
+    [
+      "Write-Log \"[Get-ComputerPasswordAge] Starting check\"",
+      "Write-Log \"[Get-ComputerPasswordAge] Начата проверка\"",
+      1
+    ],
+    [
+      "Show-Line \"$($domainControllers.Count) Domain Controller(s) have not changed their machine account password in $PasswordAgeDays days or more:\" -Class Finding",
+      "Show-Line \"Контроллеров домена, не менявших пароль учётной записи компьютера $PasswordAgeDays дней или более: $($domainControllers.Count):\" -Class Finding",
+      1
+    ],
+    [
+      "Show-Line \"$($members.Count) active computer(s) have not changed their machine account password in $PasswordAgeDays days or more:\" -Class Hint",
+      "Show-Line \"Активных компьютеров, не менявших пароль своей учётной записи $PasswordAgeDays дней или более: $($members.Count):\" -Class Hint",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ComputerPasswordAge] Error: $_\" -Level Error",
+      "Write-Log \"[Get-ComputerPasswordAge] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ComputerPasswordAge] Check completed\"",
+      "Write-Log \"[Get-ComputerPasswordAge] Проверка завершена\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Computer/Get-LAPSConfiguration.ps1": [
+    [
+      "Write-Log \"[Get-LAPSGPOConfigObjects] Failed to resolve GPO linkage: $_\"",
+      "Write-Log \"[Get-LAPSGPOConfigObjects] Не удалось определить привязку GPO: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LAPSGPOConfigObjects] Failed to read the GPO status: $_\"",
+      "Write-Log \"[Get-LAPSGPOConfigObjects] Не удалось прочитать состояние GPO: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LAPSConfiguration] Starting check\"",
+      "Write-Log \"[Get-LAPSConfiguration] Начата проверка\"",
+      1
+    ],
+    [
+      "Show-Line \"OPSEC mode: Skipping LAPS configuration check (would query every computer and walk SYSVOL)\" -Class \"Hint\"",
+      "Show-Line \"Режим OPSEC: проверка конфигурации LAPS пропущена (требует запроса всех компьютеров и обхода SYSVOL)\" -Class \"Hint\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LAPSConfiguration] Detection result: Legacy=$lapsLegacySchemaPresent, Native=$windowsLAPSSchemaPresent\"",
+      "Write-Log \"[Get-LAPSConfiguration] Результат обнаружения: Legacy=$lapsLegacySchemaPresent, Native=$windowsLAPSSchemaPresent\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LAPSConfiguration] Failed to query LAPS GPO settings: $_\"",
+      "Write-Log \"[Get-LAPSConfiguration] Не удалось запросить параметры LAPS в GPO: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LAPSConfiguration] Could not enumerate Domain Controllers: $_\" -Level Error",
+      "Write-Log \"[Get-LAPSConfiguration] Не удалось перечислить контроллеры домена: $_\" -Level Error",
+      1
+    ],
+    [
+      "Show-Line \"Windows LAPS Native schema present\" -Class \"Note\"",
+      "Show-Line \"Обнаружена встроенная схема Windows LAPS\" -Class \"Note\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LAPSConfiguration] Error: $_\" -Level Error",
+      "Write-Log \"[Get-LAPSConfiguration] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Show-Line \"Error during check - the LAPS configuration could not be evaluated: $_\" -Class Finding",
+      "Show-Line \"Ошибка проверки — не удалось оценить конфигурацию LAPS: $_\" -Class Finding",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LAPSConfiguration] Check completed\"",
+      "Write-Log \"[Get-LAPSConfiguration] Проверка завершена\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Delegation/Get-ConstrainedDelegation.ps1": [
+    [
+      "Write-Log \"[Get-ConstrainedDelegation] Starting check\"",
+      "Write-Log \"[Get-ConstrainedDelegation] Начата проверка\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ConstrainedDelegation] Could not enumerate Domain Controllers: $_\" -Level Warning",
+      "Write-Log \"[Get-ConstrainedDelegation] Не удалось перечислить контроллеры домена: $_\" -Level Warning",
+      1
+    ],
+    [
+      "Show-Line \"$totalOnDC of them delegate to a Domain Controller - treat these as a direct path to Domain Admin\" -Class \"Finding\"",
+      "Show-Line \"Из них делегируют на контроллер домена: $totalOnDC — следует считать прямым путём к правам Domain Admin\" -Class \"Finding\"",
+      1
+    ],
+    [
+      "Show-Line \"$totalNoTarget carry protocol transition without any delegation target\" -Class \"Hint\"",
+      "Show-Line \"Переход протокола без заданной цели делегирования: $totalNoTarget\" -Class \"Hint\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ConstrainedDelegation] Error: $_\" -Level Error",
+      "Write-Log \"[Get-ConstrainedDelegation] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ConstrainedDelegation] Check completed\"",
+      "Write-Log \"[Get-ConstrainedDelegation] Проверка завершена\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Delegation/Get-ResourceBasedConstrainedDelegation.ps1": [
+    [
+      "Write-Log \"[Get-ResourceBasedConstrainedDelegation] Starting check\"",
+      "Write-Log \"[Get-ResourceBasedConstrainedDelegation] Начата проверка\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ResourceBasedConstrainedDelegation] Domain controllers could not be enumerated: $_\" -Level Warning",
+      "Write-Log \"[Get-ResourceBasedConstrainedDelegation] Не удалось перечислить контроллеры домена: $_\" -Level Warning",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ResourceBasedConstrainedDelegation] Scope check failed for '$evalName': $_\"",
+      "Write-Log \"[Get-ResourceBasedConstrainedDelegation] Не удалось проверить область действия для '$evalName': $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ResourceBasedConstrainedDelegation] Error: $_\" -Level Error",
+      "Write-Log \"[Get-ResourceBasedConstrainedDelegation] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Log \"[Get-ResourceBasedConstrainedDelegation] Check completed\"",
+      "Write-Log \"[Get-ResourceBasedConstrainedDelegation] Проверка завершена\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Delegation/Get-UnconstrainedDelegation.ps1": [
+    [
+      "Write-Log \"[Get-UnconstrainedDelegation] Starting check\"",
+      "Write-Log \"[Get-UnconstrainedDelegation] Начата проверка\"",
+      1
+    ],
+    [
+      "Show-Line \"$($exposedNames.Count) privileged account(s) hand their TGT to these hosts at every Kerberos logon - not sensitive, not in Protected Users: $shownNames\" -Class Finding -FindingId 'UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS'",
+      "Show-Line \"Привилегированных учётных записей, передающих TGT этим узлам при каждом входе Kerberos (не помечены как конфиденциальные и не входят в Protected Users): $($exposedNames.Count): $shownNames\" -Class Finding -FindingId 'UNCONSTRAINED_DELEGATION_EXPOSED_ACCOUNTS'",
+      1
+    ],
+    [
+      "Write-Log \"[Get-UnconstrainedDelegation] Privileged account exposure could not be evaluated: $_\" -Level Warning",
+      "Write-Log \"[Get-UnconstrainedDelegation] Не удалось оценить подверженность привилегированных учётных записей риску: $_\" -Level Warning",
+      1
+    ],
+    [
+      "Write-Log \"[Get-UnconstrainedDelegation] Error: $_\" -Level Error",
+      "Write-Log \"[Get-UnconstrainedDelegation] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Log \"[Get-UnconstrainedDelegation] Check completed\"",
+      "Write-Log \"[Get-UnconstrainedDelegation] Проверка завершена\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Domain/Get-DomainPasswordPolicy.ps1": [
+    [
+      "Write-Log \"[Get-DomainPasswordPolicy] Starting check\"",
+      "Write-Log \"[Get-DomainPasswordPolicy] Начата проверка\"",
+      1
+    ],
+    [
+      "Write-Warning \"[Get-DomainPasswordPolicy] Could not retrieve domain password policy from $domainDN\"",
+      "Write-Warning \"[Get-DomainPasswordPolicy] Не удалось получить политику паролей домена из $domainDN\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DomainPasswordPolicy] Domain Functional Level: $domainFunctionalLevel\"",
+      "Write-Log \"[Get-DomainPasswordPolicy] Функциональный уровень домена: $domainFunctionalLevel\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DomainPasswordPolicy] Password Settings Container exists\"",
+      "Write-Log \"[Get-DomainPasswordPolicy] Контейнер Password Settings Container существует\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DomainPasswordPolicy] Password Settings Container not returned - not visible to this account\"",
+      "Write-Log \"[Get-DomainPasswordPolicy] Контейнер Password Settings Container не возвращён — не виден этой учётной записи\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DomainPasswordPolicy] Password Settings Container not returned (error: $_)\"",
+      "Write-Log \"[Get-DomainPasswordPolicy] Контейнер Password Settings Container не возвращён (ошибка: $_)\"",
+      1
+    ],
+    [
+      "Show-Line \"No weakness in the Fine-Grained Password Policies that could be read\" -Class Note",
+      "Show-Line \"В доступных для чтения детализированных политиках паролей слабые настройки не обнаружены\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"Could not be read in full, and therefore not assessed: $($unreadPSONames -join ', ')\" -Class Note",
+      "Show-Line \"Не удалось прочитать полностью, поэтому не оценены: $($unreadPSONames -join ', ')\" -Class Note",
+      1
+    ],
+    [
+      "Show-Line \"Assigned to no user and no group, and therefore not assessed: $($unassignedPSONames -join ', ')\" -Class Note",
+      "Show-Line \"Не назначены ни пользователю, ни группе, поэтому не оценены: $($unassignedPSONames -join ', ')\" -Class Note",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DomainPasswordPolicy] FGPP enumeration failed: $_\" -Level Error",
+      "Write-Log \"[Get-DomainPasswordPolicy] Не удалось перечислить FGPP: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Warning \"[Get-DomainPasswordPolicy] Failed to query Fine-Grained Password Policies: $_\"",
+      "Write-Warning \"[Get-DomainPasswordPolicy] Не удалось запросить детализированные политики паролей: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DomainPasswordPolicy] PSO assignment lookup failed: $_\" -Level Error",
+      "Write-Log \"[Get-DomainPasswordPolicy] Не удалось определить назначения PSO: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Warning \"[Get-DomainPasswordPolicy] Failed to look up Fine-Grained Password Policy assignments: $_\"",
+      "Write-Warning \"[Get-DomainPasswordPolicy] Не удалось определить назначения детализированных политик паролей: $_\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DomainPasswordPolicy] Error: $_\" -Level Error",
+      "Write-Log \"[Get-DomainPasswordPolicy] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Show-Line \"Error during check - the password policy could not be evaluated: $_\" -Class Finding",
+      "Show-Line \"Ошибка проверки — не удалось оценить политику паролей: $_\" -Class Finding",
+      1
+    ],
+    [
+      "Write-Log \"[Get-DomainPasswordPolicy] Check completed\"",
+      "Write-Log \"[Get-DomainPasswordPolicy] Проверка завершена\"",
+      1
+    ]
+  ],
+  "src/modules/Checks/Domain/Get-LDAPConfiguration.ps1": [
+    [
+      "Write-Log \"[Get-LDAPConfiguration] Starting check\"",
+      "Write-Log \"[Get-LDAPConfiguration] Начата проверка\"",
+      1
+    ],
+    [
+      "Show-Line \"The Directory Service object could not be read - dsHeuristics, which decides $unreadHeuristics, is unknown\" -Class Note",
+      "Show-Line \"Не удалось прочитать объект Directory Service — значение dsHeuristics, определяющее $unreadHeuristics, неизвестно\" -Class Note",
+      2
+    ],
+    [
+      "Write-Log \"[Get-LDAPConfiguration] Could not read dsHeuristics: $_\" -Level Warning",
+      "Write-Log \"[Get-LDAPConfiguration] Не удалось прочитать dsHeuristics: $_\" -Level Warning",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LDAPConfiguration] SYSVOL path not accessible: $sysvolPath\"",
+      "Write-Log \"[Get-LDAPConfiguration] Путь SYSVOL недоступен: $sysvolPath\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LDAPConfiguration] $($record.ValueName) = $($record.ValueInt) from Registry.pol of $polGuid\"",
+      "Write-Log \"[Get-LDAPConfiguration] $($record.ValueName) = $($record.ValueInt) из Registry.pol политики $polGuid\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LDAPConfiguration] Could not read $($polFile.FullName): $($_.Exception.Message)\"",
+      "Write-Log \"[Get-LDAPConfiguration] Не удалось прочитать $($polFile.FullName): $($_.Exception.Message)\"",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LDAPConfiguration] Error: $_\" -Level Error",
+      "Write-Log \"[Get-LDAPConfiguration] Ошибка: $_\" -Level Error",
+      1
+    ],
+    [
+      "Write-Log \"[Get-LDAPConfiguration] Check completed\"",
+      "Write-Log \"[Get-LDAPConfiguration] Проверка завершена\"",
+      1
+    ]
+  ]
+}
