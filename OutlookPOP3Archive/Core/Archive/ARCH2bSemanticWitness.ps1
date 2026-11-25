@@ -3,6 +3,7 @@
 # attachment SaveAsFile->SHA256 approach. DEV Archive/Resume/Auto remain closed.
 # ARCH2c2 private NTFS ACL and exclusive lease are mandatory for each witness.
 . (Join-Path $PSScriptRoot 'ARCH2c2TempSafety.ps1')
+. (Join-Path $PSScriptRoot 'ARCH6Antivirus.ps1')
 function Get-OPA265ARCH2bTextSha256 {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][AllowEmptyString()][string]$Text)
@@ -288,8 +289,17 @@ function Get-OPA265ARCH2bAttachmentWitnesses {
             if([IO.File]::Exists($tempPath)){throw 'ARCH2b temp collision; stop.'}
             # SaveAsFile writes only an ephemeral attachment COPY, not a PST.
             # A process crash can leave sensitive temp data (documented risk).
-            $attachment.SaveAsFile($tempPath)
-            if(-not [IO.File]::Exists($tempPath)){throw 'ARCH2b SaveAsFile did not create a file.'}
+            $exportStarted=Get-Date
+            try {
+                $attachment.SaveAsFile($tempPath)
+                if(-not [IO.File]::Exists($tempPath)){throw 'ARCH2b SaveAsFile did not create a file.'}
+            }catch{
+                if($ExtendedAttachmentWitness -and $type -eq 1){
+                    $e=New-OPAARCH6AntivirusEvidence -EntryId ([string]$Mail.EntryID) -AttachmentName $filename -Index $i -From $exportStarted.AddSeconds(-1) -To (Get-Date) -TemporaryPath $tempPath -Exception $_.Exception
+                    if($null -ne $e){throw (ConvertTo-OPAARCH6AntivirusMessage -Evidence $e)}
+                }
+                throw
+            }
             $file=Get-Item -LiteralPath $tempPath -Force
             if(($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
                 [int64]$file.Length -gt $MaxAttachmentBytes){

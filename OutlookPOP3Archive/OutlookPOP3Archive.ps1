@@ -13,6 +13,9 @@ param(
     [string[]]$IncludeFolderPath,
     [switch]$IncludeRootMail,
     [string]$ImportDeferredTransaction,
+    [string]$HistoricalThreatEntryId,
+    [string]$HistoricalDetectionId,
+    [string]$HistoricalAttachmentName,
     [switch]$RecoverInterrupted,
     [ValidateRange(1,500)][int]$ExpectedInterruptedPlanned,
     [ValidateRange(1,500)][int]$ExpectedInterruptedReturned,
@@ -132,6 +135,10 @@ $ErrorActionPreference = 'Stop'
 # worker integration flags do not disable the direct legacy COM writer.
 # Read-only Analyze and Plan remain available, but no production permit.
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH2aMoveOutcomeFence.ps1')
+if($HistoricalThreatEntryId -or $HistoricalDetectionId -or $HistoricalAttachmentName){
+    if(-not $ImportDeferredTransaction -or $HistoricalThreatEntryId -notmatch '^[0-9a-fA-F]{16,2048}$' -or $HistoricalDetectionId -notmatch '^\{?[0-9a-fA-F-]{36}\}?$' -or -not $HistoricalAttachmentName -or $HistoricalAttachmentName.Length -gt 1024){throw 'ARCH6f3c2 requires historical transaction, exact EntryID, DetectionID and attachment name.'}
+    [void][guid]::Parse($HistoricalDetectionId)
+}
 $arch4Requested = [bool]$ConfirmTestArchive -or $PSBoundParameters.ContainsKey('SourcePst') -or $ConfirmComplexAttachments -or $PSBoundParameters.ContainsKey('IncludeFolderPath') -or $IncludeRootMail -or $ImportDeferredTransaction -or $RecoverInterrupted -or $PSBoundParameters.ContainsKey('ExpectedInterruptedPlanned') -or $PSBoundParameters.ContainsKey('ExpectedInterruptedReturned')
 if ($arch4Requested) {
     if (-not $ConfirmTestArchive -or [string]::IsNullOrWhiteSpace($SourcePst) -or
@@ -380,7 +387,7 @@ if ($WorkerPilot) {
 
 
 if($arch4Requested){
-    $build='2.6.5-ARCH6f3c1 DEV'
+    $build='2.6.5-ARCH6f3c2 DEV'
     $buildPath=Join-Path $PSScriptRoot 'BUILD-INFO.json'
     if(Test-Path -LiteralPath $buildPath -PathType Leaf){
         try{
@@ -765,7 +772,7 @@ try {
     Write-OPADiscoverySummary -Discovery $discovery
 
     if ($arch4Requested) {
-        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath -IncludeRootMail:$IncludeRootMail -ARCH6DeferredPolicy -ImportDeferredTransaction $ImportDeferredTransaction -RecoverInterrupted:$RecoverInterrupted -ExpectedInterruptedPlanned $ExpectedInterruptedPlanned -ExpectedInterruptedReturned $ExpectedInterruptedReturned
+        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath -IncludeRootMail:$IncludeRootMail -ARCH6DeferredPolicy -ImportDeferredTransaction $ImportDeferredTransaction -RecoverInterrupted:$RecoverInterrupted -ExpectedInterruptedPlanned $ExpectedInterruptedPlanned -ExpectedInterruptedReturned $ExpectedInterruptedReturned -HistoricalThreatEntryId $HistoricalThreatEntryId -HistoricalDetectionId $HistoricalDetectionId -HistoricalAttachmentName $HistoricalAttachmentName
         return
     }
 

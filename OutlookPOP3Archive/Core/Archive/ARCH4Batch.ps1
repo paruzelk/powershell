@@ -400,7 +400,7 @@ function Invoke-OPAARCH4Batch {
           [string]$TransactionId,
           [int]$Limit=100,[int]$OlderThanMonths=12,[string]$ArchiveGrouping='Year',
           [double]$MaxArchivePstSizeGB=10,[double]$SafetyMarginGB=0.5,
-          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned)
+          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned,[string]$HistoricalThreatEntryId,[string]$HistoricalDetectionId,[string]$HistoricalAttachmentName)
     if($RecoverInterrupted -and ($Mode -ne 'Resume' -or -not $ARCH5Batch -or $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$' -or $ExpectedInterruptedReturned -lt 1 -or $ExpectedInterruptedPlanned -gt 500 -or $ExpectedInterruptedReturned -ge $ExpectedInterruptedPlanned)){throw 'ARCH6f3c1 explicit interrupted Resume identity/counts required.'}
     if($IncludeRootMail -and ($Mode -ne 'Archive' -or -not $ARCH5Batch)){throw 'ARCH6f2 root mail requires explicit controlled Archive.'}
     $source=[IO.Path]::GetFullPath($SourcePst)
@@ -448,6 +448,9 @@ function Invoke-OPAARCH4Batch {
                 if($ImportDeferredTransaction -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$'){throw 'ARCH6f3a invalid historical transaction ID.'}
                 $old=Get-OPAArchiveTransaction -SourcePst $source -TransactionId $ImportDeferredTransaction
                 if([string]$old.State.SourcePst -ine $source -or [int]$old.State.Verified -lt 1){throw 'ARCH6f3a historical import requires completed same-source reconciled moves.'}
+                if($HistoricalThreatEntryId){
+                    return (Save-OPAARCH6HistoricalThreat -Transaction $old -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile) -Namespace $Session.Namespace -Folders $folders -EntryId $HistoricalThreatEntryId -DetectionId $HistoricalDetectionId -AttachmentName $HistoricalAttachmentName)
+                }
                 $n=Save-OPAARCH6DeferredEvidence -Transaction $old -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile)
                 return [pscustomobject]@{Status='DeferredImportCompleted';TransactionId=$ImportDeferredTransaction;Deferred=[int]$n;ProductionReady=$false}
             }

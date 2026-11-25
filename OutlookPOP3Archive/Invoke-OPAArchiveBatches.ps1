@@ -20,6 +20,9 @@ param(
     [ValidateRange(5,300)][int]$RestartTimeoutSeconds=60,
     [ValidateSet('Continue','Stop')][string]$SkipPolicy='Continue',
     [string]$ImportDeferredTransaction,
+    [string]$HistoricalThreatEntryId,
+    [string]$HistoricalDetectionId,
+    [string]$HistoricalAttachmentName,
     [string]$RecoverTransaction,
     [switch]$RecoverInterrupted,
     [ValidateRange(1,500)][int]$ExpectedInterruptedPlanned,
@@ -37,6 +40,10 @@ if(-not $ConfirmTestArchive -or -not $ConfirmOutlookRestart -or [string]::IsNull
 if($PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5 -or
    [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -ne 'STA'){throw 'ARCH6 requires Windows PowerShell 5.1 STA.'}
 if($ImportDeferredTransaction -and ($RecoverTransaction -or $ImportDeferredTransaction -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$')){throw 'ARCH6f3a invalid import options.'}
+if($HistoricalThreatEntryId -or $HistoricalDetectionId -or $HistoricalAttachmentName){
+    if(-not $ImportDeferredTransaction -or $HistoricalThreatEntryId -notmatch '^[0-9a-fA-F]{16,2048}$' -or $HistoricalDetectionId -notmatch '^\{?[0-9a-fA-F-]{36}\}?$' -or -not $HistoricalAttachmentName -or $HistoricalAttachmentName.Length -gt 1024){throw 'ARCH6f3c2 requires historical transaction, exact EntryID, DetectionID and attachment name.'}
+    [void][guid]::Parse($HistoricalDetectionId)
+}
 if($RecoverInterrupted -and (-not $RecoverTransaction -or $ExpectedInterruptedReturned -lt 1 -or $ExpectedInterruptedReturned -ge $ExpectedInterruptedPlanned)){throw 'ARCH6f3c1 interrupted recovery requires exact transaction and expected planned/returned counts.'}
 if(-not $RecoverInterrupted -and ($PSBoundParameters.ContainsKey('ExpectedInterruptedPlanned') -or $PSBoundParameters.ContainsKey('ExpectedInterruptedReturned'))){throw 'ARCH6f3c1 expected counts require -RecoverInterrupted.'}
 if($RecoverTransaction){
@@ -45,7 +52,7 @@ if($RecoverTransaction){
     }
 }
 if($WhatIf){
-    [pscustomobject]@{Schema='2.6.5-ARCH6.WhatIf.1';Status='NoOutlookOrPersistentWrites';SourcePst=$SourcePst;BatchSize=$BatchSize;MaxMessages=$MaxMessages;MaxBatches=$MaxBatches;RecoverTransaction=$RecoverTransaction;RecoverInterrupted=[bool]$RecoverInterrupted;ExpectedInterruptedPlanned=$ExpectedInterruptedPlanned;ExpectedInterruptedReturned=$ExpectedInterruptedReturned;ImportDeferredTransaction=$ImportDeferredTransaction;SkipPolicy=$SkipPolicy;ProductionReady=$false}
+    [pscustomobject]@{Schema='2.6.5-ARCH6.WhatIf.1';Status='NoOutlookOrPersistentWrites';SourcePst=$SourcePst;BatchSize=$BatchSize;MaxMessages=$MaxMessages;MaxBatches=$MaxBatches;RecoverTransaction=$RecoverTransaction;RecoverInterrupted=[bool]$RecoverInterrupted;ExpectedInterruptedPlanned=$ExpectedInterruptedPlanned;ExpectedInterruptedReturned=$ExpectedInterruptedReturned;ImportDeferredTransaction=$ImportDeferredTransaction;HistoricalThreatEntryId=$HistoricalThreatEntryId;HistoricalDetectionId=$HistoricalDetectionId;HistoricalAttachmentName=$HistoricalAttachmentName;SkipPolicy=$SkipPolicy;ProductionReady=$false}
     return
 }
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH6Orchestration.ps1')
@@ -107,8 +114,9 @@ try{
     }
     if($ImportDeferredTransaction){
         $global:LASTEXITCODE=0
-        $import=& $main -Mode Archive @common -Limit 1 -ImportDeferredTransaction $ImportDeferredTransaction
-        if($LASTEXITCODE -ne 0 -or $import.Status -cne 'DeferredImportCompleted'){throw 'ARCH6f3a historical import failed; no Archive.'}
+        if($HistoricalThreatEntryId){$import=& $main -Mode Archive @common -Limit 1 -ImportDeferredTransaction $ImportDeferredTransaction -HistoricalThreatEntryId $HistoricalThreatEntryId -HistoricalDetectionId $HistoricalDetectionId -HistoricalAttachmentName $HistoricalAttachmentName;$expected='HistoricalThreatDeferred'}
+        else{$import=& $main -Mode Archive @common -Limit 1 -ImportDeferredTransaction $ImportDeferredTransaction;$expected='DeferredImportCompleted'}
+        if($LASTEXITCODE -ne 0 -or $import.Status -cne $expected){throw 'ARCH6f3a historical import failed; no Archive.'}
         Write-OPAARCH6RunEvent -Path $logPath -Phase DeferredImported -Data $import
         $import
         return

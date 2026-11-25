@@ -1194,6 +1194,7 @@ function Move-OPAItemsWithLimit {
             if($ARCH6DeferredPolicy){
                 $reason=Get-OPAARCH6DeferredReason -Message $_.Exception.Message
                 if(-not $reason){throw}
+                if($reason -cin @('AttachmentBlockedByAntivirus','AttachmentQuarantined') -and $null -eq (ConvertFrom-OPAARCH6AntivirusMessage -Message $_.Exception.Message -ExpectedEntryId ([string]$candidate.EntryId))){throw}
             }
             $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason=$reason; Message=$_.Exception.Message; Time=(Get-Date).ToString('o')}) | Out-Null
             Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message $(if($ARCH6DeferredPolicy){("ARCH6f3a deferred {0}: {1}" -f $reason,$_.Exception.Message)}else{("Item skipped after unexpected error: {0} | {1}" -f [string]$candidate.Subject,$_.Exception.Message)}) -SourceFolderPath $folderPath -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)

@@ -6,13 +6,16 @@ param([Parameter(Mandatory=$true)][string]$SourcePst,
 $ErrorActionPreference='Stop'
 $source=[IO.Path]::GetFullPath($SourcePst)
 $dir=Join-Path ([IO.Path]::GetDirectoryName($source)) 'OutlookPOP3Archive-Transactions'
-$rows=@(foreach($f in @(Get-ChildItem -LiteralPath $dir -Filter 'ARCH6-deferred-*.jsonl' -File)){
+. (Join-Path $PSScriptRoot 'Core/Archive/ARCH6Antivirus.ps1')
+$ledgers=@(Get-ChildItem -LiteralPath $dir -Filter 'ARCH6-deferred-*.jsonl' -File)+@(Get-ChildItem -LiteralPath $dir -Filter 'ARCH6-threat-*.jsonl' -File)
+$rows=@(foreach($f in $ledgers){
     if(($f.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'Redirected deferred ledger.'}
     $d=Get-Content -LiteralPath $f.FullName -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
-    if($d.Schema -cne '2.6.5-ARCH6f3a.Deferred.1'){throw 'Unexpected deferred schema.'}
+    if($d.Schema -cnotin @('2.6.5-ARCH6f3a.Deferred.1','2.6.5-ARCH6f3c2.HistoricalThreat.1')){throw 'Unexpected deferred schema.'}
     if($d.SourcePst -ine $source -or $d.Profile -ine $ProfileName){continue}
     foreach($r in @($d.Rows)){
-        [pscustomobject]@{TransactionId=$d.TransactionId;Folder=$r.SourceFolderPath;Date=$r.ArchiveDate;Subject=$r.Subject;Sender=$r.Sender;Size=$r.Size;Reason=$r.Reason;EntryId=$r.EntryId;Message=$r.Message}
+        $e=ConvertFrom-OPAARCH6AntivirusMessage -Message $r.Message -ExpectedEntryId $r.EntryId
+        [pscustomobject]@{TransactionId=$d.TransactionId;Folder=$r.SourceFolderPath;Date=$r.ArchiveDate;Subject=$r.Subject;Sender=$r.Sender;Size=$r.Size;Reason=$r.Reason;EntryId=$r.EntryId;AttachmentName=$e.AttachmentName;AttachmentIndex=$e.AttachmentIndex;HResult=$e.HResult;ThreatName=$e.Defender.ThreatName;ThreatId=$e.Defender.ThreatId;DetectionId=$e.Defender.DetectionId;DetectionTime=$e.Defender.DetectionTime;Message=$r.Message}
     }
 })
 $out=[IO.Path]::GetFullPath($OutputDirectory)
