@@ -1031,7 +1031,7 @@ jobs:
           $staged=Join-Path $stageParent $base
           [void][IO.Directory]::CreateDirectory($out)
           [void][IO.Directory]::CreateDirectory($staged)
-          foreach($f in @('.editorconfig','.gitignore','.psscriptanalyzer.psd1','RELEASE.json','MANIFEST.txt','README.md','CHANGELOG.md','OutlookPOP3Archive.ps1','Get-OPAArchiveRootInventory.ps1','Invoke-OPAArchiveBatches.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-ARCH2c4.ps1','Invoke-ARCH2d.ps1','Invoke-ARCH2d3.ps1','Invoke-ARCH2d4.ps1','Invoke-ARCH2d5.ps1','Invoke-ARCH3a.ps1','Invoke-ARCH3b.ps1','Invoke-ARCH3c.ps1','Invoke-ARCH3d.ps1','Invoke-ARCH3e.ps1','Invoke-ARCH3f.ps1','Invoke-ARCH3g.ps1','Invoke-ARCH3h.ps1','Invoke-ARCH3i.ps1','Invoke-ARCH3j.ps1','Invoke-ARCH3k.ps1','Invoke-ARCH3n.ps1','Invoke-ARCH3o.ps1','Invoke-ARCH3p.ps1','Invoke-ARCH3q.ps1','Invoke-ARCH3r.ps1','Invoke-ARCH3t.ps1','Invoke-ARCH3u.ps1','Invoke-ARCH3v.ps1','Invoke-ARCH3w.ps1','Invoke-ARCH3w1.ps1','Invoke-ARCH3x.ps1','Invoke-ARCH3x1.ps1','Invoke-ARCH3x2.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')){
+          foreach($f in @('.editorconfig','.gitignore','.psscriptanalyzer.psd1','RELEASE.json','MANIFEST.txt','README.md','CHANGELOG.md','OutlookPOP3Archive.ps1','Get-OPAArchiveRootInventory.ps1','Get-OPAArchiveMessageInventory.ps1','Export-OPADeferredReport.ps1','Invoke-OPAArchiveBatches.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-ARCH2c4.ps1','Invoke-ARCH2d.ps1','Invoke-ARCH2d3.ps1','Invoke-ARCH2d4.ps1','Invoke-ARCH2d5.ps1','Invoke-ARCH3a.ps1','Invoke-ARCH3b.ps1','Invoke-ARCH3c.ps1','Invoke-ARCH3d.ps1','Invoke-ARCH3e.ps1','Invoke-ARCH3f.ps1','Invoke-ARCH3g.ps1','Invoke-ARCH3h.ps1','Invoke-ARCH3i.ps1','Invoke-ARCH3j.ps1','Invoke-ARCH3k.ps1','Invoke-ARCH3n.ps1','Invoke-ARCH3o.ps1','Invoke-ARCH3p.ps1','Invoke-ARCH3q.ps1','Invoke-ARCH3r.ps1','Invoke-ARCH3t.ps1','Invoke-ARCH3u.ps1','Invoke-ARCH3v.ps1','Invoke-ARCH3w.ps1','Invoke-ARCH3w1.ps1','Invoke-ARCH3x.ps1','Invoke-ARCH3x1.ps1','Invoke-ARCH3x2.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')){
             $src=Join-Path $project $f
             if(-not (Test-Path -LiteralPath $src -PathType Leaf)){throw ('Required project file absent: '+$f)}
             Copy-Item -LiteralPath $src -Destination (Join-Path $staged $f)
@@ -1057,7 +1057,7 @@ jobs:
           # Validate the actual ZIP, not just the source/staging tree.
           $archive=[IO.Compression.ZipFile]::OpenRead($zip)
           try {
-            foreach($required in @('OutlookPOP3Archive.ps1','Get-OPAArchiveRootInventory.ps1','Invoke-OPAArchiveBatches.ps1','Core/Archive/ARCH6Orchestration.ps1','Core/Archive/ARCH6Deferred.ps1','Tests/Archive/ARCH6SequenceAndSafety.Tests.ps1','BUILD-INFO.json')){
+            foreach($required in @('OutlookPOP3Archive.ps1','Get-OPAArchiveRootInventory.ps1','Get-OPAArchiveMessageInventory.ps1','Export-OPADeferredReport.ps1','Invoke-OPAArchiveBatches.ps1','Core/Archive/ARCH6Orchestration.ps1','Core/Archive/ARCH6Deferred.ps1','Tests/Archive/ARCH6SequenceAndSafety.Tests.ps1','BUILD-INFO.json')){
               $expected=$base+'/'+$required
               $matches=@($archive.Entries | Where-Object {($_.FullName.Replace('\','/')) -ceq $expected})
               if($matches.Count -ne 1 -or $matches[0].Length -le 0){throw ('Missing/duplicate/empty required ZIP entry: '+$expected)}

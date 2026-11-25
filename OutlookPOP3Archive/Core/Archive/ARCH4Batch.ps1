@@ -404,7 +404,7 @@ function Invoke-OPAARCH4Batch {
         $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
         if($ARCH5Batch -and $state.Returned -eq 0){
             $completed=Complete-OPAARCH5aZeroMoveBatch -Transaction $tx -State $state -SourceStoreId $storeId
-            if($p.DeferredPolicy -eq $true){$n=Save-OPAARCH6DeferredEvidence -Transaction $tx -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile);$completed | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue ([int]$n)}
+            if($p.PSObject.Properties.Name -contains 'DeferredPolicy' -and $p.DeferredPolicy -eq $true){$n=Save-OPAARCH6DeferredEvidence -Transaction $tx -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile);$completed | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue ([int]$n)}
             [IO.File]::Delete($pending)
             return $completed
         }
@@ -429,7 +429,7 @@ function Invoke-OPAARCH4Batch {
             }
         }
         $completed=Complete-OPAARCH4VerifiedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId
-        if($p.DeferredPolicy -eq $true){$n=Save-OPAARCH6DeferredEvidence -Transaction $tx -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile);$completed | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue ([int]$n)}
+        if($p.PSObject.Properties.Name -contains 'DeferredPolicy' -and $p.DeferredPolicy -eq $true){$n=Save-OPAARCH6DeferredEvidence -Transaction $tx -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile);$completed | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue ([int]$n)}
         [IO.File]::Delete($pending)
         return $completed
     } finally { $lease.Dispose() }
