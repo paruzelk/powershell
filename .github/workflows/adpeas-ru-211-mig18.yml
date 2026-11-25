@@ -1,4 +1,4 @@
-name: "adPEAS RU 2.11.0 MIG18a - Russian EXE metadata"
+name: "adPEAS RU 2.11.0 MIG19a1 - console localization and runtime smoke"
 on:
   push:
     branches:
@@ -369,6 +369,11 @@ jobs:
           if ($new.Count -ne 1) { throw 'Expected one pinned upstream source tree' }
           python adPEAS-RU/Migration/v2.11.0/MIG18/Build-MIG18Integration.py --candidate '_mig/candidate' --upstream $new[0].FullName --report '_mig/2.11.0-mig18-source.json'
           if ($LASTEXITCODE -ne 0) { throw 'MIG18 source integration failed' }
+      - name: MIG19a1 console localization
+        shell: powershell
+        run: |
+          python adPEAS-RU/Migration/v2.11.0/MIG18/Build-MIG19a1.py --candidate '_mig/candidate' --report '_mig/2.11.0-mig19a1-source.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG19a1 source gate failed' }
       - name: Check generated JavaScript syntax
         shell: powershell
         run: |
@@ -450,11 +455,16 @@ jobs:
           if ($vi.ProductName -cne 'adPEAS') { throw 'EXE product name changed' }
           Write-Host 'PASS: exact Russian Win32 FileDescription and original product name'
           Write-Host 'PASS: all scripts parse; EXE resource matches readable PS1 byte for byte; no AD access'
+      - name: MIG19a1 isolated runtime smoke test - no AD
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & 'adPEAS-RU/Migration/v2.11.0/MIG18/Test-MIG19a1.ps1' -Candidate '_mig/candidate' -Report '_mig/2.11.0-mig19a1-runtime.json'
       - name: Publish gated preview, not a production release
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG18a-PREVIEW
+          name: adPEAS-RU-2.11.0-MIG19a1-PREVIEW
           path: |
             _mig/2.11.0-parity.json
             _mig/2.11.0-mig2-coverage.json
@@ -473,6 +483,8 @@ jobs:
             _mig/2.11.0-mig14-coverage.json
             _mig/2.11.0-mig18-source.json
             _mig/2.11.0-mig18-build.json
+            _mig/2.11.0-mig19a1-source.json
+            _mig/2.11.0-mig19a1-runtime.json
             _mig/candidate/README-RU-2.11.0.md
             _mig/candidate/adPEAS.ps1
             _mig/candidate/adPEAS_min.ps1
