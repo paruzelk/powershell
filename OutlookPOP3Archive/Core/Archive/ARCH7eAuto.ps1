@@ -94,12 +94,14 @@ function Invoke-OPAARCH7eSourceSequence {
                         $status='Exhausted';break
                     }
                     if($status -cnotin @('BatchLimitReached','RecoveredPendingBatch')){
+                        if($status -cnotin @('RecoveryAttemptsExhausted','ArchiveFailedWithoutPending')){throw 'ARCH7e unknown supervisor status.'}
                         # Known completed worker failure: leave this source blocked.
                         if($null -ne (& $PendingOwner $group.Name $members)){$directoryBlocked=$true}
                         break
                     }
                     if($null -ne (& $PendingOwner $group.Name $members)){throw 'ARCH7e verified batch still has pending.'}
                     if([int]$last.Batches -ne 1){throw 'ARCH7e missing completed batch.'}
+                    if($null -ne $last.LastBatchResult -and (Test-OPAARCH6ExportFailureBurst -Result $last.LastBatchResult)){$status='StoppedOnExportFailureBurst';break}
                     if(([int]$last.Verified+[int]$last.Deferred) -eq 0){
                         $status='StoppedNoProgress';break
                     }
@@ -131,6 +133,7 @@ function Invoke-OPAARCH7eAuto {
           [int]$OlderThanMonths,[string]$ArchiveGrouping,[switch]$IncludeRootMail,[int]$MaxResumeAttempts)
     . (Join-Path $ProjectRoot 'Core/Runtime/ComManager.ps1')
     . (Join-Path $ProjectRoot 'Core/Archive/ARCH7dSupervisor.ps1')
+    . (Join-Path $ProjectRoot 'Core/Archive/ARCH6Orchestration.ps1')
     $safeUser=(("{0}_{1}" -f [string]$env:USERDOMAIN,[string]$env:USERNAME) -replace '[^A-Za-z0-9_.-]','_')
     $mutex=[Threading.Mutex]::new($false,("Global\OutlookPOP3Archive-ARCH7e-"+$safeUser))
     $held=$false;$session=$null

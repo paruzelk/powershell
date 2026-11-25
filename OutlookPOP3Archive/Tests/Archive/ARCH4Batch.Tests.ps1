@@ -15,6 +15,7 @@ BeforeAll {
     . (Join-Path $script:root 'Core/Archive/ARCH4Batch.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH6Orchestration.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH7dSupervisor.ps1')
+    . (Join-Path $script:root 'Core/Archive/ARCH7eAuto.ps1')
     # ARCH7b1: the production folder adapter lives in the main entrypoint,
     # not a dot-sourceable module. Load exactly its declaration (never execute
     # the CLI, discovery, or a real COM operation) so Pester can mock it.
@@ -1197,6 +1198,177 @@ $row=[ordered]@{Mode=$Mode;Pid=$PID;SourcePst=$SourcePst;TransactionId=$Transact
         $r.ResumeWorkers | Should -Be 0
         @(Get-ChildItem -LiteralPath $r.LogDirectory -Filter '*.stdout.log').Count | Should -Be 0
         (Get-FileHash -LiteralPath $fixture.Source).Hash | Should -BeExactly $fixture.SourceHash
+    }
+}
+
+
+Describe 'ARCH7e guarded all-POP3 age-only dispatcher' {
+    BeforeAll {
+        function New-ARCH7eFixture {
+            $d=Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+            [void][IO.Directory]::CreateDirectory($d)
+            $other=Join-Path $d 'other'
+            [void][IO.Directory]::CreateDirectory($other)
+            $a=Join-Path $d 'a.pst';$b=Join-Path $d 'b.pst';$c=Join-Path $other 'c.pst'
+            $imap=Join-Path $d 'imap.ost';$archive=Join-Path $d 'a.Archive-2020.pst'
+            foreach($path in @($a,$b,$c,$imap,$archive)){[IO.File]::WriteAllBytes($path,[byte[]]@(1))}
+            $sa=[pscustomobject]@{StoreID='A';FilePath=$a;DisplayName='A'}
+            $sb=[pscustomobject]@{StoreID='B';FilePath=$b;DisplayName='B'}
+            $sc=[pscustomobject]@{StoreID='C';FilePath=$c;DisplayName='C'}
+            $si=[pscustomobject]@{StoreID='IMAP';FilePath=$imap;DisplayName='IMAP'}
+            $sx=[pscustomobject]@{StoreID='ARCHIVE';FilePath=$archive;DisplayName='Archive'}
+            $ns=[pscustomobject]@{CurrentProfileName='Outlook';Accounts=@([pscustomobject]@{AccountType=2;DeliveryStore=$sa},[pscustomobject]@{AccountType=1;DeliveryStore=$si},[pscustomobject]@{AccountType=2;DeliveryStore=$sb},[pscustomobject]@{AccountType=2;DeliveryStore=$sc});Stores=@($sa,$sb,$sc,$si,$sx)}
+            $rows=@(Get-OPAARCH7eSourceRows -Namespace $ns -ProfileName Outlook)
+            [pscustomobject]@{Namespace=$ns;Rows=$rows;A=$a;B=$b;C=$c;ArchiveStore=$sx;SourceStore=$sa}
+        }
+        function New-ARCH7eResult {
+            param([string]$Status='NoEligibleMessages',[int]$Verified=0,[int]$Deferred=0,[int]$Unprocessed=0,[int]$Batches=0)
+            [pscustomobject]@{Schema='2.6.5-ARCH7d.Supervisor.1';Status=$Status;Verified=$Verified;Deferred=$Deferred;Unprocessed=$Unprocessed;Batches=$Batches;ProductionReady=$false;AutomaticMoveRetryAllowed=$false;OutlookRestartRequired=$false;LastBatchResult=$null}
+        }
+    }
+    It 'discovers only unique direct POP3 delivery stores without size gating or archive and IMAP selection' {
+        $f=New-ARCH7eFixture
+        $f.Rows.Count | Should -Be 3
+        $f.Rows.SourcePst | Should -Contain $f.A
+        $f.Rows.SourcePst | Should -Contain $f.B
+        $f.Rows.SourcePst | Should -Contain $f.C
+        $f.Rows.SourcePst | Should -Not -Contain $f.ArchiveStore.FilePath
+        @($f.Rows | Where-Object {$_.Protocol -cne 'POP3'}).Count | Should -Be 0
+        @($f.Rows | Group-Object Directory).Count | Should -Be 2
+    }
+    It 'rejects ambiguous shared POP3 delivery, archive as delivery, and cross-protocol store ownership' {
+        $f=New-ARCH7eFixture
+        $original=$f.Namespace.Accounts
+        $f.Namespace.Accounts=$original+@([pscustomobject]@{AccountType=2;DeliveryStore=$f.SourceStore})
+        {Get-OPAARCH7eSourceRows -Namespace $f.Namespace -ProfileName Outlook} | Should -Throw '*ambiguous POP3*'
+        $f.Namespace.Accounts=$original+@([pscustomobject]@{AccountType=2;DeliveryStore=$f.ArchiveStore})
+        {Get-OPAARCH7eSourceRows -Namespace $f.Namespace -ProfileName Outlook} | Should -Throw '*unsafe POP3*'
+        $f.Namespace.Accounts=$original+@([pscustomobject]@{AccountType=1;DeliveryStore=$f.SourceStore})
+        {Get-OPAARCH7eSourceRows -Namespace $f.Namespace -ProfileName Outlook} | Should -Throw '*non-POP3 account*'
+        $f.Namespace.Accounts=$original+@([pscustomobject]@{AccountType=2;DeliveryStore=$null})
+        {Get-OPAARCH7eSourceRows -Namespace $f.Namespace -ProfileName Outlook} | Should -Throw '*identity unavailable*'
+    }
+    It 'resolves exact shared-directory pending owner without modifying evidence and blocks foreign owners' {
+        $f=New-ARCH7eFixture
+        $members=@($f.Rows | Where-Object {$_.SourcePst -in @($f.A,$f.B)})
+        $b=@($members | Where-Object {$_.SourcePst -eq $f.B})[0]
+        [void][IO.Directory]::CreateDirectory($b.Directory)
+        $path=Join-Path $b.Directory 'ARCH4.pending'
+        Get-OPAARCH7ePendingOwner -Directory $b.Directory -Sources $members | Should -BeNullOrEmpty
+        $record=[pscustomobject]@{Schema='2.6.5-ARCH4.Pending.1';TransactionId='20261125-173959-49d4a7fb';SourcePst=$b.SourcePst;SourceStoreId=$b.StoreId;Profile='Outlook';DeferredPolicy=$true;VerificationPolicy='ARCH7bFreshWorkerSameOutlook';MoveWorkerId=200}
+        Write-OPAARCH4Pending -Path $path -Record $record
+        $hash=(Get-FileHash -LiteralPath $path).Hash
+        (Get-OPAARCH7ePendingOwner -Directory $b.Directory -Sources $members).SourcePst | Should -BeExactly $f.B
+        {Get-OPAARCH7ePendingOwner -Directory $b.Directory -Sources @($members | Where-Object {$_.SourcePst -eq $f.A})} | Should -Throw '*not a uniquely discovered*'
+        (Get-FileHash -LiteralPath $path).Hash | Should -BeExactly $hash
+    }
+    It 'processes pending owner first and selects fresh batches after proven partial recovery until exhaustion' {
+        $f=New-ARCH7eFixture
+        $script:eOwner=@($f.Rows | Where-Object {$_.SourcePst -eq $f.B})[0]
+        $script:eCalls=New-Object 'System.Collections.Generic.List[string]'
+        $r=Invoke-OPAARCH7eSourceSequence -Sources $f.Rows -MaxBatchesPerSource 3 -PendingOwner {
+            param($directory,$members)
+            if($null -ne $script:eOwner -and $script:eOwner.Directory -eq $directory){$script:eOwner}
+        } -RunSource {
+            param($row)
+            $script:eCalls.Add($row.StoreId)
+            if($row.StoreId -ceq 'B' -and $null -ne $script:eOwner){
+                $script:eOwner=$null
+                New-ARCH7eResult -Status RecoveredPendingBatch -Verified 2 -Deferred 1 -Unprocessed 7 -Batches 1
+            }else{New-ARCH7eResult}
+        }
+        $r.Status | Should -BeExactly AllSourcesExhausted
+        $r.SourcesExhausted | Should -Be 3
+        $r.Verified | Should -Be 2
+        $r.Deferred | Should -Be 1
+        ($script:eCalls.ToArray() -join ',') | Should -BeExactly 'B,B,A,C'
+    }
+    It 'holds other PSTs sharing a failed pending but continues independent directory' {
+        $f=New-ARCH7eFixture
+        $script:eOwner=@($f.Rows | Where-Object {$_.SourcePst -eq $f.B})[0]
+        $script:eCalls=New-Object 'System.Collections.Generic.List[string]'
+        $r=Invoke-OPAARCH7eSourceSequence -Sources $f.Rows -MaxBatchesPerSource 3 -PendingOwner {
+            param($directory,$members)
+            if($script:eOwner.Directory -eq $directory){$script:eOwner}
+        } -RunSource {
+            param($row)
+            $script:eCalls.Add($row.StoreId)
+            if($row.StoreId -ceq 'B'){New-ARCH7eResult -Status RecoveryAttemptsExhausted}else{New-ARCH7eResult}
+        }
+        $r.Status | Should -BeExactly PartialOrBlocked
+        ($script:eCalls.ToArray() -join ',') | Should -BeExactly 'B,C'
+        @($r.Sources | Where-Object {$_.SourcePst -eq $f.A})[0].Status | Should -BeExactly NotRunBlocked
+        $r.SourcesExhausted | Should -Be 1
+    }
+    It 'never launches another source when child is still running or exit code unknown' {
+        $f=New-ARCH7eFixture
+        foreach($state in @('WorkerStillRunning','WorkerExitCodeUnavailable','RecoveryExitWithoutEvidence')){
+            $script:eState=$state
+            $script:eCalls=0
+            $r=Invoke-OPAARCH7eSourceSequence -Sources $f.Rows -MaxBatchesPerSource 3 -PendingOwner {param($directory,$members)} -RunSource {
+                param($row)
+                $script:eCalls++
+                New-ARCH7eResult -Status $script:eState
+            }
+            $script:eCalls | Should -Be 1
+            $r.Status | Should -BeExactly PartialOrBlocked
+            @($r.Sources | Where-Object {$_.Status -ceq 'NotRunBlocked'}).Count | Should -Be 2
+        }
+    }
+    It 'honors per-source bounded batch cap, skip-only progress and zero-progress stop' {
+        $f=New-ARCH7eFixture
+        $script:eCalls=0
+        $r=Invoke-OPAARCH7eSourceSequence -Sources @($f.Rows[0]) -MaxBatchesPerSource 2 -PendingOwner {param($directory,$members)} -RunSource {
+            param($row)
+            $script:eCalls++
+            New-ARCH7eResult -Status BatchLimitReached -Deferred 1 -Batches 1
+        }
+        $r.Status | Should -BeExactly PartialOrBlocked
+        $r.Deferred | Should -Be 2
+        $script:eCalls | Should -Be 2
+        $r.Sources[0].Status | Should -BeExactly BatchLimitReached
+        $r=Invoke-OPAARCH7eSourceSequence -Sources @($f.Rows[0]) -MaxBatchesPerSource 3 -PendingOwner {param($directory,$members)} -RunSource {
+            param($row)
+            New-ARCH7eResult -Status RecoveredPendingBatch -Unprocessed 10 -Batches 1
+        }
+        $r.Sources[0].Status | Should -BeExactly StoppedNoProgress
+        $r.Sources[0].Attempts | Should -Be 1
+    }
+    It 'blocks a burst of attachment export failures and does not report exhaustion' {
+        $f=New-ARCH7eFixture
+        $r=Invoke-OPAARCH7eSourceSequence -Sources @($f.Rows[0]) -MaxBatchesPerSource 3 -PendingOwner {param($directory,$members)} -RunSource {
+            param($row)
+            $x=New-ARCH7eResult -Status BatchLimitReached -Deferred 10 -Batches 1
+            $x.LastBatchResult=[pscustomobject]@{Planned=10;SkipReasons=@([pscustomobject]@{Reason='AttachmentExportFailed';Count=10})}
+            $x
+        }
+        $r.Sources[0].Status | Should -BeExactly StoppedOnExportFailureBurst
+        $r.Sources[0].Attempts | Should -Be 1
+    }
+    It 'accepts only explicit DEV Auto age-only defaults and rejects legacy policy or writer keys before COM' {
+        $main=Join-Path $script:root 'OutlookPOP3Archive.ps1'
+        $r=& $main -Mode Auto -ConfirmDevAutoArchive -WhatIf
+        $r.Status | Should -BeExactly NoOutlookOrPersistentWrites
+        $r.BatchSize | Should -Be 10
+        $r.OlderThanMonths | Should -Be 12
+        $r.ArchiveGrouping | Should -BeExactly YearQuarter
+        $r.IncludeRootMail | Should -BeTrue
+        $r.DisableStoragePolicy | Should -BeTrue
+        $r.DisableArchivePstSizeLimit | Should -BeTrue
+        $r.DurabilityMode | Should -BeExactly Safe
+        $r.ProductionReady | Should -BeFalse
+        {& $main -Mode Auto -ConfirmDevAutoArchive -WhatIf -Limit 11} | Should -Throw '*age-only*'
+        {& $main -Mode Auto -ConfirmDevAutoArchive -WhatIf -SourcePst 'fake.pst'} | Should -Throw '*unsupported Auto DEV parameter*'
+        {& $main -Mode Auto -ConfirmDevAutoArchive -WhatIf -DisableStoragePolicy:$false} | Should -Throw '*age-only*'
+        {& $main -Mode Auto -ConfirmDevAutoArchive -WhatIf -DurabilityMode Fast} | Should -Throw '*age-only*'
+        {& $main -Mode Auto -WhatIf -AutoDevMaxBatches 1} | Should -Throw '*requires ConfirmDevAutoArchive*'
+        {& $main -Mode Auto -WhatIf} | Should -Throw
+    }
+    It 'returns NoPop3Sources without any write or Archive callback' {
+        $r=Invoke-OPAARCH7eSourceSequence -Sources @() -MaxBatchesPerSource 1 -PendingOwner {throw 'unexpected pending'} -RunSource {throw 'unexpected Archive'}
+        $r.Status | Should -BeExactly NoPop3Sources
+        $r.SourcesDiscovered | Should -Be 0
+        $r.Verified | Should -Be 0
     }
 }
 
