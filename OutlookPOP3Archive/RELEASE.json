@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH7b1 DEV: fix missing original folder adapter in focused Pester setup; no execution of main CLI; same 4871/165 expected, 57 focused, runtime guards unchanged.",
     "ARCH7b DEV: separate PowerShell STA verification with same live Outlook; explicit bounded test only, attach-only, original full verification and durable journal/index gates; 4871/165 expected. Auto/production closed.",
     "ARCH6f3c3 DEV: vendor-independent pre-Move attachment export deferral, health checks, no antivirus provider query on automatic path, completed-batch burst guard. 4862/165 expected. Production closed.",
     "ARCH6f3c2 DEV: real ARCH6f3c1 interrupted recovery accepted (311 verified/indexed, zero Move, 189 unprocessed). Narrow antivirus export classification and explicit metadata-only historical hold. 4854/165 expected. Production closed.",

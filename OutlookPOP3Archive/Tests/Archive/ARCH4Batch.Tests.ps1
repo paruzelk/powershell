@@ -14,6 +14,20 @@ BeforeAll {
     . (Join-Path $script:root 'Core/Archive/ArchiveVerifier.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH4Batch.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH6Orchestration.ps1')
+    # ARCH7b1: the production folder adapter lives in the main entrypoint,
+    # not a dot-sourceable module. Load exactly its declaration (never execute
+    # the CLI, discovery, or a real COM operation) so Pester can mock it.
+    $tokens=$null;$parseErrors=$null
+    $mainAst=[System.Management.Automation.Language.Parser]::ParseFile(
+        (Join-Path $script:root 'OutlookPOP3Archive.ps1'),[ref]$tokens,[ref]$parseErrors)
+    if(@($parseErrors).Count -ne 0){throw 'ARCH7b1 main entrypoint syntax invalid.'}
+    $folderAdapter=@($mainAst.FindAll({
+        param($node)
+        $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+        $node.Name -ceq 'Get-OPAPop3SourceFolders'
+    },$false))
+    if($folderAdapter.Count -ne 1){throw 'ARCH7b1 exact original folder adapter definition required.'}
+    . ([scriptblock]::Create($folderAdapter[0].Extent.Text))
     $script:sourceFolder='\\Fake POP3\Inbox'
     $script:targetFolder='\\Fake Archive\2020\Inbox'
     function New-ARCH4Fixture {
@@ -636,6 +650,7 @@ Describe 'ARCH7b independent worker live Outlook verification fences' {
         $r.PendingCleared | Should -BeTrue
         Test-Path -LiteralPath $pending | Should -BeFalse
         @(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx) | Where-Object {$_.Step -ceq 'ARCH7b Fresh Worker Verified'}).Count | Should -Be 1
+        Should -Invoke Get-OPAPop3SourceFolders -Exactly -Times 1 -ParameterFilter {$IncludeEmptyFolders -and $IncludeRootForVerification}
         Should -Invoke Test-OPAArchiveMoves -Exactly -Times 1
         Should -Invoke Move-OPAItemsWithLimit -Exactly -Times 0
     }

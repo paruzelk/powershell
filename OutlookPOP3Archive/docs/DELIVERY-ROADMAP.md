@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH7b1 DEV: ARCH7b CI 45613631882 failed 55/57 focused due to missing Get-OPAPop3SourceFolders in test setup. Import exact original AST function only; repeat 57 focused and full 4871/165. Live acceptance still pending; no repeat of completed archive tests.
+
 > ARCH7b DEV: [fresh worker without Outlook restart](2.6.5-arch7b.md), CI/live pending. Next ARCH7c mixed recovery, ARCH7d supervisor. Production closed.
 
 > **ARCH7a 25.11.2026:** [Auto age-only, аудит и требования](ARCH7a-AUTO-REQUIREMENTS.md), [CLI](../README.md), [RDS](RDS-DEPLOYMENT.md). 4862/165 CI PASS ARCH6f3c3, live pending, historical hold failed, 1310/1500 verified. Production closed. Далее ARCH7b–g, ARCH8a/b, RC. Отдельный конфиг и обязательная size-driven policy исключены. Ниже история.

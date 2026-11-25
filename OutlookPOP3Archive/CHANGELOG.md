@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7b1 DEV
+
+- Fix two focused tests failing before verification (missing Get-OPAPop3SourceFolders): load only the original function declaration from the main script AST; no CLI/COM execution. 4871/165 and 57 focused tests unchanged; production gates unchanged.
+
 ## ARCH7b DEV
 
 - Explicit fresh-worker same-Outlook verification, attach-only, bounded 1–10, original semantic verification, durable proof; 9 new synthetic tests, 4871/165 expected. Production closed.
