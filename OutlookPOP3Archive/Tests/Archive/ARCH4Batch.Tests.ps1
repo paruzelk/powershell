@@ -62,7 +62,8 @@ BeforeAll {
             if($s.Step -eq 'Move Started'){
                 $params.SemanticWitness=$s.SourceSemanticWitness
                 if($Interrupted){$tx.State.Executed=$prior;$params.WriteCheckpoint=$true;$prior++}
-            }else{$params.ArchiveEntryId=$s.ArchiveEntryId}
+            }elseif($s.Step -ceq 'Skipped'){$params.Message=$s.Message}
+            else{$params.ArchiveEntryId=$s.ArchiveEntryId}
             Save-OPAArchiveTransaction @params
         }
         foreach($e in $Fixture.Events){
@@ -715,6 +716,145 @@ Describe 'ARCH7b independent worker live Outlook verification fences' {
         {Invoke-OPAARCH4Batch @params} | Should -Throw '*independent full verification failed*'
         Test-Path -LiteralPath $pending | Should -BeTrue
         (Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE).Reconciled | Should -Be 0
+        Should -Invoke Move-OPAItemsWithLimit -Exactly -Times 0
+    }
+}
+
+
+Describe 'ARCH7c recover proven interrupted mixed live batches' {
+    BeforeAll {
+        function New-ARCH7cMixedFixture {
+            $f=New-ARCH4Fixture -Count 4 -Returned 2
+            $plan=@($f.Transaction.State.PlannedItems)
+            $f.Transaction.State.PlannedItems=@($plan[0],$plan[2],$plan[1],$plan[3])
+            $skip=[pscustomobject]@{Step='Skipped';EntryId='S3';SourceFolderPath=$script:sourceFolder;ReceivedTime='2020-01-01T00:00:00';Message='ARCH6f3a deferred AttachmentTypeUnsupported: ARCH5 AttachmentTypeUnsupported: index=1 type=5 bytes=100'}
+            $f.Steps=@($f.Steps[0],$f.Steps[1],$skip,$f.Steps[2],$f.Steps[3])
+            foreach($step in @($f.Steps | Where-Object {$_.Step -ceq 'Move Started'})){$step.SourceSemanticWitness | Add-Member -NotePropertyName Schema -NotePropertyValue Synthetic}
+            Save-ARCH4Fixture -Fixture $f -Interrupted
+            return $f
+        }
+    }
+    It 'separates verified returned, deferred and never claimed planned items' {
+        $f=New-ARCH7cMixedFixture
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $f.Transaction))
+        $r=Get-OPAARCH7cInterruptedReview -Transaction $f.Transaction -State $state -Steps $steps
+        $r.Planned | Should -Be 4
+        $r.Returned | Should -Be 2
+        $r.Deferred | Should -Be 1
+        $r.Unprocessed | Should -Be 1
+        $r.DeferredRows[0].EntryId | Should -BeExactly S3
+    }
+    It 'rejects unknown or unproven skip, reordered prefix and unknown journal suffix' {
+        $f=New-ARCH7cMixedFixture
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $f.Transaction))
+        $skip=@($steps | Where-Object {$_.Step -ceq 'Skipped'})[0]
+        $original=$skip.Message;$skip.Message='unknown error'
+        {Get-OPAARCH7cInterruptedReview -Transaction $f.Transaction -State $state -Steps $steps} | Should -Throw '*unsafe skipped*'
+        $skip.Message=$original;$skip.EntryId='S4'
+        {Get-OPAARCH7cInterruptedReview -Transaction $f.Transaction -State $state -Steps $steps} | Should -Throw '*exact planned prefix*'
+        $skip.EntryId='S3'
+        {Get-OPAARCH7cInterruptedReview -Transaction $f.Transaction -State $state -Steps ($steps+@([pscustomobject]@{Step='Move Indeterminate'}))} | Should -Throw
+    }
+    It 'does not treat an unresolved claim or a torn journal as an unprocessed item' {
+        $f=New-ARCH7cMixedFixture
+        $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $f.Transaction))
+        {Get-OPAARCH4ReturnedState -Transaction $f.Transaction -Steps @($steps | Select-Object -SkipLast 1) -Events $f.Events -SourceStoreId STORE} | Should -Throw
+        $path=Get-OPAStepJournalPath -Transaction $f.Transaction
+        [IO.File]::AppendAllText($path,'{"Step":"Move Started"}')
+        {Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE} | Should -Throw '*incomplete tail*'
+    }
+    It 'accepts a durable plan before the first Move and leaves all items unprocessed' {
+        $f=New-ARCH4Fixture -Count 3 -Returned 0
+        Save-ARCH4Fixture -Fixture $f -Interrupted
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $f.Transaction))
+        $r=Get-OPAARCH7cInterruptedReview -Transaction $f.Transaction -State $state -Steps $steps
+        $r.Returned | Should -Be 0
+        $r.Deferred | Should -Be 0
+        $r.Unprocessed | Should -Be 3
+    }
+    It 'commits only verified receipts and durable skipped IDs, resumes idempotently' {
+        $f=New-ARCH7cMixedFixture
+        $tx=$f.Transaction
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE
+        $v=New-ARCH4Verification -Count 2
+        $r=Complete-OPAARCH7cInterruptedBatch -Transaction $tx -State $state -Verification $v -SourceStoreId STORE -ProfileName Outlook
+        $r.Status | Should -BeExactly 'LiveInterruptedBatchRecovered'
+        $r.Verified | Should -Be 2
+        $r.Indexed | Should -Be 2
+        $r.DeferredRecorded | Should -Be 1
+        $r.Unprocessed | Should -Be 1
+        $r.MoveInvocations | Should -Be 0
+        $idx=Import-OPADuplicateIndex -ArchivePst $f.Archive
+        $idx.Entries.Count | Should -Be 2
+        Test-OPADuplicateEntry -Index $idx -SourceEntryId S3 | Should -BeNullOrEmpty
+        Test-OPADuplicateEntry -Index $idx -SourceEntryId S4 | Should -BeNullOrEmpty
+        $reopened=Get-OPAArchiveTransaction -SourcePst $tx.State.SourcePst -TransactionId $tx.TransactionId
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $reopened -SourceStoreId STORE
+        $r2=Complete-OPAARCH7cInterruptedBatch -Transaction $reopened -State $state -Verification $v -SourceStoreId STORE -ProfileName Outlook
+        $r2.Indexed | Should -Be 2
+        $r2.DeferredRecorded | Should -Be 1
+        @(Get-OPAARCH6DeferredIds -SourcePst $tx.State.SourcePst -SourceStoreId STORE -ProfileName Outlook -Directory ([IO.Path]::GetDirectoryName($tx.Path))) | Should -BeExactly S3
+        @((Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx)) | Where-Object {$_.Step -ceq 'ARCH7c Recovery Verified'}).Count | Should -Be 1
+    }
+    It 'fails verifier without writing Reconciled or deferred ledger' {
+        $f=New-ARCH7cMixedFixture
+        $tx=$f.Transaction;$state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE
+        $v=New-ARCH4Verification -Count 2;$v.Verified=$false
+        {Complete-OPAARCH7cInterruptedBatch -Transaction $tx -State $state -Verification $v -SourceStoreId STORE -ProfileName Outlook} | Should -Throw '*verification failed*'
+        (Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE).Reconciled | Should -Be 0
+        @(Get-ChildItem -LiteralPath ([IO.Path]::GetDirectoryName($tx.Path)) -Filter 'ARCH6-deferred-*.jsonl').Count | Should -Be 0
+    }
+    It 'accepts a newer naturally opened Outlook only with explicit recovery and both prior processes gone' {
+        $pending=[pscustomobject]@{VerificationPolicy='ARCH7bFreshWorkerSameOutlook';MoveProcessId=100;MoveProcessStartUtcTicks=1000L;MoveWorkerId=200;MoveWorkerStartUtcTicks=2000L;MoveWorkerSessionId=3}
+        $outlook=[pscustomobject]@{Id=101;StartUtcTicks=2500L}
+        $worker=[pscustomobject]@{Id=201;StartUtcTicks=3000L;SessionId=4}
+        Mock Test-OPAARCH7bMoveWorkerAlive {$false}
+        {Assert-OPAARCH7bLiveFence -Pending $pending -Outlook $outlook -Worker $worker} | Should -Throw '*Outlook process identity changed*'
+        {Assert-OPAARCH7bLiveFence -Pending $pending -Outlook $outlook -Worker $worker -AllowNaturalOutlookRestart} | Should -Not -Throw
+        Mock Test-OPAARCH7bMoveWorkerAlive {$true}
+        {Assert-OPAARCH7bLiveFence -Pending $pending -Outlook $outlook -Worker $worker -AllowNaturalOutlookRestart} | Should -Throw '*original Outlook process still running*'
+    }
+    It 'exposes only explicit live recovery CLI, with no COM or files on WhatIf' {
+        $src=Join-Path $TestDrive 'arch7c-no-file.pst'
+        $main=Join-Path $script:root 'OutlookPOP3Archive.ps1'
+        $params=@{ProfileName='Outlook';SourcePst=$src;ConfirmTestArchive=$true;ConfirmLiveOutlookVerification=$true;RecoverLiveInterrupted=$true;WhatIf=$true}
+        (& $main -Mode Resume @params -Transaction '20261125-161734-1d203d2f').Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
+        {& $main -Mode Archive @params -Limit 1} | Should -Throw '*ARCH7c*'
+        {& $main -Mode Auto @params} | Should -Throw '*ARCH7c*'
+        Test-Path -LiteralPath $src | Should -BeFalse
+    }
+    It 'runs the actual Resume recovery branch and clears pending after original verifier and ledger' {
+        $f=New-ARCH7cMixedFixture
+        $tx=$f.Transaction;$source=[string]$tx.State.SourcePst
+        [IO.File]::WriteAllBytes($source,[byte[]]@(1));[IO.File]::WriteAllBytes($f.Archive,[byte[]]@(1))
+        $store=[pscustomobject]@{StoreID='STORE';FilePath=$source}
+        $dest=[pscustomobject]@{StoreID='ARCHIVE';FilePath=$f.Archive}
+        $session=[pscustomobject]@{Attached=$true;Namespace=[pscustomobject]@{CurrentProfileName='Outlook';Accounts=@([pscustomobject]@{AccountType=2;DeliveryStore=$store});Stores=@($store,$dest)}}
+        $discovery=[pscustomobject]@{Profile='Outlook';Pop3Sources=@([pscustomobject]@{FilePath=$source;Protocol='POP3';StoreHandle=$store})}
+        $script:liveFolder=[pscustomobject]@{StoreID='STORE';FolderPath=$script:sourceFolder}
+        Mock Get-OPAPop3SourceFolders {$script:liveFolder}
+        Mock Get-OPAARCH4OutlookProcess {[pscustomobject]@{Id=100;StartUtcTicks=1000L}}
+        Mock Get-OPAARCH7bWorkerIdentity {[pscustomobject]@{Id=201;StartUtcTicks=3000L;SessionId=3}}
+        Mock Test-OPAARCH7bMoveWorkerAlive {$false}
+        Mock Test-OPAArchiveMoves {New-ARCH4Verification -Count 2}
+        Mock Move-OPAItemsWithLimit {throw 'Resume must not call Move'}
+        $pending=Join-Path ([IO.Path]::GetDirectoryName($tx.Path)) 'ARCH4.pending'
+        $record=[pscustomobject]@{Schema='2.6.5-ARCH4.Pending.1';TransactionId=$tx.TransactionId;SourcePst=[IO.Path]::GetFullPath($source);SourceStoreId='STORE';Profile='Outlook';DeferredPolicy=$true;VerificationPolicy='ARCH7bFreshWorkerSameOutlook';MoveProcessId=100;MoveProcessStartUtcTicks=1000L;MoveWorkerId=200;MoveWorkerStartUtcTicks=2000L;MoveWorkerSessionId=3}
+        Write-OPAARCH4Pending -Path $pending -Record $record
+        $params=@{Mode='Resume';Session=$session;Discovery=$discovery;SourcePst=$source;TransactionId=$tx.TransactionId;ARCH5Batch=$true;ConfirmLiveOutlookVerification=$true;RecoverLiveInterrupted=$true}
+        $r=Invoke-OPAARCH4Batch @params
+        $r.Status | Should -BeExactly 'LiveInterruptedBatchRecovered'
+        $r.Verified | Should -Be 2
+        $r.DeferredRecorded | Should -Be 1
+        $r.Unprocessed | Should -Be 1
+        $r.PendingCleared | Should -BeTrue
+        $r.NaturalOutlookRestart | Should -BeFalse
+        $r.MoveInvocations | Should -Be 0
+        Test-Path -LiteralPath $pending | Should -BeFalse
+        Should -Invoke Test-OPAArchiveMoves -Exactly -Times 1
         Should -Invoke Move-OPAItemsWithLimit -Exactly -Times 0
     }
 }
