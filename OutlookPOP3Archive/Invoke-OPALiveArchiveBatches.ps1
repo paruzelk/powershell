@@ -44,33 +44,39 @@ try{
     $probe=[IO.FileStream]::new((Join-Path $dir 'ARCH7d.worker.lease'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
     $probe.Dispose()
     if($InterruptAfterReturned -gt 0 -and $null -ne (Get-OPAARCH7dPending -Directory $dir -SourcePst $source -ProfileName $ProfileName)){throw 'ARCH7d existing pending; recover it before fault test.'}
-    $logDir=Join-Path $dir ('ARCH7d-run-'+[guid]::NewGuid().ToString('N'))
-    [void][IO.Directory]::CreateDirectory($logDir)
-    $log=Join-Path $logDir 'supervisor.jsonl'
-    $main=Join-Path $PSScriptRoot 'OutlookPOP3Archive.ps1'
-    $common=@{SourcePst=$source;ProfileName=$ProfileName;ConfirmTestArchive=$true;ConfirmLiveOutlookVerification=$true}
-    $archive=$common.Clone()
-    $archive.Mode='Archive';$archive.Limit=$BatchSize;$archive.OlderThanMonths=$OlderThanMonths;$archive.ArchiveGrouping=$ArchiveGrouping
-    $archive.DisableArchivePstSizeLimit=$true;$archive.IncludeRootMail=[bool]$IncludeRootMail
-    if($IncludeFolderPath){$archive.IncludeFolderPath=$IncludeFolderPath}
-    if($InterruptAfterReturned -gt 0){$archive.ARCH7dInterruptAfterReturned=$InterruptAfterReturned}
-    $read={Get-OPAARCH7dPending -Directory $dir -SourcePst $source -ProfileName $ProfileName}
-    $startArchive={Invoke-OPAARCH7dWorker -Main $main -Parameters $archive -Directory $dir -LogDirectory $logDir -TimeoutSeconds $WorkerTimeoutSeconds}
-    $startResume={
+    # Callback free variables must not collide with the dynamically scoped
+    # parameters/locals of Invoke-OPAARCH7dSequence (notably $Archive).
+    $arch7dControllerTransactionDirectory=$dir
+    $arch7dControllerSourcePst=$source
+    $arch7dControllerProfile=$ProfileName
+    $arch7dControllerTimeout=$WorkerTimeoutSeconds
+    $arch7dControllerLogDirectory=Join-Path $arch7dControllerTransactionDirectory ('ARCH7d-run-'+[guid]::NewGuid().ToString('N'))
+    [void][IO.Directory]::CreateDirectory($arch7dControllerLogDirectory)
+    $arch7dControllerJournalPath=Join-Path $arch7dControllerLogDirectory 'supervisor.jsonl'
+    $arch7dControllerMainPath=Join-Path $PSScriptRoot 'OutlookPOP3Archive.ps1'
+    $arch7dControllerCommonParameters=@{SourcePst=$arch7dControllerSourcePst;ProfileName=$arch7dControllerProfile;ConfirmTestArchive=$true;ConfirmLiveOutlookVerification=$true}
+    $arch7dControllerArchiveParameters=$arch7dControllerCommonParameters.Clone()
+    $arch7dControllerArchiveParameters.Mode='Archive';$arch7dControllerArchiveParameters.Limit=$BatchSize;$arch7dControllerArchiveParameters.OlderThanMonths=$OlderThanMonths;$arch7dControllerArchiveParameters.ArchiveGrouping=$ArchiveGrouping
+    $arch7dControllerArchiveParameters.DisableArchivePstSizeLimit=$true;$arch7dControllerArchiveParameters.IncludeRootMail=[bool]$IncludeRootMail
+    if($IncludeFolderPath){$arch7dControllerArchiveParameters.IncludeFolderPath=$IncludeFolderPath}
+    if($InterruptAfterReturned -gt 0){$arch7dControllerArchiveParameters.ARCH7dInterruptAfterReturned=$InterruptAfterReturned}
+    $arch7dControllerReadPending={Get-OPAARCH7dPending -Directory $arch7dControllerTransactionDirectory -SourcePst $arch7dControllerSourcePst -ProfileName $arch7dControllerProfile}
+    $arch7dControllerStartArchive={Invoke-OPAARCH7dWorker -Main $arch7dControllerMainPath -Parameters $arch7dControllerArchiveParameters -Directory $arch7dControllerTransactionDirectory -LogDirectory $arch7dControllerLogDirectory -TimeoutSeconds $arch7dControllerTimeout}
+    $arch7dControllerStartResume={
         param($id)
-        $options=$common.Clone();$options.Mode='Resume';$options.Transaction=$id;$options.RecoverLiveInterrupted=$true
-        Invoke-OPAARCH7dWorker -Main $main -Parameters $options -Directory $dir -LogDirectory $logDir -TimeoutSeconds $WorkerTimeoutSeconds
+        $arch7dControllerResumeParameters=$arch7dControllerCommonParameters.Clone();$arch7dControllerResumeParameters.Mode='Resume';$arch7dControllerResumeParameters.Transaction=$id;$arch7dControllerResumeParameters.RecoverLiveInterrupted=$true
+        Invoke-OPAARCH7dWorker -Main $arch7dControllerMainPath -Parameters $arch7dControllerResumeParameters -Directory $arch7dControllerTransactionDirectory -LogDirectory $arch7dControllerLogDirectory -TimeoutSeconds $arch7dControllerTimeout
     }
-    $record={
+    $arch7dControllerRecord={
         param($phase,$data)
         $row=[ordered]@{Time=(Get-Date).ToString('o');Phase=$phase;Data=$data}
         $json=ConvertTo-Json -InputObject $row -Depth 14 -Compress
         $bytes=[Text.UTF8Encoding]::new($false).GetBytes($json+[char]10)
-        $stream=[IO.FileStream]::new($log,[IO.FileMode]::Append,[IO.FileAccess]::Write,[IO.FileShare]::Read)
+        $stream=[IO.FileStream]::new($arch7dControllerJournalPath,[IO.FileMode]::Append,[IO.FileAccess]::Write,[IO.FileShare]::Read)
         try{$stream.Write($bytes,0,$bytes.Length);$stream.Flush($true)}finally{$stream.Dispose()}
     }
-    $result=Invoke-OPAARCH7dSequence -ReadPending $read -Archive $startArchive -Resume $startResume -Record $record -MaxBatches $MaxBatches -MaxResumeAttempts $MaxResumeAttempts -RetryDelaySeconds $RetryDelaySeconds -RecoverOnly:$RecoverOnly
-    $result | Add-Member -NotePropertyMembers @{LogDirectory=$logDir;ControlledInterruptionRequested=$InterruptAfterReturned}
-    & $record 'SupervisorCompleted' $result
+    $result=Invoke-OPAARCH7dSequence -ReadPending $arch7dControllerReadPending -Archive $arch7dControllerStartArchive -Resume $arch7dControllerStartResume -Record $arch7dControllerRecord -MaxBatches $MaxBatches -MaxResumeAttempts $MaxResumeAttempts -RetryDelaySeconds $RetryDelaySeconds -RecoverOnly:$RecoverOnly
+    $result | Add-Member -NotePropertyMembers @{LogDirectory=$arch7dControllerLogDirectory;ControlledInterruptionRequested=$InterruptAfterReturned}
+    & $arch7dControllerRecord 'SupervisorCompleted' $result
     $result
 }finally{$lease.Dispose()}

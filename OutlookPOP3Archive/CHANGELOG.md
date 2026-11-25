@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7d2 DEV
+
+- ARCH7d1 CI 45628829292 PASS 4895/165. Operator WhatIf PASS, real controller failed before launching Archive: dynamically scoped $Archive callback shadowed $archive Hashtable. Use distinct controller-prefixed capture names; no archive/recovery algorithm changes. Add three public-controller integration tests using unchanged copied controller/supervisor, real STA children and temporary fake main/PST only; normal, controlled interruption, RecoverOnly without pending. 4898/165 expected, 84 focused.
+
 ## ARCH7d1 DEV
 
 - ARCH7d CI 45627946366: 78/79 focused PASS, real STA child ExitCode was null. Cache the original process handle before waiting and read CLR Int32 ExitCode; fail closed on unavailable handle/code. Do not continue Archive or retry Resume on unknown code. Add real failed child and unknown-exit sequence regressions, retain original Unicode child test. 4895/165 expected, 81 focused.

@@ -1078,4 +1078,126 @@ Describe 'ARCH7d supervisor recovery-only child lifecycle' {
     }
 }
 
+
+Describe 'ARCH7d2 public controller end-to-end with isolated real PowerShell children' {
+    BeforeAll {
+        function New-ARCH7d2PublicFixture {
+            # Copy the actual public controller and actual supervisor unchanged.
+            # Substitute ONLY its sibling main entrypoint inside a unique temp tree.
+            # No production test injection parameter, no Outlook, no real PST.
+            $fixture=Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+            $core=Join-Path $fixture 'Core\Archive'
+            [void][IO.Directory]::CreateDirectory($core)
+            $controller=Join-Path $fixture 'Invoke-OPALiveArchiveBatches.ps1'
+            [IO.File]::Copy((Join-Path $script:root 'Invoke-OPALiveArchiveBatches.ps1'),$controller)
+            [IO.File]::Copy((Join-Path $script:root 'Core/Archive/ARCH7dSupervisor.ps1'),(Join-Path $core 'ARCH7dSupervisor.ps1'))
+            $mailDir=Join-Path $fixture 'Файлы Outlook'
+            [void][IO.Directory]::CreateDirectory($mailDir)
+            $source=Join-Path $mailDir 'почта.pst'
+            [IO.File]::WriteAllBytes($source,[byte[]]@(1,2,3))
+            $stub=Join-Path $fixture 'OutlookPOP3Archive.ps1'
+            $code=@'
+param([string]$Mode,[string]$SourcePst,[string]$ProfileName,[switch]$ConfirmTestArchive,
+      [switch]$ConfirmLiveOutlookVerification,[int]$Limit,[int]$OlderThanMonths,[string]$ArchiveGrouping,
+      [string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$DisableArchivePstSizeLimit,
+      [int]$ARCH7dInterruptAfterReturned,[string]$Transaction,[switch]$RecoverLiveInterrupted)
+$ErrorActionPreference='Stop'
+$expected=Join-Path $PSScriptRoot 'Файлы Outlook\почта.pst'
+if($SourcePst -cne $expected -or $ProfileName -cne 'Outlook' -or -not $ConfirmTestArchive -or
+   -not $ConfirmLiveOutlookVerification -or [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -cne 'STA'){
+    throw 'ARCH7d2 fixture common parameter mismatch'
+}
+$dir=Join-Path ([IO.Path]::GetDirectoryName($SourcePst)) 'OutlookPOP3Archive-Transactions'
+$pending=Join-Path $dir 'ARCH4.pending'
+$trace=Join-Path $dir 'fixture-trace.jsonl'
+$tx='20261125-161734-1d203d2f'
+if($Mode -ceq 'Archive'){
+    if($Limit -ne 10 -or $OlderThanMonths -ne 60 -or $ArchiveGrouping -cne 'YearQuarter' -or
+       -not $DisableArchivePstSizeLimit -or -not $IncludeRootMail -or $RecoverLiveInterrupted -or $Transaction -or
+       $IncludeFolderPath.Count -ne 2 -or $IncludeFolderPath[0] -cne '\\почта\Входящие' -or $IncludeFolderPath[1] -cne '\\почта\Отправленные' -or
+       $ARCH7dInterruptAfterReturned -notin @(0,2)){throw 'ARCH7d2 fixture Archive parameter mismatch'}
+    $returned=if($ARCH7dInterruptAfterReturned -eq 2){2}else{10}
+    $p=[ordered]@{Schema='2.6.5-ARCH4.Pending.1';VerificationPolicy='ARCH7bFreshWorkerSameOutlook';DeferredPolicy=$true;SourcePst=$SourcePst;Profile=$ProfileName;SourceStoreId='FAKE';TransactionId=$tx;MoveWorkerId=$PID;FixtureReturned=$returned}
+    $json=ConvertTo-Json -InputObject $p -Compress
+    $fs=[IO.FileStream]::new($pending,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read)
+    try{$bytes=[Text.UTF8Encoding]::new($false).GetBytes($json);$fs.Write($bytes,0,$bytes.Length);$fs.Flush($true)}finally{$fs.Dispose()}
+    $row=[ordered]@{Mode=$Mode;Pid=$PID;SourcePst=$SourcePst;Folders=$IncludeFolderPath;Interrupt=$ARCH7dInterruptAfterReturned}
+    [IO.File]::AppendAllText($trace,((ConvertTo-Json -InputObject $row -Compress)+[char]10),[Text.UTF8Encoding]::new($false))
+    if($ARCH7dInterruptAfterReturned -eq 2){throw 'ARCH7d2 fixture controlled interruption'}
+    [pscustomobject]@{Schema='2.6.5-ARCH4.Returned.1';Status='BatchReturnedFreshWorkerResumeRequired';TransactionId=$tx}
+    return
+}
+if($Mode -cne 'Resume' -or $Transaction -cne $tx -or -not $RecoverLiveInterrupted -or $Limit -ne 0 -or
+   $OlderThanMonths -ne 0 -or $ArchiveGrouping -or $IncludeFolderPath -or $IncludeRootMail -or
+   $DisableArchivePstSizeLimit -or $ARCH7dInterruptAfterReturned -ne 0){throw 'ARCH7d2 fixture Resume parameter mismatch'}
+$p=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($pending,[Text.Encoding]::UTF8))
+if($p.MoveWorkerId -eq $PID -or $p.TransactionId -cne $Transaction){throw 'ARCH7d2 fixture worker identity mismatch'}
+$row=[ordered]@{Mode=$Mode;Pid=$PID;SourcePst=$SourcePst;TransactionId=$Transaction}
+[IO.File]::AppendAllText($trace,((ConvertTo-Json -InputObject $row -Compress)+[char]10),[Text.UTF8Encoding]::new($false))
+[IO.File]::Delete($pending)
+[pscustomobject]@{Schema='2.6.5-ARCH4.Completed.1';Status='LiveInterruptedBatchRecovered';TransactionId=$Transaction;PendingCleared=$true;OutlookRestartRequired=$false;VerifyWorkerId=$PID;MoveWorkerId=[int]$p.MoveWorkerId;MoveInvocations=0;Planned=10;Verified=[int]$p.FixtureReturned;Reconciled=[int]$p.FixtureReturned;Indexed=[int]$p.FixtureReturned;Deferred=0;DeferredRecorded=0;Unprocessed=(10-[int]$p.FixtureReturned)}
+'@
+            [IO.File]::WriteAllText($stub,$code,[Text.UTF8Encoding]::new($true))
+            $parameters=@{SourcePst=$source;ProfileName='Outlook';ConfirmTestArchive=$true;ConfirmLiveOutlookVerification=$true;BatchSize=10;MaxBatches=1;OlderThanMonths=60;ArchiveGrouping='YearQuarter';IncludeFolderPath=@('\\почта\Входящие','\\почта\Отправленные');IncludeRootMail=$true;MaxResumeAttempts=1;WorkerTimeoutSeconds=30}
+            [pscustomobject]@{Controller=$controller;Source=$source;Directory=(Join-Path $mailDir 'OutlookPOP3Archive-Transactions');Parameters=$parameters;SourceHash=(Get-FileHash -LiteralPath $source).Hash}
+        }
+        function Assert-ARCH7d2PublicResult {
+            param([object]$Fixture,[object]$Result,[int]$ExpectedExit,[int]$ExpectedVerified)
+            $Result.ArchiveWorkers | Should -Be 1
+            $Result.ResumeWorkers | Should -Be 1
+            $Result.LastArchiveExitCode | Should -Be $ExpectedExit
+            $Result.Verified | Should -Be $ExpectedVerified
+            $Result.LastRecovery.Indexed | Should -Be $ExpectedVerified
+            $Result.LastRecovery.MoveInvocations | Should -Be 0
+            $Result.LastRecovery.PendingCleared | Should -BeTrue
+            $Result.LastRecovery.MoveWorkerId | Should -Not -Be $Result.LastRecovery.VerifyWorkerId
+            $Result.LastRecovery.MoveWorkerId | Should -Be $Result.LastArchiveWorkerId
+            $Result.LastRecovery.VerifyWorkerId | Should -Not -Be $PID
+            $Result.Unprocessed | Should -Be (10-$ExpectedVerified)
+            [IO.File]::Exists((Join-Path $Fixture.Directory 'ARCH4.pending')) | Should -BeFalse
+            (Get-FileHash -LiteralPath $Fixture.Source).Hash | Should -BeExactly $Fixture.SourceHash
+            $trace=@(Get-Content -LiteralPath (Join-Path $Fixture.Directory 'fixture-trace.jsonl') -Encoding UTF8 | ForEach-Object {ConvertFrom-Json -InputObject $_})
+            $trace.Count | Should -Be 2
+            $trace[0].Mode | Should -BeExactly Archive
+            $trace[1].Mode | Should -BeExactly Resume
+            $trace[0].Pid | Should -Be $Result.LastArchiveWorkerId
+            $trace[1].Pid | Should -Be $Result.LastRecovery.VerifyWorkerId
+            $trace[0].SourcePst | Should -BeExactly $Fixture.Source
+            $trace[0].Folders[1] | Should -BeExactly '\\почта\Отправленные'
+            $journal=@(Get-Content -LiteralPath (Join-Path $Result.LogDirectory 'supervisor.jsonl') -Encoding UTF8 | ForEach-Object {ConvertFrom-Json -InputObject $_})
+            $journal.Count | Should -Be 3
+            $journal[0].Phase | Should -BeExactly ArchiveWorker
+            $journal[1].Phase | Should -BeExactly ResumeWorker
+            $journal[2].Phase | Should -BeExactly SupervisorCompleted
+            @(Get-ChildItem -LiteralPath $Result.LogDirectory -Filter '*.stdout.log').Count | Should -Be 2
+            @(Get-ChildItem -LiteralPath $Result.LogDirectory -Filter '*.stderr.log').Count | Should -Be 2
+        }
+    }
+    It 'runs the unmodified public controller with real Archive and Resume child processes and Unicode options' {
+        $fixture=New-ARCH7d2PublicFixture
+        $parameters=$fixture.Parameters
+        $r=& $fixture.Controller @parameters
+        $r.Status | Should -BeExactly BatchLimitReached
+        Assert-ARCH7d2PublicResult -Fixture $fixture -Result $r -ExpectedExit 0 -ExpectedVerified 10
+    }
+    It 'runs the public controller after a failed Archive and automatically recovers with a fresh child' {
+        $fixture=New-ARCH7d2PublicFixture
+        $parameters=$fixture.Parameters
+        $r=& $fixture.Controller @parameters -InterruptAfterReturned 2
+        $r.Status | Should -BeExactly RecoveredPendingBatch
+        Assert-ARCH7d2PublicResult -Fixture $fixture -Result $r -ExpectedExit 1 -ExpectedVerified 2
+        $logs=@(Get-ChildItem -LiteralPath $r.LogDirectory -Filter '*.stderr.log' | Select-String -Pattern 'ARCH7d2 fixture controlled interruption')
+        $logs.Count | Should -Be 1
+    }
+    It 'executes public RecoverOnly with no pending and does not launch any child' {
+        $fixture=New-ARCH7d2PublicFixture
+        $r=& $fixture.Controller -SourcePst $fixture.Source -ProfileName Outlook -ConfirmTestArchive -ConfirmLiveOutlookVerification -RecoverOnly
+        $r.Status | Should -BeExactly NoPendingBatch
+        $r.ArchiveWorkers | Should -Be 0
+        $r.ResumeWorkers | Should -Be 0
+        @(Get-ChildItem -LiteralPath $r.LogDirectory -Filter '*.stdout.log').Count | Should -Be 0
+        (Get-FileHash -LiteralPath $fixture.Source).Hash | Should -BeExactly $fixture.SourceHash
+    }
+}
+
 }

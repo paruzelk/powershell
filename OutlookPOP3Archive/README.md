@@ -1,12 +1,12 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7d1 DEV
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7d2 DEV
 
 ## Актуальный запуск и документация
 
 Новый тестовый контроллер `Invoke-OPALiveArchiveBatches.ps1` запускает Archive и Resume в отдельных процессах Windows PowerShell 5.1 STA, без перезапуска Outlook. Полный синтаксис и примеры — [ARCH7d](docs/2.6.5-arch7d.md).
 
-Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7d1 — идентификатор DEV-сборки.
+Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7d2 — идентификатор DEV-сборки.
 
-25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — CI 4881/165 PASS, [восстановление](docs/2.6.5-arch7c.md). ARCH7d1 — [контроллер отдельных worker](docs/2.6.5-arch7d.md): ARCH7d 78/79 focused PASS, исправление получения ExitCode и блокировка неопределённого кода; CI/live acceptance pending. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
+25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — CI 4881/165 PASS, [восстановление](docs/2.6.5-arch7c.md). ARCH7d1 — CI 4895/165 PASS; реальный запуск остановился до worker из-за конфликта $archive/$Archive. ARCH7d2 — [контроллер отдельных worker](docs/2.6.5-arch7d.md), изолированные callback-переменные и публичные end-to-end тесты; CI/live acceptance pending. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
 
 - [ARCH7d — контроллер worker, все ключи и реальный тест прерывания](docs/2.6.5-arch7d.md)
 - [ARCH7c — восстановление и точный пример Resume](docs/2.6.5-arch7c.md)
