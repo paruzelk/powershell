@@ -402,7 +402,8 @@ function Invoke-OPAARCH4Batch {
           [string]$TransactionId,
           [int]$Limit=100,[int]$OlderThanMonths=12,[string]$ArchiveGrouping='Year',
           [double]$MaxArchivePstSizeGB=10,[double]$SafetyMarginGB=0.5,
-          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned,[string]$HistoricalThreatEntryId,[string]$HistoricalDetectionId,[string]$HistoricalAttachmentName,[switch]$ConfirmLiveOutlookVerification,[switch]$RecoverLiveInterrupted)
+          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned,[string]$HistoricalThreatEntryId,[string]$HistoricalDetectionId,[string]$HistoricalAttachmentName,[switch]$ConfirmLiveOutlookVerification,[switch]$RecoverLiveInterrupted,[ValidateRange(0,9)][int]$ARCH7dInterruptAfterReturned=0)
+    if($ARCH7dInterruptAfterReturned -gt 0 -and (-not $ConfirmLiveOutlookVerification -or -not $ARCH6DeferredPolicy -or $Mode -ne 'Archive' -or $Limit -le $ARCH7dInterruptAfterReturned -or $Limit -gt 10)){throw 'ARCH7d invalid controlled interruption scope.'}
     if($RecoverLiveInterrupted -and (-not $ConfirmLiveOutlookVerification -or $Mode -ne 'Resume')){throw 'ARCH7c requires explicit live Resume.'}
     if($ConfirmLiveOutlookVerification -and (-not $ARCH5Batch -or -not $Session.Attached -or $RecoverInterrupted -or $ImportDeferredTransaction -or ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt 10)) -or ($Mode -eq 'Resume' -and $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$'))){throw 'ARCH7b requires attached Outlook, exact Resume or bounded 1..10 test Archive; no historical import/recovery.'}
     if($RecoverInterrupted -and ($Mode -ne 'Resume' -or -not $ARCH5Batch -or $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$' -or $ExpectedInterruptedReturned -lt 1 -or $ExpectedInterruptedPlanned -gt 500 -or $ExpectedInterruptedReturned -ge $ExpectedInterruptedPlanned)){throw 'ARCH6f3c1 explicit interrupted Resume identity/counts required.'}
@@ -481,7 +482,7 @@ function Invoke-OPAARCH4Batch {
             }
             Write-OPAARCH4Pending -Path $pending -Record $pendingRecord
             Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Batch Started' -WriteCheckpoint
-            $moved=Move-OPAItemsWithLimit -Namespace $Session.Namespace -SourceFolders $folders -Transaction $tx -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanCutoff $cutoff -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH4Batch -ARCH5Batch:$ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -ARCH6DeferredPolicy:$ARCH6DeferredPolicy -DeferredEntryIds $deferredIds
+            $moved=Move-OPAItemsWithLimit -Namespace $Session.Namespace -SourceFolders $folders -Transaction $tx -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanCutoff $cutoff -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH4Batch -ARCH5Batch:$ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -ARCH6DeferredPolicy:$ARCH6DeferredPolicy -DeferredEntryIds $deferredIds -ARCH7dInterruptAfterReturned $ARCH7dInterruptAfterReturned
             Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Awaiting Restart' -WriteCheckpoint
             Sync-OPAStepJournalStreams
             $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId

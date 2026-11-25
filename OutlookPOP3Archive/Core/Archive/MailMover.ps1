@@ -662,8 +662,10 @@ function Move-OPAItemsWithLimit {
         [switch]$ARCH5Batch,
         [switch]$ConfirmComplexAttachments,
         [switch]$ARCH6DeferredPolicy,
-        [string[]]$DeferredEntryIds
+        [string[]]$DeferredEntryIds,
+        [ValidateRange(0,9)][int]$ARCH7dInterruptAfterReturned=0
     )
+    if($ARCH7dInterruptAfterReturned -gt 0 -and (-not $ARCH4Batch -or -not $ARCH5Batch -or -not $ARCH6DeferredPolicy -or $Resume -or $Limit -gt 10 -or $Limit -le $ARCH7dInterruptAfterReturned)){throw 'ARCH7d invalid controlled interruption scope.'}
     if($ARCH6DeferredPolicy -and (-not $ARCH5Batch -or $Resume)){throw 'ARCH6f3a requires controlled fresh Archive.'}
     if($DeferredEntryIds -and -not $ARCH6DeferredPolicy){throw 'ARCH6f3a exclusions require deferred policy.'}
 
@@ -1105,6 +1107,10 @@ function Move-OPAItemsWithLimit {
                 Update-OPAArchivePstTelemetry -Transaction $Transaction -ArchivePst $dest.Path -PhysicalSizeBytes $physical -LogicalAddedBytes $itemSize
                 if((Get-OPAArchivePostMoveCapacityAction -PhysicalSizeBytes $physical -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB) -eq 'HardLimitExceeded'){
                     throw 'ARCH4 archive hard limit exceeded after returned Move; reconcile before new batch.'
+                }
+                if($ARCH7dInterruptAfterReturned -gt 0 -and $executed -eq $ARCH7dInterruptAfterReturned){
+                    Sync-OPAStepJournalStreams
+                    throw 'ARCH7d controlled interruption after durable paired receipt; exit worker, recover only.'
                 }
                 continue
             }
