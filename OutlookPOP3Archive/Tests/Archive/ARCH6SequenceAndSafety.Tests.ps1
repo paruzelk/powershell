@@ -171,3 +171,33 @@ Describe 'ARCH6e explicit capacity and CLI' {
         {& (Join-Path $script:root 'Invoke-OPAArchiveBatches.ps1') -ProfileName Outlook -SourcePst (Join-Path $TestDrive 'not-created.pst') -ConfirmTestArchive -ConfirmOutlookRestart -RecoverTransaction '20261124-120000-01234567' -MaxMessages 100 -WhatIf} | Should -Throw
     }
 }
+
+Describe 'ARCH6f1 exact restart identity and ROT fallback' {
+    It 'uses a registered active application without activation' {
+        $r=Get-OPAARCH6RestartApplication -GetActive { [pscustomobject]@{Kind='active'} } -Activate { throw 'unexpected activation' }
+        $r.Kind | Should -BeExactly 'active'
+    }
+    It 'activates once when ROT returns MK_E_UNAVAILABLE' {
+        $r=Get-OPAARCH6RestartApplication -GetActive { throw [Runtime.InteropServices.COMException]::new('ROT unavailable',-2147221021) } -Activate { [pscustomobject]@{Kind='COM'} }
+        $r.Kind | Should -BeExactly 'COM'
+    }
+    It 'does not activate for unrelated COM errors' {
+        {Get-OPAARCH6RestartApplication -GetActive {throw [Runtime.InteropServices.COMException]::new('Access denied',-2147024891)} -Activate {throw 'unexpected activation'}} | Should -Throw '*Access denied*'
+    }
+    It 'accepts only the exact sealed Move process' {
+        $start=[datetime]'2026-11-25T07:20:00Z'
+        $p=[pscustomobject]@{MoveProcessId=123;MoveProcessStartUtcTicks=$start.ToUniversalTime().Ticks}
+        {Assert-OPAARCH6RestartProcess -Pending $p -Processes @([pscustomobject]@{Id=123;StartTime=$start})} | Should -Not -Throw
+    }
+    It 'rejects a replacement process even when PID was reused' {
+        $start=[datetime]'2026-11-25T07:20:00Z'
+        $p=[pscustomobject]@{MoveProcessId=123;MoveProcessStartUtcTicks=$start.ToUniversalTime().Ticks}
+        {Assert-OPAARCH6RestartProcess -Pending $p -Processes @([pscustomobject]@{Id=123;StartTime=$start.AddSeconds(1)})} | Should -Throw '*never Quit a replacement*'
+    }
+    It 'rejects zero or multiple processes before Quit' {
+        $start=[datetime]'2026-11-25T07:20:00Z'
+        $p=[pscustomobject]@{MoveProcessId=123;MoveProcessStartUtcTicks=$start.ToUniversalTime().Ticks}
+        {Assert-OPAARCH6RestartProcess -Pending $p -Processes @()} | Should -Throw '*never Quit a replacement*'
+        {Assert-OPAARCH6RestartProcess -Pending $p -Processes @([pscustomobject]@{Id=123;StartTime=$start},[pscustomobject]@{Id=456;StartTime=$start})} | Should -Throw '*never Quit a replacement*'
+    }
+}
