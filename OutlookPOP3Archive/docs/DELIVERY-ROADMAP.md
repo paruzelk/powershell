@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **Real ARCH6f1 PASS (2026-11-25):** released `63e1623f`, three automatic Archive/restart/Resume cycles, 30/30 verified/indexed, zero skips, MessageLimitReached. Repeated automatic restart accepted; no repeat. Next ARCH6f2: explicit root MailItem routing (500 confirmed Class=43), then larger automatic sequence acceptance. [Evidence](2.6.5-arch6ae.md). ProductionReady=False.
+
+
 > **ARCH6f1:** actual ARCH6f 3 automatic + 2 manually reconciled = 5 verified/indexed; second restart ROT unavailable. Exact-process guarded COM activation fallback, six additional synthetic tests (4821/165 expected). Root inventory 500 Class=43; root writer remains pending. No repeated completed moves. [Evidence and limitations](2.6.5-arch6ae.md).
 
 
