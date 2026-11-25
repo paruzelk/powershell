@@ -43,6 +43,7 @@ try{
     # Independent supervisor lock, never the original user's worker mutex.
     $probe=[IO.FileStream]::new((Join-Path $dir 'ARCH7d.worker.lease'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
     $probe.Dispose()
+    if($InterruptAfterReturned -gt 0 -and $null -ne (Get-OPAARCH7dPending -Directory $dir -SourcePst $source -ProfileName $ProfileName)){throw 'ARCH7d existing pending; recover it before fault test.'}
     $logDir=Join-Path $dir ('ARCH7d-run-'+[guid]::NewGuid().ToString('N'))
     [void][IO.Directory]::CreateDirectory($logDir)
     $log=Join-Path $logDir 'supervisor.jsonl'
@@ -69,7 +70,7 @@ try{
         try{$stream.Write($bytes,0,$bytes.Length);$stream.Flush($true)}finally{$stream.Dispose()}
     }
     $result=Invoke-OPAARCH7dSequence -ReadPending $read -Archive $startArchive -Resume $startResume -Record $record -MaxBatches $MaxBatches -MaxResumeAttempts $MaxResumeAttempts -RetryDelaySeconds $RetryDelaySeconds -RecoverOnly:$RecoverOnly
-    $result | Add-Member -NotePropertyName LogDirectory -NotePropertyValue $logDir
+    $result | Add-Member -NotePropertyMembers @{LogDirectory=$logDir;ControlledInterruptionRequested=$InterruptAfterReturned}
     & $record 'SupervisorCompleted' $result
     $result
 }finally{$lease.Dispose()}

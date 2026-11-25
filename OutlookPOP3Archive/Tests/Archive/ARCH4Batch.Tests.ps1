@@ -14,6 +14,7 @@ BeforeAll {
     . (Join-Path $script:root 'Core/Archive/ArchiveVerifier.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH4Batch.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH6Orchestration.ps1')
+    . (Join-Path $script:root 'Core/Archive/ARCH7dSupervisor.ps1')
     # ARCH7b1: the production folder adapter lives in the main entrypoint,
     # not a dot-sourceable module. Load exactly its declaration (never execute
     # the CLI, discovery, or a real COM operation) so Pester can mock it.
@@ -874,6 +875,167 @@ Describe 'ARCH7c recover proven interrupted mixed live batches' {
         Test-Path -LiteralPath $pending | Should -BeFalse
         Should -Invoke Test-OPAArchiveMoves -Exactly -Times 1
         Should -Invoke Move-OPAItemsWithLimit -Exactly -Times 0
+    }
+}
+
+
+Describe 'ARCH7d supervisor recovery-only child lifecycle' {
+    BeforeEach {
+        $script:supervisorCase=[pscustomobject]@{Pending=$null;Archives=0;Resumes=0;ExitCode=1;Timeout=$false;ResumeFails=0;InvalidResult=$false;ClearOnFailure=$false;Unprocessed=1;SwapPending=$false;ForeignWorker=$false}
+        $script:supervisorId='20261125-161734-1d203d2f'
+        $script:supervisorRead={ $script:supervisorCase.Pending }
+        $script:supervisorArchive={
+            $script:supervisorCase.Archives++
+            if($script:supervisorCase.Timeout){return [pscustomobject]@{Exited=$false;WorkerId=200;ExitCode=$null;Result=$null}}
+            $script:supervisorCase.Pending=[pscustomobject]@{TransactionId=$script:supervisorId;MoveWorkerId=200}
+            if($script:supervisorCase.ForeignWorker){$script:supervisorCase.Pending.MoveWorkerId=999}
+            [pscustomobject]@{Exited=$true;WorkerId=200;ExitCode=$script:supervisorCase.ExitCode;Result=$(if($script:supervisorCase.ExitCode -eq 0){[pscustomobject]@{Status='BatchReturnedFreshWorkerResumeRequired';TransactionId=$script:supervisorId}})}
+        }
+        $script:supervisorResume={
+            param($id)
+            $script:supervisorCase.Resumes++
+            if($script:supervisorCase.SwapPending){$script:supervisorCase.Pending.TransactionId='20261125-161735-00000000'}
+            if($script:supervisorCase.Resumes -le $script:supervisorCase.ResumeFails){
+                if($script:supervisorCase.ClearOnFailure){$script:supervisorCase.Pending=$null}
+                return [pscustomobject]@{Exited=$true;WorkerId=201;ExitCode=1;Result=$null}
+            }
+            $script:supervisorCase.Pending=$null
+            $r=[pscustomobject]@{Schema='2.6.5-ARCH4.Completed.1';Status='LiveInterruptedBatchRecovered';TransactionId=$id;PendingCleared=$true;OutlookRestartRequired=$false;VerifyWorkerId=201;MoveWorkerId=200;MoveInvocations=0;Planned=(3+$script:supervisorCase.Unprocessed);Verified=2;Reconciled=2;Indexed=2;Deferred=1;DeferredRecorded=1;Unprocessed=$script:supervisorCase.Unprocessed}
+            if($script:supervisorCase.InvalidResult){$r.MoveInvocations=1}
+            [pscustomobject]@{Exited=$true;WorkerId=201;ExitCode=0;Result=$r}
+        }
+        $script:supervisorOptions=@{ReadPending=$script:supervisorRead;Archive=$script:supervisorArchive;Resume=$script:supervisorResume;Record={param($phase,$data)};MaxBatches=2;MaxResumeAttempts=3;RetryDelaySeconds=0}
+    }
+    It 'recovers a failed Archive with exactly one new Resume worker and no repeated Archive' {
+        $opts=$script:supervisorOptions
+        $r=Invoke-OPAARCH7dSequence @opts
+        $r.Status | Should -BeExactly 'RecoveredPendingBatch'
+        $r.Verified | Should -Be 2
+        $r.Unprocessed | Should -Be 1
+        $r.Deferred | Should -Be 1
+        $r.ArchiveWorkers | Should -Be 1
+        $r.ResumeWorkers | Should -Be 1
+        $r.LastArchiveExitCode | Should -Be 1
+        $r.LastRecovery.MoveInvocations | Should -Be 0
+    }
+    It 'uses fresh verification workers for normal returned batches and respects batch limit' {
+        $opts=$script:supervisorOptions
+        $script:supervisorCase.ExitCode=0;$script:supervisorCase.Unprocessed=0
+        $r=Invoke-OPAARCH7dSequence @opts
+        $r.Status | Should -BeExactly 'BatchLimitReached'
+        $r.Batches | Should -Be 2
+        $r.Verified | Should -Be 4
+        $r.ArchiveWorkers | Should -Be 2
+        $r.ResumeWorkers | Should -Be 2
+    }
+    It 'recovers existing pending before any Archive and supports recovery-only with no pending' {
+        $opts=$script:supervisorOptions
+        $script:supervisorCase.Pending=[pscustomobject]@{TransactionId=$script:supervisorId;MoveWorkerId=200}
+        $r=Invoke-OPAARCH7dSequence @opts -RecoverOnly
+        $r.Status | Should -BeExactly 'RecoveredPendingBatch'
+        $r.ArchiveWorkers | Should -Be 0
+        $r.ResumeWorkers | Should -Be 1
+        (Invoke-OPAARCH7dSequence @opts -RecoverOnly).Status | Should -BeExactly 'NoPendingBatch'
+    }
+    It 'retries only Resume with a bounded attempt count and preserves pending' {
+        $opts=$script:supervisorOptions
+        $script:supervisorCase.ResumeFails=10
+        $r=Invoke-OPAARCH7dSequence @opts
+        $r.Status | Should -BeExactly 'RecoveryAttemptsExhausted'
+        $r.ArchiveWorkers | Should -Be 1
+        $r.ResumeWorkers | Should -Be 3
+        $script:supervisorCase.Pending.TransactionId | Should -BeExactly $script:supervisorId
+    }
+    It 'recovers after transient verification failure without invoking a second Archive' {
+        $opts=$script:supervisorOptions
+        $script:supervisorCase.ResumeFails=1
+        $r=Invoke-OPAARCH7dSequence @opts
+        $r.Status | Should -BeExactly 'RecoveredPendingBatch'
+        $r.ArchiveWorkers | Should -Be 1
+        $r.ResumeWorkers | Should -Be 2
+    }
+    It 'does not restart or launch a second worker on a still running timeout' {
+        $opts=$script:supervisorOptions
+        $script:supervisorCase.Timeout=$true
+        $r=Invoke-OPAARCH7dSequence @opts
+        $r.Status | Should -BeExactly 'WorkerStillRunning'
+        $r.ArchiveWorkers | Should -Be 1
+        $r.ResumeWorkers | Should -Be 0
+    }
+    It 'stops when failed Archive leaves no pending or recovery loses pending without evidence' {
+        $opts=$script:supervisorOptions
+        $opt=$script:supervisorOptions.Clone()
+        $opt.Archive={[pscustomobject]@{Exited=$true;ExitCode=1;WorkerId=200;Result=$null}}
+        (Invoke-OPAARCH7dSequence @opt).Status | Should -BeExactly 'ArchiveFailedWithoutPending'
+        $script:supervisorCase.ResumeFails=1;$script:supervisorCase.ClearOnFailure=$true
+        $r=Invoke-OPAARCH7dSequence @opts
+        $r.Status | Should -BeExactly 'RecoveryExitWithoutEvidence'
+        $r.ArchiveWorkers | Should -Be 1
+        $r.ResumeWorkers | Should -Be 1
+    }
+    It 'rejects foreign Archive worker ownership, changed pending and invalid recovery evidence' {
+        $opts=$script:supervisorOptions
+        $script:supervisorCase.ForeignWorker=$true
+        {Invoke-OPAARCH7dSequence @opts} | Should -Throw '*not owned*'
+        $script:supervisorCase.Pending=$null;$script:supervisorCase.ForeignWorker=$false
+        $script:supervisorCase.ResumeFails=10;$script:supervisorCase.SwapPending=$true
+        {Invoke-OPAARCH7dSequence @opts} | Should -Throw '*identity changed*'
+        $script:supervisorCase.Pending=$null;$script:supervisorCase.SwapPending=$false;$script:supervisorCase.ResumeFails=0;$script:supervisorCase.InvalidResult=$true
+        {Invoke-OPAARCH7dSequence @opts} | Should -Throw '*invalid recovery result*'
+    }
+    It 'reads only exact live pending for source and profile, without modifying it' {
+        $opts=$script:supervisorOptions
+        $dir=Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+        [void][IO.Directory]::CreateDirectory($dir)
+        $source=Join-Path $dir 'source.pst'
+        $path=Join-Path $dir 'ARCH4.pending'
+        Get-OPAARCH7dPending -Directory $dir -SourcePst $source -ProfileName Outlook | Should -BeNullOrEmpty
+        $record=[pscustomobject]@{Schema='2.6.5-ARCH4.Pending.1';TransactionId=$script:supervisorId;SourcePst=$source;SourceStoreId='STORE';Profile='Outlook';DeferredPolicy=$true;VerificationPolicy='ARCH7bFreshWorkerSameOutlook';MoveWorkerId=200}
+        Write-OPAARCH4Pending -Path $path -Record $record
+        $hash=(Get-FileHash -LiteralPath $path).Hash
+        (Get-OPAARCH7dPending -Directory $dir -SourcePst $source -ProfileName Outlook).TransactionId | Should -BeExactly $script:supervisorId
+        {Get-OPAARCH7dPending -Directory $dir -SourcePst $source -ProfileName Other} | Should -Throw '*invalid pending*'
+        (Get-FileHash -LiteralPath $path).Hash | Should -BeExactly $hash
+    }
+    It 'launches a real STA PowerShell child with Unicode parameters and isolated JSON response, without Outlook' {
+        $opts=$script:supervisorOptions
+        $dir=Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+        [void][IO.Directory]::CreateDirectory($dir)
+        $stub=Join-Path $dir 'stub.ps1'
+        $code='param([string]$SourcePst,[switch]$ConfirmTestArchive); Write-Host "diagnostic"; [pscustomobject]@{Schema="Fake.1";Status="OK";SourcePst=$SourcePst;Confirmed=[bool]$ConfirmTestArchive;Pid=$PID;Apartment=[Threading.Thread]::CurrentThread.GetApartmentState().ToString()}'
+        [IO.File]::WriteAllText($stub,$code,[Text.UTF8Encoding]::new($true))
+        $source=Join-Path $dir 'Файлы Outlook\почта.pst'
+        $r=Invoke-OPAARCH7dWorker -Main $stub -Parameters @{SourcePst=$source;ConfirmTestArchive=$true} -Directory $dir -LogDirectory $dir -TimeoutSeconds 30
+        $r.Exited | Should -BeTrue
+        $r.ExitCode | Should -Be 0
+        $r.Result.SourcePst | Should -BeExactly $source
+        $r.Result.Confirmed | Should -BeTrue
+        $r.Result.Pid | Should -Be $r.WorkerId
+        $r.Result.Pid | Should -Not -Be $PID
+        $r.Result.Apartment | Should -BeExactly STA
+    }
+    It 'validates supervisor and controlled interruption CLI before COM or writes' {
+        $opts=$script:supervisorOptions
+        $src=Join-Path $TestDrive 'arch7d-not-created.pst'
+        $supervisor=Join-Path $script:root 'Invoke-OPALiveArchiveBatches.ps1'
+        $main=Join-Path $script:root 'OutlookPOP3Archive.ps1'
+        $params=@{ProfileName='Outlook';SourcePst=$src;ConfirmTestArchive=$true;ConfirmLiveOutlookVerification=$true;WhatIf=$true}
+        (& $supervisor @params -BatchSize 10 -InterruptAfterReturned 2).Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
+        {& $supervisor @params -BatchSize 2 -InterruptAfterReturned 2} | Should -Throw '*interruption scope*'
+        {& $supervisor @params -RecoverOnly -BatchSize 10} | Should -Throw '*recovery-only*'
+        (& $main @params -Mode Archive -Limit 10 -ARCH7dInterruptAfterReturned 2).Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
+        {& $main @params -Mode Resume -Transaction $script:supervisorId -ARCH7dInterruptAfterReturned 1} | Should -Throw '*controlled interruption*'
+        Test-Path -LiteralPath $src | Should -BeFalse
+    }
+    It 'places the controlled interruption strictly after durable original return and before next candidate' {
+        $opts=$script:supervisorOptions
+        $m=[IO.File]::ReadAllText((Join-Path $script:root 'Core/Archive/MailMover.ps1'))
+        $receipt=$m.IndexOf("-Step 'ARCH4 Move Returned'")
+        $flush=$m.IndexOf('Sync-OPAStepJournalStreams',$receipt)
+        $stop=$m.IndexOf("throw 'ARCH7d controlled interruption after durable paired receipt")
+        ($receipt -ge 0 -and $flush -gt $receipt -and $stop -gt $flush) | Should -BeTrue
+        $controller=[IO.File]::ReadAllText((Join-Path $script:root 'Core/Archive/ARCH7dSupervisor.ps1'))
+        $controller | Should -Not -Match '\.Quit\(|\.Kill\(|Stop-Process'
     }
 }
 

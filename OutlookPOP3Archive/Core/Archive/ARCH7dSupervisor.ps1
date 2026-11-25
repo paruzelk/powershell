@@ -73,13 +73,13 @@ function Invoke-OPAARCH7dSequence {
           [ValidateRange(1,100)][int]$MaxBatches=1,[ValidateRange(1,10)][int]$MaxResumeAttempts=3,
           [ValidateRange(0,300)][int]$RetryDelaySeconds=5,[switch]$RecoverOnly)
     $verified=0;$deferred=0;$unprocessed=0;$batches=0;$archives=0;$recoveries=0;$last=''
-    $status='BatchLimitReached'
+    $status='BatchLimitReached';$lastRecovery=$null;$lastArchiveExitCode=$null;$lastArchiveWorkerId=$null
     while($batches -lt $MaxBatches){
         $p=& $ReadPending
         if($null -eq $p){
             if($RecoverOnly){$status='NoPendingBatch';break}
             $a=& $Archive
-            $archives++
+            $archives++;$lastArchiveExitCode=$a.ExitCode;$lastArchiveWorkerId=$a.WorkerId
             & $Record 'ArchiveWorker' $a
             if(-not $a.Exited){$status='WorkerStillRunning';break}
             $p=& $ReadPending
@@ -87,7 +87,7 @@ function Invoke-OPAARCH7dSequence {
                 if($a.ExitCode -ne 0 -or $null -eq $a.Result){$status='ArchiveFailedWithoutPending';break}
                 $r=$a.Result
                 if($r.Status -ceq 'NoEligibleFolders'){$status='NoEligibleFolders';break}
-                if($r.Status -cne 'BatchCompletedNoMoves' -or [int]$r.Verified -ne 0 -or [int]$r.Indexed -ne 0 -or [int]$r.DeferredRecorded -ne [int]$r.Planned){throw 'ARCH7d unproven Archive completion; no next batch.'}
+                if($r.Schema -cne '2.6.5-ARCH4.Completed.1' -or $r.Status -cne 'BatchCompletedNoMoves' -or [int]$r.Planned -lt 0 -or [int]$r.Planned -gt 10 -or $r.PSObject.Properties.Name -notcontains 'DeferredRecorded' -or [int]$r.Verified -ne 0 -or [int]$r.Indexed -ne 0 -or [int]$r.DeferredRecorded -ne [int]$r.Planned){throw 'ARCH7d unproven Archive completion; no next batch.'}
                 $deferred+=[int]$r.DeferredRecorded;$batches++
                 if([int]$r.Planned -eq 0){$status='NoEligibleMessages';break}
                 continue
@@ -108,17 +108,18 @@ function Invoke-OPAARCH7dSequence {
             if($null -ne $after -and $after.TransactionId -cne $last){throw 'ARCH7d pending identity changed after recovery.'}
             if($v.ExitCode -eq 0 -and $null -ne $v.Result -and $null -eq $after){
                 $r=$v.Result
-                if($r.Status -cne 'LiveInterruptedBatchRecovered' -or $r.TransactionId -cne $last -or
+                if($r.Schema -cne '2.6.5-ARCH4.Completed.1' -or $r.Status -cne 'LiveInterruptedBatchRecovered' -or $r.TransactionId -cne $last -or
                    -not $r.PendingCleared -or $r.OutlookRestartRequired -ne $false -or $r.VerifyWorkerId -ne $v.WorkerId -or
                    $r.MoveWorkerId -ne $p.MoveWorkerId -or $r.VerifyWorkerId -eq $p.MoveWorkerId -or
                    [int]$r.MoveInvocations -ne 0 -or [int]$r.Verified -ne [int]$r.Reconciled -or [int]$r.Verified -ne [int]$r.Indexed -or
                    [int]$r.Verified -lt 0 -or [int]$r.Deferred -lt 0 -or [int]$r.Unprocessed -lt 0 -or
                    [int]$r.Deferred -ne [int]$r.DeferredRecorded -or
+                   [int]$r.Planned -lt 0 -or [int]$r.Planned -gt 10 -or
                    [int]$r.Planned -ne ([int]$r.Verified+[int]$r.Deferred+[int]$r.Unprocessed)){
                     throw 'ARCH7d invalid recovery result; no next batch.'
                 }
                 $verified+=[int]$r.Verified;$deferred+=[int]$r.Deferred;$unprocessed+=[int]$r.Unprocessed
-                $batches++;$completed=$true
+                $batches++;$completed=$true;$lastRecovery=$r
                 if($RecoverOnly -or [int]$r.Unprocessed -gt 0){$status='RecoveredPendingBatch'}
                 break
             }
@@ -129,5 +130,5 @@ function Invoke-OPAARCH7dSequence {
         if(-not $completed -or $RecoverOnly -or $unprocessed -gt 0){break}
         $status='BatchLimitReached'
     }
-    return [pscustomobject]@{Schema='2.6.5-ARCH7d.Supervisor.1';Status=$status;Batches=$batches;Verified=$verified;Deferred=$deferred;Unprocessed=$unprocessed;ArchiveWorkers=$archives;ResumeWorkers=$recoveries;LastTransactionId=$last;OutlookRestartRequired=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
+    return [pscustomobject]@{Schema='2.6.5-ARCH7d.Supervisor.1';Status=$status;Batches=$batches;Verified=$verified;Deferred=$deferred;Unprocessed=$unprocessed;ArchiveWorkers=$archives;ResumeWorkers=$recoveries;LastTransactionId=$last;LastArchiveExitCode=$lastArchiveExitCode;LastArchiveWorkerId=$lastArchiveWorkerId;LastRecovery=$lastRecovery;OutlookRestartRequired=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
 }
