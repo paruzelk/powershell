@@ -4,6 +4,8 @@ function Get-OPAARCH6DeferredReason {
     param([string]$Message)
     $av=ConvertFrom-OPAARCH6AntivirusMessage -Message $Message
     if($null -ne $av){return [string]$av.Reason}
+    $local=ConvertFrom-OPAARCH6LocalExportMessage -Message $Message
+    if($null -ne $local){return [string]$local.Reason}
     if($Message -match '^ARCH5 Attachment(Type|Size)Unsupported:'){return ('Attachment'+$Matches[1]+'Unsupported')}
     if($Message -ceq 'ARCH2b attachment count exceeds bounded witness limit; no Move authorized.'){return 'AttachmentCountUnsupported'}
     if($Message -ceq 'ARCH2b recipient count exceeds witness bound.'){return 'RecipientCountUnsupported'}
@@ -28,6 +30,7 @@ function Get-OPAARCH6DeferredProof {
             $reason=$Matches[1];$detail=$Matches[2]
             if($reason -cne 'ExceedsArchiveCapacity' -and $reason -cne (Get-OPAARCH6DeferredReason -Message $detail)){throw 'ARCH6f3a invalid deferred reason.'}
             if($reason -cin @('AttachmentBlockedByAntivirus','AttachmentQuarantined') -and $null -eq (ConvertFrom-OPAARCH6AntivirusMessage -Message $detail -ExpectedEntryId $id)){throw 'ARCH6f3c2 antivirus skip identity mismatch.'}
+            if($reason -cin @('AttachmentExportFailed','AttachmentPayloadUnavailable') -and $null -eq (ConvertFrom-OPAARCH6LocalExportMessage -Message $detail -ExpectedEntryId $id)){throw 'ARCH6f3c3 local export skip identity mismatch.'}
             if([string]$s.SourceFolderPath -ine [string]$p.SourceFolderPath){throw 'ARCH6f3a deferred folder mismatch.'}
         }elseif([string]$s.Message -match '^Item skipped after unexpected error: .* \| (ARCH5 AttachmentTypeUnsupported:.*)$'){
             $detail=$Matches[1];$reason=Get-OPAARCH6DeferredReason -Message $detail

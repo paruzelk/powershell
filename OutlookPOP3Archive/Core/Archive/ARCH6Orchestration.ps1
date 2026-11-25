@@ -1,5 +1,14 @@
 ﻿#requires -Version 5.1
 # ARCH6 bounded test-only orchestration. Original journals are authoritative.
+function Test-OPAARCH6ExportFailureBurst {
+    param([object]$Result)
+    if($Result.PSObject.Properties.Name -notcontains 'SkipReasons'){return $false}
+    $n=0
+    foreach($r in @($Result.SkipReasons)){
+        if($r.Reason -cin @('AttachmentExportFailed','AttachmentPayloadUnavailable')){$n+=[int]$r.Count}
+    }
+    return ($n -ge 10 -and 2*$n -ge [int]$Result.Planned)
+}
 function Invoke-OPAARCH6Sequence {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][scriptblock]$Archive,
@@ -35,6 +44,7 @@ function Invoke-OPAARCH6Sequence {
                 if([int]$a.DeferredRecorded -ne [int]$a.Planned){throw 'ARCH6f3a zero-Move deferred evidence incomplete.'}
                 $deferred+=[int]$a.DeferredRecorded
                 & $Record 'BatchVerified' $a
+                if(Test-OPAARCH6ExportFailureBurst -Result $a){$status='StoppedOnExportFailureBurst';break}
                 $status='BatchLimitReached';continue
             }
             break
@@ -64,6 +74,7 @@ function Invoke-OPAARCH6Sequence {
             if($SkipPolicy -eq 'Stop'){$status='StoppedOnSkippedItems';break}
             if([int]$r.DeferredRecorded -ne [int]$r.NotMoved){throw 'ARCH6f3a deferred evidence incomplete.'}
             $deferred+=[int]$r.DeferredRecorded
+            if(Test-OPAARCH6ExportFailureBurst -Result $r){$status='StoppedOnExportFailureBurst';break}
             continue
         }
         if([int]$a.Planned -lt $limit){$status='NoMoreSelectedMessages';break}

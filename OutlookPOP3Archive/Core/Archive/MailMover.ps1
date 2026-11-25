@@ -1025,7 +1025,7 @@ function Move-OPAItemsWithLimit {
             }
             if($ARCH5Batch){
                 Assert-OPAARCH5Route -SourcePst ([string]$Transaction.State.SourcePst) -ArchiveDate $dt -SourceFolderPath $folderPath -TargetFolderPath ([string]$dest.Folder.FolderPath) -ArchivePst ([string]$dest.Path) -Grouping $ArchiveGrouping
-                $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments:$ConfirmComplexAttachments
+                $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item -ExtendedAttachmentWitness -RecursiveEmbeddedWitness -AllowComplexAttachments:$ConfirmComplexAttachments -AllowLocalExportDeferral:$ARCH6DeferredPolicy
             }else{
                 $sourceSemanticWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $item
             }
@@ -1195,6 +1195,7 @@ function Move-OPAItemsWithLimit {
                 $reason=Get-OPAARCH6DeferredReason -Message $_.Exception.Message
                 if(-not $reason){throw}
                 if($reason -cin @('AttachmentBlockedByAntivirus','AttachmentQuarantined') -and $null -eq (ConvertFrom-OPAARCH6AntivirusMessage -Message $_.Exception.Message -ExpectedEntryId ([string]$candidate.EntryId))){throw}
+                if($reason -cin @('AttachmentExportFailed','AttachmentPayloadUnavailable') -and $null -eq (ConvertFrom-OPAARCH6LocalExportMessage -Message $_.Exception.Message -ExpectedEntryId ([string]$candidate.EntryId))){throw}
             }
             $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason=$reason; Message=$_.Exception.Message; Time=(Get-Date).ToString('o')}) | Out-Null
             Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message $(if($ARCH6DeferredPolicy){("ARCH6f3a deferred {0}: {1}" -f $reason,$_.Exception.Message)}else{("Item skipped after unexpected error: {0} | {1}" -f [string]$candidate.Subject,$_.Exception.Message)}) -SourceFolderPath $folderPath -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
