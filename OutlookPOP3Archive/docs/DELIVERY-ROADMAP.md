@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH6f1:** actual ARCH6f 3 automatic + 2 manually reconciled = 5 verified/indexed; second restart ROT unavailable. Exact-process guarded COM activation fallback, six additional synthetic tests (4821/165 expected). Root inventory 500 Class=43; root writer remains pending. No repeated completed moves. [Evidence and limitations](2.6.5-arch6ae.md).
+
+
 > **ARCH6ae combined DEV:** [Implementation, syntax and constraints](2.6.5-arch6ae.md). ARCH6a–e combined into one branch and CI. Empty-folder Resume fix, read-only root inventory, bounded automatic sequence, no blind replay, bounded ID memory/candidate pool, optional application cap disable. 25 new tests (4815/165 expected). ARCH6f validates actual COM restart/empty-folder/90 GB behavior; OLE and root writer remain unconfirmed/closed. ProductionReady=False.
 
 
