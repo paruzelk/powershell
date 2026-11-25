@@ -3,6 +3,7 @@
 # One pending batch per shared-index directory. Resume only reconciles receipts.
 . (Join-Path $PSScriptRoot 'OperationJournal.ps1')
 . (Join-Path $PSScriptRoot 'ARCH6Deferred.ps1')
+. (Join-Path $PSScriptRoot 'ARCH7bLiveVerification.ps1')
 
 function Assert-OPAARCH4Candidate {
     [CmdletBinding()]
@@ -400,7 +401,8 @@ function Invoke-OPAARCH4Batch {
           [string]$TransactionId,
           [int]$Limit=100,[int]$OlderThanMonths=12,[string]$ArchiveGrouping='Year',
           [double]$MaxArchivePstSizeGB=10,[double]$SafetyMarginGB=0.5,
-          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned,[string]$HistoricalThreatEntryId,[string]$HistoricalDetectionId,[string]$HistoricalAttachmentName)
+          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned,[string]$HistoricalThreatEntryId,[string]$HistoricalDetectionId,[string]$HistoricalAttachmentName,[switch]$ConfirmLiveOutlookVerification)
+    if($ConfirmLiveOutlookVerification -and (-not $ARCH5Batch -or -not $Session.Attached -or $RecoverInterrupted -or $ImportDeferredTransaction -or ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt 10)) -or ($Mode -eq 'Resume' -and $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$'))){throw 'ARCH7b requires attached Outlook, exact Resume or bounded 1..10 test Archive; no historical import/recovery.'}
     if($RecoverInterrupted -and ($Mode -ne 'Resume' -or -not $ARCH5Batch -or $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$' -or $ExpectedInterruptedReturned -lt 1 -or $ExpectedInterruptedPlanned -gt 500 -or $ExpectedInterruptedReturned -ge $ExpectedInterruptedPlanned)){throw 'ARCH6f3c1 explicit interrupted Resume identity/counts required.'}
     if($IncludeRootMail -and ($Mode -ne 'Archive' -or -not $ARCH5Batch)){throw 'ARCH6f2 root mail requires explicit controlled Archive.'}
     $source=[IO.Path]::GetFullPath($SourcePst)
@@ -441,6 +443,8 @@ function Invoke-OPAARCH4Batch {
     $lease=[IO.FileStream]::new((Join-Path $dir 'ARCH4.lease'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
     try {
         $proc=Get-OPAARCH4OutlookProcess
+        $worker=$null
+        if($ConfirmLiveOutlookVerification){$worker=Get-OPAARCH7bWorkerIdentity}
         $global:OPADurabilityMode='Safe'
         if($Mode -eq 'Archive'){
             if([IO.File]::Exists($pending)){throw 'ARCH4 unfinished batch exists. Use Resume, never a new Archive.'}
@@ -468,30 +472,44 @@ function Invoke-OPAARCH4Batch {
             }
             $cutoff=Get-OPAArchiveCutoff -OlderThanMonths $OlderThanMonths
             $tx=New-OPAArchiveTransaction -SourcePst $source -ArchivePst '' -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanMonths $OlderThanMonths -ArchiveCutoff $cutoff -AccountEmail ([string]$s.AccountEmail) -DurabilityMode Safe
-            Write-OPAARCH4Pending -Path $pending -Record ([pscustomobject]@{Schema='2.6.5-ARCH4.Pending.1';TransactionId=$tx.TransactionId;SourcePst=$source;SourceStoreId=$storeId;Profile=[string]$Discovery.Profile;MoveProcessId=$proc.Id;MoveProcessStartUtcTicks=$proc.StartUtcTicks;DeferredPolicy=[bool]$ARCH6DeferredPolicy})
+            $pendingRecord=[pscustomobject]@{Schema='2.6.5-ARCH4.Pending.1';TransactionId=$tx.TransactionId;SourcePst=$source;SourceStoreId=$storeId;Profile=[string]$Discovery.Profile;MoveProcessId=$proc.Id;MoveProcessStartUtcTicks=$proc.StartUtcTicks;DeferredPolicy=[bool]$ARCH6DeferredPolicy}
+            if($ConfirmLiveOutlookVerification){
+                $pendingRecord | Add-Member -NotePropertyMembers @{VerificationPolicy='ARCH7bFreshWorkerSameOutlook';MoveWorkerId=$worker.Id;MoveWorkerStartUtcTicks=$worker.StartUtcTicks;MoveWorkerSessionId=$worker.SessionId}
+                Assert-OPAARCH7bOutlookIdentity -Pending $pendingRecord -Outlook (Get-OPAARCH4OutlookProcess)
+            }
+            Write-OPAARCH4Pending -Path $pending -Record $pendingRecord
             Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Batch Started' -WriteCheckpoint
             $moved=Move-OPAItemsWithLimit -Namespace $Session.Namespace -SourceFolders $folders -Transaction $tx -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanCutoff $cutoff -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH4Batch -ARCH5Batch:$ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -ARCH6DeferredPolicy:$ARCH6DeferredPolicy -DeferredEntryIds $deferredIds
             Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Awaiting Restart' -WriteCheckpoint
             Sync-OPAStepJournalStreams
             $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
             if($state.Returned -ne [int]$moved){throw 'ARCH4 batch receipt count mismatch.'}
+            if($ConfirmLiveOutlookVerification){Assert-OPAARCH7bOutlookIdentity -Pending $pendingRecord -Outlook (Get-OPAARCH4OutlookProcess)}
             if($ARCH5Batch -and $state.Returned -eq 0){
                 $completed=Complete-OPAARCH5aZeroMoveBatch -Transaction $tx -State $state -SourceStoreId $storeId
                 if($ARCH6DeferredPolicy){$n=Save-OPAARCH6DeferredEvidence -Transaction $tx -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile);$completed | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue ([int]$n)}
                 [IO.File]::Delete($pending)
                 return $completed
             }
-            return [pscustomobject]@{Schema='2.6.5-ARCH4.Returned.1';Status='BatchReturnedRestartAndResumeRequired';TransactionId=$tx.TransactionId;Planned=$state.Planned;Returned=$state.Returned;NotMoved=($state.Planned-$state.Returned);OutlookProcessId=$proc.Id;SkipReasons=@($tx.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}});SkippedItems=@($tx.State.SkippedItems);SkipDetailsTruncated=([int]$tx.State.Skipped -gt @($tx.State.SkippedItems).Count);OriginalIndexWritten=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
+            $returned=[pscustomobject]@{Schema='2.6.5-ARCH4.Returned.1';Status='BatchReturnedRestartAndResumeRequired';TransactionId=$tx.TransactionId;Planned=$state.Planned;Returned=$state.Returned;NotMoved=($state.Planned-$state.Returned);OutlookProcessId=$proc.Id;SkipReasons=@($tx.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}});SkippedItems=@($tx.State.SkippedItems);SkipDetailsTruncated=([int]$tx.State.Skipped -gt @($tx.State.SkippedItems).Count);OriginalIndexWritten=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
+            if($ConfirmLiveOutlookVerification){
+                $returned.Status='BatchReturnedFreshWorkerResumeRequired'
+                $returned | Add-Member -NotePropertyMembers @{VerificationPolicy=$pendingRecord.VerificationPolicy;MoveWorkerId=$worker.Id;MoveWorkerStartUtcTicks=$worker.StartUtcTicks;OutlookProcessStartUtcTicks=$proc.StartUtcTicks;OutlookRestartRequired=$false}
+            }
+            return $returned
         }
         if(-not [IO.File]::Exists($pending)){
             return [pscustomobject]@{Schema='2.6.5-ARCH4.Status.1';Status='NoPendingBatch';SourcePst=$source;RestartRequired=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
         }
+        if(([IO.File]::GetAttributes($pending) -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'ARCH4 redirected pending marker.'}
         $p=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($pending,[Text.Encoding]::UTF8)) -ErrorAction Stop
         if($p.Schema -cne '2.6.5-ARCH4.Pending.1' -or [string]$p.SourcePst -ine $source -or [string]$p.SourceStoreId -ine $storeId -or
            [string]$p.Profile -ine [string]$Discovery.Profile -or [string]$p.TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$' -or
            ($TransactionId -and $TransactionId -cne [string]$p.TransactionId)){
             throw 'ARCH4 pending transaction identity mismatch.'
         }
+        Assert-OPAARCH7bPendingPolicy -Pending $p -ConfirmLiveOutlookVerification:$ConfirmLiveOutlookVerification
+        if($ConfirmLiveOutlookVerification){Assert-OPAARCH7bLiveFence -Pending $p -Outlook $proc -Worker $worker}
         $tx=Get-OPAArchiveTransaction -SourcePst $source -TransactionId ([string]$p.TransactionId)
         if([string]$tx.State.SourcePst -ine $source -or [string]$tx.TransactionId -cne [string]$p.TransactionId){throw 'ARCH4 transaction identity changed.'}
         if($ARCH5Batch){
@@ -509,7 +527,9 @@ function Invoke-OPAARCH4Batch {
             [IO.File]::Delete($pending)
             return $completed
         }
-        if($proc.StartUtcTicks -le [long]$p.MoveProcessStartUtcTicks){throw 'ARCH4 fully restart Outlook before Resume.'}
+        if(-not $ConfirmLiveOutlookVerification){
+            if($proc.StartUtcTicks -le [long]$p.MoveProcessStartUtcTicks){throw 'ARCH4 fully restart Outlook before Resume.'}
+        }
         $stores=@()
         foreach($path in @($state.Rows | ForEach-Object {$_.ArchivePst} | Sort-Object -Unique)){
             if(-not [IO.File]::Exists($path)){throw 'ARCH4 archive PST missing; never recreate on Resume.'}
@@ -536,9 +556,25 @@ function Invoke-OPAARCH4Batch {
             $completed | Add-Member -NotePropertyName PendingCleared -NotePropertyValue $true
             return $completed
         }
+        if($ConfirmLiveOutlookVerification){Assert-OPAARCH7bOutlookIdentity -Pending $p -Outlook (Get-OPAARCH4OutlookProcess)}
         $completed=Complete-OPAARCH4VerifiedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId
         if($p.PSObject.Properties.Name -contains 'DeferredPolicy' -and $p.DeferredPolicy -eq $true){$n=Save-OPAARCH6DeferredEvidence -Transaction $tx -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile);$completed | Add-Member -NotePropertyName DeferredRecorded -NotePropertyValue ([int]$n)}
+        if($ConfirmLiveOutlookVerification){
+            Assert-OPAARCH7bOutlookIdentity -Pending $p -Outlook (Get-OPAARCH4OutlookProcess)
+            $proof='OutlookPID='+$proc.Id+'; OutlookStartTicks='+$proc.StartUtcTicks+'; MoveWorkerPID='+$p.MoveWorkerId+'; MoveWorkerStartTicks='+$p.MoveWorkerStartUtcTicks+'; VerifyWorkerPID='+$worker.Id+'; VerifyWorkerStartTicks='+$worker.StartUtcTicks+'; Verified='+$completed.Verified
+            Save-OPAArchiveTransaction -Transaction $tx -Status Completed -Step 'ARCH7b Fresh Worker Verified' -Message $proof -WriteCheckpoint
+            Sync-OPAStepJournalStreams
+            Close-OPAStepJournalStreams
+            $records=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx) | Where-Object {$_.Step -ceq 'ARCH7b Fresh Worker Verified' -and $_.Message -ceq $proof})
+            if($records.Count -ne 1){throw 'ARCH7b verification proof readback failed.'}
+            Assert-OPAARCH7bOutlookIdentity -Pending $p -Outlook (Get-OPAARCH4OutlookProcess)
+            $completed | Add-Member -NotePropertyMembers @{VerificationPolicy='ARCH7bFreshWorkerSameOutlook';OutlookProcessId=$proc.Id;OutlookProcessStartUtcTicks=$proc.StartUtcTicks;MoveWorkerId=$p.MoveWorkerId;MoveWorkerStartUtcTicks=$p.MoveWorkerStartUtcTicks;VerifyWorkerId=$worker.Id;VerifyWorkerStartUtcTicks=$worker.StartUtcTicks;OutlookRestartRequired=$false;MoveInvocations=0;LiveVerificationDev=$true}
+        }
         [IO.File]::Delete($pending)
+        if($ConfirmLiveOutlookVerification){
+            if([IO.File]::Exists($pending)){throw 'ARCH7b pending marker remains.'}
+            $completed | Add-Member -NotePropertyName PendingCleared -NotePropertyValue $true
+        }
         return $completed
     } finally { $lease.Dispose() }
 }

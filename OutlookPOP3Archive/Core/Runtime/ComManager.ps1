@@ -69,7 +69,7 @@ function Clear-OpaStoreCache {
 
 function New-OPAComSession {
     [CmdletBinding()]
-    param([string]$ProfileName)
+    param([string]$ProfileName,[switch]$AttachOnly)
 
     $outlook = $null
     $namespace = $null
@@ -81,6 +81,7 @@ function New-OPAComSession {
             $attached = $true
         }
         catch {
+            if($AttachOnly){throw 'ARCH7b running Outlook is not registered in ROT; no activation attempted.'}
             $outlook = New-Object -ComObject Outlook.Application
             $attached = $false
         }
@@ -93,6 +94,7 @@ function New-OPAComSession {
         $currentProfile = ''
         try { $currentProfile = [string]$namespace.CurrentProfileName } catch {}
 
+        if($AttachOnly -and (-not $attached -or [string]::IsNullOrWhiteSpace($currentProfile))){throw 'ARCH7b existing Outlook profile unavailable; no Logon attempted.'}
         if ($attached) {
             # Outlook supports only one MAPI session per running Outlook
             # process. Never attempt to switch a live user's profile.
