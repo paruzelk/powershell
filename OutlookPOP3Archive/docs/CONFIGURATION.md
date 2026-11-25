@@ -1,4 +1,4 @@
-﻿# Конфигурация — 2.6.3-PREVIEW1 / ARCH7d DEV
+﻿# Конфигурация — 2.6.3-PREVIEW1 / ARCH7d1 DEV
 
 Контроллер отдельных worker — [ARCH7d, параметры и примеры](2.6.5-arch7d.md). Не является production Auto.
 

@@ -1007,12 +1007,51 @@ Describe 'ARCH7d supervisor recovery-only child lifecycle' {
         $source=Join-Path $dir 'Файлы Outlook\почта.pst'
         $r=Invoke-OPAARCH7dWorker -Main $stub -Parameters @{SourcePst=$source;ConfirmTestArchive=$true} -Directory $dir -LogDirectory $dir -TimeoutSeconds 30
         $r.Exited | Should -BeTrue
+        ($r.ExitCode -is [int]) | Should -BeTrue
         $r.ExitCode | Should -Be 0
         $r.Result.SourcePst | Should -BeExactly $source
         $r.Result.Confirmed | Should -BeTrue
         $r.Result.Pid | Should -Be $r.WorkerId
         $r.Result.Pid | Should -Not -Be $PID
         $r.Result.Apartment | Should -BeExactly STA
+    }
+    It 'retains numeric nonzero exit code and refuses a result from a failed real child' {
+        $dir=Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+        [void][IO.Directory]::CreateDirectory($dir)
+        $stub=Join-Path $dir 'failure.ps1'
+        [IO.File]::WriteAllText($stub,'throw "ARCH7d1 controlled child failure"',[Text.UTF8Encoding]::new($true))
+        $r=Invoke-OPAARCH7dWorker -Main $stub -Parameters @{} -Directory $dir -LogDirectory $dir -TimeoutSeconds 30
+        $r.Exited | Should -BeTrue
+        ($r.ExitCode -is [int]) | Should -BeTrue
+        $r.ExitCode | Should -Be 1
+        $r.Result | Should -BeNullOrEmpty
+        [IO.File]::ReadAllText($r.ErrorLog) | Should -Match 'ARCH7d1 controlled child failure'
+        @(Get-ChildItem -LiteralPath $dir -Filter '*.result.json').Count | Should -Be 0
+        $probe=[IO.FileStream]::new((Join-Path $dir 'ARCH7d.worker.lease'),[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+        $probe.Dispose()
+    }
+    It 'stops without launching another worker if either exit code is unknown' {
+        $opt=$script:supervisorOptions.Clone()
+        $opt.Archive={
+            $script:supervisorCase.Archives++
+            $script:supervisorCase.Pending=[pscustomobject]@{TransactionId=$script:supervisorId;MoveWorkerId=200}
+            [pscustomobject]@{Exited=$true;WorkerId=200;ExitCode=$null;Result=$null}
+        }
+        $r=Invoke-OPAARCH7dSequence @opt
+        $r.Status | Should -BeExactly 'WorkerExitCodeUnavailable'
+        $r.ArchiveWorkers | Should -Be 1
+        $r.ResumeWorkers | Should -Be 0
+        $script:supervisorCase.Pending.TransactionId | Should -BeExactly $script:supervisorId
+        $opt=$script:supervisorOptions.Clone()
+        $opt.Resume={
+            $script:supervisorCase.Resumes++
+            [pscustomobject]@{Exited=$true;WorkerId=201;ExitCode=$null;Result=$null}
+        }
+        $r=Invoke-OPAARCH7dSequence @opt
+        $r.Status | Should -BeExactly 'WorkerExitCodeUnavailable'
+        $r.ArchiveWorkers | Should -Be 0
+        $r.ResumeWorkers | Should -Be 1
+        $script:supervisorCase.Pending.TransactionId | Should -BeExactly $script:supervisorId
     }
     It 'validates supervisor and controlled interruption CLI before COM or writes' {
         $opts=$script:supervisorOptions

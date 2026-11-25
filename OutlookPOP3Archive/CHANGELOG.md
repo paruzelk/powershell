@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7d1 DEV
+
+- ARCH7d CI 45627946366: 78/79 focused PASS, real STA child ExitCode was null. Cache the original process handle before waiting and read CLR Int32 ExitCode; fail closed on unavailable handle/code. Do not continue Archive or retry Resume on unknown code. Add real failed child and unknown-exit sequence regressions, retain original Unicode child test. 4895/165 expected, 81 focused.
+
 ## ARCH7d DEV
 
 - ARCH7c1 CI 45624454936 PASS 4881/165. Add bounded separate worker supervisor, UTF-16 encoded command and UTF-8 JSON result, independent leases, recovery-first with bounded Resume attempts, no process kill/Outlook restart. Explicit controlled stop after durable paired receipt for combined real ARCH7c/d acceptance. Twelve new tests (4893/165 expected, 79 focused). Auto remains closed.

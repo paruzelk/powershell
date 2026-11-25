@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH7d1 DEV: retain process handle before wait, read CLR Int32 exit code; stop on unavailable code. Two new regression tests; 4895/165 expected, 81 focused, real acceptance pending.",
     "ARCH7d DEV: ARCH7c1 4881/165 PASS; bounded separate STA child supervisor, recovery-only retries, encoded Unicode parameters, explicit post-receipt fault point. No Outlook restart or worker kill. 4893/165 expected, 79 focused; real combined acceptance pending.",
     "ARCH7c1 DEV: fix test fixture stream closure before disk replay; explicit unresolved claim, torn tail and malformed JSON assertions. Runtime unchanged except DEV banner. 4881/165 expected, 67 focused; production closed.",
     "ARCH7c DEV: operator reported ARCH7b3 real 4/4 verified without Outlook restart; explicit recovery-only mixed returned/deferred prefix and unprocessed suffix, strict journal/index/ledger proof, optional natural Outlook restart; no uncertain Move replay. 4881/165 expected, 67 focused. Production closed.",
@@ -125,7 +126,7 @@
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
     "ExpectedTestContainers": 165,
-    "ExpectedPesterTests": 4893,
+    "ExpectedPesterTests": 4895,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

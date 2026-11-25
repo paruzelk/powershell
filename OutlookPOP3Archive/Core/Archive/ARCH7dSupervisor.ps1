@@ -56,15 +56,32 @@ function Invoke-OPAARCH7dWorker {
     $exe=Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
     $process=Start-Process -FilePath $exe -ArgumentList @('-NoProfile','-STA','-NonInteractive','-EncodedCommand',$encoded) -WorkingDirectory ([IO.Path]::GetDirectoryName($Main)) -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
     try{
+        # Windows PowerShell 5.1 Start-Process -PassThru may return a Process
+        # with only its PID. Cache the CLR handle BEFORE waiting for exit;
+        # after a short-lived process exits, reopening by PID is unreliable.
+        $workerId=[int]$process.Id
+        $handle=[Diagnostics.Process].GetProperty('Handle').GetValue($process)
+        if($null -eq $handle -or $handle -eq [IntPtr]::Zero){throw 'ARCH7d1 worker handle unavailable; no further worker launch.'}
         if(-not $process.WaitForExit($TimeoutSeconds*1000)){
             # Never kill an active worker: it may be inside Outlook Move.
-            return [pscustomobject]@{Exited=$false;ExitCode=$null;WorkerId=$process.Id;Result=$null;Log=$stdout;ErrorLog=$stderr}
+            return [pscustomobject]@{Exited=$false;ExitCode=$null;WorkerId=$workerId;Result=$null;Log=$stdout;ErrorLog=$stderr}
         }
-        $code=$process.ExitCode;$result=$null
+        # The bounded wait has already observed exit. Finish the redirected
+        # output drain, then read the original CLR property (not PS adaptation).
+        $process.WaitForExit()
+        $code=$null;$result=$null;$exitCodeError=''
+        try{
+            $raw=[Diagnostics.Process].GetProperty('ExitCode').GetValue($process)
+            if($raw -isnot [int]){throw 'ARCH7d1 worker exit code is not an Int32.'}
+            $code=$raw
+        }catch{$exitCodeError=$_.Exception.Message}
+        if($null -eq $code){
+            return [pscustomobject]@{Exited=$true;ExitCode=$null;ExitCodeError=$exitCodeError;WorkerId=$workerId;Result=$null;Log=$stdout;ErrorLog=$stderr}
+        }
         if($code -eq 0 -and [IO.File]::Exists($response)){
             $result=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText($response,[Text.UTF8Encoding]::new($false,$true))) -ErrorAction Stop
         }
-        return [pscustomobject]@{Exited=$true;ExitCode=$code;WorkerId=$process.Id;Result=$result;Log=$stdout;ErrorLog=$stderr}
+        return [pscustomobject]@{Exited=$true;ExitCode=$code;WorkerId=$workerId;Result=$result;Log=$stdout;ErrorLog=$stderr}
     }finally{$process.Dispose()}
 }
 function Invoke-OPAARCH7dSequence {
@@ -82,6 +99,7 @@ function Invoke-OPAARCH7dSequence {
             $archives++;$lastArchiveExitCode=$a.ExitCode;$lastArchiveWorkerId=$a.WorkerId
             & $Record 'ArchiveWorker' $a
             if(-not $a.Exited){$status='WorkerStillRunning';break}
+            if($a.ExitCode -isnot [int]){$status='WorkerExitCodeUnavailable';break}
             $p=& $ReadPending
             if($null -eq $p){
                 if($a.ExitCode -ne 0 -or $null -eq $a.Result){$status='ArchiveFailedWithoutPending';break}
@@ -104,6 +122,7 @@ function Invoke-OPAARCH7dSequence {
             $recoveries++
             & $Record 'ResumeWorker' $v
             if(-not $v.Exited){$status='WorkerStillRunning';break}
+            if($v.ExitCode -isnot [int]){$status='WorkerExitCodeUnavailable';break}
             $after=& $ReadPending
             if($null -ne $after -and $after.TransactionId -cne $last){throw 'ARCH7d pending identity changed after recovery.'}
             if($v.ExitCode -eq 0 -and $null -ne $v.Result -and $null -eq $after){
