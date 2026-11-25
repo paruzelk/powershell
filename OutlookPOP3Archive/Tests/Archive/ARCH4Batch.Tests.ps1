@@ -37,20 +37,24 @@ BeforeAll {
         return [pscustomobject]@{Transaction=$tx;Steps=@($steps.ToArray());Events=@($events.ToArray());Archive=$archive}
     }
     function Save-ARCH4Fixture {
-        param([object]$Fixture)
+        param([object]$Fixture,[switch]$Interrupted)
         $tx=$Fixture.Transaction
+        if($Interrupted){Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Batch Started' -WriteCheckpoint}
+        $prior=0
         Save-OPAArchiveTransaction -Transaction $tx -Status Planned -Step Candidates -WriteCheckpoint
         foreach($s in $Fixture.Steps){
             $params=@{Transaction=$tx;Status='Running';Step=$s.Step;EntryId=$s.EntryId;SourceFolderPath=$s.SourceFolderPath;TargetFolderPath=$s.TargetFolderPath;ArchivePst=$s.ArchivePst;ReceivedTime=[datetime]$s.ReceivedTime}
-            if($s.Step -eq 'Move Started'){$params.SemanticWitness=$s.SourceSemanticWitness}
-            else{$params.ArchiveEntryId=$s.ArchiveEntryId}
+            if($s.Step -eq 'Move Started'){
+                $params.SemanticWitness=$s.SourceSemanticWitness
+                if($Interrupted){$tx.State.Executed=$prior;$params.WriteCheckpoint=$true;$prior++}
+            }else{$params.ArchiveEntryId=$s.ArchiveEntryId}
             Save-OPAArchiveTransaction @params
         }
         foreach($e in $Fixture.Events){
             [void](Write-OPAOperationJournalEvent -Path (Get-OPAARCH4OperationPath -Transaction $tx) -TransactionId $tx.TransactionId -OperationId $e.OperationId -Sequence $e.Sequence -Phase Intent -SourceEntryId $e.SourceEntryId -SourceStoreId $e.SourceStoreId -SourceFolderPath $e.SourceFolderPath -TargetFolderPath $e.TargetFolderPath -ArchivePst $e.ArchivePst)
         }
         Sync-OPAStepJournalStreams
-        Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Awaiting Restart' -WriteCheckpoint
+        if(-not $Interrupted){Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Awaiting Restart' -WriteCheckpoint}
     }
     function New-ARCH4Verification {
         param([int]$Count)
@@ -257,4 +261,109 @@ Describe 'ARCH5a zero-Move terminal completion' {
         {Get-OPAARCH4ReturnedState -Transaction $f.Transaction -Steps @($f.Steps[0]) -Events $f.Events -SourceStoreId STORE} | Should -Throw '*unresolved claim*'
     }
 }
+
+Describe 'ARCH6f3c1 interrupted recovery with exact skip-free journal prefix' {
+    It 'accepts 311 paired receipts of 500 while checkpoint lags by one' {
+        $f=New-ARCH4Fixture -Count 500 -Returned 311
+        $f.Transaction.State.Status='Running';$f.Transaction.State.Executed=310
+        $steps=@([pscustomobject]@{Step='ARCH4 Batch Started'},[pscustomobject]@{Step='Candidates'})+@($f.Steps)
+        $state=Get-OPAARCH4ReturnedState -Transaction $f.Transaction -Steps $steps -Events $f.Events -SourceStoreId STORE
+        $r=Assert-OPAARCH6InterruptedState -Transaction $f.Transaction -State $state -Steps $steps -ExpectedPlanned 500 -ExpectedReturned 311
+        $r.Unprocessed | Should -Be 189
+        $r.RecoveryMarkerPresent | Should -BeFalse
+    }
+    It 'rejects a different expected receipt count' {
+        $f=New-ARCH4Fixture -Count 3 -Returned 2
+        Save-ARCH4Fixture -Fixture $f -Interrupted
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $f.Transaction))
+        {Assert-OPAARCH6InterruptedState -Transaction $f.Transaction -State $state -Steps $steps -ExpectedPlanned 3 -ExpectedReturned 1} | Should -Throw '*counts or termination*'
+    }
+    It 'rejects previous skips and unknown suffix instead of classifying the unprocessed tail as deferred' {
+        $f=New-ARCH4Fixture -Count 3 -Returned 2
+        Save-ARCH4Fixture -Fixture $f -Interrupted
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $f.Transaction))
+        $f.Transaction.State.Skipped=1
+        {Assert-OPAARCH6InterruptedState -Transaction $f.Transaction -State $state -Steps $steps -ExpectedPlanned 3 -ExpectedReturned 2} | Should -Throw '*skip-free*'
+        $f.Transaction.State.Skipped=0
+        {Assert-OPAARCH6InterruptedState -Transaction $f.Transaction -State $state -Steps ($steps+@([pscustomobject]@{Step='Skipped'})) -ExpectedPlanned 3 -ExpectedReturned 2} | Should -Throw '*suffix*'
+    }
+    It 'rejects a returned set that is not the ordered prefix of the original plan' {
+        $f=New-ARCH4Fixture -Count 3 -Returned 2
+        Save-ARCH4Fixture -Fixture $f -Interrupted
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $f.Transaction))
+        $plan=@($f.Transaction.State.PlannedItems)
+        $f.Transaction.State.PlannedItems=@($plan[1],$plan[0],$plan[2])
+        {Assert-OPAARCH6InterruptedState -Transaction $f.Transaction -State $state -Steps $steps -ExpectedPlanned 3 -ExpectedReturned 2} | Should -Throw '*exact planned prefix*'
+    }
+    It 'rejects a normally terminated partial selection in interrupted mode' {
+        $f=New-ARCH4Fixture -Count 3 -Returned 2
+        Save-ARCH4Fixture -Fixture $f
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $f.Transaction))
+        {Assert-OPAARCH6InterruptedState -Transaction $f.Transaction -State $state -Steps $steps -ExpectedPlanned 3 -ExpectedReturned 2} | Should -Throw '*counts or termination*'
+    }
+    It 'commits only the returned prefix after full verification and reads back idempotently' {
+        $f=New-ARCH4Fixture -Count 3 -Returned 2
+        Save-ARCH4Fixture -Fixture $f -Interrupted
+        $tx=Get-OPAArchiveTransaction -SourcePst $f.Transaction.State.SourcePst -TransactionId $f.Transaction.TransactionId
+        $tx.State.Executed | Should -Be 1
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE
+        Mock Move-OPAItemsWithLimit {throw 'never move on recovery'}
+        $r=Complete-OPAARCH6InterruptedBatch -Transaction $tx -State $state -Verification (New-ARCH4Verification -Count 2) -SourceStoreId STORE -ExpectedPlanned 3 -ExpectedReturned 2
+        $r.Status | Should -BeExactly 'InterruptedBatchRecovered'
+        $r.Verified | Should -Be 2
+        $r.Indexed | Should -Be 2
+        $r.Unprocessed | Should -Be 1
+        $r.Deferred | Should -Be 0
+        $r.MoveInvocations | Should -Be 0
+        $indexPath=Get-OPADuplicateIndexJournalPath -ArchivePst $f.Archive
+        $hash=(Get-FileHash -LiteralPath $indexPath).Hash
+        $s2=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE
+        $r2=Complete-OPAARCH6InterruptedBatch -Transaction $tx -State $s2 -Verification (New-ARCH4Verification -Count 2) -SourceStoreId STORE -ExpectedPlanned 3 -ExpectedReturned 2
+        $r2.Reconciled | Should -Be 2
+        (Get-FileHash -LiteralPath $indexPath).Hash | Should -BeExactly $hash
+        $idx=Import-OPADuplicateIndex -ArchivePst $f.Archive
+        $idx.Entries.Count | Should -Be 2
+        Test-OPADuplicateEntry -Index $idx -SourceEntryId S3 | Should -BeNullOrEmpty
+        @((Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx)) | Where-Object {$_.Step -ceq 'ARCH6f3c1 Interrupted Batch Verified'}).Count | Should -Be 1
+        Should -Invoke Move-OPAItemsWithLimit -Exactly -Times 0
+    }
+    It 'keeps journal and index unchanged if independent verifier fails' {
+        $f=New-ARCH4Fixture -Count 3 -Returned 2
+        Save-ARCH4Fixture -Fixture $f -Interrupted
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $v=New-ARCH4Verification -Count 2
+        $v.Verified=$false
+        Mock Write-OPAOperationJournalEvent {throw 'unexpected append'}
+        Mock Add-OPADuplicateEntry {throw 'unexpected index append'}
+        {Complete-OPAARCH6InterruptedBatch -Transaction $f.Transaction -State $state -Verification $v -SourceStoreId STORE -ExpectedPlanned 3 -ExpectedReturned 2} | Should -Throw '*verification failed*'
+        Should -Invoke Write-OPAOperationJournalEvent -Exactly -Times 0
+        Should -Invoke Add-OPADuplicateEntry -Exactly -Times 0
+    }
+    It 'recovers a partially appended Reconciled prefix without reissuing Move' {
+        $f=New-ARCH4Fixture -Count 3 -Returned 2
+        Save-ARCH4Fixture -Fixture $f -Interrupted
+        $tx=$f.Transaction;$e=$f.Events[0]
+        [void](Write-OPAOperationJournalEvent -Path (Get-OPAARCH4OperationPath -Transaction $tx) -TransactionId $tx.TransactionId -OperationId S1 -Sequence 3 -Phase Reconciled -SourceEntryId S1 -ArchiveEntryId A1 -ArchivePst $f.Archive -SourceStoreId STORE -SourceFolderPath $e.SourceFolderPath -TargetFolderPath $e.TargetFolderPath)
+        $s=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE
+        $s.Reconciled | Should -Be 1
+        $r=Complete-OPAARCH6InterruptedBatch -Transaction $tx -State $s -Verification (New-ARCH4Verification -Count 2) -SourceStoreId STORE -ExpectedPlanned 3 -ExpectedReturned 2
+        $r.Indexed | Should -Be 2
+        $r.Unprocessed | Should -Be 1
+    }
+    It 'requires explicit interrupted transaction and counts before Outlook or writes' {
+        $src=Join-Path $TestDrive 'not-created.pst'
+        $id='20261125-135508-913b789a'
+        $r=& (Join-Path $script:root 'Invoke-OPAArchiveBatches.ps1') -SourcePst $src -ProfileName Outlook -ConfirmTestArchive -ConfirmOutlookRestart -RecoverTransaction $id -RecoverInterrupted -ExpectedInterruptedPlanned 500 -ExpectedInterruptedReturned 311 -WhatIf
+        $r.Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
+        $r.RecoverInterrupted | Should -BeTrue
+        Test-Path -LiteralPath $src | Should -BeFalse
+        {& (Join-Path $script:root 'Invoke-OPAArchiveBatches.ps1') -SourcePst $src -ProfileName Outlook -ConfirmTestArchive -ConfirmOutlookRestart -RecoverTransaction $id -RecoverInterrupted -WhatIf} | Should -Throw '*expected planned/returned counts*'
+        {& (Join-Path $script:root 'OutlookPOP3Archive.ps1') -Mode Archive -SourcePst $src -ProfileName Outlook -ConfirmTestArchive -RecoverInterrupted -ExpectedInterruptedPlanned 500 -ExpectedInterruptedReturned 311 -WhatIf} | Should -Throw
+    }
+}
+
 }

@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH6f3c1 DEV
+
+- Явное восстановление прерванного префикса исходной партии без повторного Move; оригинальные verifier, reconciliation, DuplicateIndex; разделение Unprocessed/Deferred, строгий журнал и readback. 9 новых тестов; 4846/165 expected. Антивирусную политику не меняли.
+
 ## ARCH6f3a1 DEV
 
 - CI-only: restore four original SHA-256 literals accidentally changed while updating the expected Pester count. All nine historical SHA-256 occurrences match ARCH6f2. ARCH6f3a's 4837 tests in 165 containers, BOM and PSScriptAnalyzer passed on 57ac6ea8, but the subsequent ARCH3k source gate failed. No PowerShell source changes. Full CI and live acceptance pending.
