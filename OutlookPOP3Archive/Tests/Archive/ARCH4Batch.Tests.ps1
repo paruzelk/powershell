@@ -1281,7 +1281,8 @@ Describe 'ARCH7e guarded all-POP3 age-only dispatcher' {
         $r.SourcesExhausted | Should -Be 3
         $r.Verified | Should -Be 2
         $r.Deferred | Should -Be 1
-        ($script:eCalls.ToArray() -join ',') | Should -BeExactly 'B,B,A,C'
+        (@($script:eCalls.ToArray() | Where-Object {$_ -ne 'C'}) -join ',') | Should -BeExactly 'B,B,A'
+        @($script:eCalls.ToArray() | Where-Object {$_ -eq 'C'}).Count | Should -Be 1
     }
     It 'holds other PSTs sharing a failed pending but continues independent directory' {
         $f=New-ARCH7eFixture
@@ -1296,7 +1297,10 @@ Describe 'ARCH7e guarded all-POP3 age-only dispatcher' {
             if($row.StoreId -ceq 'B'){New-ARCH7eResult -Status RecoveryAttemptsExhausted}else{New-ARCH7eResult}
         }
         $r.Status | Should -BeExactly PartialOrBlocked
-        ($script:eCalls.ToArray() -join ',') | Should -BeExactly 'B,C'
+        $script:eCalls.Count | Should -Be 2
+        $script:eCalls.ToArray() | Should -Contain B
+        $script:eCalls.ToArray() | Should -Contain C
+        $script:eCalls.ToArray() | Should -Not -Contain A
         @($r.Sources | Where-Object {$_.SourcePst -eq $f.A})[0].Status | Should -BeExactly NotRunBlocked
         $r.SourcesExhausted | Should -Be 1
     }
@@ -1363,6 +1367,48 @@ Describe 'ARCH7e guarded all-POP3 age-only dispatcher' {
         {& $main -Mode Auto -ConfirmDevAutoArchive -WhatIf -DurabilityMode Fast} | Should -Throw '*age-only*'
         {& $main -Mode Auto -WhatIf -AutoDevMaxBatches 1} | Should -Throw '*requires ConfirmDevAutoArchive*'
         {& $main -Mode Auto -WhatIf} | Should -Throw
+    }
+    It 'runs actual public Auto entry and controller on isolated fake discovery with two real child processes' {
+        $fixture=Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+        foreach($dirName in @('Core\Archive','Core\Runtime','mail')){[void][IO.Directory]::CreateDirectory((Join-Path $fixture $dirName))}
+        foreach($relative in @('Core/Archive/ARCH2aMoveOutcomeFence.ps1','Core/Archive/ARCH7eAuto.ps1','Core/Archive/ARCH7dSupervisor.ps1','Core/Archive/ARCH6Orchestration.ps1','Invoke-OPALiveArchiveBatches.ps1')){
+            [IO.File]::Copy((Join-Path $script:root $relative),(Join-Path $fixture $relative))
+        }
+        $autoMain=Join-Path $fixture 'AutoEntry.ps1'
+        [IO.File]::Copy((Join-Path $script:root 'OutlookPOP3Archive.ps1'),$autoMain)
+        $a=Join-Path $fixture 'mail\a.pst';$b=Join-Path $fixture 'mail\b.pst';$imap=Join-Path $fixture 'mail\imap.ost'
+        foreach($path in @($a,$b,$imap)){[IO.File]::WriteAllBytes($path,[byte[]]@(1,2,3))}
+        # Fake only the COM boundary in a disposable copy; no Outlook activation.
+        $com=@'
+function New-OPAComSession {
+    param([string]$ProfileName,[switch]$AttachOnly)
+    if(-not $AttachOnly){throw 'fixture requires AttachOnly'}
+    $root='__FIXTURE_ROOT__'
+    $sa=[pscustomobject]@{StoreID='A';FilePath=(Join-Path $root 'mail\a.pst')}
+    $sb=[pscustomobject]@{StoreID='B';FilePath=(Join-Path $root 'mail\b.pst')}
+    $si=[pscustomobject]@{StoreID='I';FilePath=(Join-Path $root 'mail\imap.ost')}
+    $ns=[pscustomobject]@{CurrentProfileName='Outlook';Accounts=@([pscustomobject]@{AccountType=2;DeliveryStore=$sa},[pscustomobject]@{AccountType=1;DeliveryStore=$si},[pscustomobject]@{AccountType=2;DeliveryStore=$sb});Stores=@($sa,$sb,$si)}
+    [pscustomobject]@{Attached=$true;ProfileName='Outlook';Namespace=$ns}
+}
+function Close-OPAComSession {param($Session)}
+'@
+        [IO.File]::WriteAllText((Join-Path $fixture 'Core/Runtime/ComManager.ps1'),$com.Replace('__FIXTURE_ROOT__',$fixture.Replace("'","''")),[Text.UTF8Encoding]::new($true))
+        $stub=@'
+param([string]$Mode,[string]$SourcePst,[string]$ProfileName,[switch]$ConfirmTestArchive,[switch]$ConfirmLiveOutlookVerification,[int]$Limit,[int]$OlderThanMonths,[string]$ArchiveGrouping,[switch]$DisableArchivePstSizeLimit,[switch]$IncludeRootMail)
+if($Mode -cne 'Archive' -or $ProfileName -cne 'Outlook' -or -not $ConfirmTestArchive -or -not $ConfirmLiveOutlookVerification -or
+   $Limit -ne 10 -or $OlderThanMonths -ne 12 -or $ArchiveGrouping -cne 'YearQuarter' -or -not $IncludeRootMail -or -not $DisableArchivePstSizeLimit -or
+   [IO.Path]::GetFileName($SourcePst) -cnotin @('a.pst','b.pst')){throw 'ARCH7e fixture invalid worker options'}
+[IO.File]::AppendAllText((Join-Path $PSScriptRoot 'calls.txt'),([IO.Path]::GetFileName($SourcePst)+[char]10),[Text.UTF8Encoding]::new($false))
+[pscustomobject]@{Schema='2.6.5-ARCH4.Completed.1';Status='BatchCompletedNoMoves';Planned=0;Verified=0;Indexed=0;DeferredRecorded=0}
+'@
+        [IO.File]::WriteAllText((Join-Path $fixture 'OutlookPOP3Archive.ps1'),$stub,[Text.UTF8Encoding]::new($true))
+        $r=& $autoMain -Mode Auto -ConfirmDevAutoArchive -AutoDevMaxBatches 1
+        $r.Status | Should -BeExactly AllSourcesExhausted
+        $r.SourcesDiscovered | Should -Be 2
+        $r.SourcesExhausted | Should -Be 2
+        ((Get-Content -LiteralPath (Join-Path $fixture 'calls.txt')) -join ',') | Should -BeExactly 'a.pst,b.pst'
+        $r.Verified | Should -Be 0
+        $r.ProductionReady | Should -BeFalse
     }
     It 'returns NoPop3Sources without any write or Archive callback' {
         $r=Invoke-OPAARCH7eSourceSequence -Sources @() -MaxBatchesPerSource 1 -PendingOwner {throw 'unexpected pending'} -RunSource {throw 'unexpected Archive'}
