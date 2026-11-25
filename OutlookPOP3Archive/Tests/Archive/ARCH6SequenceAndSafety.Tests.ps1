@@ -201,3 +201,89 @@ Describe 'ARCH6f1 exact restart identity and ROT fallback' {
         {Assert-OPAARCH6RestartProcess -Pending $p -Processes @([pscustomobject]@{Id=123;StartTime=$start},[pscustomobject]@{Id=456;StartTime=$start})} | Should -Throw '*never Quit a replacement*'
     }
 }
+
+Describe 'ARCH6f2 explicit root mail selection and reserved route' {
+    BeforeAll {
+        . (Join-Path $script:root 'Core/Archive/ArchiveGrouping.ps1')
+        . (Join-Path $script:root 'Core/Archive/ArchiveSelector.ps1')
+        . (Join-Path $script:root 'Core/Archive/ARCH4Batch.ps1')
+    }
+    It 'includes root only with explicit write selection while preserving normal folders' {
+        $mail=[pscustomobject]@{EntryID='R1'}
+        $child=New-ARCH6Folder -Name Inbox -Path '\\PST\Inbox' -Entries @($mail)
+        $root=New-ARCH6Folder -Name PST -Path '\\PST' -Entries @($mail) -Children @($child)
+        @(Get-OPAEligiblePop3MailFolders -RootFolder $root).FolderPath | Should -Be '\\PST\Inbox'
+        $f=@(Get-OPAEligiblePop3MailFolders -RootFolder $root -IncludeRootMail)
+        $f.Count | Should -Be 2
+        $f.FolderPath | Should -Contain '\\PST'
+    }
+    It 'exact root filter does not select nested folders' {
+        $mail=[pscustomobject]@{EntryID='R1'}
+        $child=New-ARCH6Folder -Name Inbox -Path '\\PST\Inbox' -Entries @($mail)
+        $root=New-ARCH6Folder -Name PST -Path '\\PST' -Entries @($mail) -Children @($child)
+        $f=@(Get-OPAEligiblePop3MailFolders -RootFolder $root -IncludeRootMail)
+        @(Select-OPAARCH5SourceFolders -EligibleFolders $f -IncludeFolderPath '\\PST').FolderPath | Should -Be '\\PST'
+    }
+    It 'refuses exact root selection without explicit inclusion' {
+        $child=New-ARCH6Folder -Name Inbox -Path '\\PST\Inbox' -Entries @([pscustomobject]@{EntryID='I1'})
+        $root=New-ARCH6Folder -Name PST -Path '\\PST' -Entries @([pscustomobject]@{EntryID='R1'}) -Children @($child)
+        $f=@(Get-OPAEligiblePop3MailFolders -RootFolder $root)
+        {Select-OPAARCH5SourceFolders -EligibleFolders $f -IncludeFolderPath '\\PST'} | Should -Throw '*not uniquely eligible*'
+    }
+    It 'includes emptied root for verification and exact root selection' {
+        $root=New-ARCH6Folder -Name PST -Path '\\PST'
+        @(Get-OPAEligiblePop3MailFolders -RootFolder $root -IncludeRootMail).Count | Should -Be 0
+        @(Get-OPAEligiblePop3MailFolders -RootFolder $root -IncludeRootMail -IncludeEmptyFolders).Count | Should -Be 1
+        @(Get-OPAEligiblePop3MailFolders -RootFolder $root -IncludeRootForVerification).Count | Should -Be 1
+    }
+    It 'excludes Outbox children even when root enabled' {
+        $child=New-ARCH6Folder -Name Outbox -Path '\\PST\Outbox' -Entries @([pscustomobject]@{EntryID='O1'})
+        $root=New-ARCH6Folder -Name PST -Path '\\PST' -Entries @([pscustomobject]@{EntryID='R1'}) -Children @($child)
+        @(Get-OPAEligiblePop3MailFolders -RootFolder $root -IncludeRootMail).FolderPath | Should -Be '\\PST'
+    }
+    It 'routes root mail to reserved folder under all four grouping modes' {
+        $date=[datetime]'2020-04-01'
+        Get-OPAArchiveTargetPath -ReceivedTime $date -SourceFolderPath '\\PST' -Grouping None | Should -BeExactly '__OPA_ROOT_MAIL__'
+        Get-OPAArchiveTargetPath -ReceivedTime $date -SourceFolderPath '\\PST' -Grouping Year | Should -BeExactly '2020\__OPA_ROOT_MAIL__'
+        Get-OPAArchiveTargetPath -ReceivedTime $date -SourceFolderPath '\\PST' -Grouping YearQuarter | Should -BeExactly '2020\Q2\__OPA_ROOT_MAIL__'
+        Get-OPAArchiveTargetPath -ReceivedTime $date -SourceFolderPath '\\PST' -Grouping YearMonth | Should -BeExactly '2020\04\__OPA_ROOT_MAIL__'
+    }
+    It 'preserves normal nested route and rejects reserved user-folder collisions' {
+        $date=[datetime]'2020-04-01'
+        Get-OPAArchiveTargetPath -ReceivedTime $date -SourceFolderPath '\\PST\Parent\Child' -Grouping YearQuarter | Should -BeExactly '2020\Q2\Parent\Child'
+        {Get-OPAArchiveTargetPath -ReceivedTime $date -SourceFolderPath '\\PST\__opa_root_mail__\Child' -Grouping YearQuarter} | Should -Throw '*reserved root mail route*'
+    }
+    It 'validates the sealed root destination and rejects wrong destination or year' {
+        $opts=@{SourcePst='C:\Test\source.pst';ArchiveDate=[datetime]'2020-04-01';SourceFolderPath='\\PST';Grouping='YearQuarter'}
+        {Assert-OPAARCH5Route @opts -TargetFolderPath '\\Archive\2020\Q2\__OPA_ROOT_MAIL__' -ArchivePst 'C:\Test\source.Archive-2020-02.pst'} | Should -Not -Throw
+        {Assert-OPAARCH5Route @opts -TargetFolderPath '\\Archive\2020\Q2\Inbox' -ArchivePst 'C:\Test\source.Archive-2020.pst'} | Should -Throw '*ArchiveRouteMismatch*'
+        {Assert-OPAARCH5Route @opts -TargetFolderPath '\\Archive\2020\Q2\__OPA_ROOT_MAIL__' -ArchivePst 'C:\Test\source.Archive-2021.pst'} | Should -Throw '*ArchiveRouteMismatch*'
+    }
+    It 'selects only eligible MailItem class, date and nonduplicate root IDs' {
+        $old=[datetime]'2020-01-01';$young=[datetime]'2025-01-01'
+        $entries=@(
+            [pscustomobject]@{Class=43;EntryID='R1';Subject='Mail';ReceivedTime=$old;SentOn=$old;SenderEmailAddress='';Size=100},
+            [pscustomobject]@{Class=43;EntryID='R2';Subject='Duplicate';ReceivedTime=$old;SentOn=$old;SenderEmailAddress='';Size=100},
+            [pscustomobject]@{Class=26;EntryID='R3'},
+            [pscustomobject]@{Class=43;EntryID='R4';Subject='Young';ReceivedTime=$young;SentOn=$young;SenderEmailAddress='';Size=100}
+        )
+        $root=New-ARCH6Folder -Name PST -Path '\\PST' -Entries $entries
+        $result=@(Get-OPAArchiveCandidates -SourceFolder $root -Limit 10 -OlderThanCutoff ([datetime]'2021-01-01') -ExcludeEntryIds @('R2'))
+        $result.Count | Should -Be 1
+        $result[0].EntryID | Should -BeExactly 'R1'
+        $result[0].SourceFolderPath | Should -BeExactly '\\PST'
+    }
+    It 'main accepts explicit root only for controlled Archive WhatIf' {
+        $src=Join-Path $TestDrive 'not-created.pst'
+        $r=& (Join-Path $script:root 'OutlookPOP3Archive.ps1') -Mode Archive -ProfileName Outlook -SourcePst $src -ConfirmTestArchive -Limit 10 -IncludeRootMail -IncludeFolderPath '\\PST' -WhatIf
+        $r.Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
+        Test-Path $src | Should -BeFalse
+        {& (Join-Path $script:root 'OutlookPOP3Archive.ps1') -Mode Resume -ProfileName Outlook -SourcePst $src -ConfirmTestArchive -IncludeRootMail -WhatIf} | Should -Throw
+    }
+    It 'controller accepts root opt-in in WhatIf and refuses it for recovery' {
+        $src=Join-Path $TestDrive 'not-created.pst'
+        $r=& (Join-Path $script:root 'Invoke-OPAArchiveBatches.ps1') -ProfileName Outlook -SourcePst $src -ConfirmTestArchive -ConfirmOutlookRestart -IncludeRootMail -IncludeFolderPath '\\PST' -WhatIf
+        $r.Status | Should -BeExactly 'NoOutlookOrPersistentWrites'
+        {& (Join-Path $script:root 'Invoke-OPAArchiveBatches.ps1') -ProfileName Outlook -SourcePst $src -ConfirmTestArchive -ConfirmOutlookRestart -IncludeRootMail -RecoverTransaction '20261125-102130-ef2c9ada' -WhatIf} | Should -Throw
+    }
+}

@@ -1,5 +1,8 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> **ARCH6f2 DEV**: explicit root mail opt-in, reserved destination route, independent source absence and original semantic journal/index verification retained. 11 new tests (4832/165 expected). [Usage and constraints](2.6.5-arch6f2.md). Root live acceptance pending; next ARCH6f3 larger automatic batch acceptance.
+
+
 > **Real ARCH6f1 PASS (2026-11-25):** released `63e1623f`, three automatic Archive/restart/Resume cycles, 30/30 verified/indexed, zero skips, MessageLimitReached. Repeated automatic restart accepted; no repeat. Next ARCH6f2: explicit root MailItem routing (500 confirmed Class=43), then larger automatic sequence acceptance. [Evidence](2.6.5-arch6ae.md). ProductionReady=False.
 
 
