@@ -8,8 +8,9 @@ function Invoke-OPAARCH6Sequence {
           [Parameter(Mandatory=$true)][scriptblock]$Record,
           [ValidateRange(1,500)][int]$BatchSize,
           [ValidateRange(1,2147483647)][int]$MaxMessages,
-          [ValidateRange(1,100000)][int]$MaxBatches)
-    $verified=0L;$logical=0L;$batches=0;$last='';$status='BatchLimitReached'
+          [ValidateRange(1,100000)][int]$MaxBatches,
+          [ValidateSet('Continue','Stop')][string]$SkipPolicy='Continue')
+    $verified=0L;$logical=0L;$deferred=0L;$batches=0;$last='';$status='BatchLimitReached'
     while($batches -lt $MaxBatches -and $verified -lt $MaxMessages){
         $limit=[int][math]::Min($BatchSize,($MaxMessages-$verified))
         & $Record 'ArchiveStarting' ([pscustomobject]@{Limit=$limit;VerifiedTotal=$verified})
@@ -29,7 +30,14 @@ function Invoke-OPAARCH6Sequence {
                 throw 'ARCH6 inconsistent zero-Move terminal result.'
             }
             $status=if([int]$a.Planned -eq 0){'NoEligibleMessages'}else{'StoppedOnSkippedItems'}
-            $batches++;break
+            $batches++
+            if([int]$a.Planned -gt 0 -and $SkipPolicy -eq 'Continue'){
+                if([int]$a.DeferredRecorded -ne [int]$a.Planned){throw 'ARCH6f3a zero-Move deferred evidence incomplete.'}
+                $deferred+=[int]$a.DeferredRecorded
+                & $Record 'BatchVerified' $a
+                $status='BatchLimitReached';continue
+            }
+            break
         }
         if($a.Status -cne 'BatchReturnedRestartAndResumeRequired' -or
            [int]$a.Returned -lt 1 -or [int]$a.Returned -gt [int]$a.Planned -or
@@ -52,11 +60,16 @@ function Invoke-OPAARCH6Sequence {
         $verified+=[int]$r.Verified;$logical+=[long]$r.LogicalBytes;$batches++
         & $Record 'BatchVerified' $r
         # Stop on skips, including persistent oldest unsupported items.
-        if([int]$r.NotMoved -gt 0){$status='StoppedOnSkippedItems';break}
+        if([int]$r.NotMoved -gt 0){
+            if($SkipPolicy -eq 'Stop'){$status='StoppedOnSkippedItems';break}
+            if([int]$r.DeferredRecorded -ne [int]$r.NotMoved){throw 'ARCH6f3a deferred evidence incomplete.'}
+            $deferred+=[int]$r.DeferredRecorded
+            continue
+        }
         if([int]$a.Planned -lt $limit){$status='NoMoreSelectedMessages';break}
     }
     if($verified -ge $MaxMessages){$status='MessageLimitReached'}
-    return [pscustomobject]@{Schema='2.6.5-ARCH6.Sequence.1';Status=$status;Batches=$batches;Verified=$verified;LogicalBytes=$logical;LastTransactionId=$last;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
+    return [pscustomobject]@{Schema='2.6.5-ARCH6.Sequence.1';Status=$status;SkipPolicy=$SkipPolicy;Deferred=$deferred;Batches=$batches;Verified=$verified;LogicalBytes=$logical;LastTransactionId=$last;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
 }
 function Get-OPAARCH6PendingRecord {
     [CmdletBinding()]

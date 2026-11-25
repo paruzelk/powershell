@@ -660,8 +660,12 @@ function Move-OPAItemsWithLimit {
         [switch]$ARCH3mSyntheticForcePart2,
         [switch]$ARCH4Batch,
         [switch]$ARCH5Batch,
-        [switch]$ConfirmComplexAttachments
+        [switch]$ConfirmComplexAttachments,
+        [switch]$ARCH6DeferredPolicy,
+        [string[]]$DeferredEntryIds
     )
+    if($ARCH6DeferredPolicy -and (-not $ARCH5Batch -or $Resume)){throw 'ARCH6f3a requires controlled fresh Archive.'}
+    if($DeferredEntryIds -and -not $ARCH6DeferredPolicy){throw 'ARCH6f3a exclusions require deferred policy.'}
 
     if(($ARCH5Batch -and -not $ARCH4Batch) -or ($ConfirmComplexAttachments -and (-not $ARCH5Batch -or $Limit -gt 10))){throw 'ARCH5 complex attachments require explicit bounded test batch (1..10).'}
 
@@ -784,6 +788,8 @@ function Move-OPAItemsWithLimit {
         $duplicateIds = @($indexEntries | ForEach-Object { [string]$_.SourceEntryId } | Where-Object { $_ } | Select-Object -Unique)
     }
 
+    if($ARCH6DeferredPolicy){$duplicateIds=@($duplicateIds)+@($DeferredEntryIds)}
+
     # --- Candidate pool ---
     if ($Resume) {
         # FIX8: A resumed transaction may move only items persisted in its
@@ -891,6 +897,7 @@ function Move-OPAItemsWithLimit {
             throw ("Resume safety: source folder '{0}' is unavailable; cannot verify planned item '{1}'." -f $folderPath, [string]$candidate.EntryId)
         }
         if ($null -eq $source) {
+            if($ARCH6DeferredPolicy){throw 'ARCH6f3a source folder unavailable.'}
             $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason='SourceFolderUnavailable'; Message='Source folder is no longer available'; Time=(Get-Date).ToString('o')}) | Out-Null
             Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message ("Source folder unavailable: {0}" -f $folderPath) -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
             continue
@@ -903,7 +910,7 @@ function Move-OPAItemsWithLimit {
         # the whole batch (Get-OPAArchiveDestination keeps a throw as backstop).
         if ($itemSize -gt $safeCapacityBytes) {
             $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason='ExceedsArchiveCapacity'; Message="Message size $itemSize bytes exceeds safe archive capacity $safeCapacityBytes bytes"; Time=(Get-Date).ToString('o')}) | Out-Null
-            Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message ("Item exceeds archive capacity and was skipped: {0} ({1} bytes)" -f [string]$candidate.Subject,$itemSize) -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
+            Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message $(if($ARCH6DeferredPolicy){"ARCH6f3a deferred ExceedsArchiveCapacity: Message size $itemSize bytes exceeds safe archive capacity $safeCapacityBytes bytes"}else{"Item exceeds archive capacity and was skipped: {0} ({1} bytes)" -f [string]$candidate.Subject,$itemSize}) -SourceFolderPath $folderPath -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
             continue
         }
 
@@ -935,6 +942,7 @@ function Move-OPAItemsWithLimit {
                     Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'ReconciledFromArchive' -Message 'Verified interrupted Move in destination archive' -EntryId ([string]$candidate.EntryId) -ArchiveEntryId $archiveId -ArchivePst $archivePst -TargetFolderPath ([string]$reconciled.TargetFolderPath) -SourceFolderPath $folderPath -ReceivedTime ([datetime]$candidate.ReceivedTime) -WriteCheckpoint
                     continue
                 }
+                if($ARCH6DeferredPolicy){throw}
                 $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason='Unavailable'; Message=$_.Exception.Message; Time=(Get-Date).ToString('o')}) | Out-Null
                 Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message ("Item unavailable/locked: {0} | {1}" -f [string]$candidate.Subject,$_.Exception.Message) -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
                 continue
@@ -948,6 +956,7 @@ function Move-OPAItemsWithLimit {
                 continue
             }
             if ([int]$item.Class -ne 43) {
+                if($ARCH6DeferredPolicy){throw 'ARCH6f3a selected item class changed.'}
                 $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason='NotMailItem'; Message='Selected object is not a MailItem'; Time=(Get-Date).ToString('o')}) | Out-Null
                 Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message ("Not a MailItem: {0}" -f [string]$candidate.Subject) -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
                 continue
@@ -976,6 +985,7 @@ function Move-OPAItemsWithLimit {
                 }
             }
             catch {
+                if($ARCH6DeferredPolicy){throw}
                 if($ARCH3dSyntheticBoundary){
                     # Intent may already be sealed: never downgrade failure
                     # after destination choice to Skipped or retry another mail.
@@ -1181,8 +1191,12 @@ function Move-OPAItemsWithLimit {
             # remains resumable and the next candidate can continue.
             $reason='Unexpected'
             if($ARCH5Batch -and $_.Exception.Message -match '^ARCH5(?:b)? (AttachmentTypeUnsupported|AttachmentSizeUnsupported|AttachmentExportUnverified|AttachmentCleanupFailed|ArchiveRouteMismatch):'){$reason=$Matches[1]}
+            if($ARCH6DeferredPolicy){
+                $reason=Get-OPAARCH6DeferredReason -Message $_.Exception.Message
+                if(-not $reason){throw}
+            }
             $skippedList.Add([pscustomobject]@{EntryId=[string]$candidate.EntryId; SourceFolderPath=$folderPath; Reason=$reason; Message=$_.Exception.Message; Time=(Get-Date).ToString('o')}) | Out-Null
-            Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message ("Item skipped after unexpected error: {0} | {1}" -f [string]$candidate.Subject,$_.Exception.Message) -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
+            Save-OPAArchiveTransaction -Transaction $Transaction -Status 'Running' -Step 'Skipped' -Message $(if($ARCH6DeferredPolicy){("ARCH6f3a deferred {0}: {1}" -f $reason,$_.Exception.Message)}else{("Item skipped after unexpected error: {0} | {1}" -f [string]$candidate.Subject,$_.Exception.Message)}) -SourceFolderPath $folderPath -EntryId ([string]$candidate.EntryId) -ReceivedTime ([datetime]$candidate.ReceivedTime)
         }
         finally {
             Release-OPAComObject -Object $moved
