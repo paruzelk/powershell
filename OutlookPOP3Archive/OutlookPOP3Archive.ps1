@@ -145,9 +145,10 @@ if ($arch4Requested) {
     if ($Mode -eq 'Archive' -and $OlderThanMonths -eq 0 -and -not $IgnoreAge) {
         throw 'ARCH4 no-age archive requires explicit -IgnoreAge.'
     }
+    $effectiveArchivePstSizeGB=$MaxArchivePstSizeGB
     if($DisableArchivePstSizeLimit){
         if($Mode -ne 'Archive' -or $PSBoundParameters.ContainsKey('MaxArchivePstSizeGB') -or $PSBoundParameters.ContainsKey('SafetyMarginGB')){throw 'ARCH6 disable archive size limit is Archive-only and mutually exclusive with explicit capacity options.'}
-        $MaxArchivePstSizeGB=[double]::PositiveInfinity
+        $effectiveArchivePstSizeGB=[double]::PositiveInfinity
         $SafetyMarginGB=0
     }
     if ($Mode -eq 'Archive' -and ($MaxArchivePstSizeGB -le $SafetyMarginGB -or [double]::IsNaN($MaxArchivePstSizeGB) -or [double]::IsNaN($SafetyMarginGB))) {
@@ -755,7 +756,7 @@ try {
     Write-OPADiscoverySummary -Discovery $discovery
 
     if ($arch4Requested) {
-        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath
+        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath
         return
     }
 
