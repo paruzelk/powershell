@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH6f3c3: [независимый от антивируса пропуск](2.6.5-arch6f3c3.md), CI/live acceptance pending. ARCH6f3d: remaining 190.
+
 > ARCH6f3c1 real acceptance PASS (311/311, no Move). ARCH6f3c2: [antivirus hold](2.6.5-arch6f3c2.md), CI/live acceptance pending; ARCH6f3d remaining 190.
 
 > ARCH6f3c1 DEV: [восстановление 311 из 500](2.6.5-arch6f3c1.md), CI/live acceptance pending; ARCH6f3c2 — антивирусная обработка после завершения текущей транзакции.

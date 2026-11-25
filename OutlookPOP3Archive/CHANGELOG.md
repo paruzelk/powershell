@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH6f3c3 DEV
+
+- ARCH6f3c2 CI PASS; автоматическая ветвь пропуска не зависит от антивируса. Контроль локальности, проверка TEMP и метаданных, предохранитель по завершённой партии. 8 new synthetic tests, 4862/165 expected.
+
 ## ARCH6f3c2 DEV
 
 - ARCH6f3c1 real acceptance: 311 verified/reconciled/indexed, 189 unprocessed, zero Move, pending cleared.

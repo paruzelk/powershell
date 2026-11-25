@@ -13,6 +13,7 @@ BeforeAll {
     . (Join-Path $script:root 'Core/Archive/MailMover.ps1')
     . (Join-Path $script:root 'Core/Archive/ArchiveVerifier.ps1')
     . (Join-Path $script:root 'Core/Archive/ARCH4Batch.ps1')
+    . (Join-Path $script:root 'Core/Archive/ARCH6Orchestration.ps1')
     $script:sourceFolder='\\Fake POP3\Inbox'
     $script:targetFolder='\\Fake Archive\2020\Inbox'
     function New-ARCH4Fixture {
@@ -455,6 +456,91 @@ Describe 'ARCH6f3c2 antivirus evidence and historical hold' {
         Test-Path -LiteralPath $src | Should -BeFalse
         $common.Remove('HistoricalDetectionId')
         {& (Join-Path $script:root 'Invoke-OPAArchiveBatches.ps1') @common} | Should -Throw '*exact EntryID*'
+    }
+}
+
+
+Describe 'ARCH6f3c3 vendor-independent attachment export failure deferral' {
+    BeforeEach {
+        $script:localId='0011223344556677'
+        $script:localMail=[pscustomobject]@{Class=43;EntryID=$script:localId}
+        $script:localAttachment=[pscustomobject]@{Type=1;FileName='fake.doc';Size=100}
+        $localParams=@{Mail=$script:localMail;Attachment=$script:localAttachment;EntryId=$script:localId;AttachmentName='fake.doc';Index=1;AttachmentBytes=100;Workspace=$TestDrive;Exception=[Runtime.InteropServices.COMException]::new('generic save failed',-2147467259)}
+    }
+    It 'classifies a generic Outlook COM export failure without any antivirus provider lookup' {
+        Mock Assert-OPAARCH6ExportWorkspaceHealthy {}
+        Mock Get-OPAARCH6DefenderMatches {throw 'must not query antivirus'}
+        $e=New-OPAARCH6LocalExportEvidence @localParams
+        $e.Reason | Should -BeExactly 'AttachmentExportFailed'
+        $e.MoveAttempted | Should -BeFalse
+        $e.Defender | Should -BeNullOrEmpty
+        $msg=ConvertTo-OPAARCH6LocalExportMessage -Evidence $e
+        Get-OPAARCH6DeferredReason -Message $msg | Should -BeExactly 'AttachmentExportFailed'
+        (ConvertFrom-OPAARCH6LocalExportMessage -Message $msg -ExpectedEntryId $script:localId).ErrorDetail | Should -BeExactly 'generic save failed'
+        ConvertFrom-OPAARCH6LocalExportMessage -Message $msg -ExpectedEntryId '0011223344556688' | Should -BeNullOrEmpty
+        Should -Invoke Get-OPAARCH6DefenderMatches -Exactly -Times 0
+    }
+    It 'classifies missing output separately without claiming a virus' {
+        Mock Assert-OPAARCH6ExportWorkspaceHealthy {}
+        $localParams.Exception=[Exception]::new('no output')
+        $e=New-OPAARCH6LocalExportEvidence @localParams -MissingOutput
+        $e.Reason | Should -BeExactly 'AttachmentPayloadUnavailable'
+        Get-OPAARCH6DeferredReason -Message (ConvertTo-OPAARCH6LocalExportMessage -Evidence $e) | Should -BeExactly 'AttachmentPayloadUnavailable'
+    }
+    It 'never treats disk full access denied or disconnected Outlook as a local skip' {
+        Mock Assert-OPAARCH6ExportWorkspaceHealthy {throw 'unexpected probe'}
+        foreach($code in @(-2147024784,-2147024891,-2147417848,-2147023174)){
+            $localParams.Exception=[Runtime.InteropServices.COMException]::new('system fault',[int]$code)
+            New-OPAARCH6LocalExportEvidence @localParams | Should -BeNullOrEmpty
+        }
+        Should -Invoke Assert-OPAARCH6ExportWorkspaceHealthy -Exactly -Times 0
+    }
+    It 'rejects changed mail identity and changed attachment metadata' {
+        Mock Assert-OPAARCH6ExportWorkspaceHealthy {throw 'unexpected probe'}
+        $script:localMail.EntryID='0011223344556688'
+        New-OPAARCH6LocalExportEvidence @localParams | Should -BeNullOrEmpty
+        $script:localMail.EntryID=$script:localId
+        $script:localAttachment.Size=101
+        New-OPAARCH6LocalExportEvidence @localParams | Should -BeNullOrEmpty
+        Should -Invoke Assert-OPAARCH6ExportWorkspaceHealthy -Exactly -Times 0
+    }
+    It 'stops when workspace write or cleanup health check fails' {
+        Mock Assert-OPAARCH6ExportWorkspaceHealthy {throw 'workspace probe failed'}
+        {New-OPAARCH6LocalExportEvidence @localParams} | Should -Throw '*workspace probe failed*'
+    }
+    It 'preserves explicit Windows virus codes without querying Defender' {
+        Mock Assert-OPAARCH6ExportWorkspaceHealthy {}
+        Mock Get-OPAARCH6DefenderMatches {throw 'must not query antivirus'}
+        $localParams.Exception=[Runtime.InteropServices.COMException]::new('deleted',-2147024670)
+        $e=New-OPAARCH6LocalExportEvidence @localParams
+        $e.Reason | Should -BeExactly 'AttachmentQuarantined'
+        Get-OPAARCH6DeferredReason -Message (ConvertTo-OPAARCH6LocalExportMessage -Evidence $e) | Should -BeExactly 'AttachmentQuarantined'
+        Should -Invoke Get-OPAARCH6DefenderMatches -Exactly -Times 0
+    }
+    It 'only permits the real attachment witness missing-output deferral on explicit pre-Move opt-in' {
+        $a=$script:localAttachment
+        $a | Add-Member ScriptMethod SaveAsFile {param($path) }
+        $collection=[pscustomobject]@{Count=1;FakeAttachment=$a}
+        $collection | Add-Member ScriptMethod Item {param($i) $this.FakeAttachment}
+        $mail=$script:localMail
+        $mail | Add-Member NoteProperty Attachments $collection
+        Mock Assert-OPAARCH6ExportWorkspaceHealthy {}
+        {Get-OPA265ARCH2bAttachmentWitnesses -Mail $mail -ExtendedAttachmentWitness -TemporaryDirectory $TestDrive} | Should -Throw '*SaveAsFile did not create a file*'
+        $message=''
+        try{Get-OPA265ARCH2bAttachmentWitnesses -Mail $mail -ExtendedAttachmentWitness -AllowLocalExportDeferral -TemporaryDirectory $TestDrive}
+        catch{$message=$_.Exception.Message}
+        Get-OPAARCH6DeferredReason -Message $message | Should -BeExactly 'AttachmentPayloadUnavailable'
+        @(Get-ChildItem -LiteralPath $TestDrive -Directory -Filter 'OPA-ARCH2c1-*').Count | Should -Be 0
+    }
+    It 'stops only after the verified batch for a high proportion of generic export failures' {
+        $result=[pscustomobject]@{Planned=20;SkipReasons=@([pscustomobject]@{Reason='AttachmentExportFailed';Count=10})}
+        Test-OPAARCH6ExportFailureBurst -Result $result | Should -BeTrue
+        $result.Planned=500
+        Test-OPAARCH6ExportFailureBurst -Result $result | Should -BeFalse
+        $result.Planned=10;$result.SkipReasons[0].Count=9
+        Test-OPAARCH6ExportFailureBurst -Result $result | Should -BeFalse
+        $result.SkipReasons[0].Count=10;$result.SkipReasons[0].Reason='AttachmentBlockedByAntivirus'
+        Test-OPAARCH6ExportFailureBurst -Result $result | Should -BeFalse
     }
 }
 
