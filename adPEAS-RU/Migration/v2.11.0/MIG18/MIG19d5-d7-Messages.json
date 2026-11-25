@@ -1,0 +1,172 @@
+{
+  "common": {
+    "Error: $_": "Ошибка: $_",
+    "Starting check": "Начата проверка",
+    "Check completed": "Проверка завершена",
+    "Current userAccountControl: $CurrentUAC (0x$($CurrentUAC.ToString('X')))": "Текущее значение userAccountControl: $CurrentUAC (0x$($CurrentUAC.ToString('X')))",
+    "New userAccountControl: $NewUAC (0x$($NewUAC.ToString('X')))": "Новое значение userAccountControl: $NewUAC (0x$($NewUAC.ToString('X')))",
+    "Domain: $Domain": "Домен: $Domain",
+    "Using filter: $Filter": "Используется фильтр: $Filter",
+    "GPO version increment failed: $($versionResult.Message)": "Не удалось увеличить версию GPO: $($versionResult.Message)",
+    "No Configuration NC available": "Раздел Configuration NC недоступен",
+    "Error parsing $($file.FullName): $_": "Ошибка разбора $($file.FullName): $_",
+    "ACL modification failed - this may be an AD CS LDAP limitation": "Не удалось изменить ACL — возможно, это ограничение LDAP в AD CS",
+    "Kerberos authentication completed successfully": "Аутентификация Kerberos успешно завершена",
+    "Server: $Server": "Сервер: $Server",
+    "LDAP Filter: $filter": "Фильтр LDAP: $filter",
+    "No LDAP connection - returning null": "Нет подключения LDAP — возвращается null",
+    "SYSVOL path not accessible: $sysvolPath": "Путь SYSVOL недоступен: $sysvolPath",
+    "Reading: $($file.FullName)": "Чтение: $($file.FullName)",
+    "Ticket imported successfully": "Билет успешно импортирован",
+    "Using GC connection for cross-domain query": "Для междоменного запроса используется соединение GC",
+    "Object not found: $Identity": "Объект не найден: $Identity",
+    "Target OU: $TargetOU": "Целевое OU: $TargetOU",
+    "Failed: $($_.Exception.Message)": "Ошибка: $($_.Exception.Message)",
+    "Error parsing: $_": "Ошибка разбора: $_",
+    "Saved to: $outputPath": "Сохранено в: $outputPath",
+    "Using PowerShell fallback for etype $EncryptionType": "Используется резервный вариант PowerShell для etype $EncryptionType",
+    "Scan was aborted due to invalid LDAP session. No reports were generated.": "Аудит прерван из-за недействительного сеанса LDAP. Отчёты не сформированы.",
+    "Re-authenticate with Connect-adPEAS and try again.": "Повторно выполните аутентификацию через Connect-adPEAS и повторите попытку.",
+    "Check '$CheckName' failed: $_": "Ошибка проверки '$CheckName': $_",
+    "Could not read $($polFile.FullName): $($_.Exception.Message)": "Не удалось прочитать $($polFile.FullName): $($_.Exception.Message)",
+    "Error parsing $($xmlFile.Fullname): $_": "Ошибка разбора $($xmlFile.Fullname): $_",
+    "Error parsing $($polFile.FullName): $_": "Ошибка разбора $($polFile.FullName): $_",
+    "Decoded VBE file: $($file.Name)": "Декодирован файл VBE: $($file.Name)",
+    "Failed to decode VBE file: $($file.Name)": "Не удалось декодировать файл VBE: $($file.Name)",
+    "Error analyzing $($file.Name): $_": "Ошибка анализа $($file.Name): $_",
+    "Error parsing $FilePath : $_": "Ошибка разбора $FilePath : $_",
+    "Output directory specified, using: $OutputPath": "Используется заданный каталог вывода: $OutputPath",
+    "Username: $Username": "Имя пользователя: $Username",
+    "ForceSimpleBind specified, skipping Kerberos": "Задан ForceSimpleBind, Kerberos пропущен",
+    "Stored credential in LDAPContext for later use": "Учётные данные сохранены в LDAPContext для дальнейшего использования",
+    "Exception details: $($_.Exception.Message)": "Подробности исключения: $($_.Exception.Message)",
+    "Returning all templates instead.": "Вместо этого возвращаются все шаблоны.",
+    "Generated random password": "Сгенерирован случайный пароль",
+    "Password set via unicodePwd ModifyRequest": "Пароль задан через unicodePwd ModifyRequest",
+    "Falling back to DirectoryEntry SetPassword": "Переход к DirectoryEntry SetPassword",
+    "Cleaned up orphaned object": "Удалён оставшийся без связи объект",
+    "Password set via DirectoryEntry SetPassword": "Пароль задан через DirectoryEntry SetPassword",
+    "Cleaned up orphaned object after password failure": "После ошибки установки пароля удалён оставшийся объект",
+    "Account enabled": "Учётная запись включена",
+    "Consolidated to $($SYSVOLACEData.Count) unique ACEs": "Объединено в уникальные ACE: $($SYSVOLACEData.Count)",
+    "Warning: Could not add ACE for $($aceData.TrusteeSID): $_": "Предупреждение: не удалось добавить ACE для $($aceData.TrusteeSID): $_",
+    "Revision: $CurrentRevision -> $NewRevision": "Ревизия: $CurrentRevision -> $NewRevision",
+    "Successfully incremented revision to $NewRevision": "Ревизия успешно увеличена до $NewRevision",
+    "Found target: $TargetDN": "Найден целевой объект: $TargetDN",
+    "Failed to resolve member '$MemberIdentity': $_": "Не удалось разрешить участника '$MemberIdentity': $_",
+    "Cross-domain detected: user in '$UserRealm' (FQDN), target '$Domain'": "Обнаружено междоменное подключение: пользователь в '$UserRealm' (FQDN), цель '$Domain'",
+    "Cross-domain detected: user in '$UserRealm' (NetBIOS), target '$Domain'": "Обнаружено междоменное подключение: пользователь в '$UserRealm' (NetBIOS), цель '$Domain'",
+    "Cross-domain detected: user UPN realm '$UserRealm', target '$Domain'": "Обнаружено междоменное подключение: область UPN пользователя '$UserRealm', цель '$Domain'",
+    "Current msPKI-Certificate-Name-Flag: $CurrentFlags (0x$($CurrentFlags.ToString('X')))": "Текущее значение msPKI-Certificate-Name-Flag: $CurrentFlags (0x$($CurrentFlags.ToString('X')))",
+    "New msPKI-Certificate-Name-Flag: $NewFlags (0x$($NewFlags.ToString('X'))) - All other flags cleared (ENROLLEE_SUPPLIES_SUBJECT is exclusive)": "Новое значение msPKI-Certificate-Name-Flag: $NewFlags (0x$($NewFlags.ToString('X'))) — все остальные флаги сброшены (ENROLLEE_SUPPLIES_SUBJECT является исключительным)",
+    "Current msPKI-Enrollment-Flag: $CurrentFlags (0x$($CurrentFlags.ToString('X')))": "Текущее значение msPKI-Enrollment-Flag: $CurrentFlags (0x$($CurrentFlags.ToString('X')))",
+    "New msPKI-Enrollment-Flag: $NewFlags (0x$($NewFlags.ToString('X')))": "Новое значение msPKI-Enrollment-Flag: $NewFlags (0x$($NewFlags.ToString('X')))",
+    "New msPKI-Certificate-Name-Flag: $NewFlags (0x$($NewFlags.ToString('X')))": "Новое значение msPKI-Certificate-Name-Flag: $NewFlags (0x$($NewFlags.ToString('X')))",
+    "Current pKIExtendedKeyUsage (${CurrentEKU.Count} items): $($CurrentEKU -join ', ')": "Текущее значение pKIExtendedKeyUsage (элементов: ${CurrentEKU.Count}): $($CurrentEKU -join ', ')",
+    "New pKIExtendedKeyUsage (${NewEKU.Count} items): $($NewEKU -join ', ')": "Новое значение pKIExtendedKeyUsage (элементов: ${NewEKU.Count}): $($NewEKU -join ', ')",
+    "Current msDS-AllowedToDelegateTo ($($CurrentSPNs.Count)): $($CurrentSPNs -join ', ')": "Текущее значение msDS-AllowedToDelegateTo ($($CurrentSPNs.Count)): $($CurrentSPNs -join ', ')",
+    "New msDS-AllowedToDelegateTo ($($NewSPNs.Count)): $($NewSPNs -join ', ')": "Новое значение msDS-AllowedToDelegateTo ($($NewSPNs.Count)): $($NewSPNs -join ', ')",
+    "Current gPLink: $currentGPLink": "Текущее значение gPLink: $currentGPLink",
+    "New gPLink: $newGPLink": "Новое значение gPLink: $newGPLink",
+    "Current groupType: $CurrentGroupType (0x$($CurrentGroupType.ToString('X')))": "Текущее значение groupType: $CurrentGroupType (0x$($CurrentGroupType.ToString('X')))",
+    "New groupType: $NewGroupType (0x$($NewGroupType.ToString('X')))": "Новое значение groupType: $NewGroupType (0x$($NewGroupType.ToString('X')))",
+    "Current SPNs ($($CurrentSPNs.Count)): $($CurrentSPNs -join ', ')": "Текущее значение SPNs ($($CurrentSPNs.Count)): $($CurrentSPNs -join ', ')",
+    "New SPNs ($($NewSPNs.Count)): $($NewSPNs -join ', ')": "Новое значение SPNs ($($NewSPNs.Count)): $($NewSPNs -join ', ')"
+  },
+  "reports": {
+    "src/modules/Reporting/Compare-adPEASReport.ps1": {
+      "[Compare-adPEASReport] Starting report comparison": "[Compare-adPEASReport] Начато сравнение отчётов",
+      "[Compare-adPEASReport] Baseline file not found: $Baseline": "[Compare-adPEASReport] Не найден исходный файл: $Baseline",
+      "[Compare-adPEASReport] Current file not found: $Current": "[Compare-adPEASReport] Не найден текущий файл: $Current",
+      "[Compare-adPEASReport] Invalid JSON file ($($entry.Name)): $($entry.Path)": "[Compare-adPEASReport] Некорректный файл JSON ($($entry.Name)): $($entry.Path)",
+      "[Compare-adPEASReport] Unsupported cache version $($entry.Cache.CacheVersion) in $($entry.Name): $($entry.Path)": "[Compare-adPEASReport] Неподдерживаемая версия кэша $($entry.Cache.CacheVersion) в $($entry.Name): $($entry.Path)",
+      "[Compare-adPEASReport] Domain mismatch: Baseline='$($baselineMeta.Domain)' vs Current='$($currentMeta.Domain)'": "[Compare-adPEASReport] Домены не совпадают: исходный='$($baselineMeta.Domain)', текущий='$($currentMeta.Domain)'",
+      "[Compare-adPEASReport] Comparison results may not be meaningful across different domains": "[Compare-adPEASReport] Результаты сравнения разных доменов могут быть некорректными",
+      "[Compare-adPEASReport] $($entry.Name) is from an interrupted scan covering only: $covered": "[Compare-adPEASReport] $($entry.Name) получен из прерванного аудита, охватившего только: $covered",
+      "[Compare-adPEASReport] Findings from modules it never ran will appear as resolved": "[Compare-adPEASReport] Находки из незапущенных модулей будут отображаться как устранённые",
+      "[Compare-adPEASReport] Error generating HTML diff report: $_": "[Compare-adPEASReport] Ошибка формирования HTML-отчёта сравнения: $_",
+      "[Compare-adPEASReport] Comparison completed": "[Compare-adPEASReport] Сравнение завершено",
+      "[Export-DiffHtmlReport] HTML diff report saved to: $OutputPath": "[Export-DiffHtmlReport] HTML-отчёт сравнения сохранён в: $OutputPath",
+      "[Get-DiffHTMLTemplate] Loading diff template from file (development mode)": "[Get-DiffHTMLTemplate] Загрузка шаблона сравнения из файла (режим разработки)",
+      "[Get-DiffHTMLTemplate] Diff template not found at: $diffTemplatePath": "[Get-DiffHTMLTemplate] Не найден шаблон сравнения: $diffTemplatePath"
+    },
+    "src/modules/Reporting/Export-HTMLReport.ps1": {
+      "[Export-HTMLReport] Starting HTML report generation": "[Export-HTMLReport] Начато формирование HTML-отчёта",
+      "[Export-HTMLReport] No findings collected. HTML report will be empty.": "[Export-HTMLReport] Результаты проверок отсутствуют. HTML-отчёт будет пустым.",
+      "[Export-HTMLReport] Processing $($findings.Count) findings": "[Export-HTMLReport] Обрабатываются результаты проверок: $($findings.Count)",
+      "[Export-HTMLReport] Report saved to: $OutputPath": "[Export-HTMLReport] Отчёт сохранён в: $OutputPath",
+      "[Get-HTMLTemplate] Loading templates from separate files (development mode)": "[Get-HTMLTemplate] Загрузка шаблонов из отдельных файлов (режим разработки)",
+      "[Get-HTMLTemplate] Template files not found at: $templatesDir": "[Get-HTMLTemplate] Файлы шаблонов не найдены в: $templatesDir",
+      "[Get-HTMLTemplate] Either run from source directory or build the project first.": "[Get-HTMLTemplate] Запустите из каталога исходников или сначала соберите проект."
+    }
+  },
+  "comparisonLabels": {
+    "adPEAS Report Comparison": "Сравнение отчётов adPEAS",
+    "Comparison Summary": "Сводка сравнения",
+    "New findings (added)": "Новые находки (добавлены)",
+    "Remediated findings (removed)": "Устранённые находки (исчезли)",
+    "Changed findings": "Изменённые находки",
+    "Unchanged findings": "Находки без изменений",
+    "Compared categories": "Сравниваемые категории",
+    "New Findings ($($added.Count))": "Новые находки ($($added.Count))",
+    "Remediated Findings ($($removed.Count))": "Устранённые находки ($($removed.Count))",
+    "Changed Findings ($($changed.Count))": "Изменённые находки ($($changed.Count))",
+    "Scan Scope Differences": "Различия в области аудита"
+  },
+  "synopsis": [
+    [
+      "Get-DomainUser",
+      "Get-DomainUser",
+      "Retrieves user objects from Active Directory (wrapper for Get-DomainObject).",
+      "Получает объекты пользователей Active Directory (обёртка Get-DomainObject)."
+    ],
+    [
+      "Get-DomainComputer",
+      "Get-DomainComputer",
+      "Central function for querying computer objects from Active Directory.",
+      "Основная функция запроса объектов компьютеров Active Directory."
+    ],
+    [
+      "Get-DomainGroup",
+      "Get-DomainGroup",
+      "Central function for querying group objects from Active Directory.",
+      "Основная функция запроса объектов групп Active Directory."
+    ],
+    [
+      "Get-DomainObject",
+      "Get-DomainObject",
+      "Universal function for querying ANY Active Directory object.",
+      "Универсальная функция запроса объектов Active Directory любого типа."
+    ],
+    [
+      "Get-DomainGPO",
+      "Get-DomainGPO",
+      "Central function for querying Group Policy Objects from Active Directory.",
+      "Основная функция запроса объектов групповых политик Active Directory."
+    ],
+    [
+      "Get-CertificateTemplate",
+      "Get-CertificateTemplate",
+      "Retrieves ADCS certificate templates from Active Directory.",
+      "Получает шаблоны сертификатов AD CS из Active Directory."
+    ],
+    [
+      "Get-DomainDNSRecord",
+      "Get-DomainDNSRecord",
+      "Reads the address records of Active Directory-integrated DNS zones over LDAP.",
+      "Читает адресные записи DNS-зон, интегрированных в Active Directory, через LDAP."
+    ],
+    [
+      "Get-DomainDNSRecord",
+      "Get-DomainDNSZone",
+      "Lists the forward lookup zones stored in Active Directory.",
+      "Перечисляет зоны прямого просмотра DNS, хранящиеся в Active Directory."
+    ],
+    [
+      "Get-CertificateAuthority",
+      "Get-CertificateAuthority",
+      "Retrieves Active Directory Certificate Services (AD CS) Certificate Authorities.",
+      "Получает центры сертификации служб сертификатов Active Directory (AD CS)."
+    ]
+  ]
+}
