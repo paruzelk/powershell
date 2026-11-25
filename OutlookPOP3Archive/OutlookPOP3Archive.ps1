@@ -3,6 +3,10 @@ param(
     [ValidateSet('Auto','Analyze','Plan','Archive','Resume')]
     [string]$Mode = 'Analyze',
 
+    # ARCH7e DEV Auto only: every discovered POP3 PST must be approved for testing.
+    [switch]$ConfirmDevAutoArchive,
+    [ValidateRange(1,100)][int]$AutoDevMaxBatches=100,
+
     [string]$ProfileName,
     [string]$Transaction,
 
@@ -138,6 +142,27 @@ $ErrorActionPreference = 'Stop'
 # worker integration flags do not disable the direct legacy COM writer.
 # Read-only Analyze and Plan remain available, but no production permit.
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH2aMoveOutcomeFence.ps1')
+if($ConfirmDevAutoArchive){
+    $allowed=@('Mode','ConfirmDevAutoArchive','ProfileName','Limit','AutoDevMaxBatches','OlderThanMonths','ArchiveGrouping','DisableStoragePolicy','DisableArchivePstSizeLimit','IncludeRootMail','DurabilityMode','AutoMaxResumeAttempts','WhatIf')
+    foreach($key in $PSBoundParameters.Keys){if($key -notin $allowed){throw ('ARCH7e unsupported Auto DEV parameter: '+$key)}}
+    if($Mode -ne 'Auto' -or $OlderThanMonths -lt 1 -or $ArchiveGrouping -eq 'None' -or $Limit -gt 10 -or $AutoMaxResumeAttempts -gt 10 -or
+       ($PSBoundParameters.ContainsKey('DisableStoragePolicy') -and -not $DisableStoragePolicy) -or
+       ($PSBoundParameters.ContainsKey('DisableArchivePstSizeLimit') -and -not $DisableArchivePstSizeLimit) -or
+       ($PSBoundParameters.ContainsKey('DurabilityMode') -and $DurabilityMode -ne 'Safe')){
+        throw 'ARCH7e requires age-only Auto DEV, batch 1..10, Safe, disabled storage/archive size policy.'
+    }
+    $devBatch=if($Limit -eq 0){10}else{$Limit}
+    $devRoot=if($PSBoundParameters.ContainsKey('IncludeRootMail')){[bool]$IncludeRootMail}else{$true}
+    if($PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5 -or [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -ne 'STA'){throw 'ARCH7e requires Windows PowerShell 5.1 STA.'}
+    if($WhatIf){
+        [pscustomobject]@{Schema='2.6.5-ARCH7e.WhatIf.1';Status='NoOutlookOrPersistentWrites';Mode='Auto';ProfileName=$ProfileName;BatchSize=$devBatch;MaxBatchesPerSource=$AutoDevMaxBatches;OlderThanMonths=$OlderThanMonths;ArchiveGrouping=$ArchiveGrouping;IncludeRootMail=$devRoot;DisableStoragePolicy=$true;DisableArchivePstSizeLimit=$true;DurabilityMode='Safe';AllDiscoveredPop3TestConsent=$true;ProductionReady=$false}
+        return
+    }
+    . (Join-Path $PSScriptRoot 'Core/Archive/ARCH7eAuto.ps1')
+    Invoke-OPAARCH7eAuto -ProjectRoot $PSScriptRoot -ProfileName $ProfileName -BatchSize $devBatch -MaxBatchesPerSource $AutoDevMaxBatches -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -IncludeRootMail:$devRoot -MaxResumeAttempts $AutoMaxResumeAttempts
+    return
+}
+if($PSBoundParameters.ContainsKey('AutoDevMaxBatches')){throw 'ARCH7e AutoDevMaxBatches requires ConfirmDevAutoArchive.'}
 if($HistoricalThreatEntryId -or $HistoricalDetectionId -or $HistoricalAttachmentName){
     if(-not $ImportDeferredTransaction -or $HistoricalThreatEntryId -notmatch '^[0-9a-fA-F]{16,2048}$' -or $HistoricalDetectionId -notmatch '^\{?[0-9a-fA-F-]{36}\}?$' -or -not $HistoricalAttachmentName -or $HistoricalAttachmentName.Length -gt 1024){throw 'ARCH6f3c2 requires historical transaction, exact EntryID, DetectionID and attachment name.'}
     [void][guid]::Parse($HistoricalDetectionId)
@@ -393,7 +418,7 @@ if ($WorkerPilot) {
 
 
 if($arch4Requested){
-    $build='2.6.5-ARCH7d2 DEV'
+    $build='2.6.5-ARCH7e DEV'
     $buildPath=Join-Path $PSScriptRoot 'BUILD-INFO.json'
     if(Test-Path -LiteralPath $buildPath -PathType Leaf){
         try{
