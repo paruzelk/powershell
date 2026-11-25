@@ -1,17 +1,17 @@
-# adPEAS-RU 2.11.0 MIG19bc — быстрый старт и все параметры
+# adPEAS-RU 2.11.0 MIG19d — быстрый старт и все параметры
 
-**MIG19bc PREVIEW.** Консольный стартовый экран и строгая проверка загрузки пяти вариантов; результат определяется CI. Исправлены метаданные EXE; окончательная проверка выполняется в CI. Сборка из исходников MIG1–MIG17; статус компиляции и проверок определяется результатами GitHub Actions и файлами `2.11.0-mig18-source.json`, `2.11.0-mig18-build.json`. Это не окончательный релиз и не сертификат проверки в реальном AD.
+**MIG19d PREVIEW.** Консольный стартовый экран и строгая проверка загрузки пяти вариантов; результат определяется CI. Исправлены метаданные EXE; окончательная проверка выполняется в CI. Сборка из исходников MIG1–MIG17; статус компиляции и проверок определяется результатами GitHub Actions и файлами `2.11.0-mig18-source.json`, `2.11.0-mig18-build.json`. Это не окончательный релиз и не сертификат проверки в реальном AD.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
 
 ~~~powershell
 cd 'C:\Tools\adPEAS-RU\candidate'
 Import-Module .\adPEAS.ps1 -Force
-Invoke-adPEAS -Domain example.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG19bc' -Format All
+Invoke-adPEAS -Domain example.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG19d' -Format All
 Disconnect-adPEAS
 ~~~
 
-Создаются AD-Audit-MIG19bc.html, AD-Audit-MIG19bc.txt и AD-Audit-MIG19bc.json.
+Создаются AD-Audit-MIG19d.html, AD-Audit-MIG19d.txt и AD-Audit-MIG19d.json.
 Outputfile принимает имя без расширения.
 
 **LDAPS с проверкой сертификата:**
