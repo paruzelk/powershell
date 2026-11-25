@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH7b2 DEV: explicit test pending identity with JSON readback; legacy restart rejects live pending before Outlook access. 4872/165 expected, 58 focused, production closed.",
     "ARCH7b1 DEV: fix missing original folder adapter in focused Pester setup; no execution of main CLI; same 4871/165 expected, 57 focused, runtime guards unchanged.",
     "ARCH7b DEV: separate PowerShell STA verification with same live Outlook; explicit bounded test only, attach-only, original full verification and durable journal/index gates; 4871/165 expected. Auto/production closed.",
     "ARCH6f3c3 DEV: vendor-independent pre-Move attachment export deferral, health checks, no antivirus provider query on automatic path, completed-batch burst guard. 4862/165 expected. Production closed.",
@@ -120,7 +121,7 @@
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
     "ExpectedTestContainers": 165,
-    "ExpectedPesterTests": 4871,
+    "ExpectedPesterTests": 4872,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

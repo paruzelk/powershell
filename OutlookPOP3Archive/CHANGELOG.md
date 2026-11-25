@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7b2 DEV
+
+- Explicit synthetic Pending record with JSON roundtrip, legacy restart rejects tagged pending before Outlook access. One additional regression, 4872/165 expected, 58 focused. Identity checks unchanged.
+
 ## ARCH7b1 DEV
 
 - Fix two focused tests failing before verification (missing Get-OPAPop3SourceFolders): load only the original function declaration from the main script AST; no CLI/COM execution. 4871/165 and 57 focused tests unchanged; production gates unchanged.
