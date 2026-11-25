@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH7c1 DEV: fix test fixture stream closure before disk replay; explicit unresolved claim, torn tail and malformed JSON assertions. Runtime unchanged except DEV banner. 4881/165 expected, 67 focused; production closed.",
     "ARCH7c DEV: operator reported ARCH7b3 real 4/4 verified without Outlook restart; explicit recovery-only mixed returned/deferred prefix and unprocessed suffix, strict journal/index/ledger proof, optional natural Outlook restart; no uncertain Move replay. 4881/165 expected, 67 focused. Production closed.",
     "ARCH7b3 DEV: restore required base-build documentation header after ARCH7b2 58/58 focused PASS; same 4872/165 expected. No archive code or test changes except DEV banner.",
     "ARCH7b2 DEV: explicit test pending identity with JSON readback; legacy restart rejects live pending before Outlook access. 4872/165 expected, 58 focused, production closed.",

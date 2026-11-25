@@ -759,11 +759,29 @@ Describe 'ARCH7c recover proven interrupted mixed live batches' {
     }
     It 'does not treat an unresolved claim or a torn journal as an unprocessed item' {
         $f=New-ARCH7cMixedFixture
-        $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $f.Transaction))
-        {Get-OPAARCH4ReturnedState -Transaction $f.Transaction -Steps @($steps | Select-Object -SkipLast 1) -Events $f.Events -SourceStoreId STORE} | Should -Throw
-        $path=Get-OPAStepJournalPath -Transaction $f.Transaction
-        [IO.File]::AppendAllText($path,'{"Step":"Move Started"}')
-        {Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE} | Should -Throw '*incomplete tail*'
+        $tx=$f.Transaction
+        $path=Get-OPAStepJournalPath -Transaction $tx
+        # Simulate the former writer exiting before independent disk replay.
+        Sync-OPAStepJournalStreams
+        Close-OPAStepJournalStreams
+        $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE
+        $state.Returned | Should -Be 2
+        $state.Reconciled | Should -Be 0
+        $steps=@(Read-OPAARCH4StepRecords -Path $path)
+        $steps[-1].Step | Should -BeExactly 'ARCH4 Move Returned'
+        # Remove exactly the last receipt while retaining its original claim.
+        {Get-OPAARCH4ReturnedState -Transaction $tx -Steps @($steps | Select-Object -SkipLast 1) -Events $f.Events -SourceStoreId STORE} | Should -Throw '*unresolved claim*'
+        # Append an unterminated JSON record to the actual fixture journal.
+        [IO.File]::AppendAllText($path,'{"Step":"Move Started"}',[Text.UTF8Encoding]::new($false))
+        $bytes=[IO.File]::ReadAllBytes($path)
+        $bytes[-1] | Should -Not -Be 10
+        {Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE} | Should -Throw '*incomplete tail*'
+        # Also reject complete-line malformed JSON, not just a missing newline.
+        [IO.File]::AppendAllText($path,([string][char]10+'{"Step":'+[char]10),[Text.UTF8Encoding]::new($false))
+        $bytes=[IO.File]::ReadAllBytes($path)
+        $bytes[-1] | Should -Be 10
+        {Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId STORE} | Should -Throw
+        @(Get-ChildItem -LiteralPath ([IO.Path]::GetDirectoryName($tx.Path)) -Filter 'ARCH6-deferred-*.jsonl').Count | Should -Be 0
     }
     It 'accepts a durable plan before the first Move and leaves all items unprocessed' {
         $f=New-ARCH4Fixture -Count 3 -Returned 0

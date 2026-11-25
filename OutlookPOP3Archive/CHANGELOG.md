@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7c1 DEV
+
+- ARCH7c CI 45623183810 passed 66/67 focused; unresolved-claim/torn-journal test failed on an open fixture stream before assertions. Flush and close the stream, assert baseline disk replay, require exact unresolved-claim and incomplete-tail errors, also exercise malformed complete-line JSON. No runtime recovery algorithm changes. 4881/165 expected, 67 focused.
+
 ## ARCH7c DEV
 
 - Accept operator-reported real ARCH7b3 4/4 same Outlook PID 7660, distinct workers 13876/8396, no Move on Resume, pending cleared. Add explicit recovery-only Resume of durable returned/skipped prefix with zero or more receipts; retain exact journal/index/deferred readback. Natural Outlook restart permitted only in explicit recovery mode; no Outlook activation or shutdown. Unresolved claims remain blocked. Nine tests, 4881/165 expected, 67 focused.

@@ -1,10 +1,10 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7c DEV
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7c1 DEV
 
 ## Актуальный запуск и документация
 
-Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7c — идентификатор DEV-сборки.
+Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7c1 — идентификатор DEV-сборки.
 
-25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c — [восстановление прерванной партии](docs/2.6.5-arch7c.md), CI/live acceptance pending. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
+25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — [восстановление прерванной партии](docs/2.6.5-arch7c.md): ARCH7c 66/67 focused PASS, исправлено закрытие потока тестового журнала, повторный CI/live acceptance pending. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
 
 - [ARCH7c — восстановление и точный пример Resume](docs/2.6.5-arch7c.md)
 - [Целевой Auto и аудит](docs/ARCH7a-AUTO-REQUIREMENTS.md)
