@@ -1,4 +1,6 @@
-﻿# Конфигурация — 2.6.3-PREVIEW1 / ARCH7d2 DEV
+﻿# Конфигурация — 2.6.3-PREVIEW1 / ARCH7e DEV
+
+ARCH7e: `-Mode Auto -ConfirmDevAutoArchive` — явное тестовое разрешение на все обнаруженные POP3. Возраст 12, YearQuarter, Safe, root true, обе размерные политики отключены; DEV batch 10, до 100 вызовов на источник. [Полные параметры](2.6.5-arch7e.md). Целевые production defaults не открыты.
 
 Контроллер отдельных worker — [ARCH7d, параметры и примеры](2.6.5-arch7d.md). Не является production Auto.
 

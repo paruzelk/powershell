@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH7e DEV: ARCH7d2 CI 45633319867 PASS 4898/165, ZIP SHA256 5fdaeda028086f07f1dff029e23c6ebf5e2acdba1871772132185027183dddfe; REAL PASS 20261125-173959-49d4a7fb, planned 10, verified/reconciled/indexed 2, deferred AV 1, unprocessed 7, MoveInvocations=0, PendingCleared=True, same Outlook 7660. ARCH7c/d accepted, no repeat. ARCH7e guarded all-POP3 age-only Auto, 10/100 cap, shared directory pending owner first, separate source statuses. CI 4909/165 expected; live multi-source and production gate pending. [Runbook](2.6.5-arch7e.md).
+
 > ARCH7d2 DEV: ARCH7d1 CI 45628829292 PASS 4895/165, ZIP SHA256 6f9bee74570bb5f8815f191be6bdbeed17bebed0bd0a354a8342a965a72c22ed. Operator WhatIf PASS; real call failed before launch due to $archive/$Archive dynamic scope. Fix prefixed callback captures, add three public-controller tests with separate real STA children and fake main. 4898/165 expected, 84 focused. Combined real acceptance still pending.
 
 > ARCH7d1 DEV: ARCH7d CI 45627946366 78/79 focused, real STA child ExitCode was null. Cache process handle before wait, read exact CLR Int32 exit code, stop on unknown code, add failed child and missing-code regressions. 4895/165 expected, 81 focused. Combined real acceptance still pending.

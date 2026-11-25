@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH7e DEV: ARCH7d2 CI 4898/165 and operator mixed real recovery PASS. Explicit all-POP3 test Auto gate, attach-only discovery, age-only defaults, bounded per-source supervision and exact shared-directory pending owner routing. 4909/165 expected, 95 focused. Production closed.",
     "ARCH7d2 DEV: ARCH7d1 CI 4895/165 PASS, operator real callback binding failed before launch; isolate dynamic callback variables and test actual public controller with real children and synthetic main. 4898/165 expected, 84 focused; production closed.",
     "ARCH7d1 DEV: retain process handle before wait, read CLR Int32 exit code; stop on unavailable code. Two new regression tests; 4895/165 expected, 81 focused, real acceptance pending.",
     "ARCH7d DEV: ARCH7c1 4881/165 PASS; bounded separate STA child supervisor, recovery-only retries, encoded Unicode parameters, explicit post-receipt fault point. No Outlook restart or worker kill. 4893/165 expected, 79 focused; real combined acceptance pending.",
@@ -127,7 +128,7 @@
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
     "ExpectedTestContainers": 165,
-    "ExpectedPesterTests": 4898,
+    "ExpectedPesterTests": 4909,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

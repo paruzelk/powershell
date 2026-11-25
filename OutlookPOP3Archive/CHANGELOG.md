@@ -1,5 +1,10 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7e DEV
+
+- ARCH7d2 CI 45633319867 PASS 4898/165; operator real accepted mixed recovery 20261125-173959-49d4a7fb: 2 verified/reconciled/indexed, 1 AV deferred, 7 unprocessed, distinct worker 7576/5924, same Outlook 7660, pending cleared, Resume MoveInvocations=0. No repeat.
+- Explicit ConfirmDevAutoArchive gate routes Mode Auto to attach-only direct POP3 discovery and accepted per-source supervisor, age-only defaults, root mail, no source-size gate, no utility archive cap, Safe. Bounded 10/100, source-group pending ownership and fail-closed partial statuses; same-directory peers block together if pending unresolved; no migration. 11 new tests, including public main/controller with fake COM discovery and real children. 4909/165 expected, 95 focused. No production permission.
+
 ## ARCH7d2 DEV
 
 - ARCH7d1 CI 45628829292 PASS 4895/165. Operator WhatIf PASS, real controller failed before launching Archive: dynamically scoped $Archive callback shadowed $archive Hashtable. Use distinct controller-prefixed capture names; no archive/recovery algorithm changes. Add three public-controller integration tests using unchanged copied controller/supervisor, real STA children and temporary fake main/PST only; normal, controlled interruption, RecoverOnly without pending. 4898/165 expected, 84 focused.

@@ -1,13 +1,16 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7d2 DEV
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7e DEV
 
 ## Актуальный запуск и документация
 
+ARCH7e: `-Mode Auto -ConfirmDevAutoArchive` — только если ВСЕ обнаруженные POP3 PST разрешены для реального теста. Предварительно `-WhatIf` (не обнаруживает Outlook, проверяет параметры). Предел 10 писем на партию, до 100 партий на источник за запуск; `-AutoDevMaxBatches 1` для первого испытания. [Подробности и пример](docs/2.6.5-arch7e.md).
+
 Новый тестовый контроллер `Invoke-OPALiveArchiveBatches.ps1` запускает Archive и Resume в отдельных процессах Windows PowerShell 5.1 STA, без перезапуска Outlook. Полный синтаксис и примеры — [ARCH7d](docs/2.6.5-arch7d.md).
 
-Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7d2 — идентификатор DEV-сборки.
+Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7e — идентификатор DEV-сборки.
 
-25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — CI 4881/165 PASS, [восстановление](docs/2.6.5-arch7c.md). ARCH7d1 — CI 4895/165 PASS; реальный запуск остановился до worker из-за конфликта $archive/$Archive. ARCH7d2 — [контроллер отдельных worker](docs/2.6.5-arch7d.md), изолированные callback-переменные и публичные end-to-end тесты; CI/live acceptance pending. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
+25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — CI 4881/165 PASS, [восстановление](docs/2.6.5-arch7c.md). ARCH7d1 — CI 4895/165 PASS; реальный запуск остановился до worker из-за конфликта $archive/$Archive. ARCH7d2 — CI 4898/165 PASS, совместный REAL PASS ARCH7c/d (20261125-173959-49d4a7fb, 2 verified, 1 deferred, 7 unprocessed, same Outlook). ARCH7e — [ограниченный Auto DEV](docs/2.6.5-arch7e.md), CI/live pending. **ProductionReady=False. Auto без явного DEV-согласия закрыт. Не назначать DEV пользователям через планировщик.**
 
+- [ARCH7e — ограниченный Auto, синтаксис и приёмка](docs/2.6.5-arch7e.md)
 - [ARCH7d — контроллер worker, все ключи и реальный тест прерывания](docs/2.6.5-arch7d.md)
 - [ARCH7c — восстановление и точный пример Resume](docs/2.6.5-arch7c.md)
 - [Целевой Auto и аудит](docs/ARCH7a-AUTO-REQUIREMENTS.md)
@@ -36,11 +39,13 @@ $test = @{ProfileName='Outlook';SourcePst='C:\Test\mail.pst';ConfirmTestArchive=
 
 ## Полный справочник параметров OutlookPOP3Archive.ps1
 
-Таблица отражает фактический param() ARCH7b, а не будущие defaults. Условия совместимости проверяются кодом. Common parameters PowerShell предоставляются CmdletBinding. WorkerPilot* — исторические DEV диагностики, не для планировщика.
+Таблица отражает фактический param() ARCH7e, а не будущие defaults. Условия совместимости проверяются кодом. Common parameters PowerShell предоставляются CmdletBinding. WorkerPilot* — исторические DEV диагностики, не для планировщика.
 
 | Ключ | Тип / диапазон | Default DEV | Назначение |
 |---|---|---|---|
-| `-Mode` | string | 'Analyze' | Analyze/Plan — диагностика; Archive/Resume — явный тест; Auto закрыт в DEV. |
+| `-Mode` | string | 'Analyze' | Analyze/Plan — диагностика; Archive/Resume — явный тест; Auto только с ConfirmDevAutoArchive. |
+| `-ConfirmDevAutoArchive` | switch | False | Явное разрешение архивировать ВСЕ обнаруженные POP3 delivery PST как тестовые; только Mode Auto. |
+| `-AutoDevMaxBatches` | int (1–100) | 100 | Только DEV Auto: максимум вызовов контроллера на источник, включая проверку исчерпания. |
 | `-ProfileName` | string | не задан | Имя профиля Outlook; для тестового writer обязателен. |
 | `-Transaction` | string | не задан | ID транзакции Resume. |
 | `-SourcePst` | string | не задан | Точный локальный исходный POP3 PST; обязателен для writer DEV. |
@@ -60,7 +65,7 @@ $test = @{ProfileName='Outlook';SourcePst='C:\Test\mail.pst';ConfirmTestArchive=
 | `-ExpectedInterruptedReturned` | int (1,500) | 0 (не задан) | Ожидаемое число MoveReturned, меньше Planned. |
 | `-WhatIf` | switch | False | Тестовый writer/controller: проверка параметров без COM и постоянной записи; не снимает DEV gate. |
 | `-VerboseItems` | switch | False | Подробный вывод по письмам. |
-| `-Limit` | int | 0 | 0 — legacy default; Auto 500; DEV Archive требует 1–500. |
+| `-Limit` | int | 0 | DEV Auto: 0 означает партию 10, явно 1–10; DEV Archive требует 1–500, live 1–10. |
 | `-ArchiveGrouping` | string | 'YearQuarter' | None/Year/YearQuarter/YearMonth; структура внутри годового PST. |
 | `-OlderThanMonths` | int | 12 | Возраст в месяцах; 0 только с IgnoreAge для Archive. |
 | `-SourcePstHighWatermarkGB` | double | 40 | Порог legacy size policy. |
