@@ -1,4 +1,162 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 (DEV: ARCH4; ARCH3 завершён 24.11.2026)
+﻿# OutlookPOP3Archive — ARCH7a (документация; исполняемый билд ARCH6f3c3)
+
+## Актуальный запуск и документация
+
+25.11.2026: ARCH6f3c3, 8910499e, CI 4862/165 PASS. **ProductionReady=False. Auto пока закрыт. Не назначать DEV пользователям через планировщик.**
+
+- [Целевой Auto и аудит](docs/ARCH7a-AUTO-REQUIREMENTS.md)
+- [Установка на RDS, планировщик вручную, PowerShell, GPO](docs/RDS-DEPLOYMENT.md)
+- [Конфигурация](docs/CONFIGURATION.md)
+- [Роадмап](docs/DELIVERY-ROADMAP.md)
+
+Текущий DEV:
+~~~powershell
+.\OutlookPOP3Archive.ps1 -Mode Analyze
+.\OutlookPOP3Archive.ps1 -Mode Plan -OlderThanMonths 12
+$test = @{ProfileName='Outlook';SourcePst='C:\Test\mail.pst';ConfirmTestArchive=$true}
+.\OutlookPOP3Archive.ps1 -Mode Archive @test -Limit 10 -WhatIf
+.\Invoke-OPAArchiveBatches.ps1 @test -ConfirmOutlookRestart -BatchSize 100 -MaxMessages 100 -WhatIf
+~~~
+
+Для реального теста Archive/Resume использовать соответствующий runbook ARCH4/ARCH6. Текущий Resume требует нового процесса Outlook; контроллер может закрыть Outlook, не предназначен для пользователя RDS.
+
+Будущий Auto после допуска (НЕ запускать сейчас):
+~~~powershell
+.\OutlookPOP3Archive.ps1 -Mode Auto
+.\OutlookPOP3Archive.ps1 -Mode Auto -OlderThanMonths 24
+~~~
+
+Целевые defaults: Auto, 12 месяцев, YearQuarter, DisableStoragePolicy=True, DisableArchivePstSizeLimit=True, IncludeRootMail=True, Safe, Continue, все POP3 до исчерпания eligible. Outlook не перезапускается. Размер PST — статистика; контроль свободного места остаётся. Конфигурация в param() основного PS1; CLI override, без JSON/INI. Реализация этих defaults предстоит.
+
+## Полный справочник параметров OutlookPOP3Archive.ps1
+
+Таблица отражает фактический param() коммита 8910499e, а не будущие defaults. Условия совместимости проверяются кодом. Common parameters PowerShell предоставляются CmdletBinding. WorkerPilot* — исторические DEV диагностики, не для планировщика.
+
+| Ключ | Тип / диапазон | Default DEV | Назначение |
+|---|---|---|---|
+| `-Mode` | string | 'Analyze' | Analyze/Plan — диагностика; Archive/Resume — явный тест; Auto закрыт в DEV. |
+| `-ProfileName` | string | не задан | Имя профиля Outlook; для тестового writer обязателен. |
+| `-Transaction` | string | не задан | ID транзакции Resume. |
+| `-SourcePst` | string | не задан | Точный локальный исходный POP3 PST; обязателен для writer DEV. |
+| `-ConfirmTestArchive` | switch | False | Явное согласие на тестовый PST. |
+| `-ConfirmComplexAttachments` | switch | False | Экспериментальные MSG/OLE; Archive, Limit/BatchSize ≤10. |
+| `-IncludeFolderPath` | string[] | не задан | Массив точных разрешённых путей папок. |
+| `-IncludeRootMail` | switch | False | Включить письма непосредственно в корне PST. |
+| `-ImportDeferredTransaction` | string | не задан | Импорт исключений завершённой транзакции без Move. |
+| `-HistoricalThreatEntryId` | string | не задан | Точный первый необработанный EntryID; три Historical* обязательны вместе. |
+| `-HistoricalDetectionId` | string | не задан | GUID обнаружения Defender для исторического hold. |
+| `-HistoricalAttachmentName` | string | не задан | Имя вложения Type 1 для исторического hold. |
+| `-RecoverInterrupted` | switch | False | Восстановление непрерывной прерванной серии без пропусков. |
+| `-ExpectedInterruptedPlanned` | int (1,500) | 0 (не задан) | Ожидаемое число запланированных писем при RecoverInterrupted. |
+| `-ExpectedInterruptedReturned` | int (1,500) | 0 (не задан) | Ожидаемое число MoveReturned, меньше Planned. |
+| `-WhatIf` | switch | False | Тестовый writer/controller: проверка параметров без COM и постоянной записи; не снимает DEV gate. |
+| `-VerboseItems` | switch | False | Подробный вывод по письмам. |
+| `-Limit` | int | 0 | 0 — legacy default; Auto 500; DEV Archive требует 1–500. |
+| `-ArchiveGrouping` | string | 'YearQuarter' | None/Year/YearQuarter/YearMonth; структура внутри годового PST. |
+| `-OlderThanMonths` | int | 12 | Возраст в месяцах; 0 только с IgnoreAge для Archive. |
+| `-SourcePstHighWatermarkGB` | double | 40 | Порог legacy size policy. |
+| `-SourcePstTargetSizeGB` | double | 35 | Цель legacy size policy. |
+| `-DisableStoragePolicy` | switch | False | Отключение legacy size policy. |
+| `-MaxArchivePstSizeGB` | double | 10 | Прикладной лимит архивного PST. |
+| `-DisableArchivePstSizeLimit` | switch | False | Отключение прикладного лимита; сейчас Archive-only, несовместим с явными MaxArchivePstSizeGB/SafetyMarginGB. |
+| `-SafetyMarginGB` | double | 0.5 | Резерв до лимита архива. |
+| `-ArchiveDeletedItems` | switch | False | Legacy opt-in удалённых; DEV writer запрещает. |
+| `-ArchiveDrafts` | switch | False | Legacy opt-in черновиков; DEV writer запрещает. |
+| `-ArchiveJunk` | switch | False | Legacy opt-in спама; DEV writer запрещает. |
+| `-IgnoreAge` | switch | False | Явное согласие на отсутствие возрастного порога. |
+| `-AutoMaxResumeAttempts` | int (1,100) | 3 | Лимит legacy Auto recovery, не разрешает повтор неизвестного Move. |
+| `-DurabilityMode` | string | 'Fast' | Fast/Safe; ARCH4 принудительно Safe. |
+| `-TransactionRetentionDays` | int | 7 | Legacy срок очистки Completed; нельзя удалять доказательства исключений. |
+| `-DisableTransactionCleanup` | switch | False | Отключение legacy очистки. |
+| `-AutoTargetMinimum` | int | 50 | Минимум legacy target-driven batch. |
+| `-AutoMaxEmptyBatches` | int | 2 | Лимит пустых партий legacy size policy. |
+| `-WorkerPilot` | switch | False | Диагностический DEV canary, не writer. |
+| `-ConfirmDevWorkerPilot` | switch | False | Явное подтверждение DEV диагностики. |
+| `-WorkerPilotMaxOperations` | int (1,1) | 1 | Одна диагностическая операция. |
+| `-WorkerPilotTimeoutSeconds` | int (1,30) | 10 | Таймаут диагностического worker, секунды. |
+| `-WorkerPilotKeepArtifacts` | switch | False | Сохранять диагностические артефакты. |
+| `-WorkerPilotProbeSynthetic` | switch | False | BW2: чтение одной synthetic fixture. |
+| `-WorkerPilotRunId` | string | '' | ID диагностического запуска. |
+| `-WorkerPilotSourcePst` | string | '' | Путь synthetic PST. |
+| `-WorkerPilotConfirmSourceSizeDifference` | switch | False | BW2c: согласие на изменение размера fixture. |
+| `-WorkerPilotExpectedSourceSizeBytes` | long | 0 | Ожидаемый размер synthetic PST в байтах. |
+| `-WorkerPilotReviewHistoricalFence` | switch | False | BW4a: read-only исторический Intent. |
+| `-WorkerPilotExpectedHistoricalJournalSha256` | string | '' | SHA-256 исторического журнала. |
+| `-WorkerPilotReviewPerItemFence` | switch | False | BW4b: проверка per-item evidence. |
+| `-WorkerPilotPrimaryPath` | string | '' | Первичное доказательство BW4b. |
+| `-WorkerPilotIndependentPath` | string | '' | Независимое доказательство BW4b. |
+| `-WorkerPilotReviewOutlookPerItem` | switch | False | BW4c: чтение точного письма в Outlook. |
+| `-WorkerPilotCandidateFolderEntryId` | string | '' | EntryID папки. |
+| `-WorkerPilotCandidateEntryId` | string | '' | EntryID письма. |
+| `-WorkerPilotMaxFolderItems` | int (1,5000) | 1000 | Граница чтения папки. |
+| `-WorkerPilotReviewHistoryReplay` | switch | False | BW4d: read-only replay audit. |
+| `-WorkerPilotReviewFreshSynthetic` | switch | False | BW4e: фиксация наблюдённой disposable fixture. |
+| `-WorkerPilotCandidateReviewId` | string | '' | ID проверки кандидата. |
+| `-WorkerPilotExpectedCandidateInternetMessageId` | string | '' | Ожидаемый InternetMessageId. |
+| `-WorkerPilotExpectedCandidateSearchKeySha256` | string | '' | SHA-256 SearchKey. |
+| `-WorkerPilotExpectedCandidateContentFingerprintSha256` | string | '' | SHA-256 fingerprint. |
+| `-WorkerPilotUseTargetedMessageIdReadOnly` | switch | False | BW4e2: DASL Restrict read-only. |
+| `-WorkerPilotReviewFreshFixtureScope` | switch | False | BW4f: узкая проверка disposable fixture. |
+| `-WorkerPilotExpectedFreshTestId` | string | '' | Ожидаемый ID disposable test. |
+
+## Полный справочник Invoke-OPAArchiveBatches.ps1 (только DEV)
+
+| Ключ | Тип / диапазон | Default DEV | Назначение |
+|---|---|---|---|
+| `-SourcePst` | string | обязательный | Точный локальный исходный POP3 PST; обязателен для writer DEV. |
+| `-ProfileName` | string | обязательный | Имя профиля Outlook; для тестового writer обязателен. |
+| `-ConfirmTestArchive` | switch | False | Явное согласие на тестовый PST. |
+| `-ConfirmOutlookRestart` | switch | False | Обязательное согласие на закрытие Outlook в тестовом контроллере; НЕ для RDS. |
+| `-BatchSize` | int (1,500) | 500 | Размер партии. |
+| `-MaxMessages` | int (1,2147483647) | 10000 | Общий лимит успешно проверенных писем. |
+| `-MaxBatches` | int (1,100000) | 100 | Максимум партий. |
+| `-OlderThanMonths` | int (0,1200) | 12 | Возраст в месяцах; 0 только с IgnoreAge для Archive. |
+| `-ArchiveGrouping` | string | 'YearQuarter' | None/Year/YearQuarter/YearMonth; структура внутри годового PST. |
+| `-IncludeFolderPath` | string[] | не задан | Массив точных разрешённых путей папок. |
+| `-IncludeRootMail` | switch | False | Включить письма непосредственно в корне PST. |
+| `-IgnoreAge` | switch | False | Явное согласие на отсутствие возрастного порога. |
+| `-ConfirmComplexAttachments` | switch | False | Экспериментальные MSG/OLE; Archive, Limit/BatchSize ≤10. |
+| `-MaxArchivePstSizeGB` | double (0.01,1000) | 10 | Прикладной лимит архивного PST. |
+| `-SafetyMarginGB` | double (0,100) | 0.5 | Резерв до лимита архива. |
+| `-DisableArchivePstSizeLimit` | switch | False | Отключение прикладного лимита; сейчас Archive-only, несовместим с явными MaxArchivePstSizeGB/SafetyMarginGB. |
+| `-RestartTimeoutSeconds` | int (5,300) | 60 | Таймаут остановки Outlook, секунды. |
+| `-SkipPolicy` | string | 'Continue' | Continue — продолжить после пропуска; Stop — остановиться после партии. |
+| `-ImportDeferredTransaction` | string | не задан | Импорт исключений завершённой транзакции без Move. |
+| `-HistoricalThreatEntryId` | string | не задан | Точный первый необработанный EntryID; три Historical* обязательны вместе. |
+| `-HistoricalDetectionId` | string | не задан | GUID обнаружения Defender для исторического hold. |
+| `-HistoricalAttachmentName` | string | не задан | Имя вложения Type 1 для исторического hold. |
+| `-RecoverTransaction` | string | не задан | Точный ID для verification-only recovery, без новых Archive options. |
+| `-RecoverInterrupted` | switch | False | Восстановление непрерывной прерванной серии без пропусков. |
+| `-ExpectedInterruptedPlanned` | int (1,500) | 0 (не задан) | Ожидаемое число запланированных писем при RecoverInterrupted. |
+| `-ExpectedInterruptedReturned` | int (1,500) | 0 (не задан) | Ожидаемое число MoveReturned, меньше Planned. |
+| `-WhatIf` | switch | False | Тестовый writer/controller: проверка параметров без COM и постоянной записи; не снимает DEV gate. |
+
+## Вспомогательные команды
+
+### Get-OPAArchiveMessageInventory.ps1
+
+~~~powershell
+param([Parameter(Mandatory=$true)][string]$SourcePst,
+      [Parameter(Mandatory=$true)][string]$ProfileName)
+~~~
+
+### Get-OPAArchiveRootInventory.ps1
+
+~~~powershell
+param([Parameter(Mandatory=$true)][string]$SourcePst,
+      [Parameter(Mandatory=$true)][string]$ProfileName)
+~~~
+
+### Export-OPADeferredReport.ps1
+
+~~~powershell
+param([Parameter(Mandatory=$true)][string]$SourcePst,
+      [Parameter(Mandatory=$true)][string]$ProfileName,
+      [Parameter(Mandatory=$true)][string]$OutputDirectory)
+~~~
+
+## История разработки и лабораторные runbooks
+
 
 **ARCH6f3c3 DEV:** [универсальный пропуск локальной ошибки вложения, синтаксис и предохранитель](docs/2.6.5-arch6f3c3.md).
 

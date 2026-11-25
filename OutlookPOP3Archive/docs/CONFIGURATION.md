@@ -1,4 +1,26 @@
-﻿# Configuration — 2.6.3-PREVIEW1
+﻿# Конфигурация — ARCH7a
+
+Настройки в param() OutlookPOP3Archive.ps1, отдельный JSON/INI не нужен. CLI override на один запуск. Предпочтительно менять аргументы задачи, а не проверенный PS1; при редактировании кода сохранить UTF-8 BOM и повторить CI. [Полный CLI в README](../README.md).
+
+| Настройка | Фактическая DEV | Цель Auto |
+|---|---|---|
+| Mode | Analyze | Auto |
+| OlderThanMonths | 12 | 12 |
+| ArchiveGrouping | YearQuarter | YearQuarter |
+| DisableStoragePolicy | False | True |
+| DisableArchivePstSizeLimit | False (10 ГБ) | True |
+| IncludeRootMail | False | True |
+| DurabilityMode | Fast (ARCH4 Safe) | Safe |
+| Limit | 0 (legacy Auto 500) | bounded batch, до исчерпания |
+| SkipPolicy | Continue в контроллере | Continue |
+| AutoMaxResumeAttempts | 3 | 3 с backoff |
+| Quiet | нет ключа | автоматически |
+
+40/35 ГБ legacy size policy не участвует в целевом age-only Auto. IMAP/Outbox исключаются. [RDS deployment](RDS-DEPLOYMENT.md). Auto production gate пока закрыт.
+
+## Историческая документация
+
+# Configuration — 2.6.3-PREVIEW1
 
 Use `-Mode Analyze` for account discovery and `-Mode Plan` to inspect selected POP3 folders before moving mail. `-ProfileName 'Outlook'` selects a profile. `-OlderThanMonths 12` is the default; zero requires `-IgnoreAge`. POP3 Sent Items and nested folders are included. `-ArchiveDeletedItems`, `-ArchiveDrafts`, `-ArchiveJunk` are explicit opt-ins; Outbox remains excluded.
 
