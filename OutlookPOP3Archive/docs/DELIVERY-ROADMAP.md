@@ -1,5 +1,7 @@
 # OutlookPOP3Archive — короткий роадмап до стабильного архиватора
 
+> ARCH7c DEV: ARCH7b3 CI 45618265278 PASS 4872/165 and operator real transaction 20261125-161734-1d203d2f Verified=Reconciled=Indexed=4, Outlook PID 7660 unchanged, distinct workers 13876/8396, PendingCleared=True. ARCH7b accepted; no repeat. ARCH7c explicit recovery of mixed durable prefix, no blind replay, CI/live pending. Unknown claims remain manual hold, automated supervisor ARCH7d, output defects ARCH7f. [Runbook](2.6.5-arch7c.md).
+
 > ARCH7b3 DEV: CI 45615916753 ARCH7b2 58/58 focused PASS, other focused 47/35/31/911 PASS, BOM PASS; full CI stopped at CONFIGURATION.md header. Restore base build documentation marker, no test/algorithm changes. Full CI and live acceptance pending.
 
 > ARCH7b2 DEV: CI 45615251882 reached pending identity gate (55/57); explicit fixture fields and JSON readback, extra legacy restart prohibition for tagged pending. 58 focused / 4872 total expected. Live acceptance pending.

@@ -1,5 +1,9 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7c DEV
+
+- Accept operator-reported real ARCH7b3 4/4 same Outlook PID 7660, distinct workers 13876/8396, no Move on Resume, pending cleared. Add explicit recovery-only Resume of durable returned/skipped prefix with zero or more receipts; retain exact journal/index/deferred readback. Natural Outlook restart permitted only in explicit recovery mode; no Outlook activation or shutdown. Unresolved claims remain blocked. Nine tests, 4881/165 expected, 67 focused.
+
 ## ARCH7b3 DEV
 
 - Restore required base-build identifier in CONFIGURATION.md and README header; ARCH7b2 all 58 focused tests passed, CI 45615916753 stopped at documentation header. No archive algorithm or test changes. 4872/165 expected.

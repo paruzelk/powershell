@@ -1,4 +1,4 @@
-﻿# Конфигурация — 2.6.3-PREVIEW1 / ARCH7b3 DEV
+﻿# Конфигурация — 2.6.3-PREVIEW1 / ARCH7c DEV
 
 Настройки в param() OutlookPOP3Archive.ps1, отдельный JSON/INI не нужен. CLI override на один запуск. Предпочтительно менять аргументы задачи, а не проверенный PS1; при редактировании кода сохранить UTF-8 BOM и повторить CI. [Полный CLI в README](../README.md).
 
