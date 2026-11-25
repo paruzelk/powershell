@@ -1,0 +1,476 @@
+name: "adPEAS RU 2.11.0 MIG18 - integrated Russian build"
+on:
+  push:
+    branches:
+      - adpeas-ru-2.11.0
+    paths:
+      - "adPEAS-RU/Migration/v2.11.0/MIG18/**"
+      - ".github/workflows/adpeas-ru-211-mig18.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-and-preview:
+    runs-on: windows-2022
+    timeout-minutes: 40
+    steps:
+      - name: Checkout RU migration branch
+        uses: actions/checkout@v4
+      - name: Install Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download locked upstream 2.9.0 and 2.11.0
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory '_mig\old','_mig\new' -Force | Out-Null
+          [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+          Invoke-WebRequest 'https://codeload.github.com/61106960/adPEAS/zip/ee0c9c47cddcaddae74ef3b8a43f9fef1bf2d082' -OutFile '_mig\old.zip' -UseBasicParsing
+          Invoke-WebRequest 'https://codeload.github.com/61106960/adPEAS/zip/477696f48d6b486be5d9a99b598f72e3ccfcc0c0' -OutFile '_mig\new.zip' -UseBasicParsing
+          Expand-Archive -LiteralPath '_mig\old.zip' -DestinationPath '_mig\old' -Force
+          Expand-Archive -LiteralPath '_mig\new.zip' -DestinationPath '_mig\new' -Force
+      - name: Verify catalog diff and assemble safe migration preview
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $old = @(Get-ChildItem '_mig\old' -Directory)
+          $new = @(Get-ChildItem '_mig\new' -Directory)
+          if ($old.Count -ne 1 -or $new.Count -ne 1) { throw 'Unexpected source ZIP layout' }
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG1Preview.py --old $old[0].FullName --new $new[0].FullName --ru adPEAS-RU --candidate _mig/candidate --report _mig/2.11.0-parity.json
+          if ($LASTEXITCODE -ne 0) { throw 'Migration parity or preview failed' }
+      - name: Port DOC6j technical translation with strict upstream field gates
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $old = @(Get-ChildItem '_mig\old' -Directory)
+          $new = @(Get-ChildItem '_mig\new' -Directory)
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG2Preview.py --old $old[0].FullName --new $new[0].FullName --ru adPEAS-RU --candidate _mig/candidate --report _mig/2.11.0-mig2-coverage.json
+          if ($LASTEXITCODE -ne 0) { throw 'MIG2 source-witness verification failed' }
+          # MIG1 normalizes UTF-8 BOM and Windows newline endings. Compare logical source,
+          # not raw bytes, while forbidding any modifications to the PS definitions.
+          $sourceText = [IO.File]::ReadAllText((Join-Path $new[0].FullName 'src\modules\Core\adPEAS-FindingDefinitions.ps1'), [Text.Encoding]::UTF8)
+          $candidateText = [IO.File]::ReadAllText((Resolve-Path '_mig\candidate\src\modules\Core\adPEAS-FindingDefinitions.ps1'), [Text.Encoding]::UTF8)
+          $sourceNorm = ($sourceText.TrimStart([char]0xFEFF) -replace "`r`n", "`n")
+          $candidateNorm = ($candidateText.TrimStart([char]0xFEFF) -replace "`r`n", "`n")
+          if ($sourceNorm -cne $candidateNorm) { throw 'Canonical finding definitions were modified!' }
+          Write-Host 'PASS: upstream finding definitions preserved (normalizing BOM and line endings)'
+      - name: Reconcile 16 new and 5 modified finding translations, localize HTML
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $new = @(Get-ChildItem '_mig\new' -Directory)
+          if ($new.Count -ne 1) { throw 'Expected one upstream 2.11.0 directory' }
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG3Preview.py --new $new[0].FullName --candidate _mig/candidate --report _mig/2.11.0-mig3-coverage.json
+          if ($LASTEXITCODE -ne 0) { throw 'MIG3 translation source-witness gate failed' }
+          $audit = Get-Content '_mig/2.11.0-mig3-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          $newCount = @($audit.NewFullyTranslatedFindingIds).Count
+          $updatedCount = @($audit.UpdatedFindingIds.PSObject.Properties | ForEach-Object { $_.Name }).Count
+          Write-Host "MIG3 coverage: FindingIds=$($audit.FindingIds), New=$newCount, Updated=$updatedCount"
+          if ([int]$audit.FindingIds -ne 408 -or $newCount -ne 16 -or $updatedCount -ne 5) {
+            throw 'MIG3 408/16/5 coverage gate failed'
+          }
+          Write-Host 'PASS: 408 descriptions, 16 new findings, 5 amended findings'
+
+      - name: Apply verified DOC6j visible messages, RODC tooltip and MIG4 UI
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $new = @(Get-ChildItem '_mig\new' -Directory)
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG4Preview.py --new $new[0].FullName --ru adPEAS-RU --candidate _mig/candidate --report _mig/2.11.0-mig4-coverage.json
+          if ($LASTEXITCODE -ne 0) { throw 'MIG4 source-gated localization failed' }
+          $audit = Get-Content '_mig/2.11.0-mig4-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if (-not $audit.RODCPasswordReplicationTranslated -or [int]$audit.ReusedVerifiedDisplayMessages -lt 30 -or
+              [int]$audit.ExactVisibleLabels -lt 85 -or [int]$audit.RegexVisibleLabels -lt 35) {
+            throw 'MIG4 coverage gate failed'
+          }
+          $source = [IO.File]::ReadAllText((Join-Path $new[0].FullName 'src\modules\Core\adPEAS-FindingDefinitions.ps1'), [Text.Encoding]::UTF8)
+          $result = [IO.File]::ReadAllText((Resolve-Path '_mig\candidate\src\modules\Core\adPEAS-FindingDefinitions.ps1'), [Text.Encoding]::UTF8)
+          if (($source.TrimStart([char]0xFEFF) -replace "`r`n", "`n") -cne ($result.TrimStart([char]0xFEFF) -replace "`r`n", "`n")) {
+            throw 'Canonical security FindingDefinitions changed during MIG4'
+          }
+          Copy-Item 'adPEAS-RU\Migration\v2.11.0\README-RU-2.11.0.md' '_mig\candidate\README-RU-2.11.0.md'
+          Write-Host "PASS MIG4 display-only: $($audit.ReusedVerifiedDisplayMessages) prior messages; RODC, catalog and core unchanged"
+
+      - name: MIG5 source-side HTML localization and semantic safety gates
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $new = @(Get-ChildItem '_mig\new' -Directory)
+          if ($new.Count -ne 1) { throw 'MIG5 expected exactly one canonical source tree' }
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG5Preview.py --new $new[0].FullName --candidate '_mig/candidate' --report '_mig/2.11.0-mig5-coverage.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG5 reporting localization gate failed' }
+          $audit = Get-Content '_mig/2.11.0-mig5-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if (-not $audit.ReportSourceLabelsLocalized -or -not $audit.LastPureEnglishCheckLineTranslated -or
+              [int]$audit.TemplateStringsLocalized -lt 7 -or $audit.FindingDefinitionsModified -or $audit.OriginalADDataModified) {
+            throw 'MIG5 source-side coverage and safety gate failed'
+          }
+          $source = [IO.File]::ReadAllText((Join-Path $new[0].FullName 'src\modules\Core\adPEAS-FindingDefinitions.ps1'), [Text.Encoding]::UTF8)
+          $candidate = [IO.File]::ReadAllText((Resolve-Path '_mig\candidate\src\modules\Core\adPEAS-FindingDefinitions.ps1'), [Text.Encoding]::UTF8)
+          $normalizedSource = $source.TrimStart([char]0xFEFF).Replace(([string][char]13 + [string][char]10), ([string][char]10))
+          $normalizedCandidate = $candidate.TrimStart([char]0xFEFF).Replace(([string][char]13 + [string][char]10), ([string][char]10))
+          if ($normalizedSource -cne $normalizedCandidate) {
+            throw 'FindingDefinitions changed in MIG5'
+          }
+          $reporting = Get-Content '_mig\candidate\src\modules\Reporting\Export-HTMLReport.ps1' -Raw -Encoding UTF8
+          if ($reporting -notmatch 'ConvertTo-RuReportSectionTitle' -or $reporting -notmatch 'ConvertTo-RuReportObjectTitle') {
+            throw 'Missing source-side report localization helpers'
+          }
+          Write-Host 'PASS MIG5: direct HTML localization and canonical AD rules remain unchanged'
+
+      - name: MIG6 source-side result-line and safe attribute-status localization
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $new = @(Get-ChildItem '_mig\new' -Directory)
+          if ($new.Count -ne 1) { throw 'MIG6 expected exactly one canonical source tree' }
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG6Preview.py --new $new[0].FullName --candidate '_mig/candidate' --report '_mig/2.11.0-mig6-coverage.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG6 report-line or attribute-value gate failed' }
+          $audit = Get-Content '_mig/2.11.0-mig6-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if (-not $audit.ReportLineTranslationOnly -or -not $audit.AttributeDisplayOnly -or
+              $audit.RawADObjectMutation -or $audit.FindingDefinitionsModified -or
+              [int]$audit.SyntheticLineFixtures -lt 10 -or [int]$audit.SyntheticAttributeFixtures -lt 11) {
+            throw 'MIG6 localization and semantic safety gate failed'
+          }
+          $report = Get-Content '_mig\candidate\src\modules\Reporting\Export-HTMLReport.ps1' -Raw -Encoding UTF8
+          $render = Get-Content '_mig\candidate\src\modules\Core\Render-HtmlObject.ps1' -Raw -Encoding UTF8
+          if ($report -notmatch 'ConvertTo-RuReportLine' -or
+              $render -notmatch 'ConvertTo-RuReportAttributeValue') {
+            throw 'Missing MIG6 report localization call'
+          }
+          if ($audit.RealADRuntimeTestPerformed -or $audit.ProductionReady) {
+            throw 'MIG6 preview runtime status must remain unverified'
+          }
+          Write-Host 'PASS MIG6 source-side HTML message and status rendering, no raw AD mutation'
+
+      - name: MIG7 source-backed attribute caption and contextual value localization
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $new = @(Get-ChildItem '_mig\new' -Directory)
+          if ($new.Count -ne 1) { throw 'MIG7 expected exactly one canonical source tree' }
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG7Preview.py --new $new[0].FullName --candidate '_mig/candidate' --report '_mig/2.11.0-mig7-coverage.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG7 source-backed renderer gate failed' }
+          $a = Get-Content '_mig/2.11.0-mig7-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ([int]$a.Labels -ne 106 -or [int]$a.ContextExact -ne 9 -or [int]$a.ContextPatterns -ne 7 -or
+              -not $a.OnlyHTMLLabelsAndContextValues -or -not $a.RawAttributeIdentifiersPreserved -or
+              $a.OriginalADObjectDataModified -or $a.FindingDefinitionsModified -or
+              $a.RealADTestPerformed -or $a.ProductionReady) {
+            throw 'MIG7 scope, completeness, or status gate failed'
+          }
+          . '_mig\candidate\src\modules\Core\Render-HtmlObject.ps1'
+          function ConvertTo-HtmlEncode { param($Value) [System.Net.WebUtility]::HtmlEncode([string]$Value) }
+          function ConvertTo-RuReportAttributeValue { param([AllowNull()][string]$Text) return $Text }
+          $label = ConvertTo-RuReportAttributeLabel7 -Text 'pwdLastSet'
+          if ($label -ceq 'pwdLastSet' -or $label -notmatch '[^\x00-\x7F]') {
+            throw 'MIG7 runtime caption test failed'
+          }
+          $exact = ConvertTo-RuReportAttributeContext7 -Name 'logonhours' -Text 'All hours (no restriction)'
+          if ($exact -ceq 'All hours (no restriction)' -or $exact -notmatch '[^\x00-\x7F]') {
+            throw 'MIG7 runtime context exact test failed'
+          }
+          $dynamic = ConvertTo-RuReportAttributeContext7 -Name 'activityStatus' -Text 'INACTIVE (no login for >90 days)'
+          if ($dynamic -ceq 'INACTIVE (no login for >90 days)' -or $dynamic -notmatch '90' -or $dynamic -notmatch '[^\x00-\x7F]') {
+            throw 'MIG7 runtime context regex test failed'
+          }
+          foreach ($raw in @('CN=Users,DC=example,DC=local','S-1-5-21-1','Default Domain Policy')) {
+            if ((ConvertTo-RuReportAttributeContext7 -Name 'GPOName' -Text $raw) -cne $raw) {
+              throw 'MIG7 modified a raw domain value'
+            }
+          }
+          $testRow = [pscustomobject]@{
+            Name = 'logonhours'
+            RowType = 'SingleValue'
+            Values = @([pscustomobject]@{ Display = 'All hours (no restriction)'; Severity = 'Standard'; FindingId = $null })
+            OverallSeverity = 'Standard'
+          }
+          $html = Render-HtmlRow -Row $testRow
+          if ($html -notmatch 'data-attr-name="logonhours"' -or
+              $html -match 'All hours \(no restriction\)' -or
+              $html -notmatch '[^\x00-\x7F]') {
+            throw 'MIG7 actual synthetic HTML renderer output failed'
+          }
+          Write-Host 'PASS MIG7 106 Russian captions and scoped synthetic HTML renderer, original AD identifiers preserved'
+
+      - name: MIG8 report-only Russian accessibility and honest count units
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $new = @(Get-ChildItem '_mig\new' -Directory)
+          if ($new.Count -ne 1) { throw 'MIG8 expected exactly one pinned original tree' }
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG8Preview.py --new $new[0].FullName --candidate '_mig/candidate' --report '_mig/2.11.0-mig8-coverage.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG8 translation or source witness failed' }
+          $a = Get-Content '_mig/2.11.0-mig8-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ([int]$a.TemplateStaticLabels -ne 9 -or [int]$a.ExporterAccessibilityLabels -ne 3 -or
+              [int]$a.StaticRendererDragLabels -ne 6 -or [int]$a.DynamicLabels -ne 7 -or
+              -not $a.FilterCardCountersKept -or -not $a.OriginalAuditCountersKept -or
+              -not $a.OriginalAttributeKeysPreserved -or $a.OriginalADDataModified -or
+              $a.FindingDefinitionsModified -or $a.JsonExportModified -or
+              $a.RealADTestPerformed -or $a.ProductionReady) {
+            throw 'MIG8 source-only, count, or preview safety gate failed'
+          }
+          . '_mig\candidate\src\modules\Core\Render-HtmlObject.ps1'
+          function ConvertTo-HtmlEncode { param($Value) [System.Net.WebUtility]::HtmlEncode([string]$Value) }
+          function ConvertTo-RuReportAttributeValue { param([AllowNull()][string]$Text) return $Text }
+          $ru = ConvertTo-RuReportAttributeContext8 -Name 'operatingSystems' -Text '2 server(s), 4 client(s), 2 other'
+          if ($ru -notmatch '2' -or $ru -notmatch '4' -or $ru -notmatch '[^\x00-\x7F]' -or
+              $ru -match 'server\(s\)') { throw 'MIG8 network-map value translation failed' }
+          $ru = ConvertTo-RuReportAttributeContext8 -Name 'domainControllers' -Text 'server.example.test [PDC Emulator, RID Master]'
+          if ($ru -notmatch 'server\.example\.test' -or $ru -match 'PDC Emulator' -or
+              $ru -notmatch '[^\x00-\x7F]') { throw 'MIG8 FSMO role display test failed' }
+          foreach ($raw in @('S-1-5-21-1', 'Default Domain Policy', 'CN=Users,DC=example,DC=test')) {
+            if ((ConvertTo-RuReportAttributeContext8 -Name 'distinguishedName' -Text $raw) -cne $raw) {
+              throw 'MIG8 must not alter domain identifiers'
+            }
+          }
+          $tpl = Get-Content '_mig\candidate\src\modules\Reporting\templates\report-template.html' -Raw -Encoding UTF8
+          $js = Get-Content '_mig\candidate\src\modules\Reporting\templates\report-scripts.js' -Raw -Encoding UTF8
+          if ($tpl -notmatch 'mig8CardCount' -or $tpl -notmatch '\{\{TOTAL_COUNT\}\}' -or
+              $js -notmatch 'getElementById\(''mig8CardCount''\)' -or
+              $js -notmatch 'severityCounts\[severity\]') { throw 'MIG8 count unit semantics disappeared' }
+          Write-Host 'PASS MIG8 Russian UI labels, context values and dual-count audit/card distinction'
+
+      - name: MIG8a regression gate - visible priorities and header/print license notice
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG8aHotfix.py --candidate '_mig/candidate' --report '_mig/2.11.0-mig8a-coverage.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG8a source translation or anchors failed' }
+          $a = Get-Content '_mig/2.11.0-mig8a-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ([int]$a.SourceDynamicLabelsTranslated -ne 7 -or
+              -not $a.LicenseNoticeUnmodifiedAtSource -or
+              -not $a.KnownEnglishLegalNoticeTranslatedOnlyForHtml -or
+              -not $a.HeaderAndPrintUseSameDisclaimerToken -or
+              -not $a.PriorityFindingCountVariablePreserved -or
+              $a.LicenseValidationModified -or $a.ScoringLogicModified -or
+              $a.FindingDefinitionsModified -or $a.JsonExportModified -or
+              $a.OriginalADDataModified -or $a.RealADTestPerformed -or $a.ProductionReady) {
+            throw 'MIG8a source translation, licensing or scope gate failed'
+          }
+          $base = '_mig/candidate/src/modules/Reporting'
+          $reportSource = [IO.File]::ReadAllText((Resolve-Path "$base/Export-HTMLReport.ps1"),[Text.Encoding]::UTF8)
+          $jsSource = [IO.File]::ReadAllText((Resolve-Path "$base/templates/report-scripts.js"),[Text.Encoding]::UTF8)
+          $template = [IO.File]::ReadAllText((Resolve-Path "$base/templates/report-template.html"),[Text.Encoding]::UTF8)
+          if ($template.Split([string[]]@('{{DISCLAIMER}}'),[StringSplitOptions]::None).Count -ne 3) {
+            throw 'MIG8a expected same disclaimer token in HTML and print header'
+          }
+          if ($reportSource -notmatch '\$visibleDisclaimer = \$disclaimer' -or
+              $reportSource -notmatch 'ConvertTo-HtmlEncode \$visibleDisclaimer' -or
+              $reportSource -notmatch '\$Script:adPEASDisclaimer') {
+            throw 'MIG8a original disclaimer and translated presentation source missing'
+          }
+          $title = [regex]::Match($jsSource, '<span class="icon">&#9889;</span>\s+([^<\r\n]+)')
+          if (-not $title.Success -or $title.Groups[1].Value -notmatch '[^\x00-\x7F]' -or
+              $jsSource -match 'critical findings total</span>' -or
+              $jsSource -match '<div class="help-card-title">Top Priority Actions</div>' -or
+              $jsSource -match 'No Critical Findings\s*</div>') {
+            throw 'MIG8a priority strings have regressed'
+          }
+          $legal = [regex]::Match($reportSource, '\$visibleDisclaimer = ''([^'']+)''')
+          if (-not $legal.Success -or $legal.Groups[1].Value -notmatch '[^\x00-\x7F]' -or
+              $legal.Groups[1].Value -match 'This report was generated') {
+            throw 'MIG8a Russian legal notice missing'
+          }
+          $synthetic = $template.Replace('{{DISCLAIMER}}',$legal.Groups[1].Value)
+          $heads = [regex]::Matches($synthetic,'class="(?:header|print-header)-disclaimer">([^<]+)</div>')
+          if ($heads.Count -ne 2) { throw 'MIG8a synthetic HTML/print disclaimer count mismatch' }
+          foreach ($h in $heads) {
+            if ($h.Groups[1].Value -notmatch '[^\x00-\x7F]' -or
+                $h.Groups[1].Value -match 'This report was generated') {
+              throw 'MIG8a synthetic HTML/print license notice regression'
+            }
+          }
+          Write-Host 'PASS MIG8a priority labels, count, no-critical state, header and print license translation'
+
+      - name: MIG9 source-verified Russian priority, full help and score display
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG9Preview.py --candidate '_mig/candidate' --report '_mig/2.11.0-mig9-coverage.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG9 source witnesses/translation failed' }
+          $c = Get-Content '_mig/2.11.0-mig9-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ([int]$c.PriorityRussianCatalogOverlays -ne 3 -or
+              [int]$c.PriorityInfoLabels -ne 4 -or
+              [int]$c.GuideLabels -ne 46 -or
+              [int]$c.ScoreLabels -ne 8 -or
+              [int]$c.ScoreReasonSourceTypes -ne 16 -or
+              -not $c.GroupMembershipLabelsDisplayOnly -or
+              -not $c.OriginalGroupNamesAndIdsPreserved -or
+              -not $c.DisplayOnly -or $c.FindingDefinitionsModified -or
+              $c.ScoringLogicModified -or $c.JsonExportModified -or
+              $c.LicenseValidationModified -or $c.RealADTestPerformed -or $c.ProductionReady) {
+            throw 'MIG9 catalog fidelity, regression, or preview safety gate failed'
+          }
+          . '_mig/candidate/src/modules/Core/Render-HtmlObject.ps1'
+          $group = ConvertTo-RuReportAttributeContext8 -Name 'privilegedGroups' -Text 'Domain Admins (direct); Enterprise Admins (nested)'
+          if ($group -notmatch 'Domain Admins' -or $group -match '\(direct\)' -or
+              $group -match '\(nested\)' -or $group -notmatch '[^\x00-\x7F]') {
+            throw 'MIG9 privileged membership localized display failed'
+          }
+          foreach ($raw in @('S-1-5-21-11', 'CN=Test,DC=example,DC=org', '10.11.12.13')) {
+            if ((ConvertTo-RuReportAttributeContext8 -Name 'distinguishedName' -Text $raw) -cne $raw) {
+              throw 'MIG9 raw AD identifier unexpectedly mutated'
+            }
+          }
+          $candidateJs = '_mig/candidate/src/modules/Reporting/templates/report-scripts.js'
+          node adPEAS-RU/Migration/v2.11.0/MIG9-PriorityUI-Selftest.js $candidateJs
+          if ($LASTEXITCODE -ne 0) { throw 'MIG9 synthetic priority renderer failed' }
+          Write-Host 'PASS MIG9 source catalogs, 46 help strings, priority risk/remediation, score breakdown, PS group field and synthetic UI'
+
+      - name: MIG10 extended attributes and screen-reader UI source gates
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG10Preview.py --candidate '_mig/candidate' --report '_mig/2.11.0-mig10-coverage.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG10 translation failed' }
+          $c = Get-Content '_mig/2.11.0-mig10-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ($c.Schema -ne 'adPEAS-RU.2.11.0.MIG10.1' -or
+              -not $c.ExtendedAttributesCountPreserved -or
+              -not $c.OriginalAdValuesPreserved -or -not $c.OriginalAttributeKeysPreserved -or
+              $c.FindingDefinitionsModified -or $c.ScoringModified -or
+              $c.JsonExportModified -or $c.LicenseModified -or $c.ProductionReady) {
+            throw 'MIG10 semantic safety gate failed'
+          }
+          . '_mig/candidate/src/modules/Core/Render-HtmlObject.ps1'
+          function Render-HtmlRow { param($Row) return '<div class="attr-row">Fixture</div>' }
+          $fixture = [pscustomobject]@{ Primary=@(); Extended=@(1,2,3); PostObject=@() }
+          $html = Render-HtmlObject -Model $fixture -ObjectId 'test'
+          if ($html -notmatch '<span>[\u0400-\u04FF][^<]*: 3</span>' -or
+              $html -match 'Show 3 more attribute') { throw 'MIG10 actual PowerShell HTML failed' }
+          node adPEAS-RU/Migration/v2.11.0/MIG10-ExtendedAttrs-Selftest.js '_mig/candidate/src/modules/Reporting/templates/report-scripts.js'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG10 JS interactions failed' }
+          $tpl = Get-Content '_mig/candidate/src/modules/Reporting/templates/report-template.html' -Raw -Encoding UTF8
+          if (([regex]::Matches($tpl, 'alt="[\u0400-\u04FF][^"]* adPEAS"')).Count -ne 2 -or
+              $tpl -notmatch 'id="themeLabel">[\u0400-\u04FF]+') { throw 'MIG10 accessibility labels failed' }
+          Write-Host 'PASS MIG10 exact-source Russian extended attributes and accessibility'
+
+      - name: MIG11 dynamic report UI and print source gates
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python adPEAS-RU/Migration/v2.11.0/Build-MIG11Preview.py --candidate '_mig/candidate' --report '_mig/2.11.0-mig11-coverage.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG11 source-witnessed translation failed' }
+          $c = Get-Content '_mig/2.11.0-mig11-coverage.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ($c.Schema -ne 'adPEAS-RU.2.11.0.MIG11.1' -or
+              -not $c.CanonicalFindingDefinitionsPreserved -or
+              -not $c.ExtendedAttributeCountPreserved -or
+              $c.AdDataModified -or $c.RiskScoringModified -or
+              $c.JsonExportModified -or $c.LicenseRulesModified -or
+              $c.ProductionReady) { throw 'MIG11 source fidelity or preview gates failed' }
+          node adPEAS-RU/Migration/v2.11.0/MIG11-DynamicUI-Selftest.js '_mig/candidate/src/modules/Reporting/templates/report-scripts.js'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG11 browser UI synthetic regression failed' }
+          Write-Host 'PASS MIG11 translated drag/drop, clipboard, storage, print, screen reader'
+
+      - name: Integrate verified MIG12 through MIG17 sources
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $new = @(Get-ChildItem '_mig\new' -Directory)
+          if ($new.Count -ne 1) { throw 'Expected one pinned upstream source tree' }
+          python adPEAS-RU/Migration/v2.11.0/MIG18/Build-MIG18Integration.py --candidate '_mig/candidate' --upstream $new[0].FullName --report '_mig/2.11.0-mig18-source.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG18 source integration failed' }
+      - name: Check generated JavaScript syntax
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $file = '_mig\candidate\src\modules\Reporting\templates\report-scripts.js'
+          $js = [IO.File]::ReadAllText((Resolve-Path $file), [Text.Encoding]::UTF8)
+          foreach ($token in @('FINDING_DEFINITIONS_JSON','CHECK_DESCRIPTIONS_JSON','SCORING_CONTEXT_JSON')) {
+            $js = $js.Replace(('{{' + $token + '}}'), '{}')
+          }
+          $js = $js.Replace('{{SCORING_DEFINITIONS}}','')
+          $check = Join-Path $env:RUNNER_TEMP 'adpeas-mig2-report-scripts.js'
+          [IO.File]::WriteAllText($check,$js,(New-Object Text.UTF8Encoding($false)))
+          & node --check $check
+          if ($LASTEXITCODE -ne 0) { throw 'JavaScript syntax check failed' }
+          Write-Host 'PASS: report JS parses without syntax errors'
+      - name: MIG4 synthetic report DOM localization smoke test
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          node adPEAS-RU/Migration/v2.11.0/MIG4-ReportRuntime-Selftest.js
+          if ($LASTEXITCODE -ne 0) { throw 'MIG4 UI synthetic DOM regression failed' }
+
+      - name: Check syntax (Windows PowerShell 5.1)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $count = 0
+          foreach ($f in @(Get-ChildItem '_mig\candidate' -Recurse -File | Where-Object { $_.Extension -in '.ps1','.psm1','.psd1' })) {
+            $count++
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($f.FullName,[ref]$tokens,[ref]$errors)
+            if ($errors -and $errors.Count -gt 0) { throw "PowerShell syntax: $($f.FullName): $($errors[0].Message)" }
+            $bytes = [IO.File]::ReadAllBytes($f.FullName)
+            if ($bytes.Length -lt 3 -or $bytes[0] -ne 239 -or $bytes[1] -ne 187 -or $bytes[2] -ne 191) { throw "Missing UTF-8 BOM: $($f.FullName)" }
+          }
+          Write-Host "PASS: $count PowerShell source files parse, UTF-8 BOM checked"
+      - name: Build preview only (no AD access)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Push-Location '_mig\candidate'
+          try {
+            & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File '.\Build-Release.ps1' -Stable
+            if ($LASTEXITCODE -ne 0) { throw "Build exited: $LASTEXITCODE" }
+          } finally { Pop-Location }
+          foreach ($name in @('adPEAS.ps1','adPEAS_min.ps1','adPEAS_ultra.ps1','adPEAS_obf.ps1')) {
+            if (-not (Test-Path ("_mig\candidate\" + $name))) { throw "Missing artifact: $name" }
+          }
+      - name: Verify all five MIG18 outputs and embedded executable resource
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python adPEAS-RU/Migration/v2.11.0/MIG18/Build-MIG18Integration.py --candidate '_mig/candidate' --verify-build --report '_mig/2.11.0-mig18-build.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG18 output verification failed' }
+          foreach ($name in @('adPEAS.ps1','adPEAS_min.ps1','adPEAS_ultra.ps1','adPEAS_obf.ps1')) {
+            $file = (Resolve-Path "_mig/candidate/$name").Path
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($file,[ref]$tokens,[ref]$errors)
+            if ($errors.Count -gt 0) { throw "Artifact parse failed: $name $($errors[0].Message)" }
+          }
+          $exe = (Resolve-Path '_mig/candidate/adPEAS.exe').Path
+          $asm = [Reflection.Assembly]::ReflectionOnlyLoadFrom($exe)
+          $names = @($asm.GetManifestResourceNames())
+          if ($names.Count -ne 1 -or $names[0] -ne 'adPEAS.ps1') { throw 'Unexpected embedded resource' }
+          $stream = $asm.GetManifestResourceStream($names[0])
+          $sha = [Security.Cryptography.SHA256]::Create()
+          try { $embedded = [BitConverter]::ToString($sha.ComputeHash($stream)).Replace('-','') }
+          finally { $stream.Dispose(); $sha.Dispose() }
+          $expected = (Get-FileHash '_mig/candidate/adPEAS.ps1' -Algorithm SHA256).Hash
+          if ($embedded -cne $expected) { throw 'EXE payload mismatch' }
+          if ((Get-Item $exe).VersionInfo.FileDescription -notmatch '[\u0400-\u04FF]') { throw 'Missing Cyrillic EXE metadata' }
+          Write-Host 'PASS: all scripts parse; EXE resource matches readable PS1 byte for byte; no AD access'
+      - name: Publish gated preview, not a production release
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: adPEAS-RU-2.11.0-MIG18-PREVIEW
+          path: |
+            _mig/2.11.0-parity.json
+            _mig/2.11.0-mig2-coverage.json
+            _mig/2.11.0-mig3-coverage.json
+            _mig/2.11.0-mig4-coverage.json
+            _mig/2.11.0-mig5-coverage.json
+            _mig/2.11.0-mig6-coverage.json
+            _mig/2.11.0-mig7-coverage.json
+            _mig/2.11.0-mig8-coverage.json
+            _mig/2.11.0-mig8a-coverage.json
+            _mig/2.11.0-mig9-coverage.json
+            _mig/2.11.0-mig10-coverage.json
+            _mig/2.11.0-mig11-coverage.json
+            _mig/2.11.0-mig12-coverage.json
+            _mig/2.11.0-mig13-coverage.json
+            _mig/2.11.0-mig14-coverage.json
+            _mig/2.11.0-mig18-source.json
+            _mig/2.11.0-mig18-build.json
+            _mig/candidate/README-RU-2.11.0.md
+            _mig/candidate/adPEAS.ps1
+            _mig/candidate/adPEAS_min.ps1
+            _mig/candidate/adPEAS_ultra.ps1
+            _mig/candidate/adPEAS_obf.ps1
+            _mig/candidate/adPEAS.exe
+          retention-days: 14
+          if-no-files-found: error
