@@ -1,17 +1,17 @@
-# adPEAS-RU 2.11.0 MIG19d2 — быстрый старт и все параметры
+# adPEAS-RU 2.11.0 MIG19f — быстрый старт и все параметры
 
-**MIG19d2 PREVIEW.** Консольный стартовый экран и строгая проверка загрузки пяти вариантов; результат определяется CI. Исправлены метаданные EXE; окончательная проверка выполняется в CI. Сборка из исходников MIG1–MIG17; статус компиляции и проверок определяется результатами GitHub Actions и файлами `2.11.0-mig18-source.json`, `2.11.0-mig18-build.json`. Это не окончательный релиз и не сертификат проверки в реальном AD.
+**MIG19f PREVIEW.** Консольный стартовый экран и строгая проверка загрузки пяти вариантов; результат определяется CI. Исправлены метаданные EXE; окончательная проверка выполняется в CI. Сборка из исходников MIG1–MIG17; статус компиляции и проверок определяется результатами GitHub Actions и файлами `2.11.0-mig18-source.json`, `2.11.0-mig18-build.json`. Это не окончательный релиз и не сертификат проверки в реальном AD.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
 
 ~~~powershell
 cd 'C:\Tools\adPEAS-RU\candidate'
 Import-Module .\adPEAS.ps1 -Force
-Invoke-adPEAS -Domain example.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG19d2' -Format All
+Invoke-adPEAS -Domain example.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG19f' -Format All
 Disconnect-adPEAS
 ~~~
 
-Создаются AD-Audit-MIG19d2.html, AD-Audit-MIG19d2.txt и AD-Audit-MIG19d2.json.
+Создаются AD-Audit-MIG19f.html, AD-Audit-MIG19f.txt и AD-Audit-MIG19f.json.
 Outputfile принимает имя без расширения.
 
 **LDAPS с проверкой сертификата:**
@@ -37,6 +37,18 @@ Invoke-adPEAS -Domain example.local -UseWindowsAuth -Module Domain,Accounts,GPO,
 ~~~powershell
 Invoke-adPEAS -Domain example.local -Credential (Get-Credential) -OPSEC -Outputfile '.\AD-Audit-Alternate' -Format All
 ~~~
+
+## Экспорт BloodHound CE
+
+При обычном аудите выполняется модуль Bloodhound, который собирает данные для графического анализа AD в отдельный ZIP. Это не резервная копия AD и не основной отчёт. Архив импортируется в BloodHound Community Edition через интерфейс загрузки данных. Данные чувствительны; храните их локально и не публикуйте в репозитории.
+
+Для обычного аудита без дополнительного архива:
+
+~~~powershell
+Invoke-adPEAS -Domain example.local -UseWindowsAuth -ExcludeModule Bloodhound -Outputfile '.\AD-Audit' -Format All
+~~~
+
+В проверенном режиме OPSEC модуль Bloodhound не запускался. OPSEC не является гарантией полностью пассивного аудита.
 
 ## Параметры Invoke-adPEAS — оригинал 2.11.0
 
