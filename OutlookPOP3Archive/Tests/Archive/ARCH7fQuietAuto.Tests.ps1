@@ -81,6 +81,6 @@ Describe 'ARCH7f DEV diagnostics and safe pacing' {
         $r.BatchDelaySeconds | Should -Be 4
         $r.RecoveryDelaySeconds | Should -Be 7
         $r.LogRetentionDays | Should -Be 20
-        {& $main -Mode Analyze -Quiet -WhatIf} | Should -Throw '*requires ConfirmDevAutoArchive*'
+        {& $main -Mode Analyze -Quiet -WhatIf} | Should -Throw '*options require ConfirmDevAutoArchive*'
     }
 }
