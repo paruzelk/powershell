@@ -1,0 +1,35 @@
+{
+  "patches": [
+    [
+      "src/modules/Core/Render-HtmlObject.ps1",
+      "        'msds-generationid' = 'Идентификатор поколения (msDS-GenerationId)'",
+      "        'msds-generationid' = 'Идентификатор поколения (msDS-GenerationId)'\n        'Owner (non-default)' = 'Нестандартный владелец'\n        'ownerKind' = 'Тип владельца'\n        'ownerIsCreator' = 'Владелец является создателем'\n        'activeComputers' = 'Активные компьютеры'\n        'lapsProtected' = 'Компьютеры под защитой LAPS'\n        'lapsUnprotected' = 'Компьютеры без защиты LAPS'\n        'ouName' = 'Имя OU'\n        'lapsUnprotectedComputers' = 'Количество компьютеров без защиты LAPS'\n        'name' = 'Имя (name)'\n        'eolDate' = 'Дата окончания поддержки'\n        'daysSinceEoL' = 'Дней после окончания поддержки'",
+      1
+    ],
+    [
+      "src/modules/Core/Render-HtmlObject.ps1",
+      "ConvertTo-RuReportAttributeContext8 -Name $Row.Name -Text (ConvertTo-RuReportAttributeContext7 -Name $Row.Name -Text (ConvertTo-RuReportAttributeValue -Text $val.Display))",
+      "ConvertTo-RuDisplayAttribute19g -Name $Row.Name -Text $val.Display",
+      2
+    ],
+    [
+      "src/modules/Core/Render-ConsoleObject.ps1",
+      "Write-adPEASAttribute -Name $Row.Name -Value $val.Display -Class $Row.OverallSeverity -AlignAt $AlignAt -ColorValue:$colorValue",
+      "Write-adPEASAttribute -Name (ConvertTo-RuReportAttributeLabel7 -Text $Row.Name) -Value (ConvertTo-RuDisplayAttribute19g -Name $Row.Name -Text $val.Display) -Class $Row.OverallSeverity -AlignAt $AlignAt -ColorValue:$colorValue",
+      1
+    ],
+    [
+      "src/modules/Core/Render-ConsoleObject.ps1",
+      "$classifiedValues += [PSCustomObject]@{ Value = $val.Display; Class = $val.Severity }",
+      "$classifiedValues += [PSCustomObject]@{ Value = (ConvertTo-RuDisplayAttribute19g -Name $Row.Name -Text $val.Display); Class = $val.Severity }",
+      1
+    ],
+    [
+      "src/modules/Core/Render-ConsoleObject.ps1",
+      "$alignment = Get-adPEASAttributeAlignment -Name $Row.Name -Width $attrPadding",
+      "$alignment = Get-adPEASAttributeAlignment -Name (ConvertTo-RuReportAttributeLabel7 -Text $Row.Name) -Width $attrPadding",
+      1
+    ]
+  ],
+  "helper": "# MIG19g: shared, field-scoped presentation only. Never modify the RenderModel.\nfunction ConvertTo-RuDisplayAttribute19g {\n    param([AllowNull()][string]$Name,[AllowNull()][string]$Text)\n    if ([string]::IsNullOrEmpty($Name) -or [string]::IsNullOrEmpty($Text)) { return $Text }\n    $result = $Text\n    # Generic words such as Enabled or Never can also be actual AD names.\n    # Restrict generic status/unit translation to known presentation fields.\n    if ($Name -in @('anonymousLDAPAccess','anonymousNSPIAccess','recycleBin','tombstoneLifetime',\n        'maxTicketAgeTGT','maxRenewalAge','maxServiceTicketAge','maxClockSkew','krbtgtPasswordAge',\n        'accountStatus','siteSubnets','minPwdLength','passwordComplexity','minPwdAge','maxPwdAge',\n        'pwdHistoryLength','reversibleEncryption','lockoutThreshold','lockoutDuration','lockoutObservationWindow',\n        'dSHeuristics','adminSDHolderExclusion','principalNameUniqueness','LDAPSigning','ChannelBinding',\n        'anonymousSamEnumeration','anonymousSidNameTranslation','ServerSigning','ClientSigning',\n        'EffectiveSetting','decidedBy','GPOStatus','activityStatus','PrivilegeCategory','accountexpires',\n        'pwdLastSet','lastlogon','lastLogonTimestamp','lastlogoff','badpasswordtime','iscriticalsystemobject')) {\n        $result = ConvertTo-RuReportAttributeValue -Text $result\n    }\n    $result = ConvertTo-RuReportAttributeContext7 -Name $Name -Text $result\n    $result = ConvertTo-RuReportAttributeContext8 -Name $Name -Text $result\n    switch ($Name) {\n        'ownerKind' {\n            if ($result -ceq 'User account') { return 'Учётная запись пользователя' }\n        }\n        'ownerIsCreator' {\n            if ($result -ceq 'Unknown - the object records no creator') { return 'Неизвестно — создатель объекта не указан' }\n            if ($result -ceq 'True') { return 'Да' }\n            if ($result -ceq 'False') { return 'Нет' }\n        }\n        'lapsProtected' {\n            if ($result -cmatch '^(\\d+) of (\\d+) computers \\((\\d+(?:[.,]\\d+)?)%\\) - the LAPS schema is not present in Active Directory$') {\n                return [regex]::Replace($result,'^(\\d+) of (\\d+) computers \\((\\d+(?:[.,]\\d+)?)%\\) - the LAPS schema is not present in Active Directory$','$1 из $2 компьютеров ($3%) — схема LAPS отсутствует в Active Directory')\n            }\n            if ($result -cmatch '^(\\d+) of (\\d+) computers \\((\\d+(?:[.,]\\d+)?)%\\)$') {\n                return [regex]::Replace($result,'^(\\d+) of (\\d+) computers \\((\\d+(?:[.,]\\d+)?)%\\)$','$1 из $2 компьютеров ($3%)')\n            }\n        }\n        'lapsUnprotected' {\n            if ($result -cmatch '^(\\d+) of (\\d+) computers \\((\\d+(?:[.,]\\d+)?)%\\)$') {\n                return [regex]::Replace($result,'^(\\d+) of (\\d+) computers \\((\\d+(?:[.,]\\d+)?)%\\)$','$1 из $2 компьютеров ($3%)')\n            }\n        }\n    }\n    return $result\n}\n\n"
+}

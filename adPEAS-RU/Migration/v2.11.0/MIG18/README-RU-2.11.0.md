@@ -1,17 +1,17 @@
-# adPEAS-RU 2.11.0 MIG19f — быстрый старт и все параметры
+# adPEAS-RU 2.11.0 MIG19gh — быстрый старт и параметры
 
-**MIG19f PREVIEW.** Консольный стартовый экран и строгая проверка загрузки пяти вариантов; результат определяется CI. Исправлены метаданные EXE; окончательная проверка выполняется в CI. Сборка из исходников MIG1–MIG17; статус компиляции и проверок определяется результатами GitHub Actions и файлами `2.11.0-mig18-source.json`, `2.11.0-mig18-build.json`. Это не окончательный релиз и не сертификат проверки в реальном AD.
+**MIG19gh PREVIEW.** Объединённые этапы локализации отображения атрибутов и документации. База MIG19f: CI 45818118065 успешно завершён; два реальных аудита MIG19e завершены, но изменения MIG19f и MIG19gh требуют итогового реального теста. Не производственный RELEASE.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
 
 ~~~powershell
 cd 'C:\Tools\adPEAS-RU\candidate'
 Import-Module .\adPEAS.ps1 -Force
-Invoke-adPEAS -Domain example.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG19f' -Format All
+Invoke-adPEAS -Domain example.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG19gh' -Format All
 Disconnect-adPEAS
 ~~~
 
-Создаются AD-Audit-MIG19f.html, AD-Audit-MIG19f.txt и AD-Audit-MIG19f.json.
+Создаются AD-Audit-MIG19gh.html, AD-Audit-MIG19gh.txt и AD-Audit-MIG19gh.json.
 Outputfile принимает имя без расширения.
 
 **LDAPS с проверкой сертификата:**
@@ -137,6 +137,51 @@ Connect-adPEAS -Domain <String> [-Server <String>] [-UseLDAPS]
 | -TimeoutSeconds | 5–600 секунд, по умолчанию 30 |
 
 Не смешивайте разные наборы аутентификации.
+
+## Синтаксис дополнительных команд
+
+~~~text
+Get-adPEASSession [-TestConnection] [-Quiet]
+Disconnect-adPEAS [-Force]
+Convert-adPEASReport -InputJson <String> -OutputPath <String>
+    [-Format <Text|HTML|JSON|All>] [-License <String>] [-NoColor]
+Compare-adPEASReport -Baseline <String> -Current <String>
+    [-OutputPath <String>] [-NoColor]
+Get-adPEASHelp [-Section <QuickStart|Checks|Commands>[]]
+Get-adPEASHelp -Search <String>
+~~~
+
+Get-adPEASSession: TestConnection проверяет соединение, Quiet уменьшает вывод.
+Disconnect-adPEAS: Force принудительно завершает сеанс.
+Convert-adPEASReport: InputJson — исходный JSON, OutputPath — базовое имя файлов; Format по умолчанию All; License — файл лицензии; NoColor отключает ANSI.
+Compare-adPEASReport: Baseline — исходный JSON, Current — новый JSON; OutputPath — базовое имя файлов сравнения, NoColor — без ANSI. Сравнивайте один домен и одинаковый охват проверок; пропущенные модули не равнозначны исправленным находкам.
+Get-adPEASHelp: Section выбирает разделы, Search ищет текст/команду (отдельный набор параметров).
+Системные общие параметры PowerShell здесь не перечислены. Для остальных функций используйте Get-Command -Syntax и Get-Help -Full; полнота перевода их справки не заявляется.
+
+~~~powershell
+Convert-adPEASReport -InputJson '.\scan.json' -OutputPath '.\converted' -Format All -NoColor
+Compare-adPEASReport -Baseline '.\old.json' -Current '.\new.json' -OutputPath '.\diff' -NoColor
+Get-adPEASHelp -Section Commands,Checks
+Get-adPEASHelp -Search 'LDAP'
+~~~
+
+## Итоговый аудит MIG19i
+
+Только после успешного CI MIG19gh, в разрешённой тестовой среде, в отдельных свежих сессиях PowerShell 5.1:
+
+~~~powershell
+Import-Module .\adPEAS.ps1 -Force
+Invoke-adPEAS -Domain example.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG19i-OPSEC' -Format All -NoColor
+Disconnect-adPEAS
+~~~
+
+~~~powershell
+Import-Module .\adPEAS.ps1 -Force
+Invoke-adPEAS -Domain example.local -UseWindowsAuth -Outputfile '.\AD-Audit-MIG19i-Full' -Format All -NoColor
+Disconnect-adPEAS
+~~~
+
+Сравнить Complete, CompletedModules, количество карточек, критичность и видимые тексты с MIG19e с учётом изменений самого AD. Не публиковать реальные HTML/TXT/JSON/BloodHound ZIP в GitHub. Если нужен обычный отчёт без BloodHound, добавить -ExcludeModule Bloodhound (это изменит охват относительно Full). Аудит без OPSEC выполняет больше сетевых проверок. Проверка CI не заменяет проверку в реальном домене.
 
 ## Помощь, конвертация и проверка соединения
 
@@ -274,3 +319,8 @@ GitHub Actions проверяет настоящий JavaScript на шести 
 ### Пакет MIG19d5–MIG19d7 / контрольная точка перед MIG19e
 
 Три последовательных source gate в одном CI. Архив кандидата публикуется только при успехе всех этапов, включая 17 synopsis в PS1/EXE, 15 отчётов, 10 дополнительных файлов сравнения идентичных кэшей и попарное совпадение пяти вариантов. Реальный аудит AD и полнота локализации этим не сертифицируются. Сохраняются остаточные кандидаты и технические значения. Не является производственным RELEASE. См. README-MIG19d5-d7.md в исходном репозитории.
+
+
+## MIG19g–MIG19h — объединённый этап
+
+11 подписей из реальных отчётов, контекстные значения LAPS/владельца, общий рендеринг текстовых и HTML-атрибутов. Перевод ограничен именами известных полей, фактические имена объектов и значения JSON сохранены. Проверяются семь основных команд и все пять вариантов. Исторические разделы выше описывают состояние соответствующих старых этапов, а не текущий статус CI. Сборка до MIG19i не считается окончательной.
