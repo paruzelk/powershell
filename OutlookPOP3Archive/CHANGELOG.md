@@ -1,5 +1,10 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7g1 DEV — 2026-11-26
+
+- ARCH7g1: ARCH7g CI [45827311417](https://github.com/paruzelk/powershell/actions/runs/45827311417) PASS 4932/167, but published ZIP `14fe9542` omitted `New-OPARdsTaskPlan.ps1`, `Invoke-OPARdsAutoDev.ps1`, `Invoke-OPAAutoDev.ps1` due to stale workflow allowlist (operator CommandNotFoundException). Do not use that ZIP. Add all three to allowlist, require every tracked root PowerShell entrypoint staged, verify full staged ZIP inventory and SHA-256 of every entry, preserve existing explicit critical entrypoint checks. No changes to Auto/Move/recovery behavior. 4932/167 expected; real RDS acceptance pending.
+
+
 ## ARCH7g DEV — 2026-11-26
 
 - ARCH7f1 CI [45814245735](https://github.com/paruzelk/powershell/actions/runs/45814245735) PASS 4919/166, 10/10 focused, 0 failed/skipped; commit `3400d5da`, ZIP 2099247 bytes, SHA256 `55363961ff227664daf5fdd4793cd1daa4aaf1d7b7d2d5a8e07350c295ebe1a3` (CI log and release digest match). No repeat of prior live tests.

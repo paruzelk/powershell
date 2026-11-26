@@ -1,6 +1,8 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7g DEV
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7g1 DEV
 
 ## Актуальный запуск и документация
+
+ARCH7g1: ARCH7g CI [45827311417](https://github.com/paruzelk/powershell/actions/runs/45827311417) PASS 4932/167, but published ZIP `14fe9542` omitted `New-OPARdsTaskPlan.ps1`, `Invoke-OPARdsAutoDev.ps1`, `Invoke-OPAAutoDev.ps1` due to stale workflow allowlist (operator CommandNotFoundException). Do not use that ZIP. Add all three to allowlist, require every tracked root PowerShell entrypoint staged, verify full staged ZIP inventory and SHA-256 of every entry, preserve existing explicit critical entrypoint checks. No changes to Auto/Move/recovery behavior. 4932/167 expected; real RDS acceptance pending.
 
 ARCH7f1 CI [45814245735](https://github.com/paruzelk/powershell/actions/runs/45814245735) PASS 4919/166, 10/10 focused, 0 failed/skipped; commit `3400d5da`, ZIP 2099247 bytes, SHA256 `55363961ff227664daf5fdd4793cd1daa4aaf1d7b7d2d5a8e07350c295ebe1a3` (CI log and release digest match). No repeat of prior live tests.
 
@@ -18,7 +20,7 @@ ARCH7e: `-Mode Auto -ConfirmDevAutoArchive` — только если ВСЕ о�
 
 Новый тестовый контроллер `Invoke-OPALiveArchiveBatches.ps1` запускает Archive и Resume в отдельных процессах Windows PowerShell 5.1 STA, без перезапуска Outlook. Полный синтаксис и примеры — [ARCH7d](docs/2.6.5-arch7d.md).
 
-Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7g — идентификатор DEV-сборки.
+Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7g1 — идентификатор DEV-сборки.
 
 25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — CI 4881/165 PASS, [восстановление](docs/2.6.5-arch7c.md). ARCH7d1 — CI 4895/165 PASS; реальный запуск остановился до worker из-за конфликта $archive/$Archive. ARCH7d2 — CI 4898/165 PASS, совместный REAL PASS ARCH7c/d (20261125-173959-49d4a7fb, 2 verified, 1 deferred, 7 unprocessed, same Outlook). ARCH7e — [ограниченный Auto DEV](docs/2.6.5-arch7e.md), CI и single-POP3 REAL PASS. **ProductionReady=False. Auto без явного DEV-согласия закрыт. Не назначать DEV пользователям через планировщик.**
 

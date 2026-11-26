@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH7g1 DEV: ARCH7g CI 4932/167 PASS but release ZIP lacked three new entrypoints; correct allowlist and validate every tracked root PS and every staged ZIP entry. Production closed.",
     "ARCH7g DEV: ARCH7f1 CI PASS 4919/166; disabled task definition, interactive SID/session fence, Outlook absence deferral code 40, no deployment. 4932/167 expected; production closed.",
     "ARCH7f DEV: ARCH7e CI 4909/165 and real single-POP3 Auto 10/10 accepted; explicit Quiet diagnostics, private summaries, retention of successful summaries only, bounded pacing and recovery backoff, test-only exit-code wrapper. 4919/166 expected; production closed.",
     "ARCH7e DEV: ARCH7d2 CI 4898/165 and operator mixed real recovery PASS. Explicit all-POP3 test Auto gate, attach-only discovery, age-only defaults, bounded per-source supervision and exact shared-directory pending owner routing. 4909/165 expected, 95 focused. Production closed.",

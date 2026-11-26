@@ -1,4 +1,4 @@
-name: OutlookPOP3Archive ARCH7g Windows PowerShell 5.1 CI
+name: OutlookPOP3Archive ARCH7g1 Windows PowerShell 5.1 CI
 on:
   push:
     branches: [feature/outlookpop3archive-2.6.5-arch6f2-root-mail]
@@ -1035,16 +1035,25 @@ jobs:
           $ErrorActionPreference='Stop'
           $project=(Get-Location).Path
           $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
-          $base='OutlookPOP3Archive-2.6.5-ARCH7g-dev-g'+$short
-          $out=Join-Path $env:RUNNER_TEMP 'OPA-ARCH7g-Package'
-          $stageParent=Join-Path $env:RUNNER_TEMP 'OPA-ARCH7g-Stage'
+          $base='OutlookPOP3Archive-2.6.5-ARCH7g1-dev-g'+$short
+          $out=Join-Path $env:RUNNER_TEMP 'OPA-ARCH7g1-Package'
+          $stageParent=Join-Path $env:RUNNER_TEMP 'OPA-ARCH7g1-Stage'
           $staged=Join-Path $stageParent $base
           [void][IO.Directory]::CreateDirectory($out)
           [void][IO.Directory]::CreateDirectory($staged)
-          foreach($f in @('.editorconfig','.gitignore','.psscriptanalyzer.psd1','RELEASE.json','MANIFEST.txt','README.md','CHANGELOG.md','OutlookPOP3Archive.ps1','Get-OPAArchiveRootInventory.ps1','Get-OPAArchiveMessageInventory.ps1','Export-OPADeferredReport.ps1','Invoke-OPAArchiveBatches.ps1','Invoke-OPALiveArchiveBatches.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-ARCH2c4.ps1','Invoke-ARCH2d.ps1','Invoke-ARCH2d3.ps1','Invoke-ARCH2d4.ps1','Invoke-ARCH2d5.ps1','Invoke-ARCH3a.ps1','Invoke-ARCH3b.ps1','Invoke-ARCH3c.ps1','Invoke-ARCH3d.ps1','Invoke-ARCH3e.ps1','Invoke-ARCH3f.ps1','Invoke-ARCH3g.ps1','Invoke-ARCH3h.ps1','Invoke-ARCH3i.ps1','Invoke-ARCH3j.ps1','Invoke-ARCH3k.ps1','Invoke-ARCH3n.ps1','Invoke-ARCH3o.ps1','Invoke-ARCH3p.ps1','Invoke-ARCH3q.ps1','Invoke-ARCH3r.ps1','Invoke-ARCH3t.ps1','Invoke-ARCH3u.ps1','Invoke-ARCH3v.ps1','Invoke-ARCH3w.ps1','Invoke-ARCH3w1.ps1','Invoke-ARCH3x.ps1','Invoke-ARCH3x1.ps1','Invoke-ARCH3x2.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')){
+          foreach($f in @('.editorconfig','.gitignore','.psscriptanalyzer.psd1','RELEASE.json','MANIFEST.txt','README.md','CHANGELOG.md','OutlookPOP3Archive.ps1','Get-OPAArchiveRootInventory.ps1','Get-OPAArchiveMessageInventory.ps1','Export-OPADeferredReport.ps1','Invoke-OPAArchiveBatches.ps1','Invoke-OPALiveArchiveBatches.ps1','Invoke-OPAAutoDev.ps1','Invoke-OPARdsAutoDev.ps1','New-OPARdsTaskPlan.ps1','OutlookPOP3Archive.Worker.ps1','Invoke-ARCH2c4.ps1','Invoke-ARCH2d.ps1','Invoke-ARCH2d3.ps1','Invoke-ARCH2d4.ps1','Invoke-ARCH2d5.ps1','Invoke-ARCH3a.ps1','Invoke-ARCH3b.ps1','Invoke-ARCH3c.ps1','Invoke-ARCH3d.ps1','Invoke-ARCH3e.ps1','Invoke-ARCH3f.ps1','Invoke-ARCH3g.ps1','Invoke-ARCH3h.ps1','Invoke-ARCH3i.ps1','Invoke-ARCH3j.ps1','Invoke-ARCH3k.ps1','Invoke-ARCH3n.ps1','Invoke-ARCH3o.ps1','Invoke-ARCH3p.ps1','Invoke-ARCH3q.ps1','Invoke-ARCH3r.ps1','Invoke-ARCH3t.ps1','Invoke-ARCH3u.ps1','Invoke-ARCH3v.ps1','Invoke-ARCH3w.ps1','Invoke-ARCH3w1.ps1','Invoke-ARCH3x.ps1','Invoke-ARCH3x1.ps1','Invoke-ARCH3x2.ps1','Invoke-CI.ps1','Invoke-OPAWorkerSelfTest.ps1','New-OPABuildPackage.ps1')){
             $src=Join-Path $project $f
             if(-not (Test-Path -LiteralPath $src -PathType Leaf)){throw ('Required project file absent: '+$f)}
             Copy-Item -LiteralPath $src -Destination (Join-Path $staged $f)
+          }
+          # All tracked project-root PowerShell entrypoints must be staged.
+          # Keep the explicit allowlist: do not silently include arbitrary files.
+          $tracked=@(git ls-files -- '*.ps1' | Where-Object {$_ -notmatch '[/\\]'})
+          if($LASTEXITCODE -ne 0 -or $tracked.Count -eq 0){throw 'Cannot enumerate tracked root PowerShell files.'}
+          foreach($entrypoint in $tracked){
+            if(-not (Test-Path -LiteralPath (Join-Path $staged $entrypoint) -PathType Leaf)){
+              throw ('Tracked root entrypoint omitted by package allowlist: '+$entrypoint)
+            }
           }
           foreach($dir in @('Core','Tests','docs')){
             $dirPath=Join-Path $project $dir
@@ -1059,7 +1068,7 @@ jobs:
               Copy-Item -LiteralPath $f.FullName -Destination $dst
             }
           }
-          $info=[ordered]@{Schema='OPA265.ARCH7g.BuildInfo.1';DevelopmentGate='2.6.5-ARCH7g';SourceCommit=$env:GITHUB_SHA;WindowsPowerShell51CiPassed=$true;PesterAndPSScriptAnalyzerRequired=$true;LiveOutlookTestInCi=$false;ProductionArchiveResumeAutoClosed=$true;ExplicitTestArchiveResumeEnabled=$true;ProductionReady=$false}
+          $info=[ordered]@{Schema='OPA265.ARCH7g1.BuildInfo.1';DevelopmentGate='2.6.5-ARCH7g1';SourceCommit=$env:GITHUB_SHA;WindowsPowerShell51CiPassed=$true;PesterAndPSScriptAnalyzerRequired=$true;LiveOutlookTestInCi=$false;ProductionArchiveResumeAutoClosed=$true;ExplicitTestArchiveResumeEnabled=$true;ProductionReady=$false}
           [IO.File]::WriteAllText((Join-Path $staged 'BUILD-INFO.json'),(ConvertTo-Json -InputObject $info -Depth 4),(New-Object Text.UTF8Encoding($false)))
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           $zip=Join-Path $out ($base+'.zip')
@@ -1067,10 +1076,18 @@ jobs:
           # Validate the actual ZIP, not just the source/staging tree.
           $archive=[IO.Compression.ZipFile]::OpenRead($zip)
           try {
-            foreach($required in @('OutlookPOP3Archive.ps1','Get-OPAArchiveRootInventory.ps1','Get-OPAArchiveMessageInventory.ps1','Export-OPADeferredReport.ps1','Invoke-OPAArchiveBatches.ps1','Invoke-OPALiveArchiveBatches.ps1','Core/Archive/ARCH6Orchestration.ps1','Core/Archive/ARCH6Deferred.ps1','Tests/Archive/ARCH6SequenceAndSafety.Tests.ps1','BUILD-INFO.json')){
+            $critical=@('OutlookPOP3Archive.ps1','Get-OPAArchiveRootInventory.ps1','Get-OPAArchiveMessageInventory.ps1','Export-OPADeferredReport.ps1','Invoke-OPAArchiveBatches.ps1','Invoke-OPALiveArchiveBatches.ps1','Invoke-OPAAutoDev.ps1','Invoke-OPARdsAutoDev.ps1','New-OPARdsTaskPlan.ps1','Core/Runtime/ARCH7gRds.ps1','Tests/Runtime/ARCH7gRds.Tests.ps1','Tests/Archive/ARCH7fQuietAuto.Tests.ps1','Core/Archive/ARCH6Orchestration.ps1','Core/Archive/ARCH6Deferred.ps1','Tests/Archive/ARCH6SequenceAndSafety.Tests.ps1','BUILD-INFO.json')
+            $stagedFiles=@(Get-ChildItem -LiteralPath $staged -Recurse -File -Force)
+            $relativeFiles=@($stagedFiles | ForEach-Object {$_.FullName.Substring($staged.Length).TrimStart([char[]]@('\','/')).Replace('\','/')})
+            foreach($required in $critical){
+              if($required -cnotin $relativeFiles){throw ('Required staged file absent: '+$required)}
+            }
+            $zipFiles=@($archive.Entries | Where-Object {$_.Name -ne ''})
+            if($zipFiles.Count -ne $relativeFiles.Count){throw 'ZIP/staged file inventory count mismatch.'}
+            foreach($required in $relativeFiles){
               $expected=$base+'/'+$required
               $matches=@($archive.Entries | Where-Object {($_.FullName.Replace('\','/')) -ceq $expected})
-              if($matches.Count -ne 1 -or $matches[0].Length -le 0){throw ('Missing/duplicate/empty required ZIP entry: '+$expected)}
+              if($matches.Count -ne 1 -or ($required -cin $critical -and $matches[0].Length -le 0)){throw ('Missing/duplicate/empty required ZIP entry: '+$expected)}
               $file=Join-Path $staged $required
               $stream=$matches[0].Open()
               try {
@@ -1079,31 +1096,31 @@ jobs:
               } finally {$stream.Dispose()}
               if($actual -ine (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash){throw ('ZIP content differs from staged file: '+$expected)}
             }
-            Write-Host 'PASS ARCH6ae required ZIP entrypoints, core, tests and build metadata byte hashes.'
+            Write-Host 'PASS ARCH7g1 all staged ZIP entries and byte hashes; tracked root PowerShell inventory complete.'
           } finally {$archive.Dispose()}
           $hash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
           [IO.File]::WriteAllText((Join-Path $out ($base+'.sha256')),($hash+'  '+[IO.Path]::GetFileName($zip)+[char]10),(New-Object Text.UTF8Encoding($false)))
-          Write-Host ('ARCH7g ZIP SHA256: '+$hash)
-      - name: Upload tested project-only ARCH7g DEV ZIP
+          Write-Host ('ARCH7g1 ZIP SHA256: '+$hash)
+      - name: Upload tested project-only ARCH7g1 DEV ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: OutlookPOP3Archive-2.6.5-ARCH7g-dev
+          name: OutlookPOP3Archive-2.6.5-ARCH7g1-dev
           path: |
-            ${{ runner.temp }}/OPA-ARCH7g-Package/*.zip
-            ${{ runner.temp }}/OPA-ARCH7g-Package/*.sha256
+            ${{ runner.temp }}/OPA-ARCH7g1-Package/*.zip
+            ${{ runner.temp }}/OPA-ARCH7g1-Package/*.sha256
           if-no-files-found: error
           retention-days: 14
-      - name: Publish public test-only ARCH7g prerelease
+      - name: Publish public test-only ARCH7g1 prerelease
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference='Stop'
           $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
-          $base='OutlookPOP3Archive-2.6.5-ARCH7g-dev-g'+$short
-          $dir=Join-Path $env:RUNNER_TEMP 'OPA-ARCH7g-Package'
+          $base='OutlookPOP3Archive-2.6.5-ARCH7g1-dev-g'+$short
+          $dir=Join-Path $env:RUNNER_TEMP 'OPA-ARCH7g1-Package'
           $zip=Join-Path $dir ($base+'.zip')
           $sha=Join-Path $dir ($base+'.sha256')
           if(-not (Test-Path -LiteralPath $zip -PathType Leaf) -or -not (Test-Path -LiteralPath $sha -PathType Leaf)){throw 'ZIP/checksum absent'}
-          $tag='outlookpop3archive-2.6.5-arch7g-dev-g'+$short
-          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH7g DEV '+$short) --notes 'ARCH7g DEV: disabled task XML, interactive SID and same-session Outlook preflight, 4932/167 expected; no deployment; real RDS acceptance pending. Production closed.' --prerelease
+          $tag='outlookpop3archive-2.6.5-arch7g1-dev-g'+$short
+          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH7g1 DEV '+$short) --notes 'ARCH7g1 DEV: correct missing root entrypoints in ARCH7g release ZIP; enforce tracked root inventory and all staged ZIP hashes; 4932/167 expected. Production closed.' --prerelease
           if($LASTEXITCODE -ne 0){throw 'GitHub prerelease publication failed'}
