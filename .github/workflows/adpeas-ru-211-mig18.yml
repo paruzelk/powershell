@@ -1,4 +1,4 @@
-name: "adPEAS RU 2.11.0 MIG19k2 - offline SID rendering"
+name: "adPEAS RU 2.11.0 MIG20 - final localization inventory"
 on:
   push:
     branches:
@@ -471,6 +471,16 @@ jobs:
           & $f -SelfTest
           Copy-Item -LiteralPath $f -Destination '_mig/Invoke-MIG19k2LocalAcceptance.ps1'
           Copy-Item 'adPEAS-RU/Migration/v2.11.0/MIG18/README-MIG19k2.md' '_mig/README-MIG19k2.md'
+      - name: MIG20 final source and AST localization inventory
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $new = @(Get-ChildItem '_mig\new' -Directory)
+          if ($new.Count -ne 1) { throw 'MIG20 expected one pinned upstream tree' }
+          python adPEAS-RU/Migration/v2.11.0/MIG18/Audit-MIG20.py --candidate '_mig/candidate' --upstream $new[0].FullName --report '_mig/2.11.0-mig20-source.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG20 source audit failed' }
+          & 'adPEAS-RU/Migration/v2.11.0/MIG18/Audit-MIG20Ast.ps1' -Candidate '_mig/candidate' -Report '_mig/2.11.0-mig20-ast.json'
+          Copy-Item 'adPEAS-RU/Migration/v2.11.0/MIG18/README-MIG20.md' '_mig/README-MIG20.md'
       - name: Check generated JavaScript syntax
         shell: powershell
         run: |
@@ -584,11 +594,16 @@ jobs:
           if ($errors.Count -gt 0) { throw $errors[0].Message }
           python adPEAS-RU/Migration/v2.11.0/MIG18/Test-MIG19k2.py --candidate '_mig/candidate' --diagnostics '_mig/mig19k2-diagnostics' --report '_mig/2.11.0-mig19k2-report.json'
           if ($LASTEXITCODE -ne 0) { throw 'MIG19bc offline report parity failed' }
+      - name: MIG20 final runtime catalog coverage and parity
+        shell: powershell
+        run: |
+          python adPEAS-RU/Migration/v2.11.0/MIG18/Audit-MIG20.py --diagnostics '_mig/mig19k2-diagnostics' --report '_mig/2.11.0-mig20-runtime.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG20 runtime audit failed' }
       - name: Publish synthetic report diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG19k2-DIAGNOSTICS
+          name: adPEAS-RU-2.11.0-MIG20-DIAGNOSTICS
           path: |
             _mig/mig19k2-diagnostics/
             _mig/2.11.0-mig19k2-report.json
@@ -598,7 +613,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG19k2-COVERAGE
+          name: adPEAS-RU-2.11.0-MIG20-COVERAGE
           path: |
             _mig/2.11.0-mig19d2-source.json
             _mig/2.11.0-mig19d2-residual.json
@@ -621,6 +636,9 @@ jobs:
             _mig/2.11.0-mig19j-source.json
             _mig/2.11.0-mig19k-source.json
             _mig/2.11.0-mig19k2-source.json
+            _mig/2.11.0-mig20-source.json
+            _mig/2.11.0-mig20-ast.json
+            _mig/2.11.0-mig20-runtime.json
           retention-days: 14
           if-no-files-found: warn
       - name: Publish runtime diagnostic evidence
@@ -637,7 +655,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG19k2-PREVIEW
+          name: adPEAS-RU-2.11.0-MIG20-PREVIEW
           path: |
             _mig/2.11.0-parity.json
             _mig/2.11.0-mig2-coverage.json
@@ -683,8 +701,12 @@ jobs:
             _mig/2.11.0-mig19j-source.json
             _mig/2.11.0-mig19k-source.json
             _mig/2.11.0-mig19k2-source.json
+            _mig/2.11.0-mig20-source.json
+            _mig/2.11.0-mig20-ast.json
+            _mig/2.11.0-mig20-runtime.json
             _mig/Invoke-MIG19k2LocalAcceptance.ps1
             _mig/README-MIG19k2.md
+            _mig/README-MIG20.md
             _mig/candidate/README-RU-2.11.0.md
             _mig/candidate/adPEAS.ps1
             _mig/candidate/adPEAS_min.ps1
