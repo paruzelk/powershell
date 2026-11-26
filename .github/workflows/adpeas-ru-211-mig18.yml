@@ -1,4 +1,4 @@
-name: "adPEAS RU 2.11.0 MIG19d5-d7 - gated MIG19e candidate"
+name: "adPEAS RU 2.11.0 MIG19d7a - classify executable and help example AST"
 on:
   push:
     branches:
@@ -435,11 +435,11 @@ jobs:
         run: |
           python adPEAS-RU/Migration/v2.11.0/MIG18/Build-MIG19d5-d7.py --candidate '_mig/candidate' --locale 'adPEAS-RU/Localization' --stage d7 --report '_mig/2.11.0-mig19d7-source.json' --inventory '_mig/2.11.0-mig19d7-residual.json'
           if ($LASTEXITCODE -ne 0) { throw 'MIG19d7 source gate failed' }
-      - name: MIG19d7 verify 767 exact display command AST witnesses
+      - name: MIG19d7a verify all 767 executable or documented example AST witnesses
         shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
-          & 'adPEAS-RU/Migration/v2.11.0/MIG18/Test-MIG19d7-CommandAst.ps1' -Candidate '_mig/candidate' -Reports @('_mig/2.11.0-mig19d5-source.json','_mig/2.11.0-mig19d6-source.json','_mig/2.11.0-mig19d7-source.json') -OutputReport '_mig/2.11.0-mig19d7-ast.json'
+          & 'adPEAS-RU/Migration/v2.11.0/MIG18/Test-MIG19d7a-CommandAst.ps1' -Candidate '_mig/candidate' -Reports @('_mig/2.11.0-mig19d5-source.json','_mig/2.11.0-mig19d6-source.json','_mig/2.11.0-mig19d7-source.json') -OutputReport '_mig/2.11.0-mig19d7a-ast.json'
       - name: Check generated JavaScript syntax
         shell: powershell
         run: |
@@ -557,7 +557,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG19d7-DIAGNOSTICS
+          name: adPEAS-RU-2.11.0-MIG19d7a-DIAGNOSTICS
           path: |
             _mig/mig19d7-diagnostics/
             _mig/2.11.0-mig19d7-report.json
@@ -567,7 +567,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG19d7-COVERAGE
+          name: adPEAS-RU-2.11.0-MIG19d7a-COVERAGE
           path: |
             _mig/2.11.0-mig19d2-source.json
             _mig/2.11.0-mig19d2-residual.json
@@ -584,7 +584,7 @@ jobs:
             _mig/2.11.0-mig19d6-residual.json
             _mig/2.11.0-mig19d7-source.json
             _mig/2.11.0-mig19d7-residual.json
-            _mig/2.11.0-mig19d7-ast.json
+            _mig/2.11.0-mig19d7a-ast.json
           retention-days: 14
           if-no-files-found: warn
       - name: Publish runtime diagnostic evidence
@@ -601,7 +601,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG19d7-MIG19e-CANDIDATE-PREVIEW
+          name: adPEAS-RU-2.11.0-MIG19d7a-MIG19e-CANDIDATE-PREVIEW
           path: |
             _mig/2.11.0-parity.json
             _mig/2.11.0-mig2-coverage.json
@@ -641,7 +641,7 @@ jobs:
             _mig/2.11.0-mig19d6-residual.json
             _mig/2.11.0-mig19d7-source.json
             _mig/2.11.0-mig19d7-residual.json
-            _mig/2.11.0-mig19d7-ast.json
+            _mig/2.11.0-mig19d7a-ast.json
             _mig/candidate/README-RU-2.11.0.md
             _mig/candidate/adPEAS.ps1
             _mig/candidate/adPEAS_min.ps1
