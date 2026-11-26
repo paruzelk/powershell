@@ -50,7 +50,7 @@ function Get-OPAARCH7ePendingOwner {
 function Invoke-OPAARCH7eSourceSequence {
     [CmdletBinding()]
     param([AllowEmptyCollection()][object[]]$Sources,[scriptblock]$PendingOwner,[scriptblock]$RunSource,
-          [ValidateRange(1,100)][int]$MaxBatchesPerSource)
+          [ValidateRange(1,100)][int]$MaxBatchesPerSource,[ValidateRange(0,300)][int]$BatchDelaySeconds=0,[scriptblock]$Record)
     $results=New-Object 'System.Collections.Generic.List[object]'
     $halt=$false
     # Group by original directory-wide lease/pending. No migration, no overwrite.
@@ -88,6 +88,7 @@ function Invoke-OPAARCH7eSourceSequence {
                     }
                     $verified+=[int]$last.Verified;$deferred+=[int]$last.Deferred;$batches+=[int]$last.Batches
                     $status=[string]$last.Status
+                    if($Record){& $Record 'Batch' $member $last}
                     if($status -cin @('WorkerStillRunning','WorkerExitCodeUnavailable','RecoveryExitWithoutEvidence')){$halt=$true;break}
                     if($status -cin @('NoEligibleFolders','NoEligibleMessages')){
                         if($null -ne (& $PendingOwner $group.Name $members)){throw 'ARCH7e exhaustion with pending.'}
@@ -108,6 +109,7 @@ function Invoke-OPAARCH7eSourceSequence {
                     # After successful interrupted recovery, select a fresh batch
                     # from current source, not the historical unprocessed EntryIDs.
                     $status='BatchLimitReached'
+                    if($attempts -lt $MaxBatchesPerSource -and $BatchDelaySeconds -gt 0){Start-Sleep -Seconds $BatchDelaySeconds}
                 }catch{
                     $status='SupervisorException';$detail=$_.Exception.Message
                     # Cannot prove an exception occurred before child start/exit.
@@ -130,7 +132,8 @@ function Invoke-OPAARCH7eSourceSequence {
 function Invoke-OPAARCH7eAuto {
     [CmdletBinding()]
     param([string]$ProjectRoot,[string]$ProfileName,[int]$BatchSize,[int]$MaxBatchesPerSource,
-          [int]$OlderThanMonths,[string]$ArchiveGrouping,[switch]$IncludeRootMail,[int]$MaxResumeAttempts)
+          [int]$OlderThanMonths,[string]$ArchiveGrouping,[switch]$IncludeRootMail,[int]$MaxResumeAttempts,
+          [ValidateRange(0,300)][int]$BatchDelaySeconds=0,[ValidateRange(5,300)][int]$RetryDelaySeconds=5,[scriptblock]$Record)
     . (Join-Path $ProjectRoot 'Core/Runtime/ComManager.ps1')
     . (Join-Path $ProjectRoot 'Core/Archive/ARCH7dSupervisor.ps1')
     . (Join-Path $ProjectRoot 'Core/Archive/ARCH6Orchestration.ps1')
@@ -146,16 +149,109 @@ function Invoke-OPAARCH7eAuto {
         finally{Close-OPAComSession -Session $session;$session=$null}
         $arch7eControllerPath=Join-Path $ProjectRoot 'Invoke-OPALiveArchiveBatches.ps1'
         $arch7eCommon=@{ConfirmTestArchive=$true;ConfirmLiveOutlookVerification=$true;BatchSize=$BatchSize;MaxBatches=1;OlderThanMonths=$OlderThanMonths;ArchiveGrouping=$ArchiveGrouping;IncludeRootMail=[bool]$IncludeRootMail;MaxResumeAttempts=$MaxResumeAttempts}
+        $arch7eRetryDelay=$RetryDelaySeconds
         $arch7eRead={param($directory,$members) Get-OPAARCH7ePendingOwner -Directory $directory -Sources $members}
         $arch7eRun={
             param($row)
             $params=$arch7eCommon.Clone();$params.SourcePst=$row.SourcePst;$params.ProfileName=$row.Profile
+            if($arch7eRetryDelay -ne 5){$params.RetryDelaySeconds=$arch7eRetryDelay}
             & $arch7eControllerPath @params
         }
-        Invoke-OPAARCH7eSourceSequence -Sources $sourceRows -PendingOwner $arch7eRead -RunSource $arch7eRun -MaxBatchesPerSource $MaxBatchesPerSource
+        Invoke-OPAARCH7eSourceSequence -Sources $sourceRows -PendingOwner $arch7eRead -RunSource $arch7eRun -MaxBatchesPerSource $MaxBatchesPerSource -BatchDelaySeconds $BatchDelaySeconds -Record $Record
     }finally{
         if($null -ne $session){Close-OPAComSession -Session $session}
         if($held){[void]$mutex.ReleaseMutex()}
         $mutex.Dispose()
     }
+}
+
+# ARCH7f: private diagnostic summaries; original evidence is never rotated.
+function Get-OPAARCH7fExitCode {
+    [CmdletBinding()]
+    param([object]$Result)
+    if($null -eq $Result -or $Result.Schema -cne '2.6.5-ARCH7e.Auto.1' -or $Result.ProductionReady -ne $false){return 30}
+    if($Result.Status -cin @('AllSourcesExhausted','NoPop3Sources')){return 0}
+    if($Result.Status -ceq 'PartialOrBlocked'){
+        $rows=@($Result.Sources)
+        if($rows.Count -gt 0 -and @($rows | Where-Object {$_.Status -cnotin @('Exhausted','BatchLimitReached')}).Count -eq 0){return 10}
+        return 20
+    }
+    return 30
+}
+function New-OPAARCH7fLogRoot {
+    [CmdletBinding()]
+    param([string]$BaseDirectory)
+    if([string]::IsNullOrWhiteSpace($BaseDirectory) -or -not [IO.Directory]::Exists($BaseDirectory)){throw 'ARCH7f local diagnostic base unavailable.'}
+    $base=[IO.Path]::GetFullPath($BaseDirectory)
+    if($base.StartsWith('\\') -or ([IO.File]::GetAttributes($base) -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'ARCH7f redirected diagnostic base.'}
+    $path=Join-Path $base 'OutlookPOP3Archive-ARCH7f'
+    $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User
+    if(-not [IO.Directory]::Exists($path)){
+        $security=[Security.AccessControl.DirectorySecurity]::new()
+        $security.SetOwner($sid)
+        $security.SetAccessRuleProtection($true,$false)
+        $rule=[Security.AccessControl.FileSystemAccessRule]::new($sid,[Security.AccessControl.FileSystemRights]::FullControl,([Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [Security.AccessControl.InheritanceFlags]::ObjectInherit),[Security.AccessControl.PropagationFlags]::None,[Security.AccessControl.AccessControlType]::Allow)
+        $security.AddAccessRule($rule)
+        [void][IO.Directory]::CreateDirectory($path,$security)
+    }
+    if(([IO.File]::GetAttributes($path) -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'ARCH7f redirected diagnostic directory.'}
+    $acl=[IO.Directory]::GetAccessControl($path)
+    if(-not $acl.AreAccessRulesProtected -or $acl.GetOwner([Security.Principal.SecurityIdentifier]).Value -ne $sid.Value){throw 'ARCH7f diagnostic directory not private.'}
+    foreach($access in $acl.GetAccessRules($true,$true,[Security.Principal.SecurityIdentifier])){
+        if($access.AccessControlType -eq 'Allow' -and $access.IdentityReference.Value -ne $sid.Value){throw 'ARCH7f unexpected diagnostic directory access.'}
+    }
+    return $path
+}
+function Write-OPAARCH7fDiagnostic {
+    [CmdletBinding()]
+    param([IO.FileStream]$Stream,[string]$Phase,[object]$Data)
+    $row=[ordered]@{TimeUtc=[DateTime]::UtcNow.ToString('o');Phase=$Phase;Data=$Data}
+    $bytes=[Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-Json -InputObject $row -Compress -Depth 8)+[char]10)
+    $Stream.Write($bytes,0,$bytes.Length)
+    $Stream.Flush($true)
+}
+function Remove-OPAARCH7fExpiredDiagnostics {
+    [CmdletBinding()]
+    param([string]$Directory,[ValidateRange(1,3650)][int]$RetentionDays,[DateTime]$NowUtc=[DateTime]::UtcNow)
+    foreach($file in [IO.Directory]::EnumerateFiles($Directory,'ARCH7f-*.complete.jsonl',[IO.SearchOption]::TopDirectoryOnly)){
+        if([IO.Path]::GetFileName($file) -cnotmatch '^ARCH7f-[0-9a-f]{32}\.complete\.jsonl$' -or
+           ([IO.File]::GetAttributes($file) -band [IO.FileAttributes]::ReparsePoint) -ne 0){continue}
+        if([IO.File]::GetLastWriteTimeUtc($file) -lt $NowUtc.AddDays(-$RetentionDays)){[IO.File]::Delete($file)}
+    }
+}
+function Invoke-OPAARCH7fQuietAuto {
+    [CmdletBinding()]
+    param([hashtable]$AutoParameters,[ValidateRange(1,3650)][int]$RetentionDays=30)
+    $arch7fRoot=New-OPAARCH7fLogRoot -BaseDirectory ([Environment]::GetFolderPath('LocalApplicationData'))
+    $arch7fId='ARCH7f-'+[guid]::NewGuid().ToString('N')
+    $arch7fPath=Join-Path $arch7fRoot ($arch7fId+'.jsonl')
+    $arch7fStream=[IO.FileStream]::new($arch7fPath,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read)
+    $arch7fExit=30
+    try{
+        Write-OPAARCH7fDiagnostic -Stream $arch7fStream -Phase Start -Data @{Pid=$PID;BatchSize=$AutoParameters.BatchSize;MaxBatchesPerSource=$AutoParameters.MaxBatchesPerSource;OlderThanMonths=$AutoParameters.OlderThanMonths;ArchiveGrouping=$AutoParameters.ArchiveGrouping;BatchDelaySeconds=$AutoParameters.BatchDelaySeconds;RetryDelaySeconds=$AutoParameters.RetryDelaySeconds}
+        try{Remove-OPAARCH7fExpiredDiagnostics -Directory $arch7fRoot -RetentionDays $RetentionDays}
+        catch{Write-OPAARCH7fDiagnostic -Stream $arch7fStream -Phase RetentionWarning -Data @{Message=$_.Exception.Message}}
+        $arch7fRecord={
+            param($phase,$row,$data)
+            Write-OPAARCH7fDiagnostic -Stream $arch7fStream -Phase $phase -Data @{SourcePst=$row.SourcePst;Status=$data.Status;Verified=$data.Verified;Deferred=$data.Deferred;Unprocessed=$data.Unprocessed;TransactionId=$data.LastTransactionId;WorkerLogDirectory=$data.LogDirectory;ArchiveExitCode=$data.LastArchiveExitCode}
+        }
+        $arch7fParams=$AutoParameters.Clone()
+        $arch7fParams.Record=$arch7fRecord
+        $arch7fResult=Invoke-OPAARCH7eAuto @arch7fParams 3>$null 4>$null 5>$null 6>$null
+        $arch7fExit=Get-OPAARCH7fExitCode -Result $arch7fResult
+        foreach($arch7fSource in @($arch7fResult.Sources)){
+            Write-OPAARCH7fDiagnostic -Stream $arch7fStream -Phase Source -Data @{SourcePst=$arch7fSource.SourcePst;Status=$arch7fSource.Status;Verified=$arch7fSource.Verified;Deferred=$arch7fSource.Deferred;Batches=$arch7fSource.Batches;Detail=$arch7fSource.Detail}
+        }
+        Write-OPAARCH7fDiagnostic -Stream $arch7fStream -Phase Completed -Data @{Status=$arch7fResult.Status;Verified=$arch7fResult.Verified;Deferred=$arch7fResult.Deferred;ExitCode=$arch7fExit}
+    }catch{
+        try{Write-OPAARCH7fDiagnostic -Stream $arch7fStream -Phase Failed -Data @{Message=$_.Exception.Message;Type=$_.Exception.GetType().FullName;HResult=$_.Exception.HResult}}catch{}
+        throw
+    }finally{$arch7fStream.Dispose()}
+    if($arch7fExit -in @(0,10)){
+        $arch7fFinal=Join-Path $arch7fRoot ($arch7fId+'.complete.jsonl')
+        [IO.File]::Move($arch7fPath,$arch7fFinal)
+        $arch7fPath=$arch7fFinal
+    }
+    $arch7fResult | Add-Member -NotePropertyMembers @{DiagnosticLog=$arch7fPath;ExitCode=$arch7fExit}
+    return $arch7fResult
 }

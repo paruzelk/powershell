@@ -1,5 +1,12 @@
 ﻿# Architecture — 2.6.3-PREVIEW1
 
+## ARCH7f — актуальное состояние (26.11.2026)
+
+ARCH7e CI [45638316156](https://github.com/paruzelk/powershell/actions/runs/45638316156) PASS 4909/165; commit `540f5df0`; REAL PASS 26.11.2026, transaction `20261126-143718-3dd67c95`, single POP3, 10 planned/verified/reconciled/indexed, 0 deferred/unprocessed, PendingCleared=True, Outlook PID 7660 unchanged, workers 6460/19172. Multi-POP3 real acceptance remains open.
+
+ARCH7b–f используют отдельный STA worker для проверки без принудительного Outlook restart. ARCH7f добавляет диагностические summary и ограниченный recovery backoff; [runbook](2.6.5-arch7f.md). Production closed. Разделы ниже — исторические, не применять их старые ограничения как текущий CLI.
+
+
 ## 2026-11-11 ARCH2b actual main user-content verifier integration
 
 [ARCH2b design and limitations](2.6.5-arch2b-semantic-verifier.md). The original saved source MailItem is hashed, including byte SHA256 for supported file attachments, BEFORE any Move claim. The hash-only witness is written into the durable `Move Started` step; `Get-OPAExpectedMovesFromTransaction` carries it into `Test-OPAArchiveMoves`, which now has `-RequireSemanticWitness` in both main Archive and Resume. After target lookup, `Test-OPAArchiveItemFingerprint` re-hashes actual destination content and compares it without treating provider-driven `MailItem.Size` drift as corruption. Legacy read-only verifier API remains compatible unless new strict flag is passed. **Archive/Resume/Auto still closed.** Unsupported attachment types/limits and crash-temp cleanup need ARCH2c.

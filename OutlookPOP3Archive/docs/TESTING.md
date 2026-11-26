@@ -1,5 +1,12 @@
 ﻿# Testing — 2.6.3-PREVIEW1
 
+## ARCH7f — актуальное состояние (26.11.2026)
+
+ARCH7e CI [45638316156](https://github.com/paruzelk/powershell/actions/runs/45638316156) PASS 4909/165; commit `540f5df0`; REAL PASS 26.11.2026, transaction `20261126-143718-3dd67c95`, single POP3, 10 planned/verified/reconciled/indexed, 0 deferred/unprocessed, PendingCleared=True, Outlook PID 7660 unchanged, workers 6460/19172. Multi-POP3 real acceptance remains open.
+
+ARCH7b–f используют отдельный STA worker для проверки без принудительного Outlook restart. ARCH7f добавляет диагностические summary и ограниченный recovery backoff; [runbook](2.6.5-arch7f.md). Production closed. Разделы ниже — исторические, не применять их старые ограничения как текущий CLI.
+
+
 ## ARCH2b main semantic witness integration tests (2026-11-11)
 
 [ARCH2b runbook](2.6.5-arch2b-semantic-verifier.md). New `Tests/Archive/ARCH2bSemanticWitness.Tests.ps1`: 45 pure/synthetic Pester tests for Unicode, Body/HTML, sender/recipients, user state, attachment SaveAsFile byte SHA256, changed file bytes/names, expected harmless MailItem.Size drift, missing/duplicated original witness, production never ready and integration into actual `MailMover` and `ArchiveVerifier`. Full expected **3754 tests / 125 containers**. CI uses fake MailItem objects, not real Outlook. Next ARCH2c requires a controlled disposable PST with independent post-restart reconciliation, not repeat historic BW4j one-shot fixtures.

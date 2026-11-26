@@ -1,5 +1,12 @@
 ﻿# Recovery and ambiguous worker outcomes — 2.6.3-PREVIEW1
 
+## ARCH7f — актуальное состояние (26.11.2026)
+
+ARCH7e CI [45638316156](https://github.com/paruzelk/powershell/actions/runs/45638316156) PASS 4909/165; commit `540f5df0`; REAL PASS 26.11.2026, transaction `20261126-143718-3dd67c95`, single POP3, 10 planned/verified/reconciled/indexed, 0 deferred/unprocessed, PendingCleared=True, Outlook PID 7660 unchanged, workers 6460/19172. Multi-POP3 real acceptance remains open.
+
+ARCH7b–f используют отдельный STA worker для проверки без принудительного Outlook restart. ARCH7f добавляет диагностические summary и ограниченный recovery backoff; [runbook](2.6.5-arch7f.md). Production closed. Разделы ниже — исторические, не применять их старые ограничения как текущий CLI.
+
+
 ## ARCH2b source witness is required for verified archival (2026-11-11)
 
 [ARCH2b readme](2.6.5-arch2b-semantic-verifier.md): `Move Started` journal now optionally includes original pre-Move semantic witness (Body/HTML/recipients/state + SHA256 of actual attachment bytes). The main verifier invokes `-RequireSemanticWitness` so older recovered transactions with no original witness **cannot be silently promoted to Verified/Completed**, nor can DuplicateIndex stand in for a missing source snapshot. When this new optional schema is absent, historic one-shot claims remain immutable and manual reconciliation is required. `MailItem.Size` alone is not critical. ARCH2a no-blind-retry fence remains unchanged. Runtime writers remain blocked pending ARCH2c.

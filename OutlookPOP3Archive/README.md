@@ -1,14 +1,18 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7e DEV
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7f DEV
 
 ## Актуальный запуск и документация
+
+ARCH7f: [Quiet, журналы, паузы и коды выхода](docs/2.6.5-arch7f.md). ARCH7e CI [45638316156](https://github.com/paruzelk/powershell/actions/runs/45638316156) PASS 4909/165; commit `540f5df0`, ZIP SHA256 `fbfca030cdc5f9a364447a1c2c40fce3e364ce67431da94bb5a690c816a4d6ad`. REAL PASS 26.11.2026, transaction `20261126-143718-3dd67c95`, single POP3 `info@stios.ru.pst`, 10 planned/verified/reconciled/indexed, 0 deferred/unprocessed, PendingCleared=True, Outlook PID 7660 unchanged, workers 6460/19172, 13062671 logical bytes, Auto PartialOrBlocked/BatchLimitReached (cap 1). Multi-POP3 real acceptance remains open; no repeat of completed single-source test.
+
+`-Quiet` включает приватный диагностический журнал; отдельная `Invoke-OPAAutoDev.ps1` возвращает коды 0/10/20/30 (только DEV, не разворачивать).
 
 ARCH7e: `-Mode Auto -ConfirmDevAutoArchive` — только если ВСЕ обнаруженные POP3 PST разрешены для реального теста. Предварительно `-WhatIf` (не обнаруживает Outlook, проверяет параметры). Предел 10 писем на партию, до 100 партий на источник за запуск; `-AutoDevMaxBatches 1` для первого испытания. [Подробности и пример](docs/2.6.5-arch7e.md).
 
 Новый тестовый контроллер `Invoke-OPALiveArchiveBatches.ps1` запускает Archive и Resume в отдельных процессах Windows PowerShell 5.1 STA, без перезапуска Outlook. Полный синтаксис и примеры — [ARCH7d](docs/2.6.5-arch7d.md).
 
-Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7e — идентификатор DEV-сборки.
+Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7f — идентификатор DEV-сборки.
 
-25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — CI 4881/165 PASS, [восстановление](docs/2.6.5-arch7c.md). ARCH7d1 — CI 4895/165 PASS; реальный запуск остановился до worker из-за конфликта $archive/$Archive. ARCH7d2 — CI 4898/165 PASS, совместный REAL PASS ARCH7c/d (20261125-173959-49d4a7fb, 2 verified, 1 deferred, 7 unprocessed, same Outlook). ARCH7e — [ограниченный Auto DEV](docs/2.6.5-arch7e.md), CI/live pending. **ProductionReady=False. Auto без явного DEV-согласия закрыт. Не назначать DEV пользователям через планировщик.**
+25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — CI 4881/165 PASS, [восстановление](docs/2.6.5-arch7c.md). ARCH7d1 — CI 4895/165 PASS; реальный запуск остановился до worker из-за конфликта $archive/$Archive. ARCH7d2 — CI 4898/165 PASS, совместный REAL PASS ARCH7c/d (20261125-173959-49d4a7fb, 2 verified, 1 deferred, 7 unprocessed, same Outlook). ARCH7e — [ограниченный Auto DEV](docs/2.6.5-arch7e.md), CI и single-POP3 REAL PASS. **ProductionReady=False. Auto без явного DEV-согласия закрыт. Не назначать DEV пользователям через планировщик.**
 
 - [ARCH7e — ограниченный Auto, синтаксис и приёмка](docs/2.6.5-arch7e.md)
 - [ARCH7d — контроллер worker, все ключи и реальный тест прерывания](docs/2.6.5-arch7d.md)
@@ -27,7 +31,7 @@ $test = @{ProfileName='Outlook';SourcePst='C:\Test\mail.pst';ConfirmTestArchive=
 .\Invoke-OPAArchiveBatches.ps1 @test -ConfirmOutlookRestart -BatchSize 100 -MaxMessages 100 -WhatIf
 ~~~
 
-Для реального теста Archive/Resume использовать соответствующий runbook ARCH4/ARCH6. Текущий Resume требует нового процесса Outlook; контроллер может закрыть Outlook, не предназначен для пользователя RDS.
+Для реального теста Archive/Resume использовать соответствующий runbook ARCH4/ARCH6. Для ARCH7b–f fresh-worker Resume Outlook не перезапускается. Старый Invoke-OPAArchiveBatches.ps1 может закрыть Outlook; не использовать для RDS.
 
 Будущий Auto после допуска (НЕ запускать сейчас):
 ~~~powershell
@@ -39,12 +43,16 @@ $test = @{ProfileName='Outlook';SourcePst='C:\Test\mail.pst';ConfirmTestArchive=
 
 ## Полный справочник параметров OutlookPOP3Archive.ps1
 
-Таблица отражает фактический param() ARCH7e, а не будущие defaults. Условия совместимости проверяются кодом. Common parameters PowerShell предоставляются CmdletBinding. WorkerPilot* — исторические DEV диагностики, не для планировщика.
+Таблица отражает фактический param() ARCH7f, а не будущие defaults. Условия совместимости проверяются кодом. Common parameters PowerShell предоставляются CmdletBinding. WorkerPilot* — исторические DEV диагностики, не для планировщика.
 
 | Ключ | Тип / диапазон | Default DEV | Назначение |
 |---|---|---|---|
 | `-Mode` | string | 'Analyze' | Analyze/Plan — диагностика; Archive/Resume — явный тест; Auto только с ConfirmDevAutoArchive. |
 | `-ConfirmDevAutoArchive` | switch | False | Явное разрешение архивировать ВСЕ обнаруженные POP3 delivery PST как тестовые; только Mode Auto. |
+| `-Quiet` | switch | False | DEV Auto: приватный диагностический лог и подавление вспомогательных потоков. |
+| `-AutoBatchDelaySeconds` | int (0–300) | 2 | Пауза между подтверждёнными партиями одного PST. |
+| `-AutoRecoveryDelaySeconds` | int (5–300) | 5 | Начальный recovery backoff, максимум 300 секунд. |
+| `-AutoLogRetentionDays` | int (1–3650) | 30 | Ротация только успешных диагностических summary. |
 | `-AutoDevMaxBatches` | int (1–100) | 100 | Только DEV Auto: максимум вызовов контроллера на источник, включая проверку исчерпания. |
 | `-ProfileName` | string | не задан | Имя профиля Outlook; для тестового writer обязателен. |
 | `-Transaction` | string | не задан | ID транзакции Resume. |

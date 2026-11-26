@@ -1,6 +1,6 @@
 # Развёртывание на RDS: планировщик заданий и GPO
 
-**Важно:** текущая ARCH6f3c3 и документационная ARCH7a не готовы для production Auto. Не включать пользовательские задачи до RC/production acceptance. Тестовый Invoke-OPAArchiveBatches.ps1 способен закрыть Outlook; не использовать его в планировщике.
+**Важно:** текущая ARCH7f не готовы для production Auto. Не включать пользовательские задачи до RC/production acceptance. Тестовый Invoke-OPAArchiveBatches.ps1 способен закрыть Outlook; не использовать его в планировщике.
 
 ## Подготовка сервера
 
@@ -78,7 +78,7 @@ Get-ScheduledTaskInfo -TaskName $Name
 
 ## Журналы и диагностика
 
-DEV: каталог OutlookPOP3Archive-Transactions рядом с PST, ARCH4.pending, ARCH6-run-*.jsonl, checkpoints/steps/operation journal, ARCH6-deferred-*.jsonl, optional ARCH6-threat-*.jsonl. Не удалять доказательства, на которые ссылаются pending/deferred. Будущие per-user supervisor/worker logs: точный путь и retention в ARCH7f. Не логировать тело/вложения, защищать метаданные. Не отключать антивирус.
+DEV: каталог OutlookPOP3Archive-Transactions рядом с PST, ARCH4.pending, ARCH6-run-*.jsonl, checkpoints/steps/operation journal, ARCH6-deferred-*.jsonl, optional ARCH6-threat-*.jsonl. Не удалять доказательства, на которые ссылаются pending/deferred. ARCH7f Quiet: отдельные приватные summary в %LOCALAPPDATA%\OutlookPOP3Archive-ARCH7f; существующие worker logs и доказательства не ротируются. [DEV wrapper и exit codes](2.6.5-arch7f.md). Не логировать тело/вложения, защищать метаданные. Не отключать антивирус.
 
 Целевая реакция: Outlook недоступен — повтор с backoff; local attachment failure — deferred; unknown Move — reconcile, не retry; повреждённый журнал — блокировать конкретный PST; logoff — продолжить при следующем входе. Это требования, не гарантии DEV.
 

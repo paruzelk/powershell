@@ -1,4 +1,6 @@
-﻿# Конфигурация — 2.6.3-PREVIEW1 / ARCH7e DEV
+﻿# Конфигурация — 2.6.3-PREVIEW1 / ARCH7f DEV
+
+ARCH7f: `-Quiet`, `-AutoBatchDelaySeconds 2`, `-AutoRecoveryDelaySeconds 5`, `-AutoLogRetentionDays 30`; [справочник](2.6.5-arch7f.md). Только явный DEV Auto.
 
 ARCH7e: `-Mode Auto -ConfirmDevAutoArchive` — явное тестовое разрешение на все обнаруженные POP3. Возраст 12, YearQuarter, Safe, root true, обе размерные политики отключены; DEV batch 10, до 100 вызовов на источник. [Полные параметры](2.6.5-arch7e.md). Целевые production defaults не открыты.
 
@@ -18,7 +20,7 @@ ARCH7e: `-Mode Auto -ConfirmDevAutoArchive` — явное тестовое ра
 | Limit | 0 (legacy Auto 500) | bounded batch, до исчерпания |
 | SkipPolicy | Continue в контроллере | Continue |
 | AutoMaxResumeAttempts | 3 | 3 с backoff |
-| Quiet | нет ключа | автоматически |
+| Quiet | False; DEV wrapper True | автоматически |
 
 40/35 ГБ legacy size policy не участвует в целевом age-only Auto. IMAP/Outbox исключаются. [RDS deployment](RDS-DEPLOYMENT.md). Auto production gate пока закрыт.
 

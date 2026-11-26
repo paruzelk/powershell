@@ -1,5 +1,11 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7f DEV — 2026-11-26
+
+- ARCH7e CI [45638316156](https://github.com/paruzelk/powershell/actions/runs/45638316156) PASS 4909/165; commit `540f5df0`, ZIP SHA256 `fbfca030cdc5f9a364447a1c2c40fce3e364ce67431da94bb5a690c816a4d6ad`. REAL PASS 26.11.2026, transaction `20261126-143718-3dd67c95`, single POP3 `info@stios.ru.pst`, 10 planned/verified/reconciled/indexed, 0 deferred/unprocessed, PendingCleared=True, Outlook PID 7660 unchanged, workers 6460/19172, 13062671 logical bytes, Auto PartialOrBlocked/BatchLimitReached (cap 1). Multi-POP3 real acceptance remains open; no repeat of completed single-source test.
+- Quiet diagnostics, summary retention, batch delay, capped recovery backoff, DEV wrapper exit codes. Expected CI 4919/166; production closed.
+
+
 ## ARCH7e DEV
 
 - ARCH7d2 CI 45633319867 PASS 4898/165; operator real accepted mixed recovery 20261125-173959-49d4a7fb: 2 verified/reconciled/indexed, 1 AV deferred, 7 unprocessed, distinct worker 7576/5924, same Outlook 7660, pending cleared, Resume MoveInvocations=0. No repeat.

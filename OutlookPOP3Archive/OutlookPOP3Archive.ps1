@@ -6,6 +6,10 @@ param(
     # ARCH7e DEV Auto only: every discovered POP3 PST must be approved for testing.
     [switch]$ConfirmDevAutoArchive,
     [ValidateRange(1,100)][int]$AutoDevMaxBatches=100,
+    [switch]$Quiet,
+    [ValidateRange(0,300)][int]$AutoBatchDelaySeconds=2,
+    [ValidateRange(5,300)][int]$AutoRecoveryDelaySeconds=5,
+    [ValidateRange(1,3650)][int]$AutoLogRetentionDays=30,
 
     [string]$ProfileName,
     [string]$Transaction,
@@ -143,7 +147,7 @@ $ErrorActionPreference = 'Stop'
 # Read-only Analyze and Plan remain available, but no production permit.
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH2aMoveOutcomeFence.ps1')
 if($ConfirmDevAutoArchive){
-    $allowed=@('Mode','ConfirmDevAutoArchive','ProfileName','Limit','AutoDevMaxBatches','OlderThanMonths','ArchiveGrouping','DisableStoragePolicy','DisableArchivePstSizeLimit','IncludeRootMail','DurabilityMode','AutoMaxResumeAttempts','WhatIf')
+    $allowed=@('Mode','ConfirmDevAutoArchive','ProfileName','Limit','AutoDevMaxBatches','OlderThanMonths','ArchiveGrouping','DisableStoragePolicy','DisableArchivePstSizeLimit','IncludeRootMail','DurabilityMode','AutoMaxResumeAttempts','WhatIf','Quiet','AutoBatchDelaySeconds','AutoRecoveryDelaySeconds','AutoLogRetentionDays')
     foreach($key in $PSBoundParameters.Keys){if($key -notin $allowed){throw ('ARCH7e unsupported Auto DEV parameter: '+$key)}}
     if($Mode -ne 'Auto' -or $OlderThanMonths -lt 1 -or $ArchiveGrouping -eq 'None' -or $Limit -gt 10 -or $AutoMaxResumeAttempts -gt 10 -or
        ($PSBoundParameters.ContainsKey('DisableStoragePolicy') -and -not $DisableStoragePolicy) -or
@@ -155,14 +159,17 @@ if($ConfirmDevAutoArchive){
     $devRoot=if($PSBoundParameters.ContainsKey('IncludeRootMail')){[bool]$IncludeRootMail}else{$true}
     if($PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5 -or [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -ne 'STA'){throw 'ARCH7e requires Windows PowerShell 5.1 STA.'}
     if($WhatIf){
-        [pscustomobject]@{Schema='2.6.5-ARCH7e.WhatIf.1';Status='NoOutlookOrPersistentWrites';Mode='Auto';ProfileName=$ProfileName;BatchSize=$devBatch;MaxBatchesPerSource=$AutoDevMaxBatches;OlderThanMonths=$OlderThanMonths;ArchiveGrouping=$ArchiveGrouping;IncludeRootMail=$devRoot;DisableStoragePolicy=$true;DisableArchivePstSizeLimit=$true;DurabilityMode='Safe';AllDiscoveredPop3TestConsent=$true;ProductionReady=$false}
+        [pscustomobject]@{Schema='2.6.5-ARCH7e.WhatIf.1';Status='NoOutlookOrPersistentWrites';Mode='Auto';ProfileName=$ProfileName;BatchSize=$devBatch;MaxBatchesPerSource=$AutoDevMaxBatches;OlderThanMonths=$OlderThanMonths;ArchiveGrouping=$ArchiveGrouping;IncludeRootMail=$devRoot;DisableStoragePolicy=$true;DisableArchivePstSizeLimit=$true;DurabilityMode='Safe';AllDiscoveredPop3TestConsent=$true;Quiet=[bool]$Quiet;BatchDelaySeconds=$AutoBatchDelaySeconds;RecoveryDelaySeconds=$AutoRecoveryDelaySeconds;LogRetentionDays=$AutoLogRetentionDays;ProductionReady=$false}
         return
     }
     . (Join-Path $PSScriptRoot 'Core/Archive/ARCH7eAuto.ps1')
-    Invoke-OPAARCH7eAuto -ProjectRoot $PSScriptRoot -ProfileName $ProfileName -BatchSize $devBatch -MaxBatchesPerSource $AutoDevMaxBatches -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -IncludeRootMail:$devRoot -MaxResumeAttempts $AutoMaxResumeAttempts
+    $arch7fOptions=@{ProjectRoot=$PSScriptRoot;ProfileName=$ProfileName;BatchSize=$devBatch;MaxBatchesPerSource=$AutoDevMaxBatches;OlderThanMonths=$OlderThanMonths;ArchiveGrouping=$ArchiveGrouping;IncludeRootMail=$devRoot;MaxResumeAttempts=$AutoMaxResumeAttempts;BatchDelaySeconds=$AutoBatchDelaySeconds;RetryDelaySeconds=$AutoRecoveryDelaySeconds}
+    if($Quiet){Invoke-OPAARCH7fQuietAuto -AutoParameters $arch7fOptions -RetentionDays $AutoLogRetentionDays}
+    else{Invoke-OPAARCH7eAuto @arch7fOptions}
     return
 }
 if($PSBoundParameters.ContainsKey('AutoDevMaxBatches')){throw 'ARCH7e AutoDevMaxBatches requires ConfirmDevAutoArchive.'}
+foreach($arch7fKey in @('Quiet','AutoBatchDelaySeconds','AutoRecoveryDelaySeconds','AutoLogRetentionDays')){if($PSBoundParameters.ContainsKey($arch7fKey)){throw 'ARCH7f options require ConfirmDevAutoArchive.'}}
 if($HistoricalThreatEntryId -or $HistoricalDetectionId -or $HistoricalAttachmentName){
     if(-not $ImportDeferredTransaction -or $HistoricalThreatEntryId -notmatch '^[0-9a-fA-F]{16,2048}$' -or $HistoricalDetectionId -notmatch '^\{?[0-9a-fA-F-]{36}\}?$' -or -not $HistoricalAttachmentName -or $HistoricalAttachmentName.Length -gt 1024){throw 'ARCH6f3c2 requires historical transaction, exact EntryID, DetectionID and attachment name.'}
     [void][guid]::Parse($HistoricalDetectionId)
@@ -418,7 +425,7 @@ if ($WorkerPilot) {
 
 
 if($arch4Requested){
-    $build='2.6.5-ARCH7e DEV'
+    $build='2.6.5-ARCH7f DEV'
     $buildPath=Join-Path $PSScriptRoot 'BUILD-INFO.json'
     if(Test-Path -LiteralPath $buildPath -PathType Leaf){
         try{

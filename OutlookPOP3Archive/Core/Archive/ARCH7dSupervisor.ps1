@@ -84,6 +84,11 @@ function Invoke-OPAARCH7dWorker {
         return [pscustomobject]@{Exited=$true;ExitCode=$code;WorkerId=$workerId;Result=$result;Log=$stdout;ErrorLog=$stderr}
     }finally{$process.Dispose()}
 }
+function Get-OPAARCH7fRecoveryDelay {
+    [CmdletBinding()]
+    param([ValidateRange(0,300)][int]$BaseSeconds,[ValidateRange(1,10)][int]$Attempt)
+    return [int][Math]::Min(300,($BaseSeconds*[Math]::Pow(2,$Attempt-1)))
+}
 function Invoke-OPAARCH7dSequence {
     [CmdletBinding()]
     param([scriptblock]$ReadPending,[scriptblock]$Archive,[scriptblock]$Resume,[scriptblock]$Record,
@@ -144,7 +149,7 @@ function Invoke-OPAARCH7dSequence {
             }
             if($null -eq $after){$status='RecoveryExitWithoutEvidence';break}
             $status='RecoveryAttemptsExhausted'
-            if($attempt -lt $MaxResumeAttempts -and $RetryDelaySeconds -gt 0){Start-Sleep -Seconds $RetryDelaySeconds}
+            if($attempt -lt $MaxResumeAttempts -and $RetryDelaySeconds -gt 0){Start-Sleep -Seconds (Get-OPAARCH7fRecoveryDelay -BaseSeconds $RetryDelaySeconds -Attempt $attempt)}
         }
         if(-not $completed -or $RecoverOnly -or $unprocessed -gt 0){break}
         $status='BatchLimitReached'
