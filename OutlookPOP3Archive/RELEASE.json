@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH7g2 DEV: ARCH7g1 full Pester 4932/167 PASS, packaging blocked missing historical synthetic Invoke-ARCH3s.ps1; complete 43 tracked root PS1 allowlist, unchanged full ZIP verification and production closure.",
     "ARCH7g1 DEV: ARCH7g CI 4932/167 PASS but release ZIP lacked three new entrypoints; correct allowlist and validate every tracked root PS and every staged ZIP entry. Production closed.",
     "ARCH7g DEV: ARCH7f1 CI PASS 4919/166; disabled task definition, interactive SID/session fence, Outlook absence deferral code 40, no deployment. 4932/167 expected; production closed.",
     "ARCH7f DEV: ARCH7e CI 4909/165 and real single-POP3 Auto 10/10 accepted; explicit Quiet diagnostics, private summaries, retention of successful summaries only, bounded pacing and recovery backoff, test-only exit-code wrapper. 4919/166 expected; production closed.",

@@ -1,5 +1,10 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7g2 DEV — 2026-11-26
+
+- ARCH7g2: ARCH7g1 CI [45829671352](https://github.com/paruzelk/powershell/actions/runs/45829671352) PASS Pester 4932/167 (0 failed/skipped), package gate correctly blocked omitted historical synthetic `Invoke-ARCH3s.ps1`. Verified all 43 tracked root PS1 against the allowlist; this was the only remaining omission. Restore it; keep complete ZIP inventory and SHA-256 gate. No logic change; production closed. Full CI/ZIP pending.
+
+
 ## ARCH7g1 DEV — 2026-11-26
 
 - ARCH7g1: ARCH7g CI [45827311417](https://github.com/paruzelk/powershell/actions/runs/45827311417) PASS 4932/167, but published ZIP `14fe9542` omitted `New-OPARdsTaskPlan.ps1`, `Invoke-OPARdsAutoDev.ps1`, `Invoke-OPAAutoDev.ps1` due to stale workflow allowlist (operator CommandNotFoundException). Do not use that ZIP. Add all three to allowlist, require every tracked root PowerShell entrypoint staged, verify full staged ZIP inventory and SHA-256 of every entry, preserve existing explicit critical entrypoint checks. No changes to Auto/Move/recovery behavior. 4932/167 expected; real RDS acceptance pending.
