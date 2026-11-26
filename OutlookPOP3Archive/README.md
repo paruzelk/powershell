@@ -1,8 +1,14 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7f1 DEV
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7g DEV
 
 ## Актуальный запуск и документация
 
-ARCH7f1: [ARCH7f CI 45813493449](https://github.com/paruzelk/powershell/actions/runs/45813493449) — 9/10 focused; one assertion expected `requires` but guard correctly emitted `require`. Correct only expected exception text; writer safety unchanged. Full CI 4919/166 pending; no real Outlook retest.
+ARCH7f1 CI [45814245735](https://github.com/paruzelk/powershell/actions/runs/45814245735) PASS 4919/166, 10/10 focused, 0 failed/skipped; commit `3400d5da`, ZIP 2099247 bytes, SHA256 `55363961ff227664daf5fdd4793cd1daa4aaf1d7b7d2d5a8e07350c295ebe1a3` (CI log and release digest match). No repeat of prior live tests.
+
+ARCH7g DEV: disabled per-user task definition only; SID-pinned interactive limited user, same-session Outlook owner proof, attach-only existing Auto, no forced termination or external retry, optional daily trigger, 40=Outlook absent. CI 4932/167 expected; no task registration or production permit.
+
+[ARCH7g: синтаксис и RDS/GPO](docs/2.6.5-arch7g.md). `New-OPARdsTaskPlan.ps1 -ConfirmDevAutoArchive` возвращает отключённое XML-определение, не регистрирует задачу.
+
+ARCH7f1: [ARCH7f CI 45813493449](https://github.com/paruzelk/powershell/actions/runs/45813493449) — 9/10 focused; one assertion expected `requires` but guard correctly emitted `require`. Correct only expected exception text; writer safety unchanged. Full CI 4919/166 PASS; no real Outlook retest.
 
 ARCH7f: [Quiet, журналы, паузы и коды выхода](docs/2.6.5-arch7f.md). ARCH7e CI [45638316156](https://github.com/paruzelk/powershell/actions/runs/45638316156) PASS 4909/165; commit `540f5df0`, ZIP SHA256 `fbfca030cdc5f9a364447a1c2c40fce3e364ce67431da94bb5a690c816a4d6ad`. REAL PASS 26.11.2026, transaction `20261126-143718-3dd67c95`, single POP3 `info@stios.ru.pst`, 10 planned/verified/reconciled/indexed, 0 deferred/unprocessed, PendingCleared=True, Outlook PID 7660 unchanged, workers 6460/19172, 13062671 logical bytes, Auto PartialOrBlocked/BatchLimitReached (cap 1). Multi-POP3 real acceptance remains open; no repeat of completed single-source test.
 
@@ -12,7 +18,7 @@ ARCH7e: `-Mode Auto -ConfirmDevAutoArchive` — только если ВСЕ о�
 
 Новый тестовый контроллер `Invoke-OPALiveArchiveBatches.ps1` запускает Archive и Resume в отдельных процессах Windows PowerShell 5.1 STA, без перезапуска Outlook. Полный синтаксис и примеры — [ARCH7d](docs/2.6.5-arch7d.md).
 
-Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7f1 — идентификатор DEV-сборки.
+Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7g — идентификатор DEV-сборки.
 
 25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — CI 4881/165 PASS, [восстановление](docs/2.6.5-arch7c.md). ARCH7d1 — CI 4895/165 PASS; реальный запуск остановился до worker из-за конфликта $archive/$Archive. ARCH7d2 — CI 4898/165 PASS, совместный REAL PASS ARCH7c/d (20261125-173959-49d4a7fb, 2 verified, 1 deferred, 7 unprocessed, same Outlook). ARCH7e — [ограниченный Auto DEV](docs/2.6.5-arch7e.md), CI и single-POP3 REAL PASS. **ProductionReady=False. Auto без явного DEV-согласия закрыт. Не назначать DEV пользователям через планировщик.**
 

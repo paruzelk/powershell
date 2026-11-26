@@ -1,6 +1,14 @@
 # Развёртывание на RDS: планировщик заданий и GPO
 
-**Важно:** текущая ARCH7f не готовы для production Auto. Не включать пользовательские задачи до RC/production acceptance. Тестовый Invoke-OPAArchiveBatches.ps1 способен закрыть Outlook; не использовать его в планировщике.
+**Важно:** ARCH7g DEV не готов для production Auto. Не включать пользовательские задачи до RC/production acceptance. Тестовый Invoke-OPAArchiveBatches.ps1 способен закрыть Outlook; не использовать его в планировщике.
+
+## ARCH7g — только план, без регистрации
+
+ARCH7f1 CI [45814245735](https://github.com/paruzelk/powershell/actions/runs/45814245735) PASS 4919/166, 10/10 focused, 0 failed/skipped; commit `3400d5da`, ZIP 2099247 bytes, SHA256 `55363961ff227664daf5fdd4793cd1daa4aaf1d7b7d2d5a8e07350c295ebe1a3` (CI log and release digest match). No repeat of prior live tests.
+
+ARCH7g DEV: disabled per-user task definition only; SID-pinned interactive limited user, same-session Outlook owner proof, attach-only existing Auto, no forced termination or external retry, optional daily trigger, 40=Outlook absent. CI 4932/167 expected; no task registration or production permit.
+
+[Точный синтаксис, exit codes и сценарии приёмки ARCH7g](2.6.5-arch7g.md). Старые команды регистрации ниже — только будущий production-эскиз; не применять сейчас. SID зафиксирован в XML и аргументах, поэтому нельзя распространять один файл XML на всех пользователей. GPP для пилота: отдельный элемент для конкретного SID/пользователя, Update, отключённая задача, item-level targeting, interactive token, Limited; пароль и SYSTEM запрещены. Массовая подстановка SID/регистрация GPP ещё не подтверждены.
 
 ## Подготовка сервера
 
@@ -66,7 +74,7 @@ Get-ScheduledTask -TaskName $Name
 Get-ScheduledTaskInfo -TaskName $Name
 ~~~
 
-Не использовать Force вслепую. После приёмки: Start-ScheduledTask -TaskName $Name; проверить Get-ScheduledTaskInfo, итоговый журнал, отсутствие pending и неизменный Outlook PID/start time. LastTaskResult=0 недостаточен для доказательства архива. Внешний restart policy (RestartCount 3, RestartInterval 5 минут) включать только после проверки exit codes/backoff; он не заменяет внутренний recovery.
+Не использовать Force вслепую. После приёмки: Start-ScheduledTask -TaskName $Name; проверить Get-ScheduledTaskInfo, итоговый журнал, отсутствие pending и неизменный Outlook PID/start time. LastTaskResult=0 недостаточен для доказательства архива. Внешний RestartOnFailure не включать: коды 10/20/30/40 не разрешают слепой повтор; внутренний Resume остаётся единственным автоматическим recovery.
 
 ## Массовая установка через GPO/GPP (после допуска)
 

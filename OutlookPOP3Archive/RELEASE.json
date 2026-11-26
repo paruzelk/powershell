@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH7g DEV: ARCH7f1 CI PASS 4919/166; disabled task definition, interactive SID/session fence, Outlook absence deferral code 40, no deployment. 4932/167 expected; production closed.",
     "ARCH7f DEV: ARCH7e CI 4909/165 and real single-POP3 Auto 10/10 accepted; explicit Quiet diagnostics, private summaries, retention of successful summaries only, bounded pacing and recovery backoff, test-only exit-code wrapper. 4919/166 expected; production closed.",
     "ARCH7e DEV: ARCH7d2 CI 4898/165 and operator mixed real recovery PASS. Explicit all-POP3 test Auto gate, attach-only discovery, age-only defaults, bounded per-source supervision and exact shared-directory pending owner routing. 4909/165 expected, 95 focused. Production closed.",
     "ARCH7d2 DEV: ARCH7d1 CI 4895/165 PASS, operator real callback binding failed before launch; isolate dynamic callback variables and test actual public controller with real children and synthetic main. 4898/165 expected, 84 focused; production closed.",
@@ -128,8 +129,8 @@
     "BW4k7v2aIncompleteFolderScanAllowed": false,
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
-    "ExpectedTestContainers": 166,
-    "ExpectedPesterTests": 4919,
+    "ExpectedTestContainers": 167,
+    "ExpectedPesterTests": 4932,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

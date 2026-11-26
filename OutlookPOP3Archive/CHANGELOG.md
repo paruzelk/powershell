@@ -1,5 +1,11 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH7g DEV — 2026-11-26
+
+- ARCH7f1 CI [45814245735](https://github.com/paruzelk/powershell/actions/runs/45814245735) PASS 4919/166, 10/10 focused, 0 failed/skipped; commit `3400d5da`, ZIP 2099247 bytes, SHA256 `55363961ff227664daf5fdd4793cd1daa4aaf1d7b7d2d5a8e07350c295ebe1a3` (CI log and release digest match). No repeat of prior live tests.
+- ARCH7g DEV: disabled per-user task definition only; SID-pinned interactive limited user, same-session Outlook owner proof, attach-only existing Auto, no forced termination or external retry, optional daily trigger, 40=Outlook absent. CI 4932/167 expected; no task registration or production permit.
+
+
 ## ARCH7f DEV — 2026-11-26
 
 - ARCH7e CI [45638316156](https://github.com/paruzelk/powershell/actions/runs/45638316156) PASS 4909/165; commit `540f5df0`, ZIP SHA256 `fbfca030cdc5f9a364447a1c2c40fce3e364ce67431da94bb5a690c816a4d6ad`. REAL PASS 26.11.2026, transaction `20261126-143718-3dd67c95`, single POP3 `info@stios.ru.pst`, 10 planned/verified/reconciled/indexed, 0 deferred/unprocessed, PendingCleared=True, Outlook PID 7660 unchanged, workers 6460/19172, 13062671 logical bytes, Auto PartialOrBlocked/BatchLimitReached (cap 1). Multi-POP3 real acceptance remains open; no repeat of completed single-source test.
