@@ -1,5 +1,7 @@
 # Развёртывание на RDS: планировщик заданий и GPO
 
+> ARCH8a DEV: separately consented long Auto, exact local pinned single POP3 PST, batch 1..500 (default 500), 0 = no aggregate batch cap, optional 1..100 cap for pilot, original Safe/age-only/YearQuarter/attach-only and fresh-worker recovery, no blind retry, original 10/100 mode and RDS wrapper unchanged. CI expected 4947/168; production closed. [ARCH8a](2.6.5-arch8a.md). The long test mode is not a deployment permit.
+
 **Важно:** ARCH7g DEV не готов для production Auto. Не включать пользовательские задачи до RC/production acceptance. Тестовый Invoke-OPAArchiveBatches.ps1 способен закрыть Outlook; не использовать его в планировщике.
 
 ## ARCH7g — только план, без регистрации

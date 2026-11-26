@@ -4,7 +4,8 @@ param(
     [Parameter(Mandatory=$true)][string]$SourcePst,
     [Parameter(Mandatory=$true)][string]$ProfileName,
     [switch]$ConfirmTestArchive,[switch]$ConfirmLiveOutlookVerification,
-    [ValidateRange(1,10)][int]$BatchSize=10,
+    [ValidateRange(1,500)][int]$BatchSize=10,
+    [switch]$ConfirmDevLongArchive,
     [ValidateRange(1,100)][int]$MaxBatches=1,
     [ValidateRange(1,1200)][int]$OlderThanMonths=12,
     [ValidateSet('Year','YearQuarter','YearMonth')][string]$ArchiveGrouping='YearQuarter',
@@ -16,6 +17,7 @@ param(
     [switch]$RecoverOnly,[switch]$WhatIf
 )
 $ErrorActionPreference='Stop'
+if(($BatchSize -gt 10 -and -not $ConfirmDevLongArchive) -or ($ConfirmDevLongArchive -and $InterruptAfterReturned -gt 0)){throw 'ARCH8a explicit long test scope required; controlled interruption remains limited to ARCH7d.'}
 if(-not $ConfirmTestArchive -or -not $ConfirmLiveOutlookVerification -or [string]::IsNullOrWhiteSpace($ProfileName) -or
    [string]::IsNullOrWhiteSpace($SourcePst) -or
    ($InterruptAfterReturned -gt 0 -and ($RecoverOnly -or $MaxBatches -ne 1 -or $InterruptAfterReturned -ge $BatchSize))){
@@ -55,6 +57,7 @@ try{
     $arch7dControllerJournalPath=Join-Path $arch7dControllerLogDirectory 'supervisor.jsonl'
     $arch7dControllerMainPath=Join-Path $PSScriptRoot 'OutlookPOP3Archive.ps1'
     $arch7dControllerCommonParameters=@{SourcePst=$arch7dControllerSourcePst;ProfileName=$arch7dControllerProfile;ConfirmTestArchive=$true;ConfirmLiveOutlookVerification=$true}
+    if($ConfirmDevLongArchive){$arch7dControllerCommonParameters.ConfirmDevLongArchive=$true}
     $arch7dControllerArchiveParameters=$arch7dControllerCommonParameters.Clone()
     $arch7dControllerArchiveParameters.Mode='Archive';$arch7dControllerArchiveParameters.Limit=$BatchSize;$arch7dControllerArchiveParameters.OlderThanMonths=$OlderThanMonths;$arch7dControllerArchiveParameters.ArchiveGrouping=$ArchiveGrouping
     $arch7dControllerArchiveParameters.DisableArchivePstSizeLimit=$true;$arch7dControllerArchiveParameters.IncludeRootMail=[bool]$IncludeRootMail
@@ -75,7 +78,7 @@ try{
         $stream=[IO.FileStream]::new($arch7dControllerJournalPath,[IO.FileMode]::Append,[IO.FileAccess]::Write,[IO.FileShare]::Read)
         try{$stream.Write($bytes,0,$bytes.Length);$stream.Flush($true)}finally{$stream.Dispose()}
     }
-    $result=Invoke-OPAARCH7dSequence -ReadPending $arch7dControllerReadPending -Archive $arch7dControllerStartArchive -Resume $arch7dControllerStartResume -Record $arch7dControllerRecord -MaxBatches $MaxBatches -MaxResumeAttempts $MaxResumeAttempts -RetryDelaySeconds $RetryDelaySeconds -RecoverOnly:$RecoverOnly
+    $result=Invoke-OPAARCH7dSequence -ReadPending $arch7dControllerReadPending -Archive $arch7dControllerStartArchive -Resume $arch7dControllerStartResume -Record $arch7dControllerRecord -MaxBatches $MaxBatches -MaxResumeAttempts $MaxResumeAttempts -RetryDelaySeconds $RetryDelaySeconds -RecoverOnly:$RecoverOnly -ConfirmDevLongArchive:$ConfirmDevLongArchive
     $result | Add-Member -NotePropertyMembers @{LogDirectory=$arch7dControllerLogDirectory;ControlledInterruptionRequested=$InterruptAfterReturned}
     & $arch7dControllerRecord 'SupervisorCompleted' $result
     $result

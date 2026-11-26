@@ -93,7 +93,8 @@ function Invoke-OPAARCH7dSequence {
     [CmdletBinding()]
     param([scriptblock]$ReadPending,[scriptblock]$Archive,[scriptblock]$Resume,[scriptblock]$Record,
           [ValidateRange(1,100)][int]$MaxBatches=1,[ValidateRange(1,10)][int]$MaxResumeAttempts=3,
-          [ValidateRange(0,300)][int]$RetryDelaySeconds=5,[switch]$RecoverOnly)
+          [ValidateRange(0,300)][int]$RetryDelaySeconds=5,[switch]$RecoverOnly,[switch]$ConfirmDevLongArchive)
+    $devLiveCap=if($ConfirmDevLongArchive){500}else{10}
     $verified=0;$deferred=0;$unprocessed=0;$batches=0;$archives=0;$recoveries=0;$last=''
     $status='BatchLimitReached';$lastRecovery=$null;$lastBatchResult=$null;$lastArchiveExitCode=$null;$lastArchiveWorkerId=$null
     while($batches -lt $MaxBatches){
@@ -110,7 +111,7 @@ function Invoke-OPAARCH7dSequence {
                 if($a.ExitCode -ne 0 -or $null -eq $a.Result){$status='ArchiveFailedWithoutPending';break}
                 $r=$a.Result
                 if($r.Status -ceq 'NoEligibleFolders'){$status='NoEligibleFolders';break}
-                if($r.Schema -cne '2.6.5-ARCH4.Completed.1' -or $r.Status -cne 'BatchCompletedNoMoves' -or [int]$r.Planned -lt 0 -or [int]$r.Planned -gt 10 -or $r.PSObject.Properties.Name -notcontains 'DeferredRecorded' -or [int]$r.Verified -ne 0 -or [int]$r.Indexed -ne 0 -or [int]$r.DeferredRecorded -ne [int]$r.Planned){throw 'ARCH7d unproven Archive completion; no next batch.'}
+                if($r.Schema -cne '2.6.5-ARCH4.Completed.1' -or $r.Status -cne 'BatchCompletedNoMoves' -or [int]$r.Planned -lt 0 -or [int]$r.Planned -gt $devLiveCap -or $r.PSObject.Properties.Name -notcontains 'DeferredRecorded' -or [int]$r.Verified -ne 0 -or [int]$r.Indexed -ne 0 -or [int]$r.DeferredRecorded -ne [int]$r.Planned){throw 'ARCH7d unproven Archive completion; no next batch.'}
                 $deferred+=[int]$r.DeferredRecorded;$batches++;$lastBatchResult=$r
                 if([int]$r.Planned -eq 0){$status='NoEligibleMessages';break}
                 continue
@@ -138,7 +139,7 @@ function Invoke-OPAARCH7dSequence {
                    [int]$r.MoveInvocations -ne 0 -or [int]$r.Verified -ne [int]$r.Reconciled -or [int]$r.Verified -ne [int]$r.Indexed -or
                    [int]$r.Verified -lt 0 -or [int]$r.Deferred -lt 0 -or [int]$r.Unprocessed -lt 0 -or
                    [int]$r.Deferred -ne [int]$r.DeferredRecorded -or
-                   [int]$r.Planned -lt 0 -or [int]$r.Planned -gt 10 -or
+                   [int]$r.Planned -lt 0 -or [int]$r.Planned -gt $devLiveCap -or
                    [int]$r.Planned -ne ([int]$r.Verified+[int]$r.Deferred+[int]$r.Unprocessed)){
                     throw 'ARCH7d invalid recovery result; no next batch.'
                 }

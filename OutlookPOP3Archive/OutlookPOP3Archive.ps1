@@ -5,7 +5,9 @@ param(
 
     # ARCH7e DEV Auto only: every discovered POP3 PST must be approved for testing.
     [switch]$ConfirmDevAutoArchive,
-    [ValidateRange(1,100)][int]$AutoDevMaxBatches=100,
+    [switch]$ConfirmDevLongArchive,
+    [string]$LongArchiveSourcePst,
+    [ValidateRange(0,100)][int]$AutoDevMaxBatches=100,
     [switch]$Quiet,
     [ValidateRange(0,300)][int]$AutoBatchDelaySeconds=2,
     [ValidateRange(5,300)][int]$AutoRecoveryDelaySeconds=5,
@@ -147,27 +149,37 @@ $ErrorActionPreference = 'Stop'
 # Read-only Analyze and Plan remain available, but no production permit.
 . (Join-Path $PSScriptRoot 'Core/Archive/ARCH2aMoveOutcomeFence.ps1')
 if($ConfirmDevAutoArchive){
-    $allowed=@('Mode','ConfirmDevAutoArchive','ProfileName','Limit','AutoDevMaxBatches','OlderThanMonths','ArchiveGrouping','DisableStoragePolicy','DisableArchivePstSizeLimit','IncludeRootMail','DurabilityMode','AutoMaxResumeAttempts','WhatIf','Quiet','AutoBatchDelaySeconds','AutoRecoveryDelaySeconds','AutoLogRetentionDays')
+    $allowed=@('Mode','ConfirmDevAutoArchive','ProfileName','Limit','AutoDevMaxBatches','OlderThanMonths','ArchiveGrouping','DisableStoragePolicy','DisableArchivePstSizeLimit','IncludeRootMail','DurabilityMode','AutoMaxResumeAttempts','WhatIf','Quiet','AutoBatchDelaySeconds','AutoRecoveryDelaySeconds','AutoLogRetentionDays','ConfirmDevLongArchive','LongArchiveSourcePst')
     foreach($key in $PSBoundParameters.Keys){if($key -notin $allowed){throw ('ARCH7e unsupported Auto DEV parameter: '+$key)}}
-    if($Mode -ne 'Auto' -or $OlderThanMonths -lt 1 -or $ArchiveGrouping -eq 'None' -or $Limit -gt 10 -or $AutoMaxResumeAttempts -gt 10 -or
+    $devCap=if($ConfirmDevLongArchive){500}else{10}
+    if($ConfirmDevLongArchive){
+        if([string]::IsNullOrWhiteSpace($LongArchiveSourcePst) -or $LongArchiveSourcePst -notmatch '^[A-Za-z]:\\' -or [IO.Path]::GetExtension($LongArchiveSourcePst) -ine '.pst'){throw 'ARCH8a exact local test source PST required.'}
+        if(-not $PSBoundParameters.ContainsKey('AutoDevMaxBatches')){$AutoDevMaxBatches=0}
+    }elseif($AutoDevMaxBatches -eq 0 -or $PSBoundParameters.ContainsKey('LongArchiveSourcePst')){throw 'ARCH8a unlimited or pinned source requires ConfirmDevLongArchive.'}
+    if($Mode -ne 'Auto' -or $OlderThanMonths -lt 1 -or $ArchiveGrouping -eq 'None' -or $Limit -gt $devCap -or $AutoMaxResumeAttempts -gt 10 -or
        ($PSBoundParameters.ContainsKey('DisableStoragePolicy') -and -not $DisableStoragePolicy) -or
        ($PSBoundParameters.ContainsKey('DisableArchivePstSizeLimit') -and -not $DisableArchivePstSizeLimit) -or
        ($PSBoundParameters.ContainsKey('DurabilityMode') -and $DurabilityMode -ne 'Safe')){
+        if($ConfirmDevLongArchive){throw 'ARCH8a requires age-only Auto DEV, batch 1..500, Safe, disabled storage/archive size policy.'}
         throw 'ARCH7e requires age-only Auto DEV, batch 1..10, Safe, disabled storage/archive size policy.'
     }
-    $devBatch=if($Limit -eq 0){10}else{$Limit}
+    $devBatch=if($Limit -eq 0){$devCap}else{$Limit}
     $devRoot=if($PSBoundParameters.ContainsKey('IncludeRootMail')){[bool]$IncludeRootMail}else{$true}
     if($PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5 -or [Threading.Thread]::CurrentThread.GetApartmentState().ToString() -ne 'STA'){throw 'ARCH7e requires Windows PowerShell 5.1 STA.'}
     if($WhatIf){
-        [pscustomobject]@{Schema='2.6.5-ARCH7e.WhatIf.1';Status='NoOutlookOrPersistentWrites';Mode='Auto';ProfileName=$ProfileName;BatchSize=$devBatch;MaxBatchesPerSource=$AutoDevMaxBatches;OlderThanMonths=$OlderThanMonths;ArchiveGrouping=$ArchiveGrouping;IncludeRootMail=$devRoot;DisableStoragePolicy=$true;DisableArchivePstSizeLimit=$true;DurabilityMode='Safe';AllDiscoveredPop3TestConsent=$true;Quiet=[bool]$Quiet;BatchDelaySeconds=$AutoBatchDelaySeconds;RecoveryDelaySeconds=$AutoRecoveryDelaySeconds;LogRetentionDays=$AutoLogRetentionDays;ProductionReady=$false}
+        [pscustomobject]@{Schema='2.6.5-ARCH7e.WhatIf.1';Status='NoOutlookOrPersistentWrites';Mode='Auto';ProfileName=$ProfileName;BatchSize=$devBatch;MaxBatchesPerSource=$AutoDevMaxBatches;OlderThanMonths=$OlderThanMonths;ArchiveGrouping=$ArchiveGrouping;IncludeRootMail=$devRoot;DisableStoragePolicy=$true;DisableArchivePstSizeLimit=$true;DurabilityMode='Safe';AllDiscoveredPop3TestConsent=$true;Quiet=[bool]$Quiet;BatchDelaySeconds=$AutoBatchDelaySeconds;RecoveryDelaySeconds=$AutoRecoveryDelaySeconds;LogRetentionDays=$AutoLogRetentionDays;LongArchive=[bool]$ConfirmDevLongArchive;PinnedSourcePst=$LongArchiveSourcePst;ProductionReady=$false}
         return
     }
     . (Join-Path $PSScriptRoot 'Core/Archive/ARCH7eAuto.ps1')
     $arch7fOptions=@{ProjectRoot=$PSScriptRoot;ProfileName=$ProfileName;BatchSize=$devBatch;MaxBatchesPerSource=$AutoDevMaxBatches;OlderThanMonths=$OlderThanMonths;ArchiveGrouping=$ArchiveGrouping;IncludeRootMail=$devRoot;MaxResumeAttempts=$AutoMaxResumeAttempts;BatchDelaySeconds=$AutoBatchDelaySeconds;RetryDelaySeconds=$AutoRecoveryDelaySeconds}
+    if($ConfirmDevLongArchive){$arch7fOptions.ConfirmDevLongArchive=$true;$arch7fOptions.LongArchiveSourcePst=$LongArchiveSourcePst}
     if($Quiet){Invoke-OPAARCH7fQuietAuto -AutoParameters $arch7fOptions -RetentionDays $AutoLogRetentionDays}
     else{Invoke-OPAARCH7eAuto @arch7fOptions}
     return
 }
+if($PSBoundParameters.ContainsKey('LongArchiveSourcePst')){throw 'ARCH8a pinned source requires explicit Auto DEV.'}
+if($ConfirmDevLongArchive -and (-not $ConfirmTestArchive -or -not $ConfirmLiveOutlookVerification -or $Mode -notin @('Archive','Resume') -or $ARCH7dInterruptAfterReturned -gt 0)){throw 'ARCH8a explicit test live worker required.'}
+$devLiveCap=if($ConfirmDevLongArchive){500}else{10}
 if($PSBoundParameters.ContainsKey('AutoDevMaxBatches')){throw 'ARCH7e AutoDevMaxBatches requires ConfirmDevAutoArchive.'}
 foreach($arch7fKey in @('Quiet','AutoBatchDelaySeconds','AutoRecoveryDelaySeconds','AutoLogRetentionDays')){if($PSBoundParameters.ContainsKey($arch7fKey)){throw 'ARCH7f options require ConfirmDevAutoArchive.'}}
 if($HistoricalThreatEntryId -or $HistoricalDetectionId -or $HistoricalAttachmentName){
@@ -176,7 +188,7 @@ if($HistoricalThreatEntryId -or $HistoricalDetectionId -or $HistoricalAttachment
 }
 if($ARCH7dInterruptAfterReturned -gt 0 -and (-not $ConfirmTestArchive -or -not $ConfirmLiveOutlookVerification -or $Mode -ne 'Archive' -or $Limit -le $ARCH7dInterruptAfterReturned -or $Limit -gt 10)){throw 'ARCH7d controlled interruption requires explicit live Archive and 1..Limit-1 returned receipts.'}
 if($RecoverLiveInterrupted -and (-not $ConfirmLiveOutlookVerification -or $Mode -ne 'Resume')){throw 'ARCH7c requires explicit live Resume.'}
-if($ConfirmLiveOutlookVerification -and (-not $ConfirmTestArchive -or $Mode -notin @('Archive','Resume') -or $RecoverInterrupted -or $ImportDeferredTransaction -or $WorkerPilot -or ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt 10)) -or ($Mode -eq 'Resume' -and $Transaction -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$'))){throw 'ARCH7b explicit test live verification requires Archive 1..10 or exact Resume; no Auto or historical import.'}
+if($ConfirmLiveOutlookVerification -and (-not $ConfirmTestArchive -or $Mode -notin @('Archive','Resume') -or $RecoverInterrupted -or $ImportDeferredTransaction -or $WorkerPilot -or ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt $devLiveCap)) -or ($Mode -eq 'Resume' -and $Transaction -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$'))){throw 'ARCH7b explicit test live verification requires Archive 1..10 or exact Resume; no Auto or historical import.'}
 $arch4Requested = [bool]$ConfirmTestArchive -or $PSBoundParameters.ContainsKey('SourcePst') -or $ConfirmComplexAttachments -or $PSBoundParameters.ContainsKey('IncludeFolderPath') -or $IncludeRootMail -or $ImportDeferredTransaction -or $RecoverInterrupted -or $PSBoundParameters.ContainsKey('ExpectedInterruptedPlanned') -or $PSBoundParameters.ContainsKey('ExpectedInterruptedReturned')
 if ($arch4Requested) {
     if (-not $ConfirmTestArchive -or [string]::IsNullOrWhiteSpace($SourcePst) -or
@@ -425,7 +437,7 @@ if ($WorkerPilot) {
 
 
 if($arch4Requested){
-    $build='2.6.5-ARCH7g2 DEV'
+    $build='2.6.5-ARCH8a DEV'
     $buildPath=Join-Path $PSScriptRoot 'BUILD-INFO.json'
     if(Test-Path -LiteralPath $buildPath -PathType Leaf){
         try{
@@ -811,7 +823,7 @@ try {
     Write-OPADiscoverySummary -Discovery $discovery
 
     if ($arch4Requested) {
-        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath -IncludeRootMail:$IncludeRootMail -ARCH6DeferredPolicy -ImportDeferredTransaction $ImportDeferredTransaction -RecoverInterrupted:$RecoverInterrupted -ExpectedInterruptedPlanned $ExpectedInterruptedPlanned -ExpectedInterruptedReturned $ExpectedInterruptedReturned -HistoricalThreatEntryId $HistoricalThreatEntryId -HistoricalDetectionId $HistoricalDetectionId -HistoricalAttachmentName $HistoricalAttachmentName -ConfirmLiveOutlookVerification:$ConfirmLiveOutlookVerification -RecoverLiveInterrupted:$RecoverLiveInterrupted -ARCH7dInterruptAfterReturned $ARCH7dInterruptAfterReturned
+        Invoke-OPAARCH4Batch -Mode $Mode -Session $session -Discovery $discovery -SourcePst $SourcePst -TransactionId $Transaction -Limit $Limit -OlderThanMonths $OlderThanMonths -ArchiveGrouping $ArchiveGrouping -MaxArchivePstSizeGB $effectiveArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -IncludeFolderPath $IncludeFolderPath -IncludeRootMail:$IncludeRootMail -ARCH6DeferredPolicy -ImportDeferredTransaction $ImportDeferredTransaction -RecoverInterrupted:$RecoverInterrupted -ExpectedInterruptedPlanned $ExpectedInterruptedPlanned -ExpectedInterruptedReturned $ExpectedInterruptedReturned -HistoricalThreatEntryId $HistoricalThreatEntryId -HistoricalDetectionId $HistoricalDetectionId -HistoricalAttachmentName $HistoricalAttachmentName -ConfirmLiveOutlookVerification:$ConfirmLiveOutlookVerification -RecoverLiveInterrupted:$RecoverLiveInterrupted -ARCH7dInterruptAfterReturned $ARCH7dInterruptAfterReturned -ConfirmDevLongArchive:$ConfirmDevLongArchive
         return
     }
 

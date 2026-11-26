@@ -5,9 +5,10 @@ function Get-OPAARCH7cInterruptedReview {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][object]$Transaction,
           [Parameter(Mandatory=$true)][object]$State,
-          [Parameter(Mandatory=$true)][object[]]$Steps)
+          [Parameter(Mandatory=$true)][object[]]$Steps,[switch]$ConfirmDevLongArchive)
+    $devLiveCap=if($ConfirmDevLongArchive){500}else{10}
     $cp=$Transaction.State;$plan=@($cp.PlannedItems);$rows=@($State.Rows)
-    if($State.Planned -lt 0 -or $State.Planned -gt 10 -or [int]$cp.Limit -lt 1 -or [int]$cp.Limit -gt 10 -or
+    if($State.Planned -lt 0 -or $State.Planned -gt $devLiveCap -or [int]$cp.Limit -lt 1 -or [int]$cp.Limit -gt $devLiveCap -or
        $plan.Count -ne $State.Planned -or $rows.Count -ne $State.Returned -or $State.Claimed -ne $State.Returned -or
        $State.Reconciled -lt 0 -or $State.Reconciled -gt $State.Returned -or
        $State.OperationEventCount -ne ($State.Returned+$State.Reconciled) -or
@@ -69,9 +70,9 @@ function Get-OPAARCH7cInterruptedReview {
 }
 function Complete-OPAARCH7cInterruptedBatch {
     [CmdletBinding()]
-    param([object]$Transaction,[object]$State,[object]$Verification,[string]$SourceStoreId,[string]$ProfileName)
+    param([object]$Transaction,[object]$State,[object]$Verification,[string]$SourceStoreId,[string]$ProfileName,[switch]$ConfirmDevLongArchive)
     $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $Transaction))
-    $review=Get-OPAARCH7cInterruptedReview -Transaction $Transaction -State $State -Steps $steps
+    $review=Get-OPAARCH7cInterruptedReview -Transaction $Transaction -State $State -Steps $steps -ConfirmDevLongArchive:$ConfirmDevLongArchive
     # Restore only durable, pre-claim skipped rows; unprocessed is not deferred.
     $Transaction.State.SkippedItems=@($review.DeferredRows)
     $Transaction.State.SkippedEntryIds=@($review.DeferredRows | ForEach-Object {[string]$_.EntryId})
@@ -84,7 +85,7 @@ function Complete-OPAARCH7cInterruptedBatch {
     Close-OPAStepJournalStreams
     $final=Get-OPAARCH4ReturnedFromDisk -Transaction $Transaction -SourceStoreId $SourceStoreId
     $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $Transaction))
-    $readback=Get-OPAARCH7cInterruptedReview -Transaction $Transaction -State $final -Steps $steps
+    $readback=Get-OPAARCH7cInterruptedReview -Transaction $Transaction -State $final -Steps $steps -ConfirmDevLongArchive:$ConfirmDevLongArchive
     if(-not $readback.RecoveryMarkerPresent -or $readback.Proof -cne $review.Proof -or $final.Reconciled -ne $final.Returned){throw 'ARCH7c recovery readback incomplete.'}
     $n=Save-OPAARCH6DeferredEvidence -Transaction $Transaction -SourceStoreId $SourceStoreId -ProfileName $ProfileName
     if($n -ne $review.Deferred){throw 'ARCH7c deferred ledger readback incomplete.'}

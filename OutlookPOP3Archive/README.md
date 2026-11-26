@@ -1,6 +1,14 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH7g2 DEV
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH8a DEV
 
 ## Актуальный запуск и документация
+
+ARCH7g2 CI [45832907881](https://github.com/paruzelk/powershell/actions/runs/45832907881) PASS 4932/167, 13/13 focused, ZIP inventory and all entry hashes PASS, commit `51a37609`, ZIP SHA256 `ee22c3f5867d3698d4b3edde983f7432dc5030a5b9997f59769eb60a1bbfa576`. Operator REAL PASS on workstation 26.11.2026: TaskPlan disabled/unregistered, WhatIf 0, wrong SID 30, Quiet run transaction `20261126-172058-1179eba8`, verified 10, deferred/unprocessed 0, exit 10, same Outlook PID 8468 / session 1 / start 17:20:45, summary Start/Batch/Source/Completed 1038 bytes. No-Outlook code 40, real task registration, GPO and concurrent RDS remain untested.
+
+Operator reports test reset: all test archive PSTs removed after returning all mail to the sole main test delivery PST `info@stios.ru.pst`; transaction journals removed manually. This is a new test baseline, not independently verified restoration or a production recovery procedure. Do not delete evidence/index/archives during ARCH8a; stale residual index or inconsistent archives require review, never automatic reset. Earlier real evidence remains historical; no repeated acceptance of completed stages.
+
+ARCH8a DEV: separately consented long Auto, exact local pinned single POP3 PST, batch 1..500 (default 500), 0 = no aggregate batch cap, optional 1..100 cap for pilot, original Safe/age-only/YearQuarter/attach-only and fresh-worker recovery, no blind retry, original 10/100 mode and RDS wrapper unchanged. CI expected 4947/168; production closed.
+
+[ARCH8a — синтаксис, этапы реального теста и ограничения](docs/2.6.5-arch8a.md). Существующий `-ConfirmDevAutoArchive` без `-ConfirmDevLongArchive` оставляет предел 10/100.
 
 ARCH7g2: ARCH7g1 CI [45829671352](https://github.com/paruzelk/powershell/actions/runs/45829671352) PASS Pester 4932/167 (0 failed/skipped), package gate correctly blocked omitted historical synthetic `Invoke-ARCH3s.ps1`. Verified all 43 tracked root PS1 against the allowlist; this was the only remaining omission. Restore it; keep complete ZIP inventory and SHA-256 gate. No logic change; production closed. Full CI/ZIP pending.
 
@@ -22,7 +30,7 @@ ARCH7e: `-Mode Auto -ConfirmDevAutoArchive` — только если ВСЕ о�
 
 Новый тестовый контроллер `Invoke-OPALiveArchiveBatches.ps1` запускает Archive и Resume в отдельных процессах Windows PowerShell 5.1 STA, без перезапуска Outlook. Полный синтаксис и примеры — [ARCH7d](docs/2.6.5-arch7d.md).
 
-Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH7g2 — идентификатор DEV-сборки.
+Базовая версия метаданных: `0.9.4-rc1-build2.6.3-PREVIEW1` (схемы не менялись); ARCH8a — идентификатор DEV-сборки.
 
 25.11.2026: ARCH7b3 `e4c61068` — CI 4872/165 PASS, реальный Archive/Resume 4/4 без перезапуска Outlook принят (транзакция 20261125-161734-1d203d2f). ARCH7c1 — CI 4881/165 PASS, [восстановление](docs/2.6.5-arch7c.md). ARCH7d1 — CI 4895/165 PASS; реальный запуск остановился до worker из-за конфликта $archive/$Archive. ARCH7d2 — CI 4898/165 PASS, совместный REAL PASS ARCH7c/d (20261125-173959-49d4a7fb, 2 verified, 1 deferred, 7 unprocessed, same Outlook). ARCH7e — [ограниченный Auto DEV](docs/2.6.5-arch7e.md), CI и single-POP3 REAL PASS. **ProductionReady=False. Auto без явного DEV-согласия закрыт. Не назначать DEV пользователям через планировщик.**
 

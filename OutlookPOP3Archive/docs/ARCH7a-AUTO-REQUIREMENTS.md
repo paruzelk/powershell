@@ -1,5 +1,7 @@
 # ARCH7a — эксплуатационный контракт Auto
 
+> ARCH8a DEV: separately consented long Auto, exact local pinned single POP3 PST, batch 1..500 (default 500), 0 = no aggregate batch cap, optional 1..100 cap for pilot, original Safe/age-only/YearQuarter/attach-only and fresh-worker recovery, no blind retry, original 10/100 mode and RDS wrapper unchanged. CI expected 4947/168; production closed. [ARCH8a](2.6.5-arch8a.md). The long test mode is not a deployment permit.
+
 > ARCH7c/d REAL PASS via ARCH7d2, [evidence](2.6.5-arch7d.md). ARCH7e adds explicit DEV Auto age-only defaults and all-POP3 dispatcher, not production permission. Shared-directory pending remains serialized (no migration); 10/100 cap, final 500/unlimited, persistent retry, full per-PST isolation and RDS acceptance remain outstanding. [ARCH7e](2.6.5-arch7e.md).
 
 > ARCH7b3 accepted real 4/4 same Outlook, see [evidence](2.6.5-arch7b.md). ARCH7c DEV [recovery-only CLI](2.6.5-arch7c.md), supervisor/Auto still closed. Target requirements unchanged.

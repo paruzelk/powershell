@@ -402,10 +402,12 @@ function Invoke-OPAARCH4Batch {
           [string]$TransactionId,
           [int]$Limit=100,[int]$OlderThanMonths=12,[string]$ArchiveGrouping='Year',
           [double]$MaxArchivePstSizeGB=10,[double]$SafetyMarginGB=0.5,
-          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned,[string]$HistoricalThreatEntryId,[string]$HistoricalDetectionId,[string]$HistoricalAttachmentName,[switch]$ConfirmLiveOutlookVerification,[switch]$RecoverLiveInterrupted,[ValidateRange(0,9)][int]$ARCH7dInterruptAfterReturned=0)
+          [switch]$ARCH5Batch,[switch]$ConfirmComplexAttachments,[string[]]$IncludeFolderPath,[switch]$IncludeRootMail,[switch]$ARCH6DeferredPolicy,[string]$ImportDeferredTransaction,[switch]$RecoverInterrupted,[int]$ExpectedInterruptedPlanned,[int]$ExpectedInterruptedReturned,[string]$HistoricalThreatEntryId,[string]$HistoricalDetectionId,[string]$HistoricalAttachmentName,[switch]$ConfirmLiveOutlookVerification,[switch]$RecoverLiveInterrupted,[ValidateRange(0,9)][int]$ARCH7dInterruptAfterReturned=0,[switch]$ConfirmDevLongArchive)
+    $devLiveCap=if($ConfirmDevLongArchive){500}else{10}
+    if($ConfirmDevLongArchive -and (-not $ConfirmLiveOutlookVerification -or -not $ARCH6DeferredPolicy -or $ARCH7dInterruptAfterReturned -gt 0)){throw 'ARCH8a requires explicit live deferred-policy worker.'}
     if($ARCH7dInterruptAfterReturned -gt 0 -and (-not $ConfirmLiveOutlookVerification -or -not $ARCH6DeferredPolicy -or $Mode -ne 'Archive' -or $Limit -le $ARCH7dInterruptAfterReturned -or $Limit -gt 10)){throw 'ARCH7d invalid controlled interruption scope.'}
     if($RecoverLiveInterrupted -and (-not $ConfirmLiveOutlookVerification -or $Mode -ne 'Resume')){throw 'ARCH7c requires explicit live Resume.'}
-    if($ConfirmLiveOutlookVerification -and (-not $ARCH5Batch -or -not $Session.Attached -or $RecoverInterrupted -or $ImportDeferredTransaction -or ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt 10)) -or ($Mode -eq 'Resume' -and $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$'))){throw 'ARCH7b requires attached Outlook, exact Resume or bounded 1..10 test Archive; no historical import/recovery.'}
+    if($ConfirmLiveOutlookVerification -and (-not $ARCH5Batch -or -not $Session.Attached -or $RecoverInterrupted -or $ImportDeferredTransaction -or ($Mode -eq 'Archive' -and ($Limit -lt 1 -or $Limit -gt $devLiveCap)) -or ($Mode -eq 'Resume' -and $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$'))){throw 'ARCH7b requires attached Outlook, exact Resume or bounded 1..10 test Archive; no historical import/recovery.'}
     if($RecoverInterrupted -and ($Mode -ne 'Resume' -or -not $ARCH5Batch -or $TransactionId -cnotmatch '^\d{8}-\d{6}-[a-f0-9]{8}$' -or $ExpectedInterruptedReturned -lt 1 -or $ExpectedInterruptedPlanned -gt 500 -or $ExpectedInterruptedReturned -ge $ExpectedInterruptedPlanned)){throw 'ARCH6f3c1 explicit interrupted Resume identity/counts required.'}
     if($IncludeRootMail -and ($Mode -ne 'Archive' -or -not $ARCH5Batch)){throw 'ARCH6f2 root mail requires explicit controlled Archive.'}
     $source=[IO.Path]::GetFullPath($SourcePst)
@@ -519,11 +521,12 @@ function Invoke-OPAARCH4Batch {
             Write-Host ('Транзакция: '+$tx.TransactionId)
             Write-Host ('Размер партии: '+$tx.State.Limit+'; группировка: '+$tx.State.ArchiveGrouping+'; возраст: '+$tx.State.OlderThanMonths+' мес.; режим записи: Safe')
         }
+        if($ConfirmLiveOutlookVerification -and ([int]$tx.State.Limit -lt 1 -or [int]$tx.State.Limit -gt $devLiveCap)){throw 'ARCH8a pending limit exceeds explicit live worker scope; preserve pending.'}
         $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
         if($RecoverLiveInterrupted){
             if($p.PSObject.Properties.Name -notcontains 'DeferredPolicy' -or $p.DeferredPolicy -ne $true){throw 'ARCH7c requires original deferred-policy batch.'}
             $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx))
-            [void](Get-OPAARCH7cInterruptedReview -Transaction $tx -State $state -Steps $steps)
+            [void](Get-OPAARCH7cInterruptedReview -Transaction $tx -State $state -Steps $steps -ConfirmDevLongArchive:$ConfirmDevLongArchive)
         }elseif($RecoverInterrupted){
             $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx))
             [void](Assert-OPAARCH6InterruptedState -Transaction $tx -State $state -Steps $steps -ExpectedPlanned $ExpectedInterruptedPlanned -ExpectedReturned $ExpectedInterruptedReturned)
@@ -565,7 +568,7 @@ function Invoke-OPAARCH4Batch {
             # but must remain identical throughout this verification.
             $verificationProcess=[pscustomobject]@{MoveProcessId=$proc.Id;MoveProcessStartUtcTicks=$proc.StartUtcTicks}
             Assert-OPAARCH7bOutlookIdentity -Pending $verificationProcess -Outlook (Get-OPAARCH4OutlookProcess)
-            $completed=Complete-OPAARCH7cInterruptedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile)
+            $completed=Complete-OPAARCH7cInterruptedBatch -Transaction $tx -State $state -Verification $result -SourceStoreId $storeId -ProfileName ([string]$Discovery.Profile) -ConfirmDevLongArchive:$ConfirmDevLongArchive
             Assert-OPAARCH7bOutlookIdentity -Pending $verificationProcess -Outlook (Get-OPAARCH4OutlookProcess)
             $proof='OutlookPID='+$proc.Id+'; OutlookStartTicks='+$proc.StartUtcTicks+'; VerifyWorkerPID='+$worker.Id+'; VerifyWorkerStartTicks='+$worker.StartUtcTicks
             $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx))

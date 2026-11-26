@@ -50,7 +50,9 @@ function Get-OPAARCH7ePendingOwner {
 function Invoke-OPAARCH7eSourceSequence {
     [CmdletBinding()]
     param([AllowEmptyCollection()][object[]]$Sources,[scriptblock]$PendingOwner,[scriptblock]$RunSource,
-          [ValidateRange(1,100)][int]$MaxBatchesPerSource,[ValidateRange(0,300)][int]$BatchDelaySeconds=0,[scriptblock]$Record)
+          [ValidateRange(0,100)][int]$MaxBatchesPerSource,[ValidateRange(0,300)][int]$BatchDelaySeconds=0,[scriptblock]$Record,[switch]$ConfirmDevLongArchive)
+    if($MaxBatchesPerSource -eq 0 -and -not $ConfirmDevLongArchive){throw 'ARCH8a unlimited requires explicit long test scope.'}
+    $devLiveCap=if($ConfirmDevLongArchive){500}else{10}
     $results=New-Object 'System.Collections.Generic.List[object]'
     $halt=$false
     # Group by original directory-wide lease/pending. No migration, no overwrite.
@@ -72,7 +74,7 @@ function Invoke-OPAARCH7eSourceSequence {
                 continue
             }
             $verified=0;$deferred=0;$batches=0;$attempts=0;$status='BatchLimitReached';$last=$null;$detail=''
-            while($attempts -lt $MaxBatchesPerSource){
+            while($MaxBatchesPerSource -eq 0 -or $attempts -lt $MaxBatchesPerSource){
                 try{
                     $current=& $PendingOwner $group.Name $members
                     if($null -ne $current -and $current.SourcePst -ine $member.SourcePst){$status='DirectoryBlocked';$directoryBlocked=$true;break}
@@ -83,7 +85,7 @@ function Invoke-OPAARCH7eSourceSequence {
                     if($null -eq $last -or @($last).Count -ne 1 -or $last.Schema -cne '2.6.5-ARCH7d.Supervisor.1' -or
                        $last.ProductionReady -ne $false -or $last.AutomaticMoveRetryAllowed -ne $false -or $last.OutlookRestartRequired -ne $false -or
                        [int]$last.Batches -lt 0 -or [int]$last.Batches -gt 1 -or [int]$last.Verified -lt 0 -or [int]$last.Deferred -lt 0 -or
-                       [int]$last.Unprocessed -lt 0 -or ([int]$last.Verified+[int]$last.Deferred+[int]$last.Unprocessed) -gt 10){
+                       [int]$last.Unprocessed -lt 0 -or ([int]$last.Verified+[int]$last.Deferred+[int]$last.Unprocessed) -gt $devLiveCap){
                         throw 'ARCH7e invalid source supervisor result.'
                     }
                     $verified+=[int]$last.Verified;$deferred+=[int]$last.Deferred;$batches+=[int]$last.Batches
@@ -91,6 +93,7 @@ function Invoke-OPAARCH7eSourceSequence {
                     if($Record){& $Record 'Batch' $member $last}
                     if($status -cin @('WorkerStillRunning','WorkerExitCodeUnavailable','RecoveryExitWithoutEvidence')){$halt=$true;break}
                     if($status -cin @('NoEligibleFolders','NoEligibleMessages')){
+                        if($ConfirmDevLongArchive -and ([int]$last.Verified -ne 0 -or [int]$last.Deferred -ne 0 -or [int]$last.Unprocessed -ne 0)){throw 'ARCH8a inconsistent exhaustion response.'}
                         if($null -ne (& $PendingOwner $group.Name $members)){throw 'ARCH7e exhaustion with pending.'}
                         $status='Exhausted';break
                     }
@@ -109,7 +112,7 @@ function Invoke-OPAARCH7eSourceSequence {
                     # After successful interrupted recovery, select a fresh batch
                     # from current source, not the historical unprocessed EntryIDs.
                     $status='BatchLimitReached'
-                    if($attempts -lt $MaxBatchesPerSource -and $BatchDelaySeconds -gt 0){Start-Sleep -Seconds $BatchDelaySeconds}
+                    if(($MaxBatchesPerSource -eq 0 -or $attempts -lt $MaxBatchesPerSource) -and $BatchDelaySeconds -gt 0){Start-Sleep -Seconds $BatchDelaySeconds}
                 }catch{
                     $status='SupervisorException';$detail=$_.Exception.Message
                     # Cannot prove an exception occurred before child start/exit.
@@ -129,11 +132,19 @@ function Invoke-OPAARCH7eSourceSequence {
     $status=if($Sources.Count -eq 0){'NoPop3Sources'}elseif(@($all | Where-Object {$_.Status -cne 'Exhausted'}).Count -eq 0){'AllSourcesExhausted'}else{'PartialOrBlocked'}
     [pscustomobject]@{Schema='2.6.5-ARCH7e.Auto.1';Status=$status;SourcesDiscovered=$Sources.Count;SourcesExhausted=@($all | Where-Object {$_.Status -ceq 'Exhausted'}).Count;Verified=[long](($all | Measure-Object Verified -Sum).Sum);Deferred=[long](($all | Measure-Object Deferred -Sum).Sum);Sources=$all;OutlookRestartRequired=$false;AutomaticMoveRetryAllowed=$false;ProductionReady=$false}
 }
+function Assert-OPAARCH8aPinnedSource {
+    [CmdletBinding()]
+    param([AllowEmptyCollection()][object[]]$Sources,[string]$PinnedPath)
+    if(-not $PinnedPath -or $PinnedPath -notmatch '^[A-Za-z]:\\' -or [IO.Path]::GetExtension($PinnedPath) -ine '.pst' -or
+       $Sources.Count -ne 1 -or $Sources[0].SourcePst -ine [IO.Path]::GetFullPath($PinnedPath)){
+        throw 'ARCH8a exactly one discovered POP3 matching the pinned test PST is required.'
+    }
+}
 function Invoke-OPAARCH7eAuto {
     [CmdletBinding()]
     param([string]$ProjectRoot,[string]$ProfileName,[int]$BatchSize,[int]$MaxBatchesPerSource,
           [int]$OlderThanMonths,[string]$ArchiveGrouping,[switch]$IncludeRootMail,[int]$MaxResumeAttempts,
-          [ValidateRange(0,300)][int]$BatchDelaySeconds=0,[ValidateRange(5,300)][int]$RetryDelaySeconds=5,[scriptblock]$Record)
+          [ValidateRange(0,300)][int]$BatchDelaySeconds=0,[ValidateRange(5,300)][int]$RetryDelaySeconds=5,[scriptblock]$Record,[switch]$ConfirmDevLongArchive,[string]$LongArchiveSourcePst)
     . (Join-Path $ProjectRoot 'Core/Runtime/ComManager.ps1')
     . (Join-Path $ProjectRoot 'Core/Archive/ARCH7dSupervisor.ps1')
     . (Join-Path $ProjectRoot 'Core/Archive/ARCH6Orchestration.ps1')
@@ -147,8 +158,12 @@ function Invoke-OPAARCH7eAuto {
         $session=New-OPAComSession -ProfileName $ProfileName -AttachOnly
         try{$sourceRows=@(Get-OPAARCH7eSourceRows -Namespace $session.Namespace -ProfileName $session.ProfileName)}
         finally{Close-OPAComSession -Session $session;$session=$null}
+        if($ConfirmDevLongArchive){
+            Assert-OPAARCH8aPinnedSource -Sources $sourceRows -PinnedPath $LongArchiveSourcePst
+        }
         $arch7eControllerPath=Join-Path $ProjectRoot 'Invoke-OPALiveArchiveBatches.ps1'
         $arch7eCommon=@{ConfirmTestArchive=$true;ConfirmLiveOutlookVerification=$true;BatchSize=$BatchSize;MaxBatches=1;OlderThanMonths=$OlderThanMonths;ArchiveGrouping=$ArchiveGrouping;IncludeRootMail=[bool]$IncludeRootMail;MaxResumeAttempts=$MaxResumeAttempts}
+        if($ConfirmDevLongArchive){$arch7eCommon.ConfirmDevLongArchive=$true;$arch7eCommon.WorkerTimeoutSeconds=3600}
         $arch7eRetryDelay=$RetryDelaySeconds
         $arch7eRead={param($directory,$members) Get-OPAARCH7ePendingOwner -Directory $directory -Sources $members}
         $arch7eRun={
@@ -157,7 +172,7 @@ function Invoke-OPAARCH7eAuto {
             if($arch7eRetryDelay -ne 5){$params.RetryDelaySeconds=$arch7eRetryDelay}
             & $arch7eControllerPath @params
         }
-        Invoke-OPAARCH7eSourceSequence -Sources $sourceRows -PendingOwner $arch7eRead -RunSource $arch7eRun -MaxBatchesPerSource $MaxBatchesPerSource -BatchDelaySeconds $BatchDelaySeconds -Record $Record
+        Invoke-OPAARCH7eSourceSequence -Sources $sourceRows -PendingOwner $arch7eRead -RunSource $arch7eRun -MaxBatchesPerSource $MaxBatchesPerSource -BatchDelaySeconds $BatchDelaySeconds -Record $Record -ConfirmDevLongArchive:$ConfirmDevLongArchive
     }finally{
         if($null -ne $session){Close-OPAComSession -Session $session}
         if($held){[void]$mutex.ReleaseMutex()}
