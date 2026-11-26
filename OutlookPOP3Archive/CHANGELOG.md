@@ -1,5 +1,10 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH8a1 DEV — 2026-11-26
+
+ARCH8a1 DEV: ARCH8a CI [45839594016](https://github.com/paruzelk/powershell/actions/runs/45839594016) PASS 4947/168, ZIP SHA256 `cfa14c45563934078cf0c76b73f81913ebb1c18c54ed74fdaab9b2e869ebd3ee`. Real transaction `20261126-174835-acf7a0bb`, Planned=Returned=500, NotMoved=0, Archive worker PID 3324 exit 0, Outlook PID 13820 unchanged. All three Resume workers exit 1 at `Get-OPAARCH7cInterruptedReview` line 16 via `Get-OPAARCH6DeferredProof` line 21 / Save-OPAARCH6DeferredEvidence / Complete-OPAARCH7cInterruptedBatch. Completed proof readback omitted long scope. Fix readback to select bounded validation using persisted checkpoint Limit (maximum 500), only after Completed and recovery marker checks; retain original prefix, receipt, reconciliation and skip invariants, unchanged explicit live writer consent. Four added synthetic tests (500/500 zero deferred, 499/500 with durable deferred ledger re-read, limit >500, corrupt marker/incomplete reconciliation), 4951/168 expected. Root mail route accepted by operator; 500 messages confirmed. Do not delete pending, PST, or evidence; resume existing transaction only, no new Move. Production closed.
+
+
 ## ARCH8a DEV — 2026-11-26
 
 - ARCH7g2 CI [45832907881](https://github.com/paruzelk/powershell/actions/runs/45832907881) PASS 4932/167, 13/13 focused, ZIP inventory and all entry hashes PASS, commit `51a37609`, ZIP SHA256 `ee22c3f5867d3698d4b3edde983f7432dc5030a5b9997f59769eb60a1bbfa576`. Operator REAL PASS on workstation 26.11.2026: TaskPlan disabled/unregistered, WhatIf 0, wrong SID 30, Quiet run transaction `20261126-172058-1179eba8`, verified 10, deferred/unprocessed 0, exit 10, same Outlook PID 8468 / session 1 / start 17:20:45, summary Start/Batch/Source/Completed 1038 bytes. No-Outlook code 40, real task registration, GPO and concurrent RDS remain untested.

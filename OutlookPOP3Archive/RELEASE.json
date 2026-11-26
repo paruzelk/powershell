@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH8a1 DEV: fix completed long deferred evidence readback; ARCH8a real 500/500 MoveReturned, three Resume failures on old cap; 4951/168 expected, production closed.",
     "ARCH8a DEV: ARCH7g2 CI 4932/167 and real workstation wrapper PASS; explicitly pinned single test POP3, 500 default batch and unlimited aggregate count, unchanged safety gates, 4947/168 expected; production closed.",
     "ARCH7g2 DEV: ARCH7g1 full Pester 4932/167 PASS, packaging blocked missing historical synthetic Invoke-ARCH3s.ps1; complete 43 tracked root PS1 allowlist, unchanged full ZIP verification and production closure.",
     "ARCH7g1 DEV: ARCH7g CI 4932/167 PASS but release ZIP lacked three new entrypoints; correct allowlist and validate every tracked root PS and every staged ZIP entry. Production closed.",
@@ -133,7 +134,7 @@
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
     "ExpectedTestContainers": 168,
-    "ExpectedPesterTests": 4947,
+    "ExpectedPesterTests": 4951,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

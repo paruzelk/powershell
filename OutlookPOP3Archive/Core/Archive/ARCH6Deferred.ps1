@@ -18,7 +18,10 @@ function Get-OPAARCH6DeferredProof {
     $state=Get-OPAARCH4ReturnedFromDisk -Transaction $Transaction -SourceStoreId $SourceStoreId
     $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $Transaction))
     if(@($steps | Where-Object {$_.Step -ceq 'ARCH7c Recovery Verified'}).Count -gt 0){
-        $review=Get-OPAARCH7cInterruptedReview -Transaction $Transaction -State $state -Steps $steps
+        # Completed proof readback is not permission to Move or Resume. Use the
+        # persisted batch limit for validation, retaining the hard 500 ceiling
+        # and every original prefix, reconciliation and marker invariant.
+        $review=Get-OPAARCH7cInterruptedReview -Transaction $Transaction -State $state -Steps $steps -ConfirmDevLongArchive:([int]$Transaction.State.Limit -gt 10)
         if(-not $review.RecoveryMarkerPresent -or $state.Reconciled -ne $state.Returned -or [int]$Transaction.State.Verified -ne $state.Returned -or [int]$Transaction.State.Executed -ne $state.Returned -or [int]$Transaction.State.Skipped -ne $review.Deferred){throw 'ARCH7c incomplete deferred recovery proof.'}
         return $review.DeferredRows
     }

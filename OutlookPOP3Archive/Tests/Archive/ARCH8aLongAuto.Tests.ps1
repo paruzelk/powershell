@@ -6,6 +6,8 @@ BeforeAll {
     . (Join-Path $script:aRoot 'Core/Archive/ARCH7cRecovery.ps1')
     . (Join-Path $script:aRoot 'Core/Archive/ARCH6Deferred.ps1')
     . (Join-Path $script:aRoot 'Core/Archive/ARCH6Orchestration.ps1')
+    . (Join-Path $script:aRoot 'Core/Archive/ARCH4Batch.ps1')
+    . (Join-Path $script:aRoot 'Core/Archive/ArchiveTransaction.ps1')
     $script:aMain=Join-Path $script:aRoot 'OutlookPOP3Archive.ps1'
     $script:aController=Join-Path $script:aRoot 'Invoke-OPALiveArchiveBatches.ps1'
     $script:aPst='C:\Test\Mail.pst'
@@ -132,5 +134,67 @@ Describe 'ARCH8a explicitly scoped autonomous test archive' {
         $r.Verified | Should -Be 311
         $r.Unprocessed | Should -Be 188
         $r.Status | Should -BeExactly RecoveredPendingBatch
+    }
+}
+
+
+Describe 'ARCH8a1 completed long recovery deferred proof readback' {
+    BeforeEach {
+        $script:aProofDir=Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+        [void][IO.Directory]::CreateDirectory($script:aProofDir)
+        $script:aProofId='20261126-174835-acf7a0bb'
+        $plan=@(1..500 | ForEach-Object {[pscustomobject]@{EntryId=('id'+$_);SourceFolderPath='\\fake\Inbox';Subject='synthetic';Sender='fixture';ArchiveDate='2020-01-01';Size=1}})
+        $script:aProofTx=[pscustomobject]@{Path=(Join-Path $script:aProofDir ($script:aProofId+'.json'));TransactionId=$script:aProofId;State=[pscustomobject]@{SourcePst=$script:aPst;Limit=500;PlannedItems=$plan;Status='Completed';Executed=500;Verified=500;Skipped=0;SkippedEntryIds=@();SkippedItems=@()}}
+        $rows=@($plan | ForEach-Object {[pscustomobject]@{SourceEntryId=$_.EntryId}})
+        $script:aProofState=[pscustomobject]@{Planned=500;Returned=500;Claimed=500;Reconciled=500;OperationEventCount=1000;AwaitingRestart=$true;Rows=$rows}
+        $script:aProofSteps=@([pscustomobject]@{Step='ARCH4 Batch Started'},[pscustomobject]@{Step='Candidates'})
+        $script:aProofSteps+=@(foreach($item in $plan){
+            [pscustomobject]@{Step='Move Started';EntryId=$item.EntryId}
+            [pscustomobject]@{Step='ARCH4 Move Returned';EntryId=$item.EntryId}
+        })
+        $script:aProofSteps+=@([pscustomobject]@{Step='ARCH4 Awaiting Restart'},[pscustomobject]@{Step='ARCH4 Batch Verified'},[pscustomobject]@{Step='ARCH7c Recovery Verified';Message='Verified=500; Deferred=0; Unprocessed=0; MoveInvocations=0'})
+        Mock Get-OPAARCH4ReturnedFromDisk {$script:aProofState}
+        Mock Read-OPAARCH4StepRecords {$script:aProofSteps}
+        Mock Get-OPAArchiveTransaction {$script:aProofTx}
+        Mock Get-OPAARCH6HistoricalThreatIds {}
+    }
+    It 'revalidates the exact 500 returned and reconciled case through real Save-OPAARCH6DeferredEvidence twice' {
+        (Save-OPAARCH6DeferredEvidence -Transaction $script:aProofTx -SourceStoreId 'fake' -ProfileName Outlook) | Should -Be 0
+        (Save-OPAARCH6DeferredEvidence -Transaction $script:aProofTx -SourceStoreId 'fake' -ProfileName Outlook) | Should -Be 0
+        @(Get-ChildItem -LiteralPath $script:aProofDir -File).Count | Should -Be 0
+    }
+    It 'saves and reads back a real deferred ledger for a completed long mixed batch without widening writer consent' {
+        $script:aProofState.Returned=499
+        $script:aProofState.Claimed=499
+        $script:aProofState.Reconciled=499
+        $script:aProofState.OperationEventCount=998
+        $script:aProofState.Rows=@($script:aProofState.Rows | Select-Object -First 499)
+        $script:aProofTx.State.Executed=499
+        $script:aProofTx.State.Verified=499
+        $script:aProofTx.State.Skipped=1
+        $script:aProofTx.State.SkippedEntryIds=@('id500')
+        $script:aProofSteps=@($script:aProofSteps | Select-Object -First 1000)+@(
+            [pscustomobject]@{Step='Skipped';EntryId='id500';SourceFolderPath='\\fake\Inbox';Message='ARCH6f3a deferred AttachmentTypeUnsupported: ARCH5 AttachmentTypeUnsupported: index=1 type=5 bytes=1';Time='2026-11-26T17:48:00'}
+            [pscustomobject]@{Step='ARCH4 Awaiting Restart'}
+            [pscustomobject]@{Step='ARCH4 Batch Verified'}
+            [pscustomobject]@{Step='ARCH7c Recovery Verified';Message='Verified=499; Deferred=1; Unprocessed=0; MoveInvocations=0'}
+        )
+        (Save-OPAARCH6DeferredEvidence -Transaction $script:aProofTx -SourceStoreId 'fake' -ProfileName Outlook) | Should -Be 1
+        (Save-OPAARCH6DeferredEvidence -Transaction $script:aProofTx -SourceStoreId 'fake' -ProfileName Outlook) | Should -Be 1
+        @(Get-OPAARCH6DeferredIds -SourcePst $script:aPst -SourceStoreId 'fake' -ProfileName Outlook -Directory $script:aProofDir) | Should -Be 'id500'
+    }
+    It 'rejects a completed proof outside the hard 500-item scope' {
+        $script:aProofTx.State.Limit=501
+        {Save-OPAARCH6DeferredEvidence -Transaction $script:aProofTx -SourceStoreId 'fake' -ProfileName Outlook} | Should -Throw '*invalid bounded checkpoint*'
+        @(Get-ChildItem -LiteralPath $script:aProofDir -File).Count | Should -Be 0
+    }
+    It 'rejects corrupt recovery markers and incomplete reconciliation before writing evidence' {
+        $script:aProofSteps[-1].Message='Verified=499; Deferred=0; Unprocessed=0; MoveInvocations=0'
+        {Save-OPAARCH6DeferredEvidence -Transaction $script:aProofTx -SourceStoreId 'fake' -ProfileName Outlook} | Should -Throw '*recovery marker mismatch*'
+        $script:aProofSteps[-1].Message='Verified=500; Deferred=0; Unprocessed=0; MoveInvocations=0'
+        $script:aProofState.Reconciled=499
+        $script:aProofState.OperationEventCount=999
+        {Save-OPAARCH6DeferredEvidence -Transaction $script:aProofTx -SourceStoreId 'fake' -ProfileName Outlook} | Should -Throw '*inconsistent completed checkpoint*'
+        @(Get-ChildItem -LiteralPath $script:aProofDir -File).Count | Should -Be 0
     }
 }
