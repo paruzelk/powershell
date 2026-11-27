@@ -165,6 +165,9 @@ function Get-OPAARCH4ReturnedState {
     }
     if($claims.Count -ne $returns.Count){throw 'ARCH4 unresolved claim; no automatic retry or index mutation.'}
     $count=$ordered.Count;$seq=0
+    $held=@(Get-OPAARCH8a3HoldRows -Transaction $Transaction -Rows @($ordered.ToArray()) -SourceStoreId $SourceStoreId)
+    $heldIds=@($held | ForEach-Object {[string]$_.SourceEntryId})
+    $commitRows=@($ordered.ToArray() | Where-Object {$heldIds -inotcontains [string]$_.SourceEntryId})
     foreach($e in $Events){
         $seq++
         if([long]$e.Sequence -ne $seq -or [string]$e.TransactionId -cne [string]$Transaction.TransactionId -or
@@ -182,13 +185,13 @@ function Get-OPAARCH4ReturnedState {
             if($e.Phase -cne 'Intent' -or $id -ine $ordered[$seq-1].SourceEntryId){throw 'ARCH4 invalid Intent prefix.'}
         }else{
             $i=$seq-$count-1
-            if($i -ge $count -or $e.Phase -cne 'Reconciled' -or $id -ine $ordered[$i].SourceEntryId -or
+            if($i -ge $commitRows.Count -or $e.Phase -cne 'Reconciled' -or $id -ine $commitRows[$i].SourceEntryId -or
                [string]$e.ArchiveEntryId -ine $r.ArchiveEntryId){throw 'ARCH4 invalid Reconciled prefix.'}
             $done[$id]=$true
         }
     }
     if($seq -lt $count){throw 'ARCH4 original OperationJournal Intent missing.'}
-    return [pscustomobject]@{Rows=@($ordered.ToArray());Claimed=$count;Returned=$count;Reconciled=$done.Count;Planned=$planned.Count;AwaitingRestart=(@($Steps | Where-Object {$_.Step -ceq 'ARCH4 Awaiting Restart'}).Count -eq 1);OperationEventCount=$Events.Count}
+    return [pscustomobject]@{Rows=@($ordered.ToArray());HeldRows=$held;Claimed=$count;Returned=$count;Reconciled=$done.Count;Planned=$planned.Count;AwaitingRestart=(@($Steps | Where-Object {$_.Step -ceq 'ARCH4 Awaiting Restart'}).Count -eq 1);OperationEventCount=$Events.Count}
 }
 
 function Get-OPAARCH4OutlookProcess {
@@ -230,7 +233,7 @@ function Complete-OPAARCH4VerifiedBatch {
     param([Parameter(Mandatory=$true)][object]$Transaction,
           [Parameter(Mandatory=$true)][object]$State,
           [Parameter(Mandatory=$true)][object]$Verification,
-          [Parameter(Mandatory=$true)][string]$SourceStoreId)
+          [Parameter(Mandatory=$true)][string]$SourceStoreId,[switch]$AllowItemHold)
     if(-not $Verification.Verified -or -not $Verification.EntryIdsVerified -or
        -not $Verification.SemanticWitnessRequired -or -not $Verification.AllRequiredOriginalSemanticWitnessesPresent -or
        [int]$Verification.ExpectedMoved -ne $State.Returned -or
@@ -239,9 +242,19 @@ function Complete-OPAARCH4VerifiedBatch {
         # Diagnostic only: no witness payloads, no commit on a failed gate.
         $diagnostic=[ordered]@{TransactionId=[string]$Transaction.TransactionId;Returned=[int]$State.Returned;Verified=[bool]$Verification.Verified;EntryIdsVerified=[bool]$Verification.EntryIdsVerified;SemanticWitnessRequired=[bool]$Verification.SemanticWitnessRequired;AllRequiredOriginalSemanticWitnessesPresent=[bool]$Verification.AllRequiredOriginalSemanticWitnessesPresent;ExpectedMoved=$Verification.ExpectedMoved;ExpectedEntryIdsChecked=$Verification.ExpectedEntryIdsChecked;MissingEntryIds=@($Verification.MissingEntryIds);WarningEntryIds=@($Verification.WarningEntryIds)}
         Write-Host ('ARCH8a2 VERIFICATION_FAILURE '+(ConvertTo-Json -InputObject $diagnostic -Depth 5 -Compress))
-        throw 'ARCH4 independent full verification failed; no journal/index commit.'
+        if(-not $AllowItemHold){throw 'ARCH4 independent full verification failed; no journal/index commit.'}
     }
-    $rows=@($State.Rows);$source=[string]$Transaction.State.SourcePst
+    $held=@(Get-OPAARCH8a3StateHeldRows -State $State)
+    if($AllowItemHold){
+        $failures=@(Get-OPAARCH8a3ItemFailures -State $State -Verification $Verification)
+        $held=@(Save-OPAARCH8a3Hold -Transaction $Transaction -State $State -Failures $failures -SourceStoreId $SourceStoreId)
+    }elseif($held.Count -gt 0){throw 'ARCH8a3 held batch requires explicit long recovery.'}
+    $heldIds=@($held | ForEach-Object {[string]$_.SourceEntryId})
+    $rows=@($State.Rows | Where-Object {$heldIds -inotcontains [string]$_.SourceEntryId});$source=[string]$Transaction.State.SourcePst
+    if($held.Count -gt 0){
+        $holdIndex=Import-OPADuplicateIndex -ArchivePst $State.Rows[0].ArchivePst
+        foreach($h in $held){if($null -ne (Test-OPADuplicateEntry -Index $holdIndex -SourceEntryId $h.SourceEntryId)){throw 'ARCH8a3 held identity already indexed; preserve pending.'}}
+    }
     if($rows.Count -gt 0){
         $idx=Import-OPADuplicateIndex -ArchivePst $rows[0].ArchivePst
         # Validate all conflicts before appending any Reconciled or index row.
@@ -255,7 +268,7 @@ function Complete-OPAARCH4VerifiedBatch {
         }
         for($i=[int]$State.Reconciled;$i -lt $rows.Count;$i++){
             $r=$rows[$i]
-            [void](Write-OPAOperationJournalEvent -Path (Get-OPAARCH4OperationPath -Transaction $Transaction) -TransactionId $Transaction.TransactionId -OperationId $r.SourceEntryId -Sequence ([long]($rows.Count+$i+1)) -Phase Reconciled -SourceEntryId $r.SourceEntryId -ArchiveEntryId $r.ArchiveEntryId -ArchivePst $r.ArchivePst -SourceStoreId $SourceStoreId -SourceFolderPath $r.SourceFolderPath -TargetFolderPath $r.TargetFolderPath -Message 'Independent original full semantic ArchiveVerifier passed')
+            [void](Write-OPAOperationJournalEvent -Path (Get-OPAARCH4OperationPath -Transaction $Transaction) -TransactionId $Transaction.TransactionId -OperationId $r.SourceEntryId -Sequence ([long]($State.Returned+$i+1)) -Phase Reconciled -SourceEntryId $r.SourceEntryId -ArchiveEntryId $r.ArchiveEntryId -ArchivePst $r.ArchivePst -SourceStoreId $SourceStoreId -SourceFolderPath $r.SourceFolderPath -TargetFolderPath $r.TargetFolderPath -Message 'Independent original full semantic ArchiveVerifier passed')
         }
         $check=Get-OPAARCH4ReturnedFromDisk -Transaction $Transaction -SourceStoreId $SourceStoreId
         if($check.Reconciled -ne $rows.Count){throw 'ARCH4 Reconciled readback incomplete.'}
@@ -277,13 +290,13 @@ function Complete-OPAARCH4VerifiedBatch {
     }
     $logical=[long]0
     foreach($r in $rows){$logical+=[long]$r.Size}
-    Set-OPAArchiveTransactionCount -Transaction $Transaction -Planned $State.Planned -Executed $State.Returned -Verified $State.Returned
+    Set-OPAArchiveTransactionCount -Transaction $Transaction -Planned $State.Planned -Executed $State.Returned -Verified $rows.Count
     Set-OPAArchiveTransactionStorageStats -Transaction $Transaction -LogicalFreedBytes $logical
-    Save-OPAArchiveTransaction -Transaction $Transaction -Status Completed -Step 'ARCH4 Batch Verified' -Message ('Verified='+$State.Returned+'; Indexed='+$State.Returned) -WriteCheckpoint
+    Save-OPAArchiveTransaction -Transaction $Transaction -Status Completed -Step 'ARCH4 Batch Verified' -Message ('Verified='+$rows.Count+'; Indexed='+$rows.Count) -WriteCheckpoint
     Sync-OPAStepJournalStreams
     return [pscustomobject]@{
         Schema='2.6.5-ARCH4.Completed.1';Status='BatchVerifiedReconciledAndIndexed';TransactionId=[string]$Transaction.TransactionId
-        Planned=$State.Planned;Verified=$State.Returned;Reconciled=$State.Returned;Indexed=$State.Returned
+        Planned=$State.Planned;Verified=$rows.Count;Reconciled=$rows.Count;Indexed=$rows.Count;VerificationHeld=$held.Count;HeldItems=$held
         NotMoved=($State.Planned-$State.Returned);LogicalBytes=$logical
         SkipReasons=@($Transaction.State.SkippedItems | Group-Object Reason | ForEach-Object {[pscustomobject]@{Reason=$_.Name;Count=$_.Count}})
         SkippedItems=@($Transaction.State.SkippedItems)
@@ -487,7 +500,7 @@ function Invoke-OPAARCH4Batch {
             }
             Write-OPAARCH4Pending -Path $pending -Record $pendingRecord
             Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Batch Started' -WriteCheckpoint
-            $moved=Move-OPAItemsWithLimit -Namespace $Session.Namespace -SourceFolders $folders -Transaction $tx -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanCutoff $cutoff -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH4Batch -ARCH5Batch:$ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -ARCH6DeferredPolicy:$ARCH6DeferredPolicy -DeferredEntryIds $deferredIds -ARCH7dInterruptAfterReturned $ARCH7dInterruptAfterReturned
+            $moved=Move-OPAItemsWithLimit -Namespace $Session.Namespace -SourceFolders $folders -Transaction $tx -Limit $Limit -ArchiveGrouping $ArchiveGrouping -OlderThanCutoff $cutoff -MaxArchivePstSizeGB $MaxArchivePstSizeGB -SafetyMarginGB $SafetyMarginGB -ARCH4Batch -ARCH5Batch:$ARCH5Batch -ConfirmComplexAttachments:$ConfirmComplexAttachments -ARCH6DeferredPolicy:$ARCH6DeferredPolicy -DeferredEntryIds $deferredIds -ConfirmDevLongArchive:$ConfirmDevLongArchive -ARCH7dInterruptAfterReturned $ARCH7dInterruptAfterReturned
             Save-OPAArchiveTransaction -Transaction $tx -Status Running -Step 'ARCH4 Awaiting Restart' -WriteCheckpoint
             Sync-OPAStepJournalStreams
             $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
@@ -526,6 +539,7 @@ function Invoke-OPAARCH4Batch {
         }
         if($ConfirmLiveOutlookVerification -and ([int]$tx.State.Limit -lt 1 -or [int]$tx.State.Limit -gt $devLiveCap)){throw 'ARCH8a pending limit exceeds explicit live worker scope; preserve pending.'}
         $state=Get-OPAARCH4ReturnedFromDisk -Transaction $tx -SourceStoreId $storeId
+        if(@(Get-OPAARCH8a3StateHeldRows -State $state).Count -gt 0 -and (-not $RecoverLiveInterrupted -or -not $ConfirmDevLongArchive)){throw 'ARCH8a3 explicit long recovery required.'}
         if($RecoverLiveInterrupted){
             if($p.PSObject.Properties.Name -notcontains 'DeferredPolicy' -or $p.DeferredPolicy -ne $true){throw 'ARCH7c requires original deferred-policy batch.'}
             $steps=@(Read-OPAARCH4StepRecords -Path (Get-OPAStepJournalPath -Transaction $tx))

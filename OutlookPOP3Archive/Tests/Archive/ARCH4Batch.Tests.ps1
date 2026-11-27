@@ -1419,3 +1419,77 @@ if($Mode -cne 'Archive' -or $ProfileName -cne 'Outlook' -or -not $ConfirmTestArc
 }
 
 }
+
+
+Describe 'ARCH8a3 isolated post-Move exception disposition' {
+    BeforeEach {
+        $global:OPADurabilityMode='Safe'
+        Mock Test-OPA265ARCH2bWitnessSchema {$true}
+    }
+    AfterEach {
+        Close-OPADuplicateJournalStreams
+        Close-OPAStepJournalStreams
+    }
+    It 'commits 498 verified receipts, holds one failed receipt, and never indexes it' {
+        $f=New-ARCH4Fixture -Count 500 -Returned 499
+        $f.Transaction.State.PlannedItems[499] | Add-Member -NotePropertyName ArchiveDate -NotePropertyValue '2020-01-01T00:00:00'
+        $f.Steps+=@([pscustomobject]@{Step='Skipped';EntryId='S500';SourceFolderPath=$script:sourceFolder;TargetFolderPath=$script:targetFolder;ArchivePst=$f.Archive;ReceivedTime='2020-01-01T00:00:00';Message='ARCH6f3a deferred AttachmentTypeUnsupported: ARCH5 AttachmentTypeUnsupported: index=1 type=5 bytes=1'})
+        Save-ARCH4Fixture -Fixture $f -Interrupted
+        Save-OPAArchiveTransaction -Transaction $f.Transaction -Status Running -Step 'ARCH4 Awaiting Restart' -WriteCheckpoint
+        $s=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $v=New-ARCH4Verification -Count 499
+        $v.Verified=$false;$v.EntryIdsVerified=$false;$v.MissingEntryIds=@('ARCHIVE_ITEM_NOT_VERIFIED:S250')
+        $r=Complete-OPAARCH7cInterruptedBatch -Transaction $f.Transaction -State $s -Verification $v -SourceStoreId STORE -ProfileName Outlook -ConfirmDevLongArchive
+        $r.Verified | Should -Be 498
+        $r.Reconciled | Should -Be 498
+        $r.Indexed | Should -Be 498
+        $r.VerificationHeld | Should -Be 1
+        $r.Deferred | Should -Be 2
+        $r.DeferredRecorded | Should -Be 2
+        $r.MoveInvocations | Should -Be 0
+        $index=Import-OPADuplicateIndex -ArchivePst $f.Archive
+        (Test-OPADuplicateEntry -Index $index -SourceEntryId S250) | Should -BeNullOrEmpty
+        (Test-OPADuplicateEntry -Index $index -SourceEntryId S251) | Should -Not -BeNullOrEmpty
+        $ids=@(Get-OPAARCH6DeferredIds -SourcePst $f.Transaction.State.SourcePst -SourceStoreId STORE -ProfileName Outlook -Directory ([IO.Path]::GetDirectoryName($f.Transaction.Path)))
+        $ids.Count | Should -Be 2
+        $ids | Should -Contain S250
+        $ids | Should -Contain S500
+        $s=Get-OPAARCH4ReturnedFromDisk -Transaction $f.Transaction -SourceStoreId STORE
+        $r2=Complete-OPAARCH7cInterruptedBatch -Transaction $f.Transaction -State $s -Verification $v -SourceStoreId STORE -ProfileName Outlook -ConfirmDevLongArchive
+        $r2.Verified | Should -Be 498
+        $r2.VerificationHeld | Should -Be 1
+    }
+    It 'rejects global source failure even alongside an item failure' {
+        $f=New-ARCH4Fixture
+        $s=Get-OPAARCH4ReturnedState -Transaction $f.Transaction -Steps $f.Steps -Events $f.Events -SourceStoreId STORE
+        $v=New-ARCH4Verification -Count 3
+        $v.Verified=$false;$v.EntryIdsVerified=$false;$v.MissingEntryIds=@('ARCHIVE_ITEM_NOT_VERIFIED:S1','SOURCE_FOLDER_UNREADABLE:fake')
+        {Complete-OPAARCH4VerifiedBatch -Transaction $f.Transaction -State $s -Verification $v -SourceStoreId STORE -AllowItemHold} | Should -Throw '*non-item verification failure*'
+        Test-Path -LiteralPath (Get-OPAARCH8a3HoldPath -Transaction $f.Transaction) | Should -BeFalse
+    }
+    It 'holds multiple item-local failures without relying on a known root cause' {
+        $f=New-ARCH4Fixture
+        $s=Get-OPAARCH4ReturnedState -Transaction $f.Transaction -Steps $f.Steps -Events $f.Events -SourceStoreId STORE
+        $v=New-ARCH4Verification -Count 3
+        $v.Verified=$false;$v.EntryIdsVerified=$false;$v.MissingEntryIds=@('ARCHIVE_ITEM_NOT_VERIFIED:S1','STILL_IN_SOURCE:S2')
+        $v.WarningEntryIds=@('STALE_ARCHIVE_ENTRYID_VERIFIED_BY_FINGERPRINT:S3')
+        $h=@(Get-OPAARCH8a3ItemFailures -State $s -Verification $v)
+        $h.Count | Should -Be 3
+        $h[0].Reasons[0] | Should -BeExactly ARCHIVE_ITEM_NOT_VERIFIED
+    }
+    It 'refuses a new failed identity after durable hold is sealed' {
+        $f=New-ARCH4Fixture
+        $s=Get-OPAARCH4ReturnedState -Transaction $f.Transaction -Steps $f.Steps -Events $f.Events -SourceStoreId STORE
+        $v=New-ARCH4Verification -Count 3
+        $v.Verified=$false;$v.EntryIdsVerified=$false;$v.MissingEntryIds=@('ARCHIVE_ITEM_NOT_VERIFIED:S1')
+        $h=@(Get-OPAARCH8a3ItemFailures -State $s -Verification $v)
+        @(Save-OPAARCH8a3Hold -Transaction $f.Transaction -State $s -Failures $h -SourceStoreId STORE).Count | Should -Be 1
+        $v.MissingEntryIds=@('ARCHIVE_ITEM_NOT_VERIFIED:S2')
+        $h=@(Get-OPAARCH8a3ItemFailures -State $s -Verification $v)
+        {Save-OPAARCH8a3Hold -Transaction $f.Transaction -State $s -Failures $h -SourceStoreId STORE} | Should -Throw '*additional failure*'
+    }
+    It 'recognizes a sanitized unknown pre-claim read failure only in the new evidence form' {
+        Get-OPAARCH6DeferredReason -Message 'ARCH8a3 item read failed: System.Runtime.InteropServices.COMException; HResult=-2147467259' | Should -BeExactly UnknownItemPreMove
+        Get-OPAARCH6DeferredReason -Message 'unknown journal write failure' | Should -BeNullOrEmpty
+    }
+}

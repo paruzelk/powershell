@@ -68,3 +68,16 @@ For the one original disposable Attachment1K with source-zero/destination-one an
 ## SEM-001 BW4k7j per-property MAPI bit policy, original post-restart proof remains immutable
 
 For the original one-shot Attachment1K, require BW4k7i immutable SHA `f75594047529cca19bbeb8d2a52db5412187325a39db4d659dc85b4b41d44399` and original BW4k7g Claim `325787fee94bf5c80e75e761cfc2a1724d94683204b73c2e03eaf384a530ba4c`. Flag `0x00000002` is documented `mfUnmodified` only on `PidTagMessageFlags` (MS-OXCMSG 2.2.1.6); raw bit `0x00010000` is not in its reviewed table. Values shared with `STORE_HTML_OK` or `PidTagMessageStatus` MUST NOT be applied to `PidTagMessageFlags`. Classify changes at bit and property identity level. Preserve full raw-user-state mismatch, unknown/other significant changes as independent manual review blockers without global semantic waiver. Require existing post-restart body, binary attachment, recipient and 10 COM user-fields SHA match, never rewrite any earlier evidence or call Move. No production Archive/Resume/Auto until separately proven. [BW4k7j](2.6.5-bw4k7j-mapi-flag-investigation.md).
+
+
+## ARCH8a3 — приоритет непрерывной архивации и изоляция отдельных писем (27.11.2026)
+
+Обязательное требование заказчика: отдельные проблемные письма (одно, два, три и более) не должны останавливать весь цикл Auto лишь потому, что конкретная причина сбоя неизвестна. Цель — уменьшить логический объём основной POP3 PST по возрасту писем, а не получить побайтовый клон. Физическое уменьшение файла выполняется средствами Outlook.
+
+- Изолированная ошибка чтения/проверки конкретного письма до Move: оставить его в источнике, записать ID, папку, причину или тип исключения/HResult в долговечный журнал, исключить из автоматического повторного отбора. Продолжить.
+- Уже получен однозначный Move receipt, но проверка отдельного письма не прошла: сохранить исходные свидетельства, путь PST и EntryID, отдельный статус VerificationHeld. Не объявлять Verified, не индексировать как успешное перемещение; не повторять Move и не удалять письмо. Подтверждённые письма завершить, продолжить следующие партии.
+- Неподдерживаемое вложение и антивирусные ошибки обрабатывать как ранее; не отключать антивирус. Никаких ручных подтверждений для отдельных исключений.
+- Системные ошибки (невозможность установить источник/назначение, повреждение журналов, неопределённый Move без receipt, отказ долговечной записи, массовые сбои чтения) не маскировать под отдельный пропуск. Не выполнять слепой повтор Move. Существующий порог серии ошибок чтения/экспорта 10 и не менее половины партии сохраняется для системной диагностики.
+- Verified, Reconciled, Indexed отражают только подтверждённые письма. Deferred включает пред-Move пропуски и отдельные VerificationHeld; NotMoved отражает только не перемещённые. Журнал исключений сохраняется и проверяется при последующих запусках.
+
+Реализация ARCH8a3 DEV: политика включена в explicit long test scope; неизвестные локальные ошибки ограничены фазой получения и проверки свойств исходного письма до выбора назначения. Ошибки инфраструктуры, формирования свидетельства вне доказанной локальной стадии и новые ошибки после запечатывания частичной фиксации пока сохраняют защитную остановку. Не считать это полной приёмкой ТЗ до реальных испытаний, ARCH8b и RC.

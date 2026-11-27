@@ -5,7 +5,7 @@ function Test-OPAARCH6ExportFailureBurst {
     if($Result.PSObject.Properties.Name -notcontains 'SkipReasons'){return $false}
     $n=0
     foreach($r in @($Result.SkipReasons)){
-        if($r.Reason -cin @('AttachmentExportFailed','AttachmentPayloadUnavailable')){$n+=[int]$r.Count}
+        if($r.Reason -cin @('AttachmentExportFailed','AttachmentPayloadUnavailable','UnknownItemPreMove')){$n+=[int]$r.Count}
     }
     return ($n -ge 10 -and 2*$n -ge [int]$Result.Planned)
 }
