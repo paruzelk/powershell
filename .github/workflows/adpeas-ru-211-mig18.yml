@@ -1,4 +1,4 @@
-name: "adPEAS RU 2.11.0 MIG20a - source-verified check translation and domain pilot"
+name: "adPEAS RU 2.11.0 MIG21a - LDAP SID helper collision fix"
 on:
   push:
     branches:
@@ -479,6 +479,9 @@ jobs:
           if ($new.Count -ne 1) { throw 'MIG20 expected one pinned upstream tree' }
           python adPEAS-RU/Migration/v2.11.0/MIG18/Build-MIG20a.py --candidate '_mig/candidate' --upstream $new[0].FullName --report '_mig/2.11.0-mig20a-source.json'
           if ($LASTEXITCODE -ne 0) { throw 'MIG20a translation gate failed' }
+          python adPEAS-RU/Migration/v2.11.0/MIG18/Build-MIG21a.py --candidate '_mig/candidate' --upstream $new[0].FullName --report '_mig/2.11.0-mig21a-source.json' --origin-report '_mig/2.11.0-mig21a-text-origin.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG21a source and origin gate failed' }
+          Copy-Item 'adPEAS-RU/Migration/v2.11.0/MIG18/README-MIG21a.md' '_mig/README-MIG21a.md'
           python adPEAS-RU/Migration/v2.11.0/MIG18/Audit-MIG20.py --candidate '_mig/candidate' --upstream $new[0].FullName --mig20a-source '_mig/2.11.0-mig20a-source.json' --report '_mig/2.11.0-mig20-source.json'
           if ($LASTEXITCODE -ne 0) { throw 'MIG20 source audit failed' }
           & 'adPEAS-RU/Migration/v2.11.0/MIG18/Audit-MIG20Ast.ps1' -Candidate '_mig/candidate' -Report '_mig/2.11.0-mig20-ast.json'
@@ -588,14 +591,14 @@ jobs:
         shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
-          $f = (Resolve-Path 'adPEAS-RU/Migration/v2.11.0/MIG18/Probe-MIG19k2.ps1').Path
+          $f = (Resolve-Path 'adPEAS-RU/Migration/v2.11.0/MIG18/Probe-MIG21a.ps1').Path
           $bytes = [IO.File]::ReadAllBytes($f)
           if ($bytes.Length -lt 3 -or $bytes[0] -ne 239 -or $bytes[1] -ne 187 -or $bytes[2] -ne 191) { throw 'Report probe BOM missing' }
           $tokens = $null
           $errors = $null
           [void][System.Management.Automation.Language.Parser]::ParseFile($f,[ref]$tokens,[ref]$errors)
           if ($errors.Count -gt 0) { throw $errors[0].Message }
-          python adPEAS-RU/Migration/v2.11.0/MIG18/Test-MIG19k2.py --candidate '_mig/candidate' --diagnostics '_mig/mig19k2-diagnostics' --report '_mig/2.11.0-mig19k2-report.json'
+          python adPEAS-RU/Migration/v2.11.0/MIG18/Test-MIG21a.py --candidate '_mig/candidate' --diagnostics '_mig/mig19k2-diagnostics' --report '_mig/2.11.0-mig19k2-report.json'
           if ($LASTEXITCODE -ne 0) { throw 'MIG19bc offline report parity failed' }
       - name: MIG20 final runtime catalog coverage and parity
         shell: powershell
@@ -608,7 +611,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG20a-DIAGNOSTICS
+          name: adPEAS-RU-2.11.0-MIG21a-DIAGNOSTICS
           path: |
             _mig/mig19k2-diagnostics/
             _mig/2.11.0-mig19k2-report.json
@@ -618,7 +621,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG20a-COVERAGE
+          name: adPEAS-RU-2.11.0-MIG21a-COVERAGE
           path: |
             _mig/2.11.0-mig19d2-source.json
             _mig/2.11.0-mig19d2-residual.json
@@ -646,6 +649,8 @@ jobs:
             _mig/2.11.0-mig20-runtime.json
             _mig/2.11.0-mig20a-source.json
             _mig/2.11.0-mig20a-runtime.json
+            _mig/2.11.0-mig21a-source.json
+            _mig/2.11.0-mig21a-text-origin.json
           retention-days: 14
           if-no-files-found: warn
       - name: Publish runtime diagnostic evidence
@@ -662,7 +667,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG20a-PREVIEW
+          name: adPEAS-RU-2.11.0-MIG21a-PREVIEW
           path: |
             _mig/2.11.0-parity.json
             _mig/2.11.0-mig2-coverage.json
@@ -713,10 +718,13 @@ jobs:
             _mig/2.11.0-mig20-runtime.json
             _mig/2.11.0-mig20a-source.json
             _mig/2.11.0-mig20a-runtime.json
+            _mig/2.11.0-mig21a-source.json
+            _mig/2.11.0-mig21a-text-origin.json
             _mig/Invoke-MIG19k2LocalAcceptance.ps1
             _mig/README-MIG19k2.md
             _mig/README-MIG20.md
             _mig/README-MIG20a.md
+            _mig/README-MIG21a.md
             _mig/candidate/README-RU-2.11.0.md
             _mig/candidate/adPEAS.ps1
             _mig/candidate/adPEAS_min.ps1
