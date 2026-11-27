@@ -1,6 +1,6 @@
-# adPEAS-RU 2.11.0 MIG21a — быстрый старт и параметры
+# adPEAS-RU 2.11.0 MIG21bc1 — быстрый старт и параметры
 
-**MIG21a PREVIEW.** MIG20a CI PASS (45956635104), 4 реальных домена, 8 отчётов. Исправляется коллизия одноимённых SID-функций в upstream 2.11.0. См. README-MIG21a.md. Переводы и алгоритмы преобразования SID не меняются. ProductionReady=False.
+**MIG21bc1 PREVIEW.** База MIG21a CI PASS (45968744119). Полнота аудита и диагностика SYSVOL отделены от финального экспорта. См. README-MIG21bc1.md. ProductionReady=False.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
 
