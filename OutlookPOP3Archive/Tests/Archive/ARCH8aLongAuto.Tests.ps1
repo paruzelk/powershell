@@ -8,6 +8,8 @@ BeforeAll {
     . (Join-Path $script:aRoot 'Core/Archive/ARCH6Orchestration.ps1')
     . (Join-Path $script:aRoot 'Core/Archive/ARCH4Batch.ps1')
     . (Join-Path $script:aRoot 'Core/Archive/ArchiveTransaction.ps1')
+    . (Join-Path $script:aRoot 'Core/Archive/ArchiveVerifier.ps1')
+    . (Join-Path $script:aRoot 'Core/Archive/ARCH2bSemanticWitness.ps1')
     $script:aMain=Join-Path $script:aRoot 'OutlookPOP3Archive.ps1'
     $script:aController=Join-Path $script:aRoot 'Invoke-OPALiveArchiveBatches.ps1'
     $script:aPst='C:\Test\Mail.pst'
@@ -196,5 +198,30 @@ Describe 'ARCH8a1 completed long recovery deferred proof readback' {
         $script:aProofState.OperationEventCount=999
         {Save-OPAARCH6DeferredEvidence -Transaction $script:aProofTx -SourceStoreId 'fake' -ProfileName Outlook} | Should -Throw '*inconsistent completed checkpoint*'
         @(Get-ChildItem -LiteralPath $script:aProofDir -File).Count | Should -Be 0
+    }
+}
+
+
+Describe 'ARCH8a2 failure diagnostics preserve verification gate' {
+    It 'reports gate failure with missing and warning IDs without a journal/index commit' {
+        Mock Write-Host {}
+        $v=[pscustomobject]@{Verified=$false;EntryIdsVerified=$false;SemanticWitnessRequired=$true;AllRequiredOriginalSemanticWitnessesPresent=$true;ExpectedMoved=499;ExpectedEntryIdsChecked=499;MissingEntryIds=@('ARCHIVE_ITEM_NOT_VERIFIED:id123');WarningEntryIds=@('STALE_ARCHIVE_ENTRYID_VERIFIED_BY_FINGERPRINT:id456')}
+        $tx=[pscustomobject]@{TransactionId='synthetic'}
+        {Complete-OPAARCH4VerifiedBatch -Transaction $tx -State ([pscustomobject]@{Returned=499}) -Verification $v -SourceStoreId 'fake'} | Should -Throw '*independent full verification failed*'
+        Should -Invoke Write-Host -Times 1 -Exactly -ParameterFilter {$Object -like 'ARCH8a2 VERIFICATION_FAILURE*' -and $Object -like '*ARCHIVE_ITEM_NOT_VERIFIED:id123*' -and $Object -like '*STALE_ARCHIVE_ENTRYID_VERIFIED_BY_FINGERPRINT:id456*'}
+    }
+    It 'reports direct semantic mismatch issue codes without returning diagnostic objects' {
+        Mock Test-OPA265ARCH2bWitnessSchema {$true}
+        Mock Get-OPA265ARCH2bMailSemanticWitness { [pscustomobject]@{Schema='synthetic'} }
+        Mock Compare-OPA265ARCH2bMailSemanticWitness { [pscustomobject]@{CriticalContentMatches=$false;IssueCodes=@('DifferentUnRead','Attachment1DifferentPayloadSha256')} }
+        Mock Write-Host {}
+        $item=[pscustomobject]@{Class=43;Subject='synthetic'}
+        $expected=[pscustomobject]@{Subject='synthetic';Sender='';InternetMessageId='';SourceEntryId='id1';ArchiveEntryId='id2';SourceSemanticWitness=[pscustomobject]@{Schema='synthetic'}}
+        $r=@(Test-OPAArchiveItemFingerprint -Item $item -Expected $expected -ReportDirectFailure)
+        $r.Count | Should -Be 1
+        $r[0] | Should -BeFalse
+        Should -Invoke Write-Host -Times 1 -Exactly -ParameterFilter {$Object -like '*FINGERPRINT_FAILURE*' -and $Object -like '*DifferentUnRead*' -and $Object -like '*Attachment1DifferentPayloadSha256*'}
+        Test-OPAArchiveItemFingerprint -Item $item -Expected $expected | Should -BeFalse
+        Should -Invoke Write-Host -Times 1 -Exactly
     }
 }

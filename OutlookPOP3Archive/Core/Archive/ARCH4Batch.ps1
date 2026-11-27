@@ -236,6 +236,9 @@ function Complete-OPAARCH4VerifiedBatch {
        [int]$Verification.ExpectedMoved -ne $State.Returned -or
        [int]$Verification.ExpectedEntryIdsChecked -ne $State.Returned -or
        @($Verification.MissingEntryIds).Count -gt 0 -or @($Verification.WarningEntryIds).Count -gt 0){
+        # Diagnostic only: no witness payloads, no commit on a failed gate.
+        $diagnostic=[ordered]@{TransactionId=[string]$Transaction.TransactionId;Returned=[int]$State.Returned;Verified=[bool]$Verification.Verified;EntryIdsVerified=[bool]$Verification.EntryIdsVerified;SemanticWitnessRequired=[bool]$Verification.SemanticWitnessRequired;AllRequiredOriginalSemanticWitnessesPresent=[bool]$Verification.AllRequiredOriginalSemanticWitnessesPresent;ExpectedMoved=$Verification.ExpectedMoved;ExpectedEntryIdsChecked=$Verification.ExpectedEntryIdsChecked;MissingEntryIds=@($Verification.MissingEntryIds);WarningEntryIds=@($Verification.WarningEntryIds)}
+        Write-Host ('ARCH8a2 VERIFICATION_FAILURE '+(ConvertTo-Json -InputObject $diagnostic -Depth 5 -Compress))
         throw 'ARCH4 independent full verification failed; no journal/index commit.'
     }
     $rows=@($State.Rows);$source=[string]$Transaction.State.SourcePst

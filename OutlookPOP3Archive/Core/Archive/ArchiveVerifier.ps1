@@ -177,22 +177,30 @@ function Test-OPAArchiveItemFingerprint {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)][object]$Item,
-        [Parameter(Mandatory=$true)][object]$Expected
+        [Parameter(Mandatory=$true)][object]$Expected,
+        [switch]$ReportDirectFailure
     )
-    if ([int]$Item.Class -ne 43) { return $false }
+    # Only the direct recorded-ID probe reports reasons, not fallback scans.
+    $reportFailure = {
+        param([string]$Reason,[string[]]$IssueCodes=@())
+        if($ReportDirectFailure){
+            Write-Host ('ARCH8a2 FINGERPRINT_FAILURE '+(ConvertTo-Json -InputObject ([ordered]@{SourceEntryId=[string]$Expected.SourceEntryId;ArchiveEntryId=[string]$Expected.ArchiveEntryId;Reason=$Reason;IssueCodes=@($IssueCodes)}) -Compress -Depth 4))
+        }
+    }
+    if ([int]$Item.Class -ne 43) { & $reportFailure 'ClassMismatch'; return $false }
     # Cheap identity checks precede any attachment SaveAsFile/read/hash work.
-    if ([string]$Item.Subject -cne [string]$Expected.Subject) { return $false }
+    if ([string]$Item.Subject -cne [string]$Expected.Subject) { & $reportFailure 'SubjectMismatch'; return $false }
     if (-not [string]::IsNullOrWhiteSpace([string]$Expected.Sender) -and
-        [string]$Item.SenderEmailAddress -ine [string]$Expected.Sender) { return $false }
+        [string]$Item.SenderEmailAddress -ine [string]$Expected.Sender) { & $reportFailure 'SenderMismatch'; return $false }
     if (-not [string]::IsNullOrWhiteSpace([string]$Expected.InternetMessageId)) {
         $actualMessageId = [string](Get-OPAInternetMessageId -Item $Item)
-        if ($actualMessageId -cne [string]$Expected.InternetMessageId) { return $false }
+        if ($actualMessageId -cne [string]$Expected.InternetMessageId) { & $reportFailure 'InternetMessageIdMismatch'; return $false }
     }
     # Legacy Size fingerprints remain supported for older read-only tests.
     # For ARCH2b the ORIGINAL source semantic witness is authoritative:
     # provider-controlled MailItem.Size is diagnostic, NOT a data hash.
     if ($null -ne $Expected.SourceSemanticWitness) {
-        if (-not (Test-OPA265ARCH2bWitnessSchema -Witness $Expected.SourceSemanticWitness)) { return $false }
+        if (-not (Test-OPA265ARCH2bWitnessSchema -Witness $Expected.SourceSemanticWitness)) { & $reportFailure 'SourceWitnessInvalid'; return $false }
         try {
             if([string]$Expected.SourceSemanticWitness.Schema -cin @('2.6.5-ARCH5.MailSemanticWitness.2','2.6.5-ARCH5a.MailSemanticWitness.3')){
                 $recursive=[string]$Expected.SourceSemanticWitness.Schema -ceq '2.6.5-ARCH5a.MailSemanticWitness.3'
@@ -206,11 +214,11 @@ function Test-OPAArchiveItemFingerprint {
                 $destinationWitness = Get-OPA265ARCH2bMailSemanticWitness -Mail $Item
             }
             $semanticComparison = Compare-OPA265ARCH2bMailSemanticWitness -Source $Expected.SourceSemanticWitness -Destination $destinationWitness
-            if (-not $semanticComparison.CriticalContentMatches) { return $false }
+            if (-not $semanticComparison.CriticalContentMatches) { & $reportFailure 'SemanticMismatch' @($semanticComparison.IssueCodes); return $false }
         }
-        catch { return $false }
+        catch { & $reportFailure 'WitnessCaptureException' @($_.Exception.GetType().FullName,('HResult='+$_.Exception.HResult)); return $false }
     }
-    elseif ($null -ne $Expected.Size -and [int64]$Item.Size -ne [int64]$Expected.Size) { return $false }
+    elseif ($null -ne $Expected.Size -and [int64]$Item.Size -ne [int64]$Expected.Size) { & $reportFailure 'LegacySizeMismatch'; return $false }
     return $true
 }
 
@@ -374,7 +382,7 @@ function Test-OPAArchiveMoves {
             try {
                 $direct = $Namespace.GetItemFromID($archiveId, [string]$store.StoreID)
                 if ($null -ne $direct -and [string]$direct.EntryID -ieq $archiveId -and
-                    (Test-OPAArchiveItemFingerprint -Item $direct -Expected $m)) {
+                    (Test-OPAArchiveItemFingerprint -Item $direct -Expected $m -ReportDirectFailure:$RequireSemanticWitness)) {
                     # Ensure the item actually belongs to the recorded folder.
                     $parent = $null
                     try {
