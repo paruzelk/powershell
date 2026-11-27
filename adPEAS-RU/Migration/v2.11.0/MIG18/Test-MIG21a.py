@@ -119,6 +119,7 @@ def main():
             require('MIG19K2_OFFLINE_SID_OK' in read(base.with_suffix('.trace.txt')),'MIG19k2 offline SID witnesses missing')
             require('MIG21A_LDAP_SID_COLLISION_OK' in read(base.with_suffix('.trace.txt')),'MIG21a real assembled LDAP SID converter witness missing')
             require('MIG21C_SCOPED_DISPLAY_OK' in read(base.with_suffix('.trace.txt')),'MIG21c actual assembled display witness missing')
+            require('MIG22_ACCEPTANCE_DISPLAY_OK' in read(base.with_suffix('.trace.txt')),'MIG22 actual assembled acceptance display witness missing')
             sid_input=normalize_cache(json.loads(read(base.with_suffix('.sid.input.json'))))
             sid_output=normalize_cache(json.loads(read(base.with_suffix('.sid.output.json'))))
             require(sid_input==sid_output,'MIG19k2 SID cache roundtrip changed data')

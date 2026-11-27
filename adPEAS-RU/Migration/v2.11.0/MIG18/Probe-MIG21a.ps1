@@ -73,6 +73,22 @@ try {
  }
  if ((ConvertTo-RuReportLine -Text 'Found 7 scheduled task(s) distributed via GPO (custom)') -cne 'Found 7 scheduled task(s) distributed via GPO (custom)') {throw 'MIG21c anchored negative'}
  Write-Mig19bcTrace 'MIG21C_SCOPED_DISPLAY_OK'
+ $failure = 'This check did not complete - its results are incomplete or absent. Reason: synthetic $42 <error>'
+ $expected = 'Проверка не завершена — её результаты неполны или отсутствуют. Причина: synthetic $42 <error>'
+ if ((ConvertTo-RuReportLine -Text $failure) -cne $expected) {throw 'MIG22 failure message'}
+ if ((ConvertTo-RuConsoleText19f -Text $failure -Class 'Hint') -cne $expected) {throw 'MIG22 console failure'}
+ $mig22items = @(
+   [pscustomobject]@{Type='Line';Class='Finding';Text='SYSVOL access failed - credentials were not searched for'}
+   [pscustomobject]@{Type='Line';Class='Note';Text='The NTFS permissions of 2 of 5 policy folder(s) in SYSVOL could not be read - who may rewrite their content is unknown'}
+   [pscustomobject]@{Type='Object';Class='Finding';Text='SYSVOL access failed - credentials were not searched for'}
+ )
+ if ((Get-RuMIG21CoverageNotice -Findings $mig22items) -notmatch 'ограничениях SYSVOL: 2\.') {throw 'MIG22 coverage count'}
+ $mig22obj = [pscustomobject]@{_adPEASObjectType='SYSVOLCredential';_adPEASContext='';sAMAccountName='';displayName='';Name='';dNSHostName='';CredentialType='Credential mention (needs review)'}
+ if ((Get-ObjectCardTitle -Object $mig22obj) -cne 'Учётные данные (Упоминание учётных данных (требуется проверка))') {throw 'MIG22 credential title'}
+ if ($mig22obj.CredentialType -cne 'Credential mention (needs review)') {throw 'MIG22 original object mutated'}
+ $mig22group = [pscustomobject]@{_adPEASObjectType='GPOSuppressedGroup';_adPEASContext='';sAMAccountName='';displayName='';Name='';dNSHostName='';Group='Dormant policies - not linked';Count='5 policies'}
+ if ((Get-ObjectCardTitle -Object $mig22group) -cne 'Неактивные политики — не связаны (5 policies)') {throw 'MIG22 GPO title'}
+ Write-Mig19bcTrace 'MIG22_ACCEPTANCE_DISPLAY_OK'
  $null=Get-Command Convert-adPEASReport -CommandType Function -ErrorAction Stop
  $help=Get-adPEASHelp -Section Commands,Checks 6>&1 | Out-String
  [IO.File]::WriteAllText(($OutputBase+'.help.txt'),$help,[Text.Encoding]::UTF8)

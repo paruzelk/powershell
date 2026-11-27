@@ -1,0 +1,113 @@
+{
+  "exact": [
+    [
+      "PXE/WDS servers detected",
+      "Обнаружены серверы PXE/WDS"
+    ],
+    [
+      "No computer came down the pipeline - nothing was tested",
+      "По конвейеру не передано ни одного компьютера — проверка не выполнялась."
+    ],
+    [
+      "No policy denies Domain Admins the local or Remote Desktop logon on member computers",
+      "Ни одна политика не запрещает группе Domain Admins локальный вход или вход через удалённый рабочий стол на компьютерах домена."
+    ],
+    [
+      "No policy denies local administrator accounts the network logon on member computers",
+      "Ни одна политика не запрещает локальным администраторам сетевой вход на компьютерах домена."
+    ],
+    [
+      "LAPS attribute GUIDs not readable from the schema - delegated LAPS reads were not evaluated",
+      "Не удалось прочитать GUID атрибутов LAPS из схемы — делегированные права чтения LAPS не оценены."
+    ]
+  ],
+  "patterns": [
+    [
+      "^This check did not complete - its results are incomplete or absent\\. Reason: ([\\s\\S]+)$",
+      "Проверка не завершена — её результаты неполны или отсутствуют. Причина: $1",
+      "This check did not complete - its results are incomplete or absent. Reason:"
+    ],
+    [
+      "^([0-9]+) check\\(s\\) did not complete - their sections are incomplete and must not be read as clean:$",
+      "Не завершено проверок: $1. Их разделы неполны и не подтверждают отсутствие проблем:",
+      "check(s) did not complete - their sections are incomplete and must not be read as clean:"
+    ],
+    [
+      "^Partial JSON export from the modules that completed: ([\\s\\S]+)$",
+      "Частичный экспорт JSON завершённых модулей: $1",
+      "Partial JSON export from the modules that completed:"
+    ],
+    [
+      "^Rebuild a report from it with: (Convert-adPEASReport [\\s\\S]+)$",
+      "Восстановить отчёт из него можно командой: $1",
+      "Rebuild a report from it with:"
+    ],
+    [
+      "^CRITICAL ERROR: ([\\s\\S]+)$",
+      "КРИТИЧЕСКАЯ ОШИБКА: $1",
+      "CRITICAL ERROR:"
+    ],
+    [
+      "^([0-9]+) computer account\\(s\\) never had a password set - over NTLM they log on with an empty one:$",
+      "Учётные записи компьютеров, которым ни разу не задавался пароль (количество: $1), используют пустой пароль при входе через NTLM:",
+      "computer account(s) never had a password set - over NTLM they log on with an empty one:"
+    ],
+    [
+      "^([0-9]+) computer account\\(s\\) no Windows client joined are in use with their creation password:$",
+      "Используются учётные записи компьютеров (количество: $1), к которым не присоединялся клиент Windows и которые сохранили пароль при создании:",
+      "computer account(s) no Windows client joined are in use with their creation password:"
+    ],
+    [
+      "^([0-9]+) computer account\\(s\\) were created in advance and never used - the password may be the default:$",
+      "Учётные записи компьютеров (количество: $1) созданы заранее и ни разу не использовались — пароль может быть заданным по умолчанию:",
+      "computer account(s) were created in advance and never used - the password may be the default:"
+    ],
+    [
+      "^Error during check - computer accounts with their creation password could not be evaluated: ([\\s\\S]+)$",
+      "Ошибка проверки — не удалось оценить учётные записи компьютеров с паролем при создании: $1",
+      "Error during check - computer accounts with their creation password could not be evaluated:"
+    ],
+    [
+      "^Error during check - the logon restrictions of the GPOs could not be evaluated: ([\\s\\S]+)$",
+      "Ошибка проверки — не удалось оценить ограничения входа GPO: $1",
+      "Error during check - the logon restrictions of the GPOs could not be evaluated:"
+    ],
+    [
+      "^Found ([0-9]+) principal\\(s\\) outside Tier 0 that may list deleted objects$",
+      "Обнаружено субъектов вне Tier 0, которые могут перечислять удалённые объекты: $1",
+      "principal(s) outside Tier 0 that may list deleted objects"
+    ],
+    [
+      "^Found ([0-9]+) policy\\(s\\) that deny a logon:$",
+      "Обнаружено политик, запрещающих вход: $1",
+      "policy(s) that deny a logon:"
+    ],
+    [
+      "^Windows LAPS decryptor \\(from GPO\\): ([\\s\\S]+)$",
+      "Субъект расшифрования Windows LAPS (из GPO): $1",
+      "Windows LAPS decryptor (from GPO):"
+    ],
+    [
+      "^Local administrator accounts are denied the network logon on member computers by ([0-9]+) policy\\(s\\)$",
+      "Сетевой вход локальных администраторов на компьютерах домена запрещён политиками (количество: $1).",
+      "Local administrator accounts are denied the network logon on member computers by"
+    ]
+  ],
+  "sysvol": [
+    "SYSVOL access failed - credentials were not searched for",
+    "SYSVOL was not reachable - the NTFS permissions of the policy folders were not examined",
+    "SYSVOL access failed - cannot analyze Point and Print policies - SMB access failed (authentication/network issue)",
+    "SYSVOL access failed - the GPO configuration for LDAP Security was not analyzed",
+    "SYSVOL access failed - the GPO configuration for SMB Signing was not analyzed"
+  ],
+  "groups": [
+    [
+      "Dormant policies - not linked",
+      "Неактивные политики — не связаны"
+    ],
+    [
+      "Dormant policies - disabled",
+      "Неактивные политики — отключены"
+    ]
+  ]
+}

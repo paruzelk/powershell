@@ -1,17 +1,17 @@
-# adPEAS-RU 2.11.0 MIG21c — быстрый старт и параметры
+# adPEAS-RU 2.11.0 MIG22 — быстрый старт и параметры
 
-**MIG21c PREVIEW.** База MIG21bc1 CI PASS (45987200724). Объединённый этап MIG21c2–c4: локализация представления и инвентаризация остатка. См. README-MIG21c.md. ProductionReady=False.
+**MIG22 PREVIEW.** База MIG21c CI PASS (45988395085). Объединённый этап MIG21d + MIG22: кандидат для реальной приёмки, см. README-MIG22.md. ProductionReady=False.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
 
 ~~~powershell
 cd 'C:\Tools\adPEAS-RU\candidate'
 Import-Module .\adPEAS.ps1 -Force
-Invoke-adPEAS -Domain example.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG19gh' -Format All
+Invoke-adPEAS -Domain example.local -UseWindowsAuth -OPSEC -Outputfile '.\AD-Audit-MIG22' -Format All
 Disconnect-adPEAS
 ~~~
 
-Создаются AD-Audit-MIG19gh.html, AD-Audit-MIG19gh.txt и AD-Audit-MIG19gh.json.
+Создаются AD-Audit-MIG22.html, AD-Audit-MIG22.txt и AD-Audit-MIG22.json.
 Outputfile принимает имя без расширения.
 
 **LDAPS с проверкой сертификата:**
