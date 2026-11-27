@@ -1040,9 +1040,9 @@ jobs:
           $ErrorActionPreference='Stop'
           $project=(Get-Location).Path
           $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
-          $base='OutlookPOP3Archive-2.6.5-ARCH8a3-dev-g'+$short
-          $out=Join-Path $env:RUNNER_TEMP 'OPA-ARCH8a3-Package'
-          $stageParent=Join-Path $env:RUNNER_TEMP 'OPA-ARCH8a3-Stage'
+          $base='OutlookPOP3Archive-2.6.5-ARCH8a3a-dev-g'+$short
+          $out=Join-Path $env:RUNNER_TEMP 'OPA-ARCH8a3a-Package'
+          $stageParent=Join-Path $env:RUNNER_TEMP 'OPA-ARCH8a3a-Stage'
           $staged=Join-Path $stageParent $base
           [void][IO.Directory]::CreateDirectory($out)
           [void][IO.Directory]::CreateDirectory($staged)
@@ -1073,7 +1073,7 @@ jobs:
               Copy-Item -LiteralPath $f.FullName -Destination $dst
             }
           }
-          $info=[ordered]@{Schema='OPA265.ARCH8a3.BuildInfo.1';DevelopmentGate='2.6.5-ARCH8a3';SourceCommit=$env:GITHUB_SHA;WindowsPowerShell51CiPassed=$true;PesterAndPSScriptAnalyzerRequired=$true;LiveOutlookTestInCi=$false;ProductionArchiveResumeAutoClosed=$true;ExplicitTestArchiveResumeEnabled=$true;ProductionReady=$false}
+          $info=[ordered]@{Schema='OPA265.ARCH8a3a.BuildInfo.1';DevelopmentGate='2.6.5-ARCH8a3a';SourceCommit=$env:GITHUB_SHA;WindowsPowerShell51CiPassed=$true;PesterAndPSScriptAnalyzerRequired=$true;LiveOutlookTestInCi=$false;ProductionArchiveResumeAutoClosed=$true;ExplicitTestArchiveResumeEnabled=$true;ProductionReady=$false}
           [IO.File]::WriteAllText((Join-Path $staged 'BUILD-INFO.json'),(ConvertTo-Json -InputObject $info -Depth 4),(New-Object Text.UTF8Encoding($false)))
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           $zip=Join-Path $out ($base+'.zip')
@@ -1101,31 +1101,31 @@ jobs:
               } finally {$stream.Dispose()}
               if($actual -ine (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash){throw ('ZIP content differs from staged file: '+$expected)}
             }
-            Write-Host 'PASS ARCH8a3 all staged ZIP entries and byte hashes; tracked root PowerShell inventory complete.'
+            Write-Host 'PASS ARCH8a3a all staged ZIP entries and byte hashes; tracked root PowerShell inventory complete.'
           } finally {$archive.Dispose()}
           $hash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
           [IO.File]::WriteAllText((Join-Path $out ($base+'.sha256')),($hash+'  '+[IO.Path]::GetFileName($zip)+[char]10),(New-Object Text.UTF8Encoding($false)))
-          Write-Host ('ARCH8a3 ZIP SHA256: '+$hash)
-      - name: Upload tested project-only ARCH8a3 DEV ZIP
+          Write-Host ('ARCH8a3a ZIP SHA256: '+$hash)
+      - name: Upload tested project-only ARCH8a3a DEV ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: OutlookPOP3Archive-2.6.5-ARCH8a3-dev
+          name: OutlookPOP3Archive-2.6.5-ARCH8a3a-dev
           path: |
-            ${{ runner.temp }}/OPA-ARCH8a3-Package/*.zip
-            ${{ runner.temp }}/OPA-ARCH8a3-Package/*.sha256
+            ${{ runner.temp }}/OPA-ARCH8a3a-Package/*.zip
+            ${{ runner.temp }}/OPA-ARCH8a3a-Package/*.sha256
           if-no-files-found: error
           retention-days: 14
-      - name: Publish public test-only ARCH8a3 prerelease
+      - name: Publish public test-only ARCH8a3a prerelease
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference='Stop'
           $short=$env:GITHUB_SHA.Substring(0,8).ToLowerInvariant()
-          $base='OutlookPOP3Archive-2.6.5-ARCH8a3-dev-g'+$short
-          $dir=Join-Path $env:RUNNER_TEMP 'OPA-ARCH8a3-Package'
+          $base='OutlookPOP3Archive-2.6.5-ARCH8a3a-dev-g'+$short
+          $dir=Join-Path $env:RUNNER_TEMP 'OPA-ARCH8a3a-Package'
           $zip=Join-Path $dir ($base+'.zip')
           $sha=Join-Path $dir ($base+'.sha256')
           if(-not (Test-Path -LiteralPath $zip -PathType Leaf) -or -not (Test-Path -LiteralPath $sha -PathType Leaf)){throw 'ZIP/checksum absent'}
-          $tag='outlookpop3archive-2.6.5-arch8a3-dev-g'+$short
-          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH8a3 DEV '+$short) --notes 'ARCH8a3 DEV: isolated item exceptions; durable held receipts, verified-only journal/index, no replay; 4958/168 expected; production closed.' --prerelease
+          $tag='outlookpop3archive-2.6.5-arch8a3a-dev-g'+$short
+          gh release create $tag $zip $sha --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('OutlookPOP3Archive 2.6.5-ARCH8a3a DEV '+$short) --notes 'ARCH8a3a DEV: repair regex anchors and duplicated source fragments; unchanged isolated item exceptions, 4958/168 expected; production closed.' --prerelease
           if($LASTEXITCODE -ne 0){throw 'GitHub prerelease publication failed'}
