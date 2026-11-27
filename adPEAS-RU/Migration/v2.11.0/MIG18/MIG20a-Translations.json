@@ -1,0 +1,77 @@
+{
+  "schema": "adPEAS-RU.MIG20a.Translations.1",
+  "upstream": "477696f48d6b486be5d9a99b598f72e3ccfcc0c0",
+  "rows": {
+    "ComputerInitialPassword": {
+      "upstreamBlock": "    'ComputerInitialPassword' = @{\n        TitleFormat = \"Creation Password: {Name}\"\n        Module = \"Computer\"\n        Category = \"Computers\"\n        SectionTitle = \"Computer Accounts With Their Creation Password\"\n        Summary = \"Finds enabled computer accounts that no Windows client joined and whose password is still the one they were created with.\"\n        WhyItMatters = \"A computer account created in advance gets its first password from the tool that creates it - the computer name in lowercase, or none at all. A join replaces it with a random one. An account that was never joined keeps it, and anyone who knows the name can log on as the account.\"\n        WhatWeCheck = @(\n            \"Enabled computer accounts without operatingSystem and dNSHostName - no Windows client ever joined them\"\n            \"Whether a password was ever set (pwdLastSet 0 with PASSWD_NOTREQD), or whether it dates from the creation of the account\"\n            \"Whether the account has logged on since (lastLogonTimestamp)\"\n            \"Not tested: whether a password really is the default - that takes a logon attempt per account, which the scan does not make\"\n        )\n        SecureMessage = \"No enabled computer account still carries the password it was created with.\"\n        PrimaryFindingId = 'COMPUTER_PASSWORD_NEVER_SET'\n    }",
+      "before": {
+        "whyItMatters": "При предварительном создании учётной записи пароль может совпадать с именем компьютера в нижнем регистре либо отсутствовать вовсе. Присоединение Windows-клиента заменяет его случайным. Неиспользованная запись может сохранить предсказуемый пароль.",
+        "whatWeCheck": [
+          "Включённые учётные записи компьютеров без operatingSystem и dNSHostName.",
+          "Был ли установлен пароль (pwdLastSet = 0 вместе с PASSWD_NOTREQD) либо он остался с момента создания.",
+          "Использовалась ли запись для входа (lastLogonTimestamp).",
+          "Реальное совпадение пароля со стандартным не проверяется: для этого нужна попытка входа для каждой записи."
+        ],
+        "secureMessage": "Включённых учётных записей компьютеров с первоначальными паролями не обнаружено."
+      },
+      "after": {
+        "whyItMatters": "При предварительном создании учётной записи компьютера её первый пароль задаёт средство создания: это имя компьютера в нижнем регистре либо пароль отсутствует вовсе. Присоединение к домену заменяет его случайным паролем. Если компьютер так и не присоединился к домену, первоначальный пароль сохраняется, и любой, кто знает имя компьютера, может выполнить вход от имени этой учётной записи.",
+        "whatWeCheck": [
+          "Включённые учётные записи компьютеров без operatingSystem и dNSHostName: ни один клиент Windows не присоединялся к домену с этими записями.",
+          "Был ли вообще установлен пароль (pwdLastSet = 0 при установленном PASSWD_NOTREQD) либо пароль датируется моментом создания учётной записи.",
+          "Выполнялся ли вход от имени учётной записи после её создания (lastLogonTimestamp).",
+          "Не проверяется, действительно ли пароль является стандартным: для этого потребовалась бы попытка входа для каждой учётной записи, а аудит таких попыток не выполняет."
+        ],
+        "secureMessage": "Ни одна включённая учётная запись компьютера не сохраняет пароль, заданный при её создании."
+      }
+    },
+    "GPOLogonRestriction": {
+      "upstreamBlock": "    'GPOLogonRestriction' = @{\n        TitleFormat = \"GPO Logon Restrictions: {GPOName}\"\n        Module = \"Rights\"\n        Category = \"Rights\"\n        SectionTitle = \"Logons Denied via GPO\"\n        Summary = \"Reports which logons Group Policy denies, to whom and on which machines, and whether any policy keeps Domain Admins and local administrator accounts off member computers.\"\n        WhyItMatters = \"A deny logon right takes one kind of logon away and wins over every right that would allow it. Denying Domain Admins the logon on workstations and member servers keeps their credentials off the machines an attacker reaches first; denying local administrator accounts the network logon stops one machine's local password from opening the next. Neither is the Windows default, which denies the Guest account alone. Denying a broad group instead locks out everyone it covers.\"\n        WhatWeCheck = @(\n            \"Deny access to this computer from the network, Deny log on locally, Deny log on through Remote Desktop Services, Deny log on as a batch job and Deny log on as a service in GptTmpl.inf of every GPO\"\n            \"Domain Admins - or a group Domain Admins is a member of - denied a logon on member computers\"\n            \"Local account and member of Administrators group, Local account, and the local Administrator account by its name, denied on member computers\"\n            \"A broad group denied, and Domain Admins denied on domain controllers - a lockout\"\n            \"Whether any policy that applies denies Domain Admins the local or Remote Desktop logon, and local administrator accounts the network logon, on member computers\"\n            \"Not evaluated: which of several policies setting the same right wins on a machine, and a machine's local policy\"\n        )\n        SecureMessage = \"Policies keep Domain Admins and local administrator accounts off member computers, and none locks out a broad group.\"\n        PrimaryFindingId = 'GPO_TIER0_LOGON_NOT_DENIED'\n    }",
+      "before": {
+        "whyItMatters": "Запрет определённого вида входа имеет приоритет над разрешениями. Ограничение входа Domain Admins на рабочих станциях и серверах снижает риск кражи привилегированных учётных данных; запрет сетевого входа локальным администраторам ограничивает распространение при повторном использовании паролей. Избыточный запрет для широкой группы, напротив, способен заблокировать доступ.",
+        "whatWeCheck": [
+          "Пять прав запрета входа в GptTmpl.inf каждой GPO: сетевой, локальный, RDP, пакетный и вход в качестве службы.",
+          "Запрещён ли вход Domain Admins (включая группы, куда они входят) на компьютерах-участниках.",
+          "Запрещён ли вход локальным административным учётным записям на компьютерах-участниках.",
+          "Нет ли запретов широким группам или Domain Admins на контроллерах домена.",
+          "Охватывают ли применимые GPO нужные категории входа Domain Admins и локальных администраторов.",
+          "Не определяются приоритет конфликтующих GPO и локальная политика компьютера."
+        ],
+        "secureMessage": "Политики ограничивают вход Domain Admins и локальных администраторов на рядовые компьютеры; запреты для широких групп не обнаружены."
+      },
+      "after": {
+        "whyItMatters": "Право запрета входа исключает определённый вид входа и имеет приоритет над всеми правами, которые его разрешают. Запрет входа членам Domain Admins на рабочих станциях и рядовых серверах не позволяет их учётным данным попадать на компьютеры, к которым злоумышленник обычно получает доступ в первую очередь. Запрет сетевого входа локальным администраторам не позволяет использовать локальный пароль одного компьютера для доступа к другому. Ни один из этих запретов не задан в Windows по умолчанию: по умолчанию запрет касается только гостевой учётной записи. Запрет входа широкой группе, напротив, блокирует всех охватываемых ею субъектов.",
+        "whatWeCheck": [
+          "В файле GptTmpl.inf каждой GPO: запрет доступа к компьютеру из сети, запрет локального входа, запрет входа через службы удалённых рабочих столов, запрет входа в качестве пакетного задания и запрет входа в качестве службы.",
+          "Запрещён ли определённый вид входа на компьютерах — членах домена группе Domain Admins либо группе, в которую она входит.",
+          "Распространяются ли запреты на компьютерах — членах домена на специальные субъекты Local account and member of Administrators group и Local account, а также на локальную учётную запись Administrator по её имени.",
+          "Запрет входа широким группам либо группе Domain Admins на контроллерах домена — риск блокировки доступа.",
+          "Запрещает ли какая-либо применимая политика членам Domain Admins локальный вход или вход через удалённый рабочий стол, а локальным администраторам — сетевой вход на компьютерах — членах домена.",
+          "Не оценивается, какая из нескольких политик, задающих одно и то же право, имеет приоритет на конкретном компьютере, а также локальная политика компьютера."
+        ],
+        "secureMessage": "Политики не допускают входа членов Domain Admins и локальных административных учётных записей на компьютеры — члены домена в проверяемых сценариях; ни одна политика не блокирует доступ широкой группе."
+      }
+    },
+    "GPOUserRightValue": {
+      "upstreamBlock": "    'GPOUserRightValue' = @{\n        TitleFormat = \"GPO User Rights Not Judged: {GPOName}\"\n        Module = \"Rights\"\n        Category = \"Rights\"\n        SectionTitle = \"User Rights via GPO That Depart From the Windows Default\"\n        Summary = \"Lists the user rights a policy file assigns that Get-GPOUserRightsAssignment does not judge (-IncludeUnknown).\"\n        WhyItMatters = \"The comparison against the Windows defaults covers the rights that are a step to escalation or lateral movement. Rights outside that table - Access this computer from the network, Increase scheduling priority and the like - are assigned by policies as well. Listed here as they are, so that what the table does not cover can still be read.\"\n        WhatWeCheck = @(\n            \"Every right in GptTmpl.inf [Privilege Rights] that the table of the check does not name\"\n            \"Not the five deny rights - Get-GPOLogonRestrictions reads those\"\n            \"Not judged: the assignments are listed as they are, without a severity\"\n        )\n        SecureMessage = \"No user right outside the list of the check is assigned.\"\n    }",
+      "before": {
+        "whyItMatters": "Автоматическая классификация охватывает отдельные права, связанные с повышением привилегий и перемещением внутри сети. Остальные права тоже назначаются через GPO, но здесь только показываются без вывода об их опасности.",
+        "whatWeCheck": [
+          "Права в разделе [Privilege Rights] файла GptTmpl.inf, которых нет в оценочной таблице проверки.",
+          "Пять прав запрета входа исключаются: их проверяет Get-GPOLogonRestrictions.",
+          "Назначения выводятся без классификации риска."
+        ],
+        "secureMessage": "В политике не обнаружены дополнительные назначения прав вне оценочной таблицы."
+      },
+      "after": {
+        "whyItMatters": "Сравнение со стандартными настройками Windows охватывает права, которые могут способствовать повышению привилегий или перемещению внутри сети. Политики также назначают права вне этой таблицы, например доступ к компьютеру из сети и повышение приоритета планирования. Здесь такие назначения перечислены в исходном виде, чтобы можно было изучить и те права, которые оценочная таблица не охватывает.",
+        "whatWeCheck": [
+          "Все права в разделе [Privilege Rights] файла GptTmpl.inf, не перечисленные в таблице данной проверки.",
+          "Пять прав запрета входа не включаются: их анализирует Get-GPOLogonRestrictions.",
+          "Оценка не выполняется: назначения перечисляются в исходном виде, без уровня критичности."
+        ],
+        "secureMessage": "Не назначено ни одного права пользователя, выходящего за рамки перечня данной проверки."
+      }
+    }
+  }
+}

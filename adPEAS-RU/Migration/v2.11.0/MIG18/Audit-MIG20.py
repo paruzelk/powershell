@@ -62,7 +62,7 @@ class StaticHtml(HTMLParser):
         if self.ignored and tag==self.ignored[-1]: self.ignored.pop()
     def handle_data(self,text):
         if not self.ignored: self.check(text,'text')
-def source_audit(root,upstream,report):
+def source_audit(root,upstream,report,approved_check_sha=None):
     integration=runpy.run_path(str(HERE/'Build-MIG18Integration.py'))
     prior=runpy.run_path(str(HERE/'Build-MIG19d5-d7.py'))
     paths=sorted((root/'src').rglob('*'))
@@ -70,7 +70,7 @@ def source_audit(root,upstream,report):
     core='src/modules/Core/adPEAS-FindingDefinitions.ps1'
     require(read(root/core)==read(upstream/core),'canonical finding source differs')
     js=read(root/'src/modules/Reporting/templates/report-scripts.js')
-    pins=integration['verify_catalogs'](js)
+    pins=integration['verify_catalogs'](js,approved_check_sha)
     ps={f.relative_to(root).as_posix():read(f) for f in paths if f.is_file() and f.suffix=='.ps1'}
     inv=prior['inventory'](ps)
     templates={}
@@ -126,7 +126,7 @@ def runtime_audit(diag,report):
                 for name in ('whyItMatters','whatWeCheck','secureMessage'):
                     orig=row.get(name);ru=trans.get(name)
                     if orig:
-                        fields[name]={'translationPresent':bool(ru),'exactEnglishRetained':orig==ru,
+                        fields[name]={'translationPresent':bool(ru),'sameAsRuntimeBase':orig==ru,'exactEnglishRetained':orig==ru and not any(RU.search(t) for _,t in leaves(ru)),
                                       'translationLanguageCounts':dict(collections.Counter(language(t) for _,t in leaves(ru)))}
                 checkrows.append({'id':id_,'translationEntryPresent':id_ in ruchecks,'fields':fields})
             review={n:inspect_catalog(html,n) for n in NAMES}
@@ -144,8 +144,10 @@ def runtime_audit(diag,report):
     print('PASS MIG20 runtime: 408 finding rows, 128 check rows, five catalog parity witnesses; review rows',len(data['findingFieldReview']),len(data['checkFieldReview']))
 def main():
     p=argparse.ArgumentParser();p.add_argument('--candidate',type=Path);p.add_argument('--upstream',type=Path)
-    p.add_argument('--diagnostics',type=Path);p.add_argument('--report',type=Path,required=True);a=p.parse_args()
+    p.add_argument('--diagnostics',type=Path);p.add_argument('--mig20a-source',type=Path);p.add_argument('--report',type=Path,required=True);a=p.parse_args()
     if a.diagnostics: runtime_audit(a.diagnostics,a.report)
-    elif a.candidate and a.upstream: source_audit(a.candidate,a.upstream,a.report)
+    elif a.candidate and a.upstream:
+        approved=json.loads(read(a.mig20a_source))['afterCheckCatalogSha256'] if a.mig20a_source else None
+        source_audit(a.candidate,a.upstream,a.report,approved)
     else: p.error('source or runtime inputs required')
 if __name__=='__main__': main()
