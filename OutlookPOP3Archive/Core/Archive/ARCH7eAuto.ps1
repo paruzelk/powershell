@@ -144,10 +144,14 @@ function Invoke-OPAARCH7eAuto {
     [CmdletBinding()]
     param([string]$ProjectRoot,[string]$ProfileName,[int]$BatchSize,[int]$MaxBatchesPerSource,
           [int]$OlderThanMonths,[string]$ArchiveGrouping,[switch]$IncludeRootMail,[int]$MaxResumeAttempts,
-          [ValidateRange(0,300)][int]$BatchDelaySeconds=0,[ValidateRange(5,300)][int]$RetryDelaySeconds=5,[scriptblock]$Record,[switch]$ConfirmDevLongArchive,[string]$LongArchiveSourcePst)
+          [ValidateRange(0,300)][int]$BatchDelaySeconds=0,[ValidateRange(5,300)][int]$RetryDelaySeconds=5,[scriptblock]$Record,[switch]$ConfirmDevLongArchive,[string]$LongArchiveSourcePst,[string]$RdsArchiveGroupSid)
     . (Join-Path $ProjectRoot 'Core/Runtime/ComManager.ps1')
     . (Join-Path $ProjectRoot 'Core/Archive/ARCH7dSupervisor.ps1')
     . (Join-Path $ProjectRoot 'Core/Archive/ARCH6Orchestration.ps1')
+    if($RdsArchiveGroupSid){
+        . (Join-Path $ProjectRoot 'Core/Runtime/ARCH7gRds.ps1')
+        if(-not $ConfirmDevLongArchive -or $LongArchiveSourcePst -or -not (Get-OPAARCH8bRuntimeDecision -GroupSid $RdsArchiveGroupSid).MayInvokeAuto){throw 'ARCH8b group dispatcher denied.'}
+    }
     $safeUser=(("{0}_{1}" -f [string]$env:USERDOMAIN,[string]$env:USERNAME) -replace '[^A-Za-z0-9_.-]','_')
     $mutex=[Threading.Mutex]::new($false,("Global\OutlookPOP3Archive-ARCH7e-"+$safeUser))
     $held=$false;$session=$null
@@ -158,7 +162,7 @@ function Invoke-OPAARCH7eAuto {
         $session=New-OPAComSession -ProfileName $ProfileName -AttachOnly
         try{$sourceRows=@(Get-OPAARCH7eSourceRows -Namespace $session.Namespace -ProfileName $session.ProfileName)}
         finally{Close-OPAComSession -Session $session;$session=$null}
-        if($ConfirmDevLongArchive){
+        if($ConfirmDevLongArchive -and -not $RdsArchiveGroupSid){
             Assert-OPAARCH8aPinnedSource -Sources $sourceRows -PinnedPath $LongArchiveSourcePst
         }
         $arch7eControllerPath=Join-Path $ProjectRoot 'Invoke-OPALiveArchiveBatches.ps1'
@@ -168,6 +172,7 @@ function Invoke-OPAARCH7eAuto {
         $arch7eRead={param($directory,$members) Get-OPAARCH7ePendingOwner -Directory $directory -Sources $members}
         $arch7eRun={
             param($row)
+            if($RdsArchiveGroupSid -and -not (Get-OPAARCH8bRuntimeDecision -GroupSid $RdsArchiveGroupSid).MayInvokeAuto){throw 'ARCH8b session no longer ready; preserve pending.'}
             $params=$arch7eCommon.Clone();$params.SourcePst=$row.SourcePst;$params.ProfileName=$row.Profile
             if($arch7eRetryDelay -ne 5){$params.RetryDelaySeconds=$arch7eRetryDelay}
             & $arch7eControllerPath @params

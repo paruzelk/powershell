@@ -95,3 +95,62 @@ function New-OPAARCH7gTaskDefinition {
     [void]([xml]$xml)
     [pscustomobject]@{Schema='2.6.5-ARCH7g.TaskPlan.1';Status='DisabledDefinitionOnly';TaskName=('OutlookPOP3Archive-DEV-'+$UserSid);UserSid=$UserSid;Enabled=$false;Registered=$false;ProductionReady=$false;TaskXml=$xml;Command=$exe;Arguments=$arguments;WorkingDirectory=$directory}
 }
+
+
+# ARCH8b: membership in the current interactive token, never LDAP credentials.
+function Get-OPAARCH8bGroupDecision {
+    [CmdletBinding()]
+    param([string]$GroupSid,[string]$ActualSid,[int]$SessionId,[bool]$Interactive,[bool]$Elevated,[bool]$Member)
+    if(-not (Test-OPAARCH7gUserSid -Sid $GroupSid) -or $GroupSid -ceq $ActualSid){
+        return [pscustomobject]@{Status='InvalidGroupScope';ExitCode=30;MayInvokeAuto=$false}
+    }
+    $context=Get-OPAARCH7gContextDecision -ActualSid $ActualSid -ExpectedSid $ActualSid -SessionId $SessionId -Interactive $Interactive -Elevated $Elevated
+    if(-not $context.MayInvokeAuto){return $context}
+    if(-not $Member){return [pscustomobject]@{Status='NotInArchiveGroup';ExitCode=41;MayInvokeAuto=$false}}
+    return [pscustomobject]@{Status='GroupAccepted';ExitCode=0;MayInvokeAuto=$true}
+}
+function Get-OPAARCH8bRuntimeDecision {
+    [CmdletBinding()]
+    param([string]$GroupSid)
+    if(-not (Test-OPAARCH7gUserSid -Sid $GroupSid)){throw 'ARCH8b explicit domain security group SID required.'}
+    $identity=[Security.Principal.WindowsIdentity]::GetCurrent()
+    $process=[Diagnostics.Process]::GetCurrentProcess()
+    try{
+        $principal=[Security.Principal.WindowsPrincipal]::new($identity)
+        $group=[Security.Principal.SecurityIdentifier]::new($GroupSid)
+        $sid=$identity.User.Value
+        $decision=Get-OPAARCH8bGroupDecision -GroupSid $GroupSid -ActualSid $sid -SessionId $process.SessionId -Interactive ([Environment]::UserInteractive) -Elevated ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) -Member ($principal.IsInRole($group))
+        if(-not $decision.MayInvokeAuto){return $decision}
+        return Get-OPAARCH7gRuntimeDecision -ExpectedSid $sid
+    }finally{$process.Dispose();$identity.Dispose()}
+}
+function Get-OPAARCH8bReadyDecision {
+    [CmdletBinding()]
+    param([string]$GroupSid)
+    $decision=Get-OPAARCH8bRuntimeDecision -GroupSid $GroupSid
+    if(-not $decision.MayInvokeAuto){return $decision}
+    # Outlook can exist before the active object/profile is ready. This probe
+    # uses ROT only, never creates Outlook or switches a profile.
+    $app=$null;$ns=$null
+    try{
+        $app=[Runtime.InteropServices.Marshal]::GetActiveObject('Outlook.Application')
+        $ns=$app.GetNamespace('MAPI')
+        if(-not [string]::IsNullOrWhiteSpace([string]$ns.CurrentProfileName)){return $decision}
+    }catch [Runtime.InteropServices.COMException] {
+        # Only before the dispatcher is entered; no Move or pending state touched.
+    }finally{
+        if($null -ne $ns){[void][Runtime.InteropServices.Marshal]::ReleaseComObject($ns)}
+        if($null -ne $app){[void][Runtime.InteropServices.Marshal]::ReleaseComObject($app)}
+    }
+    return [pscustomobject]@{Status='OutlookNotReady';ExitCode=40;MayInvokeAuto=$false}
+}
+function Wait-OPAARCH8bOutlook {
+    [CmdletBinding()]
+    param([scriptblock]$Probe,[scriptblock]$Delay,[ValidateRange(0,240)][int]$MaxWaitIntervals=80)
+    for($attempt=0;$attempt -le $MaxWaitIntervals;$attempt++){
+        $decision=& $Probe
+        if($null -eq $decision -or @($decision).Count -ne 1 -or $decision.ExitCode -notin @(0,30,40,41) -or ([bool]$decision.MayInvokeAuto -ne ($decision.ExitCode -eq 0))){throw 'ARCH8b invalid readiness decision.'}
+        if($decision.ExitCode -ne 40 -or $attempt -eq $MaxWaitIntervals){return $decision}
+        & $Delay
+    }
+}

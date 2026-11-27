@@ -225,3 +225,35 @@ Describe 'ARCH8a2 failure diagnostics preserve verification gate' {
         Should -Invoke Write-Host -Times 1 -Exactly
     }
 }
+
+
+Describe 'ARCH8b explicit group Auto contract' {
+    It 'permits group-scoped WhatIf without a fixed source, retaining 500/unlimited and quiet defaults' {
+        $r=& $script:aMain -Mode Auto -ConfirmDevAutoArchive -ConfirmDevLongArchive -RdsArchiveGroupSid 'S-1-5-21-111-222-333-2001' -Quiet -WhatIf
+        $r.Status | Should -BeExactly NoOutlookOrPersistentWrites
+        $r.RdsGroupScope | Should -BeTrue
+        $r.BatchSize | Should -Be 500
+        $r.MaxBatchesPerSource | Should -Be 0
+        $r.PinnedSourcePst | Should -BeNullOrEmpty
+        $r.ProductionReady | Should -BeFalse
+    }
+    It 'rejects group scope without long Quiet consent, or combined with a pinned PST' {
+        $sid='S-1-5-21-111-222-333-2001'
+        {& $script:aMain -Mode Auto -ConfirmDevAutoArchive -RdsArchiveGroupSid $sid -Quiet -WhatIf} | Should -Throw '*group scope*'
+        {& $script:aMain -Mode Auto -ConfirmDevAutoArchive -ConfirmDevLongArchive -RdsArchiveGroupSid $sid -WhatIf} | Should -Throw '*group scope*'
+        {& $script:aMain -Mode Auto -ConfirmDevAutoArchive -ConfirmDevLongArchive -RdsArchiveGroupSid $sid -LongArchiveSourcePst $script:aPst -Quiet -WhatIf} | Should -Throw '*group scope*'
+        {& $script:aMain -Mode Analyze -RdsArchiveGroupSid $sid -WhatIf} | Should -Throw '*group scope*'
+    }
+    It 'exhausts two independent discovered POP3 sources in unlimited sequence without a fixed path' {
+        $script:aCalls=0
+        $row2=[pscustomobject]@{SourcePst='C:\Test\Second.pst';Directory='fake'}
+        $r=Invoke-OPAARCH7eSourceSequence -Sources @($script:aRow,$row2) -MaxBatchesPerSource 0 -ConfirmDevLongArchive -PendingOwner {} -RunSource {
+            $script:aCalls++
+            if($script:aCalls -in @(1,3)){New-ARCH8aBatch -Verified 499 -Deferred 1}else{New-ARCH8aBatch -Status NoEligibleMessages -Verified 0}
+        }
+        $r.Status | Should -BeExactly AllSourcesExhausted
+        $r.SourcesExhausted | Should -Be 2
+        $r.Verified | Should -Be 998
+        $r.Deferred | Should -Be 2
+    }
+}

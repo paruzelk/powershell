@@ -103,3 +103,65 @@ Describe 'ARCH7g disabled task definition and RDS identity fence' {
         $runtime | Should -Not -Match 'Start-Process|Stop-Process|Register-ScheduledTask|Restart-ScheduledTask'
     }
 }
+
+
+Describe 'ARCH8b group-scoped RDS logon pilot' {
+    BeforeAll {$script:gGroup='S-1-5-21-111-222-333-2001'}
+    It 'accepts only a group member in a normal interactive session' {
+        $r=Get-OPAARCH8bGroupDecision -GroupSid $script:gGroup -ActualSid $script:gSid -SessionId 2 -Interactive $true -Elevated $false -Member $true
+        $r.MayInvokeAuto | Should -BeTrue
+        $r.ExitCode | Should -Be 0
+    }
+    It 'does not authorize a nonmember, a user SID as group, or a service token' {
+        (Get-OPAARCH8bGroupDecision -GroupSid $script:gGroup -ActualSid $script:gSid -SessionId 2 -Interactive $true -Member $false).ExitCode | Should -Be 41
+        (Get-OPAARCH8bGroupDecision -GroupSid $script:gSid -ActualSid $script:gSid -SessionId 2 -Interactive $true -Member $true).ExitCode | Should -Be 30
+        (Get-OPAARCH8bGroupDecision -GroupSid $script:gGroup -ActualSid 'S-1-5-18' -SessionId 0 -Member $true).ExitCode | Should -Be 30
+        (Get-OPAARCH8bGroupDecision -GroupSid $script:gGroup -ActualSid $script:gSid -SessionId 2 -Interactive $true -Elevated $true -Member $true).ExitCode | Should -Be 30
+    }
+    It 'waits for Outlook readiness only before Auto and stops after readiness' {
+        $script:gAttempts=0;$script:gDelays=0
+        $result=Wait-OPAARCH8bOutlook -MaxWaitIntervals 4 -Probe {
+            $script:gAttempts++
+            if($script:gAttempts -lt 3){[pscustomobject]@{ExitCode=40;MayInvokeAuto=$false}}else{[pscustomobject]@{ExitCode=0;MayInvokeAuto=$true}}
+        } -Delay {$script:gDelays++}
+        $result.ExitCode | Should -Be 0
+        $script:gAttempts | Should -Be 3
+        $script:gDelays | Should -Be 2
+    }
+    It 'does not retry denied membership or identity failures' {
+        foreach($code in @(30,41)){
+            $script:gAttempts=0
+            $r=Wait-OPAARCH8bOutlook -MaxWaitIntervals 4 -Probe {$script:gAttempts++;[pscustomobject]@{ExitCode=$code;MayInvokeAuto=$false}} -Delay {throw 'unexpected delay'}
+            $r.ExitCode | Should -Be $code
+            $script:gAttempts | Should -Be 1
+        }
+    }
+    It 'ends the bounded wait without starting Outlook' {
+        $script:gAttempts=0;$script:gDelays=0
+        $r=Wait-OPAARCH8bOutlook -MaxWaitIntervals 2 -Probe {$script:gAttempts++;[pscustomobject]@{ExitCode=40;MayInvokeAuto=$false}} -Delay {$script:gDelays++}
+        $r.ExitCode | Should -Be 40
+        $script:gAttempts | Should -Be 3
+        $script:gDelays | Should -Be 2
+    }
+    It 'rejects inconsistent readiness response without invoking the dispatcher' {
+        {Wait-OPAARCH8bOutlook -Probe {[pscustomobject]@{ExitCode=40;MayInvokeAuto=$true}} -Delay {throw 'unexpected delay'}} | Should -Throw '*invalid readiness*'
+    }
+    It 'public group WhatIf has 500 and unlimited defaults and no fixed user SID' {
+        $exe=Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
+        $entry=Join-Path $script:gRoot 'Invoke-OPARdsAutoDev.ps1'
+        $out=& $exe -NoProfile -NonInteractive -STA -File $entry -ConfirmDevAutoArchive -ConfirmDevGpoArchive -ArchiveGroupSid $script:gGroup -WhatIf
+        $LASTEXITCODE | Should -Be 0
+        ($out -join ' ') | Should -Match 'NoOutlookOrPersistentWrites'
+        ($out -join ' ') | Should -Match '500'
+    }
+    It 'public group WhatIf rejects absent group, fixed user, and legacy unlimited mode' {
+        $exe=Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
+        $entry=Join-Path $script:gRoot 'Invoke-OPARdsAutoDev.ps1'
+        & $exe -NoProfile -NonInteractive -STA -File $entry -ConfirmDevAutoArchive -ConfirmDevGpoArchive -WhatIf
+        $LASTEXITCODE | Should -Be 30
+        & $exe -NoProfile -NonInteractive -STA -File $entry -ConfirmDevAutoArchive -ConfirmDevGpoArchive -ArchiveGroupSid $script:gGroup -ExpectedUserSid $script:gSid -WhatIf
+        $LASTEXITCODE | Should -Be 30
+        & $exe -NoProfile -NonInteractive -STA -File $entry -ConfirmDevAutoArchive -ExpectedUserSid $script:gSid -AutoDevMaxBatches 0 -WhatIf
+        $LASTEXITCODE | Should -Be 30
+    }
+}

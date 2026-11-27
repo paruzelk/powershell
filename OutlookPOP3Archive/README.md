@@ -1,6 +1,13 @@
-﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH8a3a DEV
+﻿# OutlookPOP3Archive — 2.6.3-PREVIEW1 / ARCH8b DEV
 
 ## Актуальный запуск и документация
+
+ARCH8b DEV: ARCH8a3a CI [45961810890](https://github.com/paruzelk/powershell/actions/runs/45961810890) PASS 4958/168. Operator real recovery of batch 27 verified/reconciled/indexed 498, deferred 2 including 1 held receipt, no repeated Move, pending cleared. Subsequent Auto returned AllSourcesExhausted, 7262 verified and 6 deferred, 16 cycles (including exhaustion probe), exit 0, Outlook PID 13820 unchanged. Aggregate ARCH8 21228 verified, 40 deferred; last six not classified by subtype. No repeat of accepted live trials. ARCH8b adds explicit group SID scoped RDS pilot with quiet 500/unlimited defaults, attach-only readiness wait, all uniquely discovered POP3 delivery PSTs, repeated token/session gates, existing mutex/leases and deferred policy. 11 new tests in existing containers (runtime 21, long Auto 24; total 4969/168 expected). No live domain/GPO registration or 90GB certification; ProductionReady=False.
+
+## ARCH8b — централизованное развёртывание (27.11.2026)
+
+Одна GPO для RDS и одна доменная группа безопасности POP3Archive. Администратор развёртывает подписанную/доверенную сборку в локальный защищённый от записи пользователями каталог на каждом RDS; задаёт SID группы в параметрах пользовательского задания GPP. При входе члена группы запускается скрытая пользовательская обёртка без пароля и повышения прав; членство повторно проверяется по текущему токену, не по имени группы. Outlook обнаруживается в текущем сеансе; ожидание его готовности ограничено, без запуска или перезапуска Outlook. Автоматически обрабатываются однозначно обнаруженные локальные POP3 delivery PST текущего активного профиля, 500 писем/партия, без общего лимита, 12 месяцев, YearQuarter, Safe, политика исключений ARCH8a3a. Не член группы — без COM/Move. Изменение членства действует после обновления токена (выход/вход). Существующий per-user mutex и directory lease сохраняются; межсерверная параллельность требует раздельных локальных PST и отдельной проверки RDS. Никаких изменений AD/GPO самим скриптом. Инструкция: docs/ARCH8b-RDS-GPO.md. До ARCH8c и RC только ограниченный пилот на тестовых PST, не массовое включение.
+
 
 ARCH8a3a DEV: ARCH8a3 CI [45961408172](https://github.com/paruzelk/powershell/actions/runs/45961408172) failed before executable tests: PowerShell ParseException in ARCH6Deferred.ps1 line 9; source review also identified duplicated fragments in ARCH7cRecovery.ps1 caused by replacement-string expansion at regex end anchors. Restore exact intended functions and literal regex anchors; no duplicate definitions remain. Keep all 4958 expected tests / 168 containers, all gates and exception policy unchanged. No live test authorization before CI PASS.
 
