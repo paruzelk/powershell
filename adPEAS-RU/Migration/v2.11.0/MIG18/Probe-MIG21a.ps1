@@ -50,6 +50,29 @@ try {
  }
  if ((Convert-SidToString -SidInput $sidBytes) -cne $sidA) {throw 'MIG21a collector binary input failed'}
  Write-Mig19bcTrace 'MIG21A_LDAP_SID_COLLISION_OK'
+ # MIG21c: actual assembled functions, no LDAP or customer data.
+ $mig21cLines = @(
+  @{Text='Found possible sensitive information';Expected='Обнаружены потенциально конфиденциальные сведения (требуется проверка).'}
+  @{Text='Found 7 scheduled task(s) distributed via GPO';Expected='Обнаружено запланированных заданий, распространяемых через GPO: 7'}
+  @{Text='No LDAP Security configuration found in any GPO - all 3 DC(s) potentially vulnerable';Expected='Ни в одной GPO не обнаружено настроек безопасности LDAP — все контроллеры домена (количество: 3) потенциально уязвимы.'}
+ )
+ foreach ($case in $mig21cLines) {
+  if ((ConvertTo-RuReportLine -Text $case.Text) -cne $case.Expected) {throw 'MIG21c HTML line'}
+  if ((ConvertTo-RuConsoleText19f -Text $case.Text -Class 'Hint') -cne $case.Expected) {throw 'MIG21c console line'}
+ }
+ $mig21cFields = @(
+  @{Name='passwordSinceCreation';Text='Unchanged, never used';Expected='Не изменён, учётная запись ни разу не использовалась'}
+  @{Name='sidFiltering';Text='Enabled - QUARANTINED_DOMAIN set';Expected='Включена — QUARANTINED_DOMAIN установлен'}
+  @{Name='CredentialType';Text='Credential mention (needs review)';Expected='Упоминание учётных данных (требуется проверка)'}
+  @{Name='VulnerabilityName';Text='Windows Firewall disabled via GPO';Expected='Брандмауэр Windows отключён через GPO'}
+  @{Name='description';Text='Unchanged, never used';Expected='Unchanged, never used'}
+  @{Name='name';Text='Enabled - QUARANTINED_DOMAIN set';Expected='Enabled - QUARANTINED_DOMAIN set'}
+ )
+ foreach ($case in $mig21cFields) {
+  if ((ConvertTo-RuDisplayAttribute19g -Name $case.Name -Text $case.Text) -cne $case.Expected) {throw 'MIG21c field scope'}
+ }
+ if ((ConvertTo-RuReportLine -Text 'Found 7 scheduled task(s) distributed via GPO (custom)') -cne 'Found 7 scheduled task(s) distributed via GPO (custom)') {throw 'MIG21c anchored negative'}
+ Write-Mig19bcTrace 'MIG21C_SCOPED_DISPLAY_OK'
  $null=Get-Command Convert-adPEASReport -CommandType Function -ErrorAction Stop
  $help=Get-adPEASHelp -Section Commands,Checks 6>&1 | Out-String
  [IO.File]::WriteAllText(($OutputBase+'.help.txt'),$help,[Text.Encoding]::UTF8)

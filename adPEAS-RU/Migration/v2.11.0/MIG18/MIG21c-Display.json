@@ -1,0 +1,312 @@
+{
+  "lines": [
+    [
+      "No enabled computer account still carries the password it was created with",
+      "Ни одна включённая учётная запись компьютера не сохранила пароль, заданный при создании."
+    ],
+    [
+      "No GPOs found in domain",
+      "В домене не обнаружено GPO."
+    ],
+    [
+      "No known vulnerable registry setting is deployed by a policy that is linked and enabled",
+      "Ни одна известная уязвимая настройка реестра не применяется связанной и включённой политикой."
+    ],
+    [
+      "No known vulnerable registry setting is deployed via GPO",
+      "Не обнаружено известных уязвимых настроек реестра, развёрнутых через GPO."
+    ],
+    [
+      "Found possible sensitive information",
+      "Обнаружены потенциально конфиденциальные сведения (требуется проверка)."
+    ],
+    [
+      "No script/config files found in path",
+      "По указанному пути не обнаружены файлы сценариев или конфигурации."
+    ],
+    [
+      "No GPP credentials found in SYSVOL",
+      "В SYSVOL не обнаружены учётные данные GPP."
+    ],
+    [
+      "No sensitive information found in SYSVOL/NETLOGON scripts",
+      "В сценариях SYSVOL/NETLOGON не обнаружены конфиденциальные сведения."
+    ],
+    [
+      "SYSVOL access failed - credentials were not searched for",
+      "Не удалось получить доступ к SYSVOL: поиск учётных данных не выполнялся."
+    ],
+    [
+      "SYSVOL was not reachable - the NTFS permissions of the policy folders were not examined",
+      "SYSVOL недоступен: разрешения NTFS папок политик не проверены."
+    ],
+    [
+      "SYSVOL access failed - cannot analyze Point and Print policies - SMB access failed (authentication/network issue)",
+      "Не удалось получить доступ к SYSVOL: политики Point and Print не оценены (ошибка SMB: аутентификация или сеть)."
+    ],
+    [
+      "No scheduled task is distributed by a policy that is linked and enabled",
+      "Ни одно запланированное задание не распространяется связанной и включённой политикой."
+    ],
+    [
+      "No local group assignment is made by a policy that is linked and enabled",
+      "Ни одно назначение локальной группы не выполняется связанной и включённой политикой."
+    ],
+    [
+      "No Point and Print or printer driver policy was found in the GPO folders that could be read",
+      "В доступных для чтения папках GPO не обнаружено политик Point and Print или драйверов принтеров."
+    ],
+    [
+      "No GPO configures Point and Print or printer driver policies - the secure Windows default applies",
+      "Ни одна GPO не настраивает Point and Print или политики драйверов принтеров — действуют безопасные настройки Windows по умолчанию."
+    ],
+    [
+      "No linked and enabled policy leaves printer driver installation open to non-administrators",
+      "Ни одна связанная и включённая политика не разрешает установку драйверов принтеров пользователям без прав администратора."
+    ],
+    [
+      "No Point and Print configuration is deployed by a policy that is linked and enabled",
+      "Ни одна конфигурация Point and Print не развёртывается связанной и включённой политикой."
+    ],
+    [
+      "No readable policy denies Domain Admins the local or Remote Desktop logon on member computers",
+      "Среди доступных для чтения политик нет запрещающей группе Domain Admins локальный вход или вход через удалённый рабочий стол на компьютерах домена."
+    ],
+    [
+      "No readable policy denies local administrator accounts the network logon on member computers",
+      "Среди доступных для чтения политик нет запрещающей локальным администраторам сетевой вход на компьютерах домена."
+    ],
+    [
+      "No user right is granted beyond the Windows default by a policy that reaches a machine",
+      "Ни одно право пользователя сверх настроек Windows по умолчанию не предоставлено политикой, применяемой к компьютеру."
+    ],
+    [
+      "No user right is granted beyond the Windows default",
+      "Не обнаружены права пользователей сверх настроек Windows по умолчанию."
+    ],
+    [
+      "Every user right assigned via GPO matches the Windows default",
+      "Все права пользователей, назначенные через GPO, соответствуют настройкам Windows по умолчанию."
+    ],
+    [
+      "SYSVOL access failed - the GPO configuration for LDAP Security was not analyzed",
+      "Не удалось получить доступ к SYSVOL: настройки безопасности LDAP через GPO не проанализированы."
+    ],
+    [
+      "SYSVOL access failed - the GPO configuration for SMB Signing was not analyzed",
+      "Не удалось получить доступ к SYSVOL: настройки подписи SMB через GPO не проанализированы."
+    ],
+    [
+      "No SMB Signing configuration is deployed by a policy that is linked and enabled",
+      "Ни одна конфигурация подписи SMB не развёртывается связанной и включённой политикой."
+    ],
+    [
+      "In force on the domain controllers, by policy precedence:",
+      "Действующие настройки контроллеров домена с учётом приоритета политик:"
+    ],
+    [
+      "In force on member servers and clients:",
+      "Действующие настройки рядовых серверов и клиентских компьютеров:"
+    ],
+    [
+      "SMB signing is weakened by:",
+      "Защита подписи SMB ослаблена следующими настройками:"
+    ],
+    [
+      "No SMB Signing configuration found in any GPO - computers rely on OS defaults (varies by Windows version)",
+      "Ни в одной GPO не обнаружено настроек подписи SMB — компьютеры используют параметры ОС по умолчанию, зависящие от версии Windows."
+    ],
+    [
+      "The configuration naming context is not known - authentication policy silos were not checked",
+      "Контекст именования Configuration неизвестен — изолированные контейнеры политик аутентификации не проверены."
+    ],
+    [
+      "The authentication policy configuration could not be read - not checked",
+      "Не удалось прочитать конфигурацию политик аутентификации — проверка не выполнена."
+    ],
+    [
+      "No authentication policy silo and no authentication policy is configured",
+      "Не настроены ни изолированные контейнеры политик аутентификации, ни сами политики аутентификации."
+    ],
+    [
+      "No authentication policy silo is configured",
+      "Не настроен ни один изолированный контейнер политик аутентификации."
+    ],
+    [
+      "The krbtgt account could not be read - its password age is unknown",
+      "Не удалось прочитать учётную запись krbtgt — возраст её пароля неизвестен."
+    ],
+    [
+      "Guest account not found (unusual - RID 501 should always exist)",
+      "Учётная запись гостя не найдена (нетипично: RID 501 должен существовать)."
+    ],
+    [
+      "No external domain trusts found (isolated domain)",
+      "Внешние доверительные отношения домена не обнаружены (изолированный домен)."
+    ]
+  ],
+  "patterns": [
+    [
+      "^Found ([0-9]+) vulnerable registry setting\\(s\\) deployed via GPO$",
+      "Обнаружено уязвимых настроек реестра, развёрнутых через GPO: $1",
+      "vulnerable registry setting(s) deployed via GPO"
+    ],
+    [
+      "^Found ([0-9]+) scheduled task\\(s\\) distributed via GPO$",
+      "Обнаружено запланированных заданий, распространяемых через GPO: $1",
+      "scheduled task(s) distributed via GPO"
+    ],
+    [
+      "^No scheduled tasks distributed via GPO in ([0-9]+) analyzed GPO\\(s\\)$",
+      "В проанализированных GPO (количество: $1) не обнаружено распространяемых запланированных заданий.",
+      "No scheduled tasks distributed via GPO in"
+    ],
+    [
+      "^Found ([0-9]+) vulnerable GPO local group assignment\\(s\\)$",
+      "Обнаружено уязвимых назначений локальных групп через GPO: $1",
+      "vulnerable GPO local group assignment(s)"
+    ],
+    [
+      "^Found ([0-9]+) GPO local group assignment\\(s\\)$",
+      "Обнаружено назначений локальных групп через GPO: $1",
+      "GPO local group assignment(s)"
+    ],
+    [
+      "^No vulnerable GPO local group assignments found in ([0-9]+) analyzed GPO\\(s\\)$",
+      "В проанализированных GPO (количество: $1) не обнаружено уязвимых назначений локальных групп.",
+      "No vulnerable GPO local group assignments found in"
+    ],
+    [
+      "^Found ([0-9]+) GPO configuration\\(s\\) with Point and Print or printer driver settings$",
+      "Обнаружено конфигураций GPO с настройками Point and Print или драйверов принтеров: $1",
+      "GPO configuration(s) with Point and Print or printer driver settings"
+    ],
+    [
+      "^No LDAP Security configuration found in any GPO - all ([0-9]+) DC\\(s\\) potentially vulnerable$",
+      "Ни в одной GPO не обнаружено настроек безопасности LDAP — все контроллеры домена (количество: $1) потенциально уязвимы.",
+      "No LDAP Security configuration found in any GPO - all"
+    ],
+    [
+      "^Found SMB Signing configuration in ([0-9]+) GPO\\(s\\):$",
+      "Конфигурация подписи SMB обнаружена в GPO (количество: $1):",
+      "Found SMB Signing configuration in"
+    ],
+    [
+      "^Found ([0-9]+) authentication policy silo\\(s\\):$",
+      "Обнаружено изолированных контейнеров политик аутентификации: $1",
+      "authentication policy silo(s):"
+    ],
+    [
+      "^Found ([0-9]+) authentication policy\\(ies\\):$",
+      "Обнаружено политик аутентификации: $1",
+      "authentication policy(ies):"
+    ],
+    [
+      "^Found ([0-9]+) domain trust\\(s\\):$",
+      "Обнаружено доверительных отношений домена: $1",
+      "domain trust(s):"
+    ],
+    [
+      "^The NTFS permissions of ([0-9]+) of ([0-9]+) policy folder\\(s\\) in SYSVOL could not be read - who may rewrite their content is unknown$",
+      "Не удалось прочитать разрешения NTFS $1 из $2 папок политик в SYSVOL — неизвестно, кто может изменять их содержимое.",
+      "policy folder(s) in SYSVOL could not be read - who may rewrite their content is unknown"
+    ],
+    [
+      "^Found ([0-9]+) user right assignment\\(s\\) that depart from the Windows default:$",
+      "Обнаружено назначений прав пользователей, отличающихся от настроек Windows по умолчанию: $1",
+      "user right assignment(s) that depart from the Windows default:"
+    ]
+  ],
+  "attrs": [
+    [
+      "passwordSinceCreation",
+      "Never set - empty password",
+      "Не задан ни разу — пустой пароль",
+      "Never set - empty password"
+    ],
+    [
+      "passwordSinceCreation",
+      "Unchanged, in use",
+      "Не изменён, используется",
+      "Unchanged, in use"
+    ],
+    [
+      "passwordSinceCreation",
+      "Unchanged, never used",
+      "Не изменён, учётная запись ни разу не использовалась",
+      "Unchanged, never used"
+    ],
+    [
+      "sidFiltering",
+      "Not applied - within the forest",
+      "Не применяется — внутри леса",
+      "Not applied - within the forest"
+    ],
+    [
+      "sidFiltering",
+      "Not applicable - this domain does not trust the partner",
+      "Неприменимо — этот домен не доверяет партнёру",
+      "Not applicable - this domain does not trust the partner"
+    ],
+    [
+      "sidFiltering",
+      "Weakened - TREAT_AS_EXTERNAL",
+      "Ослаблена — TREAT_AS_EXTERNAL",
+      "Weakened - TREAT_AS_EXTERNAL"
+    ],
+    [
+      "sidFiltering",
+      "Enabled - forest trust",
+      "Включена — доверие между лесами",
+      "Enabled - forest trust"
+    ],
+    [
+      "sidFiltering",
+      "DISABLED - QUARANTINED_DOMAIN not set",
+      "ОТКЛЮЧЕНА — QUARANTINED_DOMAIN не установлен",
+      "DISABLED - QUARANTINED_DOMAIN not set"
+    ],
+    [
+      "sidFiltering",
+      "Enabled - QUARANTINED_DOMAIN set",
+      "Включена — QUARANTINED_DOMAIN установлен",
+      "Enabled - QUARANTINED_DOMAIN set"
+    ],
+    [
+      "CredentialType",
+      "Credential mention (needs review)",
+      "Упоминание учётных данных (требуется проверка)",
+      "Credential mention"
+    ],
+    [
+      "CredentialType",
+      "XML password element (needs review)",
+      "Элемент XML с паролем (требуется проверка)",
+      "XML password element"
+    ],
+    [
+      "CredentialType",
+      "Passwd mention (needs review)",
+      "Упоминание passwd (требуется проверка)",
+      "Passwd mention"
+    ],
+    [
+      "CredentialType",
+      "Password mention (needs review)",
+      "Упоминание пароля (требуется проверка)",
+      "Password mention"
+    ],
+    [
+      "CredentialType",
+      "Secret/token assignment (needs review)",
+      "Присваивание секрета или токена (требуется проверка)",
+      "Secret/token assignment"
+    ],
+    [
+      "VulnerabilityName",
+      "Windows Firewall disabled via GPO",
+      "Брандмауэр Windows отключён через GPO",
+      "Windows Firewall disabled via GPO"
+    ]
+  ]
+}

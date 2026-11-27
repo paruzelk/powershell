@@ -1,6 +1,6 @@
-# adPEAS-RU 2.11.0 MIG21bc1 — быстрый старт и параметры
+# adPEAS-RU 2.11.0 MIG21c — быстрый старт и параметры
 
-**MIG21bc1 PREVIEW.** База MIG21a CI PASS (45968744119). Полнота аудита и диагностика SYSVOL отделены от финального экспорта. См. README-MIG21bc1.md. ProductionReady=False.
+**MIG21c PREVIEW.** База MIG21bc1 CI PASS (45987200724). Объединённый этап MIG21c2–c4: локализация представления и инвентаризация остатка. См. README-MIG21c.md. ProductionReady=False.
 
 ## Быстрый запуск (Windows PowerShell 5.1)
 

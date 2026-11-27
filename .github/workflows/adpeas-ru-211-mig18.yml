@@ -1,4 +1,4 @@
-name: "adPEAS RU 2.11.0 MIG21bc1 - report coverage and SYSVOL diagnostics"
+name: "adPEAS RU 2.11.0 MIG21c - combined display localization and residual audit"
 on:
   push:
     branches:
@@ -486,6 +486,9 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'MIG21bc1 source gate failed' }
           & 'adPEAS-RU/Migration/v2.11.0/MIG18/Test-MIG21bc1.ps1' -Candidate '_mig/candidate'
           Copy-Item 'adPEAS-RU/Migration/v2.11.0/MIG18/README-MIG21bc1.md' '_mig/README-MIG21bc1.md'
+          python adPEAS-RU/Migration/v2.11.0/MIG18/Build-MIG21c.py --candidate '_mig/candidate' --upstream $new[0].FullName --report '_mig/2.11.0-mig21c-source.json'
+          if ($LASTEXITCODE -ne 0) { throw 'MIG21c source gate failed' }
+          Copy-Item 'adPEAS-RU/Migration/v2.11.0/MIG18/README-MIG21c.md' '_mig/README-MIG21c.md'
           python adPEAS-RU/Migration/v2.11.0/MIG18/Audit-MIG20.py --candidate '_mig/candidate' --upstream $new[0].FullName --mig20a-source '_mig/2.11.0-mig20a-source.json' --report '_mig/2.11.0-mig20-source.json'
           if ($LASTEXITCODE -ne 0) { throw 'MIG20 source audit failed' }
           & 'adPEAS-RU/Migration/v2.11.0/MIG18/Audit-MIG20Ast.ps1' -Candidate '_mig/candidate' -Report '_mig/2.11.0-mig20-ast.json'
@@ -615,7 +618,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG21bc1-DIAGNOSTICS
+          name: adPEAS-RU-2.11.0-MIG21c-DIAGNOSTICS
           path: |
             _mig/mig19k2-diagnostics/
             _mig/2.11.0-mig19k2-report.json
@@ -625,7 +628,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG21bc1-COVERAGE
+          name: adPEAS-RU-2.11.0-MIG21c-COVERAGE
           path: |
             _mig/2.11.0-mig19d2-source.json
             _mig/2.11.0-mig19d2-residual.json
@@ -656,6 +659,7 @@ jobs:
             _mig/2.11.0-mig21a-source.json
             _mig/2.11.0-mig21a-text-origin.json
             _mig/2.11.0-mig21bc1-source.json
+            _mig/2.11.0-mig21c-source.json
           retention-days: 14
           if-no-files-found: warn
       - name: Publish runtime diagnostic evidence
@@ -672,7 +676,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: adPEAS-RU-2.11.0-MIG21bc1-PREVIEW
+          name: adPEAS-RU-2.11.0-MIG21c-PREVIEW
           path: |
             _mig/2.11.0-parity.json
             _mig/2.11.0-mig2-coverage.json
@@ -726,12 +730,14 @@ jobs:
             _mig/2.11.0-mig21a-source.json
             _mig/2.11.0-mig21a-text-origin.json
             _mig/2.11.0-mig21bc1-source.json
+            _mig/2.11.0-mig21c-source.json
             _mig/Invoke-MIG19k2LocalAcceptance.ps1
             _mig/README-MIG19k2.md
             _mig/README-MIG20.md
             _mig/README-MIG20a.md
             _mig/README-MIG21a.md
             _mig/README-MIG21bc1.md
+            _mig/README-MIG21c.md
             _mig/candidate/README-RU-2.11.0.md
             _mig/candidate/adPEAS.ps1
             _mig/candidate/adPEAS_min.ps1
