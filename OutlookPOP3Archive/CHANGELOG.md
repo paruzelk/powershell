@@ -1,5 +1,10 @@
 ## 2.6.5-ARCH6f2 DEV
 
+## ARCH8b1 DEV — 2026-11-27
+
+ARCH8b1 DEV merges ARCH8b1 + ARCH8b2 at operator request. ARCH8b CI [45996007728](https://github.com/paruzelk/powershell/actions/runs/45996007728) PASS 4969 tests / 168 containers, 0 failed/skipped, UTF-8 BOM PASS. New Install-OPADomain.ps1 supports Install/Update/Repair/Audit/Disable/Uninstall/WhatIf; AD discovery and security group, explicit OU and RDS computer scope, WinRM Kerberos deployment, protected program/launcher ACLs by SID, manifest and hash checks, managed run lease, supported machine GPO Run at user logon (not a generated GPP task), group-token authorization before Outlook, GPO registry settings and Apply permission readback. Existing ARCH8b manual GPP scheduled-task path remains an alternative, not simultaneous. 10 additional planning, payload, lease and static boundary tests; 4979/168 expected, 31 RDS focused. Real domain, GPO, WinRM/ACL, RDS 90GB and logon/maintenance acceptance still pending. No deployment executed by CI; ProductionReady=False.
+
+
 ## ARCH8b DEV — 2026-11-27
 
 ARCH8b DEV: ARCH8a3a CI [45961810890](https://github.com/paruzelk/powershell/actions/runs/45961810890) PASS 4958/168. Operator real recovery of batch 27 verified/reconciled/indexed 498, deferred 2 including 1 held receipt, no repeated Move, pending cleared. Subsequent Auto returned AllSourcesExhausted, 7262 verified and 6 deferred, 16 cycles (including exhaustion probe), exit 0, Outlook PID 13820 unchanged. Aggregate ARCH8 21228 verified, 40 deferred; last six not classified by subtype. No repeat of accepted live trials. ARCH8b adds explicit group SID scoped RDS pilot with quiet 500/unlimited defaults, attach-only readiness wait, all uniquely discovered POP3 delivery PSTs, repeated token/session gates, existing mutex/leases and deferred policy. 11 new tests in existing containers (runtime 21, long Auto 24; total 4969/168 expected). No live domain/GPO registration or 90GB certification; ProductionReady=False.

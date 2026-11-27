@@ -12,6 +12,7 @@
     "AutoWorkerEnabled": false
   },
   "Highlights": [
+    "ARCH8b1 DEV: combined domain installer and maintenance modes; group-scoped logon policy, protected runtime, 4979/168 expected, production closed.",
     "ARCH8b DEV: real ARCH8a3a exhaustion accepted; group-scoped RDS logon pilot, all unique POP3 delivery PSTs, 500/unlimited, bounded Outlook readiness, 4969/168 expected.",
     "ARCH8a3a DEV: fix malformed regex anchors and duplicate source fragments after failed ARCH8a3 CI; no test or safety gate relaxation.",
     "ARCH8a3 DEV: per-item verification hold and verified-only completion, unknown pre-claim read deferral, 4958/168 expected; production closed.",
@@ -138,7 +139,7 @@
     "BW4k7v2aRealOutlookProviderBehaviorVerified": false,
     "BW4k7v2aProductionWorkerEnabled": false,
     "ExpectedTestContainers": 168,
-    "ExpectedPesterTests": 4969,
+    "ExpectedPesterTests": 4979,
     "ControlledJournalResolutionOptIn": true,
     "BoundedWorkerCanaryDevOptIn": true,
     "BoundedWorkerCanaryReadOnly": true,

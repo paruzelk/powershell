@@ -165,3 +165,104 @@ Describe 'ARCH8b group-scoped RDS logon pilot' {
         $LASTEXITCODE | Should -Be 30
     }
 }
+
+
+Describe 'ARCH8b1 domain deployment planning and safety boundaries' {
+    BeforeAll {
+        . (Join-Path $script:gRoot 'Core/Runtime/ARCH8b1Domain.ps1')
+        $script:domainSid='S-1-5-21-111-222-333'
+        $script:ou='OU=RDS,DC=example,DC=local'
+        $script:hosts=@('rds01.example.local','rds02.example.local')
+        function New-ARCH8b1Fixture {
+            $root=Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+            [void][IO.Directory]::CreateDirectory((Join-Path $root 'Core\Runtime'))
+            foreach($name in @('OutlookPOP3Archive.ps1','Invoke-OPARdsAutoDev.ps1','Invoke-OPALiveArchiveBatches.ps1','Core\Runtime\Start-OPAArchiveAtLogon.ps1')){
+                [IO.File]::WriteAllText((Join-Path $root $name),'# synthetic payload only',[Text.UTF8Encoding]::new($true))
+            }
+            [IO.File]::WriteAllText((Join-Path $root 'BUILD-INFO.json'),(ConvertTo-Json @{WindowsPowerShell51CiPassed=$true;SourceCommit=('a'*40)} -Compress))
+            return $root
+        }
+    }
+    It 'generates stable independent scope from domain OU group GPO and unordered hosts' {
+        $x=Get-OPAARCH8b1ScopeId -DomainSid $script:domainSid -TargetOU $script:ou -GroupName POP3Archive -ComputerNames $script:hosts
+        $y=Get-OPAARCH8b1ScopeId -DomainSid $script:domainSid -TargetOU $script:ou.ToUpperInvariant() -GroupName pop3archive -ComputerNames @('RDS02.EXAMPLE.LOCAL','RDS01.EXAMPLE.LOCAL')
+        $x | Should -BeExactly $y
+        $x | Should -Match '^[a-f0-9]{64}$'
+        (Get-OPAARCH8b1ScopeId -DomainSid 'S-1-5-21-444-555-666' -TargetOU $script:ou -GroupName POP3Archive -ComputerNames $script:hosts) | Should -Not -Be $x
+        (Get-OPAARCH8b1ScopeId -DomainSid $script:domainSid -TargetOU $script:ou -GroupName POP3Archive -ComputerNames $script:hosts -GpoName Different) | Should -Not -Be $x
+    }
+    It 'rejects domain root duplicate hosts and missing FQDN' {
+        {Get-OPAARCH8b1ScopeId -DomainSid $script:domainSid -TargetOU 'DC=example,DC=local' -GroupName POP3Archive -ComputerNames $script:hosts} | Should -Throw
+        {Get-OPAARCH8b1ScopeId -DomainSid $script:domainSid -TargetOU $script:ou -GroupName POP3Archive -ComputerNames @('rds01.example.local','RDS01.EXAMPLE.LOCAL')} | Should -Throw
+        {Get-OPAARCH8b1ScopeId -DomainSid $script:domainSid -TargetOU $script:ou -GroupName POP3Archive -ComputerNames @('rds01')} | Should -Throw
+    }
+    It 'generates a quoted quiet local Windows PowerShell command without policy bypass' {
+        $r=New-OPAARCH8b1PolicyCommand -ProgramFiles 'C:\Program Files' -WindowsDirectory 'C:\Windows'
+        $r | Should -Match '^"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"'
+        $r | Should -Match '-STA -WindowStyle Hidden -File "C:\\Program Files\\OutlookPOP3Archive-Logon\\Start-OPAArchiveAtLogon.ps1"'
+        $r | Should -Not -Match 'ExecutionPolicy|Password|SYSVOL'
+        $r.Length | Should -BeLessThan 260
+    }
+    It 'rejects nonlocal redirected or command-injection-shaped paths' {
+        foreach($path in @('\\server\share','relative','C:\OPA\..\other','C:\OPA" & bad','C:\%bad%')){
+            {New-OPAARCH8b1PolicyCommand -ProgramFiles $path -WindowsDirectory 'C:\Windows'} | Should -Throw
+        }
+    }
+    It 'allowlists only original runtime scripts and build metadata' {
+        foreach($path in @('OutlookPOP3Archive.ps1','Invoke-OPARdsAutoDev.ps1','Core/Runtime/Start-OPAArchiveAtLogon.ps1','BUILD-INFO.json')){
+            Test-OPAARCH8b1RuntimeRelativePath -Path $path | Should -BeTrue
+        }
+        foreach($path in @('Core/../mail.pst','Core/../../evil.ps1','Core/mail.pst','../Other.ps1','Core/a.jsonl','C:/mail.pst','Core/a.ps1:stream','Install-OPADomain.ps1')){
+            Test-OPAARCH8b1RuntimeRelativePath -Path $path | Should -BeFalse
+        }
+    }
+    It 'packages a synthetic runtime and verifies compressed transfer hash and file inventory' {
+        $root=New-ARCH8b1Fixture
+        $p=New-OPAARCH8b1Payload -ProjectRoot $root
+        $p.SourceCommit | Should -BeExactly ('a'*40)
+        $p.Files.Count | Should -Be 5
+        (Get-OPAARCH8b1Sha256 -Bytes ([Convert]::FromBase64String($p.ZipBase64))) | Should -BeExactly $p.ZipSha256
+        $p.LauncherSha256 | Should -BeExactly (@($p.Files | Where-Object Path -ceq 'Core/Runtime/Start-OPAArchiveAtLogon.ps1')[0].Sha256)
+        $mem=[IO.MemoryStream]::new([Convert]::FromBase64String($p.ZipBase64))
+        $zip=[IO.Compression.ZipArchive]::new($mem,[IO.Compression.ZipArchiveMode]::Read,$false)
+        try{$zip.Entries.Count | Should -Be 5}finally{$zip.Dispose();$mem.Dispose()}
+    }
+    It 'refuses missing CI marker or an extra non-runtime file' {
+        $root=New-ARCH8b1Fixture
+        [IO.File]::WriteAllText((Join-Path $root 'Core\mail.pst'),'must not be packed')
+        {New-OPAARCH8b1Payload -ProjectRoot $root} | Should -Throw '*unexpected package path*'
+        Remove-Item -LiteralPath (Join-Path $root 'Core\mail.pst')
+        Remove-Item -LiteralPath (Join-Path $root 'BUILD-INFO.json')
+        {New-OPAARCH8b1Payload -ProjectRoot $root} | Should -Throw
+    }
+    It 'allows concurrent readers but refuses maintenance exclusive access while an archive holds the lock' {
+        $path=Join-Path $TestDrive ([guid]::NewGuid().ToString('N')+'.lock')
+        [IO.File]::WriteAllBytes($path,[byte[]]@())
+        $a=[IO.FileStream]::new($path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+        $b=$null
+        try{
+            $b=[IO.FileStream]::new($path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+            {$exclusive=[IO.FileStream]::new($path,[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None);$exclusive.Dispose()} | Should -Throw
+        }finally{if($b){$b.Dispose()};$a.Dispose()}
+        $exclusive=[IO.FileStream]::new($path,[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+        $exclusive.Dispose()
+    }
+    It 'keeps real domain mutations behind explicit scope and consent and uses supported policy cmdlets' {
+        $s=[IO.File]::ReadAllText((Join-Path $script:gRoot 'Install-OPADomain.ps1'))
+        $s | Should -Match 'SupportsShouldProcess=\$true'
+        $s | Should -Match 'if\(\$WhatIfPreference\)\{\$plan;return\}'
+        $s | Should -Match 'if\(-not \$ConfirmDomainDeployment\)'
+        $s | Should -Match 'Set-GPRegistryValue'
+        $s | Should -Match 'New-GPLink'
+        $s | Should -Not -Match 'Remove-ADGroup|Remove-GPO|Set-GPInheritance|SYSVOL|Stop-Process'
+    }
+    It 'gates the bootstrap before loading archive code and preserves user data in maintenance' {
+        $s=[IO.File]::ReadAllText((Join-Path $script:gRoot 'Core/Runtime/Start-OPAArchiveAtLogon.ps1'))
+        $s.IndexOf('$principal.IsInRole([Security.Principal.SecurityIdentifier]') | Should -BeLessThan $s.IndexOf('Invoke-OPARdsAutoDev.ps1')
+        $s | Should -Match 'FileShare\]::Read'
+        $h=[IO.File]::ReadAllText((Join-Path $script:gRoot 'Core/Runtime/Invoke-OPAARCH8b1Host.ps1'))
+        $h | Should -Match 'FileShare\]::None'
+        $h | Should -Match 'unowned extra file; preserve directory'
+        $h | Should -Not -Match 'Stop-Process|Remove-Item.*\.pst|Remove-Item.*Transactions'
+    }
+}

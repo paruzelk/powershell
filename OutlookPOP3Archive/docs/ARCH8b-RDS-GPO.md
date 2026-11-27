@@ -1,5 +1,7 @@
 # ARCH8b DEV — развёртывание через GPO и группу POP3Archive
 
+> ARCH8b1: automatic domain installer alternative: [ARCH8b1-DOMAIN-INSTALL.md](ARCH8b1-DOMAIN-INSTALL.md). Do not deploy both automatic logon and manual GPP on the same host.
+
 Это инструкция для пилота после успешного CI. ARCH8a3a: 21228 verified, 40 deferred, AllSourcesExhausted и ExitCode=0, без перезапуска Outlook. Реальная приёмка GPO, нескольких RDS-сеансов и PST 90+ ГБ относится к ARCH8c. ProductionReady=False. Не включайте массово рабочие PST до приёмки.
 
 ## 1. Подготовка AD
